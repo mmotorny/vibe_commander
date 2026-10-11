@@ -18,10 +18,17 @@ Things that are known and not done. Standing instructions are in
 
 ## Ideas put off
 
-- Running scenarios side by side. Measured on the port's test with six
-  scenarios: 13.8 s one after another, 7.7 s two at a time, 6.9 s four at a
-  time. Booting DOS for the two countries then takes 3.1 s, which is the
-  floor; since then a seventh scenario has come, and 1.7 s for making the
-  bench's setup file. `Bench._program_disk` in `harness/setups.py` is not
-  safe to call from two threads at once and has to be made so first;
-  reading the execution logs is Python and gains nothing from threads.
+- Deriving goldens side by side, as the tests now run their scenarios. The
+  original cannot say when it has finished a step, so the harness waits
+  for the screen to stand still, and a machine slowed down by its
+  neighbours may stand still before it has finished. Deriving all goldens
+  takes two and a half minutes, and only a change to the bench asks for
+  it.
+- Keeping the booted bench from one run of a tool to the next. Booting DOS
+  for the two countries and making the bench's setup file take about five
+  seconds of every run. What is kept would have to be thrown away whenever
+  the harness, a download or QEMU changes.
+- A file or a directory that a scenario makes gets the time of day, to
+  the second, and the golden lists it; deriving is slower than testing, so
+  the two differ. No scenario makes one yet. Such a time stamp could be
+  recorded only as made during the run.

@@ -32,10 +32,11 @@ minute. Exits with status 0 if a scenario notices, 1 if none does, and 2
 if the changed port does not build.
 """
 import argparse
-import shutil
 import subprocess
 import sys
+from concurrent.futures import ThreadPoolExecutor
 
+import compare
 import coverage
 import deps
 import goldens
@@ -115,19 +116,33 @@ def with_goldens():
 
 
 def noticed(program, names):
-    """Take `program` through the scenarios `names` until one differs from
-    its golden. Returns its name and how it differs, or None."""
-    with setups.Benches() as benches:
-        for name in names:
-            scenario = scenarios.SCENARIOS[name]
-            try:
-                run = scenarios.run(scenario, program,
-                                    benches[scenario.country], signals=True)
-            except MachineError as error:
-                return name, str(error).splitlines()
-            report = goldens.differences(goldens.read(name), run,
-                                         {program.filename})
+    """Take `program` through the scenarios `names` and stop at the first
+    of them that differs from its golden. Returns its name and how it
+    differs, or None.
+
+    The first is run by itself: a break that shows everywhere is then
+    found at once. The others run side by side, as compare.py has them."""
+    def one(name):
+        scenario = scenarios.SCENARIOS[name]
+        try:
+            run = scenarios.run(scenario, program,
+                                benches[scenario.country], signals=True)
+        except MachineError as error:
+            return str(error).splitlines()
+        return goldens.differences(goldens.read(name), run,
+                                   {program.filename})
+
+    with setups.Benches() as benches, \
+            ThreadPoolExecutor(compare.TOGETHER) as pool:
+        report = one(names[0])
+        if report:
+            return names[0], report
+        waiting = [pool.submit(one, name) for name in names[1:]]
+        for name, result in zip(names[1:], waiting):
+            report = result.result()
             if report:
+                for other in waiting:
+                    other.cancel()      # those that have not begun
                 return name, report
     return None
 

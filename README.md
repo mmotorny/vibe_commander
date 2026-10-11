@@ -261,7 +261,8 @@ tenth of a second: the program under test on drive `D:` with the original's
 help and configuration files, started in `C:\WORK`, on disks that no other
 scenario has touched. Keeping the program off the drive it displays stops
 its file size from appearing on screen as free space. A scenario that wants
-the program set up differently does that itself, through the menus.
+the program set up differently does that itself, through the menus. When a
+build is tested, up to four scenarios run side by side.
 
 The Russian machine also has a Russian keyboard: the keyboard driver of
 FreeDOS with its Russian layout, which the boot floppy lacks and the

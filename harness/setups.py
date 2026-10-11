@@ -17,6 +17,7 @@ Two setups share one clock and one source of files:
 import io
 import shutil
 import tempfile
+import threading
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -179,6 +180,7 @@ class Bench:
         self._work = self._workdir / "c.img"
         _work_disk(self._work, self._workdir)
         self._programs = {}             # Program -> its disk image
+        self._lock = threading.Lock()
         self._state = self._workdir / "state"
         shipped = distribution()[SETUP_FILE][0]
         with Machine(self._floppy,
@@ -227,10 +229,11 @@ class Bench:
 
     def _program_disk(self, program):
         """The image of drive D: with `program` on it."""
-        if program not in self._programs:
-            self._programs[program] = self._new_disk(
-                f"d{len(self._programs)}.img", program, self.setup)
-        return self._programs[program]
+        with self._lock:                # scenarios may run side by side
+            if program not in self._programs:
+                self._programs[program] = self._new_disk(
+                    f"d{len(self._programs)}.img", program, self.setup)
+            return self._programs[program]
 
     def _machine(self, workdir, program_disk, trace=None):
         """A machine with a copy of `program_disk` as drive D:, in which
@@ -281,14 +284,16 @@ class Benches:
     def __enter__(self):
         self._directory = tempfile.TemporaryDirectory()
         self._benches = {}
+        self._lock = threading.Lock()
         return self
 
     def __exit__(self, *exc):
         self._directory.cleanup()
 
     def __getitem__(self, country):
-        if country not in self._benches:
-            made = [bench.setup for bench in self._benches.values()]
-            self._benches[country] = Bench(
-                Path(self._directory.name) / country, country, *made[:1])
-        return self._benches[country]
+        with self._lock:                # scenarios may run side by side
+            if country not in self._benches:
+                made = [bench.setup for bench in self._benches.values()]
+                self._benches[country] = Bench(
+                    Path(self._directory.name) / country, country, *made[:1])
+            return self._benches[country]
