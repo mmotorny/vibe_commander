@@ -108,6 +108,17 @@ SCENARIOS = {
             "Ctrl+l",
         )),
 
+    "tree": Scenario(
+        "The tree of directories, which the other panel follows a moment "
+        "after the cursor has come to rest",
+        steps=(
+            "Ctrl+l",                     # the Info panel off: two panels
+            "F9 l t",                     # the tree in the left one
+            "Down",                       # the right one follows
+            "Down Down",                  # only to where the cursor stops
+            "End",
+        )),
+
     "command": Scenario(
         "DOS commands: the program gives up most of its memory while one "
         "runs, and loads itself again afterwards",
