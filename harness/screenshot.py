@@ -14,40 +14,16 @@ from there in QEMU. Written to the output directory:
 import argparse
 import json
 import tempfile
-import zipfile
 from pathlib import Path
 
 import deps
-from dos import FatImage, Machine, boot_floppy, timestamp
-
-# The PC's clock at power-on, and the date given to directories on its
-# disks: noon on the day Volkov Commander 4.05 was released.
-CLOCK = "2000-06-16T12:00:00"
-EPOCH = timestamp(2000, 6, 16, 12)
-
-
-def install_volkov_commander(disk, distribution):
-    """Unpack the distribution into \\VC, keeping the archive's file dates."""
-    disk.mkdir("VC")
-    with zipfile.ZipFile(distribution) as archive:
-        for member in archive.infolist():
-            disk.write(f"VC/{member.filename}", archive.read(member),
-                       timestamp(*member.date_time))
+import setups
 
 
 def capture(out, scale):
     out.mkdir(parents=True, exist_ok=True)
-    distribution = deps.fetch(deps.VC_SHAREWARE)
-    freedos = deps.fetch(deps.FREEDOS)
     with tempfile.TemporaryDirectory() as workdir:
-        workdir = Path(workdir)
-        floppy = boot_floppy(workdir / "a.img", workdir, freedos, EPOCH,
-                             ["C:", r"CD \VC", "VC"])
-        # The serial number is the day work on the program began, 16.05.1991.
-        disk = FatImage.hard_disk(workdir / "c.img", workdir, EPOCH,
-                                  label="VOLKOV", serial="19910516")
-        install_volkov_commander(disk, distribution)
-        with Machine(floppy.path, [disk.path], workdir, CLOCK) as machine:
+        with setups.fresh_install(Path(workdir)) as machine:
             machine.wait_for_boot()
             screen = machine.wait_for_screen()
             picture = machine.screenshot()

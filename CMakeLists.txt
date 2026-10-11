@@ -50,3 +50,17 @@ add_dos_program(VC
     VCHELP.INC VCMEM.INC VCFIND.INC VCSUB1.INC VCSUB2.INC VCSUB3.INC)
 add_dos_program(VCSETUP
     VCSTHLP.INC VCSTSUB.INC)
+
+# --- Tests --------------------------------------------------------------------
+# The tests run Volkov Commander under FreeDOS in QEMU; see harness/. They
+# need qemu-system-i386 and mtools, and download the original program and
+# FreeDOS on first use.
+
+enable_testing()
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
+
+add_test(NAME harness-self-test
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/selftest.py)
+add_test(NAME start-screen
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
+            ${CMAKE_BINARY_DIR}/VC.COM)

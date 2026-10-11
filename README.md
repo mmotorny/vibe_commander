@@ -40,17 +40,18 @@ The planned stages:
 3. Port the program to modern operating systems, held to the same
    comparison, with every intended deviation listed explicitly.
 
-Where it stands: the source builds with a free assembler, and the harness
-can run the original program and capture its screen. Comparing the two is
-the next step.
+Where it stands: the source builds with a free assembler, and the resulting
+`VC.COM` shows the same start screen as the original. That is one screen;
+the harness cannot yet press keys, so everything behind the start screen is
+still unchecked.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `CMakeLists.txt` | Builds the assembler and the two programs |
-| `harness/` | Runs Volkov Commander under FreeDOS in QEMU and captures its screen |
+| `CMakeLists.txt` | Builds the assembler and the two programs, and registers the tests |
+| `harness/` | Runs Volkov Commander under FreeDOS in QEMU, captures its screen, and compares a build with the original |
 | `docs/` | Pictures for this README |
 
 ## Building
@@ -84,6 +85,25 @@ accepts it are small, about thirty lines, and can be listed with
   `VcVers` is a text equate.
 - `VCSETUP.ASM` declares its segments up front so that uninitialised data
   comes last and takes no space in the file.
+
+## Testing
+
+Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
+
+```sh
+ctest --test-dir build --output-on-failure
+```
+
+| Test | What it checks |
+|---|---|
+| `start-screen` | `build/VC.COM` and the original `VC.COM` are started on identical machines; their screens, cursors and video modes must be the same |
+| `harness-self-test` | The comparison itself: two runs of the original must match, and a copy with one letter changed must be reported as differing in exactly that cell |
+
+On these machines the program under test sits on its own drive, `D:`, with
+the original's help and configuration files, and is started in `C:\WORK`,
+a directory with a small fixed set of files. Keeping it off the drive it
+displays stops its file size from appearing on screen as free space.
+`python3 harness/compare.py FILE` runs the comparison for any `VC.COM`.
 
 ## Running the original
 
