@@ -91,7 +91,9 @@ their callers and what they call. For each batch, in this order:
    keep.
 2. Write scenarios that reach the routines. `harness/reach.py` lists the
    instructions of theirs that no scenario has run yet, and tries steps
-   against that list; `harness/show.py` shows what keys do. Derive the
+   against that list; `harness/show.py` shows what keys do, with
+   `--changes` only the rows that a step changed; what is known about
+   driving the dialogs is at the top of `harness/scenarios.py`. Derive the
    goldens with `harness/goldens.py`.
 3. List the routines in `harness/ported.py` and run the `port` test. It
    names every instruction of theirs that no scenario executed in the
@@ -100,7 +102,9 @@ their callers and what they call. For each batch, in this order:
 4. Translate. The C goes into `port/`, the routines leave `port/asm/`, and
    those that assembly still calls leave a stub behind.
 5. The `port` test must pass. Nothing else decides whether a translation is
-   right.
+   right. What it reports, the size, the stack and what ran, is in
+   `build/Testing/Temporary/LastTest.log` afterwards: read it there rather
+   than run the test again.
 
 The test can only see what a scenario shows. Where a branch of a routine
 has run in the original but its effect cannot be pointed to in a golden,

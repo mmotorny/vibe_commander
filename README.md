@@ -238,7 +238,9 @@ goldens wherever the banner shows.
 
 `python3 harness/show.py STEP...` prints the screens that the original
 shows after each of some steps, or with `--program` those of a build. It
-is how to find out what keys do before writing them into a scenario.
+is how to find out what keys do before writing them into a scenario. With
+`--changes` it prints of each screen only the rows that differ from the
+one before, which is most of what there is to see.
 
 `python3 harness/reach.py ROUTINE...` lists the instructions of routines of
 the original that no scenario has run, and with `--steps` says which of

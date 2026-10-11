@@ -13,11 +13,56 @@ Steps are written as in scenarios.py; one that presses several keys needs
 quotes around it. The program is the original unless another is named.
 The original takes most of a second for every step; the port's build that
 signals, build/port/signalling/VC.EXE with --signals, takes none.
+
+A screen is 25 rows, and most of what a key does is in a few of them:
+
+    show.py --changes F9 o Enter        of each screen only the rows that
+                                        differ from the screen before, with
+                                        ~ where only the colours differ
+    show.py --last F9 o Enter           only the screen after the last step
 """
 import argparse
 
 import scenarios
 import setups
+
+
+def add_arguments(parser):
+    """Give `parser` the options that say how much of the screens to
+    print."""
+    parser.add_argument("--changes", action="store_true",
+                        help="print of each screen only the rows that "
+                             "differ from the screen before, numbered,\n"
+                             "with ~ where only the colours differ")
+    parser.add_argument("--last", action="store_true",
+                        help="print only the screen after the last step")
+
+
+def print_screens(steps, screens, codepage, changes=False, last=False):
+    """Print the screens that follow the start and each of `steps`, as
+    text in `codepage`: all of each, or what add_arguments() offers."""
+    before = None
+    names = ("the start",) + tuple(steps)
+    for number, (step, screen) in enumerate(zip(names, screens)):
+        rows = [line.rstrip() for line in screen.lines(codepage)]
+        width = len(screen.cells) // len(rows)
+        cells = [screen.cells[row * width:(row + 1) * width]
+                 for row in range(len(rows))]
+        if not last or number == len(names) - 1:
+            print(f"== {number}: {step}    cursor at column "
+                  f"{screen.cursor[0]}, row {screen.cursor[1]}")
+            if changes and before is not None:
+                # A row whose colours alone have changed is marked ~.
+                changed = [row for row in range(len(rows))
+                           if cells[row] != before[1][row]]
+                for row in changed:
+                    mark = "~" if rows[row] == before[0][row] else " "
+                    print(f"{row:2}{mark}{rows[row]}")
+                if not changed:
+                    print("   no row has changed")
+            else:
+                print("\n".join(rows))
+        before = rows, cells
 
 
 def main():
@@ -31,6 +76,7 @@ def main():
                                           "(default: the original)")
     parser.add_argument("--signals", action="store_true",
                         help="the program is a build that signals")
+    add_arguments(parser)
     args = parser.parse_args()
 
     program = setups.Program.load(args.program) if args.program \
@@ -39,12 +85,8 @@ def main():
     with setups.Benches() as benches:
         run = scenarios.run(scenario, program, benches[args.country],
                             args.signals)
-    steps = ("the start",) + scenario.steps
-    for number, (step, screen) in enumerate(zip(steps, run.screens)):
-        print(f"== {number}: {step}    cursor at column {screen.cursor[0]}, "
-              f"row {screen.cursor[1]}")
-        for line in screen.lines(setups.codepage(args.country)):
-            print(line.rstrip())
+    print_screens(scenario.steps, run.screens, setups.codepage(args.country),
+                  args.changes, args.last)
 
 
 if __name__ == "__main__":

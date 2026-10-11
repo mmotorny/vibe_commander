@@ -15,6 +15,19 @@ the program takes text, and in a step that types some: at the panels Alt
 by itself brings up the menu or not, as the timing has it, and a step of
 nothing but Shift and Alt leaves the program nothing to signal.
 
+What has been found out about driving the program, to save finding it
+out again (show.py --changes is how):
+
+  - In a dialog Tab goes to the next field, one at a time: four boxes to
+    tick are four Tabs. Up and Down move within a group, Space ticks a box
+    or chooses one of a group, Enter is the first button and Esc cancels.
+  - Typing into a field that holds something replaces it.
+  - A box that only reports, "Could not find the string", stays until a
+    key is pressed: close it with Esc before the next step.
+  - Shift+F3 and Shift+F4 ask for the name of a file to view or to edit;
+    Ctrl+a is the dialog of attributes, date and time; GrayPlus and
+    GrayMinus select and unselect by a mask; F4 in the viewer is hex.
+
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
 is off, started in C:\\WORK. A scenario that wants something else arranges

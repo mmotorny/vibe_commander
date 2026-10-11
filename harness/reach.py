@@ -14,6 +14,8 @@ new scenario. That takes most of a second for every step.
 
     reach.py NgLine --steps F1 "Down Enter" PgDn
     reach.py NgLine --steps F1 --screens        and print the screens
+    reach.py NgLine --steps F1 --changes        or of each only the rows
+                                                that changed (see show.py)
 
 The routines are found in the listing of the build that is laid out like
 the original, build/shareware-layout/VC.LST, which has to be built first.
@@ -26,6 +28,7 @@ import deps
 import goldens
 import scenarios
 import setups
+import show
 
 LISTING = deps.ROOT / "build" / "shareware-layout" / "VC.LST"
 COM_ORIGIN = 0x100                # where a .COM file is loaded
@@ -43,6 +46,7 @@ def main():
                         help="the country DOS is configured for")
     parser.add_argument("--screens", action="store_true",
                         help="print the screen after every step")
+    show.add_arguments(parser)
     args = parser.parse_args()
 
     listing = coverage.Listing(LISTING)
@@ -65,12 +69,10 @@ def main():
                                 benches[args.country], signals=False,
                                 trace=True)
         tried = set(run.executed)
-        if args.screens:
-            steps = ("the start",) + scenario.steps
-            for number, (step, screen) in enumerate(zip(steps, run.screens)):
-                print(f"== {number}: {step}")
-                for line in screen.lines(setups.codepage(args.country)):
-                    print(line.rstrip())
+        if args.screens or args.changes or args.last:
+            show.print_screens(scenario.steps, run.screens,
+                               setups.codepage(args.country),
+                               args.changes, args.last)
 
     lines = [line for name in args.routine
              for line in listing.procedure(name)]
