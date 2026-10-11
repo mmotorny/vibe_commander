@@ -9,17 +9,6 @@ Things that are known and not done. Standing instructions are in
   batch should include a routine that does, to prove that direction: a far
   entry in the assembly segment that calls the near routine and returns
   far, called from C like any far function.
-- A path of the start-up code that changed for the EXE is reached by no
-  scenario: the one taken when DOS cannot give the program's memory block
-  the size it asks for, and a separate block is allocated for the part
-  that is unloaded while a command runs. It takes a machine whose largest
-  free block holds the program file but not the 10 KB more that the
-  program spreads out to, and which has a second free block besides.
-  Nothing on the test bench arranges that from the keyboard; a helper
-  program written for it could.
-- A retry that succeeds after the program file was not found for
-  reloading. The scenario `lost` reaches the retry, and it fails again: no
-  key brings the file back while the program waits.
 
 ## Ideas put off
 
