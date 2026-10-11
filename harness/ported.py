@@ -15,7 +15,8 @@ below, this also checks that
 
 A comparison that finds nothing is only worth something if it would have
 found a difference. So one cell of a screen that the port has shown is
-changed, and the comparison must then report it.
+changed, and then one entry is taken off a disk it has left, and the
+comparison must report each.
 
 The build of the port that is tested is the one that signals where it is.
 What ran in the original was recorded with the goldens; what runs in the
@@ -123,24 +124,34 @@ def check_port(link_map, executed):
 
 
 def check_comparison(name, run, program):
-    """Report on whether the comparison notices a difference; return
+    """Report on whether the comparison notices differences; return
     success.
 
     `run` is that of `program` in scenario `name`. The character in the
-    top left corner of its first screen is changed.
+    top left corner of its first screen is changed, and then the first
+    entry of its drive C: is left out.
     """
     screen = run.screens[0]
     cells = bytearray(screen.cells)
     cells[0] ^= 1
-    changed = replace(run, screens=[replace(screen, cells=bytes(cells))]
-                      + run.screens[1:])
-    if goldens.differences(goldens.read(name), changed, {program.filename}):
-        print(f"The comparison: a changed cell on the first screen of "
-              f"{name} is reported")
-        return True
-    print(f"  not reported by the comparison: a changed cell on the first "
-          f"screen of {name}")
-    return False
+    entries = dict(run.disks["C"])
+    del entries[min(entries)]
+    changes = {
+        "a changed cell on the first screen": replace(
+            run, screens=[replace(screen, cells=bytes(cells))]
+            + run.screens[1:]),
+        "an entry missing from drive C:": replace(
+            run, disks={**run.disks, "C": entries}),
+    }
+    golden = goldens.read(name)
+    passed = True
+    for what, changed in changes.items():
+        if goldens.differences(golden, changed, {program.filename}):
+            print(f"The comparison: {what} of {name} is reported")
+        else:
+            passed = False
+            print(f"  not reported by the comparison: {what} of {name}")
+    return passed
 
 
 def main():

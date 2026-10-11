@@ -16,8 +16,6 @@ Things that are known and not done. Standing instructions are in
 - The clock where it has 24 hours: the scenario `clock` runs in the United
   States only. The `port` test will ask for the other when the code that
   draws the clock is translated.
-- That the comparison of the disks would report a difference. The `port`
-  test checks that for a screen only.
 
 ## Suspected bugs in the original
 
