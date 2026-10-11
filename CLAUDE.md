@@ -3,14 +3,28 @@
 Standing instructions for working in this repository. Record new ones here,
 not in Claude's memory: memory does not travel between computers.
 
-## What may be committed
+## Third-party software
 
 - Never commit anything proprietary. That includes the shareware Volkov
-  Commander distribution and any commercial tool. If the work needs such a
-  file, download it at run time from its official source, pinned by SHA-256
-  (see `harness/deps.py`).
-- Describe what is in the repository. Do not name or document tools that
-  are neither stored here nor fetched by its scripts.
+  Commander distribution and any commercial tool.
+- Only fetch and run software that has a clean licence: open-source
+  software, or software obtained from its rights holder on terms that allow
+  this use. The Volkov Commander shareware distribution qualifies, because
+  it comes from its author's site under his shareware terms. Copies of
+  commercial software from mirrors or abandonware sites do not, however
+  useful; Borland's TASM and TLINK, which the original build uses, are the
+  standing example.
+- The same goes for their output. Do not use reference binaries, hashes or
+  other results obtained by running such a tool on the side, and do not
+  shape code to match them.
+- Naming such tools is fine. Documentation should say plainly what the
+  original was built with and where a reference came from; the restriction
+  is on fetching and running them, not on mentioning them.
+- Anything the work downloads is fetched at run time from its official
+  source and pinned by SHA-256 (see `harness/deps.py`).
+
+## Naming
+
 - The project is called Vibe Commander. The name of the checkout directory
   or of the remote may be temporary; never write either into source,
   documentation or commit messages.
