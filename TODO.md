@@ -9,22 +9,34 @@ Things that are known and not done. Standing instructions are in
   batch should include a routine that does, to prove that direction: a far
   entry in the assembly segment that calls the near routine and returns
   far, called from C like any far function.
-- Two paths of the start-up and reload code that changed for the EXE are
-  reached by no scenario: the one taken when DOS cannot resize the
-  program's memory block in place and a separate block is allocated, and
-  the retry after the program file was not found for reloading.
+- A path of the start-up code that changed for the EXE is reached by no
+  scenario: the one taken when DOS cannot give the program's memory block
+  the size it asks for, and a separate block is allocated for the part
+  that is unloaded while a command runs. It takes a machine whose largest
+  free block holds the program file but not the 10 KB more that the
+  program spreads out to, and which has a second free block besides.
+  Nothing on the test bench arranges that from the keyboard; a helper
+  program written for it could.
+- A retry that succeeds after the program file was not found for
+  reloading. The scenario `lost` reaches the retry, and it fails again: no
+  key brings the file back while the program waits.
 
-## Suspected bugs in the original
+## Bugs in the original
 
-Found by reading, not reproduced. Ported as they are until decided
-otherwise.
+Ported as they are until decided otherwise.
 
 - When the program file cannot be found for reloading after a command, the
   program asks to press ENTER to try again. `NotFind` returns with DS on
   the environment segment, and the retry at `Exec12` then stores the size
   it expects through DS, at the offset that `ComnIni.LoadSiz` has in the
-  resident part: a word written into or past the DOS environment block.
-  (`VC.ASM`, `Exec12` and `Exec13`.)
+  resident part. The word lands behind the environment block, in the
+  resident part's own data, as far before `LoadSiz` as the environment
+  and its header are long. Seen in memory, in the original and in the
+  port, in the scenario `lost`: there it is 160 bytes, and the word
+  replaces characters 41 and 42 of the remembered target of the last copy
+  (`ToFile`). The port writes another value, its size in paragraphs.
+  Nothing shows it on a screen: the retry would have to succeed, and the
+  name be that long. (`VC.ASM`, `Exec12` and `Exec13`.)
 
 ## Ideas put off
 

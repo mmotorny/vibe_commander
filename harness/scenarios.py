@@ -143,6 +143,17 @@ SCENARIOS = {
             "Ctrl+PgUp",                  # and the program still works
         )),
 
+    "lost": Scenario(
+        "The program file gone when the program wants to load itself "
+        "again after a command",
+        steps=(
+            '"del" Space "d:\\vc\\vc.*"',  # the program, with what it reads
+            "Enter",                      # it asks to try again
+            "Space",                      # which is not what it asked for
+            "Enter",                      # it fails again
+            "Esc",                        # and gives up: the DOS prompt
+        )),
+
     "quit": Scenario(
         "Leaving the program, declined once",
         steps=(

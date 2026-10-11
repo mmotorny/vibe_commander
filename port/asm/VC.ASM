@@ -38,14 +38,22 @@ CallC	MACRO	Name
 ;
 ; Without this the tests could only guess when the program has finished
 ; what a key started. The build that is shipped does none of it.
+;
+; The resident part must be as long in one build as in the other: the
+; memory it leaves free is shown on the screen. So what Signal assembles
+; is counted, and the local stack at the end of the resident part is that
+; much shorter (see LastRes). Only Signal may be used in the resident part.
 SigPort	EQU	0E9h
+SigLen	=	0			; Bytes that Signal has assembled so far
 
 Signal	MACRO	Letter
+	LOCAL	From
 IFDEF	HARNESS
-	PUSH	AX
+From:	PUSH	AX
 	MOV	AL,Letter
 	OUT	SigPort,AL
 	POP	AX
+SigLen	=	SigLen + ($ - From)
 ENDIF
 	ENDM
 
@@ -700,8 +708,10 @@ NotFind	PROC	NEAR
 	PUSH	CS
 	CALL	OutStr0
 	POP	DS
-NotFn1:	MOV	AH,0
+NotFn1:	Signal	'W'
+	MOV	AH,0
 	INT	16h
+	Signal	'K'
 	CMP	AL,0Dh
 	JE	NotFn2
 	CMP	AL,1Bh
@@ -1136,6 +1146,7 @@ Relea5:	CALL	SetStat
 Release	ENDP
 
 LastRes:
+SigRes	=	SigLen			; Bytes of signals in the resident part
 
 ;--------------------- Release data --------------------
 IntTab	DD	256	DUP(?)
@@ -1151,7 +1162,7 @@ NameBuf	DB	12	DUP(?)
 WCB1sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB1
 WCB2sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB2
 ComnIni	DB	CmnSave			DUP(?)	; Common data
-DataSav	DB	LenStk			DUP(?)	; Local stack
+DataSav	DB	LenStk - SigRes		DUP(?)	; Local stack
 VcStack:
 LastDat:
 

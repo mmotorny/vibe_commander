@@ -32,4 +32,7 @@ DEVIATIONS = [
     # banner stays on the screen behind the panels.
     (re.compile(r"^The Volkov Commander, Version 4\.05 ([a-z]{1,9})"),
      "freeware "),
+    # The program names its own file when it cannot load it again after a
+    # command. The original is VC.COM; the port is VC.EXE.
+    (re.compile(r"^Bad or missing D:\\VC\\VC\.(COM)"), "EXE"),
 ]

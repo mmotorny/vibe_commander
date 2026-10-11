@@ -163,7 +163,10 @@ The tests do not run the program that is shipped but a variant of it,
 assembled with `HARNESS` defined. It writes a letter to a port of the PC
 whenever it takes a key, waits for one, or ends, and so tells the tests
 exactly when it has finished what a key started. The two differ by a few
-dozen instructions, all in macros at the top of `port/asm/VC.ASM`.
+dozen instructions, all in macros at the top of `port/asm/VC.ASM`. A few
+of them are in the part of the program that stays in memory while a command
+runs, whose size shows on the screen as free memory; the variant makes up
+for them with a stack that is as many bytes shorter, 18 of 256.
 
 ## Testing
 
@@ -192,9 +195,11 @@ python3 harness/goldens.py derive [SCENARIO...]
 
 Where a build is meant to differ from the original, `harness/deviations.py`
 says how, and the golden is derived with that difference in it, so that it
-holds exactly what a build should show. There is one such place: the banner
-names the edition, and the published source is of another edition than the
-binaries shipped in 2000.
+holds exactly what a build should show. There are two such places. The
+banner names the edition, and the published source is of another edition
+than the binaries shipped in 2000. And the program names its own file when
+it cannot load it again after a command: the original is `VC.COM`, the port
+`VC.EXE`.
 
 `python3 harness/compare.py [--signals] FILE [SCENARIO...]` takes any
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from
