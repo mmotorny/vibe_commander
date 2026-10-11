@@ -168,7 +168,11 @@ in `harness/ported.py`.
 The tests do not run the program that is shipped but a variant of it,
 assembled with `HARNESS` defined. It writes a letter to a port of the PC
 whenever it takes a key, waits for one, or ends, and so tells the tests
-exactly when it has finished what a key started. The two differ by a few
+exactly when it has finished what a key started. It also marks its stack
+when it has set it up, so that the tests can read from the machine how much
+of the 256 bytes the program never touches: compiled code uses more stack
+than the assembly it replaces, and a stack used beyond its bottom would
+overwrite data without a trace on the screen. The two differ by a few
 dozen instructions, all in macros at the top of `port/asm/VC.ASM`. A few
 of them are in the part of the program that stays in memory while a command
 runs, whose size shows on the screen as free memory; the variant makes up
@@ -185,7 +189,7 @@ ctest --test-dir build --output-on-failure
 | Test | What it checks |
 |---|---|
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
-| `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
+| `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original, and leaves at least 24 bytes of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens
 

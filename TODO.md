@@ -14,10 +14,6 @@ Things that are known and not done. Standing instructions are in
   comparison.
 - The harness can type Russian on the Russian bench, and nothing beyond
   ASCII on the other: Alt with the numeric keypad types nothing there.
-- The program runs on a stack of 256 bytes, 238 in the build that the
-  tests run. The scenarios leave 36 of them untouched, measured by hand by
-  filling the stack with a pattern first. Compiled code takes more stack
-  than the assembly it replaces, and nothing checks how much is left.
 - `tools/flagscan.py` follows flags until an instruction sets them all,
   and so reports a jump that reads a flag which an instruction in between
   has set: `DEC AX` and then `JE`, `STC` and then `JNC`. It should follow

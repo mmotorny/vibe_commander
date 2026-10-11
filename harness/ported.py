@@ -10,8 +10,17 @@ below, this also checks that
   - every instruction of the assembly they replace ran in the original, in
     some scenario, unless it is listed here with the reason why none gets
     there,
-  - every C function that replaces them ran in the port, and
-  - the port is no more than three times the size of the original.
+  - every C function that replaces them ran in the port,
+  - the port is no more than three times the size of the original, and
+  - the port leaves some of its stack untouched in every scenario.
+
+The stack is 256 bytes, a few less in the build that is tested, and
+compiled code uses more of it than the assembly it replaces. The build
+that is tested marks its stack when it has set it up, and how much of the
+mark is left is read from the machine every time the program waits for a
+key (see scenarios.py). A stack used beyond its bottom overwrites what the
+program saves of its panels and its setup while a command runs, and no
+screen would show that.
 
 A comparison that finds nothing is only worth something if it would have
 found a difference. So one cell of a screen that the port has shown is
@@ -42,6 +51,13 @@ EXE_HEADER = 0x20                 # of the port's VC.EXE, see tools/mkexe.c
 # How large the port may grow, as a multiple of the original's size. The
 # aim is to stay well below; this is where growth must have gone wrong.
 SIZE_LIMIT = 3
+
+# How many bytes of its stack the port must leave untouched in every
+# scenario. When this was set the scenarios left 36 at the least, and had
+# done since before the first routine was translated. What the limit
+# keeps is room for what no scenario has: an interrupt that arrives when
+# the calls are at their deepest.
+STACK_LEFT = 24
 
 
 @dataclass(frozen=True)
@@ -166,6 +182,20 @@ def check_port(link_map, executed):
     return passed
 
 
+def check_stack(names, runs):
+    """Report on how much of its stack the port left untouched; return
+    success."""
+    left = {name: run.stack_left for name, run in zip(names, runs)}
+    least = min(left, key=left.get)
+    print(f"The stack: {left[least]} bytes of it are left untouched at the "
+          f"least, in {least}; the limit is {STACK_LEFT}")
+    for name in names:
+        if left[name] < STACK_LEFT:
+            print(f"  too little of the stack left: {left[name]} bytes in "
+                  f"{name}")
+    return left[least] >= STACK_LEFT
+
+
 def check_comparison(name, run, program):
     """Report on whether the comparison notices differences; return
     success.
@@ -224,6 +254,7 @@ def main():
         in_port.update(run.executed)
     passed = check_original(coverage.Listing(args.listing), in_original)
     passed = check_port(args.link_map, in_port) and passed
+    passed = check_stack(names, runs) and passed
     passed = check_comparison(names[0], runs[0], port) and passed
     sys.exit(failed or not passed or size > limit)
 

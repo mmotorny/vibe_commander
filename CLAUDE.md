@@ -147,6 +147,8 @@ with it is less obvious:
   called, not expanded in place, and a multiplication has DX saved around
   it. In a routine at the bottom of deep calls, write the sharing out and
   shift instead of multiplying, and read what the compiler made of it.
+  The `port` test says how much of the stack the scenarios leave
+  untouched, and fails below a limit.
 - There is no C library. String literals and static variables are refused
   by `tools/mkexe.c`. The first 32-bit multiplication or division will
   need the compiler's helper routines written, in assembly, in the C code

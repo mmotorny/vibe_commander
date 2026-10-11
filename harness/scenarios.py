@@ -27,6 +27,7 @@ time of day, so that does not matter. A scenario that does show it, by
 switching the clock on or by listing a file it has made, has to be done
 with that before the machine's first minute is over.
 """
+import re
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -63,6 +64,10 @@ class Run:
     # Offset and length in the program file of every instruction that ran,
     # if the run was traced.
     executed: dict = field(default_factory=dict)
+    # The fewest bytes of its stack that the program had never touched,
+    # of all the times it waited for a key; None for a program that does
+    # not mark its stack.
+    stack_left: int = None
 
 
 # From C:\WORK into C:\STAMPS, whose files have sizes and time stamps of
@@ -283,11 +288,16 @@ def run(scenario, program, bench, signals, trace=False):
         log = workdir / "trace.log" if trace else None
         with bench.start(workdir, program, log) as machine:
             wait = _signalled if signals else _settled
-            screens = [wait(machine, "the start")]
-            for number, step in enumerate(scenario.steps, 1):
-                machine.resume()
-                machine.press(step)
-                screens.append(wait(machine, f"step {number}, {step}"))
+            screens, left = [], []
+            for number, step in enumerate(("",) + scenario.steps):
+                if number:
+                    machine.resume()
+                    machine.press(step)
+                where = f"step {number}, {step}" if number else "the start"
+                screen, waiting = wait(machine, where)
+                screens.append(screen)
+                if waiting:
+                    left.append(_stack_left(machine))
             disks = machine.disks
         # The machine has been shut down: the disk images are complete.
         codepage = setups.codepage(scenario.country)
@@ -295,19 +305,40 @@ def run(scenario, program, bench, signals, trace=False):
                                for drive, path in disks.items()})
         if trace:
             result.executed = coverage.executed(log, program.contents)
+        if left:
+            result.stack_left = min(left)
     return result
 
 
+# What the build that signals fills its stack with when it has set it up:
+# StkMark in port/asm/VC.ASM, low byte first. The stack grows down from its
+# top, so what it has never reached is still marked, from the bottom up.
+STACK_MARK = b"\x5A\xA5"
+CONVENTIONAL_MEMORY = 0xA0000     # where DOS programs live, below this
+
+
+def _stack_left(machine):
+    """How many bytes of its stack the program has never touched: the
+    longest run of the mark in the machine's memory. That is 0 once the
+    stack has been used to its bottom, or beyond."""
+    memory = machine._memory(0, CONVENTIONAL_MEMORY)
+    runs = re.finditer(b"(?:%s){2,}" % re.escape(STACK_MARK), memory)
+    return max((len(run.group()) for run in runs), default=0)
+
+
 def _settled(machine, where):
+    """Wait for the screen to stand still and return it, and that it is
+    not known whether the program waits for a key."""
     try:
-        return machine.wait_for_screen(SETTLE, STEP_TIME)
+        return machine.wait_for_screen(SETTLE, STEP_TIME), False
     except MachineError as error:
         raise MachineError(f"after {where}: {error}") from None
 
 
 def _signalled(machine, where):
     """Wait for the program to signal that it waits for a key, or that it
-    has ended, and return the screen. Leaves the machine paused."""
+    has ended, and return the screen and which of the two: whether it
+    waits. Leaves the machine paused if it does."""
     heard = ""
 
     def idle():
@@ -331,6 +362,6 @@ def _signalled(machine, where):
             f"{shown}") from None
     if heard.endswith("X"):
         # The program has ended; what DOS then shows comes without signals.
-        return machine.wait_for_screen(DOS_SETTLE, STEP_TIME)
+        return machine.wait_for_screen(DOS_SETTLE, STEP_TIME), False
     machine.pause()
-    return machine.screen()
+    return machine.screen(), True

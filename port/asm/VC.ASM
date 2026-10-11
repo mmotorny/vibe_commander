@@ -154,6 +154,29 @@ Told:	POP	AX
 ENDIF
 	ENDM
 
+; The stack has just been set up: mark it from its bottom to where it is
+; in use, so that the tests can see how much of it is never touched (see
+; harness/scenarios.py). Expects SS to be the segment of the resident
+; part. Not for the resident part: this is not counted.
+StkMark	EQU	0A55Ah
+
+SigStack MACRO
+	LOCAL	Next, Done
+IFDEF	HARNESS
+	PUSHF
+	PUSH	DI
+	MOV	DI,SP
+Next:	DEC	DI
+	DEC	DI
+	CMP	DI,OFFSET DataSav
+	JB	Done
+	MOV	WORD PTR SS:[DI],StkMark
+	JMP	Next
+Done:	POP	DI
+	POPF
+ENDIF
+	ENDM
+
 	.CODE
 	PUBLIC	_md
 _md	LABEL	BYTE			; The main data segment, to C code:
@@ -1576,6 +1599,7 @@ Alloc9:	MOV	SI,OFFSET Aloc_S	; Error
 
 ;------------------ Read configuration -----------------
 Init00:	CALL	Reloc
+	SigStack
 	MOV	ES,DS:[2Ch]
 	MOV	DI,OFFSET WCB1sav + WCBsave
 	MOV	DX,DI
