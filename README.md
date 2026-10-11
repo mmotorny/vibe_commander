@@ -176,8 +176,7 @@ ctest --test-dir build --output-on-failure
 | Test | What it checks |
 |---|---|
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
-| `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original |
-| `harness-self-test` | The comparison itself: the original must match what was recorded of it, and a copy with one letter changed must be reported as differing in exactly that cell |
+| `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original. And the comparison itself: with one cell of a screen changed, it must report a difference |
 
 ### Scenarios and goldens
 

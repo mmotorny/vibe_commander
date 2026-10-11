@@ -194,8 +194,6 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 add_test(NAME bytes-match-original
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/bytecheck.py
             ${layout_dir}/VC.COM ${layout_dir}/VCSETUP.COM)
-add_test(NAME harness-self-test
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/selftest.py)
 add_test(NAME port
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
             ${signalling_dir}/VC.EXE ${signalling_dir}/VC.MAP

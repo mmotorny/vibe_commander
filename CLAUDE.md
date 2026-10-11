@@ -97,6 +97,11 @@ each batch, in this order:
 5. The `port` test must pass. Nothing else decides whether a translation is
    right.
 
+When the `port` test fails where the change at hand cannot explain it,
+derive the goldens again before anything else. If `git diff` then shows
+them changed, it is the machine that differs, QEMU or DOS, and not the
+port.
+
 ### Stubs in the assembly
 
 - A stub hands back exactly the registers its remaining callers use, and

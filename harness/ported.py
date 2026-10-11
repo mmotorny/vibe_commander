@@ -13,6 +13,10 @@ below, this also checks that
   - every C function that replaces them ran in the port, and
   - the port is no more than three times the size of the original.
 
+A comparison that finds nothing is only worth something if it would have
+found a difference. So one cell of a screen that the port has shown is
+changed, and the comparison must then report it.
+
 The build of the port that is tested is the one that signals where it is.
 What ran in the original was recorded with the goldens; what runs in the
 port is read from QEMU's log of the code it executed (see coverage.py).
@@ -23,7 +27,7 @@ Exits with status 0 if all of this holds and 1 otherwise.
 """
 import argparse
 import sys
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 import compare
 import coverage
@@ -118,6 +122,27 @@ def check_port(link_map, executed):
     return passed
 
 
+def check_comparison(name, run, program):
+    """Report on whether the comparison notices a difference; return
+    success.
+
+    `run` is that of `program` in scenario `name`. The character in the
+    top left corner of its first screen is changed.
+    """
+    screen = run.screens[0]
+    cells = bytearray(screen.cells)
+    cells[0] ^= 1
+    changed = replace(run, screens=[replace(screen, cells=bytes(cells))]
+                      + run.screens[1:])
+    if goldens.differences(goldens.read(name), changed, {program.filename}):
+        print(f"The comparison: a changed cell on the first screen of "
+              f"{name} is reported")
+        return True
+    print(f"  not reported by the comparison: a changed cell on the first "
+          f"screen of {name}")
+    return False
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
@@ -145,6 +170,7 @@ def main():
         in_port.update(run.executed)
     passed = check_original(coverage.Listing(args.listing), in_original)
     passed = check_port(args.link_map, in_port) and passed
+    passed = check_comparison(names[0], runs[0], port) and passed
     sys.exit(failed or not passed or size > limit)
 
 
