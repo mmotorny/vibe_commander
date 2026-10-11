@@ -163,6 +163,22 @@ SCENARIOS = {
             "Esc",
         )),
 
+    "palettes": Scenario(
+        "The other two palettes, black and white and laptop, in which a "
+        "box throws another shadow",
+        steps=(
+            "F9 o Enter",
+            "Up Space",                   # black and white
+            "Enter",
+            "F10",                        # a box and its shadow
+            "Esc",
+            "F9 o Enter",
+            "Down Down Space",            # laptop
+            "Enter",
+            "F10",
+            "Esc",
+        )),
+
     "tree": Scenario(
         "The tree of directories, which the other panel follows a moment "
         "after the cursor has come to rest",

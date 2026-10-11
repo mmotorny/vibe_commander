@@ -142,6 +142,11 @@ with it is less obvious:
   `u16` for anything that is divided or counted.
 - The option `-nd` makes the compiler load a segment for every access to
   the main data. Do not use it.
+- The program's stack is 256 bytes, and compiled code uses more of it
+  than the assembly did. A static function that two routines share is
+  called, not expanded in place, and a multiplication has DX saved around
+  it. In a routine at the bottom of deep calls, write the sharing out and
+  shift instead of multiplying, and read what the compiler made of it.
 - There is no C library. String literals and static variables are refused
   by `tools/mkexe.c`. The first 32-bit multiplication or division will
   need the compiler's helper routines written, in assembly, in the C code

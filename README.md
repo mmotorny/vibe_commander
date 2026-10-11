@@ -59,8 +59,10 @@ Where it stands: the first stage is done. Outside the reserved room, both
 programs come out identical to the originals. The second stage has begun:
 the program builds as `VC.EXE` from assembly and C together, and the first
 routines run as C: those that write numbers, sizes, dates and times, those
-that write lines of text with their markup, and those that copy, trim and
-shorten texts, paths and file names.
+that write lines of text with their markup, those that copy, trim and
+shorten texts, paths and file names, and those that look up colours and
+put characters and colours into the copy of the screen that the program
+draws in.
 
 ## Layout
 

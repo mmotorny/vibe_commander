@@ -410,17 +410,7 @@ Int10m	ENDP
 ;			BH,BL - coordinats
 ;	Return :	   DI - address
 BasAdr	PROC	NEAR
-	PUSH	BX
-	PUSH	AX
-	MOV	AL,80
-	MUL	BH
-	MOV	BH,0
-	ADD	AX,BX
-	ADD	AX,AX
-	ADD	AX,OFFSET ScrBuf
-	MOV	DI,AX
-	POP	AX
-	POP	BX
+	CALL	FAR PTR BasAdr_c
 	RET
 BasAdr	ENDP
 
@@ -2157,87 +2147,88 @@ MnMn60	ENDP
 ;			   AH - color number
 ;	Return :	   AH - color
 Color	PROC	NEAR
-	PUSH	DI
-	CALL	ColAddr
-	MOV	AH,ES:[DI]
-	POP	DI
+	PUSH	DS
+	PUSH	BX
+	PUSH	ES
+	POP	DS
+	MOV	BL,AL
+	MOV	AL,AH
+	CALL	FAR PTR Color_c
+	MOV	AH,AL
+	MOV	AL,BL
+	POP	BX
+	POP	DS
 	RET
 Color	ENDP
-	FromC	Color
 
 ColAddr	PROC	NEAR
+	PUSH	DS
 	PUSH	AX
-	MOV	AL,6
-	MUL	AH
-	MOV	DI,AX
-	MOV	AL,ES:ColTyp
-	CMP	AL,3
-	JB	ColAd1
-	MOV	AL,1
-ColAd1:	CBW
-	ADD	AX,AX
-	CMP	ES:ScrMod,7
-	JNE	ColAd2
-	INC	AX
-ColAd2:	ADD	DI,AX
-	ADD	DI,ColTab
+	PUSH	ES
+	POP	DS
+	MOV	AL,AH
+	CALL	FAR PTR ColAddr_c
 	POP	AX
+	POP	DS
 	RET
 ColAddr	ENDP
 
 ;------------------------- Shadow ----------------------
 ;			ES:DI - address of screen buffer
 Shadow	PROC	NEAR
-	PUSH	AX
-	INC	DI
-	MOV	AH,ShadFl
-	CALL	Color
-	MOV	AL,ES:[DI]
-	CMP	AH,1
-	JB	Shadw1
-	PUSHF
-	AND	AL,8Fh
-	XOR	AL,8
-	POPF
-	JE	Shadw1
-	MOV	AL,7
-Shadw1:	STOSB
-	POP	AX
+	PUSH	DS
+	PUSH	ES
+	POP	DS
+	CALL	FAR PTR Shadow_c
+	POP	DS
 	RET
 Shadow	ENDP
 
 ;-------------------- Moving strings -------------------
 ;			CS:SI(B) -> ES:DI(W)
 MvsBwc	PROC	NEAR
-	LODS	CS:Byt
-	STOSW
-	LOOP	MvsBwc
+	PUSH	DX
+	MOV	DX,CS
+	CALL	FAR PTR MvsBw_c
+	POP	DX
+	ADD	SI,CX
+	XOR	CX,CX
+	MOV	AL,CS:[SI-1]
 	RET
 MvsBwc	ENDP
 ;			ES:SI(B) -> ES:DI(W)
 MvsBwe	PROC	NEAR
-	LODS	ES:Byt
-	STOSW
-	LOOP	MvsBwe
+	PUSH	DX
+	MOV	DX,ES
+	CALL	FAR PTR MvsBw_c
+	POP	DX
+	ADD	SI,CX
+	XOR	CX,CX
+	MOV	AL,ES:[SI-1]
 	RET
 MvsBwe	ENDP
 ;			(Color) -> ES:DI(W)
 MvsColr	PROC	NEAR
-	INC	DI
-	STOSB
-	LOOP	MvsColr
+	CALL	FAR PTR MvsColr_c
+	XOR	CX,CX
 	RET
 MvsColr	ENDP
 ;			CS:SI(B) -> ES:DI(W)
 MovDz	PROC	NEAR
 	CALL	BasAdr
-MovDz0:	LODSB
-	CMP	AL,0
-	JE	MovDz1
-	STOSB
-	INC	DI
-	JMP	MovDz0
-MovDz1:	RET
+MovDz0:	PUSH	DX
+	PUSH	DI
+	MOV	DX,DS
+	CALL	FAR PTR MovDz0_c
+	POP	DX			; Where the text begins on the screen
+	SUB	DX,DI
+	NEG	DX
+	SHR	DX,1			; Its length
+	ADD	SI,DX
+	INC	SI
+	POP	DX
+	MOV	AL,0
+	RET
 MovDz	ENDP
 ;			Add file name
 AddFile	PROC	NEAR

@@ -105,6 +105,20 @@ BATCHES = [
                    "LowCase_c", "FndLet_c", "CutPath_c", "NormStr_c",
                    "PathLin_c", "LetLin_c", "ShrtLin_c", "MainFil_c"),
     ),
+    Batch(
+        title="Colours and the screen buffer",
+        source="screen.c",
+        routines=("BasAdr", "Color", "ColAddr", "Shadow", "MvsBwc",
+                  "MvsBwe", "MvsColr", "MovDz"),
+        functions=("BasAdr_c", "Color_c", "ColAddr_c", "Shadow_c",
+                   "MvsBw_c", "MvsColr_c", "MovDz0_c"),
+        unreached={
+            0xA28F: "ColAddr, for a palette that is none of the three: "
+                    "the Configuration dialog sets no other",
+            0xA29C: "ColAddr, for a monochrome display: the machine has "
+                    "a colour one",
+        },
+    ),
 ]
 
 

@@ -18,6 +18,8 @@
 	EXTERN	AddFile_c:FAR, MvzLine_c:FAR, FilZero_c:FAR, StrLen_c:FAR
 	EXTERN	LowCase_c:FAR, FndLet_c:FAR, CutPath_c:FAR, NormStr_c:FAR
 	EXTERN	PathLin_c:FAR, LetLin_c:FAR, ShrtLin_c:FAR, MainFil_c:FAR
+	EXTERN	BasAdr_c:FAR, Color_c:FAR, ColAddr_c:FAR, Shadow_c:FAR
+	EXTERN	MvsBw_c:FAR, MvsColr_c:FAR, MovDz0_c:FAR
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.

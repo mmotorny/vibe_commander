@@ -46,13 +46,6 @@ void CntLine(struct LineArgs STACK *args);
 #pragma aux NgLine  "*_c" __far parm [bx] modify exact [ax bx cx dx es]
 #pragma aux CntLine "*_c" __far parm [bx] modify exact [ax bx cx dx es]
 
-/* The cell of the screen buffer at a row and a column, the row in the high
-   byte: what BasAdr in the assembly makes of BH and BL. */
-static u16 *BasAdr(u16 place)
-{
-    return md.ScrBuf + (place >> 8) * 80 + (place & 0xFF);
-}
-
 /* The length of a text that is put into a line, as LnStr counts it: it
    looks at 80 characters, and a text without an end among them counts as
    79 long. */
@@ -127,7 +120,7 @@ void NgLine(struct LineArgs STACK *args)
     u16 *screen = args->screen;
     u16 room = args->value & 0xFF;
     u16 style = 0;                      /* which of the colours is on */
-    u16 color = Color((u16)args->colors[0] << 8) & 0xFF00;
+    u16 color = Color(args->colors[0]) << 8;
     u16 c, count, high;
 
 #define PUT(character) \
@@ -166,7 +159,7 @@ void NgLine(struct LineArgs STACK *args)
                     if (count == style)
                         count = 0;
                     style = count;
-                    color = Color((u16)args->colors[style] << 8) & 0xFF00;
+                    color = Color(args->colors[style]) << 8;
                     continue;
                 }
                 if (c != 'A' && c != 'C')
