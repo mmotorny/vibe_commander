@@ -3,6 +3,9 @@
 Each deviation is declared here, with its reason. A golden is derived from
 the original with these differences made to it (see goldens.py), so that it
 holds exactly what a build is expected to show.
+
+One thing that a build shows is not held against the original at all, and
+is declared here too: see IGNORED.
 """
 import re
 from dataclasses import replace
@@ -25,6 +28,20 @@ def expected(screen):
     return replace(screen, cells=bytes(cells))
 
 
+def compared(screen):
+    """`screen` with what is not compared blanked out. A golden holds its
+    screens like this, and those of a build are held against it like
+    this."""
+    cells = bytearray(screen.cells)
+    for row, line in enumerate(screen.lines()):
+        for pattern in IGNORED:
+            match = pattern.search(line)
+            if match:
+                for column in range(*match.span(1)):
+                    cells[(row * COLUMNS + column) * 2] = ord(BLANK)
+    return replace(screen, cells=bytes(cells))
+
+
 DEVIATIONS = [
     # The banner that the program prints when it starts names its edition.
     # The published source is of the freeware edition; the binaries shipped
@@ -35,6 +52,21 @@ DEVIATIONS = [
     # The program names its own file when it cannot load it again after a
     # command. The original is VC.COM; the port is VC.EXE.
     (re.compile(r"^Bad or missing D:\\VC\\VC\.(COM)"), "EXE"),
+]
+
+# What stands in a golden for a character that is not compared.
+BLANK = "#"
+
+# What a build shows that is not compared with the original: the part of a
+# line that the pattern's group matches. Its colours are compared.
+IGNORED = [
+    # The editor says in its first line how many bytes it has free for the
+    # text. That is what the program leaves of the memory, and the port is
+    # larger than the original, by more with every routine translated. An
+    # expected number would have to follow the size of the build that is
+    # tested; the number says too little about the program to be worth
+    # that. The field is the number and the room in front of it.
+    re.compile(r"^Edit: .* Col \d+( [\d, ]+) Free"),
 ]
 
 # Deviations that show on no screen, and so change no golden. They are

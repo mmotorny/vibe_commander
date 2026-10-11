@@ -5,13 +5,10 @@ Things that are known and not done. Standing instructions are in
 
 ## Known and not dealt with
 
-- The editor shows the memory it has free in its first line, and the port
-  has less than the original, by as much as it is larger in memory:
-  359,048 bytes against 360,872 when the texts, paths and file names were
-  translated, and less with every batch. No scenario opens the editor yet.
-  The first that does needs this declared as a deviation, with a number
-  that follows the size of the build or with the number left out of the
-  comparison.
+- The number of bytes that the editor has free is not compared with the
+  original's (see `harness/deviations.py`). The routine that works it out
+  is still assembly. When it is translated, the number wants a check of
+  its own: that it falls by one for every character typed, at least.
 - The harness can type Russian on the Russian bench, and nothing beyond
   ASCII on the other: Alt with the numeric keypad types nothing there.
 - `tools/flagscan.py` follows flags until an instruction sets them all,

@@ -168,6 +168,14 @@ SCENARIOS = {
             "Esc",
         )),
 
+    "editor": Scenario(
+        "The editor, as it opens a file",
+        steps=(
+            "Down Down Down",             # onto a file
+            "F4",
+            "Esc",
+        )),
+
     "palettes": Scenario(
         "The other two palettes, black and white and laptop, in which a "
         "box throws another shadow",
