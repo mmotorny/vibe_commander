@@ -2,7 +2,11 @@
 ;		Version :	14.06.2000
 ;-------------------------------------------------------
 
+	OPTION	OLDSTRUCTS		; Structure fields are global names
+	OPTION	NOSCOPED		; Labels inside procedures are global
 	.MODEL	Tiny
+	.CONST				; Fix the segment order: uninitialized
+	.DATA?				; data must come last, after constants
 
 PrgName	EQU	'Volkov Commander'
 VcVers	EQU	'4.05 freeware'
@@ -72,13 +76,13 @@ BOXMN	STRUC
   mRight  DB	0			; Right link
   mBase	  DW	?			; Menu base
   mPoint  DW	?
-  mSelTot LABEL	BYTE
   mCtrl	  DW	?
 BOXMN	ENDS
+mSelTot	=	BYTE PTR mCtrl
 
 ; The star structure definition.
 STAR	STRUC
-  StarClk  LABEL   BYTE			; Time counter
+  StarClk  DB	   0 DUP(?)		; Time counter
   StarMod  DW	   ?			; Low byte - counter, High - explosion
   StarPos  DW	   ?			; Coordinates of star
 STAR	ENDS
@@ -178,7 +182,7 @@ AutoTim	DD	?
 Screen	DD	?			; Address of screen
 BrkVct	DD	?			; Original vector 1Bh
 NcPath	DB	LenPath+13 DUP(?)	; The path from VC= variable
-Country	CNTRY	?			; Country information
+Country	CNTRY	<>			; Country information
 LowTab	DB	128 DUP(?)		; Lower case table
 TmpBuf	DB	256 DUP(?)
 TmpErr	DB	256 DUP(?)

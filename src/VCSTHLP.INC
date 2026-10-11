@@ -15,7 +15,7 @@ HlpOffs	DD	?
 HlpFrst	DW	?
 HlpCur	DW	?
 	DB	8 DUP(?)
-HlpInfo	LABEL	BYTE
+HlpInfo	DB	0 DUP(?)
 HlpData	ENDS
 
 	.CONST

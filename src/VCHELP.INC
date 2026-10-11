@@ -5,7 +5,7 @@
 HlpData	STRUC
 	DB	HelpBuf DUP(?)
 HlpHndl	DW	?
-HlpPrms	LABEL	BYTE
+HlpPrms	DB	0 DUP(?)
 HlpMode	DW	?
 HlpSize	DW	?
 HlpLins	DW	?
@@ -16,7 +16,7 @@ HlpFrst	DW	?
 HlpCur	DW	?
 	DB	10 DUP(?)
 HlpBkFr	DW	?
-HlpInfo	LABEL	BYTE
+HlpInfo	DB	0 DUP(?)
 HlpData	ENDS
 
 	.CONST

@@ -3,6 +3,7 @@
 ;-------------------------------------------------------
 
 	.DATA
+	ASSUME	CS:DGROUP
 MnuTab	DW	102h, 121Bh, MenuLn1, MnuHlp1
 	DW	10Ah, 141Eh, MenuLn2, MnuHlp2
 	DW	113h, 1023h, MenuLn3, MnuHlp3
@@ -539,7 +540,10 @@ F39_56:	MOV	AL,' '
 	POP	CX
 	POP	DI
 	ADD	DI,2*80
-	LOOP	F39_52
+	LOOP	F39_5A			; F39_52 is out of LOOP's range
+	JMP	SHORT F39_5B
+F39_5A:	JMP	F39_52
+F39_5B:
 	PUSH	DI
 	MOV	AL,'À'
 	STOSW
@@ -748,7 +752,7 @@ F39_90:	MOV	BL,AL
 	MOV	BL,AH
 	DEC	BX
 	ADD	BL,BL
-	JMP	CS:[BX+SI]
+	JMP	WORD PTR CS:[BX+SI]
 F39_91:	JMP	Func04
 
 F40_10	PROC	NEAR

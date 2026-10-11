@@ -1440,6 +1440,7 @@ F54_04:	MOV	AX,WORD PTR DS:TmpBuf[10]
 PthEr_S	DB	'Path too long', 0
 
 	.DATA
+	ASSUME	CS:DGROUP
 PthEr_P	DB	Err_C, ErInv_C, ErInv_C, 0
 	DB	4, 1
 	DW	OFFSET ErrBuf

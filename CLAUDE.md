@@ -20,8 +20,9 @@ not in Claude's memory: memory does not travel between computers.
 - Naming such tools is fine. Documentation should say plainly what the
   original was built with and where a reference came from; the restriction
   is on fetching and running them, not on mentioning them.
-- Anything the work downloads is fetched at run time from its official
-  source and pinned by SHA-256 (see `harness/deps.py`).
+- Anything the work downloads is fetched at build or run time from its
+  official source and pinned, by SHA-256 (see `harness/deps.py`) or by git
+  commit (see `CMakeLists.txt`).
 
 ## Naming
 

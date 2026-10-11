@@ -4,7 +4,8 @@
 ;		Version :	16.06.2000
 ;-------------------------------------------------------
 
-	JUMPS
+	OPTION	OLDSTRUCTS		; Structure fields are global names
+	OPTION	NOSCOPED		; Labels inside procedures are global
 	.MODEL	Tiny
 	.CODE
 Zero:	.STARTUP
@@ -12,7 +13,7 @@ Zero:	.STARTUP
 
 PrgName	EQU	'Volkov Commander'
 HelpVer	EQU	'VC 4.05 Help'
-VcVers	EQU	'4.05'
+VcVers	EQU	<'4.05'>
 VcSuff	EQU	'freeware'
 VcApiVr	EQU	42
 
@@ -118,7 +119,7 @@ DIRTREE	STRUC
   TreHead  DB	   5 DUP(?)		; Tree file header 'PNCI',0
   TreeLen  DW	   ?			; Number of subdirectories
   TreSum1  DW	   ?			; Check sum of the header
-  TreList  LABEL   BYTE			; List of subdirectories
+  TreList  DB	   0 DUP(?)		; List of subdirectories
   TreSum2  DW	   ?			; Check sum of the list
 DIRTREE	ENDS
 
@@ -142,13 +143,13 @@ BOXMN	STRUC
   mRight  DB	0			; Right link
   mBase	  DW	?			; Menu base
   mPoint  DW	?
-  mSelTot LABEL	BYTE
   mCtrl	  DW	?
 BOXMN	ENDS
+mSelTot	=	BYTE PTR mCtrl
 
 ; The star structure definition.
 STAR	STRUC
-  StarClk  LABEL   BYTE			; Time counter
+  StarClk  DB	   0 DUP(?)		; Time counter
   StarMod  DW	   ?			; Low byte - counter, High - explosion
   StarPos  DW	   ?			; Coordinates of star
 STAR	ENDS
@@ -201,7 +202,7 @@ MenuFl	DB	?			; 1 to bring user menu automatically
 SelMas	DB	13 DUP(?)		; Wildcard for selection
 HstBuf	DB	LenHist DUP(?)		; History buffer
 ExtMain	DB	LenExt DUP(?)		; Buffer for the main extension file
-EPB	EPBs	?			; Execute program block
+EPB	EPBs	<>			; Execute program block
 MouseX	DW	?			; Mouse cursor X
 MouseY	DW	?			; Mouse cursor Y
 BatAdr	DW	?			; Pointer to command in buffer
@@ -274,12 +275,12 @@ Volume	DB	12 DUP(?)		; Volume label
 DosPth	DB	LenPath DUP(?)		; The current path
 NcPath	DB	LenPath DUP(?)		; The path from VC= variable
 TempDir	DB	LenPath DUP(?)		; The path from TEMP= variable
-Country	CNTRY	?			; Country information
-DTA	DTAs	?			; Data tramsnir area
+Country	CNTRY	<>			; Country information
+DTA	DTAs	<>			; Data tramsnir area
 LowTab	DB	128 DUP(?)		; Lower case table
 TmpBuf	DB	256 DUP(?)
 TmpErr	DB	256 DUP(?)
-Stars	STAR	NmbStrs DUP(?)
+Stars	STAR	NmbStrs DUP(<>)
 MenuBuf	DB	LenMenu DUP(?)
 InfBuf	DB	(MaxLins-13)* 38 DUP(?)
 	EVEN
@@ -721,7 +722,7 @@ New27	ENDP
 
 ;------------- Save vectors & program name -------------
 ;			DS:DX - file name
-ExeProg	PROC	C NEAR
+ExeProg	PROC	NEAR C
 	PUSH	ES
 	PUSH	SI
 	PUSH	DI
@@ -3028,6 +3029,7 @@ Expand	ENDP
 	INCLUDE	VCSUB3.INC
 
 	.CONST
+	ASSUME	CS:DGROUP
 Last:
 
 	END

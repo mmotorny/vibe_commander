@@ -1677,14 +1677,13 @@ Input1:	INC	SP
 	RET
 Input	ENDP
 
-Input0	PROC	C NEAR
-	USES	DS,SI,DI,DX,CX,BX
+Input0	PROC	NEAR C USES DS SI DI DX CX BX
 	LOCAL	IKeyBar	:BYTE	,\
 		BlMouse	:BYTE	,\
 		KbdFlgs	:BYTE	,\
 		AltLock	:BYTE	,\
 		ClkFlag	:BYTE	,\
-		ClkBuf	:WORD:6	,\
+		ClkBuf[6]:WORD	,\
 		BlTime	:DWORD	,\
 		AltTime	:DWORD
 	PUSH	ES

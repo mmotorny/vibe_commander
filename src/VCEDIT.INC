@@ -9,7 +9,7 @@ LenEdit	EQU	LenMenu			; Length of edit buffer
 
 EdData	STRUC
 	DB	TmpBuf+100 DUP(?)
-EdHelp	LABEL	BYTE			; Mini help
+EdHelp	DB	0 DUP(?)		; Mini help
 EdOffst	DD	?			; Offset of begin of the current line
 EdEndBf	DD	?			; Offset of end of part of current line
 EdSizLn	DW	?			; Length of part of line in buffer

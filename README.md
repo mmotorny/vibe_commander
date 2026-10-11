@@ -20,37 +20,74 @@ the direction and reviews the results.
 
 ## Approach
 
-Fidelity is judged against the original program, at two levels:
+Fidelity is judged against the original program's behaviour. Volkov
+Commander draws everything on an 80x25 text screen, so what it shows can be
+compared exactly: every character and colour attribute, the cursor, and the
+files it leaves on disk. A candidate and the original are run under DOS in
+an emulator, fed the same keystrokes, and compared.
 
-- **Bytes.** Binaries built here must be identical to the ones the original
-  source produces with its author's toolchain.
-- **Behaviour.** Volkov Commander draws everything on an 80x25 text screen,
-  so what it shows can be compared exactly: every character and colour
-  attribute, the cursor, and the files it leaves on disk. A candidate and the
-  original are run under DOS in an emulator, fed the same keystrokes, and
-  compared.
+A byte-for-byte comparison with what the author's own toolchain produces
+would be a stronger test, but that toolchain, Borland's TASM and TLINK, is
+commercial software that this project does not fetch or run. There is
+therefore no byte-level reference, and since two assemblers can encode the
+same instruction differently, the binaries built here are not expected to
+match the author's byte for byte.
 
 The planned stages:
 
-1. Build the original source with free tools, byte for byte.
+1. Build the original source with free tools.
 2. Build the harness that runs the original and a candidate side by side.
 3. Port the program to modern operating systems, held to the same
    comparison, with every intended deviation listed explicitly.
 
-So far the repository holds the original source and the beginning of the
-harness: it can run the original program and capture its screen.
+Where it stands: the source builds with a free assembler, and the harness
+can run the original program and capture its screen. Comparing the two is
+the next step.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `src/` | The Volkov Commander 4.05 source |
+| `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
+| `CMakeLists.txt` | Builds the assembler and the two programs |
 | `harness/` | Runs Volkov Commander under FreeDOS in QEMU and captures its screen |
 | `docs/` | Pictures for this README |
 
+## Building
+
+Needs CMake 3.24 or later, a C compiler and `git`.
+
+```sh
+cmake -B build
+cmake --build build
+```
+
+This fetches [JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
+MASM-compatible assembler, at a pinned commit, builds it, and assembles
+`src/` into `build/VC.COM` and `build/VCSETUP.COM`.
+
+The original source is written for TASM. The changes made so that JWasm
+accepts it are small, about thirty lines, and can be listed with
+`git diff $(git rev-list --max-parents=0 HEAD) -- src`:
+
+- The `JUMPS` directive is gone: JWasm lengthens out-of-range conditional
+  jumps by itself. One `LOOP` that is out of range is spelled out as a jump
+  over a jump.
+- Structure fields are global names and labels inside procedures are global,
+  as in TASM (`OPTION OLDSTRUCTS`, `OPTION NOSCOPED`).
+- `LABEL` inside a `STRUC` became a zero-length field or, where the structure
+  has initialised instances, an alias defined after it.
+- Structure instances are written `<>` instead of `?`.
+- Procedure headers use MASM's spelling for the language, `USES` and `LOCAL`.
+- Code and code labels that sit in a data segment are preceded by
+  `ASSUME CS:DGROUP`, an indirect `JMP` states its operand size, and
+  `VcVers` is a text equate.
+- `VCSETUP.ASM` declares its segments up front so that uninitialised data
+  comes last and takes no space in the file.
+
 ## Running the original
 
-The harness needs `python3`, `qemu-system-i386` and `mtools`.
+Needs `python3`, `qemu-system-i386` and `mtools`.
 
 ```sh
 python3 harness/screenshot.py
@@ -100,6 +137,13 @@ SHA-256 sums pinned in `harness/deps.py`, and never stored in the repository:
 |---|---|
 | Volkov Commander 4.05 shareware distribution | The author's site, <https://vc.vvv.kyiv.ua/download/vc405sw.zip> |
 | FreeDOS 1.3 Floppy Edition, for its boot floppy | <https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/1.3/official/FD13-FloppyEdition.zip> |
+
+### What the build downloads
+
+CMake fetches the JWasm source from
+<https://github.com/Baron-von-Riedesel/JWasm> at the commit pinned in
+`CMakeLists.txt` (release 2.20) into the build directory. JWasm is open
+source under the Sybase Open Watcom Public License.
 
 ## Licence
 
