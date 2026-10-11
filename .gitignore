@@ -1,0 +1,6 @@
+# Fetched by harness/deps.py; never committed.
+/downloads/
+
+# Generated.
+/out/
+__pycache__/
