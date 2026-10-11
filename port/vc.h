@@ -109,6 +109,7 @@ struct DIRTREE {
     u16 TreSum1;                        /* Check sum of the header */
     u16 TreSum2;                        /* Check sum of the list */
 };
+/* The list of subdirectories begins where TreSum2 does: TreList there. */
 
 /* A star of the screen saver. */
 struct STAR {
@@ -310,11 +311,33 @@ u16 *BasAdr(u16 place);
 #pragma aux BasAdr "*_c" __far parm [bx] value [di] modify exact [di]
 u16 TstHex(u16 digit);                  /* digits.c */
 #pragma aux TstHex "*_c" __far parm [ax] value [ax] modify exact [ax]
+void Convert(const u8 __far *name, u8 *buffer);         /* mask.c */
+u16 TstMas(const u8 __far *name, const u8 *mask);
+#pragma aux Convert "*_c" __far parm [dx si] [di] modify exact [ax]
+#pragma aux TstMas  "*_c" __far parm [dx si] [di] value [ax] modify exact [ax]
 
 /* The panel that a file entry belongs to. */
 #define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))
 
-/* Bits of a file's attributes. */
+/* The panel in the segment `panel`: what the assembly has in DS where it
+   says WCBseg. */
+#define PANEL(panel) ((struct WCBdef __far *)((u32)(panel) << 16))
+
+/* Where in a panel's segment its list of files begins, DskBuf, and where
+   in the main data the list of the tree's directories, TreeBuf.TreList.
+   The assembly keeps places in both as addresses, not as numbers. */
+#define DSKBUF  (sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT))
+#define TRELIST ((u16)&((struct DIRTREE *)md.TreeBuf)->TreSum2)
+
+/* The file entry at an address in a panel's segment. */
+#define ENTRY(wcb, address) \
+    ((struct FILENT __far *)((u8 __far *)(wcb) + (address)))
+
+/* Bits of a file's attributes. The two highest are the program's own, in
+   its lists of files. */
+#define ATTR_HIDDEN    0x02
+#define ATTR_SYSTEM    0x04
 #define ATTR_DIRECTORY 0x10
+#define ATTR_SELECTED  0x40
 
 #endif

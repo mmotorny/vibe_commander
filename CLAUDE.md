@@ -133,6 +133,21 @@ port.
   with `FromC`, declared in `port/vc.h`. Registers go in and come back as
   the routine has them. Flags do not come back: the entry of a routine
   that answers in one turns the answer into a register.
+- ES is not always on the main data: `ReDir` calls `FnFile` and `NearFl`
+  with ES on the old list of files. A function that touches nothing of
+  the main data, only far pointers and constants, needs no DS, and its
+  stub leaves DS alone. A panel goes to C as its segment in a 16-bit
+  register, and `PANEL` of `port/vc.h` makes the pointer.
+- A routine that hands back two words can return them as a `u32` in
+  `value [dx ax]`; one that hands back more gets room on the stack and a
+  `STACK` pointer to it in BX, and the stub pops the registers. Where the
+  flag a routine answers in follows from what it returns, the stub makes
+  it by comparing: `FnFile` has found a file if SI is below `EndBuf`.
+- A label inside a procedure may be an entry of its own that others call:
+  `TreNum` in `FilNum`, `NumAd1` in `NumAdr`. `tools/routines.py` does not
+  show such callers; the assembler does, with "Symbol not defined", once
+  the procedure is a stub. What they call stays, as a procedure of that
+  name.
 
 ### C for the port
 
@@ -163,6 +178,13 @@ with it is less obvious:
   in the listing next to the object, `build/port/*.lst`.
   The `port` test says how much of the stack the scenarios leave
   untouched, and fails below a limit.
+- A static function is called, not expanded in place, also where only
+  one routine uses it.
+- The structures of `port/vc.h` are the assembly's, but a field that the
+  assembly declares with `0 DUP`, a name for a place, is not in them:
+  `TreList` is where `TreSum2` is, two bytes before the end of `DIRTREE`.
+  Read the `STRUC` in `port/asm/VC.ASM` before taking an offset from a
+  C structure.
 - There is no C library. String literals and static variables are refused
   by `tools/mkexe.c`. The first 32-bit multiplication or division will
   need the compiler's helper routines written, in assembly, in the C code

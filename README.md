@@ -62,8 +62,10 @@ routines run as C: those that write numbers, sizes, dates and times, those
 that write lines of text with their markup, those that copy, trim and
 shorten texts, paths and file names, those that look up colours and put
 characters and colours into the copy of the screen that the program draws
-in, and those that read and write hex digits and numbers and hold a file
-name against a mask.
+in, those that read and write hex digits and numbers and hold a file name
+against a mask, those that filter and sort the list of files of a panel and
+find a file in it, and those that say where the panels are and where in
+them the cursor is.
 
 ## Layout
 

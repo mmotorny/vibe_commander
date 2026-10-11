@@ -3,71 +3,56 @@
 ;-------------------------------------------------------
 
 AdrNum	PROC	NEAR
-	CMP	DS:WinTyp,0
-	JNE	AdrNm1
-	MOV	AX,DS:CurAdr
-	CALL	FilNum
-	MOV	SI,AX
-	MOV	AX,DS:First
-	CALL	FilNum
-	MOV	DI,AX
-	MOV	AX,DS:EndBuf
-	CALL	FilNum
-	MOV	DX,AX
-	CALL	LnsAX
-	JMP	AdrNm2
-AdrNm1:	MOV	AX,ES:TreAdr
-	CALL	TreNum
-	MOV	SI,AX
-	MOV	AX,ES:TreFrst
-	CALL	TreNum
-	MOV	DI,AX
-	CALL	SizDX
-	MOV	AL,DH
-	SUB	AL,4
-	CBW
-	MOV	DX,ES:TreeBuf.TreeLen
-AdrNm2:	OR	DX,DX
-	JE	AdrNm3
-	DEC	DX
-AdrNm3:	MOV	BX,AX
+	PUSH	AX			; Room for the four numbers
+	PUSH	AX
+	PUSH	AX
+	PUSH	AX
+	MOV	BX,SP
+	MOV	AX,DS
+	CallC	AdrNum_c
+	POP	SI
+	POP	DI
+	POP	DX
+	POP	AX
+	MOV	BX,AX
 	RET
 AdrNum	ENDP
 
-FilNum	PROC	NEAR
-	SUB	AX,OFFSET DskBuf
-	MOV	BX,SIZE FilEnt
-	JMP	TreNm1
-TreNum:	SUB	AX,OFFSET TreeBuf.TreList
+; The half of FilNum that ChTree calls. The other is in AdrNum_c.
+TreNum	PROC	NEAR
+	SUB	AX,OFFSET TreeBuf.TreList
 	MOV	BX,SIZE DirEnt
-TreNm1:	XOR	DX,DX
+	XOR	DX,DX
 	DIV	BX
 	RET
-FilNum	ENDP
+TreNum	ENDP
 
 NumAdr	PROC	NEAR
-	CMP	DS:WinTyp,0
-	JNE	NumAd1
-	MOV	AX,SIZE FilEnt
-	MUL	SI
-	ADD	AX,OFFSET DskBuf
-	MOV	SI,AX
+	MOV	AX,DS
+	CALL	FAR PTR NumAdr_c
+	MOV	AX,SI			; What the multiplication left
+	XOR	DX,DX
 	RET
-NumAd1:	MOV	AX,SIZE DirEnt
+NumAdr	ENDP
+
+; The half of NumAdr that ChTree calls. The other is in NumAdr_c.
+NumAd1	PROC	NEAR
+	MOV	AX,SIZE DirEnt
 	MUL	SI
 	ADD	AX,OFFSET TreeBuf.TreList
 	MOV	SI,AX
 	RET
-NumAdr	ENDP
+NumAd1	ENDP
 
 ChgAdr	PROC	NEAR
-	CMP	DS:WinTyp,0
-	JNE	ChgAd1
-	XCHG	SI,DS:CurAdr
-	XCHG	DI,DS:First
-	RET
-ChgAd1:	XCHG	SI,ES:TreAdr
-	XCHG	DI,ES:TreFrst
+	PUSH	DX
+	PUSH	AX
+	MOV	AX,DS
+	CallC	ChgAdr_c
+	MOV	SI,AX
+	MOV	DI,DX
+	POP	AX
+	POP	DX
 	RET
 ChgAdr	ENDP
 

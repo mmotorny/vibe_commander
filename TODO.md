@@ -16,6 +16,31 @@ Things that are known and not done. Standing instructions are in
   has set: `DEC AX` and then `JE`, `STC` and then `JNC`. It should follow
   each flag by itself.
 
+## What batches have lost time to
+
+Minutes that a batch actually lost, for deciding which improvement of the
+tools pays (see "A run of batches" in `CLAUDE.md`).
+
+- The files of a panel and the place of the cursor, 17 routines, about
+  half an hour in all:
+  - 4 minutes: `reach.py --steps --changes` prints every row of a dialog
+    that opens and, at the end, every instruction of the routines that is
+    still unreached, one to a line. With 17 routines that was 150 lines a
+    run, cut down by hand with `grep` each time. A line for each routine,
+    "reached 12, left 3: C566 C569 C56B", would do.
+  - 3 minutes: three tries at the one instruction of `NearFl` that runs
+    when no file of the old list is left. What worked is emptying C:\ of
+    its two directories.
+  - 2 minutes: the `port` test names only the scenario with the least
+    stack left. To tell what the batch cost from what a new scenario
+    costs by itself, the routines were put back as assembly for a build
+    and the new scenarios run against that. The test could print the
+    figure of every scenario.
+  - 2 minutes: an offset taken from a C structure that the assembly has
+    otherwise (`TreList`), found by the `tree` scenario; and a label
+    inside a procedure that others call (`NumAd1`), found by the
+    assembler. Both are in `CLAUDE.md` now.
+
 ## Ideas put off
 
 - Deriving goldens side by side, as the tests now run their scenarios. The

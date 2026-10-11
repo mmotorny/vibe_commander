@@ -147,6 +147,22 @@ BATCHES = [
         routines=("Convert", "Conv10", "UnConv", "UnCnv1", "TstMas"),
         functions=("Convert_c", "UnConv_c", "TstMas_c"),
     ),
+    Batch(
+        title="The list of files of a panel: its filter and its order",
+        source="files.c",
+        routines=("SetMask", "TstExe", "Sort", "CmpPar", "CmpExt", "FnFile",
+                  "NearFl", "TotSel"),
+        functions=("SetMask_c", "TstExe_c", "Sort_c", "FnFile_c",
+                   "NearFl_c", "TotSel_c"),
+    ),
+    Batch(
+        title="Where the panels are, and the cursor in them",
+        source="place.c",
+        routines=("BegBX", "SizDX", "LnsAX", "InvWCB", "AdrNum", "FilNum",
+                  "NumAdr", "ChgAdr", "CorPar"),
+        functions=("BegBX_c", "SizDX_c", "LnsAX_c", "InvWCB_c", "AdrNum_c",
+                   "NumAdr_c", "ChgAdr_c", "CorPar_c"),
+    ),
 ]
 
 

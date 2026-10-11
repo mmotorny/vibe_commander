@@ -7,47 +7,20 @@
 ;	Return :	BH,BL - Begin
 BegBX	PROC	NEAR
 	MOV	BX,DS
-	CMP	BX,ES:WCB1seg
-	MOV	BX,0
-	JE	BegBX1
-	MOV	BL,40
-BegBX1:	CMP	BH,ES:MenuVs
-	JZ	BegBX2
-	INC	BH
-BegBX2:	RET
+	CallC	BegBX_c
+	RET
 BegBX	ENDP
 
 ;----------------- Size of main windows ----------------
 ;	Return :	DH,DL - Size
 SizDX	PROC	NEAR
-	MOV	DH,ES:Lines
-	SHR	DH,1
-	ADD	DH,3
-	CMP	ES:Lines,25
-	JBE	SizDX1
-	INC	DH
-SizDX1:	CMP	ES:FulScr,0
-	JZ	SizDX2
-	MOV	DH,ES:Lines
-	SUB	DH,2
-	CMP	ES:MenuVs,0
-	JZ	SizDX2
-	DEC	DH
-SizDX2:	MOV	DL,40
+	CallC	SizDX_c
 	RET
 SizDX	ENDP
 
 ;------------------ Files in main windows --------------
 LnsAX	PROC	NEAR
-	PUSH	DX
-	CALL	SizDX
-	MOV	AL,DH
-	CBW
-	SUB	AL,3
-	CMP	AH,ES:MiniSta
-	JZ	LnsAX1
-	SUB	AL,2
-LnsAX1:	POP	DX
+	CallC	LnsAX_c
 	RET
 LnsAX	ENDP
 
@@ -547,62 +520,10 @@ Panel8	ENDP
 ;------------------- Set directory mask ----------------
 ;			   DS - WCBseg
 SetMask	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	MOV	DI,OFFSET TmpBuf
-	MOV	AL,'?'
-	MOV	CX,11
-	PUSH	DI
-	REP	STOSB
-	POP	DI
-	MOV	SI,OFFSET DskMas
-	CMP	BYTE PTR DS:[SI],0
-	JE	SetMs1
-	CALL	Convert
-SetMs1:	MOV	SI,OFFSET DskBuf
-	MOV	BX,DS:EndFul
-	CMP	SI,BX
-	JAE	SetMs9
-SetMs2:	SUB	BX,SIZE FilEnt
-SetMs3:	CMP	BYTE PTR DS:Hidden,0
-	JNZ	SetMs4
-	TEST	BYTE PTR DS:[SI+13],6
-	JNZ	SetMs6
-SetMs4:	TEST	BYTE PTR DS:[SI+13],10h
-	JNZ	SetMs8
-	CMP	BYTE PTR DS:MasTyp,0
-	JZ	SetMs5
-	CALL	TstExe
-	JNC	SetMs6
-SetMs5:	CALL	TstMas
-	JC	SetMs8
-SetMs6:	CMP	SI,BX
-	JE	SetMs9
-	PUSH	SI
-	PUSH	BX
-	MOV	CX,SIZE FilEnt
-SetMs7:	MOV	AL,DS:[SI]
-	XCHG	AL,DS:[BX]
-	MOV	DS:[SI],AL
-	INC	SI
-	INC	BX
-	LOOP	SetMs7
-	POP	BX
-	POP	SI
-	AND	BYTE PTR DS:[BX+13],3Fh
-	JMP	SetMs2
-SetMs8:	ADD	SI,SIZE FilEnt
-	CMP	SI,BX
-	JBE	SetMs3
-SetMs9:	MOV	DS:EndBuf,SI
+	MOV	AX,DS
+	CallC	SetMask_c
 	POP	AX
-	POP	BX
-	POP	CX
-	POP	DI
-	POP	SI
 	RET
 SetMask	ENDP
 
@@ -610,247 +531,26 @@ SetMask	ENDP
 ;			DS:SI - address of file
 ;	Return :	CY = 1 - executable file
 ;			CY = 0 - no
-	.CONST
-Ext_S	DB	'com','exe','bat'
-
-	.CODE
 TstExe	PROC	NEAR
-	PUSH	ES
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
 	PUSH	AX
-TstEx1:	LODSB
-	CMP	AL,0
-	JE	TstEx3
-	CMP	AL,'.'
-	JNE	TstEx1
-	PUSH	CS
-	POP	ES
-	MOV	DI,OFFSET Ext_S
-	MOV	CX,3
-TstEx2:	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	MOV	CX,3
-	REPE	CMPSB
-	POP	CX
-	POP	DI
-	POP	SI
-	STC
-	JE	TstEx3
-	ADD	DI,3
-	LOOP	TstEx2
-	CLC
-TstEx3:	POP	AX
-	POP	CX
-	POP	DI
-	POP	SI
-	POP	ES
+	PUSH	DX
+	MOV	DX,DS
+	CALL	FAR PTR TstExe_c
+	SHR	AX,1			; CY if it is one
+	POP	DX
+	POP	AX
 	RET
 TstExe	ENDP
 
 ;----------------------- File sort ---------------------
 ;			   DS - WCBseg
 Sort	PROC	NEAR
-	PUSH	ES
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	PUSH	DS			; Convert all
-	POP	ES
-	MOV	SI,OFFSET DskBuf
-Sort01:	MOV	AL,0
-	MOV	CX,13
-	MOV	DI,SI
-	REPNE	SCASB
-	JCXZ	Sort02
-	DEC	DI
-	PUSH	DI
-	MOV	AL,' '
-	REP	STOSB
-	POP	CX
-	SUB	CX,SI
-	MOV	AL,'.'
-	CMP	AL,DS:[SI]
-	JE	Sort02
-	MOV	DI,SI
-	REPNE	SCASB
-	JNE	Sort02
-	MOV	AX,DS:[DI]
-	MOV	BL,DS:[DI+2]
-	MOV	DS:[SI+9],AX
-	MOV	DS:[SI+11],BL
-	DEC	DI
-	LEA	CX,[SI+8]
-	SUB	CX,DI
-	JCXZ	Sort02
-	MOV	AL,' '
-	REP	STOSB
-Sort02:	ADD	SI,SIZE FilEnt
-	CMP	SI,DS:EndBuf
-	JB	Sort01
-	MOV	BX,DS:EndBuf		; Shell sort
-	SUB	BX,OFFSET DskBuf
-Sort10:	MOV	CX,SIZE FilEnt
-	MOV	AX,BX
-	XOR	DX,DX
-	DIV	CX
-	SHR	AX,1
-	MUL	CX
-	MOV	BX,AX
-	OR	BX,BX
-	JE	Sort15
-	MOV	CX,DS:EndBuf
-Sort11:	XOR	DX,DX
-	MOV	SI,OFFSET DskBuf
-Sort12:	LEA	DI,[SI+BX]
-	CMP	DI,CX
-	JAE	Sort14
-	PUSH	CX
-	CALL	CmpPar
-	JNC	Sort13
-	MOV	DX,DI
-	MOV	DI,DS:EndFul
-	MOV	CX,SIZE FilEnt
-	PUSH	SI
-	PUSH	CX
-	REP	MOVSB
-	POP	CX
-	POP	DI
-	PUSH	DI
-	MOV	SI,DX
-	PUSH	CX
-	REP	MOVSB
-	POP	CX
-	MOV	SI,DS:EndFul
-	MOV	DI,DX
-	REP	MOVSB
-	POP	SI
-Sort13:	POP	CX
-	ADD	SI,SIZE FilEnt
-	JMP	Sort12
-Sort14:	MOV	CX,DX
-	OR	DX,DX
-	JNE	Sort11
-	JMP	Sort10
-Sort15:	MOV	DI,OFFSET DskBuf	; Unconvert all
-Sort20:	MOV	SI,DI
-	MOV	CX,8
-	MOV	BX,SI
-Sort21:	LODSB
-	CMP	AL,' '
-	JE	Sort22
-	MOV	BX,SI
-Sort22:	LOOP	Sort21
-	MOV	AL,'.'
-	MOV	AH,DS:[DI+9]
-	MOV	DX,DS:[DI+10]
-	MOV	DS:[BX],AX
-	MOV	DS:[BX+2],DX
-	MOV	SI,BX
-	INC	SI
-	MOV	CX,3
-Sort23:	LODSB
-	CMP	AL,' '
-	JE	Sort24
-	MOV	BX,SI
-Sort24:	LOOP	Sort23
-	MOV	BYTE PTR DS:[BX],0
-	ADD	DI,SIZE FilEnt
-	CMP	DI,DS:EndBuf
-	JB	Sort20
+	MOV	AX,DS
+	CALL	FAR PTR Sort_c
 	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	ES
 	RET
 Sort	ENDP
-
-CmpPar	PROC	NEAR
-	MOV	AL,DS:SortTyp
-	CMP	AL,4
-	JB	CmpPr0
-	MOV	AX,DS:[DI+22]
-	CMP	AX,DS:[SI+22]
-	RET
-CmpPr0:	MOV	CL,DS:[SI+13]
-	MOV	CH,DS:[DI+13]
-	TEST	CL,10h
-	JNZ	CmpPr1
-	TEST	CH,10h
-	JZ	CmpPr2
-	STC
-	RET
-CmpPr1:	TEST	CH,10h
-	JZ	CmpPr9
-	CMP	BYTE PTR DS:[SI],'.'
-	JE	CmpPr9
-	CMP	BYTE PTR DS:[DI],'.'
-	STC
-	JE	CmpPr9
-	JMP	CmpPr4
-CmpPr2:	TEST	CL,4
-	JNZ	CmpPr3
-	TEST	CH,4
-	JZ	CmpPr4
-	STC
-	RET
-CmpPr3:	TEST	CH,4
-	JZ	CmpPr9
-CmpPr4:	CMP	AL,0
-        JNE	CmpPr6
-CmpPr5:	PUSH	SI
-	PUSH	DI
-	XCHG	SI,DI
-	MOV	CX,8
-	REPE	CMPSB
-	POP	DI
-	POP	SI
-	JNE	CmpPr9
-	CALL	CmpExt
-	RET
-CmpPr6:	CMP	AL,1
-	JNE	CmpPr7
-	CALL	CmpExt
-	JE	CmpPr5
-	RET
-CmpPr7:	CMP	AL,2
-	JNE	CmpPr8
-	MOV	AX,DS:[SI+16]
-	CMP	AX,DS:[DI+16]
-	JNE	CmpPr9
-	MOV	AX,DS:[SI+14]
-	CMP	AX,DS:[DI+14]
-	JE	CmpPr5
-	RET
-CmpPr8:	MOV	AX,DS:[SI+20]
-	CMP	AX,DS:[DI+20]
-	JNE	CmpPr9
-	MOV	AX,DS:[SI+18]
-	CMP	AX,DS:[DI+18]
-	JE	CmpPr5
-CmpPr9:	RET
-CmpPar	ENDP
-
-CmpExt	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	XCHG	SI,DI
-	ADD	SI,9
-	ADD	DI,9
-	MOV	CX,3
-	REPE	CMPSB
-	POP	DI
-	POP	SI
-	RET
-CmpExt	ENDP
 
 ;----------------------- Find file ---------------------
 ;			ES:DI - File
@@ -858,23 +558,12 @@ CmpExt	ENDP
 ;	Return :	   SI - Address of file , CF=1
 ;				Not found ,       CF=0
 FnFile	PROC	NEAR
-	MOV	SI,OFFSET DskBuf
-FnFil1:	CMP	SI,DS:EndBuf
-	JAE	FnFil3
-	PUSH	SI
-	PUSH	DI
-FnFil2:	CMPSB
-	JNE	FnFil4
-	CMP	BYTE PTR DS:[SI-1],0
-	JNE	FnFil2
-	POP	DI
-	POP	SI
-	STC
-FnFil3:	RET
-FnFil4:	POP	DI
-	POP	SI
-	ADD	SI,SIZE FilEnt
-	JMP	FnFil1
+	PUSH	DX
+	MOV	DX,DS
+	CALL	FAR PTR FnFile_c
+	POP	DX
+	CMP	SI,DS:EndBuf		; CY if it is among the files
+	RET
 FnFile	ENDP
 
 ;--------------- Output path in the middle -------------
@@ -1150,47 +839,10 @@ HexDec	ENDP
 ;--------------- Correct first parameter ---------------
 ;			   DS - WCBseg
 CorPar	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	CMP	DS:WinTyp,1
-	JA	CorPr5
-	CALL	AdrNum
-	CMP	SI,DI
-	JAE	CorPr1
-	MOV	DI,SI
-CorPr1:	MOV	CL,DS:WinTyp
-	OR	CL,DS:BrfFul
-	JNZ	CorPr2
-	MOV	CX,AX
-	ADD	AX,CX
-	ADD	AX,CX
-CorPr2:	DEC	AX
-	MOV	CX,SI
-	SUB	CX,DI
-	SUB	CX,AX
-	JBE	CorPr3
-	ADD	DI,CX
-CorPr3:	SUB	DX,DI
-	SUB	AX,DX
-	JBE	CorPr4
-	SUB	DI,AX
-	JAE	CorPr4
-	XOR	DI,DI
-CorPr4:	XCHG	SI,DI
-	CALL	NumAdr
-	XCHG	SI,DI
-	CALL	NumAdr
-	CALL	ChgAdr
-CorPr5:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
+	MOV	AX,DS
+	CallC	CorPar_c
+	POP	AX
 	RET
 CorPar	ENDP
 
@@ -1379,22 +1031,11 @@ FilDir	ENDP
 ;	Return :	   DX - files
 ;			   BX - directories
 TotSel	PROC	NEAR
-	PUSH	SI
-	MOV	SI,OFFSET DskBuf
-	XOR	BX,BX
-	XOR	DX,DX
-TotSe1:	CMP	SI,DS:EndBuf
-	JAE	TotSe3
-	TEST	BYTE PTR DS:[SI+13],40h
-	JZ	TotSe2
-	INC	DX
-	TEST	BYTE PTR DS:[SI+13],10h
-	JZ	TotSe2
-	DEC	DX
-	INC	BX
-TotSe2:	ADD	SI,SIZE FilEnt
-	JMP	TotSe1
-TotSe3:	POP	SI
+	PUSH	AX
+	MOV	AX,DS
+	CALL	FAR PTR TotSel_c
+	MOV	BX,AX
+	POP	AX
 	RET
 TotSel	ENDP
 
@@ -1402,11 +1043,11 @@ TotSel	ENDP
 InvWCB	PROC	NEAR
 	PUSH	AX
 	MOV	AX,DS
-	MOV	DS,ES:WCB1seg
-	CMP	AX,ES:WCB1seg
-	JNE	In1WCB
-	MOV	DS,ES:WCB2seg
-In1WCB:	POP	AX
+	PUSH	ES
+	POP	DS
+	CALL	FAR PTR InvWCB_c
+	MOV	DS,AX
+	POP	AX
 	RET
 InvWCB	ENDP
 

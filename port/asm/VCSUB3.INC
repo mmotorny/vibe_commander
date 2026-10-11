@@ -1686,22 +1686,16 @@ PtIn20	ENDP
 ;	Return :	   SI - Address of file , CF=1
 ;				Not found ,       CF=0
 NearFl	PROC	NEAR
-	PUSH	DI
-	CMP	DI,BX
-	JAE	NrFl03
-NrFl01:	CALL	FnFile
-	JC	NrFl03
-	ADD	DI,SIZE FilEnt
-	CMP	DI,BX
-	JB	NrFl01
-	POP	DI
-	PUSH	DI
-NrFl02:	CALL	FnFile
-	JC	NrFl03
-	SUB	DI,SIZE FilEnt
-	JAE	NrFl02
-	CLC
-NrFl03:	POP	DI
+	PUSH	AX
+	PUSH	DX
+	MOV	DX,DS
+	CALL	FAR PTR NearFl_c
+	POP	DX
+	CMP	AX,1
+	CMC			; CY if one was found
+	JNC	NrFl01
+	MOV	SI,AX
+NrFl01:	POP	AX
 	RET
 NearFl	ENDP
 

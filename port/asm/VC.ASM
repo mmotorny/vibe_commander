@@ -22,6 +22,10 @@
 	EXTERN	MvsBw_c:FAR, MvsColr_c:FAR, MovDz0_c:FAR
 	EXTERN	HexByt_c:FAR, TstHex_c:FAR, TxtNum_c:FAR
 	EXTERN	Convert_c:FAR, UnConv_c:FAR, TstMas_c:FAR
+	EXTERN	SetMask_c:FAR, TstExe_c:FAR, Sort_c:FAR, FnFile_c:FAR
+	EXTERN	NearFl_c:FAR, TotSel_c:FAR
+	EXTERN	BegBX_c:FAR, SizDX_c:FAR, LnsAX_c:FAR, InvWCB_c:FAR
+	EXTERN	AdrNum_c:FAR, NumAdr_c:FAR, ChgAdr_c:FAR, CorPar_c:FAR
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.

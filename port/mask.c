@@ -11,16 +11,12 @@
  */
 #include "vc.h"
 
-void Convert(const u8 __far *name, u8 *buffer);
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);
-u16 TstMas(const u8 __far *name, const u8 *mask);
 
-/* How the assembly passes arguments to these, and what it expects back.
-   The name is where the assembly has DS, the buffer or the mask in the
-   main data. */
-#pragma aux Convert "*_c" __far parm [dx si] [di] modify exact [ax]
+/* How the assembly passes arguments to these, and what it expects back;
+   Convert and TstMas are in vc.h. The name is where the assembly has DS,
+   the buffer or the mask in the main data. */
 #pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
-#pragma aux TstMas  "*_c" __far parm [dx si] [di] value [ax] modify exact [ax]
 
 /* Fill one part of a name in its fixed form, `length` characters at
    `field`, from the text at `name`, which ends with a zero byte or with

@@ -27,6 +27,30 @@ out again (show.py --changes is how):
   - Shift+F3 and Shift+F4 ask for the name of a file to view or to edit;
     Ctrl+a is the dialog of attributes, date and time; GrayPlus and
     GrayMinus select and unselect by a mask; F4 in the viewer is hex.
+  - Ctrl+y empties the field that the cursor is in.
+  - In the dialog of attributes "Tab Tab Space" ticks Hidden and "Tab Tab
+    Tab Space" System; from System two more Tabs go to the time. For a
+    directory, or for selected files, the dialog is another, with a
+    column to set and one to clear, and no date; and when a directory has
+    been given attributes the panel is read without regard to where the
+    cursor was.
+  - The order of a panel is in its menu only: "F9 l n", x, m, s and u for
+    name, extension, time, size and unsorted. Ctrl+F3 does nothing and
+    Ctrl+F4 asks for the volume label. "F9 l f" is Full and "F9 l l" the
+    filter: a mask, then two Tabs to "Executable files". Ctrl+h switches
+    hidden files off and on. "Alt+F1 a" is another drive.
+  - "F9 o f" switches Full screen, which is on: off, a panel has ten lines
+    of files. In the Configuration dialog four Tabs go to "Menu bar
+    always visible". Alt+F9 switches to 50 lines and back; a screen is
+    recorded as its first 25 rows whatever it has.
+  - F5 on a file and a name typed makes a copy next to it that keeps the
+    time stamp, so copies are a way to more files: C:\\WORK lists nine
+    entries. Ins selects and goes down. F8 on what is selected asks
+    twice, and once more for every directory that is not empty: Enter
+    each time.
+  - A:\\ is the disk DOS started from: three files before a directory, of
+    other dates than the bench's, one of them with a name of twelve
+    characters. D:\\ has the directory of the program and nothing else.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -240,6 +264,112 @@ SCENARIOS = {
             "Enter",
             "GrayMinus",
             '"h?llo.*"',
+            "Enter",
+        )),
+
+    "sort": Scenario(
+        "The files of a panel in each order: by name, extension, time and "
+        "size, with system files first, and unsorted again",
+        steps=(
+            "Down Down Down Down",        # onto hello.txt
+            "F5",                         # a copy with the same name and
+            '"hello.doc"',                # another extension
+            "Enter",
+            "Down",                       # onto notes.doc
+            "Ctrl+a",
+            "Tab Tab Tab Space",          # a system file,
+            "Tab Tab",
+            '"3:04:05"',                  # of the same day at another time
+            "Enter",
+            "Down Down",                  # onto run.bat
+            "Ctrl+a",
+            "Tab Tab Tab Space",          # another system file
+            "Enter",
+            "F9 l n",                     # by name
+            "F9 l x",                     # by extension
+            "F9 l m",                     # by time
+            "F9 l s",                     # by size
+            "Alt+F1 a",                   # a disk with files before a
+                                          # directory, of different days
+            "F9 l u",                     # unsorted: as they are on disk
+        )),
+
+    "filter": Scenario(
+        "The files of a panel chosen: without the hidden ones, by a mask, "
+        "and only programs",
+        steps=(
+            "Down Down Down Down",        # onto hello.txt
+            "F5",                         # copies of it that are programs
+            '"hello.com"',
+            "Enter",
+            "F5",
+            '"hello.exe"',
+            "Enter",
+            "F5",                         # and one without an extension
+            '"noext"',
+            "Enter",
+            "Ctrl+h",                     # hidden files off: none is hidden
+            "Up",                         # onto readme.txt
+            "Ctrl+a",
+            "Tab Tab Space",              # hidden: it goes, and the cursor
+            "Enter",                      # to the file behind it
+            "End",                        # onto the last file
+            "Ctrl+a",
+            "Tab Tab Space",              # hidden too: the cursor goes to
+            "Enter",                      # the file before it
+            "Ctrl+h",                     # hidden files on again
+            "Home",
+            "Down Down Down Down Down Ins",   # notes.doc selected
+            "F9 l l",
+            '"*.t?t"',                    # by a mask
+            "Enter",
+            "F9 l l",
+            "Ctrl+y",                     # no mask,
+            "Tab Tab Space",              # only programs
+            "Enter",
+            "F9 l l",
+            "Tab Tab Space",              # all files again: one that was
+            "Enter",                      # left out is no longer selected
+        )),
+
+    "scroll": Scenario(
+        "Panels of other sizes, and a list of files longer than its panel",
+        steps=(
+            "F9 o Enter",
+            "Tab Tab Tab Tab",
+            "Space",                      # the menu bar always visible
+            "Enter",
+            "Alt+F9",                     # 50 lines, of which the first 25
+                                          # are recorded
+            "Alt+F9",
+            "F9 o f",                     # panels half the screen high
+            "F9 l f",                     # and of one column: ten files
+            "Down Down Down Down",        # onto hello.txt
+            "F5",
+            '"hello.doc"',
+            "Enter",
+            "F5",
+            '"hello.bak"',
+            "Enter",                      # eleven files now
+            "End",
+            "Up Up Up Up Up Up Up Up Up Up",              # scrolled back
+            "Down Down Down Down Down Down Down Down Down Down",
+            "Home",
+            "Down Ins",                   # a directory selected
+            "Down Down Ins",              # and a file
+            "F8",                         # counted
+            "Esc",
+        )),
+
+    "emptied": Scenario(
+        "A disk with nothing left on it to list",
+        steps=(
+            "Ctrl+PgUp",                  # the root, with two directories
+            "Ins Ins",
+            "F8",
+            "Enter",
+            "Enter",                      # both of them
+            "Enter",                      # though they are not empty
             "Enter",
         )),
 
