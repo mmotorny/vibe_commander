@@ -1,0 +1,3 @@
+# The original sources are CP866 text with CRLF line endings. Keep them
+# byte-exact: no line-ending conversion.
+src/** -text
