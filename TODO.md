@@ -16,12 +16,6 @@ Things that are known and not done. Standing instructions are in
 - The signal T, for a program that waits and will act by itself after a
   while, has not been seen in use: no scenario makes the program follow
   the cursor to another directory after its delay.
-- A scenario recorded across a minute of the guest's clock. With the clock
-  off on the test bench nothing should stand in its way, but no scenario is
-  long enough to have tried it. Nothing stops one from showing the time of
-  day after its first minute either, with the clock switched on or in the
-  time stamp of a file it has made; the golden would then show another
-  minute than a build does when it is tested.
 
 - The clock where it has 24 hours: the scenario `clock` runs in the United
   States only. The `port` test will ask for the other when the code that
