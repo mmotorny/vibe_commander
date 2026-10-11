@@ -242,11 +242,15 @@ goldens wherever the banner shows.
 shows after each of some steps, or with `--program` those of a build. It
 is how to find out what keys do before writing them into a scenario. With
 `--changes` it prints of each screen only the rows that differ from the
-one before, which is most of what there is to see.
+one before, which is most of what there is to see; rows that are again as
+they were after an earlier step, as when a dialog closes, it names in a
+line.
 
-`python3 harness/reach.py ROUTINE...` lists the instructions of routines of
-the original that no scenario has run, and with `--steps` says which of
-them some steps would reach.
+`python3 harness/reach.py ROUTINE...` says of each routine of the original
+how many of its instructions some scenario has run and which are left, by
+their addresses, in a line; with `--list` it prints those that are left as
+the listing has them. With `--steps` it says which of them some steps
+would reach.
 
 `python3 harness/notice.py FILE OLD NEW` makes one change to a copy of the
 port, builds it, and says which scenario notices, or that none does. That

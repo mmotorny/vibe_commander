@@ -23,11 +23,6 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
 
 - The files of a panel and the place of the cursor, 17 routines, about
   half an hour in all:
-  - 4 minutes: `reach.py --steps --changes` prints every row of a dialog
-    that opens and, at the end, every instruction of the routines that is
-    still unreached, one to a line. With 17 routines that was 150 lines a
-    run, cut down by hand with `grep` each time. A line for each routine,
-    "reached 12, left 3: C566 C569 C56B", would do.
   - 3 minutes: three tries at the one instruction of `NearFl` that runs
     when no file of the old list is left. What worked is emptying C:\ of
     its two directories.

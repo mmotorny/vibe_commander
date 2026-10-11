@@ -19,12 +19,19 @@ A screen is 25 rows, and most of what a key does is in a few of them:
     show.py --changes F9 o Enter        of each screen only the rows that
                                         differ from the screen before, with
                                         ~ where only the colours differ
+                                        and, when a dialog closes, in a
+                                        line the rows that are as they
+                                        were after an earlier step
     show.py --last F9 o Enter           only the screen after the last step
 """
 import argparse
 
 import scenarios
 import setups
+
+# With --changes, how many rows have to be as they were after an earlier
+# step for them to be named in a line instead of printed.
+AGAIN = 3
 
 
 def add_arguments(parser):
@@ -33,7 +40,9 @@ def add_arguments(parser):
     parser.add_argument("--changes", action="store_true",
                         help="print of each screen only the rows that "
                              "differ from the screen before, numbered,\n"
-                             "with ~ where only the colours differ")
+                             "with ~ where only the colours differ, and "
+                             "in a line the rows\nthat are again as they "
+                             "were after an earlier step")
     parser.add_argument("--last", action="store_true",
                         help="print only the screen after the last step")
 
@@ -41,7 +50,7 @@ def add_arguments(parser):
 def print_screens(steps, screens, codepage, changes=False, last=False):
     """Print the screens that follow the start and each of `steps`, as
     text in `codepage`: all of each, or what add_arguments() offers."""
-    before = None
+    earlier = []                  # of every screen so far: rows, cells
     names = ("the start",) + tuple(steps)
     for number, (step, screen) in enumerate(zip(names, screens)):
         rows = [line.rstrip() for line in screen.lines(codepage)]
@@ -51,18 +60,49 @@ def print_screens(steps, screens, codepage, changes=False, last=False):
         if not last or number == len(names) - 1:
             print(f"== {number}: {step}    cursor at column "
                   f"{screen.cursor[0]}, row {screen.cursor[1]}")
-            if changes and before is not None:
-                # A row whose colours alone have changed is marked ~.
+            if changes and earlier:
+                before = earlier[-1]
                 changed = [row for row in range(len(rows))
                            if cells[row] != before[1][row]]
+                # When a dialog closes, most of what changes is again as
+                # it was after an earlier step. Such rows are only named:
+                # those of the step that has the most of them, the last
+                # such step, if they are more than half and at least
+                # AGAIN.
+                then, again = 0, []
+                for step_before in range(number - 1):
+                    same = [row for row in changed
+                            if earlier[step_before][1][row] == cells[row]]
+                    if len(same) >= len(again):
+                        then, again = step_before, same
+                if len(again) < max(AGAIN, len(changed) // 2 + 1):
+                    again = []
                 for row in changed:
-                    mark = "~" if rows[row] == before[0][row] else " "
-                    print(f"{row:2}{mark}{rows[row]}")
+                    if row not in again:
+                        # A row whose colours alone have changed is
+                        # marked ~.
+                        mark = "~" if rows[row] == before[0][row] else " "
+                        print(f"{row:2}{mark}{rows[row]}")
+                if again:
+                    print(f"   as after step {then} again: rows "
+                          f"{_ranges(again)}")
                 if not changed:
                     print("   no row has changed")
             else:
                 print("\n".join(rows))
-        before = rows, cells
+        earlier.append((rows, cells))
+
+
+def _ranges(numbers):
+    """Rising `numbers` as text, "5-12 24"."""
+    found = []
+    for number in numbers:
+        if found and found[-1][1] == number - 1:
+            found[-1][1] = number
+        else:
+            found.append([number, number])
+    return " ".join(str(first) if first == last else f"{first}-{last}"
+                    for first, last in found)
 
 
 def main():

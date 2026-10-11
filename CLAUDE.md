@@ -93,8 +93,9 @@ each batch, in this order:
    uses afterwards. That and the flags are the contract the stubs must
    keep.
 2. Write scenarios that reach the routines. `harness/reach.py` lists the
-   instructions of theirs that no scenario has run yet, and tries steps
-   against that list; `harness/show.py` shows what keys do, with
+   instructions of theirs that no scenario has run yet, by address in a
+   line for each routine and with `--list` as the listing has them, and
+   tries steps against that list; `harness/show.py` shows what keys do, with
    `--changes` only the rows that a step changed; what is known about
    driving the dialogs is at the top of `harness/scenarios.py`. Derive the
    goldens with `harness/goldens.py`.
