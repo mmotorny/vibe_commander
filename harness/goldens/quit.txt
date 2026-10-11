@@ -1,7 +1,6 @@
 Volkov Commander 4.05 in the scenario quit: what the original shows and
 leaves on its disks. Derived by harness/goldens.py; not to be edited.
 code page 437
-recorded on QEMU emulator version 11.1.2
 
 == 0: the start
 cursor 8 23 lines 6 7 mode 3

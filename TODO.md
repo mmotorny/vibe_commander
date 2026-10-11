@@ -18,10 +18,6 @@ Things that are known and not done. Standing instructions are in
   the cursor to another directory after its delay.
 - `harness/goldens.py` refuses to record a scenario that takes the guest's
   clock into the next minute. No scenario is long enough to have tried it.
-- A golden records the version of QEMU it was derived on, but nothing
-  compares that with the QEMU in use. On another version a test would fail
-  on a difference in the screens, the figure for memory in the Info panel
-  for one, without saying why.
 
 ## Suspected bugs in the original
 

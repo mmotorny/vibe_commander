@@ -23,7 +23,6 @@ page of the scenario's country.
 """
 import argparse
 import re
-import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -56,7 +55,6 @@ def charset(codepage):
 class Golden:
     scenario: str
     codepage: int
-    qemu: str                     # the version that the original ran on
     steps: list                   # what was done before each screen
     screens: list
     disks: dict                   # drive -> path -> line describing it
@@ -107,8 +105,7 @@ def write(golden):
            "the original shows and",
            "leaves on its disks. Derived by harness/goldens.py; not to be "
            "edited.",
-           f"code page {golden.codepage}",
-           f"recorded on {golden.qemu}"]
+           f"code page {golden.codepage}"]
     steps = ("the start",) + scenarios.SCENARIOS[golden.scenario].steps
     for number, (step, screen) in enumerate(zip(steps, golden.screens)):
         out += ["", f"== {number}: {step}",
@@ -141,9 +138,8 @@ def read(name):
     lines = path(name).read_text(encoding="utf-8").split("\n")
     codepage = int(lines[2].split()[-1])
     codes = {char: code for code, char in enumerate(charset(codepage))}
-    golden = Golden(name, codepage, lines[3].partition(" on ")[2], [], [],
-                    {})
-    at = 4
+    golden = Golden(name, codepage, [], [], {})
+    at = 3
     while at < len(lines):
         line = lines[at]
         at += 1
@@ -279,10 +275,8 @@ def derive(name, benches):
         sys.exit(f"{name}: recording took the guest's clock into the next "
                  f"minute, after {run.ended - run.began:.0f} s; make the "
                  "scenario shorter")
-    version = subprocess.run(["qemu-system-i386", "--version"],
-                             capture_output=True, text=True).stdout
     codepage = (setups.COUNTRIES[scenario.country] or (1, 437))[1]
-    write(Golden(name, codepage, version.split("\n")[0], [],
+    write(Golden(name, codepage, [],
                  [deviations.expected(screen) for screen in run.screens],
                  disk_lines(run.disks, {original.filename})))
     write_ran(name, run.executed)
