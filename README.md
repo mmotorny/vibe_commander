@@ -86,7 +86,8 @@ MASM-compatible assembler, at a pinned commit, builds it, and assembles
 second copy of both into `build/shareware-layout/`, with the room reserved
 that the byte comparison needs; only the tests use that copy.
 
-It then builds the port, `build/port/VC.EXE`, for which it fetches a pinned
+It then builds the port, `build/port/VC.EXE`, and next to it in
+`build/port/signalling/` the variant that the tests run. For this it fetches a pinned
 snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
 download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
 and ARM and for Windows on x86-64; the build has been run on Linux x86-64
@@ -158,6 +159,12 @@ Every step is checked by the `port` test below, and nothing else decides
 whether a translation is right. The routines translated so far are listed
 in `harness/ported.py`.
 
+The tests do not run the program that is shipped but a variant of it,
+assembled with `HARNESS` defined. It writes a letter to a port of the PC
+whenever it takes a key, waits for one, or ends, and so tells the tests
+exactly when it has finished what a key started. The two differ by a few
+dozen instructions, all in macros at the top of `port/asm/VC.ASM`.
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
@@ -192,7 +199,7 @@ holds exactly what a build should show. There is one such place: the banner
 names the edition, and the published source is of another edition than the
 binaries shipped in 2000.
 
-`python3 harness/compare.py FILE [SCENARIO...]` takes any
+`python3 harness/compare.py [--signals] FILE [SCENARIO...]` takes any
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from
 the goldens.
 
@@ -210,10 +217,11 @@ the program set up differently does that itself, through the menus.
 ### When a step is finished
 
 The screen has to be read when the program has done all that a key makes
-it do, and not before. The program does not say when that is, so the
-harness waits until every key has been taken and the screen has stood
-still for most of a second. A scenario of twenty steps takes twenty
-seconds that way.
+it do, and not before. The variant of the port that the tests run says so
+itself (see [The port](#the-port)), and a scenario of twenty steps takes a
+second or two. The original cannot say, so when its goldens are derived
+the harness waits for the screen to stand still after every step. That is
+slow, and needed only when a scenario is new or has changed.
 
 Nothing waits without a limit. A program that hangs or resets its machine
 fails its scenario within seconds, with the screen it got stuck on.

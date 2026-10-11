@@ -271,7 +271,7 @@ def derive(name, benches):
     scenario = scenarios.SCENARIOS[name]
     original = setups.original_vc()
     run = scenarios.run(scenario, original, benches[scenario.country],
-                        trace=True)
+                        signals=False, trace=True)
     # Runs do not keep the same time of day: one waits longer for a step
     # to finish than another. Within one minute nothing on the screen
     # tells them apart.

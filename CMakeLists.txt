@@ -117,20 +117,8 @@ set_target_properties(mkexe PROPERTIES
     C_STANDARD 99
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
+# The compiled code, which every build of the port shares.
 file(MAKE_DIRECTORY ${port_dir})
-add_custom_command(
-    OUTPUT ${port_dir}/VC.OBJ
-    COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
-            $<TARGET_FILE:jwasm> -nologo -q -omf
-            -I${CMAKE_SOURCE_DIR}/port/asm -Fo ${port_dir}/VC.OBJ
-            ${CMAKE_SOURCE_DIR}/port/asm/VC.ASM
-    DEPENDS jwasm ${port_asm}
-    COMMENT "Assembling the port"
-    VERBATIM)
-
-# The assembly comes first: the program starts in it and expects the
-# compiled code behind it.
-set(port_objects ${port_dir}/VC.OBJ)
 set(port_compiled "")
 foreach(source ${port_c})
     string(REGEX REPLACE "\\.c$" ".obj" object ${port_dir}/${source})
@@ -152,23 +140,48 @@ foreach(source ${port_c})
                 ${CMAKE_SOURCE_DIR}/port/vc.h
         COMMENT "Compiling ${source}"
         VERBATIM)
-    list(APPEND port_objects ${object})
     list(APPEND port_compiled ${object})
 endforeach()
 
-# Warning 1014 says that there is no stack segment: the program sets up its
-# stack itself.
-list(JOIN port_objects "," port_files)
-add_custom_command(
-    OUTPUT ${port_dir}/VC.EXE ${port_dir}/VC.MAP
-    COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
-            name ${port_dir}/linked.exe file ${port_files}
-            option map=${port_dir}/VC.MAP disable 1014
-    COMMAND mkexe ${port_dir}/linked.exe ${port_dir}/VC.EXE ${port_compiled}
-    DEPENDS mkexe ${port_objects}
-    COMMENT "Linking the port"
-    VERBATIM)
-add_custom_target(port ALL DEPENDS ${port_dir}/VC.EXE)
+# add_port(<target> <directory> [<jwasm option>...]) assembles port/asm and
+# links it with the compiled code into <directory>/VC.EXE, with a link map
+# next to it.
+function(add_port target directory)
+    file(MAKE_DIRECTORY ${directory})
+    add_custom_command(
+        OUTPUT ${directory}/VC.OBJ
+        COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
+                $<TARGET_FILE:jwasm> -nologo -q -omf ${ARGN}
+                -I${CMAKE_SOURCE_DIR}/port/asm -Fo ${directory}/VC.OBJ
+                ${CMAKE_SOURCE_DIR}/port/asm/VC.ASM
+        DEPENDS jwasm ${port_asm}
+        COMMENT "Assembling the port (${target})"
+        VERBATIM)
+    # The assembly comes first: the program starts in it and expects the
+    # compiled code behind it. Warning 1014 says that there is no stack
+    # segment: the program sets up its stack itself.
+    list(JOIN port_compiled "," compiled)
+    add_custom_command(
+        OUTPUT ${directory}/VC.EXE ${directory}/VC.MAP
+        COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
+                name ${directory}/linked.exe
+                file ${directory}/VC.OBJ,${compiled}
+                option map=${directory}/VC.MAP disable 1014
+        COMMAND mkexe ${directory}/linked.exe ${directory}/VC.EXE
+                ${port_compiled}
+        DEPENDS mkexe ${directory}/VC.OBJ ${port_compiled}
+        COMMENT "Linking the port (${target})"
+        VERBATIM)
+    add_custom_target(${target} ALL DEPENDS ${directory}/VC.EXE)
+endfunction()
+
+# The program as it is shipped.
+add_port(port ${port_dir})
+
+# The program as the tests run it: it signals where it is, so that they
+# need not guess. See "Signals to the tests" in port/asm/VC.ASM.
+set(signalling_dir ${port_dir}/signalling)
+add_port(port-signalling ${signalling_dir} -DHARNESS)
 
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS
@@ -191,4 +204,5 @@ add_test(NAME start-screen-shareware-layout
             ${layout_dir}/VC.COM start)
 add_test(NAME port
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
-            ${port_dir}/VC.EXE ${port_dir}/VC.MAP ${layout_dir}/VC.LST)
+            ${signalling_dir}/VC.EXE ${signalling_dir}/VC.MAP
+            ${layout_dir}/VC.LST ${port_dir}/VC.EXE)

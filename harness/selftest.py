@@ -31,12 +31,13 @@ def main():
     with setups.Benches() as benches:
         bench = benches[scenario.country]
         report = goldens.differences(
-            golden, scenarios.run(scenario, original, bench),
+            golden, scenarios.run(scenario, original, bench, signals=False),
             {original.filename})
         if report:
             print("\n".join(report))
             sys.exit("the original was reported to differ from its golden")
-        screen = scenarios.run(scenario, changed, bench).screens[0]
+        screen = scenarios.run(scenario, changed, bench,
+                               signals=False).screens[0]
 
     expected = golden.screens[0]
     differing = [i // 2 for i in range(len(expected.cells))

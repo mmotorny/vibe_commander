@@ -23,11 +23,14 @@ import coverage
 import fat
 from dos import MachineError
 
-# How long the screen must stand still for a step to count as finished, in
-# seconds. It has to cover the longest the program waits before it does
+# How long the screen must stand still to count as finished, in seconds,
+# where that is all there is to go by: for a program that does not signal,
+# and for DOS. It has to cover the longest the program waits before it does
 # something by itself, 0.6 s for following the cursor to another directory,
 # and both states of the blinking colon of its clock.
 SETTLE = 0.8
+# The same for what DOS shows when the program has ended.
+DOS_SETTLE = 0.3
 # How long a step may take before the program counts as stuck, in seconds.
 STEP_TIME = 20
 
@@ -135,18 +138,20 @@ SCENARIOS = {
 }
 
 
-def run(scenario, program, bench, trace=False):
+def run(scenario, program, bench, signals, trace=False):
     """Run `scenario` on `program` (a setups.Program) and return the Run.
 
-    `bench` is the setups.Bench for the scenario's country. When the
-    program has finished a step is guessed: when every key has been taken
-    and the screen has stood still for a while.
+    `bench` is the setups.Bench for the scenario's country. With `signals`
+    the program is taken to be a build that signals where it is, and each
+    screen is recorded the moment it says that it waits for a key and has
+    nothing left to do by itself. Without, the moment is guessed: when the
+    screen has stood still for a while.
     """
     with tempfile.TemporaryDirectory() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None
         with bench.start(workdir, program, log) as machine:
-            wait = _settled
+            wait = _signalled if signals else _settled
             screens = [wait(machine, "the start")]
             began = machine.seconds()
             for number, step in enumerate(scenario.steps, 1):
@@ -170,3 +175,33 @@ def _settled(machine, where):
     except MachineError as error:
         raise MachineError(f"after {where}: {error}") from None
 
+
+def _signalled(machine, where):
+    """Wait for the program to signal that it waits for a key, or that it
+    has ended, and return the screen. Leaves the machine paused."""
+    heard = ""
+
+    def idle():
+        nonlocal heard
+        if not machine.keys_taken():
+            return False
+        # Every key has been taken, and a key that is taken says K at once.
+        # So if the last word now is W, the program waits with nothing in
+        # hand.
+        heard += machine.signals()
+        return heard.endswith(("W", "X"))
+
+    try:
+        machine.until(idle, STEP_TIME, "")
+    except MachineError:
+        machine.pause()
+        shown = "\n".join(machine.screen().lines())
+        raise MachineError(
+            f"after {where}: the program did not come to wait for a key "
+            f"within {STEP_TIME} s; it signalled {heard!r} and shows\n"
+            f"{shown}") from None
+    if heard.endswith("X"):
+        # The program has ended; what DOS then shows comes without signals.
+        return machine.wait_for_screen(DOS_SETTLE, STEP_TIME)
+    machine.pause()
+    return machine.screen()

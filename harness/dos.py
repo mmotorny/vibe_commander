@@ -23,6 +23,9 @@ KEYBOARD_BUFFER = 0x41A           # where it is read, where it is filled
 
 TICK = 65536 / 1193182            # of the BIOS clock, in seconds
 
+# The port a program built for the tests writes to, to say where it is.
+SIGNAL_PORT = 0xE9
+
 # Hard disks are 64 cylinders x 16 heads x 63 sectors: 31.5 MB of FAT16.
 GEOMETRY = (64, 16, 63)
 
@@ -235,12 +238,16 @@ class Machine:
         self._serial = self._workdir / "serial.log"
         self._scratch = self._workdir / "scratch.bin"
         control = self._workdir / "qmp.sock"
+        signals = self._workdir / "signals.sock"
         command = [
             "qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", "16",
             "-nodefaults", "-vga", "std", "-display", "none", "-no-reboot",
             "-rtc", f"base={clock},clock=vm", "-boot", "a",
             "-serial", f"file:{self._serial}",
             "-qmp", f"unix:{control},server=on,wait=off",
+            # What the guest writes to port E9h arrives on a socket.
+            "-chardev", f"socket,id=signals,path={signals},server=on,wait=off",
+            "-device", f"isa-debugcon,iobase={SIGNAL_PORT:#x},chardev=signals",
             "-drive", f"if=floppy,index=0,format=raw,readonly=on,file={floppy}",
         ]
         for index, disk in enumerate(hard_disks):
@@ -255,6 +262,8 @@ class Machine:
         self._channel = self._socket.makefile("rw")
         self._reply()                                    # greeting
         self._command("qmp_capabilities")
+        self._signals = self._connect(signals)
+        self._heard = ""                                 # signals not yet used
         if state:
             self.until(lambda: self._command("query-status")["status"]
                         != "inmigrate", 10, "the saved state did not load")
@@ -283,6 +292,7 @@ class Machine:
             self._qemu.kill()
             self._qemu.wait()
         self._socket.close()
+        self._signals.close()
 
     def _reply(self):
         while True:
@@ -398,6 +408,21 @@ class Machine:
         """Whether the guest has read every key that was pressed."""
         head, tail = self._keyboard()
         return head == tail
+
+    def signals(self):
+        """What the guest has signalled since this was last asked, as text:
+        the bytes it wrote to the signal port."""
+        self._signals.setblocking(False)
+        try:
+            while True:
+                data = self._signals.recv(4096)
+                if not data:
+                    break
+                self._heard += data.decode("latin-1")
+        except BlockingIOError:
+            pass
+        heard, self._heard = self._heard, ""
+        return heard
 
     def screen(self):
         """The text screen as it is now. Pause the machine first if the

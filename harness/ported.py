@@ -13,6 +13,7 @@ below, this also checks that
   - every C function that replaces them ran in the port, and
   - the port is no more than three times the size of the original.
 
+The build of the port that is tested is the one that signals where it is.
 What ran in the original was recorded with the goldens; what runs in the
 port is read from QEMU's log of the code it executed (see coverage.py).
 The assembly is identified by the listing of the build that is laid out
@@ -120,21 +121,24 @@ def check_port(link_map, executed):
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("port", help="the port's VC.EXE")
+    parser.add_argument("port", help="the port's VC.EXE, the build that "
+                                     "signals")
     parser.add_argument("link_map", help="its link map")
     parser.add_argument("listing", help="the listing of VC.COM laid out "
                                         "like the original")
+    parser.add_argument("shipped", help="the port's VC.EXE as it is shipped, "
+                                        "for its size")
     args = parser.parse_args()
 
     original, port = setups.original_vc(), setups.Program.load(args.port)
-    size = len(port.contents)
+    size = len(setups.Program.load(args.shipped).contents)
     limit = SIZE_LIMIT * len(original.contents)
     print(f"VC.EXE is {size} bytes, {size / len(original.contents):.2f} "
           f"times the original's {len(original.contents)}; the limit is "
           f"{SIZE_LIMIT} times")
 
     names = list(scenarios.SCENARIOS)
-    failed, runs = compare.compare(names, port, trace=True)
+    failed, runs = compare.compare(names, port, signals=True, trace=True)
     in_original, in_port = set(), {}
     for name, run in zip(names, runs):
         in_original |= goldens.read_ran(name)

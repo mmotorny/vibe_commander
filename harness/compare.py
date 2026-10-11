@@ -7,8 +7,10 @@ goldens.py): show the same text screen after the start and after every
 step, cell by cell, character and colour attribute, with the same cursor
 and video mode, and leave the same files on its disks.
 
-After every step the harness waits until the screen has stood still, which
-takes most of a second.
+A build that signals where it is (see "Signals to the tests" in
+port/asm/VC.ASM) is waited for exactly. For any other build, such as the
+original itself, the harness waits until the screen has stood still, which
+takes most of a second for every step.
 
 Exits with status 0 if the build is indistinguishable and 1 if it differs.
 """
@@ -21,7 +23,7 @@ import scenarios
 import setups
 
 
-def compare(names, program, trace=False):
+def compare(names, program, signals, trace=False):
     """Take `program` through the scenarios of `names`, printing a line for
     each and how it departs from the golden.
 
@@ -34,7 +36,7 @@ def compare(names, program, trace=False):
             scenario = scenarios.SCENARIOS[name]
             began = time.monotonic()
             run = scenarios.run(scenario, program, benches[scenario.country],
-                                trace)
+                                signals, trace)
             took = time.monotonic() - began
             runs.append(run)
             report = goldens.differences(goldens.read(name), run,
@@ -58,9 +60,11 @@ def main():
     parser.add_argument("scenario", nargs="*",
                         help="scenarios to run (default: all): "
                              + ", ".join(scenarios.SCENARIOS))
+    parser.add_argument("--signals", action="store_true",
+                        help="the program is a build that signals")
     args = parser.parse_args()
     failed, _ = compare(args.scenario or list(scenarios.SCENARIOS),
-                        setups.Program.load(args.program))
+                        setups.Program.load(args.program), args.signals)
     sys.exit(failed)
 
 

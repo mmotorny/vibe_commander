@@ -146,12 +146,14 @@ PutKey	PROC	NEAR
 	CMP	ES:KeyBar,0
 	JNZ	PutKy1
 	MOV	ES:BarPrev,0FFh
+	SigKeys	0
 	RET
 PutKy1:	PUSH	BX
 	PUSH	AX
 	MOV	BL,AL
 	MOV	AH,2
 	INT	16h
+	SigKeys
 	MOV	AH,3
 	TEST	AL,8
 	JNZ	PutKy2
@@ -1524,11 +1526,13 @@ Input0	PROC	NEAR C USES DS SI DI DX CX BX
 	PUSH	ES
 	POP	DS
 	MOV	IKeyBar,AL
+	SigNew
 	MOV	AH,1
 	INT	16h
 	JZ	Inpt02
 	MOV	AH,0
 	INT	16h
+	Signal	'K'
 Inpt01:	JMP	Inpt41
 Inpt02:	XOR	AX,AX
 	CALL	GetMous
@@ -1656,12 +1660,14 @@ Inpt30:	CMP	DS:AutoTim.Lo,0FFFFh
 	JA	Inpt32
 	CMP	BX,DS:AutoTim.Hi
 	JAE	Inpt32
-Inpt31:	CALL	Rnd
+Inpt31:	SigWait
+	CALL	Rnd
 	MOV	AH,1
 	INT	16h
 	JZ	Inpt33
 	MOV	AH,0
 	INT	16h
+	Signal	'K'
 Inpt32:	JMP	Inpt40
 Inpt33:	XOR	AX,AX
 	CALL	GetMous

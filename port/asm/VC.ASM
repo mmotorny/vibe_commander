@@ -25,6 +25,74 @@ CallC	MACRO	Name
 	POP	DS
 	ENDM
 
+;------------------- Signals to the tests --------------
+; The build that the tests run says where it is, by writing a letter to a
+; port that QEMU passes on to them:
+;
+;	K	it has taken a key from the keyboard
+;	W	it waits for a key
+;	S	it waits for a key and shows the key bar of Shift, Ctrl or
+;		Alt, which is held down
+;	T	it waits for a key, and will act by itself after a while
+;	X	it ends
+;
+; Without this the tests could only guess when the program has finished
+; what a key started. The build that is shipped does none of it.
+SigPort	EQU	0E9h
+
+Signal	MACRO	Letter
+IFDEF	HARNESS
+	PUSH	AX
+	MOV	AL,Letter
+	OUT	SigPort,AL
+	POP	AX
+ENDIF
+	ENDM
+
+; Before the program looks for a key: nothing has been signalled yet.
+SigNew	MACRO
+IFDEF	HARNESS
+	MOV	CS:SigSt,0
+ENDIF
+	ENDM
+
+; The key bar has been drawn for the shift keys in AL, or with 0 not at all.
+SigKeys	MACRO	Keys
+IFDEF	HARNESS
+	PUSH	AX
+IFNB	<Keys>
+	MOV	AL,Keys
+ENDIF
+	AND	AL,0Fh
+	MOV	CS:SigKb,AL
+	POP	AX
+ENDIF
+	ENDM
+
+; The program has found no key and waits: signal W, S or T, unless that is
+; what was signalled last since SigNew. Expects DS to point at the main
+; data.
+SigWait	MACRO
+	LOCAL	Which, Told
+IFDEF	HARNESS
+	PUSHF
+	PUSH	AX
+	MOV	AL,'T'
+	CMP	DS:AutoTim.Lo,0FFFFh
+	JNE	Which
+	MOV	AL,'S'
+	CMP	CS:SigKb,0
+	JNE	Which
+	MOV	AL,'W'
+Which:	CMP	AL,CS:SigSt
+	JE	Told
+	MOV	CS:SigSt,AL
+	OUT	SigPort,AL
+Told:	POP	AX
+	POPF
+ENDIF
+	ENDM
+
 	.CODE
 	PUBLIC	_md
 _md	LABEL	BYTE			; The main data segment, to C code:
@@ -612,6 +680,7 @@ Exit03:	CMP	ES:ComnIni.ChkTSR,0
 	MOV	AX,2527h
 	INT	21h
 Exit04:	POP	AX
+	Signal	'X'
 	CMP	ES:Vect22.Segm,0
 	JNE	Exit05
 	MOV	AH,4Ch
@@ -2774,6 +2843,10 @@ OkMn_D	DB	4, 0
 	DB	0
 SecDat	DW	0
 RelDone	DB	0			; 1 when this copy has been relocated
+IFDEF	HARNESS
+SigSt	DB	0			; The last of W, S and T signalled
+SigKb	DB	0			; The shift keys the key bar shows
+ENDIF
 
 	.CODE
 FatErr:	PUSH	DS
