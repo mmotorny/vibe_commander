@@ -20,7 +20,10 @@ that is tested marks its stack when it has set it up, and how much of the
 mark is left is read from the machine every time the program waits for a
 key (see scenarios.py). A stack used beyond its bottom overwrites what the
 program saves of its panels and its setup while a command runs, and no
-screen would show that.
+screen would show that. What every scenario leaves is reported, not only
+the least: a new scenario may go deeper than any before it by itself, and
+what it leaves before a batch is translated and after says which it was,
+the scenario or the batch.
 
 A comparison that finds nothing is only worth something if it would have
 found a difference. So one cell of a screen that the port has shown is
@@ -37,6 +40,7 @@ Exits with status 0 if all of this holds and 1 otherwise.
 """
 import argparse
 import sys
+import textwrap
 from dataclasses import dataclass, field, replace
 
 import compare
@@ -217,6 +221,11 @@ def check_stack(names, runs):
     least = min(left, key=left.get)
     print(f"The stack: {left[least]} bytes of it are left untouched at the "
           f"least, in {least}; the limit is {STACK_LEFT}")
+    print(textwrap.fill(
+        "in each scenario: " + ", ".join(f"{name} {left[name]}"
+                                         for name in names),
+        width=78, initial_indent="  ", subsequent_indent="    ",
+        break_on_hyphens=False))
     for name in names:
         if left[name] < STACK_LEFT:
             print(f"  too little of the stack left: {left[name]} bytes in "

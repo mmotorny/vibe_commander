@@ -26,11 +26,6 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - 3 minutes: three tries at the one instruction of `NearFl` that runs
     when no file of the old list is left. What worked is emptying C:\ of
     its two directories.
-  - 2 minutes: the `port` test names only the scenario with the least
-    stack left. To tell what the batch cost from what a new scenario
-    costs by itself, the routines were put back as assembly for a build
-    and the new scenarios run against that. The test could print the
-    figure of every scenario.
   - 2 minutes: an offset taken from a C structure that the assembly has
     otherwise (`TreList`), found by the `tree` scenario; and a label
     inside a procedure that others call (`NumAd1`), found by the

@@ -174,7 +174,8 @@ assembled with `HARNESS` defined. It writes a letter to a port of the PC
 whenever it takes a key, waits for one, or ends, and so tells the tests
 exactly when it has finished what a key started. It also marks its stack
 when it has set it up, so that the tests can read from the machine how much
-of the 256 bytes the program never touches: compiled code uses more stack
+of the 256 bytes the program never touches, which the `port` test reports
+for every scenario: compiled code uses more stack
 than the assembly it replaces, and a stack used beyond its bottom would
 overwrite data without a trace on the screen. The two differ by a few
 dozen instructions, all in macros at the top of `port/asm/VC.ASM`. A few

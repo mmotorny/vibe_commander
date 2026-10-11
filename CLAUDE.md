@@ -177,8 +177,9 @@ with it is less obvious:
   it. In a routine at the bottom of deep calls, write the sharing out and
   shift instead of multiplying, and read what the compiler made of it,
   in the listing next to the object, `build/port/*.lst`.
-  The `port` test says how much of the stack the scenarios leave
-  untouched, and fails below a limit.
+  The `port` test says how much of the stack each scenario leaves
+  untouched, and fails below a limit. Its run in step 3 has the figures
+  of the new scenarios with the routines still assembly.
 - A static function is called, not expanded in place, also where only
   one routine uses it.
 - The structures of `port/vc.h` are the assembly's, but a field that the
