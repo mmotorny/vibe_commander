@@ -16,16 +16,12 @@ u8 *ColAddr(u16 number);
 u16 *Shadow(u16 *cell);
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);
-u16 __far *MvsColr(u16 __far *screen, u16 count, u16 color);
-u16 __far *MovDz0(u16 __far *screen, const u8 __far *text);
 
 /* How the assembly passes arguments to these, and what it expects back;
-   Color and BasAdr are in vc.h. */
+   Color, BasAdr, MvsColr and MovDz0 are in vc.h. */
 #pragma aux ColAddr "*_c" __far parm [ax] value [di] modify exact [di]
 #pragma aux Shadow  "*_c" __far parm [di] value [di] modify exact [di]
 #pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
-#pragma aux MvsColr "*_c" __far parm [es di] [cx] [ax] value [es di] modify exact [di es]
-#pragma aux MovDz0  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
 /* Where in the colour table a colour is, for the palette that is set up
    and the display. Only the low byte of `number` counts.

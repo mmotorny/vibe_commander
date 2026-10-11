@@ -5,10 +5,6 @@
  */
 #include "vc.h"
 
-/* What Number() does about thousands. */
-#define NUM_SEPARATED 1                 /* put the country's separator in */
-#define NUM_PADDED    2                 /* fill with spaces up to full width */
-
 /* The country's date formats; anything above is year, month, day. */
 #define DATE_MDY 0
 #define DATE_DMY 1
@@ -31,21 +27,18 @@ struct TimeText {
 };
 
 u16 HexDec(u16 number);
-u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);
 void PutDate(u16 date, struct DateText STACK *text);
 u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText STACK *text);
 u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
-u16 *SzDtTm(const struct FILENT __far *file, u16 *screen, u16 color);
 
-/* How the assembly passes arguments to these, and what it expects back. */
+/* How the assembly passes arguments to these, and what it expects back;
+   Number and SzDtTm are in vc.h. */
 #pragma aux HexDec  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux Number  "*_c" __far parm [di] [bx] [cx] [ax] value [di] modify exact [di]
 #pragma aux PutDate "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
 #pragma aux BufDate "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
 #pragma aux PutTime "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
 #pragma aux BufTime "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
-#pragma aux SzDtTm  "*_c" __far parm [es si] [di] [ax] value [di] modify exact [di es]
 
 static const u32 CODE PowersOfTen[9] = {
     1000000000UL, 100000000UL, 10000000UL, 1000000UL, 100000UL, 10000UL,

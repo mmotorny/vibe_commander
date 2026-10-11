@@ -13,7 +13,7 @@
 ; one, and are called through the routines of the same names here. C code
 ; expects DS to point at the main data segment and may change ES.
 	EXTERN	HexDec_c:FAR, Number_c:FAR, PutDate_c:FAR, BufDate_c:FAR
-	EXTERN	PutTime_c:FAR, BufTime_c:FAR, SzDtTm_c:FAR
+	EXTERN	PutTime_c:FAR, BufTime_c:FAR
 	EXTERN	LnStr_c:FAR, NgLine_c:FAR, CntLine_c:FAR
 	EXTERN	AddFile_c:FAR, MvzLine_c:FAR, FilZero_c:FAR, StrLen_c:FAR
 	EXTERN	LowCase_c:FAR, FndLet_c:FAR, CutPath_c:FAR, NormStr_c:FAR
@@ -26,6 +26,11 @@
 	EXTERN	NearFl_c:FAR, TotSel_c:FAR
 	EXTERN	BegBX_c:FAR, SizDX_c:FAR, LnsAX_c:FAR, InvWCB_c:FAR
 	EXTERN	AdrNum_c:FAR, NumAdr_c:FAR, ChgAdr_c:FAR, CorPar_c:FAR
+	EXTERN	Panel_c:FAR, PutPath_c:FAR, PtPt10_c:FAR, PutFls_c:FAR
+	EXTERN	SetCur_c:FAR, FilDir_c:FAR
+
+; Texts here that C code shows too.
+	PUBLIC	Title_S, Var_S, Tree_S
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.

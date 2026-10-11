@@ -51,6 +51,26 @@ out again (show.py --changes is how):
   - A:\\ is the disk DOS started from: three files before a directory, of
     other dates than the bench's, one of them with a name of twelve
     characters. D:\\ has the directory of the program and nothing else.
+  - Ctrl+l makes the right panel one of files, in C:\\; "F9 r" is its
+    menu, as "F9 l" is the left one's. A mask and "Executable files" are
+    both shown behind the path over a panel, so the filter is a way to a
+    long one: C:\\STAMPS\\SUB, the longest on the bench, is 13 characters.
+    "F9 o n" switches the mini status off.
+  - In the Configuration dialog "Down Space" from where it opens chooses
+    the laptop palette, in which a selected file has a mark.
+  - Shift+F4, a name that is not there and Enter twice open the editor on
+    a new file; a letter, F2 and Esc leave a file of one byte, which
+    comes last in its panel. It has the time of day. To give it another,
+    press Ctrl+a, the Tabs, the time and Enter in one step: the dialog
+    shows the seconds, and a step shows only what is there at its end.
+    Five Tabs go from the attributes past the date to the time, and
+    "12:00:00p" is the time of the bench's files.
+  - A step may press about 16 keys. The harness waits for each to reach
+    the keyboard buffer, which holds 15, and fails when the program does
+    not take them fast enough.
+  - There is no mouse on the bench, and nothing sets the kind of a panel
+    to anything but files, tree and Info: what the program does for a
+    mouse or for a fourth kind of panel cannot be reached.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -164,6 +184,36 @@ _NAMES_STEPS = (
     "F5",                                 # a copy of it
     '"under_sc.tx"',                      # an underscore, a short extension
     "Enter",                              # the panel lists it
+)
+
+# The path over the right panel makes room for the clock: it moves to the
+# left by half of what it has beyond 28 characters, or 30 where the clock
+# has 24 hours and is a character wider, and no further than a path of 32
+# or 33 would. The path over the left panel stays, and so does the right
+# one when the menu bar is above it.
+_CLOCK_PATH_STEPS = (
+    "Ctrl+PgUp",
+    "Down Enter",                         # the left panel in C:\\STAMPS
+    "F9 l l",
+    '"????????.???"',                     # a mask, and only programs:
+    "Tab Tab Space",                      # both are shown with the path,
+    "Enter",                              # which is 30 characters now
+    "Ctrl+l",                             # the Info panel off: two panels
+    "Tab",
+    "Down Enter",                         # the right one in C:\\STAMPS
+    "Down Enter",                         # and in its directory SUB
+    "F9 o l",                             # the clock: this path is short
+    "F9 r l",
+    '"?????.txt"',
+    "Tab Tab Space",
+    "Enter",                              # longer: it moves over
+    "F9 r l",
+    '"????????.???"',                     # longer than there is room for
+    "Enter",
+    "F9 o Enter",
+    "Tab Tab Tab Tab",
+    "Space",                              # the menu bar always visible
+    "Enter",                              # and the clock in it
 )
 
 SCENARIOS = {
@@ -484,6 +534,59 @@ SCENARIOS = {
     "clock-russia": Scenario(
         "The same where the clock has 24 hours",
         country="ru", steps=_CLOCK_STEPS),
+
+    "clock-path": Scenario(
+        "The path of the right panel, which moves over for the clock",
+        steps=_CLOCK_PATH_STEPS),
+
+    "clock-path-russia": Scenario(
+        "The same where the clock has 24 hours and is wider",
+        country="ru", steps=_CLOCK_PATH_STEPS),
+
+    "laptop": Scenario(
+        "The marks of selected and of hidden files in the laptop palette, "
+        "which has no colour to tell them by",
+        steps=(
+            "F9 o Enter",
+            "Down Space",                 # laptop
+            "Enter",
+            "Down Down Down",             # onto readme.txt
+            "Ctrl+a",
+            "Tab Tab Space",              # hidden: a mark before its
+            "Enter",                      # extension
+            "Ins",                        # selected too: another mark
+            "Ins",                        # hello.txt only selected
+            "Up",                         # the cursor on the one
+            "Up",                         # and on the other
+        )),
+
+    "columns": Scenario(
+        "A list of files longer than a column of its panel, what is "
+        "selected counted, and the panel without its status line",
+        steps=(
+            "F9 o f",                     # panels half the screen high:
+                                          # ten files to a column
+            "Down Down Down Down",        # onto hello.txt
+            "F5",
+            '"hello.doc"',
+            "Enter",                      # the tenth entry
+            "Shift+F4",                   # a new file, made in the editor
+            '"one.txt"',
+            "Enter",
+            "Enter",                      # it is not there: a new one
+            '"a"',                        # of one byte
+            "F2",
+            "Esc",                        # the eleventh, in a column of
+            "End",                        # its own
+            # It has the time of day. It gets the time of the bench's
+            # files in one step, so that no screen shows its seconds.
+            'Ctrl+a Tab Tab Tab Tab Tab "12:00:00p" Enter',
+            "Ins",                        # 1 byte in 1 selected file
+            "Home",
+            "Down Ins",                   # a directory too: not counted
+            "Alt+F6",                     # until its size is worked out
+            "F9 o n",                     # the mini status off
+        )),
 }
 
 

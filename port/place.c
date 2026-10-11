@@ -17,34 +17,15 @@
  */
 #include "vc.h"
 
-/* What AdrNum hands back, in the order in which its stub takes it off the
-   stack. */
-struct Place {
-    u16 cursor;                         /* the number of the cursor's entry */
-    u16 first;                          /* of the first one shown */
-    u16 last;                           /* of the last one there is */
-    u16 lines;                          /* lines of the panel that show
-                                           entries */
-};
-
-u16 BegBX(u16 panel);
-u16 SizDX(void);
-u16 LnsAX(void);
 u16 InvWCB(u16 panel);
-void AdrNum(u16 panel, struct Place STACK *place);
 u16 NumAdr(u16 panel, u16 number);
 u32 ChgAdr(u16 panel, u16 cursor, u16 first);
-void CorPar(u16 panel);
 
-/* How the assembly passes arguments to these, and what it expects back. */
-#pragma aux BegBX  "*_c" __far parm [bx] value [bx] modify exact [bx]
-#pragma aux SizDX  "*_c" __far value [dx] modify exact [dx]
-#pragma aux LnsAX  "*_c" __far value [ax] modify exact [ax]
+/* How the assembly passes arguments to these, and what it expects back;
+   struct Place, BegBX, SizDX, LnsAX, AdrNum and CorPar are in vc.h. */
 #pragma aux InvWCB "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux AdrNum "*_c" __far parm [ax] [bx] modify exact [ax]
 #pragma aux NumAdr "*_c" __far parm [ax] [si] value [si] modify exact [si]
 #pragma aux ChgAdr "*_c" __far parm [ax] [si] [di] value [dx ax] modify exact [ax dx]
-#pragma aux CorPar "*_c" __far parm [ax] modify exact [ax]
 
 /* The rows a panel takes: half the screen and three, one more on a screen
    of more than 25 lines; or, with the panels full screen, all lines but

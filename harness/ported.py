@@ -167,6 +167,21 @@ BATCHES = [
         functions=("BegBX_c", "SizDX_c", "LnsAX_c", "InvWCB_c", "AdrNum_c",
                    "NumAdr_c", "ChgAdr_c", "CorPar_c"),
     ),
+    Batch(
+        title="A panel of files on the screen: its frame, its path, its "
+              "files and the cursor",
+        source="panel.c",
+        routines=("Panel", "Panel8", "PutPath", "PtPt10", "PutName",
+                  "PutNm5", "PutFls", "SetCur", "FilDir"),
+        functions=("Panel_c", "PutPath_c", "PtPt10_c", "PutFls_c",
+                   "SetCur_c", "FilDir_c"),
+        unreached={
+            0xAF9B: "SetCur, for a panel that shows neither files nor the "
+                    "tree, or a list with nothing in it: it is called when "
+                    "the cursor moves or a file is selected, and such a "
+                    "panel has neither",
+        },
+    ),
 ]
 
 

@@ -294,6 +294,24 @@ LAID_OUT(WCBdef, 0x1A62);
 /* The main data segment, which DS points at. */
 extern struct MainDat __near md;
 
+/* Texts of the assembly that C code shows too. They are in its code
+   segment, so naming one costs a relocation. */
+extern const u8 __far Title_S[];        /* the program's name and version,
+                                           behind two bytes of markup */
+extern const u8 __far Var_S[];          /* a line that is the text at
+                                           TmpErr+1 */
+extern const u8 __far Tree_S[];         /* the title of the tree */
+#pragma aux Title_S "*"
+#pragma aux Var_S "*"
+#pragma aux Tree_S "*"
+
+/* The numbers of the colours of a panel, for Color. */
+#define Back_C  0                       /* what is neither of the others */
+#define Cursr_C 1                       /* under the cursor */
+#define Slct_C  2                       /* selected */
+#define CurSl_C 3                       /* selected, under the cursor */
+#define Title_C 4                       /* the titles of the columns */
+
 /* Routines that are still assembly, for C code to call. Each has an entry
    in the assembly, the routine's name with _a, which is called far and
    calls the routine (see FromC in port/asm/VC.ASM). They take and return
@@ -301,20 +319,89 @@ extern struct MainDat __near md;
    there; flags do not come back. */
 u16 UpCase(u16 letter);                 /* AL: a letter -> AL: its capital */
 #pragma aux UpCase "*_a" __far parm [ax] value [ax] modify exact [ax es]
+/* Put on the screen what the screen buffer has in a window: where it
+   begins, the row in the high byte, and its rows and columns likewise. */
+void Window(u16 begin, u16 size);
+#pragma aux Window "*_a" __far parm [bx] [dx] modify exact [es]
+/* Write a line of a box to the screen buffer: `margin` spaces, the
+   character in the high byte of `ends`, `width` times the cell `cell`,
+   the character in the low byte of `ends`, and the spaces again, all in
+   the colour of `cell`. Returns the address of the line below. */
+u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width);
+#pragma aux BoxLine "*_a" __far parm [di] [ax] [bx] [cx] [dx] value [di] modify exact [di es]
+/* Write a box with a double frame and `rows` empty lines in it, in the
+   colour in the high byte of `color`. Returns the address of the line
+   below it. */
+u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width);
+#pragma aux BoxDubl "*_a" __far parm [di] [ax] [si] [cx] [dx] value [di] modify exact [di es]
+
+/* A line as the assembly hands it over: the registers that describe it,
+   pushed in this order by CallLine in port/asm/VC.ASM. */
+struct LineArgs {
+    u16 value;                          /* AX or BX: see each routine */
+    u16 *screen;                        /* DI: where in the screen buffer */
+    const u8 __far *line;               /* DS:SI */
+    const u8 __far *colors;             /* CS:BP: the numbers of four colours */
+    const u8 __far *include;            /* CS:DX */
+};
+
+/* What AdrNum hands back, in the order in which its stub takes it off the
+   stack. */
+struct Place {
+    u16 cursor;                         /* the number of the cursor's entry */
+    u16 first;                          /* of the first one shown */
+    u16 last;                           /* of the last one there is */
+    u16 lines;                          /* lines of the panel that show
+                                           entries */
+};
+
+/* What Number() does about thousands. */
+#define NUM_SEPARATED 1                 /* put the country's separator in */
+#define NUM_PADDED    2                 /* fill with spaces up to full width */
 
 /* Routines that are C, for C code in other files than theirs to call.
    The assembly calls them too, by these conventions (see the stubs in
    port/asm). */
 u16 Color(u16 number);                  /* screen.c */
 u16 *BasAdr(u16 place);
-#pragma aux Color  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux BasAdr "*_c" __far parm [bx] value [di] modify exact [di]
+u16 __far *MvsColr(u16 __far *screen, u16 count, u16 color);
+u16 __far *MovDz0(u16 __far *screen, const u8 __far *text);
+#pragma aux Color   "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux BasAdr  "*_c" __far parm [bx] value [di] modify exact [di]
+#pragma aux MvsColr "*_c" __far parm [es di] [cx] [ax] value [es di] modify exact [di es]
+#pragma aux MovDz0  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 u16 TstHex(u16 digit);                  /* digits.c */
 #pragma aux TstHex "*_c" __far parm [ax] value [ax] modify exact [ax]
 void Convert(const u8 __far *name, u8 *buffer);         /* mask.c */
 u16 TstMas(const u8 __far *name, const u8 *mask);
 #pragma aux Convert "*_c" __far parm [dx si] [di] modify exact [ax]
 #pragma aux TstMas  "*_c" __far parm [dx si] [di] value [ax] modify exact [ax]
+void NgLine(struct LineArgs STACK *args);               /* line.c */
+void CntLine(struct LineArgs STACK *args);
+#pragma aux NgLine  "*_c" __far parm [bx] modify exact [ax bx cx dx es]
+#pragma aux CntLine "*_c" __far parm [bx] modify exact [ax bx cx dx es]
+u8 __far *AddFile(u8 __far *end);                       /* string.c */
+u8 __far *MvzLine(u8 __far *to, const u8 __far *from, u16 length);
+void LetLin(u8 __far *text);
+void ShrtLin(u8 __far *text, u16 limit);
+#pragma aux AddFile "*_c" __far parm [es di] value [es di] modify exact [di es]
+#pragma aux MvzLine "*_c" __far parm [es di] [dx si] [cx] value [es di] modify exact [di es]
+#pragma aux LetLin  "*_c" __far parm [es si] modify exact [ax]
+#pragma aux ShrtLin "*_c" __far parm [es si] [ax] modify exact [ax]
+u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */
+u16 *SzDtTm(const struct FILENT __far *file, u16 *screen, u16 color);
+#pragma aux Number  "*_c" __far parm [di] [bx] [cx] [ax] value [di] modify exact [di]
+#pragma aux SzDtTm  "*_c" __far parm [es si] [di] [ax] value [di] modify exact [di es]
+u16 BegBX(u16 panel);                                   /* place.c */
+u16 SizDX(void);
+u16 LnsAX(void);
+void AdrNum(u16 panel, struct Place STACK *place);
+void CorPar(u16 panel);
+#pragma aux BegBX  "*_c" __far parm [bx] value [bx] modify exact [bx]
+#pragma aux SizDX  "*_c" __far value [dx] modify exact [dx]
+#pragma aux LnsAX  "*_c" __far value [ax] modify exact [ax]
+#pragma aux AdrNum "*_c" __far parm [ax] [bx] modify exact [ax]
+#pragma aux CorPar "*_c" __far parm [ax] modify exact [ax]
 
 /* The panel that a file entry belongs to. */
 #define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))
@@ -339,5 +426,9 @@ u16 TstMas(const u8 __far *name, const u8 *mask);
 #define ATTR_SYSTEM    0x04
 #define ATTR_DIRECTORY 0x10
 #define ATTR_SELECTED  0x40
+
+/* Add to the low byte of a word, as the assembly does to a column or a
+   count that it keeps in half a register: nothing is carried over. */
+#define ADD_LOW(word, more) ((word) & 0xFF00 | (word) + (more) & 0xFF)
 
 #endif

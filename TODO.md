@@ -31,6 +31,22 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     inside a procedure that others call (`NumAd1`), found by the
     assembler. Both are in `CLAUDE.md` now.
 
+- A panel of files on the screen, 9 routines, about half an hour in all:
+  - 4 minutes: goldens derived twice for three scenarios, 70 seconds the
+    second time. `harness/notice.py` needs the C, so it ran after the
+    translation, and found three branches that no scenario noticed: a
+    selected directory counted once its size is known, the mini status
+    off, and the clock that leaves the path of the left panel alone, or
+    that of the right one under the menu bar. Asking before translating,
+    which scenario takes a branch either way, would have had the
+    scenarios right the first time; the coverage of the original records
+    instructions, not which way a jump went.
+  - 2 minutes: the one instruction of `SetCur` that is out of reach. A
+    try of twelve steps on an emptied disk, and then reading the five
+    places that lead to it.
+  - 1 minute: a step of 23 keys failed, "the key 0 did not arrive". One of
+    16 keys is taken. Noted at the top of `harness/scenarios.py`.
+
 ## Ideas put off
 
 - Deriving goldens side by side, as the tests now run their scenarios. The

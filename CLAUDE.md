@@ -149,6 +149,17 @@ port.
   show such callers; the assembler does, with "Symbol not defined", once
   the procedure is a stub. What they call stays, as a procedure of that
   name.
+- A routine that saves every register gets a stub that saves AX only,
+  around the call: with `modify exact [ax]` the compiler saves what the
+  function uses.
+- A routine may be C in part: `PutFls` draws a panel of files in C, and
+  for the tree and the Info its stub pushes what the assembly behind it
+  pops, and jumps there.
+- A batch may leave a stub without a caller, as `PutFls` did that of
+  `SzDtTm`: `tools/routines.py` shows it with 0 callers, and it goes.
+- Data of the assembly that C code needs is made `PUBLIC` there and
+  declared in `port/vc.h` as `extern const u8 __far`, with a `#pragma
+  aux` that keeps its name: `Title_S`, `Var_S`, `Tree_S`.
 
 ### C for the port
 
@@ -166,7 +177,11 @@ with it is less obvious:
   `modify exact` says. List AX there and have the stub save it.
 - A pointer variable to a constant in the code segment makes the compiler
   load the segment by name, which costs a relocation. Index the constant
-  array directly: that is addressed through CS.
+  array directly: that is addressed through CS. Handing the constant to a
+  function that takes a far pointer, or assigning it to a far pointer in
+  a structure, costs none either: the segment is taken from CS. Choose
+  between two such constants with `if` and two assignments: of `?:` the
+  compiler makes a pointer into the main data, without a warning.
 - Arithmetic on `u8` is done as signed `int`, with a signed division. Use
   `u16` for anything that is divided or counted.
 - The option `-nd` makes the compiler load a segment for every access to
@@ -182,6 +197,12 @@ with it is less obvious:
   of the new scenarios with the routines still assembly.
 - A static function is called, not expanded in place, also where only
   one routine uses it.
+- The room a function takes for its variables is the `sub sp` at its
+  start in the listing. `PutFls_c` takes 46 bytes, and 14 for registers,
+  where the assembly pushed 16; no scenario is at its deepest there. A
+  routine that is, wants its variables few and its structures small.
+- Dividing a 16-bit number by another, or taking the remainder, needs no
+  helper routine.
 - The structures of `port/vc.h` are the assembly's, but a field that the
   assembly declares with `0 DUP`, a name for a place, is not in them:
   `TreList` is where `TreSum2` is, two bytes before the end of `DIRTREE`.

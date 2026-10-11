@@ -401,121 +401,13 @@ DosCom	ENDP
 
 ;------------------------ Panel ------------------------
 ;			   DS - WCBseg
-	.CONST
-Brief_S	DB	'^rName',0FFh,9,'Name',0FFh,9,'Name',0
-Full_S	DB	'^rName',0FFh,8,'Size',0FFh,5,'Date',0FFh,4,'Time',0
-
-	.DATA
-Panel_P	DB	Back_C, Title_C
-Brief_T	DB	13, 26, 0
-Full_T	DB	13, 23, 32, 0
-
-	.CODE
 Panel	PROC	NEAR
-	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	MOV	BP,OFFSET Panel_P
-	CALL	BegBX
-	CALL	BasAdr
-	CALL	SizDX
-	MOV	DL,DH
-	MOV	DH,0
-	MOV	SI,DX
-	DEC	SI
-	DEC	SI
-	XOR	CX,CX
-	MOV	DX,40-2
-	MOV	AH,CS:[BP]
-	CALL	Color
-	CALL	BoxDubl
-	MOV	AL,'Ä'
-	SUB	DI,2*3*80
-	CMP	DS:WinTyp,1
-	JE	Panel1
-	CMP	DS:WinTyp,3
-	JE	Panel1
-	CMP	DS:WinTyp,2
-	JNE	Panel2
-	PUSH	CS
-	POP	DS
-	ADD	BX,114h
-	MOV	SI,OFFSET Title_S+2
-	CALL	CntLine
-	CALL	BasAdr
-	ADD	DI,2*(80-20)
-	MOV	BX,'Ç¶'
-	CALL	BoxLine
-	ADD	DI,2*7*80
-Panel1:	MOV	BX,'Ç¶'
-	CALL	BoxLine
-Panel2:	CMP	DS:WinTyp,0
-	JNE	Panel6
-	CALL	BasAdr
-	PUSH	DI
-	ADD	DI,2*85
-	MOV	SI,OFFSET Brief_S
-	MOV	BX,OFFSET Brief_T
-	CMP	DS:BrfFul,0
-	JZ	Panel3
-	MOV	SI,OFFSET Full_S
-	MOV	BX,OFFSET Full_T
-Panel3:	PUSH	CS
-	POP	DS
-	MOV	AL,33
-	CALL	NgLine
-	POP	DI
-	PUSH	AX
-	CALL	LnsAX
-	INC	AX
-	MOV	CX,AX
+	MOV	AX,DS
+	CallC	Panel_c
 	POP	AX
-	MOV	SI,BX
-	MOV	AL,'Ñ'
-	CALL	Panel8
-	MOV	AL,'³'
-Panel4:	CALL	Panel8
-	LOOP	Panel4
-	MOV	AL,'Ï'
-	CMP	ES:MiniSta,0
-	JZ	Panel5
-	PUSH	DI
-	MOV	BX,'Ç¶'
-	MOV	AL,'Ä'
-	XOR	CX,CX
-	CALL	BoxLine
-	POP	DI
-	MOV	AL,'Á'
-Panel5:	CALL	Panel8
-Panel6:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
 	RET
 Panel	ENDP
-
-Panel8	PROC	NEAR
-	PUSH	SI
-	MOV	BH,0
-Panel9:	MOV	BL,DS:[SI]
-	ADD	BL,BL
-	MOV	ES:[DI+BX],AX
-	INC	SI
-	CMP	BH,DS:[SI]
-	JNE	Panel9
-	ADD	DI,2*80
-	POP	SI
-	RET
-Panel8	ENDP
 
 ;------------------- Set directory mask ----------------
 ;			   DS - WCBseg
@@ -570,184 +462,24 @@ FnFile	ENDP
 ;			   DS - WCBseg
 	.CONST
 Tree_S	DB	' Tree ',0
-Info_S	DB	' Info ',0
-Progs_S	DB	' Progs',0
-
-	.DATA
-PutPt_P	DB	Back_C, Cursr_C
 
 	.CODE
 PutPath	PROC	NEAR
-	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	CALL	BegBX
-	ADD	BL,20
-	MOV	BP,OFFSET PutPt_P
 	MOV	AX,DS
-	CMP	AX,ES:WCBcrn
-	JNE	PutPt1
-	INC	BP
-PutPt1:	CMP	DS:WinTyp,0
-	JE	PutPt2
-	MOV	SI,OFFSET Tree_S
-	CMP	DS:WinTyp,2
-	JA	PutPt7
-	JNE	PutPt6
-	MOV	SI,OFFSET Info_S
-	JMP	PutPt6
-PutPt2:	CALL	PtPt10
-	MOV	AL,38
-	CMP	BH,0
-	JNE	PutPt5
-	CMP	ES:Clock,0
-	JZ	PutPt5
-	MOV	CX,DS
-	CMP	CX,ES:WCB2seg
-	JNE	PutPt5
-	MOV	AX,1C20h
-	CMP	ES:Country.TimeFmt,0
-	JE	PutPt3
-	MOV	AX,1E21h
-PutPt3:	MOV	CX,DI
-	SUB	CX,SI
-	CMP	CL,AH
-	JB	PutPt5
-	CMP	CL,AL
-	JBE	PutPt4
-	MOV	CL,AL
-PutPt4:	SUB	CL,AH
-	SHR	CL,1
-	INC	CX
-	SUB	BL,CL
-PutPt5:	CBW
-	DEC	AX
-	INC	SI
-	CALL	ShrtLin
-	MOV	SI,OFFSET Var_S
-PutPt6:	PUSH	CS
-	POP	DS
-	CALL	CntLine
-PutPt7:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
+	CallC	PutPath_c
+	POP	AX
 	RET
 PutPath	ENDP
 
+;	Return :	   SI - the text, at TmpErr+1
+;			   DI - its end
 PtPt10	PROC	NEAR
-	MOV	DI,OFFSET TmpErr+1
-	PUSH	DI
-	MOV	SI,OFFSET WinPath
-	MOV	AL,' '
-	STOSB
-	MOV	CX,LenPath
-	CALL	MvzLine
-	MOV	SI,OFFSET DskMas
-	CMP	BYTE PTR DS:[SI],0
-	JE	PtPt11
-	MOV	CX,13
-	CALL	AddFile
-	CALL	MvzLine
-	POP	SI
-	CALL	LetLin
-	PUSH	SI
-PtPt11:	CMP	BYTE PTR DS:MasTyp,0
-	JZ	PtPt12
-	PUSH	DS
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET Progs_S
-	MOV	CX,25
-	CALL	MvzLine
-	POP	DS
-PtPt12:	MOV	AX,' '
-	STOSW
-	DEC	DI
-	POP	SI
+	MOV	AX,DS
+	CallC	PtPt10_c
+	MOV	SI,OFFSET TmpErr+1
 	RET
 PtPt10	ENDP
-
-;-------------------- Output file name -----------------
-;			DS:SI - address of disk buffer
-;			ES:DI - address of screen buffer
-;			   AH - color
-PutName	PROC	NEAR
-	PUSH	SI
-	PUSH	CX
-	PUSH	BX
-	MOV	CX,12
-	CMP	BYTE PTR DS:[SI],'.'
-	JE	PutNm3
-	MOV	BL,DS:[SI+13]
-	MOV	BH,'.'
-	MOV	CX,8
-	CALL	PutNm5
-	MOV	AL,' '
-	TEST	BL,6
-	JZ	PutNm1
-	MOV	AL,'°'
-PutNm1:	CMP	ES:ColTyp,2
-	JNE	PutNm2
-	TEST	BL,40H
-	JZ	PutNm2
-	MOV	AL,'Þ'
-	TEST	BL,6
-	JZ	PutNm2
-	MOV	AL,'Û'
-PutNm2:	STOSW
-	MOV	CX,3
-	LODSB
-	CMP	AL,0
-	JNE	PutNm3
-	DEC	SI
-PutNm3:	MOV	BH,0
-	CALL	PutNm5
-	POP	BX
-	POP	CX
-	POP	SI
-	RET
-PutName	ENDP
-
-PutNm5	PROC	NEAR
-	LODSB
-	CMP	AL,0
-	JE	PutNm6
-	CMP	AL,BH
-	JNE	PutNm7
-PutNm6:	DEC	SI
-	MOV	AL,' '
-PutNm7:	STOSW
-	LOOP	PutNm5
-	RET
-PutNm5	ENDP
-
-;--------------- Output size, date & time --------------
-;			DS:SI - address of disk buffer
-;			ES:DI - address of screen buffer
-;			   AH - color
-SzDtTm	PROC	NEAR
-	PUSH	DS
-	PUSH	ES
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	POP	ES			; The file's panel
-	CALL	FAR PTR SzDtTm_c
-	POP	ES
-	POP	DS
-	MOV	AL,AH
-	RET
-SzDtTm	ENDP
 
 ; The directory marker of the size column, for the file search.
 	.CONST
@@ -851,110 +583,12 @@ CorPar	ENDP
 ;			 AL=0 - reset cursor
 ;			 AL=1 - set cursor
 SetCur	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
+	PUSH	AX
 	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	AH,Back_C
-	CMP	AL,0
-	JZ	SetCr0
-	MOV	AH,Cursr_C
-SetCr0:	PUSH	AX
-	CALL	AdrNum
-	POP	AX
-	MOV	CX,SI
-	SUB	CX,DI
-	CMP	DS:WinTyp,1
-	JA	SetCr3
-	JE	SetCr4
-	MOV	SI,DS:CurAdr
-	CMP	SI,DS:EndBuf
-	JAE	SetCr3
-	PUSH	AX
-	MOV	AX,BX
-	CALL	BegBX
-	ADD	BX,201h
-	MOV	DL,38
-	CMP	BYTE PTR DS:BrfFul,0
-	JNZ	SetCr1
-	XCHG	AX,CX
-	DIV	CL
-	MOV	CL,AH
-	MOV	AH,13
-	MUL	AH
-	ADD	BL,AL
-	MOV	DL,12
-SetCr1:	ADD	BH,CL
-	POP	AX
-	CALL	BasAdr
-	MOV	CL,DS:[SI+13]
-	LEA	SI,[DI+16]
-	MOV	BYTE PTR ES:[SI],' '
-	TEST	CL,6
-	JZ	SetCr2
-	MOV	BYTE PTR ES:[SI],'°'
-SetCr2:	TEST	CL,40h
-	JZ	SetCr8
-	CMP	ES:ColTyp,2
-	JNE	SetCr7
-	MOV	BYTE PTR ES:[SI],'Þ'
-	TEST	CL,6
-	JZ	SetCr7
-	MOV	BYTE PTR ES:[SI],'Û'
-	JMP	SetCr7
-SetCr3:	JMP	SetCr9
-SetCr4:	CMP	SI,ES:TreeBuf.TreeLen
-	JAE	SetCr3
-	CALL	BegBX
-	ADD	BX,118h
-	ADD	BH,CL
-	MOV	SI,ES:TreAdr
-	MOV	CL,ES:[SI].DirLevel
-	CMP	CL,11
-	JA	SetCr5
-	SUB	BL,17h
-	ADD	BL,CL
-	ADD	BL,CL
-	CMP	ES:TreeTyp,0
-	JZ	SetCr5
-	ADD	BL,CL
-SetCr5:	CALL	BasAdr
-	MOV	BYTE PTR ES:[DI],' '
-	MOV	DL,3
-	CMP	SI,OFFSET TreeBuf.TreList
-	JBE	SetCr6
-	MOV	DL,14
-	CMP	AL,0
-	JNZ	SetCr6
-	PUSH	AX
-	MOV	AH,Back_C
-	CALL	Color
-	MOV	AL,'Ä'
-	STOSW
-	POP	AX
-	DEC	DX
-SetCr6:	CMP	SI,ES:TreCrnt
-	JNE	SetCr8
-SetCr7:	MOV	AH,Slct_C
-	CMP	AL,0
-	JZ	SetCr8
-	MOV	AH,CurSl_C
-SetCr8:	CALL	Color
-	MOV	DH,1
-	MOV	CL,DL
-	MOV	CH,0
-	MOV	AL,AH
-	CALL	MvsColr
-	INC	DX
-	CALL	Window
-SetCr9:	POP	AX
-	POP	BX
-	POP	CX
+	MOV	DX,DS
+	CallC	SetCur_c
 	POP	DX
-	POP	DI
-	POP	SI
+	POP	AX
 	RET
 SetCur	ENDP
 
@@ -976,54 +610,8 @@ TstInfo	ENDP
 ;			   BX - number of files
 ;			   DX - number of directories
 ;			ES:DI - buffer
-	.CONST
-FilDi_S	DB	' files and  directoriesy'
-
-	.CODE
 FilDir	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	CX
-	PUSH	AX
-	PUSH	CS
-	POP	DS
-	OR	DX,DX
-	JE	FilDi2
-	PUSH	BX
-	XOR	BX,BX
-	MOV	CX,DX
-	MOV	AL,1
-	CALL	Number
-	POP	BX
-	MOV	SI,OFFSET FilDi_S
-	MOV	CX,6
-	REP	MOVSB
-	CMP	DX,1
-	JNE	FilDi1
-	DEC	DI
-FilDi1:	OR	BX,BX
-	JE	FilDi3
-	MOV	CX,5
-	REP	MOVSB
-FilDi2:	PUSH	BX
-	MOV	CX,BX
-	XOR	BX,BX
-	MOV	AL,1
-	CALL	Number
-	POP	BX
-	MOV	SI,OFFSET FilDi_S+11
-	MOV	CX,12
-	REP	MOVSB
-	CMP	BX,1
-	JNE	FilDi3
-	SUB	DI,3
-	MOVSB
-FilDi3:	MOV	AL,0
-	STOSB
-	POP	AX
-	POP	CX
-	POP	SI
-	POP	DS
+	CallC	FilDir_c
 	RET
 FilDir	ENDP
 

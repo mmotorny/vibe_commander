@@ -27,24 +27,11 @@
  */
 #include "vc.h"
 
-/* A line as the assembly hands it over: the registers that describe it,
-   pushed in this order by CallLine in port/asm/VC.ASM. */
-struct LineArgs {
-    u16 value;                          /* AX or BX: see each routine */
-    u16 *screen;                        /* DI: where in the screen buffer */
-    const u8 __far *line;               /* DS:SI */
-    const u8 __far *colors;             /* CS:BP: the numbers of four colours */
-    const u8 __far *include;            /* CS:DX */
-};
-
 u16 LnStr(const struct LineArgs STACK *args);
-void NgLine(struct LineArgs STACK *args);
-void CntLine(struct LineArgs STACK *args);
 
-/* How the assembly passes arguments to these, and what it expects back. */
+/* How the assembly passes arguments to these, and what it expects back;
+   struct LineArgs, NgLine and CntLine are in vc.h. */
 #pragma aux LnStr   "*_c" __far parm [bx] value [ax] modify exact [ax bx cx dx es]
-#pragma aux NgLine  "*_c" __far parm [bx] modify exact [ax bx cx dx es]
-#pragma aux CntLine "*_c" __far parm [bx] modify exact [ax bx cx dx es]
 
 /* The length of a text that is put into a line, as LnStr counts it: it
    looks at 80 characters, and a text without an end among them counts as

@@ -618,6 +618,7 @@ Wind7:	MOV	AL,1
 	POP	DS
 	RET
 Window	ENDP
+	FromC	Window
 
 ;------------------------ Save screen ------------------
 SavScr	PROC	NEAR
@@ -850,6 +851,7 @@ BoxDb1:	CALL	BoxLine
 	POP	SI
 	RET
 BoxDubl	ENDP
+	FromC	BoxDubl
 
 ;-------------------- One line of box ------------------
 ;			ES:DI - screen buffer
@@ -874,6 +876,7 @@ BoxLine	PROC	NEAR
 	ADD	DI,2*80
 	RET
 BoxLine	ENDP
+	FromC	BoxLine
 
 BoxLn0	PROC	NEAR
 	PUSH	CX

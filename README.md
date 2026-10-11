@@ -64,8 +64,9 @@ shorten texts, paths and file names, those that look up colours and put
 characters and colours into the copy of the screen that the program draws
 in, those that read and write hex digits and numbers and hold a file name
 against a mask, those that filter and sort the list of files of a panel and
-find a file in it, and those that say where the panels are and where in
-them the cursor is.
+find a file in it, those that say where the panels are and where in them
+the cursor is, and those that draw a panel of files: its frame, its path,
+its files, its status line and the cursor.
 
 ## Layout
 
