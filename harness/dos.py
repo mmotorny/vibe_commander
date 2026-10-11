@@ -158,7 +158,7 @@ class FatImage:
 def boot_floppy(path, workdir, freedos_zip, epoch, commands, country=None):
     """Build a FreeDOS boot floppy that runs `commands` once it has booted.
 
-    It is the stock FreeDOS 1.3 boot floppy, with its installer replaced by
+    It is the stock FreeDOS 1.4 boot floppy, with its installer replaced by
     a minimal configuration. Before running the commands DOS reports on the
     serial port that it is up. `country` is a DOS country code and code
     page, which set how dates, times and numbers are written; without it

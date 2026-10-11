@@ -14,6 +14,7 @@ Two setups share one clock and one source of files:
                   The clock in the corner of the screen is off, so that
                   no screen depends on how long it took to get there.
 """
+import io
 import shutil
 import tempfile
 import zipfile
@@ -104,11 +105,18 @@ def _floppy(workdir, commands, country=None, keyboard=None):
     floppy = boot_floppy(workdir / "a.img", workdir, deps.fetch(deps.FREEDOS),
                          EPOCH, commands, country)
     if keyboard:
-        packages = ((deps.FREEDOS_KEYB, "BIN/KEYB.EXE"),
-                    (deps.FREEDOS_KEYB_LAYOUTS, f"BIN/{layouts}"))
-        for package, member in packages:
-            with zipfile.ZipFile(deps.fetch(package)) as archive:
+        # The driver and its layouts are two packages on the Lite USB
+        # image, which is a hard disk.
+        image = workdir / "lite.img"
+        with zipfile.ZipFile(deps.fetch(deps.FREEDOS_LITE)) as archive:
+            image.write_bytes(archive.read("FD14LITE.img"))
+        lite = FatImage(image, workdir, EPOCH, partitioned=True)
+        for package, member in (("keyb", "BIN/KEYB.EXE"),
+                                ("keyb_lay", f"BIN/{layouts}")):
+            packed = io.BytesIO(lite.read(f"packages/base/{package}.zip"))
+            with zipfile.ZipFile(packed) as archive:
                 floppy.write(f"FREEDOS/{member}", archive.read(member), EPOCH)
+        image.unlink()
     return floppy
 
 

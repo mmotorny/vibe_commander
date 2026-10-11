@@ -332,12 +332,8 @@ SHA-256 sums pinned in `harness/deps.py`, and never stored in the repository:
 | What | From |
 |---|---|
 | Volkov Commander 4.05 shareware distribution | The author's site, <https://vc.vvv.kyiv.ua/download/vc405sw.zip> |
-| FreeDOS 1.3 Floppy Edition, for its boot floppy | <https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/1.3/official/FD13-FloppyEdition.zip> |
-| The FreeDOS keyboard driver and its layouts, two packages of FreeDOS 1.3 under the GNU GPL, for the Russian keyboard | <https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.3/base/>, `keyb.zip` and `keyb_lay.zip` |
-
-The addresses at ibiblio.org are those of the FreeDOS project's own files
-archive, which its site links to; its download host carries the current
-release only, which is 1.4.
+| FreeDOS 1.4 Floppy Edition, for its boot floppy | The FreeDOS project's download host, <https://download.freedos.org/1.4/FD14-FloppyEdition.zip> |
+| FreeDOS 1.4 Lite USB image, for the keyboard driver and its layouts, which are among its packages | <https://download.freedos.org/1.4/FD14-LiteUSB.zip> |
 
 ### What the build downloads
 

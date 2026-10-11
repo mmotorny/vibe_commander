@@ -35,31 +35,24 @@ VC_SHAREWARE = Download(
     "3c43b8b12d9b986d4f09c70179d845694bda5872ebc2531357ed07ca5bd0ed6b",
     "Volkov Commander 4.05 shareware distribution")
 
-# The official FreeDOS 1.3 Floppy Edition; its boot floppy is the DOS the
-# harness runs.
+# The FreeDOS 1.4 Floppy Edition, from the project's download host; its
+# boot floppy is the DOS the harness runs.
 FREEDOS = Download(
-    "FD13-FloppyEdition.zip",
-    "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/"
-    "1.3/official/FD13-FloppyEdition.zip",
-    "75a4e11a7fce6f124e20927b3022b4b715a2a3f7324c5f5bfea42d90d80eb072",
-    "FreeDOS 1.3 Floppy Edition")
+    "FD14-FloppyEdition.zip",
+    "https://download.freedos.org/1.4/FD14-FloppyEdition.zip",
+    "45b1fa7c52dd996c3bfa5e352ffcd410781b952a6ad629f15a4c9ec4bbaefc5a",
+    "FreeDOS 1.4 Floppy Edition")
 
-# The keyboard driver of FreeDOS and its layouts, two packages of the
-# FreeDOS 1.3 repository. The boot floppy has neither.
-FREEDOS_KEYB = Download(
-    "keyb.zip",
-    "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/"
-    "1.3/base/keyb.zip",
-    "8d1f804ef46ab89abe9f278c02a6a185eeb867caed4675e64a081ac16ca89dc8",
-    "FreeDOS keyboard driver")
-FREEDOS_KEYB_LAYOUTS = Download(
-    "keyb_lay.zip",
-    "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/"
-    "1.3/base/keyb_lay.zip",
-    "ccb8425dd2df8e3c6937acc4b7edda54c4d6498e01aa810f9c721e88f8e38a7e",
-    "FreeDOS keyboard layouts")
+# The FreeDOS 1.4 Lite USB image, from the same host. It holds the packages
+# of the release, and among them the keyboard driver and its layouts, which
+# the boot floppy lacks.
+FREEDOS_LITE = Download(
+    "FD14-LiteUSB.zip",
+    "https://download.freedos.org/1.4/FD14-LiteUSB.zip",
+    "857dcd2ebf9d3d094320154db5fb5b830acba6fb98f981a95a0ca7ab3350338b",
+    "FreeDOS 1.4 Lite USB image")
 
-ALL = [VC_SHAREWARE, FREEDOS, FREEDOS_KEYB, FREEDOS_KEYB_LAYOUTS]
+ALL = [VC_SHAREWARE, FREEDOS, FREEDOS_LITE]
 
 
 def sha256(path):
