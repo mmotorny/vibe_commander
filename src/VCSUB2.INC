@@ -1151,20 +1151,20 @@ PutDat0	ENDP
 
 PutDate	PROC	NEAR
 	PUSH	AX
-	AND	AX,1Fh
+	AND	AX,WORD PTR 1Fh
 	CALL	HexDec
 	MOV	DX,AX
 	POP	AX
 	MOV	CL,5
 	SHR	AX,CL
 	PUSH	AX
-	AND	AX,0Fh
+	AND	AX,WORD PTR 0Fh
 	CALL	HexDec
 	MOV	BX,AX
 	POP	AX
 	MOV	CL,4
 	SHR	AX,CL
-	AND	AX,7Fh
+	AND	AX,WORD PTR 7Fh
 	ADD	AL,80
 	MOV	CL,100
 	DIV	CL
@@ -1247,7 +1247,7 @@ PutTim0	ENDP
 
 PutTime	PROC	NEAR
 	PUSH	AX
-	AND	AX,1Fh
+	AND	AX,WORD PTR 1Fh
 	ADD	AX,AX
 	CALL	HexDec
 	MOV	BX,AX
@@ -1255,13 +1255,13 @@ PutTime	PROC	NEAR
 	MOV	CL,5
 	SHR	AX,CL
 	PUSH	AX
-	AND	AX,3Fh
+	AND	AX,WORD PTR 3Fh
 	CALL	HexDec
 	MOV	DX,AX
 	POP	AX
 	MOV	CL,6
 	SHR	AX,CL
-	AND	AX,1Fh
+	AND	AX,WORD PTR 1Fh
 	MOV	CH,' '
 	CMP	ES:Country.TimeFmt,0
 	JNE	PutTm6
@@ -1678,11 +1678,11 @@ Input1:	INC	SP
 Input	ENDP
 
 Input0	PROC	NEAR C USES DS SI DI DX CX BX
-	LOCAL	IKeyBar	:BYTE	,\
-		BlMouse	:BYTE	,\
-		KbdFlgs	:BYTE	,\
-		AltLock	:BYTE	,\
-		ClkFlag	:BYTE	,\
+	LOCAL	IKeyBar[2]:BYTE	,\	; Each byte takes a word of stack
+		BlMouse[2]:BYTE	,\
+		KbdFlgs[2]:BYTE	,\
+		AltLock[2]:BYTE	,\
+		ClkFlag[2]:BYTE	,\
 		ClkBuf[6]:WORD	,\
 		BlTime	:DWORD	,\
 		AltTime	:DWORD

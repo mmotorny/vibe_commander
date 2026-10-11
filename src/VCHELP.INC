@@ -522,7 +522,7 @@ Help61:	MOV	BYTE PTR DS:HlpMode,1
 	JB	Help63
 	XOR	AX,AX
 	JMP	Help63
-Help62:	SUB	AX,1
+Help62:	SUB	AX,WORD PTR 1
 	JAE	Help63
 	MOV	AX,DS:HlpLins
 	DEC	AX

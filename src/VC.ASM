@@ -394,7 +394,7 @@ Exec04:	SUB	CX,SI
 	MOV	CH,'/'
 	MOV	DS:[SI],CX
 	MOV	WORD PTR DS:[SI+2],' C'
-	LEA	BX,ComnIni.EPB
+	MOV	BX,OFFSET ComnIni.EPB
 	MOV	DS:[BX].CmdLine.Offs,SI
 	MOV	DS:[BX].CmdLine.Segm,DS
 Exec05:	MOV	DI,OFFSET Command
@@ -408,7 +408,7 @@ Exec05:	MOV	DI,OFFSET Command
 	JNC	Exec07
 	MOV	DS,ES:[2Ch]
 	MOV	DI,ES:ComnIni.ComSpec
-	CMP	AX,3
+	CMP	AX,WORD PTR 3
 	JBE	Exec06
 	MOV	SI,OFFSET NoRun_S
 	PUSH	CS
@@ -468,7 +468,7 @@ Exec10:	MOV	AL,DS:ComnIni.LoadRes
 	XCHG	AL,DS:ComnIni.LoadFl
 	TEST	AL,7Fh
 	JNZ	Exec11
-	JMP	Exec15
+	JMP	NEAR PTR Exec15
 Exec11:	CALL	GetStat			; Load VC.COM
 	MOV	CL,4
 	MOV	BX,OFFSET Last-1
@@ -477,7 +477,7 @@ Exec11:	CALL	GetStat			; Load VC.COM
 	MOV	AH,48h
 	INT	21h
 	CALL	SetStat
-	SUB	AX,((Init00-Zero) SHR 4)
+	SUB	AX,WORD PTR (((Init00-Zero) SHR 4))
 	MOV	CS:RunPar,AX
 	JNC	Exec12
 	JMP	AlocEr
@@ -487,7 +487,7 @@ Exec12:	XOR	AX,AX
 	MOV	BL,CS:[SI]
 	MOV	BH,0
 	MOV	CS:[SI+BX-1],CS
-	LEA	BX,ComnIni.EPB
+	MOV	BX,OFFSET ComnIni.EPB
 	MOV	ES:[BX].CmdLine.Offs,SI
 	MOV	ES:[BX].CmdLine.Segm,CS
 	MOV	DX,ES:ComnIni.OvlPth
@@ -928,7 +928,7 @@ ChkBlk	PROC	NEAR
 	MOV	AL,DS:[0Eh]
 	MOV	AH,5
 	MUL	AH
-	ADD	AX,2+12+1+4
+	ADD	AX,WORD PTR (2+12+1+4)
 	MOV	CX,AX
 	XOR	SI,SI
 	XOR	DI,DI
@@ -1358,7 +1358,7 @@ Alloc6:	STD
 	PUSH	CS
 	POP	DS
 Alloc7:	MOV	AX,ES
-	SUB	AX,(Init00-Zero) SHR 4
+	SUB	AX,WORD PTR ((Init00-Zero) SHR 4)
 	MOV	DS:RunPar,AX
 	PUSH	AX
 	CALL	SetStat
@@ -1555,13 +1555,13 @@ Init10:	MOV	BYTE PTR DS:[BP],1Ah
 
 ;------------ Allocate Secondary Data Segment ----------
 Init11:	MOV	AX,CS
-	ADD	AX,(Init00-Zero) SHR 4
+	ADD	AX,WORD PTR ((Init00-Zero) SHR 4)
 	MOV	ES,AX
 	MOV	BX,0FFFFh
 	MOV	AH,4Ah
 	INT	21h
 	MOV	SI,BX
-	CMP	AX,8
+	CMP	AX,WORD PTR 8
 	JE	Init12
 	XOR	SI,SI
 Init12:	MOV	CL,4
@@ -1847,7 +1847,7 @@ Init35:	MOV	DS:Screen.Segm,CX
 	JNE	Init36
 	MOV	AH,30h
 	INT	21h
-Init36:	CMP	AX,4
+Init36:	CMP	AX,WORD PTR 4
 	JNE	Init37
 	CMP	BH,0FFh
 	JNE	Init37

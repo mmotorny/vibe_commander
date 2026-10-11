@@ -28,10 +28,10 @@ an emulator, fed the same keystrokes, and compared.
 
 A byte-for-byte comparison with what the author's own toolchain produces
 would be a stronger test, but that toolchain, Borland's TASM and TLINK, is
-commercial software that this project does not fetch or run. There is
-therefore no byte-level reference, and since two assemblers can encode the
-same instruction differently, the binaries built here are not expected to
-match the author's byte for byte.
+commercial software that this project does not fetch or run. The binaries
+he shipped in 2000 can stand in for it. Where JWasm and TASM encode the same
+instruction differently, the source now selects the encoding found in them.
+Comparing whole files with them is the next step.
 
 The planned stages:
 
@@ -67,9 +67,14 @@ This fetches [JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
 MASM-compatible assembler, at a pinned commit, builds it, and assembles
 `src/` into `build/VC.COM` and `build/VCSETUP.COM`.
 
-The original source is written for TASM. The changes made so that JWasm
-accepts it are small, about thirty lines, and can be listed with
-`git diff $(git rev-list --max-parents=0 HEAD) -- src`:
+### Changes to the source
+
+Everything changed since the source was imported can be listed with
+`git diff $(git rev-list --max-parents=0 HEAD) -- src`. There are two
+kinds of change.
+
+**Syntax.** The original source is written for TASM; these changes make
+JWasm accept it:
 
 - The `JUMPS` directive is gone: JWasm lengthens out-of-range conditional
   jumps by itself. One `LOOP` that is out of range is spelled out as a jump
@@ -85,6 +90,19 @@ accepts it are small, about thirty lines, and can be listed with
   `VcVers` is a text equate.
 - `VCSETUP.ASM` declares its segments up front so that uninitialised data
   comes last and takes no space in the file.
+
+**Encodings.** Where JWasm and TASM encode the same instruction
+differently, the source now says which encoding to use, so that the output
+matches the shipped binaries:
+
+- Arithmetic on `AX` with a small constant carries `WORD PTR`, which selects
+  the accumulator form of the opcode.
+- A handful of jumps that TASM left in their long form are written that way
+  explicitly, as `JMP NEAR PTR` or as a conditional jump over a jump.
+- Two `LEA reg,address` are written as the `MOV` TASM turned them into, and
+  one displacement is written so that it fits a byte.
+- The byte-sized locals of `Input0` are declared two bytes long, because
+  TASM gives each a whole word of stack.
 
 ## Testing
 

@@ -16,7 +16,9 @@ not in Claude's memory: memory does not travel between computers.
   standing example.
 - The same goes for their output. Do not use reference binaries, hashes or
   other results obtained by running such a tool on the side, and do not
-  shape code to match them.
+  shape code to match them. The binaries Volkov shipped are a different
+  matter: they are his own output, obtained from his site, and matching
+  them byte for byte is the project's test of fidelity.
 - Naming such tools is fine. Documentation should say plainly what the
   original was built with and where a reference came from; the restriction
   is on fetching and running them, not on mentioning them.

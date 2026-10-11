@@ -214,7 +214,7 @@ GetMous	PROC	NEAR
 	AND	AL,4
 	OR	AL,BL
 	OR	AL,BH
-GetMo1:	AND	AX,7
+GetMo1:	AND	AX,WORD PTR 7
 	POP	BX
 	POP	DX
 	RET
@@ -762,7 +762,7 @@ DialBox	PROC	NEAR
 	CALL	SftEGA
 	PUSH	BP			; Convert variables
 	MOV	AL,CS:[BP+5]
-	AND	AX,3
+	AND	AX,WORD PTR 3
 	JE	DiBx01
 	ADD	BP,8
 	MOV	DI,OFFSET TmpErr+1
@@ -836,7 +836,7 @@ DiBx21:	CALL	BasAdr
 	MOV	DH,0
 	MOV	AX,DX
 	DEC	AX
-	AND	AX,0FFFEh
+	AND	AX,WORD PTR 0FFFEh
 	SUB	DI,AX
 	SUB	DL,10
 	MOV	CX,3
@@ -1096,7 +1096,7 @@ CntLine	PROC	NEAR
 	CALL	BasAdr
 	PUSH	AX
 	INC	AX
-	AND	AX,0FFFEh
+	AND	AX,WORD PTR 0FFFEh
 	SUB	DI,AX
 	POP	AX
 	CALL	NgLine
@@ -2238,11 +2238,11 @@ Input1:	INC	SP
 Input	ENDP
 
 Input0	PROC	NEAR C USES DS SI DI DX CX BX
-	LOCAL	IKeyBar	:BYTE	,\
-		BlMouse	:BYTE	,\
-		KbdFlgs	:BYTE	,\
-		AltLock	:BYTE	,\
-		ClkFlag	:BYTE	,\
+	LOCAL	IKeyBar[2]:BYTE	,\	; Each byte takes a word of stack
+		BlMouse[2]:BYTE	,\
+		KbdFlgs[2]:BYTE	,\
+		AltLock[2]:BYTE	,\
+		ClkFlag[2]:BYTE	,\
 		ClkBuf[6]:WORD	,\
 		BlTime	:DWORD	,\
 		AltTime	:DWORD
