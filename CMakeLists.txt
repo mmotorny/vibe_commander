@@ -26,11 +26,10 @@ set_target_properties(jwasm PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
 # --- Open Watcom --------------------------------------------------------------
-# The linker that builds the port, and the C compiler that will: an
-# open-source compiler for 16-bit DOS, among other targets. It takes hours to
-# build from source, so the project's own snapshot of 1 October 2026 is
-# fetched, pinned by its SHA-256, and the tools that run on this computer are
-# used from it.
+# The C compiler and the linker that build the port: an open-source compiler
+# for 16-bit DOS, among other targets. It takes hours to build from source,
+# so the project's own snapshot of 1 October 2026 is fetched, pinned by its
+# SHA-256, and the tools that run on this computer are used from it.
 
 FetchContent_Declare(open_watcom
     URL https://github.com/open-watcom/open-watcom-v2/releases/download/2026-10-01-Build/ow-snapshot.tar.xz
@@ -65,7 +64,7 @@ set(VCSETUP_includes
 
 # add_programs(<target> <directory> [<jwasm option>...]) assembles
 # src/VC.ASM and src/VCSETUP.ASM into <directory>/VC.COM and
-# <directory>/VCSETUP.COM.
+# <directory>/VCSETUP.COM, with listings next to them.
 function(add_programs target directory)
     set(source_dir ${CMAKE_SOURCE_DIR}/src)
     set(outputs "")
@@ -79,7 +78,8 @@ function(add_programs target directory)
             # JWasm takes default options from the JWASM environment variable.
             COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
                     $<TARGET_FILE:jwasm> -nologo -q -bin ${ARGN}
-                    -I${source_dir} -Fo ${output} ${source_dir}/${name}.ASM
+                    -I${source_dir} -Fo ${output} -Fl=${directory}/${name}.LST
+                    ${source_dir}/${name}.ASM
             DEPENDS jwasm ${source_dir}/${name}.ASM ${includes}
             COMMENT "Assembling ${name}.COM (${target})"
             VERBATIM)
@@ -99,14 +99,16 @@ set(layout_dir ${CMAKE_BINARY_DIR}/shareware-layout)
 add_programs(shareware-layout ${layout_dir} -DSHAREWARE_LAYOUT)
 
 # --- The port -----------------------------------------------------------------
-# Volkov Commander on its way from assembly to C. So far it is all assembly,
-# in port/asm, but it is linked the way it will be with compiled code next
-# to it, into VC.EXE. See tools/mkexe.c for how.
+# Volkov Commander on its way from assembly to C: port/asm holds what is
+# still assembly, port/*.c what has been translated, and both are linked
+# into one program, VC.EXE. See port/vc.h and tools/mkexe.c for how the two
+# halves live together.
 
 set(port_dir ${CMAKE_BINARY_DIR}/port)
 set(port_asm VC.ASM
     VCFUNC.INC VCMENU.INC VCF1.INC VCCOPY.INC VCVIEW.INC VCEDIT.INC
     VCHELP.INC VCMEM.INC VCFIND.INC VCSUB1.INC VCSUB2.INC VCSUB3.INC)
+set(port_c format.c)
 list(TRANSFORM port_asm PREPEND ${CMAKE_SOURCE_DIR}/port/asm/)
 
 # mkexe turns the linker's output into the program that is run.
@@ -126,15 +128,44 @@ add_custom_command(
     COMMENT "Assembling the port"
     VERBATIM)
 
+# The assembly comes first: the program starts in it and expects the
+# compiled code behind it.
+set(port_objects ${port_dir}/VC.OBJ)
+set(port_compiled "")
+foreach(source ${port_c})
+    string(REGEX REPLACE "\\.c$" ".obj" object ${port_dir}/${source})
+    # -0     code for the 8086, like the original
+    # -ms    near code and data; the compiled code shares one segment
+    # -os    favour small code
+    # -s     no checks for stack overflow, which need the C library
+    # -zu    the stack is not in the data segment
+    # -zl    name no libraries to link: the program has none
+    # -zls   no reference to the C library's start-up code either
+    # -wx -we   all warnings, as errors
+    # -nt, -nc  the name and class of the code segment
+    add_custom_command(
+        OUTPUT ${object}
+        COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -ms -os -s -zu -zl -zls
+                -wx -we -nt=CTEXT -nc=CCODE -fo=${object}
+                ${CMAKE_SOURCE_DIR}/port/${source}
+        DEPENDS ${CMAKE_SOURCE_DIR}/port/${source}
+                ${CMAKE_SOURCE_DIR}/port/vc.h
+        COMMENT "Compiling ${source}"
+        VERBATIM)
+    list(APPEND port_objects ${object})
+    list(APPEND port_compiled ${object})
+endforeach()
+
 # Warning 1014 says that there is no stack segment: the program sets up its
 # stack itself.
+list(JOIN port_objects "," port_files)
 add_custom_command(
-    OUTPUT ${port_dir}/VC.EXE
+    OUTPUT ${port_dir}/VC.EXE ${port_dir}/VC.MAP
     COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
-            name ${port_dir}/linked.exe file ${port_dir}/VC.OBJ
-            disable 1014
-    COMMAND mkexe ${port_dir}/linked.exe ${port_dir}/VC.EXE
-    DEPENDS mkexe ${port_dir}/VC.OBJ
+            name ${port_dir}/linked.exe file ${port_files}
+            option map=${port_dir}/VC.MAP disable 1014
+    COMMAND mkexe ${port_dir}/linked.exe ${port_dir}/VC.EXE ${port_compiled}
+    DEPENDS mkexe ${port_objects}
     COMMENT "Linking the port"
     VERBATIM)
 add_custom_target(port ALL DEPENDS ${port_dir}/VC.EXE)
@@ -159,5 +190,5 @@ add_test(NAME start-screen-shareware-layout
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
             ${layout_dir}/VC.COM)
 add_test(NAME port
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
-            ${port_dir}/VC.EXE all)
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
+            ${port_dir}/VC.EXE ${port_dir}/VC.MAP ${layout_dir}/VC.LST)

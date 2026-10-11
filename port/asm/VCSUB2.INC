@@ -1045,268 +1045,103 @@ PutNm5	ENDP
 ;			ES:DI - address of screen buffer
 ;			   AH - color
 SzDtTm	PROC	NEAR
-	INC	DI
+	PUSH	DS
+	PUSH	ES
+	PUSH	DS
+	PUSH	ES
+	POP	DS
+	POP	ES			; The file's panel
+	CALL	FAR PTR SzDtTm_c
+	POP	ES
+	POP	DS
 	MOV	AL,AH
-	STOSB
-	CALL	PutSize
-	INC	DI
-	MOV	AL,AH
-	STOSB
-	CALL	PutDat0
-	INC	DI
-	MOV	AL,AH
-	STOSB
-	CALL	PutTim0
 	RET
 SzDtTm	ENDP
 
-;----------------------- Output size -------------------
-;			DS:SI - address of disk buffer
-;			ES:DI - address of screen buffer
-;			   AH - color
+; The directory marker of the size column, for the file search.
 	.CONST
-UpDir	DB	'UP--DIR'
 SubDir	DB	'SUB-DIR'
 
 	.CODE
-PutSize	PROC	NEAR
-	PUSH	SI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	TEST	BYTE PTR DS:[SI+13],10h
-	JZ	PutSz2
-	MOV	DX,OFFSET UpDir
-	CMP	BYTE PTR DS:[SI],'.'
-	JE	PutSz1
-	CMP	BYTE PTR DS:SizDir,0
-	JNZ	PutSz2
-	MOV	DX,OFFSET SubDir
-PutSz1:	MOV	SI,DX
-	MOV	CX,9
-	CALL	MvsBwc
-	JMP	PutSz4
-PutSz2:	PUSH	DI
-	MOV	CX,DS:[SI+18]
-	MOV	BX,DS:[SI+20]
-	MOV	SI,OFFSET TmpBuf
-	MOV	DI,SI
-	MOV	AL,2
-	CALL	Number
-	MOV	DI,SI
-	CMP	BYTE PTR ES:[SI],' '
-	JE	PutSz3
-	MOV	CX,10
-	MOV	AL,'9'
-	REP	STOSB
-PutSz3:	POP	DI
-	INC	SI
-	MOV	CX,9
-	CALL	MvsBwe
-PutSz4:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	SI
-	RET
-PutSize	ENDP
-
 ;---------------------- Output date --------------------
-;			DS:SI - address of disk buffer
-;			ES:DI - address of screen buffer
-;			   AH - color
-PutDat0	PROC	NEAR
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	AX,DS:[SI+16]
-	CALL	PutDate
-	POP	AX
-	PUSH	AX
-	MOV	AL,BL
-	STOSW
-	MOV	AL,BH
-	STOSW
-	MOV	AL,ES:Country.DateSep
-	STOSW
-	PUSH	AX
-	MOV	AL,DL
-	STOSW
-	MOV	AL,DH
-	STOSW
-	POP	AX
-	STOSW
-	MOV	AL,CL
-	STOSW
-	MOV	AL,CH
-	STOSW
+;			   AX - date
+;	Return :	BX, DX, CX - day, month and year in the
+;				     country's order, as text
+;			   AX - century, as text
+PutDate	PROC	NEAR
+	PUSH	DS
+	PUSH	ES
+	POP	DS
+	SUB	SP,8
+	MOV	BX,SP
+	CALL	FAR PTR PutDate_c
 	POP	AX
 	POP	BX
-	POP	CX
 	POP	DX
+	POP	CX
+	POP	DS
 	RET
-PutDat0	ENDP
-
-PutDate	PROC	NEAR
-	PUSH	AX
-	AND	AX,WORD PTR 1Fh
-	CALL	HexDec
-	MOV	DX,AX
-	POP	AX
-	MOV	CL,5
-	SHR	AX,CL
-	PUSH	AX
-	AND	AX,WORD PTR 0Fh
-	CALL	HexDec
-	MOV	BX,AX
-	POP	AX
-	MOV	CL,4
-	SHR	AX,CL
-	AND	AX,WORD PTR 7Fh
-	ADD	AL,80
-	MOV	CL,100
-	DIV	CL
-	MOV	CL,AH
-	ADD	AL,19
-	CALL	HexDec
-	XCHG	CX,AX
-	CALL	HexDec
-	CMP	ES:Country.DateFmt,1
-	JE	PutDt1
-	JB	PutDt2
-	XCHG	DX,AX
-PutDt1:	XCHG	DX,BX
-PutDt2:	XCHG	CX,AX
-	JA	PutDt3
-	CMP	BL,'0'
-	JNE	PutDt3
-	MOV	BL,' '
-PutDt3:	RET
 PutDate	ENDP
 
+;			AX, BX, CX, DX - from PutDate
+;			ES:DI - address of buffer
 BufDate	PROC	NEAR
-	CMP	ES:Country.DateFmt,1
-	JBE	BufDt1
-	STOSW
-BufDt1:	XCHG	AX,BX
-	STOSW
-	MOV	AL,ES:Country.DateSep
-	STOSB
+	PUSH	DS
+	PUSH	ES
+	POP	DS
+	PUSH	CX
+	PUSH	DX
+	PUSH	BX
 	PUSH	AX
-	MOV	AX,DX
-	STOSW
-	POP	AX
-	STOSB
-	JA	BufDt2
-	MOV	AX,BX
-	STOSW
-BufDt2:	MOV	AX,CX
-	STOSW
+	MOV	BX,SP
+	CALL	FAR PTR BufDate_c
+	ADD	SP,8
+	POP	DS
 	RET
 BufDate	ENDP
 
 ;---------------------- Output time --------------------
-;			DS:SI - address of disk buffer
-;			ES:DI - address of screen buffer
-;			   AH - color
-PutTim0	PROC	NEAR
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	AX,DS:[SI+14]
-	CALL	PutTime
-	POP	AX
-	PUSH	AX
-	CMP	CH,' '
-	JNE	PutTm1
-	MOV	AL,CH
-	STOSW
-PutTm1:	MOV	AL,BL
-	STOSW
-	MOV	AL,BH
-	STOSW
-	MOV	AL,ES:Country.TimeSep
-	STOSW
-	MOV	AL,DL
-	STOSW
-	MOV	AL,DH
-	STOSW
-	CMP	CH,' '
-	JE	PutTm2
-	MOV	AL,CH
-	STOSW
-PutTm2:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	RET
-PutTim0	ENDP
-
+;			   AX - time
+;	Return :	BX, DX, AX - hours, minutes, seconds as text
+;			   CH - 'a', 'p' or ' '
 PutTime	PROC	NEAR
-	PUSH	AX
-	AND	AX,WORD PTR 1Fh
-	ADD	AX,AX
-	CALL	HexDec
-	MOV	BX,AX
+	PUSH	DS
+	PUSH	ES
+	POP	DS
+	SUB	SP,8
+	MOV	BX,SP
+	CALL	FAR PTR PutTime_c
+	POP	BX
+	POP	DX
 	POP	AX
-	MOV	CL,5
-	SHR	AX,CL
-	PUSH	AX
-	AND	AX,WORD PTR 3Fh
-	CALL	HexDec
-	MOV	DX,AX
-	POP	AX
-	MOV	CL,6
-	SHR	AX,CL
-	AND	AX,WORD PTR 1Fh
-	MOV	CH,' '
-	CMP	ES:Country.TimeFmt,0
-	JNE	PutTm6
-	MOV	CL,12
-	DIV	CL
-	OR	AH,AH
-	JNE	PutTm5
-	MOV	AH,12
-PutTm5:	CMP	AL,0
-	MOV	AL,AH
-	MOV	CH,'a'
-	JE	PutTm6
-	MOV	CH,'p'
-PutTm6:	CALL	HexDec
-	CMP	AL,'0'
-	JNE	PutTm7
-	MOV	AL,' '
-PutTm7:	XCHG	BX,AX
+	POP	CX
+	POP	DS
 	RET
 PutTime	ENDP
 
+;			AX, BX, CH, DX - from PutTime
+;			ES:DI - address of buffer
+;	Return :	   AL - 'a', 'p' or ' '
 BufTime	PROC	NEAR
-	XCHG	AX,BX
-	STOSW
-	MOV	AL,ES:Country.TimeSep
-	STOSB
+	PUSH	DS
+	PUSH	ES
+	POP	DS
+	PUSH	CX
 	PUSH	AX
-	MOV	AX,DX
-	STOSW
-	POP	AX
-	STOSB
-	MOV	AX,BX
-	STOSW
+	PUSH	DX
+	PUSH	BX
+	MOV	BX,SP
+	CALL	FAR PTR BufTime_c
+	ADD	SP,8
 	MOV	AL,CH
-	STOSB
+	POP	DS
 	RET
 BufTime	ENDP
 
+;			   AL - number below 100
+;	Return :	   AX - its two digits as text
 HexDec	PROC	NEAR
-	PUSH	CX
-	MOV	AH,0
-	MOV	CL,10
-	DIV	CL
-	ADD	AX,'00'
-	POP	CX
+	CALL	FAR PTR HexDec_c
 	RET
 HexDec	ENDP
 

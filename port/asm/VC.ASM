@@ -7,7 +7,28 @@
 	OPTION	OLDSTRUCTS		; Structure fields are global names
 	OPTION	NOSCOPED		; Labels inside procedures are global
 	.MODEL	Tiny
+
+;------------------- Routines written in C -------------
+; They are compiled into a code segment of their own, which follows this
+; one, and are called through the routines of the same names here. C code
+; expects DS to point at the main data segment and may change ES.
+	EXTERN	HexDec_c:FAR, Number_c:FAR, PutDate_c:FAR, BufDate_c:FAR
+	EXTERN	PutTime_c:FAR, BufTime_c:FAR, SzDtTm_c:FAR
+
+; Call a routine written in C from where ES points at the main data
+; segment and DS may not.
+CallC	MACRO	Name
+	PUSH	DS
+	PUSH	ES
+	POP	DS
+	CALL	FAR PTR Name
+	POP	DS
+	ENDM
+
 	.CODE
+	PUBLIC	_md
+_md	LABEL	BYTE			; The main data segment, to C code:
+					; whatever is at offset 0 of DS
 Zero:	.STARTUP
 	JMP	Alloc0
 

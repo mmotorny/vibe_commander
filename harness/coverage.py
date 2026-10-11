@@ -134,3 +134,14 @@ class Listing:
 def _is_data(text):
     return re.match(r"\s*(\w+\s+)?(DB|DW|DD)\s", text) is not None
 
+
+def link_map(path):
+    """Read a wlink map: public symbol -> (segment, offset), both counted
+    from where the program is loaded."""
+    symbols = {}
+    with open(path) as text:
+        for line in text:
+            match = re.match(r"([0-9a-f]{4}):([0-9a-f]{4})[*+]? +(\S+)$", line)
+            if match:
+                symbols[match[3]] = (int(match[1], 16), int(match[2], 16))
+    return symbols

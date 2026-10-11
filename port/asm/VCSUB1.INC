@@ -2681,92 +2681,9 @@ MainFil	ENDP
 ;			BX CX - number
 ;			   AL - mode: b0-coma, b1-spaces
 Number	PROC	NEAR
-	PUSH	BP
-	PUSH	SI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	DH,AL
-	CMP	ES:Country.Sep1000,0
-	JNE	Numb01
-	TEST	AL,1
-	JZ	Numb01
-	AND	DH,0FEh
-	JZ	Numb01
-	MOV	AL,' '
-	STOSB
-	STOSB
-	STOSB
-Numb01:	MOV	DL,0
-	MOV	BP,0CA00h	; 1.000.000.000
-	MOV	SI,3B9Ah
-	CALL	Numb10
-	CALL	Numb20
-	MOV	BP,0E100h	;   100.000.000
-	MOV	SI,5F5h
-	CALL	Numb10
-	MOV	BP,9680h	;    10.000.000
-	MOV	SI,98h
-	CALL	Numb10
-	MOV	BP,4240h	;     1.000.000
-	MOV	SI,0Fh
-	CALL	Numb10
-	CALL	Numb20
-	MOV	BP,86A0h	;       100.000
-	MOV	SI,1
-	CALL	Numb10
-	MOV	BP,10000	;        10.000
-	XOR	SI,SI
-	CALL	Numb10
-	MOV	BP,1000		;         1.000
-	CALL	Numb10
-	CALL	Numb20
-	MOV	BP,100		;           100
-	CALL	Numb10
-	MOV	BP,10		;            10
-	CALL	Numb10
-	MOV	AL,'0'		;             1
-	ADD	AL,CL
-	MOV	AH,0
-	STOSW
-	DEC	DI
-	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	SI
-	POP	BP
+	CallC	Number_c
 	RET
 Number	ENDP
-
-Numb10	PROC	NEAR
-	MOV	AL,'0'-1
-Numb11:	INC	AX
-	SUB	CX,BP
-	SBB	BX,SI
-	JNC	Numb11
-	ADD	CX,BP
-	ADC	BX,SI
-	CMP	AL,'0'
-	JE	Numb21
-	MOV	DL,1
-	STOSB
-	RET
-Numb10	ENDP
-
-Numb20	PROC	NEAR
-	TEST	DH,1
-	JZ	Numb23
-	MOV	AL,ES:Country.Sep1000
-Numb21:	OR	DL,DL
-	JNZ	Numb22
-	TEST	DH,2
-	JZ	Numb23
-	MOV	AL,' '
-Numb22:	STOSB
-Numb23:	RET
-Numb20	ENDP
 
 ;-------------------- Output hex byte ------------------
 ;			   AL - code

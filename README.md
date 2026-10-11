@@ -56,16 +56,16 @@ The planned stages:
 
 Where it stands: the first stage is done. Outside the reserved room, both
 programs come out identical to the originals. The second stage has begun:
-the program builds as `VC.EXE`, in the form in which compiled code can be
-linked to it, and behaves as before. Nothing has been translated yet.
+the program builds as `VC.EXE` from assembly and C together, and the first
+routines, those that write numbers, sizes, dates and times, run as C.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `port/` | The program on its way to C. So far it is `port/asm/`, the assembly, arranged to take compiled code next to it |
-| `tools/` | `mkexe.c`, which makes the port's `VC.EXE` out of what the linker produces |
+| `port/` | The program on its way to C: `port/*.c` is what has been translated, `port/asm/` what is still assembly |
+| `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces; `flagscan.py` examines the callers of a routine before it is translated |
 | `CMakeLists.txt` | Builds the assembler and the programs, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running both under FreeDOS in QEMU |
 | `docs/` | Pictures for this README |
@@ -137,16 +137,25 @@ harmless: the program laid out this way still runs.
 
 ## The port
 
-`port/asm/` starts as a copy of the assembly in `src/`, and routines will
-leave it as they are translated to C. For that the program has to take
-compiled code next to it, which a `.COM` file with under 300 bytes to spare
-cannot. It is therefore linked as `VC.EXE`, though not the way an `.EXE`
-usually is: it still loads and starts like the `.COM` file it was, and
-still moves and reloads most of itself at run time, which will include the
-compiled code. `tools/mkexe.c` describes how the file is made, and
-`git diff --no-index src port/asm` shows what had to change in the program:
-the code that starts it and that reloads it after a command, which now
-measures in paragraphs and relocates what it has loaded.
+`port/` starts as a copy of the assembly in `src/` and ends as a C program.
+In between it is both. A routine that has been translated is deleted from
+`port/asm/` and leaves a few instructions behind that pass its callers on
+to the C function; `git diff --no-index src port/asm` shows what is gone.
+The C code keeps the names the routines and their data have in the
+assembly, so that either can be found from the other.
+
+The halves are linked into one program, `VC.EXE`, which is not built the
+way a C program usually is. It still loads and starts like the `.COM` file
+it was, keeps its data where the assembly put it, and moves and reloads
+most of itself at run time, compiled code included. `port/vc.h` describes
+what that asks of the C code, and `tools/mkexe.c` how the file is made.
+The code that starts the program and reloads it after a command had to
+change for this: it now measures in paragraphs and relocates what it has
+loaded.
+
+Every step is checked by the `port` test below, and nothing else decides
+whether a translation is right. The routines translated so far are listed
+in `harness/ported.py`.
 
 ## Testing
 
@@ -161,7 +170,7 @@ ctest --test-dir build --output-on-failure
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
 | `start-screen` | `build/VC.COM` and the original `VC.COM` are started on identical machines; their screens, cursors and video modes must be the same |
 | `start-screen-shareware-layout` | The same, for the copy with the reserved room |
-| `port` | `build/port/VC.EXE` and the original are taken through every scenario and must show the same screen after every step and leave the same files on their disks |
+| `port` | `build/port/VC.EXE` and the original are taken through every scenario and must show the same screen after every step and leave the same files on their disks. Every instruction of the assembly that has been translated must have run in the original on the way, and every C function that replaces it in the port. The port must not be more than three times the size of the original |
 | `harness-self-test` | The comparison itself: two runs of the original must match, and a copy with one letter changed must be reported as differing in exactly that cell |
 
 On these machines the program under test sits on its own drive, `D:`, with
@@ -181,9 +190,11 @@ says so and the comparison overlooks that and nothing else. There is one
 such place: the banner names the edition, and the published source is of
 another edition than the binaries shipped in 2000.
 
-A run can also record which of the program's code was executed, from
-QEMU's log of the code it translates (`harness/coverage.py`). No test uses
-that yet.
+What ran is taken from QEMU's log of the code it translates, which
+`harness/coverage.py` matches against the program file. For the original
+it is mapped to source lines through the listing of the build in
+`build/shareware-layout/`, which has every instruction at the address it
+has in the original.
 
 The reserved room is listed in `harness/bytecheck.py`, with the offset and
 length of each piece and a note of what the original has there.
