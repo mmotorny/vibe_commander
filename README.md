@@ -45,21 +45,28 @@ identical to it. The reserved room is 109 of 65,090 bytes in `VC.COM` and
 The planned stages:
 
 1. Build the original source with free tools, byte for byte.
-2. Build the harness that runs the original and a candidate side by side.
-3. Port the program to modern operating systems, held to the same
-   comparison, with every intended deviation listed explicitly.
+2. Translate the program from assembly to C, still for DOS, a few routines
+   at a time. The translated routines are linked into the assembly program
+   in place of the ones they replace, so that at every step there is one
+   working program to hold against the original. Bytes no longer match from
+   here on; behaviour has to, bugs included, with every intended deviation
+   listed explicitly.
+3. Give the C program a layer for what it asks of the operating system, and
+   put modern operating systems under it next to DOS.
 
 Where it stands: the first stage is done. Outside the reserved room, both
-programs come out identical to the originals. The harness presses keys and
-compares screens and disks step by step; the scenarios it has so far reach
-a small part of the program.
+programs come out identical to the originals. The second stage has begun:
+the program builds as `VC.EXE`, in the form in which compiled code can be
+linked to it, and behaves as before. Nothing has been translated yet.
 
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `CMakeLists.txt` | Builds the assembler and the two programs, and registers the tests |
+| `port/` | The program on its way to C. So far it is `port/asm/`, the assembly, arranged to take compiled code next to it |
+| `tools/` | `mkexe.c`, which makes the port's `VC.EXE` out of what the linker produces |
+| `CMakeLists.txt` | Builds the assembler and the programs, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running both under FreeDOS in QEMU |
 | `docs/` | Pictures for this README |
 
@@ -77,6 +84,12 @@ MASM-compatible assembler, at a pinned commit, builds it, and assembles
 `src/` into `build/VC.COM` and `build/VCSETUP.COM`. It also assembles a
 second copy of both into `build/shareware-layout/`, with the room reserved
 that the byte comparison needs; only the tests use that copy.
+
+It then builds the port, `build/port/VC.EXE`, for which it fetches a pinned
+snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
+download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
+and ARM and for Windows on x86-64; the build has been run on Linux x86-64
+only.
 
 ### Changes to the source
 
@@ -122,6 +135,19 @@ When `SHAREWARE_LAYOUT` is defined they generate that many NOPs or zeros, so
 that what follows lands where it does in the shipped binaries. The filler is
 harmless: the program laid out this way still runs.
 
+## The port
+
+`port/asm/` starts as a copy of the assembly in `src/`, and routines will
+leave it as they are translated to C. For that the program has to take
+compiled code next to it, which a `.COM` file with under 300 bytes to spare
+cannot. It is therefore linked as `VC.EXE`, though not the way an `.EXE`
+usually is: it still loads and starts like the `.COM` file it was, and
+still moves and reloads most of itself at run time, which will include the
+compiled code. `tools/mkexe.c` describes how the file is made, and
+`git diff --no-index src port/asm` shows what had to change in the program:
+the code that starts it and that reloads it after a command, which now
+measures in paragraphs and relocates what it has loaded.
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
@@ -135,6 +161,7 @@ ctest --test-dir build --output-on-failure
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
 | `start-screen` | `build/VC.COM` and the original `VC.COM` are started on identical machines; their screens, cursors and video modes must be the same |
 | `start-screen-shareware-layout` | The same, for the copy with the reserved room |
+| `port` | `build/port/VC.EXE` and the original are taken through every scenario and must show the same screen after every step and leave the same files on their disks |
 | `harness-self-test` | The comparison itself: two runs of the original must match, and a copy with one letter changed must be reported as differing in exactly that cell |
 
 On these machines the program under test sits on its own drive, `D:`, with
@@ -146,8 +173,8 @@ Beyond the start screen the programs are compared by scenarios: lists of
 key presses, written down in `harness/scenarios.py`. After the start and
 after every step the screens must be the same, and at the end so must the
 files on the disks. `python3 harness/compare.py FILE [SCENARIO...]` runs
-scenarios for any `VC.COM`, or all of them with `all`; without a scenario
-it compares the start screens, which is what the tests above do.
+scenarios for any `VC.COM` or `VC.EXE`, or all of them with `all`; without
+a scenario it compares the start screens.
 
 Where a build is meant to differ from the original, `harness/deviations.py`
 says so and the comparison overlooks that and nothing else. There is one
@@ -216,10 +243,17 @@ SHA-256 sums pinned in `harness/deps.py`, and never stored in the repository:
 
 ### What the build downloads
 
-CMake fetches the JWasm source from
-<https://github.com/Baron-von-Riedesel/JWasm> at the commit pinned in
-`CMakeLists.txt` (release 2.20) into the build directory. JWasm is open
-source under the Sybase Open Watcom Public License.
+CMake fetches these into the build directory, as pinned in
+`CMakeLists.txt`:
+
+| What | From |
+|---|---|
+| JWasm 2.20, as source at a pinned commit | <https://github.com/Baron-von-Riedesel/JWasm> |
+| Open Watcom 2.0, the snapshot of 1 October 2026 with tools ready to run, pinned by SHA-256 | <https://github.com/open-watcom/open-watcom-v2/releases/tag/2026-10-01-Build> |
+
+Both are open source under the Sybase Open Watcom Public License, which is
+about the tools' own code. None of that code ends up in the programs built
+here: the port is linked without Open Watcom's libraries.
 
 ## Licence
 

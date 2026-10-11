@@ -54,5 +54,18 @@ not in Claude's memory: memory does not travel between computers.
 
 - The files in `src/` are CP866 text with CRLF line endings. Edit them as
   bytes; do not let an editor or tool re-encode them or change line endings.
+  The same goes for `port/asm/`, which starts as a copy of them.
 - The first commit holds the source exactly as its author published it, so
   `git diff` against that commit shows every change made since.
+
+## The port
+
+- The program is translated to C for DOS first, and compared with the
+  original there. Nothing for other operating systems, and no layer to hide
+  DOS behind, goes in until that translation is complete and verified.
+- Fidelity means the same behaviour, bugs included. Port a bug as it is and
+  report it; whether to fix it is decided separately.
+- Translated code keeps the names that routines and data have in the
+  assembly, until the whole program is C.
+- Size matters, but need not be chased: twice the original is fine, ten
+  times would be a red flag.
