@@ -87,6 +87,15 @@ _STAMPS_STEPS = _STAMPS + (
     "Esc",
 )
 
+_CLOCK_STEPS = (
+    "F9 o",                               # the Options menu: not ticked
+    "l",                                  # the clock, over the panels
+    "Ctrl+o",                             # over what DOS shows
+    "Ctrl+o",
+    "F9 o",                               # on the menu bar, and ticked
+    "l",                                  # off again
+)
+
 SCENARIOS = {
     "start": Scenario(
         "The program as it starts"),
@@ -153,14 +162,11 @@ SCENARIOS = {
 
     "clock": Scenario(
         "The clock in the corner of the screen, which the bench has off",
-        steps=(
-            "F9 o",                       # the Options menu: not ticked
-            "l",                          # the clock, over the panels
-            "Ctrl+o",                     # over what DOS shows
-            "Ctrl+o",
-            "F9 o",                       # on the menu bar, and ticked
-            "l",                          # off again
-        )),
+        steps=_CLOCK_STEPS),
+
+    "clock-russia": Scenario(
+        "The same where the clock has 24 hours",
+        country="ru", steps=_CLOCK_STEPS),
 }
 
 

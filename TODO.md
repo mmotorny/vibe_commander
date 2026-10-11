@@ -13,9 +13,6 @@ Things that are known and not done. Standing instructions are in
   reached by no scenario: the one taken when DOS cannot resize the
   program's memory block in place and a separate block is allocated, and
   the retry after the program file was not found for reloading.
-- The clock where it has 24 hours: the scenario `clock` runs in the United
-  States only. The `port` test will ask for the other when the code that
-  draws the clock is translated.
 
 ## Suspected bugs in the original
 
