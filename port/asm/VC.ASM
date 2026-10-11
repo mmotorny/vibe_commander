@@ -616,8 +616,11 @@ Exec11:	CALL	GetStat			; Load VC.EXE
 	MOV	CS:RunPar,AX
 	JNC	Exec12
 	JMP	AlocEr
+; The original stores the size through DS, which is on the environment
+; when ENTER brings it here to try again: a word written into other data.
+; ES is on the resident part either way. See harness/deviations.py.
 Exec12:	MOV	AX,CS:ImgEnd
-	MOV	DS:ComnIni.LoadSiz,AX
+	MOV	ES:ComnIni.LoadSiz,AX
 	MOV	SI,OFFSET OvlPrm
 	MOV	BL,CS:[SI]
 	MOV	BH,0

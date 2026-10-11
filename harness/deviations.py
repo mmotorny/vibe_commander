@@ -36,3 +36,15 @@ DEVIATIONS = [
     # command. The original is VC.COM; the port is VC.EXE.
     (re.compile(r"^Bad or missing D:\\VC\\VC\.(COM)"), "EXE"),
 ]
+
+# Deviations that show on no screen, and so change no golden. They are
+# listed here all the same, so that this is the whole list.
+#
+# - When the program file cannot be loaded again after a command and ENTER
+#   is pressed to try again, the original stores the size it expects
+#   through a segment register left on the DOS environment. The word goes
+#   into other data of the program: which, depends on how long the
+#   environment is. And the place it was meant for keeps what the last
+#   attempt left there, which is wrong if that attempt found a file and it
+#   was not the program. The port stores the size where it belongs.
+#   (Exec12 in port/asm/VC.ASM.)

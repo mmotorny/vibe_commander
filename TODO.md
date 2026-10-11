@@ -21,23 +21,6 @@ Things that are known and not done. Standing instructions are in
   reloading. The scenario `lost` reaches the retry, and it fails again: no
   key brings the file back while the program waits.
 
-## Bugs in the original
-
-Ported as they are until decided otherwise.
-
-- When the program file cannot be found for reloading after a command, the
-  program asks to press ENTER to try again. `NotFind` returns with DS on
-  the environment segment, and the retry at `Exec12` then stores the size
-  it expects through DS, at the offset that `ComnIni.LoadSiz` has in the
-  resident part. The word lands behind the environment block, in the
-  resident part's own data, as far before `LoadSiz` as the environment
-  and its header are long. Seen in memory, in the original and in the
-  port, in the scenario `lost`: there it is 160 bytes, and the word
-  replaces characters 41 and 42 of the remembered target of the last copy
-  (`ToFile`). The port writes another value, its size in paragraphs.
-  Nothing shows it on a screen: the retry would have to succeed, and the
-  name be that long. (`VC.ASM`, `Exec12` and `Exec13`.)
-
 ## Ideas put off
 
 - Running scenarios side by side. Measured on the port's test with six
