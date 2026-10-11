@@ -91,7 +91,8 @@ second copy of both into `build/shareware-layout/`, with the room reserved
 that the byte comparison needs; only the tests use that copy.
 
 It then builds the port, `build/port/VC.EXE`, and next to it in
-`build/port/signalling/` the variant that the tests run. For this it fetches a pinned
+`build/port/signalling/` the variant that the tests run. What the compiler
+made of each C file is written out as a listing, `build/port/*.lst`. For this it fetches a pinned
 snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
 download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
 and ARM and for Windows on x86-64; the build has been run on Linux x86-64

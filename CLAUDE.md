@@ -152,7 +152,8 @@ with it is less obvious:
   than the assembly did. A static function that two routines share is
   called, not expanded in place, and a multiplication has DX saved around
   it. In a routine at the bottom of deep calls, write the sharing out and
-  shift instead of multiplying, and read what the compiler made of it.
+  shift instead of multiplying, and read what the compiler made of it,
+  in the listing next to the object, `build/port/*.lst`.
   The `port` test says how much of the stack the scenarios leave
   untouched, and fails below a limit.
 - There is no C library. String literals and static variables are refused

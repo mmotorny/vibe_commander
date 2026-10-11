@@ -122,6 +122,7 @@ file(MAKE_DIRECTORY ${port_dir})
 set(port_compiled "")
 foreach(source ${port_c})
     string(REGEX REPLACE "\\.c$" ".obj" object ${port_dir}/${source})
+    string(REGEX REPLACE "\\.c$" ".lst" listing ${port_dir}/${source})
     # -0     code for the 8086, like the original
     # -ms    near code and data; the compiled code shares one segment
     # -os    favour small code
@@ -131,11 +132,17 @@ foreach(source ${port_c})
     # -zls   no reference to the C library's start-up code either
     # -wx -we   all warnings, as errors
     # -nt, -nc  the name and class of the code segment
+    #
+    # What the compiler made of it is written next to the object, as a
+    # listing: that is where to read which registers a function saves and
+    # how much stack it takes, which the program has little of.
     add_custom_command(
         OUTPUT ${object}
         COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -ms -os -s -zu -zl -zls
                 -wx -we -nt=CTEXT -nc=CCODE -fo=${object}
                 ${CMAKE_SOURCE_DIR}/port/${source}
+        COMMAND ${watcom} ${watcom_bin}/wdis -l=${listing} ${object}
+        BYPRODUCTS ${listing}
         DEPENDS ${CMAKE_SOURCE_DIR}/port/${source}
                 ${CMAKE_SOURCE_DIR}/port/vc.h
         COMMENT "Compiling ${source}"
