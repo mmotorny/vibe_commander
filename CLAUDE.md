@@ -80,14 +80,19 @@ not in Claude's memory: memory does not travel between computers.
 
 ## Translating a batch
 
-Routines are translated a few at a time, ones that belong together. For
-each batch, in this order:
+Routines are translated a few at a time, ones that belong together.
+`tools/routines.py` lists those that are still assembly, with their sizes,
+their callers and what they call. For each batch, in this order:
 
-1. Run `tools/flagscan.py` on the routines, and read every caller that
-   stays in assembly: which registers it passes, which it uses afterwards,
-   whether it reads the flags. That is the contract the stubs must keep.
-2. Write scenarios that reach the routines. `harness/show.py` shows what
-   keys do. Derive their goldens with `harness/goldens.py`.
+1. Run `tools/flagscan.py` on the routines: it follows the flags they
+   leave to whatever reads them, through calls and returns. Read every
+   caller that stays in assembly: which registers it passes and which it
+   uses afterwards. That and the flags are the contract the stubs must
+   keep.
+2. Write scenarios that reach the routines. `harness/reach.py` lists the
+   instructions of theirs that no scenario has run yet, and tries steps
+   against that list; `harness/show.py` shows what keys do. Derive the
+   goldens with `harness/goldens.py`.
 3. List the routines in `harness/ported.py` and run the `port` test. It
    names every instruction of theirs that no scenario executed in the
    original. Add scenarios until none is left, or list an instruction as

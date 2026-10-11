@@ -67,7 +67,7 @@ those that write lines of text with their markup.
 |---|---|
 | `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `port/` | The program on its way to C: `port/*.c` is what has been translated, `port/asm/` what is still assembly |
-| `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces; `flagscan.py` examines the callers of a routine before it is translated |
+| `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces; `routines.py` lists the routines that are still assembly; `flagscan.py` examines the callers of a routine before it is translated |
 | `CMakeLists.txt` | Builds the assembler and the programs, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
 | `docs/` | Pictures for this README |
@@ -219,6 +219,10 @@ goldens wherever the banner shows.
 `python3 harness/show.py STEP...` prints the screens that the original
 shows after each of some steps, or with `--program` those of a build. It
 is how to find out what keys do before writing them into a scenario.
+
+`python3 harness/reach.py ROUTINE...` lists the instructions of routines of
+the original that no scenario has run, and with `--steps` says which of
+them some steps would reach.
 
 ### The machines
 
