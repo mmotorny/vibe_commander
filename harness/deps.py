@@ -44,7 +44,22 @@ FREEDOS = Download(
     "75a4e11a7fce6f124e20927b3022b4b715a2a3f7324c5f5bfea42d90d80eb072",
     "FreeDOS 1.3 Floppy Edition")
 
-ALL = [VC_SHAREWARE, FREEDOS]
+# The keyboard driver of FreeDOS and its layouts, two packages of the
+# FreeDOS 1.3 repository. The boot floppy has neither.
+FREEDOS_KEYB = Download(
+    "keyb.zip",
+    "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/"
+    "1.3/base/keyb.zip",
+    "8d1f804ef46ab89abe9f278c02a6a185eeb867caed4675e64a081ac16ca89dc8",
+    "FreeDOS keyboard driver")
+FREEDOS_KEYB_LAYOUTS = Download(
+    "keyb_lay.zip",
+    "https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/"
+    "1.3/base/keyb_lay.zip",
+    "ccb8425dd2df8e3c6937acc4b7edda54c4d6498e01aa810f9c721e88f8e38a7e",
+    "FreeDOS keyboard layouts")
+
+ALL = [VC_SHAREWARE, FREEDOS, FREEDOS_KEYB, FREEDOS_KEYB_LAYOUTS]
 
 
 def sha256(path):

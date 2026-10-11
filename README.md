@@ -241,6 +241,14 @@ scenario has touched. Keeping the program off the drive it displays stops
 its file size from appearing on screen as free space. A scenario that wants
 the program set up differently does that itself, through the menus.
 
+The Russian machine also has a Russian keyboard: the keyboard driver of
+FreeDOS with its Russian layout, which the boot floppy lacks and the
+harness adds. It types Latin letters until Alt and the right Shift select
+its Cyrillic ones, and a scenario can then type Russian text. The driver
+takes 40 KB, so this machine shows less memory free than the other. The
+other machine has the keyboard a PC has by itself, and no way to type a
+letter beyond ASCII: Alt with the numeric keypad types nothing there.
+
 The program is set up as its distribution sets it up, with one exception:
 the clock in the corner of the screen is off. It would put the time of day
 on every screen, and the original takes longer to get through a scenario
@@ -325,6 +333,11 @@ SHA-256 sums pinned in `harness/deps.py`, and never stored in the repository:
 |---|---|
 | Volkov Commander 4.05 shareware distribution | The author's site, <https://vc.vvv.kyiv.ua/download/vc405sw.zip> |
 | FreeDOS 1.3 Floppy Edition, for its boot floppy | <https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/distributions/1.3/official/FD13-FloppyEdition.zip> |
+| The FreeDOS keyboard driver and its layouts, two packages of FreeDOS 1.3 under the GNU GPL, for the Russian keyboard | <https://www.ibiblio.org/pub/micro/pc-stuff/freedos/files/repositories/1.3/base/>, `keyb.zip` and `keyb_lay.zip` |
+
+The addresses at ibiblio.org are those of the FreeDOS project's own files
+archive, which its site links to; its download host carries the current
+release only, which is 1.4.
 
 ### What the build downloads
 

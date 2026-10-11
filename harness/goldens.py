@@ -267,8 +267,7 @@ def derive(name, benches):
     original = setups.original_vc()
     run = scenarios.run(scenario, original, benches[scenario.country],
                         signals=False, trace=True)
-    codepage = (setups.COUNTRIES[scenario.country] or (1, 437))[1]
-    write(Golden(name, codepage, [],
+    write(Golden(name, setups.codepage(scenario.country), [],
                  [deviations.expected(screen) for screen in run.screens],
                  disk_lines(run.disks, {original.filename})))
     write_ran(name, run.executed)

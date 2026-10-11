@@ -93,9 +93,23 @@ def original_vc():
     return Program("VC.COM", distribution()["VC.COM"][0])
 
 
-def _floppy(workdir, commands, country=None):
-    return boot_floppy(workdir / "a.img", workdir, deps.fetch(deps.FREEDOS),
-                       EPOCH, commands, country)
+def _floppy(workdir, commands, country=None, keyboard=None):
+    """A boot floppy that runs `commands`, for a country of COUNTRIES and
+    with a keyboard of KEYBOARDS, if they are given."""
+    if keyboard:
+        layout, codepage, layouts = keyboard
+        directory = r"A:\FREEDOS\BIN"
+        commands = [rf"KEYB {layout},{codepage},{directory}\{layouts}>NUL",
+                    *commands]
+    floppy = boot_floppy(workdir / "a.img", workdir, deps.fetch(deps.FREEDOS),
+                         EPOCH, commands, country)
+    if keyboard:
+        packages = ((deps.FREEDOS_KEYB, "BIN/KEYB.EXE"),
+                    (deps.FREEDOS_KEYB_LAYOUTS, f"BIN/{layouts}"))
+        for package, member in packages:
+            with zipfile.ZipFile(deps.fetch(package)) as archive:
+                floppy.write(f"FREEDOS/{member}", archive.read(member), EPOCH)
+    return floppy
 
 
 def fresh_install(workdir):
@@ -112,6 +126,19 @@ def fresh_install(workdir):
 
 # The countries DOS can be configured for here: country code, code page.
 COUNTRIES = {"us": None, "ru": (7, 866)}
+
+
+def codepage(country):
+    """The code page that DOS shows characters in for `country`."""
+    return (COUNTRIES[country] or (1, 437))[1]
+
+
+# The keyboards of those countries that are not the one the PC has by
+# itself: the layout that the keyboard driver of FreeDOS is loaded with,
+# for which code page, and the file of the driver's that has it. The
+# Russian keyboard types Latin letters until Alt and the right Shift
+# select its Cyrillic letters; Alt and the left Shift go back.
+KEYBOARDS = {"ru": ("RU", 866, "KEYBRD2.SYS")}
 
 # What DOS runs on the test bench once it has booted. It waits for a key
 # first: that is where the machine's state is saved, and where every
@@ -139,7 +166,8 @@ class Bench:
         self._workdir = Path(workdir)
         self._workdir.mkdir(parents=True, exist_ok=True)
         self._floppy = _floppy(self._workdir, BENCH_COMMANDS,
-                               COUNTRIES[country]).path
+                               COUNTRIES[country],
+                               KEYBOARDS.get(country)).path
         self._work = self._workdir / "c.img"
         _work_disk(self._work, self._workdir)
         self._programs = {}             # Program -> its disk image

@@ -104,12 +104,6 @@ BATCHES = [
         functions=("AddFile_c", "MvzLine_c", "FilZero_c", "StrLen_c",
                    "LowCase_c", "FndLet_c", "CutPath_c", "NormStr_c",
                    "PathLin_c", "LetLin_c", "ShrtLin_c", "MainFil_c"),
-        unreached={
-            **dict.fromkeys(
-                (0xA33F, 0xA340, 0xA342, 0xA344, 0xA349),
-                "LowCase, for a letter beyond ASCII: no file of the bench "
-                "has one in its name, and the harness cannot type one"),
-        },
     ),
 ]
 

@@ -9,6 +9,11 @@ records the same.
 
 Steps are written as Machine.press() takes them: key names separated by
 spaces, "Alt+F1" for keys held together, and text to type in double quotes.
+Text may be Russian where the bench has the Russian keyboard, once
+"Alt+RightShift" has selected its Cyrillic letters. That is pressed where
+the program takes text, and in a step that types some: at the panels Alt
+by itself brings up the menu or not, as the timing has it, and a step of
+nothing but Shift and Alt leaves the program nothing to signal.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -28,6 +33,7 @@ from pathlib import Path
 
 import coverage
 import fat
+import setups
 from dos import MachineError
 
 # How long the screen must stand still to count as finished, in seconds,
@@ -216,6 +222,27 @@ SCENARIOS = {
         "and with a letter beyond Z",
         steps=_NAMES_STEPS),
 
+    "russian": Scenario(
+        "A file with a Russian name, typed on the Russian keyboard",
+        country="ru",
+        steps=(
+            "Down Down Down",             # onto a file
+            "F5",                         # a copy of it
+            # The keyboard's Cyrillic letters are selected here, where Alt
+            # by itself means nothing: at the panels it brings up the
+            # menu, if the program sees it pressed and let go in time.
+            'Alt+RightShift '
+            '"\u043f\u0438\u0441\u044c\u043c\u043e_1.\u0434\u043e\u043a"',
+            "Enter",                      # the panel lists it
+            "End",                        # the status line names it
+            "F3",                         # and so does the viewer
+            "Esc",
+            "Shift+F3",                   # typed again, in capitals
+            '"\u041f\u0418\u0421\u042c\u041c\u041e_1.\u0414\u041e\u041a"',
+            "Enter",
+            "Esc",
+        )),
+
     "clock": Scenario(
         "The clock in the corner of the screen, which the bench has off",
         steps=_CLOCK_STEPS),
@@ -247,7 +274,8 @@ def run(scenario, program, bench, signals, trace=False):
                 screens.append(wait(machine, f"step {number}, {step}"))
             disks = machine.disks
         # The machine has been shut down: the disk images are complete.
-        result = Run(screens, {drive: fat.read_tree(path)
+        codepage = setups.codepage(scenario.country)
+        result = Run(screens, {drive: fat.read_tree(path, codepage)
                                for drive, path in disks.items()})
         if trace:
             result.executed = coverage.executed(log, program.contents)

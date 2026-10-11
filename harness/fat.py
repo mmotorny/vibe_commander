@@ -25,8 +25,9 @@ class Entry:
         return bool(self.attributes & DIRECTORY)
 
 
-def read_tree(image_path):
-    """All files and directories of the image's first partition, by path."""
+def read_tree(image_path, codepage=437):
+    """All files and directories of the image's first partition, by path.
+    Names are read as they show in `codepage`."""
     with open(image_path, "rb") as f:
         disk = f.read()
     start = struct.unpack_from("<I", disk, 0x1BE + 8)[0] * SECTOR
@@ -56,8 +57,8 @@ def read_tree(image_path):
             if (raw[0] == 0xE5 or attributes & LONG_NAME == LONG_NAME
                     or attributes & VOLUME_LABEL or raw[:1] == b"."):
                 continue
-            name = raw[:8].decode("cp437").rstrip()
-            extension = raw[8:11].decode("cp437").rstrip()
+            name = raw[:8].decode(f"cp{codepage}").rstrip()
+            extension = raw[8:11].decode(f"cp{codepage}").rstrip()
             if extension:
                 name += "." + extension
             time, date, cluster, size = struct.unpack_from("<HHHI", raw, 22)

@@ -12,11 +12,8 @@ Things that are known and not done. Standing instructions are in
   The first that does needs this declared as a deviation, with a number
   that follows the size of the build or with the number left out of the
   comparison.
-- The harness cannot type letters beyond ASCII, so no scenario has a
-  Russian name or text in it, and the country's table of small letters
-  goes unread. Alt with the numeric keypad types nothing on the bench.
-  The keyboard driver of FreeDOS with its Russian layout does, tried by
-  hand.
+- The harness can type Russian on the Russian bench, and nothing beyond
+  ASCII on the other: Alt with the numeric keypad types nothing there.
 - The program runs on a stack of 256 bytes, 238 in the build that the
   tests run. The scenarios leave 36 of them untouched, measured by hand by
   filling the stack with a pattern first. Compiled code takes more stack

@@ -43,7 +43,7 @@ def main():
     for number, (step, screen) in enumerate(zip(steps, run.screens)):
         print(f"== {number}: {step}    cursor at column {screen.cursor[0]}, "
               f"row {screen.cursor[1]}")
-        for line in screen.lines():
+        for line in screen.lines(setups.codepage(args.country)):
             print(line.rstrip())
 
 

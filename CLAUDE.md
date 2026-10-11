@@ -159,5 +159,9 @@ with it is less obvious:
   the time stamp of a file it has made, does so within the first minute of
   its machine: a golden is recorded more slowly than a build is tested.
 - The countries tested are the United States and Russia.
+- Russian text is typed on the Russian keyboard of the Russian bench. Its
+  Cyrillic letters are selected in a step that types text into an input
+  line, never at the panels: there Alt by itself may bring up the menu,
+  depending on timing.
 - The tests run the build of the port that signals where it is. The build
   that is shipped is not run by them.

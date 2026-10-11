@@ -65,7 +65,7 @@ def main():
             steps = ("the start",) + scenario.steps
             for number, (step, screen) in enumerate(zip(steps, run.screens)):
                 print(f"== {number}: {step}")
-                for line in screen.lines():
+                for line in screen.lines(setups.codepage(args.country)):
                     print(line.rstrip())
 
     lines = [line for name in args.routine

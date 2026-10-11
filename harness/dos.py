@@ -38,7 +38,7 @@ BLINK_BYTES = 4
 # How long Shift, Ctrl and Alt are held down before and after the key they
 # go with, or on their own, in seconds.
 KEY_TIME = 0.02
-MODIFIERS = {"ctrl", "alt", "shift"}
+MODIFIERS = {"ctrl", "alt", "shift", "shift_r"}
 
 # Names for the keys of a US keyboard, as written in scenarios, and the
 # QEMU key codes they stand for. Letters, digits and F1-F12 name themselves.
@@ -49,7 +49,7 @@ KEYS = {
     "Up": "up", "Down": "down", "Left": "left", "Right": "right",
     "GrayPlus": "kp_add", "GrayMinus": "kp_subtract",
     "GrayStar": "kp_multiply",
-    "Ctrl": "ctrl", "Alt": "alt", "Shift": "shift",
+    "Ctrl": "ctrl", "Alt": "alt", "Shift": "shift", "RightShift": "shift_r",
 }
 PUNCTUATION = {
     " ": "spc", "-": "minus", "=": "equal", "[": "bracket_left",
@@ -58,6 +58,18 @@ PUNCTUATION = {
     "/": "slash",
 }
 SHIFTED = dict(zip('!@#$%^&*()_+{}:"~|<>?', "1234567890-=[];'`\\,./"))
+
+# The Cyrillic letters of the Russian keyboard, by the keys of a US one
+# that they are on. With them selected the full stop and the comma are on
+# one key, and the digits and the underscore where they always are.
+RUSSIAN = dict(zip(
+    "\u0439\u0446\u0443\u043a\u0435\u043d\u0433\u0448\u0449\u0437"
+    "\u0445\u044a\u0444\u044b\u0432\u0430\u043f\u0440\u043e\u043b"
+    "\u0434\u0436\u044d\u044f\u0447\u0441\u043c\u0438\u0442\u044c"
+    "\u0431\u044e\u0451",
+    "qwertyuiop[]asdfghjkl;'zxcvbnm,.`"))
+RUSSIAN_KEYS = {".": ["slash"], ",": ["shift", "slash"],
+                "_": ["shift", "minus"]}
 
 CP437_CONTROLS = ("\u0020\u263a\u263b\u2665\u2666\u2663\u2660\u2022\u25d8"
                   "\u25cb\u25d9\u2642\u2640\u266a\u266b\u263c\u25ba\u25c4"
@@ -189,10 +201,12 @@ class Screen:
     # they show in their other state.
     blinking: tuple = ()
 
-    def lines(self):
-        """The characters on screen as text, one string per row."""
+    def lines(self, codepage=437):
+        """The characters on screen as text, one string per row, as they
+        show in a code page."""
         chars = self.cells[0::2]
-        return ["".join(_glyph(c) for c in chars[r * COLUMNS:(r + 1) * COLUMNS])
+        return ["".join(_glyph(c, codepage)
+                        for c in chars[r * COLUMNS:(r + 1) * COLUMNS])
                 for r in range(ROWS)]
 
     def describe(self):
@@ -206,12 +220,12 @@ class Screen:
         }
 
 
-def _glyph(code):
+def _glyph(code, codepage=437):
     if code < 32:
         return CP437_CONTROLS[code]
     if code == 127:
         return "\u2302"
-    return bytes([code]).decode("cp437")
+    return bytes([code]).decode(f"cp{codepage}")
 
 
 class MachineError(Exception):
@@ -366,6 +380,12 @@ class Machine:
         ("Alt+F5", "Ctrl+o"), or a text to type in double quotes, which
         may not contain spaces ("readme.txt").
 
+        A text with Russian letters is typed on the keys that the Russian
+        keyboard has them on. It comes out as written only where that
+        keyboard is loaded and its Cyrillic letters have been selected,
+        with "Alt+RightShift", and it may hold digits, a full stop, a
+        comma and an underscore besides, but no Latin letters.
+
         Each key is seen to arrive in the BIOS keyboard buffer before the
         next is pressed, so none is lost however fast or slow the guest is.
         The buffer holds 15 keys; if the guest does not take them, pressing
@@ -373,19 +393,22 @@ class Machine:
         """
         for name in keys.split():
             if name.startswith('"'):
-                for char in name.strip('"'):
-                    self._chord(_character(char))
+                text = name.strip('"')
+                keys_of = (_russian if any(char.lower() in RUSSIAN
+                                           for char in text) else _character)
+                for char in text:
+                    self._chord(keys_of(char))
             else:
                 self._chord([_key(part) for part in name.split("+")])
 
     def _chord(self, codes):
         """Press the keys `codes` together: Shift, Ctrl and Alt go down
-        first and come up last, as under a hand, and long enough for the
-        guest to see them held."""
+        first, one after the other in the order given, and come up last,
+        as under a hand, and long enough for the guest to see each held."""
         held = [code for code in codes if code in MODIFIERS]
         keys = [code for code in codes if code not in MODIFIERS]
-        if held:
-            self._keys(held, True)
+        for code in held:
+            self._keys([code], True)
             time.sleep(KEY_TIME)
         if keys:
             tail = self._keyboard()[1]
@@ -394,9 +417,9 @@ class Machine:
             self.until(lambda: self._keyboard()[1] != tail, 5,
                        f"the key {'+'.join(codes)} did not arrive: the "
                        "keyboard buffer is full, or the guest is stuck")
-        if held:
+        for code in held[::-1]:
             time.sleep(KEY_TIME)
-            self._keys(held[::-1], False)
+            self._keys([code], False)
 
     def _keys(self, codes, down):
         self._command("input-send-event", events=[
@@ -500,6 +523,19 @@ def _key(name):
     if name in PUNCTUATION:
         return PUNCTUATION[name]
     raise ValueError(f"unknown key {name!r}")
+
+
+def _russian(char):
+    """The keys to hold down to type `char` of a text with Russian
+    letters."""
+    if char in RUSSIAN_KEYS:
+        return RUSSIAN_KEYS[char]
+    if char.isdigit():
+        return [char]
+    if char.lower() not in RUSSIAN:
+        raise ValueError(f"{char!r} cannot be typed with Russian letters")
+    keys = _character(RUSSIAN[char.lower()])
+    return keys if char.islower() else ["shift", *keys]
 
 
 def _character(char):
