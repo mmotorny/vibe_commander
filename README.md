@@ -204,10 +204,15 @@ than the binaries shipped in 2000. And the program names its own file when
 it cannot load it again after a command: the original is `VC.COM`, the port
 `VC.EXE`.
 
-One more deviation shows on no screen, and is listed in the same file. When
-the original tries again to load itself after a command, it stores a word
-through a segment register that is left on the DOS environment, and the
-word lands in other data of its own. The port stores it where it belongs.
+Two more deviations show on no screen, and are listed in the same file.
+When the original tries again to load itself after a command, it stores a
+word through a segment register that is left on the DOS environment, and
+the word lands in other data of its own. The port stores it where it
+belongs. And of two codes in the markup of its texts, one for a colour and
+one for a character, the original's routine that writes a line has each
+for the other, unlike the routine that measures it and unlike Norton
+Guides, where the markup comes from. The port has them agree. No text
+uses either code.
 
 `python3 harness/compare.py [--signals] FILE [SCENARIO...]` takes any
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from

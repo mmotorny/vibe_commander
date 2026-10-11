@@ -48,3 +48,10 @@ DEVIATIONS = [
 #   attempt left there, which is wrong if that attempt found a file and it
 #   was not the program. The port stores the size where it belongs.
 #   (Exec12 in port/asm/VC.ASM.)
+#
+# - In a line of text, ^A and two hex digits set a colour and ^C and two
+#   hex digits stand for a character: that is the markup of Norton Guides,
+#   and how the original's LnStr counts the cells of a line. Its NgLine,
+#   which writes the line, takes ^A for the character and ^C for the
+#   colour. The port's NgLine takes them as LnStr does. No text of the
+#   program or of its help file has either. (NgLine in port/line.c.)

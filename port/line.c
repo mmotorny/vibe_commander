@@ -14,11 +14,16 @@
  *                underlined colour, the first to the fourth of the
  *                caller's colours; naming the one that is on switches
  *                back to normal,
- *   ^Axx         stands for the character with the code xx, in hex,
- *   ^Cxx         switches to the colour xx, in hex,
+ *   ^Axx         switches to the colour xx, in hex,
+ *   ^Cxx         stands for the character with the code xx, in hex,
  *   0FFh n       stands for n spaces, and 0FFh 80h+n c for n times c.
  *
  * The letter after a caret may be small. Any other letter means nothing.
+ *
+ * This is the markup of Norton Guides, whose help files the program's own
+ * is made like. The original's NgLine has ^A and ^C the other way round,
+ * unlike its LnStr and unlike Norton Guides; here they are put right (see
+ * harness/deviations.py).
  */
 #include "vc.h"
 
@@ -64,10 +69,7 @@ static u16 Included(const u8 __far *text)
    the include line; nothing else of `args` but the line is looked at.
 
    The count is kept as the assembly keeps it: what a run of characters or
-   a text put in adds to it is added to its low byte only. And ^C counts
-   as a character while ^A does not, though it is ^A that NgLine writes
-   one for: the two routines of the original disagree about which is
-   which. */
+   a text put in adds to it is added to its low byte only. */
 u16 LnStr(const struct LineArgs STACK *args)
 {
     const u8 __far *line = args->line;
@@ -177,7 +179,7 @@ void NgLine(struct LineArgs STACK *args)
                 if (count > 0xFF)
                     continue;
                 count = (high << 4 | count) & 0xFF;
-                if (c == 'C') {
+                if (c == 'A') {
                     color = count << 8;
                     style = 0;
                     continue;
