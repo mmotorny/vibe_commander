@@ -203,6 +203,10 @@ binaries shipped in 2000.
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from
 the goldens.
 
+`python3 harness/show.py STEP...` prints the screens that the original
+shows after each of some steps, or with `--program` those of a build. It
+is how to find out what keys do before writing them into a scenario.
+
 ### The machines
 
 DOS is booted once for each country that scenarios need, the United States
