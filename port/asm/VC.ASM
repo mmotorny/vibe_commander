@@ -15,6 +15,9 @@
 	EXTERN	HexDec_c:FAR, Number_c:FAR, PutDate_c:FAR, BufDate_c:FAR
 	EXTERN	PutTime_c:FAR, BufTime_c:FAR, SzDtTm_c:FAR
 	EXTERN	LnStr_c:FAR, NgLine_c:FAR, CntLine_c:FAR
+	EXTERN	AddFile_c:FAR, MvzLine_c:FAR, FilZero_c:FAR, StrLen_c:FAR
+	EXTERN	LowCase_c:FAR, FndLet_c:FAR, CutPath_c:FAR, NormStr_c:FAR
+	EXTERN	PathLin_c:FAR, LetLin_c:FAR, ShrtLin_c:FAR, MainFil_c:FAR
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.

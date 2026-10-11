@@ -96,6 +96,28 @@ _CLOCK_STEPS = (
     "l",                                  # off again
 )
 
+# Files named by hand: with spaces around the name, by paths too long for
+# where they are shown, and with a letter that is neither capital nor
+# small.
+_NAMES_STEPS = (
+    "Shift+F3",                           # a file to view
+    'Space Space "c:hello.txt" Space',    # on the current drive
+    "Enter",                              # C: in capitals, the name small
+    "Esc",
+    "Shift+F3",                           # by a long path
+    '"c:\\work\\..\\work\\..\\work\\..\\work\\readme.txt"',
+    "Enter",                              # shortened behind C:\
+    "Esc",
+    "Shift+F3",                           # and by one from here
+    '"..\\work\\..\\work\\..\\work\\..\\work\\hello.txt"',
+    "Enter",                              # shortened from its start
+    "Esc",
+    "Down Down Down",                     # onto a file
+    "F5",                                 # a copy of it
+    '"under_sc.txt"',                     # with an underscore in its name
+    "Enter",                              # the panel lists it
+)
+
 SCENARIOS = {
     "start": Scenario(
         "The program as it starts"),
@@ -188,6 +210,11 @@ SCENARIOS = {
     "stamps-russia": Scenario(
         "The same where the day comes first and the clock has 24 hours",
         country="ru", steps=_STAMPS_STEPS),
+
+    "names": Scenario(
+        "Names of files as they are typed: tidied up, shortened to fit, "
+        "and with a letter beyond Z",
+        steps=_NAMES_STEPS),
 
     "clock": Scenario(
         "The clock in the corner of the screen, which the bench has off",

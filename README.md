@@ -58,8 +58,9 @@ The planned stages:
 Where it stands: the first stage is done. Outside the reserved room, both
 programs come out identical to the originals. The second stage has begun:
 the program builds as `VC.EXE` from assembly and C together, and the first
-routines run as C: those that write numbers, sizes, dates and times, and
-those that write lines of text with their markup.
+routines run as C: those that write numbers, sizes, dates and times, those
+that write lines of text with their markup, and those that copy, trim and
+shorten texts, paths and file names.
 
 ## Layout
 

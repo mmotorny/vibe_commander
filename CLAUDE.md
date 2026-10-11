@@ -131,6 +131,10 @@ with it is less obvious:
   registers and mask them in C.
 - A 32-bit argument in a pair of registers does not arrive with its halves
   in the order written. Pass the halves as two 16-bit arguments.
+- DS cannot carry an argument: a far pointer in `[ds si]` is refused. The
+  stub moves the segment to another register.
+- A function that returns nothing may change AX all the same, whatever
+  `modify exact` says. List AX there and have the stub save it.
 - A pointer variable to a constant in the code segment makes the compiler
   load the segment by name, which costs a relocation. Index the constant
   array directly: that is addressed through CS.

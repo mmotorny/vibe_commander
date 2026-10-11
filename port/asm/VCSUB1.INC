@@ -2241,11 +2241,9 @@ MovDz1:	RET
 MovDz	ENDP
 ;			Add file name
 AddFile	PROC	NEAR
+	CALL	FAR PTR AddFile_c
 	MOV	AL,'\'
-	CMP	AL,ES:[DI-1]
-	JE	AddFl1
-	STOSB
-AddFl1:	RET
+	RET
 AddFile	ENDP
 ;			DS:SI(B) -> ES:DI(B)
 MvzLin0	PROC	NEAR
@@ -2253,29 +2251,30 @@ MvzLin0	PROC	NEAR
 MvzLin0	ENDP
 
 MvzLine	PROC	NEAR
+	PUSH	DX
 	PUSH	DI
-	PUSH	CX
-	REP	MOVSB
-	POP	CX
-	POP	DI
+	MOV	DX,DS
+	CALL	FAR PTR MvzLine_c
+	POP	DX			; Where the copy begins
+	ADD	SI,CX
+	ADD	CX,DX			; What the search for the end
+	SUB	CX,DI			; left of the count
+	DEC	CX
+	POP	DX
 	MOV	AL,0
-	REPNE	SCASB
-	DEC	DI
 	RET
 MvzLine	ENDP
 ;			Clear rest of line DS:SI, legth CX
 FilZero	PROC	NEAR
 	PUSH	ES
-	PUSH	DI
+	PUSH	AX
 	PUSH	DS
 	POP	ES
-	MOV	DI,SI
-	MOV	AL,0
-	REPNE	SCASB
-	JCXZ	FilZr1
-	REP	STOSB
-FilZr1:	POP	DI
+	CALL	FAR PTR FilZero_c
+	POP	AX
 	POP	ES
+	MOV	AL,0
+	XOR	CX,CX
 	RET
 FilZero	ENDP
 
@@ -2302,12 +2301,8 @@ IsCrLf	ENDP
 ;			ES:DI - string
 ;	Return :	   CX - length
 StrLen	PROC	NEAR
-	PUSH	DI
-	MOV	CX,0FFFFh
+	CALL	FAR PTR StrLen_c
 	MOV	AL,0
-	REPNE	SCASB
-	NOT	CX
-	POP	DI
 	RET
 StrLen	ENDP
 
@@ -2329,93 +2324,60 @@ UpCase	ENDP
 ;			   AL - letter
 ;	Return :	   AL - letter
 LowCase	PROC	NEAR
-	CMP	AL,'A'
-	JB	LoCas2
-	CMP	AL,'Z'
-	JA	LoCas1
-	ADD	AL,20h
-	RET
-LoCas1:	CMP	AL,80h
-	JB	LoCas2
+	PUSH	DS
 	PUSH	BX
-	MOV	BL,AL
-	MOV	BH,0
-	MOV	AL,ES:LowTab[BX-128]
+	PUSH	ES
+	POP	DS
+	MOV	BH,AH
+	CALL	FAR PTR LowCase_c
+	MOV	AH,BH
 	POP	BX
-LoCas2:	RET
+	POP	DS
+	RET
 LowCase	ENDP
 
 ;----------------------- Find text ---------------------
 ;			DS:SI - string
 FndLet	PROC	NEAR
-	LODSB
-	CMP	AL,' '
-	JE	FndLet
-	CMP	AL,9
-	JE	FndLet
-	DEC	SI
+	PUSH	ES
+	PUSH	DS
+	POP	ES
+	CALL	FAR PTR FndLet_c
+	POP	ES
+	MOV	AL,DS:[SI]
 	RET
 FndLet	ENDP
 
 ;------------------------ Cut path ---------------------
 ;			DS:SI - path
 CutPath	PROC	NEAR
-	PUSH	BX
-	PUSH	AX
-CutPt1:	MOV	BX,SI
-CutPt2:	LODSB
-	CMP	AL,':'
-	JE	CutPt1
-	CMP	AL,'\'
-	JE	CutPt1
-	CMP	AL,0
-	JNE	CutPt2
-	MOV	SI,BX
-	POP	AX
-	POP	BX
+	PUSH	ES
+	PUSH	DS
+	POP	ES
+	CALL	FAR PTR CutPath_c
+	POP	ES
 	RET
 CutPath	ENDP
 
 ;--------------------- Normal string -------------------
 ;			ES:SI - address of string
 NormStr	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	BX
 	PUSH	AX
-	MOV	DI,SI
-NrmSt1:	LODS	ES:Byt
-	CMP	AL,' '
-	JE	NrmSt1
-	DEC	SI
-NrmSt2:	MOV	BX,DI
-NrmSt3:	LODS	ES:Byt
-	STOSB
-	CMP	AL,' '
-	JE	NrmSt3
-	CMP	AL,0
-	JNE	NrmSt2
-	MOV	ES:[BX],AL
+	CALL	FAR PTR NormStr_c
 	POP	AX
-	POP	BX
-	POP	DI
-	POP	SI
 	RET
 NormStr	ENDP
 
 ;---------------------- Higher letter ------------------
 ;			ES:SI - address of string
 PathLin	PROC	NEAR
-	PUSH	DI
+	PUSH	DS
 	PUSH	AX
-	MOV	DI,SI
-PthLn1:	MOV	AL,ES:[DI]
-	CALL	UpCase
-	STOSB
-	CMP	AL,0
-	JNE	PthLn1
+	PUSH	ES
+	POP	DS
+	CALL	FAR PTR PathLin_c
 	POP	AX
-	POP	DI
+	POP	DS
 	RET
 PathLin	ENDP
 
@@ -2423,22 +2385,11 @@ PathLin	ENDP
 ;			ES:SI - address of string
 LetLin	PROC	NEAR
 	PUSH	DS
-	PUSH	SI
-	PUSH	DI
 	PUSH	AX
-	CALL	PathLin
 	PUSH	ES
 	POP	DS
-	CALL	CutPath
-	MOV	DI,SI
-LetLn1:	LODSB
-	CALL	LowCase
-	STOSB
-	CMP	AL,0
-	JNE	LetLn1
+	CALL	FAR PTR LetLin_c
 	POP	AX
-	POP	DI
-	POP	SI
 	POP	DS
 	RET
 LetLin	ENDP
@@ -2447,47 +2398,9 @@ LetLin	ENDP
 ;			ES:SI - address of string
 ;			   AX - limit
 ShrtLin	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
 	PUSH	AX
-	PUSH	AX
-	MOV	DI,SI
-	MOV	CX,256
-	MOV	AL,0
-	REPNE	SCASB
-	DEC	DI
-	SUB	DI,SI
-	POP	CX
-	SUB	DI,CX
-	JBE	ShtLn3
-	PUSH	ES
-	POP	DS
-	XCHG	SI,DI
-	CMP	BYTE PTR DS:[DI+1],':'
-	JNE	ShtLn1
-	INC	DI
-	INC	DI
-	DEC	CX
-	DEC	CX
-ShtLn1:	CMP	BYTE PTR DS:[DI],'\'
-	JNE	ShtLn2
-	INC	DI
-	DEC	CX
-ShtLn2:	MOV	AL,'.'
-	STOSB
-	STOSB
-	STOSB
-	DEC	CX
-	DEC	CX
-	ADD	SI,DI
-	REP	MOVSB
-ShtLn3:	POP	AX
-	POP	CX
-	POP	DI
-	POP	SI
-	POP	DS
+	CALL	FAR PTR ShrtLin_c
+	POP	AX
 	RET
 ShrtLin	ENDP
 
@@ -2495,18 +2408,16 @@ ShrtLin	ENDP
 ;			NcPath + CS:SI -> ES:DI
 MainFil	PROC	NEAR
 	PUSH	DS
-	PUSH	SI
+	PUSH	DX
 	PUSH	ES
 	POP	DS
-	MOV	SI,OFFSET NcPath
-	MOV	CX,LenPath
-	CALL	MvzLine
-	POP	SI
-	PUSH	CS
+	MOV	DX,CS			; The name is in this segment
+	CALL	FAR PTR MainFil_c
+	POP	DX
 	POP	DS
-	MOV	CX,13
-	REP	MOVSB
-	POP	DS
+	ADD	SI,13
+	XOR	CX,CX
+	MOV	AL,0
 	RET
 MainFil	ENDP
 
