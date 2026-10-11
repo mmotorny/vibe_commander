@@ -125,7 +125,7 @@ _NAMES_STEPS = (
     "Esc",
     "Down Down Down",                     # onto a file
     "F5",                                 # a copy of it
-    '"under_sc.txt"',                     # with an underscore in its name
+    '"under_sc.tx"',                      # an underscore, a short extension
     "Enter",                              # the panel lists it
 )
 
@@ -166,6 +166,68 @@ SCENARIOS = {
         steps=(
             "F9 o Enter",
             "Esc",
+        )),
+
+    "hex": Scenario(
+        "A file in hex, and bytes looked for in it by their hex digits",
+        steps=(
+            "Down Down Down Down Down Down",   # onto the file of all bytes
+            "F3",
+            "F4",                         # in hex
+            "F7",
+            '"4a" Space "4B"',            # two bytes, digits small and big
+            "Enter",
+            "F7",
+            '"4:"',                       # no digits: looked for as text,
+            "Enter",                      # which is not there
+            "Esc",
+            "F7",
+            '"g1"',                       # nor is this, behind F
+            "Enter",
+            "Esc",
+            "F7",
+            '"/1"',                       # nor this, before 0
+            "Enter",
+            "Esc",
+            "Esc",
+        )),
+
+    "attributes": Scenario(
+        "The date and the time of a file, set by hand",
+        steps=(
+            "Down Down Down",             # onto a file
+            "Ctrl+a",
+            "Tab Tab Tab Tab",            # past the attributes, to the date
+            '"1-2-99"',
+            "Tab",
+            '"3:04:05"',
+            "Enter",                      # set, the seconds made even
+            "Ctrl+a",
+            "Tab Tab Tab Tab",
+            # A year too large for a number is refused, be it by the
+            # tenfold or by the digit added to it. Cut to 16 bits these
+            # two would be 1999 and 1.
+            '"1-2-67535"',
+            "Enter",
+            "Esc",
+            "Esc",
+            "Ctrl+a",
+            "Tab Tab Tab Tab",
+            '"1-2-65537"',
+            "Enter",
+            "Esc",
+            "Esc",
+        )),
+
+    "select": Scenario(
+        "Files selected and unselected by a mask",
+        steps=(
+            "GrayPlus",
+            '"*.txt"',
+            "Enter",
+            "GrayMinus",
+            '"h?llo.*"',
+            "Enter",
         )),
 
     "editor": Scenario(

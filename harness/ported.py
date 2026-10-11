@@ -135,6 +135,18 @@ BATCHES = [
                     "a colour one",
         },
     ),
+    Batch(
+        title="Hex digits and numbers that are typed",
+        source="digits.c",
+        routines=("HexByt", "HexCod", "TstHex", "TxtNum"),
+        functions=("HexByt_c", "TstHex_c", "TxtNum_c"),
+    ),
+    Batch(
+        title="File names in their fixed form, and masks",
+        source="mask.c",
+        routines=("Convert", "Conv10", "UnConv", "UnCnv1", "TstMas"),
+        functions=("Convert_c", "UnConv_c", "TstMas_c"),
+    ),
 ]
 
 

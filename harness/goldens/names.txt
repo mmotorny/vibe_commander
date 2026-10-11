@@ -422,8 +422,8 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 15: "under_sc.txt"
-cursor 20 8 lines 6 7 mode 3
+== 15: "under_sc.tx"
+cursor 19 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
@@ -432,7 +432,7 @@ cursor 20 8 lines 6 7 mode 3
 |║re                                                                            ║| 1Bx1 30x2 70x74 1Bx3
 |║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║no   ║ Copy "readme.txt" to                                             ║     ║| 1Bx3 70x74 03x2 1Bx1
-|║da   ║ under_sc.txt                                                     ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║da   ║ under_sc.tx                                                      ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
@@ -463,7 +463,7 @@ cursor 8 23 lines 6 7 mode 3
 |║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║under_sc txt│            │            ║║                                      ║| 1Bx80
+|║under_sc tx │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -497,7 +497,7 @@ C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
 C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
 C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
 C:\WORK\SRC  D   2000-06-16 12:00:00
-C:\WORK\UNDER_SC.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\UNDER_SC.TX  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
 D:\VC  D   2000-06-16 12:00:00
 D:\VC\<program>  the program under test
 D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e

@@ -299,10 +299,7 @@ extern struct MainDat __near md;
    what the routine's registers hold, so a value in a high byte stays
    there; flags do not come back. */
 u16 UpCase(u16 letter);                 /* AL: a letter -> AL: its capital */
-u16 TstHex(u16 digit);                  /* AL: a hex digit as text -> its
-                                           value, or above 0FFh if none */
 #pragma aux UpCase "*_a" __far parm [ax] value [ax] modify exact [ax es]
-#pragma aux TstHex "*_a" __far parm [ax] value [ax] modify exact [ax es]
 
 /* Routines that are C, for C code in other files than theirs to call.
    The assembly calls them too, by these conventions (see the stubs in
@@ -311,6 +308,8 @@ u16 Color(u16 number);                  /* screen.c */
 u16 *BasAdr(u16 place);
 #pragma aux Color  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux BasAdr "*_c" __far parm [bx] value [di] modify exact [di]
+u16 TstHex(u16 digit);                  /* digits.c */
+#pragma aux TstHex "*_c" __far parm [ax] value [ax] modify exact [ax]
 
 /* The panel that a file entry belongs to. */
 #define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))

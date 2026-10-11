@@ -20,6 +20,8 @@
 	EXTERN	PathLin_c:FAR, LetLin_c:FAR, ShrtLin_c:FAR, MainFil_c:FAR
 	EXTERN	BasAdr_c:FAR, Color_c:FAR, ColAddr_c:FAR, Shadow_c:FAR
 	EXTERN	MvsBw_c:FAR, MvsColr_c:FAR, MovDz0_c:FAR
+	EXTERN	HexByt_c:FAR, TstHex_c:FAR, TxtNum_c:FAR
+	EXTERN	Convert_c:FAR, UnConv_c:FAR, TstMas_c:FAR
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.

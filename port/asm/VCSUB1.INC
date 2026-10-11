@@ -2424,85 +2424,43 @@ Number	ENDP
 ;-------------------- Output hex byte ------------------
 ;			   AL - code
 HexByt	PROC	NEAR
-	PUSH	CX
-	PUSH	AX
-	MOV	CL,4
-	SHR	AL,CL
-	CALL	HexCod
-	POP	AX
-	CALL	HexCod
-	POP	CX
+	CALL	FAR PTR HexByt_c
 	RET
 HexByt	ENDP
-
-HexCod	PROC	NEAR
-	AND	AL,0Fh
-	ADD	AL,'0'
-	CMP	AL,'9'
-	JBE	HexCd1
-	ADD	AL,7
-HexCd1:	STOSB
-	INC	DI
-	RET
-HexCod	ENDP
 
 ;-------------------- Text hex number ------------------
 ;			   AL - ASCII byte
 ;	Return :	   AL - hex number, CY=0
 ;				     error, CY=1
 TstHex	PROC	NEAR
-	CMP	AL,'0'
-	JB	TstHx2
-	CMP	AL,'9'
-	JA	TstHx1
-	SUB	AL,'0'
-	RET
-TstHx1:	CALL	UpCase
-	CMP	AL,'A'
-	JB	TstHx2
-	CMP	AL,'F'
-	JA	TstHx2
-	SUB	AL,'A'-10
-	RET
-TstHx2:	STC
+	PUSH	DS
+	PUSH	BX
+	PUSH	ES
+	POP	DS
+	MOV	BH,AH
+	CALL	FAR PTR TstHex_c
+	NEG	AH			; CY if it is no digit
+	MOV	AH,BH
+	POP	BX
+	POP	DS
 	RET
 TstHex	ENDP
-	FromC	TstHex, <SBB AH,AH>
 
 ;---------------------- Number input -------------------
 ;			ES:SI - string
 ;	Return :	   AX - number
 ;			 CY=1 - error
 TxtNum	PROC	NEAR
-	PUSH	DX
 	PUSH	BX
-	CLD
+	PUSH	AX			; Room for the number
+	MOV	BX,SP
 	PUSH	SI
-	XOR	BX,BX
-TxtNm1:	LODS	ES:Byt
-	SUB	AL,'0'
-	JB	TxtNm3
-	CMP	AL,9
-	JA	TxtNm3
-	PUSH	AX
-	MOV	AX,10
-	MUL	BX
-	MOV	BX,AX
-	POP	AX
-	OR	DX,DX
-	JNE	TxtNm2
-	CBW
-	ADD	BX,AX
-	JNC	TxtNm1
-TxtNm2:	MOV	BX,0FFFFh
-	JMP	TxtNm1
-TxtNm3:	DEC	SI
-	POP	AX
+	CALL	FAR PTR TxtNum_c
+	POP	AX			; Where the text begins
 	CMP	AX,SI
-	CMC
-	MOV	AX,BX
+	CMC				; CY if no digit is there
+	POP	AX
 	POP	BX
-	POP	DX
 	RET
 TxtNum	ENDP
 
@@ -2510,81 +2468,30 @@ TxtNum	ENDP
 ;			DS:SI - address of file
 ;			ES:DI - convert buffer
 Convert	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
+	PUSH	DS
+	PUSH	DX
 	PUSH	AX
-        CLD
-	MOV	CX,8
-	MOV	AH,'.'
-	CALL	Conv10
-Conv01:	LODSB
-	CMP	AL,'.'
-	JE	Conv02
-	CMP	AL,0
-	JNE	Conv01
-	DEC	SI
-Conv02:	MOV	CX,3
-	MOV	AH,0
-	CALL	Conv10
+	MOV	DX,DS
+	PUSH	ES
+	POP	DS
+	CALL	FAR PTR Convert_c
 	POP	AX
-	POP	CX
-	POP	DI
-	POP	SI
+	POP	DX
+	POP	DS
 	RET
 Convert	ENDP
-
-Conv10	PROC	NEAR
-	LODSB
-	CMP	AL,0
-	JE	Conv11
-	CMP	AL,AH
-	JE	Conv11
-	CMP	AL,'*'
-	JE	Conv12
-	CALL	UpCase
-	STOSB
-	LOOP	Conv10
-	RET
-Conv11:	MOV	AL,' '
-	JMP	Conv13
-Conv12:	MOV	AL,'?'
-Conv13:	REP	STOSB
-	DEC	SI
-	RET
-Conv10	ENDP
 
 ;-------------- Unconvert name & extension -------------
 ;			DS:SI - convert buffer
 ;			ES:DI - address of file
 UnConv	PROC	NEAR
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	BX,DI
-	MOV	CX,8
-	CALL	UnCnv1
-	MOV	AL,'.'
-	STOSB
-	MOV	CX,3
-	CALL	UnCnv1
-	MOV	BYTE PTR ES:[DI],0
-	POP	AX
-	POP	BX
-	POP	CX
+	PUSH	DX
+	MOV	DX,DS
+	CALL	FAR PTR UnConv_c
+	POP	DX
+	ADD	SI,11
 	RET
 UnConv	ENDP
-
-UnCnv1	PROC	NEAR
-	LODSB
-	STOSB
-	CMP	AL,' '
-	JE	UnCnv2
-	MOV	BX,DI
-UnCnv2:	LOOP	UnCnv1
-	MOV	DI,BX
-	RET
-UnCnv1	ENDP
 
 ;--------------------- Test mask file ------------------
 ;			DS:SI - address of file
@@ -2592,31 +2499,17 @@ UnCnv1	ENDP
 ;	Return :	 CY=1 - yes
 ;			 CY=0 - no
 TstMas	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
+	PUSH	DS
+	PUSH	DX
 	PUSH	AX
-	PUSH	DI
-	MOV	DI,OFFSET TmpBuf+20
-	PUSH	DI
-	CALL	Convert
-	POP	DI
-	POP	SI
-	MOV	CX,11
-TstMs1:	LODS	ES:Byt
-	CMP	AL,'?'
-	JNE	TstMs2
-	INC	DI
-	JMP	TstMs3
-TstMs2:	SCASB
-	CLC
-	JNE	TstMs4
-TstMs3:	LOOP	TstMs1
-	STC
-TstMs4:	POP	AX
-	POP	CX
-	POP	DI
-	POP	SI
+	MOV	DX,DS
+	PUSH	ES
+	POP	DS
+	CALL	FAR PTR TstMas_c
+	SHR	AX,1			; CY if it fits
+	POP	AX
+	POP	DX
+	POP	DS
 	RET
 TstMas	ENDP
 
