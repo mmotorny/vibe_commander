@@ -40,9 +40,9 @@ not in Claude's memory: memory does not travel between computers.
 
 ## Committing and pushing
 
-- Commit only when asked to, and push only when asked to. They are separate
-  requests: being asked to commit is not being asked to push.
-- Show the result of a piece of work before committing it.
+- Show the result of a piece of work, then wait for confirmation before
+  committing it.
+- Once confirmed, commit and push together. A commit is never left unpushed.
 
 ## History
 
