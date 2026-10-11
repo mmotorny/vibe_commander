@@ -51,7 +51,11 @@ def main():
             sys.exit(f"no procedure {name} in {LISTING}")
     ran = set()
     for name in scenarios.SCENARIOS:
-        ran |= goldens.read_ran(name)
+        if goldens.derived(name):
+            ran |= goldens.read_ran(name)
+        else:
+            print(f"{name} has no golden yet and is left out",
+                  file=sys.stderr)
 
     tried = None
     if args.steps:

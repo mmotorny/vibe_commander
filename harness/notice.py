@@ -100,8 +100,18 @@ def scenarios_running(routines):
             sys.exit(f"no procedure {name} in {LISTING}")
     addresses = {line.address - COM_ORIGIN for name in routines
                  for line in listing.procedure(name)}
-    return [name for name in scenarios.SCENARIOS
+    return [name for name in with_goldens()
             if addresses & goldens.read_ran(name)]
+
+
+def with_goldens():
+    """The scenarios that have a golden to be held against; the others
+    are named."""
+    for name in scenarios.SCENARIOS:
+        if not goldens.derived(name):
+            print(f"{name} has no golden yet and is left out",
+                  file=sys.stderr)
+    return [name for name in scenarios.SCENARIOS if goldens.derived(name)]
 
 
 def noticed(program, names):
@@ -141,7 +151,7 @@ def main():
     if "port" not in target.relative_to(COPY).parts[:1]:
         sys.exit(f"{args.file} is not a file of port/")
     names = scenarios_running(args.routine) if args.routine \
-        else list(scenarios.SCENARIOS)
+        else with_goldens()
     if not names:
         sys.exit("no scenario ran " + ", ".join(args.routine)
                  + " in the original")

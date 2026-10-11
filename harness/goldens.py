@@ -186,6 +186,11 @@ def write_ran(name, executed):
     ran_path(name).write_text(text + "\n")
 
 
+def derived(name):
+    """Whether the scenario `name` has a golden."""
+    return path(name).exists() and ran_path(name).exists()
+
+
 def read_ran(name):
     """The offsets in the original's file of the bytes that ran."""
     ran = set()
