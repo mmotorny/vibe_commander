@@ -10,6 +10,7 @@ Volkov Commander moves itself about in memory, but its code can be told
 from everything else by its bytes: a block whose bytes occur in the program
 file exactly once shows where in memory that part of the file sat.
 """
+import bisect
 import re
 from collections import Counter
 from dataclasses import dataclass
@@ -102,6 +103,7 @@ class Listing:
     def __init__(self, path):
         self.lines = []
         self.procedures = {}                 # name -> (address, length)
+        labels = {}                          # name -> address
         in_code = True
         table = False
         with open(path, encoding="cp866") as listing:
@@ -115,6 +117,10 @@ class Listing:
                     if match:
                         self.procedures[match[1]] = (int(match[2], 16),
                                                      int(match[3], 16))
+                    match = re.match(r"(\w+) [ .]*L Near +([0-9A-F]+)h +"
+                                     r"_TEXT", line)
+                    if match:
+                        labels[match[1]] = int(match[2], 16)
                     continue
                 text = line[32:]
                 directive = re.match(r"\s*\.(CODE|CONST|DATA)\b", text)
@@ -124,8 +130,24 @@ class Listing:
                 if match and in_code and not _is_data(text):
                     self.lines.append(Line(int(match[1], 16), text))
 
+        # Code that stands between two procedures belongs to neither. Such
+        # a stretch counts as a procedure of its own: it has the name of
+        # its first label, and ends where the next procedure begins.
+        inside = sorted(self.procedures.values())
+        begins = [start for start, _ in inside]
+        stretches = {}                       # where it ends -> name
+        for name, address in sorted(labels.items(), key=lambda item: item[1]):
+            before = bisect.bisect_right(begins, address)
+            if before and address < sum(inside[before - 1]):
+                continue
+            end = begins[before] if before < len(begins) else None
+            if end is not None and end not in stretches:
+                stretches[end] = name
+                self.procedures[name] = (address, end - address)
+
     def procedure(self, name):
-        """The code lines of procedure `name`."""
+        """The code lines of procedure `name`, or of the code between two
+        procedures whose first label is `name`."""
         start, length = self.procedures[name]
         return [line for line in self.lines
                 if start <= line.address < start + length]

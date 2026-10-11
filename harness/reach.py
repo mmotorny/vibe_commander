@@ -13,6 +13,9 @@ takes no time:
     CurNl:  reached 7, left 3: 0DA4-0DA8
     Quit:   reached 12, left 0
 
+A routine is a procedure, or code that stands between two procedures,
+which goes by its first label: PutInf, between PutTree and PtIn20.
+
 An instruction is named by its address in the listing, and instructions
 that follow one another by the first and the last of them. With --list
 those that are left are printed as well, one to a line, as the listing
@@ -53,7 +56,8 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("routine", nargs="+",
-                        help="procedures of the original, by name")
+                        help="procedures of the original, by name, or "
+                             "code between two by its first label")
     parser.add_argument("--steps", nargs="+", metavar="STEP",
                         help="keys to press, written as in scenarios.py")
     parser.add_argument("--country", default="us",
