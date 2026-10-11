@@ -3,6 +3,10 @@
 Standing instructions for working in this repository. Record new ones here,
 not in Claude's memory: memory does not travel between computers.
 
+## Working together
+
+- Give an honest opinion, including disagreement, not compliance.
+
 ## Third-party software
 
 - Never commit anything proprietary. That includes the shareware Volkov
@@ -73,6 +77,57 @@ not in Claude's memory: memory does not travel between computers.
   assembly, until the whole program is C.
 - Size matters, but need not be chased: twice the original is fine, ten
   times would be a red flag.
+
+## Translating a batch
+
+Routines are translated a few at a time, ones that belong together. For
+each batch, in this order:
+
+1. Run `tools/flagscan.py` on the routines, and read every caller that
+   stays in assembly: which registers it passes, which it uses afterwards,
+   whether it reads the flags. That is the contract the stubs must keep.
+2. Write scenarios that reach the routines. `harness/show.py` shows what
+   keys do. Derive their goldens with `harness/goldens.py`.
+3. List the routines in `harness/ported.py` and run the `port` test. It
+   names every instruction of theirs that no scenario executed in the
+   original. Add scenarios until none is left, or list an instruction as
+   out of reach with the reason.
+4. Translate. The C goes into `port/`, the routines leave `port/asm/`, and
+   those that assembly still calls leave a stub behind.
+5. The `port` test must pass. Nothing else decides whether a translation is
+   right.
+
+### Stubs in the assembly
+
+- A stub hands back exactly the registers its remaining callers use, and
+  no caller may rely on flags: C code leaves them undefined.
+- C code needs DS on the main data segment, where assembly often has ES
+  there and DS elsewhere; the stub arranges it and restores DS.
+- C code may destroy ES. A stub whose callers need ES saves it, or the
+  function's `#pragma aux` leaves ES out of what it modifies.
+- The direction flag must be clear when C is entered. C leaves it clear.
+
+### C for the port
+
+`port/vc.h` says what the program asks of C code. What Open Watcom does
+with it is less obvious:
+
+- A byte register in the `parm` list of `#pragma aux` is ignored without a
+  warning, and the argument goes on the stack. Pass bytes in 16-bit
+  registers and mask them in C.
+- A 32-bit argument in a pair of registers does not arrive with its halves
+  in the order written. Pass the halves as two 16-bit arguments.
+- A pointer variable to a constant in the code segment makes the compiler
+  load the segment by name, which costs a relocation. Index the constant
+  array directly: that is addressed through CS.
+- Arithmetic on `u8` is done as signed `int`, with a signed division. Use
+  `u16` for anything that is divided or counted.
+- The option `-nd` makes the compiler load a segment for every access to
+  the main data. Do not use it.
+- There is no C library. String literals and static variables are refused
+  by `tools/mkexe.c`. The first 32-bit multiplication or division will
+  need the compiler's helper routines written, in assembly, in the C code
+  segment.
 
 ## Scenarios
 
