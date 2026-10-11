@@ -199,7 +199,9 @@ binaries shipped in 2000.
 `python3 harness/compare.py [--signals] FILE [SCENARIO...]` takes any
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from
 the goldens. No test runs the programs assembled from `src/`, which the
-byte comparison answers for; this is how to run them.
+byte comparison answers for; this is how to run them. The copy with the
+reserved room has no edition name in its banner, and differs from the
+goldens wherever the banner shows.
 
 `python3 harness/show.py STEP...` prints the screens that the original
 shows after each of some steps, or with `--program` those of a build. It

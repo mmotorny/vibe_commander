@@ -23,6 +23,12 @@ Things that are known and not done. Standing instructions are in
   time stamp of a file it has made; the golden would then show another
   minute than a build does when it is tested.
 
+- The clock where it has 24 hours: the scenario `clock` runs in the United
+  States only. The `port` test will ask for the other when the code that
+  draws the clock is translated.
+- That the comparison of the disks would report a difference. The `port`
+  test checks that for a screen only.
+
 ## Suspected bugs in the original
 
 Found by reading, not reproduced. Ported as they are until decided
@@ -40,6 +46,7 @@ otherwise.
 - Running scenarios side by side. Measured on the port's test with six
   scenarios: 13.8 s one after another, 7.7 s two at a time, 6.9 s four at a
   time. Booting DOS for the two countries then takes 3.1 s, which is the
-  floor. `Bench._program_disk` in `harness/setups.py` is not safe to call
-  from two threads at once and has to be made so first; reading the
-  execution logs is Python and gains nothing from threads.
+  floor; since then a seventh scenario has come, and 1.7 s for making the
+  bench's setup file. `Bench._program_disk` in `harness/setups.py` is not
+  safe to call from two threads at once and has to be made so first;
+  reading the execution logs is Python and gains nothing from threads.
