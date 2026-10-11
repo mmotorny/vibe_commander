@@ -50,9 +50,9 @@ The planned stages:
    comparison, with every intended deviation listed explicitly.
 
 Where it stands: the first stage is done. Outside the reserved room, both
-programs come out identical to the originals. The harness compares one
-screen, the start screen; it cannot yet press keys, so behaviour behind that
-screen is covered only by the byte comparison.
+programs come out identical to the originals. The harness presses keys and
+compares screens and disks step by step; the scenarios it has so far reach
+a small part of the program.
 
 ## Layout
 
@@ -141,7 +141,22 @@ On these machines the program under test sits on its own drive, `D:`, with
 the original's help and configuration files, and is started in `C:\WORK`,
 a directory with a small fixed set of files. Keeping it off the drive it
 displays stops its file size from appearing on screen as free space.
-`python3 harness/compare.py FILE` runs the comparison for any `VC.COM`.
+
+Beyond the start screen the programs are compared by scenarios: lists of
+key presses, written down in `harness/scenarios.py`. After the start and
+after every step the screens must be the same, and at the end so must the
+files on the disks. `python3 harness/compare.py FILE [SCENARIO...]` runs
+scenarios for any `VC.COM`, or all of them with `all`; without a scenario
+it compares the start screens, which is what the tests above do.
+
+Where a build is meant to differ from the original, `harness/deviations.py`
+says so and the comparison overlooks that and nothing else. There is one
+such place: the banner names the edition, and the published source is of
+another edition than the binaries shipped in 2000.
+
+A run can also record which of the program's code was executed, from
+QEMU's log of the code it translates (`harness/coverage.py`). No test uses
+that yet.
 
 The reserved room is listed in `harness/bytecheck.py`, with the offset and
 length of each piece and a note of what the original has there.

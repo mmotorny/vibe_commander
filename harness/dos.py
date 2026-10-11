@@ -5,6 +5,7 @@ Needs `qemu-system-i386` and `mtools` on the PATH.
 import calendar
 import json
 import os
+import re
 import socket
 import subprocess
 import time
@@ -28,6 +29,29 @@ BOOTED = b"BOOTED"
 # A screen that alternates between two states differing in at most this many
 # bytes is showing a blinking indicator, and counts as standing still.
 BLINK_BYTES = 4
+
+# How long a key is held down and how long the keyboard then rests, in
+# seconds. The BIOS buffers 15 keys, so a step should not type more.
+KEY_TIME = 0.03
+
+# Names for the keys of a US keyboard, as written in scenarios, and the
+# QEMU key codes they stand for. Letters, digits and F1-F12 name themselves.
+KEYS = {
+    "Enter": "ret", "Esc": "esc", "Tab": "tab", "Space": "spc",
+    "Backspace": "backspace", "Ins": "insert", "Del": "delete",
+    "Home": "home", "End": "end", "PgUp": "pgup", "PgDn": "pgdn",
+    "Up": "up", "Down": "down", "Left": "left", "Right": "right",
+    "GrayPlus": "kp_add", "GrayMinus": "kp_subtract",
+    "GrayStar": "kp_multiply",
+    "Ctrl": "ctrl", "Alt": "alt", "Shift": "shift",
+}
+PUNCTUATION = {
+    " ": "spc", "-": "minus", "=": "equal", "[": "bracket_left",
+    "]": "bracket_right", ";": "semicolon", "'": "apostrophe",
+    "`": "grave_accent", "\\": "backslash", ",": "comma", ".": "dot",
+    "/": "slash",
+}
+SHIFTED = dict(zip('!@#$%^&*()_+{}:"~|<>?', "1234567890-=[];'`\\,./"))
 
 CP437_CONTROLS = ("\u0020\u263a\u263b\u2665\u2666\u2663\u2660\u2022\u25d8"
                   "\u25cb\u25d9\u2642\u2640\u266a\u266b\u263c\u25ba\u25c4"
@@ -88,13 +112,32 @@ class FatImage:
     def delete(self, name):
         self._mtools("mdel", f"x:/{name}")
 
+    def set_size(self, name, size):
+        """Make the directory entry of the empty file `name` claim `size`
+        bytes. The name must not occur in another directory.
 
-def boot_floppy(path, workdir, freedos_zip, epoch, commands):
+        DOS and Volkov Commander then show a file of that size, which lets
+        a small disk hold "files" of any size, as long as nobody reads them.
+        """
+        base, _, extension = name.partition(".")
+        entry = f"{base:<8}{extension:<3}".encode("ascii")
+        with open(self.path, "r+b") as image:
+            disk = image.read()
+            at = disk.find(entry)
+            if at < 0 or disk.find(entry, at + 1) >= 0 or at % 32:
+                raise RuntimeError(f"cannot find the one entry of {name}")
+            image.seek(at + 28)
+            image.write(size.to_bytes(4, "little"))
+
+
+def boot_floppy(path, workdir, freedos_zip, epoch, commands, country=None):
     """Build a FreeDOS boot floppy that runs `commands` once it has booted.
 
     It is the stock FreeDOS 1.3 boot floppy, with its installer replaced by
     a minimal configuration. Before running the commands DOS reports on the
-    serial port that it is up.
+    serial port that it is up. `country` is a DOS country code, which sets
+    how dates, times and numbers are written; without it DOS uses the
+    conventions of the United States.
     """
     with zipfile.ZipFile(freedos_zip) as archive:
         Path(path).write_bytes(archive.read("144m/x86BOOT.img"))
@@ -106,6 +149,8 @@ def boot_floppy(path, workdir, freedos_zip, epoch, commands):
         "FILES=40",
         r"SHELL=\FREEDOS\BIN\COMMAND.COM \FREEDOS\BIN /E:1024 /P=\FDAUTO.BAT",
     ]
+    if country:
+        config.append(rf"COUNTRY={country:03},,\FREEDOS\BIN\COUNTRY.SYS")
     autoexec = [
         "@ECHO OFF",
         r"SET PATH=A:\FREEDOS\BIN",
@@ -155,11 +200,15 @@ def _glyph(code):
 class Machine:
     """A PC running in QEMU, controlled over QMP.
 
-    The disks are attached as snapshots, so nothing the guest writes reaches
-    the image files. The clock starts at `clock` (ISO 8601) on every boot.
+    The hard disk images are written to as the guest writes to its disks,
+    and can be read once the machine has been shut down. The clock starts
+    at `clock` (ISO 8601) on every boot.
+
+    With `trace` set, QEMU logs to that file every piece of code the guest
+    executes, the first time it does so; coverage.py reads the log.
     """
 
-    def __init__(self, floppy, hard_disks, workdir, clock):
+    def __init__(self, floppy, hard_disks, workdir, clock, trace=None):
         self._workdir = Path(workdir)
         self._serial = self._workdir / "serial.log"
         self._scratch = self._workdir / "scratch.bin"
@@ -174,7 +223,9 @@ class Machine:
         ]
         for index, disk in enumerate(hard_disks):
             command += ["-drive", f"if=ide,index={index},format=raw,"
-                                  f"snapshot=on,file={disk}"]
+                                  f"file={disk}"]
+        if trace:
+            command += ["-d", "in_asm", "-D", str(trace)]
         self._qemu = subprocess.Popen(command)
         self._socket = socket.socket(socket.AF_UNIX)
         deadline = time.monotonic() + 10
@@ -230,8 +281,35 @@ class Machine:
                 raise TimeoutError("DOS did not finish booting")
             time.sleep(0.1)
 
+    def press(self, keys):
+        """Press keys, given as in a scenario: names separated by spaces.
+
+        A name is a key ("F3", "Enter", "a"), keys held down together
+        ("Alt+F5", "Ctrl+o"), or a text to type in double quotes, which
+        may not contain spaces ("readme.txt").
+        """
+        for name in keys.split():
+            if name.startswith('"'):
+                for char in name.strip('"'):
+                    self._chord(_character(char))
+            else:
+                self._chord([_key(part) for part in name.split("+")])
+
+    def _chord(self, codes):
+        for down in (True, False):
+            events = [{"type": "key",
+                       "data": {"down": down,
+                                "key": {"type": "qcode", "data": code}}}
+                      for code in (codes if down else reversed(codes))]
+            self._command("input-send-event", events=events)
+            time.sleep(KEY_TIME)
+
     def wait_for_screen(self, settle=2.0, timeout=30):
         """Wait until the text screen stands still, then return it.
+
+        The screen stands still when it has not changed for `settle`
+        seconds, other than by blinking. A blinking indicator is seen as
+        such only if `settle` covers both of its states.
 
         The machine is left paused, showing exactly the screen returned, so
         that a screenshot taken next matches it; call resume() to go on.
@@ -277,6 +355,25 @@ class Machine:
         """The display as the video card renders it."""
         self._command("screendump", filename=str(self._scratch))
         return Image.from_ppm(self._scratch.read_bytes())
+
+
+def _key(name):
+    if name in KEYS:
+        return KEYS[name]
+    if re.fullmatch(r"[a-z0-9]|F\d\d?", name):
+        return name.lower()
+    if name in PUNCTUATION:
+        return PUNCTUATION[name]
+    raise ValueError(f"unknown key {name!r}")
+
+
+def _character(char):
+    """The keys to hold down to type `char`."""
+    if char in SHIFTED:
+        return ["shift", _key(SHIFTED[char])]
+    if char.isupper():
+        return ["shift", char.lower()]
+    return [_key(char)]
 
 
 def _still(states):

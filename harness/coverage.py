@@ -1,0 +1,136 @@
+"""Which code of a program ran, from QEMU's log of the code it executed.
+
+QEMU translates the guest's code a block at a time, just before running the
+block for the first time, and with `-d in_asm` logs each block as it does:
+the address and the bytes of every instruction. A block runs from where it
+is entered to the next jump, so with rare exceptions (an interrupt taken in
+the middle of one) what was logged is what was executed.
+
+Volkov Commander moves itself about in memory, but its code can be told
+from everything else by its bytes: a block whose bytes occur in the program
+file exactly once shows where in memory that part of the file sat.
+"""
+import re
+from collections import Counter
+from dataclasses import dataclass
+
+# Blocks shorter than this could match the program file by accident.
+MIN_BLOCK = 8
+# A place in memory counts as holding the program when this many blocks
+# agree on it.
+MIN_VOTES = 4
+
+FAR_CALL, FAR_JUMP = 0x9A, 0xEA
+
+_LINE = re.compile(r"0x([0-9a-f]{8}):  ((?:[0-9a-f]{2} )*[0-9a-f]{2})"
+                   r"(?:  +(\S.*))?$")
+
+
+def blocks(trace_path):
+    """Yield each logged block as a list of (address, bytes) instructions."""
+    block = []
+    with open(trace_path, errors="replace") as log:
+        for line in log:
+            match = _LINE.match(line)
+            if not match:
+                if line.startswith("IN:") and block:
+                    yield block
+                    block = []
+                continue
+            address = int(match[1], 16)
+            code = bytes.fromhex(match[2])
+            # A long instruction continues on a line of its own, which has
+            # no mnemonic.
+            if block and match[3] is None:
+                block[-1] = (block[-1][0], block[-1][1] + code)
+            else:
+                block.append((address, code))
+    if block:
+        yield block
+
+
+def executed(trace_path, contents):
+    """Offset -> length in `contents` (a program file) of what was executed."""
+    logged = list(blocks(trace_path))
+    votes = Counter()
+    for block in logged:
+        code = b"".join(code for _, code in block)
+        if len(code) < MIN_BLOCK:
+            continue
+        offset = contents.find(code)
+        if offset >= 0 and contents.find(code, offset + 1) < 0:
+            votes[block[0][0] - offset] += 1
+    bases = [base for base, count in votes.most_common()
+             if count >= MIN_VOTES]
+
+    # A block is in the program if every instruction of it is, at one and
+    # the same place: single instructions are too short to go by.
+    result = {}
+    for block in logged:
+        for base in bases:
+            if all(_matches(contents, address - base, code)
+                   for address, code in block):
+                for address, code in block:
+                    result[address - base] = len(code)
+                break
+    return result
+
+
+def _matches(contents, offset, code):
+    if offset < 0:
+        return False
+    there = contents[offset:offset + len(code)]
+    # A far call or jump has had its segment relocated.
+    return there == code or (code[0] in (FAR_CALL, FAR_JUMP)
+                             and there[:3] == code[:3])
+
+
+@dataclass(frozen=True)
+class Line:
+    """A line of an assembler listing that produced code."""
+    address: int
+    text: str
+
+
+class Listing:
+    """A JWasm listing of a tiny-model program: its code, line by line.
+
+    Addresses are offsets in the program's one segment, so for a .COM file
+    100h more than offsets in the file.
+    """
+
+    def __init__(self, path):
+        self.lines = []
+        self.procedures = {}                 # name -> (address, length)
+        in_code = True
+        table = False
+        with open(path, encoding="cp866") as listing:
+            for line in listing:
+                line = line.rstrip("\r\n")
+                if line.startswith("Procedures, parameters and locals:"):
+                    table = True
+                elif table:
+                    match = re.match(r"(\w+) [ .]*P Near +([0-9A-F]{4}) +"
+                                     r"_TEXT +([0-9A-F]{4})", line)
+                    if match:
+                        self.procedures[match[1]] = (int(match[2], 16),
+                                                     int(match[3], 16))
+                    continue
+                text = line[32:]
+                directive = re.match(r"\s*\.(CODE|CONST|DATA)\b", text)
+                if directive:
+                    in_code = directive[1] == "CODE"
+                match = re.match(r"([0-9A-F]{4}) [0-9A-F]{2}", line)
+                if match and in_code and not _is_data(text):
+                    self.lines.append(Line(int(match[1], 16), text))
+
+    def procedure(self, name):
+        """The code lines of procedure `name`."""
+        start, length = self.procedures[name]
+        return [line for line in self.lines
+                if start <= line.address < start + length]
+
+
+def _is_data(text):
+    return re.match(r"\s*(\w+\s+)?(DB|DW|DD)\s", text) is not None
+

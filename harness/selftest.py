@@ -7,17 +7,24 @@ expects no differences, then runs a copy with one letter of the function
 key bar changed and expects exactly that one cell to be reported.
 """
 import sys
+from dataclasses import replace
 
+import scenarios
 import setups
-from compare import differences, start_screen
+from compare import differences
 from dos import COLUMNS, ROWS
 
 LABEL, ALTERED = b"RenMov", b"RenMow"       # the F6 label on the bottom row
 
 
+def start_screen(program):
+    """The screen `program` shows once it has started on the test bench."""
+    return scenarios.run(scenarios.SCENARIOS["start"], program).screens[0]
+
+
 def main():
     original = setups.original_vc()
-    if original.count(LABEL) != 1:
+    if original.contents.count(LABEL) != 1:
         sys.exit(f"expected {LABEL!r} exactly once in the original VC.COM")
 
     first = start_screen(original)
@@ -27,7 +34,8 @@ def main():
         print("\n".join(report))
         sys.exit("two runs of the same program were reported as different")
 
-    changed = start_screen(original.replace(LABEL, ALTERED))
+    changed = start_screen(replace(
+        original, contents=original.contents.replace(LABEL, ALTERED)))
     differing = [i // 2 for i in range(len(first.cells))
                  if first.cells[i] != changed.cells[i]]
     bottom_row = first.lines()[ROWS - 1]
