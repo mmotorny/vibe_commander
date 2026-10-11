@@ -12,6 +12,8 @@ Two setups share one clock and one source of files:
                   C:\\WORK. Keeping the program off the disk it displays
                   means its size cannot show up as free space on screen.
 """
+import shutil
+import tempfile
 import zipfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -55,18 +57,6 @@ STAMPS_FILES = [
 ]
 
 
-# Where VC.INI keeps the settings that scenarios change. The file is three
-# letters V, the saved state of the left and of the right panel (WCBdef in
-# the source, 88 bytes of it), the settings (MainDat in the source), and a
-# check sum of two bytes.
-INI_PANELS = (3, 3 + 88)
-INI_SETTINGS = 3 + 2 * 88
-SETTINGS = {
-    "LeftFull": INI_PANELS[0] + 1,      # the left panel shows size, date, time
-    "Clock": INI_SETTINGS + 247,        # the clock in the top right corner
-}
-
-
 @dataclass(frozen=True)
 class Program:
     """A build of Volkov Commander, and the file name it is run under."""
@@ -92,15 +82,6 @@ def original_vc():
     return Program("VC.COM", distribution()["VC.COM"][0])
 
 
-def configuration(settings):
-    """The distribution's VC.INI with `settings` changed: name -> value."""
-    ini = bytearray(distribution()["VC.INI"][0])
-    for name, value in settings.items():
-        ini[SETTINGS[name]] = value
-    ini[-2:] = (sum(ini[:-2]) & 0xFFFF).to_bytes(2, "little")
-    return bytes(ini)
-
-
 def _floppy(workdir, commands, country=None):
     return boot_floppy(workdir / "a.img", workdir, deps.fetch(deps.FREEDOS),
                        EPOCH, commands, country)
@@ -118,15 +99,77 @@ def fresh_install(workdir):
     return Machine(floppy.path, [disk.path], workdir, CLOCK)
 
 
-def test_bench(workdir, program, settings=None, country=None, trace=None):
-    """Boot the test bench with `program` as the program under test.
+# The countries DOS can be configured for here: country code, code page.
+COUNTRIES = {"us": None, "ru": (7, 866)}
 
-    `settings` changes VC.INI from what the distribution ships, and
-    `country` is the country code DOS is configured for, the United States
-    if none. The machine returned has a `disks` attribute: drive letter ->
-    image file.
+# What DOS runs on the test bench once it has booted. It waits for a key
+# first: that is where the machine's state is saved, and where every
+# scenario begins.
+BENCH_COMMANDS = ["PAUSE>NUL", "CLS", "C:", r"CD \WORK", r"D:\VC\VC"]
+
+
+class Bench:
+    """The test bench: a machine for every scenario, each the same.
+
+    DOS is booted once, configured for `country`, and the machine's state
+    is saved as it waits for a key before starting the program. start()
+    then makes a machine in that state, with fresh disks, in a fraction of
+    a second. Nothing a scenario does can reach the next one.
     """
-    work = FatImage.hard_disk(workdir / "c.img", workdir, EPOCH,
+
+    def __init__(self, workdir, country="us"):
+        self._workdir = Path(workdir)
+        self._workdir.mkdir(parents=True, exist_ok=True)
+        self._floppy = _floppy(self._workdir, BENCH_COMMANDS,
+                               COUNTRIES[country]).path
+        self._work = self._workdir / "c.img"
+        _work_disk(self._work, self._workdir)
+        self._programs = {}             # Program -> its disk image
+        self._state = self._workdir / "state"
+        with Machine(self._floppy, [self._work, self._program_disk(None)],
+                     self._workdir, CLOCK) as machine:
+            machine.wait_for_boot()
+            machine.wait_for_screen(0.5)
+            machine.save(self._state)
+
+    def _program_disk(self, program):
+        """The image of drive D: with `program` on it, or with none."""
+        if program not in self._programs:
+            image = self._workdir / f"d{len(self._programs)}.img"
+            disk = FatImage.hard_disk(image, self._workdir,
+                                      EPOCH, label="PROGRAM",
+                                      serial="20000617")
+            disk.mkdir("VC")
+            files = distribution()
+            if program:
+                disk.write(f"VC/{program.filename}", program.contents, EPOCH)
+            for name in SUPPORT_FILES:
+                data, date = files[name]
+                disk.write(f"VC/{name}", data, date)
+            self._programs[program] = disk.path
+        return self._programs[program]
+
+    def start(self, workdir, program, trace=None):
+        """A machine in which `program` is about to start, already running.
+
+        It has a `disks` attribute: drive letter -> image file, to read
+        once the machine has been shut down.
+        """
+        workdir = Path(workdir)
+        disks = {"C": workdir / "c.img", "D": workdir / "d.img"}
+        shutil.copyfile(self._work, disks["C"])
+        shutil.copyfile(self._program_disk(program), disks["D"])
+        machine = Machine(self._floppy, list(disks.values()), workdir, CLOCK,
+                          trace=trace, state=self._state)
+        machine.disks = disks
+        machine.resume()
+        machine.press("Enter")
+        return machine
+
+
+def _work_disk(path, workdir):
+    """Build drive C: of the test bench."""
+    work = FatImage.hard_disk(path, workdir, EPOCH,
                               label="WORK", serial="20000616")
     work.mkdir("WORK")
     for name in WORK_DIRECTORIES:
@@ -139,20 +182,24 @@ def test_bench(workdir, program, settings=None, country=None, trace=None):
     for name, size, time in STAMPS_FILES:
         work.write(f"STAMPS/{name}", b"", time)
         work.set_size(name, size)
+    return work
 
-    disk = FatImage.hard_disk(workdir / "d.img", workdir, EPOCH,
-                              label="PROGRAM", serial="20000617")
-    disk.mkdir("VC")
-    files = distribution()
-    disk.write(f"VC/{program.filename}", program.contents, EPOCH)
-    for name in SUPPORT_FILES:
-        data, date = files[name]
-        if name == "VC.INI":
-            data = configuration(settings or {})
-        disk.write(f"VC/{name}", data, date)
 
-    floppy = _floppy(workdir, ["C:", r"CD \WORK", r"D:\VC\VC"], country)
-    machine = Machine(floppy.path, [work.path, disk.path], workdir, CLOCK,
-                      trace=trace)
-    machine.disks = {"C": work.path, "D": disk.path}
-    return machine
+class Benches:
+    """A bench for each country that is asked for, booted when first used:
+    benches[country]. To be used in a `with` statement, which removes them.
+    """
+
+    def __enter__(self):
+        self._directory = tempfile.TemporaryDirectory()
+        self._benches = {}
+        return self
+
+    def __exit__(self, *exc):
+        self._directory.cleanup()
+
+    def __getitem__(self, country):
+        if country not in self._benches:
+            self._benches[country] = Bench(
+                Path(self._directory.name) / country, country)
+        return self._benches[country]

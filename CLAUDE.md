@@ -25,6 +25,10 @@ not in Claude's memory: memory does not travel between computers.
   shape code to match them. The binaries Volkov shipped are a different
   matter: they are his own output, obtained from his site, and matching
   them byte for byte is the project's test of fidelity.
+- What the original does when it is run is not proprietary: the screens it
+  shows and the files it leaves, recorded as goldens in `harness/goldens/`,
+  are committed. They are derived by `harness/goldens.py` and never edited
+  by hand.
 - Naming such tools is fine. Documentation should say plainly what the
   original was built with and where a reference came from; the restriction
   is on fetching and running them, not on mentioning them.
@@ -69,3 +73,10 @@ not in Claude's memory: memory does not travel between computers.
   assembly, until the whole program is C.
 - Size matters, but need not be chased: twice the original is fine, ten
   times would be a red flag.
+
+## Scenarios
+
+- A scenario starts from the program as its distribution configures it, on
+  a machine of its own, and sets up whatever else it needs through the
+  program's own menus. It does not rely on prepared configuration files.
+- The countries tested are the United States and Russia.

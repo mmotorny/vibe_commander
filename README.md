@@ -29,9 +29,10 @@ Fidelity is judged against the original program, at two levels:
   lost by replacing it.
 - **Behaviour.** Volkov Commander draws everything on an 80x25 text screen,
   so what it shows can be compared exactly: every character and colour
-  attribute, the cursor, and the files it leaves on disk. A candidate and the
-  original are run under DOS in an emulator, fed the same keystrokes, and
-  compared. This is the test that will carry over to the port.
+  attribute, the cursor, and the files it leaves on disk. The original is
+  run under DOS in an emulator and fed keystrokes, and what it does is
+  recorded; a candidate fed the same keystrokes has to do the same. This is
+  the test that will carry over to the port.
 
 The byte comparison has one complication. The binaries Volkov shipped were
 shareware, and contain registration code, tables and strings that the source
@@ -67,7 +68,7 @@ routines, those that write numbers, sizes, dates and times, run as C.
 | `port/` | The program on its way to C: `port/*.c` is what has been translated, `port/asm/` what is still assembly |
 | `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces; `flagscan.py` examines the callers of a routine before it is translated |
 | `CMakeLists.txt` | Builds the assembler and the programs, and registers the tests |
-| `harness/` | Compares a build with the original: byte for byte, and by running both under FreeDOS in QEMU |
+| `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
 | `docs/` | Pictures for this README |
 
 ## Building
@@ -168,33 +169,62 @@ ctest --test-dir build --output-on-failure
 | Test | What it checks |
 |---|---|
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
-| `start-screen` | `build/VC.COM` and the original `VC.COM` are started on identical machines; their screens, cursors and video modes must be the same |
+| `start-screen` | `build/VC.COM` shows the start screen that the original shows |
 | `start-screen-shareware-layout` | The same, for the copy with the reserved room |
-| `port` | `build/port/VC.EXE` and the original are taken through every scenario and must show the same screen after every step and leave the same files on their disks. Every instruction of the assembly that has been translated must have run in the original on the way, and every C function that replaces it in the port. The port must not be more than three times the size of the original |
-| `harness-self-test` | The comparison itself: two runs of the original must match, and a copy with one letter changed must be reported as differing in exactly that cell |
+| `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original |
+| `harness-self-test` | The comparison itself: the original must match what was recorded of it, and a copy with one letter changed must be reported as differing in exactly that cell |
 
-On these machines the program under test sits on its own drive, `D:`, with
-the original's help and configuration files, and is started in `C:\WORK`,
-a directory with a small fixed set of files. Keeping it off the drive it
-displays stops its file size from appearing on screen as free space.
+### Scenarios and goldens
 
-Beyond the start screen the programs are compared by scenarios: lists of
-key presses, written down in `harness/scenarios.py`. After the start and
-after every step the screens must be the same, and at the end so must the
-files on the disks. `python3 harness/compare.py FILE [SCENARIO...]` runs
-scenarios for any `VC.COM` or `VC.EXE`, or all of them with `all`; without
-a scenario it compares the start screens.
+A scenario is a list of key presses, written down in `harness/scenarios.py`.
+The original was taken through each one once, and what it showed after the
+start and after every step, and what it left on its disks, is kept in
+`harness/goldens/` as text. A build is right if it does the same. The
+goldens are derived, never edited:
+
+```sh
+python3 harness/goldens.py derive [SCENARIO...]
+```
 
 Where a build is meant to differ from the original, `harness/deviations.py`
-says so and the comparison overlooks that and nothing else. There is one
-such place: the banner names the edition, and the published source is of
-another edition than the binaries shipped in 2000.
+says how, and the golden is derived with that difference in it, so that it
+holds exactly what a build should show. There is one such place: the banner
+names the edition, and the published source is of another edition than the
+binaries shipped in 2000.
 
-What ran is taken from QEMU's log of the code it translates, which
+`python3 harness/compare.py FILE [SCENARIO...]` takes any
+`VC.COM` or `VC.EXE` through scenarios and reports where it departs from
+the goldens.
+
+### The machines
+
+DOS is booted once for each country that scenarios need, the United States
+and Russia, and the machine is saved as it is about to start the program.
+Every scenario then gets a machine of its own in that state, which takes a
+tenth of a second: the program under test on drive `D:` with the original's
+help and configuration files, started in `C:\WORK`, on disks that no other
+scenario has touched. Keeping the program off the drive it displays stops
+its file size from appearing on screen as free space. A scenario that wants
+the program set up differently does that itself, through the menus.
+
+### When a step is finished
+
+The screen has to be read when the program has done all that a key makes
+it do, and not before. The program does not say when that is, so the
+harness waits until every key has been taken and the screen has stood
+still for most of a second. A scenario of twenty steps takes twenty
+seconds that way.
+
+Nothing waits without a limit. A program that hangs or resets its machine
+fails its scenario within seconds, with the screen it got stuck on.
+
+### What ran
+
+Which code ran is taken from QEMU's log of the code it translates, which
 `harness/coverage.py` matches against the program file. For the original
-it is mapped to source lines through the listing of the build in
-`build/shareware-layout/`, which has every instruction at the address it
-has in the original.
+it is recorded with the goldens, and mapped to source lines through the
+listing of the build in `build/shareware-layout/`, which has every
+instruction at the address it has in the original.
 
 The reserved room is listed in `harness/bytecheck.py`, with the offset and
 length of each piece and a note of what the original has there.

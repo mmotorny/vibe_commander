@@ -185,10 +185,10 @@ add_test(NAME harness-self-test
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/selftest.py)
 add_test(NAME start-screen
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
-            ${CMAKE_BINARY_DIR}/VC.COM)
+            ${CMAKE_BINARY_DIR}/VC.COM start)
 add_test(NAME start-screen-shareware-layout
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
-            ${layout_dir}/VC.COM)
+            ${layout_dir}/VC.COM start)
 add_test(NAME port
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
             ${port_dir}/VC.EXE ${port_dir}/VC.MAP ${layout_dir}/VC.LST)

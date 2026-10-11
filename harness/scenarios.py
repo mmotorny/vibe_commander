@@ -2,42 +2,41 @@
 
 A scenario starts the program on the test bench (see setups.py) and presses
 keys, one step at a time. After the start and after every step the screen
-is recorded once it stands still; at the end, so is everything on the hard
-disks. Run on the original and on a candidate, a scenario must give the
-same record.
+is recorded, once the program has done all that the keys make it do; at the
+end, so is everything on the hard disks. What the original records is kept
+as the scenario's golden (see goldens.py), and a build is right if it
+records the same.
 
 Steps are written as Machine.press() takes them: key names separated by
 spaces, "Alt+F1" for keys held together, and text to type in double quotes.
 
-Unless a scenario says otherwise the clock in the corner of the screen is
-switched off. Its blinking colon would otherwise make every step wait for
-a full blink to be sure that nothing else moves.
+Every scenario gets a machine of its own, in the state the bench was saved
+in: the program as its distribution configures it, started in C:\\WORK. A
+scenario that wants something else arranges it with its first steps, the
+way a user would. It may end anywhere, with the program running or not.
 """
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
-from types import MappingProxyType
 
 import coverage
 import fat
-import setups
+from dos import MachineError
 
-# How long the screen must stand still before it is recorded, in seconds:
-# after the program has started, when the disks have been busy and DOS has
-# printed its own lines, and after a step.
-START_SETTLE = 2.0
-STEP_SETTLE = 0.5
+# How long the screen must stand still for a step to count as finished, in
+# seconds. It has to cover the longest the program waits before it does
+# something by itself, 0.6 s for following the cursor to another directory,
+# and both states of the blinking colon of its clock.
+SETTLE = 0.8
+# How long a step may take before the program counts as stuck, in seconds.
+STEP_TIME = 20
 
 
 @dataclass(frozen=True)
 class Scenario:
     description: str
     steps: tuple = ()
-    # VC.INI settings changed from what the distribution ships.
-    settings: MappingProxyType = MappingProxyType({"Clock": 0})
-    # The country DOS is configured for; the United States if None.
-    country: int = None
-    settle: float = STEP_SETTLE
+    country: str = "us"           # see setups.COUNTRIES
 
 
 @dataclass
@@ -45,33 +44,45 @@ class Run:
     """What a scenario showed and left behind."""
     screens: list                 # after the start and after each step
     disks: dict                   # drive letter -> fat.read_tree() of it
+    # The guest's time of day in seconds at the first screen and the last.
+    began: float
+    ended: float
     # Offset and length in the program file of every instruction that ran,
     # if the run was traced.
     executed: dict = field(default_factory=dict)
 
 
-def _settings(**changed):
-    return MappingProxyType({"Clock": 0, **changed})
-
-
 # From C:\WORK into C:\STAMPS, whose files have sizes and time stamps of
-# every kind (see setups.py).
-_IN_STAMPS = ("Ctrl+PgUp", "Down Down Enter")
+# every kind (see setups.py), with the left panel showing them: Full in its
+# menu.
+_STAMPS = (
+    "Ctrl+PgUp",
+    "Down Down Enter",
+    "F9",
+    "Enter",                              # the menu of the left panel
+    "Down Enter",                         # Full
+)
 
-_STAMPS_ABROAD = (
-    "Down Down Down Down",                # a date and a time before ten
+_STAMPS_STEPS = _STAMPS + (
+    "Down Down Down",                     # the status line of a file
+    "Ctrl+a",                             # its date and time in full
+    "Esc",
+    "Down",                               # a date and a time before ten
     "Ctrl+a",
     "Esc",
-    "Ins",
-    "Alt+F7",
+    "Down Down Down",                     # the last date DOS can express
+    "Ctrl+a",
+    "Esc",
+    "Ins Ins",                            # the size of the selected files
+    "Alt+F6",                             # the sizes of directories
+    "Alt+F7",                             # the file search and its list
     "Enter",
     "Esc",
 )
 
 SCENARIOS = {
     "start": Scenario(
-        "The start screen, with the settings the distribution ships",
-        settings=MappingProxyType({}), settle=START_SETTLE),
+        "The program as it starts"),
 
     "panels": Scenario(
         "The file panel in its other modes, the status line and the "
@@ -93,7 +104,6 @@ SCENARIOS = {
     "command": Scenario(
         "DOS commands: the program gives up most of its memory while one "
         "runs, and loads itself again afterwards",
-        settle=2.0,
         steps=(
             '"ver"',
             "Enter",
@@ -106,55 +116,57 @@ SCENARIOS = {
             "Ctrl+PgUp",                  # and the program still works
         )),
 
-    "stamps": Scenario(
-        "Sizes, dates and times of files, wherever they are shown",
-        settings=_settings(LeftFull=1),
-        steps=_IN_STAMPS + (
-            "Down Down Down",             # the status line of a file
-            "Ctrl+a",                     # its date and time in full
+    "quit": Scenario(
+        "Leaving the program, declined once",
+        steps=(
+            "F10",
             "Esc",
-            "Down",                       # a date and a time before ten
-            "Ctrl+a",
-            "Esc",
-            "Down Down Down",             # the last date DOS can express
-            "Ctrl+a",
-            "Esc",
-            "Ins Ins",                    # the size of the selected files
-            "Alt+F6",                     # the sizes of directories
-            "Alt+F7",                     # the file search and its list
-            "Enter",
-            "Esc",
+            "F10",
+            "Enter",                      # back at the DOS prompt
         )),
 
-    "stamps-germany": Scenario(
-        "The same where the day comes first and the clock has 24 hours",
-        settings=_settings(LeftFull=1), country=49,
-        steps=_IN_STAMPS + _STAMPS_ABROAD),
+    "stamps": Scenario(
+        "Sizes, dates and times of files, wherever they are shown",
+        steps=_STAMPS_STEPS),
 
-    "stamps-japan": Scenario(
-        "The same where the year comes first",
-        settings=_settings(LeftFull=1), country=81,
-        steps=_IN_STAMPS + _STAMPS_ABROAD),
+    "stamps-russia": Scenario(
+        "The same where the day comes first and the clock has 24 hours",
+        country="ru", steps=_STAMPS_STEPS),
 }
 
 
-def run(scenario, program, trace=False):
-    """Run `scenario` on `program` (a setups.Program) and return the Run."""
+def run(scenario, program, bench, trace=False):
+    """Run `scenario` on `program` (a setups.Program) and return the Run.
+
+    `bench` is the setups.Bench for the scenario's country. When the
+    program has finished a step is guessed: when every key has been taken
+    and the screen has stood still for a while.
+    """
     with tempfile.TemporaryDirectory() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None
-        with setups.test_bench(workdir, program, scenario.settings,
-                               scenario.country, log) as machine:
-            machine.wait_for_boot()
-            screens = [machine.wait_for_screen(START_SETTLE)]
-            for step in scenario.steps:
+        with bench.start(workdir, program, log) as machine:
+            wait = _settled
+            screens = [wait(machine, "the start")]
+            began = machine.seconds()
+            for number, step in enumerate(scenario.steps, 1):
                 machine.resume()
                 machine.press(step)
-                screens.append(machine.wait_for_screen(scenario.settle))
+                screens.append(wait(machine, f"step {number}, {step}"))
+            ended = machine.seconds()
             disks = machine.disks
         # The machine has been shut down: the disk images are complete.
         result = Run(screens, {drive: fat.read_tree(path)
-                               for drive, path in disks.items()})
+                               for drive, path in disks.items()},
+                     began, ended)
         if trace:
             result.executed = coverage.executed(log, program.contents)
     return result
+
+
+def _settled(machine, where):
+    try:
+        return machine.wait_for_screen(SETTLE, STEP_TIME)
+    except MachineError as error:
+        raise MachineError(f"after {where}: {error}") from None
+

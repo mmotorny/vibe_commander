@@ -1,18 +1,20 @@
 #!/usr/bin/env python3
 """Check the port: the program that is part assembly and part C.
 
-The port is taken through every scenario next to the original and must
-show the same screens and leave the same disks (see compare.py). That
-alone would say little about a routine no scenario reaches, so for the
-routines translated so far, listed below, this also checks that
+The port is taken through every scenario and must show the same screens
+and leave the same disks as the original did, which the goldens record
+(see compare.py and goldens.py). That alone would say little about a
+routine no scenario reaches, so for the routines translated so far, listed
+below, this also checks that
 
   - every instruction of the assembly they replace ran in the original, in
     some scenario, unless it is listed here with the reason why none gets
-    there, and
+    there,
   - every C function that replaces them ran in the port, and
   - the port is no more than three times the size of the original.
 
-What ran is read from QEMU's log of the code it executed (see coverage.py).
+What ran in the original was recorded with the goldens; what runs in the
+port is read from QEMU's log of the code it executed (see coverage.py).
 The assembly is identified by the listing of the build that is laid out
 like the original, and the C functions by the port's link map.
 
@@ -24,6 +26,7 @@ from dataclasses import dataclass, field
 
 import compare
 import coverage
+import goldens
 import scenarios
 import setups
 
@@ -55,22 +58,32 @@ BATCHES = [
                   "BufTime", "HexDec"),
         functions=("HexDec_c", "Number_c", "PutDate_c", "BufDate_c",
                    "PutTime_c", "BufTime_c", "SzDtTm_c"),
-        unreached=dict.fromkeys(
-            (0xA420, 0xA422, 0xA424, 0xA427, 0xA429, 0xA42B, 0xA42C, 0xA42D),
-            "Number, for a country without a thousands separator: the "
-            "harness knows of none to configure DOS for"),
+        unreached={
+            **dict.fromkeys(
+                (0xA420, 0xA422, 0xA424, 0xA427, 0xA429, 0xA42B, 0xA42C,
+                 0xA42D),
+                "Number, for a country without a thousands separator: the "
+                "harness knows of none to configure DOS for"),
+            **dict.fromkeys(
+                (0xAE02, 0xAE18),
+                "PutDate and BufDate, for a country that writes the year "
+                "first: the scenarios cover the United States and Russia"),
+        },
     ),
 ]
 
 
-def check_original(listing, executed):
-    """Report on the assembly that has been replaced; return success."""
+def check_original(listing, ran):
+    """Report on the assembly that has been replaced; return success.
+
+    `ran` holds the offsets in the original's file of the bytes that ran.
+    """
     passed = True
     for batch in BATCHES:
         lines = [line for name in batch.routines
                  for line in listing.procedure(name)]
         missed = [line for line in lines
-                  if line.address - COM_ORIGIN not in executed]
+                  if line.address - COM_ORIGIN not in ran]
         excused = [line for line in missed if line.address in batch.unreached]
         stale = sorted(set(batch.unreached)
                        - {line.address for line in missed})
@@ -114,17 +127,17 @@ def main():
     args = parser.parse_args()
 
     original, port = setups.original_vc(), setups.Program.load(args.port)
-    size, limit = len(port.contents), SIZE_LIMIT * len(original.contents)
+    size = len(port.contents)
+    limit = SIZE_LIMIT * len(original.contents)
     print(f"VC.EXE is {size} bytes, {size / len(original.contents):.2f} "
           f"times the original's {len(original.contents)}; the limit is "
           f"{SIZE_LIMIT} times")
 
-    failed, (original_runs, port_runs) = compare.compare_all(
-        list(scenarios.SCENARIOS), original, port, trace=True)
-    in_original, in_port = {}, {}
-    for run in original_runs:
-        in_original.update(run.executed)
-    for run in port_runs:
+    names = list(scenarios.SCENARIOS)
+    failed, runs = compare.compare(names, port, trace=True)
+    in_original, in_port = set(), {}
+    for name, run in zip(names, runs):
+        in_original |= goldens.read_ran(name)
         in_port.update(run.executed)
     passed = check_original(coverage.Listing(args.listing), in_original)
     passed = check_port(args.link_map, in_port) and passed

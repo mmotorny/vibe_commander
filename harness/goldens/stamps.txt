@@ -1,0 +1,614 @@
+Volkov Commander 4.05 in the scenario stamps: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+recorded on QEMU emulator version 11.1.2
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ═══════════12:00p| 1Bx15 30x9 1Bx50 30x6
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 1: Ctrl+PgUp
+cursor 4 23 lines 6 7 mode 3
+|╔════════════╤═══ C:\ ════╤════════════╗╔════════════════ Info ═══════════12:00p| 1Bx17 30x5 1Bx52 30x6
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║WORK        │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║STAMPS      │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║            │            │            ║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║            │            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║            │            │            ║║        0 files use 0 bytes in        ║| 1Bx49 1Ex1 1Bx11 1Ex1 1Bx18
+|║            │            │            ║║                 C:\                  ║| 1Bx80
+|║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║WORK         ►SUB-DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\>                                                                            | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 2: Down Down Enter
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═╤════════════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║SUB         │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│            │            ║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 3: F9
+cursor 0 127 lines 6 7 mode 3
+|    Left    Files    Commands    Options    Right                         12:00p| 30x2 0Fx8 30x70
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║SUB         │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│            │            ║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 4: Enter
+cursor 0 127 lines 6 7 mode 3
+|    Left    Files    Commands    Options    Right                         12:00p| 30x2 0Fx8 30x70
+|║ ┌───────────────────────┐    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx2 30x25 1Ex8 1Bx45
+|║.│√ Brief                │            ║╟──────────────────────────────────────╢| 1Bx1 30x2 0Fx2 0Ex1 0Fx20 30x1 03x2 1Bx51
+|║S│  Full                 │            ║║         653,296 Bytes Memory         ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx21 1Ex7 1Bx23
+|║f│  Info                 │            ║║          500,416 Bytes Free          ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx22 1Ex7 1Bx22
+|║n│  Tree                 │            ║║      Volume in drive C: is WORK      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx34 1Ex2 1Bx4 1Ex4 1Bx7
+|║m│  On/Off       Ctrl-F1 │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx14 1Ex10 1Bx22 1Ex2 1Bx3
+|║n│ ───────────────────── │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx2 30x25 03x2 1Bx14 1Ex10 1Bx21 1Ex2 1Bx4
+|║e│  Name                 │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx14 1Ex1 1Bx11 1Ex13 1Bx12
+|║l│  eXtension            │            ║║              C:\STAMPS               ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
+|║h│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+|║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+|║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
+|║ │  Drive...     Alt-F1  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ └───────────────────────┘            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
+|║            │            │            ║║                                      ║| 1Bx4 03x25 1Bx51
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 5: Down Enter
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx1 30x38 1Bx41
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 6: Down Down Down
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx1 30x38 1Bx24 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║night.dat            9 12-31-99 12:00a║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 7: Ctrl+a
+cursor 28 8 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│                                             Bytes Free          ║| 1Bx21 70x38 1Bx21
+|║night    dat│          ╔═════════ Attributes ═════════╗   ive C: is WORK      ║| 1Bx1 30x20 70x38 03x2 1Bx2 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     12   ║  Change file attributes for  ║    bytes on drive C:  ║| 1Bx21 70x38 03x2 1Bx14 1Ex2 1Bx3
+|║noon     dat│  10485   ║         "night.dat"          ║    free on drive C:   ║| 1Bx21 70x38 03x2 1Bx13 1Ex2 1Bx4
+|║evening  dat│9999999   ║  [ ] Read only    Date       ║   7,496,192 bytes in  ║| 1Bx21 70x38 06x2 1Ex7 1Bx12
+|║last     dat│9999999   ║  [x] Archive      12-31-1999 ║   TAMPS               ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
+|║huge     dat│9999999   ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx21 70x38 03x2 1Bx19
+|║            │          ║  [ ] System       12:00:58a  ║                       ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
+|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ║     [ Set ]   [ Cancel ]     ║                       ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ╚══════════════════════════════╝                       ║| 1Bx21 70x38 03x2 1Bx19
+|║            │                                                                 ║| 1Bx21 70x38 03x2 1Bx19
+|║            │         │        │      ║║                                      ║| 1Bx23 03x38 1Bx19
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║night.dat            9 12-31-99 12:00a║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 8: Esc
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx1 30x38 1Bx24 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║night.dat            9 12-31-99 12:00a║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 9: Down
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x38 1Bx4 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║morning.dat       1234  2-03-01  9:05a║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 10: Ctrl+a
+cursor 28 8 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│                                             Bytes Free          ║| 1Bx21 70x38 1Bx21
+|║night    dat│          ╔═════════ Attributes ═════════╗   ive C: is WORK      ║| 1Bx21 70x38 03x2 1Bx2 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     12   ║  Change file attributes for  ║    bytes on drive C:  ║| 1Bx1 30x20 70x38 03x2 1Bx14 1Ex2 1Bx3
+|║noon     dat│  10485   ║        "morning.dat"         ║    free on drive C:   ║| 1Bx21 70x38 03x2 1Bx13 1Ex2 1Bx4
+|║evening  dat│9999999   ║  [ ] Read only    Date       ║   7,496,192 bytes in  ║| 1Bx21 70x38 06x2 1Ex7 1Bx12
+|║last     dat│9999999   ║  [x] Archive      2-03-2001  ║   TAMPS               ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
+|║huge     dat│9999999   ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx21 70x38 03x2 1Bx19
+|║            │          ║  [ ] System       9:05:06a   ║                       ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
+|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ║     [ Set ]   [ Cancel ]     ║                       ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ╚══════════════════════════════╝                       ║| 1Bx21 70x38 03x2 1Bx19
+|║            │                                                                 ║| 1Bx21 70x38 03x2 1Bx19
+|║            │         │        │      ║║                                      ║| 1Bx23 03x38 1Bx19
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║morning.dat       1234  2-03-01  9:05a║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 11: Esc
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx1 30x38 1Bx4 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║morning.dat       1234  2-03-01  9:05a║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 12: Down Down Down
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx1 30x38 1Bx41
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║last.dat     999999999 12-31-07  1:01p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 13: Ctrl+a
+cursor 28 8 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│                                             Bytes Free          ║| 1Bx21 70x38 1Bx21
+|║night    dat│          ╔═════════ Attributes ═════════╗   ive C: is WORK      ║| 1Bx21 70x38 03x2 1Bx2 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     12   ║  Change file attributes for  ║    bytes on drive C:  ║| 1Bx21 70x38 03x2 1Bx14 1Ex2 1Bx3
+|║noon     dat│  10485   ║          "last.dat"          ║    free on drive C:   ║| 1Bx21 70x38 03x2 1Bx13 1Ex2 1Bx4
+|║evening  dat│9999999   ║  [ ] Read only    Date       ║   7,496,192 bytes in  ║| 1Bx21 70x38 06x2 1Ex7 1Bx12
+|║last     dat│9999999   ║  [x] Archive      12-31-2107 ║   TAMPS               ║| 1Bx1 30x20 70x23 30x10 70x5 03x2 1Bx19
+|║huge     dat│9999999   ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx21 70x38 03x2 1Bx19
+|║            │          ║  [ ] System       1:01:02p   ║                       ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
+|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ║     [ Set ]   [ Cancel ]     ║                       ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ╚══════════════════════════════╝                       ║| 1Bx21 70x38 03x2 1Bx19
+|║            │                                                                 ║| 1Bx21 70x38 03x2 1Bx19
+|║            │         │        │      ║║                                      ║| 1Bx23 03x38 1Bx19
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║last.dat     999999999 12-31-07  1:01p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 14: Esc
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx1 30x38 1Bx41
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║last.dat     999999999 12-31-07  1:01p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 15: Ins Ins
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │►SUB-DIR◄│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx1 1Ex38 1Bx41
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx1 3Ex38 1Bx41
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║  999,999K bytes in 2 selected files  ║║                                      ║| 1Bx3 1Ex34 1Bx43
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 16: Alt+F6
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │        0│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx1 1Ex38 1Bx41
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx1 3Ex38 1Bx41
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║  999,999K bytes in 2 selected files  ║║                                      ║| 1Bx3 1Ex34 1Bx43
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 17: Alt+F7
+cursor 8 18 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..                                                                          ──╢| 1Bx3 3Fx74 1Bx3
+|║SU   ╔═══════════════════════════ Find File ════════════════════════════╗     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║fi   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║ni   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║mo   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║no   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║ev   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║la   ║                                                                  ║     ║| 1Bx1 1Ex2 3Fx74 03x2 1Bx1
+|║hu   ║                                                                  ║   ──╢| 1Bx1 3Ex2 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ File name:                                                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ \*.*                                                             ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
+|║     ║ Containing:                                                      ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╟──   ║                                                                  ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
+|C:\STAMPS>                                                                      | 07x5 0Fx74 07x1
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 18: Enter
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..                                                                          ──╢| 1Bx3 3Fx74 1Bx3
+|║SU   ╔═══════════════════════════ Find File ════════════════════════════╗     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║fi   ║    notes.doc                32   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║ni   ║    data.bin              1,024   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║mo   ║    run.bat                  21   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║no   ║    empty.dat                 0   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║ev   ║ ␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║la   ║ C:\STAMPS␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx1 1Ex2 3Fx74 03x2 1Bx1
+|║hu   ║    SUB                 SUB-DIR   ....    6-16-2000   12:00:00p   ║   ──╢| 1Bx1 3Ex2 3Fx74 03x2 1Bx1
+|║     ║    first.dat                 0   A...    1-01-1980   12:00:00a   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    night.dat                 9   A...   12-31-1999   12:00:58a   ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    morning.dat           1,234   A...    2-03-2001    9:05:06a   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    noon.dat          1,048,576   A...   10-10-2010   12:30:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    evening.dat     999,999,999   A...   11-30-2099   11:59:58p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    last.dat      4,294,967,295   A...   12-31-2107    1:01:02p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    huge.dat      1,000,000,000   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 18 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
+|C:\STAMPS>                                                                      | 07x5 0Fx74 07x1
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== 19: Esc
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═══════╤══════╗╔════════════════ Info ═══════════12:00p| 1Bx14 30x11 1Bx49 30x6
+|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │        0│ 6-16-00│12:00p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│        0│ 1-01-80│12:00a║║          500,416 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│        9│12-31-99│12:00a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│     1234│ 2-03-01│ 9:05a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│  1048576│10-10-10│12:30p║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│999999999│11-30-99│11:59p║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│999999999│12-31-07│ 1:01p║║              C:\STAMPS               ║| 1Bx1 1Ex38 1Bx41
+|║huge     dat│999999999│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx1 3Ex38 1Bx41
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
+|║  999,999K bytes in 2 selected files  ║║                                      ║| 1Bx3 1Ex34 1Bx43
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 76 0 to | | 30
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  05b2450fd1cfecc7
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

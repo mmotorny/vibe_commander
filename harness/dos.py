@@ -7,10 +7,11 @@ import json
 import os
 import re
 import socket
+import struct
 import subprocess
 import time
 import zipfile
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from image import Image
@@ -18,6 +19,9 @@ from image import Image
 COLUMNS, ROWS = 80, 25
 TEXT_MEMORY = 0xB8000             # the colour text screen: character, attribute
 BIOS_DATA = 0x400
+KEYBOARD_BUFFER = 0x41A           # where it is read, where it is filled
+
+TICK = 65536 / 1193182            # of the BIOS clock, in seconds
 
 # Hard disks are 64 cylinders x 16 heads x 63 sectors: 31.5 MB of FAT16.
 GEOMETRY = (64, 16, 63)
@@ -30,9 +34,10 @@ BOOTED = b"BOOTED"
 # bytes is showing a blinking indicator, and counts as standing still.
 BLINK_BYTES = 4
 
-# How long a key is held down and how long the keyboard then rests, in
-# seconds. The BIOS buffers 15 keys, so a step should not type more.
-KEY_TIME = 0.03
+# How long Shift, Ctrl and Alt are held down before and after the key they
+# go with, or on their own, in seconds.
+KEY_TIME = 0.02
+MODIFIERS = {"ctrl", "alt", "shift"}
 
 # Names for the keys of a US keyboard, as written in scenarios, and the
 # QEMU key codes they stand for. Letters, digits and F1-F12 name themselves.
@@ -135,9 +140,9 @@ def boot_floppy(path, workdir, freedos_zip, epoch, commands, country=None):
 
     It is the stock FreeDOS 1.3 boot floppy, with its installer replaced by
     a minimal configuration. Before running the commands DOS reports on the
-    serial port that it is up. `country` is a DOS country code, which sets
-    how dates, times and numbers are written; without it DOS uses the
-    conventions of the United States.
+    serial port that it is up. `country` is a DOS country code and code
+    page, which set how dates, times and numbers are written; without it
+    DOS uses the conventions of the United States.
     """
     with zipfile.ZipFile(freedos_zip) as archive:
         Path(path).write_bytes(archive.read("144m/x86BOOT.img"))
@@ -150,7 +155,9 @@ def boot_floppy(path, workdir, freedos_zip, epoch, commands, country=None):
         r"SHELL=\FREEDOS\BIN\COMMAND.COM \FREEDOS\BIN /E:1024 /P=\FDAUTO.BAT",
     ]
     if country:
-        config.append(rf"COUNTRY={country:03},,\FREEDOS\BIN\COUNTRY.SYS")
+        code, codepage = country
+        config.append(rf"COUNTRY={code:03},{codepage},"
+                      r"\FREEDOS\BIN\COUNTRY.SYS")
     autoexec = [
         "@ECHO OFF",
         r"SET PATH=A:\FREEDOS\BIN",
@@ -170,7 +177,9 @@ class Screen:
     cursor: tuple                 # column, row
     cursor_lines: tuple           # first and last scan line of the cursor
     video_mode: int
-    blinking: tuple = ()          # (column, row) of cells seen to blink
+    # The cells seen to blink: column, row, and the character and attribute
+    # they show in their other state.
+    blinking: tuple = ()
 
     def lines(self):
         """The characters on screen as text, one string per row."""
@@ -185,7 +194,7 @@ class Screen:
                        "first_line": self.cursor_lines[0],
                        "last_line": self.cursor_lines[1]},
             "blinking_cells": [{"column": c, "row": r}
-                               for c, r in self.blinking],
+                               for c, r, *_ in self.blinking],
         }
 
 
@@ -197,6 +206,10 @@ def _glyph(code):
     return bytes([code]).decode("cp437")
 
 
+class MachineError(Exception):
+    """The machine did not do what was expected of it in time."""
+
+
 class Machine:
     """A PC running in QEMU, controlled over QMP.
 
@@ -204,18 +217,27 @@ class Machine:
     and can be read once the machine has been shut down. The clock starts
     at `clock` (ISO 8601) on every boot.
 
+    The machine boots from the floppy or, given `state`, carries on from
+    where save() left another machine with disks of the same kind. In the
+    second case it waits, paused, for resume().
+
     With `trace` set, QEMU logs to that file every piece of code the guest
     executes, the first time it does so; coverage.py reads the log.
+
+    A reset ends the machine instead of restarting it, and nothing here
+    waits without a limit: a guest that crashes or hangs raises
+    MachineError.
     """
 
-    def __init__(self, floppy, hard_disks, workdir, clock, trace=None):
+    def __init__(self, floppy, hard_disks, workdir, clock, trace=None,
+                 state=None):
         self._workdir = Path(workdir)
         self._serial = self._workdir / "serial.log"
         self._scratch = self._workdir / "scratch.bin"
         control = self._workdir / "qmp.sock"
         command = [
             "qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", "16",
-            "-nodefaults", "-vga", "std", "-display", "none",
+            "-nodefaults", "-vga", "std", "-display", "none", "-no-reboot",
             "-rtc", f"base={clock},clock=vm", "-boot", "a",
             "-serial", f"file:{self._serial}",
             "-qmp", f"unix:{control},server=on,wait=off",
@@ -226,21 +248,29 @@ class Machine:
                                   f"file={disk}"]
         if trace:
             command += ["-d", "in_asm", "-D", str(trace)]
+        if state:
+            command += ["-S", "-incoming", f"file:{state}"]
         self._qemu = subprocess.Popen(command)
-        self._socket = socket.socket(socket.AF_UNIX)
-        deadline = time.monotonic() + 10
-        while True:
-            try:
-                self._socket.connect(str(control))
-                break
-            except (FileNotFoundError, ConnectionRefusedError):
-                if time.monotonic() > deadline:
-                    self._qemu.kill()
-                    raise
-                time.sleep(0.05)
+        self._socket = self._connect(control)
         self._channel = self._socket.makefile("rw")
         self._reply()                                    # greeting
         self._command("qmp_capabilities")
+        if state:
+            self.until(lambda: self._command("query-status")["status"]
+                        != "inmigrate", 10, "the saved state did not load")
+
+    def _connect(self, path):
+        connection = socket.socket(socket.AF_UNIX)
+        deadline = time.monotonic() + 10
+        while True:
+            try:
+                connection.connect(str(path))
+                return connection
+            except (FileNotFoundError, ConnectionRefusedError):
+                if time.monotonic() > deadline or self._qemu.poll() is not None:
+                    self._qemu.kill()
+                    raise MachineError("QEMU did not start") from None
+                time.sleep(0.002)
 
     def __enter__(self):
         return self
@@ -248,21 +278,30 @@ class Machine:
     def __exit__(self, *exc):
         try:
             self._command("quit")
-        except (OSError, ValueError):
+            self._qemu.wait(timeout=10)
+        except (OSError, ValueError, MachineError, subprocess.TimeoutExpired):
             self._qemu.kill()
-        self._qemu.wait(timeout=10)
+            self._qemu.wait()
         self._socket.close()
 
     def _reply(self):
         while True:
-            message = json.loads(self._channel.readline())
+            line = self._channel.readline()
+            if not line:
+                raise MachineError("the machine stopped: it was reset, or "
+                                   "QEMU ended")
+            message = json.loads(line)
             if "event" not in message:
                 return message
 
     def _command(self, name, **arguments):
-        self._channel.write(json.dumps({"execute": name,
-                                        "arguments": arguments}))
-        self._channel.flush()
+        try:
+            self._channel.write(json.dumps({"execute": name,
+                                            "arguments": arguments}))
+            self._channel.flush()
+        except OSError:
+            raise MachineError("the machine stopped: it was reset, or QEMU "
+                               "ended") from None
         reply = self._reply()
         if "error" in reply:
             raise RuntimeError(f"{name}: {reply['error']['desc']}")
@@ -273,13 +312,42 @@ class Machine:
                       filename=str(self._scratch))
         return self._scratch.read_bytes()
 
+    def until(self, done, timeout, failure, pause=0.002):
+        """Wait for done() to hold; raise MachineError(failure) if it does
+        not within `timeout` seconds."""
+        deadline = time.monotonic() + timeout
+        while not done():
+            if time.monotonic() > deadline:
+                raise MachineError(failure)
+            time.sleep(pause)
+
     def wait_for_boot(self, timeout=60):
         """Wait until DOS has booted and is about to run its commands."""
-        deadline = time.monotonic() + timeout
-        while BOOTED not in self._serial.read_bytes():
-            if time.monotonic() > deadline:
-                raise TimeoutError("DOS did not finish booting")
-            time.sleep(0.1)
+        self.until(lambda: BOOTED in self._serial.read_bytes(), timeout,
+                    "DOS did not finish booting", pause=0.05)
+
+    def save(self, path):
+        """Pause the machine and save its state, for others to start from."""
+        self._command("stop")
+        self._command("migrate", uri=f"file:{path}")
+        self.until(lambda: self._command("query-migrate").get("status")
+                    == "completed", 30, "the machine's state was not saved")
+
+    def pause(self):
+        self._command("stop")
+
+    def resume(self):
+        self._command("cont")
+
+    def seconds(self):
+        """The guest's time of day in seconds, as its BIOS counts it."""
+        ticks = struct.unpack("<I", self._memory(BIOS_DATA + 0x6C, 4))[0]
+        return ticks * TICK
+
+    def _keyboard(self):
+        """Where the BIOS keyboard buffer is read and where it is filled."""
+        head, tail = struct.unpack("<HH", self._memory(KEYBOARD_BUFFER, 4))
+        return head, tail
 
     def press(self, keys):
         """Press keys, given as in a scenario: names separated by spaces.
@@ -287,6 +355,11 @@ class Machine:
         A name is a key ("F3", "Enter", "a"), keys held down together
         ("Alt+F5", "Ctrl+o"), or a text to type in double quotes, which
         may not contain spaces ("readme.txt").
+
+        Each key is seen to arrive in the BIOS keyboard buffer before the
+        next is pressed, so none is lost however fast or slow the guest is.
+        The buffer holds 15 keys; if the guest does not take them, pressing
+        more fails.
         """
         for name in keys.split():
             if name.startswith('"'):
@@ -296,65 +369,102 @@ class Machine:
                 self._chord([_key(part) for part in name.split("+")])
 
     def _chord(self, codes):
-        for down in (True, False):
-            events = [{"type": "key",
-                       "data": {"down": down,
-                                "key": {"type": "qcode", "data": code}}}
-                      for code in (codes if down else reversed(codes))]
-            self._command("input-send-event", events=events)
+        """Press the keys `codes` together: Shift, Ctrl and Alt go down
+        first and come up last, as under a hand, and long enough for the
+        guest to see them held."""
+        held = [code for code in codes if code in MODIFIERS]
+        keys = [code for code in codes if code not in MODIFIERS]
+        if held:
+            self._keys(held, True)
             time.sleep(KEY_TIME)
+        if keys:
+            tail = self._keyboard()[1]
+            self._keys(keys, True)
+            self._keys(keys[::-1], False)
+            self.until(lambda: self._keyboard()[1] != tail, 5,
+                       f"the key {'+'.join(codes)} did not arrive: the "
+                       "keyboard buffer is full, or the guest is stuck")
+        if held:
+            time.sleep(KEY_TIME)
+            self._keys(held[::-1], False)
+
+    def _keys(self, codes, down):
+        self._command("input-send-event", events=[
+            {"type": "key", "data": {"down": down,
+                                     "key": {"type": "qcode", "data": code}}}
+            for code in codes])
+
+    def keys_taken(self):
+        """Whether the guest has read every key that was pressed."""
+        head, tail = self._keyboard()
+        return head == tail
+
+    def screen(self):
+        """The text screen as it is now. Pause the machine first if the
+        cursor and the cells are to belong together."""
+        cells = self._memory(TEXT_MEMORY, COLUMNS * ROWS * 2)
+        bios = self._memory(BIOS_DATA, 0x100)
+        return Screen(
+            cells=cells,
+            cursor=(bios[0x50], bios[0x51]),
+            cursor_lines=(bios[0x61], bios[0x60]),
+            video_mode=bios[0x49])
 
     def wait_for_screen(self, settle=2.0, timeout=30):
         """Wait until the text screen stands still, then return it.
 
-        The screen stands still when it has not changed for `settle`
-        seconds, other than by blinking. A blinking indicator is seen as
-        such only if `settle` covers both of its states.
+        The screen stands still when every key pressed has been taken and
+        nothing has changed for `settle` seconds, other than by blinking:
+        going back and forth between two states that differ in a few cells.
+        Blinking is seen as such only if `settle` covers both states. Of
+        the two the screen returned is the one with the greater bytes, and
+        its `blinking` lists the cells with what they show in the other.
 
-        The machine is left paused, showing exactly the screen returned, so
-        that a screenshot taken next matches it; call resume() to go on.
+        The machine is left paused; call resume() to go on.
         """
-        cells = COLUMNS * ROWS * 2
+        size = COLUMNS * ROWS * 2
         deadline = time.monotonic() + timeout
-        samples = []                                     # (time, cells)
+        seen = []                       # the states since the last real change
+        changed = time.monotonic()
         while True:
             now = time.monotonic()
-            samples.append((now, self._memory(TEXT_MEMORY, cells)))
-            while now - samples[0][0] > settle + 0.5:
-                samples.pop(0)
-            states = sorted({dump for _, dump in samples})
-            if now - samples[0][0] >= settle and _still(states):
+            cells = self._memory(TEXT_MEMORY, size)
+            if cells not in seen:
+                if seen and not _blinks(seen + [cells]):
+                    seen = []
+                    changed = now
+                seen.append(cells)
+            if now - changed >= settle and self.keys_taken():
                 break
             if now > deadline:
-                raise TimeoutError("the screen did not settle")
-            time.sleep(0.1)
-        # Of two blink states take the greater, so every run picks the same.
-        shown = states[-1]
-        blinking = sorted({i // 2 for other in states[:-1]
-                           for i in range(cells) if other[i] != shown[i]})
+                raise MachineError("the screen did not settle")
+            time.sleep(0.01)
+        shown = max(seen)
         while True:
             self._command("stop")
-            if self._memory(TEXT_MEMORY, cells) == shown:
+            if self._memory(TEXT_MEMORY, size) == shown:
                 break
             self._command("cont")
             if time.monotonic() > deadline:
-                raise TimeoutError("the screen did not settle")
-            time.sleep(0.05)
-        bios = self._memory(BIOS_DATA, 0x100)
-        return Screen(
-            cells=shown,
-            cursor=(bios[0x50], bios[0x51]),
-            cursor_lines=(bios[0x61], bios[0x60]),
-            video_mode=bios[0x49],
-            blinking=tuple((i % COLUMNS, i // COLUMNS) for i in blinking))
-
-    def resume(self):
-        self._command("cont")
+                raise MachineError("the screen did not settle")
+            time.sleep(0.01)
+        other = min(seen)
+        blinking = tuple((i // 2 % COLUMNS, i // 2 // COLUMNS,
+                          other[i - i % 2], other[i - i % 2 + 1])
+                         for i in range(0, size, 2)
+                         if shown[i:i + 2] != other[i:i + 2])
+        return replace(self.screen(), blinking=blinking)
 
     def screenshot(self):
         """The display as the video card renders it."""
         self._command("screendump", filename=str(self._scratch))
         return Image.from_ppm(self._scratch.read_bytes())
+
+
+def _blinks(states):
+    """Whether these screens are two that differ in a few cells only."""
+    return len(states) == 2 and \
+        sum(a != b for a, b in zip(*states)) <= BLINK_BYTES
 
 
 def _key(name):
@@ -376,9 +486,3 @@ def _character(char):
     return [_key(char)]
 
 
-def _still(states):
-    if len(states) == 1:
-        return True
-    if len(states) != 2:
-        return False
-    return sum(a != b for a, b in zip(*states)) <= BLINK_BYTES
