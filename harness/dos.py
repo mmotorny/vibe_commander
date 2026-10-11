@@ -21,8 +21,6 @@ TEXT_MEMORY = 0xB8000             # the colour text screen: character, attribute
 BIOS_DATA = 0x400
 KEYBOARD_BUFFER = 0x41A           # where it is read, where it is filled
 
-TICK = 65536 / 1193182            # of the BIOS clock, in seconds
-
 # The port a program built for the tests writes to, to say where it is.
 SIGNAL_PORT = 0xE9
 
@@ -116,6 +114,13 @@ class FatImage:
         os.utime(self._staging, (mtime, mtime))
         self._mtools("mcopy", "-o", "-m", str(self._staging), f"x:/{name}")
         self._staging.unlink()
+
+    def read(self, name):
+        """The contents of the file `name`."""
+        self._mtools("mcopy", "-o", f"x:/{name}", str(self._staging))
+        data = self._staging.read_bytes()
+        self._staging.unlink()
+        return data
 
     def delete(self, name):
         self._mtools("mdel", f"x:/{name}")
@@ -348,11 +353,6 @@ class Machine:
 
     def resume(self):
         self._command("cont")
-
-    def seconds(self):
-        """The guest's time of day in seconds, as its BIOS counts it."""
-        ticks = struct.unpack("<I", self._memory(BIOS_DATA + 0x6C, 4))[0]
-        return ticks * TICK
 
     def _keyboard(self):
         """Where the BIOS keyboard buffer is read and where it is filled."""

@@ -11,9 +11,16 @@ Steps are written as Machine.press() takes them: key names separated by
 spaces, "Alt+F1" for keys held together, and text to type in double quotes.
 
 Every scenario gets a machine of its own, in the state the bench was saved
-in: the program as its distribution configures it, started in C:\\WORK. A
-scenario that wants something else arranges it with its first steps, the
-way a user would. It may end anywhere, with the program running or not.
+in: the program as its distribution configures it but for the clock, which
+is off, started in C:\\WORK. A scenario that wants something else arranges
+it with its first steps, the way a user would. It may end anywhere, with
+the program running or not.
+
+The machine's clock runs while the harness waits, and it waits longer for
+the original than for a build that signals. Nothing on the bench shows the
+time of day, so that does not matter. A scenario that does show it, by
+switching the clock on or by listing a file it has made, has to be done
+with that before the machine's first minute is over.
 """
 import tempfile
 from dataclasses import dataclass, field
@@ -47,9 +54,6 @@ class Run:
     """What a scenario showed and left behind."""
     screens: list                 # after the start and after each step
     disks: dict                   # drive letter -> fat.read_tree() of it
-    # The guest's time of day in seconds at the first screen and the last.
-    began: float
-    ended: float
     # Offset and length in the program file of every instruction that ran,
     # if the run was traced.
     executed: dict = field(default_factory=dict)
@@ -135,6 +139,17 @@ SCENARIOS = {
     "stamps-russia": Scenario(
         "The same where the day comes first and the clock has 24 hours",
         country="ru", steps=_STAMPS_STEPS),
+
+    "clock": Scenario(
+        "The clock in the corner of the screen, which the bench has off",
+        steps=(
+            "F9 o",                       # the Options menu: not ticked
+            "l",                          # the clock, over the panels
+            "Ctrl+o",                     # over what DOS shows
+            "Ctrl+o",
+            "F9 o",                       # on the menu bar, and ticked
+            "l",                          # off again
+        )),
 }
 
 
@@ -153,17 +168,14 @@ def run(scenario, program, bench, signals, trace=False):
         with bench.start(workdir, program, log) as machine:
             wait = _signalled if signals else _settled
             screens = [wait(machine, "the start")]
-            began = machine.seconds()
             for number, step in enumerate(scenario.steps, 1):
                 machine.resume()
                 machine.press(step)
                 screens.append(wait(machine, f"step {number}, {step}"))
-            ended = machine.seconds()
             disks = machine.disks
         # The machine has been shut down: the disk images are complete.
         result = Run(screens, {drive: fat.read_tree(path)
-                               for drive, path in disks.items()},
-                     began, ended)
+                               for drive, path in disks.items()})
         if trace:
             result.executed = coverage.executed(log, program.contents)
     return result

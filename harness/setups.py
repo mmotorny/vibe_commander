@@ -11,6 +11,8 @@ Two setups share one clock and one source of files:
                   small fixed set of files on C:. VC is started in
                   C:\\WORK. Keeping the program off the disk it displays
                   means its size cannot show up as free space on screen.
+                  The clock in the corner of the screen is off, so that
+                  no screen depends on how long it took to get there.
 """
 import shutil
 import tempfile
@@ -30,6 +32,15 @@ DOS_CLOCK = ((2000 - 1980) << 9 | 6 << 5 | 16, 12 << 11)   # date, time words
 # What VC reads from its own directory besides the program itself.
 SUPPORT_FILES = ["VC.HLP", "VC.INI", "VC.EXT", "VCVIEW.EXT", "VCEDIT.EXT",
                  "VC.MNU", "ARCHIVES.MNU", "FORMAT.MNU"]
+SETUP_FILE = "VC.INI"
+
+# The keys that switch the clock from on to off or back, in the Options
+# menu, and those that save the setup.
+CLOCK_KEYS = "F9 o l"
+SAVE_SETUP_KEYS = "Shift+F9 Enter"
+# How long the screen must stand still for DOS, or the original while it
+# makes the bench's setup file, to count as finished, in seconds.
+SETTLE = 0.5
 
 # The contents of C:\WORK on the test bench, in directory order.
 WORK_DIRECTORIES = ["DOCS", "SRC"]
@@ -115,9 +126,16 @@ class Bench:
     is saved as it waits for a key before starting the program. start()
     then makes a machine in that state, with fresh disks, in a fraction of
     a second. Nothing a scenario does can reach the next one.
+
+    The program is set up as its distribution sets it up, but for the clock
+    in the corner of the screen, which the distribution has on. No setup
+    file is prepared for that: the original is started once, made to switch
+    the clock off in its menu and to save its setup, and what it then
+    writes is the VC.INI of every machine. It writes the same in every
+    country, so a bench can be given the `setup` of another to use.
     """
 
-    def __init__(self, workdir, country="us"):
+    def __init__(self, workdir, country="us", setup=None):
         self._workdir = Path(workdir)
         self._workdir.mkdir(parents=True, exist_ok=True)
         self._floppy = _floppy(self._workdir, BENCH_COMMANDS,
@@ -126,28 +144,70 @@ class Bench:
         _work_disk(self._work, self._workdir)
         self._programs = {}             # Program -> its disk image
         self._state = self._workdir / "state"
-        with Machine(self._floppy, [self._work, self._program_disk(None)],
+        shipped = distribution()[SETUP_FILE][0]
+        with Machine(self._floppy,
+                     [self._work, self._new_disk("boot.img", None, shipped)],
                      self._workdir, CLOCK) as machine:
             machine.wait_for_boot()
-            machine.wait_for_screen(0.5)
+            machine.wait_for_screen(SETTLE)
             machine.save(self._state)
+        self.setup = setup or self._setup_without_clock(shipped)
+
+    def _setup_without_clock(self, shipped):
+        """The setup file that the original writes in place of `shipped`,
+        the distribution's, once its clock has been switched off."""
+        workdir = self._workdir / "setup"
+        workdir.mkdir()
+        original = original_vc()
+        disk = self._new_disk("setup.img", original, shipped)
+        with self._machine(workdir, disk) as machine:
+            machine.wait_for_screen(SETTLE)
+            machine.resume()
+            machine.press(f"{CLOCK_KEYS} {SAVE_SETUP_KEYS}")
+            machine.wait_for_screen(SETTLE)
+            written = machine.disks["D"]
+        # The machine has been shut down: the disk image is complete.
+        setup = FatImage(written, workdir, EPOCH,
+                         partitioned=True).read(f"VC/{SETUP_FILE}")
+        if setup == shipped:
+            raise RuntimeError("the original did not save its setup with "
+                               "the clock switched off")
+        return setup
+
+    def _new_disk(self, filename, program, setup):
+        """Build drive D: in the file `filename`: `program`, if any, and
+        what it reads from its directory, with `setup` as its setup file."""
+        disk = FatImage.hard_disk(self._workdir / filename, self._workdir,
+                                  EPOCH, label="PROGRAM", serial="20000617")
+        disk.mkdir("VC")
+        files = distribution()
+        if program:
+            disk.write(f"VC/{program.filename}", program.contents, EPOCH)
+        for name in SUPPORT_FILES:
+            data, date = files[name]
+            disk.write(f"VC/{name}", setup if name == SETUP_FILE else data,
+                       date)
+        return disk.path
 
     def _program_disk(self, program):
-        """The image of drive D: with `program` on it, or with none."""
+        """The image of drive D: with `program` on it."""
         if program not in self._programs:
-            image = self._workdir / f"d{len(self._programs)}.img"
-            disk = FatImage.hard_disk(image, self._workdir,
-                                      EPOCH, label="PROGRAM",
-                                      serial="20000617")
-            disk.mkdir("VC")
-            files = distribution()
-            if program:
-                disk.write(f"VC/{program.filename}", program.contents, EPOCH)
-            for name in SUPPORT_FILES:
-                data, date = files[name]
-                disk.write(f"VC/{name}", data, date)
-            self._programs[program] = disk.path
+            self._programs[program] = self._new_disk(
+                f"d{len(self._programs)}.img", program, self.setup)
         return self._programs[program]
+
+    def _machine(self, workdir, program_disk, trace=None):
+        """A machine with a copy of `program_disk` as drive D:, in which
+        the program on it is about to start."""
+        disks = {"C": workdir / "c.img", "D": workdir / "d.img"}
+        shutil.copyfile(self._work, disks["C"])
+        shutil.copyfile(program_disk, disks["D"])
+        machine = Machine(self._floppy, list(disks.values()), workdir, CLOCK,
+                          trace=trace, state=self._state)
+        machine.disks = disks
+        machine.resume()
+        machine.press("Enter")
+        return machine
 
     def start(self, workdir, program, trace=None):
         """A machine in which `program` is about to start, already running.
@@ -155,16 +215,8 @@ class Bench:
         It has a `disks` attribute: drive letter -> image file, to read
         once the machine has been shut down.
         """
-        workdir = Path(workdir)
-        disks = {"C": workdir / "c.img", "D": workdir / "d.img"}
-        shutil.copyfile(self._work, disks["C"])
-        shutil.copyfile(self._program_disk(program), disks["D"])
-        machine = Machine(self._floppy, list(disks.values()), workdir, CLOCK,
-                          trace=trace, state=self._state)
-        machine.disks = disks
-        machine.resume()
-        machine.press("Enter")
-        return machine
+        return self._machine(Path(workdir), self._program_disk(program),
+                             trace)
 
 
 def _work_disk(path, workdir):
@@ -200,6 +252,7 @@ class Benches:
 
     def __getitem__(self, country):
         if country not in self._benches:
+            made = [bench.setup for bench in self._benches.values()]
             self._benches[country] = Bench(
-                Path(self._directory.name) / country, country)
+                Path(self._directory.name) / country, country, *made[:1])
         return self._benches[country]

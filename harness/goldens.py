@@ -23,7 +23,6 @@ page of the scenario's country.
 """
 import argparse
 import re
-import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -268,21 +267,13 @@ def derive(name, benches):
     original = setups.original_vc()
     run = scenarios.run(scenario, original, benches[scenario.country],
                         signals=False, trace=True)
-    # Runs do not keep the same time of day: one waits longer for a step
-    # to finish than another. Within one minute nothing on the screen
-    # tells them apart.
-    if run.began // 60 != run.ended // 60:
-        sys.exit(f"{name}: recording took the guest's clock into the next "
-                 f"minute, after {run.ended - run.began:.0f} s; make the "
-                 "scenario shorter")
     codepage = (setups.COUNTRIES[scenario.country] or (1, 437))[1]
     write(Golden(name, codepage, [],
                  [deviations.expected(screen) for screen in run.screens],
                  disk_lines(run.disks, {original.filename})))
     write_ran(name, run.executed)
     print(f"{name}: derived, {len(run.screens)} screen"
-          f"{'s' if len(run.screens) > 1 else ''} in "
-          f"{run.ended - run.began:.0f} s of the guest's time")
+          f"{'s' if len(run.screens) > 1 else ''}")
 
 
 def main():

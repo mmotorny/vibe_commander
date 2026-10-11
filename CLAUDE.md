@@ -134,6 +134,12 @@ with it is less obvious:
 - A scenario starts from the program as its distribution configures it, on
   a machine of its own, and sets up whatever else it needs through the
   program's own menus. It does not rely on prepared configuration files.
+- The one thing the test bench changes is the clock, which is off. It has
+  the original switch the clock off in its menu and save its setup, and
+  gives every scenario the file that leaves.
+- A scenario that shows the time of day, with the clock switched on or in
+  the time stamp of a file it has made, does so within the first minute of
+  its machine: a golden is recorded more slowly than a build is tested.
 - The countries tested are the United States and Russia.
 - The tests run the build of the port that signals where it is. The build
   that is shipped is not run by them.

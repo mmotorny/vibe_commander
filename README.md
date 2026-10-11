@@ -218,6 +218,15 @@ scenario has touched. Keeping the program off the drive it displays stops
 its file size from appearing on screen as free space. A scenario that wants
 the program set up differently does that itself, through the menus.
 
+The program is set up as its distribution sets it up, with one exception:
+the clock in the corner of the screen is off. It would put the time of day
+on every screen, and the original takes longer to get through a scenario
+when a golden is derived than a build does when it is tested. No setup file
+is prepared for this. Whenever the harness sets up its machines, the
+original is started once, made to switch the clock off in its Options menu
+and to save its setup, and the `VC.INI` it writes is what every scenario
+starts from. One scenario, `clock`, switches the clock on again.
+
 ### When a step is finished
 
 The screen has to be read when the program has done all that a key makes

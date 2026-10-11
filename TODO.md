@@ -16,8 +16,12 @@ Things that are known and not done. Standing instructions are in
 - The signal T, for a program that waits and will act by itself after a
   while, has not been seen in use: no scenario makes the program follow
   the cursor to another directory after its delay.
-- `harness/goldens.py` refuses to record a scenario that takes the guest's
-  clock into the next minute. No scenario is long enough to have tried it.
+- A scenario recorded across a minute of the guest's clock. With the clock
+  off on the test bench nothing should stand in its way, but no scenario is
+  long enough to have tried it. Nothing stops one from showing the time of
+  day after its first minute either, with the clock switched on or in the
+  time stamp of a file it has made; the golden would then show another
+  minute than a build does when it is tested.
 
 ## Suspected bugs in the original
 
@@ -39,10 +43,5 @@ otherwise.
   floor. `Bench._program_disk` in `harness/setups.py` is not safe to call
   from two threads at once and has to be made so first; reading the
   execution logs is Python and gains nothing from threads.
-- Switching the clock off for the whole test bench, with one scenario that
-  turns it on through the menus. Its minutes are on every screen, which is
-  why a golden cannot be recorded across a minute boundary, and its colon
-  is why recording waits 0.8 s after every step. Worth doing when a
-  scenario has to be longer than a minute of recording.
 - Dropping the tests `start-screen` and `start-screen-shareware-layout`.
   They take 4 s each and say little that the byte comparison does not.
