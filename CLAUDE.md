@@ -102,6 +102,12 @@ their callers and what they call. For each batch, in this order:
 5. The `port` test must pass. Nothing else decides whether a translation is
    right.
 
+The test can only see what a scenario shows. Where a branch of a routine
+has run in the original but its effect cannot be pointed to in a golden,
+`harness/notice.py` breaks it in a copy of the port and says whether any
+scenario notices. If none does, make one. Do not use it on the registers
+that a stub hands back: those are settled by reading the callers.
+
 When the `port` test fails where the change at hand cannot explain it,
 derive the goldens again before anything else. If `git diff` then shows
 them changed, it is the machine that differs, QEMU or DOS, and not the

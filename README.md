@@ -236,6 +236,12 @@ is how to find out what keys do before writing them into a scenario.
 the original that no scenario has run, and with `--steps` says which of
 them some steps would reach.
 
+`python3 harness/notice.py FILE OLD NEW` makes one change to a copy of the
+port, builds it, and says which scenario notices, or that none does. That
+an instruction ran in the original does not mean that a screen shows what
+it is for; this is how to find out, for a branch whose effect cannot be
+pointed to in a golden.
+
 ### The machines
 
 DOS is booted once for each country that scenarios need, the United States
