@@ -49,8 +49,9 @@ not in Claude's memory: memory does not travel between computers.
 ## Committing and pushing
 
 - Show the result of a piece of work, then wait for confirmation before
-  committing it.
-- Once confirmed, commit and push together. A commit is never left unpushed.
+  committing it. A translated batch is the exception: see "A run of
+  batches".
+- Commit and push together. A commit is never left unpushed.
 
 ## History
 
@@ -80,9 +81,11 @@ not in Claude's memory: memory does not travel between computers.
 
 ## Translating a batch
 
-Routines are translated a few at a time, ones that belong together.
-`tools/routines.py` lists those that are still assembly, with their sizes,
-their callers and what they call. For each batch, in this order:
+Routines are translated in batches of ones that belong together. A batch
+is as large as what belongs together: a whole dialog or a whole command
+rather than a handful of leaves. `tools/routines.py` lists those that are
+still assembly, with their sizes, their callers and what they call. For
+each batch, in this order:
 
 1. Run `tools/flagscan.py` on the routines: it follows the flags they
    leave to whatever reads them, through calls and returns. Read every
@@ -164,6 +167,49 @@ with it is less obvious:
   by `tools/mkexe.c`. The first 32-bit multiplication or division will
   need the compiler's helper routines written, in assembly, in the C code
   segment.
+
+## A run of batches
+
+Batches are translated one after another, without waiting for the user
+between them.
+
+- Each batch is the work of an agent of its own, started fresh, so that a
+  run does not fill one context. The session that runs them does not
+  translate: it starts each agent, checks what the agent left, which is
+  the commit, the push and `LastTest.log`, and keeps its report. An
+  improvement to the tools is handed to an agent in the same way.
+- An agent knows only what the repository tells it. What a batch learns
+  that the next one needs is written down before the batch is committed:
+  about the compiler and the stubs here, about driving the dialogs at the
+  top of `harness/scenarios.py`, about lost time in `TODO.md`.
+- A batch is committed and pushed as soon as the `port` test passes,
+  together with the scenarios and goldens made for it. The next batch
+  starts at once.
+- The tools and the harness are improved during a run, between batches
+  and without waiting for confirmation, each improvement a commit of its
+  own. What decides is the total cost: an improvement is made when it
+  saves more time over the batches still to come than it takes to make.
+- The time it saves is time that a batch has actually lost, not time one
+  might lose. Note what a batch lost and to what, and go by those notes.
+  What does not pay yet stays in `TODO.md` with what it has cost so far.
+- The run ends when the number of batches the user asked for is done,
+  when the program is all C, or when something below stops it. Then
+  report: what was translated, the bugs found in the original, the
+  instructions listed as out of reach, the branches that no scenario
+  notices, the size and the stack; and what was improved in the tools,
+  with the time it took and the time it is saving.
+- Stop and ask, with the batch at hand left uncommitted, before any of
+  these. An agent that meets one hands its batch back as it is, and the
+  session asks the user:
+  - behaviour that differs from the original's, a fix of its bug
+    included;
+  - a change to what the comparison leaves out, or to a limit that the
+    `port` test holds the build to;
+  - a golden that comes out changed when it is derived again;
+  - anything new to download;
+  - a change to these instructions, other than a note on what was
+    learned about the compiler or the stubs;
+  - a `port` test that still fails once the batch has been made smaller.
 
 ## Scenarios
 
