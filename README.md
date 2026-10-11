@@ -20,30 +20,39 @@ the direction and reviews the results.
 
 ## Approach
 
-Fidelity is judged against the original program's behaviour. Volkov
-Commander draws everything on an 80x25 text screen, so what it shows can be
-compared exactly: every character and colour attribute, the cursor, and the
-files it leaves on disk. A candidate and the original are run under DOS in
-an emulator, fed the same keystrokes, and compared.
+Fidelity is judged against the original program, at two levels:
 
-A byte-for-byte comparison with what the author's own toolchain produces
-would be a stronger test, but that toolchain, Borland's TASM and TLINK, is
-commercial software that this project does not fetch or run. The binaries
-he shipped in 2000 can stand in for it. Where JWasm and TASM encode the same
-instruction differently, the source now selects the encoding found in them.
-Comparing whole files with them is the next step.
+- **Bytes.** The binaries Volkov shipped in 2000 are the reference: what is
+  built here must match them byte for byte. His own toolchain, Borland's
+  TASM and TLINK, is commercial software that this project does not fetch
+  or run; matching his output with a free assembler shows that nothing was
+  lost by replacing it.
+- **Behaviour.** Volkov Commander draws everything on an 80x25 text screen,
+  so what it shows can be compared exactly: every character and colour
+  attribute, the cursor, and the files it leaves on disk. A candidate and the
+  original are run under DOS in an emulator, fed the same keystrokes, and
+  compared. This is the test that will carry over to the port.
+
+The byte comparison has one complication. The binaries Volkov shipped were
+shareware, and contain registration code, tables and strings that the source
+he later published leaves out. That material is his and is not reproduced
+here. Instead, the source can be assembled with room reserved for it: the
+same number of bytes in the same places, filled with NOPs and zeros. Every
+other byte then sits at the address it has in the original, and must be
+identical to it. The reserved room is 109 of 65,090 bytes in `VC.COM` and
+691 of 24,278 in `VCSETUP.COM`, in five places each.
 
 The planned stages:
 
-1. Build the original source with free tools.
+1. Build the original source with free tools, byte for byte.
 2. Build the harness that runs the original and a candidate side by side.
 3. Port the program to modern operating systems, held to the same
    comparison, with every intended deviation listed explicitly.
 
-Where it stands: the source builds with a free assembler, and the resulting
-`VC.COM` shows the same start screen as the original. That is one screen;
-the harness cannot yet press keys, so everything behind the start screen is
-still unchecked.
+Where it stands: the first stage is done. Outside the reserved room, both
+programs come out identical to the originals. The harness compares one
+screen, the start screen; it cannot yet press keys, so behaviour behind that
+screen is covered only by the byte comparison.
 
 ## Layout
 
@@ -51,7 +60,7 @@ still unchecked.
 |---|---|
 | `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `CMakeLists.txt` | Builds the assembler and the two programs, and registers the tests |
-| `harness/` | Runs Volkov Commander under FreeDOS in QEMU, captures its screen, and compares a build with the original |
+| `harness/` | Compares a build with the original: byte for byte, and by running both under FreeDOS in QEMU |
 | `docs/` | Pictures for this README |
 
 ## Building
@@ -65,12 +74,14 @@ cmake --build build
 
 This fetches [JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
 MASM-compatible assembler, at a pinned commit, builds it, and assembles
-`src/` into `build/VC.COM` and `build/VCSETUP.COM`.
+`src/` into `build/VC.COM` and `build/VCSETUP.COM`. It also assembles a
+second copy of both into `build/shareware-layout/`, with the room reserved
+that the byte comparison needs; only the tests use that copy.
 
 ### Changes to the source
 
 Everything changed since the source was imported can be listed with
-`git diff $(git rev-list --max-parents=0 HEAD) -- src`. There are two
+`git diff $(git rev-list --max-parents=0 HEAD) -- src`. There are three
 kinds of change.
 
 **Syntax.** The original source is written for TASM; these changes make
@@ -104,6 +115,13 @@ matches the shipped binaries:
 - The byte-sized locals of `Input0` are declared two bytes long, because
   TASM gives each a whole word of stack.
 
+**Layout.** `VCLAYOUT.INC` defines two macros, `ShwCode` and `ShwData`,
+which are placed wherever the shipped binaries have something this source
+does not. Each names a number of bytes. Normally they generate nothing.
+When `SHAREWARE_LAYOUT` is defined they generate that many NOPs or zeros, so
+that what follows lands where it does in the shipped binaries. The filler is
+harmless: the program laid out this way still runs.
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
@@ -114,7 +132,9 @@ ctest --test-dir build --output-on-failure
 
 | Test | What it checks |
 |---|---|
+| `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
 | `start-screen` | `build/VC.COM` and the original `VC.COM` are started on identical machines; their screens, cursors and video modes must be the same |
+| `start-screen-shareware-layout` | The same, for the copy with the reserved room |
 | `harness-self-test` | The comparison itself: two runs of the original must match, and a copy with one letter changed must be reported as differing in exactly that cell |
 
 On these machines the program under test sits on its own drive, `D:`, with
@@ -122,6 +142,9 @@ the original's help and configuration files, and is started in `C:\WORK`,
 a directory with a small fixed set of files. Keeping it off the drive it
 displays stops its file size from appearing on screen as free space.
 `python3 harness/compare.py FILE` runs the comparison for any `VC.COM`.
+
+The reserved room is listed in `harness/bytecheck.py`, with the offset and
+length of each piece and a note of what the original has there.
 
 ## Running the original
 

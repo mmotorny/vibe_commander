@@ -27,40 +27,66 @@ set_target_properties(jwasm PROPERTIES
 
 # --- Volkov Commander ---------------------------------------------------------
 
-# add_dos_program(<name> <include>...) assembles src/<name>.ASM, which
-# includes the listed files, into <build>/<name>.COM.
-function(add_dos_program name)
-    set(source_dir ${CMAKE_SOURCE_DIR}/src)
-    set(output ${CMAKE_BINARY_DIR}/${name}.COM)
-    list(TRANSFORM ARGN PREPEND ${source_dir}/ OUTPUT_VARIABLE includes)
-    add_custom_command(
-        OUTPUT ${output}
-        # JWasm takes default options from the JWASM environment variable.
-        COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
-                $<TARGET_FILE:jwasm> -nologo -q -bin -I${source_dir}
-                -Fo ${output} ${source_dir}/${name}.ASM
-        DEPENDS jwasm ${source_dir}/${name}.ASM ${includes}
-        COMMENT "Assembling ${name}.COM"
-        VERBATIM)
-    add_custom_target(${name} ALL DEPENDS ${output})
-endfunction()
-
-add_dos_program(VC
+# The files each program's main source includes.
+set(VC_includes
+    VCLAYOUT.INC
     VCFUNC.INC VCMENU.INC VCF1.INC VCCOPY.INC VCVIEW.INC VCEDIT.INC
     VCHELP.INC VCMEM.INC VCFIND.INC VCSUB1.INC VCSUB2.INC VCSUB3.INC)
-add_dos_program(VCSETUP
+set(VCSETUP_includes
+    VCLAYOUT.INC
     VCSTHLP.INC VCSTSUB.INC)
 
+# add_programs(<target> <directory> [<jwasm option>...]) assembles
+# src/VC.ASM and src/VCSETUP.ASM into <directory>/VC.COM and
+# <directory>/VCSETUP.COM.
+function(add_programs target directory)
+    set(source_dir ${CMAKE_SOURCE_DIR}/src)
+    set(outputs "")
+    foreach(name VC VCSETUP)
+        set(output ${directory}/${name}.COM)
+        list(TRANSFORM ${name}_includes PREPEND ${source_dir}/
+             OUTPUT_VARIABLE includes)
+        add_custom_command(
+            OUTPUT ${output}
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${directory}
+            # JWasm takes default options from the JWASM environment variable.
+            COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
+                    $<TARGET_FILE:jwasm> -nologo -q -bin ${ARGN}
+                    -I${source_dir} -Fo ${output} ${source_dir}/${name}.ASM
+            DEPENDS jwasm ${source_dir}/${name}.ASM ${includes}
+            COMMENT "Assembling ${name}.COM (${target})"
+            VERBATIM)
+        list(APPEND outputs ${output})
+    endforeach()
+    add_custom_target(${target} ALL DEPENDS ${outputs})
+endfunction()
+
+# The programs themselves.
+add_programs(programs ${CMAKE_BINARY_DIR})
+
+# The same source laid out like the binaries shipped in 2000, which were
+# shareware: room is reserved for the registration code and data that they
+# have and this source does not. Only the tests use this build; they compare
+# it with the originals byte for byte. See src/VCLAYOUT.INC.
+set(layout_dir ${CMAKE_BINARY_DIR}/shareware-layout)
+add_programs(shareware-layout ${layout_dir} -DSHAREWARE_LAYOUT)
+
 # --- Tests --------------------------------------------------------------------
-# The tests run Volkov Commander under FreeDOS in QEMU; see harness/. They
-# need qemu-system-i386 and mtools, and download the original program and
-# FreeDOS on first use.
+# The tests need python3. Those that run Volkov Commander do so under FreeDOS
+# in QEMU (see harness/) and also need qemu-system-i386 and mtools. The
+# original program and FreeDOS are downloaded on first use.
 
 enable_testing()
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
+add_test(NAME bytes-match-original
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/bytecheck.py
+            ${layout_dir}/VC.COM ${layout_dir}/VCSETUP.COM)
 add_test(NAME harness-self-test
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/selftest.py)
 add_test(NAME start-screen
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
             ${CMAKE_BINARY_DIR}/VC.COM)
+add_test(NAME start-screen-shareware-layout
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/compare.py
+            ${layout_dir}/VC.COM)

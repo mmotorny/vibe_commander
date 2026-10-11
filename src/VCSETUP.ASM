@@ -4,6 +4,7 @@
 
 	OPTION	OLDSTRUCTS		; Structure fields are global names
 	OPTION	NOSCOPED		; Labels inside procedures are global
+	INCLUDE	VCLAYOUT.INC
 	.MODEL	Tiny
 	.CONST				; Fix the segment order: uninitialized
 	.DATA?				; data must come last, after constants
@@ -321,8 +322,15 @@ DefWCB	DB	0			; WinTyp
 
 	.CONST
 	DB	13,10
+IFDEF	SHAREWARE_LAYOUT
+Init_S	DB	       'The ',PrgName,' Setup, Version 4.05 '
+	ShwData	9			; The name of the edition
+	DB	13,10, 'Copyright (C) 1991-2000 '
+	ShwData	13			; The copyright holder, worded differently
+ELSE
 Init_S	DB	       'The ',PrgName,' Setup, Version ',VcVers
 	DB	13,10, 'Copyright (C) 1991-2000 Vsevolod V. Volkov'
+ENDIF
 	DB	13,10
 	DB	13,10, '$'
 Vers_S	DB	13,10, 'This program requires DOS 3.20 or later.'
@@ -716,7 +724,22 @@ Err1:	MOV	BP,OFFSET IniEr_B
 Err2:	MOV	DI,OFFSET SrcIni
 	MOV	AL,0FFh
 	REP	STOSB
+IFDEF	SHAREWARE_LAYOUT
+Err3:	JMP	SHORT $+2		; To the registration code
+ELSE
 Err3:	JMP	Main00
+ENDIF
+
+;--------------------- Registration --------------------
+	.CONST
+	ShwData	275			; Strings of the registration dialog
+
+	.DATA
+	ShwData	119			; The registration dialog and its error box
+
+	.CODE
+	ShwCode	275			; The command line switch, the dialog,
+					; the check of what was typed into it
 
 ;---------------------- Main Menu ----------------------
 	.CONST

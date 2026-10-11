@@ -6,6 +6,7 @@
 
 	OPTION	OLDSTRUCTS		; Structure fields are global names
 	OPTION	NOSCOPED		; Labels inside procedures are global
+	INCLUDE	VCLAYOUT.INC
 	.MODEL	Tiny
 	.CODE
 Zero:	.STARTUP
@@ -1030,8 +1031,15 @@ LastDat:
 ;-------------------------- Data -----------------------
 	.CONST
 Title_S	DB	0FFh,14,'The ',PrgName,', Version ',VcVers,0
+IFDEF	SHAREWARE_LAYOUT
+Suff_S	DB	' '
+	ShwData	9			; The name of the edition
+	DB	0
+ELSE
 Suff_S	DB	' ',VcSuff,0
+ENDIF
 Copyr_S	DB	13,10, 'Copyright (C) 1991-2000 Vsevolod V. Volkov',0
+	ShwData	39			; Registration lines of the banner
 CrLf_S	DB	13,10, '$'
 Retrn_S	DB	13,10, 'Press ENTER to return ', 0
 	DB	13,10, 'to the ',PrgName, 0
@@ -1456,16 +1464,20 @@ Init04:	CALL	ChkMode
 	JZ	Init05
 	MOV	AX,3
 	INT	10h
-Init05:	PUSH	CS			; Output message
+Init05:
+	ShwCode	35			; Check of the registration data
+	PUSH	CS			; Output message
 	POP	DS
 	MOV	DX,OFFSET ComnIni.ExtMain
 	MOV	DI,DX
 	MOV	SI,OFFSET Title_S+2
 	CALL	MvzLin0
+	ShwCode	4			; No edition name when registered
 	MOV	SI,OFFSET Suff_S
 	CALL	MvzLin0
 	MOV	SI,OFFSET Copyr_S
 	CALL	MvzLin0
+	ShwCode	22			; Registration lines when registered
 	MOV	SI,OFFSET CrLf_S
 	CALL	MvzLin0
 	PUSH	ES

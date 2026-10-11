@@ -7,6 +7,12 @@ not in Claude's memory: memory does not travel between computers.
 
 - Never commit anything proprietary. That includes the shareware Volkov
   Commander distribution and any commercial tool.
+- That also covers anything reconstructed from the shareware binaries: no
+  decompiled code, no disassembly, none of their strings. Where they hold
+  material that the published source lacks, the source reserves room with
+  the `ShwCode` and `ShwData` macros of `src/VCLAYOUT.INC`, which emit
+  filler only. Recording where such material sits and how long it is, is
+  fine; reproducing it is not.
 - Only fetch and run software that has a clean licence: open-source
   software, or software obtained from its rights holder on terms that allow
   this use. The Volkov Commander shareware distribution qualifies, because
