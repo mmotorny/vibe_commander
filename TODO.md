@@ -43,5 +43,3 @@ otherwise.
   floor. `Bench._program_disk` in `harness/setups.py` is not safe to call
   from two threads at once and has to be made so first; reading the
   execution logs is Python and gains nothing from threads.
-- Dropping the tests `start-screen` and `start-screen-shareware-layout`.
-  They take 4 s each and say little that the byte comparison does not.

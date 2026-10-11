@@ -176,8 +176,6 @@ ctest --test-dir build --output-on-failure
 | Test | What it checks |
 |---|---|
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
-| `start-screen` | `build/VC.COM` shows the start screen that the original shows |
-| `start-screen-shareware-layout` | The same, for the copy with the reserved room |
 | `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original |
 | `harness-self-test` | The comparison itself: the original must match what was recorded of it, and a copy with one letter changed must be reported as differing in exactly that cell |
 
@@ -201,7 +199,8 @@ binaries shipped in 2000.
 
 `python3 harness/compare.py [--signals] FILE [SCENARIO...]` takes any
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from
-the goldens.
+the goldens. No test runs the programs assembled from `src/`, which the
+byte comparison answers for; this is how to run them.
 
 `python3 harness/show.py STEP...` prints the screens that the original
 shows after each of some steps, or with `--program` those of a build. It
