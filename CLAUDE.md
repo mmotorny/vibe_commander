@@ -111,6 +111,10 @@ port.
 - C code may destroy ES. A stub whose callers need ES saves it, or the
   function's `#pragma aux` leaves ES out of what it modifies.
 - The direction flag must be clear when C is entered. C leaves it clear.
+- C code calls a routine that is still assembly through an entry made
+  with `FromC`, declared in `port/vc.h`. Registers go in and come back as
+  the routine has them. Flags do not come back: the entry of a routine
+  that answers in one turns the answer into a register.
 
 ### C for the port
 

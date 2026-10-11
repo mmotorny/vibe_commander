@@ -293,6 +293,19 @@ LAID_OUT(WCBdef, 0x1A62);
 /* The main data segment, which DS points at. */
 extern struct MainDat __near md;
 
+/* Routines that are still assembly, for C code to call. Each has an entry
+   in the assembly, the routine's name with _a, which is called far and
+   calls the routine (see FromC in port/asm/VC.ASM). They take and return
+   what the routine's registers hold, so a value in a high byte stays
+   there; flags do not come back. */
+u16 Color(u16 number);                  /* AH: a colour's number -> AH: it */
+u16 UpCase(u16 letter);                 /* AL: a letter -> AL: its capital */
+u16 TstHex(u16 digit);                  /* AL: a hex digit as text -> its
+                                           value, or above 0FFh if none */
+#pragma aux Color  "*_a" __far parm [ax] value [ax] modify exact [ax es]
+#pragma aux UpCase "*_a" __far parm [ax] value [ax] modify exact [ax es]
+#pragma aux TstHex "*_a" __far parm [ax] value [ax] modify exact [ax es]
+
 /* The panel that a file entry belongs to. */
 #define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))
 

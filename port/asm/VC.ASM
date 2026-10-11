@@ -14,6 +14,7 @@
 ; expects DS to point at the main data segment and may change ES.
 	EXTERN	HexDec_c:FAR, Number_c:FAR, PutDate_c:FAR, BufDate_c:FAR
 	EXTERN	PutTime_c:FAR, BufTime_c:FAR, SzDtTm_c:FAR
+	EXTERN	LnStr_c:FAR, NgLine_c:FAR, CntLine_c:FAR
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.
@@ -23,6 +24,53 @@ CallC	MACRO	Name
 	POP	DS
 	CALL	FAR PTR Name
 	POP	DS
+	ENDM
+
+; An entry by which C code calls the near routine Name: Name_a, called far
+; with DS on the main data. The assembly keeps ES there, so the entry puts
+; it there too. Registers go in and come back as the routine has them. C
+; code cannot see flags: a routine that answers in one names instructions
+; for After that put the answer into a register.
+FromC	MACRO	Name, After
+	PUBLIC	Name&_a
+Name&_a	PROC	FAR
+	PUSH	DS
+	POP	ES
+	CALL	Name
+	After
+	RET
+Name&_a	ENDP
+	ENDM
+
+; Hand a line of text to the C function Name: the registers that describe
+; it are pushed, First of them last, and the function gets BX on them and
+; DS on the main data (see struct LineArgs in port/line.c). TakeLine pops
+; them again, as the function has left them, and with them DS. Scratch is
+; a register to pop into what is of no use.
+CallLine MACRO	Name, First
+	PUSH	CS
+	PUSH	DX
+	PUSH	CS
+	PUSH	BP
+	PUSH	DS
+	PUSH	SI
+	PUSH	DI
+	PUSH	First
+	MOV	BX,SP
+	PUSH	ES
+	POP	DS
+	CALL	FAR PTR Name
+	ENDM
+
+TakeLine MACRO	First, Scratch
+	POP	First
+	POP	DI
+	POP	SI
+	POP	DS
+	POP	BP
+	POP	Scratch
+	POP	DX
+	POP	Scratch
 	ENDM
 
 ;------------------- Signals to the tests --------------

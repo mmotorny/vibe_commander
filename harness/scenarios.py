@@ -117,6 +117,24 @@ SCENARIOS = {
             "Ctrl+l",
         )),
 
+    "help": Scenario(
+        "The help: its index and pages, whose text is bold, underlined "
+        "and reversed in places",
+        steps=(
+            "F1",                         # the index
+            "Down Enter",                 # the keyboard reference
+            "PgDn",
+            "Enter",                      # the next page
+            "Esc",
+        )),
+
+    "configuration": Scenario(
+        "The Configuration dialog, with its frames inside the frame",
+        steps=(
+            "F9 o Enter",
+            "Esc",
+        )),
+
     "tree": Scenario(
         "The tree of directories, which the other panel follows a moment "
         "after the cursor has come to rest",

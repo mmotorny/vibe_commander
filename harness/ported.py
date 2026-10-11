@@ -76,6 +76,25 @@ BATCHES = [
                 "first: the scenarios cover the United States and Russia"),
         },
     ),
+    Batch(
+        title="Lines of text with markup",
+        source="line.c",
+        routines=("LnStr", "NgLine", "NgLn30", "CntLine"),
+        functions=("LnStr_c", "NgLine_c", "CntLine_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x99CF, 0x99D0, 0x99D1, 0x99D2),
+                "LnStr, for ^A and ^C: it measures texts of the program "
+                "only, and none has either"),
+            **dict.fromkeys(
+                (0x9A9D, 0x9A9F, 0x9AA1, 0x9AA3, 0x9AA5, 0x9AA7, 0x9AA8,
+                 0x9AAB, 0x9AAD, 0x9AAE, 0x9AB0, 0x9AB3, 0x9AB5, 0x9AB6,
+                 0x9AB8, 0x9ABA, 0x9ABC, 0x9ABD, 0x9AC0, 0x9AC2, 0x9AC5,
+                 0x9AC7, 0x9AC9),
+                "NgLine, for ^A, ^C and a letter that means nothing: no "
+                "text of the program or of its help file has any"),
+        },
+    ),
 ]
 
 

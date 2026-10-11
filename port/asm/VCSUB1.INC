@@ -1096,72 +1096,14 @@ DiBx30	ENDP
 ;			CS:DX - address of include line
 ;	Return :	   AX - length
 LnStr	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	BX
-	XOR	BX,BX
-LnStr0:	LODSW
-	CMP	AL,0
-	JE	LnStr9
-	CMP	AL,'^'
-	JE	LnStr3
-	CMP	AL,0FFh
-	JE	LnStr2
-	DEC	SI
-LnStr1:	INC	BX
-	JMP	LnStr0
-LnStr2:	MOV	AL,AH
-	AND	AL,7Fh
-	DEC	AX
-	SHL	AH,1
-	CMC
-	ADC	BL,AL
-	JMP	LnStr0
-LnStr3:	MOV	AL,AH
-	CMP	AL,'^'
-	JE	LnStr1
-	CALL	UpCase
-	CMP	AL,'V'
-	JE	LnStr5
-	CMP	AL,'W'
-	JE	LnStr6
-	CMP	AL,'I'
-	JE	LnStr7
-	CMP	AL,'A'
-	JE	LnStr4
-	CMP	AL,'C'
-	JNE	LnStr0
-	INC	BX
-LnStr4:	INC	SI
-	INC	SI
-	JMP	LnStr0
-LnStr5:	PUSH	ES
-	MOV	DI,OFFSET TmpErr+1
-	JMP	LnStr8
-LnStr6:	PUSH	ES
-	MOV	DI,OFFSET TmpErr+101
-	JMP	LnStr8
-LnStr7:	PUSH	ES
-	PUSH	CS
-	POP	ES
-	MOV	DI,DX
-LnStr8:	PUSH	DI
 	PUSH	CX
-	MOV	CX,80
-	MOV	AL,0
-	REPNE	SCASB
-	MOV	AX,DI
-	POP	CX
-	POP	DI
+	PUSH	BX
+	PUSH	ES
+	CallLine LnStr_c, AX
+	TakeLine BX, BX
 	POP	ES
-	SUB	AX,DI
-	DEC	AX
-	ADD	BL,AL
-	JMP	LnStr0
-LnStr9:	MOV	AX,BX
 	POP	BX
-	POP	DI
-	POP	SI
+	POP	CX
 	RET
 LnStr	ENDP
 
@@ -1174,120 +1116,14 @@ LnStr	ENDP
 NgLine	PROC	NEAR
 	PUSH	CX
 	PUSH	BX
-	PUSH	AX
-	MOV	BL,AL
-	MOV	AH,CS:[BP]
-	MOV	BH,0
-NgLn01:	CALL	Color
-NgLn02:	LODSB
-	CMP	AL,0
-	JE	NgLn04
-	CMP	AL,'^'
-	JE	NgLn07
-	CMP	AL,0FFh
-	JE	NgLn05
-NgLn03:	CALL	NgLn30
-	JMP	NgLn02
-NgLn04:	POP	AX
+	PUSH	ES
+	CallLine NgLine_c, AX
+	TakeLine AX, BX
+	POP	ES
 	POP	BX
 	POP	CX
 	RET
-NgLn05:	LODSB
-	MOV	CL,AL
-	TEST	AL,80h
-	MOV	AL,' '
-	JZ	NgLn50
-	LODSB
-NgLn50:	AND	CX,7Fh
-	JE	NgLn02
-NgLn06:	CALL	NgLn30
-	LOOP	NgLn06
-	JMP	NgLn02
-NgLn07:	LODSB
-	CMP	AL,'^'
-	JE	NgLn03
-	CALL	UpCase
-	CMP	AL,'V'
-	JNE	NgLn08
-	PUSH	SI
-	MOV	SI,OFFSET TmpErr+1
-	JMP	NgLn09
-NgLn08:	CMP	AL,'W'
-	JNE	NgLn13
-	PUSH	SI
-	MOV	SI,OFFSET TmpErr+101
-NgLn09:	PUSH	DS
-	PUSH	ES
-NgLn10:	POP	DS
-NgLn11:	LODSB
-	CMP	AL,0
-	JE	NgLn12
-	CALL	NgLn30
-	JMP	NgLn11
-NgLn12:	POP	DS
-	POP	SI
-	JMP	NgLn02
-NgLn13:	CMP	AL,'I'
-	JNE	NgLn14
-	PUSH	SI
-	MOV	SI,DX
-	PUSH	DS
-	PUSH	CS
-	JMP	NgLn10
-NgLn14:	MOV	CL,0
-	CMP	AL,'N'
-	JE	NgLn15
-	MOV	CL,1
-	CMP	AL,'R'
-	JE	NgLn15
-	MOV	CL,2
-	CMP	AL,'B'
-	JE	NgLn15
-	MOV	CL,3
-	CMP	AL,'U'
-	JNE	NgLn17
-NgLn15:	CMP	CL,BH
-	JNE	NgLn16
-	MOV	CL,0
-NgLn16:	MOV	CH,0
-	PUSH	BP
-	ADD	BP,CX
-	MOV	AH,CS:[BP]
-	POP	BP
-	MOV	BH,CL
-	JMP	NgLn01
-NgLn17:	CMP	AL,'A'
-	JE	NgLn18
-	CMP	AL,'C'
-	JNE	NgLn20
-NgLn18:	MOV	CL,AL
-	LODSB
-	CALL	TstHex
-	MOV	CH,AL
-	LODSB
-	JC	NgLn20
-	CALL	TstHex
-	JC	NgLn20
-	PUSH	CX
-	MOV	CL,4
-	SHL	CH,CL
-	OR	AL,CH
-	POP	CX
-	CMP	CL,'C'
-	JE	NgLn19
-	JMP	NgLn03
-NgLn19:	MOV	AH,AL
-	MOV	BH,0
-NgLn20:	JMP	NgLn02
 NgLine	ENDP
-
-NgLn30	PROC	NEAR
-	OR	BL,BL
-	JE	NgLn31
-	STOSW
-	DEC	BL
-NgLn31:	RET
-NgLn30	ENDP
 
 ;--------------------- Center line ---------------------
 ;			BH,BL - center
@@ -1295,18 +1131,14 @@ NgLn30	ENDP
 ;			CS:DX - address of include line
 ;			CS:BP - address of color table
 CntLine	PROC	NEAR
-	PUSH	DI
+	PUSH	CX
 	PUSH	AX
-	CALL	LnStr
-	CALL	BasAdr
-	PUSH	AX
-	INC	AX
-	AND	AX,WORD PTR 0FFFEh
-	SUB	DI,AX
+	PUSH	ES
+	CallLine CntLine_c, BX
+	TakeLine BX, AX
+	POP	ES
 	POP	AX
-	CALL	NgLine
-	POP	AX
-	POP	DI
+	POP	CX
 	RET
 CntLine	ENDP
 
@@ -2331,6 +2163,7 @@ Color	PROC	NEAR
 	POP	DI
 	RET
 Color	ENDP
+	FromC	Color
 
 ColAddr	PROC	NEAR
 	PUSH	AX
@@ -2490,6 +2323,7 @@ UpCase	PROC	NEAR
 UpCas1:	CALL	ES:Country.CaseMap
 	RET
 UpCase	ENDP
+	FromC	UpCase
 
 ;--------------------- Lower letter --------------------
 ;			   AL - letter
@@ -2731,6 +2565,7 @@ TstHx1:	CALL	UpCase
 TstHx2:	STC
 	RET
 TstHex	ENDP
+	FromC	TstHex, <SBB AH,AH>
 
 ;---------------------- Number input -------------------
 ;			ES:SI - string

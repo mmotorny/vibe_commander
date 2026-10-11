@@ -3,13 +3,6 @@
 Things that are known and not done. Standing instructions are in
 `CLAUDE.md`; this is the list of loose ends.
 
-## Not yet proven
-
-- C code calling assembly. The first batch needed none of it. The next
-  batch should include a routine that does, to prove that direction: a far
-  entry in the assembly segment that calls the near routine and returns
-  far, called from C like any far function.
-
 ## Ideas put off
 
 - Running scenarios side by side. Measured on the port's test with six

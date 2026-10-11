@@ -58,7 +58,8 @@ The planned stages:
 Where it stands: the first stage is done. Outside the reserved room, both
 programs come out identical to the originals. The second stage has begun:
 the program builds as `VC.EXE` from assembly and C together, and the first
-routines, those that write numbers, sizes, dates and times, run as C.
+routines run as C: those that write numbers, sizes, dates and times, and
+those that write lines of text with their markup.
 
 ## Layout
 
@@ -144,7 +145,9 @@ In between it is both. A routine that has been translated is deleted from
 `port/asm/` and leaves a few instructions behind that pass its callers on
 to the C function; `git diff --no-index src port/asm` shows what is gone.
 The C code keeps the names the routines and their data have in the
-assembly, so that either can be found from the other.
+assembly, so that either can be found from the other. Where C code needs a
+routine that is still assembly, the assembly gets an entry for it that C
+can call.
 
 The halves are linked into one program, `VC.EXE`, which is not built the
 way a C program usually is. It still loads and starts like the `.COM` file
