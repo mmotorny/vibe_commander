@@ -774,7 +774,6 @@ MinBox	ENDP
 	FromC	MinBox
 
 MinBx3	PROC	NEAR
-	NoTick
 	PUSH	DX
 	PUSH	CX
 	PUSH	AX

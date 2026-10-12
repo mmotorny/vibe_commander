@@ -4,7 +4,6 @@
 
 	PUBLIC	PtMnu_S
 	PUBLIC	Timer_a, DosTime_a, InpKey_a
-	PUBLIC	SigNew_a, SigKeys_a, SigWait_a
 
 ;------------------ Begin of main windows --------------
 ;			   DS - WCBseg
@@ -356,7 +355,7 @@ Input	ENDP
 
 ; Input0, which waits for the key, is C too, and only C code calls it.
 
-; What Input0 and PutKey ask of the BIOS, of DOS and of the tests, now
+; What Input0 and PutKey ask of the BIOS and of DOS, now
 ; that they are C (see FromC in VC.ASM, and port/input.c for what the
 ; entries take and return).
 	FromC	LeaveTm
@@ -379,32 +378,12 @@ DosTime_a PROC	FAR
 	RET
 DosTime_a ENDP
 
-; Take the key that waits, and tell the tests so.
+; Take the key that waits.
 InpKey_a PROC	FAR
 	MOV	AH,0
 	INT	16h
-	Signal	'K'
 	RET
 InpKey_a ENDP
-
-; The other signals to the tests of Input0 and PutKey (see "Signals to the
-; tests" in VC.ASM): before the program looks for a key, the shift keys in
-; AL that the key bar has been drawn for, and that the program has found
-; no key and waits. In the build that is shipped they do nothing.
-SigNew_a PROC	FAR
-	SigNew
-	RET
-SigNew_a ENDP
-
-SigKeys_a PROC	FAR
-	SigKeys
-	RET
-SigKeys_a ENDP
-
-SigWait_a PROC	FAR
-	SigWait
-	RET
-SigWait_a ENDP
 
 LeaveTm	PROC	NEAR
 	INT	28h

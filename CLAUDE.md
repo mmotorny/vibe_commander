@@ -303,15 +303,15 @@ port.
   which leaves the flags, and `JNE` past an `INC AX`. `Int16_a` in
   `VCFIND.INC` does it with DX. A stub makes the zero flag for its callers
   of a function that returns 1 or 0 with `CMP AX,1`: `CmpSym`.
-- C code is compiled once, for the build that is shipped and for the one
-  that signals, so it cannot signal by itself. Waiting for a key is C,
-  `Input0` of `port/input.c`, and says where it is through entries that
-  hold the macros, next to its stub in `VCSUB2.INC`: `SigNew_a`,
-  `SigKeys_a` and `SigWait_a`, which have nothing in them in the build
-  that is shipped, and `InpKey_a`, which takes the key from the BIOS and
-  signals K. What the signals say is all in the macros, so a change to
-  them reaches the C by itself. C code that takes keys from the BIOS
-  otherwise, as the file search does through `Int16_a`, signals nothing.
+- Nothing in the program tells the tests where it is. The driver of the
+  tests (`harness/DRIVER.ASM`) watches it from inside the machine: it
+  knows the program by the code that follows `INT 28h` in `LeaveTm`,
+  which `Input0` of `port/input.c` calls every time it has gone round,
+  and it reads `AutoTim` and `Clock` in the main data, which
+  `harness/driver.py` finds in the listing of the assembly,
+  `build/port/VC.LST`. `INT 28h` has to stay in one place of the
+  program, and when `LeaveTm` or those two variables become C,
+  `harness/driver.py` has to be shown where they are.
 - What a routine reads in the assembly's code segment may be read by
   another file too, and then stays, `PUBLIC`, when the routine goes: the
   menu finds the menu that the mouse is on by `PtMnu_S`, the names that
@@ -733,9 +733,10 @@ several at a time.
   conflict of its batch itself and keeps what both sides added.
 - Nothing in the harness takes turns: recordings of the original and
   tests of the port run at the same time, in as many checkouts as there
-  are, and other machines only make them slower. The original is
-  recorded by watching it come back to its wait for a key
-  (`harness/watch.py`), not by the clock. Where a recording or a test
+  are, and other machines only make them slower. The original and the
+  port are driven from inside their machine, by a driver that acts when
+  the program waits (`harness/DRIVER.ASM`), not by the clock. Where a
+  recording or a test
   does come out different under load, that is a flaw to report, not
   something to wait out.
 - A routine of the assembly that C code calls has one entry for C,

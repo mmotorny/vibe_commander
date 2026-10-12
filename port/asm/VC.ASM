@@ -128,163 +128,6 @@ TakeLine MACRO	First, Scratch
 	POP	Scratch
 	ENDM
 
-;------------------- Signals to the tests --------------
-; The build that the tests run says where it is, by writing a letter to a
-; port that QEMU passes on to them:
-;
-;	K	it has taken a key from the keyboard
-;	W	it waits for a key
-;	S	it waits for a key and shows the key bar of Shift, Ctrl or
-;		Alt, which is held down
-;	T	it waits for a key, and will act by itself after a while
-;	X	it ends
-;
-; W, S and T say which keys the program has taken by then. The byte before
-; the letter is where the BIOS will put the next key in its keyboard
-; buffer, the low byte of KbTail, and they are signalled only while
-; nothing waits there. A key that the tests have seen arrive has moved
-; KbTail on, so a W with the place it has now is one that came after the
-; last key was taken, however slowly the tests look.
-;
-; Without this the tests could only guess when the program has finished
-; what a key started. The build that is shipped does none of it.
-;
-; Where the program waits for a key is C, Input0 of port/input.c, and
-; compiled code is the same in both builds. It signals through entries that
-; hold these macros, next to its stub in VCSUB2.INC: SigNew_a, SigKeys_a,
-; SigWait_a and InpKey_a.
-;
-; The resident part must be as long in one build as in the other: the
-; memory it leaves free is shown on the screen. So what Signal and SigAsks
-; assemble is counted, and the local stack at the end of the resident part
-; is that much shorter (see LastRes). Only they may be used in the
-; resident part.
-SigPort	EQU	0E9h
-KbHead	EQU	41Ah			; In segment 0: where the BIOS takes
-KbTail	EQU	41Ch			; a key from its buffer, and puts one
-SigLen	=	0			; Bytes that Signal has assembled so far
-
-Signal	MACRO	Letter
-	LOCAL	From
-IFDEF	HARNESS
-From:	PUSH	AX
-	MOV	AL,Letter
-	OUT	SigPort,AL
-	POP	AX
-SigLen	=	SigLen + ($ - From)
-ENDIF
-	ENDM
-
-; The resident part waits for a key, which it does inside the BIOS: signal
-; W unless a key is there already. Changes the flags.
-SigAsks	MACRO
-	LOCAL	From, Told
-IFDEF	HARNESS
-From:	PUSH	AX
-	PUSH	DS
-	XOR	AX,AX
-	MOV	DS,AX
-	MOV	AL,BYTE PTR DS:[KbTail]
-	CMP	AL,BYTE PTR DS:[KbHead]
-	JNE	Told
-	OUT	SigPort,AL
-	MOV	AL,'W'
-	OUT	SigPort,AL
-Told:	POP	DS
-	POP	AX
-SigLen	=	SigLen + ($ - From)
-ENDIF
-	ENDM
-
-; Before the program looks for a key: nothing has been signalled yet.
-SigNew	MACRO
-IFDEF	HARNESS
-	MOV	CS:SigSt,0
-ENDIF
-	ENDM
-
-; The key bar has been drawn for the shift keys in AL, or with 0 not at all.
-SigKeys	MACRO	Keys
-IFDEF	HARNESS
-	PUSH	AX
-IFNB	<Keys>
-	MOV	AL,Keys
-ENDIF
-	AND	AL,0Fh
-	MOV	CS:SigKb,AL
-	POP	AX
-ENDIF
-	ENDM
-
-; The program waits: signal W, S or T, unless a key is there for it to
-; take, or that is what was signalled last since SigNew, with KbTail as it
-; is. KbTail is read once, and before KbHead: a key that arrives meanwhile
-; is not missed, and only the program moves KbHead. Expects DS to point at
-; the main data.
-SigWait	MACRO
-	LOCAL	Which, Told
-IFDEF	HARNESS
-	PUSHF
-	PUSH	AX
-	PUSH	DS
-	MOV	AH,'T'
-	CMP	DS:AutoTim.Lo,0FFFFh
-	JNE	Which
-	MOV	AH,'S'
-	CMP	CS:SigKb,0
-	JNE	Which
-	MOV	AH,'W'
-Which:	MOV	DS,CS:SigNul
-	MOV	AL,BYTE PTR DS:[KbTail]
-	CMP	AL,BYTE PTR DS:[KbHead]
-	JNE	Told
-	CMP	AX,CS:SigSt
-	JE	Told
-	MOV	CS:SigSt,AX
-	OUT	SigPort,AL
-	MOV	AL,AH
-	OUT	SigPort,AL
-Told:	POP	DS
-	POP	AX
-	POPF
-ENDIF
-	ENDM
-
-; The stack has just been set up: mark it from its bottom to where it is
-; in use, so that the tests can see how much of it is never touched (see
-; harness/scenarios.py). Expects SS to be the segment of the resident
-; part. Not for the resident part: this is not counted.
-StkMark	EQU	0A55Ah
-
-SigStack MACRO
-	LOCAL	Next, Done
-IFDEF	HARNESS
-	PUSHF
-	PUSH	DI
-	MOV	DI,SP
-Next:	DEC	DI
-	DEC	DI
-	CMP	DI,OFFSET DataSav
-	JB	Done
-	MOV	WORD PTR SS:[DI],StkMark
-	JMP	Next
-Done:	POP	DI
-	POPF
-ENDIF
-	ENDM
-
-; The program waits for the next tick of the timer between two sizes of a
-; box that grows as it opens, five times for every box. The build that the
-; tests run does not: a box goes through all its sizes before the program
-; asks for a key again, so no step ends on one of them, and the waiting
-; was most of the time that a scenario with dialogs took. Stands where
-; the wait begins, in MinBx3 of VCSUB1.INC.
-NoTick	MACRO
-IFDEF	HARNESS
-	RET
-ENDIF
-	ENDM
-
 	.CODE
 	PUBLIC	_md
 _md	LABEL	BYTE			; The main data segment, to C code:
@@ -878,7 +721,6 @@ Exit03:	CMP	ES:ComnIni.ChkTSR,0
 	MOV	AX,2527h
 	INT	21h
 Exit04:	POP	AX
-	Signal	'X'
 	CMP	ES:Vect22.Segm,0
 	JNE	Exit05
 	MOV	AH,4Ch
@@ -898,10 +740,8 @@ NotFind	PROC	NEAR
 	PUSH	CS
 	CALL	OutStr0
 	POP	DS
-NotFn1:	SigAsks
-	MOV	AH,0
+NotFn1:	MOV	AH,0
 	INT	16h
-	Signal	'K'
 	CMP	AL,0Dh
 	JE	NotFn2
 	CMP	AL,1Bh
@@ -1336,7 +1176,6 @@ Relea5:	CALL	SetStat
 Release	ENDP
 
 LastRes:
-SigRes	=	SigLen			; Bytes of signals in the resident part
 
 ;--------------------- Release data --------------------
 IntTab	DD	256	DUP(?)
@@ -1353,7 +1192,7 @@ WCB1sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB1
 WCB2sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB2
 ComnIni	DB	CmnSave			DUP(?)	; Common data
 	PUBLIC	DataSav, VcStack	; For the tests: how long the stack is
-DataSav	DB	LenStk - SigRes		DUP(?)	; Local stack
+DataSav	DB	LenStk		DUP(?)	; Local stack
 VcStack:
 LastDat:
 
@@ -1711,7 +1550,6 @@ Alloc9:	MOV	SI,OFFSET Aloc_S	; Error
 
 ;------------------ Read configuration -----------------
 Init00:	CALL	Reloc
-	SigStack
 	MOV	ES,DS:[2Ch]
 	MOV	DI,OFFSET WCB1sav + WCBsave
 	MOV	DX,DI
@@ -3068,12 +2906,6 @@ OkMn_D	DB	4, 0
 	DB	0
 SecDat	DW	0
 RelDone	DB	0			; 1 when this copy has been relocated
-IFDEF	HARNESS
-SigSt	DW	0			; The last of W, S and T signalled,
-					; with KbTail in the low byte
-SigNul	DW	0			; Segment 0
-SigKb	DB	0			; The shift keys the key bar shows
-ENDIF
 
 	.CODE
 FatErr:	PUSH	DS

@@ -204,11 +204,6 @@ endfunction()
 # The program as it is shipped.
 add_port(port ${port_dir})
 
-# The program as the tests run it: it signals where it is, so that they
-# need not guess. See "Signals to the tests" in port/asm/VC.ASM.
-set(signalling_dir ${port_dir}/signalling)
-add_port(port-signalling ${signalling_dir} -DHARNESS)
-
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS
 # in QEMU (see harness/) and also need qemu-system-i386 and mtools. The

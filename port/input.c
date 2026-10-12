@@ -54,11 +54,7 @@
 
    Blank blanks the screen until a key is pressed or the mouse moved, and
    LeaveTm tells DOS and what runs beside it that the program is idle.
-
-   SigNew, SigWait and InpKey tell the tests where the program is (see
-   "Signals to the tests" in port/asm/VC.ASM): that it begins to look for
-   a key, that it has found none and waits, and that it has taken one. In
-   the build that is shipped the first two do nothing. */
+ */
 u32 Int16(u16 ax);
 u16 InpKey(void);
 u32 DosTime(void);
@@ -68,8 +64,6 @@ void TypMous(u16 look);
 u16 InWind(u16 place, u16 begin, u16 size);
 void Blank(void);
 void LeaveTm(void);
-void SigNew(void);
-void SigWait(void);
 #pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux InpKey  "*_a" __far value [ax] modify exact [ax]
 #pragma aux DosTime "*_a" __far value [dx ax] modify exact [ax cx dx]
@@ -79,8 +73,6 @@ void SigWait(void);
 #pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux Blank   "*_a" __far modify exact [es]
 #pragma aux LeaveTm "*_a" __far modify exact [ax es]
-#pragma aux SigNew  "*_a" __far modify exact [ax]
-#pragma aux SigWait "*_a" __far modify exact [ax]
 
 /* C routines of other files that vc.h does not have. */
 u16 HexDec(u16 number);                                 /* format.c */
@@ -130,7 +122,6 @@ u32 Input0(u16 bar)
     u16 *screen;
 
     bar &= 0xFF;
-    SigNew();
     if (HIGH(Int16(0x100)) == 0) {
         key = InpKey();
         goto Inpt41;
@@ -222,8 +213,7 @@ Inpt12:
                && HIGH(pair) >= (u16)(md.AutoTim >> 16))
             goto Inpt40;
     }
-    SigWait();                          /* Inpt31 */
-    Rnd();
+    Rnd();                              /* Inpt31 */
     if (HIGH(Int16(0x100)) == 0) {
         key = InpKey();
         goto Inpt40;

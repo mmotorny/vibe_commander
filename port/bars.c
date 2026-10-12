@@ -16,14 +16,9 @@
 
 /* Routines of the rest of the program that are still assembly, by their
    entries for C. Int16 calls the BIOS for the keyboard, with `ax` as INT
-   16h takes it, and returns AX as it comes back. SigKeys tells the tests
-   which of Shift, Ctrl and Alt the key bar is drawn for, 0 for none or no
-   bar: in the build that is shipped it does nothing (see "Signals to the
-   tests" in port/asm/VC.ASM). */
+   16h takes it, and returns AX as it comes back. */
 u32 Int16(u16 ax);
-void SigKeys(u16 keys);
 #pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux SigKeys "*_a" __far parm [ax] modify exact [ax]
 
 /* Which names the key bar shows: for each of the bars that the program
    has, and for none of Shift, Ctrl and Alt held, Shift, Ctrl and Alt, a
@@ -178,11 +173,9 @@ void PutKey(u16 bar)
 
     if (md.KeyBar == 0) {
         md.BarPrev = 0xFF;
-        SigKeys(0);
         return;
     }
     keys = (u16)Int16(0x200);
-    SigKeys(keys);
     PutKey0(bar, keys & 8 ? 3 : keys & 4 ? 2 : keys & 3 ? 1 : 0);
 }
 

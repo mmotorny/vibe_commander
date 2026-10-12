@@ -75,10 +75,6 @@ Things that are known and not done. Standing instructions are in
   of the text, moves the cursor back and says that nothing has changed,
   so the caller does not draw it. Whether a caller can leave the cursor
   there has not been looked into. Ported like that.
-- In the build that is shipped, three of the entries through which
-  `Input0` and `PutKey` signal to the tests are a far call of nothing,
-  once for every time the program goes round while it waits. They go
-  when the signals are C, or with the harness's need of them.
 
 - The Info panel says how much memory is free: what the part of the
   program that stays during a command leaves, or with Memory allocation

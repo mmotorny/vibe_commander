@@ -152,10 +152,9 @@ MASM-compatible assembler, at a pinned commit, builds it, and assembles
 second copy of both into `build/shareware-layout/`, with the room reserved
 that the byte comparison needs; only the tests use that copy.
 
-It then builds the port, `build/port/VC.EXE`, which is what the tests run,
-and next to it in `build/port/signalling/` a variant that they ran before
-and no longer do. What the compiler
-made of each C file is written out as a listing, `build/port/*.lst`. For this it fetches a pinned
+It then builds the port, `build/port/VC.EXE`, which is what the tests
+run. What the compiler made of each C file is written out as a listing,
+`build/port/*.lst`, and the assembler's listing is `build/port/VC.LST`. For this it fetches a pinned
 snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
 download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
 and ARM and for Windows on x86-64; the build has been run on Linux x86-64
@@ -235,9 +234,7 @@ The tests run the program that is shipped, as they run the original: a
 driver in the machine takes either through the scenarios (see [When a step
 is finished](#when-a-step-is-finished)). The driver also writes the
 program's stack out whenever a step ends, and the `port` test reports for
-every scenario how much of it the program never used. A variant assembled
-with `HARNESS` defined, which told the tests where it was, is still built
-in `build/port/signalling/` and no longer run.
+every scenario how much of it the program never used.
 
 The stack is where the port departs from the original in what it takes of
 the memory. The original has 256 bytes of it. Compiled code uses more
