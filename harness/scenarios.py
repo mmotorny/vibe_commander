@@ -2544,6 +2544,102 @@ SCENARIOS = {
             "Enter",
         )),
 
+    "menu-items": Scenario(
+        "The items of the menus that no other scenario chooses, each by "
+        "its letter: of the Files menu View, Edit, Copy, the three of a "
+        "selection, Make directory, Delete and Quit; the Commands menu "
+        "down to Swap panels; the key bar; and a panel read again and "
+        "switched off from its menu",
+        steps=(
+            "Down Down Down",             # readme.txt
+            "F9 f v",                     # View
+            "Esc",
+            "F9 f e",                     # Edit
+            "Esc",
+            "F9 f g",                     # Select group:
+            "Enter",                      # all six files
+            "F9 f c",                     # Copy, of what is selected,
+            '"src\\" Enter',              # which is selected no more
+            "F9 f s",                     # Restore selection
+            "F9 l r",                     # Re-read: nothing is selected,
+                                          # and the cursor is at the top
+            "F9 f g",
+            "Enter",
+            "F9 f n",                     # Unselect group
+            "Enter",
+            "F9 f m",                     # Make directory
+            '"new" Enter',
+            "F9 f d",                     # Delete, of that directory
+            "Enter",
+            "F9 f q",                     # Quit?
+            "Esc",
+            "Home Down",                  # DOCS
+            "F9 c d",                     # Directory sizes
+            "F9 c t",                     # Tree, in its box
+            "Esc",
+            "F9 c v",                     # Volume label
+            "Esc",
+            "F9 c i",                     # Memory info
+            "Esc",
+            "F9 c f",                     # Find file
+            "Esc",
+            "F9 c h",                     # History: no command yet
+            "Esc",
+            "F9 c e",                     # EGA lines: 50,
+            "F9 c e",                     # and 25 again
+            "F9 o k",                     # Key bar: off,
+            "F9 o k",                     # and on
+            "F9 r r",                     # Re-read, of the Info
+            "F9 c s",                     # Swap panels: files on the right
+            "F9 r o",                     # On/Off: the current panel off,
+                                          # and the Info the current one
+            "F9 r o",                     # and on
+            "F9 l r",                     # Re-read, of the Info on the left
+        )),
+
+    "menu-held": Scenario(
+        "The first eight items of the Files menu with Shift held, and "
+        "with Ctrl held, which are other commands: Help and the user "
+        "menu, the viewer, the editor, Rename, Make directory and Delete, "
+        "each asking for a name with Shift and taking the file under the "
+        "cursor with Ctrl",
+        steps=(
+            "Down Down Down",             # readme.txt
+            "F9 f Shift+Enter",           # Help
+            "Esc",
+            "Shift+F10 Down Shift+Enter",     # the main user menu
+            "Esc",
+            "Shift+F10 Down Shift+Enter",     # View...
+            "Esc",
+            "Shift+F10 Down Shift+Enter",     # Edit...
+            "Esc",
+            "Shift+F10 Down Down Shift+Enter",    # past Copy: Rename...,
+                                          # which offers no name: it goes
+                                          # by what the bar left in two
+                                          # registers
+            "Esc",
+            "Shift+F10 Down Shift+Enter",     # Make directory...
+            "Esc",
+            "Shift+F10 Down Shift+Enter",     # Delete...
+            "Esc",
+            "F9 f Ctrl+Enter",            # Help
+            "Esc",
+            "Shift+F10 Down Ctrl+Enter",  # the user menu
+            "Esc",
+            "Shift+F10 Down Ctrl+Enter",  # View, of readme.txt
+            "Esc",
+            "Shift+F10 Down Ctrl+Enter",  # Edit
+            "Esc",
+            "Ins Ins",                    # two files selected: readme.txt
+                                          # and hello.txt
+            "Shift+F10 Down Down Ctrl+Enter",     # Rename, of the one file
+            "Esc",                        # under the cursor, notes.doc
+            "Shift+F10 Down Ctrl+Enter",  # Make directory
+            "Esc",
+            "Shift+F10 Down Ctrl+Enter",  # Delete, of the one file
+            "Esc",
+        )),
+
     "phantom": Scenario(
         "The floppy drive under its second letter: a command of a "
         "panel's menu that has DOS go to a directory of A: asks for the "
