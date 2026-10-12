@@ -31,6 +31,24 @@ GEOMETRY = (64, 16, 63)
 # the commands it was given.
 BOOTED = b"BOOTED"
 
+# How the machine's clock runs: by the instructions the machine executes,
+# 2 to this power nanoseconds for each, 256. The clock of the BIOS and of
+# DOS, the timer's ticks and what the program waits for by them then go
+# by what the machine has done and not by how fast the host is or how
+# busy: a second of the machine is 3.9 million instructions, whenever they
+# are executed. Only a machine that is halted, as the bench's is while the
+# driver of the tests waits for its script, and as the BIOS is while it
+# waits for a disk, lets the host's time pass for its own.
+#
+# Smaller, and a tick of the timer is more instructions than the host has
+# time for: where the program waits for ticks, as it does five times for
+# every box that it opens, it would wait longer than by the host's clock.
+# Larger, and the minute in which a scenario may show the time of day
+# (see scenarios.py) is over before the scenarios are: at 10, the minute
+# is 59 million instructions, and directories that scenarios make have a
+# time of 12:01 where they should have 12:00.
+CLOCK_SHIFT = 8
+
 # How long the harness waits, in seconds, before it takes something for
 # stuck. These are for what hangs, and are long on purpose: a machine that
 # many tests share is slow, and must not look like one that hangs. A QEMU
@@ -234,6 +252,7 @@ class Machine:
             "qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", "16",
             "-nodefaults", "-vga", "std", "-display", "none", "-no-reboot",
             "-rtc", f"base={clock},clock=vm", "-boot", "a",
+            "-icount", f"shift={CLOCK_SHIFT}",
             "-serial", f"file:{self._serial}",
             "-qmp", f"unix:{control},server=on,wait=off",
             "-chardev", f"file,id=written,path={self._written}",

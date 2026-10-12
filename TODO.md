@@ -507,14 +507,6 @@ Things that are known and not done. Standing instructions are in
   a key over when the search comes to a named place, in the original and
   in the port alike: it would have to be told where that is in each, as
   it is told where `LeaveTm` is.
-- The machine's own clock runs with the host's while the machine runs,
-  however much of the processor the machine gets. What the program does
-  by its timer, following the cursor to a directory after 0.6 s or
-  telling a tap on Alt by three ticks, comes sooner in its work on a busy
-  host. No golden has been seen to change by that. Put off: QEMU can run
-  its clock by the instructions executed (`-icount`), so that the guest's
-  time no longer follows the host's. To be considered if timing shows up
-  as failures.
 - `cmake --build build -j4` failed once in a new checkout, "The object is
   zero length" for one C file. Building without `-j` works.
 - A run of the harness that is killed outright leaves its QEMU running,
@@ -718,13 +710,6 @@ pushed.
   BIOS and fits; 54% calls routines of ours that do; 18% calls them
   itself. 8 to 12 hours to build, for a quick check of a quarter of the
   code. Not recommended now.
-- QEMU's clock counted in instructions was tried with the resident
-  driver and by itself: `move` cost 9 processor seconds in place of 21 to 28
-  and still equalled its golden. It also takes the guest's clock off the
-  host's, which the scenarios with the clock on and the record of what
-  `delete` executes depend on today. At `shift=10` the guest passes its
-  first minute in some scenarios (12:01 for 12:00); at `shift=8` none
-  differed.
 
 ## What batches have lost time to
 

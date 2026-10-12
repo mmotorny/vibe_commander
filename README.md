@@ -359,8 +359,9 @@ letter beyond ASCII: Alt with the numeric keypad types nothing there.
 
 The program is set up as its distribution sets it up, with one exception:
 the clock in the corner of the screen is off. It would put the time of day
-on every screen, and the original takes longer to get through a scenario
-when a golden is derived than a build does when it is tested. No setup file
+on every screen, and the machine's time is counted in the instructions it
+executes (see below), of which the port takes more than the original to
+get through a scenario. No setup file
 is prepared for this. Whenever the harness sets up its machines, the
 original is started once, made to switch the clock off in its Options menu
 and to save its setup, and the `VC.INI` it writes is what every scenario
@@ -406,10 +407,20 @@ two of its variables, it is told in the script, which takes it from the
 program's file and the listing of its assembly. None of this is measured
 in time, and a busy computer makes a run slower, not different.
 
-Where time is what the program goes by, it is the machine's: with the
-clock on, when a golden is derived, the driver looks at the screen every
-time the program comes round, for more than a second of the BIOS's timer
-ticks, and writes out both states of what blinks.
+Where time is what the program goes by, it is the machine's, and the
+machine's clock is counted in the instructions that the machine executes,
+256 nanoseconds for each (QEMU's `-icount`): the timer's ticks, the time
+of day and the waits of the program come when the machine has done so
+much, not when the computer has had so long. Only while the machine is
+halted, waiting for a disk or for the script, does its clock follow the
+computer's. A scenario that shows the time of day still has to do so
+early, within the machine's first minute: the port and the original do
+not execute the same number of instructions, and their clocks drift
+apart by that.
+
+With the clock on, when a golden is derived, the driver looks at the
+screen every time the program comes round, for more than a second of the
+BIOS's timer ticks, and writes out both states of what blinks.
 
 Nothing waits without a limit. A program that hangs fails its scenario
 when the driver has written nothing for five minutes, with the screen it

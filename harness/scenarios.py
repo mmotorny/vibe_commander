@@ -572,12 +572,16 @@ is off, started in C:\\WORK. A scenario that wants something else arranges
 it with its first steps, the way a user would. It may end anywhere, with
 the program running or not.
 
-The machine's clock runs with the host's while the scenario runs, and
-runs on while the machine waits for the processor on a busy host. Nothing
-on the bench shows the time of day, so that does not matter. A scenario
-that does show it, by
-switching the clock on or by listing a file it has made, has to be done
-with that before the machine's first minute is over.
+The machine's clock is counted in the instructions that the machine
+executes, 256 nanoseconds for each (see CLOCK_SHIFT in dos.py): the same
+scenario comes to the same time of day whenever it is run and however
+busy the host is. But the port takes more instructions to do a thing than
+the original, so the two do not agree on the time for long. Nothing on
+the bench shows the time of day, so that does not matter. A scenario that
+does show it, by switching the clock on or by listing a file it has made,
+has to be done with that before the machine's first minute is over: DOS
+is booted some four seconds past noon, and `copy`, of 68 steps, ends 27
+seconds past it.
 """
 import tempfile
 from dataclasses import dataclass, field
