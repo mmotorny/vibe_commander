@@ -4257,6 +4257,32 @@ SCENARIOS = {
             "Enter",
         )),
 
+    "rename-keys": Scenario(
+        "What Rename with Shift offers behind a key of the cursor. It "
+        "offers the name under the cursor or the last target by two "
+        "registers that it has not set, and a key of the cursor goes "
+        "back to the main loop where neither is loaded again: they are "
+        "as moving the cursor left them, not both 0, and no name is "
+        "offered",
+        steps=(
+            "Down Down Down",             # onto readme.txt
+            "Shift+F6",                   # no name
+            "Esc",
+            "Up Shift+F6",                # nor behind Up,
+            "Esc",
+            "End Shift+F6",               # End,
+            "Esc",
+            "PgUp Shift+F6",              # PgUp, on ..
+            "Esc",
+            "Down Right Shift+F6",        # and Right, which moves nothing
+            "Esc",                        # in a list of one column
+            "Ins Shift+F6",               # Ins selects and goes down
+            "Esc",
+            "Home Down Down Tab",         # SRC; the Info the current panel,
+            "Down F6",                    # where Down does nothing: the
+            "Esc",                        # directory of the other panel
+        )),
+
     "copy-ask": Scenario(
         "What Copy and Rename ask before anything is copied: for the "
         "file under the cursor, for the selected ones, for a source "

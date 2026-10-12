@@ -44,10 +44,7 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST, CONST2
 ; They are compiled into a code segment of their own, which follows this
 ; one, and are called through the routines of the same names here. C code
 ; expects DS to point at the main data segment and may change ES.
-	EXTERN	F00_60_c:FAR, F00_00_c:FAR, F00_05_c:FAR
-	EXTERN	F01_00_c:FAR, F01_05_c:FAR, F02_00_c:FAR, F03_00_c:FAR
-	EXTERN	F04_00_c:FAR, F05_00_c:FAR, F06_00_c:FAR, F07_00_c:FAR
-	EXTERN	F08_00_c:FAR, F76_00_c:FAR, F76_01_c:FAR, F09_00_c:FAR
+	EXTERN	F76_00_c:FAR, F76_01_c:FAR, F09_00_c:FAR
 	EXTERN	F10_00_c:FAR, F78_00_c:FAR, F11_00_c:FAR, F12_00_c:FAR
 	EXTERN	F13_00_c:FAR, F14_00_c:FAR, F15_00_c:FAR, F16_00_c:FAR
 	EXTERN	F17_01_c:FAR, F79_00_c:FAR, F18_00_c:FAR, F20_00_c:FAR

@@ -17,35 +17,6 @@ CmdC	MACRO	Name
 	JMP	CmdEnd
 	ENDM
 
-; The mouse comes in here, from Func40 on in VC.ASM, with the numbers of
-; the cursor's entry in SI, of the first one shown in DI and of the last
-; one in DX, and with its buttons in BP.
-F00_60:	PUSH	AX			; Scroll & select
-	MOV	AX,DS
-	MOV	CX,BP
-	CallC	F00_60_c
-	JMP	CmdEnd
-F00_05:	PUSH	AX
-	MOV	AX,DS
-	MOV	CX,BP
-	CallC	F00_05_c
-	JMP	CmdEnd
-F01_05:	PUSH	AX
-	MOV	AX,DS
-	MOV	CX,BP
-	CallC	F01_05_c
-	JMP	CmdEnd
-
-F00_00:	CmdC	F00_00_c		; Up
-F01_00:	CmdC	F01_00_c		; Down
-F02_00:	CmdC	F02_00_c		; Left
-F03_00:	CmdC	F03_00_c		; Right
-F04_00:	CmdC	F04_00_c		; PgUp
-F05_00:	CmdC	F05_00_c		; PgDn
-F06_00:	CmdC	F06_00_c		; Home
-F07_00:	CmdC	F07_00_c		; End
-F08_00:	CmdC	F08_00_c		; Ins
-
 F76_00:	CmdC	F76_00_c		; Grey *
 F76_01:	CmdC	F76_01_c		; the same, from the menu
 F09_00:	CmdC	F09_00_c		; Grey +

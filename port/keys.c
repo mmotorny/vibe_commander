@@ -16,11 +16,9 @@
  */
 #include "vc.h"
 
-void F00_50(u16 panel, u16 cursor, u16 first);
 void F20_02(u16 panel);
 
-/* F00_50 and F20_02 are routines, which other files call too. */
-#pragma aux F00_50 "*_c" __far parm [ax] [si] [di] modify exact [ax]
+/* F20_02 is a routine, which other files call too, as F00_50 of vc.h. */
 #pragma aux F20_02 "*_c" __far parm [ax] modify exact [ax]
 
 /* What a command returns: where the program goes on, a NEXT_ of vc.h.
@@ -29,6 +27,11 @@ void F20_02(u16 panel);
    M06_00 the place in the menu bar that is lit meanwhile. M01_01 takes
    neither byte. */
 #define GO(where)                    ((u32)(where))
+
+/* What a routine leaves in BX and DX, for the keys of the cursor: they go
+   back to the loop where it does not load the two again, and Rename may
+   read them (see main.c). */
+#define LEFT(bx, dx) ((u32)(dx) << 16 | (u16)(bx))
 #define GO_PANEL(where, panel, byte) \
     ((u32)(panel) << 16 | (u16)((u16)(u8)(byte) << 8 | (where)))
 
@@ -122,14 +125,20 @@ static void PtFs00(u16 panel)
    BIOS scrolls them and only the new one is written.
 
    In the tree a cursor that has moved has the other panel follow it,
-   after a while: FlagCD. */
-void F00_50(u16 panel, u16 cursor, u16 first)
+   after a while: FlagCD.
+
+   Returns what the original leaves in BX and DX: the first entry shown
+   and the cursor's, as addresses, if nothing more was written than
+   those two; where the panel is and its size if all of it was; else the
+   place and the size of the line written last, which is one that the
+   BIOS has scrolled in, or the status line. DX is never 0. */
+u32 F00_50(u16 panel, u16 cursor, u16 first)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     u32 was = ChgAdr(panel, cursor, first);
     u16 was_cursor = (u16)was;
     u16 was_first = (u16)(was >> 16);
-    u32 now, window;
+    u32 now, window, left;
     u16 step, moved, how, begin, corner, bottom;
 
     CorPar(panel);
@@ -153,11 +162,13 @@ void F00_50(u16 panel, u16 cursor, u16 first)
             how = 6;                    /* and up */
         else {
             PtFs00(panel);
-            Window(BegBX(panel), SizDX());
-            return;
+            left = LEFT(BegBX(panel), SizDX());
+            Window((u16)left, (u16)(left >> 16));
+            return left;
         }
     } else if (was_cursor == cursor)
-        return;
+        return LEFT(first, cursor);
+    left = LEFT(first, cursor);
 
     /* The cursor goes from where it was, on the screen as it is. */
     now = ChgAdr(panel, was_cursor, was_first);
@@ -184,37 +195,45 @@ void F00_50(u16 panel, u16 cursor, u16 first)
         if (how != 7)
             corner = (u16)window & 0xFF00 | corner & 0xFF;
         Window(corner, 0x126);
+        left = LEFT(corner, 0x126);
     }
     SetCur(panel, 1);
     if ((wcb->WinTyp | md.MiniSta) == 0)
-        return;
+        return left;
     /* The status line. */
-    begin = BegBX(panel);
-    Window(begin + (SizDX() & 0xFF00) - 0x200 + 1, 0x126);
+    begin = BegBX(panel) + (SizDX() & 0xFF00) - 0x200 + 1;
+    Window(begin, 0x126);
+    return LEFT(begin, 0x126);
 }
 
 /* Show a file selected or not, and the status line, which counts what is
-   selected. */
-static void F08_10(u16 panel)
+   selected. Where the status line is written, its place and its size are
+   what the original has in BX and DX afterwards, and go into `r`. */
+static void F08_10(u16 panel, struct Regs STACK *r)
 {
     SetCur(panel, 1);
     if (md.MiniSta == 0)
         return;
     PtFs00(panel);
-    Window(BegBX(panel) + (SizDX() & 0xFF00) - 0x200 + 1, 0x126);
+    r->bx = BegBX(panel) + (SizDX() & 0xFF00) - 0x200 + 1;
+    r->dx = 0x126;
+    Window(r->bx, r->dx);
 }
 
 /* The cursor to the entry with the number `cursor`, and `first` the first
-   one shown. */
-static void F00_70(u16 panel, u16 cursor, u16 first)
+   one shown: with BX and DX as F00_50 leaves them. */
+static void F00_70(u16 panel, u16 cursor, u16 first, struct Regs STACK *r)
 {
-    F00_50(panel, NumAdr(panel, cursor), NumAdr(panel, first));
+    u32 left = F00_50(panel, NumAdr(panel, cursor), NumAdr(panel, first));
+
+    r->bx = (u16)left;
+    r->dx = (u16)(left >> 16);
 }
 
 /* The same for Up and Down, and for the mouse, whose buttons are in
    `buttons`: with the right one held it selects the files it passes
    over, or unselects them if the first of them was selected. */
-u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons)
+u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;
@@ -235,12 +254,12 @@ u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons)
                 attributes |= ATTR_SELECTED;
             if (attributes != file->AttrF) {
                 file->AttrF = attributes;
-                F08_10(panel);
+                F08_10(panel, r);
             }
         }
     } else
         md.WinMous &= MOUSE_HELD;
-    F00_70(panel, cursor, first);
+    F00_70(panel, cursor, first, r);
     return GO(NEXT_FUNC07);
 }
 
@@ -269,14 +288,14 @@ static u16 F03_30(u16 number, u16 more, u16 last)
 
 /* Up, and the mouse held above the entries: F00_05, which has the place
    of the cursor already. With the panels off Up is the command before. */
-u32 F00_05(u16 panel, u16 cursor, u16 first, u16 buttons)
+u32 F00_05(u16 panel, u16 cursor, u16 first, u16 buttons, struct Regs STACK *r)
 {
     if (cursor != 0)
         cursor--;
-    return F00_60(panel, cursor, first, buttons);
+    return F00_60(panel, cursor, first, buttons, r);
 }
 
-u32 F00_00(u16 panel)
+u32 F00_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
@@ -286,40 +305,41 @@ u32 F00_00(u16 panel)
     if (wcb->WinTyp > 1)
         return GO(NEXT_FUNC07);
     AdrNum(panel, (struct Place STACK *)&place);
-    return F00_05(panel, place.cursor, place.first, 0);
+    return F00_05(panel, place.cursor, place.first, 0, r);
 }
 
 /* Down, and the mouse held below the entries: F01_05. With the panels
    off Down is the command after. */
-u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons)
+u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons,
+           struct Regs STACK *r)
 {
     if (cursor < last)
         cursor++;
-    return F00_60(panel, cursor, first, buttons);
+    return F00_60(panel, cursor, first, buttons, r);
 }
 
 /* F01_01, where Ins goes on to. */
-static u32 F01_01(u16 panel)
+static u32 F01_01(u16 panel, struct Regs STACK *r)
 {
     struct Place place;
 
     if (PANEL(panel)->WinTyp > 1)
         return GO(NEXT_FUNC07);
     AdrNum(panel, (struct Place STACK *)&place);
-    return F01_05(panel, place.cursor, place.first, place.last, 0);
+    return F01_05(panel, place.cursor, place.first, place.last, 0, r);
 }
 
-u32 F01_00(u16 panel)
+u32 F01_00(u16 panel, struct Regs STACK *r)
 {
     if (PANEL(panel)->Visible == 0)
         return GO(NEXT_LATER);
-    return F01_01(panel);
+    return F01_01(panel, r);
 }
 
 /* Left and Right, in a panel of files in brief: a column back and on. In
    any other panel, and with the panels off, they are keys of the command
    line. */
-u32 F02_00(u16 panel)
+u32 F02_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
@@ -341,11 +361,11 @@ u32 F02_00(u16 panel)
         else
             cursor = first = 0;
     }
-    F00_70(panel, cursor, first);
+    F00_70(panel, cursor, first, r);
     return GO(NEXT_FUNC07);
 }
 
-u32 F03_00(u16 panel)
+u32 F03_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
@@ -366,12 +386,12 @@ u32 F03_00(u16 panel)
             && first != 0)
             cursor = first = place.last;
     }
-    F00_70(panel, cursor, first);
+    F00_70(panel, cursor, first, r);
     return GO(NEXT_FUNC07);
 }
 
 /* PgUp and PgDn. */
-u32 F04_00(u16 panel)
+u32 F04_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
@@ -389,11 +409,11 @@ u32 F04_00(u16 panel)
         if ((u16)(page + first) < cursor)
             cursor = page + first;
     }
-    F00_70(panel, cursor, first);
+    F00_70(panel, cursor, first, r);
     return GO(NEXT_FUNC07);
 }
 
-u32 F05_00(u16 panel)
+u32 F05_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
@@ -411,23 +431,23 @@ u32 F05_00(u16 panel)
         cursor = first = place.last;    /* nowhere to move to: the end */
     else if (first > cursor)
         cursor = first;
-    F00_70(panel, cursor, first);
+    F00_70(panel, cursor, first, r);
     return GO(NEXT_FUNC07);
 }
 
 /* Home and End. With the panels off, and in the Info, they are keys of
    the command line. */
-u32 F06_00(u16 panel)
+u32 F06_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
         return GO(NEXT_INPUT);
-    F00_70(panel, 0, 0);
+    F00_70(panel, 0, 0, r);
     return GO(NEXT_FUNC07);
 }
 
-u32 F07_00(u16 panel)
+u32 F07_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
@@ -435,14 +455,14 @@ u32 F07_00(u16 panel)
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
         return GO(NEXT_INPUT);
     AdrNum(panel, (struct Place STACK *)&place);
-    F00_70(panel, place.last, place.last);
+    F00_70(panel, place.last, place.last, r);
     return GO(NEXT_FUNC07);
 }
 
 /* Ins: select the file under the cursor, or unselect it, and go down a
    line if Ins is set up to. The BIOS is told that the key is up again
    then, unless the cursor is on the last file. */
-u32 F08_00(u16 panel)
+u32 F08_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;
@@ -459,10 +479,10 @@ u32 F08_00(u16 panel)
     file = ENTRY(wcb, address);
     if (file->NameF[0] != '.')
         file->AttrF ^= ATTR_SELECTED;
-    F08_10(panel);
+    F08_10(panel, r);
     if (md.InsDwn == 0)
         return GO(NEXT_FUNC07);
-    return F01_01(panel);
+    return F01_01(panel, r);
 }
 
 /* Ask for a mask and select, unselect or turn round the files like it,

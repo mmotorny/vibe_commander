@@ -641,23 +641,41 @@ enum {
 #define GO_DONE     4                   /* FncExt: the panels drawn anew
                                            if something was written */
 
+/* The registers that go round the main loop: what a command finds in
+   them, as the loop and the command before have left them, and what it
+   leaves there in its turn. A command is handed what it reads of them.
+   One that leaves something which another may read gets them all, to
+   put it there: see main.c for what is read. */
+struct Regs {
+    u16 ax, bx, cx, dx, si, di, bp;
+    u16 ds;                             /* the current panel */
+};
+
 /* The keys of the panels, keys.c: `panel` is the current panel. F00_60,
    F00_05 and F01_05 are where the mouse comes in, with the numbers of the
    cursor's entry, of the first one shown and of the last one there is,
    and with its buttons; F76_01 and F17_01 where the menus do, F17_01 with
-   the panel of the menu. */
-u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons);
-u32 F00_00(u16 panel);
-u32 F00_05(u16 panel, u16 cursor, u16 first, u16 buttons);
-u32 F01_00(u16 panel);
-u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons);
-u32 F02_00(u16 panel);
-u32 F03_00(u16 panel);
-u32 F04_00(u16 panel);
-u32 F05_00(u16 panel);
-u32 F06_00(u16 panel);
-u32 F07_00(u16 panel);
-u32 F08_00(u16 panel);
+   the panel of the menu. The keys of the cursor leave BX and DX in `r`
+   as the original has them when it goes back to the loop: F00_50, which
+   moves the cursor and which the speed search calls too, returns what it
+   leaves in the two, BX in the low word. */
+u32 F00_50(u16 panel, u16 cursor, u16 first);
+#pragma aux F00_50 "*_c" __far parm [ax] [si] [di] value [dx ax] modify exact [ax dx]
+u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons,
+           struct Regs STACK *r);
+u32 F00_00(u16 panel, struct Regs STACK *r);
+u32 F00_05(u16 panel, u16 cursor, u16 first, u16 buttons,
+           struct Regs STACK *r);
+u32 F01_00(u16 panel, struct Regs STACK *r);
+u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons,
+           struct Regs STACK *r);
+u32 F02_00(u16 panel, struct Regs STACK *r);
+u32 F03_00(u16 panel, struct Regs STACK *r);
+u32 F04_00(u16 panel, struct Regs STACK *r);
+u32 F05_00(u16 panel, struct Regs STACK *r);
+u32 F06_00(u16 panel, struct Regs STACK *r);
+u32 F07_00(u16 panel, struct Regs STACK *r);
+u32 F08_00(u16 panel, struct Regs STACK *r);
 u32 F76_00(u16 panel);
 u32 F76_01(u16 panel);
 u32 F09_00(u16 panel);
@@ -673,18 +691,18 @@ u32 F17_01(u16 panel);
 u32 F79_00(u16 panel);
 u32 F18_00(u16 panel);
 u32 F20_00(u16 panel);
-#pragma aux F00_60 "*_c" __far parm [ax] [si] [di] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux F00_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F00_05 "*_c" __far parm [ax] [si] [di] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux F01_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F01_05 "*_c" __far parm [ax] [si] [di] [dx] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux F02_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F03_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F04_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F05_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F06_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F07_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F08_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F00_60 "*_c" __far parm [ax] [si] [di] [cx] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F00_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F00_05 "*_c" __far parm [ax] [si] [di] [cx] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F01_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F01_05 "*_c" __far parm [ax] [si] [di] [dx] [cx] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F02_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F03_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F04_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F05_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F06_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F07_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
+#pragma aux F08_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
 #pragma aux F76_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux F76_01 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux F09_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]

@@ -36,12 +36,8 @@
  */
 #include "vc.h"
 
-/* The registers that go round the loop, as the stub pushes them. */
-struct Regs {
-    u16 ax, bx, cx, dx, si, di, bp;
-    u16 ds;                             /* the panel that commands take */
-};
-
+/* The registers that go round the loop are struct Regs of vc.h: the stub
+   of the loop pushes them so. */
 u16 MainLoop(u16 entry, struct Regs STACK *r);
 static u16 CmdEnd(u32 answer, struct Regs STACK *r);
 u16 ErrRdy(u16 letter);
@@ -984,9 +980,9 @@ static u16 MnuEnd(u16 answer, struct Regs STACK *r)
 /* After a command of the keys of the panels, of keys.c, enter.c and
    view.c: CmdEnd. `r->ax` is the key still, for the command line.
 
-   BX and DX at Func07, the one place of the loop where the next command
-   gets them as this one leaves them: both 0, as the stub of the assembly
-   had them that this is made of. */
+   Func07 is the one place of the loop where the next command gets BX and
+   DX as this one leaves them. Only the keys of the cursor go there, and
+   they have put into `r` what the original leaves in the two. */
 static u16 CmdEnd(u32 answer, struct Regs STACK *r)
 {
     u16 byte = (u16)answer >> 8;
@@ -994,8 +990,6 @@ static u16 CmdEnd(u32 answer, struct Regs STACK *r)
 
     switch ((u8)answer) {
     case NEXT_FUNC07:
-        r->bx = 0;
-        r->dx = 0;
         return FUNC07;
     case NEXT_FUNC05:
     case NEXT_POP_FUNC05:
@@ -1139,20 +1133,20 @@ static u16 Command(u16 command, struct Regs STACK *r)
 
     /* The keys of the panels, keys.c. The mouse has its buttons in BP. */
     case TO_F00_60:
-        return CmdEnd(F00_60(panel, r->si, r->di, r->bp), r);
+        return CmdEnd(F00_60(panel, r->si, r->di, r->bp, r), r);
     case TO_F00_05:
-        return CmdEnd(F00_05(panel, r->si, r->di, r->bp), r);
+        return CmdEnd(F00_05(panel, r->si, r->di, r->bp, r), r);
     case TO_F01_05:
-        return CmdEnd(F01_05(panel, r->si, r->di, r->dx, r->bp), r);
-    case TO_F00_00: return CmdEnd(F00_00(panel), r);
-    case TO_F01_00: return CmdEnd(F01_00(panel), r);
-    case TO_F02_00: return CmdEnd(F02_00(panel), r);
-    case TO_F03_00: return CmdEnd(F03_00(panel), r);
-    case TO_F04_00: return CmdEnd(F04_00(panel), r);
-    case TO_F05_00: return CmdEnd(F05_00(panel), r);
-    case TO_F06_00: return CmdEnd(F06_00(panel), r);
-    case TO_F07_00: return CmdEnd(F07_00(panel), r);
-    case TO_F08_00: return CmdEnd(F08_00(panel), r);
+        return CmdEnd(F01_05(panel, r->si, r->di, r->dx, r->bp, r), r);
+    case TO_F00_00: return CmdEnd(F00_00(panel, r), r);
+    case TO_F01_00: return CmdEnd(F01_00(panel, r), r);
+    case TO_F02_00: return CmdEnd(F02_00(panel, r), r);
+    case TO_F03_00: return CmdEnd(F03_00(panel, r), r);
+    case TO_F04_00: return CmdEnd(F04_00(panel, r), r);
+    case TO_F05_00: return CmdEnd(F05_00(panel, r), r);
+    case TO_F06_00: return CmdEnd(F06_00(panel, r), r);
+    case TO_F07_00: return CmdEnd(F07_00(panel, r), r);
+    case TO_F08_00: return CmdEnd(F08_00(panel, r), r);
     case TO_F09_00: return CmdEnd(F09_00(panel), r);
     case TO_F10_00: return CmdEnd(F10_00(panel), r);
     case TO_F76_00: return CmdEnd(F76_00(panel), r);

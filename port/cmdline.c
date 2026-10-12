@@ -46,11 +46,9 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 u32 TotSel(u16 panel);                                  /* files.c */
 u16 F32_70(u16 begin, u16 size);                        /* usermenu.c */
-void F00_50(u16 panel, u16 cursor, u16 first);          /* keys.c */
 #pragma aux MvsBw  "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
 #pragma aux TotSel "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux F32_70 "*_c" __far parm [bx] [dx] value [ax] modify exact [ax]
-#pragma aux F00_50 "*_c" __far parm [ax] [si] [di] modify exact [ax]
 
 /* The mask that stands behind the name of a directory in the command
    line: the assembly's, which other C code has too. */

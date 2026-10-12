@@ -862,13 +862,18 @@ them. The copy may be in another file than the text: `User_S` of
   as a number: `ClsLine` has the segment as an argument, MAIN_SEG for
   the main data, and its stub hands over DS. `Run_00` leaves DS on the
   panel when the commands have no room for a name, and passes that.
-- What a command leaves in DX and BP goes round the main loop to the
-  next command, and a command that is C does not leave what the
-  assembly left there. BX does not get round: `Func05` loads it, but
-  for the first time round after the program has started or come back
-  from a command of DOS, when it is what the start left. So Shift-F6,
-  which goes by BX and DX together, does not find both 0 because of
-  what a command left in DX.
+- What a command leaves in the registers goes round the main loop to
+  the next command, and a command that is C does not leave what the
+  assembly left there. `Func05` loads BX, so a command that comes back
+  to the loop there or before leaves nothing in BX and DX that
+  Shift-F6, which goes by the two together, could tell. But the keys
+  of the cursor come back at `Func07`, behind it, and their stub left
+  both 0 where the original leaves an address or a size in DX: Rename
+  behind Down offered a name that the original does not offer, and no
+  scenario had the two keys one behind the other. Where a register
+  goes round, look at every place that the code comes back to, not at
+  the one that most commands use. The cursor's keys put what the
+  original leaves into `struct Regs` of `port/vc.h` now.
 - Code that ends in a jump by a table, as the menu bar jumps to the
   command of the item chosen, leaves the table and the jump in its stub:
   the C function returns what was chosen and which table has it, and the

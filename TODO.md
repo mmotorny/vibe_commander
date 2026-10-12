@@ -743,9 +743,14 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   - Shift-F6, and F6 with the panels off or the Info active, offer the
     name of the file under the cursor or the last target according to
     BX and DX, which hold the numbers of selected files only where F5
-    and F6 have counted them: there they are what the key left. The
-    stub hands them on as they are. In `copy-ask`, where either way
-    shows the same.
+    and F6 have counted them: there they are what the command before
+    left, and the name is offered if both are 0. The main loop hands
+    them on as the original has them (see `port/main.c`). They are not
+    both 0 behind any command that was found: the loop loads BX with
+    an address where a command comes back to it, and the keys of the
+    cursor, which come back behind that place, leave an address or a
+    size in DX. So the name is never offered, which `rename-keys` and
+    `copy-ask` show.
 - The map of the memory, Alt+F5, names the program by its file: VC.COM
   in the original and VC.EXE in the port. `harness/deviations.py` has
   the golden expect VC.EXE there, as it does where the program cannot
@@ -1140,16 +1145,24 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     not leave. No scenario has commands that long.
   - The speed search hands `Input` the column of its cursor for the key
     bar to show. The key bar is off while it runs.
-- What a command leaves in DX and BP reaches the next command through
-  the main loop, and a command that is C leaves other values there than
-  the assembly did. One reader is known, Shift-F6, which goes by BX and
-  DX together; BX is an address that `Func05` loads, not 0, whenever a
-  command has run since the program started or came back from DOS, so
-  DX decides nothing then. The commands of the table of keys were
-  scanned for another, up to their first call or jump, and none was
-  found; what the routines they call read was not followed. After the
-  speed search, which goes on without `Func05`, the stub hands on BX,
-  DX, SI and CX as the assembly left them.
+- What a command leaves in the registers reaches the next command
+  through the main loop, and a command that is C leaves other values
+  there than the assembly did. What is read of it is at the top of
+  `port/main.c`, found by reading every stub when the loop came to call
+  the commands: the mouse's commands, the key for the command line, CX
+  by EGA lines, and BX and DX by Rename and Copy where they do not
+  count what is selected. For the last the port was wrong until then,
+  and no scenario showed it. The note here said that `Func05` loads BX
+  with an address whenever a command has run, so that DX decides
+  nothing. That holds for a command that comes back to the loop at
+  `Func05` or before, and the keys of the cursor come back at `Func07`,
+  behind it: their stub left 0 in BX and in DX, where the original
+  leaves what moving the cursor made of them, an address or a size in
+  DX. So Shift-F6 behind Down offered the name of the file under the
+  cursor, and the original offers none. The cursor's keys leave both as
+  the original does now, in `struct Regs`, and `rename-keys` holds it.
+  After the speed search, which goes on without `Func05` too, the loop
+  hands on BX, DX, SI and CX as the assembly left them.
 - What the program does by the hundredths of the time of day is the
   same every time a scenario is run with the same program, but need not
   be the same in the port, which gets to a step some instructions later
