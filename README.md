@@ -122,9 +122,14 @@ finding what an extension file says for a file. The screen blanker is
 still assembly, and so is drawing the frame of a box.
 The pull-down menus of the menu bar are C as well: the five menus with
 their ticks and the items that cannot be chosen as things are, and the
-keys and the mouse that the bar takes until an item is chosen. The
-commands that the items stand for, in the same file of the source, are
-still assembly.
+keys and the mouse that the bar takes until an item is chosen. So are
+the commands that the items stand for, in the same file of the source:
+the kind of a panel, its order and its filter, a panel switched off and
+on, the tree in a box to go to a directory, the sizes of directories,
+the screen with as many lines as an EGA or a VGA has, two directories
+compared, the configuration and the advanced options, the menu file and
+the extension files opened in the editor, the switches of the Options
+menu, and the setup saved.
 
 ## Layout
 

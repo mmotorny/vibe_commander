@@ -580,6 +580,46 @@ out again (show.py --changes is how):
     with that key. The program asks for Shift and Ctrl after it has
     taken the Enter, and the harness holds them for 20 ms for the port:
     it worked when tried, and is in no scenario.
+  - Ctrl+c, "F9 c c", compares the directories of two panels of files
+    and selects in each what the other has not or has older, by date
+    and time; with nothing to select a box says that they are the
+    same, and next to the Info the item is dark and the key does
+    nothing. Files are listed in small letters and directories in
+    capitals, and the names are compared as they are listed: a file
+    and a directory are of one name only where it has no letter, a
+    directory "1", F7, and a file "1", F5 and "src\\1". Ctrl+a with five
+    Tabs and a time, or four and a date, makes a file newer than its
+    copy.
+  - "F9 c m" is Menu file edit, and "F9 o x", "F9 o v" and "F9 o e"
+    are the three extension files: a box asks which, Enter for the
+    main one, in D:\\VC, "Right Enter" for that of the current
+    directory, which is a new file if there is none, and Esc or the
+    third button for neither. The editor opens, and Esc leaves it.
+  - Shift+F9, "F9 o s", asks whether to save the setup, and Enter
+    writes D:\\VC\\VC.INI. The command 'a:\\freedos\\bin\\attrib +r
+    d:\\vc\\vc.ini' makes that file read-only without a panel showing
+    its directory: saving then ends in a box, with a beep that scrolls
+    the screen.
+  - With the panels off, Ctrl+o, Alt+F9 leaves the command line on its
+    row in 50 lines, and Alt+F9 again finds it too far down for 25 and
+    puts it on the second row. With panels it is below them, and
+    moves up with what is shown.
+  - The floppy drive under its second letter: 'Shift+F8 "b:*.zzz"
+    Enter' brings up "Insert diskette for drive B:", and Enter there
+    has DOS take the drive for B: from then on. Whatever goes to A:
+    afterwards asks for its diskette first, and Esc refuses: that is
+    how a command finds a drive that it cannot go to. A panel that
+    shows A: is read again at once, so the question comes up as soon
+    as the first is answered; Esc, and Esc again for the box that
+    says the disk cannot be read, leave the panel empty. Enter at any
+    such box makes the drive A: again.
+  - A directory that a panel has, and that is gone when the panel is
+    made one of files again: go into it, Ctrl+l for files on the
+    right, "F9 l i" for the Info on the left, which leaves DOS in the
+    other panel's directory, and remove it by a command, "rd" Space
+    "work\\docs". Do not have the Info in both panels for it: a row
+    then has "Bytes Free" twice, and the second number is compared.
+  - Drive... of a panel's menu, "F9 l d", is the box of Alt+F1.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -1732,6 +1772,119 @@ SCENARIOS = {
             "Esc Tab Ctrl+p",             # the left panel off
             "F9 c",                       # no comparing
             "Esc",
+        )),
+
+    "menu-panel": Scenario(
+        "The commands of a panel's menu where they have something to "
+        "mend: a panel made one of files whose directory is gone, the "
+        "filter by its key, the drive from the menu, a panel switched on "
+        "while the current one is off, and 50 lines left with the command "
+        "line high up",
+        steps=(
+            "Down Enter",                 # the left panel in C:\\WORK\\DOCS
+            "Ctrl+l",                     # files on the right, in C:\\
+            "F9 l i",                     # the Info on the left: DOS goes
+                                          # where the other panel is
+            '"rd" Space "work\\docs" Enter',  # the directory that the
+                                          # left panel had is gone
+            "F9 l b",                     # files again: where DOS is
+            "Ctrl+f",                     # the filter, by its key
+            "Esc",
+            "F9 l d",                     # the drive, from the menu
+            "Esc",
+            "F9 r d",                     # and that of the right panel,
+            "a",                          # which shows files then
+            "Ctrl+F2",                    # the right panel off,
+            "Ctrl+F1",                    # and the left one, the current
+            "Ctrl+F2",                    # the right one on, and current
+            "Ctrl+F1",
+            "Ctrl+o",                     # no panels: the command line
+            "Alt+F9",                     # stays where it is in 50 lines,
+            "Alt+F9",                     # and is too far down for 25
+            "Ctrl+o",
+        )),
+
+    "compare": Scenario(
+        "Two directories compared: a file that the other has not, one "
+        "that is newer by its time and one by its date, one that is a "
+        "directory there, and two directories that are the same",
+        steps=(
+            "Ctrl+c",                     # not with the Info next to it
+            'F7 "1" Enter',               # a directory named 1
+            'Home Down Down Down F5 "src\\" Enter',  # readme.txt into SRC,
+            'F5 "src\\1" Enter',           # and again as a file named 1
+            'Down F5 "src\\" Enter',       # hello.txt, and here an hour
+            'Ctrl+a Tab Tab Tab Tab Tab "1:00:00p" Enter',     # later
+            'Down F5 "src\\" Enter',       # notes.doc, and here a day
+            'Ctrl+a Tab Tab Tab Tab "6-17-00" Enter',          # later
+            "Ctrl+l",                     # two panels of files
+            "Tab Enter",                  # both in C:\\WORK
+            "Tab Ctrl+c",                 # the same: a box says so
+            "Enter",
+            "Tab Down Down Enter",        # the right one in SRC
+            "F9 c c",                     # five files here that are not
+                                          # there or are newer, and one
+                                          # there that is a directory here
+            "Tab",
+            "Ctrl+o Ctrl+c",              # not without panels
+            "Ctrl+o",
+        )),
+
+    "menu-files": Scenario(
+        "The menu file and the extension files edited from the menus, "
+        "the main ones and those of a directory, and the setup saved, "
+        "also where its file cannot be written",
+        steps=(
+            "F9 c m",                     # the menu file: which one?
+            "Esc",
+            "F9 c m",
+            "Enter",                      # the main one, in the editor
+            "Esc",
+            "F9 c m",
+            "Right Enter",                # that of the directory: none yet
+            "Esc",
+            "F9 o x",                     # the extension file
+            "Enter",
+            "Esc",
+            "F9 o v",                     # that of the viewers,
+            "Right Enter",                # of the directory
+            "Esc",
+            "F9 o e",                     # that of the editors:
+            "Right Right Enter",          # not after all
+            "F9 o e",
+            "Enter",
+            "Esc",
+            "F9 o p",                     # the prompt without its path
+            "Shift+F9",                   # save the setup?
+            "Esc",
+            "Shift+F9 Enter",             # saved
+            '"a:\\freedos\\bin\\attrib" Space "+r" Space "d:\\vc\\vc.ini" '
+            'Enter',                      # its file read-only
+            "F9 o s",
+            "Enter",                      # not saved: a box says so
+            "Enter",
+        )),
+
+    "phantom": Scenario(
+        "The floppy drive under its second letter: a command of a "
+        "panel's menu that has DOS go to a directory of A: asks for the "
+        "diskette, and does nothing when that is refused",
+        steps=(
+            "Alt+F2 a",                   # the right panel on A:
+            'Shift+F8 "b:*.zzz" Enter',   # delete nothing on B: the
+            "Enter",                      # diskette is B: now, and A: is
+                                          # asked for to read the panel
+            "Esc",                        # no: the disk cannot be read
+            "Esc",                        # and is not
+            "F9 l t",                     # the tree on the left: DOS is
+                                          # to go where the other panel is
+            "Esc",                        # no: no tree
+            "F9 r i",                     # the Info on the right,
+            "Tab",                        # current,
+            "F9 r b",                     # and files again: in A:\\
+            "Esc",                        # no: the Info stays
+            "F9 r b",
+            "Enter",                      # yes
         )),
 
     "memory-map": Scenario(

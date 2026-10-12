@@ -332,6 +332,41 @@ BATCHES = [
         },
     ),
     Batch(
+        title="The commands of the menus: the kind of a panel, its order "
+              "and its filter, the tree in a box, the sizes of "
+              "directories, EGA lines, two directories compared, the "
+              "configuration, the files to edit and the setup saved",
+        source="commands.c",
+        # Four stretches of code that is no procedure, with the three
+        # procedures between them: M01_00 with M01_01; M03_00 with M06_00,
+        # M08_00, M16_00 and M16_10; M21_00 with M41_00, M42_00, F69_00
+        # and M49_00; and M60_00 with the commands of the Options menu
+        # down to M75_00, and on into the commands that VCF1.INC begins
+        # with, which are listed with their own batch as F37_00.
+        routines=("M01_00", "M02_10", "M03_00", "M16_20", "M21_00",
+                  "M49_10", "M60_00"),
+        functions=("M01_00_c", "M01_01_c", "M03_00_c", "M06_00_c",
+                   "M06_10_c", "M08_00_c", "M16_00_c", "M16_01_c",
+                   "M16_10_c", "M21_00_c", "M41_00_c", "M42_00_c",
+                   "F69_00_c", "M49_00_c", "M60_00_c", "M61_00_c",
+                   "M53_00_c", "M62_00_c", "M63_00_c", "M64_00_c",
+                   "M66_00_c", "M67_00_c", "M69_00_c", "M70_00_c",
+                   "M71_00_c", "M72_00_c", "M73_00_c", "M75_00_c"),
+        unreached={
+            0x3105: "M03_00, for a panel that is to show neither the tree "
+                    "nor the Info: the menu comes with the third and the "
+                    "fourth item, and the keys with a kind that is not 0, "
+                    "but for ^R in a tree if DOS answered that it wrote "
+                    "none of the one byte to the tree's file, which it "
+                    "does not do to a file that it has read",
+            0x32B2: "F69_00, for a display that is neither EGA nor VGA: "
+                    "the bench has a VGA",
+            0x3373: "F69_00, for the pointer of the mouse below the 25th "
+                    "row when a screen of 50 lines gets 25 again: a step "
+                    "of the mouse names a place among the first 25 rows",
+        },
+    ),
+    Batch(
         title="Reading what a panel shows: the files of a directory, and "
               "for the Info the disk, its label and the text of dirinfo",
         source="read.c",
@@ -352,11 +387,6 @@ BATCHES = [
                 "to when that of the panel is gone: DOS answers for "
                 "every drive that it has, and the program offers no "
                 "other"),
-            **dict.fromkeys(
-                (0xB988, 0xB989, 0xB98B, 0xB98C),
-                "ReDir, for a directory that cannot be read at all: the "
-                "disks of the bench are always ready, and it has no "
-                "second floppy drive to be asked for"),
             0xB9E9: "ReDir, for more files than a panel has room for: "
                     "2700 of them, where a step makes one",
             0xBA61: "ReDir, for a drive that is not ready when the "

@@ -121,7 +121,7 @@ file(GLOB port_c CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR}/port
 # there, or the linker says that it cannot reach them. A segment holds
 # F000h bytes, not 64K: tools/mkexe.c says why, and stops the build when
 # one is fuller. Name another file here then.
-set(port_c_second keys.c memory.c menu.c view.c)
+set(port_c_second commands.c keys.c memory.c menu.c view.c)
 list(TRANSFORM port_asm PREPEND ${CMAKE_SOURCE_DIR}/port/asm/)
 
 # mkexe turns the linker's output into the program that is run.

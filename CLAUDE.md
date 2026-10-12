@@ -593,6 +593,33 @@ port.
   and the offset of an object there like any other of the assembly.
 - A command that is C whole and ends at `Func04` is a stub of two
   lines: `CallC` and the jump. See `F65_00`.
+- A label that gets a stub takes what the stub takes, and whatever
+  jumps to the label has to bring that: a table too, not only `JMP` and
+  `CALL`. Drive... of a panel's menu went by the bar's table to `F62_01`
+  with the panel in DS and the menu in CL, as the original has it, after
+  the stub there had come to take them in AX and DX: the box came up for
+  a panel that was none, and no scenario chose the item. When a stub
+  changes what a label takes, look for the label in every table of
+  `port/asm/`, and have a scenario come in by each.
+- A command that finds a register pushed for it and takes it off on
+  every way out has a stub that takes it off: `PanC` and `PanEnd` in
+  `VCMENU.INC`, for the commands of a panel's menu, which find the
+  current panel on the stack. Where the assembly popped it to use it,
+  the C needs to know what it was: there `WCBcrn`, since every way into
+  a command has DS on the current panel. Look for what could change it
+  between the push and the pop: `F20_02` makes another panel the current
+  one, and `ReDir` may move a panel to another segment.
+- A command may come to a place with DS on the main data where the
+  place reads a panel: `M60_02` of the menus writes the prompt and tests
+  `Visible`, and the configuration and EGA lines jump there after a
+  `PUSH ES`, `POP DS`. The C takes the segment as a number, MAIN_SEG for
+  those, and reads there what the assembly read.
+- The BIOS called more than once with registers that go from one call
+  to the next, as EGA lines calls it for the font and the mode, has an
+  entry that takes AX, BX, CX and DX from four words on the stack and
+  puts them back: `Int10_a` in `VCMENU.INC`, with `struct BiosRegs` of
+  `port/commands.c`. `Int10m_a` is another thing: it takes the mouse
+  pointer off the screen around the call.
 
 ### C for the port
 
@@ -699,6 +726,13 @@ with it is less obvious:
   is refused with "Invalid declarator", and every use of it with a
   dozen errors more. What `MvsBw` and `MvsColr` return is a far pointer;
   kept in a near one it is "Pointer truncated", which stops the build.
+- Warnings stop the build, and a parameter that is not read is one. A
+  function gets of the registers that its stub has only those it reads:
+  `parm [cx]` alone where the panel in AX is of no use to it.
+- A far call from one of the two code segments to the other costs a
+  relocation, four bytes of the file, where one within a segment costs
+  none: `port/commands.c`, 2,479 bytes of code in CTEXT2 that calls the
+  dialogs and the bars in CTEXT, made the program 2,848 bytes longer.
 - The scratchpad directory of a session is one for all the agents that
   run side by side: a file there may be another agent's by the same
   name. Keep temporary files in the checkout's `build/`.

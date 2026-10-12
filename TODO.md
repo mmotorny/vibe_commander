@@ -229,18 +229,59 @@ Things that are known and not done. Standing instructions are in
   tried. The scenarios search three levels. DOS's critical error can come up with
   all of that on the stack: `FindFil` calls DOS for the files, and to
   open and read them.
-- Of `VCMENU.INC` the menu bar is C, and the commands of its items are
-  still assembly, 1,210 bytes, with the tables by which the stub of
-  the bar jumps to them: `M01_00`, `M03_00`, `M06_00` and `M08_00` with
-  `M02_10`, the kind of a panel, its order and On/Off; `M16_00` and
-  `M16_10` with `M16_20`, the filter and the hidden files; `M21_00`,
-  `M41_00` and `M42_00`, the help, the tree and the sizes of
-  directories; `F69_00`, EGA lines; `M49_00` with `M49_10`, comparing
-  two directories, of which nothing has run in a scenario; and `M60_00`
-  to `M75_00`, the configuration, the advanced options, the files to
-  edit, the switches of the Options menu and saving the setup. They jump
-  on to `Func04`, `Func02`, `Init50` and into one another, some with the
-  current panel still on the stack: a stub for each has to do the jump.
+- `VCMENU.INC` is C but for what the assembly needs of it: the tables by
+  which the stub of the menu bar jumps to the commands, the stubs of the
+  commands, 28 of them with `M17_00`, which hands Drive... to the box of
+  the drives, the boxes, dialogs and texts, which `DialBox` and `Dialog`
+  read in the assembly, and three entries for the C: `Int10_a`,
+  `ScrOffs_a` and `SaveSet_a`. The stubs go when the loop that jumps to
+  them is C, and with it `CmdM01`, `CmdM03` and `CmdM06` of
+  `VCFUNC.INC`, by which the keys of the panels go on in three of the
+  commands: `port/keys.c` can call the functions then.
+- Of the commands of the menus, three instructions are listed as out
+  of reach: one of EGA lines that keeps the pointer of the mouse on the
+  screen when it is below the 25th row and 50 lines become 25, since a
+  step of the mouse names a place among the first 25 rows, so it is
+  translated by reading; one for a display that is neither EGA nor VGA;
+  and one for a kind of panel that nothing asks for. A step that can
+  put the pointer further down on a screen of 50 lines would reach the
+  first.
+- What the commands of the menus do in the original and the port does
+  after them; whether to mend any of it is not decided:
+  - The configuration and EGA lines end by writing the prompt and
+    drawing the panels again "if the panel is on", with DS on the main
+    data instead of a panel. The prompt takes of a panel only whether
+    it is the left one, for a column that it does not use; the test
+    reads the third byte of the main data, the colour of selected files
+    in the first palette, 0Fh as the program comes, so the panels are
+    always drawn again. A setup with that colour 0 would leave them
+    undrawn after the configuration: by reading.
+  - Brief, Full or an order chosen for a panel that shows the tree or
+    the Info and is the current one has DOS go to the directory that
+    the panel had as one of files. If that is gone, DOS stays where it
+    is on that drive and the panel shows that directory, without a
+    word. In `menu-panel`. If the diskette is refused, nothing changes
+    and the panels are drawn again; for Info and Tree, which go to the
+    directory of the other panel first, nothing is drawn. In `phantom`.
+  - Menu file edit and the three for the extension files copy the
+    title of their box as 80 bytes, with whatever follows it in the
+    program, and the name of the file as 13; the 64 bytes that become
+    the name of the file to edit have those behind the name's end. The
+    C copies them from the assembly, as long as that has them. Behind
+    " User Menu " the port has other bytes than the original from the
+    42nd on: the texts of the box of the drives stood there, and are in
+    `port/drive.c` now. Nothing reads them.
+  - The boxes of Save setup and of Compare directories are shown with
+    DS on the current panel, where a box looks for the texts it is to
+    put into its lines. They have none.
+  - The configuration loads CL with whether the menu bar is always
+    visible, before its dialog, and nothing reads it.
+- Drive... of a panel's menu, "F9 l d", showed the box for a panel that
+  was none in the port, from the batch of the menu bar until that of
+  the commands: the bar's table jumped to the stub of `F62_01` with the
+  registers of the original, and the stub takes others. The box said
+  "right" for the left panel and wrote to a segment made of the item's
+  number. No scenario chose the item; `menu-panel` does now.
 - Of the menu bar, what it does for the mouse has run in no scenario, 94
   instructions, `F40_50` among them, which says whose name on the bar
   the mouse is at. It is translated by reading, and listed as out of
@@ -1412,6 +1453,30 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     segment, where the first has 61,177 bytes; the second test, 254
     seconds, passed. Why the program fails with a first segment that
     full was found out afterwards: see `CLAUDE.md`, "C for the port".
+
+- The commands of the menus, 28 commands and three routines, 1,210
+  bytes, 50 minutes in all, next to three other batches and the mouse of
+  the bench:
+  - 10 minutes to get onto `main`, behind the two commits that gave the
+    bench its mouse: no conflict, the goldens of the four new scenarios
+    derived again for the pointer, and one `port` test, 256 seconds next
+    to the tests of others. Eight of the nine instructions that EGA
+    lines has for the mouse ran at once, with a mouse there.
+  - 5 minutes: one `port` test more, 100 seconds on a quiet machine and
+    270 next to the tests of others, because the scenario of the floppy
+    under its second letter reached four instructions of `ReDir` that
+    its batch had listed as out of reach. `harness/reach.py` says so
+    beforehand only for a routine that is asked about: after goldens are
+    derived it could say for every batch which of its listed
+    instructions have run.
+  - 4 minutes: Drive... of a panel's menu, which the port got wrong
+    before this batch (see above). It showed in reading what the menu's
+    table jumps to, before any scenario chose the item.
+  - 3 minutes: a scenario with the Info in both panels, which fails on
+    the port by the second "Bytes Free" of a row. The top of
+    `harness/scenarios.py` had said so.
+  Nothing was lost to the compiler or to the stubs: both were written
+  by the notes of `CLAUDE.md`, and the first build ran.
 
 ## Ideas put off
 
