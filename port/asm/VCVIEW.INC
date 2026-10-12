@@ -2,12 +2,7 @@
 ;		Version :	14.06.2000
 ;-------------------------------------------------------
 
-; Of this file, and named by C code or by another file.
-	PUBLIC	ViewE_F, EditE_F
-
-; Boxes, dialogs and texts that C code hands to DialBox and Dialog.
-	PUBLIC	ViFl_S, Col_S, RdFil_P, FndEr_B, Srch_B, SrFor_P, SrEr_B
-	PUBLIC	ViFil_B, Viewr_P, Editr_P, RunEr_B, RunEr_S, Run1_S, Run2_S
+; The texts, boxes and dialogs of the viewer are in port/view_t.c.
 
 HexLen	EQU	WORD PTR HelpBuf[190]	; Count of hex pattern
 
@@ -36,124 +31,6 @@ ViTmp2	 DW	?			; Last byte of search string
 ViSearch DD	?			; Saerch offset
 Vi100pc	 DB	?			; 100% was displayed
 ViewDat	ENDS
-
-	.CONST
-ViewE_F	DB	"VCVIEW.EXT",0
-EditE_F	DB	"VCEDIT.EXT",0
-Col_S	DB	"Col",0
-ViFl_S	DB	" View ",0
-ViFl1_S	DB	"Loading the viewer:",0
-EdFl_S	DB	" Edit ",0
-EdFl1_S	DB	"Loading the editor:",0
-ViFi0_S	DB	" ^I",0
-ViFi1_S	DB	"^Ithe file:",0FFh,LenStr-14,0
-RdFil_S	DB	"Reading the file",0
-Srch_S	DB	"Search for the string",0FFh,LenStr-21,0
-SrFor_S	DB	"Searching for",0
-SrEr_S	DB	"Could not find the string",0
-RunEr_S	DB	"Not enough memory to load",0
-Run1_S	DB	"Can't run commands for some reason.",0
-Run2_S	DB	"Try rebooting.",0
-
-	.DATA
-RunEr_P	DB	Err_C, ErInv_C, ErInv_C, 0
-	DB	4, 1
-	DW	OFFSET ErrBuf
-	DW	TmpBuf
-	DB	0, 50
-	DW	OFFSET Err_S
-	DW	OFFSET Inc_S
-	DW	OFFSET Var_S
-	DW	OFFSET Ok_S
-RunEr_B	BOXHD	< RunEr_P, 928h, 0, 2, 0FFh, 0FFh, 2 >
-	BOXMN	< 4, 0,0,0,0, 426h, TmpBuf, OkMn_D >
-	DB	0
-ViFil_P	DB	Box_C, BoxCu_C, 0, 0
-	DB	3, 0
-	DW	WinBuf
-	DW	ViFi0_S
-	DW	ViFi1_S
-	DW	Empty_S
-ViFil_B	DW	ViFil_P, 528h, 0
-	DB	1, 2, 0, 0
-	DB	1
-	DB	0, 0, 0, 0
-	DW	305h, ViewFil, 200h+LenStr
-	DB	0
-Viewr_P	DB	Box_C, 0, 0, 0
-	DB	3, 1
-	DW	WinBuf
-	DW	TmpBuf
-	DB	7, 64
-	DW	ViFl_S
-	DW	ViFl1_S
-	DW	Var_S
-Editr_P	DB	Box_C, 0, 0, 0
-	DB	3, 1
-	DW	WinBuf
-	DW	TmpBuf
-	DB	7, 64
-	DW	EdFl_S
-	DW	EdFl1_S
-	DW	Var_S
-RdFil_P	DB	Box_C, 0, 0, 0
-	DB	3, 1
-	DW	WinBuf
-	DW	ViewFil
-	DB	7, 64
-	DW	Inc_S
-	DW	RdFil_S
-	DW	Var_S
-Srch_P	DB	Box_C, BoxCu_C, 0, 0
-	DB	3, 0
-	DW	WinBuf
-	DW	Inc_S
-	DW	Srch_S
-	DW	Empty_S
-Srch_B	DW	Srch_P, 528h, 0
-	DB	1, 0FFh, 0, 0
-	DB	1
-	DB	0, 0, 0, 0
-	DW	305h, SrchStr, LenStr
-	DB	0
-SrFor_P	DB	Box_C, 0, 0, 0
-	DB	3, 1
-	DW	WinBuf
-	DW	SrchStr
-	DB	0, LenStr
-	DW	Inc_S
-	DW	SrFor_S
-	DW	Kov_S
-FndEr_P	DB	Err_C, ErInv_C, ErInv_C, 0
-	DB	4, 1
-	DW	ErrBuf
-	DW	ViewFil
-	DB	7, 64
-	DW	Inc_S
-	DW	NoFnd_S
-	DW	Var_S
-	DW	Ok_S
-FndEr_B	DW	FndEr_P, 928h, 0
-	DB	1, 0FFh, 0, 2
-	DB	4
-	DB	0, 0, 0, 0
-	DW	426h, TmpBuf, OkMn_D
-	DB	0
-SrEr_P	DB	Err_C, ErInv_C, ErInv_C, 0
-	DB	4, 1
-	DW	WinBuf+2000
-	DW	SrchStr
-	DB	0, LenStr
-	DW	Inc_S
-	DW	SrEr_S
-	DW	Kov_S
-	DW	Ok_S
-SrEr_B	DW	SrEr_P, 928h, 0
-	DB	1, 0FFh, 0, 0
-	DB	4
-	DB	0, 0, 0, 0
-	DW	426h, TmpBuf, OkMn_D
-	DB	0
 
 	.CODE
 ; The commands that view or edit a file are C: port/view.c, with F34_30

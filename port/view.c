@@ -138,7 +138,7 @@ u32 V82_00(u16 segment, u16 at, u16 count);
    outside a window. ChgDisk asks for the disk of a drive that shares the
    floppy drive with another, and is not 0 if the user would not change it.
    ResWin puts back what a box covers. AsmSeg returns the code segment of
-   the assembly, where its boxes and texts are. */
+   the assembly, where the boxes and texts are. */
 u16 AsmSeg(void);
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
 
@@ -163,8 +163,8 @@ void T71_00(u16 function, u16 place, u16 step);
 #pragma aux T70_00  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux T71_00  "*_c" __far parm [ax] [bx] [dx] modify exact [ax bx cx dx si di]
 
-/* Boxes, dialogs and texts of the assembly, which DialBox and Dialog take
-   by their offsets in its code segment. */
+/* Boxes, dialogs and texts of port/view_t.c, which DialBox and Dialog
+   take by their offsets in the segment that AsmSeg returns. */
 extern const u8 __far ViFl_S[];         /* " View " */
 extern const u8 __far EdFl_S[];         /* " Edit " */
 extern const u8 __far Col_S[];          /* "Col" */
@@ -1637,12 +1637,14 @@ u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 #pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 #pragma aux Run_00  "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 
-/* More of the assembly: the names of the extension files of the viewer
-   and of the editor, of the menu file and of the file that an Info panel
-   shows, which are copied with what follows them there; the dialog that
-   asks for a name; the boxes shown while a program is loaded as the
-   viewer or as the editor; and the box that says it could not be run,
-   with its texts. */
+/* More of them, and two names of other files, those of the menu file
+   and of the file that an Info panel shows. The names of the extension
+   files of the viewer and of the editor are copied with what follows
+   them, as those two are, and "Try rebooting." is too: in port/view_t.c
+   each is written as long as what is copied. Then the dialog that asks
+   for a name; the boxes shown while a program is loaded as the viewer
+   or as the editor; and the box that says it could not be run, with
+   its texts. */
 extern const u8 __far ViewE_F[];        /* "VCVIEW.EXT" */
 extern const u8 __far EditE_F[];        /* "VCEDIT.EXT" */
 extern const u8 __far Menu_F[];         /* "VC.MNU" */

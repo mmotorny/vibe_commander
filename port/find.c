@@ -133,13 +133,14 @@ u32 V82_00(u16 segment, u16 at, u16 count);
 #pragma aux V81_00  "*_c" __far modify exact [ax]
 #pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
-/* Objects of the assembly's code segment: Mask_S is \*.*, and four bytes
-   are copied from it or from behind it; Find5_D describes the menu of a
+/* Objects that are named by their offsets, of port/find_t.c but for
+   Mask_S, which is of another file: Mask_S is \*.*, and four bytes are
+   copied from it or from behind it; Find5_D describes the menu of a
    search that runs, and only its offset is used here, as are those of
    Find6_D, the menu of one that is over, of FnFl_P, the colours of that
    menu, and of Find_B, the dialog that asks what to look for. FnFl6_S
    is " files" and FnFl7_S " found.": each is copied with what follows it
-   in the assembly, 15 bytes. */
+   in the original, 15 bytes, and is written that long. */
 extern const u8 __far Mask_S[];
 extern const u8 __far Find5_D[];
 extern const u8 __far Find6_D[];
@@ -751,7 +752,7 @@ stopped:
 }
 
 /* What the box of the command shows. The colours are those of Find_P in
-   the assembly, which the dialog reads there. */
+   port/find_t.c, which the dialog reads there. */
 static const u8 CODE FindColors[4] = { Conf_C, CnfRe_C, 21, 22 };
 static const u8 CODE Find0_S[] = " Find File ";
 static const u8 CODE Find1_S[] = "File name:";

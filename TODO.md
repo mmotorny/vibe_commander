@@ -25,14 +25,14 @@ but code in its row has its data in C.
 | `VCMENU.INC` | | | | | 8 / 174 | 495 | `commands.c`, `menu.c` |
 | `VCF1.INC` | | | | | | 217 | `dirfunc.c` |
 | `VCCOPY.INC` | | | | | 1 / 10 | 82 | `copy.c` |
-| `VCVIEW.INC` | 16 / 256 | 9 / 160 | 5 / 110 | | | 180 | `view.c` |
+| `VCVIEW.INC` | | | | | | 180 | `view.c` |
 | `VCEDIT.INC` | 14 / 688 | 6 / 106 | 5 / 110 | 4 / 18 | | 26 | `edit.c` |
 | `VCMEM.INC` | | | | | | 40 | `memory.c` |
 | `VCFIND.INC` | | | | | | 22 | `find.c` |
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 60 / 1,908 | 21 / 378 | 13 / 286 | 7 / 31 | 13 / 420 | 2,420 | |
+| all | 44 / 1,652 | 12 / 218 | 8 / 176 | 7 / 31 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -89,8 +89,8 @@ What names what:
   `YesNo_S`, `YesNo_D` of `port/keys_t.c`, which were of
   `VCFUNC.INC`; `OkCan_S`, `OkCan_D` of
   `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`, which were of
-  `VCF1.INC`; `EdFl_S` of
-  `VCVIEW.INC`; `Tree_S`, `PtMnu_S` of `VCSUB2.INC`. `VC.ASM` declares
+  `VCF1.INC`; `EdFl_S` of `port/view_t.c`, which was of `VCVIEW.INC`;
+  `Tree_S`, `PtMnu_S` of `VCSUB2.INC`. `VC.ASM` declares
   those `EXTERNDEF`, so that either side can name one wherever it is.
 - Code of the assembly names data in one place: the stub of the menu bar
   loads the offset of `PtMnu_S`.
@@ -169,14 +169,16 @@ No two agents have the same assembly file, and `VCSUB2.INC` and
 code, a file of another agent or the lists of `VC.ASM`: a name stays what
 it is when its object moves. What all of them may add to, a line at a
 time, is the tables of `harness/datacheck.py` and the types of
-`port/tables.h`. Done: `VCMEM.INC`, and `VCFIND.INC`, whose two texts
+`port/tables.h`. Done: `VCMEM.INC`; `VCFIND.INC`, whose two texts
 that are copied with what follows them are written as long as what is
 copied; `VCCOPY.INC`, where the titles `Copy0_S` and `Ren0_S` are such
 texts too, 20 bytes each; `VCFUNC.INC`, where the names of the menu file
 and of the list file are, 13 bytes each, and whose `AltSr_T` stays with
 the tables; `VCF1.INC`, where `DlWr4_S` is one, 81 bytes; `VCMENU.INC`,
 where the title `ExFl_S` is one, 80 bytes, and `Chk1_S`, which is read
-as far as the end of `Chk2_S` behind it, is ten.
+as far as the end of `Chk2_S` behind it, is ten; `VCVIEW.INC`, where
+the names of the two extension files are such texts, 13 bytes each, and
+`Run2_S`, 80 bytes.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for
@@ -391,8 +393,8 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     rebooting." for every other: a name with a star in it, for which
     DOS finds a file and can run none, in `view-commands`. For that
     box 80 bytes are copied from the text "Try rebooting.", which has
-    15; the C copies from the assembly, `Run2_S`, as long as that has
-    them.
+    15: `Run2_S` of `port/view_t.c` is written 80 bytes long, with the
+    first texts of the editor that the original has behind it.
   - Nothing is kept of what a program run as the viewer has shown: the
     screen is written as it was, and Ctrl+O shows what was there
     before.

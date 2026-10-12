@@ -74,7 +74,8 @@ sizes of its directories, and for the Info the sizes of the disk, its
 label and the text of dirinfo. The viewer is C: opening a file, for the
 editor too, finding the lines, keeping a part of a large file in the
 memory, writing the screen, its keys and the mouse, looking for a text,
-and the way back to the panels. The editor is C as a whole: the text in
+and the way back to the panels; its texts, boxes and dialogs are
+constants of C, in `port/view_t.c`. The editor is C as a whole: the text in
 the memory with the buffer of the line that the cursor is in, the screen
 brought up to where the cursor is, as text or in hex, with its status
 line, what every key does, the search, and saving the file. The commands
