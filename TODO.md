@@ -91,7 +91,31 @@ Things that are known and not done. Standing instructions are in
   seconds for the `*` to come back, and the derivation stops with "the
   screen did not settle". That happened in 8 of 22 derivations of
   `columns` on an idle machine. It never made a wrong golden: derive
-  again.
+  again. The same makes a step impossible that changes four bytes of the
+  screen or fewer and leaves less than there was, Up in the editor from
+  line 4 to line 3: the harness waits for the screen before the key to
+  come back, every time. Such a step is written to change more (see the
+  top of `harness/scenarios.py`).
+- When the editor has no room left for a line that has grown, `T51_00`
+  beeps and takes what room there is, but moves what follows the line up
+  by as much as it had asked for: the end of the text is lost, by what
+  did not fit, and not the end of the line. Ported like that. The
+  scenario `editor-full` fills the memory at the end of the text, where
+  nothing follows and the line itself is cut; with text behind the line
+  it rests on reading.
+- Del at the end of what the editor keeps of a line longer than 3900
+  characters joins the next line to those 3900 and drops the rest of the
+  line. That is in what the editor does with a key, which is assembly
+  still; `editor-long` and `editor-full` make their long lines that way.
+- `T54_00`, which goes to the line before, looks backwards for where a
+  line begins and then goes forwards again with `T53_00` until it is back
+  where it came from, without asking whether `T53_00` found a line. If
+  none were found before that place it would not end. That takes a text
+  whose lines do not begin where going forwards has them, which hex mode
+  might make; not tried. Ported like that.
+- Three instructions of `T53_00` are listed as out of reach: in hex, for
+  16 bytes that go beyond the end of their segment. The address it gets
+  there has an offset below 16, or is a window of lines further on.
 - What ran in the original is not the same every time. Three instructions
   of `Input0`, B16A to B16E, take a key that is already waiting when the
   program first asks, and `command.ran` came out with them once. The
@@ -211,6 +235,22 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     at lines they share, a closing bracket, so putting one side behind
     the other left both open; mended by hand. The build and the test
     after it took a minute and passed at once.
+
+- The editor: the line buffer, from line to line and from word to word,
+  9 routines, 1032 bytes, 30 minutes in all, next to three other batches:
+  - 4 minutes: a step that the harness cannot record, Up in the editor
+    where only the number of the line changes, to a lower one. Two runs
+    of `harness/reach.py` that failed after 34 seconds each, and reading
+    `wait_for_screen` for why. At the top of `harness/scenarios.py` now.
+  - 2 minutes waiting for a turn at the computer: 60 seconds before a
+    run of `harness/reach.py`, 15 before the goldens were derived, and
+    the `port` test with the routines still assembly took 138 seconds
+    next to the tests of the others, where it takes 99 by itself.
+  - 4 minutes for getting onto `main`, twice: the larger stack arrived
+    while the test after the first rebase ran. One conflict, in the notes
+    at the top of `harness/scenarios.py`, where both had changed the same
+    paragraph; a build and a test of 70 seconds each time. None of the
+    other batches was on `main` yet.
 
 ## Ideas put off
 

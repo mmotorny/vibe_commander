@@ -74,11 +74,12 @@ sizes of its directories, and for the Info the sizes of the disk, its
 label and the text of dirinfo, those of the viewer that find the lines
 of a file, keep a part of it in the memory, write the screen and look for
 a text, and those of the editor that say where in the memory a place in
-its text is and which column the cursor is in, that draw a line of the
-text, as text or in hex, and the status line, and that save the file.
-Reading the tree is still assembly, and so is what the viewer does with
-its keys, and what the editor does with a key and with the lines of its
-text.
+its text is and which column the cursor is in, that fill the buffer of
+the line the cursor is in and put it back into the text, that go from a
+line to the next, to the one before and to the next word, that draw a
+line of the text, as text or in hex, and the status line, and that save
+the file. Reading the tree is still assembly, and so is what the viewer
+and the editor do with their keys.
 
 ## Layout
 

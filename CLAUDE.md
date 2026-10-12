@@ -239,6 +239,19 @@ port.
   DOS and is 46 bytes deeper in the stack than a dialog of the routine
   that called DOS. What a C function has on the stack when it calls
   `Intr21` is on top of that: see `TODO.md` for the editor's saving.
+- A routine that answers in the zero flag gets an entry for C that is
+  written out, where `FromC` has room for one instruction: `MOV AX,0`,
+  which leaves the flags, and `JNE` past an `INC AX`. See `CmpSym_a` in
+  `VCEDIT.INC`. A stub makes the zero flag for its callers of a function
+  that returns 1 or 0 with `CMP AX,1`.
+- Registers that follow from what a function returns are made by the
+  stub: `T55_00` returns where the cursor gets to in the line, and its
+  stub makes SI of that, DI of where the cursor was, and the zero flag
+  by comparing the two, which is what `T23_00` goes on with.
+- An entry for C goes when its routine becomes C, and the C code that
+  used it calls the function: `T50_00_a`, `T51_00_a` and `T53_10_a` went
+  like that. A function that had the entry's convention, a result in SI
+  say, then has another: read every place that calls it.
 
 ### C for the port
 
@@ -312,6 +325,10 @@ with it is less obvious:
   division would be `__I4D`. Shifting a 32-bit number by a constant needs
   none. `/` and `%` of the same numbers are two calls: take the remainder
   by multiplying back where it is known to fit 16 bits.
+- `REP MOVSB` from one segment to another is a loop over two far
+  pointers: a far pointer steps its offset only, as SI and DI do, down as
+  well as up. Where the assembly divides a 32-bit count into pieces for
+  that, comparing and subtracting in the loop needs no helper routine.
 - The figures of the stack that the `port` test reports differ from one
   run to the next, by 12 bytes or so in a scenario or two: an interrupt
   that arrives when the calls are deep. What a batch costs shows in every

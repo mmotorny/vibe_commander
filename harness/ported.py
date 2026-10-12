@@ -303,6 +303,23 @@ BATCHES = [
                 "then refuses the attributes of"),
         },
     ),
+    Batch(
+        title="The editor: the line in its buffer, and from a line of the "
+              "text to the next and the one before",
+        source="edit.c",
+        routines=("T50_00", "T51_00", "T53_00", "T53_10", "T54_00",
+                  "T55_00", "T55_10", "T56_00", "T64_00"),
+        functions=("T50_00_c", "T51_00_c", "T53_00_c", "T53_10_c",
+                   "T54_00_c", "T55_00_c", "T56_00_c", "T64_00_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x7292, 0x7295, 0x7298),
+                "T53_00 in hex, for 16 bytes that go beyond the end of "
+                "their segment: the address it gets is one that T61_00 "
+                "has made, with an offset below 16, or at most a window "
+                "of lines further on"),
+        },
+    ),
 ]
 
 

@@ -160,6 +160,31 @@ out again (show.py --changes is how):
     saving to A: in the editor left 4 bytes of the stack while that was
     still assembly and the stack 256 bytes. No scenario has it yet; with
     the stack of 4,096 bytes one can.
+  - A step of the original is recorded when the screen stands still, and
+    two screens that differ in four bytes or fewer are taken for one that
+    blinks, of which the greater is waited for. So a step that changes
+    that little and to less, Up in the editor where only "Line 4" becomes
+    "Line 3", is never recorded: "the screen did not settle", after 20
+    seconds, every time. Have such a step change more: 'Up "xy"'. A step
+    that ends on the screen it began with is fine.
+  - In the editor Ctrl+Right goes to the next word and Ctrl+t deletes up
+    to it; Ctrl+k cuts off the line at the cursor. End in a line of 3900
+    characters or more stops on the 3900th, and Del there deletes that
+    one, or, in a longer line, joins the next line to those 3900 and
+    drops the rest: lines to be joined by "End Del" are 3899 long at the
+    most. "Home Ctrl+Right Ctrl+k" makes a line of 4096 characters
+    without a space one of 3899. Seventeen such lines joined from the
+    last upwards, "Up End Del" for each, are a line of more than 64K. In
+    hex Up and Down go by 16 bytes, and F4 puts the cursor into the line
+    of the text that its byte is in.
+  - The editor has 358,752 bytes for a text on the bench, and the port
+    fewer, by what it is larger. Ctrl+u puts back a line that Ctrl+y has
+    cut as often as it is pressed, 14 times to a step, until the editor
+    beeps: no room. The port gets there some presses before the
+    original, so every such step ends where both show the same whatever
+    is at the end of the text: Ctrl+Home, the top. A beep scrolls the
+    screen, so the step also has to draw all of it again, which Ctrl+Home
+    from the end of the text does.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -946,6 +971,74 @@ SCENARIOS = {
             "End Enter",                  # empty.dat: the command just
             "Ctrl+o",                     # written for its kind
             "Ctrl+o",
+        )),
+
+    "editor-words": Scenario(
+        "The editor from line to line and from word to word, as text and "
+        "in hex, in a text with empty lines",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",                   # a new file
+            '"words.txt" Enter',
+            "Enter",
+            '"one" Space "two" Enter Enter Enter',
+            '"bcdefghijk"',
+            'Up "xy"',                    # up past two empty lines
+            'Up Up Up "q"',               # to the top, and no further
+            "Ctrl+Right",                 # the next word
+            "Home Ctrl+t",                # a word deleted
+            "F4",                         # in hex: the last line is short
+            "Down",
+            'Up Up "4142"',               # up, and no further than the top
+            "Down Right F4",              # text again, the cursor in the
+                                          # line that its byte is in
+            "Esc",                        # changed: asks
+            "Right Enter",                # not saved
+        )),
+
+    "editor-full": Scenario(
+        "The editor on a line of more than 64K, and with all of its "
+        "memory full",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",                   # a new file
+            '"full.txt" Enter',
+            "Enter",
+            '"0123456789abcdef"',
+            # The line cut, put back twice and the two joined: twice as
+            # long, and that eight times. 4096 characters.
+            *("Ctrl+y Ctrl+u Ctrl+u Up Up End Del "
+              "Ctrl+y Ctrl+u Ctrl+u Up Up End Del",) * 4,
+            # To the next word, of which there is none: as far as the
+            # editor keeps the line, and the last column but one. The line
+            # cut off there, 3899 characters, and cut, and put back twelve
+            # times.
+            "Home Ctrl+Right Ctrl+k Ctrl+y "
+            + " ".join(["Ctrl+u"] * 12),
+            # Twenty lines. The sixteenth and the seventeenth joined, and
+            # then the one above with what that makes, fifteen times: 17
+            # lines in one, 66283 characters.
+            " ".join(["Ctrl+u"] * 8) + " Up Up Up Up Up End Del",
+            " ".join(["Up End Del"] * 5) + " Home",
+            " ".join(["Up End Del"] * 5),
+            " ".join(["Up End Del"] * 5) + " Home",
+            "Down",                       # the line after it
+            "F4",                         # in hex,
+            "Up",                         # 16 bytes back: in the long line,
+            "F4",                         # more than 64K from its start
+            # A line of 3899 cut, and put back at the end of the text, as
+            # often as a step has keys for: after five such steps there is
+            # no room for another, and the editor beeps. Each ends at the
+            # top of the text, which is the same however much was put in.
+            "Down Ctrl+y Ctrl+End " + " ".join(["Ctrl+u"] * 12)
+            + " Ctrl+Home",
+            *("Ctrl+End " + " ".join(["Ctrl+u"] * 14) + " Ctrl+Home",) * 5,
+            "Esc",                        # changed: asks
+            "Right Enter",                # not saved
         )),
 }
 
