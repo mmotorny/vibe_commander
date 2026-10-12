@@ -1576,10 +1576,13 @@ Srch07:	CMP	SI,AX
 Search	ENDP
 
 ;----------------- Check file panel --------------------
+;	Return :	CY=1 - it is one, and not switched off
 FilePan	PROC	NEAR
-	CMP     DS:Visible,0
-	JZ      FilPn1
-	CMP     DS:WinTyp,1
-FilPn1:	RET
+	PUSH	AX
+	MOV	AX,DS
+	CALL	FAR PTR FilePan_c
+	NEG	AX
+	POP	AX
+	RET
 FilePan	ENDP
 

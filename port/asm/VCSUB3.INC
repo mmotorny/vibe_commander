@@ -834,97 +834,25 @@ RdTr40:	CALL	TreeCur			; Set cursor
 	RET
 ReadTre	ENDP
 
-TreeCur	PROC	NEAR			; Set cursor
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	AX,OFFSET TreeBuf.TreList
-	MOV	DS:TreFrst,AX
-	MOV	DS:TreAdr,AX
-	CALL	TrCr11
-	JNC	TrCr01
-	CALL	TrCr10
-	JC	TrCr02
-TrCr01:	CALL	SizDX
-	MOV	AL,DH
-	SUB	AL,4
-	CALL	TrCr20
-TrCr02:	POP	DS
+;	Put the cursor of the tree on the current directory
+;			   ES - main data
+TreeCur	PROC	NEAR
+	CallC	TreeCur_c
 	RET
 TreeCur	ENDP
 
+;	The same, without regard to where it was
+;			DS=ES - main data
 TrCr10	PROC	NEAR
-	MOV	SI,OFFSET DosPth
-	MOV	DI,OFFSET CrnPath
-	MOV	CX,LenPath
-	REP	MOVSB
-TrCr11:	MOV	AL,DS:[DosPth]
-	CMP	AL,DS:CrnPath
-	JNE	TrCr15
-	MOV	DI,OFFSET MenuBuf
-	MOV	AH,':'
-	STOSW
-	MOV	AX,'\'
-	STOSW
-	MOV	SI,OFFSET TreeBuf.TreList
-	MOV	CX,DS:TreeBuf.TreeLen
-	JCXZ	TrCr15
-TrCr19:	PUSH	SI
-	PUSH	CX
-	MOV	CL,DS:[SI+13]
-	MOV	CH,0
-	JCXZ	TrCr13
-	MOV	DI,OFFSET MenuBuf
-	MOV	AL,'\'
-TrCr12:	PUSH	CX
-	MOV	CX,20
-	REPNE	SCASB
-	POP	CX
-	LOOP	TrCr12
-	MOV	CX,13
-	CALL	MvzLine
-	MOV	AX,'\'
-	STOSW
-TrCr13:	MOV	DI,OFFSET CrnPath
-	PUSH	DI
-	MOV	CX,100
-	MOV	AL,0
-	REPNE	SCASB
-	POP	SI
-	MOV	CX,DI
-	SUB	CX,SI
-	DEC	CX
-	MOV	DI,OFFSET MenuBuf
-	REPE	CMPSB
-	POP	CX
-	POP	SI
-	JNE	TrCr14
-	SCASB
-	JE	TrCr16
-	SCASB
-	JE	TrCr16
-TrCr14:	ADD	SI,16
-	LOOP	TrCr19
-TrCr15:	STC
-	JMP	TrCr17
-TrCr16:	MOV	DS:TreAdr,SI
-	CLC
-TrCr17:	RET
+	CALL	FAR PTR TrCr10_c
+	RET
 TrCr10	ENDP
 
+;	Begin the lines of the tree half a panel above the cursor
+;			   AL - lines shown
+;			   DS - main data
 TrCr20	PROC	NEAR
-	MOV	SI,DS:TreAdr
-	AND	AL,7Eh
-	CBW
-	MOV	CL,3
-	SHL	AX,CL
-	SUB	SI,AX
-	MOV	AX,OFFSET TreeBuf.TreList
-	JB	TrCr21
-	CMP	SI,AX
-	JB	TrCr21
-	MOV	AX,SI
-TrCr21:	MOV	DS:TreFrst,AX
+	CALL	FAR PTR TrCr20_c
 	RET
 TrCr20	ENDP
 
@@ -998,545 +926,45 @@ RdInf4:	POP	DS
 ;---------------------- Output files -------------------
 ;			   DS - WCBseg
 PutFls	PROC	NEAR
-	CMP	DS:WinTyp,0
-	JNE	PtFs01
 	PUSH	AX
 	MOV	AX,DS
+	CMP	DS:WinTyp,0
+	JNE	PtFs01
 	CallC	PutFls_c
 	POP	AX
 	RET
-PtFs01:	PUSH	DS			; The tree or the Info
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	JMP	PutTre
-PtFs15:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
+PtFs01:	CMP	DS:WinTyp,1
+	JNE	PtFs02
+	CallC	PutTre_c		; The tree
+	POP	AX
+	RET
+PtFs02:	CallC	PutInf_c		; The Info
+	POP	AX
 	RET
 PutFls	ENDP
 
-	.DATA
-PutTr_P	DB	Back_C, Cursr_C, Slct_C, CurSl_C
-
-	.CODE
-PutTre:	CMP	DS:WinTyp,1
-	JE	PtTre0
-	JMP	PutInf
-PtTre0:	CALL	CorPar
-	MOV	BP,OFFSET PutTr_P
-	CALL	BegBX
-	CALL	SizDX
-	CALL	PutTree
-	JMP	PtFs15
-
+;---------------------- Output tree --------------------
+;			   DS - WCBseg
+;			BH,BL - begin
+;			DH,DL - size
+;			CS:BP - address of color table
 PutTree	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	MOV	WORD PTR ES:[MenuBuf+48],DS
+	PUSH	DS
+	PUSH	ES
+	MOV	AX,DS
 	PUSH	ES
 	POP	DS
-	MOV	AX,BX
-	ADD	AH,DH
-	SUB	AH,2
-	INC	AX
-	MOV	WORD PTR DS:[MenuBuf+46],AX
-	XOR	AX,AX
-	MOV	DS:TreCrnt,AX
-	MOV	CX,DS:TreeBuf.TreeLen
-	JCXZ	PtTr02
-	MOV	SI,OFFSET TreeBuf.TreList
-PtTr01:	CMP	BYTE PTR ES:[SI+13],7
-	JA	PtTr02
-	ADD	SI,16
-	LOOP	PtTr01
-	INC	AX
-PtTr02:	MOV	DS:TreeTyp,AL
-	MOV	DI,OFFSET MenuBuf
-	PUSH	DI
-	MOV	CX,40
-	MOV	AL,0
-	REP	STOSB
-	MOV	DI,OFFSET MenuBuf+50
-	MOV	AX,WORD PTR DS:[DosPth]
-	STOSW
-	MOV	AX,'\'
-	STOSW
-	ADD	BX,102h
-	CALL	BasAdr
-	POP	BX
-	MOV	SI,OFFSET TreeBuf.TreList
-	MOV	AX,DS:TreFrst
-	SUB	AX,SI
-	MOV	CL,4
-	SHR	AX,CL
-	MOV	CX,AX
-	MOV	AX,DS:TreeBuf.TreeLen
-	SUB	AX,CX
-	MOV	CL,DH
-	SUB	CL,4
-	MOV	CH,0
-	CMP	CX,AX
-	JBE	PtTr10
-	MOV	CX,AX
-	OR	AX,AX
-	JNE	PtTr10
-	JMP	PtTr35
-PtTr10:	PUSH	DI
-	PUSH	SI
-	PUSH	CX
-	PUSH	BX
-	MOV	DX,DI
-	DEC	DI
-	DEC	DI
-	MOV	AH,CS:[BP]
-	CALL	Color
-	MOV	AL,' '
-	MOV	CX,38
-	REP	STOSW
-	MOV	DI,DX
-	MOV	CL,DS:[SI+13]
-	MOV	CH,0
-	JCXZ	PtTr18
-	DEC	CX
-	JCXZ	PtTr15
-	MOV	AL,'Г'
-PtTr11:	CMP	SI,DS:TreFrst
-	JB	PtTr14
-	CMP	BX,OFFSET MenuBuf+10
-	JA	PtTr14
-	JE	PtTr13
-	CMP	BYTE PTR DS:[BX],0
-	JE	PtTr12
-	STOSB
-	DEC	DI
-PtTr12:	ADD	DI,2*2
-	CMP	DS:TreeTyp,0
-	JE	PtTr14
-PtTr13:	INC	DI
-	INC	DI
-PtTr14:	INC	BX
-	LOOP	PtTr11
-PtTr15:	MOV	AL,'У'
-	CMP	BYTE PTR DS:[SI+15],0
-	JNE	PtTr16
-	MOV	AL,'Р'
-	MOV	BYTE PTR DS:[BX],0
-PtTr16:	INC	BX
-	CMP	SI,ES:TreFrst
-	JB	PtTr18
-	CMP	BX,OFFSET MenuBuf+12
-	JAE	PtTr17
-	STOSB
-	DEC	DI
-PtTr17:	INC	DI
-	INC	DI
-	MOV	AL,'Ф'
-	STOSB
-	INC	DI
-	CMP	DS:TreeTyp,0
-	JE	PtTr18
-	STOSB
-	INC	DI
-PtTr18:	CMP	BYTE PTR DS:[SI+16+14],0
-	JE	PtTr19
-	MOV	BYTE PTR DS:[BX],1
-PtTr19:	MOV	CL,DS:[SI+13]
-	MOV	CH,0
-	JCXZ	PtTr21
-	PUSH	SI
-	PUSH	DI
-	MOV	DI,OFFSET MenuBuf+50
-	MOV	AL,'\'
-PtTr20:	PUSH	CX
-	MOV	CX,20
-	REPNE	SCASB
-	POP	CX
-	LOOP	PtTr20
-	MOV	CX,13
-	CALL	MvzLine
-	MOV	AX,'\'
-	STOSW
-	POP	DI
-	POP	SI
-PtTr21:	CMP	SI,DS:TreFrst
-	JAE	PtTr22
-	JMP	PtTr33
-PtTr22:	MOV	CX,12
-	CMP	SI,OFFSET TreeBuf.TreList
-	JNE	PtTr23
-	MOV	CX,1
-PtTr23:	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	MOV	SI,OFFSET MenuBuf+50
-	MOV	DI,OFFSET DosPth
-	PUSH	DI
-	MOV	CX,100
-	MOV	AL,0
-	REPNE	SCASB
-	MOV	CX,DI
-	POP	DI
-	SUB	CX,DI
-	DEC	CX
-	REPE	CMPSB
-	JNE	PtTr24
-	CMP	AL,DS:[SI]
-	JE	PtTr24
-	CMP	AL,DS:[SI+1]
-PtTr24:	POP	CX
-	POP	DI
-	POP	SI
-	MOV	AX,CS:[BP]
-	JNE	PtTr25
-	MOV	DS:TreCrnt,SI
-	MOV	AX,CS:[BP+2]
-	PUSH	AX
-	MOV	AH,AL
-	CALL	Color
-	MOV	BX,DX
-	MOV	AL,''
-	MOV	DS:[BX+2*36],AX
-	POP	AX
-PtTr25:	XCHG	AH,AL
-	CMP	SI,DS:TreAdr
-	JE	PtTr26
-	CALL	Color
-	JMP	PtTr31
-PtTr26:	MOV	BX,WORD PTR DS:[MenuBuf+48]
-	CMP	BX,ES:WCBcrn
-	MOV	BX,'но'
-	JNE	PtTr27
-	MOV	BX,'  '
-	MOV	AH,AL
-PtTr27:	CALL	Color
-	MOV	AL,BH
-	MOV	DS:[DI-2],AX
-	PUSH	DI
-	PUSH	SI
-	PUSH	CX
-	ADD	DI,CX
-	ADD	DI,CX
-	MOV	AL,BL
-	MOV	DS:[DI],AX
-	MOV	SI,OFFSET MenuBuf+50
-	MOV	DI,OFFSET MenuBuf+140
-	MOV	CX,LenPath+13
-	PUSH	DI
-	PUSH	CX
-	REP	MOVSB
-	POP	CX
-	POP	DI
-	MOV	SI,DI
-	MOV	AL,0
-	CMP	AL,DS:[DI+3]
-	JE	PtTr28
-	REPNE	SCASB
-	DEC	DI
-	DEC	DI
-	STOSB
-PtTr28:	PUSH	SI
-	MOV	DI,OFFSET CrnPath
-	MOV	CX,LenPath
-	REP	MOVSB
-	POP	SI
-	MOV	CX,38
-	PUSH	AX
-	MOV	AX,CX
-	CALL	ShrtLin
-	POP	AX
-	MOV	BX,WORD PTR DS:[MenuBuf+46]
-	CALL	BasAdr
-PtTr29:	LODSB
-	CMP	AL,0
-	JNE	PtTr30
-	DEC	SI
-	MOV	AL,' '
-PtTr30:	STOSB
-	INC	DI
-	LOOP	PtTr29
-	POP	CX
-	POP	SI
-	POP	DI
-PtTr31:	LODSB
-	CMP	AL,0
-	JNE	PtTr32
-	DEC	SI
-	MOV	AL,' '
-PtTr32:	STOSW
-	LOOP	PtTr31
-PtTr33:	POP	BX
-	POP	CX
-	POP	SI
-	POP	DI
-	INC	CX
-	CMP	SI,DS:TreFrst
-	JB	PtTr34
-	DEC	CX
-	ADD	DI,2*80
-PtTr34:	ADD	SI,16
-	LOOP	PtTr36
-PtTr35:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
+	PUSH	CS			; The colours are in this segment
+	POP	ES
+	XCHG	SI,BP
+	CALL	FAR PTR PutTree_c
+	XCHG	SI,BP
+	POP	ES
 	POP	DS
+	POP	AX
 	RET
-PtTr36:	JMP	PtTr10
 PutTree	ENDP
-
-	.CONST
-PtIn1_S	DB	"^r^V^r Bytes ^I",0
-PtIn2_S	DB	"Memory",0
-PtIn3_S	DB	"Free",0
-PtIn4_S	DB	"Volume in drive ^r^W:^r ^I^r^V",0
-PtInA_S	DB	"is ",0
-PtInB_S	DB	"has no label",0
-PtIn5_S	DB	"^r^V^r ^I on drive ^r^W:",0
-PtIn6_S	DB	"total bytes",0
-PtIn7_S	DB	"bytes free",0
-PtIn8_S	DB	"^r^V^r files uses ^r^W^r bytes in",0
-PtIn9_S	DB	" No `dirinfo' file in this directory",0
-
-	.DATA
-PtIn_P	DB	Back_C, Title_C
-
-	.CODE
-PutInf:	CMP	DS:WinTyp,2
-	JE	PtIn00
-	JMP	PtFs15
-PtIn00:	CALL	BegBX
-	ADD	BX,314h
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	AX,DS:Memorys
-	MOV	DX,OFFSET PtIn2_S
-	CALL	PtIn20
-	MOV	AX,DS:FreMem2
-	CMP	ES:LoadFl,0
-	JE	PtIn01
-	MOV	AX,DS:FreMem1
-PtIn01:	MOV	DX,OFFSET PtIn3_S
-	CALL	PtIn20
-	MOV	AL,DS:DosPth[0]
-	MOV	AH,0
-	MOV	WORD PTR DS:TmpErr[101],AX
-	MOV	SI,OFFSET Volume
-	MOV	DX,OFFSET PtInB_S
-	CMP	BYTE PTR DS:[SI],0
-	JE	PtIn19
-	MOV	DX,OFFSET PtInA_S
-PtIn19:	MOV	DI,OFFSET TmpErr[1]
-	MOV	CX,12
-	REP	MOVSB
-	MOV	SI,OFFSET PtIn4_S
-	CALL	PtIn23
-	MOV	DX,OFFSET PtIn6_S
-	MOV	AX,DS:Total
-	CALL	PtIn21
-	MOV	DX,OFFSET PtIn7_S
-	MOV	AX,DS:FreeDsk
-	CALL	PtIn21
-	POP	DS
-	PUSH	DS
-	CALL	InvWCB
-	CALL	FilePan
-	JNC	PtIn06
-	PUSH	DS
-	PUSH	BX
-	MOV	SI,OFFSET DskBuf
-	XOR	BX,BX
-	XOR	CX,CX
-	XOR	DX,DX
-PtIn02:	CMP	SI,DS:EndBuf
-	JAE	PtIn07
-	TEST	DS:[SI].AttrF,10h
-	JNZ	PtIn05
-	INC	CX
-	PUSH	CX
-	PUSH	DX
-	MOV	AX,DS:[SI].SizeF.Lo
-	MOV	DX,DS:[SI].SizeF.Hi
-	MOV	CX,ES:ClstSiz
-	CMP	CX,1
-	JBE	PtIn04
-	PUSH	AX
-	MOV	AX,DX
-	XOR	DX,DX
-	DIV	CX
-	PUSH	DX
-	MUL	CX
-	ADD	BX,AX
-	POP	DX
-	POP	AX
-	DIV	CX
-	OR	DX,DX
-	JE	PtIn03
-	INC	AX
-PtIn03:	MUL	CX
-PtIn04:	MOV	CX,DX
-	POP	DX
-	ADD	DX,AX
-	ADC	BX,CX
-	POP	CX
-PtIn05:	ADD	SI,SIZE FilEnt
-	JMP	PtIn02
-PtIn06:	JMP	PtIn11
-PtIn07:	PUSH	BX
-	XOR	BX,BX
-	MOV	DI,OFFSET TmpErr+1
-	MOV	AL,1
-	CALL	Number
-	POP	BX
-	PUSH	CX
-	MOV	CX,DX
-	MOV	DI,OFFSET TmpErr+101
-	MOV	AL,1
-	CALL	Number
-	POP	AX
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET PtIn8_S
-	MOV	DI,OFFSET TmpBuf
-	PUSH	DI
-	MOV	CX,12
-	REP	MOVSB
-	CMP	AX,WORD PTR 1
-	JNE	PtIn08
-	DEC	DI
-PtIn08:	MOV	CX,5
-	REP	MOVSB
-	CMP	AX,WORD PTR 1
-	JE	PtIn09
-	DEC	DI
-PtIn09:	MOV	CX,13
-	REP	MOVSB
-	OR	BX,BX
-	JNE	PtIn10
-	CMP	DX,1
-	JNE	PtIn10
-	DEC	DI
-PtIn10:	MOV	CX,4
-	REP	MOVSB
-	POP	SI
-	POP	BX
-	PUSH	ES
-	POP	DS
-	MOV	BP,OFFSET PtIn_P
-	CALL	CntLine
-	POP	DS
-	INC	BH
-	CALL	PtPt10
-	INC	SI
-	MOV	AX,38-1
-	CALL	ShrtLin
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET Var_S
-	CALL	CntLine
-	DEC	BH
-PtIn11:	PUSH	ES
-	POP	DS
-	ADD	BH,4
-	CALL	SizDX
-	MOV	CL,DH
-	SUB	CL,12
-	MOV	CH,0
-	MOV	DX,DS:InfoLen
-	CMP	DX,0FFFFh
-	JNE	PtIn12
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET PtIn9_S
-	MOV	BP,OFFSET PtIn_P
-	CALL	CntLine
-	JMP	PtIn17
-PtIn12:	SUB	BX,112h
-	CALL	BasAdr
-	MOV	SI,OFFSET InfBuf
-	ADD	DX,SI
-PtIn13:	PUSH	DI
-	PUSH	CX
-	MOV	CX,36
-PtIn14:	CALL	IsCrLfS
-	JE	PtIn16
-	DEC	SI
-	CMP	SI,DX
-	JA	PtIn16
-	JCXZ	PtIn14
-	CMP	AL,9
-	JNE	PtIn15
-	MOV	AH,36
-	SUB	AH,CL
-	AND	AH,7
-	MOV	AL,8
-	SUB	AL,AH
-	CBW
-	ADD	DI,AX
-	ADD	DI,AX
-	SUB	CX,AX
-	JAE	PtIn14
-	XOR	CX,CX
-	JMP	PtIn14
-PtIn15:	STOSB
-	INC	DI
-	DEC	CX
-	JMP	PtIn14
-PtIn16:	POP	CX
-	POP	DI
-	CMP	SI,DX
-	JA	PtIn17
-	ADD	DI,2*80
-	LOOP	PtIn13
-PtIn17:	POP	DS
-	JMP	PtFs15
-
-PtIn20	PROC	NEAR
-	PUSH	BX
-	MOV	BL,AH
-	MOV	BH,0
-	MOV	CL,4
-	SHL	AX,CL
-	SHR	BX,CL
-	MOV	SI,OFFSET PtIn1_S
-	JMP	PtIn22
-PtIn21:	PUSH	BX
-	PUSH	DX
-	MUL	ES:ClstSiz
-	MOV	BX,DX
-	POP	DX
-	MOV	SI,OFFSET PtIn5_S
-PtIn22:	MOV	CX,AX
-	MOV	DI,OFFSET TmpErr+1
-	MOV	AL,1
-	CALL	Number
-	POP	BX
-PtIn23:	PUSH	DS
-	PUSH	CS
-	POP	DS
-	MOV	BP,OFFSET PtIn_P
-	CALL	CntLine
-	POP	DS
-	INC	BH
-	RET
-PtIn20	ENDP
 
 ;--------------------- Find near file ------------------
 ;			ES:DI - File

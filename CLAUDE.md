@@ -160,6 +160,23 @@ port.
 - Data of the assembly that C code needs is made `PUBLIC` there and
   declared in `port/vc.h` as `extern const u8 __far`, with a `#pragma
   aux` that keeps its name: `Title_S`, `Var_S`, `Tree_S`.
+- Code that stands between two procedures belongs to none: `PutTre` and
+  `PutInf` stood behind `PutFls`, and `RdInfo` stands before it still.
+  `tools/routines.py` does not list such code. `harness/reach.py` and
+  `harness/ported.py` take it by its first label, as far as the next
+  procedure.
+- A routine that answers in the carry flag and nothing else gets a stub
+  that makes the flag of what the function returns: `FilePan` returns 1
+  or 0, and `NEG AX` sets the carry for the 1. `POP` leaves flags alone.
+- A table that the assembly names by CS:BP goes to C as a far pointer in
+  `[es si]`. The stub puts ES on its own segment and exchanges SI and BP
+  around the call, which takes no stack: C code keeps both. `CallC` does
+  not serve there, since it takes DS from ES; see `PutTree`.
+- A stub may choose between C functions where the assembly jumped from
+  one piece to the next: that of `PutFls` goes to `PutFls_c`, `PutTre_c`
+  or `PutInf_c` by the kind of the panel. Chosen in C, by one function
+  that calls the next, the registers the first one saves lie under the
+  second: 12 bytes of the stack less, in every scenario.
 
 ### C for the port
 
@@ -209,9 +226,21 @@ with it is less obvious:
   Read the `STRUC` in `port/asm/VC.ASM` before taking an offset from a
   C structure.
 - There is no C library. String literals and static variables are refused
-  by `tools/mkexe.c`. The first 32-bit multiplication or division will
-  need the compiler's helper routines written, in assembly, in the C code
-  segment.
+  by `tools/mkexe.c`. A text may be written as a string where it gives an
+  array declared `CODE` its contents: `static const u8 CODE Name_S[] =
+  "text";` is in the code segment, with its zero byte.
+- For 32-bit numbers the compiler calls helper routines, near, in its own
+  code segment. `__U4M`, which multiplies, and `__U4D`, which divides
+  unsigned numbers, are at the end of `port/asm/VC.ASM`; of `__U4D` the
+  scenarios run only the half for a divisor of 16 bits. A helper that is
+  missing shows as an undefined symbol when the port is linked: signed
+  division would be `__I4D`. Shifting a 32-bit number by a constant needs
+  none. `/` and `%` of the same numbers are two calls: take the remainder
+  by multiplying back where it is known to fit 16 bits.
+- The figures of the stack that the `port` test reports differ from one
+  run to the next, by 12 bytes or so in a scenario or two: an interrupt
+  that arrives when the calls are deep. What a batch costs shows in every
+  scenario that draws what was translated, and the same in each.
 
 ## A run of batches
 

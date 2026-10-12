@@ -16,6 +16,24 @@ Things that are known and not done. Standing instructions are in
   has set: `DEC AX` and then `JE`, `STC` and then `JNC`. It should follow
   each flag by itself.
 
+- The Info panel says how much memory is free. With Memory allocation
+  switched off, "F9 o m", that is the memory left with all of the program
+  loaded, and the port is larger than the original: the number differs,
+  and no scenario shows it. To compare it, the comparison would have to
+  leave it out (`harness/deviations.py`), as it does the editor's.
+- Every disk of the bench has a volume label, so no scenario shows the
+  Info of a disk without one, "has no label". The program asks whether
+  to delete a label and does not get it off under FreeDOS: a disk
+  without one would have to be made for the bench.
+- `tools/routines.py` lists procedures only. Code that stands between
+  two, like `RdInfo`, which reads what the Info panel shows and is still
+  assembly, is not in its list; `harness/reach.py` knows it by its first
+  label.
+- Of `__U4D` in `port/asm/VC.ASM`, which divides 32-bit numbers for the
+  compiled code, no scenario runs the half for a divisor of more than 16
+  bits: nothing divides by one yet. It was held against a model of its
+  steps, not run.
+
 ## What batches have lost time to
 
 Minutes that a batch actually lost, for deciding which improvement of the
@@ -46,6 +64,29 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     places that lead to it.
   - 1 minute: a step of 23 keys failed, "the key 0 did not arrive". One of
     16 keys is taken. Noted at the top of `harness/scenarios.py`.
+
+- The tree and the Info in a panel, 8 routines, about 50 minutes in all:
+  - 5 minutes: code that stands between procedures, `PutTre` and
+    `PutInf`, could not be named to `harness/reach.py` or listed in
+    `harness/ported.py`. Both take it by its first label now, a commit of
+    its own.
+  - 4 minutes: a key lost in the editor. The port test failed before
+    anything was translated, an Enter gone from a step of seven keys: the
+    editor empties the keyboard buffer after every key. Found by reading
+    its loop; the scenario switches the option off first. Noted at the
+    top of `harness/scenarios.py`.
+  - 4 minutes: two steps that could not stay, each a golden derived, 23
+    seconds, and one of them a port test failed, 34: the volume label,
+    which the program does not get off the disk, and the memory free
+    with Memory allocation off, which depends on the size of the program.
+  - 4 minutes: three tries until a scenario noticed `FilePan` taking a
+    panel that is switched off for one of files. Ins does not get there
+    and the menu refuses by itself; what shows it is the Info drawn anew
+    next to such a panel. Each try was a golden derived and a run of
+    `harness/notice.py`, 55 seconds together.
+  - 2 minutes: the Info was 12 bytes deeper in the stack in every
+    scenario, written from inside the function that chooses between it
+    and the tree. The stub chooses now.
 
 ## Ideas put off
 

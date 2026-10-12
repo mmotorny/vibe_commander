@@ -65,6 +65,27 @@ out again (show.py --changes is how):
     shows the seconds, and a step shows only what is there at its end.
     Five Tabs go from the attributes past the date to the time, and
     "12:00:00p" is the time of the bench's files.
+  - The editor empties the keyboard buffer after every key it takes, and
+    once more before it draws: a key that arrives while it deals with the
+    one before is lost, now and then, and more often in the port, which
+    the tests run side by side. A scenario that types more than one key
+    to a step there first switches that off: "F9 o o" is the dialog of
+    advanced options, five times Down goes to "Clear keyboard buffer",
+    Space and Enter. Tab types a tab there and Enter ends a line.
+  - F7, a name and Enter make a directory and leave the cursor on it, so
+    one more Enter goes into it: thirteen such steps make a tree thirteen
+    levels deep. "F9 r t" shows the tree in the right panel; it is read
+    from the disk again when directories have been made. Alt+F10 shows
+    it in a box, to choose a directory from; Esc leaves that.
+  - The Info panel shows the file dirinfo of the directory of the other
+    panel, once that has been read again, as it is after the editor.
+    "F9 o m" switches Memory allocation, and the Info then says how much
+    memory is free with all of the program loaded: that depends on the
+    size of the program, so the port shows another number than the
+    original, and no scenario can do it. Every disk of the bench has a
+    volume label, and the program does not get one off: Ctrl+F4, Ctrl+y,
+    Enter and Enter again ask whether to delete it and leave it where it
+    is.
   - A step may press about 16 keys. The harness waits for each to reach
     the keyboard buffer, which holds 15, and fails when the program does
     not take them fast enough.
@@ -586,6 +607,61 @@ SCENARIOS = {
             "Down Ins",                   # a directory too: not counted
             "Alt+F6",                     # until its size is worked out
             "F9 o n",                     # the mini status off
+        )),
+
+    "dirinfo": Scenario(
+        "The Info panel, with what a directory says about itself in its "
+        "file dirinfo",
+        steps=(
+            # The editor empties the keyboard buffer when it has taken a
+            # key and again before it draws, so of keys pressed one behind
+            # the other it may lose one. Not with this option off.
+            "F9 o o",                     # the advanced options
+            "Down Down Down Down Down Space",     # Clear keyboard buffer
+            "Enter",
+            "Down Enter",                 # C:\\WORK\\DOCS: 0 files
+            "Shift+F4",                   # a new file, made in the editor
+            '"dirinfo"',
+            "Enter",
+            "Enter",
+            '"ab" Tab "c" Enter',         # a tab: on to the eighth column
+            'Tab Tab Tab Tab Tab "x" Enter',  # further than the line goes
+            '"0123456789012345"',         # a line longer than the 36
+            '"6789012345678901"',         # columns that are shown of it
+            '"23456789" Enter',
+            '"last"',                     # and one that does not end
+            "F2",
+            "Esc",                        # 1 file; the Info shows the text
+            "Ctrl+F1",                    # no panel of files next to it:
+                                          # the Info is as it was, until
+            "F9 o f",                     # it is drawn again, in panels
+                                          # half the screen high, without
+                                          # the files and with three lines
+            "Ctrl+F1",                    # of the text
+        )),
+
+    "tree-deep": Scenario(
+        "A tree thirteen directories deep, which is drawn narrower and has "
+        "no room for the last of them, and longer than its panel",
+        steps=(
+            "Ctrl+l",                     # the Info panel off: two panels
+            *(f'F7 "{letter}" Enter Enter'    # a directory, and into it
+              for letter in "abcdefghijklm"),
+            "F9 r t",                     # the tree in the right panel
+            "Ctrl+PgUp",                  # the files go up a directory, and
+                                          # the cursor of the tree with
+                                          # them: twelve levels deep
+            "Tab",
+            "Up",                         # eleven
+            "Up",                         # and ten
+            "F9 o f",                     # panels half the screen high:
+                                          # the tree begins further down
+            "Home",
+            "End",
+            "Ctrl+l",                     # the Info next to the tree
+            "Alt+F10",                    # the tree in a box, to choose a
+            "Up",                         # directory from
+            "Esc",
         )),
 }
 

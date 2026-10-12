@@ -69,7 +69,9 @@ class Batch:
     """Routines translated together."""
     title: str
     source: str                   # the C file in port/
-    routines: tuple               # the assembly procedures it replaces
+    # The assembly procedures it replaces, and stretches of code between
+    # procedures, each by its first label (see coverage.Listing).
+    routines: tuple
     functions: tuple              # its functions that the assembly calls
     # Address in the original -> why no scenario executes the instruction.
     unreached: dict = field(default_factory=dict)
@@ -163,9 +165,9 @@ BATCHES = [
         title="Where the panels are, and the cursor in them",
         source="place.c",
         routines=("BegBX", "SizDX", "LnsAX", "InvWCB", "AdrNum", "FilNum",
-                  "NumAdr", "ChgAdr", "CorPar"),
+                  "NumAdr", "ChgAdr", "CorPar", "FilePan"),
         functions=("BegBX_c", "SizDX_c", "LnsAX_c", "InvWCB_c", "AdrNum_c",
-                   "NumAdr_c", "ChgAdr_c", "CorPar_c"),
+                   "NumAdr_c", "ChgAdr_c", "CorPar_c", "FilePan_c"),
     ),
     Batch(
         title="A panel of files on the screen: its frame, its path, its "
@@ -180,6 +182,34 @@ BATCHES = [
                     "tree, or a list with nothing in it: it is called when "
                     "the cursor moves or a file is selected, and such a "
                     "panel has neither",
+        },
+    ),
+    Batch(
+        title="The tree of directories in a panel, and where in it the "
+              "current directory is",
+        source="tree.c",
+        routines=("PutTre", "PutTree", "TreeCur", "TrCr10", "TrCr20"),
+        functions=("PutTre_c", "PutTree_c", "TreeCur_c", "TrCr10_c",
+                   "TrCr20_c"),
+        unreached={
+            0xC1E9: "PutTree, for a tree with nothing in it: one that is "
+                    "read has its root at the least, and the program "
+                    "writes no tree file without",
+        },
+    ),
+    Batch(
+        title="The Info panel: memory, the disk, the files of the other "
+              "panel and the text of dirinfo",
+        source="info.c",
+        routines=("PutInf", "PtIn20"),
+        functions=("PutInf_c",),
+        unreached={
+            0xC38E: "PutInf, for a panel that shows neither files nor the "
+                    "tree nor the Info: nothing sets such a kind",
+            0xC48D: "PutInf, for files that take one byte in all: a file "
+                    "takes whole clusters, unless the size of a cluster "
+                    "is not known or is 64K, and the disks of the bench "
+                    "have clusters of 512 bytes",
         },
     ),
 ]

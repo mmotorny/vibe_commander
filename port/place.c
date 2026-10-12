@@ -17,13 +17,12 @@
  */
 #include "vc.h"
 
-u16 InvWCB(u16 panel);
 u16 NumAdr(u16 panel, u16 number);
 u32 ChgAdr(u16 panel, u16 cursor, u16 first);
 
 /* How the assembly passes arguments to these, and what it expects back;
-   struct Place, BegBX, SizDX, LnsAX, AdrNum and CorPar are in vc.h. */
-#pragma aux InvWCB "*_c" __far parm [ax] value [ax] modify exact [ax]
+   struct Place, BegBX, SizDX, LnsAX, InvWCB, FilePan, AdrNum and CorPar
+   are in vc.h. */
 #pragma aux NumAdr "*_c" __far parm [ax] [si] value [si] modify exact [si]
 #pragma aux ChgAdr "*_c" __far parm [ax] [si] [di] value [dx ax] modify exact [ax dx]
 
@@ -77,6 +76,15 @@ u16 LnsAX(void)
 u16 InvWCB(u16 panel)
 {
     return panel == md.WCB1seg ? md.WCB2seg : md.WCB1seg;
+}
+
+/* Whether a panel shows files and is not switched off. Its stub makes
+   the carry flag of this, which is how the assembly answers. */
+u16 FilePan(u16 panel)
+{
+    struct WCBdef __far *wcb = PANEL(panel);
+
+    return wcb->Visible != 0 && wcb->WinTyp == 0;
 }
 
 /* Where the cursor of a panel is, as numbers: see struct Place. The last

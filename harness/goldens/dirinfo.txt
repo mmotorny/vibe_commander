@@ -1,0 +1,597 @@
+Volkov Commander 4.05 in the scenario dirinfo: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 1: F9 o o
+cursor 25 6 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 2: Down Down Down Down Down Space
+cursor 25 13 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 3: Enter
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 4: Down Enter
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x14 1Bx53
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║            │            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║            │            │            ║║        0 files use 0 bytes in        ║| 1Bx49 1Ex1 1Bx11 1Ex1 1Bx18
+|║            │            │            ║║             C:\WORK\DOCS             ║| 1Bx80
+|║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 5: Shift+F4
+cursor 8 8 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x14 1Bx53
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║                                                                              ║| 1Bx3 70x74 1Bx3
+|║     ╔══════════════════════════════ Edit ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ Edit the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 6: "dirinfo"
+cursor 15 8 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x14 1Bx53
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║                                                                              ║| 1Bx3 70x74 1Bx3
+|║     ╔══════════════════════════════ Edit ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ Edit the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║ dirinfo                                                          ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 7: Enter
+cursor 0 127 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x14 1Bx53
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │                           in drive C: is WORK      ║| 1Bx27 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
+|║            │            │   ╔══════ Edit ══════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
+|║            │            │   ║ Reading the file ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
+|║            │            │   ║     dirinfo      ║   les use 0 bytes in        ║| 1Bx27 70x26 03x2 1Bx6 1Ex1 1Bx18
+|║            │                                        C:\WORK\DOCS             ║| 1Bx25 4Fx29 03x1 1Bx25
+|║            │              ╔════════ Edit ═══════╗   ─────────────────────────╢| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
+|║            │              ║ Can't find the file ║                            ║| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
+|║            │              ║       dirinfo       ║   ' file in this directory ║| 1Bx25 4Fx29 03x2 1Bx24
+|║            │              ║  New-file   Cancel  ║                            ║| 1Bx25 4Fx5 70x10 4Fx14 03x2 1Bx24
+|║            │              ╚═════════════════════╝                            ║| 1Bx25 4Fx29 03x2 1Bx24
+|║            │                                                                 ║| 1Bx25 4Fx29 03x2 1Bx24
+|║            │            │            ║║                                      ║| 1Bx27 03x29 1Bx24
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 8: Enter
+cursor 0 1 lines 6 7 mode 3
+|Edit: dirinfo                            Line 1     Col 1############ Free      | 30x80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 9: "ab" Tab "c" Enter
+cursor 0 2 lines 6 7 mode 3
+|Edit: dirinfo                         *  Line 2     Col 1############ Free      | 30x80
+|ab      c                                                                       | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+blinks 46 0 to |1| 30
+blinks 57 0 to |0| 30
+blinks 68 0 to |8| 30
+
+== 10: Tab Tab Tab Tab Tab "x" Enter
+cursor 0 3 lines 6 7 mode 3
+|Edit: dirinfo                         *  Line 3     Col 1############ Free      | 30x80
+|ab      c                                                                       | 1Bx80
+|                                        x                                       | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 11: "0123456789012345"
+cursor 16 3 lines 6 7 mode 3
+|Edit: dirinfo                         *  Line 3     Col 17########### Free      | 30x80
+|ab      c                                                                       | 1Bx80
+|                                        x                                       | 1Bx80
+|0123456789012345                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 12: "6789012345678901"
+cursor 32 3 lines 6 7 mode 3
+|Edit: dirinfo                         *  Line 3     Col 33########### Free      | 30x80
+|ab      c                                                                       | 1Bx80
+|                                        x                                       | 1Bx80
+|01234567890123456789012345678901                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 13: "23456789" Enter
+cursor 0 4 lines 6 7 mode 3
+|Edit: dirinfo                         *  Line 4     Col 1############ Free      | 30x80
+|ab      c                                                                       | 1Bx80
+|                                        x                                       | 1Bx80
+|0123456789012345678901234567890123456789                                        | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 14: "last"
+cursor 4 4 lines 6 7 mode 3
+|Edit: dirinfo                         *  Line 4     Col 5############ Free      | 30x80
+|ab      c                                                                       | 1Bx80
+|                                        x                                       | 1Bx80
+|0123456789012345678901234567890123456789                                        | 1Bx80
+|last                                                                            | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 15: F2
+cursor 4 4 lines 6 7 mode 3
+|Edit: dirinfo                            Line 4     Col 5############ Free      | 30x80
+|ab      c                                                                       | 1Bx80
+|                                        x                                       | 1Bx80
+|0123456789012345678901234567890123456789                                        | 1Bx80
+|last                                                                            | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 16: Esc
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x14 1Bx53
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║dirinfo     │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║            │            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║            │            │            ║║       1 file uses 512 bytes in       ║| 1Bx48 1Ex1 1Bx11 1Ex3 1Bx17
+|║            │            │            ║║             C:\WORK\DOCS             ║| 1Bx80
+|║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║ ab      c                            ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║ 012345678901234567890123456789012345 ║| 1Bx80
+|║            │            │            ║║ last                                 ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 17: Ctrl+F1
+cursor 13 23 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freew╔════════════════ Info ════════════════╗| 07x40 1Bx17 30x6 1Bx17
+|Copyright (C) 1991-2000 Vsevolod V. Volk║  The Volkov Commander, Version 4.05  ║| 07x40 1Bx40
+|                                        ╟──────────────────────────────────────╢| 07x40 1Bx40
+|                                        ║         653,296 Bytes Memory         ║| 07x40 1Bx10 1Ex7 1Bx23
+|                                        ║          498,256 Bytes Free          ║| 07x40 1Bx11 1Ex7 1Bx22
+|                                        ║      Volume in drive C: is WORK      ║| 07x40 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
+|                                        ║  32,724,992 total bytes on drive C:  ║| 07x40 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
+|                                        ║  32,718,848 bytes free on drive C:   ║| 07x40 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
+|                                        ║       1 file uses 512 bytes in       ║| 07x40 1Bx8 1Ex1 1Bx11 1Ex3 1Bx17
+|                                        ║             C:\WORK\DOCS             ║| 07x40 1Bx40
+|                                        ╟──────────────────────────────────────╢| 07x40 1Bx40
+|                                        ║ ab      c                            ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║ 012345678901234567890123456789012345 ║| 07x40 1Bx40
+|                                        ║ last                                 ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ╚══════════════════════════════════════╝| 07x40 1Bx40
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 18: F9 o f
+cursor 13 23 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freew╔════════════════ Info ════════════════╗| 07x40 1Bx17 30x6 1Bx17
+|Copyright (C) 1991-2000 Vsevolod V. Volk║  The Volkov Commander, Version 4.05  ║| 07x40 1Bx40
+|                                        ╟──────────────────────────────────────╢| 07x40 1Bx40
+|                                        ║         653,296 Bytes Memory         ║| 07x40 1Bx10 1Ex7 1Bx23
+|                                        ║          498,256 Bytes Free          ║| 07x40 1Bx11 1Ex7 1Bx22
+|                                        ║      Volume in drive C: is WORK      ║| 07x40 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
+|                                        ║  32,724,992 total bytes on drive C:  ║| 07x40 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
+|                                        ║  32,718,848 bytes free on drive C:   ║| 07x40 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ╟──────────────────────────────────────╢| 07x40 1Bx40
+|                                        ║ ab      c                            ║| 07x40 1Bx40
+|                                        ║                                      ║| 07x40 1Bx40
+|                                        ║ 012345678901234567890123456789012345 ║| 07x40 1Bx40
+|                                        ╚══════════════════════════════════════╝| 07x40 1Bx40
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 19: Ctrl+F1
+cursor 13 23 lines 6 7 mode 3
+|╔════════════ C:\WORK\DOCS ════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║dirinfo     │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║            │            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║            │            │            ║║       1 file uses 512 bytes in       ║| 1Bx48 1Ex1 1Bx11 1Ex3 1Bx17
+|║            │            │            ║║             C:\WORK\DOCS             ║| 1Bx80
+|║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║ ab      c                            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ 012345678901234567890123456789012345 ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|C:\WORK\DOCS>                                                                   | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\DOCS\DIRINFO  A   during the run  60 bytes  702dc134f8100905
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

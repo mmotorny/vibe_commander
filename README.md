@@ -65,8 +65,10 @@ characters and colours into the copy of the screen that the program draws
 in, those that read and write hex digits and numbers and hold a file name
 against a mask, those that filter and sort the list of files of a panel and
 find a file in it, those that say where the panels are and where in them
-the cursor is, and those that draw a panel of files: its frame, its path,
-its files, its status line and the cursor.
+the cursor is, those that draw a panel of files: its frame, its path, its
+files, its status line and the cursor, and those that draw what a panel
+shows instead of files: the tree of directories, with the cursor on the
+current directory, and the Info.
 
 ## Layout
 
@@ -155,7 +157,9 @@ to the C function; `git diff --no-index src port/asm` shows what is gone.
 The C code keeps the names the routines and their data have in the
 assembly, so that either can be found from the other. Where C code needs a
 routine that is still assembly, the assembly gets an entry for it that C
-can call.
+can call. The assembly also holds the two routines that the compiler calls
+to multiply and to divide numbers of 32 bits, which a C library would
+bring: the program has none.
 
 The halves are linked into one program, `VC.EXE`, which is not built the
 way a C program usually is. It still loads and starts like the `.COM` file

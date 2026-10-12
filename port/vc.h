@@ -9,7 +9,8 @@
  *     allocates when it starts. It holds one struct MainDat and nothing
  *     else, so C code has no static data of its own.
  *   - Constants sit in the code segment, as they do in the assembly.
- *     Declare them CODE. String literals are not available.
+ *     Declare them CODE. String literals are not available, but to give
+ *     such a constant its contents.
  *   - The stack is in a third segment. A pointer to a local variable must
  *     be declared STACK.
  *   - Each file panel has a segment to itself, reached by far pointers.
@@ -395,13 +396,25 @@ u16 *SzDtTm(const struct FILENT __far *file, u16 *screen, u16 color);
 u16 BegBX(u16 panel);                                   /* place.c */
 u16 SizDX(void);
 u16 LnsAX(void);
+u16 InvWCB(u16 panel);
+u16 FilePan(u16 panel);
 void AdrNum(u16 panel, struct Place STACK *place);
 void CorPar(u16 panel);
-#pragma aux BegBX  "*_c" __far parm [bx] value [bx] modify exact [bx]
-#pragma aux SizDX  "*_c" __far value [dx] modify exact [dx]
-#pragma aux LnsAX  "*_c" __far value [ax] modify exact [ax]
-#pragma aux AdrNum "*_c" __far parm [ax] [bx] modify exact [ax]
-#pragma aux CorPar "*_c" __far parm [ax] modify exact [ax]
+#pragma aux BegBX   "*_c" __far parm [bx] value [bx] modify exact [bx]
+#pragma aux SizDX   "*_c" __far value [dx] modify exact [dx]
+#pragma aux LnsAX   "*_c" __far value [ax] modify exact [ax]
+#pragma aux InvWCB  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux FilePan "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux AdrNum  "*_c" __far parm [ax] [bx] modify exact [ax]
+#pragma aux CorPar  "*_c" __far parm [ax] modify exact [ax]
+u8 *PtPt10(u16 panel);                                  /* panel.c */
+#pragma aux PtPt10  "*_c" __far parm [ax] value [di] modify exact [ax di]
+/* The colours of the tree are four numbers in the code, of the assembly's
+   or of the C's: the stub has ES on its own segment for them. */
+void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors);
+#pragma aux PutTree "*_c" __far parm [ax] [bx] [dx] [es si] modify exact [ax es]  /* tree.c */
+void PutInf(u16 panel);                                 /* info.c */
+#pragma aux PutInf  "*_c" __far parm [ax] modify exact [ax]
 
 /* The panel that a file entry belongs to. */
 #define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))

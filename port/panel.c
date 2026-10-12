@@ -7,7 +7,8 @@
  * All of this is written to the screen buffer, and but for SetCur it is
  * left to the caller to put that on the screen. A panel that shows the
  * tree or the Info has its frame, its title and its cursor from here; what
- * is in it is still assembly, which PutFls's stub goes to.
+ * is in it is written by PutTre of tree.c and PutInf of info.c, which
+ * PutFls's stub goes to.
  *
  * What PutName and Panel8 are in the assembly is written out where it is
  * used: these routines are called from deep down, and a function called
@@ -17,15 +18,14 @@
 
 void Panel(u16 panel);
 void PutPath(u16 panel);
-u8 *PtPt10(u16 panel);
 void PutFls(u16 panel);
 void SetCur(u16 panel, u16 set);
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);
 
-/* How the assembly passes arguments to these, and what it expects back. */
+/* How the assembly passes arguments to these, and what it expects back;
+   PtPt10 is in vc.h. */
 #pragma aux Panel   "*_c" __far parm [ax] modify exact [ax]
 #pragma aux PutPath "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PtPt10  "*_c" __far parm [ax] value [di] modify exact [ax di]
 #pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux SetCur  "*_c" __far parm [dx] [ax] modify exact [ax]
 #pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
