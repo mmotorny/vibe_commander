@@ -146,8 +146,9 @@ u16 AsmSeg(void);
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what
-   follows them: they are in the assembly's code segment, where DialBox
-   and Dialog read them. */
+   follows them: constants, most of them of port/commands_t.c, in the
+   segment that AsmSeg returns, where DialBox and Dialog read them by
+   their offsets. */
 extern const u8 __far Filt_B[];         /* the filter of a panel */
 extern const u8 __far DiSiz_P[];        /* "Scanning sizes of
                                            subdirectories" */
@@ -679,12 +680,12 @@ u16 M61_00(void)
    one in the program's directory, or that of the current directory, and
    have the editor open it. `title` is the title of the box, `include`
    what it calls the file, `page` its page of the help; all three and
-   the name are offsets in the assembly.
+   the name are offsets in the segment that AsmSeg returns.
 
-   The assembly copies the title as 80 bytes and the name as 13, with
+   The original copies the title as 80 bytes and the name as 13, with
    what follows them there, and 64 of those bytes go on into ViewFil
-   behind the name. So they are copied from the assembly here too, as
-   long as that has them. */
+   behind the name. So as many are copied here, and ExFl_S is written
+   in port/commands_t.c with the 80 that the original has there. */
 static u16 M64_02(u16 item, u16 name, u16 title, u16 include, u16 page)
 {
     u16 code = AsmSeg();

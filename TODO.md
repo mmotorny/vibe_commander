@@ -22,7 +22,7 @@ but code in its row has its data in C.
 |---|---|---|---|---|---|---|---|
 | `VC.ASM` | 15 / 733 | 3 / 60 | 2 / 44 | 2 / 8 | 2 / 160 | 219 | `main.c`, `start.c` |
 | `VCFUNC.INC` | | | | | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
-| `VCMENU.INC` | 53 / 1,364 | 8 / 190 | 7 / 352 | 3 / 17 | 8 / 174 | 495 | `commands.c`, `menu.c` |
+| `VCMENU.INC` | | | | | 8 / 174 | 495 | `commands.c`, `menu.c` |
 | `VCF1.INC` | | | | | | 217 | `dirfunc.c` |
 | `VCCOPY.INC` | | | | | 1 / 10 | 82 | `copy.c` |
 | `VCVIEW.INC` | 16 / 256 | 9 / 160 | 5 / 110 | | | 180 | `view.c` |
@@ -32,7 +32,7 @@ but code in its row has its data in C.
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 113 / 3,272 | 29 / 568 | 20 / 638 | 10 / 48 | 13 / 420 | 2,420 | |
+| all | 60 / 1,908 | 21 / 378 | 13 / 286 | 7 / 31 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -174,7 +174,9 @@ that are copied with what follows them are written as long as what is
 copied; `VCCOPY.INC`, where the titles `Copy0_S` and `Ren0_S` are such
 texts too, 20 bytes each; `VCFUNC.INC`, where the names of the menu file
 and of the list file are, 13 bytes each, and whose `AltSr_T` stays with
-the tables; `VCF1.INC`, where `DlWr4_S` is one, 81 bytes.
+the tables; `VCF1.INC`, where `DlWr4_S` is one, 81 bytes; `VCMENU.INC`,
+where the title `ExFl_S` is one, 80 bytes, and `Chk1_S`, which is read
+as far as the end of `Chk2_S` behind it, is ten.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for
@@ -508,10 +510,10 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   all of that on the stack: `FindFil` calls DOS for the files, and to
   open and read them.
 - `VCMENU.INC` is C but for what the assembly needs of it: the tables by
-  which the stub of the menu bar jumps to the commands, the stubs of the
-  commands, 28 of them with `M17_00`, which hands Drive... to the box of
-  the drives, the boxes, dialogs and texts, which `DialBox` and `Dialog`
-  read in the assembly. The stubs
+  which the stub of the menu bar jumps to the commands, and the stubs of
+  the commands, 28 of them with `M17_00`, which hands Drive... to the
+  box of the drives. Its boxes, dialogs and texts are constants of
+  `port/commands_t.c`. The stubs
   go when the loop that jumps to
   them is C, and with it `CmdM01`, `CmdM03` and `CmdM06` of
   `VCFUNC.INC`, by which the keys of the panels go on in three of the

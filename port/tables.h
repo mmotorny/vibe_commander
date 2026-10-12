@@ -75,6 +75,10 @@
    for the name of a field of MainDat. */
 #define MD_AT(field) ((u16)&((struct MainDat *)0)->field)
 
+/* Where in the segment of a panel something is, a field of WCBdef: the
+   filter of a panel is a dialog that is asked for with that segment. */
+#define WCB_AT(field) ((u16)&((struct WCBdef *)0)->field)
+
 /* A word that names something, where it holds a number instead: the
    length of a line that is typed into, say. */
 #define NUMBER(number) ((const void *)(number))

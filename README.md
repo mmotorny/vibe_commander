@@ -175,7 +175,8 @@ on, the tree in a box to go to a directory, the sizes of directories,
 the screen with as many lines as an EGA or a VGA has, two directories
 compared, the configuration and the advanced options, the menu file and
 the extension files opened in the editor, the switches of the Options
-menu, and the setup saved.
+menu, and the setup saved; their texts, boxes and dialogs are constants
+of C, in `port/commands_t.c`.
 
 ## Layout
 
