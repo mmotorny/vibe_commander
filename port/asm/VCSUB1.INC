@@ -948,6 +948,7 @@ StdLine	PROC	NEAR
 	INC	BH
 	RET
 StdLine	ENDP
+	FromC	StdLine
 
 ;------------------- Zoom box only once ----------------
 OncZoom	PROC	NEAR

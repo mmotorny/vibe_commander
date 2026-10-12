@@ -397,6 +397,29 @@ port.
   `Dialog` takes the answer from AL when the carry flag is clear, and
   reads nothing of AX when it is set. See `F35_60`, which also keeps
   the label that the other dialog names, `F35_61`, inside it.
+- The commands of `VCF1.INC` and the file search's go on the same way,
+  with numbers of their own, the `TO_` of `port/vc.h`: each stub is the
+  label, the call and `JMP F1Next`, which is in `VCF1.INC` and jumps to
+  `Func04`, `FncSel`, `FncExt` or `FncEx1`. `F67_00` returns the panel
+  for `F24_02` in DX, and its stub sees to that. `F38_40`, `M30_50` and
+  `FindFil` are public for `FncAddr` like `C00_00`.
+- A routine that reads through ES what its caller has at DS takes the
+  wrong bytes where the two differ, and the C has to hand it the same
+  wrong address: `ChgDisk` reads the path at ES:DX, and Go to of the
+  file search calls it with DS on the list. Read what a routine takes
+  its argument through, not only which register.
+- The header of a dialog has its bytes in the order of `BOXHD` in
+  `port/asm/VC.ASM`, the key bar first: `DB 1, 0FFh, 32, 10h` is key
+  bar 1, no menu item, help page 32, flags.
+- DOS called with `INT 21h` itself, where the original did not go
+  through `Intr21`, has an entry that takes `struct DosRegs` as
+  `Intr21_a` does: `Int21d_a` in `VCFIND.INC`. `Int2F_a` is next to it,
+  and `StdLine_a` next to its routine.
+- When the last caller of a stub becomes C, the stub goes, with its
+  line in the `EXTERN` list, and the function is static if only its own
+  file calls it: `FndMove`, `FndCurs` and `F38_70`. Take such a function
+  out of the batch's `functions` in `harness/ported.py`, which are those
+  that the assembly calls.
 
 ### C for the port
 

@@ -2,6 +2,9 @@
  * What is done to files one after the other: deleting them, and setting
  * their attributes, date and time; and DirFunc, which goes through the
  * files of a directory for these and for the other commands that do.
+ * With them the commands that ask for it: F8, Shift-F8 and Ctrl-F8, the
+ * attributes, and those that stand next to them in the assembly, F7 and
+ * Shift-F7, which make a directory, and the volume label.
  *
  * Translated from VCF1.INC.
  *
@@ -17,8 +20,12 @@
  * M30_50 sets attributes; the routines of the other commands are in
  * other files, and DirFunc serves them too.
  *
- * What the commands ask before they begin, and FncSel and FncMas, are
- * still assembly.
+ * A command is entered by a jump, from the table of the keys or from a
+ * menu, and jumps on when it is done: back to the panels, to FncSel, or
+ * to where the panels are read again. Its function here returns which,
+ * one of the TO_ of vc.h, and its stub in the assembly jumps there.
+ * FncMas is C, here; FncSel is still assembly, and so is FncExt, which
+ * reads the panels again if TmpBuf has something at 91.
  *
  * Behind the name TmpBuf has what a command keeps while it runs. For
  * deleting: at 90, not 0 once "All" was the answer for a directory that
@@ -32,18 +39,36 @@
 
 u16 F38_10(u16 answer);
 u16 F38_40(u16 attributes);
-u16 F38_70(void);
+static u16 F38_70(void);
 u16 M30_50(u16 attributes);
 u32 M30_60(u16 answer);
+u16 F37_00(u16 panel);
+u16 F47_00(void);
+u16 F38_00(u16 panel);
+u16 F48_00(void);
+u16 F58_00(u16 panel);
+u16 M30_00(u16 panel);
+u16 F54_00(void);
+u16 FncMas(u16 include);
 static u32 F38_60(void);
+static u16 FncMs1(u16 include);
 
 /* How the assembly passes arguments to these, and what it expects back
    (see the stubs in port/asm/VCF1.INC). DirFunc and DelTr0 are in vc.h. */
 #pragma aux F38_10  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux F38_40  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F38_70  "*_c" __far value [ax] modify exact [ax]
 #pragma aux M30_50  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux M30_60  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+/* The commands: the panel they are for is what the assembly has in DS
+   when it jumps to one. FncMas gets what it has in BX. */
+#pragma aux F37_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F47_00  "*_c" __far value [ax] modify exact [ax]
+#pragma aux F38_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F48_00  "*_c" __far value [ax] modify exact [ax]
+#pragma aux F58_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M30_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F54_00  "*_c" __far value [ax] modify exact [ax]
+#pragma aux FncMas  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
 /* Routines of the rest of the program that are still assembly, by their
    entries for C. OncZoom puts a box on the screen with its middle at
@@ -60,23 +85,53 @@ static u32 F38_60(void);
 
    Intr21f is Intr21 with the carry flag set before DOS is called if
    `carry` is not 0, and clear if it is. Fcb29 has DOS make an FCB of a
-   name: function 29h with 2 in AL, not through Intr21. */
+   name: function 29h with `flags` in AL, not through Intr21. HidCur puts
+   the cursor below the screen. */
 void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
 void ResWin(u16 begin, u16 size, u16 saved);
 u16 ChgDisk(const u8 *path);
 u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
-u16 Fcb29(const u8 *name, u8 *fcb);
+u16 Fcb29(const u8 *name, u8 *fcb, u16 flags);
+void HidCur(void);
 #pragma aux OncZoom "*_a" __far parm [bx] [ax] [dx] [di] modify exact [bx dx si es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
 #pragma aux Intr21f "*_a" __far parm [bx] [ax] value [ax] modify exact [ax bx cx dx si di es]
-#pragma aux Fcb29   "*_a" __far parm [si] [di] value [ax] modify exact [ax si es]
+#pragma aux Fcb29   "*_a" __far parm [si] [di] [ax] value [ax] modify exact [ax si es]
+#pragma aux HidCur  "*_a" __far modify exact [es]
 
 /* C routines of other files that vc.h does not have. */
 const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number); /* digits.c */
+void NormStr(u8 __far *text);                           /* string.c */
+u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
+u32 TotSel(u16 panel);                                  /* files.c */
+u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
+u32 GetVol(u8 *volume);                                 /* read.c */
+struct DateText {                                       /* format.c */
+    u16 century;
+    u16 first, second, third;
+};
+struct TimeText {
+    u16 hour, minute, second;
+    u8  unused;
+    u8  suffix;
+};
+void PutDate(u16 date, struct DateText STACK *text);
+u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
+void PutTime(u16 time, struct TimeText STACK *text);
+u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
 #pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
 #pragma aux TxtNum  "*_c" __far parm [es si] [bx] value [es si] modify exact [si es]
+#pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
+#pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
+#pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
+#pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux PutDate "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
+#pragma aux BufDate "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
+#pragma aux PutTime "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
+#pragma aux BufTime "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
 
 /* Boxes and texts of the assembly, which OncZoom and Dialog take by their
    offsets in its code segment: only those are used here. */
@@ -112,6 +167,53 @@ extern const u8 __far NoAtr_S[];        /* "Can't set attributes" */
 #pragma aux Empty_S "*"
 #pragma aux NoFnd_S "*"
 #pragma aux NoAtr_S "*"
+/* Those of the commands. DlWr4_S is copied with what follows it there,
+   81 bytes in all. */
+extern const u8 __far MkDi1_B[];        /* "Create the directory", a path */
+extern const u8 __far MkDi2_B[];        /* the same, a name: in the tree */
+extern const u8 __far MkErr_B[];        /* "Can't create the directory" */
+extern const u8 __far CrDir_S[];        /* "Create the directory" */
+extern const u8 __far MkDir_S[];        /* " Make directory " */
+extern const u8 __far DelDi_B[];        /* "Do you wish to delete" a */
+extern const u8 __far Subdi_S[];        /* " the directory" */
+extern const u8 __far DelFi_B[];        /* "Do you wish to delete" a file */
+extern const u8 __far DelSe_B[];        /* "You have selected" */
+extern const u8 __far DlMas_B[];        /* "Delete the file:" */
+extern const u8 __far DlWrn_B[];        /* "WARNING!" */
+extern const u8 __far DlWr4_S[];        /* "in the current directory" */
+extern const u8 __far StAt1_B[];        /* the attributes of a file */
+extern const u8 __far StAt2_B[];        /* those to set and to clear */
+extern const u8 __far Attr8_S[];        /* " for" */
+extern const u8 __far Label_B[];        /* "Change volume label ... to" */
+extern const u8 __far DelVo_B[];        /* "Do you wish to delete" it */
+extern const u8 __far ErVol_B[];        /* "Could not set" it */
+extern const u8 __far NoFnc_B[];        /* "Can't find file" */
+#pragma aux MkDi1_B "*"
+#pragma aux MkDi2_B "*"
+#pragma aux MkErr_B "*"
+#pragma aux CrDir_S "*"
+#pragma aux MkDir_S "*"
+#pragma aux DelDi_B "*"
+#pragma aux Subdi_S "*"
+#pragma aux DelFi_B "*"
+#pragma aux DelSe_B "*"
+#pragma aux DlMas_B "*"
+#pragma aux DlWrn_B "*"
+#pragma aux DlWr4_S "*"
+#pragma aux StAt1_B "*"
+#pragma aux StAt2_B "*"
+#pragma aux Attr8_S "*"
+#pragma aux Label_B "*"
+#pragma aux DelVo_B "*"
+#pragma aux ErVol_B "*"
+#pragma aux NoFnc_B "*"
+
+/* The stubs of F38_40 and of M30_50 in the assembly: FncAddr gets the
+   offset of one, for FncSel, FncMas and DirFunc to call. */
+extern const u8 __far F38_40_stub[];
+extern const u8 __far M30_50_stub[];
+#pragma aux F38_40_stub "F38_40"
+#pragma aux M30_50_stub "M30_50"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
@@ -369,7 +471,7 @@ static u32 F38_60(void)
    asks which, so the answer of the call is lost. What Intr21 hands back
    instead, one more than which is returned here, is 0 where nothing has
    failed before. So nothing says "Can't find files" for such a mask. */
-u16 F38_70(void)
+static u16 F38_70(void)
 {
     struct DosRegs regs;
     struct Box box;
@@ -386,7 +488,7 @@ u16 F38_70(void)
         drive = md.TmpBuf[0];
     fcb[7] = (u8)(drive - ('A' - 1));
     name = NEAR(CutPath(md.TmpBuf));
-    if ((u8)Fcb29(name, fcb + 7) != 1)
+    if ((u8)Fcb29(name, fcb + 7, 2) != 1)
         return NOT_DONE;
     OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(DelFs_S),
             (struct Box STACK *)&box);
@@ -842,4 +944,458 @@ u32 DelTr0(const u8 *path)
     }
     md.BlocEr = 0;
     return PAIR(carry, written);
+}
+
+/* Shift-F7, and F7 where no tree is under the cursor: ask for a path and
+   make the directory. A name without a path is added to the list of the
+   current panel, as a directory, with the cursor on it, and the panels
+   are read again. `box` asks: MkDi1_B for a path, MkDi2_B for a name, of
+   12 characters, which is then made in the current directory of the
+   tree, and that directory becomes the current one there.
+
+   The name is cut to eight characters and three and put in capitals
+   before DOS gets it. What cannot be made is said in a box, but for a
+   drive that is not ready, and a name with a path in the tree is not
+   tried.
+
+   Ported as it is: the path of the tree's new directory is copied into
+   CrnPath from its third byte on, 66 bytes, and the zero behind them
+   goes into the byte after CrnPath, the first of ViewFil. And the entry
+   is added to the list of the current panel whatever that shows, and
+   without asking whether the list has room. */
+static u16 F47_01(u16 box)
+{
+    struct DosRegs regs;
+    struct WCBdef __far *wcb;
+    struct FILENT __far *entry;
+    u8 *path = md.TmpBuf;
+    u8 *name, *end;
+    u16 i;
+
+    md.TmpBuf[0] = 0;
+    if ((u8)Dialog(box, OFFSET(CrDir_S), 0, 0, MAIN_SEG) != 0)
+        return TO_FUNC04;
+    if (md.TmpBuf[0] == 0)
+        return TO_FUNC04;
+    name = NEAR(CutPath(md.TmpBuf));
+    Convert(name, md.TmpBuf + 100);
+    UnConv(name, md.TmpBuf + 100);
+    if (box == OFFSET(MkDi2_B)) {
+        if (NEAR(CutPath(md.TmpBuf)) != md.TmpBuf)
+            goto failed;
+        path = md.TmpBuf + 100;
+        end = NEAR(MvzLine(path, md.CrnPath + 2, LenPath));
+        end = NEAR(AddFile(end));
+        for (i = 0; i < 13; i++)
+            end[i] = md.TmpBuf[i];
+    }
+    /* F47_02 */
+    if (ChgDisk(path))
+        return TO_FUNC04;
+    regs.name = path;
+    regs.ax = 0x3900;
+    if (Intr21((struct DosRegs STACK *)&regs)) {
+        if (regs.ax == ERR_NOT_READY)
+            return TO_FUNC04;
+failed:
+        /* F47_03 */
+        for (i = 0; i < LenPath + 13; i++)
+            md.TmpBuf[130 + i] = md.TmpBuf[i];
+        Dialog(OFFSET(MkErr_B), OFFSET(MkDir_S), 0, 0, MAIN_SEG);
+        return TO_FUNC04;
+    }
+    /* F47_05 */
+    if (box == OFFSET(MkDi2_B)) {
+        for (i = 0; i < LenPath - 2; i++)
+            md.CrnPath[2 + i] = path[i];
+        md.ViewFil[0] = 0;              /* the byte behind CrnPath */
+        PathLin(md.CrnPath + 2);
+    } else if (NEAR(CutPath(path)) == path) {
+        /* F47_06 */
+        PathLin(path);
+        wcb = PANEL(md.WCBcrn);
+        entry = ENTRY(wcb, wcb->EndBuf);
+        wcb->CurAdr = wcb->EndBuf;
+        wcb->EndBuf += sizeof(struct FILENT);
+        for (i = 0; i < 12; i++)
+            entry->NameF[i] = path[i];
+        entry->NameF[12] = 0;
+        entry->AttrF = ATTR_DIRECTORY;
+    }
+    /* F47_07: DelTree */
+    if (md.ChgTree != 0)
+        DelTr0(path);
+    return TO_FNCEX1;
+}
+
+/* Shift-F7: make a directory, by a path. */
+u16 F47_00(void)
+{
+    return F47_01(OFFSET(MkDi1_B));
+}
+
+/* F7: make a directory, in the current directory of the tree if the
+   panel shows that. */
+u16 F37_00(u16 panel)
+{
+    const struct WCBdef __far *wcb = PANEL(panel);
+
+    if (wcb->WinTyp == 1 && wcb->Visible != 0)
+        return F47_01(OFFSET(MkDi2_B));
+    return F47_01(OFFSET(MkDi1_B));
+}
+
+/* F8: delete what is selected in the panel, or what the cursor is on if
+   nothing is, or if OneFile says so; in a tree the current directory,
+   which is then no longer the current one of the tree. It is asked
+   about first; FncSel then has F38_40 called for each. For a panel that
+   is off or shows neither files nor the tree, this is Shift-F8. */
+u16 F38_00(u16 panel)
+{
+    const struct WCBdef __far *wcb = PANEL(panel);
+    const struct FILENT __far *file;
+    u8 *end;
+    u32 selected;
+    u16 box, include, i;
+
+    DEL_ALL = 0;
+    FNC_CHANGE = 0;
+    DEL_TREE = 0;
+    md.FncAddr = OFFSET(F38_40_stub);
+    if (wcb->Visible == 0 || wcb->WinTyp > 1)
+        return F48_00();
+    if (wcb->WinTyp == 1) {
+        if (md.CrnPath[3] == 0)         /* the root */
+            return TO_FNCEXT;
+        for (i = 0; i < LenPath; i++)
+            md.TmpBuf[i] = md.CrnPath[i];
+        if ((u8)Dialog(OFFSET(DelDi_B), OFFSET(Subdi_S), 0, 0, MAIN_SEG)
+            != 0)
+            return TO_FUNC04;
+        md.ZoomOne = 0;
+        if ((u8)F38_40(ATTR_DIRECTORY) != 0) {
+            end = NEAR(CutPath(md.CrnPath));
+            if (end > md.CrnPath + 3)
+                end--;
+            *end = 0;
+        }
+        return TO_FNCEXT;
+    }
+    /* F38_04 */
+    selected = TotSel(panel);
+    if (selected != 0 && md.OneFile == 0) {
+        FilDir(md.TmpBuf, LOW(selected), HIGH(selected));
+        for (i = 0; i < LenPath; i++)
+            md.TmpBuf[100 + i] = wcb->WinPath[i];
+        box = OFFSET(DelSe_B);
+        /* None of its lines has ^I: the assembly hands over what it
+           has there, the number of files selected. */
+        include = HIGH(selected);
+    } else {
+        /* F38_06 */
+        if (wcb->CurAdr >= wcb->EndBuf)
+            return TO_FNCEXT;
+        file = ENTRY(wcb, wcb->CurAdr);
+        if (file->NameF[0] == '.')
+            return TO_FNCEXT;
+        box = OFFSET(DelFi_B);
+        include = OFFSET(Empty_S);
+        if (file->AttrF & ATTR_DIRECTORY) {
+            box = OFFSET(DelDi_B);
+            include = OFFSET(Subdi_S);
+        }
+        for (i = 0; i < 13; i++)
+            md.TmpBuf[i] = file->NameF[i];
+    }
+    /* F38_08 */
+    if ((u8)Dialog(box, include, 0, 0, MAIN_SEG) != 0)
+        return TO_FUNC04;
+    return TO_FNCSEL;
+}
+
+/* Shift-F8: ask for a name or a mask, and delete the files it names. A
+   mask for every file, "*.*" or a full stop, with a path or without, is
+   asked about once more. F38_70 has DOS delete what it deletes at one
+   call, and FncMs1 goes through the files that are left, or says that
+   there was none. */
+u16 F48_00(void)
+{
+    const u8 __far *from;
+    u8 *name;
+    u16 i, answer, include;
+
+    /* None of its lines has ^I: no include line. */
+    if ((u8)Dialog(OFFSET(DlMas_B), 0, 0, 0, MAIN_SEG) != 0)
+        return TO_FUNC04;
+    for (i = 0; i < LenStr + 1; i++)
+        md.TmpBuf[i] = md.ViewFil[i];
+    NormStr(md.TmpBuf);
+    LetLin(md.TmpBuf);
+    if (md.TmpBuf[0] == 0)
+        return TO_FUNC04;
+    name = NEAR(CutPath(md.TmpBuf));
+    if (*(u16 *)name != '.') {
+        /* Every file, if DOS makes eleven question marks of it. */
+        if ((u8)Fcb29(name, md.TmpBuf + 100, 0) != 1)
+            goto delete;
+        for (i = 1; i <= 11; i++)
+            if (md.TmpBuf[100 + i] != '?')
+                goto delete;
+    }
+    /* F48_01 */
+    for (i = 0; i < 4; i++)
+        name[i] = Mask_S[1 + i];
+    from = md.TmpBuf;
+    if (NEAR(CutPath(md.TmpBuf)) == md.TmpBuf)
+        from = DlWr4_S;
+    for (i = 0; i < LenPath + 13; i++)
+        md.TmpBuf[100 + i] = from[i];
+    /* No ^I here either. */
+    if ((u8)Dialog(OFFSET(DlWrn_B), 0, 0, 0, MAIN_SEG) != 0)
+        return TO_FUNC04;
+delete:
+    /* F48_04 */
+    md.ZoomOne = 0;
+    DEL_ALL = 0;
+    FNC_CHANGE = 0;
+    DEL_TREE = 0;
+    md.FncAddr = OFFSET(F38_40_stub);
+    answer = F38_70();
+    if (answer >> 8)
+        return TO_FNCEXT;
+    include = 0;
+    if ((u8)answer == 0)
+        include = OFFSET(Del_S);
+    return FncMs1(include);
+}
+
+/* Ctrl-F8: delete the file under the cursor, whatever is selected. */
+u16 F58_00(u16 panel)
+{
+    md.OneFile = 1;
+    return F38_00(panel);
+}
+
+/* The bits of the attributes that the four boxes at `ticks` have a
+   tick in: read only, archive, hidden and system. */
+static u16 M30_82(const u8 *ticks)
+{
+    u16 bits = 0;
+
+    if (ticks[0] != 0)
+        bits |= 0x01;
+    if (ticks[1] != 0)
+        bits |= 0x20;
+    if (ticks[2] != 0)
+        bits |= 0x02;
+    if (ticks[3] != 0)
+        bits |= 0x04;
+    return bits;
+}
+
+/* The attributes: ask for those of the file under the cursor, with its
+   date and time, or, for a directory and for what is selected, for those
+   to set and those to clear; FncSel then has M30_50 called for each.
+   Nothing for a panel that shows no files, and for "..".
+
+   The dialog has its ticks at the start of TmpBuf, those to clear at
+   10, the date at 15 and the time at 30, each without the space that it
+   begins with where a number has one digit, and the name at 100. */
+u16 M30_00(u16 panel)
+{
+    const struct WCBdef __far *wcb = PANEL(panel);
+    const struct FILENT __far *file;
+    struct DateText date;
+    struct TimeText time;
+    u8 *end;
+    u16 i, bits, attributes;
+
+    if (!FilePan(panel))
+        return TO_FUNC04;
+    if (TotSel(panel) == 0) {
+        /* M30_03 */
+        if (wcb->CurAdr >= wcb->EndBuf)
+            return TO_FUNC04;
+        file = ENTRY(wcb, wcb->CurAdr);
+        if (file->NameF[0] == '.')
+            return TO_FUNC04;
+        attributes = file->AttrF;
+        if (!(attributes & ATTR_DIRECTORY)) {
+            md.TmpBuf[0] = (attributes & 0x01) != 0;
+            md.TmpBuf[1] = (attributes & 0x20) != 0;
+            md.TmpBuf[2] = (attributes & 0x02) != 0;
+            md.TmpBuf[3] = (attributes & 0x04) != 0;
+            PutDate(file->DateF, (struct DateText STACK *)&date);
+            end = md.TmpBuf + 15;
+            if ((u8)date.first == ' ')
+                end--;
+            end = BufDate((struct DateText STACK *)&date, end);
+            *end = 0;
+            PutTime(file->TimeF, (struct TimeText STACK *)&time);
+            end = md.TmpBuf + 30;
+            if ((u8)time.hour == ' ')
+                end--;
+            end = BufTime((struct TimeText STACK *)&time, end);
+            if (time.suffix == ' ')
+                end--;
+            *end = 0;
+            for (i = 0; i < 13; i++)
+                md.TmpBuf[100 + i] = file->NameF[i];
+            if ((u8)Dialog(OFFSET(StAt1_B), OFFSET(Attr8_S), 0, 0, MAIN_SEG)
+                != 0)
+                return TO_FUNC04;
+            bits = M30_82(md.TmpBuf);
+            ATTR_KEEP = (u8)bits;
+            ATTR_SET = (u8)bits;
+            goto set;
+        }
+    }
+    /* M30_01 */
+    for (i = 0; i < 100; i++)
+        md.TmpBuf[i] = 0;
+    if ((u8)Dialog(OFFSET(StAt2_B), OFFSET(Empty_S), 0, 0, MAIN_SEG) != 0)
+        return TO_FUNC04;
+    ATTR_SET = (u8)M30_82(md.TmpBuf);
+    ATTR_KEEP = (u8)~M30_82(md.TmpBuf + 10);
+set:
+    /* M30_07 */
+    md.FncAddr = OFFSET(M30_50_stub);
+    return TO_FNCSEL;
+}
+
+/* Ctrl-F4: ask for the volume label of the current drive, and set it.
+   Nothing for a drive of a network. A label is an entry of the root with
+   an attribute of its own: the one that is there is deleted, through an
+   FCB that asks for that attribute, and the new one is made like a
+   file, the label as a file name with a full stop behind its eighth
+   character. With no label typed the old one is deleted, after asking.
+
+   Ported as it is: the old label is deleted before it is known whether
+   the new one can be made. The calls for the FCB leave the carry flag
+   as they find it, and the assembly has it clear there, of comparing
+   with 0. None of the boxes has ^I in a line, and they get no include
+   line here, where the assembly left them what DX held. */
+u16 F54_00(void)
+{
+    struct DosRegs regs;
+    u8 *end;
+    u16 i;
+
+    HidCur();
+    ChgDisk(md.DosPth);
+    if (HIGH(GetVol(md.Volume)) == 0)
+        return TO_FUNC04;
+    md.TmpBuf[0] = '\\';
+    for (i = 0; i < 12; i++)
+        md.TmpBuf[1 + i] = md.Volume[i];
+    md.TmpBuf[20] = 0;
+    if (md.Volume[0] != 0) {
+        md.TmpBuf[20] = ' ';
+        md.TmpBuf[21] = '"';
+        end = NEAR(MvzLine(md.TmpBuf + 22, md.Volume, 12));
+        end[0] = '"';
+        end[1] = 0;
+    }
+    /* F54_01 */
+    if ((u8)Dialog(OFFSET(Label_B), 0, 0, 0, MAIN_SEG) != 0)
+        return TO_FUNC04;
+    md.TmpBuf[20] = 0xFF;               /* an extended FCB, */
+    md.TmpBuf[26] = 8;                  /* for a label, */
+    md.TmpBuf[27] = 0;                  /* on the current drive */
+    end = NEAR(MvzLine(md.TmpBuf + 28, md.Volume, 12));
+    for (i = 0; i < 12; i++)
+        end[i] = ' ';
+    regs.name = md.TmpBuf + 20;
+    if (md.TmpBuf[1] == 0) {
+        if (md.Volume[0] == 0)
+            return TO_FUNC04;
+        if ((u8)Dialog(OFFSET(DelVo_B), 0, 0, 0, MAIN_SEG) != 0)
+            return TO_FUNC04;
+        regs.ax = 0x1300;
+        Intr21f((struct DosRegs STACK *)&regs, 0);
+        return TO_FNCEXT;
+    }
+    /* F54_03 */
+    regs.ax = 0x1300 | ' ';
+    Intr21f((struct DosRegs STACK *)&regs, 0);
+    *(u16 *)(md.TmpBuf + 12) = *(u16 *)(md.TmpBuf + 11);
+    *(u16 *)(md.TmpBuf + 10) = *(u16 *)(md.TmpBuf + 9);
+    md.TmpBuf[9] = '.';
+    regs.name = md.TmpBuf;
+    regs.cx = 8;
+    regs.ax = 0x3C00;
+    if (!Intr21((struct DosRegs STACK *)&regs)) {
+        regs.bx = regs.ax;
+        regs.ax = 0x3E00;
+        Intr21((struct DosRegs STACK *)&regs);
+        return TO_FNCEXT;
+    }
+    /* F54_04 */
+    *(u16 *)(md.TmpBuf + 9) = *(u16 *)(md.TmpBuf + 10);
+    *(u16 *)(md.TmpBuf + 11) = *(u16 *)(md.TmpBuf + 12);
+    Dialog(OFFSET(ErVol_B), 0, 0, 0, MAIN_SEG);
+    return TO_FNCEXT;
+}
+
+/* Go through the files that the mask at TmpBuf names, but for
+   directories and hidden and system files, and call what FncAddr names
+   for each, with its name in place of the mask's; a key that TstBrk
+   takes, and an answer with something in its high byte, stop that. If
+   DOS finds no file at all and `include` is not 0, a box says so,
+   "Can't find file", or "files" for a mask, with `include`, the name of
+   the command, for its title. Returns where to go on: FncExt. */
+static u16 FncMs1(u16 include)
+{
+    struct DosRegs regs;
+    const u8 *text;
+    u8 *name;
+    u16 i, answer;
+
+    SetDTA();
+    regs.cx = 0x37;
+    regs.ax = 0x4E00;
+    for (;;) {
+        /* FncMs4 */
+        if (ChgDisk(md.TmpBuf))
+            return TO_FNCEXT;
+        regs.name = md.TmpBuf;
+        if (Intr21((struct DosRegs STACK *)&regs))
+            break;
+        /* FncMs2 */
+        if (!(md.DTA.FilAttr & (ATTR_DIRECTORY | ATTR_SYSTEM | ATTR_HIDDEN))) {
+            include = 0;
+            name = NEAR(CutPath(md.TmpBuf));
+            for (i = 0; i < 13; i++)
+                name[i] = md.DTA.FilName[i];
+            if (TstBrk())
+                return TO_FNCEXT;
+            answer = FncCall(0);
+            FNC_CHANGE |= (u8)answer;
+            if (answer >> 8)
+                return TO_FNCEXT;
+        }
+        regs.ax = 0x4F00;
+    }
+    if (regs.ax != 0x12 && regs.ax > 3)
+        return TO_FNCEXT;
+    /* FncMs5 */
+    if (include == 0)
+        return TO_FNCEXT;
+    *(u16 *)(md.TmpBuf + 100) = 0;
+    for (text = md.TmpBuf; *text != 0; text++)
+        if (*text == '*' || *text == '?') {
+            *(u16 *)(md.TmpBuf + 100) = 's';
+            break;
+        }
+    Dialog(OFFSET(NoFnc_B), include, 0, 0, MAIN_SEG);
+    return TO_FNCEXT;
+}
+
+/* FncMas of the assembly, which a command jumps to: the files of the
+   mask at TmpBuf, each by what FncAddr names. */
+u16 FncMas(u16 include)
+{
+    md.ZoomOne = 0;
+    FNC_CHANGE = 0;
+    return FncMs1(include);
 }

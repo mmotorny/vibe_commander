@@ -98,10 +98,23 @@ Things that are known and not done. Standing instructions are in
   has none of these, and what a scenario makes of it by typing a letter
   into it has pages that are refused for their length.
 
-- Of the file search, the command itself is still assembly, the code
-  `F67_00` of `VCFIND.INC` between its data and its stubs: the dialog,
-  the drives of "*:", "N files found" and Go to. 44 of its 391
-  instructions have run in no scenario.
+- Of the file search's command, `F67_00`, three instructions are listed
+  as out of reach: two for a drive that the CD-ROM extensions answer
+  for, and Go to where the directory cannot be changed to.
+- Go to asks for the disk of the wrong drive. `F67_00` hands `ChgDisk`
+  the address of the line, which is in the memory of the list, and
+  `ChgDisk` reads at that offset in the main data: two bytes of the
+  first palette, since a line begins within 16 bytes of its segment. So
+  the current drive is asked about, unless the second byte is 3Ah, a
+  colon, and then the "drive" of the first. Ported like that. Go to
+  also copies 69 bytes of the line into the path of the panel, which
+  has 68; the last goes into the place of the cursor, which is set
+  next.
+- "N files found." is put together from two texts of the assembly,
+  each copied with the 15 bytes that begin with it: behind the full
+  stop TmpBuf gets seven bytes of whatever follows `FnFl7_S` in the
+  program. Nothing reads them; the C copies from the assembly, as long
+  as that has them.
 - What `FndMove` does for the mouse has run in no scenario, 96
   instructions: the middle button, a button held above the list or
   below it, a click outside the box, a click and a second one on a line.
@@ -360,16 +373,36 @@ Things that are known and not done. Standing instructions are in
   Cancel for a read-only file stops the command. `M30_50` does not ask
   whether DOS could read or set the date and the time of a file. All
   ported as they are.
-- Of `VCF1.INC` the three routines that make and read the ticks of the
-  attributes dialog, `M30_80`, `M30_82` and `M30_83`, 44 bytes, are
-  still assembly: only `M30_00` calls them, the code that asks, which
-  is assembly too. So are `FncSel` and `FncMas`, which go through the
-  selected files and those of a mask, and the code of every command
-  that asks first: F7, F8, Shift-F8, the attributes and the label.
-  `FncSel` and `FncExt` are code in the program's data, behind
-  `DirFunc`, and `harness/coverage.py` cannot name them yet: no
-  procedure follows them.
-- What `F38_70` does for a drive that is not ready, what `M30_50` does
+- Of `VCF1.INC`, `FncSel`, which goes through the selected files of a
+  panel, and `FncExt`, where a command ends that may have changed the
+  disk, are still assembly, 267 bytes. They are code in the program's
+  data, behind `DirFunc`, and `harness/coverage.py` cannot name them
+  yet: no procedure follows them. Everything else of the file is C or
+  a table. The commands that are C jump on to both, through `F1Next`.
+- A command that is C returns where it goes on, and its stub jumps
+  there: `F1Next` in `VCF1.INC`, with the `TO_` of `port/vc.h`. The
+  commands of the other files can use the same; one that goes on
+  somewhere else needs a number of its own there.
+- F7 in a tree copies the path of the new directory into `CrnPath`
+  from its third byte on, 66 bytes, and puts the zero behind them into
+  the byte after `CrnPath`: the first of `ViewFil`, the name that
+  Shift+F3, Shift+F4 and Shift+F8 offer again. Ported like that. And
+  F7 with a name and no path adds the directory to the list of the
+  current panel without asking whether that shows files, or has room.
+- The volume label: the old one is deleted before the new one is made,
+  so a label that cannot be made would leave none, on a DOS that
+  deletes one. FreeDOS neither deletes the label nor shows the new
+  one, and reports no error for either; what the program does where
+  DOS does both rests on reading. Ported as it is.
+- A drive that shares the floppy drive can be had on the bench after
+  all: B:, typed. `delete-mask` has "Insert diskette for drive B:" and
+  refuses, which is how `F38_70` came to stop there: its two
+  instructions for that were listed as out of reach and are not any
+  more. What copying lists as out of reach for "a disk the user will
+  not put in" could be reached the same way, a path on B: and Esc;
+  nobody has tried.
+- What `F38_70` does when DOS says that a drive is not ready, or will
+  not go back to the directory it came from, what `M30_50` does
   when DOS refuses the attributes of a file that it has just listed,
   `M30_60` where the year is written first, and `DirFunc` for a path
   of 68 characters or more ran in no scenario and rest on reading.
@@ -718,6 +751,26 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     dialog instead of its line, and after a directory of the tree is
     renamed the cursor is on another line. Both are at the top of
     `harness/scenarios.py` now.
+
+- The commands of `VCF1.INC` and the file search's, 2,099 bytes of the
+  original in five stretches and three small routines, next to seven
+  other batches. The translation passed the first time it was tested,
+  but for one number.
+  - 6 minutes: `F37_00`, `F47_00` and `F38_00` could not be named to
+    `harness/reach.py`: they stand in a stretch of code that begins in
+    `VCMENU.INC`, with `M60_00`, and the tools took a stretch by its
+    first label only. `harness/coverage.py` takes any label of one now,
+    a commit of its own.
+  - 2 minutes: the key bar of the box of the search, read from the
+    wrong byte of the dialog's header, 32, which is its help page. Four
+    scenarios showed it at once: 45 seconds, and the `STRUC` read
+    again.
+  - What saved time: all steps tried on the port's build that signals
+    first, six runs of `harness/show.py --changes` of 5 to 15 seconds,
+    before the goldens were derived, which then took 21 seconds for
+    four scenarios and were right, but for Ctrl+F8, which was added.
+    And `harness/compare.py` with only the scenarios of the batch, 20
+    to 45 seconds, before the full test.
 
 ## Ideas put off
 

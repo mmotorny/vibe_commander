@@ -475,6 +475,21 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors);
 #pragma aux PutTree "*_c" __far parm [ax] [bx] [dx] [es si] modify exact [ax es]  /* tree.c */
 void PutInf(u16 panel);                                 /* info.c */
 #pragma aux PutInf  "*_c" __far parm [ax] modify exact [ax]
+/* Where a command goes on when it is done. A command is entered by a
+   jump, from the table of the keys or from a menu, and jumps on; one that
+   is C returns one of these, and its stub in the assembly jumps there
+   (F1Next in port/asm/VCF1.INC). */
+#define TO_FUNC04 0                     /* back to the panels as they are */
+#define TO_FNCSEL 1                     /* have what FncAddr names called
+                                           for what is selected, or for
+                                           what the cursor is on */
+#define TO_FNCEXT 2                     /* read the panels again if TmpBuf
+                                           has something at 91 */
+#define TO_FNCEX1 3                     /* read the panels again */
+#define TO_F24_02 4                     /* the current directory is
+                                           another: of F67_00 only, which
+                                           hands back the panel too */
+
 /* Calls what FncAddr names for every file of the directory at TmpBuf, and
    returns 1 if every call did what it was to, 0 if one did not, and 100h
    when it was stopped. */

@@ -334,6 +334,37 @@ out again (show.py --changes is how):
     does also for one above the current one. After F6 or F5 there the
     tree is read again, in the order of the disk, and its cursor is on
     the current directory, not on what was renamed.
+  - The floppy drive has a second letter, B:, which nothing on the bench
+    offers but which may be typed: Shift+F8, "b:*.*" and two Enters
+    bring up "Insert diskette for drive B:", and Esc there stops the
+    command. That is the way to a disk that the user will not put in.
+    Enter there has not been tried.
+  - Shift+F8 with "*.*" or a full stop for a name, with a path or
+    without, warns first, "Delete Cancel"; a name that no file has says
+    "Can't find file". Ctrl+F8 deletes the file under the cursor
+    whatever is selected. F8 on a panel that is off, Ctrl+F1 for the
+    left one, is Shift+F8.
+  - F7 in a tree panel asks for a name of twelve characters and makes
+    the directory below the one the cursor is on; a name with a path is
+    an error there. F7 with a name that is there already is an error
+    too, and so is Shift+F7 with such a path; a path that can be made
+    leaves the panel as it was.
+  - Ctrl+F4 and a new label: FreeDOS reports no error and the disk keeps
+    the label it had, WORK on C:. The name of a directory of the root,
+    "work", cannot be made: "Could not set the volume label", with a
+    beep.
+  - Alt+F7 with "*:" and a name that has no path searches C: and D:
+    from their roots. Keep the program's own file out of what is found
+    on D:, by the mask: "*:*.hlp". An empty name closes the box. Two
+    keys written as one name, "Enter+q", go down together: the second
+    is waiting when the search first looks for a key, before it has
+    found a file, so "Enter+q" is Quit and "Enter+Enter" Stop with no
+    file found, the same in every run. That is how to answer a search
+    that runs without pressing a key at no defined moment.
+  - Go to in the list of Alt+F7, Enter, on a line of a directory, which
+    Up gets to, shows that directory; with the tree in the current
+    panel the other panel gets it. Go to a file of A: from C: changes
+    the drive of the panel.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -1450,6 +1481,114 @@ SCENARIOS = {
             "End",                        # is read again
             "Ctrl+a Space Enter",         # read-only
             'F7 "more" Enter',            # and cannot be marked: a beep
+        )),
+
+    "make-directory": Scenario(
+        "Directories made from the tree and by a path, those that cannot "
+        "be made, and commands that have nothing to work on",
+        steps=(
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of what is made
+            "F9 l t",                     # the tree, on C:\\WORK
+            'F7 "new" Enter',             # a directory below that one,
+                                          # which the tree then is on
+            'F7 "a\\b" Enter',            # no path is taken there
+            "Esc",
+            "F9 l b",                     # files again
+            'F7 "docs" Enter',            # which is there already
+            "Esc",
+            'Shift+F7 "..\\other" Enter', # by a path: the panel does not
+                                          # list it
+            "Ctrl+F1",                    # the panel off
+            "F8",                         # asks for a mask then
+            "Esc",
+            "Ctrl+F1",
+            "Ctrl+a",                     # on "..": nothing
+        )),
+
+    "delete-mask": Scenario(
+        "Shift+F8 with a name that no file has, with masks that mean "
+        "every file, and on a drive whose disk is not put in",
+        steps=(
+            "Down Down Down Ins",         # readme.txt selected
+            "Ctrl+F8",                    # is for the file under the
+            "Enter",                      # cursor all the same: hello.txt
+            "Shift+F8",
+            '"nosuch.txt"',               # no mask: "Can't find file"
+            "Enter",
+            "Esc",
+            "Shift+F8",
+            '"src\\."',                   # all files of a directory
+            "Enter",                      # WARNING, with the path
+            "Esc",
+            "Shift+F8",
+            '"*.*"',
+            "Enter",                      # "in the current directory"
+            "Enter",                      # the five files are gone
+            "Shift+F8",
+            '"b:*.*"',                    # the floppy drive under its
+            "Enter",                      # other letter
+            "Enter",                      # "Insert diskette for drive B:"
+            "Esc",                        # no: that stops it
+            "Shift+F8",
+            '"docs\\*.*"',                # an empty directory
+            "Enter",
+            "Enter",                      # "Can't find files"
+            "Esc",
+        )),
+
+    "label": Scenario(
+        "The volume label: a new one, none, and one that cannot be made",
+        steps=(
+            "Ctrl+F4",
+            '"newlab"',
+            "Enter",                      # FreeDOS says nothing, and the
+                                          # disk keeps the label it had
+            "Ctrl+F4",
+            "Ctrl+y Enter",               # no label: asked about
+            "Esc",
+            "Ctrl+F4",
+            "Ctrl+y Enter",
+            "Enter",                      # and not got off the disk
+            "Ctrl+F4",
+            '"work"',                     # the name of a directory of the
+            "Enter",                      # root: "Could not set"
+            "Esc",
+        )),
+
+    "find-drives": Scenario(
+        "The file search as a command: left at once, without a name, "
+        "over every fixed drive, answered while it runs, and Go to with "
+        "nothing found, from a tree and to another drive",
+        steps=(
+            "Alt+F7",
+            "Esc",
+            "Alt+F7",
+            "Ctrl+y Enter",               # no name: nothing is searched
+            "Alt+F7",
+            '"*:*.hlp" Enter',            # C: and D:, from their roots
+            "n",                          # New search
+            '"nosuch.zzz" Enter',         # 0 files
+            "Enter",                      # Go to, with no line to go to
+            "Alt+F7",
+            # Two keys that go down together: the second is waiting when
+            # the search first looks for a key.
+            '"hello.*" Enter+q',          # Quit
+            "Alt+F7",
+            "Enter+Enter",                # Stop: nothing found yet
+            "n",
+            '"*.txt" Enter',
+            "Enter",                      # Go to: the cursor on the file
+            "Ctrl+l",                     # two panels of files,
+            "F9 l t",                     # and the left one the tree
+            "Alt+F7",
+            '"*.doc" Enter',
+            "Up Enter",                   # Go to the directory: the other
+                                          # panel shows it
+            "Alt+F7",
+            '"a:\\*.bat" Enter',          # another drive
+            "Enter",                      # the other panel on the file,
+                                          # and the tree read from A:
         )),
 
     "attributes-directory": Scenario(

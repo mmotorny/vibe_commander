@@ -405,7 +405,7 @@ BATCHES = [
         source="find.c",
         routines=("FindFil", "FnFl60", "FndBack", "FndStuf", "FndMove",
                   "FndCurs", "FndLine", "FndAdr", "FndStat"),
-        functions=("FindFil_c", "FndMove_c", "FndCurs_c", "FndAdr_c"),
+        functions=("FindFil_c",),
         unreached={
             0x8A7E: "FindFil, for more lines than the memory has room "
                     "for, some 7,000: the disks of the bench have fewer "
@@ -438,15 +438,9 @@ BATCHES = [
         source="dirfunc.c",
         routines=("F38_10", "F38_40", "F38_60", "F38_70", "M30_50",
                   "M30_60", "DirFunc", "DelTree"),
-        functions=("F38_10_c", "F38_40_c", "F38_70_c", "M30_50_c",
-                   "M30_60_c", "DirFunc_c", "DelTr0_c"),
+        functions=("F38_10_c", "F38_40_c", "M30_50_c", "M30_60_c",
+                   "DirFunc_c", "DelTr0_c"),
         unreached={
-            **dict.fromkeys(
-                (0x3935, 0x3938),
-                "F38_70, for a drive that is not ready or whose disk the "
-                "user would not change, and for a current directory "
-                "that cannot be gone back to: the bench has no such "
-                "drive, and nothing takes the directory away meanwhile"),
             **dict.fromkeys(
                 (0x3B78, 0x3B7B, 0x3B7E, 0x3B80, 0x3B83, 0x3B86, 0x3B89,
                  0x3B8B),
@@ -459,6 +453,36 @@ BATCHES = [
                 (0xD881, 0xD888, 0xD88A, 0xD88D, 0xD890, 0xD892),
                 "DirFunc, for a path of 68 characters or more: DOS has "
                 "no directory with a path that long"),
+        },
+    ),
+    Batch(
+        title="The commands that make a directory, delete, set attributes "
+              "and change the volume label, and the files of a mask",
+        source="dirfunc.c",
+        # Three stretches of code that is no procedure: F37_00 with
+        # F47_00 and F38_00; F48_00 with F58_00 and M30_00; F54_00 with
+        # FncMas.
+        routines=("F37_00", "F48_00", "M30_80", "M30_82", "M30_83",
+                  "F54_00"),
+        functions=("F37_00_c", "F47_00_c", "F38_00_c", "F48_00_c",
+                   "F58_00_c", "M30_00_c", "F54_00_c", "FncMas_c"),
+    ),
+    Batch(
+        title="Find file: the command, its box, the drives it searches "
+              "and Go to",
+        source="find.c",
+        routines=("F67_00",),
+        functions=("F67_00_c",),
+        unreached={
+            **dict.fromkeys(
+                (0x87C2, 0x87C4),
+                "F67_00, for a drive that the CD-ROM extensions answer "
+                "for: the bench has none"),
+            0x89ED: "F67_00, Go to a directory that DOS has just searched "
+                    "and will not change to, or with a current drive "
+                    "whose disk the user will not put in: no scenario "
+                    "has the floppy drive under its other letter for "
+                    "the current one",
         },
     ),
     Batch(

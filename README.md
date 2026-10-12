@@ -82,19 +82,20 @@ the file. The help is C as a whole: reading its file, showing the index
 and the pages in their window, and taking the keys and the mouse there.
 So is the tree of directories away from its panel: reading it from the
 disk, keeping it in its file there, and the box in which a directory is
-chosen from it. Of the file search, the search itself is C, by name and
-by contents through a directory and those below it, with its list and
-the keys taken while it runs; its dialog and what it does with the
-answer are still assembly. Deleting a file or a directory with what is
-in it, copying, renaming and moving one, and setting attributes, a date
-and a time, are C, and so is what goes through the files of a directory
-for these, the sizes of directories and the file search. Copy and Rename
-are C from the key on: what they offer as the target, their dialogs, the
-tree to choose the target from, and the renaming of a directory of a tree
-panel. What the other of these
-commands ask first, and going through the selected files of a panel, are
-still assembly, and so is what the viewer and the editor do with their
-keys. The dialogs are C: a box with its lines of text, the fields of a
+chosen from it. The file search is C as a whole: the command with its
+dialog, the drives it searches and Go to, and the search itself, by name
+and by contents through a directory and those below it, with its list
+and the keys taken while it runs. Deleting a file or a directory with
+what is in it, copying, renaming and moving one, and setting attributes,
+a date and a time, are C, and so is what goes through the files of a
+directory for these, the sizes of directories and the file search, and
+through the files that a mask names. The commands of these are C from
+the key on: Copy and Rename with what they offer as the target, their
+dialogs, the tree to choose the target from, and the renaming of a
+directory of a tree panel, and those that make a directory, delete, set
+attributes and change the volume label. Going through the selected files
+of a panel is still assembly, and so is what the viewer and the editor
+do with their keys. The dialogs are C: a box with its lines of text, the fields of a
 dialog, a line to type
 into, a group to choose from, a box to tick and a line of buttons, with
 the keys and the mouse that each takes, and what the fields hold handed

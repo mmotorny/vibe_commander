@@ -5,10 +5,10 @@
  *
  * Translated from VCFIND.INC.
  *
- * What the command asks and what it does with the answer, F67_00, is
- * still assembly. It sets up what is kept here, has FindFil search the
- * directory at TmpBuf, and lets FndMove take the keys once the search is
- * over. FindFil is also what DirFunc, which goes through the directories
+ * The command, F67_00, asks what to look for, sets up what is kept here,
+ * has FindFil search the directory at TmpBuf, on one drive or on every
+ * fixed one, and lets FndMove take the keys once the search is over.
+ * FindFil is also what DirFunc, which goes through the directories
  * below, calls for each of them: the search goes as deep as the
  * directories do.
  *
@@ -60,15 +60,16 @@ LAID_OUT(FndData, 18);
                                            the mouse */
 
 u16 FindFil(u16 attributes);
-u16 FndMove(u16 key, u16 mode, u16 place, u16 size);
-void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
-u8 __far *FndAdr(u16 number);
+u32 F67_00(void);
+static u16 FndMove(u16 key, u16 mode, u16 place, u16 size);
+static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
 
-/* How the assembly passes arguments to these, and what it expects back. */
+/* How the assembly passes arguments to these, and what it expects back.
+   F67_00 returns where the command goes on, one of the TO_ of vc.h, and
+   in the high word, for TO_F24_02, the panel whose directory is another
+   now. */
 #pragma aux FindFil "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux FndMove "*_c" __far parm [ax] [cx] [bx] [dx] value [ax] modify exact [ax]
-#pragma aux FndCurs "*_c" __far parm [ax] [si] [di] [bx] [dx] modify exact [ax]
-#pragma aux FndAdr  "*_c" __far parm [ax] value [dx si] modify exact [ax dx si]
+#pragma aux F67_00  "*_c" __far value [dx ax] modify exact [ax dx]
 
 /* Routines that are still assembly, by their entries for C.
 
@@ -85,7 +86,21 @@ u8 __far *FndAdr(u16 number);
    one. Int10m calls the BIOS for the screen, and returns CX as that
    leaves it. Int16 calls the BIOS for the keyboard: the high word of
    what it returns is 1 if the zero flag was set. Help00 is the help,
-   which is C, as is DirFunc, of vc.h. */
+   which is C, as is DirFunc, of vc.h.
+
+   HidCur puts the cursor below the screen and PutMnu shows the menu bar,
+   if it is always visible, with an item marked. SavWin keeps what the
+   screen buffer has where a window is to be, ResWin puts it back, and
+   MinBox draws a box with a shadow there, in the colour in the high byte
+   of `color`. StdLine writes a line of such a box at `place`, of the
+   width that the low byte of `size` has for the box: the cell `cell`
+   between the characters of `ends`; it returns the place a row below.
+
+   Int21d calls DOS as Intr21 does, with the registers of `regs` and
+   their answer there, but not through Intr21: DOS's box for a drive
+   that is not ready is not looked for, and an error is not asked about.
+   Int2F calls the multiplex interrupt, and returns AX in the low word
+   and BX in the high one. */
 u32 GetMous(u16 place);
 void ClrKbd(void);
 void TypMous(u16 pointer);
@@ -96,6 +111,14 @@ u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
 u32 Int16(u16 ax);
 u16 ChgDisk(const u8 *path);
+void HidCur(void);
+void PutMnu(u16 item);
+void SavWin(u16 begin, u16 size, u16 buffer);
+void ResWin(u16 begin, u16 size, u16 buffer);
+void MinBox(u16 begin, u16 size, u16 color);
+u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
+u16 Int21d(struct DosRegs STACK *regs);
+u32 Int2F(u16 ax, u16 bx, u16 cx);
 void Help00(void);                                      /* help.c */
 #pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
 #pragma aux ClrKbd  "*_a" __far modify exact [es]
@@ -107,6 +130,14 @@ void Help00(void);                                      /* help.c */
 #pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [cx] modify exact [ax bx cx dx es]
 #pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
+#pragma aux HidCur  "*_a" __far modify exact [es]
+#pragma aux PutMnu  "*_a" __far parm [ax] modify exact [es]
+#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
+#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
+#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
+#pragma aux StdLine "*_a" __far parm [bx] [ax] [si] [dx] value [bx] modify exact [bx es]
+#pragma aux Int21d  "*_a" __far parm [bx] value [ax] modify exact [ax bx cx dx si di es]
+#pragma aux Int2F   "*_a" __far parm [ax] [bx] [cx] value [dx ax] modify exact [ax bx dx]
 #pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* C routines of other files that vc.h does not have. */
@@ -124,6 +155,7 @@ u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText STACK *text);
 u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
 void FilZero(u8 __far *text, u16 length);               /* string.c */
+void NormStr(u8 __far *text);
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
 void V81_00(void);                                      /* view.c */
 u32 V82_00(u16 segment, u16 at, u16 count);
@@ -132,17 +164,35 @@ u32 V82_00(u16 segment, u16 at, u16 count);
 #pragma aux PutTime "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
 #pragma aux BufTime "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
 #pragma aux FilZero "*_c" __far parm [es si] [cx] modify exact [ax]
+#pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
 #pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 #pragma aux V81_00  "*_c" __far modify exact [ax]
 #pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
 /* Objects of the assembly's code segment: Mask_S is \*.*, and four bytes
    are copied from it or from behind it; Find5_D describes the menu of a
-   search that runs, and only its offset is used here. */
+   search that runs, and only its offset is used here, as are those of
+   Find6_D, the menu of one that is over, of FnFl_P, the colours of that
+   menu, and of Find_B, the dialog that asks what to look for. FnFl6_S
+   is " files" and FnFl7_S " found.": each is copied with what follows it
+   in the assembly, 15 bytes. FindFil_stub is the stub of FindFil, whose
+   offset FncAddr gets. */
 extern const u8 __far Mask_S[];
 extern const u8 __far Find5_D[];
+extern const u8 __far Find6_D[];
+extern const u8 __far FnFl_P[];
+extern const u8 __far Find_B[];
+extern const u8 __far FnFl6_S[];
+extern const u8 __far FnFl7_S[];
+extern const u8 __far FindFil_stub[];
 #pragma aux Mask_S "*"
 #pragma aux Find5_D "*"
+#pragma aux Find6_D "*"
+#pragma aux FnFl_P "*"
+#pragma aux Find_B "*"
+#pragma aux FnFl6_S "*"
+#pragma aux FnFl7_S "*"
+#pragma aux FindFil_stub "FindFil"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 #define SEGMENT(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))
@@ -181,12 +231,6 @@ static u8 __far *Line(u16 number)
                         | (u16)at & 0x0F);
 }
 
-/* For the assembly: the address of a line, for DS and SI. */
-u8 __far *FndAdr(u16 number)
-{
-    return Line(number);
-}
-
 /* Write a line of the list to the screen buffer, in the colour of the
    box: 64 cells from `place`. */
 static void FndLine(u16 number, u16 place)
@@ -203,7 +247,7 @@ static void FndLine(u16 number, u16 place)
 /* Show a line of the list in a colour, by its number: that of the box, or
    that of the cursor. `first` is the line at the top of the list, and the
    colour is in the high byte of `color`. */
-void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size)
+static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size)
 {
     u16 width = (size - 12) & 0xFF;
 
@@ -343,7 +387,7 @@ static u16 Find_T(u16 key)
    for a key that has been dealt with, and else 1 in the high byte and in
    the low one the item of the menu that Enter chose, FFh for Esc and 1
    for a second click on a line. */
-u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
+static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
 {
     u16 line = FND->FndCur;
     u16 first = FND->FndFrst;
@@ -743,4 +787,341 @@ stopped:
     regs.name = md.TmpBuf;
     Intr21((struct DosRegs STACK *)&regs);
     return 0x100;
+}
+
+/* What the box of the command shows. The colours are those of Find_P in
+   the assembly, which the dialog reads there. */
+static const u8 CODE FindColors[4] = { Conf_C, CnfRe_C, 21, 22 };
+static const u8 CODE Find0_S[] = " Find File ";
+static const u8 CODE Find1_S[] = "File name:";
+static const u8 CODE Find2_S[] = "Containing:";
+static const u8 CODE Find3_S[] = "Scanning:";
+static const u8 CODE Find5_S[] =
+    "^r[ Stop ]^r\xFF\x03[ Go to ]\xFF\x03[ Quit ]";
+static const u8 CODE Find6_S[] =
+    "[ New search ]\xFF\x03[ Go to ]\xFF\x03[ Quit ]";
+
+#define FIND_BAR 1                      /* the key bar of the box: bKeyBar
+                                           of Find_B */
+#define SPACE       ' '
+#define LINE        0xC4                /* a single line */
+#define BOTH_SIDES  0xBABA              /* the frame, left and right */
+#define LEFT_RIGHT  0xC7B6              /* where a line meets it */
+#define ALL_DRIVES  0x3A2A              /* "*:", as a word */
+
+/* Whether a file is shown in hex: ViTxHex of the viewer, which the
+   search reads files with. */
+#define ViTxHex md.TmpBuf[216]
+
+/* DX of a call of DOS, where it is not the offset of a name. */
+#define DX_OF(regs) (*(u16 STACK *)&(regs).name)
+
+#define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
+#define LOW(pair)  ((u16)(pair))
+#define HIGH(pair) ((u16)((pair) >> 16))
+
+/* Alt-F7, the file search: a box over the panels, in which a dialog asks
+   for a name, with a path or without, and for a text; then the search,
+   from the directory that the name gives, or the current one, down; and
+   then the list, with "New search", which asks again, "Go to", which
+   makes the directory of the line under the cursor the current one, with
+   the cursor of the panel on the file, and "Quit". The search answers
+   the same way if a key answered its menu while it ran.
+
+   A name on the drive "*:" is looked for on every drive from A: on that
+   is of a network or is not removable, and on no CD-ROM, from its root
+   if no path is given. The name is then left out of the path: FindFil
+   takes it from FindStr.
+
+   Ported as it is: Go to asks for the disk of a drive that shares the
+   floppy drive, ChgDisk, with the address of the line, which is in the
+   memory of the list, and ChgDisk reads there in the main data, two
+   bytes of the first palette. So it asks for the disk of the current
+   drive, unless the second of the two is a colon. And the path of the
+   line goes into the panel with what follows it, 69 bytes, one more
+   than a path has room for there, which is the first of where the
+   cursor is and is set next. */
+u32 F67_00(void)
+{
+    struct LineArgs line;
+    struct DosRegs regs;
+    struct WCBdef __far *wcb;
+    const u8 __far *from;
+    u8 __far *to;
+    const u8 *rest;
+    u8 *end;
+    u16 *screen;
+    u16 place = 0x203;
+    u16 size = (u16)(u8)(md.Lines - 3) << 8 | 76;
+    u16 color, row, count, answer, first, drive, cell, i, number, panel;
+    u16 key, mode, room;
+    u32 pair;
+
+    HidCur();
+    PutMnu(3);
+    SavWin(place, size, (u16)md.WinBuf);
+    MinBox(place, size, Color(Conf_C) << 8);
+    /* No line of the box has ^I: the include line is any text. */
+    line.colors = FindColors;
+    line.include = Find0_S;
+    line.value = place + 0x100 & 0xFF00 | 40;
+    line.line = Find0_S;
+    CntLine((struct LineArgs STACK *)&line);
+
+again:
+    /* F67_01: the box empty, with the two questions */
+    color = Color(Conf_C) << 8;
+    row = place + 0x200;
+    for (count = (u8)((size >> 8) - 5); count != 0; count--)
+        row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+    row = StdLine(row - 0x500, color | LINE, LEFT_RIGHT, size);
+    row = ADD_LOW(row, 5);
+    line.value = color | 25;
+    line.screen = BasAdr(row);
+    line.line = Find1_S;
+    NgLine((struct LineArgs STACK *)&line);
+    row += 0x200;
+    line.screen = BasAdr(row);
+    line.line = Find2_S;
+    NgLine((struct LineArgs STACK *)&line);
+    Window(place, size);
+    /* The dialog has its box there already: its nine lines. */
+    answer = Dialog(OFFSET(Find_B), 9 << 8 | size & 0xFF,
+                    place + (size & 0xFF00) - 0x900, 0, MAIN_SEG);
+    if ((u8)answer != 0)
+        goto close;
+
+    /* F67_03: what is searched, and the menu, in their place */
+    color = Color(Conf_C) << 8;
+    row = place + (size & 0xFF00) - 0x800;
+    row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+    row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+    row += 0x100;
+    row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+    row = StdLine(row, color | SPACE, BOTH_SIDES, size);
+    row = StdLine(row - 0x300, color | LINE, LEFT_RIGHT, size);
+    row = ADD_LOW(row, 5);
+    line.value = color | 25;
+    line.screen = BasAdr(row);
+    line.line = Find3_S;
+    NgLine((struct LineArgs STACK *)&line);
+    line.value = row + 0x100 & 0xFF00 | 40;
+    line.line = Find5_S;
+    CntLine((struct LineArgs STACK *)&line);
+    Window(place, size);
+    FND->FndBg = place;
+    FND->FndSz = size;
+    FND->FndCur = 0;
+    FND->FndFrst = 0;
+    FND->FndNumb = 0;
+    FND->FndFls = 0;
+    FND->FndMode = 0;
+    FND->FndMenu = 0;
+    md.WinMous = 0;
+    md.MousEnt = 0;
+    ((u16 *)&md.MousTim)[1] = 0xFFFF;
+    ViTxHex = 0;
+    /* As many lines as the memory behind the program has room for. */
+    room = SEGMENT(&md) + md.FreMem2 - md.ViewSeg;
+    FND->FndSize = (u16)(((u32)room << 4) / LenFnf) - 1;
+    FND->FndDrv = 'A';
+
+    for (;;) {
+        /* F67_08: the path to search, at TmpErr, with a name of one
+           letter in place of what is looked for */
+        rest = md.FindStr + 2;
+        end = md.TmpErr + 2;
+        *(u16 *)md.TmpErr = *(u16 *)md.FindStr;
+        if (*(u16 *)md.FindStr == ALL_DRIVES
+            && NEAR(CutPath(rest)) == rest)
+            *end++ = '\\';
+        for (i = 0; i < LenPath + 13 - 2; i++)
+            *end++ = *rest++;
+        NormStr(md.TmpErr);
+        if (md.TmpErr[0] == 0)
+            goto close;
+        *(u16 *)NEAR(CutPath(md.TmpErr)) = 'A';
+        first = *(u16 *)md.TmpErr;
+        if (first == ALL_DRIVES) {
+            for (;;) {
+                /* F67_10: the next drive that is searched */
+                drive = FND->FndDrv;
+                md.TmpErr[0] = (u8)drive;
+                FND->FndDrv++;
+                drive = (u8)(drive - 'A');
+                pair = Int2F(0x150B, 0, drive);
+                if (HIGH(pair) != 0xADAD || LOW(pair) == 0) {
+                    /* F67_11: no CD-ROM */
+                    regs.name = md.TmpErr;
+                    regs.bx = drive + 1;
+                    regs.cx = drive;
+                    regs.ax = 0x4409;
+                    if (!Int21d((struct DosRegs STACK *)&regs)
+                        && (DX_OF(regs) & 0x1000))
+                        break;
+                    regs.ax = 0x4408;
+                    if (!Int21d((struct DosRegs STACK *)&regs)
+                        && (u8)regs.ax == 1)
+                        break;
+                }
+                /* F67_13 */
+                if (FND->FndDrv > 'Z')
+                    goto searched;
+            }
+        }
+        /* F67_15: the path made whole, at TmpBuf */
+        if (ChgDisk(md.TmpErr))
+            goto close;
+        rest = md.TmpErr + 2;
+        drive = *(u16 *)md.TmpErr;
+        if ((drive >> 8) != ':') {
+            rest = md.TmpErr;
+            drive = *(u16 *)md.DosPth;
+        }
+        drive = UpCase(drive);
+        *(u16 *)md.TmpBuf = drive;
+        end = md.TmpBuf + 2;
+        count = LenPath + 13;
+        if (*rest != '\\') {
+            *end++ = '\\';
+            regs.name = md.TmpBuf;
+            DX_OF(regs) = (u8)(drive - ('A' - 1));
+            regs.si = (u16)end;
+            regs.ax = 0x4700;
+            if (Intr21((struct DosRegs STACK *)&regs))
+                goto found;
+            while (count != 0) {
+                count--;
+                if (*end++ == 0)
+                    break;
+            }
+            end = NEAR(AddFile(end - 1));
+        }
+        /* F67_17 */
+        for (; count != 0; count--)
+            *end++ = *rest++;
+        *end = 0;
+        *NEAR(CutPath(md.TmpBuf)) = 0;
+        md.FncAddr = OFFSET(FindFil_stub);
+        answer = FindFil(ATTR_DIRECTORY);
+        if ((answer >> 8) != 0 || first != ALL_DRIVES || FND->FndDrv > 'Z')
+            break;
+    }
+
+searched:
+    /* F67_18 */
+    if ((FND->FndMode & MODE_ANSWER) && FND->FndMenu != 0) {
+        answer = FND->FndMenu;
+        goto answered;
+    }
+
+found:
+    /* F67_19: "N files found", and the menu of a search that is over */
+    end = Number(md.TmpBuf, 0, FND->FndFls, NUM_SEPARATED);
+    end = NEAR(MvzLine(end, FnFl6_S, 15));
+    if (FND->FndFls == 1)
+        end--;
+    for (i = 0; i < 15; i++)
+        end[i] = FnFl7_S[i];
+    place = FND->FndBg;
+    size = FND->FndSz;
+    row = MOVED(place, (size >> 8) - 5, 5);
+    screen = BasAdr(row);
+    count = (u8)(size - 12);
+    cell = *screen & 0xFF00;            /* in the colour that is there */
+    for (i = 0; i < count; i++)
+        screen[i] = cell;
+    line.value = count;
+    line.screen = screen;
+    line.line = md.TmpBuf;
+    NgLine((struct LineArgs STACK *)&line);
+    Window(row, 0x100 | count);
+    line.value = MOVED(place, (size >> 8) - 4, 0) & 0xFF00 | 40;
+    line.line = Find6_S;
+    CntLine((struct LineArgs STACK *)&line);
+    FND->FndMenu = 1;
+    if (FND->FndCur != 0)
+        FndCurs(CnfRe_C << 8, FND->FndCur, FND->FndFrst, place, size);
+    do {
+        /* F67_21: a key for the menu, and then for the list. With a
+           button of the mouse down, the list alone. */
+        pair = GetMous(0);
+        key = LOW(pair);
+        mode = HIGH(pair);
+        if (key != 0) {
+            key = KEY_MOUSE << 8 | key & 0xFF;
+        } else {
+            md.WinMous = 0;
+            md.MousEnt = 0;
+            pair = MinMnu(OFFSET(Find6_D),
+                          MOVED(place, (size >> 8) - 4, 18), 0x125,
+                          OFFSET(FnFl_P), KEY_MOUSE << 8 | FIND_BAR,
+                          FND->FndMenu);
+            key = LOW(pair);
+            mode = HIGH(pair);
+            FND->FndMenu = (u8)mode;
+        }
+        answer = FndMove(key, mode & 0xFF00 | MODE_CURSOR, place, size);
+    } while ((answer >> 8) == 0);
+
+answered:
+    /* F67_23 */
+    if ((u8)answer == 0)
+        goto again;
+    if ((u8)answer != 1) {
+close:
+        /* F67_25 */
+        ResWin(place, size, (u16)md.WinBuf);
+        Window(place, size);
+        return TO_FUNC04;
+    }
+
+    /* F67_30: Go to */
+    ResWin(place, size, (u16)md.WinBuf);
+    Window(place, size);
+    if (FND->FndNumb == 0)
+        return TO_FUNC04;
+    /* The line of the directory: the first above that begins with no
+       space. */
+    number = FND->FndCur;
+    do
+        from = Line(number--);
+    while (*from == ' ');
+    if (ChgDisk(NEAR(from)))
+        return TO_FUNC04;
+    regs.name = from;
+    regs.ax = 0x3B00;
+    if (Intr21((struct DosRegs STACK *)&regs))
+        return TO_FUNC04;
+    DX_OF(regs) = (u8)(*from - 'A');
+    regs.ax = 0x0E00;
+    Int21d((struct DosRegs STACK *)&regs);
+    /* The panel that gets the directory: the current one, or the other
+       if that one shows no files. Its list is emptied, but for the name
+       of the file, where the cursor is to be when it is read. */
+    panel = md.WCBcrn;
+    if (PANEL(panel)->WinTyp != 0)
+        panel = InvWCB(panel);
+    wcb = PANEL(panel);
+    to = wcb->WinPath;
+    for (i = 0; i < LenPath + 1; i++)
+        to[i] = from[i];
+    wcb->CurAdr = DSKBUF;
+    wcb->First = DSKBUF + sizeof(struct FILENT);
+    wcb->EndBuf = DSKBUF + sizeof(struct FILENT);
+    wcb->DskBuf[0].NameF[0] = 0;
+    wcb->DskBuf[1].NameF[0] = 0;
+    from = Line(FND->FndCur);
+    if (*from == ' ') {
+        to = wcb->DskBuf[0].NameF;
+        for (i = 0; i < 12; i++)
+            to[i] = from[3 + i];
+        to[12] = 0;
+        NormStr(to);
+    }
+    regs.ax = 0x1900;
+    Int21d((struct DosRegs STACK *)&regs);
+    if ((u8)((u8)regs.ax + 'A') != md.DosPth[0])
+        return TO_FNCEX1;
+    return (u32)panel << 16 | TO_F24_02;
 }
