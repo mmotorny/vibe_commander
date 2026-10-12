@@ -4,28 +4,6 @@
 
 	PUBLIC	PtMnu_S
 
-;------------------ Begin of main windows --------------
-;			   DS - WCBseg
-;	Return :	BH,BL - Begin
-BegBX	PROC	NEAR
-	MOV	BX,DS
-	CallC	BegBX_c
-	RET
-BegBX	ENDP
-
-;----------------- Size of main windows ----------------
-;	Return :	DH,DL - Size
-SizDX	PROC	NEAR
-	CallC	SizDX_c
-	RET
-SizDX	ENDP
-
-;------------------ Files in main windows --------------
-LnsAX	PROC	NEAR
-	CallC	LnsAX_c
-	RET
-LnsAX	ENDP
-
 ;------------------- Clear screen line -----------------
 ;			   BH - line
 ; C: ClsLine_c of port/bars.c. The routine read the colour in the caller's
@@ -60,39 +38,6 @@ PtMnu_S	DB	0FFh,4,'Left',0FFh,4,'Files',0FFh,4,'Commands'
 	DB	0FFh,4,'Options',0FFh,4,'Right',0FFh,31,0
 
 	.CODE
-PutMnu3	PROC	NEAR
-	MOV	AL,3
-PutMnu3	ENDP
-
-PutMnu	PROC	NEAR
-	CMP	ES:MenuVs,0
-	JNZ	PtMnu1
-	RET
-PtMnu1:	PUSH	AX			; The menu draws it wherever it is
-	CallC	PtMnu1_c
-	POP	AX
-	RET
-PutMnu	ENDP
-
-;--------------------- Output prompt -------------------
-;			   DS - WCBseg
-; C: PutPrm_c of port/bars.c.
-PutPrm	PROC	NEAR
-	PUSH	AX
-	MOV	AX,DS
-	CallC	PutPrm_c
-	POP	AX
-	RET
-PutPrm	ENDP
-
-;------------------ Output command line ----------------
-; C: DosCom_c of port/bars.c.
-DosCom	PROC	NEAR
-	PUSH	AX
-	CallC	DosCom_c
-	POP	AX
-	RET
-DosCom	ENDP
 
 ;------------------------ Panel ------------------------
 ;			   DS - WCBseg
@@ -113,21 +58,6 @@ SetMask	PROC	NEAR
 	POP	AX
 	RET
 SetMask	ENDP
-
-;------------------ Test executable file ---------------
-;			DS:SI - address of file
-;	Return :	CY = 1 - executable file
-;			CY = 0 - no
-TstExe	PROC	NEAR
-	PUSH	AX
-	PUSH	DX
-	MOV	DX,DS
-	CALL	FAR PTR TstExe_c
-	SHR	AX,1			; CY if it is one
-	POP	DX
-	POP	AX
-	RET
-TstExe	ENDP
 
 ;----------------------- File sort ---------------------
 ;			   DS - WCBseg
@@ -302,46 +232,8 @@ FilDir	PROC	NEAR
 	RET
 FilDir	ENDP
 
-;------------ Selected files and directories -----------
-;	Return :	   DX - files
-;			   BX - directories
-TotSel	PROC	NEAR
-	PUSH	AX
-	MOV	AX,DS
-	CALL	FAR PTR TotSel_c
-	MOV	BX,AX
-	POP	AX
-	RET
-TotSel	ENDP
-
-;---------------------- Another WCB --------------------
-InvWCB	PROC	NEAR
-	PUSH	AX
-	MOV	AX,DS
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR InvWCB_c
-	MOV	DS,AX
-	POP	AX
-	RET
-InvWCB	ENDP
-
 ;------------ Find iten in extension file ------------
 ; C: FndItem_c of port/extfile.c, which only C code calls.
-
-;------------ Find string in extension file ------------
-;			DS:SI - file
-;	Return :	ES:SI - string, 0 - if not found
-;			 CY=1 - not found
-; C: FindExt_c of port/extfile.c.
-FindExt	PROC	NEAR
-	PUSH	DX
-	MOV	DX,DS
-	CallC	FindExt_c		; SI: the command, or 0
-	POP	DX
-	CMP	SI,1			; CY for 0
-	RET
-FindExt	ENDP
 
 ;------------------- Keyboard input --------------------
 ;			   AL - Key bar case
@@ -581,71 +473,6 @@ Rnd	PROC	NEAR
 	RET
 Rnd	ENDP
 
-;----------------------- Edit line ---------------------
-;			ES:SI - begin of line
-;			   DX - cursor
-;			   CX - length of line
-;			   AX - key code
-;	Return :	 CY=0 - no change
-;			 CY=1 - change
-;			   DX - cursor
-; C: EdLin_c of port/input.c, with EdSub2. The line is in the main data.
-EdLin	PROC	NEAR
-	PUSH	AX
-	CallC	EdLin_c			; AX: the cursor, DX: 1 for a change
-	NEG	DX			; CY then
-	MOV	DX,AX
-	POP	AX
-	RET
-EdLin	ENDP
-
 ; EdSub1, which finds where a word begins, is C too: only C code calls it.
 
-;-------------------- Compare symbol -------------------
-;			   AL - Symbol
-;	Return :	   ZR - it is one that words end at
-; C: CmpSym_c of port/input.c, which needs no DS.
-CmpSym	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR CmpSym_c	; AX: 1 for one of them
-	CMP	AX,1			; ZR then
-	POP	AX
-	RET
-CmpSym	ENDP
-
-;-------------------- Search name ----------------------
-;			   SI - current address
-;			   BX - begin
-;			   BP - end
-;			   DX - add
-;			   AX - key code
-;	Return :	Z = 0 - not found
-;			Z = 1 - found
-;			   SI - new address
-; C: Search_c of port/input.c. The names are in the caller's DS, which
-; goes there as a number, and the end in CX.
-Search	PROC	NEAR
-	PUSH	CX
-	PUSH	DI
-	PUSH	SI
-	MOV	DI,DS
-	MOV	CX,BP
-	CallC	Search_c		; SI: the name it found
-	POP	AX			; Where it began
-	POP	DI
-	POP	CX
-	CMP	SI,AX
-	RET
-Search	ENDP
-
-;----------------- Check file panel --------------------
-;	Return :	CY=1 - it is one, and not switched off
-FilePan	PROC	NEAR
-	PUSH	AX
-	MOV	AX,DS
-	CALL	FAR PTR FilePan_c
-	NEG	AX
-	POP	AX
-	RET
-FilePan	ENDP
 

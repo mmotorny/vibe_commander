@@ -78,20 +78,23 @@ and the way back to the panels. The editor is C as a whole: the text in
 the memory with the buffer of the line that the cursor is in, the screen
 brought up to where the cursor is, as text or in hex, with its status
 line, what every key does, the search, and saving the file. The commands
-that start the two, by themselves or by a program that an extension file
-names, are still assembly. Of the keys of the
-panels, those are C that move the cursor by lines, columns and pages,
+that start the two are C as well, by themselves or by a program that an
+extension file names, which is run with the viewer's memory given up
+for it. The keys of the
+panels are C: those that move the cursor by lines, columns and pages,
 select files one by one and by a mask, switch the panels off and on,
-swap them, make them of another kind and read them again, and Tab;
-Enter, the keys that change the directory and those that go to the
-command before and after are still assembly. The loop that takes a key
+swap them, make them of another kind and read them again, Tab,
+Enter, which runs a file or a command, the keys that change the
+directory, those that go to the command before and after, and F10. The
+loop that takes a key
 and goes to its command is C, with what the mouse does at the panels,
 and so are what it does on the way: drawing the two panels and reading
 what they show when that has changed, the box that asks for another
 drive when a disk cannot be read, and saving the setup when it has
 changed; and leaving the program. What starts the program, what runs a
 command with most of the program out of the memory and loads it again,
-and what answers the interrupts of DOS are still assembly. The help is C as a
+to which Enter hands over, and what answers the interrupts of DOS are
+still assembly. The help is C as a
 whole: reading its file, showing the index
 and the pages in their window, and taking the keys and the mouse there.
 So is the tree of directories away from its panel: reading it from the
@@ -111,7 +114,7 @@ attributes and change the volume label. The map of the memory is C as
 well: the blocks of DOS, whose they are and which vectors point into
 them, its window, and programs that have stayed in the memory released.
 Going through the selected files
-of a panel is still assembly. At the panels the user menu is C, with what makes
+of a panel is C too. At the panels the user menu is C, with what makes
 the commands of a line of a menu or of an extension file and writes the
 list of the selected files for them, and so are the command line, with
 Esc and the names of the selected files and the paths of the panels put

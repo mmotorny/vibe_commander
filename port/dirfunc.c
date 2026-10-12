@@ -24,8 +24,8 @@
  * menu, and jumps on when it is done: back to the panels, to FncSel, or
  * to where the panels are read again. Its function here returns which,
  * one of the TO_ of vc.h, and its stub in the assembly jumps there.
- * FncMas is C, here; FncSel is still assembly, and so is FncExt, which
- * reads the panels again if TmpBuf has something at 91.
+ * FncMas and FncSel are here, and FncExt, where such a command ends: it
+ * has the panels read again if TmpBuf has something at 91.
  *
  * Behind the name TmpBuf has what a command keeps while it runs. For
  * deleting: at 90, not 0 once "All" was the answer for a directory that
@@ -50,6 +50,8 @@ u16 F58_00(u16 panel);
 u16 M30_00(u16 panel);
 u16 F54_00(void);
 u16 FncMas(u16 include);
+u16 FncSel(void);
+u16 FncExt(void);
 static u32 F38_60(void);
 static u16 FncMs1(u16 include);
 
@@ -69,6 +71,8 @@ static u16 FncMs1(u16 include);
 #pragma aux M30_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux F54_00  "*_c" __far value [ax] modify exact [ax]
 #pragma aux FncMas  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux FncSel  "*_c" __far value [ax] modify exact [ax]
+#pragma aux FncExt  "*_c" __far value [ax] modify exact [ax]
 
 /* Routines of the rest of the program that this file calls. Those that
    are declared below are still assembly, and are called by their entries
@@ -99,6 +103,8 @@ const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number); /* digits.c */
 void NormStr(u8 __far *text);                           /* string.c */
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
 u32 TotSel(u16 panel);                                  /* files.c */
+void PutFls(u16 panel);                                 /* panel.c */
+void PutTre(u16 panel);                                 /* tree.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
 u32 GetVol(u8 *volume);                                 /* read.c */
 struct DateText {                                       /* format.c */
@@ -119,6 +125,8 @@ u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
 #pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
 #pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 #pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
 #pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux PutDate "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
@@ -1391,4 +1399,100 @@ u16 FncMas(u16 include)
     md.ZoomOne = 0;
     FNC_CHANGE = 0;
     return FncMs1(include);
+}
+
+/* Where a command ends that may have changed what is on the disk:
+   FncExt. Returns 1 if the panels are to be read again, 0 if they are as
+   they were; the stub goes on to Init50 or to Func04 by that. FncEx1, of
+   vc.h, has them read again whatever. */
+u16 FncEx1(void)
+{
+    u16 panel = md.WCBcrn;
+
+    PANEL(panel)->ChgFlg = 1;
+    PANEL(InvWCB(panel))->ChgFlg = 1;
+    return 1;
+}
+
+u16 FncExt(void)
+{
+    if (FNC_CHANGE == 0)
+        return 0;
+    return FncEx1();
+}
+
+/* FncSel of the assembly, which a command jumps to: the selected files
+   and directories of the current panel, each by what FncAddr names, or
+   the one under the cursor if none is selected, or if the command is for
+   one file only, OneFile. A key that TstBrk takes stops it, and so does
+   an answer with something in its high byte.
+
+   A file that has been dealt with loses its mark, bit 6 of its
+   attributes, and gets bit 7 instead, by which ^M selects it again; the
+   marks that the command before has left are taken off first. If the
+   setup has it so, UnSlct, the panel is written anew for every such file
+   and its line put on the screen, if that is among those shown, with the
+   status line. */
+u16 FncSel(void)
+{
+    u16 panel = md.WCBcrn;
+    struct WCBdef __far *wcb = PANEL(panel);
+    struct FILENT __far *file;
+    u16 address, answer, lines, number, begin, i;
+
+    md.ZoomOne = 0;
+    FNC_CHANGE = 0;
+    address = wcb->CurAdr;
+    if (md.OneFile != 0)
+        goto one;
+    for (address = DSKBUF; address < wcb->EndBuf;
+         address += sizeof(struct FILENT))
+        ENTRY(wcb, address)->AttrF &= 0x7F;
+    address = wcb->CurAdr;
+    if (TotSel(panel) == 0)
+        goto one;
+    for (address = DSKBUF; address < wcb->EndBuf;
+         address += sizeof(struct FILENT)) {
+        if (!(ENTRY(wcb, address)->AttrF & ATTR_SELECTED))
+            continue;
+one:
+        file = ENTRY(wcb, address);
+        for (i = 0; i < 13; i++)
+            md.TmpBuf[i] = file->NameF[i];
+        answer = FncCall(file->AttrF);
+        FNC_CHANGE |= (u8)answer;
+        panel = md.WCBcrn;
+        wcb = PANEL(panel);
+        if (md.OneFile != 0)
+            break;
+        file = ENTRY(wcb, address);
+        if ((u8)answer != 0 && file->AttrF & ATTR_SELECTED) {
+            file->AttrF = file->AttrF & 0x3F | 0x80;
+            if (md.UnSlct != 0) {
+                if (wcb->WinTyp == 0)
+                    PutFls(panel);
+                else if (wcb->WinTyp == 1)
+                    PutTre(panel);
+                else
+                    PutInf(panel);
+                lines = LnsAX();
+                number = (u16)(address - wcb->First) / sizeof(struct FILENT);
+                i = number % lines;
+                number /= lines;
+                if (number <= (wcb->BrfFul == 0 ? 2 : 0)) {
+                    begin = BegBX(panel) + 0x201;
+                    Window(begin + (i << 8), 0x126);
+                }
+                if (md.MiniSta != 0) {
+                    begin = BegBX(panel);
+                    Window(begin + (SizDX() & 0xFF00) - 0x200, 0x128);
+                }
+            }
+        }
+        if (TstBrk())
+            break;
+        if (answer >> 8)
+            break;
+    }
+    return FncExt();
 }

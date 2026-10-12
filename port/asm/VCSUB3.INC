@@ -88,13 +88,6 @@ TreeCur	PROC	NEAR
 	RET
 TreeCur	ENDP
 
-;	The same, without regard to where it was
-;			DS=ES - main data
-TrCr10	PROC	NEAR
-	CALL	FAR PTR TrCr10_c
-	RET
-TrCr10	ENDP
-
 ;	Begin the lines of the tree half a panel above the cursor
 ;			   AL - lines shown
 ;			   DS - main data
@@ -107,25 +100,6 @@ TrCr20	ENDP
 DrIn_F	DB	'DIRINFO',0
 
 	.CODE
-;---------------------- Output files -------------------
-;			   DS - WCBseg
-PutFls	PROC	NEAR
-	PUSH	AX
-	MOV	AX,DS
-	CMP	DS:WinTyp,0
-	JNE	PtFs01
-	CallC	PutFls_c
-	POP	AX
-	RET
-PtFs01:	CMP	DS:WinTyp,1
-	JNE	PtFs02
-	CallC	PutTre_c		; The tree
-	POP	AX
-	RET
-PtFs02:	CallC	PutInf_c		; The Info
-	POP	AX
-	RET
-PutFls	ENDP
 
 ;---------------------- Output tree --------------------
 ;			   DS - WCBseg
@@ -169,17 +143,6 @@ NearFl	PROC	NEAR
 NrFl01:	POP	AX
 	RET
 NearFl	ENDP
-
-;----------------------- Set Path ----------------------
-;	Return :	CY=1 - Error
-; C: SetPth_c of port/system.c, which returns 1 for an error.
-SetPth	PROC	NEAR
-	PUSH	AX
-	CallC	SetPth_c
-	NEG	AX			; CY for 1
-	POP	AX
-	RET
-SetPth	ENDP
 
 ;---------------------- Save setup ---------------------
 	.CONST
@@ -313,13 +276,6 @@ OkCan_D	DB	4, 0
 ; C: Fantom_c of port/system.c, which returns 1 if the user would not
 ; change the disk. It has Dialog show the box here.
 	PUBLIC	Fant_B
-Fantom	PROC	NEAR
-	PUSH	AX
-	CallC	Fantom_c
-	NEG	AX			; CY for 1
-	POP	AX
-	RET
-Fantom	ENDP
 
 ; The disk of the drive that the path at ES:DX names
 ;	Return :	CY=1 - the user would not change it
@@ -418,21 +374,4 @@ GetVol	PROC	NEAR
 	RET
 GetVol	ENDP
 
-; Open a file
-;			DS:DX - its name
-;			   AL - the mode, as DOS takes it
-;	Return :	   AX - the handle, or with CY the error
-; C: OpenFil_c of port/system.c, which takes the name as a far pointer in
-; DX:BX and returns 1 in DX for an error.
-OpenFil	PROC	NEAR
-	PUSH	DX
-	PUSH	BX
-	MOV	BX,DX
-	MOV	DX,DS
-	CallC	OpenFil_c
-	NEG	DX			; CY for 1
-	POP	BX
-	POP	DX
-	RET
-OpenFil	ENDP
 

@@ -57,16 +57,12 @@ u16 Run_00(u16 text, u16 view);
    for the path at `path` in the main data, and is not 0 if the user would
    not.
 
-   F34_30 looks for the next command of a line, and F34_40 at whether a
-   command is the name of a file of the kind that is being read, a menu
-   here: then it has put the path of that file at TmpBuf. Both return a
-   place in the high word, and the low one is not 0 if there is none.
-
-   PutMnu, Input0, FndItem, DosCom and ClsLine are C, of vc.h. */
-u32 F34_30(u16 text);
-u32 F34_40(u16 text, u16 view);
-#pragma aux F34_30  "*_a" __far parm [si] value [dx ax] modify exact [ax dx si es]
-#pragma aux F34_40  "*_a" __far parm [si] [cx] value [dx ax] modify exact [ax bx cx dx si di es]
+   PutMnu, Input0, FndItem, DosCom and ClsLine are C, of vc.h, and so are
+   F34_30, which looks for the next command of a line, and F34_40, which
+   looks at whether a command is the name of a file of the kind that is
+   being read, a menu here: then it has put the path of that file at
+   TmpBuf. Both return a place in the high word, and the low one is not 0
+   if there is no command, or if it is such a name. */
 
 /* FndItem of vc.h, which is C, for a place in the main data, with its
    answer as F34_30 and F34_40 have theirs: where the next line of a menu

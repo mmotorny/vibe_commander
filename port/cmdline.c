@@ -51,22 +51,18 @@ u32 F77_00(u16 key, u16 panel);
    or the column has changed. A key without a scan code is a character,
    whatever it is. DosCom draws the command line.
 
-   F77_10 is the piece of the speed search that stays assembly: it hands
-   a key to Search, for the list of the panel `panel` or the tree, and
-   has F00_50 move the cursor to what Search found.
-
-   PutMnu, PutKey, Input, EdLin and DosCom are C, of vc.h. */
-void F77_10(u16 key, u16 panel);
-#pragma aux F77_10  "*_a" __far parm [ax] [cx] modify exact [ax cx si di es]
+   PutMnu, PutKey, Input, EdLin, Search and DosCom are C, of vc.h. */
 
 /* C routines of other files that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 u32 TotSel(u16 panel);                                  /* files.c */
 u16 F32_70(u16 begin, u16 size);                        /* usermenu.c */
+void F00_50(u16 panel, u16 cursor, u16 first);          /* keys.c */
 #pragma aux MvsBw  "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
 #pragma aux TotSel "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux F32_70 "*_c" __far parm [bx] [dx] value [ax] modify exact [ax]
+#pragma aux F00_50 "*_c" __far parm [ax] [si] [di] modify exact [ax]
 
 /* The mask that stands behind the name of a directory in the command
    line: the assembly's, which other C code has too. */
@@ -425,6 +421,34 @@ F68_20:                                 /* the box goes */
     if ((c & 0xFF) == 0)
         return 0;
     return 1;
+}
+
+/* Have a key of the speed search act on what has been typed, look for
+   the next name that begins with that, among the files of the panel
+   `panel` or in the tree, and put the cursor there: F77_10. */
+static void F77_10(u16 key, u16 panel)
+{
+    struct WCBdef __far *wcb = PANEL(panel);
+    u16 segment, at, first, begin, end, step, found;
+
+    if (wcb->WinTyp == 0) {
+        segment = panel;
+        at = wcb->CurAdr;
+        first = wcb->First;
+        end = wcb->EndBuf;
+        begin = DSKBUF;
+        step = sizeof(struct FILENT);
+    } else {
+        segment = MAIN_SEG;
+        at = md.TreAdr;
+        first = md.TreFrst;
+        begin = TRELIST;
+        end = (((struct DIRTREE *)md.TreeBuf)->TreeLen << 4) + begin;
+        step = sizeof(struct DIRENT);
+    }
+    found = Search(segment, at, begin, end, step, key);
+    if (found != at)
+        F00_50(panel, found, first);
 }
 
 /* The speed search of a panel, which `key`, Alt with a letter or a digit,

@@ -1591,3 +1591,470 @@ bytes_only:
 none:
     return (u32)at << 16 | 0x100;
 }
+
+/*
+ * The commands that view or edit a file: F3 and F4, Alt-F3 and Alt-F4,
+ * which are the program's own viewer and editor whatever the setup, and
+ * Shift-F3 and Shift-F4, which ask for a name.
+ *
+ * They are commands, as in keys.c and enter.c: functions that get the
+ * panel which the assembly has in DS and return where the program goes
+ * on. NEXT_VIEW, with 1 in the high word for the editor, is V00_00 above for
+ * the file ViewFil, and NEXT_DIRINFO is V00_02 for the editor in the window of
+ * an Info panel; their stub goes on from there to the editor, or back
+ * here.
+ *
+ * Where the setup has the viewer or the editor be another program, that
+ * is looked for in VCVIEW.EXT or VCEDIT.EXT, of the current directory or
+ * else of the program's: the line for files of this kind there is
+ * commands to run, or nothing but the name of a program. Such a program
+ * is run here, with the memory of the viewer given up for it and behind
+ * the name of the file what such a program reads of the setup.
+ */
+u32 F43_00(void);
+u32 F44_00(void);
+u32 F63_00(u16 panel);
+u32 F64_00(u16 panel);
+u32 F33_00(u16 panel);
+u32 F34_00(u16 panel);
+u32 F34_10(u16 panel);
+
+/* How the assembly passes arguments to these, and what it expects back
+   (see CmdC in port/asm/VCFUNC.INC). F34_30 and F34_40 are in vc.h. */
+#pragma aux F43_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F44_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F63_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F64_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F33_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F34_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F34_10 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+
+/* More C routines of other files that vc.h does not have. */
+const u8 __far *FndLet(const u8 __far *text);           /* string.c */
+u8 __far *MainFil(u8 __far *to, const u8 __far *name);
+u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
+#pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
+#pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
+#pragma aux Run_00  "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
+
+/* More of the assembly: the names of the extension files of the viewer
+   and of the editor, of the menu file and of the file that an Info panel
+   shows, which are copied with what follows them there; the dialog that
+   asks for a name; the boxes shown while a program is loaded as the
+   viewer or as the editor; and the box that says it could not be run,
+   with its texts. */
+extern const u8 __far ViewE_F[];        /* "VCVIEW.EXT" */
+extern const u8 __far EditE_F[];        /* "VCEDIT.EXT" */
+extern const u8 __far Menu_F[];         /* "VC.MNU" */
+extern const u8 __far DrIn_F[];         /* "DIRINFO" */
+extern const u8 __far ViFil_B[];        /* "View the file:" */
+extern const u8 __far Viewr_P[];        /* "Loading the viewer:" */
+extern const u8 __far Editr_P[];        /* "Loading the editor:" */
+extern const u8 __far RunEr_B[];
+extern const u8 __far RunEr_S[];        /* "Not enough memory to load" */
+extern const u8 __far Run1_S[];         /* "Can't run commands for some
+                                           reason." */
+extern const u8 __far Run2_S[];         /* "Try rebooting." */
+#pragma aux ViewE_F "*"
+#pragma aux EditE_F "*"
+#pragma aux Menu_F "*"
+#pragma aux DrIn_F "*"
+#pragma aux ViFil_B "*"
+#pragma aux Viewr_P "*"
+#pragma aux Editr_P "*"
+#pragma aux RunEr_B "*"
+#pragma aux RunEr_S "*"
+#pragma aux Run1_S "*"
+#pragma aux Run2_S "*"
+
+#define MinView 8000                    /* Minimum view buffer size */
+
+#define EOF_CHAR 0x1A
+
+#define GO_VIEW(edit) ((u32)(u8)(edit) << 16 | NEXT_VIEW)
+
+/* What a program that is run as the viewer or the editor finds behind
+   the name of the file, in the tail of its command line: ViewPar, with
+   36 zero bytes behind it. The palette is put into its byte 9, and what
+   there is to know of the mouse into bytes 11 to 13. */
+static const u8 CODE ViewPar[9] = { 0, 'S', 'o', 'c', 'h', 'a', 0, 0x1F, 1 };
+
+/* Look for the next command of a line of an extension file or a menu
+   file: F34_30. `text` is where in MenuBuf to look from, in a command or
+   behind one. Commands are lines that begin with a space or a tab; empty
+   lines and lines that begin with an apostrophe are passed over.
+
+   Returns in the high word where the command begins, with 0 in the low
+   one; or 1 there if there is none, and in the high word where the line
+   begins that is no command, or the place behind the character that
+   ends the file. */
+u32 F34_30(u16 text)
+{
+    const u8 *at = (const u8 *)text;
+    u16 word;
+
+    for (;;) {
+        at = (const u8 *)(u16)(u32)FndLet(at);
+        word = *(const u16 *)at;
+        at += 2;
+        if (!IS_CRLF(word)) {
+            at--;
+            if ((u8)word == EOF_CHAR)
+                break;
+            at--;
+            return (u32)(u16)at << 16;
+        }
+        for (;;) {                      /* behind the end of a line */
+            word = *(const u16 *)at;
+            if ((u8)word == ' ' || (u8)word == '\t')
+                break;
+            if (!IS_CRLF(word) && (u8)word != '\'')
+                return (u32)(u16)at << 16 | 1;
+            do {                        /* to the end of this one */
+                word = *(const u16 *)at;
+                at += 2;
+                if (IS_CRLF(word))
+                    break;
+                at--;
+            } while ((u8)word != EOF_CHAR);
+            if (!IS_CRLF(word))
+                return (u32)(u16)at << 16 | 1;
+        }
+    }
+    return (u32)(u16)at << 16 | 1;
+}
+
+/* Is the command at `text` in MenuBuf nothing but the name of a file,
+   and the last of its line: F34_40. For a viewer or an editor, `view`
+   not 0, that is a name with an extension of three characters, and for a
+   menu one that ends in ".MNU". A drive in front of it has to be a
+   letter, and a "!" makes it a command.
+
+   If so, the low word is 1, and the path of the file is at TmpBuf: the
+   name as it is if it has a path of its own, and else in the directory
+   of the extension file or the menu file, whose path is at TmpBuf. Else
+   the low word is 0 and the high one the place before the command. The
+   character behind the name is made a zero byte before the length of
+   the name is found too great. */
+u32 F34_40(u16 text, u16 view)
+{
+    u16 code = AsmSeg();
+    const u8 __far *suffix = AT(code, OFFSET(Menu_F) + 1);
+    const u8 __far *from;
+    u8 __far *to;
+    u8 *at = (u8 *)text;
+    u8 *end;
+    u16 word, count;
+    u8 c;
+
+    word = *(const u16 *)at;
+    if (word >> 8 == ':') {
+        c = (u8)UpCase(word & 0xFF);
+        if (c < 'A' || c > 'Z')
+            goto command;
+        at += 2;
+    }
+    for (;;) {
+        word = *(const u16 *)at;
+        at++;
+        c = (u8)word;
+        if (c == '!')
+            goto command;
+        if (IS_CRLF(word) || c == EOF_CHAR || c == ' ' || c == '\t')
+            break;
+    }
+    at--;                               /* the character behind the name */
+    end = at;
+    at -= 4;
+    count = 1;
+    if (view == 0)
+        count = 4;
+    do {
+        c = (u8)UpCase(*at++);
+        suffix++;
+        if (c != *suffix)
+            goto command;
+    } while (--count);
+    if (LOW(F34_30((u16)end)) == 0)
+        goto command;
+    *end = 0;
+    if ((u16)(end - (u8 *)text) >= LenPath + 12)
+        goto command;
+    to = md.TmpBuf;
+    if ((u16)(u32)CutPath((const u8 *)text) == text)
+        to = (u8 __far *)CutPath(md.TmpBuf);
+    from = (const u8 *)text;
+    for (count = LenPath + 13; count != 0; count--)
+        *to++ = *from++;
+    return (u32)(text + LenPath + 13) << 16 | 1;
+command:
+    return (u32)(u16)(text - 1) << 16;
+}
+
+/* Run the program at TmpBuf as the viewer of the file ViewFil, or as the
+   editor: Aexec0. The box that says so stays until the program is done,
+   and the screen is then written as it was, which leaves nothing of what
+   the program has shown; the panels are read again. A program that DOS
+   will not run is said in a box. */
+static u32 Aexec0(u16 edit)
+{
+    u16 code = AsmSeg();
+    struct DosRegs regs;
+    struct BiosRegs bios;
+    struct Box where;
+    const u8 __far *from;
+    u8 *tail;
+    u16 box, include, failed, error, i;
+
+    tail = (u8 *)(u16)(u32)MvzLine(md.TmpBuf + 101, md.ViewFil, LenStr + 1);
+    md.TmpBuf[100] = (u8)((u16)(tail - (md.TmpBuf + 101)) + 45);
+    box = OFFSET(Viewr_P);
+    if (edit != 0)
+        box = OFFSET(Editr_P);
+    DialBox(0x528, box, (u16)md.TmpBuf, MAIN_SEG,
+            (struct Box STACK *)&where);
+    Window(where.begin, where.size);
+    *(u16 *)(md.TmpBuf + 95) = where.begin;
+    *(u16 *)(md.TmpBuf + 97) = where.size;
+    bios.ax = 0x0300;                   /* the shape of the cursor */
+    bios.bx = where.begin & 0xFF;
+    bios.cx = bios.dx = 0;
+    Int10((struct BiosRegs STACK *)&bios);
+    *(u16 *)(md.TmpBuf + 93) = bios.cx;
+    for (i = 0; i < sizeof ViewPar; i++)
+        tail[i] = ViewPar[i];
+    for (; i < 45; i++)
+        tail[i] = 0;
+    tail[45] = 0x0D;
+    tail[9] = md.ColTyp;
+    if (md.Mouse != 0) {
+        tail[11] = 0xFF;
+        tail[12] = md.LftMous;
+        tail[13] = 1;
+    }
+    /* The main data and the panels keep their memory, and the viewer as
+       much as it needs at the least. */
+    regs.ax = 0x4A00;
+    regs.bx = md.ViewSeg - MAIN_SEG + ((MinView - 1) >> 4) + 1;
+    regs.cx = regs.si = regs.di = 0;
+    regs.name = md.TmpBuf;
+    Int21d((struct DosRegs STACK *)&regs);
+    md.EPB.CmdLine = (u32)MAIN_SEG << 16 | (u16)(md.TmpBuf + 100);
+    LetLin(md.TmpBuf);
+    regs.ax = 0x4B00;
+    regs.bx = (u16)&md.EPB;
+    regs.name = md.TmpBuf;
+    failed = Intr21((struct DosRegs STACK *)&regs);
+    error = regs.ax;
+    /* All the memory that there is, again: DOS says how much that is
+       when it is asked for more. */
+    regs.ax = 0x4A00;
+    regs.bx = 0xFFFF;
+    regs.name = md.TmpBuf;
+    Int21d((struct DosRegs STACK *)&regs);
+    regs.ax = 0x4A00 | regs.ax & 0xFF;
+    Int21d((struct DosRegs STACK *)&regs);
+    HidCur();
+    SavMous();
+    IniMous();
+    if (failed && error != ERR_NOT_READY) {
+        include = OFFSET(RunEr_S);
+        if (error != 8 && error != 7) {
+            include = OFFSET(Run1_S);
+            from = AT(code, OFFSET(Run2_S));
+            for (i = 0; i < 80; i++)
+                md.TmpBuf[i] = from[i];
+        }
+        Dialog(OFFSET(RunEr_B), include, 0, 0, MAIN_SEG);
+    }
+    ResWin(*(u16 *)(md.TmpBuf + 95), *(u16 *)(md.TmpBuf + 97),
+           (u16)md.WinBuf);
+    Window(0, (u16)md.Lines << 8 | 80);
+    CurShp(*(u16 *)(md.TmpBuf + 93));
+    FncEx1();
+    return NEXT_INIT50;
+}
+
+/* View or edit the file ViewFil: F34_11. `how` is 1 in its low byte for
+   the editor, and in its high byte for Alt-F3 and Alt-F4. Those are the
+   program's own viewer and editor if the setup has the keys without Alt
+   be something else, and the other way round if it has not.
+
+   What else the viewer is, the extension file says, VCVIEW.EXT or
+   VCEDIT.EXT. One that is not there, or has nothing for files of this
+   kind, leaves the program's own; one that cannot be read, nothing. */
+static u32 F34_11(u16 how)
+{
+    u16 code = AsmSeg();
+    const u8 __far *name;
+    const u8 __far *from;
+    struct DosRegs regs;
+    u32 file, pair;
+    u16 edit = how & 0xFF;
+    u16 own = how >> 8;
+    u16 failed, count, command, i;
+
+    if ((edit != 0 ? md.AltEdit : md.AltView) == 0)
+        own = own == 0;
+    if (own != 0)
+        return GO_VIEW(edit);
+    HidCur();
+    PutMnu(2);
+    name = AT(code, OFFSET(ViewE_F));
+    if (edit != 0)
+        name = AT(code, OFFSET(EditE_F));
+    from = name;
+    for (i = 0; i < 13; i++)
+        md.TmpBuf[i] = from[i];
+    if (ChgDisk(md.TmpBuf))
+        return NEXT_FUNC04;
+    file = OpenFil(md.TmpBuf, 0x40);
+    if (file >> 16) {
+        if ((u8)file != ERR_NO_FILE)
+            return NEXT_FUNC04;
+        MainFil(md.TmpBuf, name);
+        if (ChgDisk(md.TmpBuf))
+            return GO_VIEW(edit);
+        file = OpenFil(md.TmpBuf, 0x40);
+        if (file >> 16) {
+            if ((u8)file <= 3)
+                return GO_VIEW(edit);
+            return NEXT_FUNC04;
+        }
+    }
+    regs.ax = 0x3F00;
+    regs.bx = (u16)file;
+    regs.cx = LenMenu - 1;
+    regs.si = regs.di = 0;
+    regs.name = md.MenuBuf;
+    failed = Intr21((struct DosRegs STACK *)&regs);
+    count = regs.ax;
+    regs.ax = 0x3E00;
+    regs.bx = (u16)file;
+    if (Intr21((struct DosRegs STACK *)&regs))
+        return NEXT_FUNC04;
+    if (failed)
+        return NEXT_FUNC04;
+    md.MenuBuf[count] = EOF_CHAR;
+    command = FindExt(CutPath(md.ViewFil));
+    if (command == 0)
+        return GO_VIEW(edit);
+    pair = F34_30(command);
+    if (LOW(pair))
+        return GO_VIEW(edit);
+    pair = F34_40(HIGH(pair), 1);
+    if (LOW(pair) == 0) {
+        command = HIGH(pair);
+        *(u8 *)command = ' ';
+        if (Run_00(command, 1))
+            return F21_30();
+        return NEXT_FUNC04;
+    }
+    /* A program: is it there? */
+    if (ChgDisk(md.TmpBuf))
+        return NEXT_FUNC04;
+    regs.ax = 0x4E00;
+    regs.bx = regs.si = regs.di = 0;
+    regs.cx = 0x27;
+    regs.name = md.TmpBuf;
+    if (Intr21((struct DosRegs STACK *)&regs)) {
+        if (regs.ax == ERR_NOT_READY)
+            return NEXT_FUNC04;
+        return GO_VIEW(edit);
+    }
+    return Aexec0(edit);
+}
+
+/* Ask for the name of the file to view or to edit: F44_01. */
+static u32 F44_01(u16 how)
+{
+    u16 include = OFFSET(ViFl_S) + 1;
+
+    if ((how & 0xFF) != 0)
+        include = OFFSET(EdFl_S) + 1;
+    md.HlpPage = (u8)(how + 18);
+    if ((u8)Dialog(OFFSET(ViFil_B), include, 0, 0, MAIN_SEG) != 0)
+        return NEXT_FUNC04;
+    if (md.ViewFil[0] == 0)
+        return NEXT_FUNC04;
+    return F34_11(how);
+}
+
+/* The editor on the file dirinfo of the directory that an Info panel
+   shows, in the lower part of the panel, under the word Edit: F34_10,
+   where a click of the mouse in that part comes in as well. */
+u32 F34_10(u16 panel)
+{
+    const u8 __far *from = AT(AsmSeg(), OFFSET(DrIn_F));
+    u16 begin = BegBX(panel);
+    u16 size = SizDX();
+    u16 i;
+
+    for (i = 0; i < 13; i++)
+        md.ViewFil[i] = from[i];
+    LetLin(md.ViewFil);
+    begin += 0xB02;
+    size -= 0xC04;
+    VI->ViBase = begin;
+    VI->ViSize = size;
+    begin = ADD_LOW(begin - 0x100, 15);
+    MvsBw(BasAdr(begin), AT(AsmSeg(), OFFSET(EdFl_S)), 6,
+          Color(Slct_C) << 8);
+    return NEXT_DIRINFO;
+}
+
+/* View or edit what the cursor of the panel is on, a file, or for the
+   editor the dirinfo of an Info panel: F34_01. With the panels off, in a
+   tree, and for the viewer in an Info panel, the name is asked for. */
+static u32 F34_01(u16 panel, u16 how)
+{
+    struct WCBdef __far *wcb = PANEL(panel);
+    const struct FILENT __far *file;
+    u16 i;
+
+    if (wcb->Visible == 0)
+        return F44_01(how);
+    if (wcb->WinTyp == 0) {
+        if (wcb->CurAdr >= wcb->EndBuf)
+            return NEXT_FUNC04;
+        file = ENTRY(wcb, wcb->CurAdr);
+        if (file->AttrF & ATTR_DIRECTORY)
+            return NEXT_FUNC04;
+        for (i = 0; i < 13; i++)
+            md.ViewFil[i] = file->NameF[i];
+        return F34_11(how);
+    }
+    if ((how & 0xFF) == 0 || wcb->WinTyp != 2)
+        return F44_01(how);
+    return F34_10(panel);
+}
+
+u32 F43_00(void)                        /* Shift-F3: View... */
+{
+    return F44_01(0);
+}
+
+u32 F44_00(void)                        /* Shift-F4: Edit... */
+{
+    return F44_01(1);
+}
+
+u32 F63_00(u16 panel)                   /* Alt-F3 */
+{
+    return F34_01(panel, 0x100);
+}
+
+u32 F64_00(u16 panel)                   /* Alt-F4 */
+{
+    return F34_01(panel, 0x101);
+}
+
+u32 F33_00(u16 panel)                   /* F3 */
+{
+    return F34_01(panel, 0);
+}
+
+u32 F34_00(u16 panel)                   /* F4 */
+{
+    return F34_01(panel, 1);
+}

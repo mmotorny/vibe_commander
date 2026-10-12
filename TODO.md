@@ -113,23 +113,38 @@ Things that are known and not done. Standing instructions are in
   label; `RdInfo` takes 53h there for a drive that is not ready. A
   label of eleven characters that ends in S would do that, if DOS
   leaves 0 in AH. Ported like that; not tried.
-- Of `VCVIEW.INC`, the commands that start the viewer or the editor
-  are still assembly: `F43_00`, `F44_00`, `F63_00`, `F64_00`, `F33_00`
-  and `F34_00`, 662 bytes that are no procedure, as far as `Aexec3`,
-  with `F34_30` and `F34_40`, which read a line of an extension file,
-  171 bytes; the user menu, which is C, calls those two by entries in
-  `VCFUNC.INC`. They belong together as the next batch there. The code
-  asks for a
-  name, takes the file under the cursor or the dirinfo of an Info
-  panel, looks in `VCVIEW.EXT` or `VCEDIT.EXT` for a command or a
-  program for the file's extension, and runs that program itself, with
-  the memory given up and a parameter block behind the name; else it
-  jumps to `V00_00` or `V00_02`, which are stubs of the C. 118 of its
-  273 instructions have run in no scenario, and 7 of the 87 of the two
-  routines: Alt+F3 and Alt+F4, an extension file with a program in it,
-  one named with its drive, and a program that DOS will not run. It
-  calls DOS for memory with `INT 21h` itself, three times, and the
-  BIOS for the cursor: entries of their own.
+- `VCVIEW.INC` is C but for its boxes and texts and the stubs of the
+  commands, which the loop of the keys and the menus jump to. Every
+  instruction of the commands that start the viewer or the editor has
+  run in a scenario, those that tell a program run as the viewer of the
+  mouse too, since the bench has one; what they tell it shows on no
+  screen.
+- What the commands that view and edit do in the original and the port
+  does after them; whether to mend any of it is not decided:
+  - An extension file of the viewer, `VCVIEW.EXT` of the current
+    directory, that DOS will not open for another reason than that it
+    is not there, has F3 do nothing, without a word: a directory of
+    that name, in `view-commands`.
+  - A program that such a file names as the viewer and that is not
+    there leaves the program's own viewer, without a word. One that DOS
+    finds and will not run is "Not enough memory to load" for the
+    errors 7 and 8 and "Can't run commands for some reason. Try
+    rebooting." for every other: a name with a star in it, for which
+    DOS finds a file and can run none, in `view-commands`. For that
+    box 80 bytes are copied from the text "Try rebooting.", which has
+    15; the C copies from the assembly, `Run2_S`, as long as that has
+    them.
+  - Nothing is kept of what a program run as the viewer has shown: the
+    screen is written as it was, and Ctrl+O shows what was there
+    before.
+  - A program is taken for one only if it is all that the line of the
+    extension file has, with an extension of three characters; the
+    character behind the name is made a zero byte before the name is
+    found too long, 80 characters or more, and run as a command after
+    all.
+  - Behind the name of the file such a program gets nine bytes, 36
+    zeros and the palette, of which nothing in the published source
+    says who reads them. Ported as they are; no scenario shows them.
 - `PrevLin` has three instructions for a place that is not the start of
   a line and one for a line of the table that is not its own. No caller
   hands it either, so they ran in no scenario and are translated by
@@ -364,7 +379,7 @@ Things that are known and not done. Standing instructions are in
 - `VCCOPY.INC` is C but for its boxes and texts, which `DialBox` and
   `Dialog` read in the assembly, and the stubs: of the commands, of what
   their dialogs call for the tree, and of `C00_00`, which `FncSel` and
-  `FncMas` call. Those two, in `VCF1.INC`, are assembly still.
+  `FncMas` call. Those two, in `VCF1.INC`, are C as well.
 - What the commands of Copy and Rename do in the original and the port
   does after them; whether to mend any of it is not decided:
   - When a directory of a tree panel has been renamed, the current
@@ -611,12 +626,12 @@ Things that are known and not done. Standing instructions are in
   Cancel for a read-only file stops the command. `M30_50` does not ask
   whether DOS could read or set the date and the time of a file. All
   ported as they are.
-- Of `VCF1.INC`, `FncSel`, which goes through the selected files of a
-  panel, and `FncExt`, where a command ends that may have changed the
-  disk, are still assembly, 267 bytes. They are code in the program's
-  data, behind `DirFunc`, and `harness/coverage.py` cannot name them
-  yet: no procedure follows them. Everything else of the file is C or
-  a table. The commands that are C jump on to both, through `F1Next`.
+- `VCF1.INC` is C but for its boxes and texts and the stubs: `FncSel`,
+  which goes through the selected files of a panel, and `FncExt`, where
+  a command ends that may have changed the disk, are functions of
+  `port/dirfunc.c`, and their stubs are what `F1Next` and the table of
+  Copy and Rename jump to. They were code in the program's data, behind
+  `DirFunc`; `harness/coverage.py` names such code by its label now.
 - A command that is C returns where it goes on, and its stub jumps
   there: `F1Next` in `VCF1.INC`, with the `TO_` of `port/vc.h`. The
   commands of the other files can use the same; one that goes on
@@ -643,24 +658,57 @@ Things that are known and not done. Standing instructions are in
   which is what many lists in `harness/ported.py` call out of reach,
   "the drives of the bench are always ready". The top of
   `harness/scenarios.py` says how.
-- Of the keys of the panels, `VCFUNC.INC` up to `F27_00`, these are
-  still assembly: Enter, `F21_00`, 479 bytes, which runs a file or a
-  command and ends in the part of the program that stays in the memory,
-  with `F21_40`, 110 bytes, which saves a panel for that; and `F22_00`
-  to `F27_00`, some 400 bytes, the keys that change the directory and
-  those that go to the command before and after. The last stand in
-  one stretch of code with what follows them up to the procedure
-  `F42_10`, 681 bytes, of which `F80_00` on is C and listed under that
-  label. `harness/reach.py` and `harness/ported.py` name code from a
-  label to the next procedure, so `F22_00` names all of it: a batch
-  that lists these keys has the instructions from `F80_00` on in its
-  count as well. The loop that
+- The keys of the panels, `VCFUNC.INC`, are C: what is left there is
+  the stubs, the table by which they jump on, `CmdNx_T`, boxes and
+  texts. Enter, `F21_00`, saves what the program needs to start over,
+  gives the main data back to DOS and returns `NEXT_EXEC` or
+  `NEXT_INIT11` (`F21_31` of `port/enter.c`), and the stub goes on to
+  the part of the program that stays in the memory, at `Exec`, or to
+  `Init11`: `CmdExe` and `CmdIni`. Those two jumps and that part are
+  what is left of running a command, with `VC.ASM`. The program also
+  comes through `F21_31` when it has started: the loop goes there from
+  `Init40`. The loop that
   takes a key is C, `MainLoop` of `port/main.c`, and its labels in
   `VC.ASM` are stubs that enter it: the commands that are C still
   return to it through a table of those labels, and it goes to a
   command through the table of keys there, `FncTab`, because the
   commands are labels of the assembly. When they are functions, the
   table is a `switch` in the loop and the structure of registers goes.
+- `harness/reach.py` and `harness/ported.py` name code from a label to
+  the next procedure, so `F22_00`, the keys that change the directory,
+  names all that stands up to the procedure `F42_10`, with `F80_00`
+  and what follows it, which an earlier batch lists under that label:
+  the instructions from there on are counted in both batches.
+- With "Quick execute commands" switched on, "F9 o o", a command is run
+  by `INT 2Eh` of the shell, and the shell of the bench, FreeCOM, runs
+  nothing then: the command is echoed and that is all. So no scenario
+  shows what the part that stays does with `DosChg`, the drive that
+  Enter tells it to make current first when the program was started
+  on another: it reads that for `INT 2Eh` only. The C sets it by
+  reading.
+- What Enter and the keys next to it do in the original and the port
+  does after them; whether to mend any of it is not decided:
+  - Enter on a file that is no program copies 3,999 bytes from where
+    the panel keeps the extension file of its directory, which is 512:
+    the rest of what the panel keeps and the start of its list of
+    files come along into `MenuBuf`. The file ends within the 512, so
+    nothing reads them.
+  - Going up a directory takes the name of the one that is left from
+    the path of the panel, 12 bytes whatever its length, to put the
+    cursor on it: what follows the path in the panel's segment comes
+    along behind the name's zero byte.
+  - Before the command is echoed the BIOS is asked to write the end of
+    a line with BX as it is, the address of the saved setup, where the
+    BIOS takes a page of the screen and a colour: page 37 in the
+    original. The C hands it the original's address, 25E5h; the BIOS of
+    the bench goes by neither.
+  - With more than 256 files in a panel only 256 are kept while a
+    command runs, and the cursor's file is put into the last place if
+    it is beyond; the list is read again afterwards and the cursor put
+    on that name. In `enter-many`.
+  - Shift held with Enter has the program, for that command, stay in
+    the memory whole where the setup has it give most of it up, and
+    the other way round. In `enter`.
 - What the keys of the panels do for the mouse has run in no scenario:
   26 instructions of `F00_60`, which select the files that the mouse
   passes over with its right button held, and the three places where the
@@ -696,14 +744,6 @@ Things that are known and not done. Standing instructions are in
   The 32 levels that a path of DOS can have fit the port's stack; they
   did not fit the original's 256 bytes.
 
-- Of `VCFUNC.INC` from `F80_00` on, three pieces are still assembly,
-  though `harness/ported.py` lists the stretches they stand in:
-  `F30_00`, F10, six instructions around the call of `Dialog` that asks
-  whether to quit; `F75_00`, four instructions that choose between two
-  places of the assembly by the kind of the panel; and `F77_10`, the 25
-  instructions of the speed search that hand a key to `Search` and the
-  place it finds to `F00_50`, which both take the panel in DS. The C
-  calls them as `F77_10_a`. They go when `Search` and `F00_50` are C.
 - What the user menu, the history and the box of the drives do for the
   mouse has run in no scenario, 164 instructions: all of `F32_70`, which
   the menu and the history share, and the box's own, a button held on a
@@ -1836,6 +1876,48 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     listed as out of reach, which the first `port` test said, 132
     seconds. The second passed, 348 seconds next to other runs. The
     mouse's routines, read and never run before, needed no change.
+- Enter, the keys that change the directory, the commands that view
+  and edit, and `FncSel`: 2,252 bytes, all but 281 of them no procedure,
+  about 50 minutes to the commit, next to four other batches. The
+  translation passed its scenarios and the `port` test the first time it
+  was built.
+  - 3 minutes: the files of the listing, written as text into `build/`
+    to read them, were moved out of the way with `build/*.txt`, and
+    `CMakeCache.txt` went with them: the next build said "not a CMake
+    build directory" and took the list of the C files with it; the
+    cache put back and `cmake -S . -B build` mended it. Keep such files
+    in a directory of their own from the start.
+  - 2 minutes: `F21_31`, in the middle of Enter, is where the start of
+    the program jumps to; the assembler said so when the label was gone.
+    Only the labels that looked like entries had been looked for. In
+    `CLAUDE.md` now.
+  - 3 minutes: the places a command goes on at were first made an
+    `enum` of `port/vc.h` for all files, `M03_00` among them, which is
+    the name of a routine that another batch has in hand. Undone before
+    the commit; in `CLAUDE.md` now.
+  - 2 minutes: the first scenarios copied the driver of the tests,
+    which is on the floppy as driver.com, and showed the bench's
+    fdauto.bat in the viewer: both change when the harness does, and
+    another batch was changing it. Two goldens derived again, ten
+    seconds. At the top of `harness/scenarios.py` now.
+  - What saved time: `harness/reach.py --steps` with `--changes`, three
+    seconds a try, said for every idea whether it reached what was
+    left, a dozen tries in all; and the `port` test before anything was
+    translated, which showed that the three scenarios hold.
+  - 30 minutes for getting onto `main` twenty minutes later, behind
+    five commits: the mouse on the bench, the commands of the menus,
+    the main loop and the shared routines, with every entry for C of
+    theirs gone. Ten files in conflict. What git did not show: the C
+    of this batch called DOS, the BIOS and the cursor by entries that
+    were functions of `port/vc.h` by then, and its own entry for the
+    BIOS went for `Int10`; 38 stubs of shared routines had lost their
+    last caller in the assembly with Enter and the viewer's commands,
+    found by `tools/routines.py` on both trees and taken out by a
+    script, with their lines of `EXTERN` and of `harness/ported.py`;
+    the four instructions for the mouse ran, now that the bench has
+    one, and left the list; the three goldens were derived again for
+    the pointer. The build passed at once, and the `port` test, ten
+    minutes with 96 scenarios, too.
 
 ## Ideas put off
 

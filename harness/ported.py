@@ -129,8 +129,8 @@ BATCHES = [
                   "LowCase", "FndLet", "CutPath", "NormStr", "PathLin",
                   "LetLin", "ShrtLin", "MainFil"),
         functions=("AddFile_c", "MvzLine_c", "FilZero_c", "StrLen_c",
-                   "LowCase_c", "FndLet_c", "CutPath_c", "NormStr_c",
-                   "PathLin_c", "LetLin_c", "ShrtLin_c", "MainFil_c"),
+                   "LowCase_c", "CutPath_c", "NormStr_c", "PathLin_c",
+                   "ShrtLin_c", "MainFil_c"),
     ),
     Batch(
         title="Colours and the screen buffer",
@@ -163,16 +163,14 @@ BATCHES = [
         source="files.c",
         routines=("SetMask", "TstExe", "Sort", "CmpPar", "CmpExt", "FnFile",
                   "NearFl", "TotSel"),
-        functions=("SetMask_c", "TstExe_c", "Sort_c", "FnFile_c",
-                   "NearFl_c", "TotSel_c"),
+        functions=("SetMask_c", "Sort_c", "FnFile_c", "NearFl_c"),
     ),
     Batch(
         title="Where the panels are, and the cursor in them",
         source="place.c",
         routines=("BegBX", "SizDX", "LnsAX", "InvWCB", "AdrNum", "FilNum",
                   "NumAdr", "ChgAdr", "CorPar", "FilePan"),
-        functions=("BegBX_c", "SizDX_c", "LnsAX_c", "InvWCB_c", "AdrNum_c",
-                   "NumAdr_c", "ChgAdr_c", "CorPar_c", "FilePan_c"),
+        functions=("AdrNum_c", "NumAdr_c", "ChgAdr_c", "CorPar_c"),
     ),
     Batch(
         title="The keys of the panels: the cursor, files selected, the "
@@ -180,14 +178,12 @@ BATCHES = [
         source="keys.c",
         routines=("F00_50", "F00_60", "F03_30", "F04_00", "F04_30",
                   "F05_00", "F08_10", "F76_00", "F20_02"),
-        functions=("F00_50_c", "F00_60_c", "F00_00_c", "F00_05_c",
-                   "F01_00_c", "F01_05_c", "F02_00_c", "F03_00_c",
-                   "F04_00_c", "F05_00_c", "F06_00_c", "F07_00_c",
-                   "F08_00_c", "F76_00_c", "F76_01_c", "F09_00_c",
-                   "F10_00_c", "F78_00_c", "F11_00_c", "F12_00_c",
-                   "F13_00_c", "F14_00_c", "F15_00_c", "F16_00_c",
-                   "F17_01_c", "F79_00_c", "F18_00_c", "F20_00_c",
-                   "F20_02_c"),
+        functions=("F00_60_c", "F00_00_c", "F00_05_c", "F01_00_c", "F01_05_c",
+                   "F02_00_c", "F03_00_c", "F04_00_c", "F05_00_c", "F06_00_c",
+                   "F07_00_c", "F08_00_c", "F76_00_c", "F76_01_c", "F09_00_c",
+                   "F10_00_c", "F78_00_c", "F11_00_c", "F12_00_c", "F13_00_c",
+                   "F14_00_c", "F15_00_c", "F16_00_c", "F17_01_c", "F79_00_c",
+                   "F18_00_c", "F20_00_c", "F20_02_c"),
         unreached={
             **dict.fromkeys(
                 (0x18C0, 0x18C3, 0x18C6),
@@ -209,8 +205,7 @@ BATCHES = [
         source="panel.c",
         routines=("Panel", "Panel8", "PutPath", "PtPt10", "PutName",
                   "PutNm5", "PutFls", "SetCur", "FilDir"),
-        functions=("Panel_c", "PutPath_c", "PtPt10_c", "PutFls_c",
-                   "SetCur_c", "FilDir_c"),
+        functions=("Panel_c", "PutPath_c", "PtPt10_c", "SetCur_c", "FilDir_c"),
         unreached={
             0xAF9B: "SetCur, for a panel that shows neither files nor the "
                     "tree, or a list with nothing in it: it is called when "
@@ -223,8 +218,7 @@ BATCHES = [
               "current directory is",
         source="tree.c",
         routines=("PutTre", "PutTree", "TreeCur", "TrCr10", "TrCr20"),
-        functions=("PutTre_c", "PutTree_c", "TreeCur_c", "TrCr10_c",
-                   "TrCr20_c"),
+        functions=("PutTree_c", "TreeCur_c", "TrCr20_c"),
         unreached={
             0xC1E9: "PutTree, for a tree with nothing in it: one that is "
                     "read has its root at the least, and the program "
@@ -282,7 +276,7 @@ BATCHES = [
               "panel and the text of dirinfo",
         source="info.c",
         routines=("PutInf", "PtIn20"),
-        functions=("PutInf_c",),
+        functions=(),
         unreached={
             0xC38E: "PutInf, for a panel that shows neither files nor the "
                     "tree nor the Info: nothing sets such a kind",
@@ -679,7 +673,7 @@ BATCHES = [
         routines=("DialBox", "DiBx30", "Dialog", "Dial85", "InpStr",
                   "InSt10", "Select", "Slct20", "FlipFl", "MinMnu",
                   "MnMn10", "MnMn40", "MnMn41", "MnMn50", "MnMn60"),
-        functions=("DialBox_c", "Dialog_c", "InSt10_c", "MinMnu_c"),
+        functions=("Dialog_c", "InSt10_c", "MinMnu_c"),
         unreached={
             **dict.fromkeys(
                 (0x9CE9, 0x9D2C, 0x9D2E, 0x9D30, 0x9D32,
@@ -722,7 +716,7 @@ BATCHES = [
         # commands of a line behind them.
         routines=("F80_00", "F42_10", "F32_00", "F32_60", "F32_70",
                   "F61_00", "F68_30", "F81_00", "FileLst"),
-        functions=("F80_00_c", "F32_00_c", "Run_00_c", "F62_01_c",
+        functions=("F80_00_c", "F32_00_c", "F62_01_c",
                    "F68_00_c", "F82_01_c", "F74_00_c", "F73_00_c",
                    "F77_00_c"),
         unreached={
@@ -777,21 +771,20 @@ BATCHES = [
         source="bars.c",
         routines=("ClsLine", "PutKey", "PutKey0", "PutMnu", "PutPrm",
                   "DosCom"),
-        functions=("ClsLine_c", "PutKey_c", "PtMnu1_c", "PutPrm_c",
-                   "DosCom_c"),
+        functions=("ClsLine_c", "PutKey_c"),
     ),
     Batch(
         title="The entries of an extension file",
         source="extfile.c",
         routines=("FndItem", "FindExt"),
-        functions=("FindExt_c",),
+        functions=(),
     ),
     Batch(
         title="Waiting for a key, and a line that is typed into",
         source="input.c",
         routines=("Input", "Input0", "Rnd", "EdLin", "EdSub1", "EdSub2",
                   "CmpSym", "Search"),
-        functions=("Input_c", "Rnd_c", "EdLin_c", "CmpSym_c", "Search_c"),
+        functions=("Input_c", "Rnd_c"),
         unreached={
             **dict.fromkeys(
                 (0xB1E6, 0xB1EE, 0xB1F0, 0xB1F3, 0xB1F5, 0xB1F8, 0xB1FA,
@@ -959,8 +952,7 @@ BATCHES = [
         routines=("Init40", "Init46", "Mvz2lin", "Init49", "Init90",
                   "Func01", "Func15", "Func20", "Exit", "Quit", "RestVct",
                   "HookVct", "ErrRdy"),
-        functions=("MainLoop_c", "Exit_c", "Quit_c", "RestVct_c",
-                   "HookVct_c"),
+        functions=("MainLoop_c", "Exit_c", "HookVct_c"),
         unreached={
             **dict.fromkeys(
                 (0x0D87, 0x0D88, 0x0D8B, 0x0D8C, 0x0D8D, 0x0D8F, 0x0D92,
@@ -997,9 +989,7 @@ BATCHES = [
                   "TstDrv", "Intr21", "SetPth", "Fantom", "ChgDisk",
                   "OpenFil"),
         # ClrKbd, Beep and TstDrv have no caller left in the assembly.
-        functions=("Timer_c", "TstBrk_c", "UpCase_c", "SetDTA_c",
-                   "Intr21f_c", "SetPth_c", "Fantom_c", "ChgDisk_c",
-                   "OpenFil_c"),
+        functions=("Timer_c", "Intr21f_c", "ChgDisk_c"),
         unreached={
             **dict.fromkeys(
                 (0xCC11, 0xCC13, 0xCC15),
@@ -1016,8 +1006,7 @@ BATCHES = [
         routines=("IniMous", "TypMous", "SavMous", "CurMous", "GetMous",
                   "DoublMo", "InWind"),
         # TypMous and DoublMo have no caller left in the assembly.
-        functions=("IniMous_c", "SavMous_c", "CurMous_c", "GetMous_c",
-                   "InWind_c"),
+        functions=("CurMous_c", "GetMous_c", "InWind_c"),
         unreached={
             **dict.fromkeys(
                 (0x93F3, 0x93F5),
@@ -1046,8 +1035,7 @@ BATCHES = [
                   "Int10m", "ScrOffs", "SftEGA", "SavWin", "ResWin",
                   "ResUser", "Window", "SavScr", "MovScr"),
         # ResUser and SavScr have no caller left in the assembly.
-        functions=("ChkMode_c", "Cursor_c", "Cursor1_c", "HidCur_c",
-                   "ScrOffs_c", "ResWin_c", "Window_c"),
+        functions=("ChkMode_c", "Cursor_c", "ScrOffs_c"),
         unreached={
             **dict.fromkeys(
                 (0x9376, 0x93B8),
@@ -1086,7 +1074,27 @@ BATCHES = [
         # IsCrLf0, which stepped back two bytes for IsCrLf, has no caller
         # left: what called it is C and does that itself.
         routines=("IsCrLf0", "IsCrLf", "InvVar", "ChkSum", "PgUp", "PgDn"),
-        functions=("IsCrLf_c", "InvVar_c", "ChkSum_c"),
+        functions=("ChkSum_c",),
+    ),
+    Batch(
+        title="Enter and the keys that change the directory, the commands "
+              "before and after, the commands that view and edit a file, "
+              "and going through the selected files",
+        source="enter.c, view.c and dirfunc.c",
+        # F21_00 is Enter, as far as F21_40, which saves a panel while a
+        # command runs; F22_00 the keys that change the directory, with
+        # the history behind them and then what an earlier batch has
+        # listed from F80_00 on; F43_00 the commands of the viewer and
+        # the editor; FncSel is in the program's data, with FncExt.
+        routines=("F21_00", "F21_40", "F22_00", "F43_00", "F34_30",
+                  "F34_40", "FncSel"),
+        functions=("F21_00_c", "F21_10_c", "F21_25_c", "F21_30_c",
+                   "F21_31_c", "F22_00_c", "F23_00_c", "F24_00_c",
+                   "F24_01_c", "F24_02_c", "F25_00_c", "F26_00_c",
+                   "F27_00_c", "F30_00_c", "F75_00_c", "F43_00_c",
+                   "F44_00_c", "F63_00_c", "F64_00_c", "F33_00_c",
+                   "F34_00_c", "F34_10_c", "FncSel_c", "FncExt_c",
+                   "FncEx1_c"),
     ),
 ]
 

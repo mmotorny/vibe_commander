@@ -678,6 +678,36 @@ port.
   every stub of the batch again then, in all of `port/asm/`, and take
   out the stub, its line in the `EXTERN` list and the function's name
   in `functions` of `harness/ported.py`.
+- The places of `CmdNx_T` in `VCFUNC.INC`, by which a command of the
+  keys says where the program goes on, have names in two files: those
+  that `keys.c` returns in an `enum` of its own, and those of `enter.c`
+  and `view.c` as `NEXT_` in `port/vc.h`. A name in `port/vc.h` is seen
+  by every C file, so it must not be that of a routine: `keys.c` calls
+  three places `M01_01`, `M03_00` and `M06_00`, and a function of
+  those names could not be declared next to them. A new place to go on
+  at is a new entry at the end of the table and a new `NEXT_`.
+- A command that does not come back, as Enter does not when it runs
+  something, still returns to its stub, and the stub jumps: `CmdExe`
+  and `CmdIni`, to the part of the program that stays in the memory
+  and to `Init11`. Neither sets the stack pointer, so an entry called
+  from inside the C would leave the frames of the C on the stack, and
+  more of them with every command run.
+- A label in the middle of a command may be where the start of the
+  program comes in: `Init45`, of the main loop, goes to `F21_31`, in
+  Enter, to save the setup it has read where a command leaves it, and
+  start over from there. Before taking code out, look for every label of it
+  in all of `port/asm/`, not only for those that look like entries;
+  the assembler finds the rest, "Symbol not defined".
+- C code goes on after the main data has been given back to DOS, as
+  the assembly did: `F21_31` frees it and then reads the copy in the
+  part that stays, through far pointers made with `ResSeg`. DS stays
+  where it was, and nothing has taken the memory yet.
+- A register may reach the BIOS with what it was last used for: Enter
+  has the BIOS write the end of a line with BX on the saved setup,
+  where the BIOS takes a page and a colour. The C hands it the address
+  that the original has there, from the listing of
+  `build/shareware-layout/`, as for `DelTr0`.
+- The stub of code that stands in the data can stay there: `FncSel`.
 
 ### C for the port
 

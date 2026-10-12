@@ -673,6 +673,47 @@ out again (show.py --changes is how):
   - "Click@40,15" in the Configuration, "F9 o c", ticks Left-handed
     mouse: from then on the right button puts the cursor on a file and
     the left one selects.
+  - Enter on run.bat, "End Up" in C:\\WORK, runs it. "Shift+Enter" as
+    one name has Shift held when the program asks for it. Ctrl+e and
+    Ctrl+x go through the history, and Ctrl+Enter behind a letter looks
+    there for a command that begins with what the line has. Five
+    commands of 120 characters fill the history: "rem" and letters.
+  - With "Quick execute commands" on, "F9 o o", nothing is run at all:
+    the shell of the bench does not serve the interrupt that the
+    program runs a command by then.
+  - A tree keeps a directory that DOS has removed behind the program's
+    back: with Auto change directory off, the cursor of the tree on
+    DOCS and "rd docs" typed and run, Enter in the tree finds no such
+    directory. With it on, the cursor is on the current directory, and
+    DOS does not remove that.
+  - The floppy by its other letter: Shift+F3, a file of B: and Enter
+    ask for the disk of B:, Enter puts it in, and Esc leaves the viewer
+    with the panels as they were. From then on whatever goes to A: asks
+    for its disk, and Esc there refuses: Enter on a directory of a
+    panel on A:\\, Ctrl+PgDn, Ctrl+\\. Do not get to B: by Shift+F8: that
+    has both panels read again, and a disk refused there is "Can't
+    read the disk in drive A:".
+  - More files than a panel keeps while a command runs, 256: F7 and a
+    name, Shift+F5 with "a:\\freedos\\bin\\v*.com" and the directory,
+    GrayPlus with "*.com", and then "Ctrl+m F5", "*.0" and Enter, with
+    another extension each time: Ctrl+m selects the same files again,
+    and a star in the target keeps their names. A:\\FREEDOS\\BIN has no
+    two programs of one name but fdisk.exe and fdisk.ini.
+  - What the bench puts on its floppy may change with the harness:
+    driver.com in A:\\FREEDOS\\BIN is the driver of the tests, and
+    a:\\fdauto.bat starts it. Do not copy or view either, and keep the
+    Info away from A:, which says what is free there. The programs of
+    DOS do not change: "v*.com" is eighteen small ones.
+  - A line of vcview.ext that is nothing but the name of a program
+    with its extension has F3 run that program on the file; of
+    vcedit.ext, Alt+F4, since the setup has the editor be the
+    program's own. a:\\freedos\\bin\\vecho.com is one that ends at once.
+    A name with a star, "a:\\freedos\\bin\\v*.com", is found and cannot
+    be run; a file that begins with "MZ" and 30 more characters is a
+    program that DOS has no memory for. A directory named vcview.ext
+    cannot be opened, and F3 does nothing then; with the main file
+    gone, "del d:\\vc\\vcview.ext", and none in the directory, F3 is
+    the program's own viewer.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -1711,6 +1752,94 @@ SCENARIOS = {
             "Enter",
         )),
 
+    "enter": Scenario(
+        "Enter on a file that DOS can run, with Shift held, with nothing "
+        "to run, and in a tree whose directory is gone; the commands "
+        "before and after, one looked for by how it begins, and more of "
+        "them than are kept; the keys that change the directory, on "
+        "another drive, and on one whose disk the user will not put in",
+        steps=(
+            "End Up",                     # onto run.bat
+            "Enter",                      # its name is the command
+            "Ctrl+o", "Ctrl+o",           # what it printed
+            '"ver" Shift+Enter',          # with Shift: all of the program
+                                          # stays in the memory this once
+            "Ctrl+o", "Ctrl+o",
+            '"ver" Enter',                # the same again is kept once
+            "Ctrl+o",                     # the panels off, and nothing
+            "Enter",                      # to run: a new line
+            "Ctrl+o",
+            "Ctrl+e",                     # the command before: ver
+            "Ctrl+e",                     # and before that
+            "Ctrl+e",                     # there is none
+            "Ctrl+x",                     # the one after
+            "Ctrl+x",                     # after the last: an empty line
+            "Ctrl+x",
+            '"R" Ctrl+Enter',             # the one that begins like this
+            "Ctrl+y",
+            '"zz" Ctrl+Enter',            # none does
+            "Ctrl+y",
+            # Five commands of 120 characters: the history keeps 512
+            # bytes, and the oldest of what it has is cut off.
+            *(f'"rem" Space "{letter * 116}" Enter' for letter in "abcde"),
+            "Ctrl+e", "Ctrl+e", "Ctrl+e", "Ctrl+e",
+            "Ctrl+e",                     # four are left
+            "Ctrl+y",
+            "F9 o Enter",
+            "Tab Tab Tab Space Enter",    # Auto change directory off
+            "F9 l t",                     # the tree
+            "Down",                       # onto DOCS: DOS does not follow
+            '"rd" Space "docs"',
+            "Enter",                      # removed, and the tree has it
+            "Enter",                      # still: nowhere to go
+            "Down Enter",                 # SRC is there
+            "F9 l b",                     # its files
+            "Ctrl+PgUp",                  # up, onto where it came from
+            "Ctrl+PgDn",                  # and into it again
+            "Ctrl+PgUp Ctrl+PgUp",        # the root
+            "Ctrl+PgUp",                  # which has nothing above it
+            "Down Ctrl+PgDn",             # into STAMPS
+            "Down Down Ctrl+PgDn",        # a file is no directory
+            "Ctrl+\\",                    # the root at once
+            "Ctrl+l",                     # the Info off: it would say
+                                          # what is free on the floppy
+            "Alt+F1 a",
+            '"ver" Enter',                # a command on another drive
+                                          # than the program started on
+            "Shift+F3",                   # the floppy by its other letter
+            '"b:\\freedos\\version.fdi" Enter',   # for the viewer:
+            "Enter",                      # the disk is "put in"
+            "Esc",
+            "Down Down Down",             # onto FREEDOS, of A:
+            "Enter",                      # whose disk is asked for now
+            "Esc",                        # and refused
+            "Ctrl+PgDn", "Esc",
+            "Ctrl+\\", "Esc",
+            "Enter",
+            "Enter",                      # put in: into the directory
+        )),
+
+    "enter-many": Scenario(
+        "A command run from a directory of more files than are kept "
+        "while it runs, with the cursor on the last of them",
+        steps=(
+            'F7 "big" Enter',             # in the first minute: its time
+            "Enter",                      # shows in it
+            "Shift+F5",                   # small programs of DOS
+            '"a:\\freedos\\bin\\v*.com" Tab "c:\\work\\big" Enter',
+            'GrayPlus "*.com" Enter',
+            # Eighteen files, fifteen times over: 288 with the first
+            # ones, and 256 are kept.
+            *(f'Ctrl+m F5 "*.{number:x}" Enter' for number in range(15)),
+            "F9 l f",                     # one to a line
+            "End",
+            '"ver" Enter',                # the last one is kept, and the
+                                          # cursor is on it afterwards
+            "Up",
+            "Home",
+            "End",
+        )),
+
     "stamps": Scenario(
         "Sizes, dates and times of files, wherever they are shown",
         steps=_STAMPS_STEPS),
@@ -2433,6 +2562,65 @@ SCENARIOS = {
             '"qqqq"',                     # nowhere: Esc is waiting when the
             "Enter+Esc",                  # file is to be read on, and stops
             "Esc",                        # the search
+        )),
+
+    "view-commands": Scenario(
+        "F3, F4 and their kin: a name asked for and not given, the "
+        "program's own viewer and editor whatever the setup, extension "
+        "files that are missing or cannot be opened, and a program "
+        "named in one as the viewer or the editor: run, on a disk that "
+        "is not put in, and one that DOS will not run",
+        steps=(
+            "F9 o n",                     # no mini status: no time of day
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space Enter",   # the editor
+            "Shift+F3",                   # which file? none
+            "Esc",
+            "Down Down Down",             # onto readme.txt
+            "Alt+F3",                     # the viewer, without a look at
+            "Esc",                        # the extension file
+            "Alt+F4",                     # the editor is the program's
+            "Esc",                        # own, so Alt asks vcedit.ext
+            'F7 "vcview.ext" Enter',      # a directory of that name
+            "Shift+F3",
+            '"readme.txt" Enter',         # cannot be opened: no viewer
+            "F8", "Enter",                # the directory goes
+            '"del" Space "d:\\vc\\vcview.ext"',
+            "Enter",                      # and the main file
+            "Home Down Down Down",
+            "F3",                         # no extension file: the viewer
+            "Esc",
+            "Shift+F4",                   # what DOS takes for a program
+            '"nomem.exe" Enter',          # that needs six megabytes
+            "Enter",
+            '"MZ0000000000000000000000000000000000"',
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"vcview.ext" Enter',
+            '"txt:" Tab "a:\\freedos\\bin\\vecho.com" Enter',
+            '"doc:" Tab "b:\\x.com" Enter',
+            '"bin:" Tab "a:\\freedos\\bin\\v*.com" Enter',
+            '"exe:" Tab "c:\\work\\nomem.exe" Enter',
+            "F2 Esc",
+            "Shift+F4",
+            '"vcedit.ext" Enter',
+            '"txt:" Tab "a:\\freedos\\bin\\vecho.com" Enter',
+            "F2 Esc",
+            "Home Down Down Down",
+            "F3",                         # readme.txt: the program is run
+            "Alt+F4",                     # and as the editor
+            "Down Down",
+            "F3",                         # notes.doc: its viewer is on B:
+            "Esc",                        # and the disk is not put in
+            "Down",
+            "F3",                         # data.bin: DOS finds a file for
+            "Enter",                      # the mask and can run none
+            "End Up Up",
+            "F3",                         # nomem.exe: no memory for it
+            "Enter",
+            "Ctrl+o",                     # what the programs printed is
+            "Ctrl+o",                     # not kept
         )),
 
     "editor-hex": Scenario(

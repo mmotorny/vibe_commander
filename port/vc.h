@@ -507,6 +507,55 @@ void PutInf(u16 panel);                                 /* info.c */
                                            another: of F67_00 only, which
                                            hands back the panel too */
 
+/* Where the program goes on after a command of the keys. Such a command
+   is entered by a jump from the main loop, which is still assembly, and
+   jumps back to one of several places of it, or on into another command.
+   In C it is a function that gets the panel which the assembly has in DS
+   and returns where to go on in the low byte: its stub jumps there by the
+   table CmdNx_T of port/asm/VCFUNC.INC. These are the places of that
+   table for the commands of enter.c and view.c; keys.c has those of its
+   own commands, the first fourteen, by other names. */
+#define NEXT_FUNC05   1                 /* wait for the next key, once the
+                                           setup has been saved if it has
+                                           changed and is saved by itself */
+#define NEXT_FUNC04   2                 /* first draw the menu bar */
+#define NEXT_INIT50   8                 /* draw the panels again, reading
+                                           those that have changed */
+#define NEXT_INIT11  14                 /* start over from what F21_30 has
+                                           saved in the part of the program
+                                           that stays in the memory */
+#define NEXT_EXEC    15                 /* and first have that part run
+                                           the commands saved there */
+#define NEXT_VIEW    16                 /* V00_00: the viewer on the file
+                                           ViewFil, or with 1 in the high
+                                           word the editor */
+#define NEXT_DIRINFO 17                 /* V00_02: the editor in the window
+                                           of an Info panel */
+#define NEXT_EXIT    18                 /* leave the program */
+
+/* Save the setup, the command line and the panels in the part of the
+   program that stays in the memory, and give up the main data, for that
+   part to run what the command line holds: returns NEXT_EXEC, or
+   NEXT_INIT11 if there is nothing to run, for the command to return in
+   its turn. See
+   enter.c. */
+u32 F21_30(void);
+#pragma aux F21_30 "*_c" __far value [dx ax] modify exact [ax dx]
+/* The commands of a line of an extension file or a menu file, in
+   MenuBuf: F34_30 looks for the next one from `text`, and F34_40 at
+   whether the command at `text` is only the name of a file, a program
+   for `view` and else a menu, whose path it has put at TmpBuf then. Both
+   return a place in the high word, and in the low one 1 if there is no
+   command, or if it is such a name. See view.c. */
+u32 F34_30(u16 text);
+u32 F34_40(u16 text, u16 view);
+#pragma aux F34_30 "*_c" __far parm [si] value [dx ax] modify exact [ax dx]
+#pragma aux F34_40 "*_c" __far parm [si] [cx] value [dx ax] modify exact [ax dx]
+/* Have both panels read again: where a command ends that has changed
+   what is on the disk. Returns 1. See dirfunc.c. */
+u16 FncEx1(void);
+#pragma aux FncEx1 "*_c" __far value [ax] modify exact [ax]
+
 /* Calls what FncAddr names for every file of the directory at TmpBuf, and
    returns 1 if every call did what it was to, 0 if one did not, and 100h
    when it was stopped. */

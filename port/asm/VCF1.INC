@@ -587,95 +587,19 @@ DirFunc	PROC	NEAR			; Find files in directory
 	RET
 DirFunc	ENDP
 
-FncSel:	MOV	AL,0			; Selected files and directories
-	MOV	ES:ZoomOne,AL
-	MOV	ES:[TmpBuf+91],AL
-	MOV	DS,ES:WCBcrn
-	MOV	SI,DS:CurAdr
-	CMP	ES:OneFile,0
-	JNZ	FncSl5
-	MOV	SI,OFFSET DskBuf
-FncSl1:	CMP	SI,DS:EndBuf
-	JAE	FncSl2
-	AND	DS:[SI].AttrF,7Fh
-	ADD	SI,SIZE FilEnt
-	JMP	FncSl1
-FncSl2:	CALL	TotSel
-	MOV	SI,DS:CurAdr
-	OR	BX,DX
-	JE	FncSl5
-	MOV	SI,OFFSET DskBuf
-FncSl3:	CMP	SI,DS:EndBuf
-	JB	FncSl4
-	JMP	FncExt
-FncSl4:	TEST	DS:[SI].AttrF,40h
-	JNZ	FncSl5
-	JMP	FncSl9
-FncSl5:	PUSH	SI
-	MOV	DI,OFFSET TmpBuf
-	MOV	CX,13
-	REP	MOVSB
-	POP	SI
-	MOV	AL,DS:[SI].AttrF
-	CALL	ES:FncAddr
-	OR	ES:[TmpBuf+91],AL
-	MOV	DS,ES:WCBcrn
-	CMP	ES:OneFile,0
-	JNZ	FncExt
-	PUSH	AX
-	CMP	AL,0
-	JZ	FncSl8
-	TEST	DS:[SI].AttrF,40h
-	JZ	FncSl8
-	AND	DS:[SI].AttrF,3Fh
-	OR	DS:[SI].AttrF,80h
-	CMP	ES:UnSlct,0
-	JZ	FncSl8
-	CALL	PutFls
-	CALL	LnsAX
-	MOV	CX,AX
-	MOV	AX,SI
-	SUB	AX,DS:First
-	MOV	BX,SIZE FilEnt
-	XOR	DX,DX
-	DIV	BX
-	XOR	DX,DX
-	DIV	CX
-	XOR	CX,CX
-	CMP	DS:BrfFul,CL
-	JNE	FncSl6
-	MOV	CL,2
-FncSl6:	CMP	AX,CX
-	JA	FncSl7
-	CALL	BegBX
-	ADD	BX,201h
-	ADD	BH,DL
-	MOV	DX,126h
-	CALL	Window
-FncSl7:	CMP	ES:MiniSta,0
-	JZ	FncSl8
-	CALL	BegBX
-	CALL	SizDX
-	ADD	BH,DH
-	SUB	BH,2
-	MOV	DX,128h
-	CALL	Window
-FncSl8:	POP	AX
-	CALL	TstBrk
-	JC	FncExt
-	OR	AH,AH
-	JNZ	FncExt
-FncSl9:	ADD	SI,SIZE FilEnt
-	JMP	FncSl3
-
-FncExt:	CMP	BYTE PTR ES:[TmpBuf+91],0 ; Exit
-	JE	FncEx2
-FncEx1:	MOV	DS,ES:WCBcrn
-	MOV	DS:ChgFlg,1
-	CALL	InvWCB
-	MOV	DS:ChgFlg,1
-	JMP	Init50
-FncEx2:	JMP	Func04
+; Going through the selected files of a panel is C, and so is the end of
+; a command that may have changed what is on the disk: FncSel_c, FncExt_c
+; and FncEx1_c of port/dirfunc.c, which answer 1 if the panels are to be
+; read again. They are jumped to.
+FncSel:	CallC	FncSel_c		; Selected files and directories
+	JMP	SHORT FncEx0
+FncExt:	CallC	FncExt_c		; Exit
+	JMP	SHORT FncEx0
+FncEx1:	CallC	FncEx1_c
+FncEx0:	OR	AX,AX
+	JNE	FncEx2
+	JMP	Func04
+FncEx2:	JMP	Init50
 
 	.CONST
 NoFnc_S	DB	"Can't find file^W",0

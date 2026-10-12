@@ -16,17 +16,16 @@
 	EXTERN	PutTime_c:FAR, BufTime_c:FAR
 	EXTERN	LnStr_c:FAR, NgLine_c:FAR, CntLine_c:FAR
 	EXTERN	AddFile_c:FAR, MvzLine_c:FAR, FilZero_c:FAR, StrLen_c:FAR
-	EXTERN	LowCase_c:FAR, FndLet_c:FAR, CutPath_c:FAR, NormStr_c:FAR
-	EXTERN	PathLin_c:FAR, LetLin_c:FAR, ShrtLin_c:FAR, MainFil_c:FAR
+	EXTERN	LowCase_c:FAR, CutPath_c:FAR, NormStr_c:FAR
+	EXTERN	PathLin_c:FAR, ShrtLin_c:FAR, MainFil_c:FAR
 	EXTERN	BasAdr_c:FAR, Color_c:FAR, ColAddr_c:FAR, Shadow_c:FAR
 	EXTERN	MvsBw_c:FAR, MvsColr_c:FAR, MovDz0_c:FAR
 	EXTERN	HexByt_c:FAR, TstHex_c:FAR, TxtNum_c:FAR
 	EXTERN	Convert_c:FAR, UnConv_c:FAR, TstMas_c:FAR
-	EXTERN	SetMask_c:FAR, TstExe_c:FAR, Sort_c:FAR, FnFile_c:FAR
-	EXTERN	NearFl_c:FAR, TotSel_c:FAR
-	EXTERN	BegBX_c:FAR, SizDX_c:FAR, LnsAX_c:FAR, InvWCB_c:FAR
+	EXTERN	SetMask_c:FAR, Sort_c:FAR, FnFile_c:FAR
+	EXTERN	NearFl_c:FAR
 	EXTERN	AdrNum_c:FAR, NumAdr_c:FAR, ChgAdr_c:FAR, CorPar_c:FAR
-	EXTERN	F00_50_c:FAR, F00_60_c:FAR, F00_00_c:FAR, F00_05_c:FAR
+	EXTERN	F00_60_c:FAR, F00_00_c:FAR, F00_05_c:FAR
 	EXTERN	F01_00_c:FAR, F01_05_c:FAR, F02_00_c:FAR, F03_00_c:FAR
 	EXTERN	F04_00_c:FAR, F05_00_c:FAR, F06_00_c:FAR, F07_00_c:FAR
 	EXTERN	F08_00_c:FAR, F76_00_c:FAR, F76_01_c:FAR, F09_00_c:FAR
@@ -34,14 +33,12 @@
 	EXTERN	F13_00_c:FAR, F14_00_c:FAR, F15_00_c:FAR, F16_00_c:FAR
 	EXTERN	F17_01_c:FAR, F79_00_c:FAR, F18_00_c:FAR, F20_00_c:FAR
 	EXTERN	F20_02_c:FAR
-	EXTERN	Panel_c:FAR, PutPath_c:FAR, PtPt10_c:FAR, PutFls_c:FAR
-	EXTERN	SetCur_c:FAR, FilDir_c:FAR, FilePan_c:FAR
-	EXTERN	PutTre_c:FAR, PutTree_c:FAR, TreeCur_c:FAR, TrCr10_c:FAR
-	EXTERN	TrCr20_c:FAR, PutInf_c:FAR
-	EXTERN	ClsLine_c:FAR, PutKey_c:FAR, PtMnu1_c:FAR, PutPrm_c:FAR
-	EXTERN	DosCom_c:FAR, FindExt_c:FAR
-	EXTERN	Input_c:FAR, Rnd_c:FAR, EdLin_c:FAR
-	EXTERN	CmpSym_c:FAR, Search_c:FAR
+	EXTERN	Panel_c:FAR, PutPath_c:FAR, PtPt10_c:FAR
+	EXTERN	SetCur_c:FAR, FilDir_c:FAR
+	EXTERN	PutTree_c:FAR, TreeCur_c:FAR
+	EXTERN	TrCr20_c:FAR
+	EXTERN	ClsLine_c:FAR, PutKey_c:FAR
+	EXTERN	Input_c:FAR, Rnd_c:FAR
 	EXTERN	F39_00_c:FAR
 	EXTERN	M01_00_c:FAR, M01_01_c:FAR, M03_00_c:FAR, M06_00_c:FAR
 	EXTERN	M06_10_c:FAR, M08_00_c:FAR, M16_00_c:FAR, M16_01_c:FAR
@@ -56,7 +53,7 @@
 	EXTERN	V00_02_c:FAR, V00_10_c:FAR, V13_00_c:FAR, V13_01_c:FAR
 	EXTERN	T00_00_c:FAR
 	EXTERN	Help00_c:FAR
-	EXTERN	F32_00_c:FAR, Run_00_c:FAR, F62_01_c:FAR, F68_00_c:FAR
+	EXTERN	F32_00_c:FAR, F62_01_c:FAR, F68_00_c:FAR
 	EXTERN	F82_01_c:FAR, F74_00_c:FAR, F73_00_c:FAR, F77_00_c:FAR
 	EXTERN	F80_00_c:FAR
 	EXTERN	FindFil_c:FAR, F67_00_c:FAR
@@ -64,17 +61,22 @@
 	EXTERN	M30_60_c:FAR, DirFunc_c:FAR, DelTr0_c:FAR
 	EXTERN	F37_00_c:FAR, F47_00_c:FAR, F38_00_c:FAR, F48_00_c:FAR
 	EXTERN	F58_00_c:FAR, M30_00_c:FAR, F54_00_c:FAR, FncMas_c:FAR
-	EXTERN	DialBox_c:FAR, Dialog_c:FAR, InSt10_c:FAR, MinMnu_c:FAR
+	EXTERN	Dialog_c:FAR, InSt10_c:FAR, MinMnu_c:FAR
 	EXTERN	C00_00_c:FAR, F35_01_c:FAR, F45_01_c:FAR, F35_61_c:FAR
 	EXTERN	F65_00_c:FAR
-	EXTERN	MainLoop_c:FAR, Exit_c:FAR, Quit_c:FAR, RestVct_c:FAR
+	EXTERN	MainLoop_c:FAR, Exit_c:FAR
 	EXTERN	HookVct_c:FAR
-	EXTERN	Timer_c:FAR, TstBrk_c:FAR, ChkMode_c:FAR, Cursor_c:FAR
-	EXTERN	Cursor1_c:FAR, HidCur_c:FAR, IniMous_c:FAR, SavMous_c:FAR
+	EXTERN	Timer_c:FAR, ChkMode_c:FAR, Cursor_c:FAR
 	EXTERN	CurMous_c:FAR, GetMous_c:FAR, InWind_c:FAR, ScrOffs_c:FAR
-	EXTERN	ResWin_c:FAR, Window_c:FAR, IsCrLf_c:FAR, UpCase_c:FAR
-	EXTERN	SetDTA_c:FAR, Intr21f_c:FAR, InvVar_c:FAR, ChkSum_c:FAR
-	EXTERN	SetPth_c:FAR, Fantom_c:FAR, ChgDisk_c:FAR, OpenFil_c:FAR
+	EXTERN	Intr21f_c:FAR, ChkSum_c:FAR
+	EXTERN	ChgDisk_c:FAR
+	EXTERN	F21_00_c:FAR, F21_10_c:FAR, F21_25_c:FAR, F21_30_c:FAR
+	EXTERN	F21_31_c:FAR, F22_00_c:FAR, F23_00_c:FAR, F24_00_c:FAR
+	EXTERN	F24_01_c:FAR, F24_02_c:FAR, F25_00_c:FAR, F26_00_c:FAR
+	EXTERN	F27_00_c:FAR, F30_00_c:FAR, F75_00_c:FAR
+	EXTERN	F43_00_c:FAR, F44_00_c:FAR, F63_00_c:FAR, F64_00_c:FAR
+	EXTERN	F33_00_c:FAR, F34_00_c:FAR, F34_10_c:FAR
+	EXTERN	FncSel_c:FAR, FncExt_c:FAR, FncEx1_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
@@ -2261,28 +2263,6 @@ Exit:	CallC	Exit_c
 	PUSH	AX
 	MOV	AL,0
 	RETF
-
-;------------------------ Quit -------------------------
-; C: Quit_c of port/main.c. The callers go on with the window that it put
-; back, in BX and DX, and with DS on the main data.
-Quit	PROC	NEAR
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR Quit_c
-	XOR	BX,BX
-	MOV	DH,DS:Lines
-	DEC	DH
-	MOV	DL,80
-	RET
-Quit	ENDP
-
-;--------------- Restore and Hook vectots --------------
-; C: RestVct_c and HookVct_c of port/main.c.
-;			   ES - main data
-RestVct	PROC	NEAR
-	CallC	RestVct_c
-	RET
-RestVct	ENDP
 
 ;			   DS - main data
 ;	Return :	   ES - main data

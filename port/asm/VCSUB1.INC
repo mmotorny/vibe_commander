@@ -16,17 +16,6 @@ Timer	ENDP
 ;----------------- Clear keyboard buffer ---------------
 ; C: ClrKbd_c of port/system.c, which only C code calls.
 
-;---------------------- Break test ---------------------
-;	Return :	CY=1 - break
-; C: TstBrk_c of port/system.c, which returns 1 for a break.
-TstBrk	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR TstBrk_c
-	NEG	AX			; CY for 1
-	POP	AX
-	RET
-TstBrk	ENDP
-
 ;----------------------- Go to CASE --------------------
 ;			CS:SI - address of case table
 ;			   AX - key code
@@ -79,51 +68,16 @@ Cursor	PROC	NEAR
 	RET
 Cursor	ENDP
 
-;------------------ Set cursor on prompt ---------------
-; C: Cursor1_c of port/window.c.
-Cursor1	PROC	NEAR
-	PUSH	AX
-	CallC	Cursor1_c
-	POP	AX
-	RET
-Cursor1	ENDP
-
 ;-------------- Get cursor size & set it ---------------
 ;	Return :	CX - cursor size
 ; C: ChgCur_c of port/window.c, which only C code calls.
 
-;------------------- Make hidden cursor ----------------
-; C: HidCur_c of port/window.c.
-HidCur	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR HidCur_c
-	POP	AX
-	RET
-HidCur	ENDP
-
 ;----------------------- Beep sound --------------------
 ; C: Beep_c of port/system.c, which only C code calls.
-
-;---------------------- Init mouse ---------------------
-; C: IniMous_c of port/mouse.c. It leaves all registers but AX, where the
-; routine left AX, BX, CX and DX as the mouse driver did.
-IniMous	PROC	NEAR
-	CallC	IniMous_c
-	RET
-IniMous	ENDP
 
 ;--------------- Set type of mouse sursor --------------
 ;			   AL - cursor
 ; C: TypMous_c of port/mouse.c, which only C code calls.
-
-;------------------ Save mouse cursor ------------------
-; C: SavMous_c of port/mouse.c.
-SavMous	PROC	NEAR
-	PUSH	AX
-	CallC	SavMous_c
-	POP	AX
-	RET
-SavMous	ENDP
 
 ;------------------- Set mouse cursor ------------------
 ;			   AL - set/reset
@@ -202,33 +156,10 @@ ScrOffs	ENDP
 ;			   SI - address of buffer
 ; C: SavWin_c of port/window.c, which only C code calls.
 
-;--------------------- Restore window ------------------
-;			BH,BL - begin
-;			DH,DL - size
-;			   SI - address of buffer
-; C: ResWin_c of port/window.c.
-ResWin	PROC	NEAR
-	PUSH	AX
-	CallC	ResWin_c
-	POP	AX
-	RET
-ResWin	ENDP
-
 ;----------------- Restore user screen -----------------
 ;			BH,BL - begin
 ;			DH,DL - size
 ; C: ResUser_c of port/window.c, which only C code calls.
-
-;--------------------- Output window -------------------
-;			BH,BL - begin
-;			DH,DL - size
-; C: Window_c of port/window.c.
-Window	PROC	NEAR
-	PUSH	AX
-	CallC	Window_c
-	POP	AX
-	RET
-Window	ENDP
 
 ;------------------------ Save screen ------------------
 ; C: SavScr_c of port/window.c, with MovScr, which moves the cells. Only C
@@ -238,43 +169,6 @@ Window	ENDP
 ; The frame of a box, its shadow and its growing are C: MinBox, ShadBox,
 ; BoxDubl, BoxLine, StdLine and OncZoom of port/box.c, with the routines
 ; that were their own. Only C code calls them.
-
-;---------------------- Put window ---------------------
-;			BH,BL - begin-center
-;			CS:DX - address of include line
-;			CS:BP - pointer:
-;				DB  NormCol,RevCol,BoldCol,UndrCol
-;				DB  NumLns,NumVars
-;				DW  SaveBuf
-;				DW  Variable
-;				DB  VarMode,VarLimit
-;				. . .
-;				DW  OFFSET Line1
-;				. . .
-;	Return:		BH,BL - begin
-;			DH,DL - size
-;			   SI - address of save buffer
-; A box is C: DialBox_c of port/dialog.c, with DiBx30. The box goes there
-; as its offset, and in CX the caller's DS, where the texts are that it
-; puts into its lines. Where the box is comes back in three words on the
-; stack: BX, DX and SI.
-DialBox	PROC	NEAR
-	PUSH	DI
-	PUSH	CX
-	PUSH	AX
-	SUB	SP,6
-	MOV	DI,SP
-	MOV	CX,DS
-	MOV	AX,BP
-	CallC	DialBox_c
-	POP	BX
-	POP	DX
-	POP	SI
-	POP	AX
-	POP	CX
-	POP	DI
-	RET
-DialBox	ENDP
 
 ;--------------- Calculate string length ---------------
 ;			DS:SI - address of line
@@ -468,18 +362,6 @@ Shadow	PROC	NEAR
 	RET
 Shadow	ENDP
 
-;-------------------- Moving strings -------------------
-;			CS:SI(B) -> ES:DI(W)
-MvsBwc	PROC	NEAR
-	PUSH	DX
-	MOV	DX,CS
-	CALL	FAR PTR MvsBw_c
-	POP	DX
-	ADD	SI,CX
-	XOR	CX,CX
-	MOV	AL,CS:[SI-1]
-	RET
-MvsBwc	ENDP
 ;			ES:SI(B) -> ES:DI(W)
 MvsBwe	PROC	NEAR
 	PUSH	DX
@@ -553,23 +435,6 @@ FilZero	PROC	NEAR
 	RET
 FilZero	ENDP
 
-;--------------------- Check CrLf ----------------------
-;			   AX - word
-;	Return :	   ZR - yes
-; C: IsCrLf_c of port/misc.c, which returns 1 for yes. IsCrLfS takes the
-; word from DS:SI first.
-IsCrLfS	PROC	NEAR
-	LODSW
-IsCrLfS	ENDP
-
-IsCrLf	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR IsCrLf_c
-	CMP	AX,1			; ZR for 1
-	POP	AX
-	RET
-IsCrLf	ENDP
-
 ;-------------------- String length --------------------
 ;			ES:DI - string
 ;	Return :	   CX - length
@@ -578,15 +443,6 @@ StrLen	PROC	NEAR
 	MOV	AL,0
 	RET
 StrLen	ENDP
-
-;--------------------- Upper letter --------------------
-;			   AL - letter
-;	Return :	   AL - letter
-; C: UpCase_c of port/system.c, which leaves AH as it is.
-UpCase	PROC	NEAR
-	CallC	UpCase_c
-	RET
-UpCase	ENDP
 
 ;--------------------- Lower letter --------------------
 ;			   AL - letter
@@ -603,18 +459,6 @@ LowCase	PROC	NEAR
 	POP	DS
 	RET
 LowCase	ENDP
-
-;----------------------- Find text ---------------------
-;			DS:SI - string
-FndLet	PROC	NEAR
-	PUSH	ES
-	PUSH	DS
-	POP	ES
-	CALL	FAR PTR FndLet_c
-	POP	ES
-	MOV	AL,DS:[SI]
-	RET
-FndLet	ENDP
 
 ;------------------------ Cut path ---------------------
 ;			DS:SI - path
@@ -648,19 +492,6 @@ PathLin	PROC	NEAR
 	POP	DS
 	RET
 PathLin	ENDP
-
-;----------------- Higher & lower letters --------------
-;			ES:SI - address of string
-LetLin	PROC	NEAR
-	PUSH	DS
-	PUSH	AX
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR LetLin_c
-	POP	AX
-	POP	DS
-	RET
-LetLin	ENDP
 
 ;-------------------- Shirter string -------------------
 ;			ES:SI - address of string
@@ -790,15 +621,6 @@ TstMas	PROC	NEAR
 	RET
 TstMas	ENDP
 
-;------------------------ Set DTA ----------------------
-; C: SetDTA_c of port/system.c.
-SetDTA	PROC	NEAR
-	PUSH	AX
-	CallC	SetDTA_c
-	POP	AX
-	RET
-SetDTA	ENDP
-
 ;------------------- Test drive letter -----------------
 ;			   AL - drive letter
 ;	Return :	   ZR - yes
@@ -837,19 +659,6 @@ Intr21	PROC	NEAR
 	POP	ES
 	RET
 Intr21	ENDP
-
-;------------------- Invert variable -------------------
-;			ES:BX - address of variable
-; C: InvVar_c of port/misc.c, which returns what the variable is then.
-; AH stays.
-InvVar	PROC	NEAR
-	PUSH	CX
-	MOV	CH,AH
-	CALL	FAR PTR InvVar_c
-	MOV	AH,CH
-	POP	CX
-	RET
-InvVar	ENDP
 
 ;----------------------- Check sum ---------------------
 ;			DS:SI - address
