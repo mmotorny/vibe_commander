@@ -276,6 +276,14 @@ out again (show.py --changes is how):
     on the buttons. The right button on a key of the key bar is the key
     with Alt, and a key of the bar that has no name is no key: a click
     there is one outside the box that is open.
+  - On the menu bar a click beside the names shows the bar for as long
+    as the button is down; on a name with another menu open it opens
+    that one; an item that is dark is none, and the menus close. The
+    right button on an item of the Files menu is the item with Shift,
+    as Shift+Enter is there, and Ctrl+Enter the item with Ctrl: Copy
+    asks for the file too, or copies the one under the cursor whatever
+    is selected. Alt by itself in an open menu closes the menu and
+    leaves the bar.
   - The pointer in the top right corner of the screen blanks it, and
     the stars that are shown then are not the same in the original and
     in the port: take it there and away in one step, "Move@79,0
@@ -3892,6 +3900,34 @@ SCENARIOS = {
             "Esc",                        # and stays there
             "Move@79,0 Move@40,12",       # blanked and shown again, all
                                           # of it as it should be
+        )),
+
+    "mouse-menu": Scenario(
+        "The mouse on the menu bar: beside its names, on a name with "
+        "another menu open, on an item that is dark, the right button "
+        "on an item of the Files menu, and Alt, Ctrl and Shift there",
+        steps=(
+            "Click@70,0",                 # the top line beside the names:
+                                          # the bar while the button is down
+            "Click@10,0",                 # on a name: the Files menu
+            "Click@25,0",                 # on another: Commands instead
+            "Click@30,12",                # an item that is dark: none
+            "Click@25,0",
+            "Click@70,0",                 # beside the names: no menu
+            "F9",                         # the bar by its key
+            "Click@40,12",                # a click below it: gone
+            "Down Down Down",             # readme.txt
+            "Click@10,0",
+            "RightClick@12,6",            # Copy with the right button, as
+            "Esc",                        # with Shift: Shift+F5
+            "F9 f",
+            "Alt",                        # Alt by itself closes the menu
+            "f Down Down Down Down",      # to Copy again
+            "Ctrl+Enter",                 # with Ctrl held: Ctrl+F5
+            "Esc",
+            "F9 f Down Down Down Down",
+            "Shift+Enter",                # with Shift held
+            "Esc",
         )),
 
 }

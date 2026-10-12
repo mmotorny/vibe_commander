@@ -300,17 +300,16 @@ Things that are known and not done. Standing instructions are in
   registers of the original, and the stub takes others. The box said
   "right" for the left panel and wrote to a segment made of the item's
   number. No scenario chose the item; `menu-panel` does now.
-- Of the menu bar, what it does for the mouse has run in no scenario, 94
-  instructions, `F40_50` among them, which says whose name on the bar
-  the mouse is at. It is translated by reading, and listed as out of
-  reach in `harness/ported.py`. So are Alt by itself in an open menu,
-  which only counts if it comes up within three ticks; EGA lines dark,
-  for a display that is neither EGA nor VGA; an open menu whose items
-  are dark down to the last; and
-  an item of the Files menu chosen with Shift or Ctrl held down, three
-  instructions, which the port did like the original when it was tried
-  by hand, once: the harness holds the two keys for 20 ms for the port,
-  and the program asks for them after it has taken the key.
+- Of the menu bar, four instructions run in no scenario and are listed
+  as out of reach in `harness/ported.py`: EGA lines dark, for a display
+  that is neither EGA nor VGA, and an open menu whose items are dark
+  down to the last. What it does for the mouse runs in `mouse-bars` and
+  `mouse-menu`, which also has Alt by itself in an open menu and an item
+  of the Files menu chosen with Ctrl and with Shift held down: with the
+  keys pressed inside the machine, each is still down when the program
+  asks the BIOS for it. No step has the middle button on an item of the
+  Files menu yet, which is the item with Ctrl, nor a button that is
+  held and moved along the bar.
 - With the mouse the menu bar can come to have no menu at all, the
   number 0, while it goes on as if it had one: a button pressed on the
   bar next to the names and moved onto one leaves 0 for a round, and
@@ -319,8 +318,9 @@ Things that are known and not done. Standing instructions are in
   bar between two looks at it after a menu was closed that way, has the
   keys work on menu 0, and a menu opened then is taken from 2,040 bytes
   behind the table. Ported like that as far as it can be: the C has the
-  tables in its own place, so what it reads there is something else. The
-  bench has no mouse.
+  tables in its own place, so what it reads there is something else. No
+  scenario does it: it takes a button that goes down in one place and is
+  moved to another.
 - In an open menu the key of an item that is dark, Ctrl+a in the Files
   menu of a tree, is not dropped: the number of the item is looked for
   among the letters of the items, where it is not. And the table of
@@ -579,8 +579,7 @@ Things that are known and not done. Standing instructions are in
   - `treebox.c`, 93: `ChTree`, a button held on a line of the tree,
     above the lines or below them, a second click on a line, a click
     outside the box.
-  - `menu.c`, 19: what is left of the menu bar, a button held on the bar
-    or on a menu and let go, a menu open with no item under the cursor.
+  - `menu.c`, none: `mouse-menu` has the rest of the menu bar.
   - `view.c`, 36: a button held in the viewer's window.
   - `edit.c`, 38: what is left of `T00_71`, a click in the editor's
     window, a button held above it or below it. `mouse-list` runs 36

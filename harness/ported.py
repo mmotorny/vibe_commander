@@ -294,19 +294,6 @@ BATCHES = [
         functions=("F39_00_c",),
         unreached={
             **dict.fromkeys(
-                            (0x2AEC, 0x2AEE, 0x2AF1, 0x2AF3, 0x2AF6, 0x2AF8, 0x2AFB,
-                             0x2AFD, 0x2AFF, 0x2B02, 0x2B04, 0x2B0E, 0x2B4B, 0x2B4E,
-                             0x2B51, 0x2B53, 0x2B55, 0x2B60, 0x307E),
-                "the menu bar, for the mouse: a button down on the bar or "
-                "on a menu, a button let go, a menu open with no item "
-                "under the cursor, and F40_50, which says whose name on "
-                "the bar the mouse is at. The bench has no mouse"),
-            0x2CC4: "the menu bar, for Alt pressed by itself while a menu "
-                    "is open, which goes back to the bar: Alt is such a "
-                    "key only if it comes up within three ticks of the "
-                    "timer, and the harness holds it until the program "
-                    "has seen it, as the timing has it",
-            **dict.fromkeys(
                 (0x2E6F, 0x2E71),
                 "the Commands menu, for a display that is neither EGA "
                 "nor VGA, where EGA lines is dark: the machine has a "
@@ -316,13 +303,6 @@ BATCHES = [
                 "the menu bar, where a menu opens on an item that is "
                 "dark and so is every item below it: the last item of "
                 "every menu can always be chosen"),
-            **dict.fromkeys(
-                (0x2F99, 0x2F9B, 0x2F9D),
-                "the menu bar, for an item of the Files menu chosen "
-                "with Shift or Ctrl held down: the program asks the "
-                "BIOS for them after it has taken the key, and the "
-                "harness holds them for 20 ms of the host for the port, "
-                "which a busy host may not give the program in time"),
         },
     ),
     Batch(
