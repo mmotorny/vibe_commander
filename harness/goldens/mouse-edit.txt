@@ -1,0 +1,1462 @@
+Volkov Commander 4.05 in the scenario mouse-edit: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 1: F9 o o
+cursor 25 6 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+|║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 2: Down Down Down Down Down Space
+cursor 25 13 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+|║            │    ║  │  [ ] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 3: Enter
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 4: Shift+F4
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Edit ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Edit the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 5: "a:\freedos\nls\setup.en" Enter
+cursor 0 1 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 1     Col 1############ Free      | 30x80
+|# Welcome Message                                                               | 1Bx80
+|WELCOME_DEF="Welcome to the" /fLightGreen %1 /fCyan %2 /fGray "installation pro→| 1Bx79 1Ex1
+|WELCOME_ADV="Welcome to the" /fLightRed "advanced" /fGray "installer for" /fLig→| 1Bx79 1Ex1
+|WELCOME_0=/p                                                                    | 1Bx80
+|WELCOME_1=/fLightGreen "%1" /fGray "is a complete operating system. If you choo→| 1Bx79 1Ex1
+|WELCOME_2=/fGray /c32 "If this is not what you intend, please" /fLightRed "stop→| 1Bx79 1Ex1
+|WELCOME_3=                                                                      | 1Bx80
+|WELCOME_4=                                                                      | 1Bx80
+|WELCOME_5=/fGray /p                                                             | 1Bx80
+|                                                                                | 1Bx80
+|HRULE=/fDarkGray /x 0xC4 /fGray                                                 | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
+|CONTINUE=/p "Do you want to proceed" /c32                                       | 1Bx80
+|REBOOT=/p "Do you want to reboot now" /c32                                      | 1Bx80
+|                                                                                | 1Bx80
+|AUTO_YES="[Y,N]?" /fWhite "Y" /fGray                                            | 1Bx80
+|AUTO_NO="[Y,N]?" /fWhite "N" /fGray                                             | 1Bx80
+|AUTO_FMT=/s- "[F,Q,N]?" /fWhite "Q" /Gray                                       | 1Bx80
+|                                                                                | 1Bx80
+|PROMPT_YESNO=/s YN                                                              | 1Bx80
+|PROMPT_FMT=/s FQN                                                               | 1Bx80
+|                                                                                | 1Bx80
+|ABORTED=/fLightRed "The installation of" %1 %2 "has been aborted." /e /fGray /b→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 6: Click@10,5
+cursor 10 5 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 5     Col 11########### Free      | 30x80
+|# Welcome Message                                                               | 1Bx80
+|WELCOME_DEF="Welcome to the" /fLightGreen %1 /fCyan %2 /fGray "installation pro→| 1Bx79 1Ex1
+|WELCOME_ADV="Welcome to the" /fLightRed "advanced" /fGray "installer for" /fLig→| 1Bx79 1Ex1
+|WELCOME_0=/p                                                                    | 1Bx80
+|WELCOME_1=/fLightGreen "%1" /fGray "is a complete operating system. If you choo→| 1Bx10 6Cx1 1Bx68 1Ex1
+|WELCOME_2=/fGray /c32 "If this is not what you intend, please" /fLightRed "stop→| 1Bx79 1Ex1
+|WELCOME_3=                                                                      | 1Bx80
+|WELCOME_4=                                                                      | 1Bx80
+|WELCOME_5=/fGray /p                                                             | 1Bx80
+|                                                                                | 1Bx80
+|HRULE=/fDarkGray /x 0xC4 /fGray                                                 | 1Bx80
+|                                                                                | 1Bx80
+|CONTINUE=/p "Do you want to proceed" /c32                                       | 1Bx80
+|REBOOT=/p "Do you want to reboot now" /c32                                      | 1Bx80
+|                                                                                | 1Bx80
+|AUTO_YES="[Y,N]?" /fWhite "Y" /fGray                                            | 1Bx80
+|AUTO_NO="[Y,N]?" /fWhite "N" /fGray                                             | 1Bx80
+|AUTO_FMT=/s- "[F,Q,N]?" /fWhite "Q" /Gray                                       | 1Bx80
+|                                                                                | 1Bx80
+|PROMPT_YESNO=/s YN                                                              | 1Bx80
+|PROMPT_FMT=/s FQN                                                               | 1Bx80
+|                                                                                | 1Bx80
+|ABORTED=/fLightRed "The installation of" %1 %2 "has been aborted." /e /fGray /b→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 7: Click@60,3
+cursor 60 3 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 3     Col 61########### Free      | 30x80
+|# Welcome Message                                                               | 1Bx80
+|WELCOME_DEF="Welcome to the" /fLightGreen %1 /fCyan %2 /fGray "installation pro→| 1Bx79 1Ex1
+|WELCOME_ADV="Welcome to the" /fLightRed "advanced" /fGray "installer for" /fLig→| 1Bx60 6Cx1 1Bx18 1Ex1
+|WELCOME_0=/p                                                                    | 1Bx80
+|WELCOME_1=/fLightGreen "%1" /fGray "is a complete operating system. If you choo→| 1Bx79 1Ex1
+|WELCOME_2=/fGray /c32 "If this is not what you intend, please" /fLightRed "stop→| 1Bx79 1Ex1
+|WELCOME_3=                                                                      | 1Bx80
+|WELCOME_4=                                                                      | 1Bx80
+|WELCOME_5=/fGray /p                                                             | 1Bx80
+|                                                                                | 1Bx80
+|HRULE=/fDarkGray /x 0xC4 /fGray                                                 | 1Bx80
+|                                                                                | 1Bx80
+|CONTINUE=/p "Do you want to proceed" /c32                                       | 1Bx80
+|REBOOT=/p "Do you want to reboot now" /c32                                      | 1Bx80
+|                                                                                | 1Bx80
+|AUTO_YES="[Y,N]?" /fWhite "Y" /fGray                                            | 1Bx80
+|AUTO_NO="[Y,N]?" /fWhite "N" /fGray                                             | 1Bx80
+|AUTO_FMT=/s- "[F,Q,N]?" /fWhite "Q" /Gray                                       | 1Bx80
+|                                                                                | 1Bx80
+|PROMPT_YESNO=/s YN                                                              | 1Bx80
+|PROMPT_FMT=/s FQN                                                               | 1Bx80
+|                                                                                | 1Bx80
+|ABORTED=/fLightRed "The installation of" %1 %2 "has been aborted." /e /fGray /b→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 8: RightClick@30,9
+cursor 19 9 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 9     Col 20########### Free      | 30x80
+|# Welcome Message                                                               | 1Bx80
+|WELCOME_DEF="Welcome to the" /fLightGreen %1 /fCyan %2 /fGray "installation pro→| 1Bx79 1Ex1
+|WELCOME_ADV="Welcome to the" /fLightRed "advanced" /fGray "installer for" /fLig→| 1Bx79 1Ex1
+|WELCOME_0=/p                                                                    | 1Bx80
+|WELCOME_1=/fLightGreen "%1" /fGray "is a complete operating system. If you choo→| 1Bx79 1Ex1
+|WELCOME_2=/fGray /c32 "If this is not what you intend, please" /fLightRed "stop→| 1Bx79 1Ex1
+|WELCOME_3=                                                                      | 1Bx80
+|WELCOME_4=                                                                      | 1Bx80
+|WELCOME_5=/fGray /p                                                             | 1Bx30 6Cx1 1Bx49
+|                                                                                | 1Bx80
+|HRULE=/fDarkGray /x 0xC4 /fGray                                                 | 1Bx80
+|                                                                                | 1Bx80
+|CONTINUE=/p "Do you want to proceed" /c32                                       | 1Bx80
+|REBOOT=/p "Do you want to reboot now" /c32                                      | 1Bx80
+|                                                                                | 1Bx80
+|AUTO_YES="[Y,N]?" /fWhite "Y" /fGray                                            | 1Bx80
+|AUTO_NO="[Y,N]?" /fWhite "N" /fGray                                             | 1Bx80
+|AUTO_FMT=/s- "[F,Q,N]?" /fWhite "Q" /Gray                                       | 1Bx80
+|                                                                                | 1Bx80
+|PROMPT_YESNO=/s YN                                                              | 1Bx80
+|PROMPT_FMT=/s FQN                                                               | 1Bx80
+|                                                                                | 1Bx80
+|ABORTED=/fLightRed "The installation of" %1 %2 "has been aborted." /e /fGray /b→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 9: Click@79,9*6
+cursor 19 9 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 9     Col 20########### Free      | 30x80
+|# Welcome Message                                                               | 1Bx80
+|WELCOME_DEF="Welcome to the" /fLightGreen %1 /fCyan %2 /fGray "installation pro→| 1Bx79 1Ex1
+|WELCOME_ADV="Welcome to the" /fLightRed "advanced" /fGray "installer for" /fLig→| 1Bx79 1Ex1
+|WELCOME_0=/p                                                                    | 1Bx80
+|WELCOME_1=/fLightGreen "%1" /fGray "is a complete operating system. If you choo→| 1Bx79 1Ex1
+|WELCOME_2=/fGray /c32 "If this is not what you intend, please" /fLightRed "stop→| 1Bx79 1Ex1
+|WELCOME_3=                                                                      | 1Bx80
+|WELCOME_4=                                                                      | 1Bx80
+|WELCOME_5=/fGray /p                                                             | 1Bx79 6Cx1
+|                                                                                | 1Bx80
+|HRULE=/fDarkGray /x 0xC4 /fGray                                                 | 1Bx80
+|                                                                                | 1Bx80
+|CONTINUE=/p "Do you want to proceed" /c32                                       | 1Bx80
+|REBOOT=/p "Do you want to reboot now" /c32                                      | 1Bx80
+|                                                                                | 1Bx80
+|AUTO_YES="[Y,N]?" /fWhite "Y" /fGray                                            | 1Bx80
+|AUTO_NO="[Y,N]?" /fWhite "N" /fGray                                             | 1Bx80
+|AUTO_FMT=/s- "[F,Q,N]?" /fWhite "Q" /Gray                                       | 1Bx80
+|                                                                                | 1Bx80
+|PROMPT_YESNO=/s YN                                                              | 1Bx80
+|PROMPT_FMT=/s FQN                                                               | 1Bx80
+|                                                                                | 1Bx80
+|ABORTED=/fLightRed "The installation of" %1 %2 "has been aborted." /e /fGray /b→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 10: Click@78,5
+cursor 78 5 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 5     Col 79########### Free      | 30x80
+|# Welcome Message                                                               | 1Bx80
+|WELCOME_DEF="Welcome to the" /fLightGreen %1 /fCyan %2 /fGray "installation pro→| 1Bx79 1Ex1
+|WELCOME_ADV="Welcome to the" /fLightRed "advanced" /fGray "installer for" /fLig→| 1Bx79 1Ex1
+|WELCOME_0=/p                                                                    | 1Bx80
+|WELCOME_1=/fLightGreen "%1" /fGray "is a complete operating system. If you choo→| 1Bx78 6Cx1 1Ex1
+|WELCOME_2=/fGray /c32 "If this is not what you intend, please" /fLightRed "stop→| 1Bx79 1Ex1
+|WELCOME_3=                                                                      | 1Bx80
+|WELCOME_4=                                                                      | 1Bx80
+|WELCOME_5=/fGray /p                                                             | 1Bx80
+|                                                                                | 1Bx80
+|HRULE=/fDarkGray /x 0xC4 /fGray                                                 | 1Bx80
+|                                                                                | 1Bx80
+|CONTINUE=/p "Do you want to proceed" /c32                                       | 1Bx80
+|REBOOT=/p "Do you want to reboot now" /c32                                      | 1Bx80
+|                                                                                | 1Bx80
+|AUTO_YES="[Y,N]?" /fWhite "Y" /fGray                                            | 1Bx80
+|AUTO_NO="[Y,N]?" /fWhite "N" /fGray                                             | 1Bx80
+|AUTO_FMT=/s- "[F,Q,N]?" /fWhite "Q" /Gray                                       | 1Bx80
+|                                                                                | 1Bx80
+|PROMPT_YESNO=/s YN                                                              | 1Bx80
+|PROMPT_FMT=/s FQN                                                               | 1Bx80
+|                                                                                | 1Bx80
+|ABORTED=/fLightRed "The installation of" %1 %2 "has been aborted." /e /fGray /b→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 11: Click@79,5*10
+cursor 78 5 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 5     Col 86########### Free      | 30x80
+|←e Message                                                                      | 1Ex1 1Bx79
+|←DEF="Welcome to the" /fLightGreen %1 /fCyan %2 /fGray "installation program."  | 1Ex1 1Bx79
+|←ADV="Welcome to the" /fLightRed "advanced" /fGray "installer for" /fLightGreen→| 1Ex1 1Bx78 1Ex1
+|←0=/p                                                                           | 1Ex1 1Bx79
+|←1=/fLightGreen "%1" /fGray "is a complete operating system. If you choose to i→| 1Ex1 1Bx78 69x1
+|←2=/fGray /c32 "If this is not what you intend, please" /fLightRed "stop NOW!" →| 1Ex1 1Bx78 1Ex1
+|←3=                                                                             | 1Ex1 1Bx79
+|←4=                                                                             | 1Ex1 1Bx79
+|←5=/fGray /p                                                                    | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←DarkGray /x 0xC4 /fGray                                                        | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←=/p "Do you want to proceed" /c32                                              | 1Ex1 1Bx79
+|←p "Do you want to reboot now" /c32                                             | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←="[Y,N]?" /fWhite "Y" /fGray                                                   | 1Ex1 1Bx79
+|←"[Y,N]?" /fWhite "N" /fGray                                                    | 1Ex1 1Bx79
+|←=/s- "[F,Q,N]?" /fWhite "Q" /Gray                                              | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←ESNO=/s YN                                                                     | 1Ex1 1Bx79
+|←MT=/s FQN                                                                      | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←/fLightRed "The installation of" %1 %2 "has been aborted." /e /fGray /bBlack   | 1Ex1 1Bx79
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 12: Click@40,12>40,0*12
+cursor 17 1 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 1     Col 18########### Free      | 30x40 47x1 30x39
+|# Welcome Message                                                               | 1Bx80
+|WELCOME_DEF="Welcome to the" /fLightGreen %1 /fCyan %2 /fGray "installation pro→| 1Bx79 1Ex1
+|WELCOME_ADV="Welcome to the" /fLightRed "advanced" /fGray "installer for" /fLig→| 1Bx79 1Ex1
+|WELCOME_0=/p                                                                    | 1Bx80
+|WELCOME_1=/fLightGreen "%1" /fGray "is a complete operating system. If you choo→| 1Bx79 1Ex1
+|WELCOME_2=/fGray /c32 "If this is not what you intend, please" /fLightRed "stop→| 1Bx79 1Ex1
+|WELCOME_3=                                                                      | 1Bx80
+|WELCOME_4=                                                                      | 1Bx80
+|WELCOME_5=/fGray /p                                                             | 1Bx80
+|                                                                                | 1Bx80
+|HRULE=/fDarkGray /x 0xC4 /fGray                                                 | 1Bx80
+|                                                                                | 1Bx80
+|CONTINUE=/p "Do you want to proceed" /c32                                       | 1Bx80
+|REBOOT=/p "Do you want to reboot now" /c32                                      | 1Bx80
+|                                                                                | 1Bx80
+|AUTO_YES="[Y,N]?" /fWhite "Y" /fGray                                            | 1Bx80
+|AUTO_NO="[Y,N]?" /fWhite "N" /fGray                                             | 1Bx80
+|AUTO_FMT=/s- "[F,Q,N]?" /fWhite "Q" /Gray                                       | 1Bx80
+|                                                                                | 1Bx80
+|PROMPT_YESNO=/s YN                                                              | 1Bx80
+|PROMPT_FMT=/s FQN                                                               | 1Bx80
+|                                                                                | 1Bx80
+|ABORTED=/fLightRed "The installation of" %1 %2 "has been aborted." /e /fGray /b→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 13: Click@40,12>40,24*40
+cursor 40 23 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 52    Col 41########### Free      | 30x80
+|                                                                                | 1Bx80
+|FORMAT="Drive" /fWhite %1 /fGray "does not appear to be formatted."             | 1Bx80
+|FORMAT_DEF="Do you want to format your drive" /c32                              | 1Bx80
+|FORMAT_ADV="How do you want to format your drive" /s- /c32 ( /fWhite "F" /fGray→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|FILESYSTEM_TEST="Testing filesystem on drive" /fWhite %1 /s- /fGray .           | 1Bx80
+|INSERT_DISKETTE="Insert diskette" /fWhite #%1 /fGray (%2) "in" /fWhite %3 /s- /→| 1Bx79 1Ex1
+|PRESS_KEY="Press a key to continue."                                            | 1Bx80
+|                                                                                | 1Bx80
+|TARGET_ASK="Where do you wish to install" /fLightGreen %1 /s- /fGray "?" /c32   | 1Bx80
+|TARGET_PROMPT=/fWhite /bBlue %1                                                 | 1Bx80
+|TARGET_BAD=/fLightRed "Invalid drive requested. Cannot install to floppy disket→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|CHANGE_PATH="The path" /fWhite %1 /fGray "already exists." /p "Do you wish to c→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|BACKUP_OLD="A previous operating system was detected on drive" /fWhite %1 /fGra→| 1Bx79 1Ex1
+|BACKUP_ASK="Where do you wish to place the backup files?" /c32                  | 1Bx80
+|BACKUP_PROMPT=/fWhite /bBlue %1                                                 | 1Bx80
+|BACKUP_BAD=/fLightRed "Invalid destination requested. Cannot make backup to tha→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|DELETE_OLD="The existing files in" /fWhite %1 /fGray "can just be written over.→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|FORCE_MBR="Force an update to the Master Boot Record on drive" /fWhite %1 /fGra→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x1 70x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 14: MiddleClick@5,20
+cursor 0 20 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 49    Col 1############ Free      | 30x80
+|                                                                                | 1Bx80
+|FORMAT="Drive" /fWhite %1 /fGray "does not appear to be formatted."             | 1Bx80
+|FORMAT_DEF="Do you want to format your drive" /c32                              | 1Bx80
+|FORMAT_ADV="How do you want to format your drive" /s- /c32 ( /fWhite "F" /fGray→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|FILESYSTEM_TEST="Testing filesystem on drive" /fWhite %1 /s- /fGray .           | 1Bx80
+|INSERT_DISKETTE="Insert diskette" /fWhite #%1 /fGray (%2) "in" /fWhite %3 /s- /→| 1Bx79 1Ex1
+|PRESS_KEY="Press a key to continue."                                            | 1Bx80
+|                                                                                | 1Bx80
+|TARGET_ASK="Where do you wish to install" /fLightGreen %1 /s- /fGray "?" /c32   | 1Bx80
+|TARGET_PROMPT=/fWhite /bBlue %1                                                 | 1Bx80
+|TARGET_BAD=/fLightRed "Invalid drive requested. Cannot install to floppy disket→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|CHANGE_PATH="The path" /fWhite %1 /fGray "already exists." /p "Do you wish to c→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|BACKUP_OLD="A previous operating system was detected on drive" /fWhite %1 /fGra→| 1Bx79 1Ex1
+|BACKUP_ASK="Where do you wish to place the backup files?" /c32                  | 1Bx80
+|BACKUP_PROMPT=/fWhite /bBlue %1                                                 | 1Bx80
+|BACKUP_BAD=/fLightRed "Invalid destination requested. Cannot make backup to tha→| 1Bx79 1Ex1
+|                                                                                | 1Bx5 6Cx1 1Bx74
+|DELETE_OLD="The existing files in" /fWhite %1 /fGray "can just be written over.→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|FORCE_MBR="Force an update to the Master Boot Record on drive" /fWhite %1 /fGra→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 15: Click@40,0
+cursor 0 20 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 49    Col 1############ Free      | 30x40 47x1 30x39
+|                                                                                | 1Bx80
+|FORMAT="Drive" /fWhite %1 /fGray "does not appear to be formatted."             | 1Bx80
+|FORMAT_DEF="Do you want to format your drive" /c32                              | 1Bx80
+|FORMAT_ADV="How do you want to format your drive" /s- /c32 ( /fWhite "F" /fGray→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|FILESYSTEM_TEST="Testing filesystem on drive" /fWhite %1 /s- /fGray .           | 1Bx80
+|INSERT_DISKETTE="Insert diskette" /fWhite #%1 /fGray (%2) "in" /fWhite %3 /s- /→| 1Bx79 1Ex1
+|PRESS_KEY="Press a key to continue."                                            | 1Bx80
+|                                                                                | 1Bx80
+|TARGET_ASK="Where do you wish to install" /fLightGreen %1 /s- /fGray "?" /c32   | 1Bx80
+|TARGET_PROMPT=/fWhite /bBlue %1                                                 | 1Bx80
+|TARGET_BAD=/fLightRed "Invalid drive requested. Cannot install to floppy disket→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|CHANGE_PATH="The path" /fWhite %1 /fGray "already exists." /p "Do you wish to c→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|BACKUP_OLD="A previous operating system was detected on drive" /fWhite %1 /fGra→| 1Bx79 1Ex1
+|BACKUP_ASK="Where do you wish to place the backup files?" /c32                  | 1Bx80
+|BACKUP_PROMPT=/fWhite /bBlue %1                                                 | 1Bx80
+|BACKUP_BAD=/fLightRed "Invalid destination requested. Cannot make backup to tha→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|DELETE_OLD="The existing files in" /fWhite %1 /fGray "can just be written over.→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|FORCE_MBR="Force an update to the Master Boot Record on drive" /fWhite %1 /fGra→| 1Bx79 1Ex1
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 16: F4
+cursor 56 1 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 160   Col 15########### Free      | 30x40 47x1 30x39
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx80
+| 00000A40  65 20 77 72  69 74 74 65  6E 20 6F 76  65 72 2E 22  e written over." | 1Bx80
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 17: Click@13,5
+cursor 12 5 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 164   Col 1############ Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx13 6Cx1 1Bx66
+| 00000A40  65 20 77 72  69 74 74 65  6E 20 6F 76  65 72 2E 22  e written over." | 1Bx80
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 18: Click@14,5
+cursor 14 5 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 164   Col 2############ Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx14 6Cx1 1Bx65
+| 00000A40  65 20 77 72  69 74 74 65  6E 20 6F 76  65 72 2E 22  e written over." | 1Bx80
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 19: Click@12,5
+cursor 12 5 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 164   Col 1############ Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx12 6Cx1 1Bx67
+| 00000A40  65 20 77 72  69 74 74 65  6E 20 6F 76  65 72 2E 22  e written over." | 1Bx80
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 20: Click@4,7
+cursor 11 7 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 166   Col 1############ Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx80
+| 00000A40  65 20 77 72  69 74 74 65  6E 20 6F 76  65 72 2E 22  e written over." | 1Bx80
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx4 6Cx1 1Bx75
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 21: Click@22,6
+cursor 21 6 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 165   Col 4############ Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx80
+| 00000A40  65 20 77 72  69 74 74 65  6E 20 6F 76  65 72 2E 22  e written over." | 1Bx22 6Cx1 1Bx57
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 22: Click@23,6
+cursor 21 6 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en            Line 165   Col 4############ Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx80
+| 00000A40  65 20 77 72  69 74 74 65  6E 20 6F 76  65 72 2E 22  e written over." | 1Bx23 6Cx1 1Bx56
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 23: "7"
+cursor 24 6 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en         *  Line 165   Col 5############ Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx80
+| 00000A40  65 20 77 77  69 74 74 65  6E 20 6F 76  65 72 2E 22  e wwitten over." | 1Bx23 6Cx1 1Bx56
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 24: Click@70,8
+cursor 70 8 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en         *  Line 167   Col 8############ Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx80
+| 00000A40  65 20 77 77  69 74 74 65  6E 20 6F 76  65 72 2E 22  e wwitten over." | 1Bx80
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx70 6Cx1 1Bx9
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx80
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 25: Click@79,9
+cursor 78 9 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en         *  Line 168   Col 16########### Free      | 30x80
+| 000009F0  69 6F 6E 2E  22 20 2F 66  47 72 61 79  0D 0A 0D 0A  ion." /fGray♪◙♪◙ | 1Bx80
+| 00000A00  44 45 4C 45  54 45 5F 4F  4C 44 3D 22  54 68 65 20  DELETE_OLD="The  | 1Bx80
+| 00000A10  65 78 69 73  74 69 6E 67  20 66 69 6C  65 73 20 69  existing files i | 1Bx80
+| 00000A20  6E 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  n" /fWhite %1 /f | 1Bx80
+| 00000A30  47 72 61 79  20 22 63 61  6E 20 6A 75  73 74 20 62  Gray "can just b | 1Bx80
+| 00000A40  65 20 77 77  69 74 74 65  6E 20 6F 76  65 72 2E 22  e wwitten over." | 1Bx80
+| 00000A50  20 2F 70 20  22 44 6F 20  79 6F 75 20  77 61 6E 74   /p "Do you want | 1Bx80
+| 00000A60  20 74 6F 20  63 6F 6D 70  6C 65 74 65  6C 79 20 65   to completely e | 1Bx80
+| 00000A70  72 61 73 65  20 74 68 65  20 6F 6C 64  20 64 69 72  rase the old dir | 1Bx79 6Cx1
+| 00000A80  65 63 74 6F  72 79 20 62  65 66 6F 72  65 20 69 6E  ectory before in | 1Bx80
+| 00000A90  73 74 61 6C  6C 69 6E 67  22 20 2F 63  33 32 0D 0A  stalling" /c32♪◙ | 1Bx80
+| 00000AA0  0D 0A 46 4F  52 43 45 5F  4D 42 52 3D  22 46 6F 72  ♪◙FORCE_MBR="For | 1Bx80
+| 00000AB0  63 65 20 61  6E 20 75 70  64 61 74 65  20 74 6F 20  ce an update to  | 1Bx80
+| 00000AC0  74 68 65 20  4D 61 73 74  65 72 20 42  6F 6F 74 20  the Master Boot  | 1Bx80
+| 00000AD0  52 65 63 6F  72 64 20 6F  6E 20 64 72  69 76 65 22  Record on drive" | 1Bx80
+| 00000AE0  20 2F 66 57  68 69 74 65  20 25 31 20  2F 66 47 72   /fWhite %1 /fGr | 1Bx80
+| 00000AF0  61 79 20 2F  63 33 32 0D  0A 53 59 53  5F 46 49 4C  ay /c32♪◙SYS_FIL | 1Bx80
+| 00000B00  45 53 3D 22  49 6E 73 74  61 6C 6C 20  6E 65 77 20  ES="Install new  | 1Bx80
+| 00000B10  73 79 73 74  65 6D 20 62  6F 6F 74 20  66 69 6C 65  system boot file | 1Bx80
+| 00000B20  73 20 6F 6E  20 64 72 69  76 65 22 20  2F 66 57 68  s on drive" /fWh | 1Bx80
+| 00000B30  69 74 65 20  25 31 20 2F  66 47 72 61  79 20 2F 63  ite %1 /fGray /c | 1Bx80
+| 00000B40  33 32 0D 0A  43 46 47 5F  46 49 4C 45  53 3D 22 52  32♪◙CFG_FILES="R | 1Bx80
+| 00000B50  65 70 6C 61  63 65 20 73  79 73 74 65  6D 20 63 6F  eplace system co | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 26: Click@30,10>30,24*40
+cursor 30 23 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en         *  Line 209   Col 7############ Free      | 30x80
+| 00000BA0  3D 22 49 6E  73 74 61 6C  6C 61 74 69  6F 6E 20 73  ="Installation s | 1Bx80
+| 00000BB0  65 74 74 69  6E 67 73 3A  22 20 2F 70  0D 0A 53 54  ettings:" /p♪◙ST | 1Bx80
+| 00000BC0  41 54 55 53  5F 43 50 55  3D 2F 72 34  2F 63 33 32  ATUS_CPU=/r4/c32 | 1Bx80
+| 00000BD0  20 22 50 6C  61 74 66 6F  72 6D 20 28  43 50 55 29   "Platform (CPU) | 1Bx80
+| 00000BE0  22 20 2F 66  57 68 69 74  65 20 25 31  20 2F 66 47  " /fWhite %1 /fG | 1Bx80
+| 00000BF0  72 61 79 20  28 25 32 29  0D 0A 53 54  41 54 55 53  ray (%2)♪◙STATUS | 1Bx80
+| 00000C00  5F 46 52 4F  4D 3D 2F 72  34 2F 63 33  32 20 22 49  _FROM=/r4/c32 "I | 1Bx80
+| 00000C10  6E 73 74 61  6C 6C 20 66  72 6F 6D 22  20 2F 66 57  nstall from" /fW | 1Bx80
+| 00000C20  68 69 74 65  20 25 31 20  2F 66 47 72  61 79 0D 0A  hite %1 /fGray♪◙ | 1Bx80
+| 00000C30  53 54 41 54  55 53 5F 44  52 56 3D 2F  72 34 2F 63  STATUS_DRV=/r4/c | 1Bx80
+| 00000C40  33 32 20 22  44 65 73 74  69 6E 61 74  69 6F 6E 20  32 "Destination  | 1Bx80
+| 00000C50  64 72 69 76  65 22 20 2F  66 57 68 69  74 65 20 25  drive" /fWhite % | 1Bx80
+| 00000C60  31 20 2F 66  47 72 61 79  20 28 64 69  73 6B 20 25  1 /fGray (disk % | 1Bx80
+| 00000C70  32 2C 20 70  61 72 74 69  74 69 6F 6E  20 25 33 29  2, partition %3) | 1Bx80
+| 00000C80  0D 0A 53 54  41 54 55 53  5F 44 4F 53  3D 2F 72 34  ♪◙STATUS_DOS=/r4 | 1Bx80
+| 00000C90  2F 63 33 32  20 22 49 6E  73 74 61 6C  6C 20 44 4F  /c32 "Install DO | 1Bx80
+| 00000CA0  53 20 70 61  74 68 22 20  2F 66 57 68  69 74 65 20  S path" /fWhite  | 1Bx80
+| 00000CB0  25 31 20 2F  66 47 72 61  79 0D 0A 53  54 41 54 55  %1 /fGray♪◙STATU | 1Bx80
+| 00000CC0  53 5F 42 41  4B 3D 2F 72  34 2F 63 33  32 20 22 42  S_BAK=/r4/c32 "B | 1Bx80
+| 00000CD0  61 63 6B 75  70 20 70 72  65 76 69 6F  75 73 20 4F  ackup previous O | 1Bx80
+| 00000CE0  53 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  S" /fWhite %1 /f | 1Bx80
+| 00000CF0  47 72 61 79  0D 0A 53 54  41 54 55 53  5F 50 4F 53  Gray♪◙STATUS_POS | 1Bx80
+| 00000D00  3D 2F 72 34  2F 63 33 32  20 22 50 72  65 76 69 6F  =/r4/c32 "Previo | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x5 47x1 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 27: Click@30,10>30,0*8
+cursor 30 2 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en         *  Line 188   Col 7############ Free      | 30x30 47x1 30x49
+| 00000BA0  3D 22 49 6E  73 74 61 6C  6C 61 74 69  6F 6E 20 73  ="Installation s | 1Bx80
+| 00000BB0  65 74 74 69  6E 67 73 3A  22 20 2F 70  0D 0A 53 54  ettings:" /p♪◙ST | 1Bx80
+| 00000BC0  41 54 55 53  5F 43 50 55  3D 2F 72 34  2F 63 33 32  ATUS_CPU=/r4/c32 | 1Bx80
+| 00000BD0  20 22 50 6C  61 74 66 6F  72 6D 20 28  43 50 55 29   "Platform (CPU) | 1Bx80
+| 00000BE0  22 20 2F 66  57 68 69 74  65 20 25 31  20 2F 66 47  " /fWhite %1 /fG | 1Bx80
+| 00000BF0  72 61 79 20  28 25 32 29  0D 0A 53 54  41 54 55 53  ray (%2)♪◙STATUS | 1Bx80
+| 00000C00  5F 46 52 4F  4D 3D 2F 72  34 2F 63 33  32 20 22 49  _FROM=/r4/c32 "I | 1Bx80
+| 00000C10  6E 73 74 61  6C 6C 20 66  72 6F 6D 22  20 2F 66 57  nstall from" /fW | 1Bx80
+| 00000C20  68 69 74 65  20 25 31 20  2F 66 47 72  61 79 0D 0A  hite %1 /fGray♪◙ | 1Bx80
+| 00000C30  53 54 41 54  55 53 5F 44  52 56 3D 2F  72 34 2F 63  STATUS_DRV=/r4/c | 1Bx80
+| 00000C40  33 32 20 22  44 65 73 74  69 6E 61 74  69 6F 6E 20  32 "Destination  | 1Bx80
+| 00000C50  64 72 69 76  65 22 20 2F  66 57 68 69  74 65 20 25  drive" /fWhite % | 1Bx80
+| 00000C60  31 20 2F 66  47 72 61 79  20 28 64 69  73 6B 20 25  1 /fGray (disk % | 1Bx80
+| 00000C70  32 2C 20 70  61 72 74 69  74 69 6F 6E  20 25 33 29  2, partition %3) | 1Bx80
+| 00000C80  0D 0A 53 54  41 54 55 53  5F 44 4F 53  3D 2F 72 34  ♪◙STATUS_DOS=/r4 | 1Bx80
+| 00000C90  2F 63 33 32  20 22 49 6E  73 74 61 6C  6C 20 44 4F  /c32 "Install DO | 1Bx80
+| 00000CA0  53 20 70 61  74 68 22 20  2F 66 57 68  69 74 65 20  S path" /fWhite  | 1Bx80
+| 00000CB0  25 31 20 2F  66 47 72 61  79 0D 0A 53  54 41 54 55  %1 /fGray♪◙STATU | 1Bx80
+| 00000CC0  53 5F 42 41  4B 3D 2F 72  34 2F 63 33  32 20 22 42  S_BAK=/r4/c32 "B | 1Bx80
+| 00000CD0  61 63 6B 75  70 20 70 72  65 76 69 6F  75 73 20 4F  ackup previous O | 1Bx80
+| 00000CE0  53 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  S" /fWhite %1 /f | 1Bx80
+| 00000CF0  47 72 61 79  0D 0A 53 54  41 54 55 53  5F 50 4F 53  Gray♪◙STATUS_POS | 1Bx80
+| 00000D00  3D 2F 72 34  2F 63 33 32  20 22 50 72  65 76 69 6F  =/r4/c32 "Previo | 1Bx80
+|1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 28: Esc
+cursor 0 127 lines 6 7 mode 3
+|Edit: A:\FREEDOS\NLS\setup.en         *  Line 188   Col 7############ Free      | 30x30 47x1 30x49
+| 00000BA0  3D 22 49 6E  73 74 61 6C  6C 61 74 69  6F 6E 20 73  ="Installation s | 1Bx80
+| 00000BB0  65 74 74 69  6E 67 73 3A  22 20 2F 70  0D 0A 53 54  ettings:" /p♪◙ST | 1Bx80
+| 00000BC0  41 54 55 53  5F 43 50 55  3D 2F 72 34  2F 63 33 32  ATUS_CPU=/r4/c32 | 1Bx80
+| 00000BD0  20 22 50 6C  61 74 66 6F  72 6D 20 28  43 50 55 29   "Platform (CPU) | 1Bx80
+| 00000BE0  22 2                                                  /fWhite %1 /fG | 1Bx15 4Fx50 1Bx15
+| 00000BF0  72 6   ╔══════════════════ Edit ══════════════════╗   y (%2)♪◙STATUS | 1Bx15 4Fx50 03x2 1Bx13
+| 00000C00  5F 4   ║ You've made changes since the last save. ║   ROM=/r4/c32 "I | 1Bx15 4Fx50 03x2 1Bx13
+| 00000C10  6E 7   ║   Save   Don't save   Continue editing   ║   tall from" /fW | 1Bx15 4Fx6 70x6 4Fx38 03x2 1Bx13
+| 00000C20  68 6   ╚══════════════════════════════════════════╝   te %1 /fGray♪◙ | 1Bx15 4Fx50 03x2 1Bx13
+| 00000C30  53 5                                                  ATUS_DRV=/r4/c | 1Bx15 4Fx50 03x2 1Bx13
+| 00000C40  33 32 20 22  44 65 73 74  69 6E 61 74  69 6F 6E 20  32 "Destination  | 1Bx17 03x50 1Bx13
+| 00000C50  64 72 69 76  65 22 20 2F  66 57 68 69  74 65 20 25  drive" /fWhite % | 1Bx80
+| 00000C60  31 20 2F 66  47 72 61 79  20 28 64 69  73 6B 20 25  1 /fGray (disk % | 1Bx80
+| 00000C70  32 2C 20 70  61 72 74 69  74 69 6F 6E  20 25 33 29  2, partition %3) | 1Bx80
+| 00000C80  0D 0A 53 54  41 54 55 53  5F 44 4F 53  3D 2F 72 34  ♪◙STATUS_DOS=/r4 | 1Bx80
+| 00000C90  2F 63 33 32  20 22 49 6E  73 74 61 6C  6C 20 44 4F  /c32 "Install DO | 1Bx80
+| 00000CA0  53 20 70 61  74 68 22 20  2F 66 57 68  69 74 65 20  S path" /fWhite  | 1Bx80
+| 00000CB0  25 31 20 2F  66 47 72 61  79 0D 0A 53  54 41 54 55  %1 /fGray♪◙STATU | 1Bx80
+| 00000CC0  53 5F 42 41  4B 3D 2F 72  34 2F 63 33  32 20 22 42  S_BAK=/r4/c32 "B | 1Bx80
+| 00000CD0  61 63 6B 75  70 20 70 72  65 76 69 6F  75 73 20 4F  ackup previous O | 1Bx80
+| 00000CE0  53 22 20 2F  66 57 68 69  74 65 20 25  31 20 2F 66  S" /fWhite %1 /f | 1Bx80
+| 00000CF0  47 72 61 79  0D 0A 53 54  41 54 55 53  5F 50 4F 53  Gray♪◙STATUS_POS | 1Bx80
+| 00000D00  3D 2F 72 34  2F 63 33 32  20 22 50 72  65 76 69 6F  =/r4/c32 "Previo | 1Bx80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 29: Right Enter
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx6 6Cx1 1Bx49
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 30: Shift+F4
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx6 6Cx1 1Bx49
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Edit ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Edit the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\nls\setup.en                                          ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 31: "a:\kernel.sys" Enter
+cursor 0 1 lines 6 7 mode 3
+|Edit: A:\kernel.sys                      Line 1     Col 1############ Free      | 30x30 47x1 30x49
+|δ←CONFIG♠␀␀☺☻␀☺␀nused◘•♠♣♦♥☻☺ΘS╡╣⌂Z╛ⁿ┤ë≈▲⌐╡Çî╚♣♣␀Ä╪♣#•Ä└²≤Ñⁿ.Çl↕►sτÆ»¡♫♫♠▼•▬╜►␀→| 1Bx79 1Ex1
+|#√0∞±o∞╦♣╛▓ΩΦB⍽°J≥v£►k¼Am╘╞ó◄ùÄ≥♫Ω•╣►▀w@"≥»D╝9∟⍽α,G⌠-b=╗'╕♪πn°@╡╕╒▬♂φδ+*█≡;Ssï#→| 1Bx79 1Ex1
+|b▄←■⍽├W≈Ω↓◘>t▐┴E╚┬^√ÑΦ⌠⌠8α♫█⌡◄≤┬#²Φk▐δÅ≤=♣hδà|♀ö☻╥↔→å↓p)╢⍽▌1␀╤b⍽▌>▌ë≥■e¢↓δ∩-f╫ê→| 1Bx79 1Ex1
+|w♣ÇJ╤·•"C↑F♪J♫L4↨*Xj;␀k≤∩╖╪╨ΘFΘZbδk╥╥t«12╗3'9␀|3;å╤♣íd╟╟f4ñgé╛,φ╓#♠═⌡%,≈╫'4H   →| 1Bx79 1Ex1
+|─♀ub▼╤╬¶╥R▀0─╧Q╛→Ç"g♠9┌û┴üCzVVPÇδ≤╦╛Ñ#┬!²♠ê¡╞♪ΓS◘é╩>"e4S-~Φ°■Θ■ⁿW}`F♦␀mß╪⍽╕£♦]E→| 1Bx79 1Ex1
+|↨√ΦNü±»òYPtW█P▬▬╤Uá▼φ╕s00B␀▀╘èçû◄QLó╓Γ▬⌡Çß•'*╟♪HX┘≥è↕²░☺╥α◘└%▼:Q        K      →| 1Bx79 1Ex1
+|°R∟;öF*[◘↕ª+├◄▬═¡/N╓╞↑^-p┌☺▲♂!.D}(▒mµ•î◘▐v♀"♦g↓3Φ╨╕↕gI╨ö╫☺X├ì⌠ê♫ün∟ï☼m◙█╢☼S↔ε╛E→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 32: End
+cursor 78 1 lines 6 7 mode 3
+|Edit: A:\kernel.sys                      Line 1     Col 3900######### Free      | 30x30 47x1 30x49
+|←p%Q╓¡<D├δ♥‼B•♀≈Y[├╗╖¿÷Dà3░≈7Φ5⍽a▄τ♪▬¿↨█g♦±[u½█₧=+u┐♣5╬à[♣↕ì╗┐ZΩ▐√Φé■Φ♪♦#»a╕_≡│→| 1Ex1 1Bx78 1Ex1
+|←@g«═K♫╕╖←Θok┌δ[¶-A√M╟♠╦♦▌v╞♠₧ⁿ@Φ¡◄ú╗Φq♣Z¥ΣΘ6«←÷♂░n╙├BQá▒•─\▄/±♂êäm‼CA╜♠◘}◙jxd4→| 1Ex1 1Bx78 1Ex1
+|←ö√V◙9áαÜ½+◙XƒΣè╓☻$0▲ÿEY♣ n"╕ªn▓╠} ◙φ0♥♥¿◄╤q◘;qⁿ▓♀Φ╒µ¡{╟l◘ëú←é"≡Σs#SD┌ E┘╩D|D"w→| 1Ex1 1Bx78 1Ex1
+|←G-t╣H◄↨▌┴☻zæ♣δ←j☻•≈nLΦ3•;╜‼•,"Vº◄0↔►Γ┬-☻p♥,─σ;Ç=É!↨ïεT♫▄½,δ╢ ⍽╬-┌P*îTâ»K╫φt╤δ◄→| 1Ex1 1Bx78 1Ex1
+|←┴_ⁿa±ü¿∞╫◙û#-sG↓☻gäτ█HΣç┘î␀⌐6M•:⍽O▒ÿ¶(è█%ù↔PZ╞ß#h√)⌠~°JJ╗M␀`╔╬&♣─ú&▌░ú(←Wlb*←ä→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←è→↑:òù+╒i•╥ⁿ0V╜1╢╜D┼)¼ìyg↔♪ù▓▓ⁿë←í►╪Ç{öⁿw☺Üç╛$æDvΣ╕v;↔╫∩#Φ·Ω²Φi■↓u@↑4á]♣°%á≤ƒù→| 1Ex1 1Bx78 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 33: Click@79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2>79,3*2>79,2*2
+cursor 78 2 lines 6 7 mode 3
+|Edit: A:\kernel.sys                      Line 2     Col 3982######### Free      | 30x80
+|←└Ω÷GP¿┐πÇg4■δ╖7♂3@╦t♂3√┐&╞D♫#`+^GΦÅ⍽╓ü♂┴äKêï√WwïOy↕╢φ␀HüMm;♂md;í‼z_,⍽♂⍽☺mƒY╨¥V→| 1Ex1 1Bx78 1Ex1
+|←♣¿      `╬♥│j¼•u⌐░äΘ.*m■•^kτ╣Ñ6◘►ßVR↕▼ε█á╩B╙┼₧┤♣◘K♣÷┤♠↑]␀â╣>î4:ε╗Ω±x▀┴ 6Σ█╓ºB╡→| 1Ex1 1Bx78 69x1
+|←ε r♫N┼o◘]▓╣÷☻Θ«☻9╙◙ÖO♥µcz•H☼Γå⌡►3eⁿ≡ê▒ê┬Ω▐←ï÷ P-:∞ü↔δj▒⌠b≥ö,BF)☺D.H<≥Ç_"N∞☺┴A(→| 1Ex1 1Bx78 1Ex1
+|←ÿⁿW&♪9w-↑r╥◘☺å  αΦ≡╜`▼♫5‼◘ºó╗♂k↑ç␀]►r┴♠¢Ω↑v♪ªúΦ♂=♦↨áΘτß☺Θ░      m╦☻¬Φ10ê╫X♪w-â→| 1Ex1 1Bx78 1Ex1
+|←î≡¼V3♪(9═g╧S♫╨↨⍽C@;▀♥E┴♥@╜Q·v+╢π+s┤☻►kÑ§ªï╢☺H─◙╜↨JM√o♥♂hH⌐QÇ╢ñ8:╗₧)┌╞Ju╒▀>Sòºî→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←◘^/úH4b┴òû♠─╪├◙═▄VÄ├Hδ+áß╣⌠╜⍽A8î◙╢Lα²♫«⍽x▲╖W·lφ•r◙♣§WùAâ╜ñdáπ·∟æ⍽-+▀áΓ◙åï⍽úΣ!←→| 1Ex1 1Bx78 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 34: Click@79,4
+cursor 78 4 lines 6 7 mode 3
+|Edit: A:\kernel.sys                      Line 4     Col 3983######### Free      | 30x80
+|←Ω÷GP¿┐πÇg4■δ╖7♂3@╦t♂3√┐&╞D♫#`+^GΦÅ⍽╓ü♂┴äKêï√WwïOy↕╢φ␀HüMm;♂md;í‼z_,⍽♂⍽☺mƒY╨¥V£→| 1Ex1 1Bx78 1Ex1
+|←¿      `╬♥│j¼•u⌐░äΘ.*m■•^kτ╣Ñ6◘►ßVR↕▼ε█á╩B╙┼₧┤♣◘K♣÷┤♠↑]␀â╣>î4:ε╗Ω±x▀┴ 6Σ█╓ºB╡#→| 1Ex1 1Bx78 1Ex1
+|← r♫N┼o◘]▓╣÷☻Θ«☻9╙◙ÖO♥µcz•H☼Γå⌡►3eⁿ≡ê▒ê┬Ω▐←ï÷ P-:∞ü↔δj▒⌠b≥ö,BF)☺D.H<≥Ç_"N∞☺┴A(░→| 1Ex1 1Bx78 1Ex1
+|←ⁿW&♪9w-↑r╥◘☺å  αΦ≡╜`▼♫5‼◘ºó╗♂k↑ç␀]►r┴♠¢Ω↑v♪ªúΦ♂=♦↨áΘτß☺Θ░      m╦☻¬Φ10ê╫X♪w-â╤→| 1Ex1 1Bx78 69x1
+|←≡¼V3♪(9═g╧S♫╨↨⍽C@;▀♥E┴♥@╜Q·v+╢π+s┤☻►kÑ§ªï╢☺H─◙╜↨JM√o♥♂hH⌐QÇ╢ñ8:╗₧)┌╞Ju╒▀>Sòºî╒→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←^/úH4b┴òû♠─╪├◙═▄VÄ├Hδ+áß╣⌠╜⍽A8î◙╢Lα²♫«⍽x▲╖W·lφ•r◙♣§WùAâ╜ñdáπ·∟æ⍽-+▀áΓ◙åï⍽úΣ!←♣→| 1Ex1 1Bx78 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 35: Click@79,4
+cursor 78 4 lines 6 7 mode 3
+|Edit: A:\kernel.sys                      Line 4     Col 3983######### Free      | 30x80
+|←Ω÷GP¿┐πÇg4■δ╖7♂3@╦t♂3√┐&╞D♫#`+^GΦÅ⍽╓ü♂┴äKêï√WwïOy↕╢φ␀HüMm;♂md;í‼z_,⍽♂⍽☺mƒY╨¥V£→| 1Ex1 1Bx78 1Ex1
+|←¿      `╬♥│j¼•u⌐░äΘ.*m■•^kτ╣Ñ6◘►ßVR↕▼ε█á╩B╙┼₧┤♣◘K♣÷┤♠↑]␀â╣>î4:ε╗Ω±x▀┴ 6Σ█╓ºB╡#→| 1Ex1 1Bx78 1Ex1
+|← r♫N┼o◘]▓╣÷☻Θ«☻9╙◙ÖO♥µcz•H☼Γå⌡►3eⁿ≡ê▒ê┬Ω▐←ï÷ P-:∞ü↔δj▒⌠b≥ö,BF)☺D.H<≥Ç_"N∞☺┴A(░→| 1Ex1 1Bx78 1Ex1
+|←ⁿW&♪9w-↑r╥◘☺å  αΦ≡╜`▼♫5‼◘ºó╗♂k↑ç␀]►r┴♠¢Ω↑v♪ªúΦ♂=♦↨áΘτß☺Θ░      m╦☻¬Φ10ê╫X♪w-â╤→| 1Ex1 1Bx78 69x1
+|←≡¼V3♪(9═g╧S♫╨↨⍽C@;▀♥E┴♥@╜Q·v+╢π+s┤☻►kÑ§ªï╢☺H─◙╜↨JM√o♥♂hH⌐QÇ╢ñ8:╗₧)┌╞Ju╒▀>Sòºî╒→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←^/úH4b┴òû♠─╪├◙═▄VÄ├Hδ+áß╣⌠╜⍽A8î◙╢Lα²♫«⍽x▲╖W·lφ•r◙♣§WùAâ╜ñdáπ·∟æ⍽-+▀áΓ◙åï⍽úΣ!←♣→| 1Ex1 1Bx78 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 36: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx21 6Cx1
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 37: Shift+F4
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx21 6Cx1
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Edit ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Edit the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\kernel.sys                                                    ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 38: "dirinfo" Enter
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx21 6Cx1
+|║readme   txt│            │                           in drive C: is WORK      ║| 1Bx27 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │   ╔══════ Edit ══════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
+|║notes    doc│            │   ║ Reading the file ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
+|║data     bin│            │   ║     dirinfo      ║   s use 3,072 bytes in      ║| 1Bx27 70x26 03x2 1Bx4 1Ex5 1Bx16
+|║run      bat│                                          C:\WORK                ║| 1Bx25 4Fx29 03x1 1Bx25
+|║empty    dat│              ╔════════ Edit ═══════╗   ─────────────────────────╢| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
+|║            │              ║ Can't find the file ║                            ║| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
+|║            │              ║       dirinfo       ║   ' file in this directory ║| 1Bx25 4Fx29 03x2 1Bx24
+|║            │              ║  New-file   Cancel  ║                            ║| 1Bx25 4Fx5 70x10 4Fx14 03x2 1Bx24
+|║            │              ╚═════════════════════╝                            ║| 1Bx25 4Fx29 03x2 1Bx24
+|║            │                                                                 ║| 1Bx25 4Fx29 03x2 1Bx24
+|║            │            │            ║║                                      ║| 1Bx27 03x29 1Bx24
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 39: Enter
+cursor 0 1 lines 6 7 mode 3
+|Edit: dirinfo                            Line 1     Col 1############ Free      | 30x80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx79 6Cx1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 40: "0123456789012345678901234567890123456789012345" Enter
+cursor 0 2 lines 6 7 mode 3
+|Edit: dirinfo                         *  Line 2     Col 1############ Free      | 30x80
+|0123456789012345678901234567890123456789012345                                  | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx79 6Cx1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 41: "line1" Enter "line2" Enter "line3" Enter "line4" Enter "line5" Enter "line6" Enter "line7" Enter "line8" Enter "line9" Enter "line10" Enter "line11" Enter "line12" Enter "line13" Enter "line14" Enter
+cursor 0 16 lines 6 7 mode 3
+|Edit: dirinfo                         *  Line 16    Col 1############ Free      | 30x80
+|0123456789012345678901234567890123456789012345                                  | 1Bx80
+|line1                                                                           | 1Bx80
+|line2                                                                           | 1Bx80
+|line3                                                                           | 1Bx79 6Cx1
+|line4                                                                           | 1Bx80
+|line5                                                                           | 1Bx80
+|line6                                                                           | 1Bx80
+|line7                                                                           | 1Bx80
+|line8                                                                           | 1Bx80
+|line9                                                                           | 1Bx80
+|line10                                                                          | 1Bx80
+|line11                                                                          | 1Bx80
+|line12                                                                          | 1Bx80
+|line13                                                                          | 1Bx80
+|line14                                                                          | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 42: F2 Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx21 6Cx1
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║dirinfo     │            │            ║║ 012345678901234567890123456789012345 ║| 1Bx80
+|║            │            │            ║║ line1                                ║| 1Bx80
+|║            │            │            ║║ line2                                ║| 1Bx80
+|║            │            │            ║║ line3                                ║| 1Bx80
+|║            │            │            ║║ line4                                ║| 1Bx80
+|║            │            │            ║║ line5                                ║| 1Bx80
+|║            │            │            ║║ line6                                ║| 1Bx80
+|║            │            │            ║║ line7                                ║| 1Bx80
+|║            │            │            ║║ line8                                ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║ line9                                ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ line10                               ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 43: Click@50,15
+cursor 47 15 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────── Edit ────────────────╢| 1Bx57 1Ex6 1Bx17
+|║dirinfo     │            │            ║║ 01234567890123456789012345678901234→ ║| 1Bx77 1Ex1 1Bx2
+|║            │            │            ║║ line1                                ║| 1Bx80
+|║            │            │            ║║ line2                                ║| 1Bx80
+|║            │            │            ║║ line3                                ║| 1Bx80
+|║            │            │            ║║ line4                                ║| 1Bx50 6Cx1 1Bx29
+|║            │            │            ║║ line5                                ║| 1Bx80
+|║            │            │            ║║ line6                                ║| 1Bx80
+|║            │            │            ║║ line7                                ║| 1Bx80
+|║            │            │            ║║ line8                                ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║ line9                                ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ line10                               ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Save   3       4       5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 44: Click@45,14
+cursor 45 14 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────── Edit ────────────────╢| 1Bx57 1Ex6 1Bx17
+|║dirinfo     │            │            ║║ 01234567890123456789012345678901234→ ║| 1Bx77 1Ex1 1Bx2
+|║            │            │            ║║ line1                                ║| 1Bx80
+|║            │            │            ║║ line2                                ║| 1Bx80
+|║            │            │            ║║ line3                                ║| 1Bx45 6Cx1 1Bx34
+|║            │            │            ║║ line4                                ║| 1Bx80
+|║            │            │            ║║ line5                                ║| 1Bx80
+|║            │            │            ║║ line6                                ║| 1Bx80
+|║            │            │            ║║ line7                                ║| 1Bx80
+|║            │            │            ║║ line8                                ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║ line9                                ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ line10                               ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Save   3       4       5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 45: Click@10,5
+cursor 45 14 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx10 6Cx1 1Bx52 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────── Edit ────────────────╢| 1Bx57 1Ex6 1Bx17
+|║dirinfo     │            │            ║║ 01234567890123456789012345678901234→ ║| 1Bx77 1Ex1 1Bx2
+|║            │            │            ║║ line1                                ║| 1Bx80
+|║            │            │            ║║ line2                                ║| 1Bx80
+|║            │            │            ║║ line3                                ║| 1Bx80
+|║            │            │            ║║ line4                                ║| 1Bx80
+|║            │            │            ║║ line5                                ║| 1Bx80
+|║            │            │            ║║ line6                                ║| 1Bx80
+|║            │            │            ║║ line7                                ║| 1Bx80
+|║            │            │            ║║ line8                                ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║ line9                                ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ line10                               ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Save   3       4       5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 46: Click@45,13>45,5*6
+cursor 45 11 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx45 6Cx1 1Bx17 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────── Edit ────────────────╢| 1Bx57 1Ex6 1Bx17
+|║dirinfo     │            │            ║║ 01234567890123456789012345678901234→ ║| 1Bx77 1Ex1 1Bx2
+|║            │            │            ║║ line1                                ║| 1Bx80
+|║            │            │            ║║ line2                                ║| 1Bx80
+|║            │            │            ║║ line3                                ║| 1Bx80
+|║            │            │            ║║ line4                                ║| 1Bx80
+|║            │            │            ║║ line5                                ║| 1Bx80
+|║            │            │            ║║ line6                                ║| 1Bx80
+|║            │            │            ║║ line7                                ║| 1Bx80
+|║            │            │            ║║ line8                                ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║ line9                                ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ line10                               ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Save   3       4       5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 47: Click@76,11
+cursor 76 11 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────── Edit ────────────────╢| 1Bx57 1Ex6 1Bx17
+|║dirinfo     │            │            ║║ 01234567890123456789012345678901234→ ║| 1Bx76 6Cx1 1Ex1 1Bx2
+|║            │            │            ║║ line1                                ║| 1Bx80
+|║            │            │            ║║ line2                                ║| 1Bx80
+|║            │            │            ║║ line3                                ║| 1Bx80
+|║            │            │            ║║ line4                                ║| 1Bx80
+|║            │            │            ║║ line5                                ║| 1Bx80
+|║            │            │            ║║ line6                                ║| 1Bx80
+|║            │            │            ║║ line7                                ║| 1Bx80
+|║            │            │            ║║ line8                                ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║ line9                                ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ line10                               ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Save   3       4       5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 48: Click@77,11*8
+cursor 76 11 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────── Edit ────────────────╢| 1Bx57 1Ex6 1Bx17
+|║dirinfo     │            │            ║║ ←6789012345678901234567890123456789→ ║| 1Bx42 1Ex1 1Bx34 69x1 1Bx2
+|║            │            │            ║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|║            │            │            ║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|║            │            │            ║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|║            │            │            ║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|║            │            │            ║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|║            │            │            ║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|║            │            │            ║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|║            │            │            ║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|╟────────────┴────────────┴────────────╢║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ ←                                    ║| 1Bx42 1Ex1 1Bx37
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Save   3       4       5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 49: Click@45,14>45,23*20
+cursor 42 21 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────── Edit ────────────────╢| 1Bx57 1Ex6 1Bx17
+|║dirinfo     │            │            ║║ line5                                ║| 1Bx80
+|║            │            │            ║║ line6                                ║| 1Bx80
+|║            │            │            ║║ line7                                ║| 1Bx80
+|║            │            │            ║║ line8                                ║| 1Bx80
+|║            │            │            ║║ line9                                ║| 1Bx80
+|║            │            │            ║║ line10                               ║| 1Bx80
+|║            │            │            ║║ line11                               ║| 1Bx80
+|║            │            │            ║║ line12                               ║| 1Bx80
+|║            │            │            ║║ line13                               ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║ line14                               ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x45 70x1 07x34
+|1Help   2Save   3       4       5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 50: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      7 files use 3,584 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║dirinfo     │            │            ║║ 012345678901234567890123456789012345 ║| 1Bx80
+|║            │            │            ║║ line1                                ║| 1Bx80
+|║            │            │            ║║ line2                                ║| 1Bx80
+|║            │            │            ║║ line3                                ║| 1Bx80
+|║            │            │            ║║ line4                                ║| 1Bx80
+|║            │            │            ║║ line5                                ║| 1Bx80
+|║            │            │            ║║ line6                                ║| 1Bx80
+|║            │            │            ║║ line7                                ║| 1Bx80
+|║            │            │            ║║ line8                                ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║ line9                                ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║ line10                               ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x45 70x1 07x34
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DIRINFO  A   during the run  151 bytes  14982c46303cf7c0
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

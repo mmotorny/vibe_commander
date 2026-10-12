@@ -152,9 +152,9 @@ Things that are known and not done. Standing instructions are in
   a line and one for a line of the table that is not its own. No caller
   hands it either, so they ran in no scenario and are translated by
   reading.
-- Of the viewer's keys, 49 instructions have run in no scenario and are
-  translated by reading, listed in `harness/ported.py`: the mouse, 36
-  of them; Ctrl+Right at column 65455; Up to a line with none behind
+- Of the viewer's keys, 13 instructions have run in no scenario and are
+  translated by reading, listed in `harness/ported.py`: Ctrl+Right at
+  column 65455; Up to a line with none behind
   it, which cannot be; Down on the last line of a part that ends in the
   first half of the memory; and a text found by reading the file on
   less than 2000 bytes into it, which cannot be either. The fourth is
@@ -537,18 +537,24 @@ Things that are known and not done. Standing instructions are in
     of no rows, would go round 65,536 times: the Info panel's dirinfo
     with panels half the screen high might get there. Not tried.
   - A click of the mouse on the space behind the two digits of a byte
-    puts the cursor on a third digit, which is taken for the second;
-    and a digit typed on the second digit of the byte behind the last
-    one is cleared again. By reading: the bench has no mouse.
+    puts the cursor on a third digit, which is taken for the second:
+    the screen shows it on the second, and a digit typed there goes
+    into it. In `mouse-edit`. A digit typed on the second digit of the
+    byte behind the last one is cleared again: by reading.
+  - The keys take the cursor no further than column 3900 of a line;
+    the mouse does. A click in the last column of the window on
+    another line than the cursor's puts the cursor there, and the
+    window then begins a column further on, so the next such click is
+    a column further: `mouse-edit` gets to column 3983 of a line of
+    a:\kernel.sys, where the 3900 characters that the editor keeps of
+    the line end, tabs counted as the columns they fill.
   - While a file is read, and before and after a search, the keyboard
     is looked at for Esc, Ctrl-C and F10. While it is read that cannot
     be seen: the viewer's code looks first, and takes the key.
-- Of the editor, 81 instructions have run in no scenario and are
-  translated by reading, listed in `harness/ported.py`: 74 for the
-  mouse; two for a file that DOS will not read; three where the window
-  would move up by fewer lines than it does, or begin above line 0;
-  and two for a cursor behind all that the buffer has of a line, which
-  only a click of the mouse leaves there.
+- Of the editor, five instructions have run in no scenario and are
+  translated by reading, listed in `harness/ported.py`: two for a file
+  that DOS will not read, and three where the window would move up by
+  fewer lines than it does, or begin above line 0.
 - `editor-big` has a file of 381,338 bytes that is too large for the
   editor, of the original and of the port alike. One that fits, with a
   size in the same 64K as the room, has no place in a scenario: the
@@ -576,17 +582,13 @@ Things that are known and not done. Standing instructions are in
 - The bench has a mouse now, and scenarios use it: `mouse-panel`,
   `mouse-bars` and `mouse-dialog`, with which 349 of the instructions
   that `harness/ported.py` listed as out of reach for the mouse came off
-  the lists, and `mouse-help`, `mouse-find` and `mouse-tree`, with 293
-  more. The others are still listed, with reasons that end in "the bench has no
-  mouse", which is no reason any more: each place wants a scenario, or
-  the true reason why none gets there. By the file of the port that has
-  them:
+  the lists, and the scenarios that followed with nearly all the
+  others. What is still listed, by the file of the port that has it:
+  - `help.c`, 1: a click below the last line of an index shorter than
+    the window; the file has none.
   - `menu.c`, none: `mouse-menu` has the rest of the menu bar.
-  - `view.c`, 36: a button held in the viewer's window.
-  - `edit.c`, 38: what is left of `T00_71`, a click in the editor's
-    window, a button held above it or below it. `mouse-list` runs 36
-    of its instructions: the click that opens the editor on dirinfo
-    has the button still down when the editor asks.
+  - `view.c`, `edit.c`, `find.c` and `treebox.c`, none: `mouse-view`,
+    `mouse-edit`, `mouse-find` and `mouse-tree`.
   - `dialog.c`, 2: `mouse-fields`, `mouse-line` and `mouse-filter` have
     the fields of a dialog. Left are the middle button, and a button
     moved off the button of a dialog that it went down on.

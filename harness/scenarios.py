@@ -369,6 +369,21 @@ out again (show.py --changes is how):
     Eleven directories made in C:\\WORK are a tree of 17 lines, more
     than the box has and more than a panel of half the height. The
     scenario mouse-tree has these.
+  - The viewer takes a button that is down in its window, any of the
+    three, for a key as long as it is down: Up in the first third of
+    the rows, Down in the last, and between them Left in the first
+    quarter of the columns and Right in the last, which move a text
+    that is not wrapped. Once it has been in the window the button
+    counts outside it too, on the status line. a:\\freedos\\nls\\setup.en
+    is a text of 7,948 bytes with long lines. The scenario mouse-view.
+  - In the editor a click puts the cursor on the line and the column
+    of the pointer, or at the end of a shorter line; in hex on the
+    digit or the character. A click in the last column of the window
+    on the cursor's own line is Right instead. A button that went down
+    in the window and is held above it or below it is Up or Down. A
+    click on the dirinfo that the Info panel shows edits it, in the
+    window there: rows 11 to 21, columns 42 to 77. The scenario
+    mouse-edit.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
@@ -4220,6 +4235,99 @@ SCENARIOS = {
             "Click@70,6",                 # beside the name, on its row
             "Tab",                        # the files are the current panel
             "Click@50,5",                 # and the tree again
+        )),
+
+    "mouse-view": Scenario(
+        "The mouse in the viewer: a button held in the last third of the "
+        "window and in the first, which move the text, in the middle, on "
+        "the right and on the left of a text that is not wrapped, on the "
+        "status line, from there into the window and back, the other "
+        "buttons, and the same in hex",
+        steps=(
+            "Shift+F3",
+            '"a:\\freedos\\nls\\setup.en" Enter',     # 7,948 bytes of text
+            "Click@40,20*8",              # the last third: down
+            "Click@40,3*4",               # the first third: up
+            "Click@40,12",                # the middle: nothing
+            "Click@75,12*6",              # wrapped, the right: nothing
+            "F2",                         # not wrapped
+            "Click@75,12*6",              # the right quarter: columns
+            "Click@5,12*4",               # the left quarter: and back
+            "Click@40,0",                 # on the status line: nothing
+            "Click@40,0>40,20*4",         # from there into the window
+            "Click@40,12>40,0*4",         # and from the window onto it: up
+            "RightClick@40,20*4",         # the right button does the same
+            "MiddleClick@40,3*4",         # and the middle one
+            "F4",                         # hex
+            "Click@40,20*4",              # down
+            "Click@75,12*4",              # the right: nothing
+            "Click@5,12*4",               # the left: nothing
+            "Click@40,2*8",               # up
+            "Click@73,24",                # F10 of the key bar
+        )),
+
+    "mouse-edit": Scenario(
+        "The mouse in the editor: a click that puts the cursor into the "
+        "text, behind the end of a line and into the last column, a "
+        "button held above the window and below it, the digits and the "
+        "characters in hex, the cursor taken behind what the editor "
+        "keeps of a long line, and the window of the Info panel",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # the steps that type
+            "Enter",
+            "Shift+F4",
+            '"a:\\freedos\\nls\\setup.en" Enter',
+            "Click@10,5",                 # the cursor into a line
+            "Click@60,3",                 # and into another
+            "RightClick@30,9",            # behind a short line: to its end
+            "Click@79,9*6",               # the last column there: nothing
+            "Click@78,5",                 # the end of what shows of a line
+            "Click@79,5*10",              # its last column: to the right
+            "Click@40,12>40,0*12",        # held above the window: up
+            "Click@40,12>40,24*40",       # and below it: the text moves
+            "MiddleClick@5,20",           # the middle button is one too
+            "Click@40,0",                 # on the status line: nothing
+            "F4",                         # hex
+            "Click@13,5",                 # the second digit of a byte
+            "Click@14,5",                 # the space behind it
+            "Click@12,5",                 # the first digit
+            "Click@4,7",                  # the address: the first byte
+            "Click@22,6",                 # the last byte of four
+            "Click@23,6",                 # and the space behind it
+            '"7"',                        # a digit typed there
+            "Click@70,8",                 # a character
+            "Click@79,9",                 # behind the characters
+            "Click@30,10>30,24*40",       # held below the window
+            "Click@30,10>30,0*8",         # and above it
+            "Esc",
+            "Right Enter",                # not saved
+            "Shift+F4",
+            '"a:\\kernel.sys" Enter',     # lines of more than 3900
+            "End",                        # the last column that keys go to
+            # The last column of another line is a column further on each
+            # time: with the button down from one line to the other and
+            # back, until the cursor is behind what the editor has of
+            # the line.
+            "Click@79,2*2" + "".join(f">79,{3 - place % 2}*2"
+                                     for place in range(90)),
+            "Click@79,4",                 # behind that of the next line
+            "Click@79,4",                 # and its last column
+            "Esc",
+            "Shift+F4",
+            '"dirinfo" Enter',
+            "Enter",                      # a new file
+            '"0123456789012345678901234567890123456789012345" Enter',
+            " ".join(f'"line{number}" Enter' for number in range(1, 15)),
+            "F2 Esc",                     # the Info shows it
+            "Click@50,15",                # a click on it there edits it
+            "Click@45,14",                # the cursor into a line
+            "Click@10,5",                 # outside the window: nothing
+            "Click@45,13>45,5*6",         # held above the window: up
+            "Click@76,11",                # a line longer than the window
+            "Click@77,11*8",              # its last column: to the right
+            "Click@45,14>45,23*20",       # held below it: the text moves
+            "Esc",
         )),
 
 }

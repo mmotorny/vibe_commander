@@ -384,15 +384,6 @@ BATCHES = [
                    "V80_00_c"),
         unreached={
             **dict.fromkeys(
-                (0x5351, 0x5354, 0x5359, 0x535E, 0x5364, 0x5366, 0x5369,
-                 0x536B, 0x5371, 0x5372, 0x5374, 0x5375, 0x5377, 0x5379,
-                 0x537B, 0x537D, 0x537E, 0x5380, 0x5383, 0x5385, 0x5387,
-                 0x5389, 0x538B, 0x538E, 0x5390, 0x5392, 0x5394, 0x5396,
-                 0x5398, 0x539A, 0x539C, 0x539E, 0x53A0, 0x53A2, 0x53A4,
-                 0x53A6),
-                "the viewer, for a button of the mouse held in its "
-                "window: the bench has no mouse"),
-            **dict.fromkeys(
                 (0x541D, 0x541F),
                 "the viewer, for a line moved to the left as far as it "
                 "goes, by 65455 columns: 1637 times Ctrl+Right, and a "
@@ -478,24 +469,6 @@ BATCHES = [
                 "T00_28, for a window that moves up by fewer lines than "
                 "the cursor is below its first: it moves up only to the "
                 "line of the cursor"),
-            **dict.fromkeys(
-                (0x662B, 0x6636, 0x6664, 0x6665, 0x6667, 0x6669, 0x666C,
-                 0x666F, 0x6671, 0x6673, 0x6678, 0x667A, 0x667C, 0x667E,
-                 0x6680, 0x6682, 0x6684, 0x6685, 0x6687, 0x6689, 0x668A,
-                 0x668C, 0x668D, 0x668F, 0x6691, 0x6692, 0x6696, 0x6698,
-                 0x6699, 0x669B, 0x669D, 0x669F, 0x66A4, 0x66A6, 0x66A8,
-                 0x66AA, 0x66C0, 0x66C2),
-                "T00_71, for the mouse: what is left of a click in the "
-                "window, and a button held above it or below it. The "
-                "bench has no mouse"),
-            **dict.fromkeys(
-                (0x693D, 0x6940),
-                "T06_10, for a cursor behind all that the buffer has of "
-                "a line that it holds a part of: the buffer is filled "
-                "again whenever the line is drawn with fewer characters "
-                "behind the cursor than the window has columns there, "
-                "and it is drawn after every key; only a click of the "
-                "mouse leaves that out"),
         },
     ),
     Batch(
