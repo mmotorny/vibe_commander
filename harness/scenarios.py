@@ -494,6 +494,34 @@ out again (show.py --changes is how):
     line. With the panels off Up and Down are the commands before and
     after, and Home, End, Left, Right and GrayStar keys of the command
     line.
+  - On the menu bar Left and Right go round its five menus, a letter
+    opens one, L, F, C, O or R, and Down or Enter the one that is
+    marked; in a menu Up and Down go round its items, over the lines
+    between them and the items that are dark, Home and PgUp go to the
+    first and End and PgDn to the last, the capital letter of an item
+    chooses it, and so does the key that it names, Ctrl+o for Panels
+    on/off. Esc and F10 leave, but F10 in the Files menu is Quit.
+    Shift+F10 opens the menu of the last item chosen, on that item, or
+    on the next that is not dark. F1 is the help of the item, which Esc
+    leaves for the menu. Ctrl+z makes the other panel the tree and
+    Ctrl+l the Info, or what it was before; Ctrl+p switches the other
+    panel off. Rename chosen from the Files menu with the panels off
+    asks for the file by name and offers the last target: after F6 it
+    may offer the name under the cursor instead, as the registers
+    happen to be.
+  - A panel on the left with none on the right shows, in the first row
+    of the right half, the end of the banner that the program printed
+    when it started: "are", and "ware" under the original, whose
+    banner names another edition. deviations.py knows the banner by
+    its beginning, so that row is held against the wrong letters, and
+    the port test fails before anything is translated. Switch the left
+    panel off instead, "Tab Ctrl+p": the beginning of the banner is
+    known.
+  - An item of the Files menu chosen with Shift or Ctrl held down,
+    "Shift+Enter" or "Ctrl+Enter" on Copy, is the command that F5 has
+    with that key. The program asks for Shift and Ctrl after it has
+    taken the Enter, and the harness holds them for 20 ms for the port:
+    it worked when tried, and is in no scenario.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -1572,6 +1600,77 @@ SCENARIOS = {
             "F9 o m",                     # off: the number is another
             "F9 o",                       # and the menu has it without
                                           # its mark
+        )),
+
+    "menu": Scenario(
+        "The menu bar and its menus by every key: along the bar and round "
+        "it, up and down a menu past its lines and its ends, the help of "
+        "an item, the keys that the items name, the last item again; and "
+        "the items that a menu has dark, for a tree, with the panels off, "
+        "and next to a panel of each kind",
+        steps=(
+            "End",                        # a file under the cursor
+            "Shift+F10",                  # nothing chosen yet: the bar
+            "z Home End Up PgUp PgDn Left",   # keys that mean nothing on
+                                          # the bar, and round to Right
+            "Right",                      # round to Left
+            "Left Left",                  # Options
+            "F1",                         # the help of that menu
+            "Esc",
+            "Down",                       # the menu, with its ticks
+            "Up",                         # round to the last item
+            "Up",                         # over the line between
+            "End Down",                   # round to the first
+            "PgDn",
+            "PgUp Home",
+            "Down Down Down Down Down",   # over the line, to Auto menus
+            "F1",                         # the help of that item
+            "Esc",
+            "Right",                      # the Right menu, of the Info:
+                                          # no filter, Ctrl-F2 and Alt-F2
+            "Right",                      # round to the Left menu
+            "Ctrl+F2 Ins z",              # the key of another menu, a key
+                                          # of none, a letter of none
+            "F10",                        # leaves the menu
+            "Shift+F10 Enter",            # still nothing chosen: the bar,
+                                          # and Enter opens the menu
+            "Esc",
+            "F9 Right Enter",
+            "Enter",                      # Help, in the Files menu
+            "Esc",
+            "Shift+F10",                  # the Files menu, on Help again
+            "a",                          # the attributes of the file
+            "Esc",
+            "Ctrl+z Tab",                 # the tree on the right, active
+            "Shift+F10",                  # the Files menu of a tree: five
+                                          # items dark, attributes among
+                                          # them, so the cursor is on Quit
+            "Ctrl+a",                     # the key of a dark item
+            "Up",                         # over the dark items, to Delete
+            "Right",                      # Commands, of a tree
+            "Right Right",                # the Right menu, of a tree
+            "Right",                      # the Left one, next to a tree:
+                                          # no Tree
+            "f",                          # Full, for the panel that is
+                                          # not the active one
+            "Tab F9 c",                   # Commands, next to a tree
+            "Ctrl+o",                     # the key of an item: panels off
+            "F9",                         # without panels: Left
+            "c",                          # Commands, three items dark
+            "Left",                       # Files, as of a tree
+            "r",                          # Rename asks for a name, and
+                                          # offers the last target, none:
+                                          # it goes by what the bar left
+                                          # in two registers
+            "Esc",
+            "F9 l",                       # Left: off, and no filter
+            "Esc",
+            "Ctrl+o",
+            "F9 r b",                     # files on the right
+            "F9 c",                       # Commands, nothing dark
+            "Esc Tab Ctrl+p",             # the left panel off
+            "F9 c",                       # no comparing
+            "Esc",
         )),
 
     "tree-deep": Scenario(

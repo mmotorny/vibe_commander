@@ -42,6 +42,7 @@
 	EXTERN	DosCom_c:FAR, FindExt_c:FAR
 	EXTERN	Input_c:FAR, Rnd_c:FAR, EdLin_c:FAR
 	EXTERN	CmpSym_c:FAR, Search_c:FAR
+	EXTERN	F39_00_c:FAR
 	EXTERN	ReadTre_c:FAR, ChTree_c:FAR
 	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
 	EXTERN	GetVol_c:FAR, DirSize_c:FAR, TstInfo_c:FAR

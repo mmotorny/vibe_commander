@@ -301,6 +301,56 @@ BATCHES = [
         },
     ),
     Batch(
+        title="The menu bar and its pull-down menus",
+        source="menu.c",
+        routines=("F40_00", "F40_10", "F40_20", "F40_30", "F40_40",
+                  "F40_50"),
+        functions=("F39_00_c",),
+        unreached={
+            **dict.fromkeys(
+                (0x2ADF, 0x2AE1, 0x2AE3, 0x2AE6, 0x2AE8, 0x2AEA, 0x2AEC,
+                 0x2AEE, 0x2AF1, 0x2AF3, 0x2AF6, 0x2AF8, 0x2AFB, 0x2AFD,
+                 0x2AFF, 0x2B02, 0x2B04, 0x2B0E, 0x2B34, 0x2B37, 0x2B39,
+                 0x2B3B, 0x2B3E, 0x2B40, 0x2B42, 0x2B44, 0x2B46, 0x2B48,
+                 0x2B4B, 0x2B4E, 0x2B51, 0x2B53, 0x2B55, 0x2B58, 0x2B5A,
+                 0x2B5C, 0x2B5E, 0x2B60, 0x2B69, 0x2B6B, 0x2B6D, 0x2B70,
+                 0x2B72, 0x2B75, 0x2B77, 0x2B7A, 0x2B7D, 0x2B7F, 0x2B81,
+                 0x2B82, 0x2B83, 0x2B84, 0x2B88, 0x2B8C, 0x2B8E, 0x2B91,
+                 0x2B92, 0x2B93, 0x2B94, 0x2B96, 0x2B98, 0x2B99, 0x2B9A,
+                 0x2B9C, 0x2BA1, 0x2BA3, 0x2F1A, 0x3057, 0x3058, 0x3059,
+                 0x305B, 0x305E, 0x3060, 0x3061, 0x3063, 0x3064, 0x3065,
+                 0x3067, 0x3069, 0x306B, 0x306E, 0x3070, 0x3072, 0x3074,
+                 0x3076, 0x3077, 0x3079, 0x307B, 0x307C, 0x307E, 0x3080,
+                 0x3082, 0x3083, 0x3084),
+                "the menu bar, for the mouse: a button down on the bar or "
+                "on a menu, a button let go, a menu open with no item "
+                "under the cursor, and F40_50, which says whose name on "
+                "the bar the mouse is at. The bench has no mouse"),
+            0x2CC4: "the menu bar, for Alt pressed by itself while a menu "
+                    "is open, which goes back to the bar: Alt is such a "
+                    "key only if it comes up within three ticks of the "
+                    "timer, and the harness holds it until the program "
+                    "has seen it, as the timing has it",
+            **dict.fromkeys(
+                (0x2E6F, 0x2E71),
+                "the Commands menu, for a display that is neither EGA "
+                "nor VGA, where EGA lines is dark: the machine has a "
+                "VGA"),
+            **dict.fromkeys(
+                (0x2F32, 0x2F34),
+                "the menu bar, where a menu opens on an item that is "
+                "dark and so is every item below it: the last item of "
+                "every menu can always be chosen"),
+            **dict.fromkeys(
+                (0x2F99, 0x2F9B, 0x2F9D),
+                "the menu bar, for an item of the Files menu chosen "
+                "with Shift or Ctrl held down: the program asks the "
+                "BIOS for them after it has taken the key, and the "
+                "harness holds them for 20 ms of the host for the port, "
+                "which a busy host may not give the program in time"),
+        },
+    ),
+    Batch(
         title="Reading what a panel shows: the files of a directory, and "
               "for the Info the disk, its label and the text of dirinfo",
         source="read.c",

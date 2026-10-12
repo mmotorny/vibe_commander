@@ -116,6 +116,11 @@ bar, and so are what a key does to a line that is typed into, the speed
 search, the key bar, the menu bar, the command line with its prompt, and
 finding what an extension file says for a file. The screen blanker is
 still assembly, and so is drawing the frame of a box.
+The pull-down menus of the menu bar are C as well: the five menus with
+their ticks and the items that cannot be chosen as things are, and the
+keys and the mouse that the bar takes until an item is chosen. The
+commands that the items stand for, in the same file of the source, are
+still assembly.
 
 ## Layout
 

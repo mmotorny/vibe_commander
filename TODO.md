@@ -187,6 +187,52 @@ Things that are known and not done. Standing instructions are in
   tried. The scenarios search three levels. DOS's critical error can come up with
   all of that on the stack: `FindFil` calls DOS for the files, and to
   open and read them.
+- Of `VCMENU.INC` the menu bar is C, and the commands of its items are
+  still assembly, 1,210 bytes, with the tables by which the stub of
+  the bar jumps to them: `M01_00`, `M03_00`, `M06_00` and `M08_00` with
+  `M02_10`, the kind of a panel, its order and On/Off; `M16_00` and
+  `M16_10` with `M16_20`, the filter and the hidden files; `M21_00`,
+  `M41_00` and `M42_00`, the help, the tree and the sizes of
+  directories; `F69_00`, EGA lines; `M49_00` with `M49_10`, comparing
+  two directories, of which nothing has run in a scenario; and `M60_00`
+  to `M75_00`, the configuration, the advanced options, the files to
+  edit, the switches of the Options menu and saving the setup. They jump
+  on to `Func04`, `Func02`, `Init50` and into one another, some with the
+  current panel still on the stack: a stub for each has to do the jump.
+- Of the menu bar, what it does for the mouse has run in no scenario, 94
+  instructions, `F40_50` among them, which says whose name on the bar
+  the mouse is at. It is translated by reading, and listed as out of
+  reach in `harness/ported.py`. So are Alt by itself in an open menu,
+  which only counts if it comes up within three ticks; EGA lines dark,
+  for a display that is neither EGA nor VGA; an open menu whose items
+  are dark down to the last; and
+  an item of the Files menu chosen with Shift or Ctrl held down, three
+  instructions, which the port did like the original when it was tried
+  by hand, once: the harness holds the two keys for 20 ms for the port,
+  and the program asks for them after it has taken the key.
+- With the mouse the menu bar can come to have no menu at all, the
+  number 0, while it goes on as if it had one: a button pressed on the
+  bar next to the names and moved onto one leaves 0 for a round, and
+  the page of the help is then read by a word in front of the table of
+  the menus; a button let go at that moment, or the mouse leaving the
+  bar between two looks at it after a menu was closed that way, has the
+  keys work on menu 0, and a menu opened then is taken from 2,040 bytes
+  behind the table. Ported like that as far as it can be: the C has the
+  tables in its own place, so what it reads there is something else. The
+  bench has no mouse.
+- In an open menu the key of an item that is dark, Ctrl+a in the Files
+  menu of a tree, is not dropped: the number of the item is looked for
+  among the letters of the items, where it is not. And the table of
+  those keys has F1 for the Help item of the Files menu, which `Input`
+  never hands on: it shows the help of the item under the cursor
+  itself. Both ported as they are.
+- `harness/deviations.py` knows the banner that the program prints at
+  its start by its beginning. With a panel on the left and none on the
+  right, the first row shows the end of it behind the panel, "are", or
+  "ware" under the original, whose banner names an edition with a
+  letter more: that is held against the golden as it is, and the port
+  fails there without anything translated. No scenario shows it now;
+  the comparison would have to know the end of the banner by its place.
 - Of the dialogs, what they do for the mouse has run in no scenario, 255
   instructions: `Slct20` as a whole and parts of `Dialog`, `InpStr`,
   `Select`, `FlipFl` and `MnMn10`. They are translated by reading, and
@@ -982,6 +1028,58 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     compiled code had outgrown its one segment. A C file can be put
     into a second one now, a commit of its own, and `keys.c` is. The
     test took 182 seconds and passed.
+
+- The menu bar, 1,498 bytes of code that is no procedure with its five
+  routines, some 65 minutes in all, next to seven other batches. The
+  translation passed the full test the first time that ran.
+  - 3 minutes: the end of the banner. The scenario switched the right
+    panel off next to the left one, and the port showed "are" where the
+    golden has "ware": `harness/deviations.py` knows the banner by its
+    beginning only (see above). It looked like the translation, and was
+    in the port without it: the original and the port were run through
+    "Ctrl+l" and "Ctrl+p" with `harness/show.py`, and the scenario
+    switches the left panel off now. The `port` test with the batch
+    listed without functions, before translating, would have said so
+    at once; it was left out to save a run of three minutes.
+  - 2 minutes: F1 on an item showed the index of the help. The table of
+    the pages was a constant of two dimensions, which the compiler read
+    in the main data. Found in the listing; in `CLAUDE.md` now.
+  - What saved time: `harness/compare.py` with `--signals` and the name
+    of the one scenario holds the port against its golden in ten
+    seconds, and both of these showed there, not in the full test.
+    `harness/show.py` on the port's build that signals tried the 49
+    steps in nine seconds before the golden was derived, which took
+    nine more.
+  - 4 minutes: the registers at the jump to a command. The stub gave
+    the commands CX and DS, after every command that the tables name
+    had been read for what else it takes: nothing. The batch of Copy
+    and Rename, which arrived with the rebase, had found that Rename
+    goes by BX and DX as they come. The stub hands on every register
+    but BP now, a step has Rename chosen from the menu, and the golden
+    was derived a third time.
+  - Getting onto `main`, three rebases. The first two took a minute
+    each, with the same two files in conflict, `CLAUDE.md` and
+    `harness/scenarios.py`, where both sides had added to the end of
+    the same list of notes. The full `port` test, 218 seconds each time
+    where it takes 105 on an idle machine, passed before the first
+    rebase and failed after it, in `copy-full` alone, at the 20 seconds
+    that a step could take then; the batch waited for the harness, an
+    hour, committed and not pushed. The third rebase had five files in
+    conflict, these two, `README.md`, this one and the list of `EXTERN`
+    in `VC.ASM`, each where both sides had added. What git did not
+    show: `PutKey`, `Input` and `PtMnu1` had become C, so their
+    declarations here went and with them the entry made for `PtMnu1`;
+    and the linker said that CTEXT exceeds 64K, so `menu.c` is in the
+    second segment. The test then failed once more, for an instruction
+    listed as out of reach that the scenario `cursor` of another batch
+    runs: the one that puts the tick on Full, which had been taken for
+    that of a panel of a kind that there is not, because the two ways
+    to it share a jump. It is off the list, and the C was right. Twelve
+    minutes for the third rebase, two tests among them, of five minutes
+    and of three and a half.
+  - A file of the commit message, kept in the directory for temporary
+    files that the eight agents share, was overwritten by another
+    agent's. It was written again, into `build/` of the checkout.
 
 - Copying, renaming and moving, 9 routines, 3,018 bytes, 100 minutes in
   all, next to three other batches at a time, seven of which got onto

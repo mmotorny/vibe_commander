@@ -530,6 +530,21 @@ port.
   from a command of DOS, when it is what the start left. So Shift-F6,
   which goes by BX and DX together, does not find both 0 because of
   what a command left in DX.
+- Code that ends in a jump by a table, as the menu bar jumps to the
+  command of the item chosen, leaves the table and the jump in its stub:
+  the C function returns what was chosen and which table has it, and the
+  stub makes of that the registers as the code had them at the jump, all
+  but BP there, which no command reads. Reading the commands for what
+  they take is not enough where another batch has them in hand: Rename
+  goes by BX and DX as they come, which showed only when its batch
+  arrived with a stub that hands the two to its C function.
+- A stub can put ES back on the main data itself, `PUSH DS` and `POP ES`
+  before it restores DS, and the function then lists ES among what it
+  modifies: see `F39_01` in `VCMENU.INC`.
+- An entry for a label of a file that another batch has in hand, as
+  `PtMnu1` in `PutMnu` of `VCSUB2.INC`, stands in the file of the batch
+  that needs it; and the address of a text there, `PtMnu_S`, comes to
+  the C in a register of the stub, with `AsmSeg` for its segment.
 
 ### C for the port
 
@@ -557,6 +572,15 @@ with it is less obvious:
   compiler makes a pointer into the main data, without a warning.
 - Arithmetic on `u8` is done as signed `int`, with a signed division. Use
   `u16` for anything that is divided or counted.
+- A constant array of two dimensions in the code segment is not read
+  through CS: the compiler takes the address of a row for a pointer into
+  the main data, without a warning, and reads there. Give such a table
+  one dimension and add the row's place to the index: `MnuHlp` of
+  `port/menu.c`. In the listing every access to a constant has `cs:`.
+- Texts that follow one another in one array can be written as a macro
+  of string literals, each ended by `\0`, with octal escapes for bytes
+  that are no characters: `sizeof` of the macro, less one, is where the
+  next one begins, and costs nothing in the program. See `MenuLn` there.
 - The option `-nd` makes the compiler load a segment for every access to
   the main data. Do not use it.
 - The port's stack is 4,096 bytes where the original's is 256, so stack
