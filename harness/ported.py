@@ -175,6 +175,43 @@ BATCHES = [
                    "NumAdr_c", "ChgAdr_c", "CorPar_c", "FilePan_c"),
     ),
     Batch(
+        title="The keys of the panels: the cursor, files selected, the "
+              "panels off, on, swapped and of another kind, and Tab",
+        source="keys.c",
+        routines=("F00_50", "F00_60", "F03_30", "F04_00", "F04_30",
+                  "F05_00", "F08_10", "F76_00", "F20_02"),
+        functions=("F00_50_c", "F00_60_c", "F00_00_c", "F00_05_c",
+                   "F01_00_c", "F01_05_c", "F02_00_c", "F03_00_c",
+                   "F04_00_c", "F05_00_c", "F06_00_c", "F07_00_c",
+                   "F08_00_c", "F76_00_c", "F76_01_c", "F09_00_c",
+                   "F10_00_c", "F78_00_c", "F11_00_c", "F12_00_c",
+                   "F13_00_c", "F14_00_c", "F15_00_c", "F16_00_c",
+                   "F17_01_c", "F79_00_c", "F18_00_c", "F20_00_c",
+                   "F20_02_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x1403, 0x1408, 0x140A, 0x140B, 0x140E, 0x1410, 0x1411,
+                 0x1415, 0x1417, 0x141A, 0x141C, 0x1422, 0x1424, 0x142A,
+                 0x142E, 0x1430, 0x1436, 0x1439, 0x143B, 0x1441, 0x1443,
+                 0x1445, 0x1448, 0x144A, 0x144D, 0x1450),
+                "F00_60, for the mouse: files selected by passing over "
+                "them with the right button held. The bench has no "
+                "mouse"),
+            **dict.fromkeys(
+                (0x18C0, 0x18C3, 0x18C6),
+                "F20_02, for a current directory that DOS has not "
+                "told: the drives of the bench are always ready"),
+            **dict.fromkeys(
+                (0x18E2, 0x18E5, 0x18E7, 0x18EA, 0x18ED, 0x18F0, 0x18F2,
+                 0x18F4, 0x18F5, 0x18FB, 0x1900, 0x1904, 0x1907, 0x1909,
+                 0x190B),
+                "F20_02, for a directory of the other panel that DOS "
+                "will not go to: whatever removes or renames one has "
+                "the panels read again, and the drives of the bench "
+                "are always ready"),
+        },
+    ),
+    Batch(
         title="A panel of files on the screen: its frame, its path, its "
               "files and the cursor",
         source="panel.c",

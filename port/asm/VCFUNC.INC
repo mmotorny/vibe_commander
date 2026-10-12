@@ -38,320 +38,61 @@ ChgAdr	PROC	NEAR
 	RET
 ChgAdr	ENDP
 
-F00_50	PROC	NEAR
-	CALL	ChgAdr
-	CALL	CorPar
-	MOV	CX,DI
-	MOV	AX,SIZE FilEnt
-	MOV	BX,DS:First
-	MOV	DX,DS:CurAdr
-	CMP	DS:WinTyp,0
-	JE	F00_51
-	MOV	AX,16
-	MOV	BX,ES:TreFrst
-	MOV	DX,ES:TreAdr
-	CMP	SI,DX
-	JE	F00_51
-	MOV	ES:FlagCD,1
-F00_51:	SUB	CX,BX
-	JE	F00_52
-	MOV	BL,7
-	CMP	CX,AX
-	JE	F00_53
-	MOV	BL,6
-	NEG	AX
-	CMP	CX,AX
-	JE	F00_53
-	CALL	PutFls
-	CALL	BegBX
-	CALL	SizDX
-	JMP	F00_58
-F00_52:	CMP	SI,DX
-	JNE	F00_53
-	JMP	F00_59
-F00_53:	CALL	ChgAdr
-	MOV	AL,0
-	CALL	SetCur
-	CALL	ChgAdr
-	CALL	PutFls
-	JCXZ	F00_57
-	MOV	AL,BL
+; The keys of the panels, from here to F21_00, are C: port/keys.c. A
+; command is a function there. It gets the panel, which the assembly has
+; in DS, and returns in AL where the program goes on, a number of CmdNx_T
+; below. CmdC is the stub of a command: it keeps the key, which F73_00
+; takes in AX.
+CmdC	MACRO	Name
 	PUSH	AX
-	CALL	BegBX
-	LEA	CX,[BX+201h]
-	CALL	SizDX
-	SUB	DH,4
-	CMP	DS:WinTyp,0
-	JE	F00_54
-	DEC	CH
-	DEC	DH
-	JMP	F00_55
-F00_54:	CMP	ES:MiniSta,0
-	JZ	F00_55
-	SUB	DH,2
-F00_55:	MOV	DL,38-1
-	ADD	DX,CX
-	MOV	AH,Back_C
-	CALL	Color
-	MOV	BH,AH
-	MOV	AH,AL
-	MOV	AL,1
-	CALL	Int10m
-	POP	AX
-	MOV	BX,CX
-	CMP	AL,7
-	JE	F00_56
-	MOV	BH,DH
-F00_56:	MOV	DX,126h
-	CALL	Window
-F00_57:	MOV	AL,1
-	CALL	SetCur
-	MOV	AL,DS:WinTyp
-	OR	AL,ES:MiniSta
-	JZ	F00_59
-	CALL	BegBX
-	CALL	SizDX
-	ADD	BH,DH
-	SUB	BH,2
-	INC	BL
-	MOV	DX,126h
-F00_58:	CALL	Window
-F00_59:	RET
+	MOV	AX,DS
+	CallC	Name
+	JMP	CmdEnd
+	ENDM
+
+; Move the cursor of a panel of files or of the tree
+;			   DS - WCBseg
+;			   SI - address of the entry it goes to
+;			   DI - address of the first entry shown
+F00_50	PROC	NEAR
+	MOV	AX,DS
+	CallC	F00_50_c
+	RET
 F00_50	ENDP
 
-F00_60:	TEST	BP,2			; Scroll & select
-	JZ	F00_63
-	CMP	DS:WinTyp,0
-	JNE	F00_70
-	PUSH	SI
-	CALL	NumAdr
-	MOV	BX,SI
-	POP	SI
-	CMP	BX,DS:EndBuf
-	JAE	F00_70
-	CMP	DS:[BX].NameF[0],'.'
-	JE	F00_70
-	TEST	ES:WinMous,2
-	JNZ	F00_61
-	OR	ES:WinMous,2
-	TEST	DS:[BX].AttrF,40h
-	JNZ	F00_61
-	OR	ES:WinMous,4
-F00_61:	MOV	AL,DS:[BX].AttrF
-	AND	AL,0BFh
-	TEST	ES:WinMous,4
-	JZ	F00_62
-	OR	AL,40h
-F00_62:	CMP	AL,DS:[BX].AttrF
-	JE	F00_70
-	MOV	DS:[BX].AttrF,AL
-	CALL	F08_10
-	JMP	F00_70
-F00_63:	AND	ES:WinMous,1
+; The mouse comes in here, from Func40 on in VC.ASM, with the numbers of
+; the cursor's entry in SI, of the first one shown in DI and of the last
+; one in DX, and with its buttons in BP.
+F00_60:	PUSH	AX			; Scroll & select
+	MOV	AX,DS
+	MOV	CX,BP
+	CallC	F00_60_c
+	JMP	CmdEnd
+F00_05:	PUSH	AX
+	MOV	AX,DS
+	MOV	CX,BP
+	CallC	F00_05_c
+	JMP	CmdEnd
+F01_05:	PUSH	AX
+	MOV	AX,DS
+	MOV	CX,BP
+	CallC	F01_05_c
+	JMP	CmdEnd
 
-F00_70:	CALL	NumAdr
-	XCHG	SI,DI
-	CALL	NumAdr
-	XCHG	SI,DI
-	CALL	F00_50
-F00_80:	JMP	Func07
+F00_00:	CmdC	F00_00_c		; Up
+F01_00:	CmdC	F01_00_c		; Down
+F02_00:	CmdC	F02_00_c		; Left
+F03_00:	CmdC	F03_00_c		; Right
+F04_00:	CmdC	F04_00_c		; PgUp
+F05_00:	CmdC	F05_00_c		; PgDn
+F06_00:	CmdC	F06_00_c		; Home
+F07_00:	CmdC	F07_00_c		; End
+F08_00:	CmdC	F08_00_c		; Ins
 
-F00_00:	CMP	DS:Visible,0		; Up
-	JNZ	F00_01
-	JMP	F25_00
-F00_01:	CMP	DS:WinTyp,1
-	JA	F00_80
-	CALL	AdrNum
-	XOR	BP,BP
-F00_05:	OR	SI,SI
-	JE	F00_06
-	DEC	SI
-F00_06:	JMP	F00_60
-
-F01_00:	CMP	DS:Visible,0		; Down
-	JNZ	F01_01
-	JMP	F26_00
-F01_01:	CMP	DS:WinTyp,1
-	JA	F00_80
-	CALL	AdrNum
-	XOR	BP,BP
-F01_05:	CMP	SI,DX
-	JAE	F01_06
-	INC	SI
-F01_06:	JMP	F00_60
-
-F02_00:	MOV	AL,0			; Left
-	CMP	AL,DS:Visible
-	JZ	F02_10
-	CMP	AL,DS:WinTyp
-	JNE	F02_10
-	CMP	AL,DS:BrfFul
-	JNE	F02_10
-	CALL	AdrNum
-	MOV	AX,SI
-	SUB	AX,DI
-	CMP	AX,BX
-	JB	F02_02
-	SUB	SI,BX
-F02_01:	JMP	F00_70
-F02_02:	SUB	SI,BX
-	JAE	F02_03
-	XOR	SI,SI
-F02_03:	SUB	DI,BX
-	JAE	F02_01
-	JMP	F06_01
-F02_10:	JMP	F73_00
-
-F03_00:	MOV	AL,0			; Right
-	CMP	AL,DS:Visible
-	JZ	F02_10
-	CMP	AL,DS:WinTyp
-	JNE	F02_10
-	CMP	AL,DS:BrfFul
-	JNZ	F02_10
-	CALL	AdrNum
-	MOV	AX,SI
-	SUB	AX,DI
-	CALL	F03_30
-	MOV	BP,BX
-	ADD	BP,BP
-	CMP	AX,BP
-	JB	F02_01
-	XCHG	SI,DI
-	CALL	F03_30
-	XCHG	SI,DI
-	ADD	BP,BX
-	MOV	AX,DX
-	SUB	AX,DI
-	INC	AX
-	CMP	AX,BP
-	JAE	F02_01
-	OR	DI,DI
-	JE	F02_01
-	JMP	F07_01
-
-F03_30	PROC	NEAR
-	ADD	SI,BX
-	CMP	SI,DX
-	JBE	F03_31
-	MOV	SI,DX
-F03_31:	RET
-F03_30	ENDP
-
-F04_00:	CMP	DS:Visible,0		; PgUp
-	JZ	F05_10
-	CMP	DS:WinTyp,1
-	JA	F05_10
-	CALL	F04_30
-	OR	DI,DI
-	JNE	F04_01
-	JMP	F06_01
-F04_01:	SUB	DI,BX
-	JAE	F04_02
-	XOR	DI,DI
-F04_02:	ADD	BX,DI
-	CMP	BX,SI
-	JAE	F04_03
-	MOV	SI,BX
-F04_03:	JMP	F00_70
-
-F04_30	PROC	NEAR
-	CALL	AdrNum
-	MOV	AL,DS:WinTyp
-	OR	AL,DS:BrfFul
-	MOV	AX,BX
-	JNZ	F04_31
-	ADD	BX,AX
-	ADD	BX,AX
-F04_31:	DEC	BX
-	RET
-F04_30	ENDP
-
-F05_00:	CMP	DS:Visible,0		; PgDn
-	JZ	F05_10
-	CMP	DS:WinTyp,1
-	JA	F05_10
-	CALL	F04_30
-	MOV	CX,DI
-	XCHG	SI,DI
-	CALL	F03_30
-	XCHG	SI,DI
-	MOV	AX,DX
-	SUB	AX,BX
-	JAE	F05_01
-	XOR	AX,AX
-F05_01:	CMP	DI,AX
-	JBE	F05_02
-	MOV	DI,AX
-F05_02:	CMP	DI,CX
-	JBE	F05_04
-	CMP	DI,SI
-	JBE	F05_03
-	MOV	SI,DI
-F05_03:	JMP	F00_70
-F05_04:	JMP	F07_01
-F05_10:	JMP	Func07
-
-F06_00:	CMP	DS:Visible,0		; Home
-	JZ	F06_10
-	CMP	DS:WinTyp,1
-	JA	F06_10
-	CALL	AdrNum
-F06_01:	XOR	SI,SI
-	XOR	DI,DI
-	JMP	F00_70
-F06_10:	JMP	F73_00
-
-F07_00:	CMP	DS:Visible,0		; End
-	JZ	F06_10
-	CMP	DS:WinTyp,1
-	JA	F06_10
-	CALL	AdrNum
-F07_01:	MOV	SI,DX
-	MOV	DI,DX
-	JMP	F00_70
-
-F08_00:	CALL	FilePan			; Ins
-	JNC	F05_10
-	MOV	SI,DS:CurAdr
-	CMP	SI,DS:EndBuf
-	JAE	F05_10
-	PUSH	SI
-	CMP	ES:InsDwn,0
-	JZ	F08_01
-	ADD	SI,SIZE FilEnt
-	CMP	SI,DS:EndBuf
-	JAE	F08_01
-	PUSH	DS
-	XOR	AX,AX
-	MOV	DS,AX
-	AND	BYTE PTR DS:[418h],7Fh
-	POP	DS
-F08_01:	POP	SI
-	CMP	DS:[SI].NameF[0],'.'
-	JE	F08_02
-	XOR	DS:[SI].AttrF,40h
-F08_02:	CALL	F08_10
-	CMP	ES:InsDwn,0
-	JZ	F05_10
-	JMP	F01_01
-
-F08_10	PROC	NEAR
-	MOV	AL,1
-	CALL	SetCur
-	CMP	ES:MiniSta,0
-	JZ	F08_11
-	CALL	PutFls
-	CALL	BegBX
-	CALL	SizDX
-	ADD	BH,DH
-	SUB	BH,2
-	INC	BX
-	MOV	DX,126h
-	CALL	Window
-F08_11:	RET
-F08_10	ENDP
-
+; The dialog that asks for a mask and the box that says no file is like
+; it stay here: Dialog reads them in this segment, and the C code says
+; where they are.
+	PUBLIC	Sel_S, Unsl_S, Inv_S, Sel_B, ErSel_B
 	.CONST
 Sel_S	DB	'Select',0
 Unsl_S	DB	'Unselect',0
@@ -386,297 +127,80 @@ ErSel_B	BOXHD	< ErSel_P, 528h, 0, 1, 0FFh, 0, 0 >
 	DB	0
 
 	.CODE
-F76_00:	CMP	ES:DosBuf,0		; Grey *
-	JNE	F76_02
-F76_01:	MOV	DX,OFFSET Inv_S
-	JMP	F10_01
-F76_02:	JMP	F73_00
+F76_00:	CmdC	F76_00_c		; Grey *
+F76_01:	CmdC	F76_01_c		; the same, from the menu
+F09_00:	CmdC	F09_00_c		; Grey +
+F10_00:	CmdC	F10_00_c		; Grey -
+F78_00:	CmdC	F78_00_c		; ^M - restore marks
+F11_00:	CmdC	F11_00_c		; ^O
+F15_00:	CmdC	F15_00_c		; ^U
+F16_00:	CmdC	F16_00_c		; ^B
+F20_00:	CmdC	F20_00_c		; Tab
 
-F09_00:	MOV	DX,OFFSET Sel_S		; Grey +
-	JMP	F10_01
-
-F10_00:	MOV	DX,OFFSET Unsl_S	; Grey -
-F10_01:	CALL	FilePan
-	JNC	F76_02
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	BP,OFFSET Sel_B
-	CALL	Dialog
-	POP	DS
-	JNE	F10_08
-	MOV	SI,OFFSET SelMas
-	CMP	BYTE PTR ES:[SI],0
-	JE	F10_08
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	DI,OFFSET TmpBuf
-	CALL	Convert
-	POP	DS
-	MOV	CH,0
-	MOV	SI,OFFSET DskBuf
-F10_03:	CMP	SI,DS:EndBuf
-	JAE	F10_07
-	CMP	DS:[SI].NameF,'.'
-	JE	F10_06
-	CALL	TstMas
-	JNC	F10_06
-	CMP	DX,OFFSET Unsl_S
-	JNE	F10_04
-	MOV	CH,1
-	AND	DS:[SI].AttrF,0BFh
-	JMP	F10_06
-F10_04:	TEST	DS:[SI].AttrF,10h
-	JNZ	F10_06
-	MOV	CH,1
-	CMP	DX,OFFSET Sel_S
-	JNE	F10_05
-	OR	DS:[SI].AttrF,40h
-	JMP	F10_06
-F10_05:	XOR	DS:[SI].AttrF,40h
-F10_06:	ADD	SI,SIZE FilEnt
-	JMP	F10_03
-F10_07:	OR	CH,CH
-	JNZ	F10_09
-	PUSH	ES
-	POP	DS
-	MOV	BP,OFFSET ErSel_B
-	CALL	Dialog
-F10_08:	JMP	Func04
-F10_09:	JMP	Func01
-
-F78_00:	CALL	FilePan			; ^M - restore marks
-	JNC	F10_08
-	MOV	SI,OFFSET DskBuf
-F78_01:	CMP	SI,DS:EndBuf
-	JAE	F10_09
-	CMP	DS:[SI].NameF,'.'
-	JE	F78_02
-	TEST	DS:[SI].AttrF,80h
-	JZ	F78_02
-	OR	DS:[SI].AttrF,40h
-F78_02:	ADD	SI,SIZE FilEnt
-	JMP	F78_01
-
-F11_00:	CMP	DS:Visible,0		; ^O
-	PUSH	DS
-	MOV	DS,ES:WCBsec
-	JZ	F11_01
-	MOV	AL,DS:Visible		; Panels Off
-	MOV	ES:Ctrl_O,AL
-	MOV	DS:Visible,0
-	POP	DS
-	MOV	DS:Visible,0
-	CALL	BegBX
-	CALL	SizDX
-	MOV	BL,0
-	MOV	DL,80
-	CALL	ResUser
-	JMP	Func03
-F11_01:	MOV	AL,ES:Ctrl_O		; Panels On
-	MOV	DS:Visible,AL
-	MOV	AH,DS:ChgFlg
-	POP	DS
-	MOV	DS:Visible,1
-	CMP	DS:ChgFlg,0
-	JNZ	F11_02
-	CMP	AL,0
-	JZ	F11_03
-	CMP	AH,0
-	JZ	F11_03
-F11_02:	CALL	PutMnu3
-F11_03:	JMP	Init50
-
-F12_00:	CMP	DS:Visible,0		; ^P
-	PUSH	DS
-	MOV	DS,ES:WCBsec
-	MOV	CL,0
-	JNZ	F14_01
-	POP	DS
-	JMP	Func05
-
+; These go on in the routines of a panel's menu, M01_01, M03_00 and
+; M06_00 of VCMENU.INC, which take the DS of the command off the stack
+; when they are done. The menu itself comes in at F17_01, with DS
+; pushed and on the panel of the menu.
+F12_00:	PUSH	DS			; ^P
+	CmdC	F12_00_c
 F13_00:	PUSH	DS			; ^F1
-	MOV	DS,ES:WCB1seg
-	MOV	CL,1
-	JMP	F14_01
-
+	CmdC	F13_00_c
 F14_00:	PUSH	DS			; ^F2
-	MOV	DS,ES:WCB2seg
-	MOV	CL,5
-F14_01:	JMP	M06_00
-
-F15_00:	CMP	DS:Visible,0		; ^U
-	JNZ	F15_01
-	JMP	Func04
-F15_01:	MOV	AX,ES:WCB1seg
-	XCHG	AX,ES:WCB2seg
-	MOV	ES:WCB1seg,AX
-	MOV	BX,OFFSET Active
-	CALL	InvVar
-	CALL	BegBX
-	CALL	SizDX
-	MOV	BL,0
-	MOV	DL,80
-	CALL	ResUser
-	JMP	Init50
-
-F16_00:	PUSH	ES			; ^B
-	POP	DS
-	MOV	BH,DS:Lines
-	DEC	BH
-	CMP	DS:KeyBar,0
-	JZ	F16_02
-	XOR	AX,AX
-	MOV	DS:KeyBar,AL
-	MOV	DS:BarPrev,0FFh
-	CALL	ClsLine
-	MOV	DX,150h
-	CALL	Window
-F16_01:	JMP	Func04
-F16_02:	MOV	DS:KeyBar,1
-	CMP	BH,DS:DosLin
-	JNE	F16_01
-	CALL	BegBX
-	CALL	SizDX
-	MOV	BL,0
-	MOV	DL,80
-	CALL	ResUser
-	CALL	Window
-	CALL	Cursor1
-	CALL	SavMous
-	MOV	AL,0
-	CALL	CurMous
-	JMP	Init40
-
+	CmdC	F14_00_c
 F17_00:	PUSH	DS			; ^R
-F17_01:	MOV	AL,DS:WinTyp
-	CMP	AL,0
-	JE	F17_04
-	CMP	AL,2
-	JA	F17_03
-	JE	F17_02
-	MOV	SI,OFFSET DosPth
-	CALL	DelTr0
-	JC	F17_03
-F17_02:	MOV	CH,5
-	SUB	CH,AL
-	JMP	M03_00
-F17_03:	POP	DS			; ???
-	JMP	Func04
-F17_04:	MOV	SI,DS:EndBuf
-	MOV	DS:CurAdr,SI
-	MOV	DS:[SI],AL
-	MOV	SI,OFFSET DskBuf
-F17_05:	CMP	SI,DS:EndBuf
-	JAE	F17_06
-	AND	DS:[SI].AttrF,0BFh
-	ADD	SI,SIZE FilEnt
-	JMP	F17_05
-F17_06:	MOV	DS:ChgFlg,1
+F17_01:	CmdC	F17_01_c
+F79_00:	PUSH	DS			; ^Z - tree
+	CmdC	F79_00_c
+F18_00:	PUSH	DS			; ^L - info
+	CmdC	F18_00_c
+
+; Where a command goes on: at the place of this table that it returned
+; in AL. For the routines of the menu DX is the panel, and AH a byte of
+; theirs: five less the kind of panel for M03_00, and for M06_00 the
+; word of the menu bar that is lit meanwhile. The key is on the stack.
+	.DATA
+CmdNx_T	DW	Func07, Func05, Func04, CmdF01, F73_00, F25_00, F26_00
+	DW	Init40, Init50, CmdM01, CmdM03, CmdM06, CmdPp4, CmdPp5
+
+	.CODE
+CmdEnd:	MOV	BL,AL
+	MOV	BH,0
+	ADD	BX,BX
+	MOV	CH,AH
+	POP	AX
+	JMP	CS:CmdNx_T[BX]
+CmdF01:	MOV	DS,ES:WCBcrn		; Tab has made another the current one
+	JMP	Func01
+CmdM01:	MOV	DS,DX
 	MOV	CL,DS:SortTyp
 	MOV	CH,DS:BrfFul
 	JMP	M01_01
-
-F79_00:	MOV	AL,1			; ^Z - tree
-	JMP	F18_01
-
-F18_00:	MOV	AL,2			; ^L - info
-F18_01:	CMP	DS:Visible,0
-	JE	F18_03
-	PUSH	DS
-	CMP	AL,DS:WinTyp
-	JE	F18_02
-	CALL	InvWCB
-	CMP	DS:Visible,0
-	JZ	F17_02
-	CMP	AL,DS:WinTyp
-	JNE	F17_02
-F18_02:	MOV	AL,DS:Ctrl_L
-	CMP	AL,0
-	JE	F17_06
-	JMP	F17_02
-F18_03: JMP	Func04
-
-F20_00:	PUSH	DS			; Tab
-	CALL	InvWCB
-	MOV	AX,DS
-	CMP	DS:Visible,0
-	POP	DS
-	JNZ	F20_01
+CmdM03:	MOV	DS,DX
+	JMP	M03_00
+CmdM06:	MOV	DS,DX
+	MOV	CL,CH
+	JMP	M06_00
+CmdPp4:	POP	DS
+	JMP	Func04
+CmdPp5:	POP	DS
 	JMP	Func05
-F20_01:	XCHG	AX,ES:WCBcrn
-	CALL	PutPath
-	CALL	PutFls
-	XCHG	AX,ES:WCBcrn
-	CALL	F20_02
-	CALL	PutPath
-	JMP	Func01
 
+; Make the other panel the current one
+;			   DS - WCBseg of the current one
+;	Return :	   DS - WCBseg of the one that is current now
 F20_02	PROC	NEAR
-	XOR	BX,BX
-	MOV	DH,ES:Lines
-	MOV	DL,80
-	CMP	DS:WinTyp,0
-	MOV	DS,ES:WCBsec
-	JNE	F20_03
-	CMP	DS:WinTyp,0
-	JNE	F20_03
-	CMP	ES:PathEr,0
-	JNZ	F20_04
-	PUSH	ES
-	MOV	ES,ES:WCBcrn
-	MOV	SI,OFFSET WinPath
-	MOV	DI,SI
-	CALL	StrLen
-	REPE	CMPSB
-	POP	ES
-	JNE	F20_04
-	JMP	F20_08
-F20_03:	CMP	ES:PathEr,0
-	JZ	F20_08
-	CALL	HidCur
-	CALL	Window
-	JMP	F20_07
-F20_04:	CALL	HidCur
-	CALL	Window
-	MOV	AL,DS:WinPath
-	SUB	AL,'A'-1
-	CALL	Fantom
-	JC	F20_05
-	MOV	DX,OFFSET WinPath
-	MOV	AH,3Bh
-	CALL	Intr21
-	JNC	F20_06
-	CMP	AX,WORD PTR 3
-	JE	F20_06
-F20_05:	MOV	SI,OFFSET WinPath
-	MOV	DI,OFFSET DosPth
-	MOV	CX,3
-	REP	MOVSB
-	MOV	AL,0
-	STOSB
-	MOV	ES:PathEr,1
-	MOV	DS:ChgFlg,1
-	MOV	DL,DS:WinPath
-	SUB	DL,'A'
-	MOV	AH,0Eh
-	INT	21h
-	JMP	F20_08
-F20_06:	MOV	DL,DS:WinPath
-	SUB	DL,'A'
-	MOV	AH,0Eh
-	INT	21h
-F20_07:	CALL	SetPth
-F20_08:	CALL	PutPrm
-	MOV	AX,ES:WCBcrn
-	XCHG	AX,ES:WCBsec
-	MOV	ES:WCBcrn,AX
-	MOV	DS,AX
-	MOV	BX,OFFSET Active
-	CALL	InvVar
+	MOV	AX,DS
+	CallC	F20_02_c
+	MOV	DS,ES:WCBcrn
 	RET
 F20_02	ENDP
+
+; Entries for the C code of these commands to routines of other files
+; (see FromC in VC.ASM, and port/keys.c for what they take).
+	FromC	SavMous
+	FromC	CurMous
+	FromC	ResUser
+	FromC	InvVar
 
 F21_00:	CMP	ES:DosBuf,0		; Enter
 	JNE	F21_01

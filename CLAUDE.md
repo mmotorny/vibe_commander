@@ -305,6 +305,36 @@ port.
   The listing has a table of `.DATA` by its offset in that segment only;
   where it is in the program shows in `build/shareware-layout/VC.COM`, by
   looking for its bytes.
+- A command is no routine: the main loop jumps to it by its table of
+  keys, and it jumps back to one of several places of the loop, or on
+  into another command or a routine of the menus. In C it is a function
+  that returns where the program goes on, a number, and its stub jumps
+  there by a table: `CmdC`, `CmdEnd` and `CmdNx_T` in `VCFUNC.INC`, with
+  `port/keys.c`. Where the place it goes on at takes registers, a panel
+  in DS and a byte in CL or CH for `M01_01`, `M03_00` and `M06_00`, the
+  function returns them too, in DX and the high byte of AX, and the piece
+  of the stub for that place loads them. Such a place may pop a DS that
+  the command had pushed: the stub pushes it, before the key.
+- A command is entered with the key in AX, and `F73_00`, where a key
+  goes that is one of the command line, takes it there: the stub keeps
+  it on the stack around the function. The menus enter a command with
+  their own numbers in AX and CX instead.
+- A label inside a command may be an entry of its own, as inside a
+  procedure: the menu comes in at `F17_01` and `F76_01`, the mouse at
+  `F00_05`, `F01_05` and `F00_60`, with other registers than the key's
+  entry has. Each gets a stub and a function; what only the mouse reaches
+  runs in the port all the same where the function for the key calls it.
+- The stub of `PutFls` chooses between three C functions by the kind of
+  the panel, so C code that wants a panel written makes that choice
+  itself: `PtFs00` in `port/keys.c`.
+- A routine may be called with DS somewhere that only happens to do:
+  `F16_00` asks `BegBX` where a panel begins with DS on the main data,
+  and takes the row, which is that of either panel.
+- A label names code between two procedures from there to the next
+  procedure, not to the next command: `F22_00` runs to `F42_10` and
+  holds `F80_00`, `F30_00` and `F32_00` as well. A batch that takes the
+  first commands of such a stretch and not the last answers in
+  `harness/ported.py` for the instructions of both.
 - An entry for C can be made for a label inside a procedure of another
   file: `FromC DelTr0` was in `VCSUB3.INC`, the label in `DelTree` of
   `VCF1.INC`, until `DelTree` became C. `OncZoom` hands back
@@ -534,6 +564,16 @@ with it is less obvious:
   leaves and fails when less than half is left.
 - A static function is called, not expanded in place, also where only
   one routine uses it.
+- The compiled code has two segments, each of 64K at the most: CTEXT,
+  and CTEXT2 for the files that `port_c_second` of `CMakeLists.txt`
+  names, `keys.c` the first. When the linker says "size of segment CTEXT
+  exceeds 64k", name the new file there. A file that calls `__U4M` or
+  `__U4D` stays in CTEXT, where those are.
+- A function with a `#pragma aux` that calls another of the same file
+  does so by `push cs` and a near call, and may end by jumping into the
+  end of another: `F01_05_c` goes on in `F00_05_c`. With `modify exact
+  [ax dx]` it saves ES as well, also for the static functions it calls,
+  which do not.
 - Dividing a 16-bit number by another, or taking the remainder, needs no
   helper routine.
 - The structures of `port/vc.h` are the assembly's, but a field that the

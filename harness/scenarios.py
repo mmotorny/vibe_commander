@@ -465,6 +465,35 @@ out again (show.py --changes is how):
     with the cursor on the drive that the panel has, so from C: "Right
     Enter" is D:. Do not have the Info show D:, as Ctrl+l does next to a
     panel on D: its free bytes follow the size of the program.
+  - A:\\FREEDOS\\BIN has 44 entries: with "F9 o f" a panel shows 30 of
+    them in brief and ten in full, so Left, Right, PgUp and PgDn move
+    the list there. Seven directories made in C:\\WORK give a tree of
+    thirteen lines, two more than the half-high panel shows. PgDn in a
+    list of less than two panels moves the list to its end and the
+    cursor no further than that; the next PgDn goes to the last entry.
+  - With the right panel off, Ctrl+p or Ctrl+F2, what DOS has shown is
+    behind it, and at the start that is the end of the program's
+    banner, "ware" for the original and "are" for the port:
+    deviations.py knows the banner only where a line begins with it. Run
+    a command first, "ver": that scrolls the banner away.
+  - Ctrl+z puts the tree into the other panel and Ctrl+l the Info; each
+    pressed again brings back what the panel showed before, which is
+    the other of the two once both have been there, and never files:
+    "F9 l b", Brief in the menu of the panel, makes it one of files, in
+    C:\\. With the Info it would say how much is free on D:, which
+    depends on the size of the program: keep the Info away from D:.
+    The tree of D: has two lines and is kept in no file, so Ctrl+r in
+    it finds no file to mark and reads nothing.
+  - Ctrl+m selects again what was selected before a command went
+    through the selected files: "Ins Ins", "Ctrl+a", "Enter" is such a
+    command, and sets nothing. In the Files menu "g", "n", "i" and "s"
+    are the four commands of the selection; with the tree current they
+    are switched off.
+  - With the key bar off, Ctrl+b, a command leaves the prompt on the
+    last line of the screen, and Ctrl+b then has everything move up a
+    line. With the panels off Up and Down are the commands before and
+    after, and Home, End, Left, Right and GrayStar keys of the command
+    line.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -890,6 +919,122 @@ SCENARIOS = {
             "Down Down Ins",              # and a file
             "F8",                         # counted
             "Esc",
+        )),
+
+    "cursor": Scenario(
+        "The cursor moved through a list longer than its panel, by lines, "
+        "columns and pages, in a panel of files and in the tree",
+        steps=(
+            "F9 o f",                     # panels half the screen high
+            "Alt+F1 a",
+            "Down Down Down Enter",       # A:\\FREEDOS
+            "Down Enter",                 # and its BIN: 44 entries, in
+                                          # three columns of ten
+            "Right",                      # a column on
+            "Right",
+            "Right",                      # from the last column the list
+                                          # moves by one
+            "Right",                      # no three columns are left of
+                                          # it: the end
+            "Left",
+            "Left",
+            "Left",                       # from the first column the list
+                                          # moves back
+            "Left",                       # less than a column is left
+                                          # before it: the start
+            "Down Down Down",
+            "Left",                       # in the first column of the
+                                          # list: its first entry
+            "PgDn",                       # as far as the list can move
+            "PgDn",                       # the end
+            "PgUp",
+            "PgUp",                       # the start
+            "F9 l f",                     # Full: one column
+            "End",
+            "PgUp",                       # a panel back,
+            "PgUp PgUp PgUp",             # and to where the list begins
+            "PgUp",
+            "PgDn",
+            "PgDn PgDn PgDn PgDn",
+            "Home",
+            "Ins Ins",                    # nothing above is selected
+            "Alt+F1 c",
+            "F9 l b",                     # Brief, and the mini status
+            "F9 o n",                     # off: no time of day is shown
+            *(f'F7 "{letter}" Enter'      # seven directories more: the
+              for letter in "abcdefg"),   # tree has thirteen
+            "PgDn",                       # a list shorter than its panel
+            "PgUp",
+            "F9 l t",                     # the tree, eleven lines of it
+            "Down Down Down Down Down",
+            "Down Down Down Down Down",   # the tree moves a line up,
+            "Down",                       # and another
+            "Up Up Up Up Up Up",
+            "Up Up Up Up Up",             # and a line down
+            "PgDn",
+            "PgUp",
+            "Right",                      # not a key of the tree: it
+                                          # goes to the command line
+            "Home",
+        )),
+
+    "panel-keys": Scenario(
+        "Files selected by masks and what was selected restored; the "
+        "panels switched off and on, swapped, of another kind, and the "
+        "key bar; the keys of the panels with the panels off",
+        steps=(
+            "Down Down Down Ins Ins",     # two files selected
+            "GrayStar",                   # the selection turned round,
+            '"*.txt"',                    # for a mask
+            "Enter",
+            "GrayPlus",
+            '"*.zzz"',
+            "Enter",                      # no file like that
+            "Enter",
+            "Ins Ins",                    # two files again
+            "Ctrl+a",                     # their attributes: none is set,
+            "Enter",                      # and they are selected no more
+            "Ctrl+m",                     # but they are again
+            "F9 f i",                     # turned round, from the menu:
+            "Esc",                        # not after all
+            "Ctrl+b",                     # the key bar off
+            "Ctrl+o",                     # the panels off
+            '"ver"',
+            "Enter",                      # the prompt is on the last line
+            "Up",                         # the command before
+            "Home",                       # the cursor in the line
+            "Right",
+            "End",
+            "Left",
+            "GrayStar",                   # a character of the line
+            "Down",                       # no command after it
+            "PgDn",                       # not without the panels,
+            "Ctrl+l",                     # nor this,
+            "Ctrl+u",
+            "Ctrl+p",
+            "Ctrl+b",                     # the key bar: the prompt goes up
+            "Ctrl+o",                     # the panels, read again
+            "Ctrl+p",                     # the other panel off: the banner
+                                          # of the program has gone from
+                                          # what is behind it
+            "Tab",                        # nowhere to go
+            "Ctrl+p",                     # and on
+            "Ctrl+F2",                    # the right panel off
+            "Ctrl+F2",
+            "Ctrl+u",                     # the panels change places
+            "Ctrl+z",                     # the tree for the Info,
+            "Ctrl+l",                     # the Info for the tree,
+            "Ctrl+l",                     # the tree again, which it was
+            "Ctrl+z",                     # and the Info, which it was
+            "F9 l b",                     # the Info a panel of files
+            "Tab",
+            "Enter",                      # both in C:\\WORK
+            "Tab",                        # there is nowhere to change to
+            "Alt+F2 d",                   # the right panel on D:, whose
+            "Ctrl+z",                     # tree is kept in no file
+            "Tab",
+            "Ctrl+r",                     # so there is none to mark as
+                                          # out of date
         )),
 
     "emptied": Scenario(

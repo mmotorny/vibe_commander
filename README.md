@@ -77,7 +77,13 @@ a text. The editor is C as a whole: opening a file, the text in the
 memory with the buffer of the line that the cursor is in, the screen
 brought up to where the cursor is, as text or in hex, with its status
 line, what every key does, the search, and saving the file; only the
-viewer's code that opens the file for it is assembly. The help is C as a
+viewer's code that opens the file for it is assembly. Of the keys of the
+panels, those are C that move the cursor by lines, columns and pages,
+select files one by one and by a mask, switch the panels off and on,
+swap them, make them of another kind and read them again, and Tab;
+Enter, the keys that change the directory and those that go to the
+command before and after are still assembly, and so is the loop that
+takes a key and goes to its command. The help is C as a
 whole: reading its file, showing the index
 and the pages in their window, and taking the keys and the mouse there.
 So is the tree of directories away from its panel: reading it from the

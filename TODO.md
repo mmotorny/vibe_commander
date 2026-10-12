@@ -462,6 +462,45 @@ Things that are known and not done. Standing instructions are in
   more. What copying lists as out of reach for "a disk the user will
   not put in" could be reached the same way, a path on B: and Esc;
   nobody has tried.
+- Of the keys of the panels, `VCFUNC.INC` up to `F27_00`, these are
+  still assembly: Enter, `F21_00`, 479 bytes, which runs a file or a
+  command and ends in the part of the program that stays in the memory,
+  with `F21_40`, 110 bytes, which saves a panel for that; and `F22_00`
+  to `F27_00`, some 400 bytes, the keys that change the directory and
+  those that go to the command before and after. The last stand in
+  one stretch of code with what follows them up to the procedure
+  `F42_10`, 681 bytes, of which `F80_00` on is C and listed under that
+  label. `harness/reach.py` and `harness/ported.py` name code from a
+  label to the next procedure, so `F22_00` names all of it: a batch
+  that lists these keys has the instructions from `F80_00` on in its
+  count as well. The loop that
+  takes a key, `Func01` to `Func62` in `VC.ASM`, is assembly too, and
+  the commands that are C return to it through a table of its labels.
+- What the keys of the panels do for the mouse has run in no scenario:
+  26 instructions of `F00_60`, which select the files that the mouse
+  passes over with its right button held, and the three places where the
+  mouse comes in, `F00_05`, `F01_05` and `F00_60` with buttons. They are
+  translated by reading. So is what Tab does when DOS will not go to
+  the directory of the other panel, or has not told the current one,
+  18 instructions of `F20_02`: whatever removes or renames a directory
+  has both panels read again, and the drives of the bench are ready.
+- What the keys of the panels do in the original, and in the port after
+  it; whether to mend any of it is not decided:
+  - Ctrl+R in a tree panel reads nothing if the disk has no tree file,
+    as a disk with fewer than five directories has none: `DelTr0` cannot
+    open the file to mark it, and the command takes that for a failure.
+    `panel-keys` has it, on D:.
+  - PgDn does not go a panel further in a list of less than two panels:
+    it moves the list as far as that goes and leaves the cursor, unless
+    it would be above the list. Thirteen directories in a tree of eleven
+    lines: from the second to the third, and only then to the last.
+  - Unselecting by a mask unselects directories too, which selecting and
+    turning the selection round leave alone.
+  - Ins tells the BIOS that the Ins key is up again, by clearing the
+    bit in its byte of keys held down, when the cursor goes down a
+    line.
+  - Once a panel has shown both the tree and the Info, Ctrl+L and
+    Ctrl+Z go from one to the other there and never back to the files.
 - What `F38_70` does when DOS says that a drive is not ready, or will
   not go back to the directory it came from, what `M30_50` does
   when DOS refuses the attributes of a file that it has just listed,
@@ -896,6 +935,53 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     script; its C file called `Dialog` by the entry that is gone, in
     seven places, and had `struct Box` too. The third was clean. A build
     and a test each time, 78, 142 and 75 seconds.
+
+- The keys of the panels, 29 commands and routines, 1,543 bytes, next
+  to seven other batches. The translation passed the first time it was
+  tested, and nothing in the harness had to be waited for:
+  - 3 minutes: finding out what the tools take for code between
+    procedures. A label names it as far as the next procedure, so
+    `F22_00` to `F27_00` cannot be listed without `F80_00` to `F32_57`,
+    which another batch has; they were left. In `CLAUDE.md` now.
+  - 2 minutes: the golden of `panel-keys` derived four times, 12 to 17
+    seconds each. With the right panel off the end of the program's
+    banner shows, which the original and the port have differently:
+    found by `harness/compare.py` on the port before anything was
+    translated, 20 seconds. Then a step for the one instruction left,
+    and one for the function that only the menu calls. At the top of
+    `harness/scenarios.py` now.
+  - What saved time: the scenarios were tried on the port's build that
+    signals, six seconds for twenty steps, by a script of ten lines
+    around `scenarios.run` and `show.print_screens`, and held against
+    their goldens with `harness/compare.py` before the translation and
+    after it, 20 seconds; the full `port` test ran once before the
+    rebase, 193 seconds next to the others.
+  - 3 minutes for the rebase, behind what Copy and Rename ask first: one
+    file in conflict, the notes at the top of `harness/scenarios.py`,
+    where both had added to the end of the list. Two entries were there
+    twice without a conflict: `SetPth`, which the other batch had made
+    next to the routine and with an answer, and the call of DOS that
+    makes a drive current, `SelDrv_a` there and `SelDsk_a` here, the
+    same instructions. Those of this batch went.
+  - 7 minutes: the `port` test after the rebase, 356 seconds with a
+    load of 13 on two processors, failed in `copy-full`, which is not
+    of this batch: after step 52, '"c9" Enter', the ninth copy of 3 MB,
+    the program had not come to wait for a key within the 20 seconds a
+    step had then. The 56 scenarios before it were as the original, and
+    `copy-full` by itself, on the same build a minute later, was too,
+    in 55 seconds. The batch waited, committed, for fifty minutes, as
+    its instructions said for a test that comes out different from one
+    run to the next.
+  - 7 minutes for the second rebase, behind eight commits, with the
+    machine quiet: three files in conflict, `README.md`, this one and
+    the notes at the top of `harness/scenarios.py`. `ClsLine`, `PutPrm`
+    and `PutMnu` had become C, with a segment and a panel for
+    arguments, and `Cursor1` had an entry next to the routine: the
+    entries of this batch for them went. Then the program did not
+    link, "size of segment CTEXT exceeds 64k by 1279 bytes": the
+    compiled code had outgrown its one segment. A C file can be put
+    into a second one now, a commit of its own, and `keys.c` is. The
+    test took 182 seconds and passed.
 
 - Copying, renaming and moving, 9 routines, 3,018 bytes, 100 minutes in
   all, next to three other batches at a time, seven of which got onto
