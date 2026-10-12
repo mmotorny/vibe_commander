@@ -6,7 +6,34 @@
 
 	OPTION	OLDSTRUCTS		; Structure fields are global names
 	OPTION	NOSCOPED		; Labels inside procedures are global
+
+;-------------- The two parts of the program -----------
+; The program is in two parts. One stays in the memory while a command
+; runs: it begins with the PSP, and is made of the four segments here,
+; in this order. RHEAD is what of it is still assembly, RTEXT its
+; compiled code, RDATA its data, which ends with the stack, and RGAP the
+; paragraph in which DOS keeps the header of the block of memory that
+; follows. The other part, which goes while a command runs, begins behind
+; them, at TrnBeg, and is all that follows. It begins with CONST, the
+; texts, and not with code: the machine of the tests is many times slower
+; at every write to a page of the memory that has code which it has run,
+; and the stack ends just in front. The segments are declared before the
+; model so that the linker puts them first, and they are of one group
+; with the rest of the assembly, so that every offset here counts from
+; the PSP.
+RHEAD	SEGMENT	PARA PUBLIC 'RHEAD'
+RHEAD	ENDS
+RTEXT	SEGMENT	BYTE PUBLIC 'RCODE'
+RTEXT	ENDS
+RDATA	SEGMENT	WORD PUBLIC 'RDATA'
+RDATA	ENDS
+RGAP	SEGMENT	PARA PUBLIC 'RGAP'
+RGAP	ENDS
+CONST	SEGMENT	WORD PUBLIC 'CONST'
+TrnBeg	LABEL	BYTE
+CONST	ENDS
 	.MODEL	Tiny
+DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 
 ;------------------- Routines written in C -------------
 ; They are compiled into a code segment of their own, which follows this
@@ -166,23 +193,30 @@ MainC	MACRO	Entry
 	JMP	MainGo
 	ENDM
 
-	.CODE
+RHEAD	SEGMENT
 	PUBLIC	_md
 _md	LABEL	BYTE			; The main data segment, to C code:
 					; whatever is at offset 0 of DS
-Zero:	.STARTUP
-	JMP	Alloc0
+	ORG	100h			; Behind the PSP
+Start:	JMP	Alloc0
 
 ;-------------- Layout of the linked program -----------
 ; This block is expected at 103h by tools/mkexe.c, which fills in the
-; first three words and reads the rest.
+; first three words. Of the last three it reads the offsets that the
+; linker has put there, and writes them back in paragraphs.
 ImgEnd	DW	0			; End of the program, paragraphs from PSP
 RelTab	DW	0			; Relocation table, paragraphs from PSP
 RelCnt	DW	0			; Number of relocations
-	DW	OFFSET Init00		; Start of the transit part
+TrnPrW	DW	OFFSET TrnBeg		; Transit part, paragraphs from PSP
+ResPrW	DW	OFFSET LastDat		; Size of the resident part
+DatPrW	DW	OFFSET IntTab		; Its data, paragraphs from PSP
+RHEAD	ENDS
 
-TrnPar	EQU	<((Init00-Zero) SHR 4)>	; Transit part, paragraphs from PSP
-ResPar	EQU	<(((LastDat-Zero-1) SHR 4)+1)>	; Size of the resident part
+; Neither is known before the program is linked, since compiled code
+; stands between the PSP and TrnBeg: they are read where SS is on the
+; resident part, which is everywhere but in the interrupt handlers.
+TrnPar	EQU	<WORD PTR SS:TrnPrW>
+ResPar	EQU	<WORD PTR SS:ResPrW>
 
 ; Move DX paragraphs from segment BX to segment BP, which may overlap it
 ; from above. Uses no stack. Changes AX, CX, DX, SI, DI, DS and ES.
@@ -526,6 +560,7 @@ DskBuf	DB	MinFls * SIZE FilEnt DUP(?)
 WCBdef	ENDS
 
 ;------------------- Begin of program ------------------
+RHEAD	SEGMENT
 RunPar	DW	0
 ChkFile	DW	0
 Command	DB	'COMMAND.COM', 0
@@ -1213,9 +1248,163 @@ Relea5:	CALL	SetStat
 	RETF
 Release	ENDP
 
-LastRes:
+;---------------------- The entry ----------------------
+; DOS has loaded the file as it is laid out: the transit part lies where
+; it will run, behind the resident part and the paragraph of RGAP, and
+; the stack is the resident part's from the start, by the header of the
+; file (see tools/mkexe.c). A second copy, loaded to bring the transit
+; part back after a command, moves it into the memory of the first.
+; The check sum is that of the program but for the data of the resident
+; part: the stack is there, and in use.
+Alloc0:	CLD
+	XOR	BX,BX			; Check sum of the whole program
+	MOV	BP,DS
+	ADD	BP,10h
+	MOV	DX,SS:DatPrW
+	SUB	DX,10h
+	CALL	Alloc1
+	MOV	BP,ES
+	ADD	BP,TrnPar
+	MOV	DX,ES:ImgEnd
+	SUB	DX,TrnPar
+	CALL	Alloc1
+	PUSH	ES
+	POP	DS
+	JMP	AllocB
+Alloc1:	MOV	AH,0			; DX paragraphs from BP on
+AllocC:	MOV	DS,BP
+	XOR	SI,SI
+	MOV	CX,16
+AllocA:	LODSB
+	ADD	BX,AX
+	LOOP	AllocA
+	INC	BP
+	DEC	DX
+	JNZ	AllocC
+	RET
+AllocB:
+	MOV	SI,80h
+	MOV	DI,OFFSET OvlPrm
+	MOV	CL,DS:[DI]
+	DEC	CX
+	REPE	CMPSB
+	JNE	Alloc3
+	LODSW
+	CMP	BYTE PTR DS:[SI],0Dh
+	JNE	Alloc3
+	MOV	ES,AX
+	XCHG	BX,ES:ComnIni.LoadSiz
+	MOV	BP,ES:RunPar
+	ADD	BP,TrnPar
+	MOV	DX,BX
+	SUB	DX,TrnPar
+	PUSH	BX
+	MOV	BX,DS
+	ADD	BX,TrnPar
+	MovPars
+	POP	BX
+	MOV	AX,4C00h
+	SUB	BX,CS:ImgEnd
+	JE	Alloc2
+	INC	AX
+Alloc2:	INT	21h
+Alloc3:	MOV	DS:ChkFile,BX
+	MOV	AH,30h			; Check DOS version
+	INT	21h
+	CMP	AL,3
+	JB	Alloc4
+	XCHG	AL,AH
+	CMP	AX,314h
+	JAE	Alloc5
+	MOV	SI,OFFSET Vers_S
+	PUSH	CS
+	CALL	OutStr0
+	MOV	AX,4C02h
+	INT	21h
+Alloc4:	INT	20h
+Alloc5:	MOV	BX,ResPar		; Allocate segments
+	MOV	DX,DS:ImgEnd
+	SUB	DX,TrnPar
+	ADD	BX,DX
+	INC	BX
+	MOV	AH,4Ah
+	INT	21h
+	JNC	Alloc6
+	MOV	BX,DX			; Allocate transit block
+	MOV	AH,48h
+	INT	21h
+	JC	Alloc9
+	MOV	BP,AX
+	MOV	BX,DS
+	ADD	BX,TrnPar
+	MovPars
+	CLI
+	PUSH	CS
+	POP	SS
+	MOV	SP,OFFSET VcStack
+	STI
+	PUSH	CS
+	POP	DS
+	PUSH	CS			; Compress resident block
+	POP	ES
+	MOV	BX,ResPar
+	MOV	AH,4Ah
+	INT	21h
+	MOV	ES,BP
+	JMP	Alloc7
+Alloc6:	MOV	BP,DS
+	ADD	BP,ResPar
+	INC	BP
+	MOV	BX,DS
+	ADD	BX,TrnPar
+	CLI
+	PUSH	CS
+	POP	SS
+	MOV	SP,OFFSET VcStack
+	MovPars
+	MOV	ES,BP
+	MOV	BX,ResPar
+
+;-------- Split into resident and transit parts --------
+	MOV	AX,ES
+	DEC	AX
+	PUSH	AX
+	MOV	AX,CS
+	DEC	AX
+	MOV	DS,AX
+	MOV	AL,'M'
+	XCHG	AL,DS:[0]
+	XCHG	BX,DS:[3]
+	SUB	BX,DS:[3]
+	DEC	BX
+	POP	DS
+	MOV	DS:[0],AL
+	MOV	DS:[1],CS
+	MOV	DS:[3],BX
+	STI
+	PUSH	CS
+	POP	DS
+Alloc7:	XOR	BP,BP
+	MOV	AX,ES
+	SUB	AX,TrnPar
+	MOV	DS:RunPar,AX
+	PUSH	AX
+	CALL	SetStat
+	MOV	AX,OFFSET Init00
+	PUSH	AX
+	RETF
+
+Alloc9:	MOV	SI,OFFSET Aloc_S	; Error
+	PUSH	CS
+	CALL	OutStr0
+	CALL	SetStat
+	MOV	AX,4C01h
+	INT	21h
+
+RHEAD	ENDS
 
 ;--------------------- Release data --------------------
+RDATA	SEGMENT
 IntTab	DD	256	DUP(?)
 SavePtr	DD	?
 Vect21	DD	?
@@ -1233,6 +1422,11 @@ ComnIni	DB	CmnSave			DUP(?)	; Common data
 DataSav	DB	LenStk		DUP(?)	; Local stack
 VcStack:
 LastDat:
+RDATA	ENDS
+
+RGAP	SEGMENT
+	DB	16	DUP(?)		; The header of the transit part's block
+RGAP	ENDS
 
 ;-------------------------- Data -----------------------
 	.CONST
@@ -1449,142 +1643,6 @@ FncTab	DW	4800h, F00_00		; Up
 
 ;--------------------- Main module ---------------------
 	.CODE
-	ORG	LastRes
-
-Alloc0:	CLD
-	MOV	BP,DS			; Check sum of the whole program
-	ADD	BP,10h
-	MOV	DX,DS:ImgEnd
-	SUB	DX,10h
-	XOR	BX,BX
-	MOV	AH,0
-Alloc1:	MOV	DS,BP
-	XOR	SI,SI
-	MOV	CX,16
-AllocA:	LODSB
-	ADD	BX,AX
-	LOOP	AllocA
-	INC	BP
-	DEC	DX
-	JNZ	Alloc1
-	PUSH	ES
-	POP	DS
-	MOV	SI,80h
-	MOV	DI,OFFSET OvlPrm
-	MOV	CL,DS:[DI]
-	DEC	CX
-	REPE	CMPSB
-	JNE	Alloc3
-	LODSW
-	CMP	BYTE PTR DS:[SI],0Dh
-	JNE	Alloc3
-	MOV	ES,AX
-	XCHG	BX,ES:ComnIni.LoadSiz
-	MOV	BP,ES:RunPar
-	ADD	BP,TrnPar
-	MOV	DX,BX
-	SUB	DX,TrnPar
-	PUSH	BX
-	MOV	BX,DS
-	ADD	BX,TrnPar
-	MovPars
-	POP	BX
-	MOV	AX,4C00h
-	SUB	BX,CS:ImgEnd
-	JE	Alloc2
-	INC	AX
-Alloc2:	INT	21h
-Alloc3:	MOV	DS:ChkFile,BX
-	MOV	AH,30h			; Check DOS version
-	INT	21h
-	CMP	AL,3
-	JB	Alloc4
-	XCHG	AL,AH
-	CMP	AX,314h
-	JAE	Alloc5
-	MOV	SI,OFFSET Vers_S
-	PUSH	CS
-	CALL	OutStr0
-	MOV	AX,4C02h
-	INT	21h
-Alloc4:	INT	20h
-Alloc5:	MOV	BX,ResPar		; Allocate segments
-	MOV	DX,DS:ImgEnd
-	SUB	DX,TrnPar
-	ADD	BX,DX
-	INC	BX
-	MOV	AH,4Ah
-	INT	21h
-	JNC	Alloc6
-	MOV	BX,DX			; Allocate transit block
-	MOV	AH,48h
-	INT	21h
-	JC	Alloc9
-	MOV	BP,AX
-	MOV	BX,DS
-	ADD	BX,TrnPar
-	MovPars
-	CLI
-	PUSH	CS
-	POP	SS
-	MOV	SP,OFFSET VcStack
-	STI
-	PUSH	CS
-	POP	DS
-	PUSH	CS			; Compress resident block
-	POP	ES
-	MOV	BX,ResPar
-	MOV	AH,4Ah
-	INT	21h
-	MOV	ES,BP
-	JMP	Alloc7
-Alloc6:	MOV	BP,DS
-	ADD	BP,ResPar+1
-	MOV	BX,DS
-	ADD	BX,TrnPar
-	CLI
-	PUSH	CS
-	POP	SS
-	MOV	SP,OFFSET VcStack
-	MovPars
-	MOV	ES,BP
-	MOV	BX,ResPar
-
-;-------- Split into resident and transit parts --------
-	MOV	AX,ES
-	DEC	AX
-	PUSH	AX
-	MOV	AX,CS
-	DEC	AX
-	MOV	DS,AX
-	MOV	AL,'M'
-	XCHG	AL,DS:[0]
-	XCHG	BX,DS:[3]
-	SUB	BX,DS:[3]
-	DEC	BX
-	POP	DS
-	MOV	DS:[0],AL
-	MOV	DS:[1],CS
-	MOV	DS:[3],BX
-	STI
-	PUSH	CS
-	POP	DS
-Alloc7:	XOR	BP,BP
-	MOV	AX,ES
-	SUB	AX,TrnPar
-	MOV	DS:RunPar,AX
-	PUSH	AX
-	CALL	SetStat
-	MOV	AX,OFFSET Init00
-	PUSH	AX
-	RETF
-
-Alloc9:	MOV	SI,OFFSET Aloc_S	; Error
-	PUSH	CS
-	CALL	OutStr0
-	CALL	SetStat
-	MOV	AX,4C01h
-	INT	21h
 
 ;------------------ Read configuration -----------------
 Init00:	CALL	Reloc
@@ -2670,5 +2728,5 @@ U4D4:	DEC	BP
 __U4D	ENDP
 CTEXT	ENDS
 
-	END
+	END	Start
 

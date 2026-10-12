@@ -86,8 +86,9 @@ Things that are known and not done. Standing instructions are in
   comparison in every scenario (see `harness/deviations.py`). So nothing
   checks the number itself: that the port has less by what it is larger,
   at least. The same goes for what `mem` says in the scenario `command`,
-  416K free under the original and 412K under the port, whose part that
-  stays is 3,840 bytes longer by its stack. With those numbers left out,
+  416K free under the original and some 4K less under the port, whose
+  part that stays is 4,304 bytes longer, 3,840 of them its stack. With
+  those numbers left out,
   no scenario shows any more that the program gives up its memory while
   a command runs: a check of its own would hold the port's figure
   against the original's less what the link map says the part has grown

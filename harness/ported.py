@@ -17,9 +17,9 @@ below, this also checks that
 Compiled code uses more of the stack than the assembly it replaces, so
 the port has a stack many times as long as the original's 256 bytes:
 LenStk in port/asm/VC.ASM. When the program has been loaded its stack
-holds a piece of its file, which the program moves elsewhere as it starts;
-how much of that is still there, from the bottom up, is looked at every
-time a step ends with the program waiting for a key (see driver.py). A
+holds what its file has there, which is nothing, zeros; how much of that
+is still there, from the bottom up, is looked at every time a step ends
+with the program waiting for a key (see driver.py). A
 stack used beyond its bottom overwrites what the program
 saves of its panels and its setup while a command runs, and no screen
 would show that. How long the stack is, is taken from the link map, so

@@ -77,7 +77,7 @@ Dos2523_a ENDP
 	PUBLIC	MemRun_a, ResSeg_a, Release_a
 MemRun_a PROC	FAR
 	MOV	AX,SS:RunPar
-	ADD	AX,WORD PTR ((Init00-Zero) SHR 4)
+	ADD	AX,TrnPar
 	RET
 MemRun_a ENDP
 

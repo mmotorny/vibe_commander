@@ -254,12 +254,26 @@ entries by which C code calls DOS in `VCCOPY.INC`, `VCF1.INC` and
 
 The halves are linked into one program, `VC.EXE`, which is not built the
 way a C program usually is. It still loads and starts like the `.COM` file
-it was, keeps its data where the assembly put it, and moves and reloads
+it was, keeps its data where the assembly put it, and gives up and reloads
 most of itself at run time, compiled code included. `port/vc.h` describes
 what that asks of the C code, and `tools/mkexe.c` how the file is made.
 The code that starts the program and reloads it after a command had to
 change for this: it now measures in paragraphs and relocates what it has
 loaded.
+
+The file is the program as it lies in the memory. First comes the part
+that stays there while a command runs: what is left of its assembly, room
+for its compiled code, of which there is none yet, and its data with the
+stack at the end, which are nothing but room in the file. Then, a
+paragraph further on, the part that goes while a command runs. The
+original has that part where the data of the first will be and moves it
+up as it starts, over itself; the port is loaded with it in place, on its
+own stack from the first instruction, and has only to make a block of
+memory of it. That costs 6,384 bytes of the file, and it is what lets
+compiled code stand in the first part at all: the assembler cannot lay
+data over code that the compiler has yet to make. It also leaves the
+code that starts the program in the memory, 464 bytes of it, where the
+original lays its data over that code.
 
 Every step is checked by the `port` test below, and nothing else decides
 whether a translation is right. The routines translated so far are listed
@@ -277,7 +291,7 @@ stack than the assembly it replaces, and a stack used beyond its bottom
 would overwrite data without a trace on the screen, so the port has 4,096
 bytes, of which the scenarios use some 200. The stack is the end of the
 part of the program that stays in memory while a command runs: that part
-is 16,544 bytes where it was 12,704, and a command has 3,840 bytes less
+is 17,008 bytes where it was 12,704, and a command has 4,304 bytes less
 than the original leaves it.
 
 ## Testing
@@ -380,7 +394,9 @@ memory more than it needs, so that the original's stack ends where a page
 of the machine's memory ends. QEMU has to look at every write to a page
 with code in it that it has run, and the program has its code right
 behind its stack: a push is many times slower there than elsewhere, which
-is a third of the time of a scenario with dialogs or more.
+is a third of the time of a scenario with dialogs or more. The port has
+its texts behind its stack, more than a page of them, and does not
+depend on where it is loaded.
 `python3 harness/place.py` says where the stacks of the original and of
 the port end on each bench.
 

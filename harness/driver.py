@@ -153,15 +153,18 @@ class Facts:
     stack: int = 0                # where the stack begins in its segment
     stack_size: int = 0           # how long it is; 0 for not looking
     # What the stack holds when the program has been loaded: the bytes of
-    # the program's file that are loaded there, which the program moves
-    # elsewhere as it starts and leaves behind.
+    # the program's file that are loaded there. The original has code
+    # there, which it moves elsewhere as it starts and leaves behind; the
+    # port has zeros.
     stack_loaded: bytes = b""
 
 
 def facts(program, stack=False):
     """The Facts of `program`, a setups.Program, from the name of its
     file and from the listing of its assembly. With `stack`, where its
-    stack is too."""
+    stack is too: of the port, whose assembly is in several segments
+    with compiled code between them, by the linker's map, which the
+    build writes next to the listing."""
     code = program.contents
     name = Path(program.filename).stem.upper().encode("ascii")
     if not program.listing or not Path(program.listing).exists():
@@ -177,8 +180,14 @@ def facts(program, stack=False):
                   symbol(r"^ *AutoTim [ .]*([0-9A-F]+) +DWord"),
                   symbol(r"^ *Clock [ .]*([0-9A-F]+) +Byte"))
     if stack:
-        bottom = symbol(r"^DataSav [ .]*Byte\[\d+\] +([0-9A-F]+)h")
-        top = symbol(r"^VcStack [ .]*L Near +([0-9A-F]+)h")
+        linked = Path(program.listing).with_suffix(".MAP")
+        if code[:2] == b"MZ" and linked.exists():
+            text = linked.read_text()
+            bottom = symbol(r"^0000:([0-9a-f]{4})[*+]? +DataSav$")
+            top = symbol(r"^0000:([0-9a-f]{4})[*+]? +VcStack$")
+        else:
+            bottom = symbol(r"^DataSav [ .]*Byte\[\d+\] +([0-9A-F]+)h")
+            top = symbol(r"^VcStack [ .]*L Near +([0-9A-F]+)h")
         at = bottom - COM_ORIGIN + (EXE_HEADER if code[:2] == b"MZ" else 0)
         found = replace(found, stack=bottom, stack_size=top - bottom,
                         stack_loaded=code[at:at + top - bottom])

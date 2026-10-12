@@ -9,6 +9,16 @@
  *
  *   - The program is loaded at PSP:100h and entered there, like a .COM
  *     file, by giving the header a code segment of -10h.
+ *   - Its stack is its own from the first instruction: the header names
+ *     the PSP for the stack segment too, and the end of the part of the
+ *     program that stays in the memory while a command runs, which is
+ *     where that part has its stack.
+ *   - The file is the program as it lies in the memory: that part first,
+ *     behind the PSP, with its data and its stack, which are nothing but
+ *     room, then a paragraph for the header that DOS keeps in front of a
+ *     block of memory, then the part that goes while a command runs. So
+ *     that part is loaded where it runs, and the program has only to make
+ *     a block of it.
  *   - DOS relocates nothing. A program that moves itself has to do that on
  *     its own, so the linker's relocation table is appended to the program,
  *     which applies it to every copy of itself that it loads (Reloc in
@@ -43,16 +53,21 @@
 enum {
     PSP_SIZE    = 0x100,
     HEADER_SIZE = 0x20,         /* of the output file */
-    STACK_SIZE  = 0x200,        /* until the program sets up its own */
     CODE_END    = 0xF000,       /* where compiled code ends, at the most */
 
-    /* The block at 103h. The first three words are written here. */
+    /* The block at 103h. The first three words are written here; the
+       last three come as offsets from the PSP, which the linker knows,
+       and are written back in paragraphs. */
     INFO        = 0x103,
     IMAGE_END   = INFO + 0,     /* end of the program, paragraphs from PSP */
     TABLE       = INFO + 2,     /* relocation table, paragraphs from PSP */
     COUNT       = INFO + 4,     /* number of relocations */
-    TRANSIT     = INFO + 6,     /* in: where the part that moves begins */
-    INFO_END    = INFO + 8,
+    TRANSIT     = INFO + 6,     /* where the part that goes begins */
+    RESIDENT    = INFO + 8,     /* where the part that stays ends, which is
+                                   the top of its stack */
+    DATA        = INFO + 10,    /* where the part that stays has its data,
+                                   which the file has as nothing */
+    INFO_END    = INFO + 12,
 
     /* Records of an object file (OMF). */
     LNAMES      = 0x96,         /* a list of names */
@@ -180,7 +195,7 @@ int main(int argc, char **argv)
     FILE *f;
     unsigned char *in, *image, header[HEADER_SIZE] = {0};
     long in_size, image_size, table_at, total, i;
-    unsigned relocations, header_size;
+    unsigned relocations, header_size, transit, resident, data;
     const unsigned char *entry;
 
     if (argc < 4)
@@ -219,13 +234,28 @@ int main(int argc, char **argv)
         if (image[i])
             fail("the program has contents below 100h");
 
+    /* The part that goes begins on a paragraph, one paragraph behind the
+       end of the part that stays: that one is for the header of its block
+       of memory. */
+    transit = get16(image + TRANSIT);
+    resident = get16(image + RESIDENT);
+    data = get16(image + DATA);
+    if (transit % 16 || transit / 16 != (resident + 15) / 16 + 1)
+        fail("the transit part does not begin a paragraph behind the "
+             "resident part");
+    /* The program takes its check sum of all but that data, which is in
+       use by then, the stack in it: it has to be nothing in the file. */
+    for (i = data; i < transit; i++)
+        if (image[i])
+            fail("the data of the resident part has contents");
+
     /* Only the part of the program that moves is relocated, at its new
        place; nothing below it may need relocating. */
     for (i = 0; i < relocations; i++) {
         unsigned offset = get16(entry + i * 4);
         unsigned segment = get16(entry + i * 4 + 2);
         long address = segment * 16L + offset;
-        if (address < get16(image + TRANSIT) || address + 2 > image_size)
+        if (address < transit || address + 2 > image_size)
             fail("a relocation lies outside the transit part");
         put16(image + table_at + i * 4, offset);
         put16(image + table_at + i * 4 + 2, segment);
@@ -233,19 +263,24 @@ int main(int argc, char **argv)
     put16(image + IMAGE_END, total / 16);
     put16(image + TABLE, table_at / 16);
     put16(image + COUNT, relocations);
+    put16(image + TRANSIT, transit / 16);
+    put16(image + RESIDENT, (resident + 15) / 16);
+    put16(image + DATA, (data + 15) / 16);
 
     /* DOS loads the file's contents 10h paragraphs above the PSP and adds
        that segment to the header's CS and SS. With CS = -10h and IP = 100h
-       the program starts at PSP:100h; the stack goes just above it. */
+       the program starts at PSP:100h, and with SS = -10h its stack is in
+       the same segment: it ends where the resident part does. The file
+       holds all the memory that the program needs to start. */
     total -= PSP_SIZE;
     put16(header + 0x00, 0x5A4D);
     put16(header + 0x02, (HEADER_SIZE + total) % 512);
     put16(header + 0x04, (HEADER_SIZE + total + 511) / 512);
     put16(header + 0x08, HEADER_SIZE / 16);
-    put16(header + 0x0A, STACK_SIZE / 16);              /* minimum memory */
+    put16(header + 0x0A, 0);                            /* minimum memory */
     put16(header + 0x0C, 0xFFFF);                       /* maximum memory */
-    put16(header + 0x0E, total / 16);                   /* SS */
-    put16(header + 0x10, STACK_SIZE);                   /* SP */
+    put16(header + 0x0E, 0x10000UL - PSP_SIZE / 16);    /* SS */
+    put16(header + 0x10, resident);                     /* SP */
     put16(header + 0x14, PSP_SIZE);                     /* IP */
     put16(header + 0x16, 0x10000UL - PSP_SIZE / 16);    /* CS */
     put16(header + 0x18, 0x1C);

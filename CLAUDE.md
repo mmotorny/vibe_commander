@@ -313,9 +313,9 @@ port.
   main data and on the program's own stack, as C code does. And the
   driver reads `AutoTim` and `Clock` in the main data, which
   `harness/driver.py` finds in the listing of the assembly,
-  `build/port/VC.LST`, with the stack, `DataSav` and `VcStack`: when
-  those four are no longer assembly, `harness/driver.py` has to be shown
-  where they are.
+  `build/port/VC.LST`, and the stack, `DataSav` and `VcStack`, which it
+  finds in the linker's map next to it: when those four are no longer
+  assembly, `harness/driver.py` has to be shown where they are.
 - What a routine reads in the assembly's code segment may be read by
   another file too, and then stays, `PUBLIC`, when the routine goes: the
   menu finds the menu that the mouse is on by `PtMnu_S`, the names that
@@ -593,6 +593,27 @@ port.
   routines that `CallPSP` calls. The assembly reaches that part through
   SS; C code gets its segment from an entry, `ResSeg_a` in `VCMEM.INC`,
   and the offset of an object there like any other of the assembly.
+- The part that stays is four segments of the assembly's one group,
+  declared at the top of `port/asm/VC.ASM` before `.MODEL`, so that the
+  linker puts them first and in that order: `RHEAD`, what is assembly
+  of it, behind the PSP; `RTEXT`, its compiled code; `RDATA`, its data
+  with the stack at the end; `RGAP`, the paragraph of the header of the
+  next block of memory. The part that goes begins behind them, at
+  `TrnBeg`, on a paragraph, and `tools/mkexe.c` stops the build if it
+  does not. It begins with `CONST`, the texts, 5,088 bytes of them: QEMU
+  is many times slower at a write to a page that has code which it has
+  run, the stack ends just in front, and with `_TEXT` there, whose
+  stubs of the main loop run at every key, a scenario of the cursor's
+  keys took 19.7 seconds where it takes 5.6. When the texts have gone
+  to C and `CONST` is shorter than a page, something else that is not
+  run has to stand there. Every offset of the assembly still counts
+  from the PSP. Where the two parts begin and end is not known to the
+  assembler any more, with compiled code between them: `TrnPar` and
+  `ResPar` are words of the part that stays, which `tools/mkexe.c`
+  fills in, read through SS, and they cannot be added to a constant
+  where the program is assembled.
+- A label of one segment less a label of another is no number to the
+  assembler, also within one group: "Constant expected".
 - A command that is C whole and ends at `Func04` is a stub of two
   lines: `CallC` and the jump. See `F65_00`.
 - A label that gets a stub takes what the stub takes, and whatever
