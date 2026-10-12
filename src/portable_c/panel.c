@@ -22,13 +22,7 @@ void PutFls(u16 panel);
 void SetCur(u16 panel, u16 set);
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);
 
-/* How the assembly passes arguments to these, and what it expects back;
-   PtPt10 is in vc.h. */
-#pragma aux Panel   "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutPath "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux SetCur  "*_c" __far parm [dx] [ax] modify exact [ax]
-#pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
+/* PtPt10 is in vc.h. */
 
 /* The titles of the columns, in brief and in full. */
 static const u8 CODE Brief_S[] = {

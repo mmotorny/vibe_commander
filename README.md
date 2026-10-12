@@ -550,9 +550,13 @@ the compiler gives it. So far that holds for the routines that the rest
 of the program rests on: the screen buffer, numbers and texts, the
 lists of files, the places of the panels, boxes and windows, the mouse,
 the keys and the line that is typed into, the bars, the extension
-files, the setup file, and the calls of DOS and the BIOS, 136 functions
-of 330. The functions of `src/portable_c/dos.c` keep a `#pragma aux`
-for their names alone, since that file is compiled twice.
+files, the setup file, and the calls of DOS and the BIOS; and for what
+is drawn and asked at the panels: a panel of files, the tree and the
+Info, the tree in its box, the box of the drives, the help, the menu
+bar, the dialogs, the command line, the user menu and the map of the
+memory. Those are 169 functions of 330. The functions of
+`src/portable_c/dos.c` keep a `#pragma aux` for their names alone, since
+that file is compiled twice.
 
 ## Testing
 

@@ -127,10 +127,6 @@ void PutFls(u16 panel);
 void PutTre(u16 panel);                                 /* tree.c */
 u16 StrLen(const u8 __far *text);                       /* string.c */
 const u8 __far *FndLet(const u8 __far *text);
-#pragma aux Panel   "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutPath "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
 
 /* What the assembly has that this reads or names: the scan codes of Alt
    with a digit or a letter, which begin the speed search; the routine

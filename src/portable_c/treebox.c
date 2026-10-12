@@ -23,11 +23,9 @@
 u16 ReadTre(void);
 u16 ChTree(u16 column);
 
-/* How ReDir of read.c calls ReadTre, and the tree in its box and Copy
-   and Rename ChTree: both save every register, as the routines did, and
-   return what those answered in the carry flag. */
-#pragma aux ReadTre "*_c" __far value [ax] modify exact [ax]
-#pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
+/* ReDir of read.c calls ReadTre, and the tree in its box and Copy and
+   Rename call ChTree: both return what the routines answered in the
+   carry flag. */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -58,8 +56,6 @@ u16 ChTree(u16 column);
 void FilZero(u8 __far *text, u16 length);               /* string.c */
 void TreeCur(void);                                     /* tree.c */
 void TrCr20(u16 lines);
-#pragma aux TreeCur "*_c" __far modify exact [ax]
-#pragma aux TrCr20  "*_c" __far parm [ax] modify exact [ax]
 
 /* The tables of the tree, in src/c/treebox_t.c: the name of the tree
    file, which DelTr0 has too, and the boxes that are shown while the

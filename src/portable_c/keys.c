@@ -44,10 +44,6 @@ void PutFls(u16 panel);
 void SetCur(u16 panel, u16 set);
 void PutTre(u16 panel);                                 /* tree.c */
 u16 StrLen(const u8 __far *text);                       /* string.c */
-#pragma aux PutPath "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux SetCur  "*_c" __far parm [dx] [ax] modify exact [ax]
-#pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

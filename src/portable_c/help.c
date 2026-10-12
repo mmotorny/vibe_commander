@@ -60,10 +60,9 @@ LAID_OUT(HlpData, LenHelp);
 
 void Help00(void);
 
-/* This is Help. It saves every register, as the routine did; its name is
-   from when the assembly called it, and the assembler took Help_c for
+/* This is Help. Its name is from when the assembly called it, under the
+   name that the linker had for it then: the assembler took Help_c for
    Help_C, the number of a colour. */
-#pragma aux Help00 "*_c" __far modify exact [ax]
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

@@ -40,8 +40,6 @@
 u16 TstExe(const u8 __far *name);                       /* files.c */
 void TrCr10(void);                                      /* tree.c */
 u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
-#pragma aux TrCr10 "*_c" __far modify exact [ax]
-#pragma aux Run_00 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 
 /* The dialog that asks whether to quit, and the name of the program for
    it: constants of src/c/keys_t.c. And where the part of the

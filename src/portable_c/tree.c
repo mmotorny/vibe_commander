@@ -25,12 +25,7 @@ void TreeCur(void);
 void TrCr10(void);
 void TrCr20(u16 lines);
 
-/* How the assembly passes arguments to these, and what it expects back;
-   PutTree is in vc.h. */
-#pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux TreeCur "*_c" __far modify exact [ax]
-#pragma aux TrCr10  "*_c" __far modify exact [ax]
-#pragma aux TrCr20  "*_c" __far parm [ax] modify exact [ax]
+/* PutTree is in vc.h. */
 
 /* The colours of the tree in a panel: of a directory, of the one under
    the cursor, and of the current directory likewise. */

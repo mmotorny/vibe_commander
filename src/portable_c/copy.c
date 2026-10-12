@@ -92,8 +92,6 @@ u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);       /* mask.c */
 u32 TotSel(u16 panel);                                  /* files.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
 u16 ChTree(u16 column);                                 /* treebox.c */
-#pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
-#pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
 /* Boxes and texts, which OncZoom and Dialog take by their offsets in the
    segment that the constants are in: those of src/c/copy_t.c, and some of

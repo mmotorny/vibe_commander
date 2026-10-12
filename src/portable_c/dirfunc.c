@@ -97,9 +97,6 @@ void PutDate(u16 date, struct DateText STACK *text);
 u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText STACK *text);
 u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
-#pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
 #pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 
 /* Boxes and texts, constants of src/c/dirfunc_t.c but for Empty_S, which

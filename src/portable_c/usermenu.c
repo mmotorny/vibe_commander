@@ -28,11 +28,9 @@
 u16 F32_70(u16 begin, u16 size);
 u16 Run_00(u16 text, u16 view);
 
-/* How other files call these: the history's box F32_70, in cmdline.c,
-   and Enter and the commands of the viewer Run_00. F32_00, the command,
-   is declared in vc.h: see "The commands" there. */
-#pragma aux F32_70 "*_c" __far parm [bx] [dx] value [ax] modify exact [ax]
-#pragma aux Run_00 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
+/* Other files call these: the history's box F32_70, in cmdline.c, and
+   Enter and the commands of the viewer Run_00. F32_00, the command, is
+   declared in vc.h: see "The commands" there. */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -80,7 +78,6 @@ const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 u32 TotSel(u16 panel);                                  /* files.c */
 void Help00(void);                                      /* help.c */
-#pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* What src/c/keys_t.c has of the menu: the name of the menu file, which
    F34_40 and the editor have too, with the title of the menu behind it,

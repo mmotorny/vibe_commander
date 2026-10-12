@@ -100,7 +100,6 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
    Int2F calls the multiplex interrupt, and returns AX in the low word
    and BX in the high one. */
 void Help00(void);                                      /* help.c */
-#pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* C routines of other files that vc.h does not have. */
 struct DateText {                                       /* format.c */

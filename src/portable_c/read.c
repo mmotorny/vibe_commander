@@ -51,7 +51,6 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
 
 /* The registers of these are those that the assembly called them with,
    while it did. ReDir is in vc.h. */
-#pragma aux ReadTre "*_c" __far value [ax] modify exact [ax]
 #pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux DirSize "*_c" __far parm [ax] modify exact [ax]
 #pragma aux DiSi10  "*_c" __far parm [ax] value [ax] modify exact [ax]

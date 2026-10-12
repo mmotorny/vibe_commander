@@ -48,14 +48,9 @@ void DirSize(u16 panel);                                /* read.c */
 void TstInfo(u16 panel);
 void Help00(void);                                      /* help.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
-#pragma aux PutPath "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux F20_02  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux DirSize "*_c" __far parm [ax] modify exact [ax]
 #pragma aux TstInfo "*_c" __far parm [ax] modify exact [ax]
-#pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

@@ -585,13 +585,10 @@ u16 FilePan(u16 panel);
 void AdrNum(u16 panel, struct Place STACK *place);
 void CorPar(u16 panel);
 u8 *PtPt10(u16 panel);                                  /* panel.c */
-#pragma aux PtPt10  "*_c" __far parm [ax] value [di] modify exact [ax di]
-/* The colours of the tree are four numbers in the code, which come as a
-   far pointer. */
+/* The tree in a panel, tree.c: its colours are four numbers in the code,
+   which come as a far pointer. */
 void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors);
-#pragma aux PutTree "*_c" __far parm [ax] [bx] [dx] [es si] modify exact [ax es]  /* tree.c */
 void PutInf(u16 panel);                                 /* info.c */
-#pragma aux PutInf  "*_c" __far parm [ax] modify exact [ax]
 /* Where a box is on the screen, as DialBox says it: what the assembly
    has in BX, DX and SI then. */
 struct Box {
@@ -1001,25 +998,15 @@ u32 F45_01(u16 panel, u16 command, u16 directories, u16 files);
 u32 F67_00(void);
 #pragma aux F67_00 "*_c" __far value [dx ax] modify exact [ax dx]
 void F65_00(void);
-#pragma aux F65_00 "*_c" __far modify exact [ax bx cx dx si di]
 void F73_00(u16 key);
 u16 F74_00(void);
 u16 F80_00(u16 panel);
 void F82_01(u16 panel, u16 key);
 u16 F68_00(void);
 u32 F77_00(u16 key, u16 panel);
-#pragma aux F73_00 "*_c" __far parm [ax] modify exact [ax]
-#pragma aux F74_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux F80_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F82_01 "*_c" __far parm [ax] [dx] modify exact [ax]
-#pragma aux F68_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux F77_00 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
 u16 F32_00(u16 main);
-#pragma aux F32_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
 u16 F62_01(u16 panel, u16 item);
-#pragma aux F62_01 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 u32 F39_00(u16 again, u16 panel);
-#pragma aux F39_00 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx es]
 
 /* Save the setup, the command line and the panels in the part of the
    program that stays in the memory, and give up the main data, for that
@@ -1066,12 +1053,6 @@ void InSt10(u16 place, u16 text, u16 length, u16 color);
 u32 MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys, u16 item);
 u32 MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table);
 u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table);
-#pragma aux DialBox "*_c" __far parm [bx] [ax] [dx] [cx] [di] modify exact [ax]
-#pragma aux Dialog  "*_c" __far parm [ax] [dx] [bx] [si] [cx] value [ax] modify exact [ax]
-#pragma aux InSt10  "*_c" __far parm [bx] [si] [cx] [ax] modify exact [ax]
-#pragma aux MinMnu  "*_c" __far parm [si] [bx] [dx] [di] [ax] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux MnMn10  "*_c" __far parm [ax] [bx] [cx] [dx] [di] value [dx ax] modify exact [ax dx]
-#pragma aux MnMn40  "*_c" __far parm [ax] [bx] [cx] [dx] [di] value [ax] modify exact [ax]
 /* The key bar and the menu bar, the command line and its prompt: see
    each in bars.c. `segment` is where ClsLine reads the colour, MAIN_SEG. */
 u16 *ClsLine(u16 place, u16 segment);

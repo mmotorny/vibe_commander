@@ -60,7 +60,6 @@
 /* C routines of other files that vc.h does not have. */
 u16 HexDec(u16 number);                                 /* format.c */
 void Help00(void);                                      /* help.c */
-#pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* The characters that words end at. */
 static const u8 CODE CtEn_T[10] = {
