@@ -54,6 +54,11 @@ DEVIATIONS = [
     # The program names its own file when it cannot load it again after a
     # command. The original is VC.COM; the port is VC.EXE.
     (re.compile(r"^Bad or missing D:\\VC\\VC\.(COM)"), "EXE"),
+    # And in the map of the memory, Alt+F5, which has a line for every
+    # program with the name of its file. No scenario can show the map
+    # without that line; the user has said that the deviation may stand
+    # here too.
+    (re.compile(r"║ . [0-9A-F]{4}[ \d]{6}[ \d,]{10} {3}VC\.(COM) "), "EXE"),
 ]
 
 # What stands in a golden for a character that is not compared.
@@ -103,6 +108,23 @@ IGNORED = [
                r"\([\d,]+ bytes\)"),
     re.compile(r"^Largest executable program size +[\d,]+K "
                r"\(([\d,]+) bytes\)"),
+    # The map of the memory, Alt+F5, has a line for every program and
+    # every stretch of free memory: where it begins, a segment in hex, the
+    # number of its blocks and its size. The program is larger in the port,
+    # so it has another size there, and what lies behind it, free memory
+    # and a program that was started from it and stays, begins elsewhere
+    # and has other sizes, and is other blocks: what the program takes
+    # again after a command fits before a program that stays, or does not.
+    # Left out are the size of the program; of every line of free memory
+    # where it begins, its blocks and its size, also of the one that lies
+    # before the program, which a line by itself does not tell from the
+    # others; and where FDAPM begins, the program that the scenario
+    # memory-map has stay. A field is left out whole, with the room in
+    # front of the number, so that a number with fewer digits leaves out
+    # the same cells.
+    re.compile(r"║ . ([0-9A-F]{4}[ \d]{6}[ \d,]{10}) {3}free memory "),
+    re.compile(r"║ . ([0-9A-F]{4})[ \d]{6}[ \d,]{10} {3}FDAPM\.COM "),
+    re.compile(r"║ . [0-9A-F]{4}[ \d]{6}([ \d,]{10}) {3}VC\.(?:COM|EXE) "),
 ]
 
 # Deviations that show on no screen, and so change no golden. They are
