@@ -859,46 +859,31 @@ Things that are known and not done. Standing instructions are in
     cannot say, and the move is then a loop over far pointers. It needs
     a code segment of its own for the part that stays, placed first in
     the file, with its own notion of DS: there is no main data yet.
-  - `Exec`, 470 bytes, in the part that stays: runs the commands of
-    `DosBuf` one after the other, by COMMAND.COM or by INT 2Eh, which
-    comes back with SS and SP destroyed, and loads the program again by
-    running its file as a second copy. The stack set again after INT
-    2Eh is inline assembly, three instructions. The rest is C of the
-    part that stays, where DS, SS and CS are one segment and the main
-    data does not exist: what the commands need is in the copy that
-    `F21_31` keeps there, `ComnIni`.
-  - The jumps between the two parts: `F21_31` to `Exec`, `Exec15` to
-    `Init11`, `Exit` to `Exit00`, the stub of `Init11` to `AlocEr`, and
-    `CallPSP`, by which the code that goes calls routines of the part
-    that stays: `Release` only, since the start-up is C.
-    Each is a far address made of a segment known when the program
-    runs and an offset: in C a call through a far function pointer. A
-    jump is not a call, though: a call that never returns would leave
-    its return address on the stack with every command run. The way
-    out that needs no assembly is to turn the jumps round. The part
-    that stays has the outermost loop: it calls what `Init11` begins,
-    by a far pointer, and that returns, through the main loop, when a
-    command is to be run or the program left. That asks that every
-    way to `F21_31` and to `Exit` be a return from the main loop,
-    which they are once the commands are functions: they return
-    numbers already.
-  - `Exit00` to `Exit05`, 106 bytes: gives the terminate address of the
-    PSP back, releases the programs that have stayed in the memory,
-    gives INT 21h and INT 27h back and ends the program. `Exit01` is
-    also what the PSP names as its terminate address while the program
-    runs, so DOS can jump to it with no stack of the program's: a stack
-    set by inline assembly at that entry, or the address in the PSP
-    made that of a handler written like one for an interrupt.
-  - `New21` and `New27` with `ExeProg`, `AddProg`, `FreeBlk` and
-    `ChkBlk`, `CtrlC`, `Release`, `GetStat` and `SetStat` are C, in
-    `port/resident.c`, compiled into the part that stays. `Release`,
-    `GetStat` and `SetStat` have stubs for the assembly of that part,
-    `Exec`, the entry and `Exit02`, which go when those are C; the map
-    of the memory calls `Release` through `Release_a` and `CallPSP`
-    still.
-  - `SetBrk` and `SetBrk0`, 39 bytes, `NotFind` and `OutStr0`, 54 bytes:
-    plain routines of the part that stays, called far from the rest
-    through `CallPSP`. They go with `Exec`.
+  - The part that stays in the memory is C, `port/resident.c`, but for
+    the entry: the outermost loop of the program, `Stay`, which calls
+    the part that goes, far, at `Init00` and after every command at
+    `Init11`; `Exec`, which runs the commands and loads the program
+    again; `Exit00` to `Exit05`; `New21` and `New27` with what keeps
+    the list of the programs that stay in the memory; `SetBrk`,
+    `NotFind`, `OutStr`, `GetStat` and `SetStat`. What is left of its
+    assembly, in `RHEAD` of `VC.ASM`, besides the entry and its data:
+    - `Exec`, `AlocEr` and `Exit00`, three instructions each. The part
+      that goes still comes back by a far jump to one of them, from
+      `CmdExe` in `VCFUNC.INC`, from the stub of `Init11` and from
+      `Exit`, with the
+      stack as it was when `Stay` called it: each loads a number and
+      returns far, into `Stay`. They go when those three places return
+      by themselves, which they can as soon as they are of a function
+      that `Stay` calls: `PUSH SS`, `POP DS`, the number in AX, `RETF`.
+    - `OutStr0` and `OutStr`, a stub, for the texts of the entry: they
+      come with DS:SI, which C cannot take as an argument.
+    - `SetStat` and `Release`, stubs: for the entry, and for
+      `Release_a` of `VCMEM.INC`, which the map of the memory calls
+      through `CallPSP` with the record in DS. `SetBrk` and `Exit01`
+      have none: `port/start.c` names the C functions themselves, by
+      their offsets, as it named the labels, and calls `SetBrk` through
+      a pointer to a far function.
+    - `CallPSP` itself, in `VCSUB1.INC`, is of the part that goes.
   - `FatErr`, 220 bytes: what DOS calls for a critical error. It is
     entered with nothing but CS known, takes its error in AX and DI
     and the device in BP:SI, shows a dialog, and returns the answer in
@@ -978,6 +963,29 @@ Things that are known and not done. Standing instructions are in
   - The twelve bytes of a program's name are taken from where the name
     begins in what DOS was asked to run, whatever follows the name
     there.
+- What running a command does in the original, and in the port after
+  it (`port/resident.c`); whether to mend any of it is not decided:
+  - Whether DOS had a block of memory for the part of the program that
+    is loaded again is taken from the block's address less a number of
+    paragraphs, not from what DOS answered. DOS answers 8 or 7 for no
+    block, which is less than that number, so it comes out right.
+  - A command of more than 123 characters is cut at the 124th by the
+    carriage return that ends it for COMMAND.COM, and the rest of it is
+    skipped.
+  - With Quick execute commands, COMMAND.COM's own interrupt runs the
+    commands, INT 2Eh, and under FreeDOS's COMMAND.COM nothing is run
+    at all and nothing is said: the prompt and the command are shown,
+    and the program comes back. In `quick`.
+  - The texts that the part that stays writes by itself, "Can't find
+    the file" and the others, are written with whatever BH holds for
+    the page of the screen: half of an address. The C hands the BIOS
+    page 0 there. The BIOS of the bench, like most, writes to the page
+    that shows whatever it is told, so no scenario can tell.
+  - When DOS ends the program by itself and goes on at the address
+    that the program keeps in its PSP for that, the program that
+    started this one gets the registers as the assembly left them, in
+    the port as DOS had them. No program can rely on either. Nothing
+    of the bench ends the program but the program.
 - The port's handler of INT 21h takes more of the stack of whoever
   calls DOS than the original's: 30 bytes for the registers and the
   second return address, and a few more for its own calls, at every

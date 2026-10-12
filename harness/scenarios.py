@@ -1752,6 +1752,102 @@ SCENARIOS = {
             "Ctrl+PgUp",                  # still works
         )),
 
+    "quick": Scenario(
+        "Commands run without COMMAND.COM, by the interrupt that the "
+        "COMMAND.COM in the memory has for them: Quick execute commands. "
+        "The one of the bench runs nothing that way; the program comes "
+        "back all the same, also with another drive than it started on, "
+        "which it has that interrupt change to first, and with all of "
+        "itself kept in the memory",
+        steps=(
+            "Ctrl+l",                     # no Info: it would say how much
+                                          # is free on D:, where the
+                                          # program's file is
+            "F9 o o",
+            "Down Down Down Down Space",  # Quick execute commands
+            "Enter",
+            '"ver" Enter',
+            "Ctrl+o",                     # nothing was printed
+            "Ctrl+o",
+            "Alt+F1",
+            "d",                          # the current drive is D:
+            '"ver" Enter',                # "d:" first, then the command
+            "Ctrl+o",
+            "Ctrl+o",
+            '"c:" Enter',
+            "Ctrl+o",
+            "Ctrl+o",
+            "F9 o m",                     # Memory allocation off
+            '"ver" Enter',
+            "Ctrl+o",
+            "Ctrl+o",
+        )),
+
+    "comspec": Scenario(
+        "COMMAND.COM that cannot be run, in a second copy of the program "
+        "that a batch file starts with another COMSPEC: a file that is "
+        "not there, with another try and given up; a program that DOS "
+        "has no memory for, made in the editor, in hex; and no COMSPEC "
+        "at all. Then a line of a menu whose second command begins with "
+        "@ and is not shown",
+        steps=(
+            "F9 o Enter",                 # the Configuration
+            "Tab Tab Tab Tab Down Space",  # Auto save setup
+            "Enter",
+            "Ctrl+l",                     # two panels of files, saved:
+                                          # the second copy shows no Info
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",
+            '"c.bat"',
+            "Enter",
+            "Enter",
+            '"set" Space "comspec=%1" Enter "d:\\vc\\vc"',
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"m.dat"',
+            "Enter",
+            "Enter",
+            "F4",                         # in hex: the header of an EXE
+            '"4d5a0000ff7f"',             # file of 16 megabytes that
+            '"00000200ffff"',             # wants a megabyte more
+            '"ffff00000001"',
+            '"000000000000"',
+            '"1c000000"',
+            "F2",
+            "Esc",
+            '"c" Space "c:\\x" Enter',     # the second copy, at its panels
+            '"ver" Enter',                # Can't find the file
+            "Enter",                      # again
+            "Esc",                        # given up
+            "F10",
+            "Enter",                      # back in the first copy
+            '"c" Space "c:\\work\\m.dat" Enter',
+            '"ver" Enter',                # not enough memory: back at once
+            "Ctrl+o",
+            "Ctrl+o",
+            "F10",
+            "Enter",
+            '"c" Enter',                  # no COMSPEC
+            '"ver" Enter',                # COMMAND.COM, by no path
+            "Esc",
+            "F10",
+            "Enter",
+            "Shift+F4",
+            '"vc.mnu" Enter',
+            "Enter",
+            '"b:" Tab "two" Enter',
+            'Tab "echo" Space "1" Enter',
+            'Tab "@echo" Space "2" Enter',
+            "F2 Esc",
+            "F2",
+            "b",
+            "Ctrl+o",                     # the first with its prompt
+            "Ctrl+o",
+        )),
+
     "user-menu": Scenario(
         "The user menu, of F2 and Shift+F2: the main one and that of a "
         "directory, its keys, lines of every kind, a menu that names "

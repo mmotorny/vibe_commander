@@ -78,8 +78,8 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 ; The compiled code of the part that stays in the memory, port/resident.c:
 ; the interrupt handlers, which the code that starts the program names,
 ; and what the assembly of that part calls, near and in its own group.
-	EXTERN	New21:FAR, New27:FAR, CtrlC:FAR
-	EXTERN	GetStat_r:NEAR, SetStat_r:NEAR, Release_r:NEAR
+	EXTERN	New21:FAR, New27:FAR, CtrlC:FAR, SetBrk:FAR, Exit01:FAR
+	EXTERN	SetStat_r:NEAR, Release_r:NEAR, Stay_r:NEAR, OutStr_r:NEAR
 	EXTERN	F21_00_c:FAR, F21_10_c:FAR, F21_25_c:FAR, F21_30_c:FAR
 	EXTERN	F21_31_c:FAR, F22_00_c:FAR, F23_00_c:FAR, F24_00_c:FAR
 	EXTERN	F24_01_c:FAR, F24_02_c:FAR, F25_00_c:FAR, F26_00_c:FAR
@@ -104,7 +104,12 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 	PUBLIC	AltSr_T, NoRd_P, FatErr, WCB1sav
 ; What port/resident.c keeps of the interrupts and of the programs that
 ; have stayed in the memory: its data is laid out here, in RDATA.
-	PUBLIC	IntTab, SavePtr, Vect21, Vect27, NameBuf
+	PUBLIC	IntTab, SavePtr, Vect21, Vect22, Vect27, NameBuf, TrnAdr
+; What it reads in the head of that part, and where it enters the part
+; that goes.
+	PUBLIC	RunPar, ChkFile, ImgEnd, TrnPrW, OvlPrm
+	PUBLIC	NoRun_S, FnFil_S, BadFl_S, Retr_S, Aloc_S
+	PUBLIC	Init00, Init11
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.
@@ -559,316 +564,54 @@ Aloc_S	DB	'Program too big to fit in memory', 13,10,0
 ;------------------- Execute commands ------------------
 LoadSiz	EQU	WORD PTR DosBuf+0
 
-Exec:	TEST	DS:ComnIni.LoadFl,7Fh
-	JZ	Exec01
-	CALL	GetStat
-	MOV	AH,49h
-	INT	21h
-	CALL	SetStat
-Exec01:	PUSH	DS
-	POP	ES
-	MOV	AX,OFFSET ComnIni.DosBuf
-	MOV	DS:ComnIni.BatAdr,AX
-Exec02:	CLD
-	MOV	DL,DS:ComnIni.BreakFl
-	MOV	AX,3301h
-	INT	21h
-	MOV	DI,DS:ComnIni.BatAdr
-	LEA	SI,[DI-4]
-	PUSH	DI
-	MOV	CX,0FFFFh
-	MOV	AL,0
-	REPNE	SCASB
-	MOV	DS:ComnIni.BatAdr,DI
-	POP	DI
-	MOV	CX,LenCmd
-	REPNE	SCASB
-	DEC	DI
-	MOV	BYTE PTR DS:[DI],0Dh
-	LEA	CX,[DI-1]
-	CMP	AL,DS:ComnIni.ExecTyp
-	JE	Exec04
-	INC	SI
-	INC	SI
-	INC	SI
-	SUB	CX,SI
-	MOV	DS:[SI],CL
-	CMP	DS:ComnIni.DosChg[1],0
-	JE	Exec03
-	MOV	DS:ComnIni.BatPoin,SI
-	MOV	SI,OFFSET ComnIni.DosChg
-	INT	2Eh
-	CLI
-	MOV	SP,CS
-	MOV	SS,SP
-	MOV	SP,OFFSET VcStack
-	STI
-	PUSH	CS
+; C: port/resident.c. The part that stays has the outermost loop of the
+; program there, Stay, which calls the part that goes, far: at Init00
+; when the program starts and at Init11 after every command. That part
+; comes back by a far jump to one of the three labels here, as it always
+; has, with the stack as it was when it was called: so a far return from
+; here goes back into Stay, with what to do in AX. They go when what
+; jumps here returns by itself.
+Exec:	PUSH	CS			; Run the commands of DosBuf
 	POP	DS
-	MOV	SI,DS:ComnIni.BatPoin
-	MOV	DS:ComnIni.DosChg[1],0
-Exec03:	INT	2Eh
-	CLI
-	MOV	SP,CS
-	MOV	SS,SP
-	MOV	SP,OFFSET VcStack
-	STI
-	CALL	SetBrk0
-	JMP	Exec07
-Exec04:	SUB	CX,SI
-	MOV	CH,'/'
-	MOV	DS:[SI],CX
-	MOV	WORD PTR DS:[SI+2],' C'
-	MOV	BX,OFFSET ComnIni.EPB
-	MOV	DS:[BX].CmdLine.Offs,SI
-	MOV	DS:[BX].CmdLine.Segm,DS
-Exec05:	MOV	DI,OFFSET Command
-	MOV	DX,DS:ComnIni.ComSpec
-	OR	DX,DX
-	JE	Exec06
-	MOV	DS,DS:[2Ch]
-	MOV	AX,4B00h
-	INT	21h
-	CALL	SetBrk0
-	JNC	Exec07
-	MOV	DS,ES:[2Ch]
-	MOV	DI,ES:ComnIni.ComSpec
-	CMP	AX,WORD PTR 3
-	JBE	Exec06
-	MOV	SI,OFFSET NoRun_S
-	PUSH	CS
-	CALL	OutStr0
-	JMP	Exec10
-Exec06:	MOV	SI,OFFSET FnFil_S
-	CALL	NotFind
-	PUSH	ES
+	MOV	AX,100h
+	RETF
+AlocEr:	PUSH	CS			; No memory for the main data
 	POP	DS
-	JNC	Exec05
-	JMP	Exec10
-Exec07:	PUSH	ES
+	MOV	AX,200h
+	RETF
+Exit00:	PUSH	CS			; Leave, with AL for DOS
 	POP	DS
-	MOV	BX,DS:ComnIni.BatAdr
-	CMP	BYTE PTR DS:[BX],0
-	JE	Exec10
-	CMP	BYTE PTR DS:[BX],'@'
-	JNE	Exec08
-	INC	BX
-	MOV	DS:ComnIni.BatAdr,BX
-	JMP	Exec02
-Exec08:	MOV	DI,OFFSET IntTab
-	PUSH	DI
-	MOV	AX,0A0Dh
-	STOSW
-	MOV	AH,19h
-	INT	21h
-	MOV	DL,AL
-	INC	DX
-	ADD	AL,'A'
-	STOSB
-	CMP	DS:ComnIni.Prompt,0
-	JE	Exec09
-	MOV	AX,'\:'
-	STOSW
-	MOV	SI,DI
-	MOV	AH,47h
-	INT	21h
-	MOV	CX,0FFFFh
-	MOV	AL,0
-	REPNE	SCASB
-	DEC	DI
-Exec09:	MOV	AX,'>'
-	STOSW
-	POP	SI
-	PUSH	CS
-	CALL	OutStr
-	MOV	SI,DS:ComnIni.BatAdr
-	PUSH	CS
-	CALL	OutStr
-	MOV	AX,0E0Dh
-	INT	10h
-	MOV	AX,0E0Ah
-	INT	10h
-	JMP	Exec02
-Exec10:	MOV	AL,DS:ComnIni.LoadRes
-	XCHG	AL,DS:ComnIni.LoadFl
-	TEST	AL,7Fh
-	JNZ	Exec11
-	JMP	NEAR PTR Exec15
-Exec11:	CALL	GetStat			; Load VC.EXE
-	MOV	BX,CS:ImgEnd
-	SUB	BX,TrnPar
-	MOV	AH,48h
-	INT	21h
-	CALL	SetStat
-	SUB	AX,TrnPar
-	MOV	CS:RunPar,AX
-	JNC	Exec12
-	JMP	AlocEr
-; The original stores the size through DS, which is on the environment
-; when ENTER brings it here to try again: a word written into other data.
-; ES is on the resident part either way. See harness/deviations.py.
-Exec12:	MOV	AX,CS:ImgEnd
-	MOV	ES:ComnIni.LoadSiz,AX
-	MOV	SI,OFFSET OvlPrm
-	MOV	BL,CS:[SI]
-	MOV	BH,0
-	MOV	CS:[SI+BX-1],CS
-	MOV	BX,OFFSET ComnIni.EPB
-	MOV	ES:[BX].CmdLine.Offs,SI
-	MOV	ES:[BX].CmdLine.Segm,CS
-	MOV	DX,ES:ComnIni.OvlPth
-	MOV	DS,CS:[2Ch]
-	MOV	AX,4B00h
-	INT	21h
-	PUSH	CS
-	POP	ES
-	CLD
-	JNC	Exec14
-	CMP	AL,3
-	JA	AlocEr
-Exec13:	MOV	DI,ES:ComnIni.OvlPth	; Error: VC.EXE not found
-	MOV	DS,CS:[2Ch]
-	MOV	SI,OFFSET BadFl_S
-	CALL	NotFind
-	JNC	Exec12
-	MOV	AL,1
-	JMP	Exit00
-Exec14:	MOV	AH,4Dh
-	INT	21h
-	OR	AX,AX
-	JNE	Exec13
-	PUSH	ES
-	POP	DS
-	MOV	AX,DS:ComnIni.LoadSiz
-	CMP	AX,DS:ChkFile
-	JNE	Exec13
-Exec15:	PUSH	CS:RunPar
-	MOV	AX,OFFSET Init11
-	PUSH	AX
+	MOV	AH,0
 	RETF
 
-AlocEr:	MOV	SI,OFFSET Aloc_S
-	PUSH	CS
-	CALL	OutStr0
-	MOV	AL,1
-Exit00:	MOV	BX,CS:Vect22.Offs
-	MOV	CS:[0Ah].Offs,BX
-	XOR	BX,BX
-	XCHG	BX,CS:Vect22.Segm
-	MOV	CS:[0Ah].Segm,BX
-Exit01:	PUSH	AX
-	PUSH	CS
-	POP	ES
-	MOV	DL,ES:ComnIni.BreakFl
-	MOV	AX,3301h
-	INT	21h
-	MOV	CX,ES:Counter
-	JCXZ	Exit03
-Exit02:	MOV	SI,ES:Counter
-	SHL	SI,1
-	MOV	DS,ES:PrgList[SI-2]
-	PUSH	CS
-	CALL	Release
-	LOOP	Exit02
-Exit03:	CMP	ES:ComnIni.ChkTSR,0
-	JZ	Exit04
-	LDS	DX,ES:Vect21
-	MOV	AX,2521h
-	INT	21h
-	LDS	DX,ES:Vect27
-	MOV	AX,2527h
-	INT	21h
-Exit04:	POP	AX
-	CMP	ES:Vect22.Segm,0
-	JNE	Exit05
-	MOV	AH,4Ch
-	INT	21h
-Exit05:	JMP	ES:Vect22
-
-NotFind	PROC	NEAR
-	PUSH	DS
-	PUSH	CS
-	CALL	OutStr0
-	POP	DS
-	MOV	SI,DI
-	PUSH	CS
-	CALL	OutStr
-	PUSH	DS
-	MOV	SI,OFFSET Retr_S
-	PUSH	CS
-	CALL	OutStr0
-	POP	DS
-NotFn1:	MOV	AH,0
-	INT	16h
-	CMP	AL,0Dh
-	JE	NotFn2
-	CMP	AL,1Bh
-	JNE	NotFn1
-	STC
-NotFn2:	RET
-NotFind	ENDP
-
+; Write a text as a teletype would: OutStr_r. The code that starts the
+; program calls OutStr through CallPSP, and the entry of this part calls
+; OutStr0.
+;			DS:SI - text, of this segment for OutStr0
+;			   BH - page
+;	Return :	   SI - its end
 OutStr0	PROC	NEAR
 	PUSH	CS
 	POP	DS
-OutStr:	PUSH	BP
-	PUSH	BX
-	MOV	BL,7
-	LODSB
-	MOV	AH,0Eh
-	INT	10h
-	POP	BX
-	POP	BP
-	CMP	BYTE PTR DS:[SI],0
-	JNE	OutStr
+OutStr:	PUSH	DX
+	PUSH	DS
+	MOV	DX,DS
+	MOV	AX,SI
+	PUSH	CS
+	POP	DS
+	CALL	OutStr_r
+	MOV	SI,AX
+	POP	DS
+	POP	DX
 	RETF
 OutStr0	ENDP
-
-SetBrk0	PROC	NEAR
-	CLD
-	PUSH	SS
-	POP	ES
-	POP	BP
-	PUSH	CS
-	PUSH	BP
-SetBrk0	ENDP
-
-SetBrk	PROC	NEAR
-	PUSH	DS
-	PUSH	AX
-	PUSHF
-	PUSH	SS
-	POP	DS
-	MOV	AX,3300h
-	INT	21h
-	MOV	DS:ComnIni.BreakFl,DL
-	MOV	DL,0
-	MOV	AX,3301h
-	INT	21h
-	MOV	DX,OFFSET CtrlC
-	MOV	AX,2523h
-	INT	21h
-	POPF
-	POP	AX
-	POP	DS
-	RETF
-SetBrk	ENDP
 
 ;-------- Programs that stay in the memory, and DOS's memory --------
 ; C: port/resident.c, which has the interrupt handlers New21 and New27,
 ; CtrlC, what they keep of the programs that have stayed in the memory,
-; and these three, which the assembly of this part still calls. They are
+; and these two, which the assembly still calls: SetStat the entry of
+; this part, and Release the map of the memory, through CallPSP. They are
 ; near, in RTEXT, and take DS on this segment.
-GetStat	PROC	NEAR
-	PUSH	DS
-	PUSH	CS
-	POP	DS
-	CALL	GetStat_r
-	POP	DS
-	MOV	BP,AX
-	RET
-GetStat	ENDP
-
 SetStat	PROC	NEAR
 	PUSH	AX
 	PUSHF
@@ -1056,11 +799,8 @@ Alloc7:	XOR	BP,BP
 	MOV	AX,ES
 	SUB	AX,TrnPar
 	MOV	DS:RunPar,AX
-	PUSH	AX
 	CALL	SetStat
-	MOV	AX,OFFSET Init00
-	PUSH	AX
-	RETF
+	JMP	Stay_r			; C: it calls Init00
 
 Alloc9:	MOV	SI,OFFSET Aloc_S	; Error
 	PUSH	CS
@@ -1078,6 +818,7 @@ SavePtr	DD	?
 Vect21	DD	?
 Vect22	DD	?
 Vect27	DD	?
+TrnAdr	DD	?			; Where Stay calls the transit part
 Counter	DW	?
 PrgList	DW	MaxProg	DUP(?)
 NameBuf	DB	12	DUP(?)
@@ -1156,7 +897,6 @@ ShadFl	EQU	38
 ; What it reads, writes and names of the assembly is made public here.
 	PUBLIC	SecDat
 	PUBLIC	Counter, Vect21, Vect22, Vect27, RelTab
-	PUBLIC	Exit01, SetBrk
 Init00:	CALL	Reloc
 	CLD
 	MOV	AX,SS

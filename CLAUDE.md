@@ -656,6 +656,27 @@ port.
   far call or jump: an `__interrupt` function begins with one. List in
   `functions` of `harness/ported.py` the naked entry in front of it,
   `New21`, not the function.
+- The part that goes is called from the part that stays through a
+  pointer to a far function that is kept in memory, `TrnAdr`, in
+  `Stay` of `port/resident.c`: it comes back with every register
+  changed but SS and SP, BP too, which the compiler takes to be kept
+  whatever a `modify` list says. A pointer made on the stack, or a
+  variable of `Stay`, would be reached through BP after the call. Read
+  `Stay_r` and `Stay11_` in `build/port/resident.lst` after any change
+  there: no instruction between the call and the next may name BP or a
+  register.
+- A function that does not return is `#pragma aux name aborts`; the
+  compiler then ends the caller there.
+- A far function of `port/resident.c` that the part that goes calls
+  through `CallPSP`, with DS anywhere, is `__far __loadds`: `SetBrk`.
+  Its first instructions load DS by a relocated number, so it cannot be
+  listed in `functions` of `harness/ported.py`.
+- Where the program has no stack, behind INT 2Eh, the instructions that
+  set one are a function `__declspec(naked)` with `_asm`, which ends in
+  a jump to a C function that does not return: `Int2E`. `offset
+  VcStack` there is the offset of a label of the assembly, declared
+  `extern u8 __near`. A parameter of a naked function that is only in
+  its register wants `(void)name;`, or it is "not referenced".
 - `_disable` and `_enable` are known only where a `#pragma intrinsic`
   names them, which is in `port/dos.c`: "No prototype found" elsewhere.
   Call `IntOff` and `IntOn`.

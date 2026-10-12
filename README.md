@@ -97,10 +97,12 @@ setup file and the main extension file, or taking the defaults, the
 banner, asking DOS for the memory of its data and making the data of
 what was kept, and finding out what the display, DOS and the
 environment are like. The entry of the program, which makes a block of
-the memory of the part that goes, and what runs a command with most of
-the program out of the memory and loads it again, to which Enter hands
-over, are still assembly. The program's watch on DOS
-is C: the interrupts of DOS that it takes to note every program that is
+the memory of the part that goes, is still assembly. What runs a
+command with most of the program out of the memory and loads it again,
+to which Enter hands over, is C, and is the outermost loop of the
+program now: it calls the rest of the program, which comes back to it
+with commands to run or to leave. So is the
+program's watch on DOS: the interrupts of DOS that it takes to note every program that is
 run and every one that stays in the memory, the records it keeps of
 those, by which the map of the memory lists them and releases them, and
 its answer to a program that asks for its data, as its setup program
@@ -278,7 +280,12 @@ which saves the registers and finds the program's data. Such a function
 has to go on in the handler that had the interrupt before, with the
 stack as the interrupt left it, and C cannot change how deep the stack is
 that it returns on: so it writes that handler's address into the room,
-and returns there.
+and returns there. The same four stand where DOS goes on when it has
+ended the program by itself. And nine instructions are the interrupt by
+which the COMMAND.COM in the memory runs a command, INT 2Eh: it comes
+back with no stack and no data segment, so both are set there, from the
+code segment, before any compiled instruction runs, and the program goes
+on in a function of its own on an empty stack.
 
 The halves are linked into one program, `VC.EXE`, which is not built the
 way a C program usually is. It still loads and starts like the `.COM` file
@@ -319,7 +326,7 @@ stack than the assembly it replaces, and a stack used beyond its bottom
 would overwrite data without a trace on the screen, so the port has 4,096
 bytes, of which the scenarios use some 200. The stack is the end of the
 part of the program that stays in memory while a command runs: that part
-is 18,480 bytes where it was 12,704, and a command has 5,776 bytes less
+is 19,104 bytes where it was 12,704, and a command has 6,400 bytes less
 than the original leaves it: 3,840 for the stack, and the rest because
 compiled code is longer than the assembly it replaces, and because the
 code that starts the program stays.

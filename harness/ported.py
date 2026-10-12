@@ -948,17 +948,40 @@ BATCHES = [
         # CtrlC is code between procedures: the routine for Ctrl-C and
         # Ctrl-Break, and behind it New21 and New27, which the listing
         # has as far procedures. The functions are New21 and New27, where
-        # the interrupts arrive, and what the assembly of the part that
-        # stays still calls.
+        # the interrupts arrive, and what the assembly still calls.
         routines=("CtrlC", "ExeProg", "AddProg", "FreeBlk", "ChkBlk",
                   "Release", "GetStat", "SetStat"),
-        functions=("New21", "New27", "Release_r", "GetStat_r",
-                   "SetStat_r"),
+        functions=("New21", "New27", "Release_r", "SetStat_r"),
         unreached={
             0x04AB: "CtrlC, where Ctrl-Break or DOS's Ctrl-C arrives: "
                     "the BIOS of the bench makes no interrupt of Ctrl "
                     "and ScrollLock, which was tried, and DOS does not "
                     "look for Ctrl-C in the calls that the program makes",
+        },
+    ),
+    Batch(
+        title="Commands run from the part that stays in the memory, the "
+              "rest of the program brought back, and the program left",
+        source="resident.c",
+        # Exec is code between procedures, as far as NotFind: with the
+        # commands run, Exec10, which loads the program again, AlocEr,
+        # and Exit00 to Exit05. Stay is where the code that begins the
+        # program hands over, and OutStr what the code that starts it
+        # calls for its texts.
+        routines=("Exec", "NotFind", "OutStr0", "SetBrk0", "SetBrk"),
+        functions=("Stay_r", "OutStr_r"),
+        unreached={
+            0x032B: "Exec11, where DOS has no block for the part of "
+                    "the program that is loaded again after a command: "
+                    "the block that the program gave back for the "
+                    "command is free again, since COMMAND.COM ran the "
+                    "command in it and has ended. A program that stays "
+                    "with most of the memory, which was tried, stays "
+                    "behind that block",
+            0x0405: "Exit05, where DOS has ended the program and goes "
+                    "on at the address that the program has put into "
+                    "its PSP: nothing of the bench ends the program "
+                    "but the program",
         },
     ),
 ]

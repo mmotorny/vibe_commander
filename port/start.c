@@ -79,10 +79,10 @@ extern const u8 __far SetBrk[];
 #pragma aux New27 "*"
 #pragma aux SetBrk "*"
 
-/* A routine of the part that stays, which is called far and returns far:
-   SetBrk keeps every register but DX. */
+/* A function of the part that stays, port/resident.c, which is called
+   far and loads its own DS: SetBrk keeps every register but AX and DX. */
 typedef void __far StaysFn(void);
-#pragma aux StaysFn modify exact [dx]
+#pragma aux StaysFn modify exact [ax dx]
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 #define AT(segment, offset) ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
