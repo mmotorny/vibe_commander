@@ -355,6 +355,20 @@ out again (show.py --changes is how):
     and does nothing. The lines of the list are the directories, their
     files, and an empty line between two directories: "*.txt" in
     C:\\WORK is three lines. The scenario mouse-find has these.
+  - The box of Alt+F10 has the same margin: rows 2 to 22, with the
+    lines on rows 4 to 17. A button that went down
+    on a line and is held above the lines takes the cursor to the line
+    before the first one shown, and below them to the one after the
+    last, each time the box asks: the lines move by one. A second click
+    on a row, not on a directory, is Enter: the row is what is
+    remembered. The middle button and a click outside close the box.
+    On a tree panel the main loop takes the mouse as on a panel of
+    files: a click makes the panel the current one and puts the cursor
+    on the line, the files of the other panel follow, a second click is
+    Enter, and a button held below or above the panel moves the lines.
+    Eleven directories made in C:\\WORK are a tree of 17 lines, more
+    than the box has and more than a panel of half the height. The
+    scenario mouse-tree has these.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
@@ -4171,6 +4185,41 @@ SCENARIOS = {
             "MiddleClick@30,12",          # the middle button closes it
             "Alt+F7 Enter",               # the same search again
             "Click@30,9 Click@30,9",      # a second click: Go to
+        )),
+
+    "mouse-tree": Scenario(
+        "The mouse on the tree, in the box where a directory is chosen "
+        "and in a panel: a click on a line and a second one, a button "
+        "held below the lines and above them, beside them and outside, "
+        "the right button and the middle one",
+        steps=(
+            *(f'F7 "{letter}" Enter' for letter in "abcdefghijk"),
+            "Alt+F10",                    # 17 lines, three more than fit
+            "Click@30,8",                 # the cursor onto a line
+            "RightClick@30,10",           # and with the right button
+            "Click@30,12>30,20*8",        # held below the lines: to the end
+            "Click@30,7>30,2*8",          # and above them: to the start
+            "Click@30,6>70,10*6",         # beside the lines: nothing more
+            "Click@30,3",                 # on the frame: nothing
+            "RightClick@1,1",             # the right one outside: nothing
+            "Click@30,9 Click@30,9>70,9", # let go beside the line: nothing
+            "MiddleClick@30,12",          # the middle button closes it
+            "Alt+F10",
+            "RightClick@30,8 RightClick@30,8",    # a second click: chosen
+            "Alt+F10",
+            "Click@1,1",                  # a click outside closes it
+            "F9 o f",                     # panels of half the height
+            "F9 r t",                     # the tree on the right: 11 lines
+            "Click@50,5",                 # a line: the panel is the current
+                                          # one, and the files follow
+            "Click@50,7 Click@50,7",      # a second click: Enter
+            "Click@50,4>50,14*6",         # held below the panel: down
+            "Click@50,6>50,0*4",          # and above it: up
+            "RightClick@50,8",            # the right button
+            "Click@50,9>50,5>50,7",       # the cursor goes with the pointer
+            "Click@70,6",                 # beside the name, on its row
+            "Tab",                        # the files are the current panel
+            "Click@50,5",                 # and the tree again
         )),
 
 }

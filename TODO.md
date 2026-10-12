@@ -357,11 +357,9 @@ Things that are known and not done. Standing instructions are in
   the text for ^I. From the C they get the offset of the dialog there,
   and those two, which are C as well, name no text. None of the lines of
   their boxes has ^I, so nothing read it.
-- Of the box in which a directory is chosen from the tree, what it does
-  for the mouse has run in no scenario, 93 instructions of `ChTree`: a
-  button held on a line, above the lines or below them, a second click
-  on a line, a click outside the box. It is translated by reading, and
-  listed as out of reach in `harness/ported.py`. So are 17 instructions
+- What the box in which a directory is chosen from the tree does for
+  the mouse, and the main loop for the mouse on a tree panel, runs in
+  `mouse-tree`. Listed as out of reach are 17 instructions
   of `ReadTre`: for a drive that is not ready, at first or while its
   directories are read, for a tree of 767 entries, which has no room
   for another, and for hidden directories left out, which only a setup
@@ -578,14 +576,11 @@ Things that are known and not done. Standing instructions are in
 - The bench has a mouse now, and scenarios use it: `mouse-panel`,
   `mouse-bars` and `mouse-dialog`, with which 349 of the instructions
   that `harness/ported.py` listed as out of reach for the mouse came off
-  the lists, and `mouse-help` and `mouse-find`, with 200 more. The
-  others are still listed, with reasons that end in "the bench has no
+  the lists, and `mouse-help`, `mouse-find` and `mouse-tree`, with 293
+  more. The others are still listed, with reasons that end in "the bench has no
   mouse", which is no reason any more: each place wants a scenario, or
   the true reason why none gets there. By the file of the port that has
   them:
-  - `treebox.c`, 93: `ChTree`, a button held on a line of the tree,
-    above the lines or below them, a second click on a line, a click
-    outside the box.
   - `menu.c`, none: `mouse-menu` has the rest of the menu bar.
   - `view.c`, 36: a button held in the viewer's window.
   - `edit.c`, 38: what is left of `T00_71`, a click in the editor's
