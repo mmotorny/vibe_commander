@@ -278,6 +278,12 @@ add_test(NAME bytes-match-original
 add_test(NAME data
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
             --quiet ${layout_dir} ${port_dir})
+# The two routines that the compiler calls for arithmetic on 32 bits,
+# against Python's: see harness/arithcheck.py. No scenario divides by
+# more than 16 bits.
+add_test(NAME arith
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/arithcheck.py
+            ${port_dir})
 add_test(NAME port
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
             ${port_dir}/VC.EXE ${port_dir}/VC.MAP ${layout_dir}/VC.LST)

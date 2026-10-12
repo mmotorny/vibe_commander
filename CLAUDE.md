@@ -1183,9 +1183,11 @@ with it is less obvious:
   code segment. `__U4M`, which multiplies, and `__U4D`, which divides
   unsigned numbers, are functions of `port/arith.c`, written without
   what they are there for; of `__U4D` the scenarios run only a division
-  by 16 bits. They are held against Python's arithmetic by
-  `harness/arithcheck.py`, which runs their bytes on a model of the
-  processor: run it after any change there or to the compiler. A helper
+  by 16 bits. They are held against Python's arithmetic by the
+  test `arith`, `harness/arithcheck.py`, which runs their bytes on a
+  model of the processor, and with `--pairs 200000` as many numbers as
+  they were written against: do that after a change there or to the
+  compiler. A helper
   that is missing shows as an undefined symbol when the port is linked:
   signed division would be `__I4D`. Shifting a 32-bit number by a
   constant needs none. `/` and `%` of the same numbers are two calls:

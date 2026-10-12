@@ -17,8 +17,17 @@ reads anything but the stack, if it calls something, and if a division
 by 0 is not the processor's divide error. An instruction that the model
 does not know stops it: add the instruction.
 
-usage: arithcheck.py <directory of the port: VC.EXE, VC.MAP> [<pairs>]
+It is the test `arith` of the build, with the pairs of numbers at the
+edges, 729 of them, and 4,000 random ones, which takes two seconds:
+about 2,200 of the divisions are by more than 16 bits. `--pairs` asks
+for more; the routines were held to 200,000 when they were written,
+which takes two and a half minutes. The numbers are the same from run
+to run.
+
+Exits with status 0 if everything is as Python has it, and 1 otherwise,
+with the routine and the numbers.
 """
+import argparse
 import random
 import re
 import sys
@@ -367,10 +376,16 @@ class Machine:
 
 
 def main():
-    if len(sys.argv) < 2:
-        sys.exit(__doc__)
-    directory = Path(sys.argv[1])
-    count = int(sys.argv[2]) if len(sys.argv) > 2 else 20000
+    parser = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
+    parser.add_argument("port", type=Path,
+                        help="the directory of the port: VC.EXE, VC.MAP")
+    parser.add_argument("--pairs", type=int, default=4000, metavar="N",
+                        help="how many random pairs of numbers, besides "
+                             "those at the edges (4000)")
+    args = parser.parse_args()
+    directory = args.port
+    count = args.pairs
     image = (directory / "VC.EXE").read_bytes()
     segment = None
     places = {}
@@ -447,6 +462,8 @@ def main():
                     sys.exit(f"{name}: {NAMES[n]} comes back changed, for "
                              f"{a:08X}h and {b:08X}h")
             tried[name] += 1
+    if not tried["__U4D by more"] or not tried["__U4D by 16 bits"]:
+        sys.exit("arithcheck: one half of __U4D was not run")
     for name, n in tried.items():
         print(f"{name}: {n} pairs of numbers as Python has them"
               + (f", {longest[name]} instructions at the most"

@@ -446,26 +446,27 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   would pass the scenarios: three files divide and one multiplies such
   numbers, `find.c`, `info.c` and `copy.c`. So the two helpers, which
   are C, `U4M` and `U4D` of `port/arith.c`, are held against other
-  arithmetic, in two ways, neither of them a test of the build:
-  - `python3 harness/arithcheck.py build/port` runs their bytes, as the
-    linked program has them, on a model of the 8086 that knows the
-    instructions they are made of, and holds the product, the quotient
-    and the remainder against Python's, for 729 pairs of numbers at the
-    edges and as many random ones as it is told, 20,000 unless told, in
-    17 seconds. It also says if a register that is to be kept comes back
+  arithmetic, in two ways:
+  - The test `arith`, `python3 harness/arithcheck.py build/port`, runs
+    their bytes, as the linked program has them, on a model of the 8086
+    that knows the instructions they are made of, and holds the product,
+    the quotient and the remainder against Python's, for 729 pairs of
+    numbers at the edges and as many random ones as it is told with
+    `--pairs`, 4,000 unless told, in two seconds: about 2,200 of the
+    divisions are by more than 16 bits. It also says if a register that
+    is to be kept comes back
     changed, if the stack of the caller is written to, and if a division
     by 0 is not the processor's divide error. The two routines in
     assembly that were there before passed it on the same 200,729 pairs
-    as the C does; four changes of one instruction made to see it work
-    were each found. Making it a fourth test wants a line in
-    `CMakeLists.txt`.
+    as the C does, `--pairs 200000`; four changes of one instruction
+    made to see it work were each found.
   - `port/arith.c` compiles for the computer that builds as it is, with
     `-DVC_H` and the three types of `port/vc.h` at their widths: there
     it was held against that computer's arithmetic on 101 million pairs
     for the product and 98 million for the division, 47 million of them
     by more than 16 bits. The program that did it is not kept.
   Each covers what the other does not: the second knows nothing of the
-  registers, and the first runs a thousand times fewer numbers.
+  registers, and the first runs far fewer numbers.
 
 - Of the help, one instruction for the mouse is listed as out of reach
   in `harness/ported.py`: a click below the last line of an index that

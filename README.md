@@ -389,10 +389,15 @@ Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
 ctest --test-dir build --output-on-failure
 ```
 
+There are four tests. Three of them run no machine and take a second or
+two; `port` runs every scenario, in two and a half minutes on a machine
+that does nothing else.
+
 | Test | What it checks |
 |---|---|
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
 | `data` | Every text, box, dialog and table of the port that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. No machine is run for it |
+| `arith` | The two routines of `port/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
 | `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens
@@ -468,11 +473,10 @@ an instruction ran in the original does not mean that a screen shows what
 it is for; this is how to find out, for a branch whose effect cannot be
 pointed to in a golden.
 
-`python3 harness/arithcheck.py build/port` holds the two routines of
-`port/arith.c` against Python's arithmetic: it runs them, as the bytes
-that the compiler made of them, on a model of the processor, with as
-many pairs of numbers as it is told. No scenario would show a product
-or a quotient that is wrong for some numbers only.
+`python3 harness/arithcheck.py build/port` is the test `arith` by
+itself; with `--pairs N` it takes that many random pairs of numbers
+where the test takes 4,000. The two routines were held to 200,000 when
+they were written, which takes two and a half minutes.
 
 ### The machines
 
