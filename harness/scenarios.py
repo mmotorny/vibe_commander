@@ -244,6 +244,36 @@ out again (show.py --changes is how):
     87,772 bytes, which the search reads in three parts, "Enter Right
     F1" and then "Esc Ctrl+c". A search by contents of a few small files
     there is fast enough: the three *.bat of that directory.
+  - The box of F8 takes no key that was typed before it came up: "F8"
+    and "Enter" are steps of their own, and a step "F8 Enter" leaves the
+    box open. "Ctrl+a Space Enter" and 'F7 "name" Enter' do work as one
+    step. In the boxes about a read-only file, "Delete Skip Cancel", and
+    about a directory that is not empty, "Delete All Cancel", "Right
+    Enter" is the second answer and "Right Right Enter" the third; in a
+    box of two answers "Right Right" is the first again.
+  - DOS deletes the files of a directory at one call only up to the
+    first that is read-only: the others are then deleted one by one,
+    once that one has been answered for with Skip or Delete.
+  - Shift+F8 asks for a mask. "nul" is a file that DOS finds and cannot
+    delete: the one way to "Can't delete the file" on the bench. A mask
+    in a directory that is not there is "Can't find files"; a mask with
+    a drive and no directory, "c:*.zzz", says nothing when no file is
+    like it.
+  - The directory under the cursor of a tree panel is the current one
+    of DOS, once the files have followed there: F8 in the tree deletes
+    the current directory. The tree leaves TREEINFO.NCD in the root
+    when it is read from the disk; a panel lists the file once it is
+    read again, Ctrl+r. Made read-only, it cannot be marked as out of
+    date when a directory is made: a beep, and the tree stays as it
+    was. Ctrl+r in a tree panel reads the tree again; with the file
+    read-only it would make the panel one of a kind there is not, 5,
+    which no scenario does.
+  - A directory that F7 makes has the time of day, and the mini status
+    shows it to the minute when the cursor is on it. Late in a scenario
+    switch the mini status off first, "F9 o n".
+  - On the floppy, "Alt+F1 a", setting an attribute brings up the box
+    of DOS's critical error, "Retry Abort", which Esc leaves.
+  - Dates are typed as the country writes them: "31.8.99" in Russia.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -1267,6 +1297,133 @@ SCENARIOS = {
             "Alt+F7",
             '"hello.*" Tab Ctrl+y Enter',
             "Enter",                      # Go to: the cursor on the file
+        )),
+
+    "delete": Scenario(
+        "Files and directories deleted: read-only ones, a directory with "
+        "files in it, the current one from the tree, by a mask, and what "
+        "cannot be deleted",
+        steps=(
+            "Down Down Down",             # readme.txt
+            "F8",
+            "Enter",                      # gone
+            "Ctrl+a Space Enter",         # hello.txt read-only
+            "F8",
+            "Enter",                      # which is asked about
+            "Right Enter",                # Skip
+            "F8",
+            "Enter",
+            "Right Right Enter",          # Cancel
+            "F8",
+            "Enter",
+            "Enter",                      # Delete
+            'F5 "docs\\" Enter',          # notes.doc and data.bin into DOCS
+            "Down",
+            'F5 "docs\\" Enter',
+            "Down",
+            'F5 "src\\" Enter',           # and run.bat into SRC
+            "Home Down Enter",
+            "Down",
+            "Ctrl+a Space Enter",         # DOCS\\notes.doc read-only
+            "Ctrl+PgUp",                  # the cursor on DOCS
+            "F8",
+            "Enter",                      # it is not empty
+            "Right Right Enter",          # Cancel: nothing is deleted
+            "F8",
+            "Enter",
+            "Enter",                      # Delete: DOS deletes no file of
+                                          # it, the first being read-only,
+                                          # and that one is asked about
+            "Right Right Enter",          # Cancel: that stops it all
+            "F8",
+            "Enter",
+            "Right Enter",                # All
+            "Right Enter",                # Skip: data.bin goes, and the
+                                          # directory stays
+            "F8",
+            "Enter",
+            "Enter",
+            "Enter",                      # Delete: both are gone
+            "F9 r t",                     # the tree, which leaves its file
+            "Tab",                        # on the disk
+            "Ctrl+r",                     # read again: the file is marked
+                                          # as out of date first, and the
+                                          # byte written says that this
+                                          # is a tree
+            "Down",                       # SRC, which the files follow to:
+                                          # it is the current directory
+            "F8",
+            "Enter",
+            "Enter",                      # deleted all the same, from its
+                                          # parent, and the tree's file is
+                                          # marked as out of date
+            "Tab",
+            "Shift+F8",                   # by a mask
+            '"nosuch\\*.txt"',            # in a directory that is not there
+            "Enter",
+            "Esc",
+            "Shift+F8",
+            # No file is like this either, and nothing says so: a mask
+            # with a drive and no directory. The files are deleted by a
+            # call of DOS that leaves the carry flag as it was, the flag
+            # was set by comparing the colon with a backslash, and Intr21
+            # takes it for an error of DOS.
+            '"c:*.zzz"',
+            "Enter",
+            "Shift+F8",
+            '"nul"',                      # a device: DOS finds it, and
+            "Enter",                      # cannot delete it
+            "Esc",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of what is made
+            "Ctrl+PgUp",                  # C:\\
+            'F7 "new" Enter',             # a directory: the tree has no
+                                          # file to mark, and writes one
+            "Ctrl+r",                     # which the panel lists when it
+            "End",                        # is read again
+            "Ctrl+a Space Enter",         # read-only
+            'F7 "more" Enter',            # and cannot be marked: a beep
+        )),
+
+    "attributes-directory": Scenario(
+        "Dates that are refused or need working out, the attributes of "
+        "what is in a directory, and of a file on a disk that cannot be "
+        "written",
+        steps=(
+            "Down Down Down",             # readme.txt
+            "Ctrl+a",
+            "Tab Tab Tab Tab",            # to the date
+            '"5"',                        # a month and nothing else
+            "Enter",                      # refused
+            "Esc",
+            'Ctrl+y "2-29-00"',           # a year of two digits below 80,
+            "Enter",                      # and a leap year: 2000
+            'F5 "docs\\" Enter',          # a copy in DOCS
+            "Home Down",
+            "Ctrl+a",                     # a directory: what to set and
+            "Space",                      # what to clear. Read only, set
+            "Enter",                      # for every file in it
+            "Enter",
+            "Down",
+            "F8",                         # as deleting it shows
+            "Enter",
+            "Right Right Enter",
+            "Alt+F1 a",                   # the floppy, write-protected
+            "Ctrl+a",
+            "Space",
+            "Enter",                      # DOS's critical error, in a box
+            "Esc",                        # Abort: nothing more is said
+        )),
+
+    "attributes-russia": Scenario(
+        "A date set where the day comes first, in a month after July",
+        country="ru",
+        steps=(
+            "Down Down Down",
+            "Ctrl+a",
+            "Tab Tab Tab Tab",
+            '"31.8.99"',
+            "Enter",
         )),
 }
 

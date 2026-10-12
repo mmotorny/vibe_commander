@@ -257,10 +257,12 @@ port.
   where it is in the program shows in `build/shareware-layout/VC.COM`, by
   looking for its bytes.
 - An entry for C can be made for a label inside a procedure of another
-  file: `FromC DelTr0` is in `VCSUB3.INC`, the label in `DelTree` of
-  `VCF1.INC`. `Search` takes an argument in BP, and its entry, written
-  out, takes it in CX; `OncZoom` hands back three registers as `DialBox`
-  does, into three words on the stack.
+  file: `FromC DelTr0` was in `VCSUB3.INC`, the label in `DelTree` of
+  `VCF1.INC`, until `DelTree` became C. `Search` takes an argument in
+  BP, and its entry, written out, takes it in CX; `OncZoom` hands back
+  three registers as `DialBox` does, into three words on the stack, and
+  takes the include line in DX: a function that has none to give leaves
+  DX out of its `parm`.
 - The `port` test can run before anything is translated: with the batch
   listed in `harness/ported.py` without functions, it says whether the
   new scenarios hold on the port as it is, and so tells a scenario that
@@ -298,9 +300,44 @@ port.
   and `_a` in `port/asm/`, keep the one next to the routine, and go by
   its registers and answers: those of `DoublMo` were the other way round.
 - The BIOS is called through an entry too: `Int16_a` in `VCFIND.INC`
-  for the keyboard, which makes a number of the zero flag. `DirFunc_a`
-  there saves BP, which `DirFunc` leaves changed and the compiled code
-  goes by.
+  for the keyboard, which makes a number of the zero flag.
+- The program has code in its data: `DirFunc` and what follows it,
+  `FncSel` and `FncExt`, stand behind a `.DATA` with no `.CODE` after
+  it. `harness/coverage.py` knows the procedures there; code between
+  procedures it names in the code only.
+- A routine that a command puts into `FncAddr`, as `F38_40` deletes and
+  `M30_50` sets attributes, is called by `FncSel`, by `FncMas` and by
+  `DirFunc`, with the attributes in AL, and answers in AX: 1, 0, or
+  100h to stop. Its callers go on with BX, DX and SI, so its stub saves
+  all but AX. C code calls what `FncAddr` names with `FncCall` of
+  `port/vc.h`, whose entry keeps DS: `C00_00` does not.
+- A box may name a routine that `Dialog` calls when it is answered:
+  `F38_10` and `M30_60`. It gets the answer in AL, with ES and DS on the
+  main data, and hands back AL and the carry flag, set to go on with
+  the dialog.
+- The label inside a procedure that others call may skip a test at its
+  start: `DelTr0` in `DelTree`. The stub keeps the test and the label,
+  and the C function is what follows the label.
+- A caller may go on with what a routine leaves in AX when it reports
+  no error: `^R` in a tree takes AL after `DelTr0` for the kind of the
+  panel, the 1 that DOS answers for one byte written. Hand back all of
+  AX as DOS left it, also where nothing failed.
+- A call of DOS that leaves the carry flag as it finds it comes back
+  through `Intr21` with what the caller had, and `Intr21` takes a set
+  flag for an error. The calls for an FCB are like that, 13h in
+  `F38_70`; those from 38h to 4Fh and 56h to 60h clear it first. C code
+  leaves the flag undefined, so such a call goes through `Intr21f`,
+  which sets the flag as the assembly had it: read back from the call
+  to the instruction that set it. A call that the assembly makes with
+  `INT 21h` itself gets an entry of its own: `Fcb29_a`.
+- `EXTERN` for a C function stands in the list at the top of `VC.ASM`,
+  before any segment is open. In a file that is included inside the
+  code, the assembler takes the function for one of that segment and
+  makes of `CALL FAR PTR` a `PUSH CS` and a near call, without a word:
+  some such calls arrive and some do not, and the program ends in
+  "Invalid Opcode" somewhere else. `PUBLIC` can stand anywhere, and at
+  the top of the batch's own file, as in `VCF1.INC`, it does not meet
+  the line another batch adds.
 
 ### C for the port
 
@@ -358,6 +395,11 @@ with it is less obvious:
   pointers: a far pointer steps its offset only, as SI and DI do, down as
   well as up. Where the assembly divides a 32-bit count into pieces for
   that, comparing and subtracting in the loop needs no helper routine.
+- DX of a call of DOS that is no pointer, a drive or a date, is written
+  into the offset of `name` in `struct DosRegs`, which leaves DS as it
+  was set: `*(u16 STACK *)&regs.name`, as `DX_OF` in `port/dirfunc.c`.
+- `INC AX` and `CBW` on what DOS left in AL is
+  `(u16)(signed char)(u8)(value + 1)`.
 
 ## A run of batches
 

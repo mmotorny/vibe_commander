@@ -501,19 +501,6 @@ MnMn10_a PROC	FAR
 	RET
 MnMn10_a ENDP
 
-; DirFunc leaves no register as it was but ES.
-	PUBLIC	DirFunc_a
-DirFunc_a PROC	FAR
-	PUSH	BP
-	PUSH	DS
-	PUSH	DS
-	POP	ES
-	CALL	DirFunc
-	POP	DS
-	POP	BP
-	RET
-DirFunc_a ENDP
-
 ; The BIOS for the keyboard: AX as INT 16h takes it and as it comes back,
 ; and DX is 1 if the zero flag was set, 0 if not.
 	PUBLIC	Int16_a

@@ -431,6 +431,35 @@ BATCHES = [
                 "FndMove, for the mouse: the bench has none"),
         },
     ),
+    Batch(
+        title="Deleting files and directories, setting attributes, and "
+              "the files of a directory gone through",
+        source="dirfunc.c",
+        routines=("F38_10", "F38_40", "F38_60", "F38_70", "M30_50",
+                  "M30_60", "DirFunc", "DelTree"),
+        functions=("F38_10_c", "F38_40_c", "F38_70_c", "M30_50_c",
+                   "M30_60_c", "DirFunc_c", "DelTr0_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x3935, 0x3938),
+                "F38_70, for a drive that is not ready or whose disk the "
+                "user would not change, and for a current directory "
+                "that cannot be gone back to: the bench has no such "
+                "drive, and nothing takes the directory away meanwhile"),
+            **dict.fromkeys(
+                (0x3B78, 0x3B7B, 0x3B7E, 0x3B80, 0x3B83, 0x3B86, 0x3B89,
+                 0x3B8B),
+                "M30_50, for a file whose attributes DOS refuses for "
+                "another reason than a disk that cannot be written: the "
+                "file is one that DOS has just listed"),
+            0x3C0B: "M30_60, for a country that writes the year first: "
+                    "the scenarios cover the United States and Russia",
+            **dict.fromkeys(
+                (0xD881, 0xD888, 0xD88A, 0xD88D, 0xD890, 0xD892),
+                "DirFunc, for a path of 68 characters or more: DOS has "
+                "no directory with a path that long"),
+        },
+    ),
 ]
 
 

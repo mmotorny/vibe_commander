@@ -57,6 +57,7 @@ TstBr3:	CMP	BL,1
 	POP	BX
 	RET
 TstBrk	ENDP
+	FromC	TstBrk, <SBB AX,AX>	; CY as a number
 
 ;----------------------- Go to CASE --------------------
 ;			CS:SI - address of case table
@@ -961,6 +962,24 @@ OncZo1:	CALL	DialBox
 	POP	AX
 	RET
 OncZoom	ENDP
+
+; C code puts a box on the screen, zoomed once: OncZoom for the box at
+; CS:AX, which puts where the box is, BX, DX and SI, into the three words
+; at SS:DI.
+	PUBLIC	OncZoom_a
+OncZoom_a PROC	FAR
+	PUSH	BP
+	PUSH	DS
+	POP	ES
+	MOV	BP,AX
+	CALL	OncZoom
+	MOV	BP,DI
+	MOV	[BP],BX
+	MOV	[BP+2],DX
+	MOV	[BP+4],SI
+	POP	BP
+	RET
+OncZoom_a ENDP
 
 ;---------------------- Put window ---------------------
 ;			BH,BL - begin-center
@@ -2675,6 +2694,14 @@ Intr21	ENDP
 ; port/vc.h holds, at SS:BX. AX, BX, CX and DX are put back there as they
 ; return, and AX is not 0 afterwards if the carry flag was set.
 	PUBLIC	Intr21_a
+; Intr21f_a is the same with the carry flag set first if AX is not 0, and
+; clear if it is. A call of DOS that leaves the flag as it finds it, as
+; those for an FCB do, comes back with what the caller had, and Intr21
+; takes that for an error of DOS: F38_70 goes by it. Nothing from here to
+; the INT of Intr21 changes the flag.
+	PUBLIC	Intr21f_a
+Intr21f_a LABEL	FAR
+	NEG	AX
 Intr21_a PROC	FAR
 	PUSH	BP
 	PUSH	DS

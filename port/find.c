@@ -91,10 +91,8 @@ u8 __far *FndAdr(u16 number);
    return the cursor in the low word and the first line shown in the high
    one. Int10m calls the BIOS for the screen, and returns CX as that
    leaves it. Int16 calls the BIOS for the keyboard: the high word of
-   what it returns is 1 if the zero flag was set. DirFunc calls what
-   FncAddr names for every file of the directory at TmpBuf, and returns
-   what the last call did, or 100h when it was stopped. Help00 is the
-   help, which is C. */
+   what it returns is 1 if the zero flag was set. Help00 is the help,
+   which is C, as is DirFunc, of vc.h. */
 u32 GetMous(u16 place);
 void ClrKbd(void);
 void TypMous(u16 pointer);
@@ -107,7 +105,6 @@ u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
 u32 Int16(u16 ax);
 u16 ChgDisk(const u8 *path);
-u16 DirFunc(void);
 void Help00(void);                                      /* help.c */
 #pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
 #pragma aux ClrKbd  "*_a" __far modify exact [es]
@@ -121,7 +118,6 @@ void Help00(void);                                      /* help.c */
 #pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [cx] modify exact [ax bx cx dx es]
 #pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
-#pragma aux DirFunc "*_a" __far value [ax] modify exact [ax bx cx dx si di es]
 #pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* C routines of other files that vc.h does not have. */

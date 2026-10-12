@@ -2,6 +2,13 @@
 ;		Version :	16.10.1999
 ;-------------------------------------------------------
 
+; What deletes, sets attributes and goes through a directory is C, in
+; port/dirfunc.c. These are the boxes and the texts that it hands to
+; OncZoom and Dialog.
+	PUBLIC	DelFl_P, DelDr_P, DelCo_B, RdOnl_B, NoEmp_B, DelEr_B, CntDi_B
+	PUBLIC	StAtr_P, AtrEr_B, NoDat_B, PthEr_B, Del_S, DelFs_S, Empty_S
+	PUBLIC	NoFnd_S, NoAtr_S
+
 	.CONST
 MkDir_S	DB	" Make directory ",0
 MkDi1_S	DB	"^I",0FFh,LenStr-20,0
@@ -418,319 +425,38 @@ F38_08:	CALL	Dialog
 	JNE	F38_05
 	JMP	FncSel
 
+; Dialog calls this when the box for selected files is answered.
+;			   AL - the answer
+;	Return :	   AL - the answer to go by, CY=0
 F38_10	PROC	NEAR
-	CMP	AL,0
-	JNE	F38_11
-	MOV	BP,OFFSET DelCo_B
-	CALL	Dialog
-	CMP	AL,1
-	JA	F38_11
-	MOV	DS:[TmpBuf+90],AL
-	MOV	AL,0
-F38_11:	CLC
+	CallC	F38_10_c
+	CLC
 	RET
 F38_10	ENDP
 
+;			   AL - attributes of what is at TmpBuf
+;	Return :	   AX - 1 deleted, 0 not, 100h to stop
 F38_40	PROC	NEAR			; Delete file or directory
-	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	ES
-	POP	DS
-	TEST	AL,10h
-	JZ	F38_41
-	JMP	NEAR PTR F38_50
-F38_41:	MOV	DX,OFFSET Empty_S
-	MOV	BX,528h
-	MOV	BP,OFFSET DelFl_P
-	CALL	OncZoom
-	PUSH	SI
-	PUSH	DX
-	PUSH	BX
-	MOV	DX,OFFSET TmpBuf
-	CALL	ChgDisk
-	JC	F38_45
-	MOV	AH,41h
-	CALL	Intr21
-	JNC	F38_46
-	CMP	AX,WORD PTR 5
-	JNE	F38_42
-	MOV	AX,4300h
-	CALL	Intr21
-	JC	F38_42
-	MOV	AL,0
-	TEST	CL,1
-	JZ	F38_42
-	PUSH	DX
-	MOV	DX,OFFSET Del_S
-	MOV	BP,OFFSET RdOnl_B
-	CALL	Dialog
-	POP	DX
-	CMP	AL,1
-	JE	F38_44
-	JA	F38_45
-	MOV	CX,20h
-	MOV	AX,4301h
-	CALL	Intr21
-	JC	F38_42
-	MOV	BYTE PTR DS:[TmpBuf+91],1
-	MOV	AH,41h
-	CALL	Intr21
-	JNC	F38_46
-F38_42:	MOV	SI,DX
-	MOV	DI,OFFSET TmpBuf+130
-	MOV	CX,LenPath+13
-	REP	MOVSB
-	MOV	DX,OFFSET Del_S
-	MOV	BP,OFFSET DelEr_B
-F38_43:	CMP	AX,WORD PTR 53h
-	JE	F38_45
-	CALL	Dialog
-	JNZ	F38_45
-F38_44:	XOR	AX,AX
-	JMP	F38_56
-F38_45:	JMP	F38_53
-F38_46:	JMP	F38_55
-F38_50:	MOV	BX,528h
-	MOV	DX,OFFSET Del_S
-	MOV	BP,OFFSET DelDr_P
-	CALL	OncZoom
-	PUSH	SI
-	PUSH	DX
-	PUSH	BX
-	MOV	DX,OFFSET TmpBuf
-	CALL	ChgDisk
-	JC	F38_45
-	CALL	F38_60
-	JC	$+5			; JNC F38_54
-	JMP	NEAR PTR F38_54
-	MOV	DX,OFFSET Del_S
-	MOV	BP,OFFSET CntDi_B
-	CMP	AX,WORD PTR 100
-	JAE	F38_51
-	CMP	AL,5
-	JNE	F38_43
-F38_51:	CMP	BYTE PTR DS:[TmpBuf+90],0
-	JNE	F38_52
-	MOV	BP,OFFSET NoEmp_B
-	CALL	Dialog
-	CMP	AL,1
-	JA	F38_44
-	JB	F38_52
-	MOV	BYTE PTR DS:[TmpBuf+90],1
-F38_52:	POP	BX
-	POP	DX
-	POP	SI
-	CALL	ResWin
-	CALL	Window
-	MOV	DI,OFFSET TmpBuf
-	MOV	CX,LenPath+13
-	MOV	AL,0
-	REPNE	SCASB
-	DEC	DI
-	PUSH	DI
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET Mask_S
-	MOV	CX,5
-	REP	MOVSB
-	POP	DI
-	CALL	F38_70
-	MOV	BYTE PTR ES:[DI],0
-	OR	AH,AH
-	JNZ	F38_57
-	CALL	DirFunc
-	PUSH	ES
-	POP	DS
-	OR	AH,AH
-	JNZ	F38_57
-	MOV	BX,528h
-	MOV	DX,OFFSET Del_S
-	MOV	BP,OFFSET DelDr_P
-	CALL	OncZoom
-	PUSH	SI
-	PUSH	DX
-	PUSH	BX
-	MOV	DX,OFFSET TmpBuf
-	CALL	F38_60
-	JNC	F38_54
-	CMP	AX,WORD PTR 53h
-	JE	F38_53
-	JMP	F38_44
-F38_53:	MOV	AX,100h
-	JMP	F38_56
-F38_54:	MOV	BYTE PTR DS:[TmpBuf+91],1
-	CMP	BYTE PTR DS:[TmpBuf+92],0
-	JNZ	F38_55
-	MOV	BYTE PTR DS:[TmpBuf+92],1
-	MOV	SI,OFFSET TmpBuf
-	CALL	DelTree
-	JNC	F38_55
-	CMP	AX,WORD PTR 53h
-	JE	F38_53
-F38_55:	MOV	AX,1
-F38_56:	POP	BX
-	POP	DX
-	POP	SI
-	CALL	ResWin
-	CALL	Window
-F38_57:	OR	ES:[TmpBuf+91],AL
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
+	CallC	F38_40_c
 	RET
 F38_40	ENDP
 
-F38_60	PROC	NEAR
-	MOV	AH,3Ah
-	CALL	Intr21
-	JNC	F38_61
-	CMP	AX,WORD PTR 10h
-	STC
-	JNE	F38_61
-	MOV	SI,DX
-	MOV	DI,OFFSET TmpErr
-	MOV	AH,60h
-	CALL	Intr21
-	JC	F38_61
-	PUSH	SI
-	PUSH	DI
-	XCHG	SI,DI
-	MOV	CX,LenPath+13
-	REP	MOVSB
-	POP	DI
-	POP	SI
-	MOV	DX,DI
-	MOV	AX,'.'
-	STOSB
-	STOSW
-	MOV	AH,3Bh
-	CALL	Intr21
-	JC	F38_61
-	MOV	DX,SI
-	MOV	AH,3Ah
-	CALL	Intr21
-F38_61:	RET
-F38_60	ENDP
-
+;	Return :	   AX - 1 deleted, 0 not, 100h to stop
 F38_70	PROC	NEAR			; Delete files
-	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	ES
-	POP	DS
-	MOV	DI,OFFSET TmpBuf+200
-	MOV	AL,0FFh
-	STOSB
-	ADD	DI,5
-	MOV	AL,26h
-	STOSB
-	MOV	AX,WORD PTR DS:TmpBuf[0]
-	CMP	AH,':'
-	JE	F38_71
-	MOV	AL,'A'-1
-F38_71:	SUB	AL,'A'-1
-	STOSB
-	MOV	SI,OFFSET TmpBuf
-	CALL	CutPath
-	MOV	CX,SI
-	DEC	DI
-	MOV	AX,2902h
-	INT	21h
-	CMP	AL,1
-	MOV	AX,0
-	JE	F38_72
-	JMP	F38_80
-F38_72:	MOV	DX,OFFSET DelFs_S
-	MOV	BX,528h
-	MOV	BP,OFFSET DelFl_P
-	CALL	OncZoom
-	PUSH	SI
-	PUSH	DX
-	PUSH	BX
-	MOV	SI,CX
-	MOV	DX,OFFSET TmpBuf
-	CALL	ChgDisk
-	JC	F38_76
-	MOV	DI,OFFSET TmpBuf+100
-	MOV	BYTE PTR DS:[DI],0
-	CMP	SI,OFFSET TmpBuf
-	JBE	F38_77
-	CMP	BYTE PTR DS:[SI-1],'\'
-	JNE	F38_77
-	PUSH	SI
-	MOV	AL,DS:TmpBuf+200[7]
-	MOV	DL,AL
-	CMP	AL,0
-	JE	F38_73
-	ADD	AL,'A'-1
-	MOV	AH,':'
-	STOSW
-F38_73:	MOV	AL,'\'
-	STOSB
-	MOV	SI,DI
-	MOV	AH,47h
-	CALL	Intr21
-	POP	SI
-	JC	F38_75
-	CMP	SI,OFFSET TmpBuf+1
-	JBE	F38_74
-	CMP	BYTE PTR DS:[SI-2],':'
-	JE	F38_74
-	DEC	SI
-F38_74:	MOV	BL,0
-	XCHG	BL,DS:[SI]
-	MOV	DX,OFFSET TmpBuf
-	MOV	AH,3Bh
-	CALL	Intr21
-	MOV	DS:[SI],BL
-	JNC	F38_77
-F38_75:	CMP	AX,WORD PTR 53h
-	JE	F38_76
-	XOR	AX,AX
-	JMP	F38_79
-F38_76:	MOV	AX,100h
-	JMP	F38_79
-F38_77:	MOV	BYTE PTR DS:[TmpBuf+91],1
-	MOV	DX,OFFSET TmpBuf+200
-	MOV	AH,13h
-	CALL	Intr21
-	CMP	BYTE PTR DS:TmpBuf[100],0
-	JE	F38_78
-	MOV	BL,AL
-	MOV	DX,OFFSET TmpBuf+100
-	MOV	AH,3Bh
-	CALL	Intr21
-	JC	F38_76
-	MOV	AL,BL
-F38_78:	INC	AX
-	CBW
-F38_79:	POP	BX
-	POP	DX
-	POP	SI
-	CALL	ResWin
-	CALL	Window
-F38_80:	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
+	CallC	F38_70_c
 	RET
 F38_70	ENDP
+
+; For F38_70 in C: DOS makes an FCB at DI of the name at SI, and says in
+; AL whether the name is a mask. Not through Intr21, as in the original.
+	PUBLIC	Fcb29_a
+Fcb29_a	PROC	FAR
+	PUSH	DS
+	POP	ES
+	MOV	AX,2902h
+	INT	21h
+	RET
+Fcb29_a	ENDP
 
 F48_00:	PUSH	ES			; Shift F8 - delete
 	POP	DS
@@ -1032,246 +758,23 @@ M30_07:	MOV	WORD PTR DS:[TmpBuf+94],AX
 	JMP	FncSel
 M30_08:	JMP	Func04
 
+;			   AL - attributes of what is at TmpBuf
+;	Return :	   AX - 1 set, 0 not, 100h to stop
 M30_50	PROC	NEAR			; Set attributes
-	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	ES
-	POP	DS
-	TEST	AL,10h
-	JZ	M30_51
-	CALL	DirFunc
-	JMP	M30_59
-M30_51:	MOV	BX,528h
-	MOV	BP,OFFSET StAtr_P
-	CALL	OncZoom
-	PUSH	SI
-	PUSH	DX
-	PUSH	BX
-	MOV	DX,OFFSET TmpBuf
-	CALL	ChgDisk
-	JC	M30_55
-	MOV	AX,4300h
-	CALL	Intr21
-	JC	M30_56
-	MOV	DI,CX
-	MOV	AX,DS:AttrDat
-	AND	AX,DS:AttrTim
-	INC	AX
-	JE	M30_54
-	AND	CL,0FEh
-	MOV	AX,4301h
-	CALL	Intr21
-	JC	M30_56
-	MOV	BYTE PTR DS:[TmpBuf+91],1
-	MOV	AL,41h
-	CALL	OpenFil
-	JC	M30_56
-	MOV	BX,AX
-	PUSH	DX
-	MOV	AX,5700h
-	CALL	Intr21
-	MOV	AX,DS:AttrDat
-	CMP	AX,WORD PTR 0FFFFh
-	JE	M30_52
-	MOV	DX,AX
-M30_52:	MOV	AX,DS:AttrTim
-	CMP	AX,WORD PTR 0FFFFh
-	JE	M30_53
-	MOV	CX,AX
-M30_53:	MOV	AX,5701h
-	CALL	Intr21
-	POP	DX
-	MOV	AH,3Eh
-	CALL	Intr21
-	JC	M30_56
-M30_54:	MOV	CX,DI
-	AND	CL,DS:[TmpBuf+94]
-	OR	CL,DS:[TmpBuf+95]
-	MOV	AX,4301h
-	CALL	Intr21
-	JC	M30_56
-	MOV	AX,1
-	JMP	M30_58
-M30_55:	MOV	AX,100h
-	JMP	M30_58
-M30_56:	CMP	AX,WORD PTR 53h
-	JE	M30_55
-	MOV	DX,OFFSET NoFnd_S
-	CMP	AX,WORD PTR 3
-	JBE	M30_57
-	MOV	DX,OFFSET NoAtr_S
-M30_57:	MOV	BP,OFFSET AtrEr_B
-	CALL	Dialog
-	JNE	M30_55
-	XOR	AX,AX
-M30_58:	OR	DS:[TmpBuf+91],AL
-	POP	BX
-	POP	DX
-	POP	SI
-	CALL	ResWin
-	CALL	Window
-M30_59:	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
+	CallC	M30_50_c
 	RET
 M30_50	ENDP
 
+; Dialog calls this when the dialog of attributes is answered.
+;			   AL - the answer
+;	Return :	   AL - the answer to go by
+;			 CY=1 - a date or a time was refused
 M30_60	PROC	NEAR			; Test date & time
-	CMP	AL,0
-	JNE	M30_76
-	MOV	DS:AttrDat,0FFFFh
-	MOV	DS:AttrTim,0FFFFh
-	MOV	SI,OFFSET DosBuf+LenCmd+10+3
-	CALL	FndLet
-	CMP	AL,0
-	JE	M30_70
-	CALL	TxtNum
-	JC	M30_62
-	MOV	CX,AX
-	CALL	FndLet
-	CMP	AL,DS:Country.DateSep
-	JNE	M30_61
-	INC	SI
-	CALL	FndLet
-	CALL	TxtNum
-	JC	M30_62
-	MOV	DX,AX
-	CALL	FndLet
-	CMP	AL,DS:Country.DateSep
-M30_61:	JE	$+5			; JNE M30_67
-	JMP	NEAR PTR M30_67
-	INC	SI
-	CALL	FndLet
-	CALL	TxtNum
-M30_62:	JC	M30_67
-	MOV	BX,AX
-	CALL	FndLet
-	CMP	AL,0
-	JNE	M30_67
-	CMP	DS:Country.DateFmt,0
-	JE	M30_63
-	XCHG	CX,DX
-	CMP	DS:Country.DateFmt,1
-	JE	M30_63
-	XCHG	BX,DX
-M30_63:	SUB	BX,1980
-	JAE	M30_64
-	ADD	BX,1980
-	CMP	BX,100
-	JAE	M30_67
-	SUB	BL,80
-	JAE	M30_64
-	ADD	BL,100
-M30_64:	CMP	BX,128
-	JAE	M30_67
-	CMP	CX,12
-	JA	M30_67
-	CMP	CL,1
-	JB	M30_67
-	MOV	AX,CX
-	CMP	AL,7
-	JBE	M30_65
-	INC	AX
-M30_65:	AND	AL,1
-	ADD	AL,30
-	CMP	CL,2
-	JNE	M30_66
-	MOV	AL,28
-	TEST	BL,3
-	JNZ	M30_66
-	INC	AX
-M30_66:	CMP	DX,AX
-	JA	M30_67
-	OR	DX,DX
-	JE	M30_67
-	MOV	AL,CL
-	MOV	AH,0
-	MOV	CL,5
-	SHL	AX,CL
-	SHL	BL,1
-	ADD	AL,DL
-	ADD	AH,BL
-	MOV	DS:AttrDat,AX
-	JMP	M30_70
-M30_67:	JMP	M30_75
-M30_70:	MOV	SI,OFFSET DosBuf+LenCmd+10+100+3
-	CALL	FndLet
-	CMP	AL,0
-	JE	M30_76
-	XOR	CX,CX
-	XOR	BX,BX
-	CALL	TxtNum
-	JC	M30_67
-	MOV	DX,AX
-	CALL	FndLet
-	CMP	AL,DS:Country.TimeSep
-	JNE	M30_71
-	INC	SI
-	CALL	FndLet
-	CALL	TxtNum
-	JC	M30_67
-	CMP	AX,WORD PTR 60
-	JAE	M30_67
-	MOV	CH,AL
-	CALL	FndLet
-	CMP	AL,DS:Country.TimeSep
-	JNE	M30_71
-	INC	SI
-	CALL	FndLet
-	CALL	TxtNum
-	JC	M30_67
-	CMP	AX,WORD PTR 60
-	JAE	M30_67
-	MOV	BL,AL
-	CALL	FndLet
-M30_71:	CMP	AL,0
-	JE	M30_72
-	CALL	UpCase
-	MOV	BH,AL
-	INC	SI
-	CALL	FndLet
-	CMP	AL,0
-	JNE	M30_67
-M30_72:	MOV	AX,24
-	CMP	BH,0
-	JE	M30_73
-	MOV	AL,12
-	CMP	BH,'A'
-	JE	M30_73
-	MOV	CL,12
-	CMP	BH,'P'
-	JNE	M30_75
-M30_73:	CMP	DX,AX
-	JA	M30_75
-	JNE	M30_74
-	XOR	DX,DX
-M30_74:	MOV	AH,DL
-	ADD	AH,CL
-	MOV	CL,3
-	SHL	AH,CL
-	MOV	AL,BL
-	SHR	AL,1
-	MOV	BH,CH
-	MOV	BL,0
-	SHR	BX,CL
-	ADD	AX,BX
-	MOV	DS:AttrTim,AX
-	MOV	AL,0
-	CLC
-	JMP	M30_76
-M30_75:	MOV	BP,OFFSET NoDat_B
-	CALL	Dialog
-	STC
-M30_76:	RET
+	PUSH	DX
+	CallC	M30_60_c		; DX: not 0 if one was refused
+	NEG	DX
+	POP	DX
+	RET
 M30_60	ENDP
 
 M30_80	PROC	NEAR
@@ -1459,130 +962,13 @@ PthEr_B	DW	PthEr_P, 528h, 0
 	DW	426h, TmpBuf+200, OkMn_D
 	DB	0
 
+;	Return :	   AX - 1 all done, 0 not, 100h to stop
+;			   DS - main data
 DirFunc	PROC	NEAR			; Find files in directory
 	PUSH	ES
 	POP	DS
-	MOV	DI,OFFSET TmpBuf
-	MOV	DX,DI
-	MOV	CX,LenPath
-	XOR	AX,AX
-	REPNE	SCASB
-	JE	DiFu01
-	CMP	ES:FncAddr,OFFSET DiSi10
-	JE	DiFu00
-	MOV	BP,OFFSET PthEr_B
-	CALL	Dialog
-DiFu00:	XOR	AX,AX
-	JMP	DiFu14
-DiFu01:	DEC	DI
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET Mask_S+1
-	CMP	DI,DX
-	JE	DiFu02
-	MOV	AL,ES:[DI-1]
-	CMP	AL,':'
-	JE	DiFu02
-	CMP	AL,'\'
-	JE	DiFu02
-	DEC	SI
-DiFu02:	MOV	CX,5
-	REP	MOVSB
-	PUSH	ES
-	POP	DS
-	CALL	SetDTA
-	MOV	BX,1
-	MOV	CX,37h
-	MOV	AH,4Eh
-	JMP	DiFu05
-DiFu03:	MOV	SI,OFFSET DTA.FilName
-	CMP	BYTE PTR DS:[SI],'.'
-	JE	DiFu04
-	MOV	DI,SI
-	MOV	SI,OFFSET TmpBuf
-	CALL	CutPath
-	XCHG	SI,DI
-	MOV	CX,13
-	REP	MOVSB
-	CALL	TstBrk
-	JC	DiFu06
-	MOV	AL,DS:DTA.FilAttr
-	CALL	DS:FncAddr
-	PUSH	ES
-	POP	DS
-	CMP	AH,0
-	JNZ	DiFu06
-	CMP	AL,0
-	JNZ	DiFu04
-	MOV	BL,0
-DiFu04:	MOV	AH,4Fh
-DiFu05:	CALL	ChgDisk
-	JC	DiFu06
-	CALL	Intr21
-	JNC	DiFu03
-	CMP	AX,WORD PTR 53h
-	JNE	DiFu07
-DiFu06:	MOV	AX,100h
-	JMP	DiFu14
-DiFu07:	MOV	SI,OFFSET TmpBuf
-	MOV	DX,SI
-	CALL	CutPath
-	CMP	SI,DX
-	JBE	DiFu06
-	MOV	AL,DS:[SI-1]
-	CMP	AL,'\'
-	JNE	DiFu08
-	DEC	SI
-	CMP	SI,DX
-	JBE	DiFu06
-	MOV	BYTE PTR DS:[SI],0
-	MOV	AL,DS:[SI-1]
-DiFu08:	CMP	AL,':'
-	JE	DiFu13
-	MOV	SI,DX
-	CALL	CutPath
-	PUSH	SI
-	MOV	DI,OFFSET MenuBuf
-	MOV	CX,13
-	REP	MOVSB
-	POP	DI
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET Mask_S+1
-	MOV	CX,4
-	REP	MOVSB
-	PUSH	ES
-	POP	DS
-	CALL	ChgDisk
-	JC	DiFu06
-	MOV	CX,37h
-	MOV	AH,4Eh
-	JMP	DiFu11
-DiFu09:	TEST	DS:DTA.FilAttr,10h
-	JZ	DiFu10
-	MOV	DI,OFFSET MenuBuf
-	MOV	CX,13
-	MOV	AL,0
-	PUSH	DI
-	REPNE	SCASB
-	MOV	CX,DI
-	POP	DI
-	SUB	CX,DI
-	MOV	SI,OFFSET DTA.FilName
-	REPE	CMPSB
-	JE	DiFu12
-DiFu10:	MOV	AH,4Fh
-DiFu11:	CALL	Intr21
-	JNC	DiFu09
-	JMP	DiFu06
-DiFu12:	MOV	SI,OFFSET TmpBuf
-	CALL	CutPath
-	MOV	DI,SI
-	MOV	SI,OFFSET MenuBuf
-	MOV	CX,13
-	REP	MOVSB
-DiFu13:	MOV	AX,BX
-DiFu14:	RET
+	CALL	FAR PTR DirFunc_c
+	RET
 DirFunc	ENDP
 
 FncSel:	MOV	AL,0			; Selected files and directories
@@ -1753,55 +1139,18 @@ FncMs7:	MOV	WORD PTR DS:[TmpBuf+100],BX
 	CALL	Dialog
 FncMs8:	JMP	FncExt
 
+;			ES:SI - a path on the drive
+;	Return :	 CY=1 - error
+;			   AX - what DOS answered, with CY or without:
+;				^R in a tree goes on with it
 DelTree	PROC	NEAR
 	CMP	ES:ChgTree,0
 	JZ	DelTr5
-DelTr0:	PUSH	DS
-	MOV	AX,ES:[SI]
-	CMP	AH,':'
-	JE	DelTr1
-	MOV	AL,ES:[DosPth]
-DelTr1:	MOV	DX,OFFSET TmpErr
-	MOV	DI,DX
-	MOV	AH,':'
-	STOSW
-	MOV	SI,OFFSET Tree_F
-	MOV	CX,13+1
-	PUSH	CS
-	POP	DS
-	REP	MOVSB
-	PUSH	ES
-	POP	DS
-	MOV	DS:BlocEr,1
-	MOV	AL,11h
-	CALL	OpenFil
-	JNC	DelTr3
-	CMP	AX,WORD PTR 5
-	STC
-	JNE	DelTr4
-DelTr2:	CALL	Beep
-	CLC
-	JMP	DelTr4
-DelTr3:	MOV	BX,AX
-	MOV	SI,DX
-	MOV	BYTE PTR DS:[SI],0
-	MOV	CX,1
-	MOV	AH,40h
-	CALL	Intr21
-	PUSHF
-	PUSH	AX
-	MOV	AH,3Eh
-	CALL	Intr21
-	POP	AX
-	POP	BX
-	JC	DelTr4
-	PUSH	BX
-	POPF
-	JC	DelTr4
-	CMP	AX,CX
-	JNE	DelTr2
-DelTr4:	MOV	DS:BlocEr,0
-	POP	DS
+DelTr0:	PUSH	DX			; Whether the tree is read again
+	MOV	AX,SI			; by itself or not
+	CallC	DelTr0_c		; DX: not 0 for an error
+	NEG	DX
+	POP	DX
 DelTr5:	RET
 DelTree	ENDP
 

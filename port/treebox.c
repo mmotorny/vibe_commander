@@ -69,11 +69,7 @@ struct Box {
    bytes apart, from the entry at `at` on, or from the one behind it for
    Ctrl+Enter. It returns where it found one, or `at`.
 
-   DelTr0 spoils the tree file of a disk, so that the disk is read again:
-   of the disk that the two bytes at `path` in the main data name, if the
-   second is a colon, and of the current one if not. TstBrk is not 0 if
-   Esc, F10 or Ctrl+C is waiting in the keyboard buffer, and takes it
-   out. ChkSum adds up `length` bytes at `at` in the main data. OncZoom
+   ChkSum adds up `length` bytes at `at` in the main data. OncZoom
    puts the box on the screen that the assembly describes at `box`, an
    offset in its code segment, with its middle at `place`; only the first
    box since ZoomOne was cleared grows. */
@@ -93,8 +89,6 @@ u32 PgDn(u16 cursor, u16 first, u16 lines, u16 all);
 u16 Input(u16 bar);
 void InSt10(u16 place, u16 length, u16 text, u16 color);
 u16 Search(u16 at, u16 begin, u16 end, u16 step, u16 key);
-void DelTr0(u16 path);
-u16 TstBrk(void);
 u16 ChkSum(u16 at, u16 length);
 void OncZoom(u16 place, u16 box, struct Box STACK *where);
 #pragma aux HidCur  "*_a" __far modify exact [es]
@@ -113,8 +107,6 @@ void OncZoom(u16 place, u16 box, struct Box STACK *where);
 #pragma aux Input   "*_a" __far parm [ax] value [ax] modify exact [ax es]
 #pragma aux InSt10  "*_a" __far parm [bx] [cx] [si] [ax] modify exact [es]
 #pragma aux Search  "*_a" __far parm [si] [bx] [cx] [dx] [ax] value [ax] modify exact [ax cx si di es]
-#pragma aux DelTr0  "*_a" __far parm [si] modify exact [ax bx cx dx si di es]
-#pragma aux TstBrk  "*_a" __far value [ax] modify exact [ax es]
 #pragma aux ChkSum  "*_a" __far parm [si] [cx] value [ax] modify exact [ax es]
 #pragma aux OncZoom "*_a" __far parm [bx] [ax] [di] modify exact [bx dx si es]
 
@@ -700,7 +692,7 @@ ChTr55:                                 /* the disk read again */
             *screen++ = cell;
         place += 0x100;
     } while (--count);
-    DelTr0(path);
+    DelTr0((const u8 *)path);
     goto ChTr59;
 
 ChTr60:                                 /* the mouse, while a button is

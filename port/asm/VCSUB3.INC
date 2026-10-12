@@ -81,26 +81,9 @@ ReadTre	PROC	NEAR
 	RET
 ReadTre	ENDP
 
-; C code asks whether a key is waiting that stops what is being done,
-; adds up bytes of the main data, and puts a box on the screen that
-; grows only the first time: OncZoom for the box at CS:AX, which puts
-; where the box is, BX, DX and SI, into the three words at SS:DI.
-	FromC	TstBrk, <SBB AX,AX>	; CY as a number
+; C code adds up bytes of the main data. The entries of TstBrk and of
+; OncZoom, which it calls too, are next to those routines.
 	FromC	ChkSum
-	PUBLIC	OncZoom_a
-OncZoom_a PROC	FAR
-	PUSH	BP
-	PUSH	DS
-	POP	ES
-	MOV	BP,AX
-	CALL	OncZoom
-	MOV	BP,DI
-	MOV	[BP],BX
-	MOV	[BP+2],DX
-	MOV	[BP+4],SI
-	POP	BP
-	RET
-OncZoom_a ENDP
 
 ;	Put the cursor of the tree on the current directory
 ;			   ES - main data
@@ -442,11 +425,10 @@ ChTree	PROC	NEAR
 	RET
 ChTree	ENDP
 
-; C code waits for a key, writes a text of the main data into a field,
-; and spoils the tree file of a disk.
+; C code waits for a key, and writes a text of the main data into a
+; field.
 	FromC	Input
 	FromC	InSt10
-	FromC	DelTr0
 
 ; C code has a key looked at for the speed search: Search, which takes in
 ; CX what it has in BP, and hands back SI.
@@ -473,8 +455,9 @@ DirSize	PROC	NEAR
 	RET
 DirSize	ENDP
 
-; For DirSize in C: where DiSi10 is, to put into FncAddr, and a call of
-; what FncAddr names, with the attributes of a file in AL.
+; For DirSize and DirFunc in C: where DiSi10 is, to put into FncAddr, and
+; a call of what FncAddr names, with the attributes of a file in AL. Not
+; every such routine leaves DS as it was.
 	PUBLIC	DiSi10_o, FncCall_a
 DiSi10_o PROC	FAR
 	MOV	AX,OFFSET DiSi10
@@ -484,8 +467,10 @@ DiSi10_o ENDP
 FncCall_a PROC	FAR
 	PUSH	BP
 	PUSH	DS
+	PUSH	DS
 	POP	ES
 	CALL	ES:FncAddr
+	POP	DS
 	POP	BP
 	RET
 FncCall_a ENDP

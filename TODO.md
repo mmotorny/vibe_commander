@@ -198,6 +198,47 @@ Things that are known and not done. Standing instructions are in
 - A run of the harness that is killed outright leaves its QEMU running,
   at full load and outside the turns of `harness/turn.py`.
 
+- `^R` in a tree panel marks the tree's file as out of date and takes
+  what `DelTr0` leaves in AL for the kind of the panel: 1, the one byte
+  that DOS has written. With the file read-only the byte is not
+  written, the routine beeps and leaves DOS's error there, 5: the panel
+  is then one of a kind that there is not. The port hands back the same
+  5. No scenario does it: what the C code of the panels makes of a
+  fourth kind rests on reading, and whether it is what the original
+  makes of it has not been tried. `delete` has `^R` with the file
+  writable.
+- A mask with a drive and no directory, "c:*.zzz" for Shift-F8, never
+  says "Can't find files": `F38_70` calls DOS for an FCB with the carry
+  flag set by a comparison before it, DOS leaves the flag, and `Intr21`
+  takes it for an error. Ported like that, through `Intr21f`; `delete`
+  has it. It rests on FreeDOS leaving the flag: of another DOS that
+  clears it the original would say "Can't find files", and so would the
+  port.
+- When DOS deletes the files of a directory at one call, it stops at
+  the first that is read-only; the others are deleted one by one
+  afterwards. Cancel in the box about a directory that is not empty
+  leaves that directory and goes on with the next one selected, where
+  Cancel for a read-only file stops the command. `M30_50` does not ask
+  whether DOS could read or set the date and the time of a file. All
+  ported as they are.
+- Of `VCF1.INC` the three routines that make and read the ticks of the
+  attributes dialog, `M30_80`, `M30_82` and `M30_83`, 44 bytes, are
+  still assembly: only `M30_00` calls them, the code that asks, which
+  is assembly too. So are `FncSel` and `FncMas`, which go through the
+  selected files and those of a mask, and the code of every command
+  that asks first: F7, F8, Shift-F8, the attributes and the label.
+  `FncSel` and `FncExt` are code in the program's data, behind
+  `DirFunc`, and `harness/coverage.py` cannot name them yet: no
+  procedure follows them.
+- What `F38_70` does for a drive that is not ready, what `M30_50` does
+  when DOS refuses the attributes of a file that it has just listed,
+  `M30_60` where the year is written first, and `DirFunc` for a path
+  of 68 characters or more ran in no scenario and rest on reading.
+- A directory deleted with what is below it takes about 90 bytes of
+  the stack for every level in the port, where the assembly took 22.
+  The 32 levels that a path of DOS can have fit the port's stack; they
+  did not fit the original's 256 bytes.
+
 ## What batches have lost time to
 
 Minutes that a batch actually lost, for deciding which improvement of the
@@ -405,6 +446,44 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     those of the tree in a panel, not at the end, and its entries for C
     next to its stubs. A build and a test, which waited 86 seconds for
     a turn and passed at once.
+
+- Deleting, attributes and `DirFunc`, 8 routines, 1,607 bytes, 54
+  minutes in all, next to three other batches:
+  - 10 minutes waiting for a turn at the computer, in seven runs: 99
+    seconds before a run of `harness/reach.py` with steps, 42, 157, 104
+    and 77 before the goldens were derived, 27 before a `port` test and
+    98 before a run of `harness/show.py` on the port. The others' tests
+    follow one another, and a run that wants the computer alone waits
+    for a gap.
+  - 6 minutes: `EXTERN` for the C functions at the top of `VCF1.INC`,
+    which is included inside the code. The assembler made near calls of
+    the far ones without a word; deleting worked and the attributes
+    ended in "Invalid Opcode". A `port` test failed, 77 seconds, three
+    runs of `harness/show.py` on the port, and the bytes of a stub read
+    in the program file. In `CLAUDE.md` now.
+  - 6 minutes: the golden of `delete` derived four times, 71 seconds
+    each. The tree's file is gone from the root after a directory has
+    been deleted from the tree; a panel lists the new one only when it
+    is read again; and `DelTr0`, a label inside `DelTree` that `^R` in a
+    tree calls, was found by the assembler when the scenario was done,
+    and wanted a step. At the top of `harness/scenarios.py` now. Reading
+    `tools/routines.py` for labels that others call, before the
+    scenarios are written, would have saved the last one: it does not
+    show them.
+  - 4 minutes: `harness/reach.py` and the `port` test did not know
+    `DirFunc`, which is code in the program's data. `harness/coverage.py`
+    reads such procedures now, a commit of its own.
+  - 1 minute: "F8 Enter" in one step leaves the box of F8 open, which
+    takes no key typed ahead; half a try of 49 steps went another way
+    than meant. Noted at the top of `harness/scenarios.py`.
+  - 4 minutes for getting onto `main`, behind the tree and its box: two
+    files in conflict, `README.md` and this one, where both batches had
+    written in the same place. No conflict, and the same name twice:
+    the tree's batch had made entries for `TstBrk` and `OncZoom` next
+    to its stubs, and this one next to the routines; those next to the
+    routines stay. It had also made an entry for `DelTr0`, which is C
+    now: the entry went, and the tree's box calls the function. A build
+    and a test of 146 seconds, which passed at once.
 
 ## Ideas put off
 

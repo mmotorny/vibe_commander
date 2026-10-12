@@ -371,6 +371,10 @@ u16 DiSi10(void);
 u16 FncCall(u16 attributes);
 #pragma aux DiSi10  "*_o" __far value [ax] modify exact [ax]
 #pragma aux FncCall "*_a" __far parm [ax] value [ax] modify exact [ax es]
+/* Checks the keyboard for Esc, Ctrl-C and F10, and takes them from it:
+   not 0 if one was pressed. */
+u16 TstBrk(void);
+#pragma aux TstBrk  "*_a" __far value [ax] modify exact [ax es]
 
 /* A line as the assembly hands it over: the registers that describe it,
    pushed in this order by CallLine in port/asm/VC.ASM. */
@@ -467,6 +471,16 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors);
 #pragma aux PutTree "*_c" __far parm [ax] [bx] [dx] [es si] modify exact [ax es]  /* tree.c */
 void PutInf(u16 panel);                                 /* info.c */
 #pragma aux PutInf  "*_c" __far parm [ax] modify exact [ax]
+/* Calls what FncAddr names for every file of the directory at TmpBuf, and
+   returns 1 if every call did what it was to, 0 if one did not, and 100h
+   when it was stopped. */
+u16 DirFunc(void);                                      /* dirfunc.c */
+#pragma aux DirFunc "*_c" __far value [ax] modify exact [ax]
+/* Marks the tree's file of the drive that `path` names, or of the current
+   one, as out of date. Returns what DOS answered in the low word, and
+   something that is not 0 in the high one for an error. */
+u32 DelTr0(const u8 *path);
+#pragma aux DelTr0  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 
 /* The panel that a file entry belongs to. */
 #define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))
