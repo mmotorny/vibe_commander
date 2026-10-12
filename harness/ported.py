@@ -948,10 +948,13 @@ BATCHES = [
         # CtrlC is code between procedures: the routine for Ctrl-C and
         # Ctrl-Break, and behind it New21 and New27, which the listing
         # has as far procedures. The functions are New21 and New27, where
-        # the interrupts arrive, and what the assembly still calls.
+        # the interrupts arrive, the interrupt functions that those go on
+        # in, by the names that the compiler gives them, and what the
+        # assembly still calls. CtrlC, an interrupt function too, runs in
+        # no scenario, as in the original.
         routines=("CtrlC", "ExeProg", "AddProg", "FreeBlk", "ChkBlk",
                   "Release", "GetStat", "SetStat"),
-        functions=("New21", "New27", "Release_r"),
+        functions=("New21", "New27", "Int21_", "Int27_", "Release_r"),
         unreached={
             0x04AB: "CtrlC, where Ctrl-Break or DOS's Ctrl-C arrives: "
                     "the BIOS of the bench makes no interrupt of Ctrl "
@@ -966,8 +969,10 @@ BATCHES = [
         # Exec is code between procedures, as far as NotFind: with the
         # commands run, Exec10, which loads the program again, AlocEr,
         # and Exit00 to Exit05. The assembly calls none of it any more.
+        # Exit05, the interrupt function that DOS goes on in when it has
+        # ended the program, runs in no scenario, as in the original.
         routines=("Exec", "NotFind", "OutStr0", "SetBrk0", "SetBrk"),
-        functions=(),
+        functions=("SetBrk",),
         unreached={
             0x032B: "Exec11, where DOS has no block for the part of "
                     "the program that is loaded again after a command: "
@@ -1021,12 +1026,11 @@ BATCHES = [
         title="The critical error of DOS: the box that names the drive "
               "or the device and asks whether to try again",
         source="main.c",
-        # FatErr is an interrupt function, which begins by loading DS with
-        # a number that is relocated: the test cannot know its first
-        # instructions for code that ran, so it is not named. The box is
-        # in the screens of the scenarios.
+        # FatErr is an interrupt function, which DOS calls and no stub:
+        # it begins by loading DS with a number that is relocated, which
+        # coverage.py knows of.
         routines=("FatErr",),
-        functions=(),
+        functions=("FatErr",),
         unreached={
             **dict.fromkeys(
                 (0x90C9, 0x90CA, 0x90CD, 0x90CF),

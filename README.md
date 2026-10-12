@@ -582,7 +582,11 @@ Which code ran is taken from QEMU's log of the code it translates, which
 `harness/coverage.py` matches against the program file. For the original
 it is recorded with the goldens, and mapped to source lines through the
 listing of the build in `build/shareware-layout/`, which has every
-instruction at the address it has in the original.
+instruction at the address it has in the original. The port's code is not
+in the memory quite as it is in its file: the program adds the segment it
+is loaded at to the words that its relocation table names, and the file
+is held against the log with those words as the program has them where
+it is.
 
 The reserved room is listed in `harness/bytecheck.py`, with the offset and
 length of each piece and a note of what the original has there.

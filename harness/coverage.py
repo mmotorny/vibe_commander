@@ -9,9 +9,20 @@ the middle of one) what was logged is what was executed.
 Volkov Commander moves itself about in memory, but its code can be told
 from everything else by its bytes: a block whose bytes occur in the program
 file exactly once shows where in memory that part of the file sat.
+
+The port's file is an .EXE that DOS does not relocate: the program adds
+the segment it is at to the words that its relocation table names, in the
+part of it that stays in the memory once, and in the other part every
+time it has loaded that (see tools/mkexe.c, and Reloc in
+port/resident.c). Code that holds such a word is not in the memory as it
+is in the file, once that is done. So a block is held against the file as
+it is and against the file with those words as they are at the place in
+question: a function that begins by loading a segment, as an interrupt
+function of the compiler does, is known for what it is.
 """
 import bisect
 import re
+import struct
 from collections import Counter
 from dataclasses import dataclass
 
@@ -22,6 +33,19 @@ MIN_BLOCK = 8
 MIN_VOTES = 4
 
 FAR_CALL, FAR_JUMP = 0x9A, 0xEA
+
+# The port's file, as tools/mkexe.c makes it: a header, and behind it the
+# program from offset 100h of the segment it is loaded into, where a .COM
+# file's begins. There the program has the numbers it relocates itself
+# by, words: the second is where its relocation table is, in paragraphs
+# from the segment's start, the third how many entries that has for the
+# part that goes while a command runs, and the seventh how many more for
+# the part that stays. An entry is the offset and the segment of a word,
+# counted from the segment's start too.
+EXE_HEADER = 0x20
+COM_ORIGIN = 0x100
+EXE_INFO = 0x100
+EXE_TABLE, EXE_COUNT, EXE_STAYING = EXE_INFO + 2, EXE_INFO + 4, EXE_INFO + 12
 
 _LINE = re.compile(r"0x([0-9a-f]{8}):  ((?:[0-9a-f]{2} )*[0-9a-f]{2})"
                    r"(?:  +(\S.*))?$")
@@ -50,6 +74,37 @@ def blocks(trace_path):
         yield block
 
 
+def relocated(contents):
+    """The offsets in `contents`, a program file, of the words that the
+    program adds its segment to when it is loaded: those of the port's
+    relocation table. None of them for a file that is no .EXE, the
+    original."""
+    if contents[:2] != b"MZ":
+        return ()
+    in_file = EXE_HEADER - COM_ORIGIN       # from the segment to the file
+    table, count, staying = (
+        struct.unpack_from("<H", contents, at + in_file)[0]
+        for at in (EXE_TABLE, EXE_COUNT, EXE_STAYING))
+    count += staying
+    return tuple(segment * 16 + offset + in_file
+                 for offset, segment in struct.iter_unpack(
+                     "<HH", contents[table * 16 + in_file:][:count * 4]))
+
+
+def _loaded(contents, words, base):
+    """`contents` as the program has it in the memory when the byte at
+    offset 0 of the file is at address `base`: with its segment added to
+    each of `words`. None if the program cannot be there."""
+    segment, odd = divmod(base + EXE_HEADER - COM_ORIGIN, 16)
+    if odd or segment < 0:
+        return None
+    there = bytearray(contents)
+    for at in words:
+        value, = struct.unpack_from("<H", contents, at)
+        struct.pack_into("<H", there, at, value + segment & 0xFFFF)
+    return bytes(there)
+
+
 def executed(trace_path, contents):
     """Offset -> length in `contents` (a program file) of what was executed."""
     logged = list(blocks(trace_path))
@@ -76,11 +131,18 @@ def executed(trace_path, contents):
 
     # A block is in the program if every instruction of it is, at one and
     # the same place: single instructions are too short to go by.
+    words = relocated(contents)
+    there = {base: _loaded(contents, words, base) if words else contents
+             for base in bases}
+    bases = [base for base in bases if there[base] is not None]
     result = {}
     for block in logged:
         for base in bases:
-            if all(_matches(contents, address - base, code)
-                   for address, code in block):
+            # As the program is at that place, or as it is in the file:
+            # the part that stays runs before it relocates itself.
+            if any(all(_matches(image, address - base, code)
+                       for address, code in block)
+                   for image in dict.fromkeys((there[base], contents))):
                 for address, code in block:
                     result[address - base] = len(code)
                 break
