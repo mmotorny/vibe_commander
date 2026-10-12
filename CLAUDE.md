@@ -110,11 +110,11 @@ each batch, in this order:
    `build/Testing/Temporary/LastTest.log` afterwards: read it there rather
    than run the test again.
 
-The test can only see what a scenario shows. Where a branch of a routine
-has run in the original but its effect cannot be pointed to in a golden,
-`harness/notice.py` breaks it in a copy of the port and says whether any
-scenario notices. If none does, make one. Do not use it on the registers
-that a stub hands back: those are settled by reading the callers.
+The test can only see what a scenario shows. `harness/notice.py` breaks
+a branch in a copy of the port and says whether any scenario notices, but
+it is not run for a batch: over three batches it took a sixth of the time
+and found no translation that was wrong. A batch is done when every
+instruction has run in the original and the `port` test passes.
 
 When the `port` test fails where the change at hand cannot explain it,
 derive the goldens again before anything else. If `git diff` then shows
@@ -299,9 +299,9 @@ between them.
 - The run ends when the number of batches the user asked for is done,
   when the program is all C, or when something below stops it. Then
   report: what was translated, the bugs found in the original, the
-  instructions listed as out of reach, the branches that no scenario
-  notices, the size and the stack; and what was improved in the tools,
-  with the time it took and the time it is saving.
+  instructions listed as out of reach, the size and the stack; and what
+  was improved in the tools, with the time it took and the time it is
+  saving.
 - Stop and ask, with the batch at hand left uncommitted, before any of
   these. An agent that meets one hands its batch back as it is, and the
   session asks the user:
