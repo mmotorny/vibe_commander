@@ -16,11 +16,13 @@ How one file is done is in `CLAUDE.md`, "Moving the data of a file to C";
 Objects and bytes as they are linked, after the help's file had gone. An
 object is what stands from one label to the next. "Code" is all that is
 no data: stubs, entries and what jumps between them. A file with nothing
-but code in its row has its data in C.
+but code in its row has its data in C. `VC.ASM` had 14 texts of 696
+bytes: the fifteenth that was counted here was `TrnBeg`, a label where
+the first of them stood.
 
 | File | texts | boxes | dialogs | buttons, colours | tables | code | goes with |
 |---|---|---|---|---|---|---|---|
-| `VC.ASM` | 15 / 733 | 3 / 60 | 2 / 44 | 2 / 8 | 2 / 160 | 219 | `main.c`, `start.c` |
+| `VC.ASM` | | | | | 2 / 160 | 219 | `main.c`, `start.c` |
 | `VCFUNC.INC` | | | | | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
 | `VCMENU.INC` | | | | | 8 / 174 | 495 | `commands.c`, `menu.c` |
 | `VCF1.INC` | | | | | | 217 | `dirfunc.c` |
@@ -32,7 +34,7 @@ but code in its row has its data in C.
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 30 / 964 | 6 / 112 | 3 / 66 | 3 / 13 | 13 / 420 | 2,420 | |
+| all | 15 / 231 | 3 / 52 | 1 / 22 | 1 / 5 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -85,7 +87,8 @@ What names what:
 - An object names another by a word that holds its address: a box its
   lines, a dialog its box, its buttons and the routine for Enter, a
   table its labels. Sixteen are named from more than one file: `Ok_S`,
-  `OkMn_D`, `Var_S`, `Inc_S`, `Err_S` of `VC.ASM`; `Empty_S`, `Kov_S`,
+  `OkMn_D`, `Var_S`, `Inc_S`, `Err_S` of `port/main_t.c`, which were of
+  `VC.ASM`; `Empty_S`, `Kov_S`,
   `YesNo_S`, `YesNo_D` of `port/keys_t.c`, which were of
   `VCFUNC.INC`; `OkCan_S`, `OkCan_D` of
   `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`, which were of
@@ -178,7 +181,8 @@ the tables; `VCF1.INC`, where `DlWr4_S` is one, 81 bytes; `VCMENU.INC`,
 where the title `ExFl_S` is one, 80 bytes, and `Chk1_S`, which is read
 as far as the end of `Chk2_S` behind it, is ten; `VCVIEW.INC`, where
 the names of the two extension files are such texts, 13 bytes each, and
-`Run2_S`, 80 bytes; `VCEDIT.INC`, which has none.
+`Run2_S`, 80 bytes; `VCEDIT.INC`, which has none; the texts and boxes
+of `VC.ASM`, which have none either.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for

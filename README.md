@@ -95,7 +95,9 @@ what they show when that has changed, the box that asks for another
 drive when a disk cannot be read, the box of DOS's critical error, which
 names the drive or the device and asks whether to try again, and saving
 the setup when it has
-changed; and leaving the program. What the program does once it has
+changed; and leaving the program. The texts and boxes of those two, the
+program's title and the button Ok are constants of C, in
+`port/main_t.c`. What the program does once it has
 been started, and again whenever a command has run, is C: reading the
 setup file and the main extension file, or taking the defaults, the
 banner, asking DOS for the memory of its data and making the data of

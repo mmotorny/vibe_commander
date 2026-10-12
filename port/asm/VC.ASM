@@ -91,21 +91,16 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST, CONST2
 	EXTERN	F33_00_c:FAR, F34_00_c:FAR, F34_10_c:FAR
 	EXTERN	FncSel_c:FAR, FncExt_c:FAR, FncEx1_c:FAR
 
-; A text here that C code shows too. What C code or another file names
-; of the texts and tables of a file is made public in that file, so that
-; it can go to C without a line here changing.
-	PUBLIC	Title_S
-; The box of a drive that is not ready, and in the part that stays in the
-; memory the copy of the first panel, which the C code of the main loop
-; names.
-	PUBLIC	NoRd_P, WCB1sav
+; In the part that stays in the memory, the copy of the first panel,
+; which the C code of the main loop names.
+	PUBLIC	WCB1sav
 ; What port/resident.c keeps of the interrupts and of the programs that
 ; have stayed in the memory: its data is laid out here, in RDATA.
 	PUBLIC	IntTab, SavePtr, Vect21, Vect22, Vect27, NameBuf, TrnAdr
 ; What it reads in the head of that part, and where it enters the part
 ; that goes.
 	PUBLIC	RunPar, ChkFile, ImgEnd, TrnPrW, OvlPrm
-	PUBLIC	RelTab, RelCnt, ResPrW, DatPrW, ResCnt, Vers_S
+	PUBLIC	RelTab, RelCnt, ResPrW, DatPrW, ResCnt
 	PUBLIC	NoRun_S, FnFil_S, BadFl_S, Retr_S, Aloc_S
 	PUBLIC	Init00, Init11
 
@@ -610,9 +605,6 @@ RGAP	ENDS
 	EXTERNDEF Empty_S:BYTE, Kov_S:BYTE, YesNo_S:BYTE, YesNo_D:BYTE
 	EXTERNDEF OkCan_S:BYTE, OkCan_D:BYTE, Var2_S:BYTE, NoFnd_S:BYTE
 	EXTERNDEF EdFl_S:BYTE, Tree_S:BYTE, PtMnu_S:BYTE
-Title_S	DB	0FFh,14,'The ',PrgName,', Version ',VcVers,0
-Vers_S	DB	13,10, 'This program requires DOS 3.20 or later.'
-	DB	13,10, 0
 
 	.DATA
 Back_C	EQU	0
@@ -800,97 +792,19 @@ Exit:	CallC	Exit_c
 	RETF
 
 ;--------------------- Fatal error ---------------------
-	.CONST
-Err_S	DB	' Error ',0
-OnDr_S	DB	'on drive A',0
-OnDv_S	DB	'on device '
-Errs_S	DB	'Attempt to write on write-protected disk.',0
-	DB	'Unknown disk drive.',0
-	DB	'Drive or device not ready.',0
-	DB	'Unknown command.',0
-	DB	'Data error.',0
-	DB	'Bad request.',0
-	DB	'Seek error.',0
-	DB	'Non-DOS disk.',0
-	DB	'Sector not found.',0
-	DB	'Printer out of paper.',0
-	DB	'Write fault.',0
-	DB	'Read fault.',0
-	DB	'General failure.',0
-	DB	'Sharing violation.',0
-	DB	'Lock violation.',0
-	DB	'Invalid disk change.',0
-	DB	'FCB unavailable.',0
-	DB	'Sharing buffer overflow.',0
-	DB	'Code page mismatch.',0
-	DB	'Out of input.',0
-	DB	'Insufficient disk space.',0
-	DB	'Unknown error.',0
-FatEr_S	DB	'File allocation table bad.',0
-RtAb_S	DB	' Retry   Abort ',0
-Ok_S	DB	' Ok ',0
-Var_S	DB	'^V',0
-Inc_S	DB	'^I',0
-
 	.DATA
-RtAb_D	DB	7, 0
-	DB	7, 8
-	DB	0
-FtEr1_P	DB	Err_C, ErInv_C, ErInv_C, 0
-	DB	4, 1
-	DW	ErrBuf1
-	DW	TmpErr+1
-	DB	0, 70
-	DW	Err_S
-	DW	Var_S
-	DW	Inc_S
-	DW	RtAb_S
-FtEr2_P	DB	Err_C, ErInv_C, ErInv_C, 0
-	DB	4, 1
-	DW	ErrBuf1
-	DW	TmpErr+1
-	DB	0, 70
-	DW	Err_S
-	DW	Var_S
-	DW	Inc_S
-	DW	Ok_S
-FtEr1_B	BOXHD	< FtEr1_P, 928h, 0, 2, 0FFh, 0FFh, 7>
-	BOXMN	< 4, 0,0,0,0, 420h, TmpErr, RtAb_D>
-	DB	0
-FtEr2_B	BOXHD	< FtEr2_P, 928h, 0, 2, 0FFh, 0FFh, 7>
-	BOXMN	< 4, 0,0,0,0, 426h, TmpErr, OkMn_D>
-	DB	0
-OkMn_D	DB	4, 0
-	DB	0
 SecDat	DW	0
 
 	.CODE
 ; C: FatErr of port/main.c, an interrupt function of the compiler's. Its
-; texts and its boxes stay here, where Dialog reads them, and SecDat,
-; which is where it finds the main data.
-	PUBLIC	OnDr_S, OnDv_S, Errs_S, FatEr_S, FtEr1_B, FtEr2_B
+; texts and its boxes are C too, port/main_t.c. SecDat stays here, which
+; is where it finds the main data.
 
 ;-------------------- Not ready error ------------------
 ;			   AL - Drive letter
 ;	Return:		   AL - Drive letter
-	.CONST
-NoRd1_S	DB	"Can't read the disk in drive ^V:",0
-NoRd2_S	DB	"Press ENTER to try again, ESC to abort,",0
-NoRd3_S	DB	"or enter a different drive letter here ^r^V^r:",0
-	.DATA
-NoRd_P	DB	Err_C, ErInv_C, 0, 0
-	DB	4, 1
-	DW	ErrBuf
-	DW	TmpErr+1
-	DB	0, 55
-	DW	Err_S
-	DW	NoRd1_S
-	DW	NoRd2_S
-	DW	NoRd3_S
-
-	.CODE
-; C: ErrRdy_c of port/main.c, which only C code calls. Its box stays
-; here, where DialBox reads it.
+; C: ErrRdy_c of port/main.c, which only C code calls, with its box in
+; port/main_t.c.
 
 	INCLUDE	VCSUB1.INC
 	INCLUDE	VCSUB2.INC

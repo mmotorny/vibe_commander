@@ -149,11 +149,12 @@ const u8 __far *FndLet(const u8 __far *text);
 #pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
 
 /* What the assembly has that this reads or names: the scan codes of Alt
-   with a digit or a letter, which begin the speed search; the box that
-   says a drive is not ready, which DialBox reads there; the routine that
-   DOS calls for a critical error; and, in the part that stays in the
-   memory, the routine for Ctrl-Break, which only returns, and the copy
-   of the first panel that is kept while a command runs. */
+   with a digit or a letter, which begin the speed search; the routine
+   that DOS calls for a critical error; and, in the part that stays in
+   the memory, the routine for Ctrl-Break, which only returns, and the
+   copy of the first panel that is kept while a command runs. And of
+   port/main_t.c the box that says a drive is not ready, which DialBox
+   takes by its offset. */
 extern const u8 __far AltSr_T[];
 extern const u8 __far NoRd_P[];
 extern const u8 __far CtrlC[];
@@ -1044,9 +1045,9 @@ void RestVct(void)
 }
 
 /*--------------------- Fatal error ---------------------
-   What the assembly has for it: the texts, where DS will be on the
-   main data, SecDat, and the two boxes, with Retry and Abort or with Ok
-   alone. The texts and the boxes go to Dialog by their offsets there. */
+   What port/main_t.c has for it: the texts and the two boxes, with
+   Retry and Abort or with Ok alone, which go to Dialog by their offsets.
+   And the assembly: where DS will be on the main data, SecDat. */
 extern const u8 __far Err_S[];
 extern const u8 __far OnDr_S[];
 extern const u8 __far OnDv_S[];
