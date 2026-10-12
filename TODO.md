@@ -42,17 +42,13 @@ Things that are known and not done. Standing instructions are in
   has set: `DEC AX` and then `JE`, `STC` and then `JNC`. It should follow
   each flag by itself.
 
-- The Info panel says how much memory is free. With Memory allocation
-  switched off, "F9 o m", that is the memory left with all of the program
-  loaded, and the port is larger than the original: the number differs.
-  The scenario `memory` shows it with the number left out of the
-  comparison (see `harness/deviations.py`), so nothing checks the number
-  itself: that the port has less by what it is larger, at least. With
-  Memory allocation on, the number is what the part of the program that
-  stays during a command leaves, and every scenario with the Info
-  compares it. That part is assembly still. Once it is translated and
-  larger, this number differs too, and is to be left out in every
-  scenario, with every golden derived again.
+- The Info panel says how much memory is free: what the part of the
+  program that stays during a command leaves, or with Memory allocation
+  switched off, "F9 o m", what is left with all of the program loaded.
+  Both follow the size of the port, and the number is left out of the
+  comparison in every scenario (see `harness/deviations.py`). So nothing
+  checks the number itself: that the port has less by what it is larger,
+  at least.
 - Every disk of the bench has a volume label, so no scenario has the
   program look for one and find none. The Info does say "has no label"
   in `reread`, where it does not look: a directory named DIRINFO stops

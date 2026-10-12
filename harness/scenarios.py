@@ -82,8 +82,9 @@ out again (show.py --changes is how):
     "F9 o m" switches Memory allocation, and the Info then says how much
     memory is free with all of the program loaded: that depends on the
     size of the program, so the port shows another number than the
-    original. Only the scenario memory does it, and deviations.py has
-    the number left out of the comparison there. Every disk of the bench
+    original. The scenario memory does it. deviations.py has the Info's
+    free memory left out of the comparison, there and in every other
+    scenario. Every disk of the bench
     has a volume label, and the program does not get one off: Ctrl+F4,
     Ctrl+y, Enter and Enter again ask whether to delete it and leave it
     where it is.

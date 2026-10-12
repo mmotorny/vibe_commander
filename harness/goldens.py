@@ -216,8 +216,8 @@ def differences(golden, run, programs):
         # Both are blanked, the golden's screen as well: one derived before
         # a figure was left out of the comparison still holds it.
         found = screen_differences(
-            deviations.compared(golden.screens[number], golden.scenario),
-            deviations.compared(run.screens[number], golden.scenario))
+            deviations.compared(golden.screens[number]),
+            deviations.compared(run.screens[number]))
         if found:
             report += [f"--- after step {number}: {step}"] + found
     want, got = golden.disks, disk_lines(run.disks, programs)
@@ -278,7 +278,7 @@ def derive(name, benches):
     run = scenarios.run(scenario, original, benches[scenario.country],
                         signals=False, trace=True)
     write(Golden(name, setups.codepage(scenario.country), [],
-                 [deviations.compared(deviations.expected(screen), name)
+                 [deviations.compared(deviations.expected(screen))
                   for screen in run.screens],
                  disk_lines(run.disks, {original.filename})))
     write_ran(name, run.executed)

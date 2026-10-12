@@ -5,7 +5,7 @@ the original with these differences made to it (see goldens.py), so that it
 holds exactly what a build is expected to show.
 
 Two figures that a build shows are not held against the original at all,
-and are declared here too: see IGNORED and IGNORED_IN.
+and are declared here too: see IGNORED.
 """
 import re
 from dataclasses import replace
@@ -28,15 +28,15 @@ def expected(screen):
     return replace(screen, cells=bytes(cells))
 
 
-def compared(screen, scenario):
-    """`screen` of `scenario` with what is not compared blanked out. When a
-    build is held against a golden, both screens are made like this, that
-    of the golden too: it may have been derived before a figure was left
-    out. A golden that is derived now holds its screens like this already,
-    and blanking what is blanked changes nothing."""
+def compared(screen):
+    """`screen` with what is not compared blanked out. When a build is held
+    against a golden, both screens are made like this, that of the golden
+    too: it may have been derived before a figure was left out. A golden
+    that is derived now holds its screens like this already, and blanking
+    what is blanked changes nothing."""
     cells = bytearray(screen.cells)
     for row, line in enumerate(screen.lines()):
-        for pattern in IGNORED + IGNORED_IN.get(scenario, []):
+        for pattern in IGNORED:
             match = pattern.search(line)
             if match:
                 for column in range(*match.span(1)):
@@ -69,24 +69,19 @@ IGNORED = [
     # tested; the number says too little about the program to be worth
     # that. The field is the number and the room in front of it.
     re.compile(r"^Edit: .* Col \d+( [\d, ]+) Free"),
-]
-
-# The same, for what is not compared in the scenarios named and is
-# compared in every other.
-IGNORED_IN = {
     # The Info panel says how much memory is free. As the program is
     # configured that is what a command gets: all but the part of the
-    # program that stays while one runs, which is assembly still and as
-    # long in the port as in the original. So the number is the same, and
-    # every scenario that shows the Info compares it. With Memory
-    # allocation switched off it is what is left with all of the program
-    # loaded, and follows the size of the build like the editor's. This
-    # scenario switches it off, and has the number left out on all of its
-    # screens. The field is the number only: the line is centred, so a
-    # number of another length would move the words too, and that is
-    # noticed.
-    "memory": [re.compile(r"(\d[\d,]*) Bytes Free")],
-}
+    # program that stays while one runs. That part holds the program's
+    # stack, and it is to be translated: it does not stay as long in the
+    # port as in the original. With Memory allocation switched off the
+    # number is what is left with all of the program loaded, and follows
+    # the size of the build like the editor's. Either way it is left out,
+    # in every scenario. The field is the number only, as much of it as a
+    # box in front leaves to see, with the comma or the space that a
+    # country has between its thousands: the line is centred, so a number
+    # of another length would move the words too, and that is noticed.
+    re.compile(r"(\d+(?:[, ]\d{3})*) Bytes Free"),
+]
 
 # Deviations that show on no screen, and so change no golden. They are
 # listed here all the same, so that this is the whole list.
