@@ -333,13 +333,104 @@ What was met on the way:
   the entry that called through the word, their lines in the `EXTERN`
   list and their functions in `harness/ported.py`. Routines that take
   different things, as the commands do, are called from a `switch`
-  instead.
+  instead. The routine that a dialog names for Enter and F10 went that
+  second way: the word in its header is a number, `SUB_` of
+  `port/tables.h`, and `Dialog` has a `switch` that calls `F38_10`,
+  `M30_60` or `F35_61`, each of which takes and hands back something
+  else. The test `data` is told of each such word in `NAMED_OTHERWISE`,
+  with "is" and the number.
 - The linker's map has the static objects too, `option static`, marked
   with an `s`, and that is how the test finds a constant that is
   `static`.
 - No code may come within 4K of the stack: `tools/mkexe.c` stops the
   build. The constants stand between, `CONST2`, which `VC.ASM` declares
   in front of the code.
+
+What the agents found who moved the other files, each in ten to fifteen
+minutes by the steps above, and what those steps did not say:
+
+- `Var_S`, `Title_S` and `Tree_S` are declared far in `port/vc.h`, as
+  code reads them, and `tables.h` includes that. A box names its lines
+  by near words, so `tables.h` has each of the three under a near name
+  as well, `#define Var_S VarNear_S` with `#pragma aux VarNear_S
+  "Var_S"`, and a file of constants writes `Var_S` in a box like any
+  other line. The file that defines one of them writes no `#pragma aux`
+  for it: the macro would be expanded there, and the object named
+  `VarNear_S`.
+- Take every text from the assembly's bytes by a script, never from a
+  copy that an editor shows. A text may hold bytes that are no
+  characters, the arrows 18h and 19h in `Cnf14_S`, 1Eh in a line of the
+  editor's help, and a converted copy has them as something else or not
+  at all. The script reads the `DB` lines as bytes and writes the C,
+  with an octal escape for every byte outside 20h to 7Eh, for the quote
+  and for the backslash.
+- A byte that the assembly works out from an `EQU`, a length or the
+  number of a colour, is better an array of bytes with the expression
+  in it than an escape in a string: the reader sees what it is.
+- Buttons that stand behind the dialog that names them want a
+  declaration in front of the dialog, with the length: `static const u8
+  Name_D[5];`, the dialog, then the buttons.
+- The `mCtrl` of a box to tick holds a place: `NUMBER(MD_AT(field))`,
+  and `NUMBER(WCB_AT(field))` for a field of a panel.
+- `WinBuf`, `ErrBuf` and their like are arrays of words in `struct
+  MainDat`: `WinBuf+2000` is `MD_AT(WinBuf[1000])`.
+- An object that nothing names cannot be `static`: W202, "defined, but
+  not referenced", stops the build. It is written without `static`,
+  with the `#pragma aux` of one that others name.
+- When blocks of `.CONST` and `.DATA` are cut out of a file, the `.CODE`
+  behind the last of them has to stay where code follows: without it
+  the code is assembled into the data.
+- A text written longer than the assembly has it adds to the sum of
+  bytes in the test's last lines by exactly the difference. Work the
+  sum out before the build: a text that came out a byte long or short
+  shows there.
+- The test names an object of the assembly only as `assembly`, not by
+  its file: the list of what moves, in step 1, is made from the labels
+  of the file itself, by a script, and held against the test's list.
+- The "all" row of the inventory in `TODO.md` is added up again from
+  the rows, by a script, at every rebase: two agents each change a row
+  and the sum.
+- A comment in the code's C file that the move makes stale, "of the
+  assembly" where the object is of a file of constants now, may be
+  mended in the same commit: comments only.
+
+What is read behind the end of an object. The test compares as many
+bytes as an object has, and the program reads more of some: `MvzLine`
+copies as many bytes as it is told whatever the text, 68 for a path;
+`MainFil` and `ReadOne` copy a name as 13; a title is copied as 80; a
+loop goes to a count. What lies behind the text in the original is then
+read too, and the port has to have it there: the object is written as
+long as what is read, with the original's bytes, and the test holds
+them. The copy may be in another file than the text: `User_S` of
+`port/keys_t.c` is copied as 80 bytes by Menu file edit, in
+`port/commands.c`, and was found last for that.
+
+- `python3 harness/reads.py build/port` lists every place where a file
+  of code names a constant, with the bytes that are read of it there. A
+  place that it knows by its form, a loop to a count, `MvzLine`,
+  `MvsBw`, `MainFil`, a text read as far as its zero, a box handed on
+  by its offset, needs nothing. Any other is in `REVIEWED` there, with
+  the count and how it is known, by reading the code from where the
+  constant is named to where the read stops, through the functions that
+  it is handed to.
+- The test `data` fails for an object that is shorter than what is read
+  of it, for a text that is read as far as a zero byte and has none,
+  whether code reads it or a box names it, and for a place that is of
+  no known form and not in `REVIEWED`: so a new read is looked at when
+  it is written.
+- A table of colours is read at the place that the markup of its lines
+  asks for: none the first, `^R` the second, `^B` the third, `^U` the
+  fourth. A table of one or two colours is enough for lines that are
+  constants without the other marks; a line that holds what the user
+  typed or named wants four. The name of a file in the mini status is
+  written by `MovDz0`, not as a line.
+- What the tool cannot see is said at its top: a read that does not
+  begin with the constant's name in a file of code, and a table read
+  at an index that the program does not keep inside it. Of the second
+  kind are the menu that is none, which `TODO.md` has, and the defaults
+  of a panel, 88 bytes of which the original has 8: what lies behind
+  those is addresses of routines, or is not data of the port at all,
+  and no layout of the constants can make it the original's.
 
 ### Stubs in the assembly
 

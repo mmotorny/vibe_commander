@@ -146,6 +146,35 @@ What it does not hold, each listed in the tool with the reason:
 - Tables of the assembly that the original has not: `Main_T`, `CmdNx_T`,
   `MnuNx_T`, `F35_T`.
 
+What is read behind the end of an object is held too, as far as the
+code says how much that is: a name copied as 13 bytes, a path as 68, a
+title as 80. `harness/reads.py` lists every place where code names a
+constant with the bytes read there, 400 places, and the test fails for
+an object that is shorter, for a text read to a zero byte that has
+none, and for a place it does not know (see "What is read behind the
+end of an object" in `CLAUDE.md`). Eighteen texts are written longer
+than the assembly has them for this; `User_S` was the last found.
+
+Weighed against that, and not done: the constants laid out as one
+block in the original's order, so that what follows each object is the
+original's by construction. What it would take: the original's two
+segments of data are 13,096 bytes; the port has 11,568 of them under
+their names, in thirteen files of constants and some ninety arrays that
+the code files read through CS, and the rest is gone, tables of keys
+that are `switch` statements and tables of addresses. One block is one
+file in the original's order with filler for what is gone; the arrays
+of the code files out of the code segments, so that each of some two
+hundred places that read one by its name reads through a far pointer; and the
+arrangement by file given up, which let five agents move the data side
+by side. What it would cure beyond the sweep is nothing that is known.
+The reads that the sweep cannot make good, the menu that is none and
+the 88 bytes of a panel's defaults, go on into addresses of routines
+and into what is no data, and a word that holds an address is another
+number in the port wherever it stands. What the block would have and
+the sweep has not is that it needs no reading of the code: the tool
+goes by the text of the C, and a read that it takes for another form
+than it is would pass.
+
 ### The order
 
 **1. The data, file by file.** Several agents at once, one assembly file
@@ -195,24 +224,57 @@ Enter and F10 in its header, `SubFunc`: `F38_10`, `M30_60`, `F35_60` and
 things. `DialSub_a` and the stubs are gone, and the test `data` has each
 such word in `NAMED_OTHERWISE`, as a number.
 
-**3. The commands and the main loop.** One agent, or one after another,
-never two at once: all of it is one web of jumps through `port/main.c`,
-`port/menu.c` and the `.CODE` of every file. The loop of `port/main.c`
-calls the functions of the commands, by a `switch` where they take
-different things; the stubs of the commands go with `Main_T`, `CmdNx_T`,
-`MnuNx_T`, `F35_T`, `F1Next` and the tables of the menus, then `MainC`
-and `MainGo`: `Stay` of `port/resident.c` calls the loop, which wants DS
-on the main data, the one instruction that `FatErr` has too. The stubs
-that only stubs call go as their callers do, and `ReDir_a` when `ReDir`
-is one function. The other entries, tried as far as compiling:
-`ResSeg_a` is a function that returns the segment of a far pointer to a
-variable of its own, which compiles to `mov ax,ss`; `AsmSeg_a` is the
-segment of a far pointer to a constant of the group, `mov ax,seg Name`,
-a number that is relocated; `MemRun_a` reads two words of the part that stays through `ResSeg`;
-`Release_a` and `CallPSP` go when `Release` of `port/resident.c` is a
-far function that loads its own DS, as `SetBrk` is. With the last
-command the files of the assembly are empty and go, with their
-`INCLUDE` and their names in `CMakeLists.txt`.
+**3. The commands and the main loop.** Next. One agent, or one after
+another, never two at once: all of it is one web of jumps through
+`port/main.c`, `port/menu.c` and the `.CODE` of every file. What is
+there is 192 labels and 2,359 bytes of code: the stubs of the commands
+in four families, each with an end that goes on by a table (`CmdC`
+with `CmdEnd` and `CmdNx_T`, `MnuC` and `PanC` with `MnuEnd` and
+`MnuNx_T`, `F1Next`, `F35_T`), the stub of the menu bar with the seven
+tables of the menus' commands, and the glue of the loop. Three pieces,
+each a commit that the tests pass, in this order:
+
+- The loop calls the commands. `MainLoop` of `port/main.c` returns the
+  place of `Main_T` that the assembly is to jump to. It calls the
+  command instead, from a `switch` on the place, with what the
+  command's stub hands the function of `struct Regs`, and makes of what
+  the function returns what the end of its family makes of it: a place
+  of the loop, or another command with its registers, as `M01_01`,
+  `M06_10`, `F21_25`, `F21_30`, `F24_01`, `V00_01` and `F62_01` are
+  gone on to. The stub and the end of its family say what a case has to
+  do; "Stubs in the assembly" in `CLAUDE.md` has what was met when the
+  stubs were written. It can be done a family at a time: a place that
+  the `switch` has not is still returned to the assembly. With the last
+  family `Main_T`, `CmdNx_T`, `MnuNx_T`, `F35_T` and `F1Next` go.
+- The menu bar. Its stub jumps to a command by the tables of the menus,
+  with the registers as the bar leaves them. In C the tables are tables
+  of places, numbers of the same `enum`, which the `switch` takes. The
+  test `data` should hold them: where the original's table names a
+  routine, the port's has the place of that name, which the tool can
+  read in the `enum` of `port/main.c`. Drive... of a panel's menu went
+  to a stub with the wrong registers for two batches and no scenario
+  chose it: a table of the menus is data that no screen shows until
+  every item has been chosen.
+- The glue and the entries. `Stay` of `port/resident.c` calls the
+  loop, which wants DS on the main data, the one instruction that
+  `FatErr` has too; `MainC` and `MainGo` go. The stubs that only stubs
+  call go as their callers do, and `ReDir_a` when `ReDir` is one
+  function. The other entries, tried as far as compiling: `ResSeg_a`
+  is a function that returns the segment of a far pointer to a variable
+  of its own, which compiles to `mov ax,ss`; `AsmSeg_a` is the segment
+  of a far pointer to a constant of the group, `mov ax,seg Name`, a
+  number that is relocated; `MemRun_a` reads two words of the part that
+  stays through `ResSeg`; `Release_a` and `CallPSP` go when `Release`
+  of `port/resident.c` is a far function that loads its own DS, as
+  `SetBrk` is. With the last command the files of the assembly are
+  empty and go, with their `INCLUDE` and their names in
+  `CMakeLists.txt`.
+
+The code is small and the reading is not: each stub hands over and
+takes back registers of its own, and a command goes on in another with
+what it leaves. The `port` test is strong here, since every command
+runs in some scenario, and weak in one place, the registers that go
+round the loop to a command that happens to read them.
 
 **4. What is not of one file.** After 3. The compiler's helpers,
 `__U4M` and `__U4D`, went ahead: they are `port/arith.c`.
