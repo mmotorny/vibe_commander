@@ -98,6 +98,23 @@ add_programs(programs ${CMAKE_BINARY_DIR})
 set(layout_dir ${CMAKE_BINARY_DIR}/shareware-layout)
 add_programs(shareware-layout ${layout_dir} -DSHAREWARE_LAYOUT)
 
+# And VC once more with that layout, as an object file: its relocations say
+# which words of the original hold the address of something, and of what.
+# The test of the port's data goes by them (harness/datacheck.py).
+list(TRANSFORM VC_includes PREPEND ${CMAKE_SOURCE_DIR}/src/
+     OUTPUT_VARIABLE layout_includes)
+add_custom_command(
+    OUTPUT ${layout_dir}/VC.OBJ
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${layout_dir}
+    COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
+            $<TARGET_FILE:jwasm> -nologo -q -omf -DSHAREWARE_LAYOUT
+            -I${CMAKE_SOURCE_DIR}/src -Fo ${layout_dir}/VC.OBJ
+            ${CMAKE_SOURCE_DIR}/src/VC.ASM
+    DEPENDS jwasm ${CMAKE_SOURCE_DIR}/src/VC.ASM ${layout_includes}
+    COMMENT "Assembling VC.OBJ (shareware-layout)"
+    VERBATIM)
+add_custom_target(shareware-relocations ALL DEPENDS ${layout_dir}/VC.OBJ)
+
 # --- The port -----------------------------------------------------------------
 # Volkov Commander on its way from assembly to C: port/asm holds what is
 # still assembly, port/*.c what has been translated, and both are linked
@@ -217,7 +234,8 @@ function(add_port target directory)
         COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
                 name ${directory}/linked.exe
                 file ${directory}/VC.OBJ,${compiled}
-                option map=${directory}/VC.MAP,start=Alloc0 disable 1014
+                option map=${directory}/VC.MAP,start=Alloc0,static
+                disable 1014
         COMMAND mkexe ${directory}/linked.exe ${directory}/VC.MAP
                 ${directory}/VC.EXE ${port_compiled}
         DEPENDS mkexe ${directory}/VC.OBJ ${port_compiled}
@@ -253,6 +271,11 @@ add_custom_target(driver ALL DEPENDS ${CMAKE_BINARY_DIR}/DRIVER.COM)
 add_test(NAME bytes-match-original
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/bytecheck.py
             ${layout_dir}/VC.COM ${layout_dir}/VCSETUP.COM)
+# The texts and tables of the port against the original's, by their
+# names: see harness/datacheck.py.
+add_test(NAME data
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
+            --quiet ${layout_dir} ${port_dir})
 add_test(NAME port
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
             ${port_dir}/VC.EXE ${port_dir}/VC.MAP ${layout_dir}/VC.LST)

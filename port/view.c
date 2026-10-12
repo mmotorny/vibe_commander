@@ -188,7 +188,7 @@ extern const u8 __far SrEr_B[];         /* "Could not find the string" */
 #define HIGH(pair) ((u16)((pair) >> 16))
 
 /* What the status line says behind the size of the file. */
-static const u8 CODE Byts_S[] = " Bytes";
+static const u8 CODE Byts_S[6] = " Bytes";
 
 #define Menu_C 7                        /* the colour of the menu bar, and of
                                            the status line */

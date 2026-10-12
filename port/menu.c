@@ -148,7 +148,8 @@ u32 F39_00(u16 again, u16 panel, u16 bar);
     " Memory allocation\0" \
     "\0" \
     " Save setup\377\011Shift-F9\0"
-static const u8 CODE MenuLn[] = LEFT_S FILES_S COMMANDS_S OPTIONS_S;
+static const u8 CODE MenuLn[sizeof(LEFT_S FILES_S COMMANDS_S OPTIONS_S) - 1] =
+    LEFT_S FILES_S COMMANDS_S OPTIONS_S;
 
 /* Where in MenuLn the lines of each menu begin. */
 #define MenuLn1 0
@@ -156,7 +157,7 @@ static const u8 CODE MenuLn[] = LEFT_S FILES_S COMMANDS_S OPTIONS_S;
 #define MenuLn3 (MenuLn2 + sizeof FILES_S - 1)
 #define MenuLn4 (MenuLn3 + sizeof COMMANDS_S - 1)
 
-static const u8 CODE Ctrl_S[] = "Ctrl-Alt-";
+static const u8 CODE Ctrl_S[9] = "Ctrl-Alt-";
 #define Alt_S 5                         /* where in it Alt- begins */
 
 /* The pages of the help: for each kind of menu one for the menu itself

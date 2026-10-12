@@ -210,13 +210,18 @@ static const u8 CODE DefWCB[] = {
 
 /* The banner, the two texts that ask for Enter where the screen is not
    one the program can draw on, and what is said of a setup file that is
-   not one. */
+   not one. The end of the banner, CrLf_S, has no zero byte: it is copied
+   as far as the next one, with the text that stands behind it, Retrn_S,
+   and DOS writes it as far as the dollar sign. */
 static const u8 CODE Suff_S[]  = " freeware";
 static const u8 CODE Copyr_S[] =
     "\r\nCopyright (C) 1991-2000 Vsevolod V. Volkov";
-static const u8 CODE CrLf_S[]  = "\r\n$";
-static const u8 CODE Retrn_S[] = "\r\nPress ENTER to return ";
-static const u8 CODE Retr2_S[] = "\r\nto the Volkov Commander";
+static const u8 CODE CrLf_S[]  =
+    "\r\n$"
+    "\r\nPress ENTER to return \0"
+    "\r\nto the Volkov Commander";
+#define Retrn_S (CrLf_S + 3)
+#define Retr2_S (CrLf_S + 28)
 static const u8 CODE NoIni_S[] = "VC.INI is not correct.\r\n";
 
 /* What the environment is searched for, and the mask that the program

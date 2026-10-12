@@ -192,7 +192,8 @@ This fetches [JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
 MASM-compatible assembler, at a pinned commit, builds it, and assembles
 `src/` into `build/VC.COM` and `build/VCSETUP.COM`. It also assembles a
 second copy of both into `build/shareware-layout/`, with the room reserved
-that the byte comparison needs; only the tests use that copy.
+that the byte comparison needs, and `VC` there once more as an object
+file, for its relocations; only the tests use those.
 
 It then builds the port, `build/port/VC.EXE`, which is what the tests
 run. What the compiler made of each C file is written out as a listing,
@@ -349,6 +350,7 @@ ctest --test-dir build --output-on-failure
 | Test | What it checks |
 |---|---|
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
+| `data` | Every text, box, dialog and table of the port that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. No machine is run for it |
 | `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens

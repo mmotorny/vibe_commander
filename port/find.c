@@ -162,7 +162,7 @@ extern const u8 __far FindFil_stub[];
 #define SEGMENT(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))
 
 /* What the size column says for a directory. */
-static const u8 CODE SubDir[] = "SUB-DIR";
+static const u8 CODE SubDir[7] = "SUB-DIR";
 
 /* Errors of Intr21. */
 #define ERR_NOT_READY 0x53
