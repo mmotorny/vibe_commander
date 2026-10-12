@@ -848,26 +848,20 @@ Things that are known and not done. Standing instructions are in
   A box that comes up when the panels are drawn again later, as in
   `not-ready`, is answered like any other: `AutoTim` is 0FFFFh from
   the last time round.
-- What ran in the original is not recorded the same every time for a
-  step that clicks on an entry of a panel. `DoublMo` adds 0.4 seconds
-  to the time of day, and three instructions of it, `INC DH`, `CMP
-  DH,60` and `JB DblMo2` at 9506h, run when the hundredths are 60 or
-  more. Of five derivations of `mouse-list`, one had them not run and
-  four had them run, with the same screens every time; the golden of
-  `mouse-panel` has them as run too. The hundredths at which a step
-  happens are not the same from one run of a machine to the next: the
-  machine's clock follows the computer's while the BIOS waits for a
-  disk. `SUB DL,100` in `Func07` came and went the same way when the
-  clock was changed over. It matters when `DoublMo` is translated and
-  its instructions have to have run. The double click of `mouse-list`
-  itself, two steps within those 0.4 seconds, came out the same in
-  every derivation and in the port. It has room: the machine's clock is
+- What the program does by the hundredths of the time of day is the
+  same every time a scenario is run with the same program, but need not
+  be the same in the port, which gets to a step some instructions later
+  than the original, and so some hundredths. `DoublMo` adds 0.4 seconds
+  to the time of day of a click, and three instructions of it, `INC
+  DH`, `CMP DH,60` and `JB DblMo2` at 9506h, run when the hundredths
+  are 60 or more; `SUB DL,100` in `Func07` is such a place too. Which
+  way they went in the original is in the golden; a scenario that has
+  both ways is what tests them. The double click of `mouse-list`, two
+  steps within those 0.4 seconds, has room: the machine's clock is
   counted in what the machine executes, and little of that is between
-  two clicks, in one step or in two. With the pointer taken across the
-  screen and back between them, the second click was still in time
-  after 4 times, and after 6 and 11 in one run each, and late after 8
-  and after 16: the time it has is 0.4 seconds or up to 1.4, by the
-  hundredths of the first click (see `DoublMo` below). `mouse-user-menu`
+  two clicks, in one step or in two. The time a second click has is 0.4
+  seconds or up to 1.4, by the hundredths of the first click (see
+  `DoublMo` below). `mouse-user-menu`
   has one that is late, after 64 times, `_A_WHILE` of
   `harness/scenarios.py`, which is three seconds at the least.
 - The main loop hands the next command the registers as the assembly
@@ -1147,12 +1141,11 @@ Things that are known and not done. Standing instructions are in
   `DoublMo`, where a first click falls into the last 40 hundredths of a
   minute. The rest ran when the bench got its mouse, and the C did what
   the original does in every scenario of the mouse the first time it
-  was tried. Three more instructions of `DoublMo`, at 9506h, where the
-  hundredths of the first click are 60 or more, ran or did not from one
-  derivation of the goldens to the next when the main loop was
-  translated, by the time of day of the click. They are counted as run:
-  if a derivation comes out without them, the `port` test will say "not
-  executed" of them, and that is the clock, not the port.
+  was tried. Three more instructions of `DoublMo`, at 9506h, run where
+  the hundredths of the first click are 60 or more. They ran or did not
+  from one derivation of the goldens to the next while the machine's
+  clock still took in time of the host's; they run in `mouse-list` and
+  others, the same in every derivation now.
 - Of the screen's routines 26 instructions are out of reach on the
   bench and translated by reading: a monochrome display in mode 7, two
   of `ChkMode` and `ChgCur`; a screen on another page than the first,

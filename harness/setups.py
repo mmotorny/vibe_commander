@@ -202,9 +202,9 @@ LOAD_MOUSE = "CTMOUSE /3>NUL"
 PLACE = {"us": 176, "ru": 159}
 
 # What DOS runs on the test bench once it has booted. It loads the driver
-# of the tests and then waits for a key: that is where the machine's state
-# is saved, and where every scenario begins, with the Enter that its
-# script has first.
+# of the tests and then waits for a key: there the driver, which has no
+# script yet, stops the machine, and the machine's state is saved. Every
+# scenario begins there, with the Enter that its script has first.
 BENCH_COMMANDS = [LOAD_MOUSE, Path(driver.FILENAME).stem, "PAUSE>NUL",
                   "CLS", "C:", r"CD \WORK", r"D:\VC\VC"]
 
@@ -213,10 +213,13 @@ class Bench:
     """The test bench: a machine for every scenario, each the same.
 
     DOS is booted once, configured for `country`, and the machine's state
-    is saved as it waits for a key before starting the program, with the
-    driver of the tests loaded and waiting for its script. start() then
-    makes a machine in that state, with fresh disks and a script, in a
-    fraction of a second. Nothing a scenario does can reach the next one.
+    is saved as it waits for a key before starting the program, where the
+    driver of the tests, loaded and without a script, has stopped it.
+    start() then makes a machine in that state, with fresh disks and a
+    script, in a fraction of a second. Nothing a scenario does can reach
+    the next one, and nothing of the host's time is in that state: the
+    machine has executed the same instructions by then every time it is
+    booted, and its clock is counted in them (see CLOCK_SHIFT in dos.py).
 
     The program is set up as its distribution sets it up, but for the clock
     in the corner of the screen, which the distribution has on. No setup
@@ -244,9 +247,10 @@ class Bench:
                      [self._work, self._new_disk("boot.img", None, shipped),
                       blank], self._workdir, CLOCK) as machine:
             machine.wait_for_boot()
-            # The driver says when it is loaded and has found no script.
-            machine.until(lambda: b"R" in machine.written(), BOOT_TIME,
-                          "the driver of the tests did not load")
+            # The driver stops the machine when it is loaded and has
+            # found no script.
+            machine.wait_for_stop(BOOT_TIME,
+                                  "the driver of the tests did not load")
             machine.save(self._state)
         self.setup = setup or self._setup_without_clock(shipped)
 

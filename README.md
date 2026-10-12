@@ -399,6 +399,18 @@ its file size from appearing on screen as free space. A scenario that wants
 the program set up differently does that itself, through the menus. When a
 build is tested, up to four scenarios run side by side.
 
+The hard disks are SD cards, each in a controller of its own, which the
+BIOS serves like any hard disk; DOS and the program know a disk only
+through the BIOS. QEMU reads a sector of an SD card, as of a diskette,
+while the machine executes the instruction that asks for it. A disk on
+its IDE controller it reads in the background, and the BIOS asks in a
+loop whether the sector is there yet: how often, depends on how busy the
+computer is, and that made a machine's time of day differ from one run
+to the next (see below). QEMU does not keep all of such a controller in
+a saved state, so the harness notes where the BIOS has put each one and
+tells the machine that goes on from the state, through the ports that
+the BIOS used.
+
 Where DOS loads the program is chosen: the driver of the tests keeps some
 memory more than it needs, so that the original's stack ends where a page
 of the machine's memory ends. QEMU has to look at every write to a page
@@ -494,12 +506,20 @@ Where time is what the program goes by, it is the machine's, and the
 machine's clock is counted in the instructions that the machine executes,
 256 nanoseconds for each (QEMU's `-icount`): the timer's ticks, the time
 of day and the waits of the program come when the machine has done so
-much, not when the computer has had so long. Only while the machine is
-halted, waiting for a disk or for the script, does its clock follow the
-computer's. A scenario that shows the time of day still has to do so
-early, within the machine's first minute: the port and the original do
-not execute the same number of instructions, and their clocks drift
-apart by that.
+much, not when the computer has had so long. Nothing of the computer's
+time gets into it. Where the machine is halted, as the BIOS halts it
+while a program waits there for a key, its clock goes straight on to the
+next tick of the timer (`sleep=off`). Nothing in the machine waits for
+the computer: its disks answer within the instruction that asks. And the
+state that every scenario starts from is saved where the machine stops
+itself, which the driver has it do, by the port QEMU has for that, when
+it is loaded and finds no script. So every scenario begins at the same
+instruction and the same time of day, and gets to each of its steps at
+the same hundredth of a second, in every run and on a computer however
+busy. The program's first screen comes some ten seconds past noon. A
+scenario that shows the time of day still has to do so early, within the
+machine's first minute: the port and the original do not execute the
+same number of instructions, and their clocks drift apart by that.
 
 With the clock on, when a golden is derived, the driver looks at the
 screen every time the program comes round, for more than a second of the

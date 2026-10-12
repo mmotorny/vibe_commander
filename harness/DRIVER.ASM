@@ -20,8 +20,8 @@
 ; round twice like that with nothing left to take and nothing that it will
 ; do by itself after a while (AutoTim): the screen is then written out.
 ;
-; The script is on the third hard disk, which has no file system, from
-; its first sector on:
+; The script is on a hard disk of its own, which has no file system and is
+; known by the two bytes it begins with, from its first sector on:
 ;
 ;	A5 5A		says that it is a script
 ;	word		where AutoTim is in the program's main data, or FFFFh
@@ -51,7 +51,6 @@
 ;
 ; What the driver writes goes to a port that QEMU keeps in a file:
 ;
-;	'R'		the driver is loaded and waits for a script
 ;	'S' 4005 bytes	the screen at the end of a step: 2000 cells, the
 ;			cursor's column and row, the two lines of its
 ;			shape, the video mode
@@ -63,15 +62,28 @@
 ;			change within 20 ticks of the timer after 'S'
 ;	'E'		the script has ended; the machine is then reset
 ;
-; Until the disk holds a script the driver waits, halted between the
-; interrupts: the machine's state is saved like that, and the script is
-; there when a machine goes on from it.
+; While no disk holds a script the driver has nothing to go by, and stops
+; the machine, through the port that QEMU has for a program to do that
+; (pvpanic). There the machine's state is saved: at an instruction of the
+; machine's, not at a moment of the host's, so every machine that is
+; booted has executed the same by then. One that goes on from the state
+; has a script.
+;
+; A machine that goes on first waits for two ticks of the timer, halted.
+; QEMU's clock for the machine is the instructions executed, and while the
+; machine is halted it is put straight on to whatever is due next. As the
+; machine stops itself QEMU sometimes takes it for halted, and puts the
+; clock on to the next tick, and sometimes not: of twelve boots, six had
+; the timer 4.9 ms short of its tick in the saved state and six had it at
+; the tick. Halted until that tick and then until the one behind it, both
+; are at the same instruction at the same time.
 ;
 ; Assemble with JWasm: jwasm -bin -Fo DRIVER.COM DRIVER.ASM
 	.model	tiny
 	.186
 
 OutPort	EQU	0E9h			; QEMU's debug console
+StopPort EQU	505h			; QEMU's port that stops the machine
 Cells	EQU	4000			; Bytes of an 80 x 25 text screen
 Events	EQU	18			; Where the events begin in a script
 Rounds	EQU	2			; Idle rounds that end a step
@@ -94,8 +106,9 @@ Old28	dd	0
 Old33	dd	0
 SPos	dw	0			; Where in the script the next byte is
 SSec	dw	0FFFFh			; Which sector of it SecBuf holds
+SDisk	db	80h			; Which disk it is on, as the BIOS
+					; numbers the hard disks
 Ready	db	0			; The script's header has been read
-Told	db	0			; 'R' has been written
 Done	db	0			; The script has ended
 Idles	db	0			; Rounds the program has idled since
 					; anything was fed or seen to change
@@ -130,7 +143,7 @@ RdSec	proc	near
 	mov	PktLba,ax
 	mov	SSec,0FFFFh
 	mov	si,offset Packet
-	mov	dl,82h
+	mov	dl,SDisk
 	mov	ah,42h
 	int	13h
 	jc	RdSec1
@@ -163,15 +176,29 @@ Next	proc	near
 	ret
 Next	endp
 
-; Look for a script on the disk. Leaves Ready set if there is one.
+; Look for a script on the hard disks. Leaves Ready set if there is one.
 Load	proc	near
+	push	ax
+	push	ds
+	mov	ax,40h
+	mov	ds,ax
+	mov	ah,ds:[75h]		; How many hard disks the BIOS has
+	pop	ds
+	mov	al,80h
+	add	ah,al
+Load2:	cmp	al,ah
+	jae	Load1
+	mov	cs:SDisk,al
 	push	ax
 	xor	ax,ax
 	call	RdSec
-	jc	Load1
+	pop	ax
+	jc	Load3
 	cmp	word ptr cs:[SecBuf],5AA5h
-	jne	Load1
-	pusha
+	je	Load4
+Load3:	inc	al
+	jmp	Load2
+Load4:	pusha
 	push	ds
 	push	es
 	push	cs
@@ -341,12 +368,18 @@ Pump	proc	near
 	call	Load
 	cmp	cs:Ready,0
 	jne	Pump0
-	cmp	cs:Told,0		; No script yet: say so, once, and
-	jne	PumpW			; wait, halted and not counting
-	mov	cs:Told,1		; through the machine's clock
-	mov	al,'R'
-	out	OutPort,al
-PumpW:	hlt
+	push	dx			; No script: the machine stops here,
+	mov	dx,StopPort		; and one that goes on from here has
+	mov	al,1			; a script
+	cli
+	out	dx,al
+	sti				; Two ticks of the timer, halted, with
+	hlt				; no interrupt taken before the first
+	hlt				; halt: see the top
+	pop	dx
+	call	Load
+	cmp	cs:Ready,0
+	jne	Pump0
 	jmp	PumpX
 Pump0:	mov	ax,40h
 	mov	ds,ax

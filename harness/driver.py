@@ -430,8 +430,6 @@ def read(data):
             steps[-1].stack = data[at + 5:at + 5 + size]
             steps[-1].stack_segment = segment
             at += 5 + size
-        elif kind == b"R":
-            at += 1
         elif kind == b"E":
             ended = True
         else:

@@ -24,8 +24,42 @@ KEYBOARD_BUFFER = 0x41A           # where it is read, where it is filled
 # debug console, which QEMU keeps in a file.
 DRIVER_PORT = 0xE9
 
-# Hard disks are 64 cylinders x 16 heads x 63 sectors: 31.5 MB of FAT16.
+# Hard disks are 64 cylinders x 16 heads x 63 sectors: 31.5 MB of FAT16,
+# on a card of 32 MB.
 GEOMETRY = (64, 16, 63)
+
+# The hard disks are SD cards, each in a controller of its own on the PCI
+# bus, from this slot on. The BIOS serves them like any hard disk, and DOS
+# and the program know them only through the BIOS. They are cards because
+# of how QEMU reads them: a sector of an SD card while the machine
+# executes the instruction that asks for it, like one of a diskette; a
+# sector of a disk on its IDE controller in the background, when the host
+# gets round to it, while the BIOS asks in a loop whether it is there yet.
+# Every round of that loop is instructions, and so, with the clock counted
+# in them (see CLOCK_SHIFT), time of the machine: the hundredth of a second
+# at which a program did something was not the same in two runs: on a
+# busy host a call of the BIOS for a disk took up to 40 ms of the machine
+# longer in one run than in another. A card has a power of two for its
+# size.
+#
+# The BIOS numbers the cards as it gets done with setting them up, which
+# is not the order of their slots: of three it has the last as its second
+# disk. DOS gives its letters in the BIOS's order to the disks that have
+# a partition, and the driver of the tests looks for its script on all.
+SD_SLOT = 3
+CARD_SIZE = 1 << 25
+# What QEMU does not keep of such a controller when the state of a machine
+# is saved, though it keeps the rest: where the BIOS has put its registers
+# in the machine's memory, that they are switched on, and its interrupt.
+# These are registers of its PCI configuration: number, bytes.
+SD_SETTINGS = ((0x04, 2), (0x10, 4), (0x3C, 1))
+PCI_ADDRESS, PCI_DATA = 0xCF8, 0xCFC      # the ports of that configuration
+
+# The port by which a program stops the machine: QEMU's pvpanic. The
+# driver of the tests writes to it where the machine's state is to be
+# saved (see DRIVER.ASM).
+STOP_PORT = 0x505
+STOPPED = "guest-panicked"                # what QEMU calls a machine then
 
 # What DOS prints on the serial port once it has booted, just before it runs
 # the commands it was given.
@@ -36,9 +70,13 @@ BOOTED = b"BOOTED"
 # DOS, the timer's ticks and what the program waits for by them then go
 # by what the machine has done and not by how fast the host is or how
 # busy: a second of the machine is 3.9 million instructions, whenever they
-# are executed. Only a machine that is halted, as the bench's is while the
-# driver of the tests waits for its script, and as the BIOS is while it
-# waits for a disk, lets the host's time pass for its own.
+# are executed. A machine that is halted, as the BIOS halts it while it
+# waits for a key, executes none: its clock then goes straight on to the
+# next thing that is due by it, a tick of the timer as a rule, and the
+# host's time does not pass for the machine's there either (sleep=off).
+# So nothing of the host's time gets in, as long as nothing in the machine
+# waits for the host: the disks do not (see SD_SLOT), and the machine's
+# state is saved where the machine stops itself (see STOP_PORT).
 #
 # Smaller, and a tick of the timer is more instructions than the host has
 # time for: where the program waits for ticks, as it does five times for
@@ -97,6 +135,9 @@ class FatImage:
         disk._mtools("mpartition", "-I", *geometry, "x:")
         disk._mtools("mpartition", "-c", "-a", *geometry, "x:")
         disk._mtools("mformat", "-N", serial, "-v", label, "x:")
+        # The partition is the disk of that geometry; the card it is on
+        # is larger.
+        os.truncate(path, CARD_SIZE)
         return disk
 
     def _mtools(self, *args):
@@ -228,7 +269,8 @@ class Machine:
 
     The machine boots from the floppy or, given `state`, carries on from
     where save() left another machine with disks of the same kind. In the
-    second case it waits, paused, for resume().
+    second case it waits, paused, for resume(). The hard disks have to be
+    as large as an SD card can be: see CARD_SIZE.
 
     What the guest writes to its debug console, as the driver of the tests
     does, is kept in a file: written() returns it.
@@ -252,16 +294,22 @@ class Machine:
             "qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", "16",
             "-nodefaults", "-vga", "std", "-display", "none", "-no-reboot",
             "-rtc", f"base={clock},clock=vm", "-boot", "a",
-            "-icount", f"shift={CLOCK_SHIFT}",
+            "-icount", f"shift={CLOCK_SHIFT},sleep=off",
+            "-device", f"pvpanic,ioport={STOP_PORT:#x}",
+            "-action", "panic=pause",
             "-serial", f"file:{self._serial}",
             "-qmp", f"unix:{control},server=on,wait=off",
             "-chardev", f"file,id=written,path={self._written}",
             "-device", f"isa-debugcon,iobase={DRIVER_PORT:#x},chardev=written",
             "-drive", f"if=floppy,index=0,format=raw,readonly=on,file={floppy}",
         ]
-        for index, disk in enumerate(hard_disks):
-            command += ["-drive", f"if=ide,index={index},format=raw,"
-                                  f"file={disk}"]
+        self._slots = range(SD_SLOT, SD_SLOT + len(hard_disks))
+        for slot, disk in zip(self._slots, hard_disks):
+            command += ["-device", f"sdhci-pci,id=sd{slot},addr={slot:#x}",
+                        "-drive", f"if=none,id=card{slot},format=raw,"
+                                  f"file={disk}",
+                        "-device", f"sd-card,drive=card{slot},"
+                                   f"bus=pci.0/sd{slot}/sd-bus"]
         if trace:
             command += ["-d", "in_asm", "-D", str(trace)]
         if state:
@@ -275,6 +323,12 @@ class Machine:
             self.until(lambda: self._command("query-status")["status"]
                         != "inmigrate", LOAD_TIME,
                        "the saved state did not load")
+            # QEMU has left these out of the state: see SD_SETTINGS.
+            settings = json.loads(Path(f"{state}.pci").read_text())
+            if self._configure(settings) != settings:
+                raise MachineError("the SD controllers did not take the "
+                                   "settings they had when the state was "
+                                   "saved")
 
     def _connect(self, path):
         connection = socket.socket(socket.AF_UNIX)
@@ -348,9 +402,49 @@ class Machine:
         self.until(lambda: BOOTED in self._serial.read_bytes(), timeout,
                     "DOS did not finish booting", pause=0.05)
 
+    def _port(self, port, size, value=None):
+        """Read `size` bytes from a port of the machine, or write `value`
+        to it: for a machine that is not running."""
+        letter = {1: "b", 2: "h", 4: "w"}[size]
+        if value is None:
+            line = f"i/{letter} {port:#x}"
+        else:
+            line = f"o/{letter} {port:#x} {value:#x}"
+        reply = self._command("human-monitor-command",
+                              **{"command-line": line})
+        return int(reply.split("=")[1], 16) if value is None else None
+
+    def _configure(self, new=None):
+        """What the SD controllers have in the registers of SD_SETTINGS,
+        by "slot:register". With `new`, the same of another machine, the
+        registers are first set to that. This goes through the ports that
+        the machine has for it, as the BIOS does it; the machine must not
+        be running, and is left with its port for the address as it was."""
+        address = self._port(PCI_ADDRESS, 4)
+        found = {}
+        for slot in self._slots:
+            for register, size in SD_SETTINGS:
+                self._port(PCI_ADDRESS, 4, 1 << 31 | slot << 11 | register)
+                key = f"{slot}:{register:#x}"
+                if new:
+                    self._port(PCI_DATA, size, new[key])
+                found[key] = self._port(PCI_DATA, size)
+        self._port(PCI_ADDRESS, 4, address)
+        return found
+
+    def wait_for_stop(self, timeout, failure):
+        """Wait until the machine has stopped itself, as the driver of
+        the tests stops it when it has no script (see DRIVER.ASM)."""
+        self.until(lambda: self._command("query-status")["status"]
+                    == STOPPED, timeout, failure)
+
     def save(self, path):
-        """Pause the machine and save its state, for others to start from."""
-        self._command("stop")
+        """Save the state of the machine, which has stopped itself, for
+        others to start from, and next to it what QEMU leaves out of it:
+        see SD_SETTINGS."""
+        if self._command("query-status")["status"] != STOPPED:
+            raise MachineError("the machine has not stopped itself")
+        Path(f"{path}.pci").write_text(json.dumps(self._configure()))
         self._command("migrate", uri=f"file:{path}")
         self.until(lambda: self._command("query-migrate").get("status")
                     == "completed", SAVE_TIME,

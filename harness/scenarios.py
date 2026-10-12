@@ -296,9 +296,10 @@ out again (show.py --changes is how):
     clicks. The program allows 0.4 seconds, or up to 1.4, by the
     hundredths of the time of day at the first click. To have a click
     come late, take the pointer across the screen and back 64 times
-    first: _A_WHILE below. And the time of day itself is not the same
-    from run to run to the hundredth, so nothing may depend on which
-    side of a second a click is.
+    first: _A_WHILE below. The time of day is the same to the hundredth
+    every time a scenario is run with the same program, but the port
+    gets to a click some hundredths later than the original: nothing
+    may depend on which side of a second a click is.
   - The pointer in the top right corner of the screen blanks it, and
     the stars that are shown then are not the same in the original and
     in the port: take it there and away in one step, "Move@79,0
@@ -946,15 +947,18 @@ it with its first steps, the way a user would. It may end anywhere, with
 the program running or not.
 
 The machine's clock is counted in the instructions that the machine
-executes, 256 nanoseconds for each (see CLOCK_SHIFT in dos.py): the same
-scenario comes to the same time of day whenever it is run and however
-busy the host is. But the port takes more instructions to do a thing than
-the original, so the two do not agree on the time for long. Nothing on
-the bench shows the time of day, so that does not matter. A scenario that
-does show it, by switching the clock on or by listing a file it has made,
-has to be done with that before the machine's first minute is over: DOS
-is booted some four seconds past noon, and `copy`, of 68 steps, ends 27
-seconds past it.
+executes, 256 nanoseconds for each (see CLOCK_SHIFT in dos.py), and
+nothing of the host's time gets into it: a scenario comes to each of its
+steps at the same hundredth of a second of the time of day whenever it is
+run, on whichever bench and however busy the host is. But the port takes
+more instructions to do a thing than the original, so the two do not
+agree on the time for long. Nothing on the bench shows the time of day, so
+that does not matter. A scenario that does show it, by switching the
+clock on or by listing a file it has made, has to be done with that
+before the machine's first minute is over. The original shows its first
+screen 9.6 seconds past noon and the port 9.9; `copy`, of 68 steps, ends
+26.9 seconds past noon in the original and 28.1 in the port, and
+`delete`, of 63, 25.8 and 28.5: the port has taken up to a sixth longer.
 """
 import tempfile
 from dataclasses import dataclass, field
