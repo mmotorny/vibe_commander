@@ -17,7 +17,10 @@
 ; them, at TrnBeg, and is all that follows. It begins with CONST, the
 ; texts, and not with code: the machine of the tests is many times slower
 ; at every write to a page of the memory that has code which it has run,
-; and the stack ends just in front. The segments are declared before the
+; and the stack ends just in front. Behind the texts come the constants of
+; the C code, CONST2, which the compiler puts into this group, and the
+; tables here, _DATA, which are of the same class: a text that goes to C
+; still stands in front of the code. The segments are declared before the
 ; model so that the linker puts them first, and they are of one group
 ; with the rest of the assembly, so that every offset here counts from
 ; the PSP.
@@ -32,8 +35,10 @@ RGAP	ENDS
 CONST	SEGMENT	WORD PUBLIC 'CONST'
 TrnBeg	LABEL	BYTE
 CONST	ENDS
+CONST2	SEGMENT	WORD PUBLIC 'DATA'
+CONST2	ENDS
 	.MODEL	Tiny
-DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
+DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST, CONST2
 
 ;------------------- Routines written in C -------------
 ; They are compiled into a code segment of their own, which follows this
@@ -61,7 +66,6 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 	EXTERN	DiSi10_c:FAR
 	EXTERN	V00_02_c:FAR, V00_10_c:FAR, V13_00_c:FAR, V13_01_c:FAR
 	EXTERN	T00_00_c:FAR
-	EXTERN	Help00_c:FAR
 	EXTERN	F32_00_c:FAR, F62_01_c:FAR, F68_00_c:FAR
 	EXTERN	F82_01_c:FAR, F74_00_c:FAR, F73_00_c:FAR, F77_00_c:FAR
 	EXTERN	F80_00_c:FAR
@@ -88,20 +92,14 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 	EXTERN	F33_00_c:FAR, F34_00_c:FAR, F34_10_c:FAR
 	EXTERN	FncSel_c:FAR, FncExt_c:FAR, FncEx1_c:FAR
 
-; Texts here that C code shows too.
-	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
-; The name of the tree file, and the boxes shown while the tree is read
-; and saved, which C code hands to OncZoom.
-	PUBLIC	Tree_F, Tree_P, TrSav_P
-; Boxes and a text that C code hands to DialBox and Dialog.
-	PUBLIC	SavFi_P, SavEr_B, Prot_B, EdFl_S
-; A text, a box, and buttons with their colours, of the help.
-	PUBLIC	Help_S, HlpEr_B, HlMn1_D, HlMn2_D, HlpMn_P
-; The scan codes that begin the speed search, the box of a drive that is
-; not ready, the routine for the critical errors of DOS, and in the part
-; that stays in the memory the routine for Ctrl-Break and the copy of the
-; first panel, all of which the C code of the main loop names.
-	PUBLIC	AltSr_T, NoRd_P, WCB1sav
+; A text here that C code shows too. What C code or another file names
+; of the texts and tables of a file is made public in that file, so that
+; it can go to C without a line here changing.
+	PUBLIC	Title_S
+; The box of a drive that is not ready, and in the part that stays in the
+; memory the copy of the first panel, which the C code of the main loop
+; names.
+	PUBLIC	NoRd_P, WCB1sav
 ; What port/resident.c keeps of the interrupts and of the programs that
 ; have stayed in the memory: its data is laid out here, in RDATA.
 	PUBLIC	IntTab, SavePtr, Vect21, Vect22, Vect27, NameBuf, TrnAdr
@@ -605,6 +603,14 @@ RGAP	ENDS
 
 ;-------------------------- Data -----------------------
 	.CONST
+; Texts, buttons and the title of a tree that the boxes of more than one
+; file name. One that is defined in the assembly is made public by this,
+; for a box that is C to name; one that has gone to C is taken from there,
+; for a box that is still here.
+	EXTERNDEF Ok_S:BYTE, OkMn_D:BYTE, Var_S:BYTE, Inc_S:BYTE, Err_S:BYTE
+	EXTERNDEF Empty_S:BYTE, Kov_S:BYTE, YesNo_S:BYTE, YesNo_D:BYTE
+	EXTERNDEF OkCan_S:BYTE, OkCan_D:BYTE, Var2_S:BYTE, NoFnd_S:BYTE
+	EXTERNDEF EdFl_S:BYTE, Tree_S:BYTE, PtMnu_S:BYTE
 Title_S	DB	0FFh,14,'The ',PrgName,', Version ',VcVers,0
 Vers_S	DB	13,10, 'This program requires DOS 3.20 or later.'
 	DB	13,10, 0
@@ -778,7 +784,6 @@ ReDir_a	ENDP
 	INCLUDE	VCCOPY.INC
 	INCLUDE	VCVIEW.INC
 	INCLUDE	VCEDIT.INC
-	INCLUDE	VCHELP.INC
 	INCLUDE	VCMEM.INC
 	INCLUDE	VCFIND.INC
 
@@ -861,7 +866,7 @@ SecDat	DW	0
 ; C: FatErr of port/main.c, an interrupt function of the compiler's. Its
 ; texts and its boxes stay here, where Dialog reads them, and SecDat,
 ; which is where it finds the main data.
-	PUBLIC	Err_S, OnDr_S, OnDv_S, Errs_S, FatEr_S, FtEr1_B, FtEr2_B
+	PUBLIC	OnDr_S, OnDv_S, Errs_S, FatEr_S, FtEr1_B, FtEr2_B
 
 ;-------------------- Not ready error ------------------
 ;			   AL - Drive letter

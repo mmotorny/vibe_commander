@@ -17,45 +17,20 @@
  * it is, in the segment of whoever asks for the box, how it is to be
  * written and how long it may be.
  *
- * A dialog is a header, struct BOXHD, and behind it its fields, struct
- * BOXMN, up to a byte 0. A field is a line to type into, a group of which
- * one is chosen, a box to tick or a line of buttons. While the dialog is
- * up, what is typed is in DosBuf, behind the command line: three bytes
- * and the text, and 100 bytes further on the same for a second line. The
- * three bytes are the column of the cursor and a byte that is 0 until a
- * key has been typed there: the first one typed replaces the text.
+ * A dialog is a header, struct BOXHD of tables.h, and behind it its
+ * fields, struct BOXMN, up to a byte 0. A field is a line to type into, a
+ * group of which one is chosen, a box to tick or a line of buttons. While
+ * the dialog is up, what is typed is in DosBuf, behind the command line:
+ * three bytes and the text, and 100 bytes further on the same for a
+ * second line. The three bytes are the column of the cursor and a byte
+ * that is 0 until a key has been typed there: the first one typed
+ * replaces the text.
  */
-#include "vc.h"
+#include "tables.h"
 
-#pragma pack(push, 1)
-
-/* The header of a dialog: BOXHD of the assembly. */
-struct BOXHD {
-    u16 pDiBox;                         /* its box */
-    u16 BoxBase;                        /* where the middle of its top is */
-    u16 SubFunc;                        /* a routine for Enter and F10, or 0 */
-    u8  bKeyBar;                        /* the key bar to show */
-    u8  bMenu;                          /* the item of the menu bar, or FFh */
-    u8  bHelp;                          /* the page of the help, or 0 */
-    u8  bFlags;
-};
-
-/* A field of a dialog: BOXMN of the assembly. */
-struct BOXMN {
-    u8  mType;
-    u8  mUp;                            /* the fields that Up, Down, Left */
-    u8  mDown;                          /* and Right go to: see LINK_ */
-    u8  mLeft;
-    u8  mRight;
-    u16 mBase;                          /* where it is in the box */
-    u16 mPoint;                         /* what it sets */
-    u16 mCtrl;                          /* see each kind */
-};
-
-#pragma pack(pop)
-
-LAID_OUT(BOXHD, 10);
-LAID_OUT(BOXMN, 11);
+/* A word of a box or a dialog that names something, as the offset that
+   it is: tables.h has such a word as a pointer. */
+#define WORD(names) ((u16)(names))
 
 /* The kinds of a field. A line to type into has its text at mPoint in
    the segment of whoever asks for the dialog, its length in the low byte
@@ -803,13 +778,13 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     if (head->bFlags & BOX_ERROR)
         begin += (u16)md.SftErr << 8;
     if (!(head->bFlags & BOX_THERE)) {
-        DialBox(begin, head->pDiBox, include, segment,
+        DialBox(begin, WORD(head->pDiBox), include, segment,
                 (struct Box STACK *)&where);
         begin = where.begin;
         size = where.size;
         saved = where.saved;
     }
-    colors = AT(code, head->pDiBox);
+    colors = AT(code, WORD(head->pDiBox));
 
     /* The fields as they are when the dialog opens. */
     for (item = first; ; item += sizeof(struct BOXMN)) {
@@ -818,7 +793,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
         place = begin + field->mBase;
         screen = BasAdr(place);
         if (type == FIELD_INPUT) {
-            control = field->mCtrl;
+            control = WORD(field->mCtrl);
             text = INPUT(control);
             text[0] = 0;
             text[1] = 0;
@@ -833,14 +808,14 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
         } else if (type == FIELD_SELECT) {
             *((u8 *)screen + MD(field->mPoint) * (2 * 80)) = BULLET;
         } else if (type == FIELD_FLIP) {
-            value = *AT(segment, field->mCtrl);
+            value = *AT(segment, WORD(field->mCtrl));
             MD(field->mPoint) = (u8)value;
             if (value != 0)
                 *(u8 *)screen = 'x';
         } else if (type == FIELD_BUTTONS) {
             screen = BasAdr(Dial18(place, begin & 0xFF));
             MD(field->mPoint) = 0;
-            MnMn41(colors[2], 0, field->mCtrl, screen, code);
+            MnMn41(colors[2], 0, WORD(field->mCtrl), screen, code);
         } else
             break;
     }
@@ -858,21 +833,21 @@ Dial31:                                 /* the field of the cursor has the keys 
     type = field->mType;
     place = begin + field->mBase;
     if (type == FIELD_INPUT) {
-        control = field->mCtrl;
+        control = WORD(field->mCtrl);
         text = INPUT(control);
         pair = InpStr(place, text + 3, *(u16 *)text, control & 0xFF,
                       colors[1], head->bKeyBar);
         *(u16 *)text = HIGH(pair);
     } else if (type == FIELD_SELECT) {
-        pair = Select(place, head->bKeyBar, field->mCtrl & 0xFF,
+        pair = Select(place, head->bKeyBar, WORD(field->mCtrl) & 0xFF,
                       MDW(field->mPoint));
         MDW(field->mPoint) = HIGH(pair);
     } else if (type == FIELD_FLIP) {
         pair = FlipFl(place, head->bKeyBar, MD(field->mPoint));
         MD(field->mPoint) = (u8)HIGH(pair);
     } else if (type == FIELD_BUTTONS) {
-        pair = MinMnu(field->mCtrl, Dial18(place, begin & 0xFF),
-                      MnMn60(field->mCtrl, code), head->pDiBox,
+        pair = MinMnu(WORD(field->mCtrl), Dial18(place, begin & 0xFF),
+                      MnMn60(WORD(field->mCtrl), code), WORD(head->pDiBox),
                       head->bKeyBar | 0x80, MD(field->mPoint));
         MD(field->mPoint) = (u8)HIGH(pair);
     } else
@@ -944,7 +919,7 @@ Dial31:                                 /* the field of the cursor has the keys 
     if (field->mType == FIELD_SELECT && (link & LINK_SET)) {
         value = 0;
         if (link & LINK_LAST)
-            value = field->mCtrl - 1;
+            value = WORD(field->mCtrl) - 1;
         MD(field->mPoint + 1) = (u8)value;
     }
     goto Dial31;
@@ -971,7 +946,7 @@ Dial40:                                 /* the mouse */
                 if (type == 0)
                     break;
                 place = begin + field->mBase;
-                window = field->mCtrl;
+                window = WORD(field->mCtrl);
                 if (type == FIELD_INPUT) {
                     window = 0x100 | window & 0xFF;
                 } else if (type <= FIELD_FLIP) {
@@ -1006,7 +981,8 @@ Dial49:
     if (field->mType == FIELD_BUTTONS)
         MnMn40((u16)colors[0] << 8 | colors[2],
                Dial18(begin + field->mBase, begin & 0xFF),
-               MD(field->mPoint), MnMn60(field->mCtrl, code), field->mCtrl);
+               MD(field->mPoint), MnMn60(WORD(field->mCtrl), code),
+               WORD(field->mCtrl));
     cursor = item;
     goto Dial31;
 
@@ -1016,8 +992,8 @@ Dial70:                                 /* Enter */
     if (field->mType == FIELD_BUTTONS)
         key = MD(field->mPoint);
 Dial71:
-    if (head->SubFunc != 0) {
-        pair = DialSub(key, begin, cursor, head->SubFunc, segment, box);
+    if (WORD(head->SubFunc) != 0) {
+        pair = DialSub(key, begin, cursor, WORD(head->SubFunc), segment, box);
         key = LOW(pair);
         if (HIGH(pair) != 0)
             goto Dial31;
@@ -1031,7 +1007,7 @@ Dial71:
         if (type == 0)
             break;
         if (type == FIELD_INPUT) {
-            control = field->mCtrl;
+            control = WORD(field->mCtrl);
             text = INPUT(control) + 3;
             if (control & INPUT_NORMAL)
                 NormStr(text);
@@ -1040,7 +1016,7 @@ Dial71:
                 *to++ = *text++;
             *to = 0;
         } else if (type == FIELD_FLIP)
-            *AT(segment, field->mCtrl) = MD(field->mPoint);
+            *AT(segment, WORD(field->mCtrl)) = MD(field->mPoint);
     }
     goto Dial82;
 

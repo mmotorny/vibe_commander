@@ -2,8 +2,6 @@
 ;		Version :	16.10.1999
 ;-------------------------------------------------------
 
-	PUBLIC	PtMnu_S
-
 ;-------------------- Output menu bar ------------------
 ;			   AL - Case
 ; C: PtMnu1_c of port/bars.c. The names of the menus stay here: the menu

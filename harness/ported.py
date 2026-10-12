@@ -471,7 +471,7 @@ BATCHES = [
         source="help.c",
         routines=("Help", "Help70", "Help71", "Help72", "Help77", "RdEntry",
                   "SeekDsk", "ReadDsk", "DeCode"),
-        functions=("Help00_c",),
+        functions=(),
         unreached={
             0x7C17: "Help, for a click below the last line of the index: "
                     "the index has 62 lines, and the window shows 13 of "

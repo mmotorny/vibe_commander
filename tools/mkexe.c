@@ -34,11 +34,16 @@
  *     that port/asm/VC.ASM reserves at 100h.
  *
  * It also checks the object files of the compiled code, if they are named:
- * they may hold code only, of the part that goes or of the part that
- * stays. The program keeps its data in a segment that it
- * allocates when it starts, and its constants in the code segment; static
- * data of the compiler's making, a string literal for example, would be
- * linked to where the program does not look for it.
+ * one may hold code, of the part that goes or of the part that stays, or
+ * constants, and not both. The program keeps its data in a segment that it
+ * allocates when it starts, and has DS there; the constants that its code
+ * reads by their names are in the code segment. Static data of the
+ * compiler's making, a string literal for example, would be linked to
+ * where the program does not look for it. The tables that the program
+ * names by their offsets, boxes and dialogs with their texts, are
+ * constants of the compiler's own group, which is the assembly's: a file
+ * of those has no code that could read them through DS (see
+ * port/tables.h).
  *
  * And it checks the linker's map: no segment of compiled code may reach
  * into the last 4K of its 64K. Between the end of a segment and its
@@ -52,6 +57,12 @@
  * paragraph, so the end of its 64K is at most FF0h into a page, and such a
  * call has one end at F010h or beyond.
  *
+ * And that no code of the part that goes lies within 4K of the stack,
+ * which is the end of the part that stays: QEMU is many times slower at a
+ * write to a page of the memory that has code which it has run, and a
+ * push is a write. Constants stand between the two, the assembly's texts
+ * and the tables of the C code.
+ *
  * Usage: mkexe <linked.exe> <linked.map> <output.exe> [<compiled.obj>...]
  */
 #include <stdio.h>
@@ -62,6 +73,7 @@ enum {
     PSP_SIZE    = 0x100,
     HEADER_SIZE = 0x20,         /* of the output file */
     CODE_END    = 0xF000,       /* where compiled code ends, at the most */
+    PAGE        = 0x1000,       /* of the machine's memory */
 
     /* The block at 100h. The first three words are written here; the
        last three come as offsets from the PSP, which the linker knows,
@@ -120,15 +132,17 @@ static unsigned char *read_file(const char *path, long *size)
     return contents;
 }
 
-/* Fail if the object file at `path` has anything in a segment that is not
-   code. The compiler names its code segments by class, here CCODE, and
-   RCODE for the part of the program that stays in the memory. */
+/* Fail if the object file at `path` has anything but code, or anything
+   but constants. The compiler names its code segments by class, here
+   CCODE, and RCODE for the part of the program that stays in the memory;
+   its constants are in the segment CONST2. */
 static void check_object(const char *path)
 {
     long size, at = 0;
     unsigned char *object = read_file(path, &size);
     char names[64][32];
     int count = 1;                      /* names are numbered from 1 */
+    int code = 0, constants = 0;
 
     while (at + 3 <= size) {
         int type = object[at];
@@ -153,8 +167,14 @@ static void check_object(const char *path)
             class = p[3];
             if (name >= (unsigned)count || class >= (unsigned)count)
                 fail("an object file is not as expected");
-            if ((length || attributes & 2) && strcmp(names[class], "CCODE")
-                    && strcmp(names[class], "RCODE")) {
+            if (!length && !(attributes & 2))
+                ;
+            else if (!strcmp(names[class], "CCODE")
+                    || !strcmp(names[class], "RCODE"))
+                code = 1;
+            else if (!strcmp(names[name], "CONST2"))
+                constants = 1;
+            else {
                 fprintf(stderr, "mkexe: %s has %u bytes of static data in "
                         "segment %s; compiled code may hold none, not even "
                         "a string literal\n", path, length, names[name]);
@@ -163,17 +183,27 @@ static void check_object(const char *path)
         }
         at = end + 1;
     }
+    if (code && constants) {
+        fprintf(stderr, "mkexe: %s has code and constants of the "
+                "compiler's group; the code would read them through DS, "
+                "which is on the main data. A constant that only code "
+                "reads is declared CODE; one that is named by its offset "
+                "goes to a file of constants (see port/tables.h)\n", path);
+        exit(1);
+    }
     free(object);
 }
 
 /* Fail if the linker's map at `path` has a segment of compiled code that
-   ends beyond CODE_END, counted from where its segment register points. */
-static void check_map(const char *path)
+   ends beyond CODE_END, counted from where its segment register points.
+   Returns where the first code behind `from` begins, the assembly's or
+   compiled, counted from the PSP. */
+static unsigned long check_map(const char *path, unsigned long from)
 {
     FILE *f = fopen(path, "r");
     char line[256], name[32], class[32], group[32];
     unsigned segment, offset;
-    unsigned long size;
+    unsigned long size, first = 0xFFFFFFFFUL;
     int found = 0;
 
     if (!f) {
@@ -183,7 +213,13 @@ static void check_map(const char *path)
     /* A line of the list of segments: name, class, group, address, size. */
     while (fgets(line, sizeof line, f)) {
         if (sscanf(line, "%31s %31s %31s %4x:%4x %8lx", name, class, group,
-                   &segment, &offset, &size) != 6 || strcmp(class, "CCODE"))
+                   &segment, &offset, &size) != 6)
+            continue;
+        if (size && segment * 16UL + offset >= from
+                && segment * 16UL + offset < first
+                && (!strcmp(class, "CODE") || !strcmp(class, "CCODE")))
+            first = segment * 16UL + offset;
+        if (strcmp(class, "CCODE"))
             continue;
         found = 1;
         if (offset + size > CODE_END) {
@@ -200,6 +236,7 @@ static void check_map(const char *path)
     fclose(f);
     if (!found)
         fail("the map lists no segment of compiled code");
+    return first;
 }
 
 int main(int argc, char **argv)
@@ -218,7 +255,6 @@ int main(int argc, char **argv)
     remove(argv[3]);
     for (i = 4; i < argc; i++)
         check_object(argv[i]);
-    check_map(argv[2]);
     in = read_file(argv[1], &in_size);
 
     if (in_size < 0x1C || get16(in) != 0x5A4D)
@@ -264,6 +300,10 @@ int main(int argc, char **argv)
             fail("the data of the resident part has contents");
     if (start < INFO_END || start >= data)
         fail("the program does not start in the resident part");
+    if (check_map(argv[2], transit) < resident + (unsigned long)PAGE)
+        fail("the transit part has code within 4K of the stack, which "
+             "makes the machine of the tests many times slower: have "
+             "constants stand in front of the code");
 
     /* A relocation is a word of the program that holds a segment, counted
        from the PSP. The part that moves is relocated at its new place,

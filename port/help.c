@@ -2,7 +2,7 @@
  * The help: the file it is read from, the index and the pages in their
  * window, and the keys and the mouse that move in them.
  *
- * Translated from VCHELP.INC.
+ * Translated from VCHELP.INC, whose tables are in help_t.c.
  *
  * The help file is VC.HLP in the program's directory. It begins with a
  * header that holds its version, and at 194h has the place of its first
@@ -60,9 +60,9 @@ LAID_OUT(HlpData, LenHelp);
 
 void Help00(void);
 
-/* How the assembly calls this (see the stub in port/asm/VCHELP.INC): it
-   saves every register, as the routine did. This is Help: the assembler
-   takes Help_c for Help_C, the number of a colour. */
+/* This is Help. It saves every register, as the routine did; its name is
+   from when the assembly called it, and the assembler took Help_c for
+   Help_C, the number of a colour. */
 #pragma aux Help00 "*_c" __far modify exact [ax]
 
 /* Routines of the rest of the program that this file calls: all are C,
@@ -95,10 +95,10 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
 #pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
 #pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
-/* What the assembly keeps of the help, because its routines read it
-   there: the title of the window, the box of the error, which Dialog
-   takes by its offset, and for MinMnu the buttons under the index and
-   under a page and the numbers of their colours. */
+/* The tables of the help, in port/help_t.c: the title of the window, the
+   box of the error, which Dialog takes by its offset, and for MinMnu the
+   buttons under the index and under a page and the numbers of their
+   colours. */
 extern const u8 __far Help_S[];         /* " Help " */
 extern const u8 __far HlpEr_B[];        /* "There was error reading data..." */
 extern const u8 __far HlMn1_D[];        /* Help, Cancel */

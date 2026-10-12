@@ -2,12 +2,15 @@
 ;		Version :	16.10.1999
 ;-------------------------------------------------------
 
+; Of this file, and named by C code or by another file.
+	PUBLIC	MkErr_B
+
 ; What deletes, sets attributes and goes through a directory is C, in
 ; port/dirfunc.c. These are the boxes and the texts that it hands to
 ; OncZoom and Dialog.
 	PUBLIC	DelFl_P, DelDr_P, DelCo_B, RdOnl_B, NoEmp_B, DelEr_B, CntDi_B
-	PUBLIC	StAtr_P, AtrEr_B, NoDat_B, PthEr_B, Del_S, DelFs_S, Empty_S
-	PUBLIC	NoFnd_S, NoAtr_S
+	PUBLIC	StAtr_P, AtrEr_B, NoDat_B, PthEr_B, Del_S, DelFs_S
+	PUBLIC	NoAtr_S
 ; Those that its commands hand to Dialog, a text that F48_00 copies, and
 ; the stubs whose offsets they put into FncAddr.
 	PUBLIC	MkDi1_B, MkDi2_B, CrDir_S, MkDir_S, DelDi_B, Subdi_S, DelFi_B

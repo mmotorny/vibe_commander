@@ -2,6 +2,9 @@
 ;		Version :	09.09.1999
 ;-------------------------------------------------------
 
+; Of this file, and named by C code or by another file.
+	PUBLIC	Mask_S, Ext_F, Tree_F, Tree_P, TrSav_P, DrIn_F
+
 ;-------------- Read directory with save ---------------
 ;			    DS - WCBseg
 ;			AL = 0 - Without save

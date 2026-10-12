@@ -10,7 +10,9 @@
  *     else, so C code has no static data of its own.
  *   - Constants sit in the code segment, as they do in the assembly.
  *     Declare them CODE. String literals are not available, but to give
- *     such a constant its contents.
+ *     such a constant its contents. The tables that the program names
+ *     by their offsets, boxes and dialogs with their texts, are in files
+ *     of their own: see tables.h.
  *   - The stack is in a third segment. A pointer to a local variable must
  *     be declared STACK.
  *   - Each file panel has a segment to itself, reached by far pointers.

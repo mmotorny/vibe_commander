@@ -2,6 +2,9 @@
 ;		Version :	07.06.2000
 ;-------------------------------------------------------
 
+; Of this file, and named by C code or by another file.
+	PUBLIC	AltSr_T
+
 AdrNum	PROC	NEAR
 	PUSH	AX			; Room for the four numbers
 	PUSH	AX

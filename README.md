@@ -112,7 +112,9 @@ those, by which the map of the memory lists them and releases them, and
 its answer to a program that asks for its data, as its setup program
 does. The help is C as a
 whole: reading its file, showing the index
-and the pages in their window, and taking the keys and the mouse there.
+and the pages in their window, and taking the keys and the mouse there;
+its file of the assembly is the first that is gone, with its texts, its
+box and its buttons constants of C.
 So is the tree of directories away from its panel: reading it from the
 disk, keeping it in its file there, and the box in which a directory is
 chosen from it. The file search is C as a whole: the command with its
@@ -173,7 +175,7 @@ menu, and the setup saved.
 | Path | Contents |
 |---|---|
 | `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `port/` | The program on its way to C: `port/*.c` is what has been translated, `port/asm/` what is still assembly |
+| `port/` | The program on its way to C: `port/*.c` is what has been translated, with the tables of a file in the one next to it whose name ends in `_t`, and `port/asm/` what is still assembly |
 | `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces; `routines.py` lists the routines that are still assembly; `flagscan.py` examines the callers of a routine before it is translated |
 | `CMakeLists.txt` | Builds the assembler and the programs, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
@@ -321,6 +323,21 @@ data over that code.
 Every step is checked by the `port` test below, and nothing else decides
 whether a translation is right. The routines translated so far are listed
 in `harness/ported.py`.
+
+The program's texts and tables are checked by themselves, by the `data`
+test: a table that no screen shows can be wrong in every scenario and
+pass. The boxes and dialogs name their texts, their buttons and one
+another by address, words that are offsets in the one segment the
+assembly has them in. In C they are constants written with the names of
+what they name, in files that hold nothing else (`port/help_t.c`, with
+`port/tables.h` for how they are written): the compiler puts them into
+the same group as the assembly's, so the two can name each other's while
+both exist. They are apart from the code because the code has its data
+segment on memory that the program asks DOS for, and would read a
+constant that it names there. The test holds each against the original
+by its name: the bytes, and for a word that holds an address the thing
+that it names, which the original's source, assembled once more as an
+object file, tells by its relocations.
 
 The tests run the program that is shipped, as they run the original: a
 driver in the machine takes either through the scenarios (see [When a step

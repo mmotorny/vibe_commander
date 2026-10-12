@@ -2,10 +2,13 @@
 ;		Version :	16.10.1999
 ;-------------------------------------------------------
 
+; Of this file, and named by C code or by another file.
+	PUBLIC	SavFi_P, SavEr_B
+
 ; Boxes, dialogs and texts that the C code of the editor names: its own,
 ; and those of other files.
-	PUBLIC	BigFi_B, NewFi_B, SavAs_B, SavCn_B, Srch_B, SrFor_P, SrEr_B
-	PUBLIC	ViFl_S, Menu_F, ViewE_F, EditE_F, Line_S, Col_S, FrBuf_S
+	PUBLIC	BigFi_B, NewFi_B, SavAs_B, SavCn_B
+	PUBLIC	Line_S, FrBuf_S
 	PUBLIC	EdtH_P, EdtH_S, EdtH1_S, EdtH2_S
 
 EditBuf	EQU	MenuBuf			; Edit line buffer

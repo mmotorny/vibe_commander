@@ -2,12 +2,12 @@
 ;		Version :	14.06.2000
 ;-------------------------------------------------------
 
+; Of this file, and named by C code or by another file.
+	PUBLIC	ViewE_F, EditE_F
+
 ; Boxes, dialogs and texts that C code hands to DialBox and Dialog.
 	PUBLIC	ViFl_S, Col_S, RdFil_P, FndEr_B, Srch_B, SrFor_P, SrEr_B
 	PUBLIC	ViFil_B, Viewr_P, Editr_P, RunEr_B, RunEr_S, Run1_S, Run2_S
-; The name of the file that an Info panel shows, in VCSUB3.INC: C code
-; copies it with what follows it there.
-	PUBLIC	DrIn_F
 
 HexLen	EQU	WORD PTR HelpBuf[190]	; Count of hex pattern
 

@@ -2,6 +2,9 @@
 ;		Version :	27.08.1999
 ;-------------------------------------------------------
 
+; Of this file, and named by C code or by another file.
+	PUBLIC	Prot_B
+
 CpVar1	EQU	BYTE PTR TmpBuf+120	; Variable 1
 CpVar2	EQU	BYTE PTR TmpBuf+140	; Variable 2
 
@@ -297,7 +300,7 @@ Cont_D	DB	 7, 0
 ; Texts and boxes that C code hands to OncZoom and Dialog. MkErr_B is of
 ; VCF1.INC, which has made the others of its own public.
 	PUBLIC	Copy0_S, Move0_S, Ren0_S, RenFi_P, CopFi_P, MovFi_P, CopDi_P
-	PUBLIC	MovDi_P, OvrCo_B, Cont_B, OpnEr_B, Itslf_B, RenEr_B, MkErr_B
+	PUBLIC	MovDi_P, OvrCo_B, Cont_B, OpnEr_B, Itslf_B, RenEr_B
 ; What the commands in C copy texts from and hand to Dialog, and the
 ; routine that they put into FncAddr.
 	PUBLIC	RnMv_S, CopTo_S, CopFi_S, Copy1_B, Copy2_B, Renam_B, C00_00

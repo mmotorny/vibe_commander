@@ -124,10 +124,11 @@ add_custom_target(shareware-relocations ALL DEPENDS ${layout_dir}/VC.OBJ)
 set(port_dir ${CMAKE_BINARY_DIR}/port)
 set(port_asm VC.ASM
     VCFUNC.INC VCMENU.INC VCF1.INC VCCOPY.INC VCVIEW.INC VCEDIT.INC
-    VCHELP.INC VCMEM.INC VCFIND.INC VCSUB1.INC VCSUB2.INC VCSUB3.INC)
+    VCMEM.INC VCFIND.INC VCSUB1.INC VCSUB2.INC VCSUB3.INC)
 # Every C file in port/ is part of the program, in the order of their
 # names: a new one needs no mention here. The build looks again each time
-# it runs.
+# it runs. One whose name ends in _t holds constants and no code: the
+# tables of the file it is named after (see port/tables.h).
 file(GLOB port_c CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR}/port
      ${CMAKE_SOURCE_DIR}/port/*.c)
 # The compiled code is more than one segment holds, so it has two: CTEXT,
@@ -190,6 +191,7 @@ function(port_compile source object text class)
         BYPRODUCTS ${port_dir}/${object}.lst
         DEPENDS ${CMAKE_SOURCE_DIR}/port/${source}
                 ${CMAKE_SOURCE_DIR}/port/vc.h
+                ${CMAKE_SOURCE_DIR}/port/tables.h
         COMMENT "Compiling ${source} (${text})"
         VERBATIM)
 endfunction()
