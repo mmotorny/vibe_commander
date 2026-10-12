@@ -214,11 +214,6 @@ MnuV00:	MOV	AX,CX			; Edit ViewFil, with the menu that
 	MOV	DL,1			; the command came from marked
 	JMP	V00_01
 
-; Entries for the C code of these commands to routines of files that are
-; being translated elsewhere (see FromC in VC.ASM, and port/commands.c for
-; what they take and return).
-	FromC	SaveSet, <SBB DX,DX>	; CY as a number, next to AX
-
 ; The boxes and the dialogs of the commands, and their texts, stay here:
 ; DialBox and Dialog read them in this segment, and the C code says where
 ; they are. ExFl_S is copied with the 80 bytes that begin with it.

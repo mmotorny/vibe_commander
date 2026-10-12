@@ -15,7 +15,7 @@
  * says that the time has come which the caller left in AutoTim.
  *
  * The screen blanker itself and what gives the time away, Blank and
- * LeaveTm, are still assembly.
+ * LeaveTm, are in blank.c.
  */
 #include "vc.h"
 
@@ -37,9 +37,8 @@
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls, all of them
+   C, of vc.h.
 
    Int16 calls the BIOS for the keyboard, with `ax` as INT 16h takes it: it
    returns AX as it comes back, and 1 in the high word if the zero flag was
@@ -57,10 +56,6 @@
    Blank blanks the screen until a key is pressed or the mouse moved, and
    LeaveTm tells DOS and what runs beside it that the program is idle.
  */
-void Blank(void);
-void LeaveTm(void);
-#pragma aux Blank   "*_a" __far modify exact [es]
-#pragma aux LeaveTm "*_a" __far modify exact [ax es]
 
 /* C routines of other files that vc.h does not have. */
 u16 HexDec(u16 number);                                 /* format.c */

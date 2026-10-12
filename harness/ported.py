@@ -89,8 +89,7 @@ BATCHES = [
         routines=("Number", "Numb10", "Numb20", "SzDtTm", "PutSize",
                   "PutDat0", "PutDate", "BufDate", "PutTim0", "PutTime",
                   "BufTime", "HexDec"),
-        functions=("HexDec_c", "Number_c", "PutDate_c", "BufDate_c",
-                   "PutTime_c", "BufTime_c", "SzDtTm_c"),
+        functions=("SzDtTm_c",),
         unreached={
             **dict.fromkeys(
                 (0xA420, 0xA422, 0xA424, 0xA427, 0xA429, 0xA42B, 0xA42C,
@@ -107,7 +106,7 @@ BATCHES = [
         title="Lines of text with markup",
         source="line.c",
         routines=("LnStr", "NgLine", "NgLn30", "CntLine"),
-        functions=("LnStr_c", "NgLine_c", "CntLine_c"),
+        functions=(),
         unreached={
             **dict.fromkeys(
                 (0x99CF, 0x99D0, 0x99D1, 0x99D2),
@@ -128,17 +127,14 @@ BATCHES = [
         routines=("AddFile", "MvzLin0", "MvzLine", "FilZero", "StrLen",
                   "LowCase", "FndLet", "CutPath", "NormStr", "PathLin",
                   "LetLin", "ShrtLin", "MainFil"),
-        functions=("AddFile_c", "MvzLine_c", "FilZero_c", "StrLen_c",
-                   "LowCase_c", "CutPath_c", "NormStr_c", "PathLin_c",
-                   "ShrtLin_c", "MainFil_c"),
+        functions=("AddFile_c", "MvzLine_c", "CutPath_c", "PathLin_c"),
     ),
     Batch(
         title="Colours and the screen buffer",
         source="screen.c",
         routines=("BasAdr", "Color", "ColAddr", "Shadow", "MvsBwc",
                   "MvsBwe", "MvsColr", "MovDz"),
-        functions=("BasAdr_c", "Color_c", "ColAddr_c", "Shadow_c",
-                   "MvsBw_c", "MvsColr_c", "MovDz0_c"),
+        functions=(),
         unreached={
             0xA28F: "ColAddr, for a palette that is none of the three: "
                     "the Configuration dialog sets no other",
@@ -150,27 +146,27 @@ BATCHES = [
         title="Hex digits and numbers that are typed",
         source="digits.c",
         routines=("HexByt", "HexCod", "TstHex", "TxtNum"),
-        functions=("HexByt_c", "TstHex_c", "TxtNum_c"),
+        functions=(),
     ),
     Batch(
         title="File names in their fixed form, and masks",
         source="mask.c",
         routines=("Convert", "Conv10", "UnConv", "UnCnv1", "TstMas"),
-        functions=("Convert_c", "UnConv_c", "TstMas_c"),
+        functions=(),
     ),
     Batch(
         title="The list of files of a panel: its filter and its order",
         source="files.c",
         routines=("SetMask", "TstExe", "Sort", "CmpPar", "CmpExt", "FnFile",
                   "NearFl", "TotSel"),
-        functions=("SetMask_c", "Sort_c", "FnFile_c", "NearFl_c"),
+        functions=(),
     ),
     Batch(
         title="Where the panels are, and the cursor in them",
         source="place.c",
         routines=("BegBX", "SizDX", "LnsAX", "InvWCB", "AdrNum", "FilNum",
                   "NumAdr", "ChgAdr", "CorPar", "FilePan"),
-        functions=("AdrNum_c", "NumAdr_c", "ChgAdr_c", "CorPar_c"),
+        functions=("AdrNum_c", "NumAdr_c", "ChgAdr_c"),
     ),
     Batch(
         title="The keys of the panels: the cursor, files selected, the "
@@ -205,7 +201,7 @@ BATCHES = [
         source="panel.c",
         routines=("Panel", "Panel8", "PutPath", "PtPt10", "PutName",
                   "PutNm5", "PutFls", "SetCur", "FilDir"),
-        functions=("Panel_c", "PutPath_c", "PtPt10_c", "SetCur_c", "FilDir_c"),
+        functions=(),
         unreached={
             0xAF9B: "SetCur, for a panel that shows neither files nor the "
                     "tree, or a list with nothing in it: it is called when "
@@ -218,7 +214,7 @@ BATCHES = [
               "current directory is",
         source="tree.c",
         routines=("PutTre", "PutTree", "TreeCur", "TrCr10", "TrCr20"),
-        functions=("PutTree_c", "TreeCur_c", "TrCr20_c"),
+        functions=(),
         unreached={
             0xC1E9: "PutTree, for a tree with nothing in it: one that is "
                     "read has its root at the least, and the program "
@@ -230,7 +226,7 @@ BATCHES = [
               "box in which a directory is chosen from it",
         source="treebox.c",
         routines=("ReadTre", "ChTree", "ChTr50"),
-        functions=("ReadTre_c", "ChTree_c"),
+        functions=("ReadTre_c",),
         unreached={
             **dict.fromkeys(
                 (0xBBC0, 0xBBC3, 0xBBC4, 0xBBC7, 0xBBC9, 0xBBCB, 0xBBCC,
@@ -323,8 +319,7 @@ BATCHES = [
               "for the Info the disk, its label and the text of dirinfo",
         source="read.c",
         routines=("ReDir", "RdInfo", "GetVol", "DirSize", "TstInfo"),
-        functions=("ReDir_c", "ReDr45_c", "ReDr50_c", "RdInfo_c",
-                   "GetVol_c", "DirSize_c", "TstInfo_c"),
+        functions=("ReDir_c", "ReDr45_c", "ReDr50_c", "RdInfo_c"),
         unreached={
             **dict.fromkeys(
                 (0xB8BE, 0xB8C0, 0xB8C2, 0xB8C5, 0xB8C7, 0xB8C9, 0xB8CB,
@@ -572,7 +567,7 @@ BATCHES = [
         routines=("DialBox", "DiBx30", "Dialog", "Dial85", "InpStr",
                   "InSt10", "Select", "Slct20", "FlipFl", "MinMnu",
                   "MnMn10", "MnMn40", "MnMn41", "MnMn50", "MnMn60"),
-        functions=("Dialog_c", "InSt10_c", "MinMnu_c"),
+        functions=("Dialog_c",),
         unreached={
             0x9D32: "Dialog, for the middle button of the mouse, or two "
                     "buttons at once, which leave the dialog as Esc does: "
@@ -629,9 +624,11 @@ BATCHES = [
     Batch(
         title="The key bar, the menu bar and the command line",
         source="bars.c",
-        routines=("ClsLine", "PutKey", "PutKey0", "PutMnu", "PutPrm",
-                  "DosCom"),
-        functions=("ClsLine_c", "PutKey_c"),
+        # PutMnu3 loaded a 3, for Options lit, and ran into PutMnu: its
+        # callers, which are C, hand PutMnu the 3.
+        routines=("ClsLine", "PutKey", "PutKey0", "PutMnu3", "PutMnu",
+                  "PutPrm", "DosCom"),
+        functions=(),
     ),
     Batch(
         title="The entries of an extension file",
@@ -644,7 +641,7 @@ BATCHES = [
         source="input.c",
         routines=("Input", "Input0", "Rnd", "EdLin", "EdSub1", "EdSub2",
                   "CmpSym", "Search"),
-        functions=("Input_c", "Rnd_c"),
+        functions=(),
         unreached={
             **dict.fromkeys(
                 (0xB1E6, 0xB1EE, 0xB1F0, 0xB1F3),
@@ -825,7 +822,7 @@ BATCHES = [
                   "TstDrv", "Intr21", "SetPth", "Fantom", "ChgDisk",
                   "OpenFil"),
         # ClrKbd, Beep and TstDrv have no caller left in the assembly.
-        functions=("Timer_c", "Intr21f_c", "ChgDisk_c"),
+        functions=(),
         unreached={
             **dict.fromkeys(
                 (0xCC11, 0xCC13, 0xCC15),
@@ -842,7 +839,7 @@ BATCHES = [
         routines=("IniMous", "TypMous", "SavMous", "CurMous", "GetMous",
                   "DoublMo", "InWind"),
         # TypMous and DoublMo have no caller left in the assembly.
-        functions=("CurMous_c", "GetMous_c", "InWind_c"),
+        functions=(),
         unreached={
             **dict.fromkeys(
                 (0x93F3, 0x93F5),
@@ -910,7 +907,7 @@ BATCHES = [
         # IsCrLf0, which stepped back two bytes for IsCrLf, has no caller
         # left: what called it is C and does that itself.
         routines=("IsCrLf0", "IsCrLf", "InvVar", "ChkSum", "PgUp", "PgDn"),
-        functions=("ChkSum_c",),
+        functions=(),
     ),
     Batch(
         title="Enter and the keys that change the directory, the commands "
@@ -922,8 +919,10 @@ BATCHES = [
         # the history behind them and then what an earlier batch has
         # listed from F80_00 on; F43_00 the commands of the viewer and
         # the editor; FncSel is in the program's data, with FncExt.
+        # IsCrLfS took a word of the text for IsCrLf, for F34_30 alone,
+        # which reads it itself.
         routines=("F21_00", "F21_40", "F22_00", "F43_00", "F34_30",
-                  "F34_40", "FncSel"),
+                  "F34_40", "FncSel", "IsCrLfS"),
         functions=("F21_00_c", "F21_10_c", "F21_25_c", "F21_30_c",
                    "F21_31_c", "F22_00_c", "F23_00_c", "F24_00_c",
                    "F24_01_c", "F24_02_c", "F25_00_c", "F26_00_c",
@@ -931,6 +930,61 @@ BATCHES = [
                    "F44_00_c", "F63_00_c", "F64_00_c", "F33_00_c",
                    "F34_00_c", "F34_10_c", "FncSel_c", "FncExt_c",
                    "FncEx1_c"),
+    ),
+    Batch(
+        title="The setup: what its file holds, and the file written",
+        source="setup.c",
+        routines=("SaveSet", "MakeIni", "MkIni1"),
+        # Only C code calls them: the main loop and Shift-F9.
+        functions=(),
+        unreached={
+            0xC60C: "SaveSet, where the disk of the program's drive is "
+                    "refused, or fewer bytes are written than the setup "
+                    "has: the program is on D:, a hard disk, and a write "
+                    "comes up short only on a disk that is full. D: could "
+                    "be filled as copy-full fills C:, with the setup file "
+                    "deleted first; that is the longest scenario by far, "
+                    "once more, for this instruction",
+        },
+    ),
+    Batch(
+        title="The screen blanker, and the word that the program is idle",
+        source="blank.c",
+        routines=("LeaveTm", "Blank"),
+        # Only C code calls them: Input0.
+        functions=(),
+        unreached={
+            **dict.fromkeys(
+                (0xB44A, 0xB44D, 0xB44F, 0xB452, 0xB454, 0xB457),
+                "LeaveTm, giving the time to the other programs of "
+                "DESQview: the bench does not run it"),
+            **dict.fromkeys(
+                (0xB547, 0xB549, 0xB54B, 0xB563, 0xB565, 0xB568, 0xB56B,
+                 0xB56D, 0xB56E, 0xB570, 0xB572, 0xB574, 0xB576, 0xB577,
+                 0xB579, 0xB57C, 0xB57E, 0xB581, 0xB583),
+                "Blank, for a star that flares up or goes out: it has "
+                "been out for 88 turns of the sky by then, at the least, "
+                "and the sky turns when the timer has ticked. A step "
+                "ends when the program has gone round twice; what keeps "
+                "it from ending, the mouse moved within the corner, "
+                "lets half a tick pass for 500 bytes of a script, which "
+                "holds 64K: some 60 turns. A step that lets the program "
+                "go round a number of times would reach them: the driver "
+                "has the event for it, and no step makes it"),
+        },
+    ),
+    Batch(
+        title="The size of a file added to that of its directory",
+        source="read.c",
+        routines=("DiSi10",),
+        functions=("DiSi10_c",),
+    ),
+    Batch(
+        title="The command of a key: the last table of keys that Case "
+              "went by",
+        source="main.c",
+        routines=("Case",),
+        functions=(),
     ),
 ]
 

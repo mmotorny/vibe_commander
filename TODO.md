@@ -37,33 +37,52 @@ Things that are known and not done. Standing instructions are in
   has set: `DEC AX` and then `JE`, `STC` and then `JNC`. It should follow
   each flag by itself.
 
-- Of `VCSUB2.INC` three routines are still assembly: `Blank`, the
-  screen blanker, 402 bytes, `LeaveTm`, 46, which tells DOS, Windows and
-  DESQview that the program is idle, and the two bytes of `PutMnu3`,
-  which load a 3 and run into the stub of `PutMnu`. `Input0`, which is C,
-  calls the first two through entries. `Blank` runs when no key has been
-  pressed for as many minutes as the setup says, one at the least, and
-  the harness has no step that waits: it presses the next key as soon as
-  the program waits for one. A step that lets the machine run until its
-  BIOS has counted a minute of timer ticks would do: the driver of the
-  tests counts them for the clock already, and has an event that lets
-  rounds of the program pass. What `Blank` shows could still not be
-  compared: where its stars are is drawn from random numbers that the
-  program steps every time it goes round while it waits. That the screen
-  comes back with a key could. `LeaveTm` is three calls of interrupts
-  and little else; of its 17 instructions six, for DESQview, run in no
-  scenario.
-- Of `Input0` in C, four instructions of the original run in no
-  scenario and are translated by reading: where the minute has come in
-  which the screen is blanked, or midnight has passed before it. They
-  are listed as out of reach in `harness/ported.py`. The blanking itself
-  runs, in `mouse-keys`: the pointer of the mouse in the top right
-  corner blanks the screen at once, and a step that takes it there and
-  away again, "Move@79,0 Move@40,12", ends with the screen shown again.
-  That shows on a screen which a beep has moved up a line: all of it is
-  put back as it should be. A step that ended with the screen blank
-  could not be compared, for the stars; one of two such steps tried had
-  none yet.
+- The screen blanker is C, `Blank` of `port/blank.c`, and what it draws
+  is held against the original on no screen. Its stars come out where
+  the program's random numbers say, and nothing sets the two words that
+  those are made of, `Rand1` and `Rand2`, when the program starts: the
+  sky follows from what the memory held where the main data is. On the
+  bench that is 0 for the original, and something else for the port,
+  whose main data is elsewhere, another thing with every build. So a
+  step may not end in the blanker. The scenario `blank` brings it up,
+  with the mouse in the top right corner, and ends it in the same step,
+  by a key, by the mouse moving away, by Shift and by a button: what the
+  goldens hold is that the screen and the cursor come back and that the
+  key is lost. If the program set the two words when it starts, a step
+  could end in the sky and a golden could hold it; that would be other
+  behaviour than the original's, and is not decided.
+  The C was held against the original by hand instead, once, outside
+  the tests: with the port's two words set, in a build made for it, to
+  what the original's are when the blanker comes up first, and with a
+  step that lets the program go round without ending, both were taken
+  through a sky of some hundreds of turns, and every screen of either
+  was one that a model of the routine, written from the assembly, has
+  after some turn. See what the batch lost time to, below.
+- Of `Blank`, 19 instructions of the original have run in no scenario
+  and are listed as out of reach: a star that flares up or goes out has
+  been out for 88 turns of the sky at the least, a turn takes a tick of
+  the timer, and a step ends when the program has gone round twice. The
+  one thing a script has to keep a step from ending there is the mouse
+  moved within the corner, which lets half a tick pass for 500 bytes,
+  and a script holds 64K. A step that has the driver let the program go
+  round so many times would reach them, and the minute after which the
+  blanker comes up by itself too, four instructions of `Input0`: the
+  driver has the events, 04 for rounds and 05 for times that the mouse
+  is asked, and `harness/driver.py` makes the second only behind a
+  click. "Move@79,0*255" could be the mouse moved and 255 times asked.
+  Six more of `LeaveTm` are for DESQview.
+- A script of more than 64K goes wrong without a word: the driver
+  counts its place in the script in 16 bits, and `harness/driver.py`
+  only refuses one that is longer than its disk, a megabyte. The steps
+  then come out as others, and the run ends with "the driver wrote 4
+  screens for 5 steps". The longest script is that of
+  `mouse-user-menu`, 55K.
+- Of `Input0` in C, four instructions of the original have run in no
+  scenario and are listed as out of reach in `harness/ported.py`: where
+  the minute has come in which the screen is blanked, or midnight has
+  passed before it. The blanking by the mouse in the corner runs, in
+  `mouse-keys`, which shows it on a screen that a beep has moved up a
+  line, all of it put back as it should be, and in `blank`.
 - `ClsLine` fills a row with the colour that DOS writes in, and reads
   that colour through DS, where every other routine of its kind goes by
   ES. One caller comes with DS on a panel: a command of a menu or of an
@@ -256,7 +275,7 @@ Things that are known and not done. Standing instructions are in
   which the stub of the menu bar jumps to the commands, the stubs of the
   commands, 28 of them with `M17_00`, which hands Drive... to the box of
   the drives, the boxes, dialogs and texts, which `DialBox` and `Dialog`
-  read in the assembly, and one entry for the C, `SaveSet_a`. The stubs
+  read in the assembly. The stubs
   go when the loop that jumps to
   them is C, and with it `CmdM01`, `CmdM03` and `CmdM06` of
   `VCFUNC.INC`, by which the keys of the panels go on in three of the
@@ -689,9 +708,10 @@ Things that are known and not done. Standing instructions are in
   takes a key is C, `MainLoop` of `port/main.c`, and its labels in
   `VC.ASM` are stubs that enter it: the commands that are C still
   return to it through a table of those labels, and it goes to a
-  command through the table of keys there, `FncTab`, because the
-  commands are labels of the assembly. When they are functions, the
-  table is a `switch` in the loop and the structure of registers goes.
+  command through a table of labels too, `Main_T`, because the commands
+  are labels of the assembly; which command a key has is a `switch`,
+  `Func12`. When the commands are functions, the loop calls them, and
+  the table and the structure of registers go.
 - `harness/reach.py` and `harness/ported.py` name code from a label to
   the next procedure, so `F22_00`, the keys that change the directory,
   names all that stands up to the procedure `F42_10`, with `F80_00`
@@ -999,37 +1019,87 @@ Things that are known and not done. Standing instructions are in
   that follow `VC.MNU`: both are copied from the assembly, `List_F` and
   `Menu_F`, as long as it has them. Nothing reads the six.
 
-- Of the shared routines of `VCSUB1.INC` two are still assembly. `Case`,
-  37 bytes, jumps by a table of keys to a label of whoever called it, and
-  takes that caller's return address off the stack: one caller is left,
-  `MainKy` in `VC.ASM`, where the main loop, which is C, has the key
-  looked up in the table of the commands, whose labels are stubs. It
-  goes when that table is a `switch`.
-  `CallPSP`, 6 bytes, calls a routine in the part of the program that
-  stays in the memory, far, by way of the stack; `OutStr1` and
-  `Release_a` call it. Of `VCSUB3.INC` four are still assembly, 232
-  bytes, the next batch there with `LeaveTm` and `Blank` of
-  `VCSUB2.INC`: `SaveSet`, `MakeIni` and `MkIni1`, which save the setup,
-  and `DiSi10`, which `DirFunc` calls for the sizes of directories, by
-  its address. `SaveSet` has run in no scenario: the bench has the setup
-  saved before the scenarios begin.
-- When `LeaveTm` becomes C its `INT 28h` goes into `port/dos.c`, with
-  the calls of `INT 2Fh` and `INT 15h` behind it. The driver of the
-  tests takes a call of `INT 28h` for the program's when it comes from
-  the memory of the program that DOS has as the current one and that
-  program is named `VC`, so the call may stand anywhere in the port and
-  `harness/driver.py` needs no change for it. What the call needs is DS
-  on the main data, where the driver reads `AutoTim` and `Clock`, and
-  the program's own stack: any C function has both.
-- Entries by which C code calls DOS are still in the assembly, each a
-  call of `INT 21h` that the original made without `Intr21`: `SelDrv_a`
-  in `VCCOPY.INC`, `Fcb29_a` in `VCF1.INC`, and `Dos5802_a`, `Dos5803_a`,
-  `Dos52_a`, `Dos4452_a` and `Dos2523_a` in `VCMEM.INC`. They belong in
-  `port/dos.c`, or go through `Int21d` there: `struct DosRegs` has ES
-  as DOS leaves it, for `Dos52_a`, and DS with DX, for `Dos2523_a`. The
-  two that the main loop and the commands of the menus had made, for
-  the BIOS and for where an interrupt goes, went that way: `Int10` and
-  `Int21d`.
+- `VCSUB1.INC`, `VCSUB2.INC` and `VCSUB3.INC`, the shared routines, hold
+  no routine of the original any more but one, `CallPSP`. What is left
+  in them, and goes when what needs it is C:
+  - Stubs, twelve of them: the routine's name, the call of the C
+    function, and the registers and flags that the assembly which still
+    calls it goes on with. `VCSUB1.INC` has nine: `ChkMode`, `ScrOffs`,
+    `MvzLin0`, `MvzLine`, `AddFile`, `CutPath` and `PathLin`, which the
+    code that starts the program calls, `Dialog`, which the routine for
+    DOS's critical error calls, and `Cursor`, which `CurNl` of the
+    start-up jumps to and the editor's stubs call. `VCSUB2.INC` has
+    none: it is the names of the menus and the title of the tree.
+    `VCSUB3.INC` has three: `ReDir`, for the entry `ReDir_a` of the main
+    loop, `ReadTre`, which the stub of `ReDir` calls, and `DiSi10`,
+    which nothing calls by its name: `DirSize` puts its address into
+    `FncAddr`. A stub that had lost its last caller went with this
+    batch, 58 of them, behind the 38 that went with Enter, each with
+    its line in the `EXTERN` list and its function in
+    `harness/ported.py`. `tools/routines.py` counts calls, not jumps:
+    `Cursor` has fewer callers there than it has. The assembler says
+    "Symbol not defined" for a stub that is taken out too early.
+  - Entries for C: `AsmSeg_a`, the assembly's code segment, where its
+    boxes and texts are; `DialSub_a`, which calls what a dialog names
+    for Enter; `FncCall_a`, which calls what `FncAddr` names. None of
+    them calls an interrupt.
+  - Texts and tables that the assembly reads, or C at its offset there:
+    the names of the menus, `PtMnu_S`; `Tree_S`; `Mask_S` and `Ext_F`;
+    the name of the tree's file and the two boxes shown while it is
+    read and saved; `DrIn_F`; `Init_F`, the name of the setup file,
+    which the code that starts the program reads too; and the dialog
+    that asks for a diskette, `Fant_B`, with its box and texts.
+  - `CallPSP`, 6 bytes: a far call, by way of the stack, of a routine in
+    the part of the program that stays in the memory. It is no routine
+    to translate: C code makes such a call through a far pointer. Three
+    places of the assembly use it, none of this batch's: the code that
+    starts the program, for `OutStr` (`OutStr1`) and for `SetBrk`, and
+    `Release_a` of `VCMEM.INC`, by which the map of the memory has a
+    program released. It goes with the last of them.
+- No entry in the assembly calls an interrupt for C code any more. A
+  drive made the current one is `SelDrv` of `port/system.c`; the FCB
+  that deleting by a mask has DOS make is `Fcb29` of `port/dirfunc.c`;
+  what the map of the memory asks of DOS is in `port/memory.c`,
+  `Dos5802` to `Dos2523`. All go through `Int21d` of `port/dos.c`, as
+  the assembly called DOS itself there, without `Intr21`. `LeaveTm`'s
+  three interrupts are `Int28`, `Int2F` and `DvPause` there.
+- The jump of the main loop to the command of a key is a `switch`,
+  `Func12` of `port/main.c`, and `Case` is gone. The commands are still
+  labels of the assembly, stubs of the C functions with one way of
+  handing registers over for each file, so the function returns the
+  number of a place and the stub of the loop jumps there by `Main_T` in
+  `VC.ASM`, which has 79 places now. With Enter and the commands of the
+  viewer and the editor in C too, the loop can call the functions: the
+  table, the stubs of the commands and the structure of registers go
+  then.
+- What the routines of this batch do in the original and the port does
+  after them; whether to mend any of it is not decided:
+  - `SaveSet` makes the setup file anew before it writes it: when the
+    writing fails, what the file held is gone. A file that could not be
+    written whole stays as it is, and the error that comes back has a
+    low byte of 0. By reading: it takes a full disk.
+  - The random numbers are never seeded: see the blanker, above.
+  - `Blank` goes away after its first turn when Shift, Ctrl or Alt is
+    held as it comes up. By reading.
+  - `Blank` steps a star's clock as a word, with the kind of the star
+    in the high byte, and keeps the low byte: a clock of 0 would borrow
+    from the kind. No star has one.
+  - `LeaveTm` asks Windows for its turn to be passed on every time
+    until Windows has once not answered: `WinLeav` is 1 when the call
+    is not to be made, the other way round than its name says.
+- What the C of this batch hands DOS and the BIOS where the assembly
+  had whatever a register held, none of which they read: the BIOS gets
+  AL 0 where `Blank` asks for the page, and the multiplexer BX and CX 0
+  with the call 1680h. DOS gets the registers of `struct DosRegs` that
+  the call takes, and the rest as they come.
+- One instruction of `SaveSet` is listed as out of reach, `MOV AL,0`
+  where the diskette of the program's drive is refused or fewer bytes
+  are written than the setup has. The program is on D:, a hard disk, so
+  only a full disk gets there: with the setup file deleted first and D:
+  filled as `copy-full` fills C:, saving would. That scenario is the
+  longest by far, 136 seconds of 468 when four checkouts test at once,
+  and this would be it once more for one instruction: say if it is
+  wanted.
 - Of the mouse's routines, which are C, ten instructions of the
   original have run in no scenario and are translated by reading: six of
   `IniMous`, for a mouse driver that does not know the call 21h and for
@@ -1944,6 +2014,56 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     one, and left the list; the three goldens were derived again for
     the pointer. The build passed at once, and the `port` test, ten
     minutes with 96 scenarios, too.
+
+- What was left of the shared routines, seven of them with the screen
+  blanker, 717 bytes, and the entries that called DOS for C code: some
+  45 minutes to a translation that passed, with other checkouts at
+  work. Every scenario compared as the original the first time it ran
+  on the C, twelve of them in 20 seconds and then all.
+  - 18 minutes: the `port` test twice, 468 seconds for the base before
+    anything was changed and 612 for the batch, where it takes 100
+    alone. The base need not have been tested: the batch before had
+    just passed on it.
+  - 8 minutes: why the port's sky is another than the original's. A
+    model of the routine in Python, 40 lines, found the original's
+    stars for a seed of 0 and none of the port's for any number of
+    turns before: the numbers are never seeded. With that known, no
+    step may end in the blanker, and the scenario was written so.
+  - 3 minutes: a step of 1,300 movements of the mouse, to wait out the
+    minute of the blanker: 530K of script, where the driver counts in
+    16 bits. Nothing said so; the run ended with one screen too few.
+  - What saved time: `harness/reach.py --steps`, four seconds, said
+    which of the blanker's instructions a list of steps reaches before
+    a golden was derived; a script took the stubs without a caller out
+    of the three files, the `EXTERN` list and `harness/ported.py`, and
+    can be run again after a rebase; and the table of keys was turned
+    into the `switch` and into the table of labels by a script, so that
+    the two agree.
+  - The sky by hand, 5 minutes of machine time and 15 of writing: the
+    model, a step that has the driver wait for the mouse to be asked
+    255 times, made of the driver's event 05 by a wrapper around
+    `driver.events` that is not in the repository, and a build of the
+    port with `Rand1` and `Rand2` set as `Blank` begins, 5BA1h and
+    6E84h, which is what the original has there when the blanker is
+    the first thing a scenario does. 151 screens of the original over
+    674 turns and 151 of that build over 776 were each the sky that
+    the model has after some turn, in order: stars that come out,
+    flare up four times or go, a sky with no room for another, and a
+    star that would come out where one is.
+
+  - 12 minutes to get onto `main`, behind Enter with the commands of
+    the viewer and the editor, twelve commits of the mouse and the new
+    layout of the part that stays: nine files in conflict. The five of
+    the assembly were taken as `main` had them and the batch's changes
+    made again by the scripts that had made them, which took three
+    minutes; the script for the stubs then found 57 without a caller
+    where it had found 51. What git did not show: the 14 instructions
+    of `Input0` that `mouse-keys` had taken off its list were the ones
+    this batch had taken off; `F34_30` was C, so the `LODSW` moved into
+    it was gone with it; and the table of keys had to be held against
+    the `switch` again, by a script, 72 entries the same. The two
+    goldens came out as before on the new bench, and the `port` test
+    passed the first time, 150 seconds.
 
 ## Ideas put off
 

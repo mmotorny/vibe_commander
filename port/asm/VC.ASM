@@ -39,19 +39,10 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 ; They are compiled into a code segment of their own, which follows this
 ; one, and are called through the routines of the same names here. C code
 ; expects DS to point at the main data segment and may change ES.
-	EXTERN	HexDec_c:FAR, Number_c:FAR, PutDate_c:FAR, BufDate_c:FAR
-	EXTERN	PutTime_c:FAR, BufTime_c:FAR
-	EXTERN	LnStr_c:FAR, NgLine_c:FAR, CntLine_c:FAR
-	EXTERN	AddFile_c:FAR, MvzLine_c:FAR, FilZero_c:FAR, StrLen_c:FAR
-	EXTERN	LowCase_c:FAR, CutPath_c:FAR, NormStr_c:FAR
-	EXTERN	PathLin_c:FAR, ShrtLin_c:FAR, MainFil_c:FAR
-	EXTERN	BasAdr_c:FAR, Color_c:FAR, ColAddr_c:FAR, Shadow_c:FAR
-	EXTERN	MvsBw_c:FAR, MvsColr_c:FAR, MovDz0_c:FAR
-	EXTERN	HexByt_c:FAR, TstHex_c:FAR, TxtNum_c:FAR
-	EXTERN	Convert_c:FAR, UnConv_c:FAR, TstMas_c:FAR
-	EXTERN	SetMask_c:FAR, Sort_c:FAR, FnFile_c:FAR
-	EXTERN	NearFl_c:FAR
-	EXTERN	AdrNum_c:FAR, NumAdr_c:FAR, ChgAdr_c:FAR, CorPar_c:FAR
+	EXTERN	AddFile_c:FAR, MvzLine_c:FAR
+	EXTERN	CutPath_c:FAR
+	EXTERN	PathLin_c:FAR
+	EXTERN	AdrNum_c:FAR, NumAdr_c:FAR, ChgAdr_c:FAR
 	EXTERN	F00_60_c:FAR, F00_00_c:FAR, F00_05_c:FAR
 	EXTERN	F01_00_c:FAR, F01_05_c:FAR, F02_00_c:FAR, F03_00_c:FAR
 	EXTERN	F04_00_c:FAR, F05_00_c:FAR, F06_00_c:FAR, F07_00_c:FAR
@@ -60,12 +51,6 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 	EXTERN	F13_00_c:FAR, F14_00_c:FAR, F15_00_c:FAR, F16_00_c:FAR
 	EXTERN	F17_01_c:FAR, F79_00_c:FAR, F18_00_c:FAR, F20_00_c:FAR
 	EXTERN	F20_02_c:FAR
-	EXTERN	Panel_c:FAR, PutPath_c:FAR, PtPt10_c:FAR
-	EXTERN	SetCur_c:FAR, FilDir_c:FAR
-	EXTERN	PutTree_c:FAR, TreeCur_c:FAR
-	EXTERN	TrCr20_c:FAR
-	EXTERN	ClsLine_c:FAR, PutKey_c:FAR
-	EXTERN	Input_c:FAR, Rnd_c:FAR
 	EXTERN	F39_00_c:FAR
 	EXTERN	M01_00_c:FAR, M01_01_c:FAR, M03_00_c:FAR, M06_00_c:FAR
 	EXTERN	M06_10_c:FAR, M08_00_c:FAR, M16_00_c:FAR, M16_01_c:FAR
@@ -74,9 +59,9 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 	EXTERN	M53_00_c:FAR, M62_00_c:FAR, M63_00_c:FAR, M64_00_c:FAR
 	EXTERN	M66_00_c:FAR, M67_00_c:FAR, M69_00_c:FAR, M70_00_c:FAR
 	EXTERN	M71_00_c:FAR, M72_00_c:FAR, M73_00_c:FAR, M75_00_c:FAR
-	EXTERN	ReadTre_c:FAR, ChTree_c:FAR
+	EXTERN	ReadTre_c:FAR
 	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
-	EXTERN	GetVol_c:FAR, DirSize_c:FAR, TstInfo_c:FAR
+	EXTERN	DiSi10_c:FAR
 	EXTERN	V00_02_c:FAR, V00_10_c:FAR, V13_00_c:FAR, V13_01_c:FAR
 	EXTERN	T00_00_c:FAR
 	EXTERN	Help00_c:FAR
@@ -88,15 +73,13 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 	EXTERN	M30_60_c:FAR, DirFunc_c:FAR, DelTr0_c:FAR
 	EXTERN	F37_00_c:FAR, F47_00_c:FAR, F38_00_c:FAR, F48_00_c:FAR
 	EXTERN	F58_00_c:FAR, M30_00_c:FAR, F54_00_c:FAR, FncMas_c:FAR
-	EXTERN	Dialog_c:FAR, InSt10_c:FAR, MinMnu_c:FAR
+	EXTERN	Dialog_c:FAR
 	EXTERN	C00_00_c:FAR, F35_01_c:FAR, F45_01_c:FAR, F35_61_c:FAR
 	EXTERN	F65_00_c:FAR
 	EXTERN	MainLoop_c:FAR, Exit_c:FAR
 	EXTERN	HookVct_c:FAR
-	EXTERN	Timer_c:FAR, ChkMode_c:FAR, Cursor_c:FAR
-	EXTERN	CurMous_c:FAR, GetMous_c:FAR, InWind_c:FAR, ScrOffs_c:FAR
-	EXTERN	Intr21f_c:FAR, ChkSum_c:FAR
-	EXTERN	ChgDisk_c:FAR
+	EXTERN	ChkMode_c:FAR, Cursor_c:FAR
+	EXTERN	ScrOffs_c:FAR
 	EXTERN	F21_00_c:FAR, F21_10_c:FAR, F21_25_c:FAR, F21_30_c:FAR
 	EXTERN	F21_31_c:FAR, F22_00_c:FAR, F23_00_c:FAR, F24_00_c:FAR
 	EXTERN	F24_01_c:FAR, F24_02_c:FAR, F25_00_c:FAR, F26_00_c:FAR
@@ -1567,79 +1550,6 @@ DefWCB	DB	0			; WinTyp
 	DB	8			; SortTyp
 	DB	0			; Ctrl_L
 	DB	0			; DskMas
-FncTab	DW	4800h, F00_00		; Up
-	DW	5000h, F01_00		; Down
-	DW	4B00h, F02_00		; Left
-	DW	4D00h, F03_00		; Right
-	DW	4900h, F04_00		; PgUp
-	DW	5100h, F05_00		; PgDn
-	DW	4700h, F06_00		; Home
-	DW	4F00h, F07_00		; End
-	DW	5200h, F08_00		; Ins     - select / unselect
-	DW	4E2Bh, F09_00		; Grey +  - select group
-	DW	4A2Dh, F10_00		; Grey -  - unselect group
-	DW	372Ah, F76_00		; Grey *  - invert group
-	DW	0F09h, F20_00		; Tab     - change active panel
-	DW	1C0Dh, F21_00		; Enter   - run / change directory
-	DW	000Ah, F27_00		; ^Enter  - history command
-	DW	011Bh, F74_00		; Esc     - clear command line / on/off
-	DW	000Dh, F78_00		; ^M      - restore marks
-	DW	000Fh, F11_00		; ^O      - on/off panels
-	DW	0010h, F12_00		; ^P      - on/off unactive panel
-	DW	5E00h, F13_00		; ^F1     - on/off left panel
-	DW	5F00h, F14_00		; ^F2     - on/off right panel
-	DW	0015h, F15_00		; ^U      - swap panels
-	DW	0002h, F16_00		; ^B      - on/off key bar
-	DW	0012h, F17_00		; ^R      - re-read
-	DW	0006h, M16_00		; ^F      - filter
-	DW	2308h, M16_10		; ^H      - hidden files
-	DW	0001h, M30_00		; ^A      - attributes
-	DW	0003h, M49_00		; ^C      - compare directories
-	DW	000Ch, F18_00		; ^L      - info
-	DW	001Ah, F79_00		; ^Z      - tree
-	DW	8400h, F22_00		; ^PgUp   - CD ..
-	DW	7600h, F23_00		; ^PgDn   - change directory
-	DW	001Ch, F24_00		; ^\      - CD \
-	DW	0005h, F25_00		; ^E      - previous history command
-	DW	0018h, F26_00		; ^X      - next history command
-	DW	0009h, F80_00		; ^I	  - insert files
-	DW	001Bh, F81_00		; ^[	  - insert left path
-	DW	001Dh, F82_00		; ^]	  - insert right path
-	DW	4400h, F30_00		; F10     - quit
-	DW	3C00h, F32_00		; F2      - user menu
-	DW	3D00h, F33_00		; F3      - view
-	DW	3E00h, F34_00		; F4      - edit
-	DW	3F00h, F35_00		; F5      - copy
-	DW	4000h, F36_00		; F6      - rename / move
-	DW	4100h, F37_00		; F7      - make directory
-	DW	4200h, F38_00		; F8      - delete
-	DW	4300h, F39_00		; F9      - pull down menu
-	DW	5D00h, F40_00		; Shift F10 - pull down menu
-	DW	5500h, F42_00		; Shift F2  - main menu...
-	DW	5600h, F43_00		; Shift F3  - view...
-	DW	5700h, F44_00		; Shift F4  - edit...
-	DW	5800h, F45_00		; Shift F5  - copy...
-	DW	5900h, F46_00		; Shift F6  - rename/move...
-	DW	5A00h, F47_00		; Shift F7  - make directory...
-	DW	5B00h, F48_00		; Shift F8  - delete...
-	DW	5C00h, M75_00		; Shift F9  - save setup
-	DW	6100h, F54_00		; ^F4     - change label
-	DW	6200h, F55_00		; ^F5     - copy file
-	DW	6300h, F56_00		; ^F6     - rename/move file
-	DW	6500h, F58_00		; ^F8     - delete file
-	DW	6800h, F61_00		; Alt F1  - change left drive
-	DW	6900h, F62_00		; Alt F2  - change right drive
-	DW	6A00h, F63_00		; Alt F3  - internal viewer
-	DW	6B00h, F64_00		; Alt F4  - internal editer
-	DW	6C00h, F65_00		; Alt F5  - memory info
-	DW	6D00h, M42_00		; Alt F6  - directory sizes
-	DW	6E00h, F67_00		; Alt F7  - file find
-	DW	6F00h, F68_00		; Alt F8  - history
-	DW	7000h, F69_00		; Alt F9  - EGA lines
-	DW	7100h, M41_00		; Alt F10 - Tree
-	DW     0FD00h, F39_00		; Alt     - pull down menu
-	DW     0FE00h, F75_00		;         - auto CD / quick view
-	DW	0
 
 ;--------------------- Main module ---------------------
 	.CODE
@@ -2272,24 +2182,29 @@ MainGo:	MOV	BX,SP
 	POP	DS
 	RET				; To the place of Main_T
 
-; The command that the table of keys has for the key in AX, or the
-; command line for a key that it has not.
-MainKy:	MOV	SI,OFFSET FncTab
-	CALL	Case
-	JMP	F73_00
-
+; Where the program goes on: the command line, the places that the mouse
+; goes to, and from F00_00 on the other commands of the keys, in the
+; order that the table of the keys had them in, which Func12 of
+; port/main.c knows them by.
 	.DATA
-Main_T	DW	MainKy, F73_00, F77_00, F11_00, F39_00, F20_00, F34_10
+Main_T	DW	F73_00, F77_00, F11_00, F39_00, F20_00, F34_10
 	DW	F00_60, F00_05, F01_05, F21_10, F21_31
+	DW	F00_00, F01_00, F02_00, F03_00, F04_00, F05_00, F06_00
+	DW	F07_00, F08_00, F09_00, F10_00, F76_00, F21_00, F27_00
+	DW	F74_00, F78_00, F12_00, F13_00, F14_00, F15_00, F16_00
+	DW	F17_00, M16_00, M16_10, M30_00, M49_00, F18_00, F79_00
+	DW	F22_00, F23_00, F24_00, F25_00, F26_00, F80_00, F81_00
+	DW	F82_00, F30_00, F32_00, F33_00, F34_00, F35_00, F36_00
+	DW	F37_00, F38_00, F40_00, F42_00, F43_00, F44_00, F45_00
+	DW	F46_00, F47_00, F48_00, M75_00, F54_00, F55_00, F56_00
+	DW	F58_00, F61_00, F62_00, F63_00, F64_00, F65_00, M42_00
+	DW	F67_00, F68_00, F69_00, M41_00, F75_00
 
 	.CODE
-; Entries for the C code of the loop to routines of other files (see
-; FromC above, and port/main.c for what they take and return). That of
-; SaveSet is in VCMENU.INC.
-	FromC	MakeIni
-
-; Read what a panel shows: ReDir, with the panel in DX and in AL whether
-; to keep the cursor and the marks. AX is not 0 if it set the carry flag.
+; An entry for the C code of the loop (see port/main.c for what it takes
+; and returns). Read what a panel shows: ReDir, with the panel in DX and
+; in AL whether to keep the cursor and the marks. AX is not 0 if it set
+; the carry flag.
 	PUBLIC	ReDir_a
 ReDir_a	PROC	FAR
 	PUSH	DS

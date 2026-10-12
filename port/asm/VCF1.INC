@@ -311,18 +311,6 @@ F38_40	PROC	NEAR			; Delete file or directory
 	RET
 F38_40	ENDP
 
-; For F38_70 and F48_00 in C: DOS makes an FCB at DI of the name at SI,
-; by the flags in AL, and says in AL whether the name is a mask. Not
-; through Intr21, as in the original.
-	PUBLIC	Fcb29_a
-Fcb29_a	PROC	FAR
-	PUSH	DS
-	POP	ES
-	MOV	AH,29h
-	INT	21h
-	RET
-Fcb29_a	ENDP
-
 F48_00:	CallC	F48_00_c		; Shift F8 - delete
 	JMP	F1Next
 

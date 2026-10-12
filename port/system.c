@@ -136,6 +136,18 @@ u16 TstDrv(u16 letter)
     return now == drive;
 }
 
+/* Make a drive the current one of DOS: 0 for A:, in the low byte of
+   `drive`. */
+void SelDrv(u16 drive)
+{
+    struct DosRegs regs;
+
+    regs.name = (const u8 __far *)&md;
+    regs.ax = 0x0E00;
+    DX_OF(regs) = drive & 0xFF;
+    Int21d((struct DosRegs STACK *)&regs);
+}
+
 /* Call DOS where a drive may not be ready, with the carry flag set first
    if `carry` is not 0. When DOS asks what to do about a drive, the
    program's routine for that, ErrRdy, shows a box and notes in ErrDat

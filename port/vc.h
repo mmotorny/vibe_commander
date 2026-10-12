@@ -334,13 +334,15 @@ struct BiosRegs {
    calls the routine (see FromC in port/asm/VC.ASM). They take and return
    what the routine's registers hold, so a value in a high byte stays
    there; flags do not come back. */
-/* Where the routine is that DirSize has DirFunc call for every file, and a
-   call of what FncAddr names, for a file with these attributes at TmpBuf:
-   the high byte of what it returns is not 0 to stop. */
-u16 DiSi10(void);
+/* A call of what FncAddr names, for a file with these attributes at
+   TmpBuf: the high byte of what it returns is not 0 to stop. FncAddr has
+   the address of a routine of the assembly, which is the stub of a C
+   function: DiSi10_s is that of DiSi10 of read.c, which DirSize has
+   DirFunc call for every file. */
 u16 FncCall(u16 attributes);
-#pragma aux DiSi10  "*_o" __far value [ax] modify exact [ax]
+extern const u8 __far DiSi10_s[];
 #pragma aux FncCall "*_a" __far parm [ax] value [ax] modify exact [ax es]
+#pragma aux DiSi10_s "DiSi10"
 /* RestVct gives the vectors of the critical error and of Ctrl-Break back
    to whoever had them, and HookVct takes them again: it returns where
    its routine for Ctrl-Break is, in the part of the program that stays
@@ -357,12 +359,21 @@ u16 ErrRdy(u16 letter);
 #pragma aux HookVct "*_c" __far value [ax] modify exact [ax]
 #pragma aux Quit    "*_c" __far modify exact [ax]
 #pragma aux ErrRdy  "*_c" __far parm [ax] value [ax] modify exact [ax]
-/* SaveSet writes the setup to its file: something that is not 0 in the
-   high word if it could not, with what DOS answered in the low one, or
-   53h there for a drive that is not ready. Its entry is in
-   port/asm/VCMENU.INC. */
+/* The setup file: see each in setup.c. MakeIni writes into MenuBuf what
+   the file holds, and returns how long that is. SaveSet writes it to the
+   file: 1 in the high word if it could not, with what DOS answered in
+   the low one, or 53h there for a drive that is not ready. */
+u16 MakeIni(void);
 u32 SaveSet(void);
-#pragma aux SaveSet "*_a" __far value [dx ax] modify exact [ax dx es]
+#pragma aux MakeIni "*_c" __far value [ax] modify exact [ax]
+#pragma aux SaveSet "*_c" __far value [dx ax] modify exact [ax dx]
+
+/* What the setup file holds: three letters V, of each panel what a
+   WCBdef has before CurAdr, of the main data what it has before LoadRes,
+   and the sum of all these bytes. */
+#define WCBini  ((u16)(u32)&((struct WCBdef __far *)0)->CurAdr)
+#define CmnIni  ((u16)&((struct MainDat *)0)->LoadRes)
+#define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
 
 /* DOS, the BIOS, the mouse driver and the machine: the functions of
    dos.c, which has every software interrupt of the C code and what each
@@ -384,6 +395,8 @@ u16 CaseMap(u16 letter);
 u16 InPort(u16 port);
 void IntOff(void);
 void IntOn(void);
+void Int28(void);
+void DvPause(void);
 #pragma aux Int21d  "*_c" __far parm [bx] value [ax] modify exact [ax]
 #pragma aux Int21f  "*_c" __far parm [bx] [ax] value [ax] modify exact [ax]
 #pragma aux Int10   "*_c" __far parm [bx] modify exact [ax]
@@ -396,6 +409,8 @@ void IntOn(void);
 #pragma aux InPort  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux IntOff  "*_c" __far modify exact [ax]
 #pragma aux IntOn   "*_c" __far modify exact [ax]
+#pragma aux Int28   "*_c" __far modify exact [ax]
+#pragma aux DvPause "*_c" __far modify exact [ax]
 
 /* A line as the assembly hands it over: the registers that describe it,
    pushed in this order by CallLine in port/asm/VC.ASM. */
@@ -622,7 +637,8 @@ u16 FindExt(const u8 __far *name);
    for a key clicked on the key bar. EdLin returns the column of the
    cursor, and 1 in the high word if anything changed. CmpSym is 1 for a
    character that words end at. Search is the speed search among names
-   in the segment `segment`. */
+   in the segment `segment`. Rnd is the next of the program's random
+   numbers. */
 u16 Input(u16 bar);
 u32 Input0(u16 bar);
 u16 Rnd(void);
@@ -649,7 +665,8 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
    directory, into DosPth, and is not 0 if that fails. Fantom asks for
    the disk of a drive that shares a floppy drive with another, 1 for A:,
    and ChgDisk for that of the drive that a path of the main data names:
-   not 0 if the user would not put it in. */
+   not 0 if the user would not put it in. SelDrv makes a drive the
+   current one, 0 for A:. */
 u32 Timer(void);
 void ClrKbd(void);
 u16 TstBrk(void);
@@ -657,6 +674,7 @@ void Beep(void);
 u16 UpCase(u16 letter);
 void SetDTA(void);
 u16 TstDrv(u16 letter);
+void SelDrv(u16 drive);
 u16 Intr21(struct DosRegs STACK *regs);
 u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
 u32 DosTime(void);
@@ -671,6 +689,7 @@ u16 ChgDisk(const u8 *path);
 #pragma aux UpCase  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux SetDTA  "*_c" __far modify exact [ax]
 #pragma aux TstDrv  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux SelDrv  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux Intr21  "*_c" __far parm [bx] value [ax] modify exact [ax]
 #pragma aux Intr21f "*_c" __far parm [bx] [ax] value [ax] modify exact [ax]
 #pragma aux DosTime "*_c" __far value [dx ax] modify exact [ax dx]
@@ -746,6 +765,13 @@ void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
 #pragma aux MinBox  "*_c" __far parm [bx] [dx] [ax] modify exact [ax]
 #pragma aux StdLine "*_c" __far parm [bx] [ax] [si] [dx] value [bx] modify exact [bx]
 #pragma aux OncZoom "*_c" __far parm [bx] [ax] [dx] [di] modify exact [ax]
+/* The screen blanker, which comes back when a key is pressed or the mouse
+   moved, and the word to DOS and to what shares the machine that the
+   program is idle: see each in blank.c. */
+void Blank(void);
+void LeaveTm(void);
+#pragma aux Blank   "*_c" __far modify exact [ax]
+#pragma aux LeaveTm "*_c" __far modify exact [ax]
 /* Small ones: see each in misc.c. PgUp and PgDn return the cursor in the
    low word and the first line shown in the high one. */
 u16 IsCrLf(u16 word);

@@ -308,9 +308,10 @@ port.
   tests (`harness/DRIVER.ASM`) watches it from inside the machine: it
   takes a call of `INT 28h` for the program's when it comes from the
   memory of the program that DOS has as the current one, and that is
-  named as the file under test is. `LeaveTm` makes that call every time
-  `Input0` has gone round; whatever makes it has to do so with DS on the
-  main data and on the program's own stack, as C code does. And the
+  named as the file under test is. `LeaveTm` of `port/blank.c` makes that
+  call, through `Int28` of `port/dos.c`, every time `Input0` has gone
+  round, and `Blank` while it waits; whatever makes it has to do so with
+  DS on the main data and on the program's own stack, as C code does. And the
   driver reads `AutoTim` and `Clock` in the main data, which
   `harness/driver.py` finds in the listing of the assembly,
   `build/port/VC.LST`, and the stack, `DataSav` and `VcStack`, which it
@@ -449,7 +450,8 @@ port.
   leaves the flag undefined, so such a call goes through `Intr21f`,
   which sets the flag as the assembly had it: read back from the call
   to the instruction that set it. A call that the assembly makes with
-  `INT 21h` itself gets an entry of its own: `Fcb29_a`.
+  `INT 21h` itself is `Int21d` of `port/dos.c` in C, which has the flag
+  clear when DOS is called: `Fcb29` of `port/dirfunc.c`.
 - `EXTERN` for a C function stands in the list at the top of `VC.ASM`,
   before any segment is open. In a file that is included inside the
   code, the assembler takes the function for one of that segment and
@@ -858,7 +860,8 @@ with it is less obvious:
 - DOS, the BIOS and the mouse driver are called in `port/dos.c` and
   nowhere else, and that file alone has inline assembly: `Int21d` and
   `Int21f` for DOS, `Int10` and `TopView` for the screen, `Int16` for
-  the keyboard, `Int2F`, and `Int33` and `MousAt` for the mouse, all
+  the keyboard, `Int2F`, `Int33` and `MousAt` for the mouse, and `Int28`
+  and `DvPause`, by which the program says that it is idle, all
   declared in `port/vc.h`. Each is a line of C around a `#pragma aux`
   that holds the `INT` and as little else as will do: the registers are
   its `parm` and its `value`, and the compiler loads them. C code that
@@ -876,9 +879,27 @@ with it is less obvious:
   interrupt flag, for which the compiler has intrinsic functions. What
   is in the memory, the BIOS's data and the screen, is read and written
   through far pointers in plain C: `Timer` of `port/system.c`, `Window`
-  of `port/window.c`. The entries of `VCCOPY.INC`, `VCF1.INC` and
-  `VCMEM.INC` that call DOS for C code are still there, and go the same
-  way.
+  of `port/window.c`. No entry of the assembly calls an interrupt for C
+  code any more: a call of DOS that an entry made is a few lines around
+  `Int21d` in the C file that wants it, as `Dos52` of `port/memory.c`.
+- Calls of an interrupt between which no compiled code may run are one
+  piece of inline assembly: DESQview is asked for a stack of its own,
+  for a pause and for the program's stack back, and the compiler may use
+  the stack between any two calls of C. `DvPause` of `port/dos.c`.
+- A number of 16 bits times another, as a number of 32, is a call of
+  `__U4M`, which a file of the second segment cannot reach. Where one
+  factor is below 256 the product can be had in halves of 16 bits:
+  `Below` of `port/blank.c`.
+- A table for `Case` that has keys with their scan codes besides
+  characters that count with any, as the main loop's had, is a `switch`
+  on the key and then one on the character, if every character of the
+  second kind stood behind the keys that have it too: Tab before ^I.
+  `Func12` of `port/main.c`.
+- A stub is taken out when nothing of the assembly names it, and what
+  says so is the assembler, not `tools/routines.py`, which counts calls
+  and misses a jump to a routine and a routine named in a table. With
+  the stub go its line in the `EXTERN` list and its function in
+  `harness/ported.py`.
 - A number of 32 bits in a pair of registers has its halves by the
   registers, not by the order they are written in: `[dx cx]` has DX for
   the low word and CX for the high one, `[dx ax]` and `[bx ax]` have AX

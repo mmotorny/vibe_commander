@@ -384,6 +384,27 @@ out again (show.py --changes is how):
     click on the dirinfo that the Info panel shows edits it, in the
     window there: rows 11 to 21, columns 42 to 77. The scenario
     mouse-edit.
+  - More of the blanker. The pointer has to have been elsewhere since
+    the last time for the corner, columns 78 and 79 of row 0, to bring
+    it up. It stays while the mouse moves within columns 76 to 79 of
+    rows 0 and 1, and goes with a key, which it takes, with Shift, Ctrl
+    or Alt, with a button, or with the mouse elsewhere. Its stars are
+    drawn from random numbers that begin with whatever the memory held,
+    which is why the port's are others: so the key or the movement that
+    ends it is in the same step, "Move@79,0 x". The sky changes when
+    the timer has ticked, 18 times a second, and the machine's time is
+    counted in instructions: one movement of the mouse within the
+    corner, which is 500 bytes of a script, lets about half a tick
+    pass, and a script holds 64K at the most (the driver counts its
+    place in 16 bits, and nothing says so when a script is longer: the
+    steps come out wrong). That is some 60 turns of the sky, and a star
+    is out for 88 at the least before it changes. For the same reason
+    no scenario waits the minute after which the blanker comes up by
+    itself. See blank.
+  - The setup file is written to the program's directory whatever the
+    panels show: with "del d:\\vc\\vc.ini" run as a command it is made
+    anew, and with the directory renamed, F6 on it in a panel that shows
+    D:\\ and has no Info beside it, saving fails. See setup-new.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
@@ -4330,6 +4351,41 @@ SCENARIOS = {
             "Esc",
         )),
 
+    "setup-new": Scenario(
+        "The setup saved where its file is gone, which makes it anew, and "
+        "where the directory of the program is gone, which is an error",
+        steps=(
+            '"del" Space "d:\\vc\\vc.ini"',
+            "Enter",                      # no setup file any more
+            "Shift+F9",
+            "Enter",                      # saved: a new one
+            "Ctrl+l",                     # no Info, which says what D: has
+            "Alt+F1 d",                   # D:\, with the directory VC
+            "F6",
+            '"vx" Enter',                 # under another name
+            "Shift+F9 Enter",             # no such path: a box says so
+            "Enter",
+            "F6",
+            '"vc" Enter',                 # and back
+        )),
+
+    "blank": Scenario(
+        "The screen blanker, brought up by the mouse in the top right "
+        "corner and ended by a key, which is lost, by the mouse leaving "
+        "the corner, by Shift, and by a button of the mouse after the "
+        "mouse has moved about in the corner for a while",
+        steps=(
+            "Move@79,0 x",                # the sky, and a key: the panels
+            "x",                          # that one is typed
+            "Esc",
+            "Move@40,12",
+            "Move@78,0 Move@40,12",       # the sky, and the mouse away
+            "Move@79,0 Shift",            # the sky, and Shift
+            "Move@40,12",
+            # The sky for some twenty turns of it: stars come out.
+            "Move@79,0 " + "Move@76,1 Move@79,0 " * 20 + "Click@77,0",
+            "x",                          # the panels take keys again
+        )),
 }
 
 

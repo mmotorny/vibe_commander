@@ -106,6 +106,27 @@ static u32 Multiplex(u16 ax, u16 bx, u16 cx);
     "int 2Fh" \
     parm [ax] [bx] [cx] value [bx ax] modify exact [ax bx]
 
+/* INT 28h, which leaves every register as it finds it. */
+static void DosIdle(void);
+#pragma aux DosIdle = \
+    "int 28h" \
+    modify exact []
+
+/* INT 15h three times, for DESQview: its calls 101Ah, 1000h and 1025h.
+   The first has DESQview take the program off its stack onto one of
+   DESQview's own and the third puts it back, so nothing that the
+   compiler makes, which may use the stack, can stand between them: the
+   three calls are one piece. */
+static void DesqviewPause(void);
+#pragma aux DesqviewPause = \
+    "mov ax,101Ah" \
+    "int 15h" \
+    "mov ax,1000h" \
+    "int 15h" \
+    "mov ax,1025h" \
+    "int 15h" \
+    modify exact [ax]
+
 /* INT 33h, with AX as it leaves it. */
 static u16 MouseDriver(u16 ax, u16 bx, u16 cx, u16 dx);
 #pragma aux MouseDriver = \
@@ -183,10 +204,28 @@ u32 Int16(u16 ax)
 /* The multiplex interrupt, by which resident programs are asked: its
    call with these registers. Returns AX in the low word and BX in the
    high one. The program asks the CD-ROM extensions whether a drive is
-   theirs (AX 150Bh). */
+   theirs (AX 150Bh), and tells Windows, or whatever else shares the
+   machine among programs, that it can do without the rest of its turn
+   (1680h), which leaves AL as it is if nobody listens. */
 u32 Int2F(u16 ax, u16 bx, u16 cx)
 {
     return Multiplex(ax, bx, cx);
+}
+
+/* Tell DOS that the program is idle: the interrupt that DOS itself
+   calls while it waits for a key, and that programs which stay in the
+   memory take to do their work in. */
+void Int28(void)
+{
+    DosIdle();
+}
+
+/* Give the rest of the program's turn to the other programs of
+   DESQview: on DESQview's stack (INT 15h, AX 101Ah), pause (1000h), and
+   back on the program's own (1025h). */
+void DvPause(void)
+{
+    DesqviewPause();
 }
 
 /* The mouse driver: its call with these registers. Returns AX as the

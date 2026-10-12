@@ -2,44 +2,13 @@
 ;		Version :	09.09.1999
 ;-------------------------------------------------------
 
-;----------------------- Timer -------------------------
-; C: Timer_c of port/system.c, which returns the count in DX and AX.
-Timer	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR Timer_c
-	MOV	CX,DX
-	MOV	DX,AX
-	POP	AX
-	RET
-Timer	ENDP
-
 ;----------------- Clear keyboard buffer ---------------
 ; C: ClrKbd_c of port/system.c, which only C code calls.
 
 ;----------------------- Go to CASE --------------------
-;			CS:SI - address of case table
-;			   AX - key code
-Case	PROC	NEAR
-	PUSH	SI
-	PUSH	CX
-	OR	AH,AH
-	JE	Case3
-Case1:	MOV	CX,CS:[SI]
-	ADD	SI,4
-	JCXZ	Case3
-	CMP	AL,CL
-	JNE	Case1
-	OR	CH,CH
-	JE	Case2
-	CMP	AH,CH
-	JNE	Case1
-Case2:	POP	CX
-	ADD	SP,4
-	JMP	WORD PTR CS:[SI-2]
-Case3:	POP	CX
-	POP	SI
-	RET
-Case	ENDP
+; Case, which jumped by a table of keys, is gone: every such table is a
+; switch in C now, the last of them that of the main loop's keys, Func12
+; of port/main.c.
 
 ;------------------ Check video mode -------------------
 ;			   ZR - ok
@@ -79,30 +48,6 @@ Cursor	ENDP
 ;			   AL - cursor
 ; C: TypMous_c of port/mouse.c, which only C code calls.
 
-;------------------- Set mouse cursor ------------------
-;			   AL - set/reset
-; C: CurMous_c of port/mouse.c.
-CurMous	PROC	NEAR
-	PUSH	AX
-	CallC	CurMous_c
-	POP	AX
-	RET
-CurMous	ENDP
-
-;------------------- Get mouse cursor ------------------
-;	Return :	CH,CL - mouse cursor
-;			   AX - mouse buttons
-; C: GetMous_c of port/mouse.c, which takes CX and returns the buttons in
-; AX and the place in DX.
-GetMous	PROC	NEAR
-	PUSH	DX
-	CallC	GetMous_c
-	MOV	CX,DX
-	POP	DX
-	OR	AX,AX			; ZR for no button, and no carry
-	RET
-GetMous	ENDP
-
 ;----------------- Mouse double click ------------------
 ;			BH,BL - base of selected point
 ;			DH,DL - size of selected point
@@ -111,30 +56,8 @@ GetMous	ENDP
 ;			   NZ - action
 ; C: DoublMo_c of port/mouse.c, which only C code calls.
 
-;--------------- Check cursor in window ----------------
-;			CH,CL - cursor
-;			BH,BL - begin of window
-;			DH,DL - size of window
-;	Return :	CY=0  - cursor inside the window
-; C: InWind_c of port/mouse.c, which returns 1 for a place outside.
-InWind	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR InWind_c
-	NEG	AX			; CY for 1
-	POP	AX
-	RET
-InWind	ENDP
-
 ;------------------ INT 10h with mouse -----------------
 ; C: Int10m_c of port/window.c, which only C code calls.
-
-;------------- Convert coordinars to address -----------
-;			BH,BL - coordinats
-;	Return :	   DI - address
-BasAdr	PROC	NEAR
-	CALL	FAR PTR BasAdr_c
-	RET
-BasAdr	ENDP
 
 ;-------------------- Screen Offset --------------------
 ; C: ScrOffs_c of port/window.c, which notes the offset in the main data,
@@ -169,57 +92,6 @@ ScrOffs	ENDP
 ; The frame of a box, its shadow and its growing are C: MinBox, ShadBox,
 ; BoxDubl, BoxLine, StdLine and OncZoom of port/box.c, with the routines
 ; that were their own. Only C code calls them.
-
-;--------------- Calculate string length ---------------
-;			DS:SI - address of line
-;			CS:DX - address of include line
-;	Return :	   AX - length
-LnStr	PROC	NEAR
-	PUSH	CX
-	PUSH	BX
-	PUSH	ES
-	CallLine LnStr_c, AX
-	TakeLine BX, BX
-	POP	ES
-	POP	BX
-	POP	CX
-	RET
-LnStr	ENDP
-
-;-------------------- Output NG line -------------------
-;			DS:SI - address of line
-;			ES:DI - address of screen buffer
-;			CS:DX - address of include line
-;			CS:BP - address of color table
-;			   AL - limit
-NgLine	PROC	NEAR
-	PUSH	CX
-	PUSH	BX
-	PUSH	ES
-	CallLine NgLine_c, AX
-	TakeLine AX, BX
-	POP	ES
-	POP	BX
-	POP	CX
-	RET
-NgLine	ENDP
-
-;--------------------- Center line ---------------------
-;			BH,BL - center
-;			DS:SI - address of line
-;			CS:DX - address of include line
-;			CS:BP - address of color table
-CntLine	PROC	NEAR
-	PUSH	CX
-	PUSH	AX
-	PUSH	ES
-	CallLine CntLine_c, BX
-	TakeLine BX, AX
-	POP	ES
-	POP	AX
-	POP	CX
-	RET
-CntLine	ENDP
 
 ;------------------------ Dialog -----------------------
 ;			CS:DX - address of include line
@@ -286,116 +158,6 @@ DialSub_a PROC	FAR
 	RET
 DialSub_a ENDP
 
-;--------------------- Input string --------------------
-;			BH,BL - begin
-;			ES:SI - string
-;			   CX - length
-;			   AH - number of color
-; Showing a line that is typed into is C: InSt10_c of port/dialog.c. It
-; leaves AX changed, as the routine did.
-InSt10	PROC	NEAR
-	CallC	InSt10_c
-	RET
-InSt10	ENDP
-
-;------------------------ Menu -------------------------
-;			CS:SI - control line
-;			BH,BL - begin
-;			DH,DL - size
-;			   BP - color table
-;			   AL - key bar
-;			   CL - case
-;	Return :	   CL - case
-;			   AX - key code
-; A line of buttons is C: MinMnu_c of port/dialog.c, with MnMn10 to
-; MnMn60. The colours go there as their offset, in DI. CX comes back in
-; DX: the case, and above it the key bar.
-MinMnu	PROC	NEAR
-	PUSH	DI
-	PUSH	DX
-	MOV	DI,BP
-	CallC	MinMnu_c
-	MOV	CX,DX
-	POP	DX
-	POP	DI
-	RET
-MinMnu	ENDP
-
-;----------------------- Get color ---------------------
-;			   AH - color number
-;	Return :	   AH - color
-Color	PROC	NEAR
-	PUSH	DS
-	PUSH	BX
-	PUSH	ES
-	POP	DS
-	MOV	BL,AL
-	MOV	AL,AH
-	CALL	FAR PTR Color_c
-	MOV	AH,AL
-	MOV	AL,BL
-	POP	BX
-	POP	DS
-	RET
-Color	ENDP
-
-ColAddr	PROC	NEAR
-	PUSH	DS
-	PUSH	AX
-	PUSH	ES
-	POP	DS
-	MOV	AL,AH
-	CALL	FAR PTR ColAddr_c
-	POP	AX
-	POP	DS
-	RET
-ColAddr	ENDP
-
-;------------------------- Shadow ----------------------
-;			ES:DI - address of screen buffer
-Shadow	PROC	NEAR
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR Shadow_c
-	POP	DS
-	RET
-Shadow	ENDP
-
-;			ES:SI(B) -> ES:DI(W)
-MvsBwe	PROC	NEAR
-	PUSH	DX
-	MOV	DX,ES
-	CALL	FAR PTR MvsBw_c
-	POP	DX
-	ADD	SI,CX
-	XOR	CX,CX
-	MOV	AL,ES:[SI-1]
-	RET
-MvsBwe	ENDP
-;			(Color) -> ES:DI(W)
-MvsColr	PROC	NEAR
-	CALL	FAR PTR MvsColr_c
-	XOR	CX,CX
-	RET
-MvsColr	ENDP
-;			CS:SI(B) -> ES:DI(W)
-MovDz	PROC	NEAR
-	CALL	BasAdr
-MovDz0:	PUSH	DX
-	PUSH	DI
-	MOV	DX,DS
-	CALL	FAR PTR MovDz0_c
-	POP	DX			; Where the text begins on the screen
-	SUB	DX,DI
-	NEG	DX
-	SHR	DX,1			; Its length
-	ADD	SI,DX
-	INC	SI
-	POP	DX
-	MOV	AL,0
-	RET
-MovDz	ENDP
 ;			Add file name
 AddFile	PROC	NEAR
 	CALL	FAR PTR AddFile_c
@@ -421,44 +183,6 @@ MvzLine	PROC	NEAR
 	MOV	AL,0
 	RET
 MvzLine	ENDP
-;			Clear rest of line DS:SI, legth CX
-FilZero	PROC	NEAR
-	PUSH	ES
-	PUSH	AX
-	PUSH	DS
-	POP	ES
-	CALL	FAR PTR FilZero_c
-	POP	AX
-	POP	ES
-	MOV	AL,0
-	XOR	CX,CX
-	RET
-FilZero	ENDP
-
-;-------------------- String length --------------------
-;			ES:DI - string
-;	Return :	   CX - length
-StrLen	PROC	NEAR
-	CALL	FAR PTR StrLen_c
-	MOV	AL,0
-	RET
-StrLen	ENDP
-
-;--------------------- Lower letter --------------------
-;			   AL - letter
-;	Return :	   AL - letter
-LowCase	PROC	NEAR
-	PUSH	DS
-	PUSH	BX
-	PUSH	ES
-	POP	DS
-	MOV	BH,AH
-	CALL	FAR PTR LowCase_c
-	MOV	AH,BH
-	POP	BX
-	POP	DS
-	RET
-LowCase	ENDP
 
 ;------------------------ Cut path ---------------------
 ;			DS:SI - path
@@ -470,15 +194,6 @@ CutPath	PROC	NEAR
 	POP	ES
 	RET
 CutPath	ENDP
-
-;--------------------- Normal string -------------------
-;			ES:SI - address of string
-NormStr	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR NormStr_c
-	POP	AX
-	RET
-NormStr	ENDP
 
 ;---------------------- Higher letter ------------------
 ;			ES:SI - address of string
@@ -493,186 +208,19 @@ PathLin	PROC	NEAR
 	RET
 PathLin	ENDP
 
-;-------------------- Shirter string -------------------
-;			ES:SI - address of string
-;			   AX - limit
-ShrtLin	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR ShrtLin_c
-	POP	AX
-	RET
-ShrtLin	ENDP
-
-;----------------------- Main file ---------------------
-;			NcPath + CS:SI -> ES:DI
-MainFil	PROC	NEAR
-	PUSH	DS
-	PUSH	DX
-	PUSH	ES
-	POP	DS
-	MOV	DX,CS			; The name is in this segment
-	CALL	FAR PTR MainFil_c
-	POP	DX
-	POP	DS
-	ADD	SI,13
-	XOR	CX,CX
-	MOV	AL,0
-	RET
-MainFil	ENDP
-
-;-------------- Output number into buffer --------------
-;			ES:DI - address of buffer
-;			BX CX - number
-;			   AL - mode: b0-coma, b1-spaces
-Number	PROC	NEAR
-	CallC	Number_c
-	RET
-Number	ENDP
-
-;-------------------- Output hex byte ------------------
-;			   AL - code
-HexByt	PROC	NEAR
-	CALL	FAR PTR HexByt_c
-	RET
-HexByt	ENDP
-
-;-------------------- Text hex number ------------------
-;			   AL - ASCII byte
-;	Return :	   AL - hex number, CY=0
-;				     error, CY=1
-TstHex	PROC	NEAR
-	PUSH	DS
-	PUSH	BX
-	PUSH	ES
-	POP	DS
-	MOV	BH,AH
-	CALL	FAR PTR TstHex_c
-	NEG	AH			; CY if it is no digit
-	MOV	AH,BH
-	POP	BX
-	POP	DS
-	RET
-TstHex	ENDP
-
-;---------------------- Number input -------------------
-;			ES:SI - string
-;	Return :	   AX - number
-;			 CY=1 - error
-TxtNum	PROC	NEAR
-	PUSH	BX
-	PUSH	AX			; Room for the number
-	MOV	BX,SP
-	PUSH	SI
-	CALL	FAR PTR TxtNum_c
-	POP	AX			; Where the text begins
-	CMP	AX,SI
-	CMC				; CY if no digit is there
-	POP	AX
-	POP	BX
-	RET
-TxtNum	ENDP
-
-;--------------- Convert name & extension --------------
-;			DS:SI - address of file
-;			ES:DI - convert buffer
-Convert	PROC	NEAR
-	PUSH	DS
-	PUSH	DX
-	PUSH	AX
-	MOV	DX,DS
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR Convert_c
-	POP	AX
-	POP	DX
-	POP	DS
-	RET
-Convert	ENDP
-
-;-------------- Unconvert name & extension -------------
-;			DS:SI - convert buffer
-;			ES:DI - address of file
-UnConv	PROC	NEAR
-	PUSH	DX
-	MOV	DX,DS
-	CALL	FAR PTR UnConv_c
-	POP	DX
-	ADD	SI,11
-	RET
-UnConv	ENDP
-
-;--------------------- Test mask file ------------------
-;			DS:SI - address of file
-;			ES:DI - converted mask
-;	Return :	 CY=1 - yes
-;			 CY=0 - no
-TstMas	PROC	NEAR
-	PUSH	DS
-	PUSH	DX
-	PUSH	AX
-	MOV	DX,DS
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR TstMas_c
-	SHR	AX,1			; CY if it fits
-	POP	AX
-	POP	DX
-	POP	DS
-	RET
-TstMas	ENDP
-
 ;------------------- Test drive letter -----------------
 ;			   AL - drive letter
 ;	Return :	   ZR - yes
 ;			   NZ - no
 ; C: TstDrv_c of port/system.c, which only C code calls.
 
-;--------------- Int 21h with fatal error --------------
-; C: Intr21f_c of port/system.c. The registers go there on the stack, as
-; struct DosRegs of port/vc.h has them, with the carry flag as a number in
-; AX: a call of DOS that leaves the flag as it finds it comes back with
-; what the caller had. AX, BX, CX and DX come back as DOS leaves them, and
-; AX is not 0 afterwards if the carry flag is to be set. DOS is called
-; with ES on the main data, which is found as the routine found it: no
-; caller has DS there for sure. ES comes back as DOS leaves it.
-Intr21	PROC	NEAR
-	PUSH	ES
-	PUSH	DI
-	PUSH	SI
-	PUSH	DS
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	SBB	AX,AX			; The carry flag as it comes
-	MOV	BX,SP
-	MOV	DS,CS:SecDat
-	CALL	FAR PTR Intr21f_c
-	NEG	AX			; CY for an error
-	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DS
-	POP	SI
-	POP	DI
-	POP	ES
-	RET
-Intr21	ENDP
-
-;----------------------- Check sum ---------------------
-;			DS:SI - address
-;			   CX - length
-;	Return :	   AX - check sum
-; C: ChkSum_c of port/misc.c, which adds up in the caller's DS: the main
-; data.
-ChkSum	PROC	NEAR
-	CALL	FAR PTR ChkSum_c
-	RET
-ChkSum	ENDP
-
 ;----------------- CALL to PSP segment -----------------
 ;			   AX - offset in PSP
+; A far call, by way of the stack, of a routine in the part of the program
+; that stays in the memory. It is here for as long as assembly makes such
+; calls: the code that starts the program, for OutStr and SetBrk, and the
+; entry by which C code has a program released, Release_a of VCMEM.INC.
+; C code that calls such a routine does so through a far pointer.
 CallPSP	PROC	NEAR
 	POP	BP
 	PUSH	CS

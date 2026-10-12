@@ -7,11 +7,11 @@
  *
  * The loop is no routine. The start-up code, which is still assembly,
  * falls into it; commands jump back into it at one of several places, and
- * it jumps to a command by the table of the keys, which is still in the
- * assembly because the commands are labels there. So here it is one
- * function, MainLoop, that is entered at a place, the numbers below, and
- * returns where the program goes on, the numbers of Main_T in
- * port/asm/VC.ASM, once a key or the mouse has said which command it is.
+ * it jumps to the command of a key, which is a label of the assembly. So
+ * here it is one function, MainLoop, that is entered at a place, the
+ * numbers below, and returns where the program goes on, the numbers of
+ * Main_T in port/asm/VC.ASM, once a key or the mouse has said which
+ * command it is: Func12 has the keys.
  *
  * What a command leaves in the registers reaches the next command through
  * the loop, and one command is known to read some of it: Shift-F6, which
@@ -59,8 +59,6 @@ enum {
 
 /* Where the program goes on: the places of Main_T. */
 enum {
-    TO_KEY,                             /* the command that the table of
-                                           keys has for AX, or F73_00 */
     TO_F73_00,                          /* the key goes to the command
                                            line */
     TO_F77_00,                          /* the speed search */
@@ -73,6 +71,20 @@ enum {
     TO_F01_05,                          /* a line down */
     TO_F21_10,                          /* Enter on the entry */
     TO_F21_31,                          /* run the command in DosBuf */
+    /* The other commands of the keys, in the order of Main_T: see
+       Func12. */
+    TO_F00_00, TO_F01_00, TO_F02_00, TO_F03_00, TO_F04_00, TO_F05_00,
+    TO_F06_00, TO_F07_00, TO_F08_00, TO_F09_00, TO_F10_00, TO_F76_00,
+    TO_F21_00, TO_F27_00, TO_F74_00, TO_F78_00, TO_F12_00, TO_F13_00,
+    TO_F14_00, TO_F15_00, TO_F16_00, TO_F17_00, TO_M16_00, TO_M16_10,
+    TO_M30_00, TO_M49_00, TO_F18_00, TO_F79_00, TO_F22_00, TO_F23_00,
+    TO_F24_00, TO_F25_00, TO_F26_00, TO_F80_00, TO_F81_00, TO_F82_00,
+    TO_F30_00, TO_F32_00, TO_F33_00, TO_F34_00, TO_F35_00, TO_F36_00,
+    TO_F37_00, TO_F38_00, TO_F40_00, TO_F42_00, TO_F43_00, TO_F44_00,
+    TO_F45_00, TO_F46_00, TO_F47_00, TO_F48_00, TO_M75_00, TO_F54_00,
+    TO_F55_00, TO_F56_00, TO_F58_00, TO_F61_00, TO_F62_00, TO_F63_00,
+    TO_F64_00, TO_F65_00, TO_M42_00, TO_F67_00, TO_F68_00, TO_F69_00,
+    TO_M41_00, TO_F75_00,
     AGAIN = 0x100                       /* not a place: go round, from the
                                            entry in the low byte */
 };
@@ -106,20 +118,17 @@ enum {
    time of day, the hours and minutes in the low word. Int10 calls the
    BIOS for the screen.
 
-   MakeIni writes into MenuBuf what the setup file holds, and SaveSet, of
-   vc.h, writes that file. ReDir reads what a panel shows, keeping the
-   cursor and the marks if `keep` is not 0: not 0 if it could not be read.
+   MakeIni writes into MenuBuf what the setup file holds, and SaveSet
+   writes that file: both of vc.h. ReDir reads what a panel shows,
+   keeping the cursor and the marks if `keep` is not 0: not 0 if it could
+   not be read.
 
    AsmSeg returns the code segment of the assembly and ResSeg the segment
    of the part of the program that stays in the memory while a command
    runs, where the stack is. */
-void SelDrv(u16 drive);
-void MakeIni(void);
 u16 ReDir(u16 panel, u16 keep);
 u16 AsmSeg(void);
 u16 ResSeg(void);
-#pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
-#pragma aux MakeIni "*_a" __far modify exact [cx si es]
 #pragma aux ReDir   "*_a" __far parm [dx] [ax] value [ax] modify exact [ax es]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
 #pragma aux ResSeg  "*_a" __far value [ax] modify exact [ax]
@@ -161,18 +170,14 @@ extern const u8 __far WCB1sav[];
 #define KEY_MOUSE 0xFC                  /* the scan code that Input has
                                            for the mouse */
 
-/* What the setup file holds: three letters V, of each panel what a
-   WCBdef has before CurAdr, of the main data what it has before LoadRes,
-   and the sum of all these bytes. The program keeps the one it has
-   written last, or found when it started, where the copy of the first
-   panel is kept while a command runs: IniSave. */
-#define WCBini  ((u16)(u32)&((struct WCBdef __far *)0)->CurAdr)
-#define CmnIni  ((u16)&((struct MainDat *)0)->LoadRes)
+/* Where the setup file has a field of a panel and one of the main data
+   (see WCBini and CmnIni in vc.h). The program keeps the file that it
+   has written last, or found when it started, where the copy of the
+   first panel is kept while a command runs: IniSave. */
 #define INI_WCB(number, field) \
     (3 + (number) * WCBini + (u16)(u32)&((struct WCBdef __far *)0)->field)
 #define INI_CMN(field) \
     (3 + 2 * WCBini + (u16)&((struct MainDat *)0)->field)
-#define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
 
 #define DOS_SET_VECTOR 0x2500           /* DOS: an interrupt to DS:DX */
 #define DOS_PATH       0x4700           /* the current directory of a
@@ -622,6 +627,100 @@ Func40:                                 /* Move the cursor */
     return TO_F21_10;
 }
 
+/* The command of a key, a place of Main_T: the command line for a key
+   that has none, and for one without a scan code.
+
+   The assembly had a table of keys and commands, FncTab, which Case went
+   through from its start: an entry was a key, or a character that counts
+   with any scan code. Every character of the second kind that a key of
+   the first kind has too, Tab, Enter and Esc, stood behind that key, so
+   the keys are looked for first here. Case left SI behind the entry it
+   had found, or on the table: no command reads it, and here it stays as
+   it is. */
+static u16 Func12(u16 key)
+{
+    if (key >> 8 == 0)
+        return TO_F73_00;
+    switch (key) {
+    case 0x4800: return TO_F00_00;  /* Up */
+    case 0x5000: return TO_F01_00;  /* Down */
+    case 0x4B00: return TO_F02_00;  /* Left */
+    case 0x4D00: return TO_F03_00;  /* Right */
+    case 0x4900: return TO_F04_00;  /* PgUp */
+    case 0x5100: return TO_F05_00;  /* PgDn */
+    case 0x4700: return TO_F06_00;  /* Home */
+    case 0x4F00: return TO_F07_00;  /* End */
+    case 0x5200: return TO_F08_00;  /* Ins: select / unselect */
+    case 0x4E2B: return TO_F09_00;  /* Grey +: select group */
+    case 0x4A2D: return TO_F10_00;  /* Grey -: unselect group */
+    case 0x372A: return TO_F76_00;  /* Grey *: invert group */
+    case 0x0F09: return TO_F20_00;  /* Tab: change active panel */
+    case 0x1C0D: return TO_F21_00;  /* Enter: run / change directory */
+    case 0x011B: return TO_F74_00;  /* Esc: clear command line / on/off */
+    case 0x5E00: return TO_F13_00;  /* ^F1: on/off left panel */
+    case 0x5F00: return TO_F14_00;  /* ^F2: on/off right panel */
+    case 0x2308: return TO_M16_10;  /* ^H: hidden files */
+    case 0x8400: return TO_F22_00;  /* ^PgUp: CD .. */
+    case 0x7600: return TO_F23_00;  /* ^PgDn: change directory */
+    case 0x4400: return TO_F30_00;  /* F10: quit */
+    case 0x3C00: return TO_F32_00;  /* F2: user menu */
+    case 0x3D00: return TO_F33_00;  /* F3: view */
+    case 0x3E00: return TO_F34_00;  /* F4: edit */
+    case 0x3F00: return TO_F35_00;  /* F5: copy */
+    case 0x4000: return TO_F36_00;  /* F6: rename / move */
+    case 0x4100: return TO_F37_00;  /* F7: make directory */
+    case 0x4200: return TO_F38_00;  /* F8: delete */
+    case 0x4300: return TO_F39_00;  /* F9: pull down menu */
+    case 0x5D00: return TO_F40_00;  /* Shift F10: pull down menu */
+    case 0x5500: return TO_F42_00;  /* Shift F2: main menu... */
+    case 0x5600: return TO_F43_00;  /* Shift F3: view... */
+    case 0x5700: return TO_F44_00;  /* Shift F4: edit... */
+    case 0x5800: return TO_F45_00;  /* Shift F5: copy... */
+    case 0x5900: return TO_F46_00;  /* Shift F6: rename/move... */
+    case 0x5A00: return TO_F47_00;  /* Shift F7: make directory... */
+    case 0x5B00: return TO_F48_00;  /* Shift F8: delete... */
+    case 0x5C00: return TO_M75_00;  /* Shift F9: save setup */
+    case 0x6100: return TO_F54_00;  /* ^F4: change label */
+    case 0x6200: return TO_F55_00;  /* ^F5: copy file */
+    case 0x6300: return TO_F56_00;  /* ^F6: rename/move file */
+    case 0x6500: return TO_F58_00;  /* ^F8: delete file */
+    case 0x6800: return TO_F61_00;  /* Alt F1: change left drive */
+    case 0x6900: return TO_F62_00;  /* Alt F2: change right drive */
+    case 0x6A00: return TO_F63_00;  /* Alt F3: internal viewer */
+    case 0x6B00: return TO_F64_00;  /* Alt F4: internal editor */
+    case 0x6C00: return TO_F65_00;  /* Alt F5: memory info */
+    case 0x6D00: return TO_M42_00;  /* Alt F6: directory sizes */
+    case 0x6E00: return TO_F67_00;  /* Alt F7: file find */
+    case 0x6F00: return TO_F68_00;  /* Alt F8: history */
+    case 0x7000: return TO_F69_00;  /* Alt F9: EGA lines */
+    case 0x7100: return TO_M41_00;  /* Alt F10: Tree */
+    case 0xFD00: return TO_F39_00;  /* Alt: pull down menu */
+    case 0xFE00: return TO_F75_00;  /* the time in AutoTim has come:
+                                           auto CD / quick view */
+    }
+    switch (key & 0xFF) {
+    case 0x0A: return TO_F27_00;  /* ^Enter: history command */
+    case 0x0D: return TO_F78_00;  /* ^M: restore marks */
+    case 0x0F: return TO_F11_00;  /* ^O: on/off panels */
+    case 0x10: return TO_F12_00;  /* ^P: on/off unactive panel */
+    case 0x15: return TO_F15_00;  /* ^U: swap panels */
+    case 0x02: return TO_F16_00;  /* ^B: on/off key bar */
+    case 0x12: return TO_F17_00;  /* ^R: re-read */
+    case 0x06: return TO_M16_00;  /* ^F: filter */
+    case 0x01: return TO_M30_00;  /* ^A: attributes */
+    case 0x03: return TO_M49_00;  /* ^C: compare directories */
+    case 0x0C: return TO_F18_00;  /* ^L: info */
+    case 0x1A: return TO_F79_00;  /* ^Z: tree */
+    case 0x1C: return TO_F24_00;  /* ^\: CD \ */
+    case 0x05: return TO_F25_00;  /* ^E: previous history command */
+    case 0x18: return TO_F26_00;  /* ^X: next history command */
+    case 0x09: return TO_F80_00;  /* ^I: insert files */
+    case 0x1B: return TO_F81_00;  /* ^[: insert left path */
+    case 0x1D: return TO_F82_00;  /* ^]: insert right path */
+    }
+    return TO_F73_00;
+}
+
 /* The main loop: see the top of this file. `entry` is where it is
    entered and `r` the registers as they are there; it returns where the
    program goes on, with the registers as that place gets them. */
@@ -785,7 +884,7 @@ u16 MainLoop(u16 entry, struct Regs STACK *r)
                 goto Func20;
             if (md.Quote != 0)
                 return TO_F73_00;
-            return TO_KEY;
+            return Func12(r->ax);
         }
 
     Func20:                             /* Mouse support */

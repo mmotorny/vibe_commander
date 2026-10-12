@@ -81,170 +81,18 @@ ReadTre	PROC	NEAR
 	RET
 ReadTre	ENDP
 
-;	Put the cursor of the tree on the current directory
-;			   ES - main data
-TreeCur	PROC	NEAR
-	CallC	TreeCur_c
-	RET
-TreeCur	ENDP
-
-;	Begin the lines of the tree half a panel above the cursor
-;			   AL - lines shown
-;			   DS - main data
-TrCr20	PROC	NEAR
-	CALL	FAR PTR TrCr20_c
-	RET
-TrCr20	ENDP
-
 	.CONST
 DrIn_F	DB	'DIRINFO',0
 
 	.CODE
 
-;---------------------- Output tree --------------------
-;			   DS - WCBseg
-;			BH,BL - begin
-;			DH,DL - size
-;			CS:BP - address of color table
-PutTree	PROC	NEAR
-	PUSH	AX
-	PUSH	DS
-	PUSH	ES
-	MOV	AX,DS
-	PUSH	ES
-	POP	DS
-	PUSH	CS			; The colours are in this segment
-	POP	ES
-	XCHG	SI,BP
-	CALL	FAR PTR PutTree_c
-	XCHG	SI,BP
-	POP	ES
-	POP	DS
-	POP	AX
-	RET
-PutTree	ENDP
-
-;--------------------- Find near file ------------------
-;			ES:DI - File
-;			   BX - End
-;			   DS - WCBseg
-;	Return :	   SI - Address of file , CF=1
-;				Not found ,       CF=0
-NearFl	PROC	NEAR
-	PUSH	AX
-	PUSH	DX
-	MOV	DX,DS
-	CALL	FAR PTR NearFl_c
-	POP	DX
-	CMP	AX,1
-	CMC			; CY if one was found
-	JNC	NrFl01
-	MOV	SI,AX
-NrFl01:	POP	AX
-	RET
-NearFl	ENDP
-
 ;---------------------- Save setup ---------------------
+; Saving the setup is C: SaveSet and MakeIni of port/setup.c, which only
+; C code calls. The name of the file stays here: the code that starts the
+; program reads the file too.
+	PUBLIC	Init_F
 	.CONST
 Init_F	DB	'VC.INI',0
-
-	.CODE
-SaveSet	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	CALL	MakeIni
-	MOV	BX,CX
-	MOV	DX,OFFSET TmpBuf
-	MOV	SI,OFFSET Init_F
-	MOV	DI,DX
-	CALL	MainFil
-	CALL	ChgDisk
-	JC	SavSt2
-	MOV	AX,4300h
-	CALL	Intr21
-	JNC	SavSt1
-	CMP	AX,WORD PTR 2
-	JNE	SavSt3
-	XOR	CX,CX
-SavSt1:	OR	CL,20h
-	MOV	AH,3Ch
-	CALL	Intr21
-	JC	SavSt4
-	MOV	CX,BX
-	MOV	BX,AX
-	MOV	DX,OFFSET MenuBuf
-	MOV	AH,40h
-	CALL	Intr21
-	PUSHF
-	PUSH	AX
-	MOV	AH,3Eh
-	CALL	Intr21
-	POP	BX
-	POP	DX
-	JC	SavSt4
-	MOV	AX,BX
-	PUSH	DX
-	POPF
-	JC	SavSt4
-	CMP	AX,CX
-	JE	SavSt4
-SavSt2:	MOV	AL,0
-SavSt3:	STC
-SavSt4:	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
-	RET
-SaveSet	ENDP
-
-MakeIni	PROC	NEAR
-	PUSH	DI
-	PUSH	AX
-	MOV	DI,OFFSET MenuBuf
-	PUSH	DI
-	MOV	AL,'V'
-	STOSB
-	STOSB
-	STOSB
-	MOV	DS,ES:WCB1seg
-	CALL	MkIni1
-	MOV	DS,ES:WCB2seg
-	CALL	MkIni1
-	PUSH	ES
-	POP	DS
-	MOV	SI,0
-	MOV	CX,CmnIni
-	REP	MOVSB
-	POP	SI
-	MOV	CX,DI
-	SUB	CX,SI
-	CALL	ChkSum
-	STOSW
-	INC	CX
-	INC	CX
-	POP	AX
-	POP	DI
-	RET
-MakeIni	ENDP
-
-MkIni1	PROC	NEAR
-	MOV	SI,OFFSET DskMas
-	MOV	CX,13
-	CALL	FilZero
-	MOV	SI,OFFSET WinPath
-	MOV	CX,LenPath
-	CALL	FilZero
-	XOR	SI,SI
-	MOV	CX,WCBini
-	REP	MOVSB
-	RET
-MkIni1	ENDP
 
 ;-------------------- Fantom Diskette ------------------
 ;			AL - Disk ID
@@ -277,49 +125,9 @@ OkCan_D	DB	4, 0
 ; change the disk. It has Dialog show the box here.
 	PUBLIC	Fant_B
 
-; The disk of the drive that the path at ES:DX names
-;	Return :	CY=1 - the user would not change it
-; C: ChgDisk_c of port/system.c, which returns 1 for that.
-ChgDisk	PROC	NEAR
-	PUSH	AX
-	CallC	ChgDisk_c
-	NEG	AX			; CY for 1
-	POP	AX
-	RET
-ChgDisk	ENDP
-
-; Have a directory chosen from the tree, in a box
-;			   AL - the column the box begins in
-;			   ES - main data
-;	Return :	CY=0 - chosen, its path at TmpBuf
-ChTree	PROC	NEAR
-	PUSH	AX
-	CallC	ChTree_c
-	NEG	AX			; CY for 1
-	POP	AX
-	RET
-ChTree	ENDP
-
-;	Work out the sizes of the directories of a panel
-;			   DS - WCBseg
-;			   ES - main data
-DirSize	PROC	NEAR
-	PUSH	AX
-	MOV	AX,DS
-	CallC	DirSize_c
-	POP	AX
-	RET
-DirSize	ENDP
-
-; For DirSize and DirFunc in C: where DiSi10 is, to put into FncAddr, and
-; a call of what FncAddr names, with the attributes of a file in AL. Not
-; every such routine leaves DS as it was.
-	PUBLIC	DiSi10_o, FncCall_a
-DiSi10_o PROC	FAR
-	MOV	AX,OFFSET DiSi10
-	RET
-DiSi10_o ENDP
-
+; For DirSize and DirFunc in C: a call of what FncAddr names, with the
+; attributes of a file in AL. Not every such routine leaves DS as it was.
+	PUBLIC	FncCall_a
 FncCall_a PROC	FAR
 	PUSH	BP
 	PUSH	DS
@@ -331,47 +139,14 @@ FncCall_a PROC	FAR
 	RET
 FncCall_a ENDP
 
+; What DirSize puts into FncAddr, for DirFunc to call with every file
+;			   AL - its attributes
+;	Return :	   AX - see DiSi10 in port/read.c
+; C: DiSi10_c of port/read.c. Only FncCall_a calls this.
+	PUBLIC	DiSi10
 DiSi10	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	TEST	AL,10h
-	JZ	DiSi11
-	CALL	DirFunc
-	JMP	DiSi13
-DiSi11:	MOV	AX,ES:DTA.FilSize.Lo
-	MOV	BX,ES:DTA.FilSize.Hi
-	ADD	AX,WORD PTR ES:[TmpBuf+90]
-	ADC	BX,WORD PTR ES:[TmpBuf+92]
-	JNC	DiSi12
-	MOV	AX,0FFFFh
-	MOV	BX,0FFFFh
-DiSi12:	MOV	WORD PTR ES:[TmpBuf+90],AX
-	MOV	WORD PTR ES:[TmpBuf+92],BX
-	XOR	AX,AX
-DiSi13:	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
+	CallC	DiSi10_c
 	RET
 DiSi10	ENDP
-
-;	Get the label of the current drive
-;			ES:SI - where to put it
-;	Return :	   CY - 0 for a drive of a network
-;			   AX - with CY, see GetVol in port/read.c
-GetVol	PROC	NEAR
-	PUSH	DX
-	MOV	AX,SI
-	CallC	GetVol_c
-	NEG	DX
-	POP	DX
-	RET
-GetVol	ENDP
 
 

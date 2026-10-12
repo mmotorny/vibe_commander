@@ -44,6 +44,7 @@ void ReDr50(u16 panel, struct OldList STACK *old);
 void RdInfo(u16 panel);
 u32 GetVol(u8 *volume);
 void DirSize(u16 panel);
+u16 DiSi10(u16 attributes);
 void TstInfo(u16 panel);
 static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
 
@@ -54,6 +55,7 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
 #pragma aux RdInfo  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux DirSize "*_c" __far parm [ax] modify exact [ax]
+#pragma aux DiSi10  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux TstInfo "*_c" __far parm [ax] modify exact [ax]
 
 /* The names of files, in the assembly's code segment: Mask_S is \*.* and
@@ -544,9 +546,8 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs)
    SizDir is made 1 when all are known, and left alone when the work was
    broken off, by a key or by an error.
 
-   The files are gone through by DirFunc, which is still assembly: it
-   takes the path at TmpBuf and for every file calls what FncAddr names,
-   here DiSi10, which adds a size to the four bytes at TmpBuf+90. */
+   The files are gone through by DirFunc, which takes the path at TmpBuf
+   and for every file calls what FncAddr names, here DiSi10. */
 void DirSize(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
@@ -554,7 +555,7 @@ void DirSize(u16 panel)
     u8 __far *to;
     u16 file, i;
 
-    md.FncAddr = DiSi10();
+    md.FncAddr = (u16)(u32)(const void __far *)DiSi10_s;
     to = MvzLine(md.TmpBuf, wcb->WinPath, LenPath);
     if (to[-1] != '\\')
         *(u16 __far *)to = '\\';
@@ -572,6 +573,26 @@ void DirSize(u16 panel)
         entry->SizeF = *(u32 *)(md.TmpBuf + 90);
     }
     wcb->SizDir = 1;
+}
+
+/* What DirSize has done with every file that DirFunc finds, whose
+   attributes are the low byte of `attributes`: the size of a file is
+   added to the sum at TmpBuf+90, which stays at 0FFFFFFFFh once it has
+   got beyond that, and a directory is gone through in its turn, by
+   DirFunc, whose answer is returned then: 1 if all of it was done, 0 if
+   not, 100h to stop. For a file it is 0. */
+u16 DiSi10(u16 attributes)
+{
+    u32 *sum = (u32 *)(md.TmpBuf + 90);
+    u32 size;
+
+    if (attributes & ATTR_DIRECTORY)
+        return DirFunc();
+    size = md.DTA.FilSize;
+    *sum += size;
+    if (*sum < size)
+        *sum = 0xFFFFFFFFUL;
+    return 0;
 }
 
 /* Have the other panel read again if it is of a kind that shows what

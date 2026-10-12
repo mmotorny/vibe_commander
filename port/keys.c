@@ -151,8 +151,6 @@ u16 StrLen(const u8 __far *text);                       /* string.c */
    which asks DOS for the current directory, is in vc.h, and so are SavMous
    and CurMous, of the mouse, and the bars and the prompt, which are C:
    PutMnu, ClsLine, PutPrm. */
-void SelDrv(u16 drive);
-#pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
 
 /* The dialog that asks for a mask, the box that says no file is like it,
    and what ^I stands for in both: they are in the assembly's code

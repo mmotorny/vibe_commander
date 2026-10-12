@@ -348,15 +348,6 @@ F35_61:	ADD	BX,305h
 	RET
 F35_60	ENDP
 
-; C code has DOS make a drive the current one: DL - the drive, 0 for A:.
-; Not through Intr21, as in the original.
-	PUBLIC	SelDrv_a
-SelDrv_a PROC	FAR
-	MOV	AH,0Eh
-	INT	21h
-	RET
-SelDrv_a ENDP
-
 ;	Copy, rename or move a file or a directory
 ;			AL - its attributes
 ;	Return :	AL - 1 if it was done

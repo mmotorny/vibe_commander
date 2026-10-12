@@ -141,9 +141,7 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
    the assembly. ScrOffs asks the BIOS where in the memory of the screen
    the page begins that is shown. Int10 calls the BIOS for the screen,
    and SaveSet writes the setup to its file. */
-void SelDrv(u16 drive);
 u16 AsmSeg(void);
-#pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands

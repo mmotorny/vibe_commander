@@ -73,33 +73,16 @@ void F65_00(void);
 
 /* Routines that are still assembly, by their entries for C. The routines
    of the screen, the mouse and the keyboard that this file calls are C,
-   of vc.h.
-
-   What is asked of DOS for the map, without Intr21 as in the original:
-   Dos5802 says whether the upper memory is linked into the chain of
-   blocks, 0 or 1, or 0FFFFh if DOS does not know of it, and Dos5803 links
-   it or not; Dos52 returns the segment of the first header of the chain;
-   Dos4452 returns what DR DOS says its version is, 0 for another DOS;
-   Dos2523 gives Ctrl-C of DOS to the routine at `routine` in the part of
-   the program that stays in the memory.
+   of vc.h, and so is Int21d, by which DOS is asked for the map without
+   Intr21, as in the original: see Dos5802 to Dos2523 below.
 
    MemRun returns the segment of the part of the program that goes while
    a command runs, and ResSeg that of the part that stays, where Counter,
    PrgList and Command are. Release releases a program that has stayed in
    the memory: `program` is what PrgList has of it. */
-u16 Dos5802(void);
-void Dos5803(u16 link);
-u16 Dos52(void);
-u16 Dos4452(void);
-void Dos2523(u16 routine);
 u16 MemRun(void);
 u16 ResSeg(void);
 void Release(u16 program);
-#pragma aux Dos5802 "*_a" __far value [ax] modify exact [ax]
-#pragma aux Dos5803 "*_a" __far parm [bx] modify exact [ax]
-#pragma aux Dos52   "*_a" __far value [ax] modify exact [ax bx]
-#pragma aux Dos4452 "*_a" __far value [ax] modify exact [ax]
-#pragma aux Dos2523 "*_a" __far parm [dx] modify exact [ax]
 #pragma aux MemRun  "*_a" __far value [ax] modify exact [ax]
 #pragma aux ResSeg  "*_a" __far value [ax] modify exact [ax]
 #pragma aux Release "*_a" __far parm [ax] modify exact [ax es]
@@ -274,6 +257,66 @@ static void F65_29(u8 *to, const u8 __far *name, u16 count)
             name++;
         *to++ = c;
     }
+}
+
+/* Whether the upper memory is linked into the chain of blocks of DOS: 0
+   or 1, or 0FFFFh if DOS does not know of it. */
+static u16 Dos5802(void)
+{
+    struct DosRegs regs;
+
+    regs.name = (const u8 __far *)&md;
+    regs.ax = 0x5802;
+    if (Int21d((struct DosRegs STACK *)&regs))
+        return 0xFFFF;
+    return regs.ax & 0xFF;
+}
+
+/* Link it, or not: `link` is 1 or 0. */
+static void Dos5803(u16 link)
+{
+    struct DosRegs regs;
+
+    regs.name = (const u8 __far *)&md;
+    regs.bx = link;
+    regs.ax = 0x5803;
+    Int21d((struct DosRegs STACK *)&regs);
+}
+
+/* The segment of the first header of that chain: DOS has it in the word
+   before the list that its function 52h names in ES:BX. */
+static u16 Dos52(void)
+{
+    struct DosRegs regs;
+
+    regs.name = (const u8 __far *)&md;
+    regs.ax = 0x5200;
+    Int21d((struct DosRegs STACK *)&regs);
+    return WORD_AT(regs.es, regs.bx - 2);
+}
+
+/* What DR DOS says its version is, in a byte: 0 for another DOS, which
+   does not know the call. */
+static u16 Dos4452(void)
+{
+    struct DosRegs regs;
+
+    regs.name = (const u8 __far *)&md;
+    regs.ax = 0x4452;
+    if (Int21d((struct DosRegs STACK *)&regs))
+        return 0;
+    return regs.ax & 0xFF;
+}
+
+/* Give Ctrl-C of DOS, interrupt 23h, to the routine at `routine` in the
+   part of the program that stays in the memory. */
+static void Dos2523(u16 routine)
+{
+    struct DosRegs regs;
+
+    regs.name = AT(ResSeg(), routine);
+    regs.ax = 0x2523;
+    Int21d((struct DosRegs STACK *)&regs);
 }
 
 /* MCB analisis: list the blocks of DOS in BlkList. Before the first

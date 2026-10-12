@@ -78,9 +78,7 @@ u16 F35_61(u16 answer, u16 place);
    (see port/dialog.c). SelDrv makes a drive the current one, 0 for A:,
    by the call of DOS that the assembly makes without Intr21. */
 u16 AsmSeg(void);
-void SelDrv(u16 drive);
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
 
 /* A dialog whose box is not on the screen yet, and which sets what it
    sets in the main data: Dialog of vc.h. The low byte of what it returns

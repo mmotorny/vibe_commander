@@ -91,11 +91,8 @@ static u16 FncMs1(u16 include);
    if the user would not change it.
 
    Intr21f is Intr21 with the carry flag set before DOS is called if
-   `carry` is not 0, and clear if it is. Fcb29 has DOS make an FCB of a
-   name: function 29h with `flags` in AL, not through Intr21. HidCur puts
-   the cursor below the screen. */
-u16 Fcb29(const u8 *name, u8 *fcb, u16 flags);
-#pragma aux Fcb29   "*_a" __far parm [si] [di] [ax] value [ax] modify exact [ax si es]
+   `carry` is not 0, and clear if it is. HidCur puts the cursor below the
+   screen. */
 
 /* C routines of other files that vc.h does not have. */
 const u8 __far *FndLet(const u8 __far *text);           /* string.c */
@@ -260,6 +257,22 @@ extern const u8 __far Tree_F[];
 #define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
 
 /* Take a box off the screen. */
+/* Have DOS make an FCB of a name: its function 29h with the low byte of
+   `flags` in AL, called without Intr21, as the assembly calls it. Both
+   are in the main data. Returns AX as DOS leaves it: the low byte is 1
+   if the name is a mask. */
+static u16 Fcb29(const u8 *name, u8 *fcb, u16 flags)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x2900 | flags & 0xFF;
+    regs.name = (const u8 __far *)&md;
+    regs.si = (u16)name;
+    regs.di = (u16)fcb;
+    Int21d((struct DosRegs STACK *)&regs);
+    return regs.ax;
+}
+
 static void Close(struct Box STACK *box)
 {
     ResWin(box->begin, box->size, box->saved);
@@ -799,7 +812,7 @@ u16 DirFunc(void)
     end = md.TmpBuf;
     for (count = LenPath; ; count--) {
         if (count == 0) {
-            if (md.FncAddr != DiSi10())
+            if (md.FncAddr != OFFSET(DiSi10_s))
                 /* None of its lines has ^I: no include line. */
                 Dialog(OFFSET(PthEr_B), 0, 0, 0, MAIN_SEG);
             return 0;

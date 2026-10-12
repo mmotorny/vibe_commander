@@ -128,15 +128,19 @@ the screen, the tap on Alt and the keys that the mouse clicks on the key
 bar, and so are what a key does to a line that is typed into, the speed
 search, the key bar, the menu bar, the command line with its prompt, and
 finding what an extension file says for a file. The screen blanker is
-still assembly. What all of these rest on is C too: putting a window of
+C, with the word to DOS that the program is idle; what the blanker draws
+is on no screen of a scenario (see `TODO.md`). What all of these rest on
+is C too: putting a window of
 the program's copy of the screen on the display, keeping what a box
 covers and putting it back, the frame of a box with its shadow and the
 box growing, the cursor, the mouse with its pointer and the second click,
 the keys that wait, the bell, capitals, every call of DOS with the error
 that it may end in, opening a file, asking DOS for the current directory,
 and asking the user for the disk of a drive that shares the floppy drive
-with another. Saving the setup and the jump by a table of keys are still
-assembly.
+with another. Saving the setup is C, and so is the jump from a key to its
+command, which was a table in the assembly. Of the three files of shared
+routines nothing is left but what passes the rest of the assembly on to
+the C, and texts.
 The pull-down menus of the menu bar are C as well: the five menus with
 their ticks and the items that cannot be chosen as things are, and the
 keys and the mouse that the bar takes until an item is chosen. So are
@@ -241,16 +245,16 @@ bring: the program has none.
 
 DOS, the BIOS and the mouse driver are called by software interrupts,
 which C cannot express. The C code calls them in one file, `port/dos.c`,
-and nowhere else: eight small functions, each a line of C around the one
+and nowhere else: ten small functions, each a line of C around the
 instruction, which is inline assembly there, with the registers as its
-arguments. Four more are there for a port of the machine and its
+arguments; one has three such instructions that may not be parted. Four more are there for a port of the machine and its
 interrupt flag, for which the compiler has functions of its own, and for
 DOS's routine that makes capitals. Everything else is plain C that calls
 these, and reads the BIOS's data and the memory of the display through
 pointers. That file is where the program will meet another operating
 system; until the translation is done it hides nothing of DOS. The
-entries by which C code calls DOS in `VCCOPY.INC`, `VCF1.INC` and
-`VCMEM.INC` have yet to move there.
+assembly that is left calls interrupts itself; nothing in it does so for
+C code.
 
 The halves are linked into one program, `VC.EXE`, which is not built the
 way a C program usually is. It still loads and starts like the `.COM` file
