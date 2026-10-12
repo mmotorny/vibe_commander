@@ -312,8 +312,8 @@ out again (show.py --changes is how):
     appended to the other in turn, seven times, and nine copies of the
     3 MB that makes. The scenario copy-full does it and takes half a
     minute when a build is tested. Keep what a step copies small: 25 MB
-    in one step took more than the 20 seconds a step may, on a machine
-    that other tests were using.
+    in one step took more than 20 seconds on a machine that other tests
+    were using, and a test is as slow as its slowest step.
   - "Ctrl+a", "Down Space Enter" takes the Archive attribute off a
     file, which then has none.
   - Ctrl+F5 and Ctrl+F6 copy and rename the file under the cursor,
@@ -396,7 +396,9 @@ from dos import MachineError
 # directory, and both states of the blinking colon of its clock.
 SETTLE = 0.8
 # How long a step may take before the program counts as stuck, in seconds.
-STEP_TIME = 20
+# It is long on purpose: it is there for a program that hangs, and a
+# machine that many tests share must not look like one.
+STEP_TIME = 300
 
 
 @dataclass(frozen=True)
@@ -2017,8 +2019,8 @@ SCENARIOS = {
             '"b" Enter',
             "p",
             "Down",                       # onto b
-            # Nine copies of it. No step moves more than 3 MB: a step
-            # may take 20 seconds, on a machine that others use too.
+            # Nine copies of it. No step moves more than 3 MB, to keep
+            # the test quick on a machine that others use too.
             *(step for number in range(1, 10)
               for step in ("F5", f'"c{number}" Enter')),
             "F5",

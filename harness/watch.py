@@ -64,8 +64,10 @@ SIGNATURE = 16                    # bytes of code that a place is known by
 
 # How long the program may take to come to wait for a key before it
 # counts as stuck, in seconds, and for how long the machine runs between
-# two looks at where the program is in its memory.
-STEP_TIME = 20
+# two looks at where the program is in its memory. The first is long on
+# purpose: it is there for a program that hangs, and a machine that many
+# tests share must not look like one.
+STEP_TIME = 300
 SLICE = 0.05
 # With the clock on, the screen is looked at for this many timer ticks,
 # with no more than GAP of them between two looks: the colon of the clock
