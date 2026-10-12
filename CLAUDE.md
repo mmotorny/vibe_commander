@@ -1021,6 +1021,27 @@ them. The copy may be in another file than the text: `User_S` of
   value, `= 0`, or `tools/mkexe.c` stops the build for what is in the
   segment of the stack. An interrupt function and a `__loadds` one load
   DS with the group, a number that is relocated.
+- The compiler's option `-g=NAME` puts the code segment of a file into
+  a group of that name. With the name that `-nd` gives the group of the
+  data, `-nd=R -g=R_GROUP`, the object file has two groups of one name
+  and the linker makes one of them: code and data in one group, which
+  begins with the code. Not used yet: see `TODO.md`, the last item of
+  step 4.
+- A layout at the number 0, `(*(struct MainDat __near *)0)`, is not the
+  main data. Read and written through it, it is; but an address in it
+  is a number to the compiler, and of a near pointer that is a number
+  it makes a far one with the segment 0, not with DS, without a
+  warning: `MvzLine(to, md.DosPth, ...)` would copy from the bottom of
+  the memory. `__based(__segname("_DATA"))` in its place makes every
+  address of a field far, "Pointer truncated" wherever one is kept in a
+  near pointer. `md` is an `extern` object for that reason, and its
+  place is the linker's to say. A `#pragma aux` can name it as another
+  object, `#pragma aux md "Psp"`: the linker takes the offset of that
+  in its own group.
+- The linker's command can say the order too: `order clname RCODE clname
+  DATA segment CONST segment CONST2 clname CCODE`, classes and the
+  segments within one, whatever the order of the object files. Its
+  help does not list the directive for DOS; it works.
 - The linker places segments by their class, in the order in which it
   first meets each, and a group may have segments of other groups, or
   of none, between its own: a group is where its first segment is. A

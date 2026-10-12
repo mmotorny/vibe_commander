@@ -297,8 +297,8 @@ round the loop to a command that happens to read them.
 - The layout of the main data: the `STRUC` goes with the last line of
   assembly that names a field, which is a stub of 3: the room of the
   part that stays, sized by `CmnSave` and `WCBsave`, is C. `struct
-  MainDat` of `port/vc.h` is then the only one, and `md` a type at
-  offset 0 of DS.
+  MainDat` of `port/vc.h` is then the only one, and `md` no label of
+  the assembly: see the last item for what it is to the linker.
   Its layout stays the original's: boxes and dialogs hold places in it
   as numbers, `MD_AT`, and the test `data` holds those against the
   original's.
@@ -351,20 +351,71 @@ round the loop to a command that happens to read them.
     their start is the main data to C code.
   - The 16 bytes of `RGAP`, on a paragraph, and the name of what
     follows, `TrnBeg`, which `tools/mkexe.c` goes by.
-  One way that needs no assembler and changes nothing of the above: an
-  object file without code or data that a tool writes, a dozen records
-  for the segments and the two groups, linked first. Other ways were
-  looked at and each costs something that a program or a test would
-  see. With `RTEXT` of no group its code has a segment of its own, not
-  the PSP's: the vectors, `SetBrk`, `Exit01` and the entry of the file
-  then want that segment, a relocation in the part that goes which
-  names the part that stays and is not `RunPar`, the second count that
-  `Reloc` has not, and INT 2Eh wants the PSP from a relocated number.
-  With `R_GROUP` first in the file, to begin at the PSP by itself, the
-  code of that part stands behind the stack, where `New21` runs at
-  every call of DOS: the page that QEMU is slow on. And with the stack
-  elsewhere than at the end, whatever it runs down into is no longer
-  the command line.
+  All of it can be said in C and in the linker's command, with no
+  object file made otherwise. That was tried on a copy of the port in
+  `build/`, with the glue of step 3 still assembly, and the `port` test
+  passed on it, every scenario as the original:
+  - The code of the part that stays goes into the group of its data by
+    the compiler's option `-g=R_GROUP`, for `resident.c` and the second
+    copy of `dos.c`: the compiler then names two groups of that name,
+    one for the code and one for the data, and the linker makes one of
+    them. That group begins with the code, so with the PSP by itself,
+    and CS, DS and SS are on it as they are now. `RPSP` goes.
+  - The 256 bytes are an array in that code, `const u8 CODE Psp[0x100]`,
+    the first thing of `port/resident.c`, whose object file is linked
+    first. `Vect21` wants a value then, `= 0`: the compiler writes what
+    has none in front of what has one, in the code segment as well.
+    `tools/mkexe.c` holds `Psp` to be at 0.
+  - The order is `order clname RCODE clname FAR_DATA clname DATA
+    segment CONST segment CONST2 segment _DATA clname CCODE` in the
+    linker's command: classes, and the segments within one.
+  - The header of the next block has room in a constant of 32 bytes,
+    `TrnBeg`, in a file of constants of its own that is linked first of
+    the part that goes. The linker puts it where the stack ends, on no
+    paragraph: 32 bytes hold a whole paragraph wherever they begin, and
+    `tools/mkexe.c` has the part that goes begin behind that one.
+    `RGAP` goes. The test `data` wants `TrnBeg` in `OWN`.
+  - `md` stays `extern struct MainDat __near md`, with `#pragma aux md
+    "Psp"`: to the linker the main data is whatever the program has at
+    offset 0, as `_md` was a label at the start of `RHEAD`, and the
+    program that comes out is the same byte for byte. A type at the
+    number 0, `(*(struct MainDat __near *)0)`, will not do: of an
+    address that is a number the compiler makes a far pointer with the
+    segment 0, not with DS, where a text of the main data is handed to
+    a function that takes a far one. Based on the data segment,
+    `__based(__segname("_DATA"))`, the addresses of its fields are far,
+    and every near pointer into the main data is "Pointer truncated".
+    The `STRUC` of the main data goes: nothing of the glue names a
+    field of it. That of a panel stays as long as the stub of `ReDir`
+    reads `WinTyp` and `ChgFlg`.
+  - The group of the constants, `DGROUP`, then begins where its first
+    segment is, behind the part that stays, and no longer at the PSP:
+    nothing of C can hold it there, since the first bytes of the file
+    are of the other group. Three things took it to begin there.
+    `Init11` of `port/start.c` works out how long the block of the part
+    that goes is from `block - code`, which is `TrnPrW` only then: it
+    reads `TrnPrW`. `port/resident.c` reads `Vers_S` through DS and
+    enters the part that goes at `RunPar` with the offset of `Init00`
+    or `Init11`: it wants the segment of each as the linker has it, in
+    paragraphs from the PSP, which is the high word of a far pointer to
+    the thing, added to the PSP for the text and to `RunPar` for the
+    entry; and `tools/mkexe.c` leaves such a number as it is, where it
+    stopped the build for a segment of the part that goes named in the
+    part that stays. It tells the two apart by the number: the part
+    that stays is one group and its segment is 0. The glue of the
+    assembly took the block of the part that goes to be CS and
+    `TrnPar`, in `Init11` and `CmdExe`: it is `RunPar` and `TrnPar`.
+    The test `data` is ready: it holds a word that names something
+    against the offset of that in its group, as the map has it, where
+    it held it against the place from the PSP.
+  What was looked at and not taken: an object file without code or
+  data that a tool writes, for the segments and the groups, which
+  would do the same and is neither C nor the linker's command; `RTEXT`
+  of no group, with a segment of its own for that code, which wants the
+  vectors, `SetBrk`, `Exit01` and INT 2Eh told another segment than the
+  PSP's; and the data linked first, in front of the code, which puts
+  the code of that part behind the stack, on the page that QEMU is slow
+  on.
 
 What must not be done by two at once: one assembly file; `VC.ASM` beyond
 its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
@@ -1522,8 +1573,10 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     `Stays` on: the layout numbers, the texts and `OvlPrm` are summed,
     as they were in `RHEAD`.
   - The main data is no storage of the program's but a block that DOS
-    gives it: `md` needs no label, only a type at offset 0 of DS,
-    `(*(struct MainDat __near *)0)`.
+    gives it. `md` needs no label of the assembly, but it has to stay
+    an object to the compiler, named to the linker as what the program
+    has at offset 0: see step 4 of "The last of the assembly" for why a
+    type at the number 0 will not do.
   - `SecDat`, the word with the main data's segment, is a variable of
     the compiler's own group, in `port/main_t.c`: an interrupt function
     has DS on that group when it begins, which is how `FatErr` reads
