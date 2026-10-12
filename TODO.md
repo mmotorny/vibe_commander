@@ -341,6 +341,39 @@ Things that are known and not done. Standing instructions are in
     and F6 have counted them: there they are what the key left. The
     stub hands them on as they are. In `copy-ask`, where either way
     shows the same.
+- The map of the memory, Alt+F5, names the program by its file: VC.COM
+  in the original and VC.EXE in the port. `harness/deviations.py` has
+  the golden expect VC.EXE there, as it does where the program cannot
+  be loaded again. That is no figure that follows the size of the
+  program, and no scenario can show the map without that line: the
+  batch of the map waited, committed and not pushed, until the user
+  had said that the deviation may stand in this second place.
+- Of the map, the sizes and the places that follow the size of the
+  program are left out of the comparison: the size of the program, where
+  a program begins that it has started and that stays, and of every line
+  of free memory where it begins, its blocks and its size. So nothing
+  checks that what the program gives up while a command runs is listed
+  as free, but the kind of the line.
+- Of the map, 187 instructions of 913 have run in no scenario and are
+  translated by reading: the mouse, 136; a map of more lines than its
+  window has, 13 on a screen of 25 lines, with the line that scrolls in,
+  22; a DOS before version 4 or with a version of two digits, 15; a
+  block of an unknown owner, 4; and a second program that stays in the
+  memory and is not released with the first, 10. The bench has one such
+  program, FDAPM of the floppy, which does not stay twice.
+- What the map does in the original and the port does after it:
+  - A line with exactly eight vectors shows seven and three full stops,
+    as one with more does: `MemItem` counts the vectors down in AL and
+    tests all of AX, whose other half holds the colour of the line. By
+    reading: no line of the bench has eight.
+  - Grey + and Grey - have all lines drawn again by making the first
+    line shown out to be another, two further on, and the cursor is
+    taken off at the top of the window with the colour and the mark of
+    the line two below the first. All lines are written afterwards, so
+    nothing of that shows.
+  - A vector is counted for the line whose blocks it points into, up to
+    255 of them in a byte: the 256th would make it 0 and be noted as the
+    count itself. No line has so many.
 - A new name for a directory of the tree that makes its path longer
   than 64 characters is reported as "Can't create the directory", as a
   name with a path in it is. The first rests on reading: it takes a
@@ -1298,6 +1331,36 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     on the original when first derived, but for the figure of D:. And
     `harness/coverage.py` came to name a later label of a stretch while
     this batch was at work, so `F80_00` could be listed after all.
+
+- The map of the memory, one command and five routines, 2,036 bytes, 25
+  minutes to the commit, next to seven other batches; it passed but for
+  one thing the first time it was tested.
+  - 3 minutes: the vectors came out wrong. A far pointer into segment 0,
+    written with the constant, is compiled as a near one, and the map
+    read the main data for the table of vectors. Two scenarios showed
+    it, and the listing why. In `CLAUDE.md` now.
+  - 4 minutes: goldens derived three times, 45 seconds each: for what
+    is left out, where the number of blocks of free memory turned out
+    to follow the size of the program too, which the `port` test of the
+    scenarios showed before anything was translated; and for a step
+    more.
+  - 6 minutes: deciding what to do about the name of the program in the
+    map, VC.COM or VC.EXE, which no scenario of the map can avoid
+    showing.
+  - 25 minutes to get onto `main` an hour later, behind fourteen
+    commits: four files in conflict, each where both sides had added,
+    the list of scenarios cut at the lines that two scenarios end with.
+    What git did not show: `PutMnu` had become C, and the keys of the
+    panels had made entries for `SavMous` and `CurMous` too, which went
+    for those next to the routines. The first `port` test, 9 minutes,
+    failed in `command-edit`, a scenario of another batch: "Invalid
+    Opcode" after a command of an extension file. The compiled code of
+    the first segment was 64,636 bytes with `memory.c` in it, 900 below
+    the 64K, and the linker had said nothing. The same scenario passed
+    on `main` as it was, 17 seconds, and with `memory.c` in the second
+    segment, where the first has 61,177 bytes; the second test, 254
+    seconds, passed. Why the program fails with a first segment that
+    full has not been found out: see `CLAUDE.md`, "C for the port".
 
 ## Ideas put off
 

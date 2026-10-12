@@ -59,6 +59,7 @@
 	EXTERN	F58_00_c:FAR, M30_00_c:FAR, F54_00_c:FAR, FncMas_c:FAR
 	EXTERN	DialBox_c:FAR, Dialog_c:FAR, InSt10_c:FAR, MinMnu_c:FAR
 	EXTERN	C00_00_c:FAR, F35_01_c:FAR, F45_01_c:FAR, F35_61_c:FAR
+	EXTERN	F65_00_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
@@ -2968,6 +2969,27 @@ HookVct	PROC	NEAR
 	POP	ES
 	RET
 HookVct	ENDP
+
+; C code takes the vectors of the critical error and of Ctrl-Break back
+; from the program and gives them to it again: RestVct, and HookVct, which
+; hands back in DX the address of its routine for Ctrl-Break, in the part
+; of the program that stays in the memory.
+	PUBLIC	RestVct_a, HookVct_a
+RestVct_a PROC	FAR
+	PUSH	DS
+	PUSH	DS
+	POP	ES
+	CALL	RestVct
+	POP	DS
+	RET
+RestVct_a ENDP
+
+HookVct_a PROC	FAR
+	PUSH	DS
+	CALL	HookVct
+	POP	DS
+	RET
+HookVct_a ENDP
 
 ;--------------------- Fatal error ---------------------
 	.CONST

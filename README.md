@@ -101,7 +101,10 @@ through the files that a mask names. The commands of these are C from
 the key on: Copy and Rename with what they offer as the target, their
 dialogs, the tree to choose the target from, and the renaming of a
 directory of a tree panel, and those that make a directory, delete, set
-attributes and change the volume label. Going through the selected files
+attributes and change the volume label. The map of the memory is C as
+well: the blocks of DOS, whose they are and which vectors point into
+them, its window, and programs that have stayed in the memory released.
+Going through the selected files
 of a panel is still assembly. At the panels the user menu is C, with what makes
 the commands of a line of a menu or of an extension file and writes the
 list of the selected files for them, and so are the command line, with

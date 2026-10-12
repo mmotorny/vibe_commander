@@ -197,8 +197,7 @@ F20_02	ENDP
 
 ; Entries for the C code of these commands to routines of other files
 ; (see FromC in VC.ASM, and port/keys.c for what they take).
-	FromC	SavMous
-	FromC	CurMous
+; Those of SavMous and CurMous are next to the routines, in VCSUB1.INC.
 	FromC	ResUser
 	FromC	InvVar
 

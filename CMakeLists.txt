@@ -120,7 +120,7 @@ file(GLOB port_c CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR}/port
 # of port/asm/VC.ASM, are in CTEXT only: a file that needs them stays
 # there, or the linker says that it cannot reach them. When the linker
 # says that CTEXT exceeds 64K, name another file here.
-set(port_c_second keys.c menu.c view.c)
+set(port_c_second keys.c memory.c menu.c view.c)
 list(TRANSFORM port_asm PREPEND ${CMAKE_SOURCE_DIR}/port/asm/)
 
 # mkexe turns the linker's output into the program that is run.

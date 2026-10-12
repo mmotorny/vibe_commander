@@ -935,6 +935,81 @@ BATCHES = [
         routines=("F36_00", "F35_50", "F35_60", "F35_70"),
         functions=("F35_01_c", "F45_01_c", "F35_61_c"),
     ),
+    Batch(
+        title="The map of the memory: its lines, the vectors that point "
+              "into them, and programs released",
+        source="memory.c",
+        routines=("F65_00", "MemAddr", "MemColr", "MemCurs", "MemEnd",
+                  "MemItem"),
+        functions=("F65_00_c",),
+        unreached={
+            **dict.fromkeys(
+                (0x7F7D, 0x7F7E),
+                "F65_00, for a version of DOS with two digits before "
+                "the full stop"),
+            **dict.fromkeys(
+                (0x800D, 0x800E, 0x8011, 0x8013, 0x8014, 0x8016, 0x8018),
+                "F65_00, for a DOS before version 4, which is asked "
+                "whether it is DR DOS: the bench has FreeDOS, which "
+                "says 7.10"),
+            **dict.fromkeys(
+                (0x8035, 0x8036, 0x8037, 0x803A),
+                "F65_00, for a block of memory whose owner has no "
+                "block of its own and is no number up to 8, "
+                '"unknown": the bench has none'),
+            **dict.fromkeys(
+                (0x8052, 0x8054, 0x8058, 0x805A, 0x805B, 0x805C),
+                "F65_00, for a DOS before version 4, where the first "
+                "command processor is named by guessing"),
+            **dict.fromkeys(
+                (0x8186, 0x8193, 0x8195, 0x8197, 0x8199),
+                "F65_00, for a map of more lines than its window has, "
+                "13 on a screen of 25 lines, where the cursor leaves "
+                "the window: the bench has eight at the most, with "
+                "the one program on it that stays in the memory"),
+            **dict.fromkeys(
+                (0x81A1, 0x81A4, 0x81A7, 0x81A9, 0x81AE, 0x81B0, 0x81B5,
+                 0x81B8, 0x81BA, 0x81BF, 0x81C1, 0x81C3, 0x81C8, 0x81CA,
+                 0x81CC, 0x81CE, 0x81D0, 0x81D2, 0x81D4, 0x81D6, 0x81D9,
+                 0x81DC),
+                "F65_00, for the mouse: the right button held over "
+                "the lines. The bench has no mouse"),
+            **dict.fromkeys(
+                (0x8237, 0x823A, 0x823C, 0x823E, 0x8240, 0x8242, 0x8243,
+                 0x8248, 0x824B, 0x824D, 0x824E, 0x824F, 0x8251, 0x8254,
+                 0x8255, 0x8257, 0x8259),
+                "F65_00, scrolling the lines by one: for a map of "
+                "more lines than its window has"),
+            **dict.fromkeys(
+                (0x82B9, 0x82BB, 0x82BE, 0x82C1, 0x82C3, 0x82C5, 0x82C7,
+                 0x82C9, 0x82CC, 0x82CF, 0x82D2, 0x82D4, 0x82D6, 0x82D7,
+                 0x82D9, 0x82DC, 0x82DD, 0x82DF, 0x82E1, 0x82E4, 0x82E7,
+                 0x82E8, 0x82E9, 0x82ED, 0x82F1, 0x82F4, 0x82F5, 0x82F6,
+                 0x82F8, 0x82FD, 0x82FF, 0x8303, 0x8307, 0x8309, 0x830B,
+                 0x830D, 0x830F, 0x8312, 0x8314, 0x8316, 0x8318, 0x831A,
+                 0x831C, 0x831F, 0x8321, 0x8323, 0x8324, 0x8325, 0x8327,
+                 0x832A, 0x832C, 0x832F, 0x8332, 0x8333, 0x8334, 0x8336,
+                 0x8339, 0x833C, 0x833E, 0x8340, 0x8341, 0x8345, 0x8348,
+                 0x8349, 0x834B, 0x834E, 0x8351, 0x8356, 0x8357, 0x8359,
+                 0x835C, 0x835E, 0x8360, 0x8364, 0x8366, 0x8368, 0x836B,
+                 0x836C, 0x836D, 0x836F, 0x8371, 0x8373, 0x8375, 0x8378,
+                 0x837A, 0x837C, 0x837D, 0x837E, 0x8380, 0x8382, 0x8384,
+                 0x8387, 0x838A, 0x838C, 0x838F, 0x8390, 0x8391, 0x8393,
+                 0x8395, 0x839A, 0x83A0, 0x83A2, 0x83A5, 0x83A8, 0x83AB,
+                 0x83AD, 0x83AF, 0x83B1, 0x83B4, 0x83B8, 0x83BA, 0x83BD,
+                 0x83BE, 0x83C0),
+                "F65_00, for the mouse: a button on a line, on the "
+                "buttons, outside the window, held above the lines or "
+                "below them, the middle button, and a second click on "
+                "a line. The bench has no mouse"),
+            **dict.fromkeys(
+                (0x84EA, 0x84EE, 0x84F0, 0x84F2, 0x84F5, 0x84F7, 0x84F9,
+                 0x84FB, 0x8501, 0x8504),
+                "F65_00, for a program that stays in the memory and "
+                "is not released while another is: the bench has one "
+                "such program, FDAPM, which does not stay twice"),
+        },
+    ),
 ]
 
 

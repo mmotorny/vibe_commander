@@ -141,26 +141,22 @@ u16 StrLen(const u8 __far *text);                       /* string.c */
    calls the BIOS with the mouse cursor off, and hands back what that
    leaves in DX, in the low word, and in CX; ResUser writes what DOS has
    shown, which the panels cover, to the screen buffer, for a window
-   given like Window's; SavMous notes where the mouse is and CurMous
-   shows its cursor or not; InvVar makes of a byte of the main data 1 if
+   given like Window's; InvVar makes of a byte of the main data 1 if
    it is 0, and 0 otherwise. SelDrv is the call of DOS that makes a drive
    the current one, 0 for A:, which the assembly makes without Intr21.
    SetPth, which asks DOS for the current directory, is in vc.h, and so
-   are the bars and the prompt, which are C: PutMnu, ClsLine, PutPrm. */
+   are SavMous and CurMous, of the mouse, and the bars and the prompt,
+   which are C: PutMnu, ClsLine, PutPrm. */
 void HidCur(void);
 void Cursor1(void);
 u32 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
 void ResUser(u16 begin, u16 size);
-void SavMous(void);
-void CurMous(u16 show);
 void InvVar(u8 *variable);
 void SelDrv(u16 drive);
 #pragma aux HidCur  "*_a" __far modify exact [es]
 #pragma aux Cursor1 "*_a" __far modify exact [es]
 #pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [dx cx] modify exact [ax bx cx dx es]
 #pragma aux ResUser "*_a" __far parm [bx] [dx] modify exact [es]
-#pragma aux SavMous "*_a" __far modify exact [es]
-#pragma aux CurMous "*_a" __far parm [ax] modify exact [es]
 #pragma aux InvVar  "*_a" __far parm [bx] modify exact [ax es]
 #pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
 

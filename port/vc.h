@@ -375,6 +375,23 @@ u16 FncCall(u16 attributes);
    set if that fails: not 0 then. */
 u16 SetPth(void);
 #pragma aux SetPth  "*_a" __far value [ax] modify exact [ax es]
+/* The mouse: SavMous notes where its pointer is, CurMous shows the
+   pointer, or hides it for 0, and IniMous looks for a mouse and sets it
+   up as when the program starts. */
+void SavMous(void);
+void CurMous(u16 show);
+void IniMous(void);
+#pragma aux SavMous "*_a" __far modify exact [es]
+#pragma aux CurMous "*_a" __far parm [ax] modify exact [es]
+#pragma aux IniMous "*_a" __far modify exact [ax bx cx dx es]
+/* RestVct gives the vectors of the critical error and of Ctrl-Break back
+   to whoever had them, and HookVct takes them again: it returns where
+   its routine for Ctrl-Break is, in the part of the program that stays
+   in the memory. */
+void RestVct(void);
+u16 HookVct(void);
+#pragma aux RestVct "*_a" __far modify exact [ax dx es]
+#pragma aux HookVct "*_a" __far value [dx] modify exact [ax bx dx es]
 /* Checks the keyboard for Esc, Ctrl-C and F10, and takes them from it:
    not 0 if one was pressed. */
 u16 TstBrk(void);

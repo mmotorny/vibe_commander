@@ -414,6 +414,16 @@ out again (show.py --changes is how):
     were using, and a test is as slow as its slowest step.
   - "Ctrl+a", "Down Space Enter" takes the Archive attribute off a
     file, which then has none.
+  - Alt+F5 is the map of the memory: Up, Down, Home, End, PgUp and PgDn
+    move the cursor, which shows in the colours only; Ins, GrayPlus and
+    GrayMinus select programs that can be released, Enter releases
+    them, or the one under the cursor, and "Right Enter", Esc and F10
+    leave. A program can be released if it was started from here and
+    stays in the memory: 'a:\\freedos\\bin\\fdapm' Space "apmdos"
+    Enter at the command line is the one such program of the bench. It
+    does not stay twice, and the map has eight lines with it, fewer
+    than its window. deviations.py leaves out the sizes and the places
+    that follow the size of the program.
   - Ctrl+F5 and Ctrl+F6 copy and rename the file under the cursor,
     whatever is selected. Tab makes the Info the active panel, and F5
     there asks for the source too, as Shift+F5 does and as F5 does with
@@ -1703,6 +1713,62 @@ SCENARIOS = {
             "F9 c",                       # Commands, nothing dark
             "Esc Tab Ctrl+p",             # the left panel off
             "F9 c",                       # no comparing
+            "Esc",
+        )),
+
+    "memory-map": Scenario(
+        "The map of the memory, Alt+F5: its lines and the cursor, and a "
+        "program that stays in the memory selected and released",
+        steps=(
+            "Alt+F5",                     # the cursor on the first line
+            "Down Down",
+            "Up",
+            "End",
+            "Down",                       # no further
+            "Home",
+            "PgDn",
+            "PgUp",
+            "Ins",                        # nothing to release there: down
+            "GrayPlus",                   # nor anywhere
+            "GrayMinus",
+            "Enter",                      # Release: nothing
+            "F1",                         # the help
+            "Esc",
+            "Right",                      # Cancel
+            "Enter",
+            "Alt+F5",
+            "F10",
+            "F9 o m",                     # Memory allocation off: all of
+            "Alt+F5",                     # the program stays
+            "Esc",
+            "F9 o m",
+            "F9 o c",
+            "Tab Tab Space Enter",        # Ins moves down: off
+            '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter',
+            "Alt+F5",                     # a program that stays, marked
+            "Ins",                        # DOS is not selected
+            "End Up",                     # onto the program
+            "Ins",                        # selected
+            "Ins",                        # and not
+            "GrayPlus",
+            "GrayMinus",
+            "Enter",                      # released without that
+            "Alt+F5",                     # gone
+            "Esc",
+            '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter',
+            "Alt+F5",
+            "GrayPlus",
+            "Enter",                      # released as selected
+            "Alt+F5",
+            "Esc",
+        )),
+
+    "memory-map-russia": Scenario(
+        "The map of the memory with Russian numbers",
+        country="ru",
+        steps=(
+            "Alt+F5",
+            "End",
             "Esc",
         )),
 

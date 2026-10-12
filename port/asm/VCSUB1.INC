@@ -225,6 +225,7 @@ IniMo4:	MOV	AL,1
 	CALL	CurMous
 	RET
 IniMous	ENDP
+	FromC	IniMous
 
 ;--------------- Set type of mouse sursor --------------
 ;			   AL - cursor
@@ -268,6 +269,7 @@ SavMous	PROC	NEAR
 	POP	DX
 SavMo1:	RET
 SavMous	ENDP
+	FromC	SavMous
 
 ;------------------- Set mouse cursor ------------------
 ;			   AL - set/reset
@@ -282,6 +284,7 @@ CurMous	PROC	NEAR
 	POP	AX
 CurMo1:	RET
 CurMous	ENDP
+	FromC	CurMous
 
 ;------------------- Get mouse cursor ------------------
 ;	Return :	CH,CL - mouse cursor

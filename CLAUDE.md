@@ -570,6 +570,14 @@ port.
   the stub, with `AsmSeg` for its segment: `F39_01` in `VCMENU.INC`.
   An entry made for a label there, as one was for `PtMnu1`, goes when
   that batch arrives with the routine in C: call the function then.
+- The program is in three parts: the assembly's code segment, the main
+  data, and the part that stays in the memory while a command runs,
+  where the stack is, with `Counter`, `PrgList`, `RunPar` and the
+  routines that `CallPSP` calls. The assembly reaches that part through
+  SS; C code gets its segment from an entry, `ResSeg_a` in `VCMEM.INC`,
+  and the offset of an object there like any other of the assembly.
+- A command that is C whole and ends at `Func04` is a stub of two
+  lines: `CallC` and the jump. See `F65_00`.
 
 ### C for the port
 
@@ -618,6 +626,12 @@ with it is less obvious:
   names, `keys.c` the first. When the linker says "size of segment CTEXT
   exceeds 64k", name the new file there. A file that calls `__U4M` or
   `__U4D` stays in CTEXT, where those are.
+  Do not wait for the linker to say so: with CTEXT at 64,636 bytes
+  (FC7Ch in `build/port/signalling/VC.MAP`) it said nothing, and the
+  program ended in "Invalid Opcode" after a command of an extension
+  file, in `command-edit`; at 61,177 it does not. Where the limit is,
+  and why, has not been found out. Read the length of CTEXT in the map
+  after adding a file, and keep it below F000h.
 - A function with a `#pragma aux` that calls another of the same file
   does so by `push cs` and a near call, and may end by jumping into the
   end of another: `F01_05_c` goes on in `F00_05_c`. With `modify exact
@@ -660,6 +674,10 @@ with it is less obvious:
 - The scratchpad directory of a session is one for all the agents that
   run side by side: a file there may be another agent's by the same
   name. Keep temporary files in the checkout's `build/`.
+- A far pointer whose segment is the constant 0 is compiled as a near
+  one, without a warning: the table of interrupt vectors was read from
+  the main data. Take the segment from a `volatile` variable, as
+  `F65_31` of `port/memory.c` does.
 
 ## A run of batches
 
