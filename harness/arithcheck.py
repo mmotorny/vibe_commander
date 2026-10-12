@@ -2,7 +2,7 @@
 """Hold the arithmetic that the compiler calls for against Python's.
 
 For a product or a quotient of numbers of 32 bits the compiled code calls
-two routines, __U4M and __U4D, which are functions of port/arith.c. No
+two routines, __U4M and __U4D, which are functions of src/c/arith.c. No
 scenario shows a wrong one for what it is, and of the division the
 scenarios run little: nothing divides by more than 16 bits. So the two
 are run here, as the bytes that they are in the linked program, on a
@@ -17,7 +17,7 @@ reads anything but the stack, if it calls something, and if a division
 by 0 is not the processor's divide error. An instruction that the model
 does not know stops it: add the instruction.
 
-It is the test `arith` of the build, with the pairs of numbers at the
+It is the test `c-arith` of the build, with the pairs of numbers at the
 edges, 729 of them, and 4,000 random ones, which takes two seconds:
 about 2,200 of the divisions are by more than 16 bits. `--pairs` asks
 for more; the routines were held to 200,000 when they were written,

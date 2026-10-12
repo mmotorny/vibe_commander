@@ -76,11 +76,11 @@ label and the text of dirinfo. The viewer is C: opening a file, for the
 editor too, finding the lines, keeping a part of a large file in the
 memory, writing the screen, its keys and the mouse, looking for a text,
 and the way back to the panels; its texts, boxes and dialogs are
-constants of C, in `port/view_t.c`. The editor is C as a whole: the text in
+constants of C, in `src/c/view_t.c`. The editor is C as a whole: the text in
 the memory with the buffer of the line that the cursor is in, the screen
 brought up to where the cursor is, as text or in hex, with its status
 line, what every key does, the search, and saving the file, with its
-texts, boxes and dialogs constants of C in `port/edit_t.c`. The commands
+texts, boxes and dialogs constants of C in `src/c/edit_t.c`. The commands
 that start the two are C as well, by themselves or by a program that an
 extension file names, which is run with the viewer's memory given up
 for it. The keys of the
@@ -98,7 +98,7 @@ names the drive or the device and asks whether to try again, and saving
 the setup when it has
 changed; and leaving the program. The texts and boxes of those two, the
 program's title and the button Ok are constants of C, in
-`port/main_t.c`. What the program does once it has
+`src/c/main_t.c`. What the program does once it has
 been started, and again whenever a command has run, is C: reading the
 setup file and the main extension file, or taking the defaults, the
 banner, asking DOS for the memory of its data and making the data of
@@ -123,26 +123,26 @@ box and its buttons constants of C.
 So is the tree of directories away from its panel: reading it from the
 disk, keeping it in its file there, and the box in which a directory is
 chosen from it; its title, the name of its file and the boxes shown
-while it is read and saved are constants of C, in `port/treebox_t.c`.
+while it is read and saved are constants of C, in `src/c/treebox_t.c`.
 The file search is C as a whole: the command with its
 dialog, the drives it searches and Go to, and the search itself, by name
 and by contents through a directory and those below it, with its list
 and the keys taken while it runs; its dialog, its buttons and their
-colours are constants of C, in `port/find_t.c`. Deleting a file or a directory with
-what is in it, copying, renaming and moving one, and setting attributes,
-a date and a time, are C, and so is what goes through the files of a
-directory for these, the sizes of directories and the file search, and
+colours are constants of C, in `src/c/find_t.c`. Deleting a file or a
+directory with what is in it, copying, renaming and moving one, and setting
+attributes, a date and a time, are C, and so is what goes through the files
+of a directory for these, the sizes of directories and the file search, and
 through the files that a mask names. The commands of these are C from
 the key on: Copy and Rename with what they offer as the target, their
 dialogs, the tree to choose the target from, and the renaming of a
 directory of a tree panel, and those that make a directory, delete, set
 attributes and change the volume label; the texts, boxes and dialogs of
-copying and renaming are constants of C, in `port/copy_t.c`, and those of
+copying and renaming are constants of C, in `src/c/copy_t.c`, and those of
 making a directory, deleting, the attributes and the volume label in
-`port/dirfunc_t.c`. The map of the memory is C as
+`src/c/dirfunc_t.c`. The map of the memory is C as
 well: the blocks of DOS, whose they are and which vectors point into
 them, its window, and programs that have stayed in the memory released;
-the buttons of the window are constants of C, in `port/memory_t.c`.
+the buttons of the window are constants of C, in `src/c/memory_t.c`.
 Going through the selected files
 of a panel is C too. At the panels the user menu is C, with what makes
 the commands of a line of a menu or of an extension file and writes the
@@ -151,8 +151,8 @@ Esc and the names of the selected files and the paths of the panels put
 into it, the history of commands in its box, the speed search, and the
 box that asks for the drive of a panel; what these have of texts, boxes
 and dialogs, the mask to select by, the question before leaving and the
-user menu's, are constants of C, in `port/keys_t.c`. The dialogs are C: a box with its lines of text, the fields of a
-dialog, a line to type
+user menu's, are constants of C, in `src/c/keys_t.c`. The dialogs are C: a
+box with its lines of text, the fields of a dialog, a line to type
 into, a group to choose from, a box to tick and a line of buttons, with
 the keys and the mouse that each takes, and what the fields hold handed
 back at the end. Waiting for a key is C, with the clock that it keeps on
@@ -171,9 +171,9 @@ that it may end in, opening a file, asking DOS for the current directory,
 and asking the user for the disk of a drive that shares the floppy drive
 with another. Saving the setup is C, and so is the jump from a key to its
 command, which was a table in the assembly. The names of the menus in
-the menu bar are constants of C, in `port/bars_t.c`, and the names of
+the menu bar are constants of C, in `src/c/bars_t.c`, and the names of
 the files that the program reads and the dialog that asks for a disk in
-`port/system_t.c`.
+`src/c/system_t.c`.
 The pull-down menus of the menu bar are C as well: the five menus with
 their ticks and the items that cannot be chosen as things are, and the
 keys and the mouse that the bar takes until an item is chosen. So are
@@ -184,13 +184,13 @@ the screen with as many lines as an EGA or a VGA has, two directories
 compared, the configuration and the advanced options, the menu file and
 the extension files opened in the editor, the switches of the Options
 menu, and the setup saved; their texts, boxes and dialogs are constants
-of C, in `port/commands_t.c`.
+of C, in `src/c/commands_t.c`.
 The main loop calls the commands. In the original a command is no
 routine: the loop jumps to it by a table of the keys and the menu bar by
 tables of the menus, and it jumps back into the loop at one of several
 places, or on into another command. Each is a function now, which
 returns where the program goes on, and the loop calls it from a `switch`
-(`Command` of `port/main.c`); the tables of the menus hold the commands
+(`Command` of `src/c/main.c`); the tables of the menus hold the commands
 by their numbers. What a command finds in the registers, as the command
 before left them, is kept where one reads it. With that no instruction
 of the program is assembly but those that are written into the C, and
@@ -204,8 +204,8 @@ linker's command (see [The port](#the-port)).
 
 | Path | Contents |
 |---|---|
-| `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `port/` | The program in C, all of it: `port/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
+| `src/asm/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
+| `src/c/` | The program in C, all of it: `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
 | `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the port, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
@@ -226,20 +226,20 @@ the other's program.
 The original is assembled. The build fetches
 [JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
 MASM-compatible assembler, at a pinned commit, builds it, and assembles
-`src/`, the source as its author published it, into `build/VC.COM` and
+`src/asm/`, the source as its author published it, into `build/VC.COM` and
 `build/VCSETUP.COM`. It also assembles a second copy of both into
 `build/shareware-layout/`, with the room reserved that the byte
 comparison needs, and `VC` there once more as an object file, for its
 relocations; only the tests use those. That is what the test
-`bytes-match-original` holds against the binaries that were shipped, and
+`asm-bytes` holds against the binaries that were shipped, and
 what says where the original has its routines and its data. The
 assembler also builds the driver of the tests, `harness/DRIVER.ASM`,
 which is no part of either program.
 
-The port is compiled: `build/port/VC.EXE`, which is what the tests run
-and hold against the original. It is C and nothing else, `port/*.c`,
+The port is compiled: `build/c/VC.EXE`, which is what the tests run
+and hold against the original. It is C and nothing else, `src/c/*.c`,
 and no assembler has a hand in it. What the compiler made of each C
-file is written out as a listing, `build/port/*.lst`. For this the build
+file is written out as a listing, `build/c/*.lst`. For this the build
 fetches a pinned
 snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
 download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
@@ -249,8 +249,8 @@ only.
 ### Changes to the source
 
 Everything changed since the source was imported can be listed with
-`git diff $(git rev-list --max-parents=0 HEAD) -- src`. There are three
-kinds of change.
+`git diff $(git rev-list --max-parents=0 HEAD):src HEAD:src/asm`: the first
+commit has the files in `src/` itself. There are three kinds of change.
 
 **Syntax.** The original source is written for TASM; these changes make
 JWasm accept it:
@@ -292,23 +292,23 @@ harmless: the program laid out this way still runs.
 
 ## The port
 
-`port/` started as a copy of the assembly in `src/` and ends as a C
+`src/c/` started as a copy of the assembly in `src/asm/` and ends as a C
 program. In between it was both. A routine that had been translated was
-deleted from `port/asm/` and left a few instructions behind that passed
+deleted from `src/c/asm/` and left a few instructions behind that passed
 its callers on to the C function, and where C code needed a routine that
 was still assembly, the assembly got an entry for it that C could call.
-All of the code is C now, and those are gone, and `port/asm/` with them:
+All of the code is C now, and those are gone, and `src/c/asm/` with them:
 the last file there held no instruction and no data any more, only the
 order of the program's segments. The C code keeps the names
 the routines and their data have in the assembly, so that either can be
 found from the other, and a function still takes its arguments in the
 registers that the assembly called it with. The two routines that the
 compiler calls to multiply and to divide numbers of 32 bits, which a C
-library would bring, are C too, `port/arith.c`: the program has no C
+library would bring, are C too, `src/c/arith.c`: the program has no C
 library.
 
 DOS, the BIOS and the mouse driver are called by software interrupts,
-which C cannot express. The C code calls them in one file, `port/dos.c`,
+which C cannot express. The C code calls them in one file, `src/c/dos.c`,
 and nowhere else: twelve small functions, each a line of C around the
 instruction, which is inline assembly there, with the registers as its
 arguments; one has three such instructions that may not be parted. Four more are there for a port of the machine and its
@@ -319,11 +319,11 @@ pointers. That file is where the program will meet another operating
 system; until the translation is done it hides nothing of DOS.
 
 The part of the program that stays in the memory while a command runs is
-C in `port/resident.c`, with its data. The
-rest of the program is not in the memory then, `port/dos.c` with it, so the build
-compiles that file a second time, into that part: one source, two copies
-of its code. `port/resident.c` has the only other inline assembly of the
-port, four instructions where an interrupt arrives that the program has
+C in `src/c/resident.c`, with its data. The
+rest of the program is not in the memory then, `src/c/dos.c` with it, so the
+build compiles that file a second time, into that part: one source, two
+copies of its code. `src/c/resident.c` has the only other inline assembly of
+the port, four instructions where an interrupt arrives that the program has
 taken, INT 21h and INT 27h: they make room on the stack for a second
 return address, and an interrupt function of the compiler's takes over,
 which saves the registers and finds the program's data. Such a function
@@ -344,7 +344,7 @@ instructions are the interrupt by which the COMMAND.COM in the memory
 runs a command, INT 2Eh: it comes back with no stack and no data
 segment, so both are set there, from the code segment, before any
 compiled instruction runs, and the program goes on in a function of its
-own on an empty stack. `port/main.c` has one instruction, which loads
+own on an empty stack. `src/c/main.c` has one instruction, which loads
 DS with the segment of the main data, known only when the program runs:
 where DOS calls the program for a critical error, and where the part
 that stays in the memory calls the rest of the program, which is one
@@ -353,7 +353,7 @@ function to it, and gets DS back as it was.
 The program is linked as `VC.EXE`, which is not built the way a C
 program usually is. It still loads and starts like the `.COM` file it
 was, keeps its data where the original has it, and gives up and reloads
-most of itself at run time, compiled code included. `port/vc.h` describes
+most of itself at run time, compiled code included. `src/c/vc.h` describes
 what that asks of the C code, and `tools/mkexe.c` how the file is made.
 The code that begins the program and reloads it after a command had to
 change for this: it measures in paragraphs and relocates what it has
@@ -363,7 +363,7 @@ The file is the program as it lies in the memory. First comes the part
 that stays there while a command runs: room for the PSP, which
 `tools/mkexe.c` takes off, its compiled code, and its data
 with the stack at the end, which are nothing but room in the file. That
-data is of `port/resident.c`, the one C file
+data is of `src/c/resident.c`, the one C file
 with data of its own: its texts, the numbers that `tools/mkexe.c`
 writes, which it finds by their names in the linker's map, one
 structure for what the part keeps, in the order of the original, and
@@ -391,17 +391,17 @@ against what the program needs, and stops the build where it differs.
 [What rests on Open Watcom](#what-rests-on-open-watcom) has each such
 place.
 
-Every step was checked by the `port` test below, and nothing else decides
-whether a translation is right. The routines are listed there, batch
+Every step was checked by the `c-scenarios` test below, and nothing else
+decides whether a translation is right. The routines are listed there, batch
 by batch, in `harness/ported.py`.
 
-The program's texts and tables are checked by themselves, by the `data`
+The program's texts and tables are checked by themselves, by the `c-data`
 test: a table that no screen shows can be wrong in every scenario and
 pass. The boxes and dialogs name their texts, their buttons and one
 another by address, words that are offsets in the one segment the
 assembly has them in. In C they are constants written with the names of
-what they name, in files that hold nothing else (`port/help_t.c`, with
-`port/tables.h` for how they are written): the compiler puts them into
+what they name, in files that hold nothing else (`src/c/help_t.c`, with
+`src/c/tables.h` for how they are written): the compiler puts them into
 a group of their own, where a word that names one is its offset, as it
 is in the original's one segment. They are apart from the code because the code has its data
 segment on memory that the program asks DOS for, and would read a
@@ -413,8 +413,8 @@ object file, tells by its relocations.
 The tests run the program that is shipped, as they run the original: a
 driver in the machine takes either through the scenarios (see [When a step
 is finished](#when-a-step-is-finished)). The driver also writes the
-program's stack out whenever a step ends, and the `port` test reports for
-every scenario how much of it the program never used.
+program's stack out whenever a step ends, and the `c-scenarios` test reports
+for every scenario how much of it the program never used.
 
 The stack is where the port departs from the original in what it takes of
 the memory. The original has 256 bytes of it. Compiled code uses more
@@ -440,14 +440,14 @@ without:
 
 | What | Where | How many |
 |---|---|---|
-| `__far` and `__near` pointers, and pointers based on a segment, `CODE` and `STACK` of `port/vc.h` | every file | some 1,200 `__far`, 475 `STACK`, 97 `CODE` |
+| `__far` and `__near` pointers, and pointers based on a segment, `CODE` and `STACK` of `src/c/vc.h` | every file | some 1,200 `__far`, 475 `STACK`, 97 `CODE` |
 | `#pragma aux`: the registers that a function takes and returns, kept from the assembly, and the name that the linker has for it | every file | 866 |
-| `#pragma pack(1)` for the structures that are the original's | `port/vc.h`, `port/tables.h` and five files with structures of their own | 8 pairs |
-| `__interrupt` functions, which save the registers and load DS | `FatErr` of `port/main.c`; `CtrlC`, `Int21`, `Int27`, `Exit05` of `port/resident.c` | 5 |
-| `__loadds` functions, which load DS when they are called from the other part | `SetBrk`, `Release` of `port/resident.c` | 2 |
-| `__declspec(naked)` functions, which are their inline assembly and nothing else | `New21`, `New27`, `Exit01`, `Int2E` of `port/resident.c` | 4 |
-| Intrinsic functions: `inp`, `_disable`, `_enable` | `port/dos.c` | 3 |
-| The two routines that the compiler calls for arithmetic on 32 bits, under its names and with its registers | `__U4M`, `__U4D` of `port/arith.c` | 2 |
+| `#pragma pack(1)` for the structures that are the original's | `src/c/vc.h`, `src/c/tables.h` and five files with structures of their own | 8 pairs |
+| `__interrupt` functions, which save the registers and load DS | `FatErr` of `src/c/main.c`; `CtrlC`, `Int21`, `Int27`, `Exit05` of `src/c/resident.c` | 5 |
+| `__loadds` functions, which load DS when they are called from the other part | `SetBrk`, `Release` of `src/c/resident.c` | 2 |
+| `__declspec(naked)` functions, which are their inline assembly and nothing else | `New21`, `New27`, `Exit01`, `Int2E` of `src/c/resident.c` | 4 |
+| Intrinsic functions: `inp`, `_disable`, `_enable` | `src/c/dos.c` | 3 |
+| The two routines that the compiler calls for arithmetic on 32 bits, under its names and with its registers | `__U4M`, `__U4D` of `src/c/arith.c` | 2 |
 
 Then what cannot be seen in the code: where the program is right only
 because of what this compiler and its linker do with it. The language
@@ -456,23 +456,23 @@ the first eleven does not hold; the others would show in the tests.
 
 | | What is relied on | Where it is done | What holds it |
 |---|---|---|---|
-| 1 | The option `-nd=R` gives the data of a file a group of its own, `R_GROUP`, which its code reads through DS without loading a segment, in four segments of the class `FAR_DATA`: `RCONST`, `RCONST2`, `R_DATA`, `R_BSS` | `CMakeLists.txt`, for `port/resident.c` | `tools/mkexe.c` knows the four names, and refuses any other data |
-| 2 | The option `-g=R_GROUP` puts the code segment into a group of that name, and the linker makes one group of two of the same name: the part that stays is one segment to the program, the PSP's | `CMakeLists.txt`, for `port/resident.c` and the second copy of `port/dos.c` | the group has to begin at 0 |
+| 1 | The option `-nd=R` gives the data of a file a group of its own, `R_GROUP`, which its code reads through DS without loading a segment, in four segments of the class `FAR_DATA`: `RCONST`, `RCONST2`, `R_DATA`, `R_BSS` | `CMakeLists.txt`, for `src/c/resident.c` | `tools/mkexe.c` knows the four names, and refuses any other data |
+| 2 | The option `-g=R_GROUP` puts the code segment into a group of that name, and the linker makes one group of two of the same name: the part that stays is one segment to the program, the PSP's | `CMakeLists.txt`, for `src/c/resident.c` and the second copy of `src/c/dos.c` | the group has to begin at 0 |
 | 3 | The linker's `order` directive, which its help does not list for DOS: the order of the classes and of the segments within one | `CMakeLists.txt`, the linker's command | the checks of 2, 6, 8 and 11 |
 | 4 | A segment holds what the object files have of it in their order: `resident.c` is linked first, `transit_t.c` first of the part that goes | `CMakeLists.txt` | the checks of 6 and 10 |
-| 5 | The compiler writes the objects of the code segment that have a value in the order of the file, and those without in front of them: so `Vect21` is given a value, `= 0` | `port/resident.c` | the check of 6 |
-| 6 | So the room of the PSP, `Psp`, is the first thing of the code segment and of the program | `port/resident.c`, its first lines | `Psp` has to be at 0 |
-| 7 | What has a value is in `R_DATA` in the order of the file, so `Stays`, written last and with a value, zeros, is the last of it: the part is nothing but zeros from there on, which the check sum of the file leaves out | `port/resident.c` | from `Stays` to the part that goes the file has to be zeros, and the seven words that are written in have to stand in front |
-| 8 | What has no value is in a segment of its own behind the others, `R_BSS`: the stack, `DataSav`, is the one object without, and so the end of the part that stays | `port/resident.c` | `R_BSS` may hold no other symbol, and `DataSav` has to be at its start |
-| 9 | A far pointer to something has the linker's number of its segment in the high word, and a word of the part that stays that names the part that goes is left as that number: `TRN_SEG` | `port/resident.c` | a number that is not 0 has to be a segment behind the part that stays |
-| 10 | The constants of the files without code are in `CONST2` of the compiler's group, `DGROUP`, and begin with `TrnBeg`, 32 bytes in which there is a whole paragraph | `port/transit_t.c`, `port/*_t.c` | `TrnBeg` has to stand where the stack ends; a file with code and such constants is refused |
-| 11 | No code of the part that goes is within 4K of the stack, the constants being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 3; `port_c_second` in `CMakeLists.txt` | read in the linker's map |
-| 12 | `md`, the main data, is declared as an object and named to the linker as `Psp`: the linker takes the offset of an object in the group that the object is of, 0 here | `port/vc.h` | every scenario |
-| 13 | The segment of a far pointer made of a near one is DS, `MAIN_SEG`, and of one to a local variable it is SS, with the option `-zu`: `ResSeg` | `port/vc.h`, `port/misc.c` | every scenario |
-| 14 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with its group, by a number that is relocated; `SecDat`, the one variable of `DGROUP`, is where `FatErr` finds the main data by that | `port/vc.h`, `port/main_t.c`, `port/main.c`, `port/resident.c` | the scenarios of the critical error and of the programs that stay |
-| 15 | A variable with a value in a file without code is in `_DATA` of `DGROUP`, in the file | `port/main_t.c`, `SecDat` | `tools/mkexe.c` refuses one without a value |
-| 16 | `_enable` is `STI` and `CLD`: the first call of the program, `IntOn`, clears the direction flag, which the compiled code needs clear and DOS does not promise | `port/resident.c`, `Alloc0` | every scenario |
-| 17 | A far call to a function of the same segment is made `push cs` and a near call by the linker, and needs no relocation: so the part that stays can call its own far functions before its relocations are applied | `port/resident.c`, `Alloc0` | every scenario |
+| 5 | The compiler writes the objects of the code segment that have a value in the order of the file, and those without in front of them: so `Vect21` is given a value, `= 0` | `src/c/resident.c` | the check of 6 |
+| 6 | So the room of the PSP, `Psp`, is the first thing of the code segment and of the program | `src/c/resident.c`, its first lines | `Psp` has to be at 0 |
+| 7 | What has a value is in `R_DATA` in the order of the file, so `Stays`, written last and with a value, zeros, is the last of it: the part is nothing but zeros from there on, which the check sum of the file leaves out | `src/c/resident.c` | from `Stays` to the part that goes the file has to be zeros, and the seven words that are written in have to stand in front |
+| 8 | What has no value is in a segment of its own behind the others, `R_BSS`: the stack, `DataSav`, is the one object without, and so the end of the part that stays | `src/c/resident.c` | `R_BSS` may hold no other symbol, and `DataSav` has to be at its start |
+| 9 | A far pointer to something has the linker's number of its segment in the high word, and a word of the part that stays that names the part that goes is left as that number: `TRN_SEG` | `src/c/resident.c` | a number that is not 0 has to be a segment behind the part that stays |
+| 10 | The constants of the files without code are in `CONST2` of the compiler's group, `DGROUP`, and begin with `TrnBeg`, 32 bytes in which there is a whole paragraph | `src/c/transit_t.c`, `src/c/*_t.c` | `TrnBeg` has to stand where the stack ends; a file with code and such constants is refused |
+| 11 | No code of the part that goes is within 4K of the stack, the constants being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 3; `c_second` in `CMakeLists.txt` | read in the linker's map |
+| 12 | `md`, the main data, is declared as an object and named to the linker as `Psp`: the linker takes the offset of an object in the group that the object is of, 0 here | `src/c/vc.h` | every scenario |
+| 13 | The segment of a far pointer made of a near one is DS, `MAIN_SEG`, and of one to a local variable it is SS, with the option `-zu`: `ResSeg` | `src/c/vc.h`, `src/c/misc.c` | every scenario |
+| 14 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with its group, by a number that is relocated; `SecDat`, the one variable of `DGROUP`, is where `FatErr` finds the main data by that | `src/c/vc.h`, `src/c/main_t.c`, `src/c/main.c`, `src/c/resident.c` | the scenarios of the critical error and of the programs that stay |
+| 15 | A variable with a value in a file without code is in `_DATA` of `DGROUP`, in the file | `src/c/main_t.c`, `SecDat` | `tools/mkexe.c` refuses one without a value |
+| 16 | `_enable` is `STI` and `CLD`: the first call of the program, `IntOn`, clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/c/resident.c`, `Alloc0` | every scenario |
+| 17 | A far call to a function of the same segment is made `push cs` and a near call by the linker, and needs no relocation: so the part that stays can call its own far functions before its relocations are applied | `src/c/resident.c`, `Alloc0` | every scenario |
 
 What else the notes of `CLAUDE.md` have under "C for the port" is how
 to write for this compiler, not what the program rests on: a register
@@ -481,29 +481,29 @@ that it ignores in a `#pragma aux`, a pointer that it truncates.
 ### Inline assembly
 
 Every piece of it, 81 instructions in 14 pieces. The first nine are a
-`#pragma aux` each in `port/dos.c`, put in place where the function of
+`#pragma aux` each in `src/c/dos.c`, put in place where the function of
 that file calls them; no other file calls DOS, the BIOS or the mouse
 driver.
 
 | File | Piece | Instructions | Why it is not C |
 |---|---|---|---|
-| `port/dos.c` | `Dos` | 20: `NEG AX` for the carry flag, `PUSH` of BP and DS, nine that load the registers from a structure on the stack, `INT 21h`, five that store what DOS returns, `SBB AX,AX` for the carry flag, two `POP` | A software interrupt is no call that C has, DOS takes and returns more registers than a function can, DS among them, and its answer is the carry flag |
-| `port/dos.c` | `Video` | 7: `PUSH BP`, `INT 10h`, `POP BP`, four that store AX to DX on the stack | The BIOS for the screen; some lose BP |
-| `port/dos.c` | `VideoBuffer` | 3: `PUSH BP`, `INT 10h`, `POP BP` | The same, with an address in ES:DI |
-| `port/dos.c` | `Keyboard` | 3: `INT 16h`, `PUSHF`, `POP DX` | The BIOS for the keyboard answers in the zero flag |
-| `port/dos.c` | `Multiplex` | 1: `INT 2Fh` | The interrupt that the mouse driver and Windows are asked by |
-| `port/dos.c` | `DosIdle` | 1: `INT 28h` | The program says that it is idle |
-| `port/dos.c` | `DesqviewPause` | 6: `MOV AX` and `INT 15h`, three times | DESQview takes the program off its stack between the first and the third: no compiled instruction may stand between them |
-| `port/dos.c` | `MouseDriver` | 1: `INT 33h` | The mouse driver |
-| `port/dos.c` | `MouseState` | 4: `INT 33h`, three that store BX, CX and DX on the stack | The same, which answers in three registers |
-| `port/main.c` | `DataSeg` | 1: `MOV DS,AX` | C has no word for a segment register. DS is put on the main data, whose segment is known only when the program runs: where DOS calls the program for a critical error, and around the main loop |
-| `port/resident.c` | `New21` | 17: six `CMP` with their jumps, a far `JMP` through `Vect21`, and `PUSHF`, `PUSH AX`, `PUSH AX`, `JMP` to the interrupt function | Every call of DOS by any program comes here. One that the program does not deal with is passed on with no register changed, nothing taken of the caller's stack and the flags of the original's comparisons; compiled code saves registers first and promises nothing of flags |
-| `port/resident.c` | `New27` | 4: `PUSHF`, `PUSH AX`, `PUSH AX`, `JMP` | Room on the stack for a second return address, so that the interrupt function can go on in the handler before by returning: C cannot change how deep the stack is that it returns on |
-| `port/resident.c` | `Exit01` | 4: the same | Where DOS goes on when it has ended the program by itself, on the stack of the program that started this one, to which it goes on in the same way |
-| `port/resident.c` | `Int2E` | 9: `INT 2Eh`, `CLI`, `MOV AX,CS`, `MOV SS,AX`, `MOV SP`, `STI`, `MOV DS,AX`, `CLD`, `JMP` | COMMAND.COM's interrupt for a command comes back with no stack and no data segment: both are set from CS before any compiled instruction can run, and the function that called cannot be returned into |
+| `src/c/dos.c` | `Dos` | 20: `NEG AX` for the carry flag, `PUSH` of BP and DS, nine that load the registers from a structure on the stack, `INT 21h`, five that store what DOS returns, `SBB AX,AX` for the carry flag, two `POP` | A software interrupt is no call that C has, DOS takes and returns more registers than a function can, DS among them, and its answer is the carry flag |
+| `src/c/dos.c` | `Video` | 7: `PUSH BP`, `INT 10h`, `POP BP`, four that store AX to DX on the stack | The BIOS for the screen; some lose BP |
+| `src/c/dos.c` | `VideoBuffer` | 3: `PUSH BP`, `INT 10h`, `POP BP` | The same, with an address in ES:DI |
+| `src/c/dos.c` | `Keyboard` | 3: `INT 16h`, `PUSHF`, `POP DX` | The BIOS for the keyboard answers in the zero flag |
+| `src/c/dos.c` | `Multiplex` | 1: `INT 2Fh` | The interrupt that the mouse driver and Windows are asked by |
+| `src/c/dos.c` | `DosIdle` | 1: `INT 28h` | The program says that it is idle |
+| `src/c/dos.c` | `DesqviewPause` | 6: `MOV AX` and `INT 15h`, three times | DESQview takes the program off its stack between the first and the third: no compiled instruction may stand between them |
+| `src/c/dos.c` | `MouseDriver` | 1: `INT 33h` | The mouse driver |
+| `src/c/dos.c` | `MouseState` | 4: `INT 33h`, three that store BX, CX and DX on the stack | The same, which answers in three registers |
+| `src/c/main.c` | `DataSeg` | 1: `MOV DS,AX` | C has no word for a segment register. DS is put on the main data, whose segment is known only when the program runs: where DOS calls the program for a critical error, and around the main loop |
+| `src/c/resident.c` | `New21` | 17: six `CMP` with their jumps, a far `JMP` through `Vect21`, and `PUSHF`, `PUSH AX`, `PUSH AX`, `JMP` to the interrupt function | Every call of DOS by any program comes here. One that the program does not deal with is passed on with no register changed, nothing taken of the caller's stack and the flags of the original's comparisons; compiled code saves registers first and promises nothing of flags |
+| `src/c/resident.c` | `New27` | 4: `PUSHF`, `PUSH AX`, `PUSH AX`, `JMP` | Room on the stack for a second return address, so that the interrupt function can go on in the handler before by returning: C cannot change how deep the stack is that it returns on |
+| `src/c/resident.c` | `Exit01` | 4: the same | Where DOS goes on when it has ended the program by itself, on the stack of the program that started this one, to which it goes on in the same way |
+| `src/c/resident.c` | `Int2E` | 9: `INT 2Eh`, `CLI`, `MOV AX,CS`, `MOV SS,AX`, `MOV SP`, `STI`, `MOV DS,AX`, `CLD`, `JMP` | COMMAND.COM's interrupt for a command comes back with no stack and no data segment: both are set from CS before any compiled instruction can run, and the function that called cannot be returned into |
 
 Three more instructions are the compiler's own, by its intrinsic
-functions in `port/dos.c`: `IN` for a port of the machine, `CLI`, and
+functions in `src/c/dos.c`: `IN` for a port of the machine, `CLI`, and
 `STI` with `CLD`.
 
 ## Testing
@@ -515,15 +515,15 @@ ctest --test-dir build --output-on-failure
 ```
 
 There are four tests. Three of them run no machine and take a second or
-two; `port` runs every scenario, in two and a half minutes on a machine
-that does nothing else.
+two; `c-scenarios` runs every scenario, in two and a half minutes on a
+machine that does nothing else.
 
 | Test | What it checks |
 |---|---|
-| `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
-| `data` | Every text, box, dialog and table of the port that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
-| `arith` | The two routines of `port/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
-| `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
+| `asm-bytes` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
+| `c-data` | Every text, box, dialog and table of the port that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
+| `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
+| `c-scenarios` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens
 
@@ -573,7 +573,7 @@ uses either code.
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from
 the goldens. For a `VC.COM` it needs the listing that the build writes
 next to the file, and for the port's `VC.EXE` the linker's map there. No
-test runs the programs assembled from `src/`, which the
+test runs the programs assembled from `src/asm/`, which the
 byte comparison answers for; this is how to run them. The copy with the
 reserved room has no edition name in its banner, and differs from the
 goldens wherever the banner shows.
@@ -600,7 +600,7 @@ an instruction ran in the original does not mean that a screen shows what
 it is for; this is how to find out, for a branch whose effect cannot be
 pointed to in a golden.
 
-`python3 harness/arithcheck.py build/port` is the test `arith` by
+`python3 harness/arithcheck.py build/c` is the test `c-arith` by
 itself; with `--pairs N` it takes that many random pairs of numbers
 where the test takes 4,000. The two routines were held to 200,000 when
 they were written, which takes two and a half minutes.
@@ -807,7 +807,7 @@ Needs the project built, and a terminal of 80 columns by 25 lines at least.
 python3 harness/play.py
 ```
 
-This starts the port, `build/port/VC.EXE`, on the machine of the tests, with
+This starts the port, `build/c/VC.EXE`, on the machine of the tests, with
 its screen in the terminal and the terminal's keyboard: FreeDOS from its
 floppy, the bench's files on `C:` and the program on `D:`. `--original` runs
 the original there, `--country ru` uses the Russian bench, and
@@ -819,7 +819,8 @@ every time, so nothing done there is kept.
 
 ### The source
 
-`src/` holds the contents of the 4.05 source archive published by the author:
+`src/asm/` holds the contents of the 4.05 source archive published by the
+author:
 
 - URL: <https://vc.vvv.kyiv.ua/download/src/vc405.zip>
 - SHA-256: `c4ede94b833ea81da24483231de157bd64b67cf1ec66a77be383490046889c3e`
@@ -861,10 +862,10 @@ here: the port is linked without Open Watcom's libraries.
 
 This project is released under the 3-clause BSD licence in `LICENSE`. That
 covers everything written for it, including changes made to the files in
-`src/`.
+`src/asm/`.
 
 Volkov Commander is Copyright 1991-2000 Vsevolod V. Volkov and was released
-by its author under the 2-clause BSD licence in `src/LICENSE.TXT`, which
+by its author under the 2-clause BSD licence in `src/asm/LICENSE.TXT`, which
 continues to apply to his code.
 
 The shareware distribution of Volkov Commander is proprietary and is not

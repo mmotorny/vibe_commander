@@ -14,7 +14,7 @@ The port's file is an .EXE that DOS does not relocate: the program adds
 the segment it is at to the words that its relocation table names, in the
 part of it that stays in the memory once, and in the other part every
 time it has loaded that (see tools/mkexe.c, and Reloc in
-port/resident.c). Code that holds such a word is not in the memory as it
+src/c/resident.c). Code that holds such a word is not in the memory as it
 is in the file, once that is done. So a block is held against the file as
 it is and against the file with those words as they are at the place in
 question: a function that begins by loading a segment, as an interrupt
@@ -37,7 +37,7 @@ FAR_CALL, FAR_JUMP = 0x9A, 0xEA
 # The port's file, as tools/mkexe.c makes it: a header, and behind it the
 # program from offset 100h of the segment it is loaded into, where a .COM
 # file's begins. The program has the numbers it relocates itself by in
-# words of port/resident.c, which the linker's map names: where its
+# words of src/c/resident.c, which the linker's map names: where its
 # relocation table is, in paragraphs from the segment's start, how many
 # entries that has for the part that goes while a command runs, and how
 # many more for the part that stays. An entry is the offset and the
@@ -318,7 +318,7 @@ def link_map(path):
     return symbols
 
 
-# The port's stack, as its link map names it: an array of port/resident.c,
+# The port's stack, as its link map names it: an array of src/c/resident.c,
 # and the segment that the compiler has it in, of which it is all. See
 # tools/mkexe.c, which stops the build if it is not.
 STACK = ("DataSav", "R_BSS")

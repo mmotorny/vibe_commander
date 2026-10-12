@@ -7,17 +7,17 @@ Things that are known and not done. Standing instructions are in
 
 Done: the port has no assembly file, and its build runs no assembler
 for it. The assembler that the build fetches, JWasm, builds the
-original from `src/`, which the tests hold the port against and hold
+original from `src/asm/`, which the tests hold the port against and hold
 against the shipped binary, and the driver of the tests. This is a
 short account of how the rest went, for whoever reads the history.
 
-When every routine was C, `port/asm/` still held the data and the glue.
+When every routine was C, `src/c/asm/` still held the data and the glue.
 It went in this order:
 
 1. The texts, boxes, dialogs, buttons and colours, a file of the
-   assembly at a time, into files of constants, `port/*_t.c`, by the
+   assembly at a time, into files of constants, `src/c/*_t.c`, by the
    recipe in `CLAUDE.md`, "Moving the data of a file to C": several
-   agents side by side, each with one file. The test `data` held every
+   agents side by side, each with one file. The test `c-data` held every
    object against the original's bytes while it moved (below).
 2. The words of a dialog that name a routine, which became numbers that
    `Dialog` goes by.
@@ -25,18 +25,18 @@ It went in this order:
    jumped to and that jumped back; each is a function that the loop
    calls from a `switch`, and the tables of the menus hold commands by
    their numbers. With the stubs went ten files. `Stay` of
-   `port/resident.c` calls the rest of the program as one function,
-   `TrnMain` of `port/main.c`.
+   `src/c/resident.c` calls the rest of the program as one function,
+   `TrnMain` of `src/c/main.c`.
 4. The data and the stack of the part that stays in the memory, which
-   are of `port/resident.c`; the word with the main data's segment,
-   `SecDat`, a variable of `port/main_t.c`; and last what the one file
+   are of `src/c/resident.c`; the word with the main data's segment,
+   `SecDat`, a variable of `src/c/main_t.c`; and last what the one file
    left, `VC.ASM`, still said without an instruction or a byte of data:
    how the program is laid out. That is said by two options of the
    compiler and by the linker's command, and held by `tools/mkexe.c`:
    the README has it under "The port", and each place that rests on
    the compiler under "What rests on Open Watcom". The layout of the
    main data that the file had, its `STRUC`, nothing read any more:
-   `struct MainDat` of `port/vc.h` is the only one.
+   `struct MainDat` of `src/c/vc.h` is the only one.
 
 What the last step found, beyond what the README says:
 
@@ -45,13 +45,13 @@ What the last step found, beyond what the README says:
   file are of the other group. A word of a box that names a text is an
   offset in that group, whatever it begins at, and `AsmSeg` is its
   segment. Three places took the group to begin at the PSP: `Init11` of
-  `port/start.c`, which worked out the length of a block from the
+  `src/c/start.c`, which worked out the length of a block from the
   segment of the constants; `Stay`, which read a far address in a
   constant at its offset in the segment `RunPar`; and `Alloc0`, which
   read a text of the rest through DS.
 - The part that stays names something of the part that goes by its
   segment as the linker has it, to which it adds where that part is:
-  `TRN_SEG` of `port/resident.c`. `tools/mkexe.c` keeps such a word out
+  `TRN_SEG` of `src/c/resident.c`. `tools/mkexe.c` keeps such a word out
   of the table of relocations.
 - `md` is still an `extern` object, named to the linker as `Psp`. A
   layout at the number 0 does not work with this compiler, and neither
@@ -67,7 +67,7 @@ What the last step found, beyond what the README says:
 
 ### What holds the data
 
-The test `data`, `harness/datacheck.py`, holds every object of the port
+The test `c-data`, `harness/datacheck.py`, holds every object of the port
 that has the name of an object of the original against the original's
 bytes, without a machine: 96 constants of the C code, 2,976 bytes, and
 373 objects of the assembly, 8,545 bytes, when it was made, and 469
@@ -101,11 +101,11 @@ What it does not hold, each listed in the tool with the reason:
   the scenarios answer for them.
 - The tables by which the stubs of the commands went on, which are
   gone with them, `Main_T`, `CmdNx_T`, `MnuNx_T` and `F35_T`: they are
-  `switch` statements of `port/main.c`, as the tables of keys are.
+  `switch` statements of `src/c/main.c`, as the tables of keys are.
 
 The tables of the menus' commands it holds in a way of their own. The
 original has the address of a command for every item; the port has the
-number of the command, a `CMD_` of `port/vc.h` that is named after the
+number of the command, a `CMD_` of `src/c/vc.h` that is named after the
 original's label, and the test reads those numbers there: an item that
 has another command than the original's fails it.
 
@@ -142,7 +142,7 @@ than it is would pass.
 
 - The number of bytes that the editor has free is not compared with the
   original's (see `harness/deviations.py`). What works it out is C now,
-  in `T00_20` of `port/edit.c`, and the number still wants a check of
+  in `T00_20` of `src/c/edit.c`, and the number still wants a check of
   its own: that it falls by one for every character typed, at least.
   It has been wrong once without a test saying so, when a stub that it
   called handed back another CX. Held against the original by hand when
@@ -168,7 +168,7 @@ than it is would pass.
 - The harness can type Russian on the Russian bench, and nothing beyond
   ASCII on the other: Alt with the numeric keypad types nothing there.
 
-- The screen blanker is C, `Blank` of `port/blank.c`, and what it draws
+- The screen blanker is C, `Blank` of `src/c/blank.c`, and what it draws
   is held against the original on no screen. Its stars come out where
   the program's random numbers say, and nothing sets the two words that
   those are made of, `Rand1` and `Rand2`, when the program starts: the
@@ -258,7 +258,7 @@ than it is would pass.
     rebooting." for every other: a name with a star in it, for which
     DOS finds a file and can run none, in `view-commands`. For that
     box 80 bytes are copied from the text "Try rebooting.", which has
-    15: `Run2_S` of `port/view_t.c` is written 80 bytes long, with the
+    15: `Run2_S` of `src/c/view_t.c` is written 80 bytes long, with the
     first texts of the editor that the original has behind it.
   - Nothing is kept of what a program run as the viewer has shown: the
     screen is written as it was, and Ctrl+O shows what was there
@@ -314,9 +314,9 @@ than it is would pass.
   yet. And a product or a quotient that is wrong for some numbers only
   would pass the scenarios: three files divide and one multiplies such
   numbers, `find.c`, `info.c` and `copy.c`. So the two helpers, which
-  are C, `U4M` and `U4D` of `port/arith.c`, are held against other
+  are C, `U4M` and `U4D` of `src/c/arith.c`, are held against other
   arithmetic, in two ways:
-  - The test `arith`, `python3 harness/arithcheck.py build/port`, runs
+  - The test `c-arith`, `python3 harness/arithcheck.py build/c`, runs
     their bytes, as the linked program has them, on a model of the 8086
     that knows the instructions they are made of, and holds the product,
     the quotient and the remainder against Python's, for 729 pairs of
@@ -329,8 +329,8 @@ than it is would pass.
     assembly that were there before passed it on the same 200,729 pairs
     as the C does, `--pairs 200000`; four changes of one instruction
     made to see it work were each found.
-  - `port/arith.c` compiles for the computer that builds as it is, with
-    `-DVC_H` and the three types of `port/vc.h` at their widths: there
+  - `src/c/arith.c` compiles for the computer that builds as it is, with
+    `-DVC_H` and the three types of `src/c/vc.h` at their widths: there
     it was held against that computer's arithmetic on 101 million pairs
     for the product and 98 million for the division, 47 million of them
     by more than 16 bits. The program that did it is not kept.
@@ -369,7 +369,7 @@ than it is would pass.
   the 15 bytes that begin with it: behind the full stop TmpBuf gets
   seven bytes of what follows `FnFl7_S` in the program, the title of
   an error's box without its zero byte. Nothing reads them. The two
-  are constants of `port/find_t.c`, each 15 bytes long with what the
+  are constants of `src/c/find_t.c`, each 15 bytes long with what the
   original has there, so the copy no longer goes by what happens to
   stand behind them.
 - What `FndMove` does for the mouse runs in `mouse-find`, with the
@@ -391,7 +391,7 @@ than it is would pass.
 - A name to search for that has a full stop gets four bytes behind it
   that follow `\*.*` in the assembly: a zero and "VC.", the start of
   the name of the main extension file. Nothing reads the three; the C
-  copies them from `Mask_S`, a constant of `port/system_t.c`, which is
+  copies them from `Mask_S`, a constant of `src/c/system_t.c`, which is
   written with what follows it in the original.
 - `FindFil` calls itself, through `DirFunc`, once for every level of
   the directories it searches. The original took 18 bytes of its stack
@@ -401,11 +401,11 @@ than it is would pass.
   all of that on the stack: `FindFil` calls DOS for the files, and to
   open and read them.
 - The tables by which the menu bar finds the command of an item are
-  constants of `port/commands_t.c`, with the boxes, dialogs and texts of
+  constants of `src/c/commands_t.c`, with the boxes, dialogs and texts of
   the menus' commands, and the main loop calls the commands. Where the
   keys of the panels go on in three of them, `M01_01`, `M03_00` and
   `M06_00`, the loop calls those too, by what the key's command returns:
-  `CmdEnd` of `port/main.c`.
+  `CmdEnd` of `src/c/main.c`.
 - Of the commands of the menus, two instructions are listed as out of
   reach: one for a display that is neither EGA nor VGA, and one for a
   kind of panel that nothing asks for. The one of EGA lines that keeps
@@ -435,7 +435,7 @@ than it is would pass.
     C copies them from the assembly, as long as that has them. Behind
     " User Menu " the port has other bytes than the original from the
     42nd on: the texts of the box of the drives stood there, and are in
-    `port/drive.c` now. Nothing reads them.
+    `src/c/drive.c` now. Nothing reads them.
   - The boxes of Save setup and of Compare directories are shown with
     DS on the current panel, where a box looks for the texts it is to
     put into its lines. They have none.
@@ -542,7 +542,7 @@ than it is would pass.
     BX and DX, which hold the numbers of selected files only where F5
     and F6 have counted them: there they are what the command before
     left, and the name is offered if both are 0. The main loop hands
-    them on as the original has them (see `port/main.c`). They are not
+    them on as the original has them (see `src/c/main.c`). They are not
     both 0 behind any command that was found: the loop loads BX with
     an address where a command comes back to it, and the keys of the
     cursor, which come back behind that place, leave an address or a
@@ -642,18 +642,18 @@ than it is would pass.
   - Of a device that gives its bytes in several calls of DOS to a
     piece, the room left in the memory is counted down by the last
     call only. By reading: the bench has no such device.
-- The functions of `port/copy.c` are on the stack when DOS brings up
+- The functions of `src/c/copy.c` are on the stack when DOS brings up
   its box for a critical error during a copy, a copy to the floppy A:
   for one. No scenario has that.
 - `copy-full` fills C: by copies, 32 MB, in half a minute. So a full
   disk can be made on the bench after all, and what the editor does when
   it saves to one, listed as out of reach for `T80_00`, could be shown.
-- The `port` test has five scenarios more for copying, 304 steps, which
-  take two and a half minutes of machine time between them: `copy-full`
-  alone 33 seconds on an idle machine and a minute next to the tests of
-  other batches, the longest of all. It moves some 80 MB. Its first
+- The `c-scenarios` test has five scenarios more for copying, 304 steps,
+  which take two and a half minutes of machine time between them:
+  `copy-full` alone 33 seconds on an idle machine and a minute next to the
+  tests of other batches, the longest of all. It moves some 80 MB. Its first
   form did that in steps of up to 25 MB, and a step ran into the 20
-  seconds that a step may take, twice, with other `port` tests and
+  seconds that a step may take, twice, with other `c-scenarios` tests and
   runs of goldens under way; no step moves more than 6 MB now. If the
   test is to be faster, this is the scenario to drop: 74 instructions
   of `C00_00` would go to the list of what is out of reach.
@@ -786,7 +786,7 @@ than it is would pass.
   ported as they are.
 - `FncSel`, which goes through the selected files of a panel, and
   `FncExt`, where a command ends that may have changed the disk, are
-  functions of `port/dirfunc.c`. In the original they are code in the
+  functions of `src/c/dirfunc.c`. In the original they are code in the
   program's data, behind `DirFunc`; `harness/coverage.py` names such
   code by its label.
 - F7 in a tree copies the path of the new directory into `CrnPath`
@@ -813,12 +813,12 @@ than it is would pass.
   `harness/scenarios.py` says how.
 - Enter, `F21_00`, saves what the program needs to start over, gives
   the main data back to DOS and returns `NEXT_EXEC` or `NEXT_INIT11`
-  (`F21_31` of `port/enter.c`); the main loop returns that, and
-  `TrnMain` of `port/main.c` returns to the part of the program that
+  (`F21_31` of `src/c/enter.c`); the main loop returns that, and
+  `TrnMain` of `src/c/main.c` returns to the part of the program that
   stays in the memory, which runs the commands, or starts over at
   `Init11`. The program also comes through `F21_31` when it has
   started. Which command a key has is a `switch`, `Func12` of
-  `port/main.c`.
+  `src/c/main.c`.
 - `harness/reach.py` and `harness/ported.py` name code from a label to
   the next procedure, so `F22_00`, the keys that change the directory,
   names all that stands up to the procedure `F42_10`, with `F80_00`
@@ -928,7 +928,7 @@ than it is would pass.
 - What a command leaves in the registers reaches the next command
   through the main loop, and a command that is C leaves other values
   there than the assembly did. What is read of it is at the top of
-  `port/main.c`, found by reading every stub when the loop came to call
+  `src/c/main.c`, found by reading every stub when the loop came to call
   the commands: the mouse's commands, the key for the command line, CX
   by EGA lines, and BX and DX by Rename and Copy where they do not
   count what is selected. For the last the port was wrong until then,
@@ -968,19 +968,19 @@ than it is would pass.
   registers that the call does not read, BX to DX of the call for the
   video mode, BX and CX of those that set a vector, is 0 where the
   assembly had what was left there.
-- There is no `port/asm/` any more. What was said here of each piece of
+- There is no `src/c/asm/` any more. What was said here of each piece of
   its `VC.ASM` that was code, and what became of it:
   - The stubs of the start-up, `Init00` and `Init11`, are `TrnMain` of
-    `port/main.c`, which the part that stays calls: it calls the three
-    functions of `port/start.c` and the main loop, and puts DS on the
+    `src/c/main.c`, which the part that stays calls: it calls the three
+    functions of `src/c/start.c` and the main loop, and puts DS on the
     main data and back by the instruction of inline assembly that
-    `FatErr` has. What `port/start.c` names of the part that stays is
+    `FatErr` has. What `src/c/start.c` names of the part that stays is
     in one list at its top: `ComnIni`, `WCB1sav`, `WCB2sav`, `Counter`,
     `Vect22` and `Vect27`, which are members of `struct Stays`,
     `Vect21`, `RelTab`, the functions `Exit01`, `New21` and `New27`, by
     their offsets, and `SetBrk`, which it calls through a pointer to a
     far function.
-  - The part that stays in the memory is C, `port/resident.c`, with its
+  - The part that stays in the memory is C, `src/c/resident.c`, with its
     data: the entry of the program, `Alloc0`, which DOS enters; `Reloc`,
     which that part applies to the other whenever it has loaded it; the
     outermost loop of the program, `Stay`, which calls the part that
@@ -992,12 +992,12 @@ than it is would pass.
     labels that the part that goes jumped back to, and the stub of
     `Release` with `CallPSP`, are gone.
   - `FatErr`, what DOS calls for a critical error, is C, an interrupt
-    function in `port/main.c`. Its texts and its two boxes are
-    constants of `port/main_t.c`, and so is `SecDat`, the word that
+    function in `src/c/main.c`. Its texts and its two boxes are
+    constants of `src/c/main_t.c`, and so is `SecDat`, the word that
     holds the segment of the main data, but that it is a variable:
-    `port/start.c` writes it, and `FatErr` loads DS from it, by the one
+    `src/c/start.c` writes it, and `FatErr` loads DS from it, by the one
     instruction of inline assembly there.
-- Ported as they are, in `port/start.c`: see the comments of `Init00`
+- Ported as they are, in `src/c/start.c`: see the comments of `Init00`
   and `IniData` there. Three of them reach further:
   - The original takes the two panels of a program that starts without
     a setup file, or with one that is not correct, from 88 bytes of
@@ -1009,7 +1009,7 @@ than it is would pass.
     fills both fields with zeros behind their texts, in the panel, before
     the first key is taken, and the setup file is made of that. The
     port has no such table any more, the keys are a `switch`, and
-    `Init00` of `port/start.c` puts zeros where the original has those
+    `Init00` of `src/c/start.c` puts zeros where the original has those
     80 bytes. Nothing was found that reads them in between: the mask
     and the path are read as texts, by `SetMask`, `PutPath`, `Init50`
     and `ReDir`, and copied whole only as such. The file that a copy
@@ -1040,7 +1040,7 @@ than it is would pass.
   screen that it should not have left, is the sign; `start-screen` has
   its programs typed right.
 - What the program's watch on DOS does in the original, and in the
-  port after it (`port/resident.c`); whether to mend any of it is not
+  port after it (`src/c/resident.c`); whether to mend any of it is not
   decided:
   - The call by which another program asks for the program's data,
     INT 21h with AH 2Bh, CX 'VC' and DX 'OM', returns with the flags as
@@ -1087,7 +1087,7 @@ than it is would pass.
     where the original returns to the INT 20h that a .COM file has at
     the bottom of its stack. Both end the program the old way.
 - What running a command does in the original, and in the port after
-  it (`port/resident.c`); whether to mend any of it is not decided:
+  it (`src/c/resident.c`); whether to mend any of it is not decided:
   - Whether DOS had a block of memory for the part of the program that
     is loaded again is taken from the block's address less a number of
     paragraphs, not from what DOS answered. DOS answers 8 or 7 for no
@@ -1118,7 +1118,7 @@ than it is would pass.
     can rely on them. In `ended`, where a program made for it has DOS
     end a second copy.
 - What the critical error does in the original, and in the port after
-  it (`FatErr` in `port/main.c`):
+  it (`FatErr` in `src/c/main.c`):
   - The number of the error is all of DI, of which DOS defines the low
     byte. A number of 21 or more is "Unknown error.", and so is any
     whose high byte is not 0: a copy to COM2, which the machine has
@@ -1126,7 +1126,7 @@ than it is would pass.
   - Where DOS does not allow another try, the box has Ok alone and the
     call fails; where it does, anything but Retry fails it, Esc too.
     The program never has DOS end it.
-- Where the part that stays in the memory (`port/resident.c`) is not
+- Where the part that stays in the memory (`src/c/resident.c`) is not
   as the original. No scenario shows any of these; each is here with
   what it would take to make it as the original, for the user to
   decide:
@@ -1196,7 +1196,7 @@ than it is would pass.
   of it loaded. The port may use more memory than the original as long
   as it behaves the same: this is a place where it does not.
 - How the part that stays in the memory is laid out by C, and what it
-  rests on (`port/resident.c`, `tools/mkexe.c`). Each of these is in
+  rests on (`src/c/resident.c`, `tools/mkexe.c`). Each of these is in
   the README's list, "What rests on Open Watcom"; this is what would
   show if one stopped holding:
   - Its code and its data are one group, `R_GROUP`, by the compiler's
@@ -1211,7 +1211,7 @@ than it is would pass.
     two, `Counter` in front of `PrgList`, `SavePtr` behind `IntTab`.
     What needs a name is a variable by itself, since a member has none
     to the linker: the seven words of `tools/mkexe.c`, `RunPar`, the
-    texts, which the test `data` holds, and the stack.
+    texts, which the test `c-data` holds, and the stack.
   - That the stack is the end of that part is by the compiler's
     segments and not by the language: `DataSav` is the one object of
     that file without a value, and what has none is in the last of the
@@ -1229,13 +1229,13 @@ than it is would pass.
   - What the check sum of the file leaves out is from `Stays` on: the
     layout numbers, the texts and `OvlPrm` are summed.
   - `SecDat`, the word with the main data's segment, is a variable of
-    the compiler's own group, in `port/main_t.c`: an interrupt function
+    the compiler's own group, in `src/c/main_t.c`: an interrupt function
     has DS on that group when it begins, which is how `FatErr` reads
     the word. `tools/mkexe.c` refuses static data in a file of the part
     that goes that has code, because the code has DS elsewhere; a file
     without code may have a variable, with a value, so that it is in
     the file. The group is relocated like any segment of that part,
-    and `port/start.c` writes the word after every command.
+    and `src/c/start.c` writes the word after every command.
   - The constants behind the stack, `CONST2`, some 8,900 bytes, keep
     code off the page that the stack ends in: it is the linker's
     command that has them in front of the code, and `tools/mkexe.c`
@@ -1246,7 +1246,7 @@ than it is would pass.
   added to `harness/driver.py` for it and taken out again. In the port
   it is an interrupt function without a body, which saves the registers
   and puts them back where the original has one instruction.
-- Ported as they are, in `port/main.c`:
+- Ported as they are, in `src/c/main.c`:
   - When a panel cannot be read and another drive is chosen for it,
     the assembly notes the drive if none is noted as the one that
     failed. One always is: an instruction that never runs, `MOV CL,AL`
@@ -1272,8 +1272,8 @@ than it is would pass.
     is whatever DX holds, and nothing reads it then.
   - `Mvz2lin` had no caller, and is gone.
 - `AltSr_T`, the scan codes that begin the speed search, is a constant
-  of `port/keys_t.c`, which the main loop reads, and the place behind
-  the code found goes round in DI as in the assembly. `port/cmdline.c`
+  of `src/c/keys_t.c`, which the main loop reads, and the place behind
+  the code found goes round in DI as in the assembly. `src/c/cmdline.c`
   has a copy of its own: the table wants one home.
 - The list file gets, behind its name at TmpBuf+100, the six bytes that
   follow `vc.lst` in the assembly, and the menu's name at TmpBuf the six
@@ -1282,27 +1282,27 @@ than it is would pass.
 
 - `VCSUB1.INC`, `VCSUB2.INC` and `VCSUB3.INC`, the shared routines, are
   gone. Their last stubs were `ReDir` and `ReadTre`: `ReDir` is one
-  function of `port/read.c`. Their last entries for C were `AsmSeg_a`,
-  which is `AsmSeg` of `port/misc.c`, and `CallPSP`, by which the map of
+  function of `src/c/read.c`. Their last entries for C were `AsmSeg_a`,
+  which is `AsmSeg` of `src/c/misc.c`, and `CallPSP`, by which the map of
   the memory had a program released: C code makes such a call through
   a pointer to a far function. Their texts and tables are constants of
-  `port/bars_t.c`, `port/treebox_t.c` and `port/system_t.c`. Four names
+  `src/c/bars_t.c`, `src/c/treebox_t.c` and `src/c/system_t.c`. Four names
   of files are copied with what follows them, and are written there as
   long as what is copied, with what the original has behind each:
   `Mask_S` and `Ext_F`, 68 bytes by `MvzLine`, `DrIn_F` and `Init_F`,
   the 13 of a name. Nothing is known to read those bytes where they
   get to.
 - No entry in the assembly calls an interrupt for C code any more. A
-  drive made the current one is `SelDrv` of `port/system.c`; the FCB
-  that deleting by a mask has DOS make is `Fcb29` of `port/dirfunc.c`;
-  what the map of the memory asks of DOS is in `port/memory.c`,
-  `Dos5802` to `Dos2523`. All go through `Int21d` of `port/dos.c`, as
+  drive made the current one is `SelDrv` of `src/c/system.c`; the FCB
+  that deleting by a mask has DOS make is `Fcb29` of `src/c/dirfunc.c`;
+  what the map of the memory asks of DOS is in `src/c/memory.c`,
+  `Dos5802` to `Dos2523`. All go through `Int21d` of `src/c/dos.c`, as
   the assembly called DOS itself there, without `Intr21`. `LeaveTm`'s
   three interrupts are `Int28`, `Int2F` and `DvPause` there.
 - The jump of the main loop to the command of a key is a `switch`,
-  `Func12` of `port/main.c`, and `Case` is gone. The loop calls the
+  `Func12` of `src/c/main.c`, and `Case` is gone. The loop calls the
   commands, from a second `switch`, `Command`. The structure of
-  registers is still there: `struct Regs` of `port/vc.h`, for the few
+  registers is still there: `struct Regs` of `src/c/vc.h`, for the few
   that one command reads as another left them. Its fields SI, DI and BP
   are read by the mouse's commands alone, which the loop sets them for
   just before, and what else the loop writes there, as the original
@@ -1404,9 +1404,9 @@ than it is would pass.
 
 ## Ways of testing that were tried, for the user to decide on
 
-The full `port` test took 105 seconds on an idle machine with 59 scenarios
-and twelve minutes with eight checkouts busy, so four other ways were
-tried on 11 and 12 October 2026, and a fifth, a driver that stays
+The full `c-scenarios` test took 105 seconds on an idle machine with 59
+scenarios and twelve minutes with eight checkouts busy, so four other ways
+were tried on 11 and 12 October 2026, and a fifth, a driver that stays
 resident in the guest, which is what the tests use now (see the README). What was measured first: 77% of a
 scenario's time is the guest running while the harness waits, most of it
 the program waiting for the timer while a box grows; pressing keys is
@@ -1480,14 +1480,14 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `PutInf`, could not be named to `harness/reach.py` or listed in
     `harness/ported.py`. Both take it by its first label now, a commit of
     its own.
-  - 4 minutes: a key lost in the editor. The port test failed before
-    anything was translated, an Enter gone from a step of seven keys: the
-    editor empties the keyboard buffer after every key. Found by reading
+  - 4 minutes: a key lost in the editor. The `c-scenarios` test failed
+    before anything was translated, an Enter gone from a step of seven keys:
+    the editor empties the keyboard buffer after every key. Found by reading
     its loop; the scenario switches the option off first. Noted at the
     top of `harness/scenarios.py`.
   - 4 minutes: two steps that could not stay, each a golden derived, 23
-    seconds, and one of them a port test failed, 34: the volume label,
-    which the program does not get off the disk, and the memory free
+    seconds, and one of them a `c-scenarios` test failed, 34: the volume
+    label, which the program does not get off the disk, and the memory free
     with Memory allocation off, which depends on the size of the program.
   - 4 minutes: three tries until a scenario noticed `FilePan` taking a
     panel that is switched off for one of files. Ins does not get there
@@ -1521,7 +1521,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   to another batch in a checkout of its own:
   - 2 minutes: waiting for a turn at the computer, in three runs: 20
     seconds before a run of `harness/show.py`, 25 before the goldens
-    were derived and 60 before the first `port` test. The rebase, the
+    were derived and 60 before the first `c-scenarios` test. The rebase, the
     build and the test after it took a minute and met no conflict: the
     other batch was not on `main` yet.
   - 1 minute: a run of `harness/show.py` that pressed Enter on a file
@@ -1531,11 +1531,11 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
 
 - The viewer's keys, 2,290 bytes that are no procedure but for 20 of
   them, 40 minutes to a translation that passed its own scenarios the
-  first time it was built, next to seven other batches; then the `port`
-  test did not pass, for scenarios of copying, and the batch waited an
-  hour and a quarter for its turn to land:
-  - 7 minutes: the first full `port` test, 4 minutes 6 seconds at a load
-    of 17 on two processors, and the two scenarios it failed in run
+  first time it was built, next to seven other batches; then the
+  `c-scenarios` test did not pass, for scenarios of copying, and the batch
+  waited an hour and a quarter for its turn to land:
+  - 7 minutes: the first full `c-scenarios` test, 4 minutes 6 seconds at a
+    load of 17 on two processors, and the two scenarios it failed in run
     again by themselves, a minute and a half and 44 seconds. `copy-full`
     stopped both times at step 36, '"c1" Enter', a copy of 3 MB that did
     not end within the 20 seconds a step had then. `move` differed at
@@ -1548,7 +1548,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     after the comparison were run for the viewer's scenarios by a
     script of thirty lines around the functions of `harness/ported.py`,
     49 seconds: every instruction ran or is listed, every function ran.
-    A `port` test that could leave a scenario out, or that went on to
+    A `c-scenarios` test that could leave a scenario out, or that went on to
     its checks after a scenario has failed, would have said the same in
     one run.
   - 1 minute: a search expected to begin at the top of the file again,
@@ -1578,12 +1578,12 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     compiled code was 1830 bytes over the 64K of its segment, so
     `view.c` is in the second one. All four stubs went, the editor
     calls `V80_00`, and the build, the viewer's scenarios and the
-    `port` test, 5 minutes 33 seconds, passed at once.
+    `c-scenarios` test, 5 minutes 33 seconds, passed at once.
 
 - The editor: addresses in its text, a line on the screen, saving, 13
   routines, 1079 bytes, 40 minutes in all, next to the viewer's batch:
   - 5 minutes: a scenario that could not stay as written, found by the
-    `port` test before anything was translated. It showed D:\VC in a
+    `c-scenarios` test before anything was translated. It showed D:\VC in a
     panel, where the program's file has another name and size; and it
     saved to the write-protected floppy, which left 4 bytes of the stack
     in the port as it was. Two goldens derived again, 33 seconds each,
@@ -1614,7 +1614,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `wait_for_screen` for why. At the top of `harness/scenarios.py` now.
   - 2 minutes waiting for a turn at the computer: 60 seconds before a
     run of `harness/reach.py`, 15 before the goldens were derived, and
-    the `port` test with the routines still assembly took 138 seconds
+    the `c-scenarios` test with the routines still assembly took 138 seconds
     next to the tests of the others, where it takes 99 by itself.
   - 4 minutes for getting onto `main`, twice: the larger stack arrived
     while the test after the first rebase ran. One conflict, in the notes
@@ -1631,8 +1631,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     the port with the editor in C: the scenario failed on the first
     run of the translation. It has a file now that is too large for
     both. At the top of `harness/scenarios.py`.
-  - 3 minutes and a half: a full `port` test that failed on nothing but
-    `T60_00_c` and `T61_00_c`, listed for an earlier batch and called
+  - 3 minutes and a half: a full `c-scenarios` test that failed on nothing
+    but `T60_00_c` and `T61_00_c`, listed for an earlier batch and called
     by stubs that had gone. `harness/compare.py` on the batch's own
     scenarios does not look at that.
   - 3 minutes: the Info in both panels, where the second "Bytes Free"
@@ -1645,7 +1645,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     bench's floppy has not.
   - 14 minutes: a step of five keys in `editor-full` with two beeps in
     it and F4 before and after them, which the port passed twice and
-    then failed, in a full `port` test of nine minutes: the key bar
+    then failed, in a full `c-scenarios` test of nine minutes: the key bar
     was missing. It is drawn only where the program waits and finds no
     key, and the port need not wait within a step. Found by reading
     `Input0` and `PutKey0`; at the top of `harness/scenarios.py` now.
@@ -1666,12 +1666,12 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - 4 minutes and a half waiting for a turn at the computer before
     the rebases, in six runs: 57 and 26 seconds before two runs of `harness/reach.py`
     with steps, 97 before the goldens were derived, 46 and 19 before
-    two `port` tests, and 25 before a derivation that then stopped at
+    two `c-scenarios` tests, and 25 before a derivation that then stopped at
     once, the scenarios not yet in the file: an edit had been refused
     and the refusal not read.
   - 1 minute: the C function named `Help_c`, which the assembler takes
     for `Help_C`. In `CLAUDE.md` now.
-  - 1 minute: the byte 1Ah at the end of the files of `port/asm/`,
+  - 1 minute: the byte 1Ah at the end of the files of `src/c/asm/`,
     which a script that split them by lines did not expect. In
     `CLAUDE.md` now.
   - 11 minutes for four rebases, the push refused once. The last was
@@ -1697,7 +1697,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `harness/scenarios.py` now.
   - 6 minutes waiting for a turn at the computer: 95 seconds before the
     third run of `harness/reach.py`, 50 and 40 before two derivations,
-    and some three minutes of a `port` test that took 4:43 where it
+    and some three minutes of a `c-scenarios` test that took 4:43 where it
     takes 1:16 by itself.
   - 1 minute and a half: a derivation that stopped, "the screen did not
     settle", at the step that ends in the help; the next one went
@@ -1705,7 +1705,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - 1 minute: `FndAdr_c` not executed in the port. Its stub is called
     by Go to alone, which no scenario had: three steps more, and the
     golden derived again.
-  - The `port` test failed on the stack alone, none of 256 bytes left
+  - The `c-scenarios` test failed on the stack alone, none of 256 bytes left
     in `stamps` and `find`, and passed on the stack of 4,096 bytes,
     which was on `main` by then.
   - 4 minutes for getting onto `main`, behind the larger stack, the
@@ -1723,10 +1723,10 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   passed the first time it was tested, and nothing but waiting was lost.
   - 8 minutes waiting for a turn at the computer before the rebase, in
     four runs: 158 seconds before the goldens of the two scenarios were
-    derived, which then took a minute, 143 and 134 before the two `port`
-    tests, the one before translating and the one after, and 43 before a
-    comparison of four scenarios. Two runs of `harness/reach.py` with
-    steps, 20 and 36 seconds, did not wait.
+    derived, which then took a minute, 143 and 134 before the two
+    `c-scenarios` tests, the one before translating and the one after, and
+    43 before a comparison of four scenarios. Two runs of `harness/reach.py`
+    with steps, 20 and 36 seconds, did not wait.
   - 4 minutes for getting onto `main`, behind find file: two files in
     conflict, `README.md` and this one, each where both batches had
     written in the same place, and a script kept both. The lists of
@@ -1740,16 +1740,16 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   minutes in all, next to three other batches:
   - 10 minutes waiting for a turn at the computer, in seven runs: 99
     seconds before a run of `harness/reach.py` with steps, 42, 157, 104
-    and 77 before the goldens were derived, 27 before a `port` test and
-    98 before a run of `harness/show.py` on the port. The others' tests
+    and 77 before the goldens were derived, 27 before a `c-scenarios` test
+    and 98 before a run of `harness/show.py` on the port. The others' tests
     follow one another, and a run that wants the computer alone waits
     for a gap.
   - 6 minutes: `EXTERN` for the C functions at the top of `VCF1.INC`,
     which is included inside the code. The assembler made near calls of
     the far ones without a word; deleting worked and the attributes
-    ended in "Invalid Opcode". A `port` test failed, 77 seconds, three
-    runs of `harness/show.py` on the port, and the bytes of a stub read
-    in the program file. In `CLAUDE.md` now.
+    ended in "Invalid Opcode". A `c-scenarios` test failed, 77 seconds,
+    three runs of `harness/show.py` on the port, and the bytes of a stub
+    read in the program file. In `CLAUDE.md` now.
   - 6 minutes: the golden of `delete` derived four times, 71 seconds
     each. The tree's file is gone from the root after a directory has
     been deleted from the tree; a panel lists the new one only when it
@@ -1759,7 +1759,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `tools/routines.py` for labels that others call, before the
     scenarios are written, would have saved the last one: it does not
     show them.
-  - 4 minutes: `harness/reach.py` and the `port` test did not know
+  - 4 minutes: `harness/reach.py` and the `c-scenarios` test did not know
     `DirFunc`, which is code in the program's data. `harness/coverage.py`
     reads such procedures now, a commit of its own.
   - 1 minute: "F8 Enter" in one step leaves the box of F8 open, which
@@ -1782,8 +1782,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `PtMnu_S`, which the menu reads: the first found by the assembler,
     the second by looking for every table that was to go. In `CLAUDE.md`
     now.
-  - 3 minutes: the `port` test took 268 seconds next to the tests and the
-    recordings of seven other batches, where it takes 105 by itself. The
+  - 3 minutes: the `c-scenarios` test took 268 seconds next to the tests and
+    the recordings of seven other batches, where it takes 105 by itself. The
     steps were tried on the port's build that signals first, 6 to 10
     seconds a run, and the three goldens were derived once, in 19
     seconds.
@@ -1794,7 +1794,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     anything was pushed. Such files belong in the checkout's own
     `build/`.
   - 55 minutes for getting onto `main`, six times. The first rebase met no
-    conflict and no entry twice, and its `port` test failed after 324
+    conflict and no entry twice, and its `c-scenarios` test failed after 324
     seconds in `copy-full`, a scenario of the copying: step 42, '"c4"
     Enter', a copy of 3 MB, was still copying when the 20 seconds were
     over that a step might take, with a load of 14 on the two
@@ -1824,7 +1824,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     with `FndItem`'s answer turned round in a function of the user
     menu's, and the stubs of `FndItem` and `Input0` went too, having no
     caller left. Ten minutes, and a test of 195 seconds, during which
-    the editor landed. The sixth had `port/edit.c` and `VCEDIT.INC` in
+    the editor landed. The sixth had `src/c/edit.c` and `VCEDIT.INC` in
     conflict; the editor's entries for `EdSub1` and `CmpSym` went, it
     calls the functions and `Input`, and the stub of `EdSub1` went. Its
     test took 162 seconds.
@@ -1842,7 +1842,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     that were waiting for a turn.
   - 5 minutes waiting for a turn at the computer otherwise: 137 seconds
     before a run of `harness/reach.py` with 30 steps, 63 before the
-    golden was derived, 100 before the `port` test with the routines
+    golden was derived, 100 before the `c-scenarios` test with the routines
     still assembly; and the first test of the C took 156 seconds where
     it takes 78 by itself.
   - 3 minutes: "not executed in the port" for three functions that
@@ -1856,7 +1856,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `README.md`, and three things git did not show: the tree had made
     entries for `Input`, which this batch had made too, and for
     `InSt10`, which is C now and takes its arguments in another order,
-    and `struct Box` was in its C file and in `port/vc.h`. Behind
+    and `struct Box` was in its C file and in `src/c/vc.h`. Behind
     deleting eight files were in conflict, the lists of batches and of
     scenarios cut at their closing brackets again and put right by a
     script; its C file called `Dialog` by the entry that is gone, in
@@ -1881,7 +1881,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     signals, six seconds for twenty steps, by a script of ten lines
     around `scenarios.run` and `show.print_screens`, and held against
     their goldens with `harness/compare.py` before the translation and
-    after it, 20 seconds; the full `port` test ran once before the
+    after it, 20 seconds; the full `c-scenarios` test ran once before the
     rebase, 193 seconds next to the others.
   - 3 minutes for the rebase, behind what Copy and Rename ask first: one
     file in conflict, the notes at the top of `harness/scenarios.py`,
@@ -1890,7 +1890,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     next to the routine and with an answer, and the call of DOS that
     makes a drive current, `SelDrv_a` there and `SelDsk_a` here, the
     same instructions. Those of this batch went.
-  - 7 minutes: the `port` test after the rebase, 356 seconds with a
+  - 7 minutes: the `c-scenarios` test after the rebase, 356 seconds with a
     load of 13 on two processors, failed in `copy-full`, which is not
     of this batch: after step 52, '"c9" Enter', the ninth copy of 3 MB,
     the program had not come to wait for a key within the 20 seconds a
@@ -1919,7 +1919,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     beginning only (see above). It looked like the translation, and was
     in the port without it: the original and the port were run through
     "Ctrl+l" and "Ctrl+p" with `harness/show.py`, and the scenario
-    switches the left panel off now. The `port` test with the batch
+    switches the left panel off now. The `c-scenarios` test with the batch
     listed without functions, before translating, would have said so
     at once; it was left out to save a run of three minutes.
   - 2 minutes: F1 on an item showed the index of the help. The table of
@@ -1941,8 +1941,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - Getting onto `main`, three rebases. The first two took a minute
     each, with the same two files in conflict, `CLAUDE.md` and
     `harness/scenarios.py`, where both sides had added to the end of
-    the same list of notes. The full `port` test, 218 seconds each time
-    where it takes 105 on an idle machine, passed before the first
+    the same list of notes. The full `c-scenarios` test, 218 seconds each
+    time where it takes 105 on an idle machine, passed before the first
     rebase and failed after it, in `copy-full` alone, at the 20 seconds
     that a step could take then; the batch waited for the harness, an
     hour, committed and not pushed. The third rebase had five files in
@@ -1977,8 +1977,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `harness/scenarios.py`.
   - 19 minutes waiting for a turn at the computer, in 43 runs, about
     half of them while other work went on: a derivation of goldens
-    waited a minute or two each time, eight times, and the last `port`
-    test took four minutes where it takes one and a half.
+    waited a minute or two each time, eight times, and the last
+    `c-scenarios` test took four minutes where it takes one and a half.
   - 12 minutes: goldens derived again. `move` three times, 2 minutes
     each with the waiting: once for steps added, once because a step of
     the editor in hex stopped with "the screen did not settle"; the
@@ -1986,12 +1986,12 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     four times, 2 or 3 minutes each: for a better ending; because that
     ending, going on after a full disk with a file that was appended
     to, left other contents in the port than in the original (see
-    above), which the `port` test found after the rebase; and for
-    smaller steps, after a `port` test of four minutes that stopped in
-    it at the 20 seconds a step may take.
+    above), which the `c-scenarios` test found after the rebase; and for
+    smaller steps, after a `c-scenarios` test of four minutes that stopped
+    in it at the 20 seconds a step may take.
   - 1 minute: F6 and Enter on a directory, which moves it into itself.
   - 31 minutes from the first rebase to the push: four rebases, each
-    with a build and a `port` test of two and a half to four minutes,
+    with a build and a `c-scenarios` test of two and a half to four minutes,
     and each but the last overtaken by another batch while its test
     ran. Six or seven files in conflict each time, `CLAUDE.md`,
     `README.md`, `TODO.md`, `ported.py`, `scenarios.py` and `VC.ASM`,
@@ -2016,7 +2016,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   routines, 903 bytes, 25 minutes to the commit, next to seven other
   batches. The translation passed the first time it was tested, and no
   run waited: nothing takes turns any more. Two goldens were derived in
-  20 seconds, the first `port` test took 151 seconds.
+  20 seconds, the first `c-scenarios` test took 151 seconds.
   - 3 minutes: three drafts of the scenarios, tried on the port's build
     that signals, 10 seconds each. A step typed into the buttons of the
     dialog instead of its line, and after a directory of the tree is
@@ -2047,7 +2047,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   drives, nine names in `harness/ported.py`, 3,429 bytes, 67 minutes
   in all, next to seven other batches. The translation passed its own
   four scenarios the first time it was run.
-  - 14 minutes: the full `port` test failed once, 3 minutes 35, in
+  - 14 minutes: the full `c-scenarios` test failed once, 3 minutes 35, in
     `copy-full`, where a step that copies 3 MB took more than the 20
     seconds a step had then, with a load of 14 to 20 on two processors;
     every other scenario had passed, and nothing after the comparison
@@ -2092,8 +2092,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     it, and the listing why. In `CLAUDE.md` now.
   - 4 minutes: goldens derived three times, 45 seconds each: for what
     is left out, where the number of blocks of free memory turned out
-    to follow the size of the program too, which the `port` test of the
-    scenarios showed before anything was translated; and for a step
+    to follow the size of the program too, which the `c-scenarios` test of
+    the scenarios showed before anything was translated; and for a step
     more.
   - 6 minutes: deciding what to do about the name of the program in the
     map, VC.COM or VC.EXE, which no scenario of the map can avoid
@@ -2103,7 +2103,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     the list of scenarios cut at the lines that two scenarios end with.
     What git did not show: `PutMnu` had become C, and the keys of the
     panels had made entries for `SavMous` and `CurMous` too, which went
-    for those next to the routines. The first `port` test, 9 minutes,
+    for those next to the routines. The first `c-scenarios` test, 9 minutes,
     failed in `command-edit`, a scenario of another batch: "Invalid
     Opcode" after a command of an extension file. The compiled code of
     the first segment was 64,636 bytes with `memory.c` in it, 900 below
@@ -2118,11 +2118,11 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   the bench:
   - 10 minutes to get onto `main`, behind the two commits that gave the
     bench its mouse: no conflict, the goldens of the four new scenarios
-    derived again for the pointer, and one `port` test, 256 seconds next
-    to the tests of others. Eight of the nine instructions that EGA
+    derived again for the pointer, and one `c-scenarios` test, 256 seconds
+    next to the tests of others. Eight of the nine instructions that EGA
     lines has for the mouse ran at once, with a mouse there.
-  - 5 minutes: one `port` test more, 100 seconds on a quiet machine and
-    270 next to the tests of others, because the scenario of the floppy
+  - 5 minutes: one `c-scenarios` test more, 100 seconds on a quiet machine
+    and 270 next to the tests of others, because the scenario of the floppy
     under its second letter reached four instructions of `ReDir` that
     its batch had listed as out of reach. `harness/reach.py` says so
     beforehand only for a routine that is asked about: after goldens are
@@ -2155,8 +2155,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     40 seconds each, until it was understood that the box makes the
     diskette that of its drive again as it closes, and that a panel
     which could not be read is read when the viewer is left.
-  - 4 minutes: the first run of the `port` test, which failed on seven
-    instructions that two earlier batches had listed as out of reach
+  - 4 minutes: the first run of the `c-scenarios` test, which failed on
+    seven instructions that two earlier batches had listed as out of reach
     and that `not-ready` runs; `harness/reach.py` on the routines of
     the batch does not show those of other batches. The test took 171
     and 227 seconds next to those of three other batches, where it
@@ -2168,7 +2168,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `TODO.md` and the list of files of the second segment, each where
     both sides had added. What git did not show: the commands had made
     `Int10_a` and an entry for `SaveSet` as this batch had, under the
-    same names; theirs stayed, and both are declared in `port/vc.h`
+    same names; theirs stayed, and both are declared in `src/c/vc.h`
     now. The three scenarios of the mouse passed on this C at once, so
     nothing was lost to the mouse at the panels; a fourth was written
     for what they leave, and derived five times because one record of
@@ -2177,13 +2177,13 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   them, 1,822 bytes, with the file for DOS and the BIOS, some 45 minutes
   to a translation that passed, next to three other batches and one
   change to the harness. No golden was derived twice, and the full
-  `port` test passed both times it ran, 173 and 233 seconds.
+  `c-scenarios` test passed both times it ran, 173 and 233 seconds.
   - 2 minutes: the halves of a number of 32 bits in `[dx cx]`, which are
     the other way round than in `[dx ax]`: the cursor came back to the
     wrong place after the help, in the third scenario compared. In
     `CLAUDE.md` now.
   - 5 minutes: the first comparison of all scenarios, 4 minutes 26 with
-    the other checkouts at work, where the `port` test takes three.
+    the other checkouts at work, where the `c-scenarios` test takes three.
   - Most of the time went into reading: the 125 places of the assembly
     that call these routines, for the registers they go on with. Three
     mattered: the start of the program takes AL, AH and BH from
@@ -2200,17 +2200,17 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     and `commands.c` declared 19 of these routines by their entries;
     seven stubs had lost their last caller to the main loop; the two
     batches had made entries for the BIOS and for a vector of DOS,
-    which went into `port/dos.c`, the first by making `Int10` take the
+    which went into `src/c/dos.c`, the first by making `Int10` take the
     structure that their code already filled; and the new scenario of
     the left-handed mouse ran 55 instructions that the dialogs had
-    listed as out of reach, which the first `port` test said, 132
+    listed as out of reach, which the first `c-scenarios` test said, 132
     seconds. The second passed, 348 seconds next to other runs. The
     mouse's routines, read and never run before, needed no change.
 - Enter, the keys that change the directory, the commands that view
   and edit, and `FncSel`: 2,252 bytes, all but 281 of them no procedure,
   about 50 minutes to the commit, next to four other batches. The
-  translation passed its scenarios and the `port` test the first time it
-  was built.
+  translation passed its scenarios and the `c-scenarios` test the first time
+  it was built.
   - 3 minutes: the files of the listing, written as text into `build/`
     to read them, were moved out of the way with `build/*.txt`, and
     `CMakeCache.txt` went with them: the next build said "not a CMake
@@ -2222,7 +2222,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     Only the labels that looked like entries had been looked for. In
     `CLAUDE.md` now.
   - 3 minutes: the places a command goes on at were first made an
-    `enum` of `port/vc.h` for all files, `M03_00` among them, which is
+    `enum` of `src/c/vc.h` for all files, `M03_00` among them, which is
     the name of a routine that another batch has in hand. Undone before
     the commit; in `CLAUDE.md` now.
   - 2 minutes: the first scenarios copied the driver of the tests,
@@ -2232,21 +2232,21 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     seconds. At the top of `harness/scenarios.py` now.
   - What saved time: `harness/reach.py --steps` with `--changes`, three
     seconds a try, said for every idea whether it reached what was
-    left, a dozen tries in all; and the `port` test before anything was
-    translated, which showed that the three scenarios hold.
+    left, a dozen tries in all; and the `c-scenarios` test before anything
+    was translated, which showed that the three scenarios hold.
   - 30 minutes for getting onto `main` twenty minutes later, behind
     five commits: the mouse on the bench, the commands of the menus,
     the main loop and the shared routines, with every entry for C of
     theirs gone. Ten files in conflict. What git did not show: the C
     of this batch called DOS, the BIOS and the cursor by entries that
-    were functions of `port/vc.h` by then, and its own entry for the
+    were functions of `src/c/vc.h` by then, and its own entry for the
     BIOS went for `Int10`; 38 stubs of shared routines had lost their
     last caller in the assembly with Enter and the viewer's commands,
     found by `tools/routines.py` on both trees and taken out by a
     script, with their lines of `EXTERN` and of `harness/ported.py`;
     the four instructions for the mouse ran, now that the bench has
     one, and left the list; the three goldens were derived again for
-    the pointer. The build passed at once, and the `port` test, ten
+    the pointer. The build passed at once, and the `c-scenarios` test, ten
     minutes with 96 scenarios, too.
 - The start of the program, `Init00` to `Init40` with five routines,
   1,478 bytes, an hour and a half to the commit, next to four
@@ -2260,8 +2260,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `harness/scenarios.py` now.
   - 5 minutes: the table of stars read as two bytes where it is five,
     three of them no characters, and a bug of the original made of
-    that, in the C and in three files of notes. The `port` test passed
-    with it. It showed when the setup file of a copy started on the
+    that, in the C and in three files of notes. The `c-scenarios` test
+    passed with it. It showed when the setup file of a copy started on the
     defaults was held against the original's, to see how they differ:
     by those three bytes and nothing else. In `CLAUDE.md` now, and the
     scenario ends with that file on its disk.
@@ -2269,7 +2269,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     for every file that could be read, a mistake of the C. The two
     scenarios with a second copy said so at once, in the line of the
     banner.
-  - 25 minutes: four runs of the `port` test, five to nine minutes
+  - 25 minutes: four runs of the `c-scenarios` test, five to nine minutes
     each next to the tests of others, where it takes under two alone,
     most of it spent writing the notes meanwhile. The
     first failed on three instructions that two earlier batches had
@@ -2278,7 +2278,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     does not show those of others.
   - 5 minutes to get behind the shared routines, which landed while the
     scenarios were written: one conflict, in the list of scenarios, and
-    the calls of DOS written against `port/dos.c` from the start. That
+    the calls of DOS written against `src/c/dos.c` from the start. That
     file calls DOS with ES on the main data, and the start has a block
     of its own to make smaller: `Int21e`, and `TopScr` for an address
     that the BIOS hands back.
@@ -2297,15 +2297,15 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     gone, and with it the 80 bytes that the defaults of a panel took
     from behind their own 8: the panel went to the C file, with zeros
     there (see above). The three goldens came out the same, and the
-    `port` test took 78 seconds, alone on the machine.
+    `c-scenarios` test took 78 seconds, alone on the machine.
 
 - What was left of the shared routines, seven of them with the screen
   blanker, 717 bytes, and the entries that called DOS for C code: some
   45 minutes to a translation that passed, with other checkouts at
   work. Every scenario compared as the original the first time it ran
   on the C, twelve of them in 20 seconds and then all.
-  - 18 minutes: the `port` test twice, 468 seconds for the base before
-    anything was changed and 612 for the batch, where it takes 100
+  - 18 minutes: the `c-scenarios` test twice, 468 seconds for the base
+    before anything was changed and 612 for the batch, where it takes 100
     alone. The base need not have been tested: the batch before had
     just passed on it.
   - 8 minutes: why the port's sky is another than the original's. A
@@ -2346,22 +2346,22 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     this batch had taken off; `F34_30` was C, so the `LODSW` moved into
     it was gone with it; and the table of keys had to be held against
     the `switch` again, by a script, 72 entries the same. The two
-    goldens came out as before on the new bench, and the `port` test
+    goldens came out as before on the new bench, and the `c-scenarios` test
     passed the first time, 150 seconds.
 
 - The data of `VC.ASM`, `VCSUB2.INC` and `VCSUB3.INC`, and the
   compiler's helpers, with four other files of data moving in checkouts
   of their own:
-  - 5 minutes: `port/vc.h` declares `Title_S`, `Var_S` and `Tree_S` for
-    the code, far, and `port/tables.h` includes it. A file of constants
+  - 5 minutes: `src/c/vc.h` declares `Title_S`, `Var_S` and `Tree_S` for
+    the code, far, and `src/c/tables.h` includes it. A file of constants
     that defines one of the three was "Modifiers disagree with previous
     definition", and one whose box names one "Pointer truncated", which
     stops the build. Every checkout met it. These files got round it by
-    a `#define` around the `#include`, until `port/tables.h` came with
+    a `#define` around the `#include`, until `src/c/tables.h` came with
     the rebase, which gives each of the three a near name: the file
     that defines one writes it under its name and no `#pragma aux`.
   - 3 minutes: the first of the sixteen names that `VC.ASM` declares
-    `EXTERNDEF` went to C, and the test `data` failed on each, "the
+    `EXTERNDEF` went to C, and the test `c-data` failed on each, "the
     port has 53h": the assembler's listing has such a name in `CONST`
     at 0, marked `External`, and `harness/datacheck.py` took it for an
     object of the assembly. Two checkouts mended that, each for itself;
@@ -2373,7 +2373,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `TODO.md` was in conflict in every commit: its changes were made
     again on the new text by the scripts that had made them, and the
     last row of the inventory added up from the others.
-  - The `port` test took 320 and 219 seconds where it takes 150, with
+  - The `c-scenarios` test took 320 and 219 seconds where it takes 150, with
     the other checkouts testing. Nothing came out different.
   - What saved time: the lines of the assembly were taken out by a
     script that names the lines it expects, and the names of the test's
@@ -2393,14 +2393,14 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     group at the PSP. Try a layout there before the program.
   - A member of a structure has no name to the linker, and the stubs
     of the assembly, four C files, `tools/mkexe.c`, the harness and
-    the test `data` each went by such names: what needs a name became
+    the test `c-data` each went by such names: what needs a name became
     a variable of its own, the stack among it, and the four files name
     a member through `STAYS` under the name it had.
   - 3 minutes: the twelve scenarios of that part came out as the
-    original under `harness/compare.py`, and the `port` test stopped
+    original under `harness/compare.py`, and the `c-scenarios` test stopped
     in `harness/coverage.py`, which read at 100h of the file where the
     table of relocations is. `compare.py` does not trace what ran: it
-    is `ctest -R port` that says whether the harness still knows the
+    is `ctest -R c-scenarios` that says whether the harness still knows the
     file.
   - What saved time: the lines of the assembly were taken out by a
     script that names what it expects, and the three commits were made

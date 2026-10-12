@@ -11,7 +11,7 @@
  *     with CS on the PSP, by giving the header a code segment of -10h:
  *     at the address that the linker has for the start, which is that of
  *     a function of the part that stays in the memory (Alloc0 in
- *     port/resident.c).
+ *     src/c/resident.c).
  *   - Its stack is its own from the first instruction: the header names
  *     the PSP for the stack segment too, and the end of the part of the
  *     program that stays in the memory while a command runs, which is
@@ -22,24 +22,24 @@
  *     block of memory, then the part that goes while a command runs. So
  *     that part is loaded where it runs, and the program has only to make
  *     a block of it. The linker's file begins with room for the PSP, 256
- *     bytes of the code of the part that stays (Psp of port/resident.c),
+ *     bytes of the code of the part that stays (Psp of src/c/resident.c),
  *     which are taken off here: DOS has the PSP there.
  *   - DOS relocates nothing. A program that moves itself has to do that on
  *     its own, so the linker's relocation table is appended to the program,
  *     which applies it to every copy of itself that it loads (Reloc in
- *     port/resident.c). The relocations of the part that stays come
+ *     src/c/resident.c). The relocations of the part that stays come
  *     behind the others in the table: that part does not move, but it
  *     takes a check sum of the file as it was loaded, to know the file
  *     again when it loads it after a command, and so applies its own
  *     relocations itself too, once, when it has the sum.
  *   - The numbers the program needs for this are written into words of
- *     the part that stays, which port/resident.c has for them: each is
+ *     the part that stays, which src/c/resident.c has for them: each is
  *     found by its name in the linker's map. So are the things that the
  *     numbers say: where the part that stays has nothing but zeros in the
  *     file, from Stays on; its stack, DataSav, which is all of the
  *     segment R_BSS, the last of that part; and where the part that goes
  *     begins. That is behind the first whole paragraph of TrnBeg, 32
- *     bytes of nothing which port/transit_t.c has and the linker puts
+ *     bytes of nothing which src/c/transit_t.c has and the linker puts
  *     behind the stack, on no paragraph of their own: the header of the
  *     block is in that paragraph.
  *
@@ -62,7 +62,7 @@
  * names by their offsets, boxes and dialogs with their texts, are
  * constants of the compiler's own group, DGROUP: a file
  * of those has no code that could read them through DS (see
- * port/tables.h), and may have a variable for that reason, with a value,
+ * src/c/tables.h), and may have a variable for that reason, with a value,
  * so that it is in the file. One of the part that stays has that part's
  * data besides its code, in the group that the compiler makes for it,
  * R_GROUP, on which DS is there: the four segments that the option -nd=R
@@ -103,7 +103,7 @@ enum {
     SEGDEF      = 0x98          /* a segment: attributes, length, name */
 };
 
-/* The words of port/resident.c that are written here, by their names in
+/* The words of src/c/resident.c that are written here, by their names in
    the linker's map. All are in paragraphs from the PSP but the counts. */
 #define IMAGE_END   "ImgEnd"    /* end of the program */
 #define TABLE       "RelTab"    /* relocation table */
@@ -231,7 +231,7 @@ static void check_object(const char *path)
                 "the main data, or on the part that stays. A constant "
                 "that only code reads is declared CODE; one that is named "
                 "by its offset goes to a file of constants (see "
-                "port/tables.h)\n", path);
+                "src/c/tables.h)\n", path);
         exit(1);
     }
     if (kept && !stays) {
@@ -380,7 +380,7 @@ static unsigned long check_map(unsigned long from)
                     "the beginning of the segment goes around the end of "
                     "its 64K, which the machine of the tests gets wrong. "
                     "Have a file compiled into another segment: see "
-                    "port_c_second in CMakeLists.txt\n",
+                    "c_second in CMakeLists.txt\n",
                     name, offset + size, (unsigned)CODE_END);
             exit(1);
         }
@@ -499,7 +499,7 @@ int main(int argc, char **argv)
        and what its words name moves with it. So they cannot name the
        part that stays, which is where it was: its segment is the PSP's,
        0 here, and the program has that from SS (ResSeg of
-       port/misc.c). */
+       src/c/misc.c). */
     for (i = 0; i < relocations; i++) {
         unsigned offset = get16(entry + i * 4);
         unsigned segment = get16(entry + i * 4 + 2);
@@ -521,7 +521,7 @@ int main(int argc, char **argv)
        segment is the PSP's, 0 here. One that names a segment of the part
        that goes is left as the linker has it, in paragraphs from the PSP,
        and is not in the table: that part is somewhere else after every
-       command, and the code adds where (TRN_SEG of port/resident.c). */
+       command, and the code adds where (TRN_SEG of src/c/resident.c). */
     for (i = 0; i < relocations; i++) {
         long address = get16(entry + i * 4 + 2) * 16L + get16(entry + i * 4);
         if (address >= (long)transit)

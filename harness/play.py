@@ -8,7 +8,7 @@ floppy, is not loaded. Its screen is shown in the terminal, which
 has to be 80 columns by 25 lines at least, and its keyboard is the
 terminal's. Nothing is kept: the disks are made anew every time.
 
-    play.py                     the port, build/port/VC.EXE
+    play.py                     the port, build/c/VC.EXE
     play.py --original          the original, VC.COM
     play.py --country ru        on the Russian bench
     play.py PROGRAM             another build
@@ -66,7 +66,7 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("program", nargs="?", type=Path,
-                        default=ROOT / "build" / "port" / "VC.EXE")
+                        default=ROOT / "build" / "c" / "VC.EXE")
     parser.add_argument("--original", action="store_true",
                         help="run the original in place of a build")
     parser.add_argument("--country", choices=sorted(setups.COUNTRIES),

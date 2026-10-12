@@ -11,7 +11,7 @@ pressed, and the screen after the start and after each step is printed.
 
 Steps are written as in scenarios.py; one that presses several keys needs
 quotes around it. The program is the original unless another is named:
---program build/port/VC.EXE is the port.
+--program build/c/VC.EXE is the port.
 
 A screen is 25 rows, and most of what a key does is in a few of them:
 

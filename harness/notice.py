@@ -7,13 +7,13 @@ screen shows what the instruction is for: a branch can run and leave
 nothing to see. This makes one change to a copy of the port, builds it,
 and takes it through scenarios until one differs from its golden:
 
-    notice.py port/string.c "c == ':' || " "" --routine CutPath
+    notice.py src/c/string.c "c == ':' || " "" --routine CutPath
 
 says which scenario notices that CutPath no longer stops at a colon, or
 that none does. Then the scenarios cannot tell a right translation of that
 branch from a wrong one, and one of them should be made to.
 
-The change is one piece of text in FILE, a file of port/, replaced by
+The change is one piece of text in FILE, a file of src/c/, replaced by
 another. The text has to be there exactly once. In the assembly it is
 written with its tabs, $'\\tMOV\\tAL,0\\r\\n' in a shell.
 
@@ -48,7 +48,7 @@ LISTING = BUILD / "shareware-layout" / "VC.LST"
 COPY = BUILD / "notice" / "source"
 COPY_BUILD = BUILD / "notice" / "build"
 # What the port is built from, of all that the project holds.
-BUILT_FROM = ["CMakeLists.txt", "tools/mkexe.c", "port"]
+BUILT_FROM = ["CMakeLists.txt", "tools/mkexe.c", "src/c"]
 COM_ORIGIN = 0x100                # where a .COM file is loaded
 
 
@@ -81,7 +81,7 @@ def build():
          f"-DFETCHCONTENT_SOURCE_DIR_JWASM={fetched / 'jwasm-src'}",
          f"-DFETCHCONTENT_SOURCE_DIR_OPEN_WATCOM="
          f"{fetched / 'open_watcom-src'}"],
-        ["cmake", "--build", COPY_BUILD, "--target", "port"],
+        ["cmake", "--build", COPY_BUILD, "--target", "c"],
     ]
     for step in steps:
         done = subprocess.run([str(word) for word in step],
@@ -89,7 +89,7 @@ def build():
         if done.returncode:
             print(done.stdout + done.stderr)
             return None
-    return setups.Program.load(COPY_BUILD / "port" / "VC.EXE")
+    return setups.Program.load(COPY_BUILD / "c" / "VC.EXE")
 
 
 def scenarios_running(routines):
@@ -149,7 +149,7 @@ def noticed(program, names):
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("file", help="the file of port/ to change, from "
+    parser.add_argument("file", help="the file of src/c/ to change, from "
                                      "the project's directory")
     parser.add_argument("old", help="the text to replace")
     parser.add_argument("new", help="what to put in its place")
@@ -162,8 +162,8 @@ def main():
     if not (BUILD / "_deps").is_dir():
         sys.exit(f"{BUILD} has to be built first")
     target = COPY / args.file
-    if "port" not in target.relative_to(COPY).parts[:1]:
-        sys.exit(f"{args.file} is not a file of port/")
+    if target.relative_to(COPY).parts[:2] != ("src", "c"):
+        sys.exit(f"{args.file} is not a file of src/c/")
     names = scenarios_running(args.routine) if args.routine \
         else with_goldens()
     if not names:

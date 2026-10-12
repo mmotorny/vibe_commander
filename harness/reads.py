@@ -27,14 +27,14 @@ an index which the program does not keep inside it, where REVIEWED says
 of the C, not by what the compiler made of it: a constant that is handed
 through a variable is known only as far as REVIEWED says.
 
-    reads.py PORT_DIR           every place, with the bytes read there
+    reads.py BUILD_DIR          every place, with the bytes read there
 """
 import re
 import sys
 from collections import defaultdict
 from pathlib import Path
 
-PORT = Path(__file__).resolve().parent.parent / "port"
+C_DIR = Path(__file__).resolve().parent.parent / "src" / "c"
 
 ZERO = "as far as its zero"     # a text
 TABLE = "as it is laid out"     # a box, a dialog, buttons: by their kind
@@ -276,7 +276,7 @@ def places(objects, variables=()):
     names = sorted(by_name, key=len, reverse=True)
     pattern = re.compile(r"\b(" + "|".join(map(re.escape, names)) + r")\b")
     found = []
-    for path in sorted(PORT.glob("*.c")):
+    for path in sorted(C_DIR.glob("*.c")):
         if path.name.endswith("_t.c"):
             continue
         text = re.sub(r"/\*.*?\*/",

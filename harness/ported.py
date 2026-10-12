@@ -16,7 +16,7 @@ below, this also checks that
 
 Compiled code uses more of the stack than the assembly it replaces, so
 the port has a stack many times as long as the original's 256 bytes:
-LenStk in port/resident.c. When the program has been loaded its stack
+LenStk in src/c/resident.c. When the program has been loaded its stack
 holds what its file has there, which is nothing, zeros; how much of that
 is still there, from the bottom up, is looked at every time a step ends
 with the program waiting for a key (see driver.py). A
@@ -69,7 +69,7 @@ STACK_LEFT = 2
 class Batch:
     """Routines translated together."""
     title: str
-    source: str                   # the C file in port/
+    source: str                   # the C file in src/c/
     # The assembly procedures it replaces, and stretches of code between
     # procedures, each by its first label, or by a later one for what
     # stands from there on (see coverage.Listing).

@@ -156,11 +156,11 @@ IGNORED = [
 #   environment is. And the place it was meant for keeps what the last
 #   attempt left there, which is wrong if that attempt found a file and it
 #   was not the program. The port stores the size where it belongs.
-#   (Exec12 of the original; Exec10 in port/resident.c.)
+#   (Exec12 of the original; Exec10 in src/c/resident.c.)
 #
 # - In a line of text, ^A and two hex digits set a colour and ^C and two
 #   hex digits stand for a character: that is the markup of Norton Guides,
 #   and how the original's LnStr counts the cells of a line. Its NgLine,
 #   which writes the line, takes ^A for the character and ^C for the
 #   colour. The port's NgLine takes them as LnStr does. No text of the
-#   program or of its help file has either. (NgLine in port/line.c.)
+#   program or of its help file has either. (NgLine in src/c/line.c.)

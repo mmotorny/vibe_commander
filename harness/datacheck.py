@@ -10,8 +10,8 @@ no machine involved.
 
 The original is the build of the published source that is laid out like
 the shipped binary, build/shareware-layout/VC.COM, which the test
-bytes-match-original holds against that binary. Its listing says where
-every label is. The port is build/port/VC.EXE, and the linker's map says
+asm-bytes holds against that binary. Its listing says where
+every label is. The port is build/c/VC.EXE, and the linker's map says
 where each of its objects landed, static ones too; how long an object
 is, its object file says. Nothing of the port is assembled, and no
 listing of it is read.
@@ -99,7 +99,7 @@ OWN = {
 
 # The tables of the menus' commands. Where the original has the address
 # of a command there, the port has the number of the command: the CMD_ of
-# port/vc.h that has the name of the original's label. So an item that
+# src/c/vc.h that has the name of the original's label. So an item that
 # names another command than the original's fails the test, though no
 # screen shows a table of the menus until its item is chosen.
 COMMAND_TABLES = {"Menu1_T", "Menu2_T", "Menu3_T", "Menu4_T", "MenuS_T",
@@ -123,7 +123,7 @@ _MENUS = ("the C has the lines of the menus in one array and the pages of "
 NAMED_OTHERWISE = {
     **{(dialog, 4): ("is", number,
                      "the routine that a dialog names for Enter and F10 is "
-                     "a number, SUB_ of port/tables.h, by which Dialog "
+                     "a number, SUB_ of src/c/tables.h, by which Dialog "
                      "calls the function")
        for dialog, number in (("DelSe_B", 1), ("StAt1_B", 2), ("StAt2_B", 2),
                               ("Copy2_B", 3), ("Copy1_B", 4))},
@@ -139,9 +139,9 @@ class Problem(Exception):
 
 
 def commands():
-    """The numbers of the commands: the names that port/vc.h has with CMD_
+    """The numbers of the commands: the names that src/c/vc.h has with CMD_
     in an enumeration, as the compiler counts them."""
-    header = Path(__file__).resolve().parent.parent / "port" / "vc.h"
+    header = Path(__file__).resolve().parent.parent / "src" / "c" / "vc.h"
     text = re.sub(r"/\*.*?\*/", "", header.read_text(), flags=re.S)
     numbers = {}
     for body in re.findall(r"\benum\s*{(.*?)}", text, flags=re.S):
@@ -484,7 +484,7 @@ def compare(original, port, name, there, address, length):
             numbers = commands()
             wanted = [numbers[candidate] for candidate in names
                       if candidate in numbers]
-            instead = f"the number of the command {said} in port/vc.h"
+            instead = f"the number of the command {said} in src/c/vc.h"
         else:
             groups = {offset + behind & 0xFFFF: group
                       for candidate in names

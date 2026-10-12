@@ -44,7 +44,7 @@ def main():
     if len(sys.argv) > 1:
         sys.exit(__doc__)
     programs = [setups.original_vc(), setups.Program.load(
-        deps.ROOT / "build" / "port" / "VC.EXE")]
+        deps.ROOT / "build" / "c" / "VC.EXE")]
     with setups.Benches() as benches:
         for country in setups.COUNTRIES:
             ends = [stack_end(program, benches[country])
