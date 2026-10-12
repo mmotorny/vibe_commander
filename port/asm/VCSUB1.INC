@@ -72,26 +72,7 @@
 ;					b3 - F10-Tree
 ;					b4 - disable DialBox
 ; A dialog is C: Dialog_c of port/dialog.c, with the routines of its
-; fields, InpStr, Select and FlipFl. The dialog goes there as its offset,
-; and in CX the caller's DS, where the fields have what they set. The
-; answer comes back in AX, and callers go by the zero flag for AL.
-Dialog	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	MOV	CX,DS
-	MOV	AX,BP
-	CallC	Dialog_c
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	CMP	AL,0
-	RET
-Dialog	ENDP
+; fields, InpStr, Select and FlipFl, which only C code calls.
 
 ; The code segment of the assembly, where the boxes and the dialogs are
 ; that C code reads.

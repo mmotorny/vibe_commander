@@ -23,17 +23,17 @@ the first of them stood. `VCSUB2.INC` was two texts and is gone.
 | File | texts | boxes | dialogs | buttons, colours | tables | code | goes with |
 |---|---|---|---|---|---|---|---|
 | `VC.ASM` | | | | | 2 / 160 | 219 | `main.c`, `start.c` |
-| `VCFUNC.INC` | | | | | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
+| `VCFUNC.INC` | | | | | 2 / 76 | 905 | `keys.c`, `usermenu.c` |
 | `VCMENU.INC` | | | | | 8 / 174 | 495 | `commands.c`, `menu.c` |
-| `VCF1.INC` | | | | | | 192 | `dirfunc.c` |
+| `VCF1.INC` | | | | | | 160 | `dirfunc.c` |
 | `VCCOPY.INC` | | | | | 1 / 10 | 61 | `copy.c` |
 | `VCVIEW.INC` | | | | | | 180 | `view.c` |
 | `VCEDIT.INC` | | | | | | 26 | `edit.c` |
 | `VCMEM.INC` | | | | | | 40 | `memory.c` |
 | `VCFIND.INC` | | | | | | 22 | `find.c` |
-| `VCSUB1.INC` | | | | | | 35 | `dialog.c` |
+| `VCSUB1.INC` | | | | | | 9 | `dialog.c` |
 | `VCSUB3.INC` | | | | | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | | | | | 13 / 420 | 2,359 | |
+| all | | | | | 13 / 420 | 2,226 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -67,10 +67,11 @@ The code is, by what it is there for:
   to where that says, which may be another command.
 - The glue of the main loop in `VC.ASM`: the stubs of `Init00` and
   `Init11`, the eight entries made with `MainC`, `MainGo`, `Exit`.
-- Stubs of routines that other stubs call: `AdrNum`, `NumAdr`, `ChgAdr`
-  and `F20_02` in `VCFUNC.INC`, `Dialog` in `VCSUB1.INC`, `ReDir` and
-  `ReadTre` in `VCSUB3.INC`, `DelTree` in `VCF1.INC`. Those that a
-  dialog names for Enter and F10 are gone: `Dialog` calls the functions.
+- Stubs of routines that other stubs call: `ReDir` and `ReadTre` in
+  `VCSUB3.INC`. Those that nothing called any more are gone, `AdrNum`,
+  `NumAdr`, `ChgAdr`, `F20_02`, `Dialog`, `DirFunc` and `DelTree`, and so
+  are those that a dialog names for Enter and F10: `Dialog` calls the
+  functions.
 - Entries for C: `ReDir_a` in `VC.ASM`; `MemRun_a`, `ResSeg_a` and
   `Release_a` in `VCMEM.INC`; `AsmSeg_a` in `VCSUB1.INC`, with
   `CallPSP`.

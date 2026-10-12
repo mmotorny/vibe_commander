@@ -48,15 +48,6 @@ F54_00:	CallC	F54_00_c		; Change label
 	.DATA
 	ASSUME	CS:DGROUP
 
-;	Return :	   AX - 1 all done, 0 not, 100h to stop
-;			   DS - main data
-DirFunc	PROC	NEAR			; Find files in directory
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR DirFunc_c
-	RET
-DirFunc	ENDP
-
 ; Going through the selected files of a panel is C, and so is the end of
 ; a command that may have changed what is on the disk: FncSel_c, FncExt_c
 ; and FncEx1_c of port/dirfunc.c, which answer 1 if the panels are to be
@@ -77,19 +68,4 @@ FncEx2:	JMP	Init50
 FncMas:	MOV	AX,BX			; Masked files
 	CallC	FncMas_c
 	JMP	FncExt
-
-;			ES:SI - a path on the drive
-;	Return :	 CY=1 - error
-;			   AX - what DOS answered, with CY or without:
-;				^R in a tree goes on with it
-DelTree	PROC	NEAR
-	CMP	ES:ChgTree,0
-	JZ	DelTr5
-DelTr0:	PUSH	DX			; Whether the tree is read again
-	MOV	AX,SI			; by itself or not
-	CallC	DelTr0_c		; DX: not 0 for an error
-	NEG	DX
-	POP	DX
-DelTr5:	RET
-DelTree	ENDP
 

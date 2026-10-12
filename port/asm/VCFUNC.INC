@@ -5,42 +5,6 @@
 ; Of this file, and named by C code or by another file.
 	PUBLIC	AltSr_T
 
-AdrNum	PROC	NEAR
-	PUSH	AX			; Room for the four numbers
-	PUSH	AX
-	PUSH	AX
-	PUSH	AX
-	MOV	BX,SP
-	MOV	AX,DS
-	CallC	AdrNum_c
-	POP	SI
-	POP	DI
-	POP	DX
-	POP	AX
-	MOV	BX,AX
-	RET
-AdrNum	ENDP
-
-NumAdr	PROC	NEAR
-	MOV	AX,DS
-	CALL	FAR PTR NumAdr_c
-	MOV	AX,SI			; What the multiplication left
-	XOR	DX,DX
-	RET
-NumAdr	ENDP
-
-ChgAdr	PROC	NEAR
-	PUSH	DX
-	PUSH	AX
-	MOV	AX,DS
-	CallC	ChgAdr_c
-	MOV	SI,AX
-	MOV	DI,DX
-	POP	AX
-	POP	DX
-	RET
-ChgAdr	ENDP
-
 ; The keys of the panels, from here to F21_00, are C: port/keys.c. A
 ; command is a function there. It gets the panel, which the assembly has
 ; in DS, and returns in AL where the program goes on, a number of CmdNx_T
@@ -165,16 +129,6 @@ CmdIni:	PUSH	SS
 CmdV02:	MOV	DL,1
 	MOV	AL,2
 	JMP	V00_02
-
-; Make the other panel the current one
-;			   DS - WCBseg of the current one
-;	Return :	   DS - WCBseg of the one that is current now
-F20_02	PROC	NEAR
-	MOV	AX,DS
-	CallC	F20_02_c
-	MOV	DS,ES:WCBcrn
-	RET
-F20_02	ENDP
 
 ; Enter, the keys that change the directory and the commands before and
 ; after are C: port/enter.c. F21_10 is where the mouse comes in with a
