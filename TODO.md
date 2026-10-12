@@ -868,17 +868,15 @@ Things that are known and not done. Standing instructions are in
       functions themselves, by their offsets, as it named the labels,
       and calls `SetBrk` through a pointer to a far function.
     - `CallPSP` itself, in `VCSUB1.INC`, is of the part that goes.
-  - `FatErr`, 220 bytes: what DOS calls for a critical error. It is
-    entered with nothing but CS known, takes its error in AX and DI
-    and the device in BP:SI, shows a dialog, and returns the answer in
-    AL by IRET. It finds the main data by a word that the start-up
-    code writes into the code segment, `SecDat`, which `Intr21` reads
-    too. An `__interrupt` function gets and sets those registers, but
-    C code has no word in its code segment to write, and nothing in C
-    sets DS to a segment known only when the program runs: loading DS
-    from where the program keeps the segment is inline assembly, two
-    or three instructions, here and wherever else the program is
-    entered from outside.
+  - `FatErr`, what DOS calls for a critical error, is C, an interrupt
+    function in `port/main.c`. Its texts and its two boxes are still
+    the assembly's, where `Dialog` reads them, and so is `SecDat`, the
+    word that holds the segment of the main data: `port/start.c`
+    writes it, the stub of `Intr21` reads it, and `FatErr` loads DS
+    from it, by the one instruction of inline assembly there. When no
+    assembly is left, that word wants a home that an interrupt function
+    can read with nothing but its code segment or the compiler's group
+    to go by.
 - Ported as they are, in `port/start.c`: see the comments of `Init00`
   and `IniData` there. Three of them reach further:
   - The original takes the two panels of a program that starts without
@@ -991,6 +989,15 @@ Things that are known and not done. Standing instructions are in
     started this one gets the registers as the assembly left them, in
     the port as DOS had them. No program can rely on either. Nothing
     of the bench ends the program but the program.
+- What the critical error does in the original, and in the port after
+  it (`FatErr` in `port/main.c`):
+  - The number of the error is all of DI, of which DOS defines the low
+    byte. A number of 21 or more is "Unknown error.", and so is any
+    whose high byte is not 0: a copy to COM2, which the machine has
+    not, says so under FreeDOS. In `device`.
+  - Where DOS does not allow another try, the box has Ok alone and the
+    call fails; where it does, anything but Retry fails it, Esc too.
+    The program never has DOS end it.
 - The port's handler of INT 21h takes more of the stack of whoever
   calls DOS than the original's: 30 bytes for the registers and the
   second return address, and a few more for its own calls, at every

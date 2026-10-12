@@ -156,12 +156,10 @@ const u8 __far *FndLet(const u8 __far *text);
    of the first panel that is kept while a command runs. */
 extern const u8 __far AltSr_T[];
 extern const u8 __far NoRd_P[];
-extern const u8 __far FatErr[];
 extern const u8 __far CtrlC[];
 extern const u8 __far WCB1sav[];
 #pragma aux AltSr_T "*"
 #pragma aux NoRd_P "*"
-#pragma aux FatErr "*"
 #pragma aux CtrlC "*"
 #pragma aux WCB1sav "*"
 
@@ -1045,7 +1043,136 @@ void RestVct(void)
     RstVc1();
 }
 
-/* Take the critical error of DOS, for FatErr of the assembly, and
+/*--------------------- Fatal error ---------------------
+   What the assembly has for it: the texts, where DS will be on the
+   main data, SecDat, and the two boxes, with Retry and Abort or with Ok
+   alone. The texts and the boxes go to Dialog by their offsets there. */
+extern const u8 __far Err_S[];
+extern const u8 __far OnDr_S[];
+extern const u8 __far OnDv_S[];
+extern const u8 __far Errs_S[];
+extern const u8 __far FatEr_S[];
+extern const u8 __far FtEr1_B[];
+extern const u8 __far FtEr2_B[];
+extern u16 __near SecDat;
+#pragma aux Err_S "*"
+#pragma aux OnDr_S "*"
+#pragma aux OnDv_S "*"
+#pragma aux Errs_S "*"
+#pragma aux FatEr_S "*"
+#pragma aux FtEr1_B "*"
+#pragma aux FtEr2_B "*"
+#pragma aux SecDat "*"
+
+/* What DOS is answered for a critical error. */
+#define ERR_RETRY 1
+#define ERR_FAIL  3
+
+/* A critical error of DOS: `ax` and `code` are what DOS hands over in AX
+   and DI, and `device` is the header of the device. Say which drive or
+   which device and what is wrong, in a box, and ask whether to try
+   again, where DOS allows that; else the box has Ok alone. Returns what
+   DOS is to do: try again, or have its call fail.
+
+   Once a call has been let fail, ErrDat is set, and every error after
+   it fails without a box until whoever called DOS clears that: Intr21.
+   BlocEr does the same for those who want no box at all.
+
+   The clock and the screen blanker are off while the box is up, and
+   nothing is to happen by itself then: AutoTim. */
+static u16 FtErr1(u16 ax, u16 code, const u8 __far *device)
+{
+    u16 assembly = AsmSeg();
+    const u8 __far *from;
+    const u8 __far *text;
+    u8 *to = md.TmpErr + 1;
+    u8 *name;
+    u16 i, answer;
+    u8 clock, delay, page;
+
+    if (md.ErrDat | md.BlocEr)
+        return ERR_FAIL;
+    from = AT(assembly, OFFSET(Err_S) + 1);
+    for (i = 6; i; i--)
+        *to++ = *from++;
+    text = AT(assembly, OFFSET(Errs_S));
+    if (!(device[5] & 0x80)) {          /* a disk */
+        from = AT(assembly, OFFSET(OnDr_S));
+        for (i = 11; i; i--)
+            *to++ = *from++;
+        to[-2] += (u8)ax;
+        if (ax & 0x8000) {
+            text = AT(assembly, OFFSET(FatEr_S));
+            goto FtErr5;
+        }
+    } else {                            /* FtErr2: a device, by its name */
+        from = AT(assembly, OFFSET(OnDv_S));
+        for (i = 10; i; i--)
+            *to++ = *from++;
+        name = to;
+        from = device + 10;
+        for (i = 8; i; i--)
+            *to++ = *from++;
+        *to = ' ';
+        for (to = name, i = 9; i; i--)
+            if (*to++ == ' ')
+                break;
+        to--;
+        *to++ = ':';
+        *to = 0;
+    }
+    if (code != 0) {                    /* FtErr3 */
+        if (code >= 0x15)
+            code = 0x15;
+        do
+            for (i = 80; i; i--)
+                if (*text++ == 0)
+                    break;
+        while (--code);
+    }
+FtErr5:
+    clock = md.Clock;
+    md.Clock = 0;
+    delay = md.BlDelay;
+    md.BlDelay = 0;
+    page = md.HlpPage;
+    *(u16 *)&md.AutoTim = 0xFFFF;
+    if (ax & 0x1000)
+        answer = (u8)Dialog(OFFSET(FtEr1_B), (u16)(u32)text, 0, 0, MAIN_SEG)
+                 == 0 ? ERR_RETRY : ERR_FAIL;
+    else {
+        Dialog(OFFSET(FtEr2_B), (u16)(u32)text, 0, 0, MAIN_SEG);
+        answer = ERR_FAIL;
+    }
+    md.Clock = clock;                   /* FtErr8 */
+    md.BlDelay = delay;
+    md.HlpPage = page;
+    if (answer != ERR_RETRY)
+        md.ErrDat = 1;
+    return answer;
+}
+
+/* Put DS on the main data. An interrupt function is entered with DS
+   anywhere, and the compiler puts it on its own group, which is the
+   assembly's and where SecDat is: the segment of the main data, which
+   the program asks DOS for when it starts and after every command. C
+   has no words for loading a segment register, and the compiler takes
+   none for an argument: this is the one instruction. */
+static void DataSeg(u16 segment);
+#pragma aux DataSeg = "mov ds,ax" parm [ax] modify exact []
+
+/* INT 24h: what DOS calls for a critical error, with the error in AX and
+   DI and the device at BP:SI, on the stack of whoever called DOS, which
+   is the program's. It answers in AL, and every other register comes
+   back as it was. */
+void __interrupt __far FatErr(struct Saved r)
+{
+    DataSeg(SecDat);
+    r.ax = FtErr1(r.ax, r.di, AT(r.bp, r.si));
+}
+#pragma aux FatErr "*"
+
+/* Take the critical error of DOS, for FatErr, and
    Ctrl-Break, for a routine that only returns, and note who had them.
    Returns where that routine is in the part of the program that stays in
    the memory. */
@@ -1053,7 +1180,7 @@ u16 HookVct(void)
 {
     md.ErrVct = Dos35(0x3524);
     md.BrkVct = Dos35(0x351B);
-    SetVect(0x24, AT(AsmSeg(), OFFSET(FatErr)));
+    SetVect(0x24, (const u8 __far *)(void __far *)FatErr);
     SetVect(0x1B, AT(ResSeg(), OFFSET(CtrlC)));
     return OFFSET(CtrlC);
 }

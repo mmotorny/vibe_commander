@@ -187,11 +187,9 @@ extern const u8 __near Vers_S[];
 #define REC_FIRST   15
 #define REC_PARAS   ((2 + 12 + 1 + 5 * 256 + 4 + 2 + 15) >> 4)
 
-/* The registers as the compiler's interrupt functions save them on the
-   stack, and the return address that an interrupt leaves there. */
-struct Saved {
-    u16 gs, fs, es, ds, di, si, bp, sp, bx, dx, cx, ax;
-};
+/* The return address that an interrupt leaves on the stack, behind the
+   registers that an interrupt function of the compiler saves there:
+   struct Saved of vc.h. */
 struct Frame {
     u16 ip, cs, flags;
 };

@@ -1848,6 +1848,20 @@ SCENARIOS = {
             "Ctrl+o",
         )),
 
+    "device": Scenario(
+        "A critical error of DOS on a device that is no disk: a file "
+        "copied to COM2, which the machine has not. The box names the "
+        "device, tried again and then given up",
+        steps=(
+            "Down Down Down",             # onto readme.txt
+            "F5",
+            '"com2" Enter',               # Error on device COM2:
+            "Enter",                      # Retry: the same again
+            "Right",
+            "Enter",                      # Abort
+            "Down",
+        )),
+
     "user-menu": Scenario(
         "The user menu, of F2 and Shift+F2: the main one and that of a "
         "directory, its keys, lines of every kind, a menu that names "

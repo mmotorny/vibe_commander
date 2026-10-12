@@ -101,7 +101,7 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 ; not ready, the routine for the critical errors of DOS, and in the part
 ; that stays in the memory the routine for Ctrl-Break and the copy of the
 ; first panel, all of which the C code of the main loop names.
-	PUBLIC	AltSr_T, NoRd_P, FatErr, WCB1sav
+	PUBLIC	AltSr_T, NoRd_P, WCB1sav
 ; What port/resident.c keeps of the interrupts and of the programs that
 ; have stayed in the memory: its data is laid out here, in RDATA.
 	PUBLIC	IntTab, SavePtr, Vect21, Vect22, Vect27, NameBuf, TrnAdr
@@ -858,116 +858,10 @@ OkMn_D	DB	4, 0
 SecDat	DW	0
 
 	.CODE
-FatErr:	PUSH	DS
-	PUSH	ES
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	CLD
-	MOV	DS,CS:SecDat
-	PUSH	DS
-	POP	ES
-	MOV	BL,DS:ErrDat
-	OR	BL,DS:BlocEr
-	JZ	FtErr1
-	MOV	AL,3
-	JMP	FtErr9
-FtErr1:	PUSH	AX
-	PUSH	ES
-	PUSH	DI
-	MOV	DS,BP
-	MOV	BX,SI
-	TEST	BYTE PTR DS:[BX+5],80h
-	PUSH	CS
-	POP	DS
-	MOV	DI,OFFSET TmpErr+1
-	MOV	SI,OFFSET Err_S+1
-	MOV	CX,6
-	REP	MOVSB
-	JNZ	FtErr2
-	MOV	SI,OFFSET OnDr_S
-	MOV	CL,11
-	REP	MOVSB
-	ADD	ES:[DI-2],AL
-	TEST	AH,80h
-	JZ	FtErr3
-	POP	DI
-	MOV	DI,OFFSET FatEr_S
-	XOR	AX,AX
-	JMP	FtErr5
-FtErr2:	MOV	SI,OFFSET OnDv_S
-	MOV	CL,10
-	REP	MOVSB
-	MOV	DS,BP
-	LEA	SI,[BX+10]
-	MOV	CL,8
-	PUSH	DI
-	PUSH	CX
-	REP	MOVSB
-	MOV	AL,' '
-	STOSB
-	POP	CX
-	POP	DI
-	INC	CX
-	REPNE	SCASB
-	DEC	DI
-	MOV	AX,':'
-	STOSW
-FtErr3:	PUSH	CS
-	POP	ES
-	POP	CX
-	XOR	AX,AX
-	MOV	DI,OFFSET Errs_S
-	JCXZ	FtErr5
-	CMP	CX,15h
-	JB	FtErr4
-	MOV	CX,15h
-FtErr4:	PUSH	CX
-	MOV	CL,80
-	REPNE	SCASB
-	POP	CX
-	LOOP	FtErr4
-FtErr5:	POP	ES
-	POP	CX
-	PUSH	ES
-	POP	DS
-	XOR	BX,BX
-	XCHG	BL,DS:Clock
-	XCHG	BH,DS:BlDelay
-	MOV	CL,DS:HlpPage
-	DEC	AX
-	MOV	DS:AutoTim.Lo,AX
-	MOV	BP,OFFSET FtEr1_B
-	TEST	CH,10h
-	JNZ	FtErr6
-	MOV	BP,OFFSET FtEr2_B
-FtErr6:	MOV	DX,DI
-	CALL	Dialog
-	TEST	CH,10h
-	JZ	FtErr7
-	CMP	AL,0
-	MOV	AL,1
-	JE	FtErr8
-FtErr7:	MOV	AL,3
-FtErr8:	MOV	DS:Clock,BL
-	MOV	DS:BlDelay,BH
-	MOV	DS:HlpPage,CL
-	CMP	AL,1
-	JE	FtErr9
-	MOV	DS:ErrDat,1
-FtErr9:	CBW
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	ES
-	POP	DS
-	IRET
+; C: FatErr of port/main.c, an interrupt function of the compiler's. Its
+; texts and its boxes stay here, where Dialog reads them, and SecDat,
+; which is where it finds the main data.
+	PUBLIC	Err_S, OnDr_S, OnDv_S, Errs_S, FatEr_S, FtEr1_B, FtEr2_B
 
 ;-------------------- Not ready error ------------------
 ;			   AL - Drive letter

@@ -90,7 +90,9 @@ loop that takes a key
 and goes to its command is C, with what the mouse does at the panels,
 and so are what it does on the way: drawing the two panels and reading
 what they show when that has changed, the box that asks for another
-drive when a disk cannot be read, and saving the setup when it has
+drive when a disk cannot be read, the box of DOS's critical error, which
+names the drive or the device and asks whether to try again, and saving
+the setup when it has
 changed; and leaving the program. What the program does once it has
 been started, and again whenever a command has run, is C: reading the
 setup file and the main extension file, or taking the defaults, the
@@ -287,7 +289,10 @@ ended the program by itself. And nine instructions are the interrupt by
 which the COMMAND.COM in the memory runs a command, INT 2Eh: it comes
 back with no stack and no data segment, so both are set there, from the
 code segment, before any compiled instruction runs, and the program goes
-on in a function of its own on an empty stack.
+on in a function of its own on an empty stack. `port/main.c` has one
+instruction: where DOS calls the program for a critical error, DS is
+loaded with the segment of the main data, which is known only when the
+program runs.
 
 The halves are linked into one program, `VC.EXE`, which is not built the
 way a C program usually is. It still loads and starts like the `.COM` file

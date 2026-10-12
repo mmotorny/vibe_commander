@@ -1017,6 +1017,27 @@ BATCHES = [
                 "when it begins"),
         },
     ),
+    Batch(
+        title="The critical error of DOS: the box that names the drive "
+              "or the device and asks whether to try again",
+        source="main.c",
+        # FatErr is an interrupt function, which begins by loading DS with
+        # a number that is relocated: the test cannot know its first
+        # instructions for code that ran, so it is not named. The box is
+        # in the screens of the scenarios.
+        routines=("FatErr",),
+        functions=(),
+        unreached={
+            **dict.fromkeys(
+                (0x90C9, 0x90CA, 0x90CD, 0x90CF),
+                "FtErr1, for an error in the file allocation table of "
+                "a disk, as DOS hands it over: the disks of the bench "
+                "are whole"),
+            0x9128: "FtErr5, for an error that DOS does not allow to be "
+                    "tried again, where the box has Ok alone: FreeDOS "
+                    "allows it for every error that the bench can make",
+        },
+    ),
 ]
 
 

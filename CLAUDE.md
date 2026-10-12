@@ -677,6 +677,14 @@ port.
   none, the linker makes `push cs` and a near call of it.
 - The block of numbers that `tools/mkexe.c` fills in is at 100h, the
   first thing behind the PSP, in `RHEAD`.
+- An `__interrupt` function of the part that goes has DS on the
+  compiler's group when its first statement runs, and that group is the
+  assembly's: its segment, where `SecDat` is. `FatErr` of `port/main.c`
+  reads `SecDat` there as a near word and puts DS on the main data by
+  `DataSeg`, a `#pragma aux` of one instruction, `mov ds,ax`, with
+  nothing in its `modify` list: DS in a `parm` or a `modify` list is
+  "Illegal register modified". Everything behind it is C as anywhere,
+  `md` and the functions of other files.
 - A function that does not return is `#pragma aux name aborts`; the
   compiler then ends the caller there.
 - A far function of `port/resident.c` that the part that goes calls
@@ -987,7 +995,8 @@ with it is less obvious:
   nothing: `(const u8 __far *)md.ErrVct`.
 - DOS, the BIOS and the mouse driver are called in `port/dos.c` and
   nowhere else, and that file alone has inline assembly, but for the
-  entries of the interrupts in `port/resident.c`: `Int21d` and
+  entries of the interrupts and INT 2Eh in `port/resident.c` and one
+  instruction that loads DS in `port/main.c`: `Int21d` and
   `Int21f` for DOS, `Int10` and `TopView` for the screen, `Int16` for
   the keyboard, `Int2F`, `Int33` and `MousAt` for the mouse, and `Int28`
   and `DvPause`, by which the program says that it is idle, all

@@ -428,6 +428,12 @@ void DvPause(void);
 #pragma aux Int28   DOS_NAME __far modify exact [ax]
 #pragma aux DvPause DOS_NAME __far modify exact [ax]
 
+/* The registers as an interrupt function of the compiler saves them on
+   the stack and puts them back: its first parameter. */
+struct Saved {
+    u16 gs, fs, es, ds, di, si, bp, sp, bx, dx, cx, ax;
+};
+
 /* A line as the assembly hands it over: the registers that describe it,
    pushed in this order by CallLine in port/asm/VC.ASM. */
 struct LineArgs {
