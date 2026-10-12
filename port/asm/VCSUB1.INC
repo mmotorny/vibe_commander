@@ -129,6 +129,7 @@ Cursor1	PROC	NEAR
 	POP	AX
 	RET
 Cursor1	ENDP
+	FromC	Cursor1
 
 ;-------------- Get cursor size & set it ---------------
 ;	Return :	CX - cursor size
@@ -465,6 +466,7 @@ SftEGA	PROC	NEAR
 SfEGA1:	POP	AX
 	RET
 SftEGA	ENDP
+	FromC	SftEGA
 
 ;---------------------- Save window --------------------
 ;			BH,BL - begin
@@ -1112,7 +1114,18 @@ Dialog	ENDP
 ; FromC in VC.ASM, and port/dialog.c for what they take and return).
 	FromC	PutMnu
 	FromC	PutKey
-	FromC	EdLin, <MOV AX,DX>	; Where the cursor is, in AX
+
+; EdLin for C code: where the cursor is comes back in AX, and DX is not 0
+; if the routine set the carry flag, for a line or a cursor that changed.
+	PUBLIC	EdLin_a
+EdLin_a	PROC	FAR
+	PUSH	DS
+	POP	ES
+	CALL	EdLin
+	MOV	AX,DX
+	SBB	DX,DX
+	RET
+EdLin_a	ENDP
 
 ; The code segment of the assembly, where the boxes and the dialogs are
 ; that C code reads.
@@ -1600,6 +1613,16 @@ TstDrv	PROC	NEAR
 	POP	DX
 	RET
 TstDrv	ENDP
+
+; C code asks whether there is a drive of the letter AL: 1 in AX for ZR.
+	PUBLIC	TstDrv_a
+TstDrv_a PROC	FAR
+	CALL	TstDrv
+	MOV	AX,0			; This leaves the flags
+	JNE	TstDrA
+	INC	AX
+TstDrA:	RET
+TstDrv_a ENDP
 
 ;--------------- Int 21h with fatal error --------------
 Intr21	PROC	NEAR

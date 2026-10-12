@@ -95,7 +95,12 @@ dialogs, the tree to choose the target from, and the renaming of a
 directory of a tree panel, and those that make a directory, delete, set
 attributes and change the volume label. Going through the selected files
 of a panel is still assembly, and so is what the viewer and the editor
-do with their keys. The dialogs are C: a box with its lines of text, the fields of a
+do with their keys. At the panels the user menu is C, with what makes
+the commands of a line of a menu or of an extension file and writes the
+list of the selected files for them, and so are the command line, with
+Esc and the names of the selected files and the paths of the panels put
+into it, the history of commands in its box, the speed search, and the
+box that asks for the drive of a panel. The dialogs are C: a box with its lines of text, the fields of a
 dialog, a line to type
 into, a group to choose from, a box to tick and a line of buttons, with
 the keys and the mouse that each takes, and what the fields hold handed

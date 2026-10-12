@@ -420,6 +420,38 @@ port.
   file calls it: `FndMove`, `FndCurs` and `F38_70`. Take such a function
   out of the batch's `functions` in `harness/ported.py`, which are those
   that the assembly calls.
+- The commands of `VCFUNC.INC` from `F80_00` on have stubs that jump on
+  by themselves, two ways each: `F32_00` to `Func04` or `F21_30`,
+  `F68_00` to `Func04` or `F21_25`, `F80_00` to `Func05` or `Func01`,
+  `F62_01` to `Func04` or `M06_10`, with the panel in DS and the item of
+  the menu in CL for that. Where the place jumped to takes the current
+  panel in DS, `Func01`, `Func05`, `Func12` and `F11_00`, the stub saves
+  DS around the call. A label that others jump to, `F73_00`, `Run_00`,
+  stays as such a stub.
+- A name given to `harness/ported.py` takes all that stands from its
+  label to the next procedure: `F80_00` takes `F30_00` and `F42_00` with
+  it, `F81_00` the commands down to `Run_00`, and `F61_00` the history
+  behind the box of the drives. Such a stretch is listed once all of it
+  is C or stub; what is left of it in the assembly is said in `TODO.md`.
+- A piece of a command that only hands registers to routines which are
+  still assembly, and takes the panel in DS for them, can stay assembly
+  as an entry that the C calls: `F77_10_a`, of the speed search, calls
+  `Search` and `F00_50`.
+- An entry that hands back the cursor of a line and the carry flag:
+  `EdLin_a` has the column in AX and the flag in DX. C code that wants
+  only the column declares it with `value [ax]` and DX among what is
+  modified.
+- A routine that reads DS, as `ClsLine` reads `CrntCol`, and that the
+  assembly once calls with DS left elsewhere by a jump out of a loop,
+  gets an entry that takes DS as a number: `ClsLine_a`. `Run_00` leaves
+  DS on the panel when the commands have no room for a name.
+- What a command leaves in DX and BP goes round the main loop to the
+  next command, and a command that is C does not leave what the
+  assembly left there. BX does not get round: `Func05` loads it, but
+  for the first time round after the program has started or come back
+  from a command of DOS, when it is what the start left. So Shift-F6,
+  which goes by BX and DX together, does not find both 0 because of
+  what a command left in DX.
 
 ### C for the port
 
@@ -482,6 +514,15 @@ with it is less obvious:
   was set: `*(u16 STACK *)&regs.name`, as `DX_OF` in `port/dirfunc.c`.
 - `INC AX` and `CBW` on what DOS left in AL is
   `(u16)(signed char)(u8)(value + 1)`.
+- A text without its zero byte is an array of its length:
+  `static const u8 CODE Hist_S[9] = " History ";`.
+- `far` and `near` are words of the compiler: a variable of that name
+  is refused with "Invalid declarator", and every use of it with a
+  dozen errors more. What `MvsBw` and `MvsColr` return is a far pointer;
+  kept in a near one it is "Pointer truncated", which stops the build.
+- The scratchpad directory of a session is one for all the agents that
+  run side by side: a file there may be another agent's by the same
+  name. Keep temporary files in the checkout's `build/`.
 
 ## A run of batches
 

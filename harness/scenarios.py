@@ -367,6 +367,41 @@ out again (show.py --changes is how):
     Up gets to, shows that directory; with the tree in the current
     panel the other panel gets it. Go to a file of A: from C: changes
     the drive of the panel.
+  - F2 shows the menu of the current directory, its file vc.mnu, or
+    else the main one, of D:\\VC, which Shift+F2 shows at once: F1 is
+    its line "Archives...", another menu, F2 "Format floppy disk..." and
+    F4 "Edit file", whose command, ne, is not there. A key of a line
+    comes before what the key means otherwise: F1 is the help and F10
+    leaves only in a menu that has no such line. A menu file is made in
+    the editor, Shift+F4 and its name: for vc.mnu, vc.ext and vcview.ext
+    the editor opens at once, for another name it asks first, and Enter
+    is "New-file". A line of the menu begins at the margin, "a:" or
+    "f3:" and what is shown; its commands begin with Tab, and a comment
+    is one only at the margin: behind a Tab it is run. A command that is
+    the name of a menu file shows that menu.
+  - The list file that "!@" stands for is D:\\VC\\vc.lst: the bench sets
+    no TEMP. Run with the cursor on "..", or in the tree, it beeps. F3 on
+    a file runs the command that a vcview.ext of the directory has for
+    its kind, with the name as it was given, and Shift+F3 does for a
+    name with a path; Alt+F3 is always the program's own viewer.
+    "F9 o a" switches Auto menus: the menu comes back after a command.
+  - Alt with a letter or a digit begins the speed search of a panel of
+    files or of the tree; letters go on with it, Backspace takes one
+    back, Ctrl+Enter goes to the next name, Esc ends it, and any other
+    key ends it and is acted on. Ctrl+[ and Ctrl+] put the paths of the
+    left and the right panel into the command line, and Ctrl+i the
+    names of the selected files, or of the one under the cursor; Esc
+    empties that,
+    and with nothing in it switches the panels off and on, unless "F9 o
+    o", "Down Space" has it otherwise. The command line takes 123
+    characters; a beep there scrolls nothing, the cursor being on the
+    screen.
+  - Alt+F8 is the history: Enter runs the command under the cursor,
+    Ctrl+Enter only puts it into the command line, a letter goes to the
+    next command that begins with it. The box of Alt+F1 and Alt+F2 opens
+    with the cursor on the drive that the panel has, so from C: "Right
+    Enter" is D:. Do not have the Info show D:, as Ctrl+l does next to a
+    panel on D: its free bytes follow the size of the program.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -867,6 +902,265 @@ SCENARIOS = {
             "Esc",
             "F10",
             "Enter",                      # back at the DOS prompt
+        )),
+
+    "user-menu": Scenario(
+        "The user menu, of F2 and Shift+F2: the main one and that of a "
+        "directory, its keys, lines of every kind, a menu that names "
+        "another, and menu files that are not there, empty, or no file",
+        steps=(
+            "F9 o n",                     # no mini status: no time of day
+            "F2",                         # no menu here: the main one
+            "Down", "Down", "Down",       # round the end
+            "Up", "Up",                   # and round the top
+            "End", "Home", "PgDn", "PgUp",
+            "Home",                       # where it is already
+            "x",                          # the letter of no line
+            "F10",                        # leaves: no line has that key
+            "Shift+F2",                   # the main menu, asked for
+            "F1",                         # a line's key: another menu
+            "F1",                         # no line's key there: the help
+            "Esc",
+            "Esc",
+            "F9 o o",
+            "Down Down Down Down Down Space Enter",   # keys are kept
+            "F7", '"d.mnu" Enter',        # a directory named like a menu
+            "Shift+F4",                   # a menu of every kind of line
+            '"l.mnu" Enter', "Enter",
+            '"f11:abcdefghijkl"',
+            "Ctrl+y Ctrl+u Ctrl+u Up Up End Del",  # a line of 32 characters
+            "Ctrl+y Ctrl+u Ctrl+u Up Up End Del",   # 64: too wide
+            "Down Home",
+            'Tab "d.mnu" Enter',          # its command: the directory
+            '"\'c" Enter',                # a comment
+            '"f10:ten" Enter',
+            'Tab "x.mnu" Enter',          # a menu that is not there
+            '"F12:" Space "twelve" Enter',
+            'Tab "nul.mnu" Enter',        # one with nothing in it
+            '"f2:" Tab "two" Tab "x" Enter',  # tabs in a line
+            'Tab Enter',                  # an empty command, and
+            '"\'no" Enter',               # a comment, before the command
+            'Tab "vc.mnu" Enter',
+            '"f13:no" Enter',             # no keys, these
+            '"g:" Enter',
+            '"end"',                      # the file ends in its last line
+            "F2 Esc",
+            "Shift+F4", '"vc.mnu" Enter',  # the menu of this directory
+            '"l:b" Enter Tab "l.mnu" Enter',  # narrower than a menu gets
+            '"n" Enter',                  # a line without a command
+            "F2 Esc",
+            "F2",                         # found here now
+            "F1",                         # the help
+            "Esc",
+            "Down Enter",                 # the line without a command
+            "F2",
+            "l",                          # the other menu, by its letter
+            "End",
+            "Enter",                      # the last line: nothing to run
+            "F2 Enter",
+            "F10",                        # a menu that is not there
+            "Enter",
+            "F2 Enter",
+            "F12",                        # an empty one
+            "Esc",
+            "F2 Enter",
+            "Enter",                      # a directory: nothing is said
+            "F2 Enter",
+            "F2",                         # back to the first menu
+            "Esc",
+            "F9 f Down Enter",            # by the menu bar
+            "Esc",
+            "Alt+F9",                     # 50 lines
+            "F2 Enter",
+            "Esc",
+            "Alt+F9",
+            "Home Down Enter",            # into DOCS
+            "F7", '"vc.mnu" Enter',       # a directory where a menu is
+            "F2",                         # looked for: the main one
+            "Esc",
+            '"del" Space "d:\\vc\\vc.mnu"',
+            "Enter",
+            "F2",                         # nor is that there
+            "Esc",
+        )),
+
+    "user-menu-run": Scenario(
+        "Commands of the user menu: what stands for the file, its drive "
+        "and its path, the list of the selected files, with the tree in "
+        "the panel and with the panels off, the menu that comes back by "
+        "itself, and the command of a viewer for a kind of file",
+        steps=(
+            "F9 o n",                     # no mini status: no time of day
+            "F9 o o",
+            "Down Down Down Down Down Space Enter",   # keys are kept
+            "Shift+F4", '"vc.mnu" Enter',
+            '"a:" Tab "all" Enter',
+            'Tab "echo" Space "!.!" Space "!!"',
+            'Space "!:" Space "!\\" Space "!" Enter',
+            'Tab "echo" Tab "t" Enter',   # a second one, with a tab
+            '"f3:list" Enter',
+            'Tab "@echo" Space "!@" Enter',
+            '"\'no" Enter',
+            'Tab "ver" Enter',
+            "F2 Esc",
+            "F2",
+            "a",                          # on "..": the name is two dots
+            "Ctrl+o", "Ctrl+o",
+            "Down Down Down",             # onto a file
+            "F2 a",
+            "Ctrl+o", "Ctrl+o",
+            "F2 F3",                      # the list file, of this one
+            "Ctrl+o", "Ctrl+o",
+            "Up Up Ins",                  # a directory selected,
+            "Down Ins Ins",               # and two files
+            "F2 F3",                      # the list of them
+            "Ctrl+o", "Ctrl+o",
+            '"type" Space "d:\\vc\\vc.lst"',
+            "Enter",
+            "Ctrl+o", "Ctrl+o",
+            "Ctrl+m",                     # what was selected is so again
+            "F9 o a",                     # Auto menus
+            "F2 a",                       # the menu comes back by itself
+            "Esc",
+            "F9 o a",
+            "Shift+F2",                   # the main menu
+            "F4",                         # its command is not there
+            "Ctrl+o", "Ctrl+o",
+            "Shift+F4",                   # a viewer for a kind of file
+            '"vcview.ext" Enter',
+            '"txt:" Tab "echo" Space "!.!" Space "!"',
+            "F2 Esc",
+            "Up Up",
+            "F3",                         # the file, as it is viewed
+            "Ctrl+o", "Ctrl+o",
+            "Shift+F3",                   # and one named with a path
+            '"..\\work\\hello.txt" Enter',
+            "Ctrl+o", "Ctrl+o",
+            "F9 l t",                     # the tree: no file to name
+            "F2 a",
+            "Ctrl+o", "Ctrl+o",
+            "F2 F3",                      # and none to list: a beep
+            "Ctrl+o", "Ctrl+o",
+            "F9 l Enter",                 # files again
+            "Ctrl+o",                     # the panels off
+            "F2",                         # the menu over what DOS shows
+            "a",
+            "Ctrl+o",
+        )),
+
+    "command-line": Scenario(
+        "The command line: typing into it, Esc, the selected files and "
+        "the paths of the panels put into it, and the speed search, which "
+        "Alt and a letter start in a panel of files and in the tree",
+        steps=(
+            '"dir"',                      # typed into the command line
+            "Backspace",                  # and edited there
+            "Esc",                        # which Esc empties
+            "Esc",                        # nothing in it: the panels go
+            "Esc",                        # and come back
+            "Ctrl+i",                     # the file of the cursor: not ".."
+            "Down Ctrl+i",                # a directory, with a mask
+            "Down Down Ctrl+i",           # a file
+            "Ins Ins",
+            "Ctrl+i",                     # the two that are selected
+            "Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i Ctrl+i",
+            "Ctrl+m",                     # until no room; selected again
+            "Esc",
+            "Home",
+            "Ctrl+[",                     # the path of the left panel
+            "Ctrl+]",                     # the right one is the Info
+            "Esc",
+            "Ctrl+l",                     # two panels of files
+            "Ctrl+]",                     # the root: no backslash more
+            "Ctrl+[",
+            "Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[",
+            "Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[",
+            "Ctrl+[",                     # no room for it: a beep
+            "Esc",
+            "Alt+r",                      # the speed search: readme
+            "u",                          # run
+            "x",                          # no such name
+            "Backspace",                  # r again
+            "Ctrl+Enter",                 # the next of them, and round
+            "Ctrl+Enter",
+            "Alt+e",                      # with Alt as without
+            "Esc",                        # leaves it
+            "Alt+d",                      # DOCS
+            "Alt+a",                      # data
+            "Up",                         # leaves it and is acted on
+            "Alt+s",
+            "Enter",                      # likewise: into SRC
+            "Alt+z",                      # nothing there by that name
+            "Esc",
+            "Ctrl+PgUp",
+            "F9 l t",                     # the tree
+            "Ctrl+i",                     # has no files for the command line
+            "Alt+s",                      # SRC is the next from here
+            "Ctrl+Enter",                 # STAMPS
+            "Ctrl+Enter",                 # SUB
+            "t",                          # ST: STAMPS
+            "Esc",
+            "Ctrl+[",                     # the directory of the tree
+            "Esc",
+            "F9 o o",
+            "Down Space Enter",           # Esc no longer hides the panels
+            "Esc",
+        )),
+
+    "history-drives": Scenario(
+        "The history of commands in its box, and the box that asks for "
+        "the drive of a panel",
+        steps=(
+            "Alt+F8",                     # the history: nothing in it yet
+            "Esc",
+            '"ver"', "Enter",
+            '"echo" Space "one"', "Enter",
+            '"echo" Space "two"', "Enter",
+            '"echo" Space',
+            "Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[ Ctrl+[",
+            "Enter",                      # a command of 77 characters
+            "Alt+F8",                     # wider than the box gets
+            "Up", "Up", "Up", "Up",       # round the top
+            "Down", "Down",               # and round the end
+            "Home", "End", "PgUp", "PgDn",
+            "Home", "Home",
+            "v",                          # the next that begins with it
+            "e", "e", "e",                # and round
+            "x",                          # none does
+            "Ctrl+Enter",                 # into the command line
+            "Esc",
+            "Alt+F8",
+            "Up Up",
+            "Enter",                      # run again
+            "Ctrl+o", "Ctrl+o",
+            "Alt+F8",
+            "F10",
+            "Alt+F9",                     # 50 lines
+            "Alt+F8",
+            "Esc",
+            "Alt+F9",
+            "Alt+F1",                     # the drive of the left panel
+            "Right", "Right", "Right",    # round the end
+            "Left", "Left",               # and round the start
+            "Home", "End", "Space", "Backspace",
+            "z",                          # no such drive
+            "Esc",
+            "Alt+F1",
+            "F10",
+            "Alt+F1",
+            "Enter",                      # the drive it has
+            "Alt+F1",
+            "a",                          # by its letter
+            "Alt+F2",                     # the right panel: the Info goes
+            "Right Enter",                # D:
+            "Tab",
+            "Alt+F1",                     # of the panel that is not current
+            "c",
+            "Alt+F2",
+            "a",                          # the right one on A: as well
+            "Ctrl+l",                     # the Info again, on the left
+            "Alt+F1",                     # it becomes files
+            "Enter",
         )),
 
     "stamps": Scenario(

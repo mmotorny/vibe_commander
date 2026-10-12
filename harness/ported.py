@@ -574,6 +574,74 @@ BATCHES = [
         },
     ),
     Batch(
+        title="The user menu and the commands of its lines, the command "
+              "line, the history, the speed search, and the box for the "
+              "drive of a panel",
+        source="usermenu.c, cmdline.c and drive.c",
+        # F80_00 is Ctrl+I, with F10 and Shift+F2 behind it; F61_00 the
+        # box of the drives, with the history behind it; and F81_00 the
+        # command line and the speed search, with what makes the
+        # commands of a line behind them.
+        routines=("F80_00", "F42_10", "F32_00", "F32_60", "F32_70",
+                  "F61_00", "F68_30", "F81_00", "FileLst"),
+        functions=("F80_00_c", "F32_00_c", "Run_00_c", "F62_01_c",
+                   "F68_00_c", "F82_01_c", "F74_00_c", "F73_00_c",
+                   "F77_00_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x20AD, 0x20B0, 0x20B3, 0x20B5, 0x20B7, 0x20BA, 0x212F,
+                 0x2130, 0x2132, 0x2135, 0x2137, 0x2139, 0x213C, 0x213E,
+                 0x2140, 0x2142, 0x2144, 0x2146, 0x2148, 0x214A, 0x214C,
+                 0x214E, 0x2151, 0x2155, 0x2157, 0x2158, 0x2159, 0x215D,
+                 0x2161, 0x2163, 0x2166, 0x2167, 0x2168, 0x216A, 0x216C,
+                 0x216E, 0x2171, 0x2172, 0x2174, 0x2176, 0x2178, 0x217A,
+                 0x217C, 0x217E, 0x217F, 0x2180, 0x2182, 0x2186, 0x2189,
+                 0x218A, 0x218B, 0x218D, 0x218F, 0x2190, 0x2192, 0x2193,
+                 0x2195, 0x2197, 0x2199, 0x219A, 0x219C, 0x219D, 0x219E,
+                 0x219F, 0x21A3, 0x21A5, 0x21A8, 0x21AA, 0x21AD, 0x21AE,
+                 0x21AF, 0x21B0, 0x21B1, 0x21B3, 0x21B5, 0x21B6, 0x21B8,
+                 0x21BA, 0x21BD, 0x21BF),
+                "The user menu, for the mouse, with all of F32_70: the "
+                "bench has none"),
+            0x2201: "The box of the drives, for a DOS that cannot say "
+                    "which letter a floppy drive goes by",
+            0x2245: "The box of the drives, for more drives than fit a "
+                    "box as wide as its title: the bench has three",
+            **dict.fromkeys(
+                (0x2351, 0x2353, 0x2356, 0x2358, 0x235A, 0x235D, 0x235F,
+                 0x2361, 0x2364, 0x2366, 0x2367, 0x2368, 0x236A, 0x236D,
+                 0x236F, 0x2371, 0x2373, 0x2375, 0x2377, 0x2379, 0x237C,
+                 0x237E, 0x2380, 0x2381, 0x2382, 0x2385, 0x2387, 0x2389,
+                 0x238A, 0x238B, 0x238D, 0x238F, 0x2390, 0x2391, 0x2392,
+                 0x2394, 0x2395, 0x2396, 0x2398, 0x239A, 0x239D, 0x239F,
+                 0x23A2, 0x23A4, 0x23A6, 0x23A7, 0x23A8, 0x23AA, 0x23B1,
+                 0x23B3, 0x23B5, 0x23B7, 0x23B9, 0x23BB, 0x23BD, 0x23BF,
+                 0x23C2, 0x23C5, 0x23C7, 0x23C9, 0x23CC, 0x23CE, 0x23CF,
+                 0x23D0, 0x23D2, 0x23D4, 0x23D6, 0x23D8, 0x23DA, 0x23DC,
+                 0x23DD, 0x23DE, 0x23E2, 0x23E5, 0x23E8, 0x23E9, 0x23EA),
+                "The box of the drives, for the mouse"),
+            **dict.fromkeys(
+                (0x2475, 0x2477, 0x247A),
+                "The box of the drives, for a drive that is not ready: "
+                "the bench has none"),
+            **dict.fromkeys(
+                (0x25D4, 0x25D7, 0x25DA, 0x25DC, 0x25DE, 0x25E0, 0x2618),
+                "The history, for the mouse"),
+            0x2714: "F75_00, for the key that follows the cursor of the "
+                    "tree arriving when the panel is no tree: Input "
+                    "makes that key only for a tree",
+            **dict.fromkeys(
+                (0x29D6, 0x29D9),
+                "FileLst, for a list file whose attributes DOS will not "
+                "set though it is there: of a directory of that name "
+                "FreeDOS sets them"),
+            **dict.fromkeys(
+                (0x2A76, 0x2A78),
+                "FileLst, for a list that DOS will not write: the disk "
+                "of the program is not full"),
+        },
+    ),
+    Batch(
         title="Copying, renaming and moving a file or a directory",
         source="copy.c",
         routines=("F35_40", "C00_00", "C00_30", "C40_00", "C40_05",

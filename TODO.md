@@ -390,6 +390,63 @@ Things that are known and not done. Standing instructions are in
   The 32 levels that a path of DOS can have fit the port's stack; they
   did not fit the original's 256 bytes.
 
+- Of `VCFUNC.INC` from `F80_00` on, three pieces are still assembly,
+  though `harness/ported.py` lists the stretches they stand in:
+  `F30_00`, F10, six instructions around the call of `Dialog` that asks
+  whether to quit; `F75_00`, four instructions that choose between two
+  places of the assembly by the kind of the panel; and `F77_10`, the 25
+  instructions of the speed search that hand a key to `Search` and the
+  place it finds to `F00_50`, which both take the panel in DS. The C
+  calls them as `F77_10_a`. They go when `Search` and `F00_50` are C.
+- What the user menu, the history and the box of the drives do for the
+  mouse has run in no scenario, 164 instructions: all of `F32_70`, which
+  the menu and the history share, and the box's own, a button held on a
+  letter and let go on it or elsewhere. They are translated by reading
+  and listed as out of reach in `harness/ported.py`, with a box of the
+  drives too wide for its title, 15 letters or more, a drive that is not
+  ready, and a list file that DOS will not give attributes to or write.
+- What the original does and the port does after it, found while the
+  user menu was translated; whether to mend any of it is not decided:
+  - A line of a menu that has no command, at the end of the file, is
+    run from the byte behind the end-of-file character: what MenuBuf has
+    there from the menu or the setup that was in it before. If that
+    began with a space or a tab it would be taken for a command. In
+    `user-menu`, where it is none.
+  - With Auto menus switched on, a line without a command brings the
+    menu back, as if a command had run.
+  - A comment among the commands of a line is one only at the left
+    margin: behind a space or a tab it is run as a command, the
+    apostrophe included. The editor's help for menu files shows it at
+    the margin.
+  - A key of a line comes before the keys of the menu: with a line
+    "F1:" there is no help, with "F10:" no leaving by F10.
+  - Of a command 123 characters are taken, but of what "!" stands for
+    only the name is counted: the path of a file that is viewed, "!"
+    with Shift+F3, is not.
+  - When the commands of a line outgrow their 998 bytes while a name is
+    put in, the routine leaves its loop without taking a word off the
+    stack, and, for the name of a file of the panel, with DS on the
+    panel: the line of a command that begins with "@" is then cleared in
+    the colour that the byte of the panel at the place of `CrntCol` is.
+    The port clears it in that colour too; the word on the stack it does
+    not leave. No scenario has commands that long.
+  - The speed search hands `Input` the column of its cursor for the key
+    bar to show. The key bar is off while it runs.
+- What a command leaves in DX and BP reaches the next command through
+  the main loop, and a command that is C leaves other values there than
+  the assembly did. One reader is known, Shift-F6, which goes by BX and
+  DX together; BX is an address that `Func05` loads, not 0, whenever a
+  command has run since the program started or came back from DOS, so
+  DX decides nothing then. The commands of the table of keys were
+  scanned for another, up to their first call or jump, and none was
+  found; what the routines they call read was not followed. After the
+  speed search, which goes on without `Func05`, the stub hands on BX,
+  DX, SI and CX as the assembly left them.
+- The list file gets, behind its name at TmpBuf+100, the six bytes that
+  follow `vc.lst` in the assembly, and the menu's name at TmpBuf the six
+  that follow `VC.MNU`: both are copied from the assembly, `List_F` and
+  `Menu_F`, as long as it has them. Nothing reads the six.
+
 ## What batches have lost time to
 
 Minutes that a batch actually lost, for deciding which improvement of the
@@ -750,6 +807,46 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     four scenarios and were right, but for Ctrl+F8, which was added.
     And `harness/compare.py` with only the scenarios of the batch, 20
     to 45 seconds, before the full test.
+
+- The user menu, the command line, the history and the box of the
+  drives, nine names in `harness/ported.py`, 3,429 bytes, 67 minutes
+  in all, next to seven other batches. The translation passed its own
+  four scenarios the first time it was run.
+  - 14 minutes: the full `port` test failed once, 3 minutes 35, in
+    `copy-full`, where a step that copies 3 MB took more than the 20
+    seconds a step had then, with a load of 14 to 20 on two processors;
+    every other scenario had passed, and nothing after the comparison
+    was printed. So after the first rebase a script of twenty lines
+    around the functions of `harness/ported.py` ran everything but
+    `copy-full`, 5 minutes 36, and `copy-full` ran by itself, 3 minutes
+    34 where it takes half a minute: both passed. Then the wait of 300
+    seconds reached `main`, and the full test after a second rebase
+    passed, 4 minutes 46. `harness/ported.py` cannot leave a scenario
+    out, and says nothing of what ran when one scenario stops it.
+  - 5 minutes for the first rebase, behind three commits: four files in
+    conflict, `CLAUDE.md`, `README.md`, `harness/scenarios.py` and the
+    list of functions in `VC.ASM`, settled by a script. What git did not
+    show: the file search's batch had made `Int21d_a` for DOS called
+    without `Intr21`, and the entry made here for the same went; and its
+    note that Shift-F6 reads BX and DX as the key before left them, which
+    a scan of the commands made here had not found: the main loop was
+    read again for what gets round it.
+  - 3 minutes: scenarios that could not stay as tried. A new file in the
+    editor wants Enter once more, but not vc.mnu; a comment behind a Tab
+    is run; the Info next to a panel on D: shows free bytes that follow
+    the size of the program, found by comparing the port as it was with
+    the new golden, which was derived again, 33 seconds.
+  - 2 minutes: three builds for a variable named `far`, and for a far
+    pointer kept in a near one. In `CLAUDE.md` now.
+  - 1 minute: the scratchpad directory is one for all agents, and a
+    directory made there for a second derivation held another agent's
+    goldens under the same name. Nothing was lost; the files are in
+    `build/` since.
+  - What saved time: steps tried on the port's build that signals, six
+    seconds for twenty steps; the four scenarios, 272 steps, were right
+    on the original when first derived, but for the figure of D:. And
+    `harness/coverage.py` came to name a later label of a stretch while
+    this batch was at work, so `F80_00` could be listed after all.
 
 ## Ideas put off
 
