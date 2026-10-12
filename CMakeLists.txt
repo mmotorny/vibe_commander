@@ -113,6 +113,14 @@ set(port_asm VC.ASM
 # it runs.
 file(GLOB port_c CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR}/port
      ${CMAKE_SOURCE_DIR}/port/*.c)
+# The compiled code is more than one segment holds, 64K, so it has two:
+# CTEXT, and CTEXT2 for the files named here. Functions of different files
+# call each other far, so a file may be in either. The routines that the
+# compiler calls near for arithmetic on 32 bits, __U4M and __U4D at the end
+# of port/asm/VC.ASM, are in CTEXT only: a file that needs them stays
+# there, or the linker says that it cannot reach them. When the linker
+# says that CTEXT exceeds 64K, name another file here.
+set(port_c_second "")
 list(TRANSFORM port_asm PREPEND ${CMAKE_SOURCE_DIR}/port/asm/)
 
 # mkexe turns the linker's output into the program that is run.
@@ -135,15 +143,20 @@ foreach(source ${port_c})
     # -zl    name no libraries to link: the program has none
     # -zls   no reference to the C library's start-up code either
     # -wx -we   all warnings, as errors
-    # -nt, -nc  the name and class of the code segment
+    # -nt, -nc  the name and class of the code segment: CTEXT, or CTEXT2
+    #           for a file of port_c_second
     #
     # What the compiler made of it is written next to the object, as a
     # listing: that is where to read which registers a function saves and
     # how much stack it takes.
+    set(text CTEXT)
+    if(source IN_LIST port_c_second)
+        set(text CTEXT2)
+    endif()
     add_custom_command(
         OUTPUT ${object}
         COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -ms -os -s -zu -zl -zls
-                -wx -we -nt=CTEXT -nc=CCODE -fo=${object}
+                -wx -we -nt=${text} -nc=CCODE -fo=${object}
                 ${CMAKE_SOURCE_DIR}/port/${source}
         COMMAND ${watcom} ${watcom_bin}/wdis -l=${listing} ${object}
         BYPRODUCTS ${listing}
