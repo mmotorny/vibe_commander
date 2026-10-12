@@ -561,8 +561,10 @@ Things that are known and not done. Standing instructions are in
   - `menu.c`, 19: what is left of the menu bar, a button held on the bar
     or on a menu and let go, a menu open with no item under the cursor.
   - `view.c`, 36: a button held in the viewer's window.
-  - `edit.c`, 74: `T00_71`, a click in the editor's window, a button
-    held above it or below it.
+  - `edit.c`, 38: what is left of `T00_71`, a click in the editor's
+    window, a button held above it or below it. `mouse-list` runs 36
+    of its instructions: the click that opens the editor on dirinfo
+    has the button still down when the editor asks.
   - `help.c`, 105: a button held in the text, above it or below it, a
     click on a line of the index and one outside the window.
   - `find.c`, 96: `FndMove`, the list of the file search.
@@ -636,7 +638,11 @@ Things that are known and not done. Standing instructions are in
   instructions for that were listed as out of reach and are not any
   more. What copying lists as out of reach for "a disk the user will
   not put in" could be reached the same way, a path on B: and Esc;
-  nobody has tried.
+  nobody has tried. `not-ready` goes further: with the diskette made
+  B:'s, A: is a drive that is not ready for everything that reads it,
+  which is what many lists in `harness/ported.py` call out of reach,
+  "the drives of the bench are always ready". The top of
+  `harness/scenarios.py` says how.
 - Of the keys of the panels, `VCFUNC.INC` up to `F27_00`, these are
   still assembly: Enter, `F21_00`, 479 bytes, which runs a file or a
   command and ends in the part of the program that stays in the memory,
@@ -649,8 +655,12 @@ Things that are known and not done. Standing instructions are in
   label to the next procedure, so `F22_00` names all of it: a batch
   that lists these keys has the instructions from `F80_00` on in its
   count as well. The loop that
-  takes a key, `Func01` to `Func62` in `VC.ASM`, is assembly too, and
-  the commands that are C return to it through a table of its labels.
+  takes a key is C, `MainLoop` of `port/main.c`, and its labels in
+  `VC.ASM` are stubs that enter it: the commands that are C still
+  return to it through a table of those labels, and it goes to a
+  command through the table of keys there, `FncTab`, because the
+  commands are labels of the assembly. When they are functions, the
+  table is a `switch` in the loop and the structure of registers goes.
 - What the keys of the panels do for the mouse has run in no scenario:
   26 instructions of `F00_60`, which select the files that the mouse
   passes over with its right button held, and the three places where the
@@ -738,6 +748,186 @@ Things that are known and not done. Standing instructions are in
   found; what the routines they call read was not followed. After the
   speed search, which goes on without `Func05`, the stub hands on BX,
   DX, SI and CX as the assembly left them.
+- A box that is drawn before the main loop has set `AutoTim` gets no
+  key from the driver of the tests, and its step never ends. The main
+  data is memory newly asked for when the program starts and after
+  every command of DOS, and `AutoTim` there is whatever that memory
+  holds until `Func10` writes it, once the panels have been drawn. The
+  driver reads `AutoTim` every time the program idles, and while its low
+  word is not 0FFFFh it takes the program to have something pending,
+  counts no idle round and hands over no key. So it was with `b:` run
+  as a command from the program's command line: back from DOS the
+  panels are drawn, the current drive is the floppy's second letter,
+  and "Insert diskette for drive B:" stands on the screen with the
+  driver silent, until the 300 seconds of `STEP_TIME` are over; Esc or
+  Enter put behind the command in the same step are not handed over
+  either. The same would hold for the box of a drive that is not ready
+  and for a critical error of DOS while the panels are first drawn.
+  A box that comes up when the panels are drawn again later, as in
+  `not-ready`, is answered like any other: `AutoTim` is 0FFFFh from
+  the last time round.
+- What ran in the original is not recorded the same every time for a
+  step that clicks on an entry of a panel. `DoublMo` adds 0.4 seconds
+  to the time of day, and three instructions of it, `INC DH`, `CMP
+  DH,60` and `JB DblMo2` at 9506h, run when the hundredths are 60 or
+  more. Of five derivations of `mouse-list`, one had them not run and
+  four had them run, with the same screens every time; the golden of
+  `mouse-panel` has them as run too. The hundredths at which a step
+  happens are not the same from one run of a machine to the next: the
+  machine's clock follows the computer's while the BIOS waits for a
+  disk. `SUB DL,100` in `Func07` came and went the same way when the
+  clock was changed over. It matters when `DoublMo` is translated and
+  its instructions have to have run. The double click of `mouse-list`
+  itself, two steps within those 0.4 seconds, came out the same in
+  every derivation and in the port; how much room it has was not
+  measured.
+- The main loop hands the next command the registers as the assembly
+  left them, BX, CX, DX, SI, DI and BP, but for two things. What
+  `DoublMo` leaves in AX and CX after a click on an entry is not handed
+  on: its entry for C answers in AX and does not return CX. Where the
+  program goes on then, `F00_60`, `Func04` and `F21_10`, sets both
+  before reading them; `mouse-list` goes to the first and the last of
+  these so, and comes out as the original. And what the loop hands to the BIOS and to DOS in
+  registers that the call does not read, BX to DX of the call for the
+  video mode, BX and CX of those that set a vector, is 0 where the
+  assembly had what was left there.
+- What of `port/asm/VC.ASM` is still assembly, and what each piece will
+  want. The port ends with no assembly, and the order of preference is
+  the user's: portable C, then C tied to the compiler or the machine,
+  then intrinsics, then inline assembly where nothing else works.
+  - The start-up from `Init00` to `Init40`, 1,266 bytes, with `MainPth`,
+    `ReadOne`, `Expand`, `CurNl` and `OutStr1`: plain code, the next
+    batch. `Init00` to `Init11` runs before there is a main data
+    segment, with DS on the part that stays in the memory, where the
+    setup file and the main extension file are read to: C functions
+    that take that segment as far pointers and touch nothing of `md`.
+    From `Init11` on it is the main data. It asks much of the BIOS and
+    of DOS: the video mode set, the cursor's shape, the country, the
+    font's rows, DESQview, for which `Int10_a` of `VCMENU.INC` and
+    `Int21d_a` do, and the address of a virtual screen (INT 10h,
+    AH=FEh), which answers in ES:DI and has no entry yet. It
+    calls the routine of DOS that makes capitals through the far
+    pointer of the country information, with a character in AL: a far
+    function pointer with a `#pragma aux`. It writes two vectors into
+    the table at 0:0 with interrupts off, and looks for snow by reading
+    port 3DAh in a loop that is timed by its instructions: `inp()`,
+    `_disable()` and `_enable()` are intrinsics, and how many times the
+    loop has to see the bit clear will want measuring again in C.
+    `MainPth` is not reached for a `VC=` in the environment and
+    `CurNl` not for a cursor on the last line; a second copy of the
+    program run after `set vc=` and after enough lines of output would
+    reach both.
+  - `Reloc`, which the original has not: applies the linker's
+    relocations to the copy of the program that has just been loaded.
+    It cannot be called far before it has run, since a far call
+    between two segments is itself relocated. It is C once what calls
+    it is C in the same file: a static function is called near.
+  - The entry of the program, `Alloc0` to `Alloc9`, 256 bytes: adds up
+    the check sum of the file; as the second copy, loaded to bring the
+    program back after a command, moves its code into the first copy's
+    memory and ends; otherwise shrinks its block, moves everything
+    from `Init00` on above the part that stays, over itself, makes a
+    block of DOS of that by writing its header, and jumps there. DS and
+    ES are on the PSP and the stack is the one of the EXE header, in
+    memory that the move overwrites, so `MovPars` uses no stack. In C
+    this is a function of the part that stays, which is not moved: the
+    stack has to be set first, SS and SP, two instructions that C
+    cannot say, and the move is then a loop over far pointers. It needs
+    a code segment of its own for the part that stays, placed first in
+    the file, with its own notion of DS: there is no main data yet.
+  - `Exec`, 470 bytes, in the part that stays: runs the commands of
+    `DosBuf` one after the other, by COMMAND.COM or by INT 2Eh, which
+    comes back with SS and SP destroyed, and loads the program again by
+    running its file as a second copy. The stack set again after INT
+    2Eh is inline assembly, three instructions. The rest is C of the
+    part that stays, where DS, SS and CS are one segment and the main
+    data does not exist: what the commands need is in the copy that
+    `F21_31` keeps there, `ComnIni`.
+  - The jumps between the two parts: `F21_31` to `Exec`, `Exec15` to
+    `Init11`, `Exit` to `Exit00`, `Init12` to `AlocEr`, and `CallPSP`,
+    by which the code that goes calls routines of the part that stays.
+    Each is a far address made of a segment known when the program
+    runs and an offset: in C a call through a far function pointer. A
+    jump is not a call, though: a call that never returns would leave
+    its return address on the stack with every command run. The way
+    out that needs no assembly is to turn the jumps round. The part
+    that stays has the outermost loop: it calls what `Init11` begins,
+    by a far pointer, and that returns, through the main loop, when a
+    command is to be run or the program left. That asks that every
+    way to `F21_31` and to `Exit` be a return from the main loop,
+    which they are once the commands are functions: they return
+    numbers already.
+  - `Exit00` to `Exit05`, 106 bytes: gives the terminate address of the
+    PSP back, releases the programs that have stayed in the memory,
+    gives INT 21h and INT 27h back and ends the program. `Exit01` is
+    also what the PSP names as its terminate address while the program
+    runs, so DOS can jump to it with no stack of the program's: a stack
+    set by inline assembly at that entry, or the address in the PSP
+    made that of a handler written like one for an interrupt.
+  - `New21` and `New27`, 113 bytes, with `ExeProg`, `AddProg`, `FreeBlk`
+    and `ChkBlk`, 354 bytes: the program's hook on DOS, which notes
+    every program that is run and every one that stays in the memory,
+    with the vectors it has changed, and answers the question of
+    other programs for the program's data (AH=2Bh, CX='VC', DX='OM').
+    They run on the stack of whoever called DOS, know only CS, and
+    hand the call on to DOS with every register and the flags as they
+    came. `__interrupt` functions of Open Watcom save the registers
+    and give them to the C as a structure; they load DS with a segment
+    that the linker names, which here has to be the part that stays
+    and has to be relocated by `Reloc`. To go on in the old handler
+    they need `_chain_intr`, which is of the C library that the
+    program does not have: a few instructions of inline assembly that
+    put the registers back and jump far. `VCapi` returns with the
+    flags as it sets them, `RET 2`: an `__interrupt` function does
+    that by changing the flags in its structure. The table of
+    vectors is copied with interrupts off: `_disable()`.
+  - `Release`, 104 bytes, `GetStat` and `SetStat`, 68 bytes, `SetBrk`
+    and `SetBrk0`, 39 bytes, `NotFind` and `OutStr0`, 54 bytes: plain
+    routines that happen to be of the part that stays, called far from
+    the rest through `CallPSP`. `GetStat` and `SetStat` keep what they
+    found in BP from the one to the other: an argument in C. They wait
+    for the code segment of that part.
+  - `FatErr`, 220 bytes: what DOS calls for a critical error. It is
+    entered with nothing but CS known, takes its error in AX and DI
+    and the device in BP:SI, shows a dialog, and returns the answer in
+    AL by IRET. It finds the main data by a word that the start-up
+    code writes into the code segment, `SecDat`, which `Intr21` reads
+    too. An `__interrupt` function gets and sets those registers, but
+    C code has no word in its code segment to write, and nothing in C
+    sets DS to a segment known only when the program runs: loading DS
+    from where the program keeps the segment is inline assembly, two
+    or three instructions, here and wherever else the program is
+    entered from outside.
+- Ported as they are, in `port/main.c`:
+  - When a panel cannot be read and another drive is chosen for it,
+    the assembly notes the drive if none is noted as the one that
+    failed. One always is: an instruction that never runs, `MOV CL,AL`
+    in `Init60`.
+  - After another drive has been chosen in the box, the window that is
+    put on the screen has the number of that drive for a width.
+    `Window` goes by the width for a single row only, so nothing shows.
+  - The row below the panels is asked for with DS on the main data
+    where a panel is meant, at `Init41`: `BegBX` answers for the right
+    panel, and only the row is used, which both have.
+  - A tree or an Info in the second panel is not read but given
+    nothing to show when the current directory could not be had for
+    the first panel, whatever it would show.
+  - The box of a drive that is not ready tells DOS, as it closes, that
+    the floppy drive's diskette is that of the letter it ends with
+    (INT 21h, AX=440Fh), and given up, with a drive number that is no
+    drive's, C0h. On the bench the diskette is then that of A: again.
+    With the mouse, a button that is up again by the time the box asks
+    gives up.
+  - Leaving gives Ctrl-Break back and not the critical error, which
+    DOS puts back by itself when a program ends.
+  - When nothing is pending for the tree, the high word of `AutoTim`
+    is whatever DX holds, and nothing reads it then.
+  - `Mvz2lin` had no caller, and is gone.
+- `AltSr_T`, the scan codes that begin the speed search, is read by the
+  main loop where it is, in `port/asm/VCFUNC.INC`, and the place behind
+  the code found goes round in DI as in the assembly. `port/cmdline.c`
+  has a copy of its own. When that file of the assembly goes, the table
+  wants one home.
 - The list file gets, behind its name at TmpBuf+100, the six bytes that
   follow `vc.lst` in the assembly, and the menu's name at TmpBuf the six
   that follow `VC.MNU`: both are copied from the assembly, `List_F` and
@@ -1477,6 +1667,43 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `harness/scenarios.py` had said so.
   Nothing was lost to the compiler or to the stubs: both were written
   by the notes of `CLAUDE.md`, and the first build ran.
+
+
+- The main loop, the panels drawn and read, a drive that is not ready,
+  and leaving, 1,801 bytes, about three quarters of an hour in all, of
+  which reading `VC.ASM` and what the loop hands on took most:
+  - 12 minutes: three runs of `harness/show.py` that waited out the five
+    minutes of `STEP_TIME` each, two of them side by side. `b:` typed
+    as a command leaves the program at "Insert diskette for drive B:",
+    drawn before the main loop has set `AutoTim` in the new main data,
+    and the driver hands no key to a program whose `AutoTim` says that
+    something is pending. The screen that the error shows after five
+    minutes is the blanker's. A copy of `show.py` with `STEP_TIME` at
+    12 seconds showed the box at once; a switch of `show.py` for that
+    limit would have saved ten of the minutes. The top of
+    `harness/scenarios.py` has both facts now.
+  - 6 minutes: four tries at the scenario of a drive that is not ready,
+    40 seconds each, until it was understood that the box makes the
+    diskette that of its drive again as it closes, and that a panel
+    which could not be read is read when the viewer is left.
+  - 4 minutes: the first run of the `port` test, which failed on seven
+    instructions that two earlier batches had listed as out of reach
+    and that `not-ready` runs; `harness/reach.py` on the routines of
+    the batch does not show those of other batches. The test took 171
+    and 227 seconds next to those of three other batches, where it
+    takes 80 alone.
+  - 1 minute: a macro used before it was defined, which JWasm calls a
+    syntax error. In `CLAUDE.md` now.
+  - 15 minutes to get onto `main`, behind the mouse of the bench and the
+    commands of the menus: three files in conflict, `CLAUDE.md`,
+    `TODO.md` and the list of files of the second segment, each where
+    both sides had added. What git did not show: the commands had made
+    `Int10_a` and an entry for `SaveSet` as this batch had, under the
+    same names; theirs stayed, and both are declared in `port/vc.h`
+    now. The three scenarios of the mouse passed on this C at once, so
+    nothing was lost to the mouse at the panels; a fourth was written
+    for what they leave, and derived five times because one record of
+    what ran differed (see above).
 
 ## Ideas put off
 

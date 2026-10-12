@@ -129,40 +129,27 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
 #pragma aux Help00  "*_c" __far modify exact [ax]
 #pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
-/* The registers of a call of the BIOS for the screen, as the entry Int10
-   takes them off the stack and puts them back. */
-struct BiosRegs {
-    u16 ax, bx, cx, dx;
-};
-
 /* Routines that are still assembly, by their entries for C. HidCur puts
    the cursor below the screen. ResUser writes what DOS has shown, which
    the panels cover, to the screen buffer, for a window given like
    Window's, and ResWin what a box covers, from where it was kept. SelDrv
    is the call of DOS that makes a drive the current one, 0 for A:, which
    the assembly makes without Intr21. AsmSeg returns the code segment of
-   the assembly. Int10 calls the BIOS for the screen, as the assembly does
-   here: with the mouse pointer left as it is. ScrOffs asks the BIOS where
-   in the memory of the screen the page begins that is shown. SaveSet
-   writes the setup to its file: something that is not 0 in the high word
-   if it could not, with what DOS answered in the low one, or 53h there
-   for a drive that is not ready. */
+   the assembly. ScrOffs asks the BIOS where in the memory of the screen
+   the page begins that is shown. Int10, which calls the BIOS for the
+   screen, and SaveSet, which writes the setup to its file, are in vc.h. */
 void HidCur(void);
 void ResUser(u16 begin, u16 size);
 void ResWin(u16 begin, u16 size, u16 buffer);
 void SelDrv(u16 drive);
 u16 AsmSeg(void);
-void Int10(struct BiosRegs STACK *regs);
 void ScrOffs(void);
-u32 SaveSet(void);
 #pragma aux HidCur  "*_a" __far modify exact [es]
 #pragma aux ResUser "*_a" __far parm [bx] [dx] modify exact [es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux Int10   "*_a" __far parm [bx] modify exact [ax bx cx dx si di es]
 #pragma aux ScrOffs "*_a" __far modify exact [ax bx di es]
-#pragma aux SaveSet "*_a" __far value [dx ax] modify exact [ax dx es]
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what

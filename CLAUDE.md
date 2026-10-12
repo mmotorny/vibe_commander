@@ -620,6 +620,25 @@ port.
   puts them back: `Int10_a` in `VCMENU.INC`, with `struct BiosRegs` of
   `port/commands.c`. `Int10m_a` is another thing: it takes the mouse
   pointer off the screen around the call.
+- Code that is entered by jumps at several labels, falls from one into
+  the next, and leaves by jumps, never by a return, as the main loop
+  does, is one function that takes the number of the label and returns
+  the number of the place where the program goes on: `MainLoop` of
+  `port/main.c`, a `switch` whose cases fall into one another, in a
+  loop for what jumps back. Every label is a stub that pushes a word of
+  room and all the registers, as a structure that the function gets in
+  BX, and jumps to one piece of code that calls the function, puts the
+  address of the place into the room, pops the registers and returns
+  there: `MainC` and `MainGo` in `port/asm/VC.ASM`. So what goes round
+  in registers from one command to the next is what the function makes
+  of the structure.
+- A macro stands before its first use. JWasm says "Syntax error" at a
+  use that comes first, and names the macro.
+- An entry for a routine that takes a panel in DS is written out, with
+  the panel in a register: `ReDir_a` in `port/asm/VC.ASM`.
+- A routine that only C code calls any more leaves nothing in the
+  assembly but what it read there: `ErrRdy` left its box, `NoRd_P`,
+  made `PUBLIC`, and the table of its keys went.
 
 ### C for the port
 
@@ -740,6 +759,12 @@ with it is less obvious:
   one, without a warning: the table of interrupt vectors was read from
   the main data. Take the segment from a `volatile` variable, as
   `F65_31` of `port/memory.c` does.
+- CTEXT has some 280 bytes left below its limit. A new file goes into
+  CTEXT2, by its name in `port_c_second`, unless it multiplies or
+  divides numbers of 32 bits.
+- An address that the main data keeps as two words, offset and segment,
+  `ErrVct`, is a `u32` there and a far pointer by a cast, which costs
+  nothing: `(const u8 __far *)md.ErrVct`.
 
 ## A run of batches
 

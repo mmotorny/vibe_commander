@@ -84,8 +84,14 @@ panels, those are C that move the cursor by lines, columns and pages,
 select files one by one and by a mask, switch the panels off and on,
 swap them, make them of another kind and read them again, and Tab;
 Enter, the keys that change the directory and those that go to the
-command before and after are still assembly, and so is the loop that
-takes a key and goes to its command. The help is C as a
+command before and after are still assembly. The loop that takes a key
+and goes to its command is C, with what the mouse does at the panels,
+and so are what it does on the way: drawing the two panels and reading
+what they show when that has changed, the box that asks for another
+drive when a disk cannot be read, and saving the setup when it has
+changed; and leaving the program. What starts the program, what runs a
+command with most of the program out of the memory and loads it again,
+and what answers the interrupts of DOS are still assembly. The help is C as a
 whole: reading its file, showing the index
 and the pages in their window, and taking the keys and the mouse there.
 So is the tree of directories away from its panel: reading it from the

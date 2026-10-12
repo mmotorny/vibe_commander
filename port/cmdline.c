@@ -104,8 +104,8 @@ static const u8 CODE AltSr_P[] = { Box_C, BoxCu_C, 0x78, 0x79 };
 static const u8 CODE AltSr_S[] = "Search: ^r\xFF\x0C^r";
 
 /* The scan codes of Alt with a digit, a hyphen, an equals sign or a
-   letter, as the main loop of the assembly has them too, and what each
-   stands for in the speed search. */
+   letter, as the assembly has them too, where the main loop reads
+   them, and what each stands for in the speed search. */
 static const u8 CODE AltSr_T[38] = {
     0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,

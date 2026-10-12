@@ -29,11 +29,10 @@ u16 F62_01(u16 panel, u16 item);
    are C, of vc.h.
 
    TstDrv is 1 if DOS has a drive of the letter in the low byte of
-   `letter`. ErrRdy says that a drive is not ready and asks for another:
-   it returns the letter in the low byte, or 0 there for none. Int21d
-   calls DOS as Intr21 does, with the registers of `regs` and their
-   answer there, but not through Intr21, where the assembly called DOS
-   itself. */
+   `letter`. ErrRdy, which says that a drive is not ready and asks for
+   another, is C, of vc.h. Int21d calls DOS as Intr21 does, with the
+   registers of `regs` and their answer there, but not through Intr21,
+   where the assembly called DOS itself. */
 void HidCur(void);
 void SavWin(u16 begin, u16 size, u16 buffer);
 void ResWin(u16 begin, u16 size, u16 buffer);
@@ -43,7 +42,6 @@ u32 GetMous(u16 place);
 void TypMous(u16 look);
 u16 InWind(u16 place, u16 begin, u16 size);
 u16 TstDrv(u16 letter);
-u16 ErrRdy(u16 letter);
 u16 Int21d(struct DosRegs STACK *regs);
 #pragma aux HidCur  "*_a" __far modify exact [es]
 #pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
@@ -54,7 +52,6 @@ u16 Int21d(struct DosRegs STACK *regs);
 #pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
 #pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux TstDrv  "*_a" __far parm [ax] value [ax] modify exact [ax es]
-#pragma aux ErrRdy  "*_a" __far parm [ax] value [ax] modify exact [ax es]
 #pragma aux Int21d  "*_a" __far parm [bx] value [ax] modify exact [ax bx cx dx si di es]
 
 /* A C routine of another file that vc.h does not have. */

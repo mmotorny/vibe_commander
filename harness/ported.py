@@ -527,20 +527,15 @@ BATCHES = [
                 "the cursor is below its first: it moves up only to the "
                 "line of the cursor"),
             **dict.fromkeys(
-                (0x6610, 0x6613, 0x6618, 0x661C, 0x6620, 0x6625, 0x6627,
-                 0x6629, 0x662B, 0x662E, 0x662F, 0x6631, 0x6633, 0x6634,
-                 0x6636, 0x6639, 0x663C, 0x663E, 0x6643, 0x6648, 0x664A,
-                 0x664C, 0x664D, 0x6652, 0x6654, 0x6658, 0x665C, 0x6660,
-                 0x6662, 0x6664, 0x6665, 0x6667, 0x6669, 0x666C, 0x666F,
-                 0x6671, 0x6673, 0x6678, 0x667A, 0x667C, 0x667E, 0x6680,
-                 0x6682, 0x6684, 0x6685, 0x6687, 0x6689, 0x668A, 0x668C,
-                 0x668D, 0x668F, 0x6691, 0x6692, 0x6696, 0x6698, 0x6699,
-                 0x669B, 0x669D, 0x669F, 0x66A4, 0x66A6, 0x66A8, 0x66AA,
-                 0x66AC, 0x66AF, 0x66B1, 0x66B3, 0x66B6, 0x66BA, 0x66BC,
-                 0x66BE, 0x66C0, 0x66C2, 0x66C4),
-                "T00_71, for the mouse: a click in the window, and a "
-                "button held above it or below it. The bench has no "
-                "mouse"),
+                (0x662B, 0x6636, 0x6664, 0x6665, 0x6667, 0x6669, 0x666C,
+                 0x666F, 0x6671, 0x6673, 0x6678, 0x667A, 0x667C, 0x667E,
+                 0x6680, 0x6682, 0x6684, 0x6685, 0x6687, 0x6689, 0x668A,
+                 0x668C, 0x668D, 0x668F, 0x6691, 0x6692, 0x6696, 0x6698,
+                 0x6699, 0x669B, 0x669D, 0x669F, 0x66A4, 0x66A6, 0x66A8,
+                 0x66AA, 0x66C0, 0x66C2),
+                "T00_71, for the mouse: what is left of a click in the "
+                "window, and a button held above it or below it. The "
+                "bench has no mouse"),
             **dict.fromkeys(
                 (0x693D, 0x6940),
                 "T06_10, for a cursor behind all that the buffer has of "
@@ -797,12 +792,6 @@ BATCHES = [
                   "DosCom"),
         functions=("ClsLine_c", "PutKey_c", "PtMnu1_c", "PutPrm_c",
                    "DosCom_c"),
-        unreached={
-            **dict.fromkeys(
-                (0xA867, 0xA869, 0xA86A),
-                "PutPrm, for a drive whose current directory DOS will "
-                "not tell: the disks of the bench are always ready"),
-        },
     ),
     Batch(
         title="The entries of an extension file",
@@ -974,6 +963,42 @@ BATCHES = [
                 "F65_00, for a program that stays in the memory and "
                 "is not released while another is: the bench has one "
                 "such program, FDAPM, which does not stay twice"),
+        },
+    ),
+    Batch(
+        title="The main loop, the panels drawn and read, a drive that "
+              "is not ready, and leaving",
+        source="main.c",
+        routines=("Init40", "Init46", "Mvz2lin", "Init49", "Init90",
+                  "Func01", "Func15", "Func20", "Exit", "Quit", "RestVct",
+                  "HookVct", "ErrRdy"),
+        functions=("MainLoop_c", "Exit_c", "Quit_c", "RestVct_c",
+                   "HookVct_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x0D87, 0x0D88, 0x0D8B, 0x0D8C, 0x0D8D, 0x0D8F, 0x0D92,
+                 0x0D93),
+                "Mvz2lin, which nothing calls"),
+            0x0E99: "Init60, where a drive has been chosen for a panel "
+                    "that could not be read and none was noted as the "
+                    "one that failed: Init59 notes the panel's drive "
+                    "whenever a panel cannot be read",
+            **dict.fromkeys(
+                (0x108C, 0x108F, 0x1090, 0x1093, 0x1095, 0x1098, 0x109A,
+                 0x109D, 0x109F, 0x10A1),
+                "Func08, where the cursor of the tree has moved in the "
+                "last 0.6 seconds of a minute, of an hour and of a day: "
+                "the machine's clock is counted in instructions, of "
+                "which the port takes others than the original, so no "
+                "step falls into that time for both"),
+            0x10DA: "Func10, for a screen that is neither EGA nor VGA, "
+                    "whose key bar has no Alt-F9: the bench has VGA",
+            0x128C: "Func61, where the button of a second click comes up "
+                    "off the entry: the pointer of the bench does not "
+                    "move while a button is down",
+            0x91E5: "ErRdy3, for the middle button or both in the box of "
+                    "a drive that is not ready: a step of the bench "
+                    "presses the left button or the right one",
         },
     ),
 ]

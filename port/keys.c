@@ -5,9 +5,10 @@
  *
  * Translated from VCFUNC.INC.
  *
- * These are commands, not routines: the program's main loop, which is
- * still assembly, jumps to one by a table of keys, and the command jumps
- * back to one of several places of the loop, or on into another command.
+ * These are commands, not routines: the program's main loop, MainLoop of
+ * main.c, goes to one by the table of keys, which is still in the
+ * assembly, and the command jumps back to one of several places of the
+ * loop, or on into another command.
  * Here a command is a function that the stub at its label calls, with the
  * panel that the assembly has in DS, and what it returns says where the
  * program goes on: see GO below, and CmdEnd in port/asm/VCFUNC.INC.

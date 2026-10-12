@@ -387,19 +387,38 @@ void IniMous(void);
 /* RestVct gives the vectors of the critical error and of Ctrl-Break back
    to whoever had them, and HookVct takes them again: it returns where
    its routine for Ctrl-Break is, in the part of the program that stays
-   in the memory. */
+   in the memory. Quit puts back what DOS had on the screen before the
+   program drew over it, but for the line of the key bar, which is blank
+   if there is one. ErrRdy says that the disk of a drive cannot be read
+   and asks for another drive: it returns the letter in the low byte, or
+   0 there for none. See each in main.c. */
 void RestVct(void);
 u16 HookVct(void);
-#pragma aux RestVct "*_a" __far modify exact [ax dx es]
-#pragma aux HookVct "*_a" __far value [dx] modify exact [ax bx dx es]
+void Quit(void);
+u16 ErrRdy(u16 letter);
+#pragma aux RestVct "*_c" __far modify exact [ax dx]
+#pragma aux HookVct "*_c" __far value [ax] modify exact [ax]
+#pragma aux Quit    "*_c" __far modify exact [ax]
+#pragma aux ErrRdy  "*_c" __far parm [ax] value [ax] modify exact [ax]
 /* Checks the keyboard for Esc, Ctrl-C and F10, and takes them from it:
    not 0 if one was pressed. */
 u16 TstBrk(void);
 #pragma aux TstBrk  "*_a" __far value [ax] modify exact [ax es]
-/* Put back what DOS had on the screen before the program drew over it,
-   but for the line of the key bar, which is blank if there is one. */
-void Quit(void);
-#pragma aux Quit    "*_a" __far modify exact [ax bx dx di es]
+
+/* The registers of a call of the BIOS for the screen, as the entry Int10
+   takes them off the stack and puts them back: it calls the BIOS as the
+   assembly does where it does not take the mouse pointer off the screen
+   first. SaveSet writes the setup to its file: something that is not 0
+   in the high word if it could not, with what DOS answered in the low
+   one, or 53h there for a drive that is not ready. Both entries are in
+   port/asm/VCMENU.INC. */
+struct BiosRegs {
+    u16 ax, bx, cx, dx;
+};
+void Int10(struct BiosRegs STACK *regs);
+u32 SaveSet(void);
+#pragma aux Int10   "*_a" __far parm [bx] modify exact [ax bx cx dx si di es]
+#pragma aux SaveSet "*_a" __far value [dx ax] modify exact [ax dx es]
 
 /* A line as the assembly hands it over: the registers that describe it,
    pushed in this order by CallLine in port/asm/VC.ASM. */

@@ -67,6 +67,8 @@
 	EXTERN	DialBox_c:FAR, Dialog_c:FAR, InSt10_c:FAR, MinMnu_c:FAR
 	EXTERN	C00_00_c:FAR, F35_01_c:FAR, F45_01_c:FAR, F35_61_c:FAR
 	EXTERN	F65_00_c:FAR
+	EXTERN	MainLoop_c:FAR, Exit_c:FAR, Quit_c:FAR, RestVct_c:FAR
+	EXTERN	HookVct_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
@@ -77,6 +79,11 @@
 	PUBLIC	SavFi_P, SavEr_B, Prot_B, EdFl_S
 ; A text, a box, and buttons with their colours, of the help.
 	PUBLIC	Help_S, HlpEr_B, HlMn1_D, HlMn2_D, HlpMn_P
+; The scan codes that begin the speed search, the box of a drive that is
+; not ready, the routine for the critical errors of DOS, and in the part
+; that stays in the memory the routine for Ctrl-Break and the copy of the
+; first panel, all of which the C code of the main loop names.
+	PUBLIC	AltSr_T, NoRd_P, FatErr, CtrlC, WCB1sav
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.
@@ -133,6 +140,22 @@ TakeLine MACRO	First, Scratch
 	POP	Scratch
 	POP	DX
 	POP	Scratch
+	ENDM
+
+; Enter the main loop, which is C, at the place Entry: see MainGo. The
+; registers go on the stack as struct Regs of port/main.c has them.
+MainC	MACRO	Entry
+	PUSH	AX			; Room for where the program goes on
+	PUSH	DS
+	PUSH	BP
+	PUSH	DI
+	PUSH	SI
+	PUSH	DX
+	PUSH	CX
+	PUSH	BX
+	PUSH	AX
+	MOV	AX,Entry
+	JMP	MainGo
 	ENDM
 
 	.CODE
@@ -2075,82 +2098,10 @@ Init38:	MOV	DS:WCBcrn,SI
 	INT	10h
 
 ;----------------------- Set cursor --------------------
-Init40:	PUSH	ES
-	POP	DS
-	MOV	AH,0Fh
-	INT	10h
-	MOV	AH,3
-	INT	10h
-	CMP	DS:KeyBar,0
-	JE	Init41
-	MOV	AL,DS:Lines
-	DEC	AX
-	CMP	DH,AL
-	JB	Init41
-	MOV	DH,AL
-	DEC	DH
-	MOV	AX,0E0Ah
-	INT	10h
-Init41:	MOV	AL,DH
-	MOV	DS:MenuBuf[0],AL
-	PUSH	DS
-	MOV	DS,DS:WCBcrn
-	CMP	DS:Visible,0
-	POP	DS
-	JE	Init42
-	CALL	BegBX
-	CALL	SizDX
-	ADD	DH,BH
-	CMP	AL,DH
-	JAE	Init42
-	MOV	AL,DH
-Init42:	MOV	DS:DosLin,AL
-	CALL	HidCur
-
-;--------------------- Save Screen ---------------------
-	CALL	SavScr
-	CALL	IniMous
-
-;------------------ Save Main Windows ------------------
-	MOV	SI,OFFSET ScrBuf
-	MOV	DI,OFFSET UserScr
-	MOV	AL,DS:Lines
-	DEC	AX
-	MOV	AH,80
-	MUL	AH
-	MOV	CX,AX
-	REP	MOVSW
-
-;----------------------- Auto file ---------------------
-	CMP	DS:LoadRes,0FFh
-	JNE	Init49
-	MOV	DS:LoadRes,0
-	PUSH	SS
-	POP	DS
-	MOV	SI,81h
-	CALL	FndLet
-	CALL	Init46
-	JE	Init49
-	MOV	DI,OFFSET DosBuf
-Init43:	LODSB
-	CALL	Init46
-	JE	Init45
-	CMP	AL,9
-	JNE	Init44
-	MOV	AL,' '
-Init44:	STOSB
-	JMP	Init43
-Init45:	PUSH	ES
-	POP	DS
-	XOR	AX,AX
-	STOSW
-	MOV	AL,DS:MenuBuf[0]
-	DEC	AX
-	MOV	DS:DosLin,AL
-	MOV	AL,81h
-	XCHG	AL,DS:LoadFl
-	MOV	DS:LoadRes,AL
-	JMP	F21_31
+; From here on the loop is C: MainLoop_c of port/main.c, which is entered
+; at one of several places and returns where the program goes on. See
+; MainGo below.
+Init40:	MainC	0
 
 ;---------------- Relocate the transit part -------------
 ; The program moves and reloads its transit part itself, so DOS cannot
@@ -2194,26 +2145,6 @@ Reloc3:	POPF
 	RET
 Reloc	ENDP
 
-Init46	PROC	NEAR
-	CMP	AL,0
-	JE	Init47
-	CMP	AL,0Dh
-	JE	Init47
-	CMP	AL,0Ah
-Init47:	RET
-Init46	ENDP
-
-Mvz2lin	PROC	NEAR
-	PUSH	DS
-	CALL	MvzLin0
-	PUSH	ES
-	POP	DS
-	MOV	SI,BP
-	CALL	MvzLin0
-	POP	DS
-	RET
-Mvz2lin	ENDP
-
 CurNl	PROC	NEAR
 	MOV	AH,0Fh
 	INT	10h
@@ -2221,213 +2152,12 @@ CurNl	PROC	NEAR
 	INT	10h
 	MOV	AH,DS:Lines
 	CMP	DH,AH
-	JB	Init47
+	JB	CurNl1
 	DEC	AH
 	MOV	AL,0
 	JMP	Cursor
+CurNl1:	RET
 CurNl	ENDP
-
-Init49:
-
-;---------------- Output menu & key bar ----------------
-	MOV	AL,0
-	CALL	PutMnu
-	MOV	AL,0FFh
-	CALL	PutKey
-
-;--------------------- Main windows --------------------
-Init50:	CALL	HidCur
-	MOV	SI,ES:WCBcrn
-	MOV	DI,ES:WCBsec
-	MOV	DS,DI
-	MOV	AL,DS:WinTyp
-	MOV	DS,SI
-	CMP	AL,DS:WinTyp
-	JAE	Init51
-	MOV	DS,DI
-	XCHG	SI,DI
-Init51:	XOR	BX,BX
-	MOV	DH,ES:Lines
-	MOV	DL,80
-	MOV	CL,0
-	CMP	DS:ChgFlg,CL
-	JE	Init53
-Init52:	MOV	ES:BlocEr,1
-	CALL	SetPth
-	MOV	ES:BlocEr,0
-Init53:	CALL	PutPrm
-	XOR	AX,AX
-	CMP	DS:Visible,AL
-	JNZ	Init54
-	JMP	Init70
-Init54:	CALL	Panel
-	CMP	DS:ChgFlg,AL
-	JE	Init60
-	CALL	Window
-	CMP	DS:WinTyp,AL
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	POP	ES
-	JNE	Init55
-	PUSH	SI
-	PUSH	CX
-	MOV	SI,OFFSET DosPth
-	MOV	DI,OFFSET WinPath
-	CALL	StrLen
-	PUSH	SI
-	PUSH	DI
-	REPE	CMPSB
-	POP	DI
-	POP	SI
-	MOV	CX,LenPath
-	REP	MOVSB
-	POP	CX
-	POP	SI
-	MOV	DS:OldFlg,AL
-	JNE	Init55
-	MOV	DS:OldFlg,1
-Init55:	CMP	DS:PathEr,AL
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	POP	ES
-	JE	Init56
-	CALL	Init90
-	JMP	Init59
-Init56:	OR	CL,CL
-	JNE	Init57
-	CMP	ES:OldFlg,AL
-	JE	Init57
-	MOV	AL,1
-Init57:	CMP	DS:WinTyp,0
-	JNE	Init58
-	MOV	ES:BlocEr,1
-Init58:	CALL	ReDir
-	MOV	ES:BlocEr,0
-	JNC	Init60
-Init59:	MOV	AH,1
-	OR	CL,CL
-	JNE	Init60
-	MOV	CL,DS:WinPath[0]
-Init60:	CALL	PutPath
-	CALL	PutFls
-	OR	AH,AH
-	JE	Init62
-	CALL	Window
-	CMP	DS:WinTyp,0
-	JNE	Init70
-	MOV	AL,DS:WinPath[0]
-	CALL	ErrRdy
-	CMP	AL,0
-	JE	Init70
-	OR	CL,CL
-	JNE	Init61
-	MOV	CL,AL
-Init61:	SUB	AL,'A'
-	MOV	DL,AL
-	MOV	AH,0Eh
-	INT	21h
-	JMP	Init52
-Init62:	CMP	CL,DS:WinPath[0]
-	JNE	Init70
-	MOV	CL,0
-Init70:	CALL	InvWCB
-	MOV	AL,1
-	CMP	DS:Visible,0
-	JNE	Init71
-	JMP	Init80
-Init71:	CALL	Panel
-	MOV	AH,0
-	CMP	DS:ChgFlg,AH
-	JE	Init77
-	CALL	Window
-	CMP	DS:WinTyp,AH
-	JNE	Init72
-	CMP	CL,DS:WinPath[0]
-	JNE	Init74
-	MOV	DS:WinPath[3],AH
-	JMP	Init73
-Init72:	CMP	ES:PathEr,AH
-	JE	Init75
-Init73:	CALL	Init90
-	JMP	Init76
-Init74:	MOV	ES:BlocEr,1
-Init75:	CALL	ReDir
-	MOV	ES:BlocEr,0
-	JNC	Init77
-Init76:	MOV	AH,1
-Init77:	CALL	PutPath
-	CALL	PutFls
-	CMP	DS:WinTyp,0
-	JNE	Init80
-	OR	AH,AH
-	JE	Init80
-	CALL	Window
-	MOV	AL,DS:WinPath[0]
-	CALL	ErrRdy
-	CMP	AL,0
-	JE	Init80
-	MOV	SI,OFFSET WinPath[3]
-	MOV	BYTE PTR DS:[SI],0
-	MOV	CL,AL
-	MOV	DS:WinPath[0],AL
-	SUB	AL,'A'-1
-	MOV	DL,AL
-	CALL	Fantom
-	JC	Init78
-	MOV	AH,47h
-	MOV	ES:BlocEr,1
-	CALL	Intr21
-	MOV	ES:BlocEr,0
-	JC	Init78
-	MOV	CL,0
-Init78:	MOV	AL,0
-	JMP	Init71
-Init80:	MOV	DS,ES:WCBcrn
-	JMP	Func02
-
-Init90	PROC	NEAR
-	PUSH	DS
-	PUSH	AX
-	XOR	AX,AX
-	CMP	DS:WinTyp,AL
-	JNE	Init91
-	MOV	AX,OFFSET DskBuf
-	MOV	DS:EndBuf,AX
-	MOV	DS:EndFul,AX
-	MOV	DS:CurAdr,AX
-	MOV	DS:First,AX
-	JMP	Init93
-Init91:	CMP	DS:WinTyp,2
-	PUSH	ES
-	POP	DS
-	JNE	Init92
-	MOV	DS:Total,AX
-	MOV	DS:FreeDsk,AX
-	MOV	DS:ClstSiz,1
-	MOV	DS:Volume[0],AL
-	DEC	AX
-	MOV	DS:InfoLen,AX
-	JMP	Init93
-Init92:	JA	Init93			; ???
-	MOV	DI,OFFSET TreeBuf.TreList
-	PUSH	DI
-	PUSH	CX
-	MOV	CX,16
-	REP	STOSB
-	POP	CX
-	POP	DI
-	MOV	DS:[DI].DirName,'\'
-	MOV	DS:[DI].DirShift,1
-	MOV	DS:TreeBuf.TreeLen,1
-	MOV	AX,OFFSET TreeBuf.TreList
-	MOV	DS:TreFrst,AX
-	MOV	DS:TreAdr,AX
-Init93:	POP	AX
-	POP	DS
-	RET
-Init90	ENDP
 
 OutStr1	PROC	NEAR
 	PUSH	CS
@@ -2437,313 +2167,88 @@ OutStr1	PROC	NEAR
 OutStr1	ENDP
 
 ;-------------------------------------------------------
-Func01:	CALL	Panel
-	CALL	PutPath
-	CALL	PutFls
-Func02:	XOR	BX,BX
-	MOV	DH,ES:Lines
-	MOV	DL,80
-Func03:	CALL	Window
-Func04:	XOR	AX,AX
-	CALL	PutMnu
+; The main loop is C: MainLoop_c of port/main.c. It is no routine: the
+; code above falls into it, commands jump back into it at the labels
+; here, and it jumps to a command. So each label hands the function the
+; number of the place, and all the registers as a structure on the stack
+; (struct Regs there): what a command leaves in them goes round the loop
+; to the next command. The function returns in AX where the program goes
+; on, a number of Main_T, and has made of the registers what that place
+; gets, with the current panel for DS. MainC, at the top of this file,
+; pushes the registers.
+Init50:	MainC	1			; Draw the panels, reading them
+Func01:	MainC	2			; Draw the panel in DS
+Func02:	MainC	3			; The screen buffer to the screen
+Func04:	MainC	4			; The menu bar
+Func05:	MainC	5			; The setup saved if it has changed
+Func07:	MainC	6			; The next key
+Func12:	MainC	7			; The command of the key in AX
+
+MainGo:	MOV	BX,SP
 	PUSH	ES
 	POP	DS
-	MOV	DS:OneFile,AL
-	MOV	DS:FlagCD,AL
-	MOV	DS:MousEnt,AL
-	DEC	AX
-	MOV	DS:MousTim.Hi,AX
-Func05:	CALL	MakeIni
-	PUSH	SS
-	POP	ES
-	MOV	DI,OFFSET IniSave
-	CMP	WORD PTR ES:[DI],'VV'
-	JNE	Func06
-	PUSH	CX
-	MOV	AX,OFFSET [3].WinPath
-	MOV	CX,LenPath
-	PUSH	CX
-	CALL	Func15
-	POP	CX
-	MOV	AX,OFFSET [3+WCBini].WinPath
-	CALL	Func15
-	POP	CX
-	MOV	BX,OFFSET [3+2*WCBini].Active
-	MOV	AL,DS:[SI+BX]
-	MOV	ES:[DI+BX],AL
-	MOV	BX,OFFSET [3+2*WCBini].Ctrl_O
-	MOV	AL,DS:[SI+BX]
-	MOV	ES:[DI+BX],AL
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	DEC	CX
-	DEC	CX
-	REPE	CMPSB
-	POP	CX
-	POP	DI
-	POP	SI
-	JE	Func06
-	CMP	DS:AutoSav,0
-	JZ	Func06
+	CLD
+	CALL	FAR PTR MainLoop_c
 	PUSH	DS
 	POP	ES
-	CALL	HidCur
-	MOV	DS:BlocEr,1
-	CALL	SaveSet
-	MOV	DS:BlocEr,0
-Func06:	PUSH	SS
-	POP	ES
-	REP	MOVSB
-	PUSH	DS
-	POP	ES
-Func07:	CALL	Cursor1
-	MOV	DS,ES:WCBcrn
-	PUSH	DS
-	XOR	AX,AX
-	CMP	ES:AutoCD,AL
-	JZ	Func09
-	CMP	DS:WinTyp,1
-	JNE	Func09
-	CMP	DS:Visible,AL
-	JZ	Func09
-	PUSH	ES
-	POP	DS
-	MOV	DI,OFFSET DosPth
-	CALL	StrLen
-	MOV	SI,OFFSET CrnPath
-	REPE	CMPSB
-	JE	Func09
-	CMP	DS:FlagCD,AL
-	JZ	Func09
-	MOV	AH,2Ch
-	INT	21h
-	ADD	DL,DS:DelayTm[0]
-	CMP	DL,100
-	JB	Func08
-	SUB	DL,100
-	INC	DH
-Func08:	ADD	DH,DS:DelayTm[1]
-	CMP	DH,60
-	JB	Func10
-	SUB	DH,60
-	INC	CX
-	CMP	CL,60
-	JB	Func10
-	SUB	CL,60
-	INC	CH
-	CMP	CH,24
-	JB	Func10
-	MOV	CH,0
-	JMP	Func10
-Func09:	MOV	CX,0FFFFh
-Func10:	POP	DS
-	MOV	ES:AutoTim.Lo,CX
-	MOV	ES:AutoTim.Hi,DX
-	XOR	CX,CX
-	MOV	ES:HlpPage,CL
-	XCHG	CH,ES:MenuFl
-	MOV	AX,3C00h
-	OR	CH,CH
-	JNE	Func12
-	CALL	GetMous
-	JNZ	Func21
-	MOV	AL,0
-	MOV	ES:WinMous,AL
-	MOV	ES:MousEnt,AL
-	CMP	ES:TstEGA,AL
-	JNE	Func11
-	MOV	AL,9
-Func11:	CALL	Input
-	CMP	AH,0FCh
-	JE	Func20
-	CMP	DS:Visible,0
-	JZ	Func12
-	CMP	DS:WinTyp,1
-	JA	Func12
-	CMP	AL,0
-	JNE	Func12
-	XCHG	AL,AH
-	PUSH	ES
-	PUSH	CS
-	POP	ES
-	MOV	DI,OFFSET AltSr_T
-	MOV	CX,12+10+9+7
-	REPNE	SCASB
-	POP	ES
-	XCHG	AL,AH
-	JNE	Func12
-	JMP	F77_00
-Func12:	CMP	AH,0FCh
-	JE	Func20
-	CMP	ES:Quote,0
-	JNZ	Func14
-	MOV	SI,OFFSET FncTab
-	CALL	Case
-Func14:	JMP	F73_00
-
-Func15	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	ADD	SI,AX
-	ADD	DI,AX
-	REP	MOVSB
-	POP	DI
-	POP	SI
-	RET
-Func15	ENDP
-
-Func20:	CALL	GetMous			; Mouse support
-Func21:	CALL	ClrKbd
-	CMP	ES:WinMous,0
-	JNZ	Func30
-	CMP	CX,2			; Panels on/off
-	JAE	Func25
-	MOV	BL,0
-Func22:	CALL	GetMous
-	JZ	Func24
-	MOV	AL,0
-	CMP	CX,2
-	JAE	Func23
-	MOV	AL,'þ'
-Func23:	CMP	AL,BL
-	JE	Func22
-	MOV	BL,AL
-	CALL	TypMous
-	JMP	Func22
-Func24:	MOV	AL,0
-	CALL	TypMous
-	OR	BL,BL
-	JE	Func35
-	JMP	F11_00
-
-Func25:	OR	CH,CH			; Pull down menu
-	JNE	Func26
-	JMP	F39_00
-Func26:	CALL	BegBX
-	CALL	SizDX
-	ADD	DH,BH
-	CMP	CH,DH
-	JAE	Func35
-
-	CMP	CL,40			; Change panel
-	JAE	Func27
-	MOV	DS,ES:WCB1seg
-	CMP	ES:Active,0
-	JE	Func30
-	JMP	Func28
-Func27:	MOV	DS,ES:WCB2seg
-	CMP	ES:Active,0
-	JNE	Func30
-Func28:	MOV	DS,ES:WCBcrn
-	JMP	F20_00
-
-Func30:	TEST	AL,3
-	JZ	Func35
-	CMP	DS:Visible,0
-	JZ	Func35
-	CMP	DS:WinTyp,2
-	JB	Func40
-	JNE	Func35
-	CALL	BegBX			; Edit 'dirinfo'
-	CALL	SizDX
-	ADD	BX,0B01h
-	SUB	DX,0C02h
-	CALL	InWind
-	JC	Func35
-	JMP	F34_10
-Func35:	JMP	Func07
-
-TmpMous	EQU	WORD PTR TmpBuf[0]
-
-Func40:	OR	ES:WinMous,1		; Move the cursor
-	MOV	ES:TmpMous,CX
-	PUSH	AX
-	CALL	AdrNum
-	POP	BP
-	CALL	BegBX
-	CMP	CL,BL
-	JB	Func35
-	PUSH	BX
-	ADD	BL,40
-	CMP	CL,BL
+	MOV	BX,AX
+	ADD	BX,BX
+	MOV	AX,CS:Main_T[BX]
+	MOV	BX,SP
+	MOV	SS:[BX+16],AX
+	POP	AX
 	POP	BX
-	JAE	Func35
-	INC	BH
-	CMP	DS:WinTyp,0
-	JNE	Func41
-	INC	BH
-Func41:	SUB	CH,BH
-	JB	Func50
-	CMP	CH,AL
-	JAE	Func55
-	SUB	CL,BL			; Set cursor position
-	CMP	CL,39
-	JAE	Func35
-	MOV	BL,DS:WinTyp
-	OR	BL,DS:BrfFul
-	JNE	Func42
-	XCHG	AL,CL
-	CBW
-	MOV	BL,13
-	DIV	BL
-	XCHG	AH,CL
-	MUL	AH
-	ADD	CH,AL
-Func42:	OR	CL,CL
-	JE	Func35
-	MOV	AL,CH
-	CBW
-	ADD	AX,DI
-	MOV	SI,AX
-	CMP	SI,DX
-	JBE	Func43
-	MOV	SI,DX
-	JMP	Func45
-Func43:	TEST	BP,1
-	JNZ	Func60
-Func45:	JMP	F00_60
+	POP	CX
+	POP	DX
+	POP	SI
+	POP	DI
+	POP	BP
+	POP	DS
+	RET				; To the place of Main_T
 
-Func50:	MOV	SI,DI			; Scroll up
-	JMP	F00_05
+; The command that the table of keys has for the key in AX, or the
+; command line for a key that it has not.
+MainKy:	MOV	SI,OFFSET FncTab
+	CALL	Case
+	JMP	F73_00
 
-Func55:	MOV	BL,DS:WinTyp		; Scroll down
-	OR	BL,DS:BrfFul
-	JNE	Func56
-	MOV	AH,3
-	MUL	AH
-Func56:	DEC	AX
-	MOV	SI,DI
-	ADD	SI,AX
-	CMP	SI,DX
-	JBE	Func57
-	MOV	SI,DX
-Func57:	JMP	F01_05
+	.DATA
+Main_T	DW	MainKy, F73_00, F77_00, F11_00, F39_00, F20_00, F34_10
+	DW	F00_60, F00_05, F01_05, F21_10, F21_31
 
-Func60:	MOV	CX,ES:TmpMous		; Double click
-	CALL	BegBX
-	INC	BX
-	MOV	BH,CH
-	MOV	DX,126h
-	MOV	CH,0
-	MOV	AL,DS:WinTyp
-	OR	AL,DS:BrfFul
-	JNE	Func61
-	MOV	AL,CL
-	SUB	AL,BL
-	CBW
-	MOV	CL,13
-	DIV	CL
-	MUL	CL
-	ADD	BL,AL
-	MOV	DL,12
-Func61:	CALL	DoublMo
-	JC	Func45
-	JNE	Func62
-	JMP	Func04
-Func62:	MOV	AL,0
-	CALL	TypMous
-	JMP	F21_10
+	.CODE
+; Entries for the C code of the loop to routines of other files (see
+; FromC above, and port/main.c for what they take and return). Those
+; of SaveSet and of the BIOS for the screen, Int10_a, are in VCMENU.INC.
+	FromC	MakeIni
+	FromC	SavScr
+
+; Read what a panel shows: ReDir, with the panel in DX and in AL whether
+; to keep the cursor and the marks. AX is not 0 if it set the carry flag.
+	PUBLIC	ReDir_a, Dos35_a
+ReDir_a	PROC	FAR
+	PUSH	DS
+	PUSH	DS
+	POP	ES
+	MOV	DS,DX
+	CALL	ReDir
+	SBB	AX,AX
+	POP	DS
+	RET
+ReDir_a	ENDP
+
+; DOS for where an interrupt goes: AL - which. It comes back in DX and AX.
+Dos35_a	PROC	FAR
+	PUSH	ES
+	PUSH	BX
+	MOV	AH,35h
+	INT	21h
+	MOV	DX,ES
+	MOV	AX,BX
+	POP	BX
+	POP	ES
+	RET
+Dos35_a	ENDP
 
 	INCLUDE	VCFUNC.INC
 	INCLUDE	VCMENU.INC
@@ -2756,19 +2261,9 @@ Func62:	MOV	AL,0
 	INCLUDE	VCFIND.INC
 
 ;------------------------ Exit -------------------------
-Exit:	CALL	RstVc1
-	CALL	Quit
-	MOV	BH,DS:DosLin
-	CALL	ClsLine
-	XOR	BX,BX
-	MOV	DH,DS:Lines
-	MOV	DL,80
-	CALL	Window
-	MOV	AL,0
-	CALL	CurMous
-	MOV	AH,DS:DosLin
-	DEC	AH
-	CALL	Cursor
+; C: Exit_c of port/main.c puts the screen back. The part of the program
+; that stays in the memory ends it.
+Exit:	CallC	Exit_c
 	MOV	AX,OFFSET Exit00
 	PUSH	SS
 	PUSH	AX
@@ -2776,77 +2271,35 @@ Exit:	CALL	RstVc1
 	RETF
 
 ;------------------------ Quit -------------------------
+; C: Quit_c of port/main.c. The callers go on with the window that it put
+; back, in BX and DX, and with DS on the main data.
 Quit	PROC	NEAR
 	PUSH	ES
 	POP	DS
-	MOV	BH,DS:Lines
-	DEC	BH
-	CMP	DS:KeyBar,0
-	JE	Quit01
-	CALL	ClsLine
-Quit01:	MOV	DH,BH
+	CALL	FAR PTR Quit_c
 	XOR	BX,BX
+	MOV	DH,DS:Lines
+	DEC	DH
 	MOV	DL,80
-	CALL	ResUser
 	RET
 Quit	ENDP
-	FromC	Quit
 
 ;--------------- Restore and Hook vectots --------------
+; C: RestVct_c and HookVct_c of port/main.c.
+;			   ES - main data
 RestVct	PROC	NEAR
-	LDS	DX,ES:ErrVct
-	MOV	AX,2524h
-	INT	21h
-RstVc1:	LDS	DX,ES:BrkVct
-	MOV	AX,251Bh
-	INT	21h
+	CallC	RestVct_c
 	RET
 RestVct	ENDP
 
+;			   DS - main data
+;	Return :	   ES - main data
 HookVct	PROC	NEAR
+	CALL	FAR PTR HookVct_c
 	PUSH	DS
-	MOV	AX,3524h
-	INT	21h
-	MOV	DS:ErrVct.Offs,BX
-	MOV	DS:ErrVct.Segm,ES
-	MOV	AX,351Bh
-	INT	21h
-	MOV	DS:BrkVct.Offs,BX
-	MOV	DS:BrkVct.Segm,ES
-	PUSH	CS
-	POP	DS
-	MOV	DX,OFFSET FatErr
-	MOV	AX,2524h
-	INT	21h
-	PUSH	SS
-	POP	DS
-	MOV	DX,OFFSET CtrlC
-	MOV	AX,251Bh
-	INT	21h
 	POP	ES
 	RET
 HookVct	ENDP
-
-; C code takes the vectors of the critical error and of Ctrl-Break back
-; from the program and gives them to it again: RestVct, and HookVct, which
-; hands back in DX the address of its routine for Ctrl-Break, in the part
-; of the program that stays in the memory.
-	PUBLIC	RestVct_a, HookVct_a
-RestVct_a PROC	FAR
-	PUSH	DS
-	PUSH	DS
-	POP	ES
-	CALL	RestVct
-	POP	DS
-	RET
-RestVct_a ENDP
-
-HookVct_a PROC	FAR
-	PUSH	DS
-	CALL	HookVct
-	POP	DS
-	RET
-HookVct_a ENDP
 
 ;--------------------- Fatal error ---------------------
 	.CONST
@@ -3043,121 +2496,10 @@ NoRd_P	DB	Err_C, ErInv_C, 0, 0
 	DW	NoRd1_S
 	DW	NoRd2_S
 	DW	NoRd3_S
-Ready_T	DW	001Bh, ErRdy6
-	DW	4400h, ErRdy6
-	DW	000Dh, ErRdy7
-	DW	0
 
 	.CODE
-ErrRdy	PROC	NEAR
-	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	PUSH	ES
-	POP	DS
-	CBW
-	MOV	WORD PTR DS:[TmpErr+1],AX
-	MOV	CL,AL
-	MOV	AL,2
-	CALL	PutKey
-	MOV	BP,OFFSET NoRd_P
-	MOV	BX,528h
-	CALL	DialBox
-	CALL	Window
-	PUSH	SI
-	LEA	AX,[BX+42Ch]
-	CALL	Cursor
-	CALL	ClrKbd
-	CALL	Beep
-	MOV	DS:HlpPage,0FFh
-	CALL	BasAdr
-	ADD	DI,2*364
-ErRdy1:	MOV	AL,2
-	CALL	Input
-	CMP	AH,0FCh
-	JE	ErRdy2
-	MOV	SI,OFFSET Ready_T
-	CALL	Case
-	CMP	AL,80h
-	JAE	ErRdy1
-	CALL	UpCase
-	CMP	AL,'A'
-	JB	ErRdy1
-	CMP	AL,'Z'
-	JA	ErRdy1
-	CALL	TstDrv
-	JNZ	ErRdy1
-	MOV	DS:[DI],AL
-	MOV	CL,AL
-	PUSH	DX
-	PUSH	BX
-	ADD	BX,42Ch
-	MOV	DX,101h
-	CALL	Window
-	POP	BX
-	POP	DX
-	JMP	ErRdy1
-ErRdy2:	PUSH	CX
-	XOR	SI,SI
-ErRdy3:	CALL	GetMous
-	JZ	ErRdy5
-	MOV	BP,CX
-	MOV	AH,0
-	CMP	AL,1
-	JE	ErRdy4
-	MOV	AH,'û'
-	CMP	AL,2
-	JE	ErRdy4
-	MOV	AH,'x'
-ErRdy4:	MOV	CX,SI
-	MOV	SI,AX
-	CMP	AH,CH
-	JE	ErRdy3
-	MOV	AL,AH
-	CALL	TypMous
-	JMP	ErRdy3
-ErRdy5:	POP	CX
-	MOV	AL,0
-	CALL	TypMous
-	MOV	AX,SI
-	CMP	AL,2
-	JE	ErRdy7
-	CMP	AL,1
-	JNE	ErRdy6
-	PUSH	DX
-	PUSH	CX
-	MOV	CX,BP
-	SUB	DX,102h
-	CALL	InWind
-	POP	CX
-	POP	DX
-	JNC	ErRdy1
-ErRdy6:	MOV	CL,0
-ErRdy7:	CALL	HidCur
-	POP	SI
-	CALL	ResWin
-	CALL	Window
-	MOV	BL,CL
-	SUB	BL,'A'-1
-	MOV	AX,440Fh
-	INT	21h
-	POP	AX
-	MOV	AL,CL
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
-	RET
-ErrRdy	ENDP
-	FromC	ErrRdy
+; C: ErrRdy_c of port/main.c, which only C code calls. Its box stays
+; here, where DialBox reads it.
 
 MainPth	PROC	NEAR
 	MOV	SI,OFFSET NcEnv

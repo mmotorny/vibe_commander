@@ -155,8 +155,40 @@ out again (show.py --changes is how):
   - A directory named DIRINFO is what the Info panel cannot open: it
     then says that the disk has no label, which it has not looked for.
     Ctrl+F4 shows the label in a dialog, which Esc leaves.
-  - The dialog of Alt+F1 offers A, C and D: there is no drive B to be
-    asked for, and no drive that is not ready.
+  - The dialog of Alt+F1 offers A, C and D. The one floppy drive is B:
+    as well, and DOS has its diskette be that of one letter at a time:
+    the dialog offers the letter that it is. A file of the other letter
+    named, Shift+F3 and "b:\\fdauto.bat", has the program ask for the
+    diskette, "Insert diskette for drive B:", and Enter there makes it
+    B:'s. From then on A: is a drive that is not ready: whatever reads
+    it asks for its diskette, and Esc there fails. A panel of files that
+    cannot be read is drawn empty and has the box "Can't read the disk
+    in drive A:", which takes a letter, Enter to try the letter it
+    shows and Esc or F10 to give up. Enter makes the diskette that of
+    the letter shown, if the floppy drive has that letter; and given up,
+    the diskette was A:'s again, the drive that had failed and the
+    current one. So the diskette is made B:'s again before every
+    failure. "F9 o d", Auto directory sizes switched on, reads both
+    panels again, Ctrl+r the current one, and a panel that could not be
+    read is read again when the viewer is left. See not-ready.
+  - The driver hands the program a key only when AutoTim says that
+    nothing is pending, and the main data is new memory when the
+    program starts and after every command of DOS, until the main loop
+    has set AutoTim once. A box that comes up before that, while the
+    panels are drawn for the first time, gets no key and the step never
+    ends: "b:" as a command leaves the program at "Insert diskette for
+    drive B:" for the five minutes of STEP_TIME. To see where a step is
+    stuck without waiting that long, run show.py with STEP_TIME set to
+    a few seconds: the error has the screen.
+  - The program run from its own command line, "d:\\vc\\vc", is a second
+    copy of whichever program is tested, and what follows the name is a
+    command that the copy runs before it shows its panels; F10 and Enter
+    leave it. Its Info counts all the memory from where the copy is
+    loaded, which follows the size of the first copy's part that stays:
+    have the setup saved without an Info first. "F9 o Enter", four
+    Tabs, Down and Space tick Auto save setup, and the setup is then
+    saved whenever it has changed, the directories of the panels and
+    which one is current apart. See second-copy.
   - In the viewer F2 switches wrapping, F4 hex, F7 asks for a text and
     Shift+F7 looks for it again; Right and Left move a line that is not
     wrapped by a column, with Ctrl by forty. Home in a file that has
@@ -221,7 +253,17 @@ out again (show.py --changes is how):
     open; on an item of a menu it is the item, and beside a menu it
     closes it; in a dialog it is on a button or in a field. The
     scenarios mouse-panel, mouse-bars and mouse-dialog have each of
-    these once.
+    these once. In the top left corner it switches the panels off and
+    on; on the titles of a list and on its status line it moves the
+    cursor up and down for as long as it is held, so to the end; below
+    the last file it goes to that; in the other panel it makes that the
+    current one, an Info too, and in the lower part of an Info that is
+    current it edits dirinfo. Two clicks on an entry in two steps that
+    follow each other are a double click, Enter there: mouse-list. The
+    pointer does not move while a button is down, and no step presses
+    two buttons or the middle one. In the box of a drive that is not
+    ready the right button is Enter and the left one beside the box
+    gives up: not-ready.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
@@ -461,7 +503,7 @@ out again (show.py --changes is how):
     offers but which may be typed: Shift+F8, "b:*.*" and two Enters
     bring up "Insert diskette for drive B:", and Esc there stops the
     command. That is the way to a disk that the user will not put in.
-    Enter there has not been tried.
+    Enter there makes the diskette B:'s: see above.
   - Shift+F8 with "*.*" or a full stop for a name, with a path or
     without, warns first, "Delete Cancel"; a name that no file has says
     "Can't find file". Ctrl+F8 deletes the file under the cursor
@@ -764,6 +806,18 @@ _CLOCK_PATH_STEPS = (
     "Tab Tab Tab Tab",
     "Space",                              # the menu bar always visible
     "Enter",                              # and the clock in it
+)
+
+# The diskette made that of B:. The floppy drive is A: and B: both, and
+# DOS has it be one of them at a time: a file of B: viewed has the program
+# ask for the diskette of B:, and from then on A: is the drive whose disk
+# is not there.
+_DISK_B = (
+    "Shift+F3",
+    '"b:\\fdauto.bat"',
+    "Enter",                              # Insert diskette for drive B:
+    "Enter",                              # Ok: the file is shown
+    "Esc",
 )
 
 # The time of day set by DOS's command, and the clock switched on: the
@@ -1296,6 +1350,95 @@ SCENARIOS = {
             "Esc",
             "F10",
             "Enter",                      # back at the DOS prompt
+        )),
+
+    "not-ready": Scenario(
+        "A drive whose disk is not there: the one floppy drive is A: and "
+        "B:, and the panels of the letter that it is not at the moment "
+        "cannot be read. The box that says so, with another drive chosen "
+        "there, with another try, and given up; and what the panels show "
+        "then",
+        steps=(
+            "Ctrl+l",                     # two panels of files
+            "Alt+F2",
+            "a",                          # the right one on A:
+            "Alt+F1",
+            "a",                          # and the left one, the current
+        ) + _DISK_B + (
+            "F9 o d",                     # both are read again: Auto
+                                          # directory sizes. DOS wants
+                                          # the diskette of A:
+            "Esc",                        # not given: the left panel
+                                          # cannot be read
+            "Esc",                        # no other drive: the right one,
+                                          # on the same drive, is not tried
+            "Click@5,15",                 # the left button beside the box
+                                          # gives up: both are empty
+            "Ctrl+l",                     # the Info: A: is read, the
+                                          # diskette is A:'s again once
+                                          # the box has been given up
+        ) + _DISK_B + (
+            "F9 o d",
+            "F9 o d",                     # read again
+            "Esc",
+            "F10",                        # given up: an Info without
+                                          # figures
+            "F9 r t",                     # the tree
+        ) + _DISK_B + (
+            "F9 o d",
+            "F9 o d",
+            "Esc",
+            "Esc",                        # a tree of the root alone
+        ) + _DISK_B + (                   # a panel that was not read is
+                                          # read when the viewer is left
+            "Esc",
+            "1 z c",                      # no letter, no such drive, and
+                                          # a drive: the box shows it
+            "Click@30,8",                 # the left button in the box does
+                                          # nothing
+            "RightClick@30,8",            # the right one is Enter: C: is
+                                          # the current drive now
+            "Alt+F1",                     # the diskette is still B:
+            "b",
+            "Shift+F3",
+            '"a:\\fdauto.bat"',
+            "Enter",
+            "Enter",                      # and is A: now
+            "Esc",
+            "Ctrl+r",                     # so B: cannot be read
+            "Esc",
+            "Enter",                      # try again: the box has made
+                                          # the diskette that of B:
+            "F9 r b",                     # the right panel shows files
+                                          # again, of A:
+            "Esc",                        # which cannot be read
+            "c",
+            "Enter",                      # so it shows C: instead
+        )),
+
+    "second-copy": Scenario(
+        "The setup saved by itself when it has changed, and the program "
+        "started with a command to run: a second copy of it, run from "
+        "the command line of the first",
+        steps=(
+            "F9 o Enter",                 # the Configuration
+            "Tab Tab Tab Tab Down Space",  # Auto save setup
+            "Enter",                      # which is a change: saved
+            "Ctrl+l",                     # two panels of files, saved too:
+                                          # the second copy starts so, and
+                                          # shows no Info, whose count of
+                                          # all the memory follows where
+                                          # the copy is loaded
+            # A Tab in the command line, typed as it is after ^Q, comes
+            # to the second copy as it is, and is a space in its command.
+            '"d:\\vc\\vc" Space "ver" Ctrl+q Tab "/r"',
+            "Enter",                      # the second copy runs the
+                                          # command and shows its panels
+            "Ctrl+o",                     # what the command printed
+            "Ctrl+o",
+            "F10",
+            "Enter",                      # the second copy left: the first
+            "Ctrl+PgUp",                  # still works
         )),
 
     "user-menu": Scenario(
@@ -3355,6 +3498,27 @@ SCENARIOS = {
             "RightClick@3,6",             # hello.txt selected
             "RightClick@3,6",             # and not
             "Move@40,12",                 # the pointer by itself
+        )),
+
+    "mouse-list": Scenario(
+        "The mouse at the panels otherwise: in the corner, which switches "
+        "them off and on, above and below a list, which move the cursor "
+        "that way while the button is held, twice on a directory, which "
+        "is Enter, in the other panel, and in the lower part of an Info, "
+        "which edits dirinfo",
+        steps=(
+            "Click@0,0",                  # the corner: the panels off
+            "Click@0,0",                  # and on
+            "Click@3,15",                 # below the last file: onto it
+            "Click@3,1",                  # the titles: up, to the top
+            "Click@3,21",                 # the status line: down again
+            "Click@3,3",                  # DOCS
+            "Click@3,3",                  # at once again: into it
+            "Click@45,5",                 # the Info is the current panel
+            "Click@60,5",                 # its upper part: nothing
+            "Click@60,15",                # its lower part: a dirinfo
+            "Esc",
+            "Click@3,5",                  # the left panel again
         )),
 
     "mouse-bars": Scenario(
