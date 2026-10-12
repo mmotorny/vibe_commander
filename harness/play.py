@@ -51,6 +51,9 @@ def command(floppy, disks, display):
     line = ["qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", "16",
             "-nodefaults", "-vga", "std", "-display", display, "-no-reboot",
             "-rtc", "base=localtime", "-boot", "a", "-monitor", "vc",
+            # The floppy tells its serial port when DOS has booted, for
+            # the tests: there has to be one, and nobody listens.
+            "-serial", "null",
             "-drive", f"if=floppy,index=0,format=raw,readonly=on,file={floppy}"]
     for index, disk in enumerate(disks):
         line += ["-drive", f"if=ide,index={index},format=raw,file={disk}"]
