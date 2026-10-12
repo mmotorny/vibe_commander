@@ -56,7 +56,6 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
 #pragma aux DirSize "*_c" __far parm [ax] modify exact [ax]
 #pragma aux TstInfo "*_c" __far parm [ax] modify exact [ax]
 #pragma aux Help00  "*_c" __far modify exact [ax]
-#pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

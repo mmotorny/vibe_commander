@@ -121,13 +121,6 @@ void NormStr(u8 __far *text);
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
 void V81_00(void);                                      /* view.c */
 u32 V82_00(u16 segment, u16 at, u16 count);
-#pragma aux PutDate "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
-#pragma aux BufDate "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
-#pragma aux PutTime "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
-#pragma aux BufTime "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
-#pragma aux FilZero "*_c" __far parm [es si] [cx] modify exact [ax]
-#pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
-#pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 #pragma aux V81_00  "*_c" __far modify exact [ax]
 #pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 

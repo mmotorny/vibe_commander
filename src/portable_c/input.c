@@ -60,7 +60,6 @@
 /* C routines of other files that vc.h does not have. */
 u16 HexDec(u16 number);                                 /* format.c */
 void Help00(void);                                      /* help.c */
-#pragma aux HexDec  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* The characters that words end at. */

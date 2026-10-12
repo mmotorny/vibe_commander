@@ -8,9 +8,7 @@
 
 const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number);
 
-/* How the assembly passes arguments to these, and what it expects back;
-   HexByt and TstHex are in vc.h. */
-#pragma aux TxtNum "*_c" __far parm [es si] [bx] value [es si] modify exact [si es]
+/* HexByt and TstHex are in vc.h. */
 
 /* Write the low byte of `byte` to the screen buffer as two hex digits,
    leaving the colours as they are, and return the address of the cell

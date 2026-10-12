@@ -25,8 +25,6 @@
 
 u8 *ColAddr(u16 number);                                /* screen.c */
 u16 *Shadow(u16 *cell);
-#pragma aux ColAddr "*_c" __far parm [ax] value [di] modify exact [di]
-#pragma aux Shadow  "*_c" __far parm [di] value [di] modify exact [di]
 
 /* Write a line of a box to the screen buffer, and return the address of
    the cell behind it: `margin` spaces, the character in the high byte of

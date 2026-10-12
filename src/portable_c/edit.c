@@ -165,9 +165,6 @@ u16 __far *HexByt(u16 __far *screen, u16 byte);         /* digits.c */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 void PathLin(u8 __far *text);                           /* string.c */
-#pragma aux HexByt  "*_c" __far parm [es di] [ax] value [es di] modify exact [di es]
-#pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
-#pragma aux PathLin "*_c" __far parm [es si] modify exact [ax]
 /* The viewer's search: V80_00 shows the box "Searching for" under the
    title `include`, says where it is, and makes ready what is looked for,
    SrchStr; V82_00 looks for it in `count` bytes. Behind what it finds is

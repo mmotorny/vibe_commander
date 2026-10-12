@@ -1074,13 +1074,25 @@ def check_original(listing, ran):
     return passed
 
 
+def linked_as(symbols, name):
+    """Where the map has the function that `functions` of a batch names:
+    under that name, which is the one that a #pragma aux of the C
+    translation gives it, with _c behind the routine's; or, in a tree
+    that leaves the name to the compiler, with the underscore that the
+    compiler puts behind the name of a function."""
+    for known in (name, name.removesuffix("_c") + "_"):
+        if known in symbols:
+            return symbols[known]
+    raise KeyError(f"the link map has no function {name}")
+
+
 def check_translation(link_map, executed):
     """Report on the C functions that replace it; return success."""
     symbols = coverage.link_map(link_map)
     passed = True
     for batch in BATCHES:
         for name in batch.functions:
-            segment, offset = symbols[name]
+            segment, offset = linked_as(symbols, name)
             start = segment * 16 + offset
             if start - COM_ORIGIN + EXE_HEADER not in executed:
                 passed = False

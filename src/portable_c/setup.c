@@ -31,8 +31,6 @@ extern const u8 __far Init_F[];
 /* C routines of other files that vc.h does not have. */
 void FilZero(u8 __far *text, u16 length);               /* string.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
-#pragma aux FilZero "*_c" __far parm [es si] [cx] modify exact [ax]
-#pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
 #define DOS_ATTRIBUTES 0x4300           /* of the file at DS:DX, into CX */
 #define DOS_CREATE     0x3C00           /* that file, with those of CX */

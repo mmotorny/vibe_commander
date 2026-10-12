@@ -16,14 +16,8 @@ const u8 __far *FndLet(const u8 __far *text);
 void NormStr(u8 __far *text);
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 
-/* The registers of these. The original has a text at DS:SI or ES:DI; DS
-   cannot carry an argument here, so such a text comes in another
-   register. AddFile, MvzLine, PathLin, LetLin and ShrtLin are in vc.h. */
-#pragma aux FilZero "*_c" __far parm [es si] [cx] modify exact [ax]
-#pragma aux StrLen  "*_c" __far parm [es di] value [cx] modify exact [cx]
-#pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
-#pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
-#pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
+/* AddFile, MvzLine, PathLin, LetLin and ShrtLin are in vc.h. The
+   original has a text at DS:SI or ES:DI, and here it is a far pointer. */
 
 /* End a path with a backslash, unless it has one: `end` is where the path
    ends. Returns where it ends then. Nothing is written behind it. */

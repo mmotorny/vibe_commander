@@ -458,8 +458,6 @@ u16 ReDir(u16 panel, u16 keep);
    the low one, or 53h there for a drive that is not ready. */
 u16 MakeIni(void);
 u32 SaveSet(void);
-#pragma aux MakeIni "*_c" __far value [ax] modify exact [ax]
-#pragma aux SaveSet "*_c" __far value [dx ax] modify exact [ax dx]
 
 /* What the setup file holds: three letters V, of each panel what a
    WCBdef has before CurAdr, of the main data what it has before LoadRes,
@@ -476,7 +474,9 @@ u32 SaveSet(void);
    (resident.c) cannot call them: they are of the part that goes, and
    not in the memory then. So the build compiles dos.c a second time, into
    that part, with RESIDENT defined as it is for resident.c: the names of
-   the second copy end otherwise, and resident.c calls those. */
+   the second copy end otherwise, and resident.c calls those. That is all
+   that the #pragma aux of each says here, the name that the linker has
+   for it: two copies of one function cannot have one name. */
 #ifdef RESIDENT
 #define DOS_NAME "*_r"
 #else
@@ -503,22 +503,22 @@ void IntOff(void);
 void IntOn(void);
 void Int28(void);
 void DvPause(void);
-#pragma aux Int21d  DOS_NAME __far parm [bx] value [ax] modify exact [ax]
-#pragma aux Int21f  DOS_NAME __far parm [bx] [ax] value [ax] modify exact [ax]
-#pragma aux Int21e  DOS_NAME __far parm [bx] value [ax] modify exact [ax]
-#pragma aux Int10   DOS_NAME __far parm [bx] modify exact [ax]
-#pragma aux TopView DOS_NAME __far parm [es di] [cx] modify exact [ax]
-#pragma aux TopScr  DOS_NAME __far parm [es di] value [es di] modify exact [ax di es]
-#pragma aux Int16   DOS_NAME __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux Int2F   DOS_NAME __far parm [ax] [bx] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux Int33   DOS_NAME __far parm [ax] [bx] [cx] [dx] value [ax] modify exact [ax]
-#pragma aux MousAt  DOS_NAME __far parm [di] modify exact [ax]
-#pragma aux CaseMap DOS_NAME __far parm [ax] value [ax] modify exact [ax]
-#pragma aux InPort  DOS_NAME __far parm [ax] value [ax] modify exact [ax]
-#pragma aux IntOff  DOS_NAME __far modify exact [ax]
-#pragma aux IntOn   DOS_NAME __far modify exact [ax]
-#pragma aux Int28   DOS_NAME __far modify exact [ax]
-#pragma aux DvPause DOS_NAME __far modify exact [ax]
+#pragma aux Int21d  DOS_NAME
+#pragma aux Int21f  DOS_NAME
+#pragma aux Int21e  DOS_NAME
+#pragma aux Int10   DOS_NAME
+#pragma aux TopView DOS_NAME
+#pragma aux TopScr  DOS_NAME
+#pragma aux Int16   DOS_NAME
+#pragma aux Int2F   DOS_NAME
+#pragma aux Int33   DOS_NAME
+#pragma aux MousAt  DOS_NAME
+#pragma aux CaseMap DOS_NAME
+#pragma aux InPort  DOS_NAME
+#pragma aux IntOff  DOS_NAME
+#pragma aux IntOn   DOS_NAME
+#pragma aux Int28   DOS_NAME
+#pragma aux DvPause DOS_NAME
 
 /* The registers as an interrupt function of the compiler saves them on
    the stack and puts them back: its first parameter. */
@@ -550,28 +550,20 @@ struct Place {
 #define NUM_SEPARATED 1                 /* put the country's separator in */
 #define NUM_PADDED    2                 /* fill with spaces up to full width */
 
-/* Routines for C code in other files than theirs to call. The registers
-   of each are those that the assembly called it with, while it did. */
+/* Routines for C code in other files than theirs to call. Each is
+   called as the compiler calls any function: the C translation says of
+   each, in a #pragma aux, in which registers the assembly called it, and
+   the portable C does not. */
 u16 Color(u16 number);                  /* screen.c */
 u16 *BasAdr(u16 place);
 u16 __far *MvsColr(u16 __far *screen, u16 count, u16 color);
 u16 __far *MovDz0(u16 __far *screen, const u8 __far *text);
-#pragma aux Color   "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux BasAdr  "*_c" __far parm [bx] value [di] modify exact [di]
-#pragma aux MvsColr "*_c" __far parm [es di] [cx] [ax] value [es di] modify exact [di es]
-#pragma aux MovDz0  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 u16 __far *HexByt(u16 __far *screen, u16 byte);         /* digits.c */
 u16 TstHex(u16 digit);
-#pragma aux HexByt "*_c" __far parm [es di] [ax] value [es di] modify exact [di es]
-#pragma aux TstHex "*_c" __far parm [ax] value [ax] modify exact [ax]
 void Convert(const u8 __far *name, u8 *buffer);         /* mask.c */
 u16 TstMas(const u8 __far *name, const u8 *mask);
-#pragma aux Convert "*_c" __far parm [dx si] [di] modify exact [ax]
-#pragma aux TstMas  "*_c" __far parm [dx si] [di] value [ax] modify exact [ax]
 void NgLine(struct LineArgs STACK *args);               /* line.c */
 void CntLine(struct LineArgs STACK *args);
-#pragma aux NgLine  "*_c" __far parm [bx] modify exact [ax bx cx dx es]
-#pragma aux CntLine "*_c" __far parm [bx] modify exact [ax bx cx dx es]
 u8 __far *AddFile(u8 __far *end);                       /* string.c */
 u8 __far *MvzLine(u8 __far *to, const u8 __far *from, u16 length);
 u16 LowCase(u16 letter);
@@ -579,25 +571,12 @@ const u8 __far *CutPath(const u8 __far *path);
 void PathLin(u8 __far *text);
 void LetLin(u8 __far *text);
 void ShrtLin(u8 __far *text, u16 limit);
-#pragma aux AddFile "*_c" __far parm [es di] value [es di] modify exact [di es]
-#pragma aux MvzLine "*_c" __far parm [es di] [dx si] [cx] value [es di] modify exact [di es]
-#pragma aux LowCase "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux CutPath "*_c" __far parm [es si] value [es si] modify exact [si es]
-#pragma aux PathLin "*_c" __far parm [es si] modify exact [ax]
-#pragma aux LetLin  "*_c" __far parm [es si] modify exact [ax]
-#pragma aux ShrtLin "*_c" __far parm [es si] [ax] modify exact [ax]
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */
 u16 *SzDtTm(const struct FILENT __far *file, u16 *screen, u16 color);
-#pragma aux Number  "*_c" __far parm [di] [bx] [cx] [ax] value [di] modify exact [di]
-#pragma aux SzDtTm  "*_c" __far parm [es si] [di] [ax] value [di] modify exact [di es]
 void SetMask(u16 panel);                                /* files.c */
 void Sort(u16 panel);
 u16 FnFile(u16 panel, const u8 __far *name);
 u16 NearFl(u16 panel, const u8 __far *name, u16 end);
-#pragma aux SetMask "*_c" __far parm [ax] modify exact [ax]
-#pragma aux Sort    "*_c" __far parm [ax] modify exact [ax]
-#pragma aux FnFile  "*_c" __far parm [dx] [es di] value [si] modify exact [si]
-#pragma aux NearFl  "*_c" __far parm [dx] [es di] [bx] value [ax] modify exact [ax]
 u16 BegBX(u16 panel);                                   /* place.c */
 u16 SizDX(void);
 u16 LnsAX(void);
@@ -605,13 +584,6 @@ u16 InvWCB(u16 panel);
 u16 FilePan(u16 panel);
 void AdrNum(u16 panel, struct Place STACK *place);
 void CorPar(u16 panel);
-#pragma aux BegBX   "*_c" __far parm [bx] value [bx] modify exact [bx]
-#pragma aux SizDX   "*_c" __far value [dx] modify exact [dx]
-#pragma aux LnsAX   "*_c" __far value [ax] modify exact [ax]
-#pragma aux InvWCB  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux FilePan "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux AdrNum  "*_c" __far parm [ax] [bx] modify exact [ax]
-#pragma aux CorPar  "*_c" __far parm [ax] modify exact [ax]
 u8 *PtPt10(u16 panel);                                  /* panel.c */
 #pragma aux PtPt10  "*_c" __far parm [ax] value [di] modify exact [ax di]
 /* The colours of the tree are four numbers in the code, which come as a
@@ -1109,21 +1081,12 @@ void PutMnu(u16 item);
 void PtMnu1(u16 item);
 void PutPrm(u16 panel);
 void DosCom(void);
-#pragma aux ClsLine "*_c" __far parm [bx] [ax] value [di] modify exact [ax di]
-#pragma aux PutKey  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutKey0 "*_c" __far parm [ax] [dx] modify exact [ax]
-#pragma aux PutMnu  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PtMnu1  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux PutPrm  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux DosCom  "*_c" __far modify exact [ax]
 /* The entries of an extension file or a menu file: FndItem returns where
    the next one is, the offset in the low word, and 1 in the high one at
    the end of the file; FindExt where in the main data the command for a
    file's extension is, or 0. See extfile.c. */
 u32 FndItem(const u8 __far *file);
 u16 FindExt(const u8 __far *name);
-#pragma aux FndItem "*_c" __far parm [dx si] value [dx ax] modify exact [ax dx]
-#pragma aux FindExt "*_c" __far parm [dx si] value [si] modify exact [ax si]
 /* Waiting for a key, and a line that is typed into: see each in input.c.
    Input and Input0 return the key, the scan code in the high byte, where
    FCh says that the mouse did something; Input0 has 1 in the high word
@@ -1139,13 +1102,6 @@ u32 EdLin(u16 key, u8 *text, u16 cursor, u16 length);
 u16 EdSub1(const u8 *line, u16 cursor);
 u16 CmpSym(u16 symbol);
 u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
-#pragma aux Input   "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux Input0  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux Rnd     "*_c" __far value [ax] modify exact [ax]
-#pragma aux EdLin   "*_c" __far parm [ax] [si] [dx] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux EdSub1  "*_c" __far parm [di] [ax] value [ax] modify exact [ax]
-#pragma aux CmpSym  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux Search  "*_c" __far parm [di] [si] [bx] [cx] [dx] [ax] value [si] modify exact [ax si]
 
 /* What the program asks of DOS and the BIOS at every turn: see each in
    system.c. Intr21 and Intr21f call DOS with the registers of `regs` and
@@ -1175,21 +1131,6 @@ u32 OpenFil(const u8 __far *name, u16 mode);
 u16 SetPth(void);
 u16 Fantom(u16 drive);
 u16 ChgDisk(const u8 *path);
-#pragma aux Timer   "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux ClrKbd  "*_c" __far modify exact [ax]
-#pragma aux TstBrk  "*_c" __far value [ax] modify exact [ax]
-#pragma aux Beep    "*_c" __far modify exact [ax]
-#pragma aux UpCase  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux SetDTA  "*_c" __far modify exact [ax]
-#pragma aux TstDrv  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux SelDrv  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux Intr21  "*_c" __far parm [bx] value [ax] modify exact [ax]
-#pragma aux Intr21f "*_c" __far parm [bx] [ax] value [ax] modify exact [ax]
-#pragma aux DosTime "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux OpenFil "*_c" __far parm [dx bx] [ax] value [dx ax] modify exact [ax dx]
-#pragma aux SetPth  "*_c" __far value [ax] modify exact [ax]
-#pragma aux Fantom  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux ChgDisk "*_c" __far parm [dx] value [ax] modify exact [ax]
 /* The mouse: see each in mouse.c. GetMous returns the buttons in the low
    word and the place in the high one, InWind is not 0 for a place
    outside a window, and DoublMo is 2 to go on, 1 for a second click and 0
@@ -1201,13 +1142,6 @@ void CurMous(u16 show);
 u32 GetMous(u16 place);
 u16 DoublMo(u16 begin, u16 size, u16 cursor);
 u16 InWind(u16 where, u16 begin, u16 size);
-#pragma aux IniMous "*_c" __far modify exact [ax]
-#pragma aux TypMous "*_c" __far parm [ax] modify exact [ax]
-#pragma aux SavMous "*_c" __far modify exact [ax]
-#pragma aux CurMous "*_c" __far parm [ax] modify exact [ax]
-#pragma aux GetMous "*_c" __far parm [cx] value [dx ax] modify exact [ax dx]
-#pragma aux DoublMo "*_c" __far parm [bx] [dx] [si] value [ax] modify exact [ax]
-#pragma aux InWind  "*_c" __far parm [cx] [bx] [dx] value [ax] modify exact [ax]
 /* The screen, its cursor, and windows of the screen buffer: see each in
    window.c. A place has the row in its high byte, and a size the rows.
    `buffer` is an address in the main data. */
@@ -1231,21 +1165,6 @@ void ResWin(u16 begin, u16 size, u16 buffer);
 void ResUser(u16 begin, u16 size);
 void Window(u16 begin, u16 size);
 void SavScr(void);
-#pragma aux ChkMode "*_c" __far parm [bx] value [ax] modify exact [ax]
-#pragma aux Cursor  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux Cursor1 "*_c" __far modify exact [ax]
-#pragma aux ChgCur  "*_c" __far value [ax] modify exact [ax]
-#pragma aux CurShp  "*_c" __far parm [cx] modify exact [ax]
-#pragma aux GetCur  "*_c" __far value [ax] modify exact [ax]
-#pragma aux HidCur  "*_c" __far modify exact [ax]
-#pragma aux Int10m  "*_c" __far parm [ax] [bx] [cx] [dx] value [dx cx] modify exact [cx dx]
-#pragma aux ScrOffs "*_c" __far value [di] modify exact [ax di]
-#pragma aux SftEGA  "*_c" __far parm [bx] value [bx] modify exact [bx]
-#pragma aux SavWin  "*_c" __far parm [bx] [dx] [si] modify exact [ax]
-#pragma aux ResWin  "*_c" __far parm [bx] [dx] [si] modify exact [ax]
-#pragma aux ResUser "*_c" __far parm [bx] [dx] modify exact [ax]
-#pragma aux Window  "*_c" __far parm [bx] [dx] modify exact [ax]
-#pragma aux SavScr  "*_c" __far modify exact [ax]
 /* The frame of a box: see each in box.c. OncZoom takes a box of the
    assembly as DialBox does, in the main data. */
 u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width);
@@ -1253,18 +1172,11 @@ u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width);
 void MinBox(u16 begin, u16 size, u16 color);
 u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
 void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
-#pragma aux BoxLine "*_c" __far parm [di] [ax] [bx] [cx] [dx] value [di] modify exact [di]
-#pragma aux BoxDubl "*_c" __far parm [di] [ax] [si] [cx] [dx] value [di] modify exact [di]
-#pragma aux MinBox  "*_c" __far parm [bx] [dx] [ax] modify exact [ax]
-#pragma aux StdLine "*_c" __far parm [bx] [ax] [si] [dx] value [bx] modify exact [bx]
-#pragma aux OncZoom "*_c" __far parm [bx] [ax] [dx] [di] modify exact [ax]
 /* The screen blanker, which comes back when a key is pressed or the mouse
    moved, and the word to DOS and to what shares the machine that the
    program is idle: see each in blank.c. */
 void Blank(void);
 void LeaveTm(void);
-#pragma aux Blank   "*_c" __far modify exact [ax]
-#pragma aux LeaveTm "*_c" __far modify exact [ax]
 /* Small ones: see each in misc.c. PgUp and PgDn return the cursor in the
    low word and the first line shown in the high one. AsmSeg is the
    segment of the program's constants, the texts and tables of the files
@@ -1275,19 +1187,11 @@ void LeaveTm(void);
 u16 AsmSeg(void);
 u16 ResSeg(void);
 u16 MemRun(void);
-#pragma aux AsmSeg  "*_c" __far value [ax] modify exact [ax]
-#pragma aux ResSeg  "*_c" __far value [ax] modify exact [ax]
-#pragma aux MemRun  "*_c" __far value [ax] modify exact [ax]
 u16 IsCrLf(u16 word);
 u16 InvVar(u8 __far *variable);
 u16 ChkSum(const u8 *data, u16 length);
 u32 PgUp(u16 cursor, u16 first, u16 rows);
 u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
-#pragma aux IsCrLf  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux InvVar  "*_c" __far parm [es bx] value [ax] modify exact [ax]
-#pragma aux ChkSum  "*_c" __far parm [si] [cx] value [ax] modify exact [ax]
-#pragma aux PgUp    "*_c" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx]
-#pragma aux PgDn    "*_c" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx]
 
 /* The segment of the main data, as a number: this compiler makes a far
    pointer of a near one with DS, and that is not read anywhere else. */

@@ -58,7 +58,6 @@ u16 ChTree(u16 column);
 void FilZero(u8 __far *text, u16 length);               /* string.c */
 void TreeCur(void);                                     /* tree.c */
 void TrCr20(u16 lines);
-#pragma aux FilZero "*_c" __far parm [es si] [cx] modify exact [ax]
 #pragma aux TreeCur "*_c" __far modify exact [ax]
 #pragma aux TrCr20  "*_c" __far parm [ax] modify exact [ax]
 

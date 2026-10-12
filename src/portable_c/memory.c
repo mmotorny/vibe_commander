@@ -90,8 +90,6 @@ extern const u8 __far Release[];
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 u16 HexDec(u16 number);                                 /* format.c */
-#pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
-#pragma aux HexDec  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
 /* The buttons of the map and their colours, of src/c/memory_t.c, which
    MinMnu takes by their offsets; and what the part of the program that

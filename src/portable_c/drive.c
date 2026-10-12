@@ -35,7 +35,6 @@
 /* A C routine of another file that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
-#pragma aux MvsBw "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
 
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))

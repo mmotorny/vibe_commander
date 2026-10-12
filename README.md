@@ -540,6 +540,20 @@ multiply and divide such numbers. In the part that stays in the memory
 one jump of the inline assembly is far for it: from the nine
 instructions of INT 2Eh to the function that goes on behind them.
 
+The registers go from its functions. In the C translation a function
+that another file calls takes its arguments and returns its value in the
+registers that the assembly called it with, by a `#pragma aux` that also
+says what it changes and gives it a name of its own for the linker;
+there is no assembly left to call it, and in the portable C such a
+function is called as the compiler calls any other, under the name that
+the compiler gives it. So far that holds for the routines that the rest
+of the program rests on: the screen buffer, numbers and texts, the
+lists of files, the places of the panels, boxes and windows, the mouse,
+the keys and the line that is typed into, the bars, the extension
+files, the setup file, and the calls of DOS and the BIOS, 136 functions
+of 330. The functions of `src/portable_c/dos.c` keep a `#pragma aux`
+for their names alone, since that file is compiled twice.
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.

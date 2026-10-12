@@ -92,8 +92,6 @@ void Help00(void);
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
-#pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
-#pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
 /* The tables of the help, in src/c/help_t.c: the title of the window, the
    box of the error, which Dialog takes by its offset, and for MinMnu the

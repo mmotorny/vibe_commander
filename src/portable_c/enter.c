@@ -40,7 +40,6 @@
 u16 TstExe(const u8 __far *name);                       /* files.c */
 void TrCr10(void);                                      /* tree.c */
 u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
-#pragma aux TstExe "*_c" __far parm [dx si] value [ax] modify exact [ax]
 #pragma aux TrCr10 "*_c" __far modify exact [ax]
 #pragma aux Run_00 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 

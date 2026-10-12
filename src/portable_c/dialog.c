@@ -127,8 +127,6 @@ u16 F35_61(u16 answer, u16 place);                      /* copy.c */
 /* C routines of other files that vc.h does not have. */
 u16 LnStr(const struct LineArgs STACK *args);           /* line.c */
 void NormStr(u8 __far *text);                           /* string.c */
-#pragma aux LnStr   "*_c" __far parm [bx] value [ax] modify exact [ax bx cx dx es]
-#pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
 
 /* Copy a text that a box puts into its lines to where the lines have it,
    and write it as the box asks: `entry` is its four bytes in the box. */

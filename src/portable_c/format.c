@@ -32,13 +32,7 @@ u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText STACK *text);
 u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
 
-/* How the assembly passes arguments to these, and what it expects back;
-   Number and SzDtTm are in vc.h. */
-#pragma aux HexDec  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux PutDate "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
-#pragma aux BufDate "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
-#pragma aux PutTime "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
-#pragma aux BufTime "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
+/* Number and SzDtTm are in vc.h. */
 
 static const u32 CODE PowersOfTen[9] = {
     1000000000UL, 100000000UL, 10000000UL, 1000000UL, 100000UL, 10000UL,

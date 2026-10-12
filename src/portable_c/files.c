@@ -19,10 +19,7 @@
 u16 TstExe(const u8 __far *name);
 u32 TotSel(u16 panel);
 
-/* How the assembly passes arguments to these, and what it expects back;
-   SetMask, Sort, FnFile and NearFl are in vc.h. */
-#pragma aux TstExe  "*_c" __far parm [dx si] value [ax] modify exact [ax]
-#pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+/* SetMask, Sort, FnFile and NearFl are in vc.h. */
 
 /* The extensions of programs. Names in a list are in small letters. */
 static const u8 CODE Ext_S[9] = {

@@ -72,7 +72,6 @@
 
 /* A C routine of another file that vc.h does not have. */
 u16 *Shadow(u16 *cell);                                 /* screen.c */
-#pragma aux Shadow  "*_c" __far parm [di] value [di] modify exact [di]
 
 /* F39_00, the bar itself, is declared in vc.h: see "The commands"
    there. The text of the bar, the names of its menus, is of

@@ -92,10 +92,6 @@ u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);       /* mask.c */
 u32 TotSel(u16 panel);                                  /* files.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
 u16 ChTree(u16 column);                                 /* treebox.c */
-#pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
-#pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
-#pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
-#pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
 #pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
 

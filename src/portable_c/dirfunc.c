@@ -97,19 +97,10 @@ void PutDate(u16 date, struct DateText STACK *text);
 u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText STACK *text);
 u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
-#pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
-#pragma aux TxtNum  "*_c" __far parm [es si] [bx] value [es si] modify exact [si es]
-#pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
-#pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
-#pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
 #pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux PutDate "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
-#pragma aux BufDate "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
-#pragma aux PutTime "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
-#pragma aux BufTime "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
 
 /* Boxes and texts, constants of src/c/dirfunc_t.c but for Empty_S, which
    OncZoom and Dialog take by their offsets in the segment that the

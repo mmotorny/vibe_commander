@@ -80,10 +80,6 @@ const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 u32 TotSel(u16 panel);                                  /* files.c */
 void Help00(void);                                      /* help.c */
-#pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
-#pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
-#pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
-#pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* What src/c/keys_t.c has of the menu: the name of the menu file, which

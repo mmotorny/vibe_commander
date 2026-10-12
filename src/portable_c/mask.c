@@ -13,10 +13,9 @@
 
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);
 
-/* How the assembly passes arguments to these, and what it expects back;
-   Convert and TstMas are in vc.h. The name is where the assembly has DS,
-   the buffer or the mask in the main data. */
-#pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
+/* Convert and TstMas are in vc.h. The name is where the assembly has DS,
+   and comes as a far pointer; the buffer or the mask is in the main
+   data. */
 
 /* Fill one part of a name in its fixed form, `length` characters at
    `field`, from the text at `name`, which ends with a zero byte or with

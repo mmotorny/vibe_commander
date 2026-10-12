@@ -20,11 +20,8 @@
 u16 NumAdr(u16 panel, u16 number);
 u32 ChgAdr(u16 panel, u16 cursor, u16 first);
 
-/* How the assembly passes arguments to these, and what it expects back;
-   struct Place, BegBX, SizDX, LnsAX, InvWCB, FilePan, AdrNum and CorPar
+/* struct Place, BegBX, SizDX, LnsAX, InvWCB, FilePan, AdrNum and CorPar
    are in vc.h. */
-#pragma aux NumAdr "*_c" __far parm [ax] [si] value [si] modify exact [si]
-#pragma aux ChgAdr "*_c" __far parm [ax] [si] [di] value [dx ax] modify exact [ax dx]
 
 /* The rows a panel takes: half the screen and three, one more on a screen
    of more than 25 lines; or, with the panels full screen, all lines but

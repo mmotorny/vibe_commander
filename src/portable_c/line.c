@@ -29,9 +29,7 @@
 
 u16 LnStr(const struct LineArgs STACK *args);
 
-/* How the assembly passes arguments to these, and what it expects back;
-   struct LineArgs, NgLine and CntLine are in vc.h. */
-#pragma aux LnStr   "*_c" __far parm [bx] value [ax] modify exact [ax bx cx dx es]
+/* struct LineArgs, NgLine and CntLine are in vc.h. */
 
 /* The length of a text that is put into a line, as LnStr counts it: it
    looks at 80 characters, and a text without an end among them counts as

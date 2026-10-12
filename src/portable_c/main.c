@@ -131,8 +131,6 @@ const u8 __far *FndLet(const u8 __far *text);
 #pragma aux PutPath "*_c" __far parm [ax] modify exact [ax]
 #pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux StrLen  "*_c" __far parm [es di] value [cx] modify exact [cx]
-#pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
 
 /* What the assembly has that this reads or names: the scan codes of Alt
    with a digit or a letter, which begin the speed search; the routine

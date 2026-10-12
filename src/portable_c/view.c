@@ -140,7 +140,6 @@ void T71_00(u16 function, u16 place, u16 step);
 #pragma aux PutPath "*_c" __far parm [ax] modify exact [ax]
 #pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
 #pragma aux T70_00  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux T71_00  "*_c" __far parm [ax] [bx] [dx] modify exact [ax bx cx dx si di]
 
@@ -1599,8 +1598,6 @@ none:
 const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
-#pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
-#pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 #pragma aux Run_00  "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 
 /* More of them, and two names of other files, those of the menu file
