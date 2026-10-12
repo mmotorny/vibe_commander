@@ -998,13 +998,95 @@ Things that are known and not done. Standing instructions are in
   - Where DOS does not allow another try, the box has Ok alone and the
     call fails; where it does, anything but Retry fails it, Esc too.
     The program never has DOS end it.
-- The port's handler of INT 21h takes more of the stack of whoever
-  calls DOS than the original's: 30 bytes for the registers and the
-  second return address, and a few more for its own calls, at every
-  call of DOS while the program runs and while a command runs from it,
-  where the assembly took none for a call that it only passed on. A
-  program with a stack that is short by that much would fail under the
-  port and not under the original; none of the bench does.
+- Five places where the port is not as the original, in the part that
+  stays in the memory (`port/resident.c`). No scenario shows any of
+  them; each is here with what it would take to make it as the
+  original, for the user to decide:
+  - The handler of INT 21h takes about 30 bytes of the stack of whoever
+    calls DOS, for the saved registers and the second return address,
+    and a few more for its calls: at every call of DOS while the
+    program runs and while a command runs from it. The assembly took
+    none for a call that it only passed on, and a dozen or two for
+    the four that it deals with. A program whose stack is short by that much
+    would fail under the port and not under the original; none of the
+    bench does. As the original: the test of AH and the jump to the
+    handler before have to stand in front of anything that saves a
+    register, in the naked entry `New21`, some ten instructions of
+    assembly in place of four (four `CMP AH` with their jumps, and a
+    far jump through the word that holds the old address, which then
+    has to be where CS reaches it). The four calls that the program
+    deals with would still take the 30 bytes: C needs them.
+  - DOS is entered from that handler with the flags that its caller
+    had, interrupts off, where the assembly left there the flags of
+    its own last comparison. DOS reads none of them. As the original:
+    no assembly, the flags worked out in C in each of the handler's
+    ways, as is done already for the program's own call, some twenty
+    lines.
+  - The texts that the part writes by itself, "Can't find the file",
+    "There is not enough memory to run this command" and the others,
+    go to page 0 of the screen. The assembly handed the BIOS for a
+    page whatever BH held, the high byte of an address of its own
+    layout; most BIOSes, that of the bench among them, write to the
+    page that shows whatever they are told. As the original: no
+    assembly, the original's byte as a constant at each place that
+    writes one, read from its listing.
+  - Where DOS has ended the program by itself and goes on at the
+    address that the program keeps in its PSP for that, the program
+    that started this one gets every register as DOS had it. The
+    assembly left its own in AX's neighbours: ES and DS on its
+    segment, and BX, CX, DX and SI as its last calls left them. No
+    program can go by either. As the original: no assembly, six
+    assignments to the saved registers in `Exit05`, of values that
+    are addresses of the original's layout or what DOS answered.
+  - The second way of the entry is not there: the original, when DOS
+    will not make its block of memory as long as the program needs,
+    asks for a block elsewhere for the part that goes, so it can be
+    loaded into a block that holds its file and little more. The
+    port's file is as long as the program in the memory, so DOS loads
+    it where all of it fits or not at all (see the entry, above). As
+    the original: the file would have to be shorter than the program
+    again, with the data of the part that stays laid over what
+    follows it, which `tools/mkexe.c` could do by leaving that data
+    out of the file; the entry would then run on a stack outside what
+    it moves and set the program's own afterwards, four instructions
+    of assembly (`CLI`, SS, SP, `STI`) and a jump as behind INT 2Eh,
+    and the check sum and `harness/driver.py`, which knows what the
+    stack holds when loaded, would follow the new layout.
+- How the data that the assembly still lays out could go to C, from
+  having built the layout of the part that stays:
+  - The data of the part that stays, `RDATA` and what `RHEAD` has, is
+    best one structure in `port/resident.c`, with the stack its last
+    member: `WCB2sav` has to stand right in front of `ComnIni` (the
+    setup file is read across the two), `Counter` right in front of
+    `PrgList`, `SavePtr` behind `IntTab`, and the compiler lays out
+    separate variables in an order of its own. Compiled with `-nd=R`
+    the file gets a group of its own for it, `R_GROUP`, and reads it
+    through DS without loading a segment (tried). That group has to
+    begin at the PSP, since SS, DS and the offsets that the rest of
+    the program has for that part all count from there: the structure
+    begins with 256 bytes for the PSP, and the group is linked first.
+    Its code is then no longer of that group: `RTEXT` gets a segment
+    of its own, and where the part that goes names a function of it,
+    the relocation takes the PSP's segment and not `RunPar`.
+    `tools/mkexe.c` can tell the two by the segment that the word
+    names, as it tells the two parts by where a word lies, and `Reloc`
+    gets a second count.
+  - The block of numbers at 100h is then the first initialised member
+    of that structure, and `tools/mkexe.c` finds it by its name in the
+    linker's map, as it could find the end of the stack.
+  - The main data is no storage of the program's but a block that DOS
+    gives it: `md` needs no label, only a type at offset 0 of DS,
+    `(*(struct MainDat __near *)0)`.
+  - `SecDat`, the word with the main data's segment, can be a variable
+    of the compiled code's own group once the assembly is gone: an
+    interrupt function has DS on that group when it begins, which is
+    how `FatErr` reads the word now. `tools/mkexe.c` refuses static
+    data in the part that goes, because nothing else there has DS on
+    that group; that one word would be the exception, and the group
+    is relocated like any segment of that part.
+  - The texts behind the stack: when `CONST` is gone, a C file of
+    constants only, linked first in the part that goes, keeps code
+    off the page that the stack ends in.
 - `CtrlC`, the routine that the program has for Ctrl-C of DOS and for
   Ctrl-Break of the BIOS, runs in no scenario: the BIOS of the bench
   makes no interrupt of Ctrl and ScrollLock, which was tried with a key
