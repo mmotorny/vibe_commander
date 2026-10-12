@@ -675,34 +675,13 @@ BATCHES = [
                   "MnMn10", "MnMn40", "MnMn41", "MnMn50", "MnMn60"),
         functions=("Dialog_c", "InSt10_c", "MinMnu_c"),
         unreached={
-            **dict.fromkeys(
-                (0x9CE9, 0x9D2C, 0x9D2E, 0x9D30, 0x9D32,
-                 0x9D34, 0x9D35, 0x9D37, 0x9D39, 0x9D3B,
-                 0x9D3D, 0x9D3F, 0x9D41, 0x9D42, 0x9D44,
-                 0x9D47, 0x9D57, 0x9D6C, 0x9D6D, 0x9D6E,
-                 0x9D70, 0x9D74, 0x9D76, 0x9D78, 0x9D7A,
-                 0x9D7D, 0x9D81, 0x9D84, 0x9D88, 0x9D8A,
-                 0x9D8D, 0x9D91, 0x9D94, 0x9D98, 0x9D9B,
-                 0x9D9C, 0x9DA1, 0x9DA3, 0x9DA6, 0x9DAA,
-                 0x9DAC, 0x9DAF, 0x9DB1, 0x9DB5, 0x9DB7,
-                 0x9DB9, 0x9DBC),
-                "Dialog, for the mouse: a button held, a click on a "
-                "field, on a button or outside the box. The bench has no "
-                "mouse"),
-            **dict.fromkeys(
-                            (0x9F5F, 0x9F64, 0x9F66, 0x9F67, 0x9F68, 0x9F6A, 0x9F6C,
-                             0x9F6E, 0x9F6F, 0x9F71, 0x9F73, 0x9F75, 0x9F77, 0x9F78,
-                             0x9F79, 0x9F7B, 0x9F7D, 0x9F7F),
-                "InpStr, for the mouse: a click in the line that is typed "
-                "into"),
-            **dict.fromkeys(
-                (0x9FFE, 0xA000, 0xA002, 0xA004, 0xA006,
-                 0xA008),
-                "Select, for the mouse: a click on a line of the group"),
-            **dict.fromkeys(
-                            (0xA181,),
-                "MnMn10, for the mouse: a click on a button and a button "
-                "held on one"),
+            0x9D32: "Dialog, for the middle button of the mouse, or two "
+                    "buttons at once, which leave the dialog as Esc does: "
+                    "a step of the mouse presses the left button or the "
+                    "right one",
+            0xA181: "MnMn10, for a button of the mouse held on the button "
+                    "chosen and moved off it before it is let go: a step "
+                    "of the mouse presses and lets go in one place",
         },
     ),
     Batch(
@@ -787,22 +766,13 @@ BATCHES = [
         functions=("Input_c", "Rnd_c"),
         unreached={
             **dict.fromkeys(
-                (0xB1E6, 0xB1EE, 0xB1F0, 0xB1F3, 0xB1F5, 0xB1F8, 0xB1FA,
-                 0xB1FE, 0xB200, 0xB203, 0xB205, 0xB208, 0xB20A),
-                "Input0, when the time has come to blank the screen, or "
-                "its minute, or midnight has passed meanwhile: a minute "
-                "at the least of the machine's time in which no key is "
+                (0xB1E6, 0xB1EE, 0xB1F0, 0xB1F3),
+                "Input0, when the minute has come in which the screen is "
+                "blanked, or midnight has passed before it: a minute at "
+                "the least of the machine's time in which no key is "
                 "pressed, and the harness presses the next one as soon "
-                "as the program waits"),
-            **dict.fromkeys(
-                (0xB328, 0xB32C, 0xB32E),
-                "Input0, for the mouse in the corner of the screen that "
-                "blanks it. The bench has no mouse"),
-            **dict.fromkeys(
-                            (0xB3F3, 0xB416),
-                "Input0, for the mouse: a button held on a key of the "
-                "key bar, and the key that is pressed when it is let go "
-                "there"),
+                "as the program waits. The blanking itself runs, for the "
+                "mouse in the corner of the screen"),
         },
     ),
     Batch(

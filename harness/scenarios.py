@@ -264,6 +264,27 @@ out again (show.py --changes is how):
     two buttons or the middle one. In the box of a drive that is not
     ready the right button is Enter and the left one beside the box
     gives up: not-ready.
+  - More of the mouse. A box has a blank row above its frame and one
+    below, and blank columns beside it, which are in the box: a click
+    outside it is further out, and count the rows of a field from the
+    screen, not from the frame. In a dialog a click on a field takes
+    the cursor there and acts on it: a line of a group is chosen, a box
+    is ticked or not, a line that is typed into has its cursor where
+    the click is and keeps its text; a click in the box and on no field
+    does nothing, one outside the box is Esc, and the right button
+    anywhere is Enter, on the button that is chosen if the cursor is
+    on the buttons. The right button on a key of the key bar is the key
+    with Alt, and a key of the bar that has no name is no key: a click
+    there is one outside the box that is open.
+  - The pointer in the top right corner of the screen blanks it, and
+    the stars that are shown then are not the same in the original and
+    in the port: take it there and away in one step, "Move@79,0
+    Move@40,12". The screen is drawn again from what the program has
+    of it, which shows when a beep has moved the screen up a line.
+  - The button of a click comes up when the program has asked for the
+    mouse 20 times, and the first of those sees it down: "Click@1,24*2"
+    has the program see the button once and find it up when it looks
+    again, and "*1" not see it at all.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
@@ -3786,6 +3807,93 @@ SCENARIOS = {
             "Click@3,6",                  # hello.txt selected
             "Click@3,8",                  # and data.bin
         )),
+
+    "mouse-fields": Scenario(
+        "The mouse on the fields of a dialog: a line of a group, a box to "
+        "tick, a click on no field and from the buttons to a field, and "
+        "the right button for Enter",
+        steps=(
+            "F9 o c",                     # Configuration
+            "Click@18,5",                 # a line of a group: Black & White
+            "Click@18,5",                 # the line that is chosen: nothing
+            "Click@43,5",                 # a box that is ticked: it is not
+            "Click@43,5",                 # and is again
+            "Click@30,17",                # in the box, on no field: nothing
+            "Click@18,13 Click@18,14",    # two lines of the other group
+            "PgDn",                       # the buttons
+            "Click@18,7",                 # from them to a group: Laptop
+            "RightClick@30,17",           # the right button is Enter
+        )),
+
+    "mouse-line": Scenario(
+        "The mouse in a line that is typed into: a click puts the cursor "
+        "there, no further than the text goes, and what is typed then "
+        "does not replace the text",
+        steps=(
+            'F7 "abcdef"',
+            "Click@10,8",                 # into the text
+            "Click@10,8",                 # where the cursor is: nothing
+            "Click@40,8",                 # behind the text: to its end
+            "x",
+            "Click@8,8 y",                # at its start
+            "Click@40,10",                # in the box, below the line
+            "RightClick@40,10",           # Enter: the directory is made
+            "Down Down Down Down",
+            "F6",                         # offers the name
+            "Click@10,8 x",               # a click, and the name is kept
+            "Click@40,3",                 # outside the box: Esc
+        )),
+
+    "mouse-filter": Scenario(
+        "The mouse in a dialog of the right half of the screen, the "
+        "filter of the right panel: from its buttons to a field, a line "
+        "that is full, and its button Ok",
+        steps=(
+            "Ctrl+l",                     # files on the right
+            "F9 r l",                     # their filter
+            '"abcdefgh.xyz"',             # as long as the line
+            "Click@57,8",                 # its first character
+            "Click@70,8",                 # behind the line: no field
+            "Click@68,8",                 # its last character
+            "PgDn",                       # the buttons
+            "Click@57,12",                # between two of them: nothing
+            "Click@50,10",                # from them to a box to tick
+            "PgDn Right",                 # Cancel
+            "Click@60,8",                 # from there to the line
+            "Click@62,12",                # Cancel, by a click
+            "F9 r l",
+            "Click@50,10",                # Executable files
+            "Click@52,12",                # Ok
+            "F9 r l",
+            "Click@50,10",                # and not
+            "PgDn Right",                 # Cancel
+            "RightClick@50,7",            # the right button is Enter, on
+                                          # the button that is chosen
+        )),
+
+    "mouse-keys": Scenario(
+        "The mouse on the key bar with the right button, on a key without "
+        "a name, with the bar off, and in the corners of the screen: the "
+        "top right one blanks it",
+        steps=(
+            "RightClick@1,24",            # Alt+F1: the drive of the left
+            "Esc",
+            "Click@1,24*2",               # let go at once: nothing
+            "F7",
+            "Click@12,24",                # F2 has no name there: a click
+                                          # outside the box
+            "Ctrl+b",                     # no key bar
+            "Click@12,24",                # the last row is no key
+            "Ctrl+b",
+            "Move@79,24",                 # the corner that keeps the
+                                          # screen from being blanked
+            "Shift+F3",
+            '"nofile" Enter',             # a beep: the screen moves up
+            "Esc",                        # and stays there
+            "Move@79,0 Move@40,12",       # blanked and shown again, all
+                                          # of it as it should be
+        )),
+
 }
 
 

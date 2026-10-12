@@ -53,14 +53,17 @@ Things that are known and not done. Standing instructions are in
   comes back with a key could. `LeaveTm` is three calls of interrupts
   and little else; of its 17 instructions six, for DESQview, run in no
   scenario.
-- Of `Input0` in C, 88 instructions of the original ran in no scenario
-  and are translated by reading: 72 for a button of the mouse held on a
-  key of the key bar, three for the mouse in the corner that blanks the
-  screen, and 13 around the call of `Blank`, where the time to blank
-  has come, with its minute and with midnight passing meanwhile. They
-  are listed as out of reach in `harness/ported.py`, and so are three of
-  `PutPrm`, the question mark in the prompt of a drive whose directory
-  DOS will not tell.
+- Of `Input0` in C, four instructions of the original run in no
+  scenario and are translated by reading: where the minute has come in
+  which the screen is blanked, or midnight has passed before it. They
+  are listed as out of reach in `harness/ported.py`. The blanking itself
+  runs, in `mouse-keys`: the pointer of the mouse in the top right
+  corner blanks the screen at once, and a step that takes it there and
+  away again, "Move@79,0 Move@40,12", ends with the screen shown again.
+  That shows on a screen which a beep has moved up a line: all of it is
+  put back as it should be. A step that ended with the screen blank
+  could not be compared, for the stars; one of two such steps tried had
+  none yet.
 - `ClsLine` fills a row with the colour that DOS writes in, and reads
   that colour through DS, where every other routine of its kind goes by
   ES. One caller comes with DS on a panel: a command of a menu or of an
@@ -331,10 +334,11 @@ Things that are known and not done. Standing instructions are in
   letter more: that is held against the golden as it is, and the port
   fails there without anything translated. No scenario shows it now;
   the comparison would have to know the end of the banner by its place.
-- Of the dialogs, what they do for the mouse has run in no scenario, 255
-  instructions: `Slct20` as a whole and parts of `Dialog`, `InpStr`,
-  `Select`, `FlipFl` and `MnMn10`. They are translated by reading, and
-  listed as out of reach in `harness/ported.py`.
+- Of the dialogs, what they do for the mouse runs in `mouse-dialog`,
+  `mouse-fields`, `mouse-line` and `mouse-filter`, but for two
+  instructions that are listed as out of reach in `harness/ported.py`:
+  the middle button, or two buttons at once, which leave a dialog as Esc
+  does, and a button held on the button that is chosen and moved off it.
 - A dialog trusts its tables. One without a field takes no key and does
   not end, a box without a line has 65536, and a line to type into of
   length 0 is shown as one of 65536. Ported like that; the program has
@@ -342,8 +346,10 @@ Things that are known and not done. Standing instructions are in
 - A click of the mouse into a line that is typed into puts the cursor
   where the mouse is, and no further than the text goes; `InpStr` looks
   for the end of the text in as many bytes as the line has, so in a
-  line that is full it finds none and stops one short of the end. Ported
-  like that, by reading.
+  line that is full it finds none and stops one short of the end. That
+  shows nowhere: a click is in the line only on one of its characters,
+  and the last of them is one short of the end. `mouse-filter` has such
+  a line.
 - The routine that a dialog has for Enter and F10 got DX as `Dialog`
   happened to have it, the size of the box or of its buttons, and two of
   them, `M30_60` and `F38_10`, showed a box of their own with that as
@@ -583,16 +589,16 @@ Things that are known and not done. Standing instructions are in
   - `help.c`, 105: a button held in the text, above it or below it, a
     click on a line of the index and one outside the window.
   - `find.c`, 96: `FndMove`, the list of the file search.
-  - `dialog.c`, 127: what is left of `Dialog`, a click in a line that is
-    typed into (`InpStr`), on a line of a group (`Select`, `Slct20`), on
-    a box to tick (`FlipFl`).
+  - `dialog.c`, 2: `mouse-fields`, `mouse-line` and `mouse-filter` have
+    the fields of a dialog. Left are the middle button, and a button
+    moved off the button of a dialog that it went down on.
   - `usermenu.c`, `cmdline.c` and `drive.c`, 114: the rest of the user
     menu with `F32_70`, the box of the drives, the history.
   - `memory.c`, 136: `F65_00`, the map of the memory, either button on
     its lines and buttons, held above or below, the middle button, a
     second click.
-  - `input.c`, 5: the pointer in the corner of the screen that blanks
-    it, and what is left of a button held on the key bar.
+  - `input.c`, none: `mouse-keys` has the right button on the key bar, a
+    key of the bar that has no name, and the corners of the screen.
   A second click is two clicks in one step; a button held is a click
   with a count behind it, "Click@3,5*200". There is no step yet for a
   button that goes down in one place and comes up in another, nor for
