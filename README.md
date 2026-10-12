@@ -96,8 +96,10 @@ been started, and again whenever a command has run, is C: reading the
 setup file and the main extension file, or taking the defaults, the
 banner, asking DOS for the memory of its data and making the data of
 what was kept, and finding out what the display, DOS and the
-environment are like. The entry of the program, which makes a block of
-the memory of the part that goes, is still assembly. What runs a
+environment are like. Where DOS enters the program is C too: the check
+sum of the file, the second copy that brings the program back after a
+command, the block of memory made of the part that goes while a command
+runs, and the relocations of that part. What runs a
 command with most of the program out of the memory and loads it again,
 to which Enter hands over, is C, and is the outermost loop of the
 program now: it calls the rest of the program, which comes back to it
@@ -292,8 +294,8 @@ way a C program usually is. It still loads and starts like the `.COM` file
 it was, keeps its data where the assembly put it, and gives up and reloads
 most of itself at run time, compiled code included. `port/vc.h` describes
 what that asks of the C code, and `tools/mkexe.c` how the file is made.
-The code that starts the program and reloads it after a command had to
-change for this: it now measures in paragraphs and relocates what it has
+The code that begins the program and reloads it after a command had to
+change for this: it measures in paragraphs and relocates what it has
 loaded.
 
 The file is the program as it lies in the memory. First comes the part
@@ -307,8 +309,8 @@ own stack from the first instruction, and has only to make a block of
 memory of it. That costs 6,384 bytes of the file, and it is what lets
 compiled code stand in the first part at all: the assembler cannot lay
 data over code that the compiler has yet to make. It also leaves the
-code that starts the program in the memory, 464 bytes of it, where the
-original lays its data over that code.
+code that begins the program in the memory, where the original lays its
+data over that code.
 
 Every step is checked by the `port` test below, and nothing else decides
 whether a translation is right. The routines translated so far are listed
@@ -326,7 +328,7 @@ stack than the assembly it replaces, and a stack used beyond its bottom
 would overwrite data without a trace on the screen, so the port has 4,096
 bytes, of which the scenarios use some 200. The stack is the end of the
 part of the program that stays in memory while a command runs: that part
-is 19,104 bytes where it was 12,704, and a command has 6,400 bytes less
+is 19,168 bytes where it was 12,704, and a command has 6,464 bytes less
 than the original leaves it: 3,840 for the stack, and the rest because
 compiled code is longer than the assembly it replaces, and because the
 code that starts the program stays.

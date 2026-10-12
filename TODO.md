@@ -82,8 +82,8 @@ Things that are known and not done. Standing instructions are in
   comparison in every scenario (see `harness/deviations.py`). So nothing
   checks the number itself: that the port has less by what it is larger,
   at least. The same goes for what `mem` says in the scenario `command`,
-  416K free under the original and some 4K less under the port, whose
-  part that stays is 4,304 bytes longer, 3,840 of them its stack. With
+  416K free under the original and some 6K less under the port, whose
+  part that stays is 6,464 bytes longer, 3,840 of them its stack. With
   those numbers left out,
   no scenario shows any more that the program gives up its memory while
   a command runs: a check of its own would hold the port's figure
@@ -830,43 +830,30 @@ Things that are known and not done. Standing instructions are in
   then intrinsics, then inline assembly where nothing else works.
   - The stubs of the start-up, `Init00` and `Init11`: the start-up is C,
     `port/start.c`, and what is left of it in the assembly is what the
-    part that stays jumps to, the call of `Reloc`, the segment of that
-    part and the block of the code handed to the C, DS put on the main
-    data that `Init11_c` has asked DOS for, and the far jump to
-    `AlocEr` when there is none to have. They go when the part that
-    stays is C and calls the three functions itself; setting DS will
-    then want the two instructions of inline assembly that `FatErr`
-    wants too. What `port/start.c` names of that part is in one list at
-    its top: `ComnIni`, `WCB1sav`, `WCB2sav`, `Counter`, `Vect21`,
-    `Vect22`, `Vect27`, `RelTab`, the labels `Exit01`, `New21` and
-    `New27`, and `SetBrk`, which it calls through a pointer to a far
-    function.
-  - `Reloc`, which the original has not: applies the linker's
-    relocations to the copy of the program that has just been loaded.
-    It cannot be called far before it has run, since a far call
-    between two segments is itself relocated. It is C once what calls
-    it is C in the same file: a static function is called near.
-  - The entry of the program, `Alloc0` to `Alloc9`, 256 bytes: adds up
-    the check sum of the file; as the second copy, loaded to bring the
-    program back after a command, moves its code into the first copy's
-    memory and ends; otherwise shrinks its block, moves everything
-    from `Init00` on above the part that stays, over itself, makes a
-    block of DOS of that by writing its header, and jumps there. DS and
-    ES are on the PSP and the stack is the one of the EXE header, in
-    memory that the move overwrites, so `MovPars` uses no stack. In C
-    this is a function of the part that stays, which is not moved: the
-    stack has to be set first, SS and SP, two instructions that C
-    cannot say, and the move is then a loop over far pointers. It needs
-    a code segment of its own for the part that stays, placed first in
-    the file, with its own notion of DS: there is no main data yet.
-  - The part that stays in the memory is C, `port/resident.c`, but for
-    the entry: the outermost loop of the program, `Stay`, which calls
-    the part that goes, far, at `Init00` and after every command at
-    `Init11`; `Exec`, which runs the commands and loads the program
-    again; `Exit00` to `Exit05`; `New21` and `New27` with what keeps
-    the list of the programs that stay in the memory; `SetBrk`,
-    `NotFind`, `OutStr`, `GetStat` and `SetStat`. What is left of its
-    assembly, in `RHEAD` of `VC.ASM`, besides the entry and its data:
+    part that stays calls, far, the segment of that part and the block
+    of the code handed to the C, DS put on the main data that
+    `Init11_c` has asked DOS for, and the far jump to `AlocEr` when
+    there is none to have. `Stay` of `port/resident.c` could call the
+    three functions itself, but for DS: `IniData_c` and the main loop
+    behind it want it on the main data, which C cannot set; that is
+    the instruction of inline assembly that `FatErr` wants too. What
+    `port/start.c` names of the part that stays is in one list at its
+    top: `ComnIni`, `WCB1sav`, `WCB2sav`, `Counter`, `Vect21`,
+    `Vect22`, `Vect27`, `RelTab`, the functions `Exit01`, `New21` and
+    `New27`, by their offsets, and `SetBrk`, which it calls through a
+    pointer to a far function.
+  - The part that stays in the memory is C, `port/resident.c`: the
+    entry of the program, `Alloc0`, which DOS enters; `Reloc`, which
+    that part applies to the other whenever it has loaded it; the
+    outermost loop of the program, `Stay`, which calls the part that
+    goes, far, at `Init00` and after every command at `Init11`; `Exec`,
+    which runs the commands and loads the program again; `Exit00` to
+    `Exit05`; `New21` and `New27` with what keeps the list of the
+    programs that stay in the memory; `SetBrk`, `NotFind`, `OutStr`,
+    `GetStat` and `SetStat`. What is left of its assembly, in `RHEAD`
+    of `VC.ASM`, is its data, the block of numbers for `tools/mkexe.c`
+    at 100h, the name and the command tail, the texts, with `RDATA`
+    behind the compiled code, and two kinds of stub:
     - `Exec`, `AlocEr` and `Exit00`, three instructions each. The part
       that goes still comes back by a far jump to one of them, from
       `CmdExe` in `VCFUNC.INC`, from the stub of `Init11` and from
@@ -875,14 +862,11 @@ Things that are known and not done. Standing instructions are in
       returns far, into `Stay`. They go when those three places return
       by themselves, which they can as soon as they are of a function
       that `Stay` calls: `PUSH SS`, `POP DS`, the number in AX, `RETF`.
-    - `OutStr0` and `OutStr`, a stub, for the texts of the entry: they
-      come with DS:SI, which C cannot take as an argument.
-    - `SetStat` and `Release`, stubs: for the entry, and for
-      `Release_a` of `VCMEM.INC`, which the map of the memory calls
-      through `CallPSP` with the record in DS. `SetBrk` and `Exit01`
-      have none: `port/start.c` names the C functions themselves, by
-      their offsets, as it named the labels, and calls `SetBrk` through
-      a pointer to a far function.
+    - `Release`, a stub: for `Release_a` of `VCMEM.INC`, which the map
+      of the memory calls through `CallPSP` with the record in DS.
+      `SetBrk` and `Exit01` have none: `port/start.c` names the C
+      functions themselves, by their offsets, as it named the labels,
+      and calls `SetBrk` through a pointer to a far function.
     - `CallPSP` itself, in `VCSUB1.INC`, is of the part that goes.
   - `FatErr`, 220 bytes: what DOS calls for a critical error. It is
     entered with nothing but CS known, takes its error in AX and DI
@@ -963,6 +947,27 @@ Things that are known and not done. Standing instructions are in
   - The twelve bytes of a program's name are taken from where the name
     begins in what DOS was asked to run, whatever follows the name
     there.
+- The entry of the program, in the original and in the port:
+  - The program sets how DOS looks for memory to what it is when DOS
+    starts, the lowest block that fits and no upper memory, whatever it
+    was when the program was run. Ported as it is.
+  - The original cannot always make its block of memory as long as the
+    program needs it, its file being shorter than the program in the
+    memory by the data of the part that stays, and then asks DOS for a
+    block elsewhere for the part that goes: so it can be loaded into
+    a block that holds its file and little more, the upper memory for
+    one. The port's file is as long as the program in the memory, so
+    DOS loads it where all of it fits or not at all, and that second
+    way is not in the port: it could only be taken with DOS's chain of
+    blocks destroyed, where it fails too. The port ends then as the
+    original does when both ways fail, "Program too big to fit in
+    memory".
+  - The check sum by which the program knows its file again after a
+    command leaves out the data of the part that stays, in the port:
+    the stack is there and in use while the sum is taken.
+  - A DOS before version 3 is left by its function 0 in the port,
+    where the original returns to the INT 20h that a .COM file has at
+    the bottom of its stack. Both end the program the old way.
 - What running a command does in the original, and in the port after
   it (`port/resident.c`); whether to mend any of it is not decided:
   - Whether DOS had a block of memory for the part of the program that

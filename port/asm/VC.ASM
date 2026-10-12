@@ -79,7 +79,7 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 ; the interrupt handlers, which the code that starts the program names,
 ; and what the assembly of that part calls, near and in its own group.
 	EXTERN	New21:FAR, New27:FAR, CtrlC:FAR, SetBrk:FAR, Exit01:FAR
-	EXTERN	SetStat_r:NEAR, Release_r:NEAR, Stay_r:NEAR, OutStr_r:NEAR
+	EXTERN	Release_r:NEAR
 	EXTERN	F21_00_c:FAR, F21_10_c:FAR, F21_25_c:FAR, F21_30_c:FAR
 	EXTERN	F21_31_c:FAR, F22_00_c:FAR, F23_00_c:FAR, F24_00_c:FAR
 	EXTERN	F24_01_c:FAR, F24_02_c:FAR, F25_00_c:FAR, F26_00_c:FAR
@@ -108,6 +108,7 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 ; What it reads in the head of that part, and where it enters the part
 ; that goes.
 	PUBLIC	RunPar, ChkFile, ImgEnd, TrnPrW, OvlPrm
+	PUBLIC	RelTab, RelCnt, ResPrW, DatPrW, ResCnt, Vers_S
 	PUBLIC	NoRun_S, FnFil_S, BadFl_S, Retr_S, Aloc_S
 	PUBLIC	Init00, Init11
 
@@ -189,13 +190,14 @@ RHEAD	SEGMENT
 _md	LABEL	BYTE			; The main data segment, to C code:
 					; whatever is at offset 0 of DS
 	ORG	100h			; Behind the PSP
-Start:	JMP	Alloc0
 
 ;-------------- Layout of the linked program -----------
-; This block is expected at 103h by tools/mkexe.c, which fills in the
+; This block is expected at 100h by tools/mkexe.c, which fills in the
 ; first three words and the last. Of the three between it reads the
 ; offsets that the linker has put there, and writes them back in
-; paragraphs.
+; paragraphs. The program is entered at Alloc0 of port/resident.c, which
+; the linker is told and tools/mkexe.c writes into the header of the
+; file.
 ImgEnd	DW	0			; End of the program, paragraphs from PSP
 RelTab	DW	0			; Relocation table, paragraphs from PSP
 RelCnt	DW	0			; Number of relocations
@@ -210,35 +212,6 @@ RHEAD	ENDS
 ; resident part, which is everywhere but in the interrupt handlers.
 TrnPar	EQU	<WORD PTR SS:TrnPrW>
 ResPar	EQU	<WORD PTR SS:ResPrW>
-
-; Move DX paragraphs from segment BX to segment BP, which may overlap it
-; from above. Uses no stack. Changes AX, CX, DX, SI, DI, DS and ES.
-MovPars	MACRO
-	LOCAL	Next, Part
-	STD
-Next:	MOV	CX,800h
-	CMP	DX,CX
-	JAE	Part
-	MOV	CX,DX
-Part:	SUB	DX,CX
-	MOV	AX,BX
-	ADD	AX,DX
-	MOV	DS,AX
-	MOV	AX,BP
-	ADD	AX,DX
-	MOV	ES,AX
-	SHL	CX,1
-	SHL	CX,1
-	SHL	CX,1
-	SHL	CX,1
-	MOV	SI,CX
-	DEC	SI
-	MOV	DI,SI
-	REP	MOVSB
-	OR	DX,DX
-	JNZ	Next
-	CLD
-	ENDM
 
 PrgName	EQU	'Volkov Commander'
 HelpVer	EQU	'VC 4.05 Help'
@@ -584,48 +557,11 @@ Exit00:	PUSH	CS			; Leave, with AL for DOS
 	MOV	AH,0
 	RETF
 
-; Write a text as a teletype would: OutStr_r. The code that starts the
-; program calls OutStr through CallPSP, and the entry of this part calls
-; OutStr0.
-;			DS:SI - text, of this segment for OutStr0
-;			   BH - page
-;	Return :	   SI - its end
-OutStr0	PROC	NEAR
-	PUSH	CS
-	POP	DS
-OutStr:	PUSH	DX
-	PUSH	DS
-	MOV	DX,DS
-	MOV	AX,SI
-	PUSH	CS
-	POP	DS
-	CALL	OutStr_r
-	MOV	SI,AX
-	POP	DS
-	POP	DX
-	RETF
-OutStr0	ENDP
-
 ;-------- Programs that stay in the memory, and DOS's memory --------
 ; C: port/resident.c, which has the interrupt handlers New21 and New27,
 ; CtrlC, what they keep of the programs that have stayed in the memory,
-; and these two, which the assembly still calls: SetStat the entry of
-; this part, and Release the map of the memory, through CallPSP. They are
-; near, in RTEXT, and take DS on this segment.
-SetStat	PROC	NEAR
-	PUSH	AX
-	PUSHF
-	PUSH	DS
-	PUSH	CS
-	POP	DS
-	MOV	AX,BP
-	CALL	SetStat_r
-	POP	DS
-	POPF
-	POP	AX
-	RET
-SetStat	ENDP
-
+; and Release, which the map of the memory still calls, through CallPSP:
+; near, in RTEXT, with DS on this segment.
 ;			   DS - PrgSeg
 Release	PROC	NEAR
 	PUSH	DS
@@ -638,176 +574,6 @@ Release	PROC	NEAR
 	POP	DS
 	RETF
 Release	ENDP
-
-;---------------------- The entry ----------------------
-; DOS has loaded the file as it is laid out: the transit part lies where
-; it will run, behind the resident part and the paragraph of RGAP, and
-; the stack is the resident part's from the start, by the header of the
-; file (see tools/mkexe.c). A second copy, loaded to bring the transit
-; part back after a command, moves it into the memory of the first.
-; The check sum is that of the program but for the data of the resident
-; part: the stack is there, and in use.
-Alloc0:	CLD
-	XOR	BX,BX			; Check sum of the whole program
-	MOV	BP,DS
-	ADD	BP,10h
-	MOV	DX,SS:DatPrW
-	SUB	DX,10h
-	CALL	Alloc1
-	MOV	BP,ES
-	ADD	BP,TrnPar
-	MOV	DX,ES:ImgEnd
-	SUB	DX,TrnPar
-	CALL	Alloc1
-	PUSH	ES
-	POP	DS
-	JMP	AllocB
-Alloc1:	MOV	AH,0			; DX paragraphs from BP on
-AllocC:	MOV	DS,BP
-	XOR	SI,SI
-	MOV	CX,16
-AllocA:	LODSB
-	ADD	BX,AX
-	LOOP	AllocA
-	INC	BP
-	DEC	DX
-	JNZ	AllocC
-	RET
-AllocB:
-	MOV	SI,80h
-	MOV	DI,OFFSET OvlPrm
-	MOV	CL,DS:[DI]
-	DEC	CX
-	REPE	CMPSB
-	JNE	Alloc3
-	LODSW
-	CMP	BYTE PTR DS:[SI],0Dh
-	JNE	Alloc3
-	MOV	ES,AX
-	XCHG	BX,ES:ComnIni.LoadSiz
-	MOV	BP,ES:RunPar
-	ADD	BP,TrnPar
-	MOV	DX,BX
-	SUB	DX,TrnPar
-	PUSH	BX
-	MOV	BX,DS
-	ADD	BX,TrnPar
-	MovPars
-	POP	BX
-	MOV	AX,4C00h
-	SUB	BX,CS:ImgEnd
-	JE	Alloc2
-	INC	AX
-Alloc2:	INT	21h
-Alloc3:	MOV	DS:ChkFile,BX
-; The compiled code of the resident part names its segment, which is the
-; PSP's: the linker's relocations for that, behind those of the transit
-; part in the table. They are applied when the sum has been taken, which
-; has to be that of the file.
-	MOV	CX,DS:ResCnt
-	JCXZ	AllocE
-	MOV	AX,DS
-	ADD	AX,DS:RelTab
-	MOV	ES,AX
-	MOV	DI,DS:RelCnt
-	SHL	DI,1
-	SHL	DI,1
-	MOV	AX,DS
-AllocD:	MOV	BX,ES:[DI]
-	ADD	DS:[BX],AX
-	ADD	DI,4
-	LOOP	AllocD
-	PUSH	DS
-	POP	ES
-AllocE:
-	MOV	AH,30h			; Check DOS version
-	INT	21h
-	CMP	AL,3
-	JB	Alloc4
-	XCHG	AL,AH
-	CMP	AX,314h
-	JAE	Alloc5
-	MOV	SI,OFFSET Vers_S
-	PUSH	CS
-	CALL	OutStr0
-	MOV	AX,4C02h
-	INT	21h
-Alloc4:	INT	20h
-Alloc5:	MOV	BX,ResPar		; Allocate segments
-	MOV	DX,DS:ImgEnd
-	SUB	DX,TrnPar
-	ADD	BX,DX
-	INC	BX
-	MOV	AH,4Ah
-	INT	21h
-	JNC	Alloc6
-	MOV	BX,DX			; Allocate transit block
-	MOV	AH,48h
-	INT	21h
-	JC	Alloc9
-	MOV	BP,AX
-	MOV	BX,DS
-	ADD	BX,TrnPar
-	MovPars
-	CLI
-	PUSH	CS
-	POP	SS
-	MOV	SP,OFFSET VcStack
-	STI
-	PUSH	CS
-	POP	DS
-	PUSH	CS			; Compress resident block
-	POP	ES
-	MOV	BX,ResPar
-	MOV	AH,4Ah
-	INT	21h
-	MOV	ES,BP
-	JMP	Alloc7
-Alloc6:	MOV	BP,DS
-	ADD	BP,ResPar
-	INC	BP
-	MOV	BX,DS
-	ADD	BX,TrnPar
-	CLI
-	PUSH	CS
-	POP	SS
-	MOV	SP,OFFSET VcStack
-	MovPars
-	MOV	ES,BP
-	MOV	BX,ResPar
-
-;-------- Split into resident and transit parts --------
-	MOV	AX,ES
-	DEC	AX
-	PUSH	AX
-	MOV	AX,CS
-	DEC	AX
-	MOV	DS,AX
-	MOV	AL,'M'
-	XCHG	AL,DS:[0]
-	XCHG	BX,DS:[3]
-	SUB	BX,DS:[3]
-	DEC	BX
-	POP	DS
-	MOV	DS:[0],AL
-	MOV	DS:[1],CS
-	MOV	DS:[3],BX
-	STI
-	PUSH	CS
-	POP	DS
-Alloc7:	XOR	BP,BP
-	MOV	AX,ES
-	SUB	AX,TrnPar
-	MOV	DS:RunPar,AX
-	CALL	SetStat
-	JMP	Stay_r			; C: it calls Init00
-
-Alloc9:	MOV	SI,OFFSET Aloc_S	; Error
-	PUSH	CS
-	CALL	OutStr0
-	CALL	SetStat
-	MOV	AX,4C01h
-	INT	21h
 
 RHEAD	ENDS
 
@@ -889,16 +655,18 @@ ShadFl	EQU	38
 
 ;------------------ Read configuration -----------------
 ; C: Init00_c, Init11_c and IniData_c of port/start.c. The part of the
-; program that stays in the memory jumps here, far: to Init00 when the
-; program has been started, to Init11 when a command has run. CmdIni of
-; VCFUNC.INC jumps to Init11 too. The stack is in that part every time,
+; program that stays in the memory calls here, far, and is come back to
+; by a far jump to one of three labels of its own (see Exec in RHEAD): at
+; Init00 when the program has been started, at Init11 when a command has
+; run. It has relocated this part by then: Reloc of port/resident.c.
+; CmdIni of VCFUNC.INC jumps to Init11. The stack is in that part every
+; time,
 ; and its segment is what the C is told of it. Until Init11 has asked DOS
 ; for the main data there is none: the C does without DS up to there.
 ; What it reads, writes and names of the assembly is made public here.
 	PUBLIC	SecDat
 	PUBLIC	Counter, Vect21, Vect22, Vect27, RelTab
-Init00:	CALL	Reloc
-	CLD
+Init00:	CLD
 	MOV	AX,SS
 	CALL	FAR PTR Init00_c
 
@@ -906,8 +674,7 @@ Init00:	CALL	Reloc
 ; The block of the memory that this code is in goes to the C in DX. What
 ; comes back is the segment of the main data, or 0 if there is too
 ; little memory: the part that stays says so and ends the program.
-Init11:	CALL	Reloc
-	CLD
+Init11:	CLD
 	MOV	AX,SS
 	MOV	DX,CS
 	ADD	DX,TrnPar
@@ -929,47 +696,6 @@ IniOk:	MOV	DS,AX
 ; MainGo below.
 Init40:	MainC	0
 
-;---------------- Relocate the transit part -------------
-; The program moves and reloads its transit part itself, so DOS cannot
-; relocate it. The linker's relocation table is appended to the program by
-; tools/mkexe.c and applied here, once to every copy that is loaded.
-Reloc	PROC	NEAR
-	PUSHF
-	CMP	CS:RelDone,0
-	JNE	Reloc3
-	INC	CS:RelDone
-	PUSH	AX
-	PUSH	BX
-	PUSH	CX
-	PUSH	SI
-	PUSH	DI
-	PUSH	DS
-	PUSH	ES
-	CLD
-	MOV	BX,CS
-	MOV	AX,BX
-	ADD	AX,SS:RelTab
-	MOV	DS,AX
-	XOR	SI,SI
-	MOV	CX,SS:RelCnt
-	JCXZ	Reloc2
-Reloc1:	LODSW
-	MOV	DI,AX
-	LODSW
-	ADD	AX,BX
-	MOV	ES,AX
-	ADD	ES:[DI],BX
-	LOOP	Reloc1
-Reloc2:	POP	ES
-	POP	DS
-	POP	DI
-	POP	SI
-	POP	CX
-	POP	BX
-	POP	AX
-Reloc3:	POPF
-	RET
-Reloc	ENDP
 
 ;-------------------------------------------------------
 ; The main loop is C: MainLoop_c of port/main.c. It is no routine: the
@@ -1130,7 +856,6 @@ FtEr2_B	BOXHD	< FtEr2_P, 928h, 0, 2, 0FFh, 0FFh, 7>
 OkMn_D	DB	4, 0
 	DB	0
 SecDat	DW	0
-RelDone	DB	0			; 1 when this copy has been relocated
 
 	.CODE
 FatErr:	PUSH	DS
@@ -1349,5 +1074,5 @@ U4D4:	DEC	BP
 __U4D	ENDP
 CTEXT	ENDS
 
-	END	Start
+	END
 

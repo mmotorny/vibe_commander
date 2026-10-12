@@ -951,7 +951,7 @@ BATCHES = [
         # the interrupts arrive, and what the assembly still calls.
         routines=("CtrlC", "ExeProg", "AddProg", "FreeBlk", "ChkBlk",
                   "Release", "GetStat", "SetStat"),
-        functions=("New21", "New27", "Release_r", "SetStat_r"),
+        functions=("New21", "New27", "Release_r"),
         unreached={
             0x04AB: "CtrlC, where Ctrl-Break or DOS's Ctrl-C arrives: "
                     "the BIOS of the bench makes no interrupt of Ctrl "
@@ -965,11 +965,9 @@ BATCHES = [
         source="resident.c",
         # Exec is code between procedures, as far as NotFind: with the
         # commands run, Exec10, which loads the program again, AlocEr,
-        # and Exit00 to Exit05. Stay is where the code that begins the
-        # program hands over, and OutStr what the code that starts it
-        # calls for its texts.
+        # and Exit00 to Exit05. The assembly calls none of it any more.
         routines=("Exec", "NotFind", "OutStr0", "SetBrk0", "SetBrk"),
-        functions=("Stay_r", "OutStr_r"),
+        functions=(),
         unreached={
             0x032B: "Exec11, where DOS has no block for the part of "
                     "the program that is loaded again after a command: "
@@ -982,6 +980,41 @@ BATCHES = [
                     "on at the address that the program has put into "
                     "its PSP: nothing of the bench ends the program "
                     "but the program",
+        },
+    ),
+    Batch(
+        title="The entry of the program: its check sum, the second copy "
+              "that brings the program back, and the block of memory "
+              "made of the part that goes",
+        source="resident.c",
+        # The code that begins the program runs on into the code that
+        # starts it, Init00, which is another batch's: it is named from
+        # its label to that one. DOS enters Alloc0, no stub does.
+        routines=("Alloc0..Init00",),
+        functions=("Alloc0",),
+        unreached={
+            0x072C: "Alloc0, where a second copy finds the file of "
+                    "another length than the first copy had it: the "
+                    "file would have to change while a command runs, "
+                    "into another that runs",
+            **dict.fromkeys(
+                (0x0742, 0x0745, 0x0746, 0x0749, 0x074C, 0x074E),
+                "Alloc3, for a DOS before 3.20: the bench has FreeDOS, "
+                "which says 7.10"),
+            **dict.fromkeys(
+                (0x0779, 0x077B, 0x077D, 0x077F, 0x0781, 0x0783, 0x0785,
+                 0x0786, 0x0788, 0x0789, 0x078C, 0x078D, 0x078E, 0x078F,
+                 0x0791, 0x0793, 0x0794),
+                "Alloc5, where DOS will not make the program's block "
+                "as long as the program needs it and the part that "
+                "goes is moved to a block elsewhere: how much memory "
+                "there is to it follows the size of the program. The "
+                "port has no such way: its block holds its file, which "
+                "is as long as the program in the memory"),
+            **dict.fromkeys(
+                (0x07D8, 0x07DB, 0x07DC, 0x07DF, 0x07E2, 0x07E5),
+                "Alloc9, where there is no memory for the program "
+                "when it begins"),
         },
     ),
 ]

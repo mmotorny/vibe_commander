@@ -206,16 +206,18 @@ function(add_port target directory)
         DEPENDS jwasm ${port_asm}
         COMMENT "Assembling the port (${target})"
         VERBATIM)
-    # The assembly comes first: the program starts in it and expects the
-    # compiled code behind it. Warning 1014 says that there is no stack
-    # segment: the program sets up its stack itself.
+    # The assembly comes first: it lays the program out, and expects the
+    # compiled code behind it. The program starts at Alloc0, a function of
+    # port/resident.c. Warning 1014 says that there is no stack segment:
+    # the stack is of the part that stays in the memory, and
+    # tools/mkexe.c names it in the header of the file.
     list(JOIN port_compiled "," compiled)
     add_custom_command(
         OUTPUT ${directory}/VC.EXE ${directory}/VC.MAP
         COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
                 name ${directory}/linked.exe
                 file ${directory}/VC.OBJ,${compiled}
-                option map=${directory}/VC.MAP disable 1014
+                option map=${directory}/VC.MAP,start=Alloc0 disable 1014
         COMMAND mkexe ${directory}/linked.exe ${directory}/VC.MAP
                 ${directory}/VC.EXE ${port_compiled}
         DEPENDS mkexe ${directory}/VC.OBJ ${port_compiled}

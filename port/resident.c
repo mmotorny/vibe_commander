@@ -10,14 +10,17 @@
  * calls a function of another file but those of dos.c, of which the
  * build compiles a second copy into this part (see RESIDENT in vc.h).
  *
- * Two things are here. One is the outermost loop of the program, Stay:
+ * Three things are here. The program begins here, at Alloc0: DOS enters
+ * it there.
+ *
+ * The second is the outermost loop of the program, Stay:
  * it calls the part that goes, which comes back with commands to run or to
  * leave; it runs the commands, Exec, by COMMAND.COM or by the interrupt
  * that COMMAND.COM has for that, brings the other part back into the
  * memory if that was given up for them, by running the program's own
  * file as a second copy, and calls it again.
  *
- * The other is the program's watch on DOS. While the program runs, and
+ * The third is the program's watch on DOS. While the program runs, and
  * while a command runs from it, every call of DOS comes by New21: it notes
  * which program is being run, and when one stays in the memory, by DOS's
  * call for that or by INT 27h, it writes down who it is and which
@@ -69,11 +72,21 @@ extern struct MainDat __near ComnIni;
    COMMAND.COM has when the environment does not say, and the command
    tail by which a second copy of the program knows that it is one, with
    room for the segment of the first; and what this part says for
-   itself. The end of the stack is the end of this part. */
+   itself. The end of the stack is the end of this part. And the numbers
+   that tools/mkexe.c writes into the file, all in paragraphs from the
+   PSP but the counts: how long this part is, ResPrW, and where its data
+   begins, DatPrW; where the linker's relocations are, RelTab, how many
+   of them are of the part that goes, RelCnt, and how many, behind
+   those, of this part, ResCnt. */
 extern u16 __near RunPar;
 extern u16 __near ChkFile;
 extern u16 __near ImgEnd;
 extern u16 __near TrnPrW;
+extern u16 __near ResPrW;
+extern u16 __near DatPrW;
+extern u16 __near RelTab;
+extern u16 __near RelCnt;
+extern u16 __near ResCnt;
 extern u8 __near OvlPrm[];
 extern const u8 __near Command[];
 extern const u8 __near NoRun_S[];
@@ -86,6 +99,11 @@ extern u8 __near VcStack[];
 #pragma aux ChkFile "*"
 #pragma aux ImgEnd "*"
 #pragma aux TrnPrW "*"
+#pragma aux ResPrW "*"
+#pragma aux DatPrW "*"
+#pragma aux RelTab "*"
+#pragma aux RelCnt "*"
+#pragma aux ResCnt "*"
 #pragma aux OvlPrm "*"
 #pragma aux Command "*"
 #pragma aux NoRun_S "*"
@@ -97,11 +115,14 @@ extern u8 __near VcStack[];
 
 /* Where the part that goes is entered: when the program starts, and
    when it has run a command. Both are of the assembly there, and only
-   their offsets are of use: the segment is RunPar. */
+   their offsets are of use: the segment is RunPar. And a text of that
+   part, which is where the file has it when the program begins. */
 extern const u8 __far Init00[];
 extern const u8 __far Init11[];
+extern const u8 __near Vers_S[];
 #pragma aux Init00 "*"
 #pragma aux Init11 "*"
+#pragma aux Vers_S "*"
 
 /* The PSP, which this segment begins with: where the program goes on
    when DOS has ended it, and the segment of its environment. */
@@ -116,8 +137,11 @@ extern const u8 __far Init11[];
 #define WORD_AT(segment, offset) (*(u16 __far *)AT(segment, offset))
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
-#define DOS_DRIVE    0x1900             /* DOS: the current drive, to AL */
+#define DOS_END      0x0000             /* DOS: end the program, the old
+                                           way */
+#define DOS_DRIVE    0x1900             /* the current drive, to AL */
 #define DOS_VECTOR   0x2500             /* an interrupt, AL, to DS:DX */
+#define DOS_VERSION  0x3000             /* which DOS it is, to AL and AH */
 #define DOS_BREAK    0x3300             /* whether DOS looks for Ctrl-C at
                                            every call, to DL, and with AL 1
                                            from DL */
@@ -175,21 +199,15 @@ struct Frame {
 /* DX of a call of DOS that is no address. */
 #define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
-/* What the assembly still calls: near, with DS on this segment, and
-   every register kept but AX. Release, for the map of the memory; SetStat
-   and Stay, for the code that begins the program, which jumps to Stay
-   and is not come back to; and OutStr, for the code that starts the
-   program, which is of the part that goes. */
+/* What the assembly still calls, for the map of the memory: near, with
+   DS on this segment, and every register kept but AX. */
 void Release(u16 record);
-void SetStat(u16 state);
-void Stay(void);
-u16 OutStr(const u8 __far *text, u16 bx);
 #pragma aux Release "*_r" __near parm [ax] modify exact [ax]
-#pragma aux SetStat "*_r" __near parm [ax] modify exact [ax]
-#pragma aux Stay    "*_r" __near aborts
-#pragma aux OutStr  "*_r" __near parm [dx ax] [bx] value [ax] modify exact [ax]
 
 static u16 GetStat(void);
+static void SetStat(u16 state);
+static void Stay(void);
+#pragma aux Stay aborts
 
 /*---------------------- Check sum ----------------------
    Whether the record in the segment `record` is whole: 1 if its sum is
@@ -400,7 +418,7 @@ static u16 GetStat(void)
 }
 
 /* Have DOS look for memory as it did before GetStat. */
-void SetStat(u16 state)
+static void SetStat(u16 state)
 {
     struct DosRegs regs;
 
@@ -562,7 +580,7 @@ void __interrupt __far Int27(struct Saved r, struct Frame on)
 /* Write the text at `text` on the screen as a teletype would, in grey,
    on the page in the high byte of `bx`. Returns where the text ends. A
    text of no characters is written as its zero byte. */
-u16 OutStr(const u8 __far *text, u16 bx)
+static u16 OutStr(const u8 __far *text, u16 bx)
 {
     struct BiosRegs regs;
 
@@ -857,6 +875,27 @@ static void Exec02(u16 behind)
     }
 }
 
+/*---------------- Relocate the transit part -------------
+   The part that goes has just been loaded, into the block that RunPar
+   goes with. The linker's relocations for it are behind it, where
+   tools/mkexe.c has put them: each is the place of a word that holds a
+   segment, as the linker counts them, from the PSP, and so is what the
+   word holds. RunPar is what a segment of the file has become. DOS
+   cannot do this: the program loads that part itself, time after
+   time. */
+static void Reloc(void)
+{
+    const u16 __far *entry = (const u16 __far *)AT(RunPar + RelTab, 0);
+    u16 count;
+
+    for (count = RelCnt; count; count--) {
+        u16 offset = *entry++;
+        u16 segment = *entry++;
+
+        *(u16 __far *)AT(RunPar + segment, offset) += RunPar;
+    }
+}
+
 /* The commands are done. If the part that goes was given up for them,
    bring it back: a block of memory for it, and the program's own file
    run as a second copy, with a command tail that says where the block
@@ -901,8 +940,10 @@ static void Exec10(void)
         if (!Int21e(&regs)) {
             regs.ax = DOS_CODE;         /* Exec14 */
             Int21e(&regs);
-            if (regs.ax == 0 && *(u16 *)ComnIni.DosBuf == ChkFile)
+            if (regs.ax == 0 && *(u16 *)ComnIni.DosBuf == ChkFile) {
+                Reloc();
                 return;
+            }
         } else if ((u8)regs.ax > 3) {
             AlocEr();
         }
@@ -974,7 +1015,7 @@ static void Stay11(void)
 
 /* The same from the start of the program, where that part is entered at
    Init00 and reads the setup first. */
-void Stay(void)
+static void Stay(void)
 {
     TrnAdr = (Transit *)AT(RunPar, OFFSET(Init00));
     Go(TrnAdr());
@@ -996,3 +1037,158 @@ static void Exec2E(void)
     Exec10();
     Stay11();
 }
+
+/*---------------------- The entry ----------------------*/
+
+/* Add the bytes of `count` paragraphs from the segment `from` on to
+   `sum`. */
+static u16 AllocS(u16 sum, u16 from, u16 count)
+{
+    do {
+        const u8 __far *byte = AT(from, 0);
+        u16 i;
+
+        for (i = 16; i; i--)
+            sum += *byte++;
+        from++;
+    } while (--count);
+    return sum;
+}
+
+/* Move `count` paragraphs from the segment `from` to the segment `to`,
+   the last first. */
+static void MovPars(u16 from, u16 to, u16 count)
+{
+    while (count) {
+        const u8 __far *source;
+        u8 __far *target;
+        u16 i;
+
+        count--;
+        source = AT(from + count, 16);
+        target = AT(to + count, 16);
+        for (i = 16; i; i--)
+            *--target = *--source;
+    }
+}
+
+/* No memory when the program begins: say so and end. */
+static void Alloc9(void)
+{
+    struct DosRegs regs;
+
+    OutStr0(Aloc_S);
+    SetStat(0);
+    regs.ax = DOS_EXIT + 1;
+    Int21e(&regs);
+}
+#pragma aux Alloc9 aborts
+
+/* The program begins here: DOS has loaded the file and enters it with DS
+   on the PSP, which is this segment, and with the stack that the header
+   of the file names, which is this part's own (see tools/mkexe.c). The
+   file is the program as it lies in the memory, so the part that goes
+   is where it will run, a paragraph behind this one.
+
+   First the check sum of the file as it is loaded, by which the program
+   knows it again after a command: all of it but the data of this part,
+   where the stack is, and in use.
+
+   If the command tail is the one that Exec10 gives a second copy, this
+   is one: it moves its part that goes into the block that the first
+   copy has for it, leaves its check sum there, takes the length that
+   the first has for the file, and ends, with 1 if that is not the
+   length of its own.
+
+   Else the program is starting. The compiled code of this part names
+   its segment, the PSP's, in a few places: the linker's relocations for
+   that are applied now, when the sum has been taken, and until then
+   nothing here calls what needs them. DOS has to be 3.20 at the least.
+   The block of memory that DOS has given the program is made as long as
+   the file, and of the part that goes a block of its own, by writing
+   the header that DOS keeps in front of one. Then that part is
+   relocated, and Stay calls it.
+
+   Ported as it is: how DOS looks for memory is set to what it is when
+   DOS starts, the lowest block that fits and no upper memory, whatever
+   it was.
+
+   Not in the port: the original cannot always make its block as long as
+   it needs, since its file is shorter than the program in the memory,
+   and then asks for a block elsewhere for the part that goes. The
+   port's block holds all of the file, and making it as long as the file
+   cannot fail but with DOS's chain of blocks destroyed, where asking
+   for another fails as well. So that way is left out, and the program
+   ends as the original does when both fail. */
+void Alloc0(void)
+{
+    struct DosRegs regs;
+    const u8 *tail = (const u8 *)0x80;
+    u16 psp = RES_SEG;
+    u16 sum, i, block, rest;
+    u8 __far *header;
+    u8 kind;
+
+    IntOn();                            /* for the direction flag, which
+                                           the compiler wants clear */
+    sum = AllocS(0, psp + 0x10, DatPrW - 0x10);
+    sum = AllocS(sum, psp + TrnPrW, ImgEnd - TrnPrW);
+    for (i = 0; i < (u16)OvlPrm[0] - 1; i++)
+        if (tail[i] != OvlPrm[i])
+            break;
+    if (i == (u16)OvlPrm[0] - 1 && tail[i + 2] == 0x0D) {
+        u16 first = *(const u16 *)(tail + i);
+        u16 __far *size = (u16 __far *)AT(first, (u16)ComnIni.DosBuf);
+        u16 length = *size;
+
+        *size = sum;
+        MovPars(psp + TrnPrW, WORD_AT(first, (u16)&RunPar) + TrnPrW,
+                length - TrnPrW);
+        regs.ax = DOS_EXIT + (length != ImgEnd);
+        Int21e(&regs);                  /* Alloc2 */
+    }
+    ChkFile = sum;                      /* Alloc3 */
+    {
+        const u16 __far *entry =
+            (const u16 __far *)AT(psp + RelTab, RelCnt * 4);
+
+        for (i = ResCnt; i; i--) {
+            *(u16 *)*entry += psp;
+            entry += 2;
+        }
+    }
+    regs.ax = DOS_VERSION;              /* Check DOS version */
+    Int21e(&regs);
+    if ((u8)regs.ax < 3) {
+        regs.ax = DOS_END;              /* Alloc4 */
+        Int21e(&regs);
+    }
+    if (((regs.ax & 0xFF) << 8 | regs.ax >> 8) < 0x314) {
+        OutStr0(Vers_S);
+        regs.ax = DOS_EXIT + 2;
+        Int21e(&regs);
+    }
+    regs.bx = ResPrW + (ImgEnd - TrnPrW) + 1;   /* Alloc5 */
+    regs.es = psp;
+    regs.ax = DOS_RESIZE;
+    if (Int21e(&regs))
+        Alloc9();
+    block = psp + ResPrW + 1;           /* Alloc6 */
+    IntOff();
+    /* Split into resident and transit parts */
+    header = AT(psp - 1, 0);
+    kind = header[0];
+    header[0] = 'M';
+    rest = *(u16 __far *)(header + 3) - ResPrW - 1;
+    *(u16 __far *)(header + 3) = ResPrW;
+    header = AT(block - 1, 0);
+    header[0] = kind;
+    *(u16 __far *)(header + 1) = psp;
+    *(u16 __far *)(header + 3) = rest;
+    IntOn();
+    RunPar = block - TrnPrW;            /* Alloc7 */
+    SetStat(0);
+    Reloc();
+    Stay();
+}
+#pragma aux Alloc0 "*" aborts

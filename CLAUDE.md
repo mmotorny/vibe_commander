@@ -665,6 +665,18 @@ port.
   `Stay_r` and `Stay11_` in `build/port/resident.lst` after any change
   there: no instruction between the call and the next may name BP or a
   register.
+- The program is entered at a C function, `Alloc0` of
+  `port/resident.c`: the linker is told `option start=Alloc0`, and
+  `tools/mkexe.c` takes the address from the linker's header. DOS enters
+  it with DS on the PSP, which is what that file takes DS to be, and on
+  the stack that the header names. The direction flag is as DOS leaves
+  it: the first thing called is `IntOn`, which clears it. Until the
+  relocations of the part that stays have been applied there, nothing
+  may be called that needs one: an `__interrupt` or `__loadds` function,
+  or a far function of another segment. A far call within `RTEXT` needs
+  none, the linker makes `push cs` and a near call of it.
+- The block of numbers that `tools/mkexe.c` fills in is at 100h, the
+  first thing behind the PSP, in `RHEAD`.
 - A function that does not return is `#pragma aux name aborts`; the
   compiler then ends the caller there.
 - A far function of `port/resident.c` that the part that goes calls
