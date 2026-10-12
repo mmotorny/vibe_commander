@@ -783,7 +783,9 @@ several at a time.
   gives every scenario the file that leaves.
 - A scenario that shows the time of day, with the clock switched on or in
   the time stamp of a file it has made, does so within the first minute of
-  its machine: a golden is recorded more slowly than a build is tested.
+  its machine. The machine's clock is counted in the instructions it
+  executes, and the port takes more of them than the original to get to
+  the same step.
 - A figure on the screen that follows the time of day or the size of the
   program, such as the clock or a count of free memory, is left out of
   the comparison, in `harness/deviations.py`. The exception is a scenario
@@ -791,10 +793,14 @@ several at a time.
 - The countries tested are the United States and Russia.
 - Russian text is typed on the Russian keyboard of the Russian bench. Its
   Cyrillic letters are selected in a step that types text into an input
-  line, never at the panels: there Alt by itself may bring up the menu,
-  depending on timing.
-- The tests run the build of the port that signals where it is. The build
-  that is shipped is not run by them.
+  line, never at the panels: there Alt by itself brings up the menu.
+- The tests run the build of the port that is shipped; no build is made
+  for them. The original and the port are driven alike, by a program of
+  ours that stays resident in the machine, `harness/DRIVER.ASM`: it puts
+  the keys of a step in through the keyboard controller, so that the BIOS
+  makes of them what it makes of a keyboard's, and writes the screen out
+  when the program idles with none left. It watches and feeds, and
+  answers nothing in the program's place or the BIOS's.
 - A test does not put a stand-in where something is that the project does
   not own: DOS, the BIOS, the machine. What a test knows of them it gets
   from the real ones. A part of the program itself may be replaced in a
