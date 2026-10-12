@@ -22,7 +22,19 @@
  * data of the compiler's making, a string literal for example, would be
  * linked to where the program does not look for it.
  *
- * Usage: mkexe <linked.exe> <output.exe> [<compiled.obj>...]
+ * And it checks the linker's map: no segment of compiled code may reach
+ * into the last 4K of its 64K. Between the end of a segment and its
+ * beginning a near call or jump goes the short way, around the end of the
+ * 64K, and the linker makes such calls: near ones out of the far calls
+ * between two files of a segment. A processor does them. QEMU, on which
+ * the tests run, does not where the call and the place it would go to
+ * without wrapping are in one 4K page of the machine's memory: it leaves
+ * the wrapping out, and the program goes on 64K off (gen_jmp_rel in QEMU's
+ * target/i386/tcg/translate.c, as of 11.1). A segment starts on a
+ * paragraph, so the end of its 64K is at most FF0h into a page, and such a
+ * call has one end at F010h or beyond.
+ *
+ * Usage: mkexe <linked.exe> <linked.map> <output.exe> [<compiled.obj>...]
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -32,6 +44,7 @@ enum {
     PSP_SIZE    = 0x100,
     HEADER_SIZE = 0x20,         /* of the output file */
     STACK_SIZE  = 0x200,        /* until the program sets up its own */
+    CODE_END    = 0xF000,       /* where compiled code ends, at the most */
 
     /* The block at 103h. The first three words are written here. */
     INFO        = 0x103,
@@ -126,6 +139,42 @@ static void check_object(const char *path)
     free(object);
 }
 
+/* Fail if the linker's map at `path` has a segment of compiled code that
+   ends beyond CODE_END, counted from where its segment register points. */
+static void check_map(const char *path)
+{
+    FILE *f = fopen(path, "r");
+    char line[256], name[32], class[32], group[32];
+    unsigned segment, offset;
+    unsigned long size;
+    int found = 0;
+
+    if (!f) {
+        fprintf(stderr, "mkexe: cannot open %s\n", path);
+        exit(1);
+    }
+    /* A line of the list of segments: name, class, group, address, size. */
+    while (fgets(line, sizeof line, f)) {
+        if (sscanf(line, "%31s %31s %31s %4x:%4x %8lx", name, class, group,
+                   &segment, &offset, &size) != 6 || strcmp(class, "CCODE"))
+            continue;
+        found = 1;
+        if (offset + size > CODE_END) {
+            fprintf(stderr, "mkexe: segment %s ends at %lXh, and compiled "
+                    "code may not reach beyond %Xh: a call from there to "
+                    "the beginning of the segment goes around the end of "
+                    "its 64K, which the machine of the tests gets wrong. "
+                    "Have a file compiled into another segment: see "
+                    "port_c_second in CMakeLists.txt\n",
+                    name, offset + size, (unsigned)CODE_END);
+            exit(1);
+        }
+    }
+    fclose(f);
+    if (!found)
+        fail("the map lists no segment of compiled code");
+}
+
 int main(int argc, char **argv)
 {
     FILE *f;
@@ -134,10 +183,14 @@ int main(int argc, char **argv)
     unsigned relocations, header_size;
     const unsigned char *entry;
 
-    if (argc < 3)
-        fail("usage: mkexe <linked.exe> <output.exe> [<compiled.obj>...]");
-    for (i = 3; i < argc; i++)
+    if (argc < 4)
+        fail("usage: mkexe <linked.exe> <linked.map> <output.exe> "
+             "[<compiled.obj>...]");
+    /* What an earlier build left is not the program of one that fails. */
+    remove(argv[3]);
+    for (i = 4; i < argc; i++)
         check_object(argv[i]);
+    check_map(argv[2]);
     in = read_file(argv[1], &in_size);
 
     if (in_size < 0x1C || get16(in) != 0x5A4D)
@@ -197,7 +250,7 @@ int main(int argc, char **argv)
     put16(header + 0x16, 0x10000UL - PSP_SIZE / 16);    /* CS */
     put16(header + 0x18, 0x1C);
 
-    if (!(f = fopen(argv[2], "wb")))
+    if (!(f = fopen(argv[3], "wb")))
         fail("cannot create the output file");
     if (fwrite(header, 1, HEADER_SIZE, f) != HEADER_SIZE
             || fwrite(image + PSP_SIZE, 1, total, f) != (size_t)total

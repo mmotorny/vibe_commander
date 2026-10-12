@@ -633,17 +633,30 @@ with it is less obvious:
   leaves and fails when less than half is left.
 - A static function is called, not expanded in place, also where only
   one routine uses it.
-- The compiled code has two segments, each of 64K at the most: CTEXT,
-  and CTEXT2 for the files that `port_c_second` of `CMakeLists.txt`
-  names, `keys.c` the first. When the linker says "size of segment CTEXT
-  exceeds 64k", name the new file there. A file that calls `__U4M` or
-  `__U4D` stays in CTEXT, where those are.
-  Do not wait for the linker to say so: with CTEXT at 64,636 bytes
-  (FC7Ch in `build/port/signalling/VC.MAP`) it said nothing, and the
-  program ended in "Invalid Opcode" after a command of an extension
-  file, in `command-edit`; at 61,177 it does not. Where the limit is,
-  and why, has not been found out. Read the length of CTEXT in the map
-  after adding a file, and keep it below F000h.
+- The compiled code has two segments: CTEXT, and CTEXT2 for the files
+  that `port_c_second` of `CMakeLists.txt` names, `keys.c` the first. A
+  file that calls `__U4M` or `__U4D` stays in CTEXT, where those are.
+  A segment may end at F000h at the most, its offset in the linker's map
+  and its size together, not at 64K: `tools/mkexe.c` reads the map and
+  stops the build with a message when one is fuller. Name a file in
+  `port_c_second` then.
+  The limit is QEMU's, not the program's. The linker makes the far call
+  between two files of one segment into `push cs` and a near call, and
+  between the end of a segment and its beginning a near call goes the
+  short way, around the end of the 64K. A processor does that. QEMU, as
+  of 11.1 and of its source in October 2026, leaves the wrapping out
+  when the call and where it would go without wrapping are in one 4K
+  page of memory, and goes on there, 64K off, in whatever lies next to
+  the segment. With CTEXT at FC7Ch `Run_00_c` at F6B8h called `DosCom_c`
+  at 0471h so, and `command-edit` ended in "Invalid Opcode" after a
+  command of an extension file; in a trial with CTEXT at FC19h the same
+  call went astray, happened to come back, and the scenario passed. It
+  takes one end of the call at F010h or beyond, wherever DOS loads the
+  program.
+  A program that fails where no translation explains it, and runs right
+  when QEMU is also given `-d nochain`, has met this or something like
+  it: that keeps QEMU from the short cut that is wrong. All scenarios
+  take a third longer with it.
 - A function with a `#pragma aux` that calls another of the same file
   does so by `push cs` and a near call, and may end by jumping into the
   end of another: `F01_05_c` goes on in `F00_05_c`. With `modify exact

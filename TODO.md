@@ -1428,7 +1428,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     on `main` as it was, 17 seconds, and with `memory.c` in the second
     segment, where the first has 61,177 bytes; the second test, 254
     seconds, passed. Why the program fails with a first segment that
-    full has not been found out: see `CLAUDE.md`, "C for the port".
+    full was found out afterwards: see `CLAUDE.md`, "C for the port".
 
 ## Ideas put off
 
