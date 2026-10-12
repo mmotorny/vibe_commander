@@ -82,7 +82,8 @@ MAGIC = b"\xA5\x5A"
 KEYBOARD, MOUSE, STEP, HOLD, ASKS, END = 1, 2, 3, 4, 5, 0
 NONE = 0xFFFF
 # The disk a script is on: its size is that of the disk the machine had
-# when its state was saved.
+# when its state was saved, and the longest that a script may be. The
+# driver would read one of 32 MB.
 SCRIPT_DISK = 1 << 20
 
 # What the driver writes.
@@ -369,7 +370,9 @@ def script(steps, known, blinking=False):
         out.append(STEP)
     out.append(END)
     if len(out) > SCRIPT_DISK:
-        raise ValueError("the script is longer than its disk")
+        raise ValueError(f"the script is {len(out)} bytes, and its disk "
+                         f"holds {SCRIPT_DISK}: SCRIPT_DISK in driver.py, "
+                         "a power of two")
     return bytes(out)
 
 

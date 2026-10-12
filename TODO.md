@@ -71,12 +71,6 @@ Things that are known and not done. Standing instructions are in
   is asked, and `harness/driver.py` makes the second only behind a
   click. "Move@79,0*255" could be the mouse moved and 255 times asked.
   Six more of `LeaveTm` are for DESQview.
-- A script of more than 64K goes wrong without a word: the driver
-  counts its place in the script in 16 bits, and `harness/driver.py`
-  only refuses one that is longer than its disk, a megabyte. The steps
-  then come out as others, and the run ends with "the driver wrote 4
-  screens for 5 steps". The longest script is that of
-  `mouse-user-menu`, 55K.
 - Of `Input0` in C, four instructions of the original have run in no
   scenario and are listed as out of reach in `harness/ported.py`: where
   the minute has come in which the screen is blanked, or midnight has

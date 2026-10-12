@@ -428,12 +428,10 @@ out again (show.py --changes is how):
     the timer has ticked, 18 times a second, and the machine's time is
     counted in instructions: one movement of the mouse within the
     corner, which is 500 bytes of a script, lets about half a tick
-    pass, and a script holds 64K at the most (the driver counts its
-    place in 16 bits, and nothing says so when a script is longer: the
-    steps come out wrong). That is some 60 turns of the sky, and a star
-    is out for 88 at the least before it changes. For the same reason
-    no scenario waits the minute after which the blanker comes up by
-    itself. See blank.
+    pass, and a script holds a megabyte at the most, which driver.py
+    says when one is longer. A star is out for 88 turns at the least
+    before it changes, and the blanker comes up by itself after a
+    minute: no scenario waits for either that way. See blank.
   - The setup file is written to the program's directory whatever the
     panels show: with "del d:\\vc\\vc.ini" run as a command it is made
     anew, and with the directory renamed, F6 on it in a panel that shows

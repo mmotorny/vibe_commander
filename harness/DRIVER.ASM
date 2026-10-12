@@ -34,7 +34,10 @@
 ; does not come to set the same hundredth of a second twice.
 ;
 ; The script is on a hard disk of its own, which has no file system and is
-; known by the two bytes it begins with, from its first sector on:
+; known by the two bytes it begins with, from its first sector on. It may
+; be as long as its disk, a megabyte, and the driver would read one of 32
+; megabytes: its place in the script has 32 bits, and a sector's number
+; 16.
 ;
 ;	A5 5A		says that it is a script
 ;	word		where AutoTim is in the program's main data, or FFFFh
@@ -93,7 +96,7 @@
 ;
 ; Assemble with JWasm: jwasm -bin -Fo DRIVER.COM DRIVER.ASM
 	.model	tiny
-	.186
+	.386				; The machine is a 486
 
 OutPort	EQU	0E9h			; QEMU's debug console
 StopPort EQU	505h			; QEMU's port that stops the machine
@@ -118,7 +121,7 @@ Pad	dw	0
 Old16	dd	0
 Old28	dd	0
 Old33	dd	0
-SPos	dw	0			; Where in the script the next byte is
+SPos	dd	0			; Where in the script the next byte is
 SSec	dw	0FFFFh			; Which sector of it SecBuf holds
 SDisk	db	80h			; Which disk it is on, as the BIOS
 					; numbers the hard disks
@@ -176,10 +179,10 @@ RdSec	endp
 ; AL = the byte of the script at SPos, which stays where it is.
 Peek	proc	near
 	push	si
-	mov	ax,cs:SPos
-	mov	si,ax
+	mov	si,word ptr cs:SPos
 	and	si,1FFh
-	shr	ax,9
+	mov	ax,word ptr cs:SPos+1	; The sector: bits 9 to 24
+	shr	ax,1
 	cmp	ax,cs:SSec
 	je	Peek1
 	call	RdSec
