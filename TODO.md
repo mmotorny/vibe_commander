@@ -57,6 +57,22 @@ Things that are known and not done. Standing instructions are in
   bits: nothing divides by one yet. It was held against a model of its
   steps, not run.
 
+- `wait_for_screen` takes a change of one cell for blinking. In `columns`
+  the editor closes its box after F2 and clears the `*` in its first row
+  some 10 ms later; a sample between the two has the harness wait 20
+  seconds for the `*` to come back, and the derivation stops with "the
+  screen did not settle". That happened in 8 of 22 derivations of
+  `columns` on an idle machine. It never made a wrong golden: derive
+  again.
+- What ran in the original is not the same every time. Three instructions
+  of `Input0`, B16A to B16E, take a key that is already waiting when the
+  program first asks, and `command.ran` came out with them once. The
+  goldens of `quit`, `select` and `start` are without them too.
+- `cmake --build build -j4` failed once in a new checkout, "The object is
+  zero length" for one C file. Building without `-j` works.
+- A run of the harness that is killed outright leaves its QEMU running,
+  at full load and outside the turns of `harness/turn.py`.
+
 ## What batches have lost time to
 
 Minutes that a batch actually lost, for deciding which improvement of the
