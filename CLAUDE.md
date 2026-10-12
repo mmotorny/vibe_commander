@@ -151,7 +151,11 @@ For one file, in this order:
 1. Build, and run `python3 harness/datacheck.py build/shareware-layout
    build/port`. Under `assembly` it names every object of the file that
    has a name of the original, with its length. That is the list of what
-   moves, and each is as the original now.
+   moves, and each is as the original now. Keep the output, in `build/`:
+   step 5 holds the new one against it. To read the assembly, make a
+   copy that an editor shows, `iconv -f cp866 port/asm/VCFIND.INC >
+   build/VCFIND.txt`; change the file itself by a script that reads and
+   writes bytes.
 2. Write the file of constants, `port/NAME_t.c`, under the name that
    `TODO.md` has for it. It includes `tables.h` and holds constants and
    nothing else, in the order of the assembly:
@@ -161,10 +165,28 @@ For one file, in this order:
      an octal escape, `\377\003`: the markup, and the frames, which are
      characters of CP866, `\263` for the upright line. The source stays
      ASCII; a comment may show the line as it looks. Take every byte
-     from the line of the assembly, read as bytes.
+     from the line of the assembly, read as bytes. An escape has three
+     digits always, since a digit may follow: `0FFh,3,'5 minutes'` is
+     `"\377\0035 minutes"`. A number that the assembly works out is
+     worked out: `0FFh,80h+16` is `\377\220`. `'\*.*'` is `"\\*.*"`,
+     and `^V` and `^I` are a caret and a letter. Several `DB` under one
+     label are one array: `'a',0` and `'b',0` are `"a\0" "b"`, the last
+     zero being the string's own.
+   - A text that the assembly ends without a zero and that is read as
+     far as the next zero all the same, as a line of a box is, is
+     written with what follows it up to that zero: `Kov_S`, four
+     characters in front of `Empty_S`, which is a zero byte, is
+     `"\"^V\""` with the string's zero, five bytes. `Empty_S` is a
+     constant of its own besides. Two objects of C stand one behind the
+     other as they are written, but nothing says that they must.
    - Buttons and colours are arrays of `u8`.
    - A box is `BOX(n)`, or `BOX1(n)` and `BOX2(n)` with texts put in; a
-     dialog is `DIALOG(n)`. A word that names something is a pointer,
+     dialog is `DIALOG(n)`. The assembly's `DB 4, 1`, `DW ErrBuf`, `DW
+     TmpErr+1`, `DB 0, 55` and four lines are `BOX1(4)`: `{ colours },
+     4, 1, MD_AT(ErrBuf), { { MD_AT(TmpErr[1]), 0, 55 } }, { lines }`. A
+     dialog is written in the assembly as `BOXHD <...>` and `BOXMN
+     <...>` or as `DW` and `DB` with the same values in the same order;
+     `OFFSET Name` is `Name`. A word that names something is a pointer,
      written as the name. A place in the main data is `MD_AT(TmpBuf)`,
      and `MD_AT(TmpErr[1])` for `TmpErr+1`; a number in a word that
      names something elsewhere is `NUMBER(n)`. What `port/tables.h`
@@ -191,22 +213,89 @@ For one file, in this order:
 4. The C code that uses them does not change: `extern const u8 __far`
    with its `#pragma aux` reads a constant of C as it read the
    assembly's.
-5. Build, and run the tests. `data` has to name each object of step 1
-   under the new file, as long as it was or longer, and pass; `port` has
-   to pass.
+5. Build, and run the tests, `ctest --test-dir build -R data` first:
+   it takes no time, and the build a minute. `data` has to name each
+   object of step 1 under the new file, as long as it was or longer,
+   and pass. The test does not notice an object that has left the
+   assembly and not arrived: hold the names against those of step 1.
+   The two counts in its last lines add up to what they added up to
+   before, in objects, and in bytes but for what was written longer.
+   Then `port` has to pass, two minutes.
 6. A file with nothing left but comments goes: `git rm`, its `INCLUDE`
    in `VC.ASM`, its name in `port_asm` of `CMakeLists.txt`.
 
+In what order the objects of a file go: all at once is the least work,
+since what names what moves together. Where a file is done in pieces,
+go from the top down: the dialogs, which only C code names, then the
+boxes, then the texts and the buttons. A dialog of C that names a box
+still in the assembly needs the box `PUBLIC` in its file and no more;
+the other way round, a box of the assembly that names a text of C needs
+an `EXTERN` line, which goes again a step later.
+
+What names an object from elsewhere, and what to do:
+
+- C code: nothing. It has `extern const u8 __far Name[]` and `#pragma
+  aux Name "*"`, and the constant has `#pragma aux Name "*"`. If the
+  linker says "undefined symbol Name", one of the two lacks the pragma,
+  or the assembly lacks `PUBLIC`.
+- A box of another assembly file: today only the sixteen that `VC.ASM`
+  declares `EXTERNDEF`, and for those nothing is to do on either side.
+  Should the assembler say "Symbol not defined" in a file that is not
+  yours, that file wants `EXTERN Name:BYTE` at its top: add the line,
+  and say so in the commit, since another agent has the file.
+- A stub: `PtMnu_S` alone, which is one of the sixteen.
+- A code file that has a copy of its own, `static ... CODE`, under the
+  same name, as `Empty_S` and `Mask_S` are in several: leave it. The two
+  do not meet at the linker, and the test holds both.
+
 What the test `data` goes by is the name: an object is held against the
 label of the original that has its name, and a word that holds an
-address there against where the port has what that label names. Where
-the port is meant to be otherwise, `harness/datacheck.py` has four
-tables, each entry with its reason: `ELSEWHERE` for a constant that the
-original has under another name or inside another object, `OWN` for one
-that it has not as data, `DIFFERENT`, and `NAMED_OTHERWISE` for a word
-that names something the port has in another way. A difference that the
-test reports is mended in the C; it is listed only where the C is meant
-to differ.
+address there against where the port has what that label names. What it
+says when it fails, and what that means as a rule:
+
+- "Name+N: the port has XXh, the original YYh". Byte N of the object,
+  counted from 0, is another. With 00h in the port at the last byte, the
+  string's zero is one that the assembly has not: give the array its
+  length. With 00h behind a single byte, a structure is not packed. With
+  everything from N on shifted, a byte is missing or one too many just
+  before: an escape that ran on, a `BOX` that should be `BOX1`, a count
+  of lines that is not the number of lines.
+- "the port has XXXXh, which is not where it has Y, ...: the original
+  names Y there". The word names the wrong thing: two lines exchanged, a
+  name of another box. A number where a name belongs shows like this
+  too.
+- "the original names Y there, which the port has not by that name".
+  Nothing in the port is called Y: a name written otherwise in C, or Y
+  left in neither place.
+- "the original has no data called X". A constant of C whose name the
+  original has not: a name mistyped, as a rule.
+- "X is listed in datacheck.py, and the C code has no constant of that
+  name". An entry of a table there that has outlived its constant.
+
+Where the port is meant to be otherwise, `harness/datacheck.py` has four
+tables, each entry with its reason. A file of the assembly that moves as
+it is needs no entry in any of them, and wanting one is a sign to look
+again:
+
+- `ELSEWHERE`, for a constant that the original has under another name
+  or inside another object. It is there for the constants that code
+  files had before the test was. A constant that moves keeps its name.
+- `OWN`, for a constant that the original has not as data, which is
+  then not compared. Right for a table that only the port has, as
+  `Main_T`, `CmdNx_T`, `MnuNx_T` and `F35_T` will be when they are C.
+  Wrong for anything that was in the published source: an entry here to
+  quiet "no data called X" takes the object out of the test.
+- `NAMED_OTHERWISE`, for a word that names something the port has in
+  another way: a routine that has become a number in a table of
+  functions. Texts, boxes and buttons are never named otherwise.
+- `DIFFERENT`, for an object that is meant to differ from the original.
+  It is empty. An entry is behaviour other than the original's: stop and
+  ask, as "A run of batches" has it.
+
+A difference that the test reports is mended in the C. If the C is as
+the assembly of the port and the test still fails, the port's assembly
+had drifted from the original, which the test said before the move, in
+step 1: it does not start to fail by moving what was right.
 
 What was met on the way:
 
