@@ -274,8 +274,8 @@ with it is less obvious:
 
 ## A run of batches
 
-Batches are translated one after another, without waiting for the user
-between them.
+Batches are translated without waiting for the user between them, and
+several at a time.
 
 - Each batch is the work of an agent of its own, started fresh, so that a
   run does not fill one context. The session that runs them does not
@@ -286,9 +286,25 @@ between them.
   that the next one needs is written down before the batch is committed:
   about the compiler and the stubs here, about driving the dialogs at the
   top of `harness/scenarios.py`, about lost time in `TODO.md`.
-- A batch is committed and pushed as soon as the `port` test passes,
-  together with the scenarios and goldens made for it. The next batch
-  starts at once.
+- Batches that run at the same time each have a checkout of their own, a
+  plain clone of the same origin with its own build, and a part of the
+  program that the others leave alone. The session names both: the part
+  is a file of the source, as a rule.
+- A batch is committed as soon as the `port` test passes, together with
+  the scenarios and goldens made for it. It gets onto `main` by
+  `git pull --rebase`, a build, the `port` test once more, now with the
+  other batches under it, and `git push`. If the push is refused, another
+  batch got there first: again from the pull. The agent settles a
+  conflict of its batch itself and keeps what both sides added.
+- The stack is one budget for all the batches. What counts is what the
+  test says is left after the rebase.
+- The screens of the original cannot be recorded while other machines
+  run: goldens came out different when they were. `harness/turn.py` has
+  every run of the harness wait for its turn, a run that records the
+  original by itself, tests of the port together. So, while other batches
+  run, derive the goldens of the scenarios at hand and never all of
+  them; and when the `port` test fails where the change cannot explain
+  it, derive again the golden of the scenario that failed.
 - The tools and the harness are improved during a run, between batches
   and without waiting for confirmation, each improvement a commit of its
   own. What decides is the total cost: an improvement is made when it
