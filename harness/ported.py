@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Check the C translation: the program as it has been translated to C.
+"""Check a C tree: the C translation, the program as it has been translated
+to C, or the portable C, which began as a copy of that. Either is "the
+translation" below, and the one that is checked is the one whose VC.EXE
+and link map are named.
 
 The translation is taken through every scenario and must show the same
 screens and leave the same disks as the original did, which the goldens
@@ -71,7 +74,7 @@ STACK_LEFT = 2
 class Batch:
     """Routines translated together."""
     title: str
-    source: str                   # the C file in src/c/
+    source: str                   # the C file of the tree
     # The assembly procedures it replaces, and stretches of code between
     # procedures, each by its first label, or by a later one for what
     # stands from there on (see coverage.Listing).
@@ -1144,7 +1147,9 @@ def check_comparison(name, run, program):
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("translation", help="the translation's VC.EXE")
+    parser.add_argument("translation", help="the VC.EXE of a C tree: "
+                                            "build/c/VC.EXE, or "
+                                            "build/portable_c/VC.EXE")
     parser.add_argument("link_map", help="its link map")
     parser.add_argument("listing", help="the listing of VC.COM laid out "
                                         "like the original")

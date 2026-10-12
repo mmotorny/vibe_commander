@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """How much the C code reads of each of the program's constants.
 
-The test of the C translation's data (datacheck.py) compares as many bytes
+The test of a C tree's data (datacheck.py) compares as many bytes
 as an object has. The program reads more of some: it copies a name as 13
 bytes whatever its length, a title as 80, and writes a line with a table of
 colours of which the line may ask for the fourth. What lies behind such
@@ -27,14 +27,15 @@ an index which the program does not keep inside it, where REVIEWED says
 of the C, not by what the compiler made of it: a constant that is handed
 through a variable is known only as far as REVIEWED says.
 
-    reads.py BUILD_DIR          every place, with the bytes read there
+    reads.py BUILD_DIR          every place, with the bytes read there:
+                                build/c for the C translation, whose
+                                files are src/c, build/portable_c for
+                                the portable C
 """
 import re
 import sys
 from collections import defaultdict
 from pathlib import Path
-
-C_DIR = Path(__file__).resolve().parent.parent / "src" / "c"
 
 ZERO = "as far as its zero"     # a text
 TABLE = "as it is laid out"     # a box, a dialog, buttons: by their kind
@@ -263,12 +264,12 @@ def _form(statement, name, sizes):
     return None
 
 
-def places(objects, variables=()):
-    """Every place where a file of code names one of `objects`, a list
-    of (file, name, address, length) as datacheck.Translation has them:
-    (file, line, name, the file of the object, its length, what is read
-    there, how that is known). `variables` are names among them that are
-    no constants."""
+def places(source, objects, variables=()):
+    """Every place where a file of code in the directory `source` names
+    one of `objects`, a list of (file, name, address, length) as
+    datacheck.Translation has them: (file, line, name, the file of the
+    object, its length, what is read there, how that is known).
+    `variables` are names among them that are no constants."""
     by_name = defaultdict(list)
     for module, name, _, length in objects:
         if name not in variables:
@@ -276,7 +277,7 @@ def places(objects, variables=()):
     names = sorted(by_name, key=len, reverse=True)
     pattern = re.compile(r"\b(" + "|".join(map(re.escape, names)) + r")\b")
     found = []
-    for path in sorted(C_DIR.glob("*.c")):
+    for path in sorted(source.glob("*.c")):
         if path.name.endswith("_t.c"):
             continue
         text = re.sub(r"/\*.*?\*/",
@@ -327,16 +328,16 @@ def places(objects, variables=()):
     return found
 
 
-def check(objects, contents, variables=()):
-    """What is wrong with how the code reads the constants: a list of
-    lines. `contents` gives the bytes of an object by its address and
-    length."""
+def check(source, objects, contents, variables=()):
+    """What is wrong with how the code in the directory `source` reads
+    the constants: a list of lines. `contents` gives the bytes of an
+    object by its address and length."""
     wrong = []
     used = set()
     where = {(module, name): address
              for module, name, address, _ in objects}
-    for file, line, name, module, length, read, how in places(objects,
-                                                              variables):
+    for file, line, name, module, length, read, how in places(
+            source, objects, variables):
         used.add((file, name))
         if read is None:
             wrong.append(f"{file}:{line}: how much of {name} is read here "
@@ -363,11 +364,12 @@ def main():
     import datacheck
     translation = datacheck.Translation(Path(sys.argv[1]))
     for file, line, name, module, length, read, how in places(
-            translation.objects, translation.variables):
+            translation.source, translation.objects,
+            translation.variables):
         print(f"{file + ':' + str(line):18} {name:11} {length:4} of "
               f"{module:13} {read}{'' if how == 'by its form' else ': ' + how}")
-    for line in check(translation.objects, translation.bytes,
-                      translation.variables):
+    for line in check(translation.source, translation.objects,
+                      translation.bytes, translation.variables):
         print("WRONG   ", line)
 
 

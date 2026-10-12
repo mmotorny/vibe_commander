@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Say where the stacks of the original and of the C translation end in the
+"""Say where the stacks of the original and of the C trees end in the
 memory of the test bench, and where the driver of the tests would put them.
 
 QEMU translates the code that the machine runs, a page of 4,096 bytes at
@@ -14,11 +14,13 @@ clock counted in instructions it is most of a scenario's time.
 Where DOS loads the program follows from what is loaded before it, and
 the driver of the tests can keep some memory more than it needs:
 setups.PLACE, in paragraphs of 16 bytes, for each country's bench. This
-prints, for each bench, where the stack of the original and of the
-translation ends in its page, and the PLACE that would end the original's
+prints, for each bench, where the stack of the original and of each C
+tree ends in its page, and the PLACE that would end the original's
 stack on a page. The original is the one to go by: it does not change.
 
-    place.py
+    place.py                    the original, the C translation and the
+                                portable C
+    place.py portable_c         the original and that tree
 
 Needs the project built.
 """
@@ -30,6 +32,8 @@ import scenarios
 import setups
 
 PAGE = 4096
+# The C trees, by the names of their directories in build/.
+TREES = {"c": "the C translation", "portable_c": "the portable C"}
 
 
 def stack_end(program, bench):
@@ -41,17 +45,19 @@ def stack_end(program, bench):
 
 
 def main():
-    if len(sys.argv) > 1:
+    trees = sys.argv[1:] or list(TREES)
+    if any(tree not in TREES for tree in trees):
         sys.exit(__doc__)
-    programs = [setups.original_vc(), setups.Program.load(
-        deps.ROOT / "build" / "c" / "VC.EXE")]
+    programs = [setups.original_vc()] + [setups.Program.load(
+        deps.ROOT / "build" / tree / "VC.EXE") for tree in trees]
+    names = ["the original"] + [TREES[tree] for tree in trees]
     with setups.Benches() as benches:
         for country in setups.COUNTRIES:
             ends = [stack_end(program, benches[country])
                     for program in programs]
-            for program, end in zip(programs, ends):
-                print(f"{country}: the stack of {program.filename} ends at "
-                      f"{end:05X}, byte {end % PAGE} of its page")
+            for name, program, end in zip(names, programs, ends):
+                print(f"{country}: the stack of {name}, {program.filename}, "
+                      f"ends at {end:05X}, byte {end % PAGE} of its page")
             more = -ends[0] % PAGE // 16
             print(f"{country}: PLACE is {setups.PLACE[country]}; "
                   f"{(setups.PLACE[country] + more) % (PAGE // 16)} would "

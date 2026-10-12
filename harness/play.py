@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the translation, or the original, on the test bench, to use it by hand.
+"""Run a C tree, or the original, on the test bench, to use it by hand.
 
 The machine is the one of the tests: FreeDOS booted from its floppy, the
 bench's files on C:, the program with what it reads on D:, and the program
@@ -8,7 +8,8 @@ floppy, is not loaded. Its screen is shown in the terminal, which
 has to be 80 columns by 25 lines at least, and its keyboard is the
 terminal's. Nothing is kept: the disks are made anew every time.
 
-    play.py                     the C translation, build/c/VC.EXE
+    play.py                     the portable C, build/portable_c/VC.EXE
+    play.py --tree c            the C translation, build/c/VC.EXE
     play.py --original          the original, VC.COM
     play.py --country ru        on the Russian bench
     play.py PROGRAM             another build
@@ -29,6 +30,8 @@ from pathlib import Path
 import setups
 
 ROOT = Path(__file__).resolve().parent.parent
+# The C trees, by the names of their directories in src/ and in build/.
+TREES = ("portable_c", "c")
 
 # What DOS runs once it has booted: the program, where the tests start it,
 # and then what switches the machine off.
@@ -66,7 +69,10 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("program", nargs="?", type=Path,
-                        default=ROOT / "build" / "c" / "VC.EXE")
+                        help="the file of a build, in place of a tree's")
+    parser.add_argument("--tree", choices=TREES, default="portable_c",
+                        help="the tree to run: portable_c, the portable C, "
+                             "or c, the C translation")
     parser.add_argument("--original", action="store_true",
                         help="run the original in place of a build")
     parser.add_argument("--country", choices=sorted(setups.COUNTRIES),
@@ -74,12 +80,13 @@ def main():
     parser.add_argument("--display", default="curses",
                         help="QEMU's display: curses, or gtk for a window")
     args = parser.parse_args()
+    path = args.program or ROOT / "build" / args.tree / "VC.EXE"
     if args.original:
         program = setups.original_vc()
-    elif args.program.exists():
-        program = setups.Program.load(args.program)
+    elif path.exists():
+        program = setups.Program.load(path)
     else:
-        sys.exit(f"{args.program} is not there: build the project first")
+        sys.exit(f"{path} is not there: build the project first")
     with tempfile.TemporaryDirectory() as directory:
         print("Making the bench...", flush=True)
         floppy, disks = machine(Path(directory), program, args.country)

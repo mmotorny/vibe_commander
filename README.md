@@ -14,11 +14,14 @@ A faithful recreation of
 DOS file manager written by Vsevolod V. Volkov, carried from its original
 assembly source to C, and from DOS to modern operating systems.
 
-The program is here in three trees, the third of them still to come.
-`src/asm/` is the assembly: Volkov Commander 4.05 as its author published
-it. `src/c/` is the C translation: that program translated to C for DOS,
-behaving as the original does, bugs included. `src/portable_c/` will be the
-portable C: the line that leaves DOS behind, starting as a copy of `src/c/`.
+The program is here in three trees. `src/asm/` is the assembly: Volkov
+Commander 4.05 as its author published it. `src/c/` is the C translation:
+that program translated to C for DOS, behaving as the original does, bugs
+included; it is finished, and is kept as it is. `src/portable_c/` is the
+portable C: the line that leaves DOS behind. It began as a copy of `src/c/`,
+is built and tested beside it, against the same recordings of the original,
+and is where work goes on; where it is to behave otherwise than the
+original, `src/portable_c/DEVIATIONS.md` says so, and has no entry yet.
 
 The project is also an experiment in how far an AI coding agent can take such
 a recreation on its own. The engineering work is done by Claude; a human sets
@@ -212,8 +215,9 @@ linker's command (see [The C translation](#the-c-translation)).
 |---|---|
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
-| `tools/` | `mkexe.c` makes the translation's `VC.EXE` out of what the linker produces |
-| `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the translation, and registers the tests |
+| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
+| `tools/` | `mkexe.c` makes the `VC.EXE` of a C tree out of what the linker produces |
+| `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, each as the other is, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
 | `docs/` | Pictures for this README |
 
@@ -226,8 +230,8 @@ cmake -B build
 cmake --build build
 ```
 
-Two programs are built, by two sets of tools, and neither set touches
-the other's program.
+The original is built by one set of tools and the two C trees by
+another, and neither set touches the other's programs.
 
 The original is assembled. The build fetches
 [JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
@@ -251,6 +255,10 @@ snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
 download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
 and ARM and for Windows on x86-64; the build has been run on Linux x86-64
 only.
+
+The portable C is built the same way, by the same lines of
+`CMakeLists.txt`, from `src/portable_c/` into `build/portable_c/`:
+`VC.EXE`, the linker's map and the listings.
 
 ### Changes to the source
 
@@ -520,15 +528,20 @@ Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
 ctest --test-dir build --output-on-failure
 ```
 
-There are four tests. Three of them run no machine and take a second or
-two; `c-scenarios` runs every scenario, in two and a half minutes on a
-machine that does nothing else.
+There are seven tests: one of the assembly, and three of each C tree,
+named by the tree that they judge, `c-` for the C translation and
+`portable_c-` for the portable C. The two trees are held to the same
+checks, against the same goldens. Five of the tests run no machine and
+take a second or two; `c-scenarios` and `portable_c-scenarios` each run
+every scenario, in a little under two minutes on a machine that does
+nothing else, so all seven take three minutes and forty seconds.
 
 | Test | What it checks |
 |---|---|
 | `asm-bytes` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
 | `c-data` | Every text, box, dialog and table of the translation that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
 | `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
+| `portable_c-data`, `portable_c-arith`, `portable_c-scenarios` | The same three checks of the portable C, `build/portable_c/`: what is said of the translation in the rows above and below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise |
 | `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens
@@ -600,14 +613,16 @@ their addresses, in a line; with `--list` it prints those that are left as
 the listing has them. With `--steps` it says which of them some steps
 would reach, and takes `--limit` like `show.py`.
 
-`python3 harness/notice.py FILE OLD NEW` makes one change to a copy of the
-translation, builds it, and says which scenario notices, or that none does.
+`python3 harness/notice.py FILE OLD NEW` makes one change to a copy of a
+C tree, the one that `FILE` is of, builds it, and says which scenario
+notices, or that none does.
 That an instruction ran in the original does not mean that a screen shows
 what it is for; this is how to find out, for a branch whose effect cannot be
 pointed to in a golden.
 
 `python3 harness/arithcheck.py build/c` is the test `c-arith` by
-itself; with `--pairs N` it takes that many random pairs of numbers
+itself, and with `build/portable_c` that of the portable C; with
+`--pairs N` it takes that many random pairs of numbers
 where the test takes 4,000. The two routines were held to 200,000 when
 they were written, which takes two and a half minutes.
 
@@ -805,7 +820,7 @@ files. The picture at the top is `screen.png` from
 `python3 harness/screenshot.py --scale 3x4`, which enlarges the 720x400
 display to roughly the 4:3 shape it had on a monitor.
 
-## Using the C translation by hand
+## Using the C trees by hand
 
 Needs the project built, and a terminal of 80 columns by 25 lines at least.
 
@@ -813,9 +828,10 @@ Needs the project built, and a terminal of 80 columns by 25 lines at least.
 python3 harness/play.py
 ```
 
-This starts the translation, `build/c/VC.EXE`, on the machine of the tests,
-with its screen in the terminal and the terminal's keyboard: FreeDOS from
-its floppy, the bench's files on `C:` and the program on `D:`. `--original`
+This starts the portable C, `build/portable_c/VC.EXE`, on the machine of
+the tests, with its screen in the terminal and the terminal's keyboard:
+FreeDOS from its floppy, the bench's files on `C:` and the program on
+`D:`. `--tree c` runs the C translation, `build/c/VC.EXE`, `--original`
 runs the original there, `--country ru` uses the Russian bench, and
 `--display gtk` opens a window where there is a desktop. F10 leaves the
 program, and the machine then switches itself off. The disks are made anew

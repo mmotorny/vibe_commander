@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Hold the data of the C translation against the original's, byte for byte.
+"""Hold the data of a C tree against the original's, byte for byte.
 
 The scenarios compare screens and disks. A table that no screen shows can
 be wrong and pass them: a text that is copied with what follows it, the
@@ -11,10 +11,13 @@ no machine involved.
 The original is the build of the published source that is laid out like
 the shipped binary, build/shareware-layout/VC.COM, which the test
 asm-bytes holds against that binary. Its listing says where every label
-is. The translation is build/c/VC.EXE, and the linker's map says where
-each of its objects landed, static ones too; how long an object is, its
-object file says. Nothing of the translation is assembled, and no
-listing of it is read.
+is. The translation is the VC.EXE of a C tree, build/c/ for the C
+translation and build/portable_c/ for the portable C, and the linker's map
+says where each of its objects landed, static ones too; how long an object
+is, its object file says. Nothing of the translation is assembled, and no
+listing of it is read. The tree's source, where the numbers of the commands
+are read and what the code reads of each constant, is the directory of
+src/ that has the name of the build's, or the one that --source names.
 
 A word that holds the address of something else cannot be equal as a
 number: a box that names its text, a dialog that names its box, a table of
@@ -138,10 +141,11 @@ class Problem(Exception):
     pass
 
 
-def commands():
-    """The numbers of the commands: the names that src/c/vc.h has with CMD_
-    in an enumeration, as the compiler counts them."""
-    header = Path(__file__).resolve().parent.parent / "src" / "c" / "vc.h"
+def commands(source):
+    """The numbers of the commands: the names that vc.h of the tree in the
+    directory `source` has with CMD_ in an enumeration, as the compiler
+    counts them."""
+    header = source / "vc.h"
     text = re.sub(r"/\*.*?\*/", "", header.read_text(), flags=re.S)
     numbers = {}
     for body in re.findall(r"\benum\s*{(.*?)}", text, flags=re.S):
@@ -369,10 +373,20 @@ class Original:
                    for offset, size, _, _ in REGIONS["VC.COM"])
 
 
-class Translation:
-    """The translation: the bytes of its file, and where its objects are."""
+def source_of(directory):
+    """Where the tree is that is built in `directory`: build/c is of
+    src/c."""
+    root = Path(__file__).resolve().parent.parent
+    return root / "src" / directory.resolve().name
 
-    def __init__(self, directory):
+
+class Translation:
+    """The translation: the bytes of its file, and where its objects are.
+    `source` is the directory of its C files; without one, it is the
+    directory of src/ that has the name of `directory`."""
+
+    def __init__(self, directory, source=None):
+        self.source = source or source_of(directory)
         self.image = (directory / "VC.EXE").read_bytes()
         self.segments = {}          # (name, class) -> where it begins
         self.places = defaultdict(list)     # name -> [address]
@@ -482,10 +496,11 @@ def compare(original, translation, name, there, address, length):
             wanted = [label]
             instead = "the number that it is to have"
         elif name in COMMAND_TABLES:
-            numbers = commands()
+            numbers = commands(translation.source)
             wanted = [numbers[candidate] for candidate in names
                       if candidate in numbers]
-            instead = f"the number of the command {said} in src/c/vc.h"
+            instead = (f"the number of the command {said} in "
+                       f"{translation.source.name}/vc.h")
         else:
             groups = {offset + behind & 0xFFFF: group
                       for candidate in names
@@ -528,13 +543,17 @@ def main():
     parser.add_argument("translation", type=Path,
                         help="the directory of the translation: VC.EXE, "
                              "VC.MAP and the object files")
+    parser.add_argument("--source", type=Path, metavar="DIRECTORY",
+                        help="the directory of its C files: by default "
+                             "the one of src/ that has the name of the "
+                             "translation's directory")
     parser.add_argument("--quiet", action="store_true",
                         help="do not name every object that was compared")
     args = parser.parse_args()
 
     try:
         original = Original(args.layout)
-        translation = Translation(args.translation)
+        translation = Translation(args.translation, args.source)
     except Problem as problem:
         sys.exit(f"datacheck: {problem}")
 
@@ -591,8 +610,8 @@ def main():
                       "C code has no constant of that name")
     # An object is compared as long as it is. Where the code reads more
     # of it, the object has to be that long: see reads.py.
-    failed += reads.check(translation.objects, translation.bytes,
-                          translation.variables)
+    failed += reads.check(translation.source, translation.objects,
+                          translation.bytes, translation.variables)
     for name, at in sorted(set(NAMED_OTHERWISE) - used):
         failed.append(f"{name}+{at} is listed in {Path(__file__).name}, "
                       "and the translation has no object of that name")

@@ -380,7 +380,7 @@ static unsigned long check_map(unsigned long from)
                     "the beginning of the segment goes around the end of "
                     "its 64K, which the machine of the tests gets wrong. "
                     "Have a file compiled into another segment: see "
-                    "c_second in CMakeLists.txt\n",
+                    "add_c_tree in CMakeLists.txt\n",
                     name, offset + size, (unsigned)CODE_END);
             exit(1);
         }
