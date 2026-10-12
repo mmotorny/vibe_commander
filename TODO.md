@@ -412,13 +412,18 @@ Things that are known and not done. Standing instructions are in
   of free memory where it begins, its blocks and its size. So nothing
   checks that what the program gives up while a command runs is listed
   as free, but the kind of the line.
-- Of the map, 187 instructions of 913 have run in no scenario and are
-  translated by reading: the mouse, 136; a map of more lines than its
+- Of the map, 78 instructions of 913 have run in no scenario and are
+  translated by reading: the mouse, 27; a map of more lines than its
   window has, 13 on a screen of 25 lines, with the line that scrolls in,
   22; a DOS before version 4 or with a version of two digits, 15; a
   block of an unknown owner, 4; and a second program that stays in the
   memory and is not released with the first, 10. The bench has one such
-  program, FDAPM of the floppy, which does not stay twice.
+  program, FDAPM of the floppy, which does not stay twice. Of the
+  mouse, `mouse-memory` has what a button does that goes down and comes
+  up in one place; left are the middle button, 13, and a button that is
+  moved while it is down, 14: from a line to above the lines or below
+  them, where the cursor goes on, and from beside the lines onto the
+  buttons.
 - What the map does in the original and the port does after it:
   - A line with exactly eight vectors shows seven and three full stops,
     as one with more does: `MemItem` counts the vectors down in AL and
@@ -595,16 +600,25 @@ Things that are known and not done. Standing instructions are in
     `mouse-history` and `mouse-drive` have the user menu, the history
     and the box of the drives. Left is the middle button in the two
     lists, which gives the pointer another look.
-  - `memory.c`, 136: `F65_00`, the map of the memory, either button on
-    its lines and buttons, held above or below, the middle button, a
-    second click.
+  - `memory.c`, 27: `mouse-memory` has the map of the memory. Left are
+    the middle button, and a button moved while it is down.
   - `input.c`, none: `mouse-keys` has the right button on the key bar, a
     key of the bar that has no name, and the corners of the screen.
+  - `keys.c`, none: `mouse-select` has the right button held below a
+    list and above it, which selects the files that come under it.
   A second click is two clicks in one step; a button held is a click
   with a count behind it, "Click@3,5*200". There is no step yet for a
   button that goes down in one place and comes up in another, nor for
   the middle button: `harness/driver.py` has the packets, and the names
-  would be two lines there.
+  would be two lines there. What such steps would still show, where the
+  instructions have run without them: the middle button on a key of
+  the key bar, which is the key with Shift, and on an item of the Files
+  menu, which is the item with Ctrl; a button let go beside the key of
+  the key bar or the letter of a drive that it went down on, which is
+  no key and no drive; a button held and moved along the menu bar, from
+  name to name and down a menu; a second click let go beside its line,
+  which chooses nothing; and the right button moved over the files of a
+  panel, which selects each.
 - `cmake --build build -j4` failed once in a new checkout, "The object is
   zero length" for one C file. Building without `-j` works.
 - A run of the harness that is killed outright leaves its QEMU running,
@@ -716,14 +730,12 @@ Things that are known and not done. Standing instructions are in
   - Shift held with Enter has the program, for that command, stay in
     the memory whole where the setup has it give most of it up, and
     the other way round. In `enter`.
-- What the keys of the panels do for the mouse has run in no scenario:
-  26 instructions of `F00_60`, which select the files that the mouse
-  passes over with its right button held, and the three places where the
-  mouse comes in, `F00_05`, `F01_05` and `F00_60` with buttons. They are
-  translated by reading. So is what Tab does when DOS will not go to
-  the directory of the other panel, or has not told the current one,
-  18 instructions of `F20_02`: whatever removes or renames a directory
-  has both panels read again, and the drives of the bench are ready.
+- Of the keys of the panels, what Tab does when DOS will not go to the
+  directory of the other panel, or has not told the current one, has
+  run in no scenario and is translated by reading, 18 instructions of
+  `F20_02`: whatever removes or renames a directory has both panels
+  read again, and the drives of the bench are ready. What they do for
+  the mouse runs in `mouse-panel`, `mouse-list` and `mouse-select`.
 - What the keys of the panels do in the original, and in the port after
   it; whether to mend any of it is not decided:
   - Ctrl+R in a tree panel reads nothing if the disk has no tree file,

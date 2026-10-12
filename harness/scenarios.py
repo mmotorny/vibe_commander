@@ -309,6 +309,14 @@ out again (show.py --changes is how):
     mouse 20 times, and the first of those sees it down: "Click@1,24*2"
     has the program see the button once and find it up when it looks
     again, and "*1" not see it at all.
+  - A button held where the program goes on doing something, the right
+    one below a list, which selects the file that comes into the panel,
+    does it nine times with "*12", in the original and in the port
+    alike.
+  - In the map of the memory a letter is taken by the buttons, whether
+    it is one of theirs or not; Tab is a key that gets to the map and
+    means nothing there. The one program that can be released is the
+    ninth line, FDAPM once it has been run.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
@@ -3838,6 +3846,24 @@ SCENARIOS = {
             "Click@3,8",                  # and data.bin
         )),
 
+    "mouse-select": Scenario(
+        "Files selected with the right button of the mouse held: below "
+        "a list and above it, where the list moves under it, and on a "
+        "file",
+        steps=(
+            "F9 o f",                     # panels half the screen high
+            "Alt+F1 a",
+            "Down Down Down Enter",       # A:\\FREEDOS
+            "Down Enter",                 # and its BIN: 44 entries
+            "F9 l f",                     # in one column, ten at a time
+            "RightClick@3,3",             # a file: selected
+            "RightClick@3,12*12",         # held below the list: it moves,
+                                          # and what comes is selected
+            "RightClick@3,1*8",           # held above it: back again
+            "RightClick@3,5*40",          # held on a file that is
+                                          # selected: not any more, once
+        )),
+
     "mouse-fields": Scenario(
         "The mouse on the fields of a dialog: a line of a group, a box to "
         "tick, a click on no field and from the buttons to a field, and "
@@ -4011,6 +4037,31 @@ SCENARIOS = {
                                           # wherever it is
             "Alt+F1",
             "Click@30,15",                # outside the box: Esc
+        )),
+
+    "mouse-memory": Scenario(
+        "The mouse in the map of the memory: either button on a line, "
+        "two clicks on a program that can be released and on one that "
+        "cannot, its buttons, and clicks beside all of them",
+        steps=(
+            '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter',
+            "Alt+F5",
+            "Click@30,8",                 # a line: the cursor goes there
+            "Click@30,17",                # below the last line: onto it
+            "RightClick@30,7",            # the right button on a line
+                                          # that cannot be released
+            "RightClick@30,14",           # and on the program: selected
+            "RightClick@30,14",           # and not
+            "Click@30,4",                 # in the box, on no line: nothing
+            "RightClick@30,2",            # the right button outside it:
+                                          # nothing
+            "Click@30,7 Click@30,7",      # twice on such a line: nothing
+            "Tab",                        # a key that means nothing here
+            "Click@47,20",                # the button Cancel
+            "Alt+F5",
+            "Click@30,14 Click@30,14",    # twice on the program: released
+            "Alt+F5",                     # gone
+            "Click@30,1",                 # outside the box: it closes
         )),
 
 }
