@@ -541,10 +541,11 @@ port.
 - A stub can put ES back on the main data itself, `PUSH DS` and `POP ES`
   before it restores DS, and the function then lists ES among what it
   modifies: see `F39_01` in `VCMENU.INC`.
-- An entry for a label of a file that another batch has in hand, as
-  `PtMnu1` in `PutMnu` of `VCSUB2.INC`, stands in the file of the batch
-  that needs it; and the address of a text there, `PtMnu_S`, comes to
-  the C in a register of the stub, with `AsmSeg` for its segment.
+- The address of a text in a file that another batch has in hand, the
+  bar's `PtMnu_S` in `VCSUB2.INC`, can come to the C in a register of
+  the stub, with `AsmSeg` for its segment: `F39_01` in `VCMENU.INC`.
+  An entry made for a label there, as one was for `PtMnu1`, goes when
+  that batch arrives with the routine in C: call the function then.
 
 ### C for the port
 
