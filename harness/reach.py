@@ -92,8 +92,7 @@ def main():
         original = setups.original_vc()
         with setups.Benches() as benches:
             run = scenarios.run(scenario, original,
-                                benches[args.country], signals=False,
-                                trace=True)
+                                benches[args.country], trace=True)
         tried = set(run.executed)
         if args.screens or args.changes or args.last:
             show.print_screens(scenario.steps, run.screens,

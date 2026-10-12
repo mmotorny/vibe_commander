@@ -7,11 +7,10 @@ goldens.py): show the same text screen after the start and after every
 step, cell by cell, character and colour attribute, with the same cursor
 and video mode, and leave the same files on its disks.
 
-A build that signals where it is (see "Signals to the tests" in
-port/asm/VC.ASM) is waited for exactly, and so is the original, which is
-watched from outside (see watch.py). For any other build the harness waits
-until the screen has stood still, which takes most of a second for every
-step.
+The build is run as it is, and so is the original: a driver in the
+machine presses the keys and writes each screen out when the program has
+finished the step (see driver.py). The driver finds what it watches of a
+build in the listing that the build writes next to it.
 
 Scenarios run side by side, each on a machine of its own, and are reported
 in their order.
@@ -27,7 +26,6 @@ from concurrent.futures import ThreadPoolExecutor
 import goldens
 import scenarios
 import setups
-import watch
 
 
 # How many scenarios run side by side: each has a machine of its own,
@@ -35,25 +33,23 @@ import watch
 TOGETHER = min(4, os.cpu_count() or 1)
 
 
-def compare(names, program, signals, trace=False, together=None):
+def compare(names, program, trace=False, together=None, stack=False):
     """Take `program` through the scenarios of `names`, printing a line for
     each and how it departs from the golden.
 
     `together` scenarios run side by side, each on a machine of its own;
-    TOGETHER if it is not given. Returns whether any departed, and the
-    runs.
+    TOGETHER if it is not given. `trace` and `stack` are as for
+    scenarios.run(). Returns whether any departed, and the runs.
     """
     def one(name):
         scenario = scenarios.SCENARIOS[name]
         began = time.monotonic()
         run = scenarios.run(scenario, program, benches[scenario.country],
-                            signals, trace)
+                            trace, stack=stack)
         return run, time.monotonic() - began
 
     failed = False
     runs = []
-    if not signals:
-        watch.warn_if_guessed(program)
     with setups.Benches() as benches, \
             ThreadPoolExecutor(together or TOGETHER) as pool:
         # In the order of `names`, as each is done.
@@ -80,14 +76,12 @@ def main():
     parser.add_argument("scenario", nargs="*",
                         help="scenarios to run (default: all): "
                              + ", ".join(scenarios.SCENARIOS))
-    parser.add_argument("--signals", action="store_true",
-                        help="the program is a build that signals")
     parser.add_argument("--together", type=int, metavar="N",
                         help="run this many scenarios side by side "
                              f"(default: {TOGETHER} here)")
     args = parser.parse_args()
     failed, _ = compare(args.scenario or list(scenarios.SCENARIOS),
-                        setups.Program.load(args.program), args.signals,
+                        setups.Program.load(args.program),
                         together=args.together)
     sys.exit(failed)
 

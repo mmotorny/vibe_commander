@@ -178,6 +178,7 @@ function(add_port target directory)
         COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
                 $<TARGET_FILE:jwasm> -nologo -q -omf ${ARGN}
                 -I${CMAKE_SOURCE_DIR}/port/asm -Fo ${directory}/VC.OBJ
+                -Fl=${directory}/VC.LST
                 ${CMAKE_SOURCE_DIR}/port/asm/VC.ASM
         DEPENDS jwasm ${port_asm}
         COMMENT "Assembling the port (${target})"
@@ -216,13 +217,25 @@ add_port(port-signalling ${signalling_dir} -DHARNESS)
 enable_testing()
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
+# The driver of the tests: a resident program that takes the original and
+# the port through the scenarios, in the machine. See harness/DRIVER.ASM.
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/DRIVER.COM
+    COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
+            $<TARGET_FILE:jwasm> -nologo -q -bin
+            -Fo ${CMAKE_BINARY_DIR}/DRIVER.COM
+            ${CMAKE_SOURCE_DIR}/harness/DRIVER.ASM
+    DEPENDS jwasm ${CMAKE_SOURCE_DIR}/harness/DRIVER.ASM
+    COMMENT "Assembling the driver of the tests"
+    VERBATIM)
+add_custom_target(driver ALL DEPENDS ${CMAKE_BINARY_DIR}/DRIVER.COM)
+
 add_test(NAME bytes-match-original
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/bytecheck.py
             ${layout_dir}/VC.COM ${layout_dir}/VCSETUP.COM)
 add_test(NAME port
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
-            ${signalling_dir}/VC.EXE ${signalling_dir}/VC.MAP
-            ${layout_dir}/VC.LST ${port_dir}/VC.EXE)
+            ${port_dir}/VC.EXE ${port_dir}/VC.MAP ${layout_dir}/VC.LST)
 # The port's test runs every scenario, and on a machine that other tests
 # share it takes many times as long as by itself: it gets an hour before
 # it counts as stuck, where CTest would give it 25 minutes.

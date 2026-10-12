@@ -16,23 +16,24 @@ below, this also checks that
 
 Compiled code uses more of the stack than the assembly it replaces, so
 the port has a stack many times as long as the original's 256 bytes:
-LenStk in port/asm/VC.ASM, a few bytes less in the build that is tested.
-That build marks its stack when it has set it up, and how much of the
-mark is left is read from the machine every time the program waits for a
-key (see scenarios.py). A stack used beyond its bottom overwrites what the
-program saves of its panels and its setup while a command runs, and no
-screen would show that. How long the stack is, is taken from the link
-map, so the limit follows it. What every scenario leaves is reported, not
-only the least.
+LenStk in port/asm/VC.ASM. When the program has been loaded its stack
+holds a piece of its file, which the program moves elsewhere as it starts;
+how much of that is still there, from the bottom up, is looked at every
+time a step ends with the program waiting for a key (see driver.py). A
+stack used beyond its bottom overwrites what the program
+saves of its panels and its setup while a command runs, and no screen
+would show that. How long the stack is, is taken from the link map, so
+the limit follows it. What every scenario leaves is reported, not only
+the least.
 
 A comparison that finds nothing is only worth something if it would have
 found a difference. So one cell of a screen that the port has shown is
 changed, and then one entry is taken off a disk it has left, and the
 comparison must report each.
 
-The build of the port that is tested is the one that signals where it is.
-What ran in the original was recorded with the goldens; what runs in the
-port is read from QEMU's log of the code it executed (see coverage.py).
+The build of the port that is tested is the one that is shipped. What
+ran in the original was recorded with the goldens; what runs in the port
+is read from QEMU's log of the code it executed (see coverage.py).
 The assembly is identified by the listing of the build that is laid out
 like the original, and the C functions by the port's link map.
 
@@ -45,12 +46,11 @@ from dataclasses import dataclass, field, replace
 
 import compare
 import coverage
+from driver import COM_ORIGIN, EXE_HEADER
 import goldens
 import scenarios
 import setups
 
-COM_ORIGIN = 0x100                # where a .COM file is loaded
-EXE_HEADER = 0x20                 # of the port's VC.EXE, see tools/mkexe.c
 
 # How large the port may grow, as a multiple of the original's size. The
 # aim is to stay well below; this is where growth must have gone wrong.
@@ -1116,24 +1116,21 @@ def check_comparison(name, run, program):
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("port", help="the port's VC.EXE, the build that "
-                                     "signals")
+    parser.add_argument("port", help="the port's VC.EXE")
     parser.add_argument("link_map", help="its link map")
     parser.add_argument("listing", help="the listing of VC.COM laid out "
                                         "like the original")
-    parser.add_argument("shipped", help="the port's VC.EXE as it is shipped, "
-                                        "for its size")
     args = parser.parse_args()
 
     original, port = setups.original_vc(), setups.Program.load(args.port)
-    size = len(setups.Program.load(args.shipped).contents)
+    size = len(port.contents)
     limit = SIZE_LIMIT * len(original.contents)
     print(f"VC.EXE is {size} bytes, {size / len(original.contents):.2f} "
           f"times the original's {len(original.contents)}; the limit is "
           f"{SIZE_LIMIT} times")
 
     names = list(scenarios.SCENARIOS)
-    failed, runs = compare.compare(names, port, signals=True, trace=True)
+    failed, runs = compare.compare(names, port, trace=True, stack=True)
     in_original, in_port = set(), {}
     for name, run in zip(names, runs):
         in_original |= goldens.read_ran(name)

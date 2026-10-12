@@ -5,8 +5,6 @@ Needs `qemu-system-i386` and `mtools` on the PATH.
 import calendar
 import json
 import os
-import re
-import select
 import socket
 import struct
 import subprocess
@@ -21,11 +19,10 @@ COLUMNS, ROWS = 80, 25
 TEXT_MEMORY = 0xB8000             # the colour text screen: character, attribute
 BIOS_DATA = 0x400
 KEYBOARD_BUFFER = 0x41A           # where it is read, where it is filled
-BIOS_SHIFT_KEYS = 0x417           # which of Shift, Ctrl and Alt are held
-SHIFT_BITS = {"shift_r": 1, "shift": 2, "ctrl": 4, "alt": 8}
 
-# The port a program built for the tests writes to, to say where it is.
-SIGNAL_PORT = 0xE9
+# The port that the driver of the tests writes to (see DRIVER.ASM): QEMU's
+# debug console, which QEMU keeps in a file.
+DRIVER_PORT = 0xE9
 
 # Hard disks are 64 cylinders x 16 heads x 63 sectors: 31.5 MB of FAT16.
 GEOMETRY = (64, 16, 63)
@@ -34,55 +31,14 @@ GEOMETRY = (64, 16, 63)
 # the commands it was given.
 BOOTED = b"BOOTED"
 
-# How long Shift, Ctrl and Alt are held down before and after the key they
-# go with, or on their own, in seconds.
-KEY_TIME = 0.02
-
 # How long the harness waits, in seconds, before it takes something for
 # stuck. These are for what hangs, and are long on purpose: a machine that
 # many tests share is slow, and must not look like one that hangs. A QEMU
 # that has ended is noticed at once, whatever these say.
-START_TIME = 60     # QEMU, to open the sockets it is spoken to through
+START_TIME = 60     # QEMU, to open the socket it is spoken to through
 LOAD_TIME = 120     # a saved state, to be loaded
 SAVE_TIME = 120     # a state, to be saved
 BOOT_TIME = 300     # DOS, to boot; and a screen, to stand still after it
-REPLY_TIME = 60     # QEMU's debugger, to answer or to let the machine run
-# A key, to get into the keyboard buffer. Shorter than the others: what
-# usually keeps a key out is a buffer that a step has filled, a mistake in
-# a scenario that wants to be heard of soon.
-ARRIVE_TIME = 30
-MODIFIERS = {"ctrl", "alt", "shift", "shift_r"}
-
-# Names for the keys of a US keyboard, as written in scenarios, and the
-# QEMU key codes they stand for. Letters, digits and F1-F12 name themselves.
-KEYS = {
-    "Enter": "ret", "Esc": "esc", "Tab": "tab", "Space": "spc",
-    "Backspace": "backspace", "Ins": "insert", "Del": "delete",
-    "Home": "home", "End": "end", "PgUp": "pgup", "PgDn": "pgdn",
-    "Up": "up", "Down": "down", "Left": "left", "Right": "right",
-    "GrayPlus": "kp_add", "GrayMinus": "kp_subtract",
-    "GrayStar": "kp_multiply",
-    "Ctrl": "ctrl", "Alt": "alt", "Shift": "shift", "RightShift": "shift_r",
-}
-PUNCTUATION = {
-    " ": "spc", "-": "minus", "=": "equal", "[": "bracket_left",
-    "]": "bracket_right", ";": "semicolon", "'": "apostrophe",
-    "`": "grave_accent", "\\": "backslash", ",": "comma", ".": "dot",
-    "/": "slash",
-}
-SHIFTED = dict(zip('!@#$%^&*()_+{}:"~|<>?', "1234567890-=[];'`\\,./"))
-
-# The Cyrillic letters of the Russian keyboard, by the keys of a US one
-# that they are on. With them selected the full stop and the comma are on
-# one key, and the digits and the underscore where they always are.
-RUSSIAN = dict(zip(
-    "\u0439\u0446\u0443\u043a\u0435\u043d\u0433\u0448\u0449\u0437"
-    "\u0445\u044a\u0444\u044b\u0432\u0430\u043f\u0440\u043e\u043b"
-    "\u0434\u0436\u044d\u044f\u0447\u0441\u043c\u0438\u0442\u044c"
-    "\u0431\u044e\u0451",
-    "qwertyuiop[]asdfghjkl;'zxcvbnm,.`"))
-RUSSIAN_KEYS = {".": ["slash"], ",": ["shift", "slash"],
-                "_": ["shift", "minus"]}
 
 CP437_CONTROLS = ("\u0020\u263a\u263b\u2665\u2666\u2663\u2660\u2022\u25d8"
                   "\u25cb\u25d9\u2642\u2640\u266a\u266b\u263c\u25ba\u25c4"
@@ -256,6 +212,9 @@ class Machine:
     where save() left another machine with disks of the same kind. In the
     second case it waits, paused, for resume().
 
+    What the guest writes to its debug console, as the driver of the tests
+    does, is kept in a file: written() returns it.
+
     With `trace` set, QEMU logs to that file every piece of code the guest
     executes, the first time it does so; coverage.py reads the log.
 
@@ -269,20 +228,17 @@ class Machine:
         self._workdir = Path(workdir)
         self._serial = self._workdir / "serial.log"
         self._scratch = self._workdir / "scratch.bin"
+        self._written = self._workdir / "written.bin"
         control = self._workdir / "qmp.sock"
-        signals = self._workdir / "signals.sock"
         command = [
             "qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", "16",
             "-nodefaults", "-vga", "std", "-display", "none", "-no-reboot",
             "-rtc", f"base={clock},clock=vm", "-boot", "a",
             "-serial", f"file:{self._serial}",
             "-qmp", f"unix:{control},server=on,wait=off",
-            # What the guest writes to port E9h arrives on a socket.
-            "-chardev", f"socket,id=signals,path={signals},server=on,wait=off",
-            "-device", f"isa-debugcon,iobase={SIGNAL_PORT:#x},chardev=signals",
+            "-chardev", f"file,id=written,path={self._written}",
+            "-device", f"isa-debugcon,iobase={DRIVER_PORT:#x},chardev=written",
             "-drive", f"if=floppy,index=0,format=raw,readonly=on,file={floppy}",
-            # A debugger may attach here, to stop the guest at an address.
-            "-gdb", f"unix:{self._workdir / 'gdb.sock'},server=on,wait=off",
         ]
         for index, disk in enumerate(hard_disks):
             command += ["-drive", f"if=ide,index={index},format=raw,"
@@ -296,10 +252,6 @@ class Machine:
         self._channel = self._socket.makefile("rw")
         self._reply()                                    # greeting
         self._command("qmp_capabilities")
-        self._signals = self._connect(signals)
-        self._heard = ""                                 # signals not yet used
-        self._stale = 0                 # how many are from before the last key
-        self._debugger = None
         if state:
             self.until(lambda: self._command("query-status")["status"]
                         != "inmigrate", LOAD_TIME,
@@ -323,13 +275,17 @@ class Machine:
 
     def __exit__(self, *exc):
         try:
-            self._command("quit")
+            if self._qemu.poll() is None:
+                self._command("quit")
             self._qemu.wait(timeout=10)
         except (OSError, ValueError, MachineError, subprocess.TimeoutExpired):
             self._qemu.kill()
             self._qemu.wait()
-        self._socket.close()
-        self._signals.close()
+        for channel in (self._channel, self._socket):
+            try:
+                channel.close()
+            except OSError:
+                pass                    # QEMU has gone, with what was unsent
 
     def _reply(self):
         while True:
@@ -387,137 +343,33 @@ class Machine:
     def resume(self):
         self._command("cont")
 
+    def written(self):
+        """What the guest has written to its debug console so far."""
+        return self._written.read_bytes() if self._written.exists() else b""
+
+    def wait_for_end(self, limit):
+        """Wait until the machine has ended, as it does when the guest
+        resets it. Raises MachineError if the guest writes nothing to its
+        debug console for `limit` seconds: the machine is then paused, for
+        its screen to be looked at."""
+        size, since = -1, time.monotonic()
+        while self._qemu.poll() is None:
+            now = self._written.stat().st_size \
+                if self._written.exists() else 0
+            if now != size:
+                size, since = now, time.monotonic()
+            elif time.monotonic() - since > limit:
+                self.pause()
+                raise MachineError(f"nothing for {limit} s")
+            try:
+                self._qemu.wait(0.01)
+            except subprocess.TimeoutExpired:
+                pass
+
     def _keyboard(self):
         """Where the BIOS keyboard buffer is read and where it is filled."""
         head, tail = struct.unpack("<HH", self._memory(KEYBOARD_BUFFER, 4))
         return head, tail
-
-    def press(self, keys, watch=None):
-        """Press keys, given as in a scenario: names separated by spaces.
-
-        A name is a key ("F3", "Enter", "a"), keys held down together
-        ("Alt+F5", "Ctrl+o"), or a text to type in double quotes, which
-        may not contain spaces ("readme.txt"). Keys of one name that are
-        not Shift, Ctrl or Alt go down one behind the other with nothing
-        in between ("Enter+Home"): when the program takes the first, the
-        others are waiting, which is how a key gets to a program that
-        looks for keys while it works.
-
-        A text with Russian letters is typed on the keys that the Russian
-        keyboard has them on. It comes out as written only where that
-        keyboard is loaded and its Cyrillic letters have been selected,
-        with "Alt+RightShift", and it may hold digits, a full stop, a
-        comma and an underscore besides, but no Latin letters.
-
-        Each key is seen to arrive in the BIOS keyboard buffer before the
-        next is pressed, so none is lost however fast or slow the guest is.
-        The buffer holds 15 keys; if the guest does not take them, pressing
-        more fails.
-
-        With `watch`, which knows where the program in the guest is (see
-        watch.py), a key is pressed when the program waits for one, and
-        Shift, Ctrl and Alt are held until it has seen them; the machine
-        is left paused. Without, they are held for KEY_TIME.
-        """
-        chords = []
-        for name in keys.split():
-            if name.startswith('"'):
-                text = name.strip('"')
-                keys_of = (_russian if any(char.lower() in RUSSIAN
-                                           for char in text) else _character)
-                chords += [keys_of(char) for char in text]
-            else:
-                chords.append([_key(part) for part in name.split("+")])
-        for codes in chords:
-            self._chord(codes, watch)
-
-    def _chord(self, codes, watch=None):
-        """Press the keys `codes` together: Shift, Ctrl and Alt go down
-        first, one after the other in the order given, and come up last,
-        as under a hand, and long enough for the guest to see each held."""
-        held = [code for code in codes if code in MODIFIERS]
-        keys = [code for code in codes if code not in MODIFIERS]
-        if watch:
-            watch.before_key(self)
-        for code in held:
-            self._shift(code, True, watch)
-        if keys:
-            tail = self._keyboard()[1]
-
-            def send():
-                # What the guest has signalled so far says nothing about
-                # this key.
-                self._listen()
-                self._stale = len(self._heard)
-                if watch:
-                    # Down and up in one: the program may act on the key
-                    # and have the machine stopped before a second command.
-                    self._command("input-send-event", events=[
-                        _key_event(code, down) for code, down in
-                        [(code, True) for code in keys]
-                        + [(code, False) for code in keys[::-1]]])
-                else:
-                    self._keys(keys, True)
-                    self._keys(keys[::-1], False)
-                self.until(lambda: self._keyboard()[1] != tail, ARRIVE_TIME,
-                           f"the key {'+'.join(codes)} did not arrive: the "
-                           "keyboard buffer is full, or the guest is stuck")
-            if watch:
-                watch.key(self, send)
-            else:
-                send()
-        for code in held[::-1]:
-            self._shift(code, False, watch)
-
-    def _shift(self, code, down, watch):
-        """Press or release one of Shift, Ctrl and Alt, and wait until
-        the program that `watch` watches has seen it."""
-        if watch:
-            watch.shift(self, lambda: self._keys([code], down), lambda: bool(
-                self._memory(BIOS_SHIFT_KEYS, 1)[0] & SHIFT_BITS[code])
-                == down)
-            return
-        if not down:
-            time.sleep(KEY_TIME)
-        self._keys([code], down)
-        if down:
-            time.sleep(KEY_TIME)
-
-    def _keys(self, codes, down):
-        self._command("input-send-event", events=[
-            _key_event(code, down) for code in codes])
-
-    def keys_taken(self):
-        """Whether the guest has read every key that was pressed."""
-        head, tail = self._keyboard()
-        return head == tail
-
-    def keyboard(self):
-        """Where the BIOS takes a key from its keyboard buffer and where
-        it puts the next: the buffer is empty when they are the same."""
-        return self._keyboard()
-
-    def signals(self):
-        """What the guest has signalled since this was last asked, as text:
-        the bytes it wrote to the signal port. And how many of them it
-        had written before the last key was pressed, if one has been
-        pressed since this was last asked: otherwise 0."""
-        self._listen()
-        heard, stale = self._heard, self._stale
-        self._heard, self._stale = "", 0
-        return heard, stale
-
-    def _listen(self):
-        """Take what the guest has signalled by now."""
-        self._signals.setblocking(False)
-        try:
-            while True:
-                data = self._signals.recv(4096)
-                if not data:
-                    break
-                self._heard += data.decode("latin-1")
-        except BlockingIOError:
-            pass
 
     def screen(self):
         """The text screen as it is now. Pause the machine first if the
@@ -567,7 +419,7 @@ class Machine:
                     changed = now
                     seen.append(cells)
                 last = cells
-            if now - changed >= settle and self.keys_taken():
+            if now - changed >= settle and len(set(self._keyboard())) == 1:
                 break
             if now > deadline:
                 raise MachineError("the screen did not settle")
@@ -588,142 +440,10 @@ class Machine:
                          if shown[i:i + 2] != other[i:i + 2])
         return replace(self.screen(), blinking=blinking)
 
-    def wait_for_prompt(self, timeout=30):
-        """Wait until DOS shows its prompt and waits for a command, then
-        return the screen: the cursor stands behind a ">", and every key
-        pressed has been taken. The machine is left paused.
-
-        A command that prints a ">" at the end of what it has printed so
-        far would be taken for the prompt.
-        """
-        deadline = time.monotonic() + timeout
-        while True:
-            self._command("stop")
-            screen = self.screen()
-            column, row = screen.cursor
-            if column and row < ROWS and self.keys_taken() and \
-                    screen.cells[(row * COLUMNS + column - 1) * 2] == 0x3E:
-                return screen
-            self._command("cont")
-            if time.monotonic() > deadline:
-                raise MachineError("DOS did not come to its prompt")
-            time.sleep(0.002)
-
-    def _debug(self, packet=None, timeout=REPLY_TIME, reply=True):
-        """Send a packet of GDB's remote protocol, if one is given, and
-        return the reply, or None if none came within `timeout` seconds.
-        Without `reply` it is not waited for. Attaching stops the
-        machine."""
-        if self._debugger is None:
-            self._debugger = self._connect(self._workdir / "gdb.sock")
-            self._unread = b""
-        if packet is not None:
-            self._debugger.sendall(b"$%s#%02x" % (packet, sum(packet) % 256))
-        if not reply:
-            return None
-        self._debugger.settimeout(timeout)
-        while True:
-            match = re.search(rb"\$([^#]*)#..", self._unread, re.S)
-            if match:
-                self._unread = self._unread[match.end():]
-                self._debugger.sendall(b"+")
-                return match[1]
-            try:
-                data = self._debugger.recv(4096)
-            except socket.timeout:
-                return None
-            if not data:
-                raise MachineError("the machine stopped: it was reset, or "
-                                   "QEMU ended")
-            self._unread += data
-
-    def start(self, addresses):
-        """Let the paused machine run until it is about to execute the
-        instruction at one of `addresses`, or stopped() is called."""
-        self._stops = list(addresses)
-        for address in self._stops:
-            self._debug(b"Z0,%x,1" % address)
-        self._debug(b"c", reply=False)
-        # It runs once QEMU has got to that, unless it has stopped again
-        # already, which QEMU reports.
-        def stopped_again():
-            while select.select([self._debugger], [], [], 0)[0]:
-                self._unread += self._debugger.recv(4096)
-            return b"$" in self._unread
-
-        self.until(lambda: self._command("query-status")["running"]
-                   or stopped_again(), REPLY_TIME,
-                   "the machine did not go on")
-
-    def stopped(self, timeout=0):
-        """Wait `timeout` seconds for the machine that start() let run to
-        come to one of its addresses, then pause it wherever it is. Returns
-        the address it came to, or None. `registers` has its registers."""
-        reply = self._debug(timeout=timeout) if timeout else None
-        if reply is None:
-            self._command("stop")
-            reply = self._debug()
-        for address in self._stops:
-            self._debug(b"z0,%x,1" % address)
-        registers = struct.unpack("<16I", bytes.fromhex(
-            self._debug(b"g")[:128].decode()))
-        self.registers = dict(zip(
-            "ax cx dx bx sp bp si di ip flags cs ss ds es fs gs".split(),
-            registers))
-        at = self.registers["cs"] * 16 + self.registers["ip"]
-        return at if reply.startswith(b"T05") and at in self._stops else None
-
-    def run_to(self, addresses, timeout):
-        """Let the paused machine run until it is about to execute the
-        instruction at one of `addresses`, and return which; None if it
-        has not come to any within `timeout` seconds. It is left paused."""
-        self.start(addresses)
-        return self.stopped(timeout)
-
-    def step(self):
-        """Have the paused machine execute one instruction."""
-        self._debug(b"s")
-
     def screenshot(self):
         """The display as the video card renders it."""
         self._command("screendump", filename=str(self._scratch))
         return Image.from_ppm(self._scratch.read_bytes())
 
-
-def _key_event(code, down):
-    return {"type": "key", "data": {"down": down,
-                                    "key": {"type": "qcode", "data": code}}}
-
-
-def _key(name):
-    if name in KEYS:
-        return KEYS[name]
-    if re.fullmatch(r"[a-z0-9]|F\d\d?", name):
-        return name.lower()
-    if name in PUNCTUATION:
-        return PUNCTUATION[name]
-    raise ValueError(f"unknown key {name!r}")
-
-
-def _russian(char):
-    """The keys to hold down to type `char` of a text with Russian
-    letters."""
-    if char in RUSSIAN_KEYS:
-        return RUSSIAN_KEYS[char]
-    if char.isdigit():
-        return [char]
-    if char.lower() not in RUSSIAN:
-        raise ValueError(f"{char!r} cannot be typed with Russian letters")
-    keys = _character(RUSSIAN[char.lower()])
-    return keys if char.islower() else ["shift", *keys]
-
-
-def _character(char):
-    """The keys to hold down to type `char`."""
-    if char in SHIFTED:
-        return ["shift", _key(SHIFTED[char])]
-    if char.isupper():
-        return ["shift", char.lower()]
-    return [_key(char)]
 
 

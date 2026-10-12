@@ -10,9 +10,8 @@ pressed, and the screen after the start and after each step is printed.
     show.py --country ru Ctrl+PgUp
 
 Steps are written as in scenarios.py; one that presses several keys needs
-quotes around it. The program is the original unless another is named.
-The original takes most of a second for every step; the port's build that
-signals, build/port/signalling/VC.EXE with --signals, takes none.
+quotes around it. The program is the original unless another is named:
+--program build/port/VC.EXE is the port.
 
 A screen is 25 rows, and most of what a key does is in a few of them:
 
@@ -28,7 +27,6 @@ import argparse
 
 import scenarios
 import setups
-import watch
 
 # With --changes, how many rows have to be as they were after an earlier
 # step for them to be named in a line instead of printed.
@@ -115,19 +113,14 @@ def main():
                         help="the country DOS is configured for")
     parser.add_argument("--program", help="the VC.COM or VC.EXE to run "
                                           "(default: the original)")
-    parser.add_argument("--signals", action="store_true",
-                        help="the program is a build that signals")
     add_arguments(parser)
     args = parser.parse_args()
 
     program = setups.Program.load(args.program) if args.program \
         else setups.original_vc()
     scenario = scenarios.Scenario("", tuple(args.step), args.country)
-    if not args.signals:
-        watch.warn_if_guessed(program)
     with setups.Benches() as benches:
-        run = scenarios.run(scenario, program, benches[args.country],
-                            args.signals)
+        run = scenarios.run(scenario, program, benches[args.country])
     print_screens(scenario.steps, run.screens, setups.codepage(args.country),
                   args.changes, args.last)
 

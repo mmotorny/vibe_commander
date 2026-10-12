@@ -67,7 +67,7 @@ cursor 4 23 lines 6 7 mode 3
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║FREEDOS     │            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║            │            │            ║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║            │            │            ║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║            │            │            ║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
 |║            │            │            ║║     3 files use 47,616 bytes in      ║| 1Bx46 1Ex1 1Bx11 1Ex6 1Bx16
 |║            │            │            ║║                 A:\                  ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
@@ -95,7 +95,7 @@ cursor 11 23 lines 6 7 mode 3
 |║NLS         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║CONFIGS     │            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║version  fdi│            │            ║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║            │            │            ║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║            │            │            ║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
 |║            │            │            ║║       1 file uses 512 bytes in       ║| 1Bx48 1Ex1 1Bx11 1Ex3 1Bx17
 |║            │            │            ║║              A:\FREEDOS              ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
@@ -123,8 +123,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│command  com│vcls     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│country  sys│vcursor  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│kernl386 sys│vdelay   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│setver   sys│veach    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│sys      com│vecho    com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│setver   sys│veach    com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│sys      com│vecho    com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│mem      exe│verrlvl  com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│more     exe│vfdutil  com║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│slicerex exe│vfont    com║║                                      ║| 1Bx80
@@ -151,8 +151,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│command  com│vcls     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│country  sys│vcursor  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│kernl386 sys│vdelay   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│setver   sys│veach    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│sys      com│vecho    com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│setver   sys│veach    com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│sys      com│vecho    com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│mem      exe│verrlvl  com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│more     exe│vfdutil  com║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│slicerex exe│vfont    com║║                                      ║| 1Bx80
@@ -179,8 +179,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│command  com│vcls     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│country  sys│vcursor  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│kernl386 sys│vdelay   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│setver   sys│veach    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│sys      com│vecho    com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│setver   sys│veach    com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│sys      com│vecho    com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│mem      exe│verrlvl  com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│more     exe│vfdutil  com║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│slicerex exe│vfont    com║║                                      ║| 1Bx80
@@ -207,8 +207,8 @@ cursor 15 23 lines 6 7 mode 3
 |║command  com│vcls     com│vinfo    com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║country  sys│vcursor  com│vline    com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║kernl386 sys│vdelay   com│vpause   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║setver   sys│veach    com│vprogres com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║sys      com│vecho    com│vstr     com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║setver   sys│veach    com│vprogres com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║sys      com│vecho    com│vstr     com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║mem      exe│verrlvl  com│vtest    com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║more     exe│vfdutil  com│xcopy    exe║╟──────────────────────────────────────╢| 1Bx80
 |║slicerex exe│vfont    com│cp850    v8f║║                                      ║| 1Bx80
@@ -230,18 +230,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernl386 sys│vdelay   com│vpause   com║╟──────────────────────────────────────╢| 1Bx80
-|║setver   sys│veach    com│vprogres com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║sys      com│vecho    com│vstr     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║mem      exe│verrlvl  com│vtest    com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║more     exe│vfdutil  com│xcopy    exe║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║slicerex exe│vfont    com│cp850    v8f║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║vask     com│vframe   com│cp857    v8f║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vchoice  com│vgotoxy  com│cp858    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║vcls     com│vinfo    com│cp866    v8f║╟──────────────────────────────────────╢| 1Bx80
-|║vcursor  com│vline    com│fdwrapup bat║║                                      ║| 1Bx27 30x12 1Bx41
+|║setver   sys│veach    com│vprogres com║╟──────────────────────────────────────╢| 1Bx80
+|║sys      com│vecho    com│vstr     com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║mem      exe│verrlvl  com│vtest    com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║more     exe│vfdutil  com│xcopy    exe║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║slicerex exe│vfont    com│cp850    v8f║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║vask     com│vframe   com│cp857    v8f║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║vchoice  com│vgotoxy  com│cp858    v8f║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║vcls     com│vinfo    com│cp866    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║vcursor  com│vline    com│fdwrapup bat║╟──────────────────────────────────────╢| 1Bx80
+|║vdelay   com│vpause   com│driver   com║║                                      ║| 1Bx27 30x12 1Bx41
 |╟────────────┴────────────┴────────────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║fdwrapup.bat       757  4-02-25  2:22p║║                                      ║| 1Bx80
+|║driver.com        1416  6-16-00 12:00p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -258,18 +258,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernl386 sys│vdelay   com│vpause   com║╟──────────────────────────────────────╢| 1Bx80
-|║setver   sys│veach    com│vprogres com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║sys      com│vecho    com│vstr     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║mem      exe│verrlvl  com│vtest    com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║more     exe│vfdutil  com│xcopy    exe║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║slicerex exe│vfont    com│cp850    v8f║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║vask     com│vframe   com│cp857    v8f║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vchoice  com│vgotoxy  com│cp858    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║vcls     com│vinfo    com│cp866    v8f║╟──────────────────────────────────────╢| 1Bx80
-|║vcursor  com│vline    com│fdwrapup bat║║                                      ║| 1Bx14 30x12 1Bx54
+|║setver   sys│veach    com│vprogres com║╟──────────────────────────────────────╢| 1Bx80
+|║sys      com│vecho    com│vstr     com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║mem      exe│verrlvl  com│vtest    com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║more     exe│vfdutil  com│xcopy    exe║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║slicerex exe│vfont    com│cp850    v8f║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║vask     com│vframe   com│cp857    v8f║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║vchoice  com│vgotoxy  com│cp858    v8f║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║vcls     com│vinfo    com│cp866    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║vcursor  com│vline    com│fdwrapup bat║╟──────────────────────────────────────╢| 1Bx80
+|║vdelay   com│vpause   com│driver   com║║                                      ║| 1Bx14 30x12 1Bx54
 |╟────────────┴────────────┴────────────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║vline.com         2144  1-10-22  9:14a║║                                      ║| 1Bx80
+|║vpause.com        2012  1-10-22  9:14a║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -286,18 +286,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernl386 sys│vdelay   com│vpause   com║╟──────────────────────────────────────╢| 1Bx80
-|║setver   sys│veach    com│vprogres com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║sys      com│vecho    com│vstr     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║mem      exe│verrlvl  com│vtest    com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║more     exe│vfdutil  com│xcopy    exe║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║slicerex exe│vfont    com│cp850    v8f║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║vask     com│vframe   com│cp857    v8f║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vchoice  com│vgotoxy  com│cp858    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║vcls     com│vinfo    com│cp866    v8f║╟──────────────────────────────────────╢| 1Bx80
-|║vcursor  com│vline    com│fdwrapup bat║║                                      ║| 1Bx1 30x12 1Bx67
+|║setver   sys│veach    com│vprogres com║╟──────────────────────────────────────╢| 1Bx80
+|║sys      com│vecho    com│vstr     com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║mem      exe│verrlvl  com│vtest    com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║more     exe│vfdutil  com│xcopy    exe║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║slicerex exe│vfont    com│cp850    v8f║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║vask     com│vframe   com│cp857    v8f║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║vchoice  com│vgotoxy  com│cp858    v8f║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║vcls     com│vinfo    com│cp866    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║vcursor  com│vline    com│fdwrapup bat║╟──────────────────────────────────────╢| 1Bx80
+|║vdelay   com│vpause   com│driver   com║║                                      ║| 1Bx1 30x12 1Bx67
 |╟────────────┴────────────┴────────────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║vcursor.com       1342 11-19-21  6:28a║║                                      ║| 1Bx80
+|║vdelay.com        1360 11-19-21  6:28a║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -314,18 +314,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║fdapm    com│kernl386 sys│vdelay   com║╟──────────────────────────────────────╢| 1Bx80
-|║fdbanner com│setver   sys│veach    com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║fasthelp bat│sys      com│vecho    com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║setlang  bat│mem      exe│verrlvl  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║welcome  bat│more     exe│vfdutil  com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdisk    exe│slicerex exe│vfont    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fdisk    ini│vask     com│vframe   com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║format   exe│vchoice  com│vgotoxy  com║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║command  com│vcls     com│vinfo    com║╟──────────────────────────────────────╢| 1Bx80
-|║country  sys│vcursor  com│vline    com║║                                      ║| 1Bx1 30x12 1Bx67
+|║fdbanner com│setver   sys│veach    com║╟──────────────────────────────────────╢| 1Bx80
+|║fasthelp bat│sys      com│vecho    com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║setlang  bat│mem      exe│verrlvl  com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║welcome  bat│more     exe│vfdutil  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║fdisk    exe│slicerex exe│vfont    com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║fdisk    ini│vask     com│vframe   com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║format   exe│vchoice  com│vgotoxy  com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║command  com│vcls     com│vinfo    com║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║country  sys│vcursor  com│vline    com║╟──────────────────────────────────────╢| 1Bx80
+|║kernl386 sys│vdelay   com│vpause   com║║                                      ║| 1Bx1 30x12 1Bx67
 |╟────────────┴────────────┴────────────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║country.sys      30250 11-03-24  9:55a║║                                      ║| 1Bx80
+|║kernl386.sys     46256  5-15-21  2:38a║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -347,8 +347,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│command  com│vcls     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│country  sys│vcursor  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│kernl386 sys│vdelay   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│setver   sys│veach    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│sys      com│vecho    com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│setver   sys│veach    com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│sys      com│vecho    com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│mem      exe│verrlvl  com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│more     exe│vfdutil  com║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│slicerex exe│vfont    com║║                                      ║| 1Bx80
@@ -375,8 +375,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│command  com│vcls     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│country  sys│vcursor  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx1 30x12 1Bx47 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│kernl386 sys│vdelay   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│setver   sys│veach    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│sys      com│vecho    com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│setver   sys│veach    com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│sys      com│vecho    com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│mem      exe│verrlvl  com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│more     exe│vfdutil  com║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│slicerex exe│vfont    com║║                                      ║| 1Bx80
@@ -403,8 +403,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│command  com│vcls     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│country  sys│vcursor  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│kernl386 sys│vdelay   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│setver   sys│veach    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│sys      com│vecho    com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│setver   sys│veach    com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│sys      com│vecho    com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│mem      exe│verrlvl  com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│more     exe│vfdutil  com║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│slicerex exe│vfont    com║║                                      ║| 1Bx80
@@ -426,18 +426,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernl386 sys│vdelay   com│vpause   com║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║setver   sys│veach    com│vprogres com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║sys      com│vecho    com│vstr     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║mem      exe│verrlvl  com│vtest    com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║more     exe│vfdutil  com│xcopy    exe║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║slicerex exe│vfont    com│cp850    v8f║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║vask     com│vframe   com│cp857    v8f║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vchoice  com│vgotoxy  com│cp858    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║vcls     com│vinfo    com│cp866    v8f║╟──────────────────────────────────────╢| 1Bx80
-|║vcursor  com│vline    com│fdwrapup bat║║                                      ║| 1Bx80
+|║setver   sys│veach    com│vprogres com║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║sys      com│vecho    com│vstr     com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║mem      exe│verrlvl  com│vtest    com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║more     exe│vfdutil  com│xcopy    exe║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║slicerex exe│vfont    com│cp850    v8f║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║vask     com│vframe   com│cp857    v8f║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║vchoice  com│vgotoxy  com│cp858    v8f║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║vcls     com│vinfo    com│cp866    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║vcursor  com│vline    com│fdwrapup bat║╟──────────────────────────────────────╢| 1Bx80
+|║vdelay   com│vpause   com│driver   com║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║kernl386.sys     46256  5-15-21  2:38a║║                                      ║| 1Bx80
+|║setver.sys         109  5-14-21  3:32a║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -454,18 +454,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ═══════════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║kernl386 sys│vdelay   com│vpause   com║╟──────────────────────────────────────╢| 1Bx80
-|║setver   sys│veach    com│vprogres com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║sys      com│vecho    com│vstr     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║mem      exe│verrlvl  com│vtest    com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║more     exe│vfdutil  com│xcopy    exe║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║slicerex exe│vfont    com│cp850    v8f║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║vask     com│vframe   com│cp857    v8f║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vchoice  com│vgotoxy  com│cp858    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║vcls     com│vinfo    com│cp866    v8f║╟──────────────────────────────────────╢| 1Bx80
-|║vcursor  com│vline    com│fdwrapup bat║║                                      ║| 1Bx27 30x12 1Bx41
+|║setver   sys│veach    com│vprogres com║╟──────────────────────────────────────╢| 1Bx80
+|║sys      com│vecho    com│vstr     com║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║mem      exe│verrlvl  com│vtest    com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║more     exe│vfdutil  com│xcopy    exe║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║slicerex exe│vfont    com│cp850    v8f║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║vask     com│vframe   com│cp857    v8f║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║vchoice  com│vgotoxy  com│cp858    v8f║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║vcls     com│vinfo    com│cp866    v8f║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║vcursor  com│vline    com│fdwrapup bat║╟──────────────────────────────────────╢| 1Bx80
+|║vdelay   com│vpause   com│driver   com║║                                      ║| 1Bx27 30x12 1Bx41
 |╟────────────┴────────────┴────────────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║fdwrapup.bat       757  4-02-25  2:22p║║                                      ║| 1Bx80
+|║driver.com        1416  6-16-00 12:00p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -487,8 +487,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│command  com│vcls     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│country  sys│vcursor  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│kernl386 sys│vdelay   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│setver   sys│veach    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│sys      com│vecho    com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│setver   sys│veach    com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│sys      com│vecho    com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│mem      exe│verrlvl  com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│more     exe│vfdutil  com║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│slicerex exe│vfont    com║║                                      ║| 1Bx27 30x12 1Bx41
@@ -515,8 +515,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│command  com│vcls     com║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│country  sys│vcursor  com║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│kernl386 sys│vdelay   com║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│setver   sys│veach    com║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│sys      com│vecho    com║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│setver   sys│veach    com║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│sys      com│vecho    com║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│mem      exe│verrlvl  com║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│more     exe│vfdutil  com║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│slicerex exe│vfont    com║║                                      ║| 1Bx80
@@ -543,8 +543,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│    14835│ 1-09-05│12:03p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│     7434│ 9-11-09│ 4:41a║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│      475│11-30-21│ 5:44p║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│      475│11-30-21│ 5:44p║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│     5322│ 2-18-22│ 5:26p║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│      923│ 4-19-21│10:35a║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│    39859│ 1-20-25│ 6:38p║║                                      ║| 1Bx80
@@ -566,18 +566,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║vpause   com│     2012│ 1-10-22│ 9:14a║╟──────────────────────────────────────╢| 1Bx80
-|║vprogres com│     2424│ 1-10-22│ 9:14a║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vstr     com│     2387│ 1-10-22│ 2:17p║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vtest    com│     2791│ 6-24-23│11:41a║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║xcopy    exe│    22685│ 3-21-25│ 6:38p║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║cp850    v8f│     3103│ 4-02-25│ 2:22p║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║cp857    v8f│     3132│ 4-02-25│ 2:22p║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║cp858    v8f│     1060│ 4-02-25│ 2:22p║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║cp866    v8f│     1277│ 4-02-25│ 2:22p║╟──────────────────────────────────────╢| 1Bx80
-|║fdwrapup bat│      757│ 4-02-25│ 2:22p║║                                      ║| 1Bx1 30x38 1Bx41
+|║vprogres com│     2424│ 1-10-22│ 9:14a║╟──────────────────────────────────────╢| 1Bx80
+|║vstr     com│     2387│ 1-10-22│ 2:17p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║vtest    com│     2791│ 6-24-23│11:41a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║xcopy    exe│    22685│ 3-21-25│ 6:38p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║cp850    v8f│     3103│ 4-02-25│ 2:22p║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║cp857    v8f│     3132│ 4-02-25│ 2:22p║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║cp858    v8f│     1060│ 4-02-25│ 2:22p║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║cp866    v8f│     1277│ 4-02-25│ 2:22p║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║fdwrapup bat│      757│ 4-02-25│ 2:22p║╟──────────────────────────────────────╢| 1Bx80
+|║driver   com│     1416│ 6-16-00│12:00p║║                                      ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║fdwrapup.bat       757  4-02-25  2:22p║║                                      ║| 1Bx80
+|║driver.com        1416  6-16-00 12:00p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -594,18 +594,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║veach    com│     3166│11-19-21│ 6:28a║╟──────────────────────────────────────╢| 1Bx80
-|║vecho    com│     2196│ 1-10-22│ 2:15p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║verrlvl  com│     1083│11-19-21│ 6:28a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vfdutil  com│     2334│ 9-28-22│12:45p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║vfont    com│     1970│11-19-21│ 6:28a║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║vframe   com│     2492│ 1-10-22│ 2:16p║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║vgotoxy  com│     2085│11-19-21│ 6:28a║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vinfo    com│     3112│10-01-24│ 3:42a║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║vline    com│     2144│ 1-10-22│ 9:14a║╟──────────────────────────────────────╢| 1Bx80
-|║vpause   com│     2012│ 1-10-22│ 9:14a║║                                      ║| 1Bx1 30x38 1Bx41
+|║vecho    com│     2196│ 1-10-22│ 2:15p║╟──────────────────────────────────────╢| 1Bx80
+|║verrlvl  com│     1083│11-19-21│ 6:28a║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║vfdutil  com│     2334│ 9-28-22│12:45p║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║vfont    com│     1970│11-19-21│ 6:28a║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║vframe   com│     2492│ 1-10-22│ 2:16p║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║vgotoxy  com│     2085│11-19-21│ 6:28a║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║vinfo    com│     3112│10-01-24│ 3:42a║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║vline    com│     2144│ 1-10-22│ 9:14a║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║vpause   com│     2012│ 1-10-22│ 9:14a║╟──────────────────────────────────────╢| 1Bx80
+|║vprogres com│     2424│ 1-10-22│ 9:14a║║                                      ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║vpause.com        2012  1-10-22  9:14a║║                                      ║| 1Bx80
+|║vprogres.com      2424  1-10-22  9:14a║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -627,8 +627,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│    14835│ 1-09-05│12:03p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│     7434│ 9-11-09│ 4:41a║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│      475│11-30-21│ 5:44p║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│      475│11-30-21│ 5:44p║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│     5322│ 2-18-22│ 5:26p║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│      923│ 4-19-21│10:35a║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│    39859│ 1-20-25│ 6:38p║║                                      ║| 1Bx1 30x38 1Bx41
@@ -655,8 +655,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│    14835│ 1-09-05│12:03p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│     7434│ 9-11-09│ 4:41a║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│      475│11-30-21│ 5:44p║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│      475│11-30-21│ 5:44p║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│     5322│ 2-18-22│ 5:26p║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│      923│ 4-19-21│10:35a║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│    39859│ 1-20-25│ 6:38p║║                                      ║| 1Bx80
@@ -683,8 +683,8 @@ cursor 15 23 lines 6 7 mode 3
 |║format   exe│    42424│ 9-08-24│ 3:16p║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║command  com│    87772│ 2-21-25│ 2:06p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║country  sys│    30250│11-03-24│ 9:55a║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║kernl386 sys│    46256│ 5-15-21│ 2:38a║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║setver   sys│      109│ 5-14-21│ 3:32a║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║kernl386 sys│    46256│ 5-15-21│ 2:38a║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║setver   sys│      109│ 5-14-21│ 3:32a║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║sys      com│    11727│ 5-14-21│10:38p║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║mem      exe│    15028│ 3-01-22│ 5:49p║╟──────────────────────────────────────╢| 1Bx80
 |║more     exe│     6942│ 9-24-07│ 5:26a║║                                      ║| 1Bx80
@@ -706,18 +706,18 @@ cursor 15 23 lines 6 7 mode 3
 cursor 15 23 lines 6 7 mode 3
 |╔═══════════ A:\FREEDOS\BIN ════╤══════╗╔════════════════ Info ════════════════╗| 1Bx12 30x16 1Bx52
 |║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║vpause   com│     2012│ 1-10-22│ 9:14a║╟──────────────────────────────────────╢| 1Bx80
-|║vprogres com│     2424│ 1-10-22│ 9:14a║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vstr     com│     2387│ 1-10-22│ 2:17p║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vtest    com│     2791│ 6-24-23│11:41a║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
-|║xcopy    exe│    22685│ 3-21-25│ 6:38p║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║cp850    v8f│     3103│ 4-02-25│ 2:22p║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║cp857    v8f│     3132│ 4-02-25│ 2:22p║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║cp858    v8f│     1060│ 4-02-25│ 2:22p║║            A:\FREEDOS\BIN            ║| 1Bx80
-|║cp866    v8f│     1277│ 4-02-25│ 2:22p║╟──────────────────────────────────────╢| 1Bx80
-|║fdwrapup bat│      757│ 4-02-25│ 2:22p║║                                      ║| 1Bx1 30x38 1Bx41
+|║vprogres com│     2424│ 1-10-22│ 9:14a║╟──────────────────────────────────────╢| 1Bx80
+|║vstr     com│     2387│ 1-10-22│ 2:17p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║vtest    com│     2791│ 6-24-23│11:41a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║xcopy    exe│    22685│ 3-21-25│ 6:38p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
+|║cp850    v8f│     3103│ 4-02-25│ 2:22p║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
+|║cp857    v8f│     3132│ 4-02-25│ 2:22p║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║cp858    v8f│     1060│ 4-02-25│ 2:22p║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║cp866    v8f│     1277│ 4-02-25│ 2:22p║║            A:\FREEDOS\BIN            ║| 1Bx80
+|║fdwrapup bat│      757│ 4-02-25│ 2:22p║╟──────────────────────────────────────╢| 1Bx80
+|║driver   com│     1416│ 6-16-00│12:00p║║                                      ║| 1Bx1 30x38 1Bx41
 |╟────────────┴─────────┴────────┴──────╢║  No `dirinfo' file in this directory ║| 1Bx80
-|║fdwrapup.bat       757  4-02-25  2:22p║║                                      ║| 1Bx80
+|║driver.com        1416  6-16-00 12:00p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -739,8 +739,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║fc       exe│    14835│ 1-09-05│12:03p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│     7434│ 9-11-09│ 4:41a║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│      475│11-30-21│ 5:44p║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│      475│11-30-21│ 5:44p║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│     5322│ 2-18-22│ 5:26p║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│      923│ 4-19-21│10:35a║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│    39859│ 1-20-25│ 6:38p║║                                      ║| 1Bx80
@@ -767,8 +767,8 @@ cursor 15 23 lines 6 7 mode 3
 |║deltree  com│     3339│ 3-30-13│ 4:14a║║          ####### Bytes Free          ║| 1Bx1 30x38 1Bx12 1Ex7 1Bx22
 |║fc       exe│    14835│ 1-09-05│12:03p║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║fdapm    com│     7434│ 9-11-09│ 4:41a║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║fdbanner com│      475│11-30-21│ 5:44p║║    848,896 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
-|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    43 files use 438,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
+|║fdbanner com│      475│11-30-21│ 5:44p║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║fasthelp bat│       64│ 2-09-22│ 4:00p║║    44 files use 439,808 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
 |║setlang  bat│     5322│ 2-18-22│ 5:26p║║            A:\FREEDOS\BIN            ║| 1Bx80
 |║welcome  bat│      923│ 4-19-21│10:35a║╟──────────────────────────────────────╢| 1Bx80
 |║fdisk    exe│    39859│ 1-20-25│ 6:38p║║                                      ║| 1Bx80

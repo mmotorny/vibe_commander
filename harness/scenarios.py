@@ -7,13 +7,20 @@ end, so is everything on the hard disks. What the original records is kept
 as the scenario's golden (see goldens.py), and a build is right if it
 records the same.
 
-Steps are written as Machine.press() takes them: key names separated by
+The keys are pressed inside the machine, by a driver that DOS has loaded
+before the program (see driver.py and DRIVER.ASM). It hands the keyboard
+controller what the keyboard would send, one key when the program waits
+for a key and has taken the one before, and writes the screen out when a
+step has no key left and the program waits, with nothing that it will do
+by itself after a while. The original and the port are driven alike, as
+they are: nothing in either knows of the tests.
+
+Steps are written as driver.py takes them: key names separated by
 spaces, "Alt+F1" for keys held together, and text to type in double quotes.
 Text may be Russian where the bench has the Russian keyboard, once
 "Alt+RightShift" has selected its Cyrillic letters. That is pressed where
-the program takes text, and in a step that types some: at the panels Alt
-by itself brings up the menu or not, as the timing has it, and a step of
-nothing but Shift and Alt leaves the program nothing to signal.
+the program takes text: at the panels Alt by itself, down and up again,
+brings up the menu bar.
 
 What has been found out about driving the program, to save finding it
 out again (show.py --changes is how):
@@ -196,9 +203,10 @@ out again (show.py --changes is how):
     does not.
   - Enter on a file with the extension bat runs it: on A:\\ the second
     file is fdauto.bat, which starts the bench again.
-  - A step may press about 16 keys. The harness waits for each to reach
-    the keyboard buffer, which holds 15, and fails when the program does
-    not take them fast enough.
+  - A step may press any number of keys: each is handed over when the
+    program waits for one and has taken the one before. Keys written as
+    one name, "Enter+Home", go into the keyboard buffer together, and
+    that holds 15.
   - There is no mouse on the bench, and nothing sets the kind of a panel
     to anything but files, tree and Info: what the program does for a
     mouse or for a fourth kind of panel cannot be reached.
@@ -278,21 +286,13 @@ out again (show.py --changes is how):
     of C:\\STAMPS have no bytes behind their sizes: the editor opens
     night.dat as an empty text, and has no room for noon.dat.
   - The floppy of the bench has no SETUP.BAT.
-  - The original is slow while it is watched: a search through 87K of
-    text in the editor takes seconds, and one through 245K took more
-    than 20 seconds when the goldens were derived next to other runs.
-    Keep a search short.
   - The key bar is drawn when the program waits for a key and finds
     none, and only if it is another than the last one drawn: the bar of
-    another mode, or of Shift, Ctrl or Alt held down. The original is
-    given every key when it waits; the port gets the keys of a step as
-    fast as its keyboard buffer takes them, and may not wait in
-    between. So a step in which a beep scrolls the key bar away ends
-    with a key that changes the bar, F4 in the editor, or the bar is
-    there in the golden and now and then not in the port: in
-    `editor-full`, 'F4 Ctrl+End "4" Ctrl+Home F4' as one step failed
-    once in three runs, and "F4" as a step of its own before the rest
-    does not.
+    another mode, or of Shift, Ctrl or Alt held down. Every key of a
+    step is given to the program when it waits, so the bar is drawn
+    between any two keys as it would be between two steps. That was not
+    so while the port's keys were pressed by the clock, and
+    `editor-full` has "F4" as a step of its own from then.
   - In the help Up, Down, PgUp, PgDn, Home and End move the cursor in
     the index and the text of a page; Left and Right go from button to
     button, Enter presses the one the cursor is on and a button's first
@@ -323,9 +323,9 @@ out again (show.py --changes is how):
     letter answers. The one way to give it a key is with the Enter that
     starts it, as one name: "Enter+Home", "Enter+Right+Left+F1". The
     keys go down together and the search finds them waiting when it
-    first looks, before DOS is asked for a file. Do not write a key
-    behind that Enter as a name of its own: the original gets it when
-    the search is over, and the port while it runs. From the help over
+    first looks, before DOS is asked for a file. A key written
+    behind that Enter as a name of its own gets to the program when
+    the search is over. From the help over
     a search, "c+Esc" is Cancel for the help and Esc for the search,
     and "Ctrl+Esc+c" Esc for the help and Ctrl+c for the search; in the
     dialog Ctrl+m is Enter, so "Ctrl+m+c" stops a search as it begins.
@@ -375,14 +375,14 @@ out again (show.py --changes is how):
     choose from: Enter there types the path of the directory into the
     line. "F9 r l" with the left panel active is the filter of the right
     one, in the right half of the screen, three Tabs from its buttons.
-  - F5 and F6 go in a step of their own, the name and Enter in the
-    next: 'F5 "name" Enter' as one step works at first, but once a box
-    with an error has been shown the dialog is slow to come up, the
-    keys behind F5 fill the keyboard buffer, and the step fails with
-    "the key t did not arrive", whatever the sixteenth key is. An
-    answer to a box that the copying brings up is a step of its own
-    too: Esc typed behind the Enter that starts the copying is taken
-    for a break, if it gets there in time.
+  - F5 and F6 are in a step of their own in the scenarios, the name
+    and Enter in the next. That was needed while keys were pressed by
+    the clock; 'F5 "name" Enter' as one step does the same now. An
+    answer to a box that the copying brings up may follow in the same
+    step too: a key of its own gets to the program when the copying
+    has stopped at the box. Only a key written with the Enter that
+    starts the copying, "Enter+Esc", is there while it copies, and is
+    taken for a break.
   - With the Info next to it a panel's F5 offers the last target again,
     so "F5", "Enter" and an answer repeat a copy; with a panel of files
     next to it, that panel's directory. F6 offers the name of the file
@@ -572,32 +572,27 @@ is off, started in C:\\WORK. A scenario that wants something else arranges
 it with its first steps, the way a user would. It may end anywhere, with
 the program running or not.
 
-The machine's clock runs while the harness waits, and it waits longer for
-the original than for a build that signals. Nothing on the bench shows the
-time of day, so that does not matter. A scenario that does show it, by
+The machine's clock runs with the host's while the scenario runs, and
+runs on while the machine waits for the processor on a busy host. Nothing
+on the bench shows the time of day, so that does not matter. A scenario
+that does show it, by
 switching the clock on or by listing a file it has made, has to be done
 with that before the machine's first minute is over.
 """
-import re
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import coverage
+import driver
 import fat
 import setups
-import watch
 from dos import MachineError
 
-# How long the screen must stand still to count as finished, in seconds,
-# where that is all there is to go by: for a program that neither signals
-# nor is the original. It has to cover the longest the program waits before
-# it does something by itself, 0.6 s for following the cursor to another
-# directory, and both states of the blinking colon of its clock.
-SETTLE = 0.8
-# How long a step may take before the program counts as stuck, in seconds.
-# It is long on purpose: it is there for a program that hangs, and a
-# machine that many tests share must not look like one.
+# How long the driver may write nothing before the program counts as
+# stuck, in seconds: the longest a step may take. It is long on purpose:
+# it is there for a program that hangs, and a machine that many tests
+# share must not look like one.
 STEP_TIME = 300
 
 
@@ -616,9 +611,9 @@ class Run:
     # Offset and length in the program file of every instruction that ran,
     # if the run was traced.
     executed: dict = field(default_factory=dict)
-    # The fewest bytes of its stack that the program had never touched,
-    # of all the times it waited for a key; None for a program that does
-    # not mark its stack.
+    # The fewest bytes of its stack that the program had never used, of
+    # all the steps that ended with it waiting for a key; None if its stack
+    # was not looked at.
     stack_left: int = None
 
 
@@ -737,6 +732,9 @@ SCENARIOS = {
             "Ctrl+F1",
             "Ctrl+l",                     # the Info panel on the left
             "Ctrl+l",
+            # Two keys at once: the second is waiting when the program
+            # comes to ask for the next key, which only happens like this.
+            "Up+Up",
         )),
 
     "help": Scenario(
@@ -3179,134 +3177,66 @@ SCENARIOS = {
 
 
 
-def run(scenario, program, bench, signals, trace=False):
+def run(scenario, program, bench, trace=False, blinking=False,
+        stack=False):
     """Run `scenario` on `program` (a setups.Program) and return the Run.
 
-    `bench` is the setups.Bench for the scenario's country. With `signals`
-    the program is taken to be a build that signals where it is, and each
-    screen is recorded the moment it says that it waits for a key and has
-    nothing left to do by itself. The original is watched from outside for
-    the same moment (see watch.py). For any other program the moment is
-    guessed: when the screen has stood still for a while.
+    `bench` is the setups.Bench for the scenario's country. The driver of
+    the tests, in the machine, presses the keys of each step when the
+    program is ready for them and writes the screen out when the program
+    waits for a key with every key of the step taken and nothing left to
+    do by itself (see driver.py and DRIVER.ASM). The original and a build
+    of the port are driven alike, and neither is changed for it.
+
+    With `trace`, what the program executed is recorded. With `blinking`,
+    a screen with the program's clock on is recorded in both its states,
+    which takes a second of the machine's time for each. With `stack`, how
+    much of its stack the program never used is recorded (see
+    driver.stack_left).
     """
+    steps = ("",) + scenario.steps
+    known = driver.facts(program, stack)
+    script = driver.script(scenario.steps, known, blinking)
     with tempfile.TemporaryDirectory() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None
-        with bench.start(workdir, program, log) as machine:
-            watched = None
-            if signals:
-                wait = _signalled
-            elif watch.available(program):
-                watched = watch.Watch(program)
-                wait = _watched(watched)
-            else:
-                wait = _settled
-            screens, left = [], []
-            for number, step in enumerate(("",) + scenario.steps):
-                if number:
-                    machine.resume()
-                    machine.press(step, watched)
-                where = f"step {number}, {step}" if number else "the start"
-                screen, waiting = wait(machine, where)
-                screens.append(screen)
-                if waiting:
-                    left.append(_stack_left(machine))
+        with bench.start(workdir, program, script, log) as machine:
+            machine.resume()
+            try:
+                machine.wait_for_end(STEP_TIME)
+            except MachineError:
+                done = len(driver.read(machine.written())[0])
+                shown = "\n".join(machine.screen().lines())
+                raise MachineError(
+                    f"after {_where(steps, done)}: the program did not "
+                    f"come to wait for a key within {STEP_TIME} s; it "
+                    f"shows\n{shown}") from None
+            done, ended = driver.read(machine.written())
             disks = machine.disks
+        if not ended:
+            raise MachineError(
+                f"after {_where(steps, len(done))}: the machine stopped: "
+                "it was reset, or QEMU ended")
+        if len(done) != len(steps):
+            raise MachineError(f"the driver wrote {len(done)} screens for "
+                               f"{len(steps)} steps")
         # The machine has been shut down: the disk images are complete.
         codepage = setups.codepage(scenario.country)
-        result = Run(screens, {drive: fat.read_tree(path, codepage)
-                               for drive, path in disks.items()})
+        result = Run([step.screen for step in done],
+                     {drive: fat.read_tree(path, codepage)
+                      for drive, path in disks.items()})
         if trace:
             result.executed = coverage.executed(log, program.contents)
+        left = [driver.stack_left(step.stack, known) for step in done
+                if step.stack is not None]
         if left:
             result.stack_left = min(left)
     return result
 
 
-# What the build that signals fills its stack with when it has set it up:
-# StkMark in port/asm/VC.ASM, low byte first. The stack grows down from its
-# top, so what it has never reached is still marked, from the bottom up.
-STACK_MARK = b"\x5A\xA5"
-CONVENTIONAL_MEMORY = 0xA0000     # where DOS programs live, below this
-
-
-def _stack_left(machine):
-    """How many bytes of its stack the program has never touched: the
-    longest run of the mark in the machine's memory. That is 0 once the
-    stack has been used to its bottom, or beyond."""
-    memory = machine._memory(0, CONVENTIONAL_MEMORY)
-    runs = re.finditer(b"(?:%s){2,}" % re.escape(STACK_MARK), memory)
-    return max((len(run.group()) for run in runs), default=0)
-
-
-def _settled(machine, where):
-    """Wait for the screen to stand still and return it, and that it is
-    not known whether the program waits for a key."""
-    try:
-        return machine.wait_for_screen(SETTLE, STEP_TIME), False
-    except MachineError as error:
-        raise MachineError(f"after {where}: {error}") from None
-
-
-def _watched(watched):
-    """What waits for the original to have finished a step, with the
-    watch.Watch on its machine, and returns the screen, and that it is not
-    asked how much of its stack the program has left."""
-    def wait(machine, where):
-        try:
-            return watched.wait(machine), False
-        except MachineError as error:
-            raise MachineError(f"after {where}: {error}") from None
-    return wait
-
-
-def _spelled(heard):
-    """Signals as they can be read: the letters, and in hexadecimal the
-    byte before W, S and T that says where the keyboard buffer ended."""
-    return "".join(signal if signal in "KWSTX" else f" {ord(signal):02X}"
-                   for signal in heard).strip()
-
-
-def _signalled(machine, where):
-    """Wait for the program to signal that it waits for a key with every
-    key of the step taken, or that it has ended, and return the screen and
-    which of the two: whether it waits. Leaves the machine paused if it
-    does.
-
-    That the keyboard buffer is empty and the last word is W does not say
-    so: a key leaves the buffer before the program says K, and the W may
-    be that of the key before. The W says where the buffer ended when it
-    was given, with nothing waiting in it (see "Signals to the tests" in
-    port/asm/VC.ASM), and every key was seen to arrive there, so the W
-    that counts is one with the place where the buffer ends now. After 16
-    keys that is a place it has had before: the W must also have come
-    since the last key was pressed.
-    """
-    # What was signalled before the last key was pressed is old.
-    heard, old = machine.signals()
-
-    def idle():
-        nonlocal heard
-        head, tail = machine.keyboard()
-        if head != tail:
-            return False
-        heard += machine.signals()[0]
-        return heard.endswith("X") or (
-            len(heard) - old >= 2 and heard[-1] == "W"
-            and ord(heard[-2]) == tail % 256)
-
-    try:
-        machine.until(idle, STEP_TIME, "")
-    except MachineError:
-        machine.pause()
-        shown = "\n".join(machine.screen().lines())
-        raise MachineError(
-            f"after {where}: the program did not come to wait for a key "
-            f"within {STEP_TIME} s; it signalled {_spelled(heard)!r} and "
-            f"shows\n"
-            f"{shown}") from None
-    if heard.endswith("X"):
-        # The program has ended; DOS then shows its prompt.
-        return machine.wait_for_prompt(STEP_TIME), False
-    machine.pause()
-    return machine.screen(), True
+def _where(steps, done):
+    """The step that was under way when `done` of `steps` had ended, the
+    start being the first."""
+    if done >= len(steps):
+        return "the last step"
+    return f"step {done}, {steps[done]}" if done else "the start"

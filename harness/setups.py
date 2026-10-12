@@ -13,18 +13,22 @@ Two setups share one clock and one source of files:
                   means its size cannot show up as free space on screen.
                   The clock in the corner of the screen is off, so that
                   no screen depends on how long it took to get there.
+                  DOS has loaded the driver of the tests (see driver.py),
+                  which takes the program through a scenario's steps from
+                  a script on a third disk, one without a file system.
 """
 import io
 import shutil
 import tempfile
 import threading
 import zipfile
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import deps
-import watch
-from dos import FatImage, Machine, boot_floppy, timestamp
+import driver
+from dos import BOOT_TIME, FatImage, Machine, MachineError, boot_floppy, \
+    timestamp
 
 # The PC's clock at power-on, and the date given to directories and to the
 # test bench's files: noon on the day Volkov Commander 4.05 was released.
@@ -41,10 +45,6 @@ SETUP_FILE = "VC.INI"
 # menu, and those that save the setup.
 CLOCK_KEYS = "F9 o l"
 SAVE_SETUP_KEYS = "Shift+F9 Enter"
-# How long the screen must stand still for DOS when it has booted to count
-# as finished, in seconds.
-SETTLE = 0.5
-
 # The contents of C:\WORK on the test bench, in directory order.
 WORK_DIRECTORIES = ["DOCS", "SRC"]
 WORK_FILES = [
@@ -76,11 +76,19 @@ class Program:
     """A build of Volkov Commander, and the file name it is run under."""
     filename: str
     contents: bytes
+    # The listing of its assembly, where the build has written one: the
+    # driver of the tests reads there where the program keeps what it
+    # watches. Two programs are the same if their files are.
+    listing: Path = field(default=None, compare=False)
 
     @classmethod
     def load(cls, path):
+        """The program in the file `path`, with the listing that the
+        build writes next to it."""
         path = Path(path)
-        return cls(path.name.upper(), path.read_bytes())
+        listing = path.with_suffix(".LST")
+        return cls(path.name.upper(), path.read_bytes(),
+                   listing if listing.exists() else None)
 
 
 def distribution():
@@ -91,14 +99,22 @@ def distribution():
                 for member in archive.infolist()}
 
 
+# The listing of the build of the published source that is laid out as
+# the original is, and is the same byte for byte: it says where the
+# original has its routines and its variables.
+LISTING = deps.ROOT / "build" / "shareware-layout" / "VC.LST"
+
+
 def original_vc():
     """The original VC.COM."""
-    return Program("VC.COM", distribution()["VC.COM"][0])
+    return Program("VC.COM", distribution()["VC.COM"][0], LISTING)
 
 
-def _floppy(workdir, commands, country=None, keyboard=None):
+def _floppy(workdir, commands, country=None, keyboard=None, bench=False):
     """A boot floppy that runs `commands`, for a country of COUNTRIES and
-    with a keyboard of KEYBOARDS, if they are given."""
+    with a keyboard of KEYBOARDS, if they are given. With `bench` it has
+    what the test bench has besides: the driver of the tests, next to the
+    programs of DOS, for the commands to load."""
     if keyboard:
         layout, codepage, layouts = keyboard
         directory = r"A:\FREEDOS\BIN"
@@ -119,6 +135,12 @@ def _floppy(workdir, commands, country=None, keyboard=None):
             with zipfile.ZipFile(packed) as archive:
                 floppy.write(f"FREEDOS/{member}", archive.read(member), EPOCH)
         image.unlink()
+    if bench:
+        if not driver.PROGRAM.exists():
+            raise RuntimeError(f"{driver.PROGRAM} is not there: build the "
+                               "project first")
+        floppy.write(f"FREEDOS/BIN/{driver.FILENAME}",
+                     driver.PROGRAM.read_bytes(), EPOCH)
     return floppy
 
 
@@ -150,19 +172,22 @@ def codepage(country):
 # select its Cyrillic letters; Alt and the left Shift go back.
 KEYBOARDS = {"ru": ("RU", 866, "KEYBRD2.SYS")}
 
-# What DOS runs on the test bench once it has booted. It waits for a key
-# first: that is where the machine's state is saved, and where every
-# scenario begins.
-BENCH_COMMANDS = ["PAUSE>NUL", "CLS", "C:", r"CD \WORK", r"D:\VC\VC"]
+# What DOS runs on the test bench once it has booted. It loads the driver
+# of the tests and then waits for a key: that is where the machine's state
+# is saved, and where every scenario begins, with the Enter that its
+# script has first.
+BENCH_COMMANDS = [Path(driver.FILENAME).stem, "PAUSE>NUL", "CLS", "C:",
+                  r"CD \WORK", r"D:\VC\VC"]
 
 
 class Bench:
     """The test bench: a machine for every scenario, each the same.
 
     DOS is booted once, configured for `country`, and the machine's state
-    is saved as it waits for a key before starting the program. start()
-    then makes a machine in that state, with fresh disks, in a fraction of
-    a second. Nothing a scenario does can reach the next one.
+    is saved as it waits for a key before starting the program, with the
+    driver of the tests loaded and waiting for its script. start() then
+    makes a machine in that state, with fresh disks and a script, in a
+    fraction of a second. Nothing a scenario does can reach the next one.
 
     The program is set up as its distribution sets it up, but for the clock
     in the corner of the screen, which the distribution has on. No setup
@@ -176,19 +201,23 @@ class Bench:
         self._workdir = Path(workdir)
         self._workdir.mkdir(parents=True, exist_ok=True)
         self._floppy = _floppy(self._workdir, BENCH_COMMANDS,
-                               COUNTRIES[country],
-                               KEYBOARDS.get(country)).path
+                               COUNTRIES[country], KEYBOARDS.get(country),
+                               bench=True).path
         self._work = self._workdir / "c.img"
         _work_disk(self._work, self._workdir)
         self._programs = {}             # Program -> its disk image
         self._lock = threading.Lock()
         self._state = self._workdir / "state"
         shipped = distribution()[SETUP_FILE][0]
+        blank = self._workdir / "script.img"
+        blank.write_bytes(bytes(driver.SCRIPT_DISK))
         with Machine(self._floppy,
-                     [self._work, self._new_disk("boot.img", None, shipped)],
-                     self._workdir, CLOCK) as machine:
+                     [self._work, self._new_disk("boot.img", None, shipped),
+                      blank], self._workdir, CLOCK) as machine:
             machine.wait_for_boot()
-            machine.wait_for_screen(SETTLE)
+            # The driver says when it is loaded and has found no script.
+            machine.until(lambda: b"R" in machine.written(), BOOT_TIME,
+                          "the driver of the tests did not load")
             machine.save(self._state)
         self.setup = setup or self._setup_without_clock(shipped)
 
@@ -199,12 +228,14 @@ class Bench:
         workdir.mkdir()
         original = original_vc()
         disk = self._new_disk("setup.img", original, shipped)
-        with self._machine(workdir, disk) as machine:
-            watched = watch.Watch(original)
-            watched.wait(machine)
+        script = driver.script([CLOCK_KEYS, SAVE_SETUP_KEYS],
+                               driver.facts(original))
+        with self._machine(workdir, disk, script) as machine:
             machine.resume()
-            machine.press(f"{CLOCK_KEYS} {SAVE_SETUP_KEYS}", watched)
-            watched.wait(machine)
+            machine.wait_for_end(BOOT_TIME)
+            if not driver.read(machine.written())[1]:
+                raise MachineError("the original did not get through "
+                                   "saving its setup")
             written = machine.disks["D"]
         # The machine has been shut down: the disk image is complete.
         setup = FatImage(written, workdir, EPOCH,
@@ -237,27 +268,31 @@ class Bench:
                     f"d{len(self._programs)}.img", program, self.setup)
             return self._programs[program]
 
-    def _machine(self, workdir, program_disk, trace=None):
-        """A machine with a copy of `program_disk` as drive D:, in which
-        the program on it is about to start."""
+    def _machine(self, workdir, program_disk, script, trace=None):
+        """A machine with a copy of `program_disk` as drive D: and `script`
+        for the driver, in which the program is about to start: paused."""
         disks = {"C": workdir / "c.img", "D": workdir / "d.img"}
         shutil.copyfile(self._work, disks["C"])
         shutil.copyfile(program_disk, disks["D"])
-        machine = Machine(self._floppy, list(disks.values()), workdir, CLOCK,
-                          trace=trace, state=self._state)
+        image = workdir / "script.img"
+        with open(image, "wb") as file:
+            file.write(script)
+            file.truncate(driver.SCRIPT_DISK)
+        machine = Machine(self._floppy, [*disks.values(), image], workdir,
+                          CLOCK, trace=trace, state=self._state)
         machine.disks = disks
-        machine.resume()
-        machine.press("Enter")
         return machine
 
-    def start(self, workdir, program, trace=None):
-        """A machine in which `program` is about to start, already running.
+    def start(self, workdir, program, script, trace=None):
+        """A machine in which `program` is about to start and the driver
+        is about to go by `script` (see driver.script): paused, until
+        resume().
 
         It has a `disks` attribute: drive letter -> image file, to read
         once the machine has been shut down.
         """
         return self._machine(Path(workdir), self._program_disk(program),
-                             trace)
+                             script, trace)
 
 
 def _work_disk(path, workdir):

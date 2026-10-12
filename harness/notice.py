@@ -74,15 +74,15 @@ def copy_port():
 
 
 def build():
-    """Build the port of COPY that signals; return it, or None with what
-    the build said printed."""
+    """Build the port of COPY; return it, or None with what the build
+    said printed."""
     fetched = BUILD / "_deps"
     steps = [
         ["cmake", "-S", COPY, "-B", COPY_BUILD,
          f"-DFETCHCONTENT_SOURCE_DIR_JWASM={fetched / 'jwasm-src'}",
          f"-DFETCHCONTENT_SOURCE_DIR_OPEN_WATCOM="
          f"{fetched / 'open_watcom-src'}"],
-        ["cmake", "--build", COPY_BUILD, "--target", "port-signalling"],
+        ["cmake", "--build", COPY_BUILD, "--target", "port"],
     ]
     for step in steps:
         done = subprocess.run([str(word) for word in step],
@@ -90,7 +90,7 @@ def build():
         if done.returncode:
             print(done.stdout + done.stderr)
             return None
-    return setups.Program.load(COPY_BUILD / "port" / "signalling" / "VC.EXE")
+    return setups.Program.load(COPY_BUILD / "port" / "VC.EXE")
 
 
 def scenarios_running(routines):
@@ -126,7 +126,7 @@ def noticed(program, names):
         scenario = scenarios.SCENARIOS[name]
         try:
             run = scenarios.run(scenario, program,
-                                benches[scenario.country], signals=True)
+                                benches[scenario.country])
         except MachineError as error:
             return str(error).splitlines()
         return goldens.differences(goldens.read(name), run,

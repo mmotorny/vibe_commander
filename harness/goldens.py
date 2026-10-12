@@ -276,7 +276,7 @@ def derive(name, benches):
     scenario = scenarios.SCENARIOS[name]
     original = setups.original_vc()
     run = scenarios.run(scenario, original, benches[scenario.country],
-                        signals=False, trace=True)
+                        trace=True, blinking=True)
     write(Golden(name, setups.codepage(scenario.country), [],
                  [deviations.compared(deviations.expected(screen))
                   for screen in run.screens],

@@ -152,8 +152,9 @@ MASM-compatible assembler, at a pinned commit, builds it, and assembles
 second copy of both into `build/shareware-layout/`, with the room reserved
 that the byte comparison needs; only the tests use that copy.
 
-It then builds the port, `build/port/VC.EXE`, and next to it in
-`build/port/signalling/` the variant that the tests run. What the compiler
+It then builds the port, `build/port/VC.EXE`, which is what the tests run,
+and next to it in `build/port/signalling/` a variant that they ran before
+and no longer do. What the compiler
 made of each C file is written out as a listing, `build/port/*.lst`. For this it fetches a pinned
 snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
 download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
@@ -230,20 +231,13 @@ Every step is checked by the `port` test below, and nothing else decides
 whether a translation is right. The routines translated so far are listed
 in `harness/ported.py`.
 
-The tests do not run the program that is shipped but a variant of it,
-assembled with `HARNESS` defined. It writes a letter to a port of the PC
-whenever it takes a key, waits for one, or ends, and so tells the tests
-exactly when it has finished what a key started. It also marks its stack
-when it has set it up, so that the tests can read from the machine how much
-of it the program never touches, which the `port` test reports for every
-scenario. And it does not wait for the timer between the sizes of a box
-that grows as it opens, five times for every dialog: no screen is recorded
-while a box grows, and the waiting was most of the time that a scenario
-with dialogs took. The two differ by a few
-dozen instructions, all in macros at the top of `port/asm/VC.ASM`. A few
-of them are in the part of the program that stays in memory while a command
-runs, whose size shows on the screen as free memory; the variant makes up
-for them with a stack that is as many bytes shorter, 18 of 4,096.
+The tests run the program that is shipped, as they run the original: a
+driver in the machine takes either through the scenarios (see [When a step
+is finished](#when-a-step-is-finished)). The driver also writes the
+program's stack out whenever a step ends, and the `port` test reports for
+every scenario how much of it the program never used. A variant assembled
+with `HARNESS` defined, which told the tests where it was, is still built
+in `build/port/signalling/` and no longer run.
 
 The stack is where the port departs from the original in what it takes of
 the memory. The original has 256 bytes of it. Compiled code uses more
@@ -309,9 +303,9 @@ for the other, unlike the routine that measures it and unlike Norton
 Guides, where the markup comes from. The port has them agree. No text
 uses either code.
 
-`python3 harness/compare.py [--signals] FILE [SCENARIO...]` takes any
+`python3 harness/compare.py FILE [SCENARIO...]` takes any
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from
-the goldens. No test runs the programs assembled from `src/`, which the
+the goldens. It needs the listing that the build writes next to the file. No test runs the programs assembled from `src/`, which the
 byte comparison answers for; this is how to run them. The copy with the
 reserved room has no edition name in its banner, and differs from the
 goldens wherever the banner shows.
@@ -343,7 +337,8 @@ and Russia, and the machine is saved as it is about to start the program.
 Every scenario then gets a machine of its own in that state, which takes a
 tenth of a second: the program under test on drive `D:` with the original's
 help and configuration files, started in `C:\WORK`, on disks that no other
-scenario has touched. Keeping the program off the drive it displays stops
+scenario has touched, and on a third disk, one without a file system, the
+script of the scenario. Keeping the program off the drive it displays stops
 its file size from appearing on screen as free space. A scenario that wants
 the program set up differently does that itself, through the menus. When a
 build is tested, up to four scenarios run side by side.
@@ -368,48 +363,53 @@ starts from. One scenario, `clock`, switches the clock on again.
 ### When a step is finished
 
 The screen has to be read when the program has done all that a key makes
-it do, and not before. The variant of the port that the tests run says so
-itself (see [The port](#the-port)), and a scenario of twenty steps takes a
-second or two. It says that it waits for a key, and with that where the
-keyboard buffer of the BIOS ended when it found nothing waiting there. The
-harness has seen every key of the step arrive in that buffer, so the step
-is finished when the program says that it waits with the buffer ending
-where it ends now, and not when it said so before it took the last key.
+it do, and not before; and a key has to come when the program is ready for
+it. Neither is decided from outside the machine. DOS loads a small
+resident program before Volkov Commander, the driver of the tests
+(`harness/DRIVER.ASM`, with `harness/driver.py` for the host's side), and
+that takes the program through the steps of the scenario's script.
 
-The original cannot say, but it can be watched
-(`harness/watch.py`): the build of the source that is laid out like it is
-the same byte for byte, so its listing says where the original goes round
-while it waits for a key, and where it ends. QEMU's debugger stops the
-machine when the original comes there, and it has finished a step when it
-waits with every key taken, none of Shift, Ctrl and Alt held, nothing
-that it will do by itself after a while, and has gone round once more
-without changing the screen. A key is pressed when the original waits for
-one, so that it never finds one waiting. None of that is measured in
-time, and a busy computer makes a recording slower, not different. Where
-a scenario wants the program to find a key while it works, as `find`
-does of a search, the key is written as one name with the key that
-starts the work, "Enter+Home": the two go down together, and the second
-is waiting when the first is taken.
+The driver stands in for nothing. A key is the scan codes that the
+keyboard would send, handed to the keyboard controller with the command
+it has for that, so the BIOS, and on the Russian machine the keyboard
+driver of DOS, make of them what they make of a keyboard's: the key in the
+BIOS's buffer, and Shift, Ctrl and Alt in its flags. Every request the
+program makes for a key is answered by the BIOS as always. The driver
+only watches two interrupts on their way to their owners: the one by
+which a program says that it is idle, which Volkov Commander calls every
+time it has gone round waiting for a key, and the BIOS's keyboard
+interrupt, for a program that waits inside the BIOS.
+
+When the program is idle and the BIOS's buffer is empty, it has taken
+every key so far, and the driver hands over the next: so no key is ever
+found waiting by a program that looks for keys while it works. Shift, Ctrl
+and Alt go down and come up one at a time, with a round of the program
+between. Where a scenario wants the program to find a key while it works,
+as `find` does of a search, the key is written as one name with the key
+that starts the work, "Enter+Home": the two go into the buffer together.
+A step is finished when the program has gone round twice with no key left
+and nothing that it will do by itself after a while, which the driver
+reads in the program's own data. The driver then writes the screen, with
+the cursor, to a port that QEMU keeps in a file, and goes on with the
+next step; after the last it resets the machine, which ends QEMU. The
+host starts the machine and reads the file and the disks afterwards.
+
+The original and the port are driven alike, and neither is changed for it.
+What the driver has to know of a program, where its idle routine is and
+two of its variables, it is told in the script, which takes it from the
+program's file and the listing of its assembly. None of this is measured
+in time, and a busy computer makes a run slower, not different.
 
 Where time is what the program goes by, it is the machine's: with the
-clock on, what blinks is found by looking at the screen every time the
-original comes round, over more than a second of the BIOS's timer ticks.
-And when the program has ended, the harness waits for the prompt of DOS.
+clock on, when a golden is derived, the driver looks at the screen every
+time the program comes round, for more than a second of the BIOS's timer
+ticks, and writes out both states of what blinks.
 
-A still screen is waited for only where nothing better is known: when DOS
-has booted for the bench, and for a build that neither signals nor is the
-original.
-
-Nothing waits without a limit. A program that hangs or resets its machine
-fails its scenario within seconds, with the screen it got stuck on.
-
-A screen that stands still says that the program has finished only on a
-computer that is not busy, so a tool that has to go by one says so when
-it starts. The original is never timed that way: without the listing of
-the build that is laid out like it, which says where to watch, a run of
-the original fails and asks for the build. Nothing keeps runs of the
-harness apart: several checkouts may run their machines on one computer
-at once, and each only gets slower.
+Nothing waits without a limit. A program that hangs fails its scenario
+when the driver has written nothing for five minutes, with the screen it
+got stuck on, and one that resets its machine fails at once. Nothing
+keeps runs of the harness apart: several checkouts may run their machines
+on one computer at once, and each only gets slower.
 
 ### What ran
 

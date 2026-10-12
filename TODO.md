@@ -45,9 +45,9 @@ Things that are known and not done. Standing instructions are in
   pressed for as many minutes as the setup says, one at the least, and
   the harness has no step that waits: it presses the next key as soon as
   the program waits for one. A step that lets the machine run until its
-  BIOS has counted a minute of timer ticks would do, for the original in
-  `harness/watch.py`, which counts them for the clock already, and for
-  the port next to its signals. What `Blank` shows could still not be
+  BIOS has counted a minute of timer ticks would do: the driver of the
+  tests counts them for the clock already, and has an event that lets
+  rounds of the program pass. What `Blank` shows could still not be
   compared: where its stars are is drawn from random numbers that the
   program steps every time it goes round while it waits. That the screen
   comes back with a key could. `LeaveTm` is three calls of interrupts
@@ -502,23 +502,15 @@ Things that are known and not done. Standing instructions are in
 - Three instructions of `T53_00` are listed as out of reach: in hex, for
   16 bytes that go beyond the end of their segment. The address it gets
   there has an offset below 16, or is a window of lines further on.
-- What still goes by the time of the host, in the harness. The bench
-  waits for a still screen when DOS has booted, before it saves the
-  machine's state. A build that neither signals nor is the original is
-  timed by still screens throughout, and the tools say so. For the port,
-  Shift, Ctrl and Alt are held for 20 ms of the host, not until the
-  program has seen them.
 - A search can be given a key only where it begins: with the Enter
   that starts it, written as one name, or behind the help that such a
   key brings up. So `find` no longer has a key that stops a search
   between two parts of a file it reads, and the five instructions of
   `FindFil` that close the file then, `FnFl48`, are listed as out of
-  reach. To have that again, the harness would have to put a key in
-  when the search comes to a named place, in the original and in the
-  port alike. That was tried for the original and worked, with the key
-  written into the keyboard buffer of the BIOS at `FndBk1`; the same
-  place was not found in the port, which would want a label of its own
-  in the build that signals.
+  reach. To have that again, the driver of the tests would have to hand
+  a key over when the search comes to a named place, in the original and
+  in the port alike: it would have to be told where that is in each, as
+  it is told where `LeaveTm` is.
 - The machine's own clock runs with the host's while the machine runs,
   however much of the processor the machine gets. What the program does
   by its timer, following the cursor to a directory after 0.6 s or
@@ -527,10 +519,6 @@ Things that are known and not done. Standing instructions are in
   its clock by the instructions executed (`-icount`), so that the guest's
   time no longer follows the host's. To be considered if timing shows up
   as failures.
-- `Machine.wait_for_prompt` takes a `>` before the cursor for the prompt
-  of DOS. A command that leaves one there before it has finished would
-  be taken for it; nothing runs after the program has ended in any
-  scenario.
 - `cmake --build build -j4` failed once in a new checkout, "The object is
   zero length" for one C file. Building without `-j` works.
 - A run of the harness that is killed outright leaves its QEMU running,
@@ -697,30 +685,15 @@ Things that are known and not done. Standing instructions are in
 
 The full `port` test took 105 seconds on an idle machine with 59 scenarios
 and twelve minutes with eight checkouts busy, so four other ways were
-tried on 11 and 12 October 2026. What was measured first: 77% of a
+tried on 11 and 12 October 2026, and a fifth, a driver that stays
+resident in the guest, which is what the tests use now (see the README). What was measured first: 77% of a
 scenario's time is the guest running while the harness waits, most of it
 the program waiting for the timer while a box grows; pressing keys is
 13%; reading the machine's memory for the stack 6.5%; starting a machine
-1%. Recording what was executed costs nothing that shows. The growing box
-no longer waits in the build the tests run, which took a third off the
-scenarios' time. None of the four is in use; each is on a local branch of
-the checkout named, not pushed.
+1%. Recording what was executed costs nothing that shows. None of the
+four is in use; each is on a local branch of the checkout named, not
+pushed.
 
-- A driver that stays resident in the guest (`proto-driver`, checkout
-  `.6`, `harness/driver/`). It feeds the keys of a script through the
-  keyboard controller, so that the BIOS makes of them what it makes of a
-  keyboard's, passes every keyboard call on to the BIOS, and writes the
-  screen out when the program idles with no key left. It serves the
-  original and the shipped build of the port, neither changed. All 72
-  scenarios of its day equalled their goldens, screens and disks, for
-  both. Alone it is 15% faster; with QEMU's clock counted in instructions
-  (`-icount shift=8`) the suite took 195 seconds against 377, with no
-  scenario different. It would replace `watch.py`, the build that signals
-  and the timing of keys. To finish: 8 to 12 hours of an agent. To
-  decide: whether the controller's command D2h counts as the keyboard;
-  how the driver gets into the machine without showing on a disk; whether
-  it may read the program's `AutoTim`; and the rule that the tests run a
-  build of their own.
 - A build of the port that tests itself (`proto-selftest`, checkout
   `.8`). The program's own routines that call the keyboard BIOS, 14
   places, and its mouse routines ask a driver in place of the BIOS; DOS,
@@ -749,17 +722,13 @@ the checkout named, not pushed.
   BIOS and fits; 54% calls routines of ours that do; 18% calls them
   itself. 8 to 12 hours to build, for a quick check of a quarter of the
   code. Not recommended now.
-- QEMU's clock counted in instructions was tried with the first of these
-  and by itself: `move` cost 9 processor seconds in place of 21 to 28
+- QEMU's clock counted in instructions was tried with the resident
+  driver and by itself: `move` cost 9 processor seconds in place of 21 to 28
   and still equalled its golden. It also takes the guest's clock off the
   host's, which the scenarios with the clock on and the record of what
   `delete` executes depend on today. At `shift=10` the guest passes its
   first minute in some scenarios (12:01 for 12:00); at `shift=8` none
   differed.
-- Independently of all of them: today's harness presses the port's keys
-  with Shift, Ctrl and Alt held for 20 ms, where the original gets a key
-  only when it waits and a modifier until it has gone round with it. The
-  port passes anyway, but that is the harness's last timed sleep.
 
 ## What batches have lost time to
 

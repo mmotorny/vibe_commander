@@ -3,7 +3,8 @@
 
 The machine is the one of the tests: FreeDOS booted from its floppy, the
 bench's files on C:, the program with what it reads on D:, and the program
-set up as the tests have it. Its screen is shown in the terminal, which
+set up as the tests have it; only the driver of the tests, which is on the
+floppy, is not loaded. Its screen is shown in the terminal, which
 has to be 80 columns by 25 lines at least, and its keyboard is the
 terminal's. Nothing is kept: the disks are made anew every time.
 
@@ -39,7 +40,7 @@ def machine(workdir, program, country):
     with `program` on drive D:."""
     bench = setups.Bench(workdir / "bench", country)
     floppy = setups._floppy(workdir, COMMANDS, setups.COUNTRIES[country],
-                            setups.KEYBOARDS.get(country)).path
+                            setups.KEYBOARDS.get(country), bench=True).path
     disks = [workdir / "c.img", workdir / "d.img"]
     shutil.copyfile(bench._work, disks[0])
     shutil.copyfile(bench._program_disk(program), disks[1])

@@ -45,9 +45,9 @@ cursor 0 127 lines 6 7 mode 3
 |║em   ║   22BF     1     1 936   KEYB           15 2F                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   2C4F     1     1 216   KEYBDATA                                ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2C9C     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   2C9C     2     5 760   DRIVER.COM     16 28                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   2DFC     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -73,9 +73,9 @@ cursor 0 127 lines 6 7 mode 3
 |║em   ║   22BF     1     1 936   KEYB           15 2F                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   2C4F     1     1 216   KEYBDATA                                ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2C9C     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   2C9C     2     5 760   DRIVER.COM     16 28                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   2DFC     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
-|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1

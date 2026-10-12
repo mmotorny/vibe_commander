@@ -653,7 +653,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ ├                                                                            ║| 1Bx3 3Fx74 1Bx3
 |║ │   ╔═══════════════════════════ Find File ════════════════════════════╗     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ │   ║ A:\␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║ └   ║    fdauto.bat               94   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║ └   ║    fdauto.bat              102   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ ␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ A:\FREEDOS\BIN␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    fasthelp.bat             64   A...    2-09-2022    4:00:48p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -686,7 +686,7 @@ cursor 15 23 lines 6 7 mode 3
 |║                                      ║║fdbanner com│vcursor  com│cp858    v8f║| 1Bx80
 |║                                      ║║fasthelp bat│vdelay   com│cp866    v8f║| 1Bx80
 |║                                      ║║setlang  bat│veach    com│fdwrapup bat║| 1Bx80
-|║                                      ║║welcome  bat│vecho    com│            ║| 1Bx80
+|║                                      ║║welcome  bat│vecho    com│driver   com║| 1Bx80
 |║                                      ║║fdisk    exe│verrlvl  com│            ║| 1Bx80
 |║                                      ║║fdisk    ini│vfdutil  com│            ║| 1Bx80
 |║                                      ║║format   exe│vfont    com│            ║| 1Bx80
