@@ -218,7 +218,9 @@ def listed_symbols(path):
                 continue
             # A name that the assembly declares and a C file defines has a
             # line here too, with the segment that the declaration stands
-            # in and no place in it.
+            # in and no place in it. It ends in "External" while something
+            # of the assembly names the object, and in "*External" once
+            # nothing does: the end of the word is what is held.
             if line.rstrip().endswith("External"):
                 continue
             match = re.match(r"(\S+) [ .]*P Near +([0-9A-F]+) +(\w+) ", line)
