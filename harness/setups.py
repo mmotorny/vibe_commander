@@ -23,7 +23,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import deps
-import turn
 import watch
 from dos import FatImage, Machine, boot_floppy, timestamp
 
@@ -42,9 +41,8 @@ SETUP_FILE = "VC.INI"
 # menu, and those that save the setup.
 CLOCK_KEYS = "F9 o l"
 SAVE_SETUP_KEYS = "Shift+F9 Enter"
-# How long the screen must stand still for DOS when it has booted, or for
-# the original where it cannot be watched while it makes the bench's setup
-# file, to count as finished, in seconds.
+# How long the screen must stand still for DOS when it has booted to count
+# as finished, in seconds.
 SETTLE = 0.5
 
 # The contents of C:\WORK on the test bench, in directory order.
@@ -202,17 +200,11 @@ class Bench:
         original = original_vc()
         disk = self._new_disk("setup.img", original, shipped)
         with self._machine(workdir, disk) as machine:
-            if watch.available(original):
-                watched = watch.Watch(original)
-                watched.wait(machine)
-                machine.resume()
-                machine.press(f"{CLOCK_KEYS} {SAVE_SETUP_KEYS}", watched)
-                watched.wait(machine)
-            else:
-                machine.wait_for_screen(SETTLE)
-                machine.resume()
-                machine.press(f"{CLOCK_KEYS} {SAVE_SETUP_KEYS}")
-                machine.wait_for_screen(SETTLE)
+            watched = watch.Watch(original)
+            watched.wait(machine)
+            machine.resume()
+            machine.press(f"{CLOCK_KEYS} {SAVE_SETUP_KEYS}", watched)
+            watched.wait(machine)
             written = machine.disks["D"]
         # The machine has been shut down: the disk image is complete.
         setup = FatImage(written, workdir, EPOCH,
@@ -289,31 +281,16 @@ def _work_disk(path, workdir):
 class Benches:
     """A bench for each country that is asked for, booted when first used:
     benches[country]. To be used in a `with` statement, which removes them.
-
-    The statement also waits for a turn at the computer, which other
-    checkouts may be running their machines on, and has it until it ends
-    (see turn.py). `alone` says which kind: whether the machines are timed
-    by a still screen, and so must have the computer to themselves, or run
-    a build that signals, or the original, which is watched (see
-    watch.py).
     """
 
-    def __init__(self, alone):
-        self._alone = alone
-
     def __enter__(self):
-        self._turn = turn.taken(self._alone)
-        self._turn.__enter__()
         self._directory = tempfile.TemporaryDirectory()
         self._benches = {}
         self._lock = threading.Lock()
         return self
 
     def __exit__(self, *exc):
-        try:
-            self._directory.cleanup()
-        finally:
-            self._turn.__exit__(*exc)
+        self._directory.cleanup()
 
     def __getitem__(self, country):
         with self._lock:                # scenarios may run side by side

@@ -44,6 +44,7 @@ from one recording to the next, though the screens have not.
 """
 import re
 import struct
+import sys
 import time
 from dataclasses import replace
 
@@ -74,10 +75,20 @@ BLINK_GAP = 3
 
 
 def available(program):
-    """Whether `program` (a setups.Program) can be watched: it is the
-    original, and the listing has been built."""
+    """Whether `program` (a setups.Program) is watched: it is the
+    original."""
     import setups                       # which itself needs this module
-    return program == setups.original_vc() and LISTING.exists()
+    return program == setups.original_vc()
+
+
+def warn_if_guessed(program):
+    """Say so if `program`, a build that does not signal, is not the
+    original either: its steps are then timed by still screens."""
+    if not available(program):
+        print(f"{program.filename} neither signals nor is the original: "
+              "the harness waits for its screen to stand still after "
+              "every step, and on a busy computer that may be before the "
+              "program has finished", file=sys.stderr)
 
 
 class Watch:
@@ -85,6 +96,10 @@ class Watch:
     `watch`."""
 
     def __init__(self, program):
+        if not LISTING.exists():
+            raise MachineError(
+                f"the original cannot be watched without {LISTING}: "
+                "build the project first")
         text = LISTING.read_text(encoding="cp866")
 
         def symbol(name, kind):

@@ -31,7 +31,6 @@ from pathlib import Path
 import deviations
 import scenarios
 import setups
-import watch
 from dos import COLUMNS, CP437_CONTROLS, ROWS, Screen
 
 DIRECTORY = Path(__file__).resolve().parent / "goldens"
@@ -295,8 +294,7 @@ def main():
                         help=", ".join(scenarios.SCENARIOS))
     args = parser.parse_args()
     names = args.scenario or list(scenarios.SCENARIOS)
-    alone = not watch.available(setups.original_vc())
-    with setups.Benches(alone) as benches:
+    with setups.Benches() as benches:
         for name in names:
             derive(name, benches)
 

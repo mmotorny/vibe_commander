@@ -52,8 +52,9 @@ def compare(names, program, signals, trace=False, together=None):
 
     failed = False
     runs = []
-    alone = not signals and not watch.available(program)
-    with setups.Benches(alone) as benches, \
+    if not signals:
+        watch.warn_if_guessed(program)
+    with setups.Benches() as benches, \
             ThreadPoolExecutor(together or TOGETHER) as pool:
         # In the order of `names`, as each is done.
         for name, (run, took) in zip(names, pool.map(one, names)):

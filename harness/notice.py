@@ -132,7 +132,7 @@ def noticed(program, names):
         return goldens.differences(goldens.read(name), run,
                                    {program.filename})
 
-    with setups.Benches(alone=False) as benches, \
+    with setups.Benches() as benches, \
             ThreadPoolExecutor(compare.TOGETHER) as pool:
         report = one(names[0])
         if report:

@@ -366,14 +366,12 @@ Nothing waits without a limit. A program that hangs or resets its machine
 fails its scenario within seconds, with the screen it got stuck on.
 
 A screen that stands still says that the program has finished only on a
-computer that is not busy. The project may be worked on in several
-checkouts on one computer at once, so a run takes a turn before it starts
-its machines (`harness/turn.py`): a run that waits for still screens has
-its turn alone, and runs of the build that signals and of the original
-have theirs together, when no such run has one. A run that
-has to wait says so, and every turn leaves a line in
-`/tmp/vibe-commander/turn.log`: the tool, its checkout, how long it
-waited and how long it had the turn.
+computer that is not busy, so a tool that has to go by one says so when
+it starts. The original is never timed that way: without the listing of
+the build that is laid out like it, which says where to watch, a run of
+the original fails and asks for the build. Nothing keeps runs of the
+harness apart: several checkouts may run their machines on one computer
+at once, and each only gets slower.
 
 ### What ran
 

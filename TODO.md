@@ -273,23 +273,35 @@ Things that are known and not done. Standing instructions are in
 - What still goes by the time of the host, in the harness. The bench
   waits for a still screen when DOS has booted, before it saves the
   machine's state. A build that neither signals nor is the original is
-  timed by still screens throughout. For the port, Shift, Ctrl and Alt are held for 20
-  ms of the host, not until the program has seen them.
+  timed by still screens throughout, and the tools say so. For the port,
+  Shift, Ctrl and Alt are held for 20 ms of the host, not until the
+  program has seen them.
 - A key that a scenario has pressed while the program is busy
   (`Scenario.ahead`, in `find` only) is pressed when the key before it
-  has been taken, and finds the search wherever it has got to. The
-  screens of `find` came out the same every time, but what ran did not:
-  parts of `FndBk`, `FndStuf` and `F67_18`, file offsets 8760-876E,
-  8BB4-8BBE and 8C1D-8C46, are in the committed `find.ran` and were not
-  in a new derivation. Pressing such a key where the search looks for
-  one, at a stop of the debugger there, would settle it. Shift, Ctrl and
-  Alt of such a key are held for 20 ms of the host.
+  has been taken, at no defined moment of the search. The screens of
+  `find` came out the same every time, but what ran did not: parts of
+  `FndBk`, `FndStuf` and `F67_18`, file offsets 8760-876E, 8BB4-8BBE and
+  8C1D-8C46, and others from one time to the next. So `find.ran` was left
+  as it was recorded the old way when the other goldens were derived
+  again. The cure is in the scenario and the harness, not in timing: have
+  the scenario name a place in the search, and the watch press the key
+  when the original reaches it. Shift, Ctrl and Alt of such a key are
+  held for 20 ms of the host.
 - The machine's own clock runs with the host's while the machine runs,
   however much of the processor the machine gets. What the program does
   by its timer, following the cursor to a directory after 0.6 s or
   telling a tap on Alt by three ticks, comes sooner in its work on a busy
-  host. No golden has been seen to change by that. QEMU can count time in
-  instructions executed (`-icount`), which would end it; not tried.
+  host. No golden has been seen to change by that. Put off: QEMU can run
+  its clock by the instructions executed (`-icount`), so that the guest's
+  time no longer follows the host's. To be considered if timing shows up
+  as failures.
+- The `port` test failed once without a cause being found: in
+  `stamps-russia`, after "Down Down Enter", the port's screen was taken
+  with the cursor moved and Enter not yet acted on. Four derivations of
+  goldens ran beside it, and the checkout was in the middle of a rebase,
+  with the harness as it was about to be committed. The next two runs
+  passed. If it is the signals, a W of the key before read after the
+  buffer was seen empty, it would show again under load.
 - `Machine.wait_for_prompt` takes a `>` before the cursor for the prompt
   of DOS. A command that leaves one there before it has finished would
   be taken for it; nothing runs after the program has ended in any
@@ -297,7 +309,7 @@ Things that are known and not done. Standing instructions are in
 - `cmake --build build -j4` failed once in a new checkout, "The object is
   zero length" for one C file. Building without `-j` works.
 - A run of the harness that is killed outright leaves its QEMU running,
-  at full load and outside the turns of `harness/turn.py`.
+  at full load.
 
 - `^R` in a tree panel marks the tree's file as out of date and takes
   what `DelTr0` leaves in AL for the kind of the panel: 1, the one byte

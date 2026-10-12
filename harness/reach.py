@@ -46,7 +46,6 @@ import deps
 import goldens
 import scenarios
 import setups
-import watch
 import show
 
 LISTING = deps.ROOT / "build" / "shareware-layout" / "VC.LST"
@@ -88,7 +87,7 @@ def main():
     if args.steps:
         scenario = scenarios.Scenario("", tuple(args.steps), args.country)
         original = setups.original_vc()
-        with setups.Benches(not watch.available(original)) as benches:
+        with setups.Benches() as benches:
             run = scenarios.run(scenario, original,
                                 benches[args.country], signals=False,
                                 trace=True)

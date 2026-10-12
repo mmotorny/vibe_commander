@@ -123,8 +123,9 @@ def main():
     program = setups.Program.load(args.program) if args.program \
         else setups.original_vc()
     scenario = scenarios.Scenario("", tuple(args.step), args.country)
-    alone = not args.signals and not watch.available(program)
-    with setups.Benches(alone) as benches:
+    if not args.signals:
+        watch.warn_if_guessed(program)
+    with setups.Benches() as benches:
         run = scenarios.run(scenario, program, benches[args.country],
                             args.signals)
     print_screens(scenario.steps, run.screens, setups.codepage(args.country),
