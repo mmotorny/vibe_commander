@@ -571,7 +571,6 @@ ShadFl	EQU	38
 ; and its segment is what the C is told of it. Until Init11 has asked DOS
 ; for the main data there is none: the C does without DS up to there.
 ; What it reads, writes and names of the assembly is made public here.
-	PUBLIC	SecDat
 	PUBLIC	Counter, Vect21, Vect22, Vect27, RelTab
 Init00:	CLD
 	MOV	AX,SS
@@ -689,13 +688,9 @@ Exit:	CallC	Exit_c
 	RETF
 
 ;--------------------- Fatal error ---------------------
-	.DATA
-SecDat	DW	0
-
-	.CODE
 ; C: FatErr of port/main.c, an interrupt function of the compiler's. Its
-; texts and its boxes are C too, port/main_t.c. SecDat stays here, which
-; is where it finds the main data.
+; texts and its boxes are C too, port/main_t.c, and so is SecDat, where
+; it finds the main data.
 
 ;-------------------- Not ready error ------------------
 ;			   AL - Drive letter

@@ -1442,7 +1442,7 @@ void RestVct(void)
 /*--------------------- Fatal error ---------------------
    What port/main_t.c has for it: the texts and the two boxes, with
    Retry and Abort or with Ok alone, which go to Dialog by their offsets.
-   And the assembly: where DS will be on the main data, SecDat. */
+   And the word that says where DS will be on the main data, SecDat. */
 extern const u8 __far Err_S[];
 extern const u8 __far OnDr_S[];
 extern const u8 __far OnDv_S[];
@@ -1549,8 +1549,8 @@ FtErr5:
 }
 
 /* Put DS on the main data. An interrupt function is entered with DS
-   anywhere, and the compiler puts it on its own group, which is the
-   assembly's and where SecDat is: the segment of the main data, which
+   anywhere, and the compiler puts it on its own group, that of the
+   constants, where SecDat is: the segment of the main data, which
    the program asks DOS for when it starts and after every command. C
    has no words for loading a segment register, and the compiler takes
    none for an argument: this is the one instruction. */

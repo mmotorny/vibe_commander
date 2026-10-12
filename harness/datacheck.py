@@ -411,12 +411,12 @@ class Port:
                     ends[segment].append(begin + value)
                     break
         # What the assembly has in the part that stays in the memory is
-        # that part's variables and texts, and the word with the segment
-        # of the main data is a variable too: no constants of the code.
+        # that part's variables and texts: no constants of the code. Nor
+        # are the variables of the C code that have a value in the file,
+        # which the compiler has in a segment of their own, _DATA.
         self.variables = {name for name, (_, kind, segment)
                           in self.assembly.items()
                           if kind == "data" and segment == "RHEAD"}
-        self.variables.add("SecDat")
         for name, (address, kind, segment) in self.assembly.items():
             self.places[name].append(address)
             if kind == "data" and segment not in ("RDATA", "RGAP"):
@@ -446,6 +446,8 @@ class Port:
                 code = compiled.segments[segment][1] in ("CCODE", "RCODE")
                 if code and not re.match(r"_[A-Za-z0-9]", name):
                     continue
+                if compiled.segments[segment][0].endswith("_DATA"):
+                    self.variables.add(name.lstrip("_"))
                 end = min(there for there in offsets[segment]
                           if there > offset)
                 self.objects.append((f"{module}.c", name.lstrip("_"),

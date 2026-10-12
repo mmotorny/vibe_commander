@@ -23,11 +23,11 @@ tables of the commands. Seven files went with the stubs of the commands:
 
 | File | tables | code | goes with |
 |---|---|---|---|
-| `VC.ASM` | 2 / 8 | 143 | `main.c`, `start.c` |
+| `VC.ASM` | 1 / 6 | 143 | `main.c`, `start.c` |
 | `VCMEM.INC` | | 30 | `memory.c` |
 | `VCSUB1.INC` | | 9 | `dialog.c` |
 | `VCSUB3.INC` | | 109 | `treebox.c`, `read.c` |
-| all | 2 / 8 | 291 | |
+| all | 1 / 6 | 291 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -44,9 +44,8 @@ Besides these, all in `VC.ASM`:
   the `EQU` of the colours and the lengths.
 - The macros `CallC` and `MainC`.
 
-The tables are `Main_T`, the three places that the stub of the main loop
-goes on at when the loop returns, and `SecDat`, the word with the segment
-of the main data.
+The table is `Main_T`, the three places that the stub of the main loop
+goes on at when the loop returns.
 
 The code is, by what it is there for:
 
@@ -1216,14 +1215,12 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
       and calls `SetBrk` through a pointer to a far function.
     - `CallPSP` itself, in `VCSUB1.INC`, is of the part that goes.
   - `FatErr`, what DOS calls for a critical error, is C, an interrupt
-    function in `port/main.c`. Its texts and its two boxes are still
-    the assembly's, where `Dialog` reads them, and so is `SecDat`, the
-    word that holds the segment of the main data: `port/start.c`
-    writes it, the stub of `Intr21` reads it, and `FatErr` loads DS
-    from it, by the one instruction of inline assembly there. When no
-    assembly is left, that word wants a home that an interrupt function
-    can read with nothing but its code segment or the compiler's group
-    to go by.
+    function in `port/main.c`, and nothing of it is left in the
+    assembly. Its texts and its two boxes are constants of
+    `port/main_t.c`, and so is `SecDat`, the word that holds the
+    segment of the main data, but that it is a variable:
+    `port/start.c` writes it, and `FatErr` loads DS from it, by the one
+    instruction of inline assembly there.
 - Ported as they are, in `port/start.c`: see the comments of `Init00`
   and `IniData` there. Three of them reach further:
   - The original takes the two panels of a program that starts without
@@ -1456,13 +1453,14 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   - The main data is no storage of the program's but a block that DOS
     gives it: `md` needs no label, only a type at offset 0 of DS,
     `(*(struct MainDat __near *)0)`.
-  - `SecDat`, the word with the main data's segment, can be a variable
-    of the compiled code's own group once the assembly is gone: an
-    interrupt function has DS on that group when it begins, which is
-    how `FatErr` reads the word now. `tools/mkexe.c` refuses static
-    data in the part that goes, because nothing else there has DS on
-    that group; that one word would be the exception, and the group
-    is relocated like any segment of that part.
+  - `SecDat`, the word with the main data's segment, is a variable of
+    the compiler's own group, in `port/main_t.c`: an interrupt function
+    has DS on that group when it begins, which is how `FatErr` reads
+    the word. `tools/mkexe.c` refuses static data in a file of the part
+    that goes that has code, because the code has DS elsewhere; a file
+    without code may have a variable, with a value, so that it is in
+    the file. The group is relocated like any segment of that part,
+    and `port/start.c` writes the word after every command.
   - The texts behind the stack: when `CONST` is gone, a C file of
     constants only, linked first in the part that goes, keeps code
     off the page that the stack ends in.

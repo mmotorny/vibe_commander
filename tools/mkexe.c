@@ -35,15 +35,16 @@
  *
  * It also checks the object files of the compiled code, if they are named:
  * one may hold code, of the part that goes or of the part that stays, or
- * constants, and not both. The program keeps its data in a segment that it
- * allocates when it starts, and has DS there; the constants that its code
- * reads by their names are in the code segment. Static data of the
- * compiler's making, a string literal for example, would be linked to
- * where the program does not look for it. The tables that the program
- * names by their offsets, boxes and dialogs with their texts, are
- * constants of the compiler's own group, which is the assembly's: a file
- * of those has no code that could read them through DS (see
- * port/tables.h).
+ * data of the compiler's group, and not both. The program keeps its data
+ * in a segment that it allocates when it starts, and has DS there; the
+ * constants that its code reads by their names are in the code segment.
+ * Static data of the compiler's making, a string literal for example,
+ * would be linked to where the program does not look for it. The tables
+ * that the program names by their offsets, boxes and dialogs with their
+ * texts, are constants of the compiler's own group, which is the
+ * assembly's: a file of those has no code that could read them through DS
+ * (see port/tables.h), and may have a variable for that reason, with a
+ * value, so that it is in the file.
  *
  * And it checks the linker's map: no segment of compiled code may reach
  * into the last 4K of its 64K. Between the end of a segment and its
@@ -133,9 +134,10 @@ static unsigned char *read_file(const char *path, long *size)
 }
 
 /* Fail if the object file at `path` has anything but code, or anything
-   but constants. The compiler names its code segments by class, here
-   CCODE, and RCODE for the part of the program that stays in the memory;
-   its constants are in the segment CONST2. */
+   but data of the compiler's group. The compiler names its code segments
+   by class, here CCODE, and RCODE for the part of the program that stays
+   in the memory; of its group it has constants in the segment CONST2 and
+   variables that have a value in _DATA. */
 static void check_object(const char *path)
 {
     long size, at = 0;
@@ -172,7 +174,8 @@ static void check_object(const char *path)
             else if (!strcmp(names[class], "CCODE")
                     || !strcmp(names[class], "RCODE"))
                 code = 1;
-            else if (!strcmp(names[name], "CONST2"))
+            else if (!strcmp(names[name], "CONST2")
+                    || !strcmp(names[name], "_DATA"))
                 constants = 1;
             else {
                 fprintf(stderr, "mkexe: %s has %u bytes of static data in "
@@ -184,11 +187,11 @@ static void check_object(const char *path)
         at = end + 1;
     }
     if (code && constants) {
-        fprintf(stderr, "mkexe: %s has code and constants of the "
-                "compiler's group; the code would read them through DS, "
-                "which is on the main data. A constant that only code "
-                "reads is declared CODE; one that is named by its offset "
-                "goes to a file of constants (see port/tables.h)\n", path);
+        fprintf(stderr, "mkexe: %s has code and data of the compiler's "
+                "group; the code would read that through DS, which is on "
+                "the main data. A constant that only code reads is "
+                "declared CODE; one that is named by its offset goes to a "
+                "file of constants (see port/tables.h)\n", path);
         exit(1);
     }
     free(object);

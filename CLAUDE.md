@@ -1002,7 +1002,8 @@ them. The copy may be in another file than the text: `User_S` of
   first thing behind the PSP, in `RHEAD`.
 - An `__interrupt` function of the part that goes has DS on the
   compiler's group when its first statement runs, and that group is the
-  assembly's: its segment, where `SecDat` is. `FatErr` of `port/main.c`
+  assembly's: its segment, where `SecDat` is, a variable of
+  `port/main_t.c`. `FatErr` of `port/main.c`
   reads `SecDat` there as a near word and puts DS on the main data by
   `DataSeg`, a `#pragma aux` of one instruction, `mov ds,ax`, with
   nothing in its `modify` list: DS in a `parm` or a `modify` list is
@@ -1270,8 +1271,10 @@ with it is less obvious:
   Read the `STRUC` in `port/asm/VC.ASM` before taking an offset from a
   C structure.
 - There is no C library. String literals and static variables are refused
-  by `tools/mkexe.c`. A text may be written as a string where it gives an
-  array declared `CODE` its contents: `static const u8 CODE Name_S[] =
+  by `tools/mkexe.c`, but for a variable with a value in a file that
+  has no code: `SecDat` of `port/main_t.c`, the one. A text may be
+  written as a string where it gives an array declared `CODE` its
+  contents: `static const u8 CODE Name_S[] =
   "text";` is in the code segment, with its zero byte. Constants that
   are named by their offsets, boxes and dialogs with their texts, are in
   files of their own, without `CODE`: see "Moving the data of a file to

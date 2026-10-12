@@ -3,7 +3,8 @@
  * that is too old, and the boxes of port/main.c, which are that of DOS's
  * critical error and that of a drive that is not ready. With them the
  * texts and the button that the boxes of every file name: Error, Ok, and
- * the two lines that stand for a text put in.
+ * the two lines that stand for a text put in. And one word that is no
+ * constant: SecDat, where the main data is.
  *
  * From VC.ASM.
  */
@@ -15,6 +16,7 @@
    and Var_S have theirs by port/tables.h, which gives each a near name
    for a file of constants, and no line here. */
 #pragma aux Vers_S "*"
+#pragma aux SecDat "*"
 #pragma aux Err_S "*"
 #pragma aux OnDr_S "*"
 #pragma aux OnDv_S "*"
@@ -32,6 +34,17 @@
    banner. */
 const u8 Title_S[] = "\377\016The Volkov Commander, Version 4.05";
 const u8 Vers_S[] = "\r\nThis program requires DOS 3.20 or later.\r\n";
+
+/* The segment of the main data, which the program asks DOS for when it
+   starts and after every command: port/start.c writes it here. FatErr of
+   port/main.c, which DOS calls with DS anywhere, finds the main data by
+   it: an interrupt function has DS on this group when it begins, and on
+   nothing else that the program could keep a word in. It is the one
+   variable of the group, with a value, 0, for the compiler to put it
+   where the file has contents; tools/mkexe.c allows one in a file like
+   this, which has no code that would read it through DS on the main
+   data. */
+u16 SecDat = 0;
 
 /* The critical error of DOS. The title, of which the box of every error
    is headed, and what goes in front of the text: the drive, whose letter
