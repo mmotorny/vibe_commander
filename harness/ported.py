@@ -335,9 +335,6 @@ BATCHES = [
                     "does not do to a file that it has read",
             0x32B2: "F69_00, for a display that is neither EGA nor VGA: "
                     "the bench has a VGA",
-            0x3373: "F69_00, for the pointer of the mouse below the 25th "
-                    "row when a screen of 50 lines gets 25 again: a step "
-                    "of the mouse names a place among the first 25 rows",
         },
     ),
     Batch(
@@ -528,25 +525,9 @@ BATCHES = [
                   "SeekDsk", "ReadDsk", "DeCode"),
         functions=("Help00_c",),
         unreached={
-            **dict.fromkeys(
-                (0x7B5F, 0x7B60, 0x7B63, 0x7B66, 0x7B68, 0x7B6A, 0x7B6C,
-                 0x7B6E, 0x7B71, 0x7B74, 0x7B77, 0x7B79, 0x7B7B, 0x7B7C,
-                 0x7B7E, 0x7B81, 0x7B82, 0x7B84, 0x7B86, 0x7B87, 0x7B88,
-                 0x7B8C, 0x7B90, 0x7B93, 0x7B94, 0x7B95, 0x7B97, 0x7B9C,
-                 0x7B9E, 0x7BA0, 0x7BA5, 0x7BA7, 0x7BA9, 0x7BAB, 0x7BAC,
-                 0x7BAD, 0x7BAF, 0x7BB1, 0x7BB2, 0x7BB4, 0x7BB7, 0x7BB9,
-                 0x7BBB, 0x7BBD, 0x7BBF, 0x7BC1, 0x7BC4, 0x7BC6, 0x7BC8,
-                 0x7BCA, 0x7BCB, 0x7BCE, 0x7BCF, 0x7BD1, 0x7BD2, 0x7BD5,
-                 0x7BD7, 0x7BD9, 0x7BDC, 0x7BDE, 0x7BE0, 0x7BE1, 0x7BE5,
-                 0x7BE8, 0x7BE9, 0x7BEB, 0x7BEC, 0x7BEF, 0x7BF4, 0x7BF9,
-                 0x7BFB, 0x7BFC, 0x7BFE, 0x7C01, 0x7C03, 0x7C05, 0x7C09,
-                 0x7C0B, 0x7C0F, 0x7C10, 0x7C11, 0x7C13, 0x7C15, 0x7C17,
-                 0x7C19, 0x7C1A, 0x7C1D, 0x7C1E, 0x7C1F, 0x7C21, 0x7C23,
-                 0x7C25, 0x7C28, 0x7C2B, 0x7C2D, 0x7C30, 0x7C31, 0x7C32,
-                 0x7C34, 0x7C36, 0x7C3B, 0x7C41, 0x7C43, 0x7C46, 0x7C47),
-                "Help, for the mouse: a button held where the text is, "
-                "above it or below it, a click on a line of the index "
-                "and one outside the window. The bench has no mouse"),
+            0x7C17: "Help, for a click below the last line of the index: "
+                    "the index has 62 lines, and the window shows 13 of "
+                    "them, or 38 on a screen of 50 lines",
             0x7E26: "SeekDsk, for a file that is not where DOS was asked "
                     "to put it: DOS answers with the place asked for, "
                     "behind the end of the file too",

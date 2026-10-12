@@ -329,6 +329,20 @@ out again (show.py --changes is how):
   - The row of a step may be any of 50: on a screen of 50 lines,
     Alt+F9, "Click@1,49" is F1 of the key bar. The mouse driver stops
     the pointer at the last row that the screen has.
+  - A second click on the same line is one within 0.4 seconds of the
+    first, by the machine's clock, which counts instructions: two
+    clicks of one step are that, and so is the first click of the next
+    step on a line that the step before clicked on. To click a line
+    twice without that, click another in between.
+  - In the help a click on a line of the index puts the cursor there
+    and a second one shows its page. A button that went down on a line
+    and is held above or below the lines moves the cursor, a line for
+    every two times that the program asks where the mouse is:
+    "Click@20,10>20,22*40" is 20 lines. On a page the same holds for a
+    button in the first third of the text or the last, without moving
+    the pointer: "Click@30,16*40". A click outside the window leaves,
+    and so does the middle button anywhere; beside the text in the
+    window a click does nothing. The scenario mouse-help has these.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
@@ -4074,6 +4088,44 @@ SCENARIOS = {
             "Click@30,14 Click@30,14",    # twice on the program: released
             "Alt+F5",                     # gone
             "Click@30,1",                 # outside the box: it closes
+        )),
+
+    "mouse-help": Scenario(
+        "The mouse in the help: a click on a line of the index and a "
+        "second one, a button held above the lines and below them, in "
+        "the first and the last third of a page, beside the text and "
+        "outside the window, the right button and the middle one, and "
+        "the help on a screen of 50 lines",
+        steps=(
+            "F1",
+            "Click@20,10",                # the cursor onto a line
+            "RightClick@30,12",           # and with the right button
+            "Click@20,14*3",              # let go when asked next
+            "Click@20,10>20,22*40",       # held below the lines: 20 down
+            "Click@20,12>20,3*12",        # and above them: six up
+            "Click@20,4",                 # on the title: nothing
+            "RightClick@2,2",             # the right one outside: nothing
+            "Click@30,9 Click@30,9>75,9", # let go beside the line: nothing
+            "Click@30,11 Click@30,11",    # a second click: the page
+            "Click@30,16*40",             # the last third: down to the end
+            "Click@30,8*10",              # the first third: up
+            "Click@30,12",                # between them: nothing
+            "Click@30,12>30,21*4",        # held below the text: down
+            "Click@30,12>30,2*8",         # and above it: up
+            "MiddleClick@30,12",          # the middle button leaves
+            "F1 Right",                   # the cursor on Cancel
+            "Click@30,9 Click@30,9",      # a second click is Cancel then
+            "F1",
+            "Click@2,2",                  # a click outside the window
+            "Alt+F9",                     # 50 lines
+            "Click@1,49",                 # F1 of the key bar
+            "Click@20,30",                # a line below the 25th row
+            "Click@20,10>20,48*20",       # held below the lines
+            "Click@20,43 Click@20,43",    # the page of the last line shown
+            "Click@30,12>30,47*8",        # held below its text
+            "MiddleClick@70,40",
+            "Move@40,40",                 # the pointer on the 41st row
+            "Alt+F9",                     # which 25 lines have not
         )),
 
 }

@@ -191,11 +191,14 @@ Things that are known and not done. Standing instructions are in
   bits: nothing divides by one yet. It was held against a model of its
   steps, not run.
 
-- Of the help, what it does for the mouse has run in no scenario, 105
-  instructions of `Help`: a button held above the text or below it, a
-  click and a second one on a line of the index, the middle button, a
-  click outside the window. The bench has no mouse. It is translated by
-  reading, and listed as out of reach in `harness/ported.py`.
+- Of the help, one instruction for the mouse is listed as out of reach
+  in `harness/ported.py`: a click below the last line of an index that
+  is shorter than the window. The file has one index, of 62 lines. The
+  rest runs in `mouse-help`.
+- A second click on a line of the help's index is Enter, and Enter goes
+  by the button that the cursor of the keys is on: with that on Cancel,
+  after Right, the second click leaves the help instead of showing the
+  page of the line. Ported like that, and in `mouse-help`.
 - The help trusts its file. `DeCode` takes a length of 0 for 65536, so an
   entry whose text has no length would have the whole main data changed,
   byte by byte; an index without lines has Enter take the place of a page
@@ -256,14 +259,11 @@ Things that are known and not done. Standing instructions are in
   them is C, and with it `CmdM01`, `CmdM03` and `CmdM06` of
   `VCFUNC.INC`, by which the keys of the panels go on in three of the
   commands: `port/keys.c` can call the functions then.
-- Of the commands of the menus, three instructions are listed as out
-  of reach: one of EGA lines that keeps the pointer of the mouse on the
-  screen when it is below the 25th row and 50 lines become 25, since a
-  step of the mouse names a place among the first 25 rows, so it is
-  translated by reading; one for a display that is neither EGA nor VGA;
-  and one for a kind of panel that nothing asks for. A step can put
-  the pointer further down on a screen of 50 lines now, "Move@40,40",
-  so the first wants a scenario.
+- Of the commands of the menus, two instructions are listed as out of
+  reach: one for a display that is neither EGA nor VGA, and one for a
+  kind of panel that nothing asks for. The one of EGA lines that keeps
+  the pointer of the mouse on the screen when it is below the 25th row
+  and 50 lines become 25 runs at the end of `mouse-help`.
 - What the commands of the menus do in the original and the port does
   after them; whether to mend any of it is not decided:
   - The configuration and EGA lines end by writing the prompt and
@@ -574,13 +574,13 @@ Things that are known and not done. Standing instructions are in
   a key over when the search comes to a named place, in the original and
   in the port alike: it would have to be told where that is in each, as
   it is told where `LeaveTm` is.
-- The bench has a mouse now, and three scenarios use it: `mouse-panel`,
-  `mouse-bars` and `mouse-dialog`. With them 349 of the instructions
-  that `harness/ported.py` listed as out of reach for the mouse run in
-  the original, and their C in the port, and are off the lists. Some 800
-  are still listed, with reasons that end in "the bench has no mouse",
-  which is no reason any more: each place wants a scenario, or the true
-  reason why none gets there. By the file of the port that has them:
+- The bench has a mouse now, and scenarios use it: `mouse-panel`,
+  `mouse-bars` and `mouse-dialog`, with which 349 of the instructions
+  that `harness/ported.py` listed as out of reach for the mouse came off
+  the lists, and `mouse-help`, with 104 more. The others are still
+  listed, with reasons that end in "the bench has no mouse", which is
+  no reason any more: each place wants a scenario, or the true reason
+  why none gets there. By the file of the port that has them:
   - `treebox.c`, 93: `ChTree`, a button held on a line of the tree,
     above the lines or below them, a second click on a line, a click
     outside the box.
@@ -590,8 +590,6 @@ Things that are known and not done. Standing instructions are in
     window, a button held above it or below it. `mouse-list` runs 36
     of its instructions: the click that opens the editor on dirinfo
     has the button still down when the editor asks.
-  - `help.c`, 105: a button held in the text, above it or below it, a
-    click on a line of the index and one outside the window.
   - `find.c`, 96: `FndMove`, the list of the file search.
   - `dialog.c`, 2: `mouse-fields`, `mouse-line` and `mouse-filter` have
     the fields of a dialog. Left are the middle button, and a button
