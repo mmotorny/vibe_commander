@@ -175,11 +175,15 @@ out again (show.py --changes is how):
     nothing is pending, and the main data is new memory when the
     program starts and after every command of DOS, until the main loop
     has set AutoTim once. A box that comes up before that, while the
-    panels are drawn for the first time, gets no key and the step never
-    ends: "b:" as a command leaves the program at "Insert diskette for
-    drive B:" for the five minutes of STEP_TIME. To see where a step is
-    stuck without waiting that long, run show.py with STEP_TIME set to
-    a few seconds: the error has the screen.
+    panels are drawn for the first time, finds a time there that will
+    not come: "b:" as a command leaves the program at "Insert diskette
+    for drive B:". The driver believes a time for two seconds of the
+    machine's and then hands the box its key, one of the same step too:
+    see diskette-command. The floppy drive made A: again by a command,
+    "a:", is asked for by DOS itself, which takes any key.
+  - A step that the program does not get through fails after the five
+    minutes of STEP_TIME, with the screen it stopped on. To try steps
+    out, give show.py or reach.py a shorter limit: "--limit 10".
   - The program run from its own command line, "d:\\vc\\vc", is a second
     copy of whichever program is tested, and what follows the name is a
     command that the copy runs before it shows its panels; F10 and Enter
@@ -958,7 +962,7 @@ clock on or by listing a file it has made, has to be done with that
 before the machine's first minute is over. The original shows its first
 screen 9.6 seconds past noon and the port 9.9; `copy`, of 68 steps, ends
 26.9 seconds past noon in the original and 28.1 in the port, and
-`delete`, of 63, 25.8 and 28.5: the port has taken up to a sixth longer.
+`delete`, of 63, 25.8 and 28.6: the port has taken up to a sixth longer.
 """
 import tempfile
 from dataclasses import dataclass, field
@@ -1700,6 +1704,24 @@ SCENARIOS = {
             "Esc",                        # which cannot be read
             "c",
             "Enter",                      # so it shows C: instead
+        )),
+
+    "diskette-command": Scenario(
+        "A box that comes up before the main loop has run: the floppy "
+        "drive by its second letter as a command of DOS, after which the "
+        "panels are drawn anew and the program asks for the diskette; "
+        "answered in a step of its own, and by a key that the step of the "
+        "command has behind it",
+        steps=(
+            '"b:"',
+            "Enter",                      # the command: Insert diskette
+                                          # for drive B:
+            "Enter",                      # Ok: the panels show B:
+            '"a:" Enter Esc',             # back: DOS asks for the diskette
+                                          # itself, and takes any key
+            '"b:" Enter Esc',             # and again, not given: the disk
+                                          # cannot be read
+            "Esc",                        # given up: an empty panel
         )),
 
     "second-copy": Scenario(
@@ -4714,7 +4736,7 @@ SCENARIOS = {
 
 
 def run(scenario, program, bench, trace=False, blinking=False,
-        stack=False):
+        stack=False, limit=STEP_TIME):
     """Run `scenario` on `program` (a setups.Program) and return the Run.
 
     `bench` is the setups.Bench for the scenario's country. The driver of
@@ -4728,7 +4750,9 @@ def run(scenario, program, bench, trace=False, blinking=False,
     a screen with the program's clock on is recorded in both its states,
     which takes a second of the machine's time for each. With `stack`, how
     much of its stack the program never used is recorded (see
-    driver.stack_left).
+    driver.stack_left). `limit` is for how many seconds the driver may
+    write nothing before the program counts as stuck: STEP_TIME for a
+    test, and less where steps are tried out (see show.py).
     """
     steps = ("",) + scenario.steps
     known = driver.facts(program, stack)
@@ -4739,13 +4763,13 @@ def run(scenario, program, bench, trace=False, blinking=False,
         with bench.start(workdir, program, script, log) as machine:
             machine.resume()
             try:
-                machine.wait_for_end(STEP_TIME)
+                machine.wait_for_end(limit)
             except MachineError:
                 done = len(driver.read(machine.written())[0])
                 shown = "\n".join(machine.screen().lines())
                 raise MachineError(
                     f"after {_where(steps, done)}: the program did not "
-                    f"come to wait for a key within {STEP_TIME} s; it "
+                    f"come to wait for a key within {limit} s; it "
                     f"shows\n{shown}") from None
             done, ended = driver.read(machine.written())
             disks = machine.disks

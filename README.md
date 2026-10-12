@@ -372,13 +372,15 @@ is how to find out what keys do before writing them into a scenario. With
 `--changes` it prints of each screen only the rows that differ from the
 one before, which is most of what there is to see; rows that are again as
 they were after an earlier step, as when a dialog closes, it names in a
-line.
+line. A step that the program does not get through ends the run after
+five minutes, as in a test, or after `--limit SECONDS`, with the screen
+it stopped on.
 
 `python3 harness/reach.py ROUTINE...` says of each routine of the original
 how many of its instructions some scenario has run and which are left, by
 their addresses, in a line; with `--list` it prints those that are left as
 the listing has them. With `--steps` it says which of them some steps
-would reach.
+would reach, and takes `--limit` like `show.py`.
 
 `python3 harness/notice.py FILE OLD NEW` makes one change to a copy of the
 port, builds it, and says which scenario notices, or that none does. That
@@ -489,7 +491,9 @@ as `find` does of a search, the key is written as one name with the key
 that starts the work, "Enter+Home": the two go into the buffer together.
 A step is finished when the program has gone round twice with no key left
 and nothing that it will do by itself after a while, which the driver
-reads in the program's own data. The driver then writes the screen, with
+reads in the program's own data: a time of day, which it believes for two
+seconds, since the program's data holds no time that means anything
+until the main loop has run. The driver then writes the screen, with
 the cursor, to a port that QEMU keeps in a file, and goes on with the
 next step; after the last it resets the machine, which ends QEMU. The
 host starts the machine and reads the file and the disks afterwards.

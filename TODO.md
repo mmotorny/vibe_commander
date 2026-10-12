@@ -830,24 +830,6 @@ Things that are known and not done. Standing instructions are in
   found; what the routines they call read was not followed. After the
   speed search, which goes on without `Func05`, the stub hands on BX,
   DX, SI and CX as the assembly left them.
-- A box that is drawn before the main loop has set `AutoTim` gets no
-  key from the driver of the tests, and its step never ends. The main
-  data is memory newly asked for when the program starts and after
-  every command of DOS, and `AutoTim` there is whatever that memory
-  holds until `Func10` writes it, once the panels have been drawn. The
-  driver reads `AutoTim` every time the program idles, and while its low
-  word is not 0FFFFh it takes the program to have something pending,
-  counts no idle round and hands over no key. So it was with `b:` run
-  as a command from the program's command line: back from DOS the
-  panels are drawn, the current drive is the floppy's second letter,
-  and "Insert diskette for drive B:" stands on the screen with the
-  driver silent, until the 300 seconds of `STEP_TIME` are over; Esc or
-  Enter put behind the command in the same step are not handed over
-  either. The same would hold for the box of a drive that is not ready
-  and for a critical error of DOS while the panels are first drawn.
-  A box that comes up when the panels are drawn again later, as in
-  `not-ready`, is answered like any other: `AutoTim` is 0FFFFh from
-  the last time round.
 - What the program does by the hundredths of the time of day is the
   same every time a scenario is run with the same program, but need not
   be the same in the port, which gets to a step some instructions later

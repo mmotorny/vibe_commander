@@ -20,6 +20,19 @@
 ; round twice like that with nothing left to take and nothing that it will
 ; do by itself after a while (AutoTim): the screen is then written out.
 ;
+; AutoTim is a time of day, or FFFFh in its low word for none: the program
+; sets it when the cursor of a tree has moved, to 0.6 seconds from then as
+; it is distributed, and goes to the directory when that time has come. It
+; says nothing until the main loop has set it once. The main data is new
+; memory when the program starts and after every command of DOS, and a box
+; that comes up while the panels are drawn for the first time, for a
+; diskette that is to be put in, finds in AutoTim what that memory held:
+; as a rule a time that will not come. So the driver believes a time for
+; 2 seconds from when it first saw it there, and after that takes it for
+; none, also when it finds the same there again later: new memory holds
+; after the next command what it held after the last, and the program
+; does not come to set the same hundredth of a second twice.
+;
 ; The script is on a hard disk of its own, which has no file system and is
 ; known by the two bytes it begins with, from its first sector on:
 ;
@@ -88,6 +101,7 @@ Cells	EQU	4000			; Bytes of an 80 x 25 text screen
 Events	EQU	18			; Where the events begin in a script
 Rounds	EQU	2			; Idle rounds that end a step
 Blink	EQU	20			; Ticks to look for what blinks: 1.1 s
+Soon	EQU	37			; Ticks for which AutoTim is believed
 FileLen	EQU	2048			; Bytes of the driver's file
 SecBuf	EQU	100h + FileLen		; Behind it in memory: a sector of
 Last	EQU	SecBuf + 512		; the script, and Cells bytes of screen
@@ -125,6 +139,11 @@ HClock	dw	0FFFFh
 HStack	dw	0
 HStLen	dw	0
 HName	db	8 dup (0)
+
+; The time that AutoTim was last seen to hold, and the tick at which it
+; was first seen to hold that.
+PTime	dw	0FFFFh, 0FFFFh
+PTick	dw	0
 
 ; The packet for INT 13h, AH=42h: one sector to SecBuf.
 Packet	db	10h, 0
@@ -561,7 +580,24 @@ I28A:	popf
 	je	I28B
 	cmp	word ptr [bx],0FFFFh
 	je	I28B
-	pop	bx
+	mov	ax,[bx]			; A time: one that was seen there?
+	cmp	ax,cs:PTime
+	jne	I28G
+	mov	ax,[bx+2]
+	cmp	ax,cs:PTime+2
+	jne	I28G
+	call	Ticks			; For how long has it been?
+	sub	ax,cs:PTick
+	cmp	ax,Soon
+	ja	I28B			; Too long to be a time that comes
+	jmp	I28H
+I28G:	mov	ax,[bx]			; Another: it is believed from now
+	mov	cs:PTime,ax
+	mov	ax,[bx+2]
+	mov	cs:PTime+2,ax
+	call	Ticks
+	mov	cs:PTick,ax
+I28H:	pop	bx
 	mov	cs:Idles,0
 	jmp	I28X
 I28B:	pop	bx

@@ -22,11 +22,20 @@ A screen is 25 rows, and most of what a key does is in a few of them:
                                         line the rows that are as they
                                         were after an earlier step
     show.py --last F9 o Enter           only the screen after the last step
+
+A step that the program does not get through, because it waits for a key
+that the step has not, or hangs, ends the run when nothing has come of it
+for five minutes, as in a test, and the screen it stopped on is printed.
+For trying steps out that is long:
+
+    show.py --limit 10 F5 Enter         give a step up after 10 seconds
 """
 import argparse
+import sys
 
 import scenarios
 import setups
+from dos import MachineError
 
 # With --changes, how many rows have to be as they were after an earlier
 # step for them to be named in a line instead of printed.
@@ -35,7 +44,7 @@ AGAIN = 3
 
 def add_arguments(parser):
     """Give `parser` the options that say how much of the screens to
-    print."""
+    print, and how long a step may take."""
     parser.add_argument("--changes", action="store_true",
                         help="print of each screen only the rows that "
                              "differ from the screen before, numbered,\n"
@@ -44,6 +53,21 @@ def add_arguments(parser):
                              "were after an earlier step")
     parser.add_argument("--last", action="store_true",
                         help="print only the screen after the last step")
+    parser.add_argument("--limit", type=float, metavar="SECONDS",
+                        default=scenarios.STEP_TIME,
+                        help="give a step up when nothing has come of it "
+                             "for so long, and print the\nscreen it "
+                             f"stopped on (default: {scenarios.STEP_TIME}, "
+                             "as in a test)")
+
+
+def run(scenario, program, bench, limit, **how):
+    """scenarios.run(), ending the tool with what it says of a step that
+    the program did not get through."""
+    try:
+        return scenarios.run(scenario, program, bench, limit=limit, **how)
+    except MachineError as error:
+        sys.exit(str(error))
 
 
 def print_screens(steps, screens, codepage, changes=False, last=False):
@@ -120,8 +144,9 @@ def main():
         else setups.original_vc()
     scenario = scenarios.Scenario("", tuple(args.step), args.country)
     with setups.Benches() as benches:
-        run = scenarios.run(scenario, program, benches[args.country])
-    print_screens(scenario.steps, run.screens, setups.codepage(args.country),
+        made = run(scenario, program, benches[args.country], args.limit)
+    print_screens(scenario.steps, made.screens,
+                  setups.codepage(args.country),
                   args.changes, args.last)
 
 

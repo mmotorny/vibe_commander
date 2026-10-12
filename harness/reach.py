@@ -37,6 +37,8 @@ new scenario. That takes most of a second for every step.
     reach.py NgLine --steps F1 --screens        and print the screens
     reach.py NgLine --steps F1 --changes        or of each only the rows
                                                 that changed (see show.py)
+    reach.py NgLine --steps F1 --limit 10       give a step up after 10
+                                                seconds, not five minutes
 
 The routines are found in the listing of the build that is laid out like
 the original, build/shareware-layout/VC.LST, which has to be built first.
@@ -91,8 +93,8 @@ def main():
         scenario = scenarios.Scenario("", tuple(args.steps), args.country)
         original = setups.original_vc()
         with setups.Benches() as benches:
-            run = scenarios.run(scenario, original,
-                                benches[args.country], trace=True)
+            run = show.run(scenario, original, benches[args.country],
+                           args.limit, trace=True)
         tried = set(run.executed)
         if args.screens or args.changes or args.last:
             show.print_screens(scenario.steps, run.screens,
