@@ -12,8 +12,8 @@
  * panels and the box of the drives go on in some of them. A command is a
  * function here that the stub at its label calls, with the panel that the
  * assembly has in DS and with CX as the menu or the key left it, and what
- * it returns says where the program goes on: see FUNC04 below, and MnuEnd
- * in port/asm/VCMENU.INC.
+ * it returns says where the program goes on: see MNU_FUNC04 in vc.h, and
+ * MnuEnd in main.c.
  *
  * A command of the Left or the Right menu gets that menu's panel, and
  * finds the current one on the stack, where the bar's stub has pushed it;
@@ -25,82 +25,11 @@
  */
 #include "vc.h"
 
-/* A command: `panel` is what the assembly has in DS, `item` what it has
-   in CX, from the menu bar the menu in the low byte and the item in the
-   high one. Each takes of the two what it reads. */
-u16 M01_00(u16 panel, u16 item);
-u16 M01_01(u16 panel, u16 item);
-u16 M03_00(u16 panel, u16 item);
-u16 M06_00(u16 panel, u16 item);
-u16 M06_10(u16 panel, u16 item);
-u16 M08_00(u16 panel, u16 item);
-u16 M16_00(u16 panel);
-u16 M16_01(u16 panel);
-u16 M16_10(u16 panel);
-u16 M21_00(void);
-u16 M41_00(void);
-u16 M42_00(u16 panel);
-u16 F69_00(u16 item);
-u16 M49_00(u16 panel);
-u16 M60_00(void);
-u16 M61_00(void);
-u16 M53_00(u16 item);
-u16 M62_00(u16 item);
-u16 M63_00(u16 item);
-u16 M64_00(u16 item);
-u16 M66_00(u16 panel);
-u16 M67_00(u16 panel);
-u16 M69_00(u16 panel);
-u16 M70_00(u16 panel);
-u16 M71_00(u16 panel);
-u16 M72_00(u16 panel);
-u16 M73_00(u16 panel);
-u16 M75_00(u16 panel);
-
-/* How the assembly passes arguments to these, and what it expects back:
-   the stubs go on with CX and DS as they were. */
-#pragma aux M01_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M01_01 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M03_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M06_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M06_10 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M08_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M16_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M16_01 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M16_10 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M21_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux M41_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux M42_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F69_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M49_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M60_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux M61_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux M53_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M62_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M63_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M64_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M66_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M67_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M69_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M70_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M71_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M72_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M73_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M75_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-
-/* Where the program goes on after a command: the numbers of MnuNx_T in
-   port/asm/VCMENU.INC. */
-enum {
-    FUNC04,                             /* back to the panels as they are:
-                                           the menu bar is drawn first */
-    INIT50,                             /* draw the panels again, reading
-                                           those that have changed */
-    F24_01,                             /* have DOS go to the directory at
-                                           TmpBuf, and read the panels */
-    V00_01                              /* edit the file ViewFil, with the
-                                           menu marked that the command
-                                           came from */
-};
+/* The commands are declared in vc.h, see "The commands" there: `panel`
+   is what the assembly has in DS, `item` what it has in CX, from the menu
+   bar the menu in the low byte and the item in the high one, and each
+   takes of the two what it reads. What one returns is where the program
+   goes on, a MNU_ of vc.h. */
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. F20_02 makes the other
@@ -297,7 +226,7 @@ u16 M06_10(u16 panel, u16 item)
         PutMnu(item);
         TstInfo(panel);
     }
-    return INIT50;
+    return MNU_INIT50;
 }
 
 /* M03_05: the panel is to be on, with its menu marked meanwhile. */
@@ -328,7 +257,7 @@ u16 M01_01(u16 panel, u16 item)
     HidCur();
     if (wcb->WinTyp != 0) {
         if (panel == md.WCBcrn && M02_10(panel))
-            return INIT50;
+            return MNU_INIT50;
         wcb->WinTyp = 0;
         wcb->ChgFlg = 1;
     }
@@ -374,7 +303,7 @@ u16 M03_00(u16 panel, u16 item)
         if (panel == md.WCBcrn) {
             other = InvWCB(panel);
             if (FilePan(other) && M02_10(other))
-                return FUNC04;
+                return MNU_FUNC04;
         }
         if (wcb->WinTyp != kind)
             wcb->Ctrl_L = wcb->WinTyp;
@@ -410,7 +339,7 @@ u16 M06_00(u16 panel, u16 item)
         PtFs00(current);
     }
     Window(0, (u16)md.Lines << 8 | 80);
-    return FUNC04;
+    return MNU_FUNC04;
 }
 
 /* M16_01: the dialog of a panel's filter, whose fields are in the panel's
@@ -419,7 +348,7 @@ u16 M06_00(u16 panel, u16 item)
 u16 M16_01(u16 panel)
 {
     if ((u8)Dialog(OFFSET(Filt_B), 0, 0, 0, panel) != 0)
-        return FUNC04;
+        return MNU_FUNC04;
     return M16_11(panel);
 }
 
@@ -427,7 +356,7 @@ u16 M16_01(u16 panel)
 u16 M16_00(u16 panel)
 {
     if (!FilePan(panel))
-        return FUNC04;
+        return MNU_FUNC04;
     return M16_01(panel);
 }
 
@@ -438,7 +367,7 @@ u16 M16_10(u16 panel)
     struct WCBdef __far *wcb = PANEL(panel);
 
     if (!FilePan(panel))
-        return FUNC04;
+        return MNU_FUNC04;
     wcb->Hidden = wcb->Hidden == 0;     /* InvVar */
     return M16_11(panel);
 }
@@ -448,7 +377,7 @@ u16 M16_10(u16 panel)
 u16 M21_00(void)
 {
     Help00();
-    return FUNC04;
+    return MNU_FUNC04;
 }
 
 /* Alt-F10: the tree in a box, to go to the directory that is chosen
@@ -458,8 +387,8 @@ u16 M41_00(void)
     PutMnu(3);
     md.HlpPage = 28;
     if (ChTree(16))
-        return INIT50;
-    return F24_01;
+        return MNU_INIT50;
+    return MNU_F24_01;
 }
 
 /* Alt-F6: the sizes of the directories of the current panel, if that
@@ -481,7 +410,7 @@ u16 M42_00(u16 panel)
         ResWin(where.begin, where.size, where.saved);
         Window(where.begin, where.size);
     }
-    return INIT50;
+    return MNU_INIT50;
 }
 
 /* M60_02: the prompt written again, and the panels drawn again if the
@@ -496,8 +425,8 @@ static u16 M60_02(u16 panel)
 {
     PutPrm(panel);
     if (PANEL(panel)->Visible == 0)
-        return FUNC04;
-    return INIT50;
+        return MNU_FUNC04;
+    return MNU_INIT50;
 }
 
 /* Alt-F9: the screen with as many lines as an EGA or a VGA has for the
@@ -521,7 +450,7 @@ u16 F69_00(u16 item)
     u16 *to;
 
     if (md.TstEGA == 0)
-        return FUNC04;
+        return MNU_FUNC04;
     Quit();
     ClsLine((u16)md.DosLin << 8, MAIN_SEG);
     SavMous();
@@ -629,15 +558,15 @@ u16 M49_00(u16 panel)
     u16 other, marked;
 
     if (!FilePan(panel))
-        return FUNC04;
+        return MNU_FUNC04;
     other = InvWCB(panel);
     if (!FilePan(other))
-        return FUNC04;
+        return MNU_FUNC04;
     marked = M49_10(other, 0);
     marked = M49_10(panel, marked);
     if (marked == 0) {
         Dialog(OFFSET(CmpDi_B), 0, 0, 0, panel);
-        return FUNC04;
+        return MNU_FUNC04;
     }
     return M60_02(panel);
 }
@@ -660,7 +589,7 @@ u16 M60_00(void)
     md.TmpBuf[2] = delay;
     md.TmpBuf[3] = delay;
     if ((u8)Dialog(OFFSET(Conf_B), OFFSET(Chk1_S), 0, 0, MAIN_SEG) != 0)
-        return FUNC04;
+        return MNU_FUNC04;
     md.ColTyp = md.TmpBuf[0];
     md.BlDelay = Delay_T[md.TmpBuf[2]];
     ResUser(0, (u16)(u8)(md.Lines - 2) << 8 | 80);
@@ -673,7 +602,7 @@ u16 M60_00(void)
 u16 M61_00(void)
 {
     Dialog(OFFSET(Sets_B), OFFSET(Chk2_S), 0, 0, MAIN_SEG);
-    return FUNC04;
+    return MNU_FUNC04;
 }
 
 /* M64_02: ask whether the main file of the name at `name` is meant, the
@@ -699,7 +628,7 @@ static u16 M64_02(u16 item, u16 name, u16 title, u16 include, u16 page)
         md.TmpBuf[i] = from[i];
     answer = Dialog(OFFSET(MnLoc_B), include, 0, 0, MAIN_SEG) & 0xFF;
     if (answer >= 2)
-        return FUNC04;
+        return MNU_FUNC04;
     from = AT(code, name);
     for (i = 0; i < 13; i++)
         md.TmpBuf[i] = from[i];
@@ -709,7 +638,7 @@ static u16 M64_02(u16 item, u16 name, u16 title, u16 include, u16 page)
     for (i = 0; i < LenStr; i++)
         md.ViewFil[i] = md.TmpBuf[i];
     md.ViewFil[LenStr] = 0;
-    return V00_01;
+    return MNU_V00_01;
 }
 
 /* Menu file edit, of the Commands menu. */
@@ -800,5 +729,5 @@ u16 M75_00(u16 panel)
         if (HIGH(answer) != 0 && LOW(answer) != ERR_NOT_READY)
             Dialog(OFFSET(SetEr_B), 0, 0, 0, panel);
     }
-    return FUNC04;
+    return MNU_FUNC04;
 }

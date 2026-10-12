@@ -535,10 +535,91 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors);
 #pragma aux PutTree "*_c" __far parm [ax] [bx] [dx] [es si] modify exact [ax es]  /* tree.c */
 void PutInf(u16 panel);                                 /* info.c */
 #pragma aux PutInf  "*_c" __far parm [ax] modify exact [ax]
-/* Where a command goes on when it is done. A command is entered by a
-   jump, from the table of the keys or from a menu, and jumps on; one that
-   is C returns one of these, and its stub in the assembly jumps there
-   (F1Next in port/asm/VCF1.INC). */
+/* Where a box is on the screen, as DialBox says it: what the assembly
+   has in BX, DX and SI then. */
+struct Box {
+    u16 begin;                          /* the row in the high byte */
+    u16 size;                           /* the rows in the high byte */
+    u16 saved;                          /* where what it covers is kept */
+};
+
+/*
+ * The commands.
+ *
+ * A command is what a key or an item of a menu does. In the original it
+ * is no routine: the main loop jumps to it by the table of the keys and
+ * the menu bar by the tables of the menus, with the current panel in DS,
+ * and it ends by jumping back to one of several places of the loop, or on
+ * into another command. Here a command is a function that returns where
+ * the program goes on, and the loop, MainLoop of main.c, calls it from a
+ * `switch` and goes on from what it returns. A function takes of what the
+ * original has in its registers at the jump only what the command reads,
+ * the panel as a rule.
+ *
+ * The commands are of four families, each with its own places to go on
+ * at, which is how the original's files have them.
+ */
+
+/* Where the program goes on after a command of the keys of the panels,
+   of keys.c, enter.c and view.c, in the low byte of what it returns. The
+   routines of a panel's menu take a panel, in the high word, and a byte,
+   the high byte of the low word: for M03_00 five less the kind of panel,
+   and for M06_00 the place in the menu bar that is lit meanwhile. */
+enum {
+    NEXT_FUNC07,                        /* wait for the next key */
+    NEXT_FUNC05,                        /* first save the setup, if it has
+                                           changed and is saved by itself */
+    NEXT_FUNC04,                        /* first draw the menu bar */
+    NEXT_FUNC01,                        /* first draw the current panel
+                                           and put the screen buffer on
+                                           the screen */
+    NEXT_INPUT,                         /* F73_00: the key goes to the
+                                           command line */
+    NEXT_EARLIER,                       /* F25_00: the command before in
+                                           the history */
+    NEXT_LATER,                         /* F26_00: the one after */
+    NEXT_INIT40,                        /* find the command line again
+                                           and draw everything */
+    NEXT_INIT50,                        /* draw the panels again, reading
+                                           those that have changed */
+    NEXT_M01_01,                        /* the menu's routine that makes a
+                                           panel one of files, in the order
+                                           and the form it has */
+    NEXT_M03_00,                        /* that makes one the tree or the
+                                           Info */
+    NEXT_M06_00,                        /* that switches one off or on */
+    NEXT_POP_FUNC04,                    /* FUNC04 and FUNC05, where the
+                                           original takes off its stack the
+                                           panel that it has put there for
+                                           the menu's routines */
+    NEXT_POP_FUNC05,
+    NEXT_INIT11,                        /* start over from what F21_30 has
+                                           saved in the part of the program
+                                           that stays in the memory */
+    NEXT_EXEC,                          /* and first have that part run
+                                           the commands saved there */
+    NEXT_VIEW,                          /* V00_00: the viewer on the file
+                                           ViewFil, or with 1 in the high
+                                           word the editor */
+    NEXT_DIRINFO,                       /* V00_02: the editor in the window
+                                           of an Info panel */
+    NEXT_EXIT                           /* leave the program */
+};
+
+/* After a command of the menus, of commands.c. */
+enum {
+    MNU_FUNC04,                         /* back to the panels as they are:
+                                           the menu bar is drawn first */
+    MNU_INIT50,                         /* draw the panels again, reading
+                                           those that have changed */
+    MNU_F24_01,                         /* have DOS go to the directory at
+                                           TmpBuf, and read the panels */
+    MNU_V00_01                          /* edit the file ViewFil, with the
+                                           menu marked that the command
+                                           came from */
+};
+
+/* After a command of dirfunc.c, and after the file search. */
 #define TO_FUNC04 0                     /* back to the panels as they are */
 #define TO_FNCSEL 1                     /* have what FncAddr names called
                                            for what is selected, or for
@@ -550,31 +631,276 @@ void PutInf(u16 panel);                                 /* info.c */
                                            another: of F67_00 only, which
                                            hands back the panel too */
 
-/* Where the program goes on after a command of the keys. Such a command
-   is entered by a jump from the main loop, which is still assembly, and
-   jumps back to one of several places of it, or on into another command.
-   In C it is a function that gets the panel which the assembly has in DS
-   and returns where to go on in the low byte: its stub jumps there by the
-   table CmdNx_T of port/asm/VCFUNC.INC. These are the places of that
-   table for the commands of enter.c and view.c; keys.c has those of its
-   own commands, the first fourteen, by other names. */
-#define NEXT_FUNC05   1                 /* wait for the next key, once the
-                                           setup has been saved if it has
-                                           changed and is saved by itself */
-#define NEXT_FUNC04   2                 /* first draw the menu bar */
-#define NEXT_INIT50   8                 /* draw the panels again, reading
-                                           those that have changed */
-#define NEXT_INIT11  14                 /* start over from what F21_30 has
-                                           saved in the part of the program
-                                           that stays in the memory */
-#define NEXT_EXEC    15                 /* and first have that part run
-                                           the commands saved there */
-#define NEXT_VIEW    16                 /* V00_00: the viewer on the file
-                                           ViewFil, or with 1 in the high
-                                           word the editor */
-#define NEXT_DIRINFO 17                 /* V00_02: the editor in the window
-                                           of an Info panel */
-#define NEXT_EXIT    18                 /* leave the program */
+/* After Copy and Rename, of copy.c, in the low word of what they return.
+   With GO_MASKED the high word is the title of the boxes. */
+#define GO_KEYS     0                   /* Func04: the next key */
+#define GO_PANELS   1                   /* Init50: the panels drawn anew */
+#define GO_SELECTED 2                   /* FncSel: C00_00 for every file
+                                           that is selected */
+#define GO_MASKED   3                   /* FncMas: for those of a mask */
+#define GO_DONE     4                   /* FncExt: the panels drawn anew
+                                           if something was written */
+
+/* The keys of the panels, keys.c: `panel` is the current panel. F00_60,
+   F00_05 and F01_05 are where the mouse comes in, with the numbers of the
+   cursor's entry, of the first one shown and of the last one there is,
+   and with its buttons; F76_01 and F17_01 where the menus do, F17_01 with
+   the panel of the menu. */
+u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons);
+u32 F00_00(u16 panel);
+u32 F00_05(u16 panel, u16 cursor, u16 first, u16 buttons);
+u32 F01_00(u16 panel);
+u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons);
+u32 F02_00(u16 panel);
+u32 F03_00(u16 panel);
+u32 F04_00(u16 panel);
+u32 F05_00(u16 panel);
+u32 F06_00(u16 panel);
+u32 F07_00(u16 panel);
+u32 F08_00(u16 panel);
+u32 F76_00(u16 panel);
+u32 F76_01(u16 panel);
+u32 F09_00(u16 panel);
+u32 F10_00(u16 panel);
+u32 F78_00(u16 panel);
+u32 F11_00(u16 panel);
+u32 F12_00(u16 panel);
+u32 F13_00(void);
+u32 F14_00(void);
+u32 F15_00(u16 panel);
+u32 F16_00(void);
+u32 F17_01(u16 panel);
+u32 F79_00(u16 panel);
+u32 F18_00(u16 panel);
+u32 F20_00(u16 panel);
+#pragma aux F00_60 "*_c" __far parm [ax] [si] [di] [cx] value [dx ax] modify exact [ax dx]
+#pragma aux F00_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F00_05 "*_c" __far parm [ax] [si] [di] [cx] value [dx ax] modify exact [ax dx]
+#pragma aux F01_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F01_05 "*_c" __far parm [ax] [si] [di] [dx] [cx] value [dx ax] modify exact [ax dx]
+#pragma aux F02_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F03_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F04_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F05_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F06_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F07_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F08_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F76_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F76_01 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F09_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F10_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F78_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F11_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F12_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F13_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F14_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F15_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F16_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F17_01 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F79_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F18_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F20_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+
+/* Enter, the directory changed and the history, enter.c. F21_10 is Enter
+   on the entry under the cursor, F21_25 a command of the command line
+   run, F21_31 the program started over to run what DosBuf holds; F24_01
+   goes to the directory whose path is at `path` in the main data, and
+   F24_02 has the current panel show the directory that DOS is in. */
+u32 F21_00(u16 panel);
+u32 F21_10(u16 panel);
+u32 F21_25(void);
+u32 F21_31(void);
+u32 F22_00(u16 panel);
+u32 F23_00(u16 panel);
+u32 F24_00(u16 panel);
+u32 F24_01(u16 panel, u16 path);
+u32 F24_02(u16 panel);
+u32 F25_00(void);
+u32 F26_00(void);
+u32 F27_00(u16 panel);
+u32 F30_00(u16 panel);
+u32 F75_00(u16 panel);
+#pragma aux F21_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F21_10 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F21_25 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F21_31 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F22_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F23_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F24_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F24_01 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
+#pragma aux F24_02 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F25_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F26_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F27_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F30_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F75_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+
+/* The viewer and the editor, view.c and edit.c: the commands, and what
+   they go on in. V00_02 opens the file ViewFil and says in `open` what it
+   found, 0 if there is nothing to show, 1 for the editor and 2 for the
+   viewer; T00_00 is the editor, which returns 0 if the file is to be
+   viewed instead, 1 if it is to be closed and nothing more, and 2 when
+   it has been edited and is closed, with what V13_01 takes in the high
+   byte: not 0 if a file was written. V00_10 is the viewer; V13_00 closes
+   the file and goes back to the panels, as V13_01 does without closing
+   one. See each there. */
+struct Open {
+    u16 handle;                         /* 0FFFFh for a new file */
+    struct Box box;                     /* where the box "Reading the
+                                           file" is */
+};
+u32 F43_00(void);
+u32 F44_00(void);
+u32 F63_00(u16 panel);
+u32 F64_00(u16 panel);
+u32 F33_00(u16 panel);
+u32 F34_00(u16 panel);
+u32 F34_10(u16 panel);
+u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open);
+void V00_10(u16 handle);
+void V13_00(void);
+void V13_01(u16 changed);
+#pragma aux F43_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F44_00 "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux F63_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F64_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F33_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F34_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F34_10 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux V00_02 "*_c" __far parm [ax] [dx] [bx] [di] value [ax] modify exact [ax]
+#pragma aux V00_10 "*_c" __far parm [bx] modify exact [ax]
+#pragma aux V13_00 "*_c" __far modify exact [ax]
+#pragma aux V13_01 "*_c" __far parm [ax] modify exact [ax]
+u16 T00_00(u16 handle, u16 begin, u16 size, u16 saved);
+#pragma aux T00_00 "*_c" __far parm [bx] [ax] [dx] [si] value [ax] modify exact [ax bx cx dx si di es]
+
+/* The commands of the menus, commands.c: `panel` is the current panel,
+   or the panel of the Left or the Right menu, and `item` what the
+   original has in CX, from the menu bar the menu in the low byte and the
+   item in the high one. M01_01, M03_00, M06_00 and M06_10 are where the
+   keys of the panels and the box of the drives go on. */
+u16 M01_00(u16 panel, u16 item);
+u16 M01_01(u16 panel, u16 item);
+u16 M03_00(u16 panel, u16 item);
+u16 M06_00(u16 panel, u16 item);
+u16 M06_10(u16 panel, u16 item);
+u16 M08_00(u16 panel, u16 item);
+u16 M16_00(u16 panel);
+u16 M16_01(u16 panel);
+u16 M16_10(u16 panel);
+u16 M21_00(void);
+u16 M41_00(void);
+u16 M42_00(u16 panel);
+u16 F69_00(u16 item);
+u16 M49_00(u16 panel);
+u16 M60_00(void);
+u16 M61_00(void);
+u16 M53_00(u16 item);
+u16 M62_00(u16 item);
+u16 M63_00(u16 item);
+u16 M64_00(u16 item);
+u16 M66_00(u16 panel);
+u16 M67_00(u16 panel);
+u16 M69_00(u16 panel);
+u16 M70_00(u16 panel);
+u16 M71_00(u16 panel);
+u16 M72_00(u16 panel);
+u16 M73_00(u16 panel);
+u16 M75_00(u16 panel);
+#pragma aux M01_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
+#pragma aux M01_01 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
+#pragma aux M03_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
+#pragma aux M06_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
+#pragma aux M06_10 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
+#pragma aux M08_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
+#pragma aux M16_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M16_01 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M16_10 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M21_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux M41_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux M42_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F69_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
+#pragma aux M49_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M60_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux M61_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux M53_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
+#pragma aux M62_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
+#pragma aux M63_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
+#pragma aux M64_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
+#pragma aux M66_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M67_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M69_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M70_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M71_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M72_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M73_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M75_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+
+/* Directories made, files deleted, attributes and the label, dirfunc.c;
+   and where a command ends that goes through files: FncSel for those
+   that are selected, FncMas for those of a mask, with the title of its
+   boxes, and FncExt, which like FncSel returns 1 if the panels are to be
+   read again. */
+u16 F37_00(u16 panel);
+u16 F47_00(void);
+u16 F38_00(u16 panel);
+u16 F48_00(void);
+u16 F58_00(u16 panel);
+u16 M30_00(u16 panel);
+u16 F54_00(void);
+u16 FncMas(u16 include);
+u16 FncSel(void);
+u16 FncExt(void);
+#pragma aux F37_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F47_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux F38_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F48_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux F58_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M30_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F54_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux FncMas "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux FncSel "*_c" __far value [ax] modify exact [ax]
+#pragma aux FncExt "*_c" __far value [ax] modify exact [ax]
+
+/* Copy and Rename, copy.c: `command` is 1 to rename, and `directories`
+   and `files` are what the original has in BX and DX at the jump. Where
+   the command does not count what is selected, it goes by those two as
+   they come: see F35_50 there. */
+u32 F35_01(u16 panel, u16 command, u16 directories, u16 files);
+u32 F45_01(u16 panel, u16 command, u16 directories, u16 files);
+#pragma aux F35_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
+#pragma aux F45_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
+
+/* The file search, find.c, which returns a place of dirfunc.c's and in
+   the high word, with TO_F24_02, the panel; the map of the memory,
+   memory.c; the command line, cmdline.c: a key for it, Esc, the selected
+   files and the path of a panel put into it, the history in its box, and
+   the speed search, which returns the key that ended it and in the high
+   word where its box was; the user menu, usermenu.c, 1 for the main one;
+   the box of the drives, drive.c; and the menu bar, menu.c. See each
+   there. */
+u32 F67_00(void);
+#pragma aux F67_00 "*_c" __far value [dx ax] modify exact [ax dx]
+void F65_00(void);
+#pragma aux F65_00 "*_c" __far modify exact [ax bx cx dx si di]
+void F73_00(u16 key);
+u16 F74_00(void);
+u16 F80_00(u16 panel);
+void F82_01(u16 panel, u16 key);
+u16 F68_00(void);
+u32 F77_00(u16 key, u16 panel);
+#pragma aux F73_00 "*_c" __far parm [ax] modify exact [ax]
+#pragma aux F74_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux F80_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F82_01 "*_c" __far parm [ax] [dx] modify exact [ax]
+#pragma aux F68_00 "*_c" __far value [ax] modify exact [ax]
+#pragma aux F77_00 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
+u16 F32_00(u16 main);
+#pragma aux F32_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+u16 F62_01(u16 panel, u16 item);
+#pragma aux F62_01 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
+u32 F39_00(u16 again, u16 panel, u16 bar);
+#pragma aux F39_00 "*_c" __far parm [ax] [dx] [si] value [dx ax] modify exact [ax dx es]
 
 /* Save the setup, the command line and the panels in the part of the
    program that stays in the memory, and give up the main data, for that
@@ -609,14 +935,6 @@ u16 DirFunc(void);                                      /* dirfunc.c */
    something that is not 0 in the high one for an error. */
 u32 DelTr0(const u8 *path);
 #pragma aux DelTr0  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-
-/* Where a box is on the screen, as DialBox says it: what the assembly
-   has in BX, DX and SI then. */
-struct Box {
-    u16 begin;                          /* the row in the high byte */
-    u16 size;                           /* the rows in the high byte */
-    u16 saved;                          /* where what it covers is kept */
-};
 
 /* The boxes and the dialogs, which the assembly describes: `box`,
    `include`, `table`, `control` and `colors` are offsets in its code

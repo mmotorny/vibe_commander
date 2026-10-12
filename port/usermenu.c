@@ -25,13 +25,12 @@
  */
 #include "vc.h"
 
-u16 F32_00(u16 main);
 u16 F32_70(u16 begin, u16 size);
 u16 Run_00(u16 text, u16 view);
 
-/* How the assembly calls these (see the stubs in port/asm/VCFUNC.INC),
-   and F32_70 how the history's box does, in port/cmdline.c. */
-#pragma aux F32_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+/* How other files call these: the history's box F32_70, in cmdline.c,
+   and Enter and the commands of the viewer Run_00. F32_00, the command,
+   is declared in vc.h: see "The commands" there. */
 #pragma aux F32_70 "*_c" __far parm [bx] [dx] value [ax] modify exact [ax]
 #pragma aux Run_00 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 

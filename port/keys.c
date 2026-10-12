@@ -5,117 +5,29 @@
  *
  * Translated from VCFUNC.INC.
  *
- * These are commands, not routines: the program's main loop, MainLoop of
- * main.c, goes to one by the table of keys, which is still in the
- * assembly, and the command jumps back to one of several places of the
- * loop, or on into another command.
- * Here a command is a function that the stub at its label calls, with the
- * panel that the assembly has in DS, and what it returns says where the
- * program goes on: see GO below, and CmdEnd in port/asm/VCFUNC.INC.
+ * These are commands, not routines: see "The commands" in vc.h, which
+ * declares them. The main loop, MainLoop of main.c, calls one for its key
+ * with the current panel, and what it returns says where the program
+ * goes on: see GO below, and CmdEnd in main.c.
  *
- * The pull-down menus call some of these too, and the mouse, which the
+ * The pull-down menus have some of these too, and the mouse, which the
  * loop reads, enters three of them past their start: F00_05, F01_05 and
  * F00_60.
  */
 #include "vc.h"
 
 void F00_50(u16 panel, u16 cursor, u16 first);
-u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons);
-u32 F00_00(u16 panel);
-u32 F00_05(u16 panel, u16 cursor, u16 first, u16 buttons);
-u32 F01_00(u16 panel);
-u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons);
-u32 F02_00(u16 panel);
-u32 F03_00(u16 panel);
-u32 F04_00(u16 panel);
-u32 F05_00(u16 panel);
-u32 F06_00(u16 panel);
-u32 F07_00(u16 panel);
-u32 F08_00(u16 panel);
-u32 F76_00(u16 panel);
-u32 F76_01(u16 panel);
-u32 F09_00(u16 panel);
-u32 F10_00(u16 panel);
-u32 F78_00(u16 panel);
-u32 F11_00(u16 panel);
-u32 F12_00(u16 panel);
-u32 F13_00(void);
-u32 F14_00(void);
-u32 F15_00(u16 panel);
-u32 F16_00(void);
-u32 F17_01(u16 panel);
-u32 F79_00(u16 panel);
-u32 F18_00(u16 panel);
-u32 F20_00(u16 panel);
 void F20_02(u16 panel);
 
-/* How the assembly passes arguments to these, and what it expects back.
-   F00_50 and F20_02 are routines, and save what they use. */
+/* F00_50 and F20_02 are routines, which other files call too. */
 #pragma aux F00_50 "*_c" __far parm [ax] [si] [di] modify exact [ax]
-#pragma aux F00_60 "*_c" __far parm [ax] [si] [di] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux F00_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F00_05 "*_c" __far parm [ax] [si] [di] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux F01_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F01_05 "*_c" __far parm [ax] [si] [di] [dx] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux F02_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F03_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F04_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F05_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F06_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F07_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F08_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F76_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F76_01 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F09_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F10_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F78_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F11_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F12_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F13_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F14_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F15_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F16_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F17_01 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F79_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F18_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F20_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux F20_02 "*_c" __far parm [ax] modify exact [ax]
 
-/* Where the program goes on after a command: the numbers of CmdNx_T in
-   port/asm/VCFUNC.INC, in the low byte of what a command returns. */
-enum {
-    FUNC07,                             /* wait for the next key */
-    FUNC05,                             /* first save the setup, if it has
-                                           changed and is saved by itself */
-    FUNC04,                             /* first draw the menu bar */
-    FUNC01,                             /* first draw the current panel
-                                           and put the screen buffer on
-                                           the screen */
-    INPUT,                              /* F73_00: the key goes to the
-                                           command line */
-    EARLIER,                            /* F25_00: the command before in
-                                           the history */
-    LATER,                              /* F26_00: the one after */
-    INIT40,                             /* find the command line again
-                                           and draw everything */
-    INIT50,                             /* draw the panels again, reading
-                                           those that have changed */
-    M01_01,                             /* the menu's routine that makes a
-                                           panel one of files, in the order
-                                           and the form it has */
-    M03_00,                             /* that makes one the tree or the
-                                           Info */
-    M06_00,                             /* that switches one off or on */
-    POP_FUNC04,                         /* FUNC04 and FUNC05, with the DS
-                                           that the stub has pushed for the
-                                           menu's routines taken off */
-    POP_FUNC05
-};
-
-/* The menu's routines take a panel, which the stub loads into DS from
-   the high word, and a byte from the high byte of the low one: for
-   M03_00 five less the kind of panel, for M06_00 the place in the menu
-   bar that is lit meanwhile. M01_01 takes neither byte. */
+/* What a command returns: where the program goes on, a NEXT_ of vc.h.
+   The menu's routines take a panel, in the high word, and a byte, in the
+   high byte of the low one: for M03_00 five less the kind of panel, for
+   M06_00 the place in the menu bar that is lit meanwhile. M01_01 takes
+   neither byte. */
 #define GO(where)                    ((u32)(where))
 #define GO_PANEL(where, panel, byte) \
     ((u32)(panel) << 16 | (u16)((u16)(u8)(byte) << 8 | (where)))
@@ -329,7 +241,7 @@ u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons)
     } else
         md.WinMous &= MOUSE_HELD;
     F00_70(panel, cursor, first);
-    return GO(FUNC07);
+    return GO(NEXT_FUNC07);
 }
 
 /* The place of the cursor for the keys that go by pages: F04_30. Returns
@@ -370,9 +282,9 @@ u32 F00_00(u16 panel)
     struct Place place;
 
     if (wcb->Visible == 0)
-        return GO(EARLIER);
+        return GO(NEXT_EARLIER);
     if (wcb->WinTyp > 1)
-        return GO(FUNC07);
+        return GO(NEXT_FUNC07);
     AdrNum(panel, (struct Place STACK *)&place);
     return F00_05(panel, place.cursor, place.first, 0);
 }
@@ -392,7 +304,7 @@ static u32 F01_01(u16 panel)
     struct Place place;
 
     if (PANEL(panel)->WinTyp > 1)
-        return GO(FUNC07);
+        return GO(NEXT_FUNC07);
     AdrNum(panel, (struct Place STACK *)&place);
     return F01_05(panel, place.cursor, place.first, place.last, 0);
 }
@@ -400,7 +312,7 @@ static u32 F01_01(u16 panel)
 u32 F01_00(u16 panel)
 {
     if (PANEL(panel)->Visible == 0)
-        return GO(LATER);
+        return GO(NEXT_LATER);
     return F01_01(panel);
 }
 
@@ -414,7 +326,7 @@ u32 F02_00(u16 panel)
     u16 cursor, first;
 
     if (wcb->Visible == 0 || wcb->WinTyp != 0 || wcb->BrfFul != 0)
-        return GO(INPUT);
+        return GO(NEXT_INPUT);
     AdrNum(panel, (struct Place STACK *)&place);
     cursor = place.cursor;
     first = place.first;
@@ -430,7 +342,7 @@ u32 F02_00(u16 panel)
             cursor = first = 0;
     }
     F00_70(panel, cursor, first);
-    return GO(FUNC07);
+    return GO(NEXT_FUNC07);
 }
 
 u32 F03_00(u16 panel)
@@ -440,7 +352,7 @@ u32 F03_00(u16 panel)
     u16 cursor, first, column;
 
     if (wcb->Visible == 0 || wcb->WinTyp != 0 || wcb->BrfFul != 0)
-        return GO(INPUT);
+        return GO(NEXT_INPUT);
     AdrNum(panel, (struct Place STACK *)&place);
     first = place.first;
     column = place.cursor - first;
@@ -455,7 +367,7 @@ u32 F03_00(u16 panel)
             cursor = first = place.last;
     }
     F00_70(panel, cursor, first);
-    return GO(FUNC07);
+    return GO(NEXT_FUNC07);
 }
 
 /* PgUp and PgDn. */
@@ -466,7 +378,7 @@ u32 F04_00(u16 panel)
     u16 cursor, first, page;
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
-        return GO(FUNC07);
+        return GO(NEXT_FUNC07);
     page = F04_30(panel, (struct Place STACK *)&place);
     cursor = place.cursor;
     first = place.first;
@@ -478,7 +390,7 @@ u32 F04_00(u16 panel)
             cursor = page + first;
     }
     F00_70(panel, cursor, first);
-    return GO(FUNC07);
+    return GO(NEXT_FUNC07);
 }
 
 u32 F05_00(u16 panel)
@@ -488,7 +400,7 @@ u32 F05_00(u16 panel)
     u16 cursor, first, page, limit;
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
-        return GO(FUNC07);
+        return GO(NEXT_FUNC07);
     page = F04_30(panel, (struct Place STACK *)&place);
     cursor = place.cursor;
     first = F03_30(place.first, page, place.last);
@@ -500,7 +412,7 @@ u32 F05_00(u16 panel)
     else if (first > cursor)
         cursor = first;
     F00_70(panel, cursor, first);
-    return GO(FUNC07);
+    return GO(NEXT_FUNC07);
 }
 
 /* Home and End. With the panels off, and in the Info, they are keys of
@@ -510,9 +422,9 @@ u32 F06_00(u16 panel)
     struct WCBdef __far *wcb = PANEL(panel);
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
-        return GO(INPUT);
+        return GO(NEXT_INPUT);
     F00_70(panel, 0, 0);
-    return GO(FUNC07);
+    return GO(NEXT_FUNC07);
 }
 
 u32 F07_00(u16 panel)
@@ -521,10 +433,10 @@ u32 F07_00(u16 panel)
     struct Place place;
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
-        return GO(INPUT);
+        return GO(NEXT_INPUT);
     AdrNum(panel, (struct Place STACK *)&place);
     F00_70(panel, place.last, place.last);
-    return GO(FUNC07);
+    return GO(NEXT_FUNC07);
 }
 
 /* Ins: select the file under the cursor, or unselect it, and go down a
@@ -537,10 +449,10 @@ u32 F08_00(u16 panel)
     u16 address;
 
     if (!FilePan(panel))
-        return GO(FUNC07);
+        return GO(NEXT_FUNC07);
     address = wcb->CurAdr;
     if (address >= wcb->EndBuf)
-        return GO(FUNC07);
+        return GO(NEXT_FUNC07);
     if (md.InsDwn != 0
         && address + sizeof(struct FILENT) < wcb->EndBuf)
         *KEYS_DOWN &= 0x7F;
@@ -549,7 +461,7 @@ u32 F08_00(u16 panel)
         file->AttrF ^= ATTR_SELECTED;
     F08_10(panel);
     if (md.InsDwn == 0)
-        return GO(FUNC07);
+        return GO(NEXT_FUNC07);
     return F01_01(panel);
 }
 
@@ -564,10 +476,10 @@ static u32 F10_01(u16 panel, u16 include)
     u16 address, found;
 
     if (!FilePan(panel))
-        return GO(INPUT);
+        return GO(NEXT_INPUT);
     if ((u8)Dialog(OFFSET(Sel_B), include, 0, 0, MAIN_SEG) != 0
         || md.SelMas[0] == 0)
-        return GO(FUNC04);
+        return GO(NEXT_FUNC04);
     Convert(md.SelMas, md.TmpBuf);
     found = 0;
     for (address = DSKBUF; address < wcb->EndBuf;
@@ -587,9 +499,9 @@ static u32 F10_01(u16 panel, u16 include)
         }
     }
     if (found)
-        return GO(FUNC01);
+        return GO(NEXT_FUNC01);
     Dialog(OFFSET(ErSel_B), include, 0, 0, MAIN_SEG);
-    return GO(FUNC04);
+    return GO(NEXT_FUNC04);
 }
 
 /* Grey * turns the selection round, when nothing has been typed: it is a
@@ -602,7 +514,7 @@ u32 F76_01(u16 panel)
 u32 F76_00(u16 panel)
 {
     if (md.DosBuf[0] != 0)
-        return GO(INPUT);
+        return GO(NEXT_INPUT);
     return F76_01(panel);
 }
 
@@ -626,14 +538,14 @@ u32 F78_00(u16 panel)
     u16 address;
 
     if (!FilePan(panel))
-        return GO(FUNC04);
+        return GO(NEXT_FUNC04);
     for (address = DSKBUF; address < wcb->EndBuf;
          address += sizeof(struct FILENT)) {
         file = ENTRY(wcb, address);
         if (file->NameF[0] != '.' && file->AttrF & ATTR_WAS_SELECTED)
             file->AttrF |= ATTR_SELECTED;
     }
-    return GO(FUNC01);
+    return GO(NEXT_FUNC01);
 }
 
 /* ^O: both panels off, with what DOS has shown in their place, or on
@@ -653,7 +565,7 @@ u32 F11_00(u16 panel)
         size = SizDX() & 0xFF00 | 80;
         ResUser(begin, size);
         Window(begin, size);            /* Func03 */
-        return GO(FUNC04);
+        return GO(NEXT_FUNC04);
     }
     was = md.Ctrl_O;
     second->Visible = (u8)was;
@@ -661,7 +573,7 @@ u32 F11_00(u16 panel)
     wcb->Visible = 1;
     if (wcb->ChgFlg != 0 || was != 0 && changed != 0)
         PutMnu(3);                      /* PutMnu3 */
-    return GO(INIT50);
+    return GO(NEXT_INIT50);
 }
 
 /* ^P, ^F1 and ^F2: the other panel, the left and the right one off or
@@ -669,18 +581,18 @@ u32 F11_00(u16 panel)
 u32 F12_00(u16 panel)
 {
     if (PANEL(panel)->Visible == 0)
-        return GO(POP_FUNC05);
-    return GO_PANEL(M06_00, md.WCBsec, 0);
+        return GO(NEXT_POP_FUNC05);
+    return GO_PANEL(NEXT_M06_00, md.WCBsec, 0);
 }
 
 u32 F13_00(void)
 {
-    return GO_PANEL(M06_00, md.WCB1seg, 1);
+    return GO_PANEL(NEXT_M06_00, md.WCB1seg, 1);
 }
 
 u32 F14_00(void)
 {
-    return GO_PANEL(M06_00, md.WCB2seg, 5);
+    return GO_PANEL(NEXT_M06_00, md.WCB2seg, 5);
 }
 
 /* ^U: the panels change places. */
@@ -689,13 +601,13 @@ u32 F15_00(u16 panel)
     u16 left;
 
     if (PANEL(panel)->Visible == 0)
-        return GO(FUNC04);
+        return GO(NEXT_FUNC04);
     left = md.WCB1seg;
     md.WCB1seg = md.WCB2seg;
     md.WCB2seg = left;
     InvVar(&md.Active);
     ResUser(BegBX(panel) & 0xFF00, SizDX() & 0xFF00 | 80);
-    return GO(INIT50);
+    return GO(NEXT_INIT50);
 }
 
 /* ^B: the key bar off or on. Where the command line is on the last line
@@ -713,11 +625,11 @@ u32 F16_00(void)
         md.BarPrev = 0xFF;
         ClsLine(last, MAIN_SEG);
         Window(last, 0x150);
-        return GO(FUNC04);
+        return GO(NEXT_FUNC04);
     }
     md.KeyBar = 1;
     if (last >> 8 != md.DosLin)
-        return GO(FUNC04);
+        return GO(NEXT_FUNC04);
     begin = BegBX(MAIN_SEG) & 0xFF00;
     size = SizDX() & 0xFF00 | 80;
     ResUser(begin, size);
@@ -725,14 +637,14 @@ u32 F16_00(void)
     Cursor1();
     SavMous();
     CurMous(0);
-    return GO(INIT40);
+    return GO(NEXT_INIT40);
 }
 
 /* F17_06: a panel is to be one of files, and read. */
 static u32 F17_06(u16 panel)
 {
     PANEL(panel)->ChgFlg = 1;
-    return GO_PANEL(M01_01, panel, 0);
+    return GO_PANEL(NEXT_M01_01, panel, 0);
 }
 
 /* ^R: read a panel again. Files: none is selected afterwards and the
@@ -751,14 +663,14 @@ u32 F17_01(u16 panel)
 
     if (kind != 0) {
         if (kind > 2)
-            return GO(POP_FUNC04);
+            return GO(NEXT_POP_FUNC04);
         if (kind != 2) {
             answer = DelTr0(md.DosPth);
             if ((u16)(answer >> 16) != 0)
-                return GO(POP_FUNC04);
+                return GO(NEXT_POP_FUNC04);
             kind = (u8)answer;
         }
-        return GO_PANEL(M03_00, panel, 5 - kind);       /* F17_02 */
+        return GO_PANEL(NEXT_M03_00, panel, 5 - kind);       /* F17_02 */
     }
     address = wcb->EndBuf;
     wcb->CurAdr = address;
@@ -777,17 +689,17 @@ static u32 F18_01(u16 panel, u16 kind)
     struct WCBdef __far *wcb = PANEL(panel);
 
     if (wcb->Visible == 0)
-        return GO(POP_FUNC04);
+        return GO(NEXT_POP_FUNC04);
     if (kind != wcb->WinTyp) {
         panel = InvWCB(panel);
         wcb = PANEL(panel);
         if (wcb->Visible == 0 || kind != wcb->WinTyp)
-            return GO_PANEL(M03_00, panel, 5 - kind);
+            return GO_PANEL(NEXT_M03_00, panel, 5 - kind);
     }
     kind = wcb->Ctrl_L;
     if (kind == 0)
         return F17_06(panel);
-    return GO_PANEL(M03_00, panel, 5 - kind);
+    return GO_PANEL(NEXT_M03_00, panel, 5 - kind);
 }
 
 u32 F79_00(u16 panel)
@@ -868,7 +780,7 @@ u32 F20_00(u16 panel)
     u16 current;
 
     if (PANEL(other)->Visible == 0)
-        return GO(FUNC05);
+        return GO(NEXT_FUNC05);
     current = md.WCBcrn;
     md.WCBcrn = other;
     PutPath(panel);
@@ -876,5 +788,5 @@ u32 F20_00(u16 panel)
     md.WCBcrn = current;
     F20_02(panel);
     PutPath(md.WCBcrn);
-    return GO(FUNC01);
+    return GO(NEXT_FUNC01);
 }

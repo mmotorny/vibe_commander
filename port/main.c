@@ -5,20 +5,34 @@
  *
  * Translated from VC.ASM.
  *
- * The loop is no routine. The start-up code, which is still assembly,
- * falls into it; commands jump back into it at one of several places, and
- * it jumps to the command of a key, which is a label of the assembly. So
- * here it is one function, MainLoop, that is entered at a place, the
- * numbers below, and returns where the program goes on, the numbers of
- * Main_T in port/asm/VC.ASM, once a key or the mouse has said which
- * command it is: Func12 has the keys.
+ * The loop is no routine in the original. The code that starts the
+ * program falls into it; it jumps to the command of a key, which is no
+ * routine either, and the command jumps back into it at one of several
+ * places, or on into another command. Here the loop is two functions and
+ * a third that has them take turns, MainLoop. Loop is entered at a place,
+ * the numbers below, and returns the command that a key or the mouse
+ * asks for: Func12 has the keys. Command calls the function of that
+ * command (see "The commands" in vc.h), and returns the place of the loop
+ * where the program goes on, which the function says, by way of what the
+ * original has at the end of each family of commands: CmdEnd, MnuEnd,
+ * F1Next and F35_90.
  *
- * What a command leaves in the registers reaches the next command through
- * the loop, and one command is known to read some of it: Shift-F6, which
- * renames, goes by BX and DX as they come. So the stub of the loop hands
- * the registers over as a structure on the stack, and gets them back as
- * the loop of the assembly would have left them at the jump: where the
- * code below sets a field of `r` that nothing here reads, that is why.
+ * In the original a command finds the registers as the loop leaves them,
+ * and leaves them to the loop in its turn, and so to the next command.
+ * Some of that is read: the mouse hands its commands where the cursor is
+ * to go; a key that goes on to the command line is taken there from AX;
+ * EGA lines hands the BIOS what CX holds; and Rename, with Shift or
+ * without a panel of files, goes by BX and DX as they come (F35_50 of
+ * copy.c). So the registers are a structure here, `r`, which Loop and
+ * Command keep as the original has them wherever a command reads one:
+ * where the code below sets a field of `r` that nothing here reads, that
+ * is why. Func05 loads BX, with a number that is not 0, so a command that
+ * goes back to the loop there or before leaves nothing in BX and DX that
+ * Rename could tell; the cursor's keys go back behind it, at Func07.
+ *
+ * The menu bar and its tables of commands are still assembly, and so is
+ * what ends the program or has a command run: for those MainLoop returns
+ * to its stub, MainGo of port/asm/VC.ASM, which jumps on.
  */
 #include "vc.h"
 
@@ -29,6 +43,7 @@ struct Regs {
 };
 
 u16 MainLoop(u16 entry, struct Regs STACK *r);
+static u16 CmdEnd(u32 answer, struct Regs STACK *r);
 u16 ErrRdy(u16 letter);
 void Exit(void);
 /* Quit, RestVct and HookVct are in vc.h. */
@@ -39,7 +54,8 @@ void RstVc1(void);
 #pragma aux Exit     "*_c" __far modify exact [ax]
 #pragma aux RstVc1   "*_c" __far modify exact [ax dx]
 
-/* Where the loop is entered: what MainC of port/asm/VC.ASM hands over. */
+/* Where the loop is entered: what MainC of port/asm/VC.ASM hands over,
+   and what Command returns. */
 enum {
     INIT40,                             /* find the command line on the
                                            screen, keep what DOS shows,
@@ -53,11 +69,25 @@ enum {
     FUNC05,                             /* save the setup if it has
                                            changed and is saved by itself */
     FUNC07,                             /* wait for a key */
-    FUNC12                              /* go to the command of the key
+    FUNC12,                             /* go to the command of the key
                                            in AX */
+    LEAVE = 0x100                       /* not a place: leave the loop, for
+                                           what is in the low byte */
 };
 
-/* Where the program goes on: the places of Main_T. */
+/* Where the stub of the loop goes on when MainLoop returns: the places of
+   Main_T in port/asm/VC.ASM. */
+enum {
+    ASM_F39_00,                         /* the menu bar, */
+    ASM_F40_00,                         /* and with its last item again */
+    ASM_INIT11,                         /* start the program over */
+    ASM_EXEC,                           /* have the part of the program
+                                           that stays in the memory run
+                                           the commands of DosBuf first */
+    ASM_EXIT                            /* leave the program */
+};
+
+/* The commands: what Loop returns and Command takes. */
 enum {
     TO_F73_00,                          /* the key goes to the command
                                            line */
@@ -720,10 +750,10 @@ static u16 Func12(u16 key)
     return TO_F73_00;
 }
 
-/* The main loop: see the top of this file. `entry` is where it is
-   entered and `r` the registers as they are there; it returns where the
-   program goes on, with the registers as that place gets them. */
-u16 MainLoop(u16 entry, struct Regs STACK *r)
+/* The main loop as far as a command: see the top of this file. `entry`
+   is where it is entered and `r` the registers as they are there; it
+   returns the command, with the registers as the command gets them. */
+static u16 Loop(u16 entry, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb;
     u8 __far *saved;
@@ -895,6 +925,340 @@ u16 MainLoop(u16 entry, struct Regs STACK *r)
         if (!(where & AGAIN))
             return where;
         entry = where & 0xFF;
+    }
+}
+
+/*---------------- Where a command goes on ----------------
+   What the function of a command returns says where the program goes
+   on. Each of these makes of it what the original has at the end of that
+   family of commands, and returns the place of the loop, an entry of
+   Loop, or LEAVE with what is to be done outside it. Where the original
+   goes on in another command, so does this. */
+
+/* Open the file ViewFil and show it in the viewer, or in the editor if
+   `edit` is not 0: V00_00, V00_01 and V00_02 of the original, which are
+   one piece of code entered with this or that in its registers. `menu`
+   is the item of the menu bar to mark meanwhile, and `whole` is 0 for the
+   window that an Info panel has for its dirinfo. The editor may have the
+   file viewed instead, where it is too large to edit. */
+static u16 V00_03(u16 menu, u16 edit, u16 whole)
+{
+    struct Open open;
+    u16 what;
+
+    what = V00_02(menu, edit, whole, (struct Open STACK *)&open);
+    if (what == 0)
+        return FUNC04;
+    if (what == 1) {
+        what = T00_00(open.handle, open.box.begin, open.box.size,
+                      open.box.saved);
+        if (what == 1) {                /* T00_01: not read */
+            V13_00();
+            return INIT50;
+        }
+        if (what != 0) {                /* T00_02: edited */
+            V13_01(what >> 8);
+            return INIT50;
+        }
+    }
+    V00_10(open.handle);
+    return INIT50;
+}
+
+/* After a command of the menus, of commands.c: MnuEnd. */
+static u16 MnuEnd(u16 answer, struct Regs STACK *r)
+{
+    switch (answer) {
+    case MNU_FUNC04:
+        return FUNC04;
+    case MNU_INIT50:
+        return INIT50;
+    case MNU_F24_01:                    /* MnuF24 */
+        return CmdEnd(F24_01(r->ds, (u16)md.TmpBuf), r);
+    default:                            /* MnuV00, MNU_V00_01: the menu of
+                                           the command is in CL */
+        return V00_03(r->cx & 0xFF, 1, 1);
+    }
+}
+
+/* After a command of the keys of the panels, of keys.c, enter.c and
+   view.c: CmdEnd. `r->ax` is the key still, for the command line.
+
+   BX and DX at Func07, the one place of the loop where the next command
+   gets them as this one leaves them: both 0, as the stub of the assembly
+   had them that this is made of. */
+static u16 CmdEnd(u32 answer, struct Regs STACK *r)
+{
+    u16 byte = (u16)answer >> 8;
+    u16 panel = (u16)(answer >> 16);
+
+    switch ((u8)answer) {
+    case NEXT_FUNC07:
+        r->bx = 0;
+        r->dx = 0;
+        return FUNC07;
+    case NEXT_FUNC05:
+    case NEXT_POP_FUNC05:
+        return FUNC05;
+    case NEXT_FUNC04:
+    case NEXT_POP_FUNC04:
+        return FUNC04;
+    case NEXT_FUNC01:                   /* CmdF01: Tab has made another
+                                           panel the current one */
+        r->ds = md.WCBcrn;
+        return FUNC01;
+    case NEXT_INPUT:
+        F73_00(r->ax);
+        return FUNC05;
+    case NEXT_EARLIER:
+        return CmdEnd(F25_00(), r);
+    case NEXT_LATER:
+        return CmdEnd(F26_00(), r);
+    case NEXT_INIT40:
+        return INIT40;
+    case NEXT_INIT50:
+        return INIT50;
+    case NEXT_M01_01:                   /* CmdM01: in the order and the
+                                           form that the panel has */
+        return MnuEnd(M01_01(panel, (u16)PANEL(panel)->BrfFul << 8
+                                    | PANEL(panel)->SortTyp), r);
+    case NEXT_M03_00:                   /* CmdM03 */
+        return MnuEnd(M03_00(panel, byte << 8), r);
+    case NEXT_M06_00:                   /* CmdM06 */
+        return MnuEnd(M06_00(panel, byte << 8 | byte), r);
+    case NEXT_INIT11:                   /* CmdIni */
+        return LEAVE | ASM_INIT11;
+    case NEXT_EXEC:                     /* CmdExe */
+        return LEAVE | ASM_EXEC;
+    case NEXT_VIEW:                     /* V00_00: with the Files menu
+                                           marked, and in DL whether to
+                                           edit */
+        return V00_03(2, panel & 0xFF, 1);
+    case NEXT_DIRINFO:                  /* CmdV02 */
+        return V00_03(2, 1, 0);
+    default:                            /* NEXT_EXIT */
+        return LEAVE | ASM_EXIT;
+    }
+}
+
+/* After a command of dirfunc.c, and after the file search: F1Next. The
+   files that are selected, or the panels read again if something has
+   been written, or whatever has. */
+static u16 F1Next(u16 answer)
+{
+    u16 read;
+
+    if (answer == TO_FUNC04)
+        return FUNC04;
+    if (answer == TO_FNCSEL)
+        read = FncSel();
+    else if (answer == TO_FNCEXT)
+        read = FncExt();
+    else
+        read = FncEx1();
+    return read ? INIT50 : FUNC04;      /* FncEx0 */
+}
+
+/* After Copy and Rename, of copy.c: F35_90. */
+static u16 F35_90(u32 answer)
+{
+    switch ((u16)answer) {
+    case GO_KEYS:
+        return FUNC04;
+    case GO_PANELS:
+        return INIT50;
+    case GO_SELECTED:
+        return FncSel() ? INIT50 : FUNC04;
+    case GO_MASKED:
+        FncMas((u16)(answer >> 16));
+        /* fall through */
+    default:                            /* GO_DONE */
+        return FncExt() ? INIT50 : FUNC04;
+    }
+}
+
+/* The box of the drives for a panel, and the panel switched on if a
+   drive was chosen: F62_01 of the original, where Alt-F1 and Alt-F2 go
+   on. `item` is the menu to mark meanwhile. */
+static u16 F62_02(u16 panel, u16 item, struct Regs STACK *r)
+{
+    if (F62_01(panel, item) == 0)
+        return FUNC04;                  /* F62_46 */
+    return MnuEnd(M06_10(panel, item), r);
+}
+
+/* Do a command: call its function, with what it reads of the registers,
+   and go on by what that returns. Returns the place of the loop where the
+   program goes on, with the registers as that place and the next command
+   get them, or LEAVE with what the stub of the loop is to go on in.
+
+   In the original every command is entered with the current panel in
+   DS, and so `r->ds` is that panel. */
+static u16 Command(u16 command, struct Regs STACK *r)
+{
+    u16 panel = r->ds;
+    u32 pair;
+    u16 answer;
+
+    switch (command) {
+    case TO_F39_00: return LEAVE | ASM_F39_00;
+    case TO_F40_00: return LEAVE | ASM_F40_00;
+
+    /* The command line, cmdline.c. */
+    case TO_F73_00:
+        F73_00(r->ax);
+        return FUNC05;
+    case TO_F74_00:                     /* Esc: the panels off or on, if
+                                           the command line was empty */
+        answer = F74_00();
+        if (answer == 0)
+            return FUNC05;
+        return CmdEnd(F11_00(panel), r);
+    case TO_F77_00:
+        /* The speed search ends with a key that is not its own, and the
+           command of that key gets the registers as the search leaves
+           them. */
+        pair = F77_00(r->ax, panel);
+        r->ax = (u16)pair;
+        r->bx = (u16)(pair >> 16);
+        r->dx = 0x318;
+        r->si = (u16)md.WinBuf;
+        r->cx = md.KeyBar;
+        return FUNC12;
+    case TO_F80_00: return F80_00(panel) ? FUNC01 : FUNC05;
+    case TO_F81_00:
+        F82_01(md.WCB1seg, r->ax);
+        return FUNC04;
+    case TO_F82_00:
+        F82_01(md.WCB2seg, r->ax);
+        return FUNC04;
+    case TO_F68_00:                     /* the history: a command to run? */
+        if (F68_00() == 0)
+            return FUNC04;
+        return CmdEnd(F21_25(), r);
+
+    /* The keys of the panels, keys.c. The mouse has its buttons in BP. */
+    case TO_F00_60:
+        return CmdEnd(F00_60(panel, r->si, r->di, r->bp), r);
+    case TO_F00_05:
+        return CmdEnd(F00_05(panel, r->si, r->di, r->bp), r);
+    case TO_F01_05:
+        return CmdEnd(F01_05(panel, r->si, r->di, r->dx, r->bp), r);
+    case TO_F00_00: return CmdEnd(F00_00(panel), r);
+    case TO_F01_00: return CmdEnd(F01_00(panel), r);
+    case TO_F02_00: return CmdEnd(F02_00(panel), r);
+    case TO_F03_00: return CmdEnd(F03_00(panel), r);
+    case TO_F04_00: return CmdEnd(F04_00(panel), r);
+    case TO_F05_00: return CmdEnd(F05_00(panel), r);
+    case TO_F06_00: return CmdEnd(F06_00(panel), r);
+    case TO_F07_00: return CmdEnd(F07_00(panel), r);
+    case TO_F08_00: return CmdEnd(F08_00(panel), r);
+    case TO_F09_00: return CmdEnd(F09_00(panel), r);
+    case TO_F10_00: return CmdEnd(F10_00(panel), r);
+    case TO_F76_00: return CmdEnd(F76_00(panel), r);
+    case TO_F78_00: return CmdEnd(F78_00(panel), r);
+    case TO_F11_00: return CmdEnd(F11_00(panel), r);
+    case TO_F12_00: return CmdEnd(F12_00(panel), r);
+    case TO_F13_00: return CmdEnd(F13_00(), r);
+    case TO_F14_00: return CmdEnd(F14_00(), r);
+    case TO_F15_00: return CmdEnd(F15_00(panel), r);
+    case TO_F16_00: return CmdEnd(F16_00(), r);
+    case TO_F17_00: return CmdEnd(F17_01(panel), r);
+    case TO_F18_00: return CmdEnd(F18_00(panel), r);
+    case TO_F79_00: return CmdEnd(F79_00(panel), r);
+    case TO_F20_00: return CmdEnd(F20_00(panel), r);
+
+    /* Enter, the directory changed and the history, enter.c. */
+    case TO_F21_00: return CmdEnd(F21_00(panel), r);
+    case TO_F21_10: return CmdEnd(F21_10(panel), r);
+    case TO_F21_31: return CmdEnd(F21_31(), r);
+    case TO_F22_00: return CmdEnd(F22_00(panel), r);
+    case TO_F23_00: return CmdEnd(F23_00(panel), r);
+    case TO_F24_00: return CmdEnd(F24_00(panel), r);
+    case TO_F25_00: return CmdEnd(F25_00(), r);
+    case TO_F26_00: return CmdEnd(F26_00(), r);
+    case TO_F27_00: return CmdEnd(F27_00(panel), r);
+    case TO_F30_00: return CmdEnd(F30_00(panel), r);
+    case TO_F75_00: return CmdEnd(F75_00(panel), r);
+
+    /* The user menu, usermenu.c: a line with a command to run? */
+    case TO_F32_00:
+    case TO_F42_00:
+        if (F32_00(command == TO_F42_00) == 0)
+            return FUNC04;              /* Run_0A */
+        return CmdEnd(F21_30(), r);
+
+    /* The viewer and the editor, view.c. */
+    case TO_F33_00: return CmdEnd(F33_00(panel), r);
+    case TO_F34_00: return CmdEnd(F34_00(panel), r);
+    case TO_F34_10: return CmdEnd(F34_10(panel), r);
+    case TO_F43_00: return CmdEnd(F43_00(), r);
+    case TO_F44_00: return CmdEnd(F44_00(), r);
+    case TO_F63_00: return CmdEnd(F63_00(panel), r);
+    case TO_F64_00: return CmdEnd(F64_00(panel), r);
+
+    /* Copy and Rename, copy.c: with BX and DX as they come. */
+    case TO_F35_00: return F35_90(F35_01(panel, 0, r->bx, r->dx));
+    case TO_F36_00: return F35_90(F35_01(panel, 1, r->bx, r->dx));
+    case TO_F45_00: return F35_90(F45_01(panel, 0, r->bx, r->dx));
+    case TO_F46_00: return F35_90(F45_01(panel, 1, r->bx, r->dx));
+    case TO_F55_00:
+    case TO_F56_00:                     /* F56_01: of the one file */
+        md.OneFile = 1;
+        return F35_90(F35_01(panel, command == TO_F56_00, r->bx, r->dx));
+
+    /* Directories, deleting, attributes and the label, dirfunc.c. */
+    case TO_F37_00: return F1Next(F37_00(panel));
+    case TO_F38_00: return F1Next(F38_00(panel));
+    case TO_F47_00: return F1Next(F47_00());
+    case TO_F48_00: return F1Next(F48_00());
+    case TO_F54_00: return F1Next(F54_00());
+    case TO_F58_00: return F1Next(F58_00(panel));
+    case TO_M30_00: return F1Next(M30_00(panel));
+
+    /* The box of the drives, drive.c. */
+    case TO_F61_00: return F62_02(md.WCB1seg, 1, r);
+    case TO_F62_00: return F62_02(md.WCB2seg, 5, r);
+
+    /* The map of the memory, memory.c. */
+    case TO_F65_00:
+        F65_00();
+        return FUNC04;
+
+    /* The file search, find.c: Go to has the current directory be
+       another, and the panel that it hands back show it. */
+    case TO_F67_00:
+        pair = F67_00();
+        if ((u16)pair == TO_F24_02)
+            return CmdEnd(F24_02((u16)(pair >> 16)), r);    /* F67_01 */
+        return F1Next((u16)pair);
+
+    /* The commands of the menus that have keys, commands.c. EGA lines
+       hands the BIOS what CX holds. */
+    case TO_M16_00: return MnuEnd(M16_00(panel), r);
+    case TO_M16_10: return MnuEnd(M16_10(panel), r);
+    case TO_M41_00: return MnuEnd(M41_00(), r);
+    case TO_M42_00: return MnuEnd(M42_00(panel), r);
+    case TO_M49_00: return MnuEnd(M49_00(panel), r);
+    case TO_F69_00: return MnuEnd(F69_00(r->cx), r);
+    default:                            /* TO_M75_00 */
+        return MnuEnd(M75_00(panel), r);
+    }
+}
+
+/* The main loop: see the top of this file. `entry` is where it is
+   entered and `r` the registers as its stub has pushed them. It returns
+   when the stub is to go on somewhere, a place of Main_T there, with the
+   registers as that place gets them. */
+u16 MainLoop(u16 entry, struct Regs STACK *r)
+{
+    u16 command;
+
+    for (;;) {
+        command = Loop(entry, r);
+        entry = Command(command, r);
+        if (entry & LEAVE)
+            return entry & 0xFF;
     }
 }
 

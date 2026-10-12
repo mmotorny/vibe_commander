@@ -50,15 +50,12 @@
 #define LenName (LenPath + 13)          /* a path and a file name */
 
 u16 C00_00(u16 attributes);
-u32 F35_01(u16 panel, u16 command, u16 directories, u16 files);
-u32 F45_01(u16 panel, u16 command, u16 directories, u16 files);
 u16 F35_61(u16 answer, u16 place);
 
-/* How the assembly passes arguments to these, and what it expects back
-   (see the stubs in port/asm/VCCOPY.INC). */
+/* C00_00 is what FncAddr names, and F35_61 what the dialogs of the
+   commands name for F10. The commands, F35_01 and F45_01, are declared in
+   vc.h. */
 #pragma aux C00_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F35_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
-#pragma aux F45_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
 #pragma aux F35_61 "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]
 
 /* Routines of the rest of the program that this file calls. Those that
@@ -1356,15 +1353,8 @@ u16 C00_00(u16 attributes)
  * and say where the main loop is to go on.
  */
 
-/* Where a command goes on, in the low word of what it returns: the stub
-   jumps there. With GO_MASKED the high word is the title of the boxes. */
-#define GO_KEYS     0                   /* Func04: the next key */
-#define GO_PANELS   1                   /* Init50: the panels drawn anew */
-#define GO_SELECTED 2                   /* FncSel: C00_00 for every file
-                                           that is selected */
-#define GO_MASKED   3                   /* FncMas: for those of a mask */
-#define GO_DONE     4                   /* FncExt: the panels drawn anew
-                                           if something was written */
+/* Where a command goes on is in the low word of what it returns, a GO_
+   of vc.h. With GO_MASKED the high word is the title of the boxes. */
 
 #define ASM(object, offset) AT(AsmSeg(), OFFSET(object) + (offset))
 

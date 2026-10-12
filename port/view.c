@@ -74,17 +74,6 @@ struct Line {
     u16 entry;                          /* BX */
 };
 
-/* What V00_02 hands back, in the order in which its stub takes it off the
-   stack: the file, and where the box "Reading the file" is. */
-struct Open {
-    u16 handle;                         /* BX; 0FFFFh for a new file */
-    struct Box box;                     /* AX, DX and SI */
-};
-
-u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open);
-void V00_10(u16 handle);
-void V13_00(void);
-void V13_01(u16 changed);
 void V80_00(u16 include, struct Box STACK *where);
 u16 NextLin(u16 segment, struct Line STACK *line);
 u16 PrevLin(u16 segment, struct Line STACK *line);
@@ -101,16 +90,11 @@ void V60_00(u16 segment, u16 at, u16 table);
 void V81_00(void);
 u32 V82_00(u16 segment, u16 at, u16 count);
 
-/* How the assembly passes arguments to those that it jumps to, and what
-   it expects back: V00_02, V00_10, V13_00 and V13_01 (see the stubs in
-   port/asm/VCVIEW.INC). The others are called from C only, since the keys
-   of the viewer are looked at here: V80_00 and V82_00 by the editor too,
-   V82_00 by the file search. The segment of the text is what the
-   assembly has in DS. */
-#pragma aux V00_02  "*_c" __far parm [ax] [dx] [bx] [di] value [ax] modify exact [ax]
-#pragma aux V00_10  "*_c" __far parm [bx] modify exact [ax]
-#pragma aux V13_00  "*_c" __far modify exact [ax]
-#pragma aux V13_01  "*_c" __far parm [ax] modify exact [ax]
+/* V00_02, V00_10, V13_00 and V13_01, which the main loop goes on in, are
+   declared in vc.h, with struct Open, which V00_02 fills. The others are
+   called by the keys of the viewer, which are looked at here: V80_00 and
+   V82_00 by the editor too, V82_00 by the file search. The segment of the
+   text is what the assembly has in DS. */
 #pragma aux V80_00  "*_c" __far parm [ax] [bx] modify exact [ax]
 #pragma aux NextLin "*_c" __far parm [dx] [bx] value [ax] modify exact [ax]
 #pragma aux PrevLin "*_c" __far parm [dx] [bx] value [ax] modify exact [ax]
@@ -1611,23 +1595,8 @@ none:
  * is run here, with the memory of the viewer given up for it and behind
  * the name of the file what such a program reads of the setup.
  */
-u32 F43_00(void);
-u32 F44_00(void);
-u32 F63_00(u16 panel);
-u32 F64_00(u16 panel);
-u32 F33_00(u16 panel);
-u32 F34_00(u16 panel);
-u32 F34_10(u16 panel);
 
-/* How the assembly passes arguments to these, and what it expects back
-   (see CmdC in port/asm/VCFUNC.INC). F34_30 and F34_40 are in vc.h. */
-#pragma aux F43_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F44_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F63_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F64_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F33_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F34_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F34_10 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+/* The commands are declared in vc.h, and so are F34_30 and F34_40. */
 
 /* More C routines of other files that vc.h does not have. */
 const u8 __far *FndLet(const u8 __far *text);           /* string.c */

@@ -22,7 +22,7 @@ the first of them stood. `VCSUB2.INC` was two texts and is gone.
 
 | File | texts | boxes | dialogs | buttons, colours | tables | code | goes with |
 |---|---|---|---|---|---|---|---|
-| `VC.ASM` | | | | | 2 / 160 | 219 | `main.c`, `start.c` |
+| `VC.ASM` | | | | | 2 / 12 | 219 | `main.c`, `start.c` |
 | `VCFUNC.INC` | | | | | 2 / 76 | 905 | `keys.c`, `usermenu.c` |
 | `VCMENU.INC` | | | | | 8 / 174 | 495 | `commands.c`, `menu.c` |
 | `VCF1.INC` | | | | | | 160 | `dirfunc.c` |
@@ -33,7 +33,7 @@ the first of them stood. `VCSUB2.INC` was two texts and is gone.
 | `VCFIND.INC` | | | | | | 22 | `find.c` |
 | `VCSUB1.INC` | | | | | | 9 | `dialog.c` |
 | `VCSUB3.INC` | | | | | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | | | | | 13 / 420 | 2,226 | |
+| all | | | | | 13 / 272 | 2,226 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -52,8 +52,9 @@ Besides these, all in `VC.ASM`:
 - The macros `CallC`, `MainC`, `CmdC`, `MnuC` and `PanC`; `FromC`,
   `CallLine` and `TakeLine` have no use left.
 
-The tables are `Main_T`, the 79 places that the main loop goes on at, and
-`SecDat`, the word with the segment of the main data, in `VC.ASM`;
+The tables are `Main_T`, the five places that the stub of the main loop
+goes on at when the loop returns, and `SecDat`, the word with the segment
+of the main data, in `VC.ASM`;
 `CmdNx_T` and `AltSr_T` in `VCFUNC.INC`; the seven tables of the menus'
 commands and `MnuNx_T` in `VCMENU.INC`; `F35_T` in `VCCOPY.INC`.
 
@@ -235,18 +236,19 @@ with `CmdEnd` and `CmdNx_T`, `MnuC` and `PanC` with `MnuEnd` and
 tables of the menus' commands, and the glue of the loop. Three pieces,
 each a commit that the tests pass, in this order:
 
-- The loop calls the commands. `MainLoop` of `port/main.c` returns the
-  place of `Main_T` that the assembly is to jump to. It calls the
-  command instead, from a `switch` on the place, with what the
-  command's stub hands the function of `struct Regs`, and makes of what
-  the function returns what the end of its family makes of it: a place
-  of the loop, or another command with its registers, as `M01_01`,
-  `M06_10`, `F21_25`, `F21_30`, `F24_01`, `V00_01` and `F62_01` are
-  gone on to. The stub and the end of its family say what a case has to
-  do; "Stubs in the assembly" in `CLAUDE.md` has what was met when the
-  stubs were written. It can be done a family at a time: a place that
-  the `switch` has not is still returned to the assembly. With the last
-  family `Main_T`, `CmdNx_T`, `MnuNx_T`, `F35_T` and `F1Next` go.
+- The loop calls the commands. Done, for the keys and the mouse:
+  `MainLoop` of `port/main.c` returned the place of `Main_T` that the
+  assembly was to jump to, and calls the command instead, from a
+  `switch` in `Command`, with what the command's stub handed the
+  function of `struct Regs`, and makes of what the function returns
+  what the end of its family made of it, in `CmdEnd`, `MnuEnd`,
+  `F1Next` and `F35_90` there: a place of the loop, or another command,
+  as `M01_01`, `M06_10`, `F21_25`, `F21_30`, `F24_01`, `V00_01` and
+  `F62_01` are gone on to. The commands are declared in one place,
+  `port/vc.h`. The stubs are all there still: the menu bar jumps to
+  them by its tables, and they jump back into the loop. `Main_T` has
+  the five places left that the loop returns for: the menu bar, twice,
+  and what ends the program or has a command run.
 - The menu bar. Its stub jumps to a command by the tables of the menus,
   with the registers as the bar leaves them. In C the tables are tables
   of places, numbers of the same `enum`, which the `switch` takes. The

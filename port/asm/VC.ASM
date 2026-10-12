@@ -693,15 +693,15 @@ Init40:	MainC	0
 
 
 ;-------------------------------------------------------
-; The main loop is C: MainLoop_c of port/main.c. It is no routine: the
-; code above falls into it, commands jump back into it at the labels
-; here, and it jumps to a command. So each label hands the function the
-; number of the place, and all the registers as a structure on the stack
-; (struct Regs there): what a command leaves in them goes round the loop
-; to the next command. The function returns in AX where the program goes
-; on, a number of Main_T, and has made of the registers what that place
-; gets, with the current panel for DS. MainC, at the top of this file,
-; pushes the registers.
+; The main loop is C: MainLoop_c of port/main.c, which calls the commands
+; of the keys and of the mouse too. It is no routine: the code above
+; falls into it, and the commands of the menus, which are stubs here
+; still, jump back into it at the labels here. So each label hands the
+; function the number of the place, and all the registers as a structure
+; on the stack (struct Regs there). The function returns when the program
+; goes on outside it, with the place in AX, a number of Main_T, and has
+; made of the registers what that place gets, with the current panel for
+; DS. MainC, at the top of this file, pushes the registers.
 Init50:	MainC	1			; Draw the panels, reading them
 Func01:	MainC	2			; Draw the panel in DS
 Func02:	MainC	3			; The screen buffer to the screen
@@ -732,23 +732,12 @@ MainGo:	MOV	BX,SP
 	POP	DS
 	RET				; To the place of Main_T
 
-; Where the program goes on: the command line, the places that the mouse
-; goes to, and from F00_00 on the other commands of the keys, in the
-; order that the table of the keys had them in, which Func12 of
-; port/main.c knows them by.
+; Where the program goes on when the loop returns: the menu bar, whose
+; tables of commands are here still, and what starts the program over,
+; has a command run first, or leaves. Every other command the loop calls
+; itself: Command of port/main.c, which has these as ASM_.
 	.DATA
-Main_T	DW	F73_00, F77_00, F11_00, F39_00, F20_00, F34_10
-	DW	F00_60, F00_05, F01_05, F21_10, F21_31
-	DW	F00_00, F01_00, F02_00, F03_00, F04_00, F05_00, F06_00
-	DW	F07_00, F08_00, F09_00, F10_00, F76_00, F21_00, F27_00
-	DW	F74_00, F78_00, F12_00, F13_00, F14_00, F15_00, F16_00
-	DW	F17_00, M16_00, M16_10, M30_00, M49_00, F18_00, F79_00
-	DW	F22_00, F23_00, F24_00, F25_00, F26_00, F80_00, F81_00
-	DW	F82_00, F30_00, F32_00, F33_00, F34_00, F35_00, F36_00
-	DW	F37_00, F38_00, F40_00, F42_00, F43_00, F44_00, F45_00
-	DW	F46_00, F47_00, F48_00, M75_00, F54_00, F55_00, F56_00
-	DW	F58_00, F61_00, F62_00, F63_00, F64_00, F65_00, M42_00
-	DW	F67_00, F68_00, F69_00, M41_00, F75_00
+Main_T	DW	F39_00, F40_00, CmdIni, CmdExe, Exit
 
 	.CODE
 ; An entry for the C code of the loop (see port/main.c for what it takes

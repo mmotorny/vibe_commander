@@ -76,8 +76,8 @@ u16 AsmSeg(void);
 u16 *Shadow(u16 *cell);                                 /* screen.c */
 #pragma aux Shadow  "*_c" __far parm [di] value [di] modify exact [di]
 
-u32 F39_00(u16 again, u16 panel, u16 bar);
-#pragma aux F39_00  "*_c" __far parm [ax] [dx] [si] value [dx ax] modify exact [ax dx es]
+/* F39_00, the bar itself, is declared in vc.h: see "The commands"
+   there. */
 
 /* The lines of the menus, one behind the other, each ended by a 0, and
    an empty one for a line across the menu. FFh and a number are that

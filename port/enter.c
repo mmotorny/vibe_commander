@@ -22,38 +22,8 @@
  */
 #include "vc.h"
 
-u32 F21_00(u16 panel);
-u32 F21_10(u16 panel);
-u32 F21_25(void);
-u32 F21_31(void);
-u32 F22_00(u16 panel);
-u32 F23_00(u16 panel);
-u32 F24_00(u16 panel);
-u32 F24_01(u16 panel, u16 path);
-u32 F24_02(u16 panel);
-u32 F25_00(void);
-u32 F26_00(void);
-u32 F27_00(u16 panel);
-u32 F30_00(u16 panel);
-u32 F75_00(u16 panel);
-
-/* How the assembly passes arguments to these, and what it expects back
-   (see CmdC in port/asm/VCFUNC.INC). F21_30, which other files call too,
-   is in vc.h. */
-#pragma aux F21_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F21_10 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F21_25 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F21_31 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F22_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F23_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F24_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F24_01 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
-#pragma aux F24_02 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F25_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F26_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F27_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F30_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F75_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+/* The commands are declared in vc.h, see "The commands" there, and so is
+   F21_30, which other files call too. */
 
 /* ResSeg is the segment of the part of the program that stays in the
    memory while a command runs: an entry of the assembly, which has that

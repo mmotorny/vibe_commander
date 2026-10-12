@@ -10,10 +10,7 @@
  */
 #include "vc.h"
 
-u16 F62_01(u16 panel, u16 item);
-
-/* How the assembly calls it (see the stub in port/asm/VCFUNC.INC). */
-#pragma aux F62_01 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
+/* F62_01 is declared in vc.h: see "The commands" there. */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

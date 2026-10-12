@@ -14,20 +14,8 @@
  */
 #include "vc.h"
 
-void F73_00(u16 key);
-u16 F74_00(void);
-u16 F80_00(u16 panel);
-void F82_01(u16 panel, u16 key);
-u16 F68_00(void);
-u32 F77_00(u16 key, u16 panel);
-
-/* How the assembly calls these (see the stubs in port/asm/VCFUNC.INC). */
-#pragma aux F73_00 "*_c" __far parm [ax] modify exact [ax]
-#pragma aux F74_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux F80_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F82_01 "*_c" __far parm [ax] [dx] modify exact [ax]
-#pragma aux F68_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux F77_00 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
+/* The commands of this file are declared in vc.h: see "The commands"
+   there. */
 
 /* Routines of the rest of the program that this file calls. Those that
    are declared below are still assembly, and are called by their entries

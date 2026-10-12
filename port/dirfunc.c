@@ -42,16 +42,6 @@ u16 F38_40(u16 attributes);
 static u16 F38_70(void);
 u16 M30_50(u16 attributes);
 u32 M30_60(u16 answer);
-u16 F37_00(u16 panel);
-u16 F47_00(void);
-u16 F38_00(u16 panel);
-u16 F48_00(void);
-u16 F58_00(u16 panel);
-u16 M30_00(u16 panel);
-u16 F54_00(void);
-u16 FncMas(u16 include);
-u16 FncSel(void);
-u16 FncExt(void);
 static u32 F38_60(void);
 static u16 FncMs1(u16 include);
 
@@ -61,18 +51,8 @@ static u16 FncMs1(u16 include);
 #pragma aux F38_40  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux M30_50  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux M30_60  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-/* The commands: the panel they are for is what the assembly has in DS
-   when it jumps to one. FncMas gets what it has in BX. */
-#pragma aux F37_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F47_00  "*_c" __far value [ax] modify exact [ax]
-#pragma aux F38_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F48_00  "*_c" __far value [ax] modify exact [ax]
-#pragma aux F58_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M30_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F54_00  "*_c" __far value [ax] modify exact [ax]
-#pragma aux FncMas  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux FncSel  "*_c" __far value [ax] modify exact [ax]
-#pragma aux FncExt  "*_c" __far value [ax] modify exact [ax]
+/* The commands, with FncMas, FncSel and FncExt, are declared in vc.h:
+   see "The commands" there. */
 
 /* Routines of the rest of the program that this file calls. Those that
    are declared below are still assembly, and are called by their entries

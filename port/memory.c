@@ -66,10 +66,7 @@ LAID_OUT(MemLine, 7 + 12 + 1 + MaxVect);
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 #define NEAR(pointer) ((u16 *)(u16)(u32)(pointer))
 
-void F65_00(void);
-
-/* How the assembly calls it (see the stub in port/asm/VCMEM.INC). */
-#pragma aux F65_00 "*_c" __far modify exact [ax bx cx dx si di]
+/* F65_00 is declared in vc.h: see "The commands" there. */
 
 /* Routines that are still assembly, by their entries for C. The routines
    of the screen, the mouse and the keyboard that this file calls are C,

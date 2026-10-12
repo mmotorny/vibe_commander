@@ -94,7 +94,6 @@ LAID_OUT(EdData, 138);
    set when the help has been drawn. */
 #define EdHelp (*(u8 *)&ed.EdOffst)
 
-u16 T00_00(u16 handle, u16 begin, u16 size, u16 saved);
 void T50_00(void);
 void T51_00(void);
 u16 T53_00(struct Where STACK *where);
@@ -118,11 +117,9 @@ void T75_00(u16 number, u16 *screen, u16 color);
 void T76_00(u16 place, u16 segment, u16 text, u16 colors);
 u16 T80_00(void);
 
-/* How the assembly passes arguments to T00_00, and what it expects back
-   (see the stub in port/asm/VCEDIT.INC). The others had stubs too, until
-   what called them became C: the viewer, which is C, calls T70_00 and
-   T71_00. */
-#pragma aux T00_00 "*_c" __far parm [bx] [ax] [dx] [si] value [ax] modify exact [ax bx cx dx si di es]
+/* T00_00, the editor itself, is declared in vc.h. The others had stubs
+   in the assembly, until what called them became C: the viewer calls
+   T70_00 and T71_00. */
 #pragma aux T50_00 "*_c" __far modify exact [ax]
 #pragma aux T51_00 "*_c" __far modify exact [ax]
 #pragma aux T53_00 "*_c" __far parm [bx] value [ax] modify exact [ax]
@@ -2490,7 +2487,9 @@ again:
    what it covers is kept.
 
    Returns 0 if the file is to be viewed instead, 1 if it is to be closed
-   and nothing more, and 2 when it has been edited and is closed.
+   and nothing more, and 2 when it has been edited and is closed, with
+   EdWrite in the high byte, which V13_01 of the viewer takes: not 0 if
+   the file was written.
 
    The text goes into the memory behind the program, EdSpace paragraphs:
    a file that is not shorter than that is too large, and a box asks
@@ -2648,7 +2647,7 @@ u16 T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     ed.EdShape = ChgCur();
     T00_19();
     CurShp(ed.EdShape);                 /* T35_02 */
-    return 2;
+    return (u16)ed.EdWrite << 8 | 2;
 closed:
     ResWin(begin, size, (u16)md.WinBuf);        /* T00_10 */
     Window(begin, size);

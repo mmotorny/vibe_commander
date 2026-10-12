@@ -60,16 +60,14 @@ LAID_OUT(FndData, 18);
                                            the mouse */
 
 u16 FindFil(u16 attributes);
-u32 F67_00(void);
 static u16 FndMove(u16 key, u16 mode, u16 place, u16 size);
 static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
 
-/* How the assembly passes arguments to these, and what it expects back.
-   F67_00 returns where the command goes on, one of the TO_ of vc.h, and
-   in the high word, for TO_F24_02, the panel whose directory is another
-   now. */
+/* FindFil is what FncAddr names for the search. F67_00, the command, is
+   declared in vc.h: it returns where the program goes on, one of the TO_
+   there, and in the high word, for TO_F24_02, the panel whose directory
+   is another now. */
 #pragma aux FindFil "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F67_00  "*_c" __far value [dx ax] modify exact [ax dx]
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
