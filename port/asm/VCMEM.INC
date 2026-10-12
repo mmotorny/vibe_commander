@@ -5,8 +5,6 @@
 ; The map of the memory is C: port/memory.c, with the buttons of its
 ; window and their colours in port/memory_t.c. What is left here is what
 ; the C code asks of the part of the program that stays in the memory.
-; Counter, PrgList and Command are of that part, in VC.ASM.
-	PUBLIC	Counter, PrgList, Command
 
 	.CODE
 ; The segment of the part of the program that goes while a command runs,

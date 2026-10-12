@@ -31,14 +31,12 @@ tables of the commands. Seven files went with the stubs of the commands:
 
 Besides these, all in `VC.ASM`:
 
-- The part that stays in the memory: 213 bytes with contents (the seven
-  words at 100h that `tools/mkexe.c` fills in, `RunPar`, `ChkFile`, the
-  name `COMMAND.COM`, the command tail of the second copy, five texts),
-  29 bytes of code (`Exec`, `AlocEr`, `Exit00` and the stub of
-  `Release`), and room without contents: the 14,751 bytes of `RDATA`,
-  which are the table of vectors, the list of programs, the copies of
-  the panels and of the setup and the stack of 4,096, and the 16 of
-  `RGAP`.
+- Of the part that stays in the memory: 29 bytes of code (`Exec`,
+  `AlocEr`, `Exit00` and the stub of `Release`), which go with step 3;
+  the 256 bytes in front of them, where the PSP is; the 16 of `RGAP`
+  behind that part; the order of its segments; and `RPSP`, a segment
+  without contents by which the group of its data begins at the PSP.
+  Its data and its stack are C, `port/resident.c`.
 - The layout: the `STRUC` of the main data, 62,603 bytes that the
   program asks DOS for, that of a panel, and a dozen small ones, and
   the `EQU` of the colours and the lengths.
@@ -78,17 +76,22 @@ What names what:
   - `harness/driver.py` reads where `AutoTim` and `Clock` are in the
     main data from the listing of the original, in
     `build/shareware-layout/`, for the port too: its main data is laid
-    out as the original's. Where the stack is, `DataSav` and `VcStack`,
-    it takes from the linker's map, as `harness/ported.py` does; the
-    stack wants two names in the map when it is C.
+    out as the original's. Where the stack is it takes from the
+    linker's map, as `harness/ported.py` does: `DataSav`, where it
+    begins, and the segment `R_BSS`, which it is all of. And
+    `harness/coverage.py` takes from the map where the file has its
+    table of relocations, `RelTab`, `RelCnt` and `ResCnt`. None of them
+    reads anything of the port that an assembler has made.
   - `harness/datacheck.py` reads `VC.LST` and `VC.OBJ` of the port for
     what is still assembly, and does without them when they are gone.
   - `harness/coverage.py`, `harness/reach.py` and `harness/notice.py`
     read the listing of the original only, and need nothing.
   - `tools/routines.py` and `tools/flagscan.py` read `port/asm/`: they
     are for routines that are still assembly, and go with it.
-  - `tools/mkexe.c` reads the seven words at 100h, which the assembly
-    lays out, and the map.
+  - `tools/mkexe.c` goes by the map: the seven words that it fills in
+    and the stack by their names of `port/resident.c`, and one name
+    that is still the assembly's, `TrnBeg`, where the part that goes
+    begins.
 
 ### What holds the data while it moves
 
@@ -115,7 +118,9 @@ original does. No screen shows it.
 What it does not hold, each listed in the tool with the reason:
 
 - Constants that the original has not as data: `PowersOfTen`, `Panel_T`,
-  `Scan_P`, `Fnc_T`.
+  `Scan_P`, `Fnc_T`. And of the part that stays in the memory the seven
+  numbers that `tools/mkexe.c` writes, and `Stays`, what that part
+  keeps, which is zeros in the file.
 - `Suff_S`, the edition in the banner: it lies in room that is reserved
   for what only the shipped binary has.
 - Data that became code: the tables of keys are `switch` statements, and
@@ -265,23 +270,35 @@ round the loop to a command that happens to read them.
 **4. What is not of one file.** After 3. The compiler's helpers,
 `__U4M` and `__U4D`, went ahead: they are `port/arith.c`.
 
-- The data and the stack of the part that stays: as its agent left it
-  below ("How the data that the assembly still lays out could go to C"),
-  one structure in `port/resident.c` in a group of its own that begins
-  at the PSP. Two things to add. The constants of that part, its five
-  texts, `Command` and the tail `OvlPrm`, are better arrays declared
-  `CODE` in `port/resident.c` than members: the test `data` finds an
-  object by its name, and a member has none. And the group of the
-  constants, the compiler's, need not begin at the PSP any more once no
-  assembly counts from there: a word in a table is held by what it
-  names, not by its number. `tools/mkexe.c` lets the object file of
-  `port/resident.c` have data then, and finds the seven words by a name
-  in the map; `harness/driver.py` and `harness/ported.py` find the stack
-  by two names there.
+- The data and the stack of the part that stays. Done, ahead of the
+  last piece of 3: they are of `port/resident.c`, in a group that the compiler makes for
+  that file, `R_GROUP`, and that begins at the PSP. What that part
+  keeps is one structure, `struct Stays` of `port/vc.h`, in the order
+  of the original; its texts, `Command` and the tail `OvlPrm` are
+  arrays, which the test `data` holds by their names, with `RunPar` and
+  `ChkFile`; the seven numbers that `tools/mkexe.c` writes are words
+  that it finds by their names in the map; `SecDat` is a variable of
+  `port/main_t.c`. Three things are not as this list had them:
+  - The stack is no member of the structure but an array behind it,
+    `DataSav`. A member has no name in the linker's map, and
+    `tools/mkexe.c`, the harness and the nine instructions behind
+    INT 2Eh all want to know where the stack is. It is last by the
+    compiler's segments, not by the structure: it alone has no value,
+    so it alone is in `R_BSS`, which `tools/mkexe.c` checks.
+  - `Vect21` is no member either: a variable of the code segment,
+    `CODE`, which `New21` reads through CS.
+  - The texts are constants of the group, not arrays declared `CODE`:
+    the code there has DS on its data and hands them on as near
+    pointers.
+  The group of the constants, the compiler's `DGROUP`, still begins at
+  the PSP, because the assembly's does and they are one. It need not
+  once no assembly counts from there: a word in a table is held by what
+  it names, not by its number.
 - The layout of the main data: the `STRUC` goes with the last line of
-  assembly that names a field, which is a stub of 3 or the room of the
-  part that stays, sized by `CmnSave` and `WCBsave`. `struct MainDat` of
-  `port/vc.h` is then the only one, and `md` a type at offset 0 of DS.
+  assembly that names a field, which is a stub of 3: the room of the
+  part that stays, sized by `CmnSave` and `WCBsave`, is C. `struct
+  MainDat` of `port/vc.h` is then the only one, and `md` a type at
+  offset 0 of DS.
   Its layout stays the original's: boxes and dialogs hold places in it
   as numbers, `MD_AT`, and the test `data` holds those against the
   original's.
@@ -297,11 +314,57 @@ round the loop to a command that happens to read them.
   `arith.obj`, is of `CTEXT`.
 - `tools/mkexe.c` and `CMakeLists.txt` when there is nothing to
   assemble: the last step, by one agent. No `VC.OBJ`, no listing of the
-  port; the order of the segments and the two groups by the linker's
-  command; the relocations of the second group in `tools/mkexe.c` and
-  `Reloc`; `tools/routines.py`, `tools/flagscan.py` and what
-  `CLAUDE.md` and the README say of stubs and of the listing taken out.
-  JWasm stays: it builds the original and the driver of the tests.
+  port; `tools/routines.py`, `tools/flagscan.py` and what `CLAUDE.md`
+  and the README say of stubs and of the listing taken out. JWasm
+  stays: it builds the original and the driver of the tests. The
+  harness is ready for it: `harness/driver.py` has the original's
+  listing for `AutoTim` and `Clock`, and what it, `harness/ported.py`
+  and `harness/coverage.py` take of the port is in the linker's map.
+  What `VC.ASM` will still say then of how the program is laid out,
+  when its code and its tables are gone, and what can say it instead:
+  - The order of the segments, by their classes: `RPSP`, `RHEAD`,
+    `RCODE`, `FAR_DATA`, `RGAP`, `CONST`, `DATA`, `CODE`, `CCODE`. The
+    linker takes that from its command as well, `order clname RCODE
+    clname FAR_DATA ...`, which was tried with the object files given
+    in another order. Its help does not list the directive for DOS.
+    Without it the order is that in which the linker first meets each
+    class, and every object file of C names its code segment first,
+    empty or not: so `CCODE` would stand in front of `DATA`, code
+    within 4K of the stack, which `tools/mkexe.c` refuses.
+  - Two groups and what is of them, which the linker has no word for:
+    a group and a class come from object files only. `R_GROUP`, the
+    data of the part that stays, is the compiler's four segments of
+    the class `FAR_DATA`, which lie behind that part's code, and the
+    assembly adds `RPSP` to it, a segment without contents that is the
+    first of all: a group begins where its first segment does, and
+    that one is why the offsets of that data count from the PSP.
+    `DGROUP` is the compiler's for the constants, and the assembly
+    adds `RHEAD`, which begins at the PSP, `RTEXT`, the compiled code
+    of the part that stays, and `RGAP`. That `RTEXT` is of a group
+    which begins at the PSP is why that code has CS on the PSP: the
+    program is entered there with CS as `tools/mkexe.c` writes it, the
+    interrupts are taken at `stays:OFFSET(New21)`, INT 2Eh comes back
+    with nothing but CS to set DS and SS from, and `ResSeg` is SS for
+    code and data alike.
+  - The 256 bytes at the start, where the PSP is: `ORG 100h` in
+    `RHEAD`. `tools/mkexe.c` takes them off, and the label `_md` at
+    their start is the main data to C code.
+  - The 16 bytes of `RGAP`, on a paragraph, and the name of what
+    follows, `TrnBeg`, which `tools/mkexe.c` goes by.
+  One way that needs no assembler and changes nothing of the above: an
+  object file without code or data that a tool writes, a dozen records
+  for the segments and the two groups, linked first. Other ways were
+  looked at and each costs something that a program or a test would
+  see. With `RTEXT` of no group its code has a segment of its own, not
+  the PSP's: the vectors, `SetBrk`, `Exit01` and the entry of the file
+  then want that segment, a relocation in the part that goes which
+  names the part that stays and is not `RunPar`, the second count that
+  `Reloc` has not, and INT 2Eh wants the PSP from a relocated number.
+  With `R_GROUP` first in the file, to begin at the PSP by itself, the
+  code of that part stands behind the stack, where `New21` runs at
+  every call of DOS: the page that QEMU is slow on. And with the stack
+  elsewhere than at the end, whatever it runs down into is no longer
+  the command line.
 
 What must not be done by two at once: one assembly file; `VC.ASM` beyond
 its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
@@ -1184,10 +1247,10 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     behind it want it on the main data, which C cannot set; that is
     the instruction of inline assembly that `FatErr` wants too. What
     `port/start.c` names of the part that stays is in one list at its
-    top: `ComnIni`, `WCB1sav`, `WCB2sav`, `Counter`, `Vect21`,
-    `Vect22`, `Vect27`, `RelTab`, the functions `Exit01`, `New21` and
-    `New27`, by their offsets, and `SetBrk`, which it calls through a
-    pointer to a far function.
+    top: `ComnIni`, `WCB1sav`, `WCB2sav`, `Counter`, `Vect22` and
+    `Vect27`, which are members of `struct Stays`, `Vect21`, `RelTab`,
+    the functions `Exit01`, `New21` and `New27`, by their offsets, and
+    `SetBrk`, which it calls through a pointer to a far function.
   - The part that stays in the memory is C, `port/resident.c`: the
     entry of the program, `Alloc0`, which DOS enters; `Reloc`, which
     that part applies to the other whenever it has loaded it; the
@@ -1196,10 +1259,9 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     which runs the commands and loads the program again; `Exit00` to
     `Exit05`; `New21` and `New27` with what keeps the list of the
     programs that stay in the memory; `SetBrk`, `NotFind`, `OutStr`,
-    `GetStat` and `SetStat`. What is left of its assembly, in `RHEAD`
-    of `VC.ASM`, is its data, the block of numbers for `tools/mkexe.c`
-    at 100h, the name and the command tail, the texts, with `RDATA`
-    behind the compiled code, and two kinds of stub:
+    `GetStat` and `SetStat`. Its data is C too, of the same file. What
+    is left of its assembly, in `RHEAD` of `VC.ASM`, is two kinds of
+    stub:
     - `Exec`, `AlocEr` and `Exit00`, three instructions each. The part
       that goes still comes back by a far jump to one of them, from
       `CmdExe` in `VCFUNC.INC`, from the stub of `Init11` and from
@@ -1419,37 +1481,46 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   scenario switches Memory allocation off in the copy, which keeps all
   of it loaded. The port may use more memory than the original as long
   as it behaves the same: this is a place where it does not.
-- How the data that the assembly still lays out could go to C, from
-  having built the layout of the part that stays:
-  - The data of the part that stays, `RDATA` and what `RHEAD` has, is
-    best one structure in `port/resident.c`, with the stack its last
-    member: `WCB2sav` has to stand right in front of `ComnIni` (the
-    setup file is read across the two), `Counter` right in front of
-    `PrgList`, `SavePtr` behind `IntTab`, and the compiler lays out
-    separate variables in an order of its own. Compiled with `-nd=R`
-    the file gets a group of its own for it, `R_GROUP`, and reads it
-    through DS without loading a segment (tried). That group has to
-    begin at the PSP, since SS, DS and the offsets that the rest of
-    the program has for that part all count from there: the structure
-    begins with 256 bytes for the PSP, and the group is linked first.
-    Its code is then no longer of that group: `RTEXT` gets a segment
-    of its own, and where the part that goes names a function of it,
-    the relocation takes the PSP's segment and not `RunPar`.
-    `tools/mkexe.c` can tell the two by the segment that the word
-    names, as it tells the two parts by where a word lies, and `Reloc`
-    gets a second count.
-  - The block of numbers at 100h is then the first initialised member
-    of that structure, and `tools/mkexe.c` finds it by its name in the
-    linker's map, as it could find the end of the stack.
+- How the data of the part that stays is laid out by C, and what it
+  rests on (`port/resident.c`, `tools/mkexe.c`):
+  - The file is compiled with `-nd=R`, which gives its data a group of
+    its own, `R_GROUP`, that it reads through DS without loading a
+    segment. The group has to begin at the PSP, since SS, DS and the
+    offsets that the rest of the program has for that part all count
+    from there, and the compiler's four segments lie behind the code:
+    so the top of `port/asm/VC.ASM` puts an empty segment, `RPSP`, into
+    the group and in front of everything. That is the one thing of that
+    data which the assembly still says: see step 4 of "The last of the
+    assembly", the last item, for what could say it instead.
+  - What needs an order is one structure, `Stays`, since the compiler
+    lays out what has no value in an order of its own: `WCB2sav` right
+    in front of `ComnIni`, where the setup file is read across the
+    two, `Counter` in front of `PrgList`, `SavePtr` behind `IntTab`.
+    What needs a name is a variable by itself, since a member has none
+    to the linker: the seven words of `tools/mkexe.c`, `RunPar` and
+    `TrnPrW`, which the stubs of the assembly read, the texts, which
+    the test `data` holds, and the stack.
+  - That the stack is the end of that part is by the compiler's
+    segments and not by the language: `DataSav` is the one object of
+    that file without a value, and what has none is in the last of the
+    four, `R_BSS`. `Stays` is written with a value for that, zeros,
+    and last of what has one. `tools/mkexe.c` stops the build if
+    `R_BSS` holds another symbol, if `DataSav` is not at its start, or
+    if anything from `Stays` to the part that goes is not zero in the
+    file. Should a compiler lay those segments out otherwise, that is
+    where it shows.
   - `Vect21`, where INT 21h went before the program took it, is read
-    through CS by the entry of that interrupt, `New21` of
-    `port/resident.c`, which passes a call on before it has saved a
-    register: a word of the code's own segment is all that can be
-    reached there with no register and no stack. Today the code and
-    the data of the part that stays are one segment. If the code gets
-    a segment of its own, that word has to go with it, a word of
-    `RTEXT` that the start-up writes through a far pointer, as it
-    writes it now.
+    through CS by the entry of that interrupt, `New21`, which passes a
+    call on before it has saved a register: a word of the code's own
+    segment is all that can be reached there with no register and no
+    stack. It is a variable declared `CODE`, and `port/start.c` writes
+    it through a far pointer, as it did. Today the code of that part is
+    of the assembly's group and the data of its own, and both begin at
+    the PSP: should the code get a segment of its own, the word is
+    where it has to be.
+  - What the check sum of the file leaves out is what it left out, from
+    `Stays` on: the layout numbers, the texts and `OvlPrm` are summed,
+    as they were in `RHEAD`.
   - The main data is no storage of the program's but a block that DOS
     gives it: `md` needs no label, only a type at offset 0 of DS,
     `(*(struct MainDat __near *)0)`.
@@ -1461,9 +1532,10 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     without code may have a variable, with a value, so that it is in
     the file. The group is relocated like any segment of that part,
     and `port/start.c` writes the word after every command.
-  - The texts behind the stack: when `CONST` is gone, a C file of
-    constants only, linked first in the part that goes, keeps code
-    off the page that the stack ends in.
+  - The texts behind the stack: `CONST` is gone already, and the
+    constants of the C code, `CONST2`, stand there, some 8,900 bytes.
+    When `VC.ASM` is gone it is the linker's order that keeps them in
+    front of the code.
 - `CtrlC`, the routine that the program has for Ctrl-C of DOS and for
   Ctrl-Break of the BIOS, runs in no scenario: the BIOS of the bench
   makes no interrupt of Ctrl and ScrollLock, which was tried with a key
@@ -2631,6 +2703,33 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     script that names the lines it expects, and the names of the test's
     output were held against those of before by another, which also
     says which objects have another length.
+
+- The data and the stack of the part that stays, to C:
+  - A quarter of an hour before a line was written, on where the data
+    can lie. The plan had its group linked first, to begin at the PSP,
+    which puts the code of that part behind the stack, on the page
+    that QEMU is slow on; and the four segments that the compiler
+    makes with `-nd` are of one class, `FAR_DATA`, not `DATA` and
+    `BSS`, so they cannot stand on both sides of the code. What settled
+    it was ten lines of assembly and a C file of the same in `build/`,
+    linked by hand: the map says in a second where the linker puts a
+    group, a class and an object, and whether an empty segment holds a
+    group at the PSP. Try a layout there before the program.
+  - A member of a structure has no name to the linker, and the stubs
+    of the assembly, four C files, `tools/mkexe.c`, the harness and
+    the test `data` each went by such names: what needs a name became
+    a variable of its own, the stack among it, and the four files name
+    a member through `STAYS` under the name it had.
+  - 3 minutes: the twelve scenarios of that part came out as the
+    original under `harness/compare.py`, and the `port` test stopped
+    in `harness/coverage.py`, which read at 100h of the file where the
+    table of relocations is. `compare.py` does not trace what ran: it
+    is `ctest -R port` that says whether the harness still knows the
+    file.
+  - What saved time: the lines of the assembly were taken out by a
+    script that names what it expects, and the three commits were made
+    from the finished tree, kept on a branch while the first two were
+    cut out of it and tested.
 
 ## Ideas put off
 

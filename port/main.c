@@ -151,19 +151,18 @@ const u8 __far *FndLet(const u8 __far *text);
    with a digit or a letter, which begin the speed search; the routine
    that DOS calls for a critical error; and, in the part that stays in
    the memory, the routine for Ctrl-Break, which only returns, and the
-   copy of the first panel that is kept while a command runs. And of
-   port/main_t.c the box that says a drive is not ready, which DialBox
-   takes by its offset. */
+   copy of the first panel that is kept while a command runs, of struct
+   Stays there. And of port/main_t.c the box that says a drive is not
+   ready, which DialBox takes by its offset. */
 extern const u8 __far AltSr_T[];
 extern const u8 __far Menu_T[];
 extern const u8 __far NoRd_P[];
 extern const u8 __far CtrlC[];
-extern const u8 __far WCB1sav[];
 #pragma aux AltSr_T "*"
 #pragma aux Menu_T "*"
 #pragma aux NoRd_P "*"
 #pragma aux CtrlC "*"
-#pragma aux WCB1sav "*"
+#define WCB1sav STAYS(WCB1sav)
 
 #define ALT_KEYS 38                     /* the length of AltSr_T */
 

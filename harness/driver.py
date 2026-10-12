@@ -83,6 +83,7 @@ import struct
 from dataclasses import dataclass, replace
 from pathlib import Path
 
+import coverage
 from dos import COLUMNS, ROWS, MachineError, Screen
 
 # The driver, assembled by the build.
@@ -199,9 +200,7 @@ def facts(program, stack=False):
                   symbol(r"^ *Clock [ .]*([0-9A-F]+) +Byte"))
     if stack:
         if program.linked:
-            text = Path(program.linked).read_text()
-            bottom = symbol(r"^0000:([0-9a-f]{4})[*+]? +DataSav$")
-            top = symbol(r"^0000:([0-9a-f]{4})[*+]? +VcStack$")
+            bottom, top = coverage.stack(program.linked)
         else:
             bottom = symbol(r"^DataSav [ .]*Byte\[\d+\] +([0-9A-F]+)h")
             top = symbol(r"^VcStack [ .]*L Near +([0-9A-F]+)h")

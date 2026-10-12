@@ -148,7 +148,10 @@ list(TRANSFORM port_asm PREPEND ${CMAKE_SOURCE_DIR}/port/asm/)
 # so dos.c, the one file that calls DOS and the BIOS, is compiled a second
 # time for it, into RTEXT as well: one source, two copies of its code.
 # RESIDENT is defined for both, and by it port/vc.h gives the functions of
-# the second copy names of their own.
+# the second copy names of their own. The files named here have data too,
+# that of the part that stays, which the compiler puts into a group of
+# their own, R_GROUP, and reads through DS: the option -nd=R. The second
+# copy of dos.c has none and is compiled without.
 set(port_c_resident resident.c)
 
 # mkexe turns the linker's output into the program that is run.
@@ -197,7 +200,7 @@ endfunction()
 foreach(source ${port_c})
     string(REGEX REPLACE "\\.c$" "" object ${source})
     if(source IN_LIST port_c_resident)
-        port_compile(${source} ${object} RTEXT RCODE -dRESIDENT)
+        port_compile(${source} ${object} RTEXT RCODE -dRESIDENT -nd=R)
     elseif(source IN_LIST port_c_second)
         port_compile(${source} ${object} CTEXT2 CCODE)
     else()

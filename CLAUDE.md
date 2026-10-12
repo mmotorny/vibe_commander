@@ -610,9 +610,9 @@ them. The copy may be in another file than the text: `User_S` of
   driver reads `AutoTim` and `Clock` in the main data, which
   `harness/driver.py` finds in the listing of the original,
   `build/shareware-layout/VC.LST`, for the port too: its main data is
-  laid out as the original's. The port's stack, `DataSav` and
-  `VcStack`, it finds in the linker's map: when those two are no longer
-  assembly, `harness/driver.py` has to be shown where they are.
+  laid out as the original's. The port's stack it finds in the linker's
+  map, `stack` of `harness/coverage.py`: it begins at `DataSav` of
+  `port/resident.c` and is all of the segment `R_BSS`.
 - What a routine reads in the assembly's code segment may be read by
   another file too, and then stays, `PUBLIC`, when the routine goes: the
   menu finds the menu that the mouse is on by `PtMnu_S`, the names that
@@ -896,35 +896,39 @@ them. The copy may be in another file than the text: `User_S` of
   where the stack is, with `Counter`, `PrgList`, `RunPar` and the
   routines that `CallPSP` calls. The assembly reaches that part through
   SS; C code gets its segment from an entry, `ResSeg_a` in `VCMEM.INC`,
-  and the offset of an object there like any other of the assembly.
-- The part that stays is four segments of the assembly's one group,
-  declared at the top of `port/asm/VC.ASM` before `.MODEL`, so that the
-  linker puts them first and in that order: `RHEAD`, what is assembly
-  of it, behind the PSP; `RTEXT`, its compiled code; `RDATA`, its data
-  with the stack at the end; `RGAP`, the paragraph of the header of the
-  next block of memory. The part that goes begins behind them, at
-  `TrnBeg`, on a paragraph, and `tools/mkexe.c` stops the build if it
-  does not. It begins with `CONST`, the texts, 5,088 bytes of them: QEMU
-  is many times slower at a write to a page that has code which it has
-  run, the stack ends just in front, and with `_TEXT` there, whose
-  stubs of the main loop run at every key, a scenario of the cursor's
-  keys took 19.7 seconds where it takes 5.6. When the texts have gone
-  to C and `CONST` is shorter than a page, something else that is not
-  run has to stand there. Every offset of the assembly still counts
-  from the PSP. Where the two parts begin and end is not known to the
-  assembler any more, with compiled code between them: `TrnPar` and
-  `ResPar` are words of the part that stays, which `tools/mkexe.c`
-  fills in, read through SS, and they cannot be added to a constant
-  where the program is assembled.
+  and the offset of an object there like any other that it names. What
+  that part keeps is one structure, `struct Stays` of `port/vc.h`, and a
+  member has no name to the linker: `#define Counter STAYS(Counter)` at
+  the top of a file makes `OFFSET(Counter)` the member's place.
+- The part that stays is the segments that the top of
+  `port/asm/VC.ASM` declares before `.MODEL`, so that the linker puts
+  them first and in that order: `RHEAD`, what is assembly of it, behind
+  the PSP; `RTEXT`, its compiled code; the four that the compiler makes
+  for the data of `port/resident.c`, `RCONST`, `RCONST2`, `R_DATA` and
+  `R_BSS`, the last of which is the stack; `RGAP`, the paragraph of the
+  header of the next block of memory. The part that goes begins behind
+  them, at `TrnBeg`, on a paragraph, and `tools/mkexe.c` stops the build
+  if it does not. It begins with the constants of the C code, `CONST2`,
+  some 8,900 bytes of them: QEMU is many times slower at a write to a
+  page that has code which it has run, the stack ends just in front,
+  and with `_TEXT` there, whose stubs of the main loop ran at every
+  key, a scenario of the cursor's keys took 19.7 seconds where it takes
+  5.6.
+  Every offset of the assembly still counts from the PSP, and so does
+  every one in the data of the part that stays, which is a group of its
+  own (see below). Where the two parts begin and end is not known to
+  the assembler, with compiled code between them: `TrnPar` is a word of
+  the part that stays, `TrnPrW` of `port/resident.c`, which
+  `tools/mkexe.c` fills in, read through SS, and it cannot be added to
+  a constant where the program is assembled.
 - A label of one segment less a label of another is no number to the
   assembler, also within one group: "Constant expected".
 - The compiled code of the part that stays is `port/resident.c`, a file
   of `port_c_resident` in `CMakeLists.txt`: compiled into `RTEXT` with
   `RESIDENT` defined. DS is the PSP's segment in all of it, not the main
-  data, and `md` means nothing there. Its data is laid out by the
-  assembly, in `RDATA`, made `PUBLIC` and declared in the C as `extern
-  ... __near` with a `#pragma aux` that keeps the name, as `md` is; a
-  place in the PSP is a near pointer made of its offset. Nothing of the
+  data, and `md` means nothing there. Its data is its own, static data
+  of C, which `tools/mkexe.c` lets that file have; a place in the PSP
+  is a near pointer made of its offset. Nothing of the
   part that goes can be called from it, since that is not in the memory
   while a command runs: `port/dos.c` is compiled a second time into
   `RTEXT`, as `dos_r.obj`, and `port/vc.h` names the functions of that
@@ -956,8 +960,10 @@ them. The copy may be in another file than the text: `User_S` of
 - A statement of C in a `__declspec(naked)` function is compiled to
   nothing, without a warning: such a function is its `_asm` and no more.
   `_asm` takes labels and jumps to them, and `jmp dword ptr cs:Vect21`
-  is a far jump through a word of the part that stays, whose data is of
-  the segment that its code is in.
+  is a far jump through a word of the code segment of the part that
+  stays: `Vect21` is a variable declared `CODE`, which C code reads
+  through CS as well, and no member of that part's data. `_asm` expands
+  the macros of C: `mov sp,offset DataSav + LenStk`.
 - Nothing that the compiler makes passes an interrupt on with the stack
   as it found it and no register changed. An ordinary function with the
   call in AX, `modify exact []`, and the handler before called through a
@@ -998,8 +1004,30 @@ them. The copy may be in another file than the text: `User_S` of
   may be called that needs one: an `__interrupt` or `__loadds` function,
   or a far function of another segment. A far call within `RTEXT` needs
   none, the linker makes `push cs` and a near call of it.
-- The block of numbers that `tools/mkexe.c` fills in is at 100h, the
-  first thing behind the PSP, in `RHEAD`.
+- The numbers that `tools/mkexe.c` fills in are seven words of
+  `port/resident.c`, each of which it finds by its name in the linker's
+  map, as it finds what they say: `TrnBeg`, `Stays`, `DataSav` and the
+  segment `R_BSS`.
+- The data of the part that stays is in a group of its own, `R_GROUP`,
+  which the compiler makes for a file that is compiled with `-nd=R` and
+  reads through DS without loading a segment. Its four segments are
+  `RCONST` for string literals, `RCONST2` for what is `const`, `R_DATA`
+  for what has a value and `R_BSS` for what has none, all of the class
+  `FAR_DATA` and in that order. What has no value the compiler lays out
+  in an order of its own; what has one, in the order it is written. So
+  what needs an order is one structure, `Stays`, written last and with
+  a value, zeros, and the stack is the one thing without: the end of
+  the group, by the segments. A variable added to that file needs a
+  value, `= 0`, or `tools/mkexe.c` stops the build for what is in the
+  segment of the stack. An interrupt function and a `__loadds` one load
+  DS with the group, a number that is relocated.
+- The linker places segments by their class, in the order in which it
+  first meets each, and a group may have segments of other groups, or
+  of none, between its own: a group is where its first segment is. A
+  segment without contents counts for that. `R_GROUP` begins at the PSP
+  because `port/asm/VC.ASM` declares an empty segment, `RPSP`, first of
+  all, and says that it is of that group. The linker has no word of its
+  own for a group or for a class: both come from object files.
 - An `__interrupt` function of the part that goes has DS on the
   compiler's group when its first statement runs, and that group is the
   assembly's: its segment, where `SecDat` is, a variable of
@@ -1018,16 +1046,12 @@ them. The copy may be in another file than the text: `User_S` of
 - Where the program has no stack, behind INT 2Eh, the instructions that
   set one are a function `__declspec(naked)` with `_asm`, which ends in
   a jump to a C function that does not return: `Int2E`. `offset
-  VcStack` there is the offset of a label of the assembly, declared
-  `extern u8 __near`. A parameter of a naked function that is only in
+  DataSav + LenStk` there is the end of an array of the file, the
+  stack. A parameter of a naked function that is only in
   its register wants `(void)name;`, or it is "not referenced".
 - `_disable` and `_enable` are known only where a `#pragma intrinsic`
   names them, which is in `port/dos.c`: "No prototype found" elsewhere.
   Call `IntOff` and `IntOn`.
-- The option `-nd` gives a file's own data a group of its own name,
-  which it reads through DS without loading a segment; the linker puts
-  that group where it likes, not at the PSP. Not used: the data of the
-  part that stays is the assembly's.
 - A command that is C whole and ends at `Func04` is a stub of two
   lines: `CallC` and the jump. See `F65_00`.
 - A label that gets a stub takes what the stub takes, and whatever
@@ -1228,7 +1252,7 @@ with it is less obvious:
   that are no characters: `sizeof` of the macro, less one, is where the
   next one begins, and costs nothing in the program. See `MenuLn` there.
 - The option `-nd` makes the compiler load a segment for every access to
-  the main data. Do not use it.
+  the main data. Do not use it for a file of the part that goes.
 - The port's stack is 4,096 bytes where the original's is 256, so stack
   use needs no care. The `port` test reports how much each scenario
   leaves and fails when less than half is left.
@@ -1271,10 +1295,10 @@ with it is less obvious:
   Read the `STRUC` in `port/asm/VC.ASM` before taking an offset from a
   C structure.
 - There is no C library. String literals and static variables are refused
-  by `tools/mkexe.c`, but for a variable with a value in a file that
-  has no code: `SecDat` of `port/main_t.c`, the one. A text may be
-  written as a string where it gives an array declared `CODE` its
-  contents: `static const u8 CODE Name_S[] =
+  by `tools/mkexe.c`, but for the data of `port/resident.c`, which has
+  DS on it, and for a variable with a value in a file that has no code:
+  `SecDat` of `port/main_t.c`, the one. A text may be written as a
+  string where it gives an array declared `CODE` its contents: `static const u8 CODE Name_S[] =
   "text";` is in the code segment, with its zero byte. Constants that
   are named by their offsets, boxes and dialogs with their texts, are in
   files of their own, without `CODE`: see "Moving the data of a file to

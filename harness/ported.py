@@ -16,7 +16,7 @@ below, this also checks that
 
 Compiled code uses more of the stack than the assembly it replaces, so
 the port has a stack many times as long as the original's 256 bytes:
-LenStk in port/asm/VC.ASM. When the program has been loaded its stack
+LenStk in port/resident.c. When the program has been loaded its stack
 holds what its file has there, which is nothing, zeros; how much of that
 is still there, from the bottom up, is looked at every time a step ends
 with the program waiting for a key (see driver.py). A
@@ -63,9 +63,6 @@ SIZE_LIMIT = 3
 # scenario has: a critical error of DOS at the bottom of deep calls, an
 # interrupt that arrives there.
 STACK_LEFT = 2
-
-# The bottom and the top of the stack, as the link map names them.
-STACK = ("DataSav", "VcStack")
 
 
 @dataclass(frozen=True)
@@ -1089,9 +1086,7 @@ def check_port(link_map, executed):
 def check_stack(link_map, names, runs):
     """Report on how much of its stack the port left untouched; return
     success."""
-    symbols = coverage.link_map(link_map)
-    (segment, bottom), (same, top) = (symbols[name] for name in STACK)
-    assert segment == same
+    bottom, top = coverage.stack(link_map)
     size = top - bottom
     limit = size // STACK_LEFT
     left = {name: run.stack_left for name, run in zip(names, runs)}

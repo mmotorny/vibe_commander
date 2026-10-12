@@ -297,6 +297,50 @@ LAID_OUT(WCBdef, 0x1A62);
 /* The main data segment, which DS points at. */
 extern struct MainDat __near md;
 
+/* What the part of the program that stays in the memory while a command
+   runs keeps there (resident.c), in the order of the original: the
+   interrupts as they were when a program was last run, with what the
+   BIOS keeps at 40h:A8h behind them; where INT 22h and INT 27h went
+   before the program took them; where that part calls the rest of the
+   program, a far address; the programs that have stayed in the memory,
+   each by the segment of its record; the name of the program run last;
+   and what is kept of the two panels and of the main data while a
+   command runs: of a panel what a WCBdef has before ExtBuf and of each
+   file of its list the first 13 bytes, of the main data what it has
+   before DosLin. The setup file is read across the three, so they stand
+   one behind the other.
+
+   resident.c has the structure itself, and DS on it. The rest of the
+   program reaches it through far pointers: the segment is that of the
+   stack, and STAYS is the place of a member, of which a file takes the
+   offset as of any object that it names. */
+#define MaxProg 18                      /* Maximal resident quantaty */
+#define STAYS_WCB \
+    ((u16)(u32)&((struct WCBdef __far *)0)->ExtBuf + 13 * MinFls)
+#define STAYS_CMN ((u16)&((struct MainDat *)0)->DosLin)
+
+#pragma pack(push, 1)
+struct Stays {
+    u32 IntTab[256];
+    u32 SavePtr;
+    u32 Vect22;
+    u32 Vect27;
+    u32 TrnAdr;
+    u16 Counter;
+    u16 PrgList[MaxProg];
+    u8  NameBuf[12];
+    u8  WCB1sav[STAYS_WCB];
+    u8  WCB2sav[STAYS_WCB];
+    u8  ComnIni[STAYS_CMN];
+};
+#pragma pack(pop)
+
+#ifndef RESIDENT
+extern struct Stays __far Stays;
+#pragma aux Stays "*"
+#define STAYS(member) (&Stays.member)
+#endif
+
 /* Texts that the code of more than one file shows: the first two are
    constants of port/main_t.c, the third is one of port/treebox_t.c.
    They are in the group of the constants, so naming one costs a

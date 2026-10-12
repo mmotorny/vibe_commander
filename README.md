@@ -342,7 +342,12 @@ loaded.
 The file is the program as it lies in the memory. First comes the part
 that stays there while a command runs: what is left of its assembly, its
 compiled code, and its data with the stack at the end, which are nothing
-but room in the file. Then, a
+but room in the file. That data is of `port/resident.c`, the one C file
+with data of its own, in a group that the compiler makes for it and
+that begins at the PSP, as the program's one segment did when it was a
+`.COM` file: its texts, the numbers that `tools/mkexe.c` writes, which
+it finds by their names in the linker's map, one structure for what the
+part keeps, in the order of the original, and the stack. Then, a
 paragraph further on, the part that goes while a command runs. The
 original has that part where the data of the first will be and moves it
 up as it starts, over itself; the port is loaded with it in place, on its

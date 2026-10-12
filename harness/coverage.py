@@ -36,16 +36,15 @@ FAR_CALL, FAR_JUMP = 0x9A, 0xEA
 
 # The port's file, as tools/mkexe.c makes it: a header, and behind it the
 # program from offset 100h of the segment it is loaded into, where a .COM
-# file's begins. There the program has the numbers it relocates itself
-# by, words: the second is where its relocation table is, in paragraphs
-# from the segment's start, the third how many entries that has for the
-# part that goes while a command runs, and the seventh how many more for
-# the part that stays. An entry is the offset and the segment of a word,
-# counted from the segment's start too.
+# file's begins. The program has the numbers it relocates itself by in
+# words of port/resident.c, which the linker's map names: where its
+# relocation table is, in paragraphs from the segment's start, how many
+# entries that has for the part that goes while a command runs, and how
+# many more for the part that stays. An entry is the offset and the
+# segment of a word, counted from the segment's start too.
 EXE_HEADER = 0x20
 COM_ORIGIN = 0x100
-EXE_INFO = 0x100
-EXE_TABLE, EXE_COUNT, EXE_STAYING = EXE_INFO + 2, EXE_INFO + 4, EXE_INFO + 12
+EXE_TABLE, EXE_COUNT, EXE_STAYING = "RelTab", "RelCnt", "ResCnt"
 
 _LINE = re.compile(r"0x([0-9a-f]{8}):  ((?:[0-9a-f]{2} )*[0-9a-f]{2})"
                    r"(?:  +(\S.*))?$")
@@ -74,17 +73,19 @@ def blocks(trace_path):
         yield block
 
 
-def relocated(contents):
+def relocated(contents, linked=None):
     """The offsets in `contents`, a program file, of the words that the
     program adds its segment to when it is loaded: those of the port's
-    relocation table. None of them for a file that is no .EXE, the
-    original."""
+    relocation table, with the linker's map of the port at `linked`. None
+    of them for a file that is no .EXE, the original."""
     if contents[:2] != b"MZ":
         return ()
     in_file = EXE_HEADER - COM_ORIGIN       # from the segment to the file
+    symbols = link_map(linked)
     table, count, staying = (
-        struct.unpack_from("<H", contents, at + in_file)[0]
-        for at in (EXE_TABLE, EXE_COUNT, EXE_STAYING))
+        struct.unpack_from("<H", contents, symbols[name][0] * 16
+                           + symbols[name][1] + in_file)[0]
+        for name in (EXE_TABLE, EXE_COUNT, EXE_STAYING))
     count += staying
     return tuple(segment * 16 + offset + in_file
                  for offset, segment in struct.iter_unpack(
@@ -105,8 +106,10 @@ def _loaded(contents, words, base):
     return bytes(there)
 
 
-def executed(trace_path, contents):
-    """Offset -> length in `contents` (a program file) of what was executed."""
+def executed(trace_path, contents, linked=None):
+    """Offset -> length in `contents` (a program file) of what was
+    executed. `linked` is the linker's map of the port, for where its
+    relocation table is."""
     logged = list(blocks(trace_path))
     votes = Counter()
     # Instructions that follow one another in memory vote as one block
@@ -131,7 +134,7 @@ def executed(trace_path, contents):
 
     # A block is in the program if every instruction of it is, at one and
     # the same place: single instructions are too short to go by.
-    words = relocated(contents)
+    words = relocated(contents, linked)
     there = {base: _loaded(contents, words, base) if words else contents
              for base in bases}
     bases = [base for base in bases if there[base] is not None]
@@ -313,3 +316,29 @@ def link_map(path):
             if match:
                 symbols[match[3]] = (int(match[1], 16), int(match[2], 16))
     return symbols
+
+
+# The port's stack, as its link map names it: an array of port/resident.c,
+# and the segment that the compiler has it in, of which it is all. See
+# tools/mkexe.c, which stops the build if it is not.
+STACK = ("DataSav", "R_BSS")
+
+
+def stack(path):
+    """Where the port's stack begins and ends, by the wlink map at
+    `path`: two offsets from where the program is loaded, which is where
+    its stack segment is."""
+    array, segment = STACK
+    at, offset = link_map(path)[array]
+    bottom = at * 16 + offset
+    with open(path) as text:
+        for line in text:
+            match = re.match(rf"{segment} +\w+ +\w+ +([0-9a-f]{{4}}):"
+                             r"([0-9a-f]{4}) +([0-9a-f]{8})$", line)
+            if match:
+                begin = int(match[1], 16) * 16 + int(match[2], 16)
+                if begin != bottom:
+                    raise ValueError(f"{path}: {array} is not where "
+                                     f"{segment} begins")
+                return bottom, begin + int(match[3], 16)
+    raise ValueError(f"{path} has no segment {segment}")

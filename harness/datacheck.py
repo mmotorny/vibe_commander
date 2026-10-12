@@ -83,6 +83,15 @@ OWN = {
                    "instructions",
     "Scan_P": "the four colours of a box that the C draws without the "
               "table of one",
+    "Stays": "what the part that stays in the memory keeps there, zeros "
+             "in the file: the original lays it over the code that starts "
+             "the program",
+    **dict.fromkeys(
+        ("ImgEnd", "RelTab", "RelCnt", "TrnPrW", "ResPrW", "DatPrW",
+         "ResCnt"),
+        "a number of how the file is laid out, which tools/mkexe.c writes "
+        "there: the original's assembler works such numbers into its "
+        "instructions"),
 }
 
 # The tables of the menus' commands. Where the original has the address
@@ -410,16 +419,14 @@ class Port:
                     self.assembly[name] = (begin + value, kind, segment)
                     ends[segment].append(begin + value)
                     break
-        # What the assembly has in the part that stays in the memory is
-        # that part's variables and texts: no constants of the code. Nor
-        # are the variables of the C code that have a value in the file,
-        # which the compiler has in a segment of their own, _DATA.
-        self.variables = {name for name, (_, kind, segment)
-                          in self.assembly.items()
-                          if kind == "data" and segment == "RHEAD"}
+        # What is no constant, though it has contents: the variables of
+        # the C code that have a value in the file. The compiler has them
+        # in a segment of their own, _DATA, and R_DATA for those of the
+        # part that stays in the memory.
+        self.variables = set()
         for name, (address, kind, segment) in self.assembly.items():
             self.places[name].append(address)
-            if kind == "data" and segment not in ("RDATA", "RGAP"):
+            if kind == "data" and segment != "RGAP":
                 # A label with nothing of the assembly behind it is no
                 # object: TrnBeg, once the assembly's texts are gone.
                 behind = [there for there in ends[segment] if there > address]
@@ -430,6 +437,8 @@ class Port:
         # The C code: an object of it is a symbol of a segment that is
         # no code, or one in the code that has an underscore in front, as
         # the compiler names data. It is as long as its object file says.
+        # What has no value in the file is no object here: the stack of
+        # the part that stays, in R_BSS.
         for module, symbols in modules.items():
             if module == "VC":
                 continue
@@ -445,6 +454,8 @@ class Port:
             for name, segment, offset in compiled.symbols:
                 code = compiled.segments[segment][1] in ("CCODE", "RCODE")
                 if code and not re.match(r"_[A-Za-z0-9]", name):
+                    continue
+                if compiled.segments[segment][0].endswith("_BSS"):
                     continue
                 if compiled.segments[segment][0].endswith("_DATA"):
                     self.variables.add(name.lstrip("_"))

@@ -2,8 +2,8 @@
  * The part of the program that stays in the memory while a command runs.
  *
  * It begins with the PSP and is one segment, as the program was when it
- * was a .COM file: the code here, the data, which port/asm/VC.ASM lays
- * out behind it, and the stack at the end. DS is that segment in every
+ * was a .COM file: the code here, the data behind it, which is of this
+ * file too, and the stack at the end. DS is that segment in every
  * function of this file, where vc.h says that DS is the main data: the
  * main data is not in the memory while a command runs, and neither is
  * the C code of the rest of the program. So nothing here uses `md` or
@@ -30,88 +30,124 @@
  */
 #include "vc.h"
 
-#define MaxProg 18                      /* Maximal resident quantaty */
+#define LenStk  0x1000                  /* Stack size */
 #define LenCmd  124                     /* Length of command line */
 #define VcApiVr 42
 
-/* The data of this part, in RDATA of port/asm/VC.ASM: the interrupts as
-   they were when a program was last run, with what the BIOS keeps at
-   40h:A8h behind them; where INT 21h and INT 27h went before the program
-   took them; the programs that have stayed, each by the segment of its
-   record; the name of the program run last; and what is kept of the
-   panels and of the main data while a command runs. Of ComnIni only as
-   much is there as the main data has before DosLin. */
-extern u32 __near IntTab[256];
-extern u32 __near SavePtr;
-extern u32 __near Vect21;
-extern u32 __near Vect22;
-extern u32 __near Vect27;
-extern u16 __near Counter;
-extern u16 __near PrgList[MaxProg];
-extern u8 __near NameBuf[12];
-extern u8 __near WCB1sav[];
-extern u8 __near WCB2sav[];
-extern struct MainDat __near ComnIni;
-#pragma aux IntTab "*"
-#pragma aux SavePtr "*"
-#pragma aux Vect21 "*"
-#pragma aux Vect22 "*"
-#pragma aux Vect27 "*"
-#pragma aux Counter "*"
-#pragma aux PrgList "*"
-#pragma aux NameBuf "*"
-#pragma aux WCB1sav "*"
-#pragma aux WCB2sav "*"
-#pragma aux ComnIni "*"
+/*----------------------- The data -----------------------
+   The data of this part is of this file, in a group of the compiler's
+   that only this file has, R_GROUP (the option -nd=R of the build). The
+   group begins at the PSP, as that of the code does: so DS is on it, and
+   SS, and an offset here is one from the PSP. It lies behind the code in
+   the order of the compiler's segments: the constants, what has a value
+   when the program is loaded, and last what has none, which is the stack
+   and nothing else. tools/mkexe.c stops the build if that segment holds
+   anything more, or if anything stands behind the structure that the
+   file does not have as zeros.
 
-/* What the head of this part has, in RHEAD of port/asm/VC.ASM: the
-   segment that the part that goes runs in, which is so many paragraphs
-   below its block of memory as that part begins behind the PSP in the
-   file, TrnPrW; the check sum of the program's file as it was loaded;
-   how long the file is, in paragraphs from the PSP; the name that
-   COMMAND.COM has when the environment does not say, and the command
-   tail by which a second copy of the program knows that it is one, with
-   room for the segment of the first; and what this part says for
-   itself. The end of the stack is the end of this part. And the numbers
-   that tools/mkexe.c writes into the file, all in paragraphs from the
-   PSP but the counts: how long this part is, ResPrW, and where its data
-   begins, DatPrW; where the linker's relocations are, RelTab, how many
-   of them are of the part that goes, RelCnt, and how many, behind
-   those, of this part, ResCnt. */
-extern u16 __near RunPar;
-extern u16 __near ChkFile;
-extern u16 __near ImgEnd;
-extern u16 __near TrnPrW;
-extern u16 __near ResPrW;
-extern u16 __near DatPrW;
-extern u16 __near RelTab;
-extern u16 __near RelCnt;
-extern u16 __near ResCnt;
-extern u8 __near OvlPrm[];
-extern const u8 __near Command[];
-extern const u8 __near NoRun_S[];
-extern const u8 __near FnFil_S[];
-extern const u8 __near BadFl_S[];
-extern const u8 __near Retr_S[];
-extern const u8 __near Aloc_S[];
-extern u8 __near VcStack[];
-#pragma aux RunPar "*"
-#pragma aux ChkFile "*"
-#pragma aux ImgEnd "*"
-#pragma aux TrnPrW "*"
-#pragma aux ResPrW "*"
-#pragma aux DatPrW "*"
-#pragma aux RelTab "*"
-#pragma aux RelCnt "*"
-#pragma aux ResCnt "*"
-#pragma aux OvlPrm "*"
+   First the constants: the name that COMMAND.COM has when the
+   environment does not say, and what this part says for itself. */
+const u8 Command[] = "COMMAND.COM";
+const u8 NoRun_S[] =
+    "There is not enough memory to run this command\015\012";
+const u8 FnFil_S[] = "\015\012" "Can't find the file: ";
+const u8 BadFl_S[] = "\015\012" "Bad or missing ";
+const u8 Retr_S[] =
+    "\015\012" "Press ENTER to try again or ESC to abort\015\012";
+const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
 #pragma aux Command "*"
 #pragma aux NoRun_S "*"
 #pragma aux FnFil_S "*"
 #pragma aux BadFl_S "*"
 #pragma aux Retr_S "*"
 #pragma aux Aloc_S "*"
-#pragma aux VcStack "*"
+
+/* The numbers that tools/mkexe.c writes into the file, each of which it
+   finds by its name in the linker's map. All are in paragraphs from the
+   PSP but the counts: how long the file is, ImgEnd; where the part that
+   goes begins, TrnPrW; how long this part is, ResPrW, and where the
+   file has nothing but zeros for it, DatPrW, which is where Stays
+   begins; where the linker's relocations are, RelTab, how many of them
+   are of the part that goes, RelCnt, and how many, behind those, of
+   this part, ResCnt. They are given a value here, 0, for the compiler
+   to put them where the file has contents. */
+u16 ImgEnd = 0;
+u16 RelTab = 0;
+u16 RelCnt = 0;
+u16 TrnPrW = 0;
+u16 ResPrW = 0;
+u16 DatPrW = 0;
+u16 ResCnt = 0;
+#pragma aux ImgEnd "*"
+#pragma aux RelTab "*"
+#pragma aux RelCnt "*"
+#pragma aux TrnPrW "*"
+#pragma aux ResPrW "*"
+#pragma aux DatPrW "*"
+#pragma aux ResCnt "*"
+
+/* The segment that the part that goes runs in, which is so many
+   paragraphs below its block of memory as that part begins behind the
+   PSP in the file, TrnPrW; the check sum of the program's file as it
+   was loaded; and the command tail by which a second copy of the
+   program knows that it is one, with room for the segment of the
+   first. */
+u16 RunPar = 0;
+u16 ChkFile = 0;
+u8 OvlPrm[12] = { 10, 'V', 'V', 'V', 0, 0, 0, 0, 0, 0, 0, 0x0D };
+#pragma aux RunPar "*"
+#pragma aux ChkFile "*"
+#pragma aux OvlPrm "*"
+
+/* What this part keeps: struct Stays of vc.h, which says what is in it.
+   Of ComnIni only as much is there as the main data has before DosLin.
+   It is one structure for the order of its members, which the compiler
+   keeps of nothing else; so they have no names of their own to the
+   linker, and are named here as the assembly names them. It is all
+   zeros in the file, and written out as that: without a value it would
+   be of the segment that is to hold the stack alone. It is the last
+   that has a value, so that this part is nothing but zeros from here
+   on. */
+struct Stays Stays = { { 0 } };
+#pragma aux Stays "*"
+#define IntTab  Stays.IntTab
+#define SavePtr Stays.SavePtr
+#define Vect22  Stays.Vect22
+#define Vect27  Stays.Vect27
+#define Counter Stays.Counter
+#define PrgList Stays.PrgList
+#define NameBuf Stays.NameBuf
+#define WCB1sav Stays.WCB1sav
+#define WCB2sav Stays.WCB2sav
+#define ComnIni (*(struct MainDat *)Stays.ComnIni)
+
+/* The stack, which is the end of this part: the header of the file names
+   it, so the program is on it from its first instruction. The original
+   has 100h bytes of it. Compiled code uses more than the assembly did,
+   so the port has sixteen times that, and its use needs no care. It is
+   an object of its own, not the last member of Stays, for the name: by
+   that tools/mkexe.c and the tests find where it begins, and it ends
+   where its segment does, R_BSS, of which it is all.
+
+   That it is the end rests on this compiler and not on the language.
+   Open Watcom has what is given no value in a segment of its own behind
+   what is given one, and this is the one object of the file without:
+   C promises no order of two objects. tools/mkexe.c stops the build
+   where that does not hold. For another compiler the stack would have
+   to be put last by what that one has for it, a section that its
+   linker is told to place behind the others, and tools/mkexe.c and
+   harness/coverage.py told the name of that in place of R_BSS; or it
+   goes into Stays as the last member, which the language does keep
+   in its place, and the two are told how long it is some other way
+   than by a name in the map. */
+u8 DataSav[LenStk];
+#pragma aux DataSav "*"
+
+/* Where INT 21h went before the program took it. This one is of the
+   code's segment, not of the data: New21 passes a call of DOS on with
+   no register to find the data by, and CS is all that it has. */
+u32 CODE Vect21;
+#pragma aux Vect21 "*"
 
 /* Where the part that goes is entered: when the program starts, and
    when it has run a command. Both are of the assembly there, and only
@@ -939,7 +975,7 @@ __declspec(naked) static void Int2E(const u8 *command)
         cli
         mov ax,cs
         mov ss,ax
-        mov sp,offset VcStack
+        mov sp,offset DataSav + LenStk
         sti
         mov ds,ax
         cld
@@ -1193,8 +1229,7 @@ typedef u32 __far Transit(void);
                                            data: say so and leave */
                                         /* less: leave, with that for DOS */
 
-extern Transit * __near TrnAdr;
-#pragma aux TrnAdr "*"
+#define TrnAdr (*(Transit * __near *)&Stays.TrnAdr)
 
 static void Go(u32 back)
 {

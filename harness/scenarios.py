@@ -5343,7 +5343,8 @@ def run(scenario, program, bench, trace=False, blinking=False,
                      {drive: fat.read_tree(path, codepage)
                       for drive, path in disks.items()})
         if trace:
-            result.executed = coverage.executed(log, program.contents)
+            result.executed = coverage.executed(log, program.contents,
+                                                program.linked)
         left = [driver.stack_left(step.stack, known) for step in done
                 if step.stack is not None]
         if left:

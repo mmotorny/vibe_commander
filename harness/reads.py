@@ -169,7 +169,13 @@ REVIEWED = {
     ("panel.c", "BytIn_S"): (25, "copied in pieces, 25 bytes in all"),
     ("format.c", "PowersOfTen"): (OWN, "nine of them"),
     ("format.c", "DirMarker"): (OWN, "one of two rows of nine"),
+    ("memory.c", "Command"): (ZERO, "CutPath goes to its zero, and "
+                                    "F65_29 copies as far as that"),
     ("resident.c", "Vers_S"): (ZERO, "written as far as its zero"),
+    ("resident.c", "Command"): (ZERO, "NotFind writes it as far as its "
+                                      "zero"),
+    **{("resident.c", text): (ZERO, "OutStr0 writes it as far as its zero")
+       for text in ("NoRun_S", "FnFil_S", "BadFl_S", "Retr_S", "Aloc_S")},
     ("start.c", "NcEnv"): (OWN, "compared at its size"),
     ("start.c", "TempEnv"): (OWN, "compared at its size"),
     ("start.c", "Comsp"): (OWN, "compared at its size"),
@@ -280,8 +286,12 @@ def places(objects, variables=()):
         for number, line in enumerate(lines):
             for match in pattern.finditer(line):
                 name = match[1]
-                if re.match(rf"\s*(extern|static)\b[^=;(]*\b{name}\b\s*\[",
-                            line) or re.match(
+                # A function may have the name of a constant of another
+                # file: Command of main.c, and that of resident.c.
+                if line[match.end():].lstrip().startswith("("):
+                    continue
+                if re.match(rf"\s*(extern|static|const)\b[^=;(]*\b{name}\b"
+                            rf"\s*\[", line) or re.match(
                                 rf"\s*#\s*(pragma\s+aux|define)\s+{name}\b",
                                 line) or re.match(r"\s*#\s*define\b", line):
                     continue

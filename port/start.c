@@ -39,26 +39,27 @@ u16 ResSeg(void);
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
 #pragma aux ResSeg  "*_a" __far value [ax] modify exact [ax]
 
-/* What the assembly has that this reads, writes or names. In its code
-   segment: the names of the setup file and of the main extension file,
-   13 bytes each with what follows them, and the word where FatErr and
-   Intr21 find the main data. In the part that stays: what is kept there while a
-   command runs, ComnIni of the main data and the two panels; how many
-   programs have stayed in the memory since; where the interrupts 21h,
-   22h and 27h went before the program took them; where the linker's
+/* What this reads, writes or names of other files. In the group of the
+   constants: the names of the setup file and of the main extension file,
+   13 bytes each with what follows them, and the word where FatErr finds
+   the main data. In the part that stays, of struct Stays there: what is
+   kept while a command runs, ComnIni of the main data and the two
+   panels; how many programs have stayed in the memory since; and where
+   the interrupts 22h and 27h went before the program took them. And of
+   that part besides: where the interrupt 21h went; where the linker's
    relocation table is, in paragraphs from the PSP; and the routines that
    the program has the three interrupts go to, with the one that takes
    Ctrl-Break. */
+#define ComnIni STAYS(ComnIni)
+#define WCB1sav STAYS(WCB1sav)
+#define WCB2sav STAYS(WCB2sav)
+#define Counter STAYS(Counter)
+#define Vect22  STAYS(Vect22)
+#define Vect27  STAYS(Vect27)
 extern const u8 __far Init_F[];
 extern const u8 __far Ext_F[];
 extern const u8 __far SecDat[];
-extern const u8 __far ComnIni[];
-extern const u8 __far WCB1sav[];
-extern const u8 __far WCB2sav[];
-extern const u8 __far Counter[];
 extern const u8 __far Vect21[];
-extern const u8 __far Vect22[];
-extern const u8 __far Vect27[];
 extern const u8 __far RelTab[];
 extern const u8 __far New21[];
 extern const u8 __far Exit01[];
@@ -67,13 +68,7 @@ extern const u8 __far SetBrk[];
 #pragma aux Init_F "*"
 #pragma aux Ext_F "*"
 #pragma aux SecDat "*"
-#pragma aux ComnIni "*"
-#pragma aux WCB1sav "*"
-#pragma aux WCB2sav "*"
-#pragma aux Counter "*"
 #pragma aux Vect21 "*"
-#pragma aux Vect22 "*"
-#pragma aux Vect27 "*"
 #pragma aux RelTab "*"
 #pragma aux New21 "*"
 #pragma aux Exit01 "*"

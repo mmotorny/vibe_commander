@@ -50,17 +50,14 @@ u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 /* The dialog that asks whether to quit, and the name of the program for
    it: constants of port/keys_t.c. And where the part of the
    program that stays in the memory keeps the main data and the two
-   panels while a command runs. */
+   panels while a command runs: of struct Stays there. */
 extern const u8 __far Quit_B[];
 extern const u8 __far Name_S[];
-extern const u8 __far ComnIni[];
-extern const u8 __far WCB1sav[];
-extern const u8 __far WCB2sav[];
 #pragma aux Quit_B "*"
 #pragma aux Name_S "*"
-#pragma aux ComnIni "*"
-#pragma aux WCB1sav "*"
-#pragma aux WCB2sav "*"
+#define ComnIni STAYS(ComnIni)
+#define WCB1sav STAYS(WCB1sav)
+#define WCB2sav STAYS(WCB2sav)
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 #define AT(segment, offset) ((u8 __far *)((u32)(segment) << 16 | (offset)))

@@ -95,20 +95,18 @@ u16 HexDec(u16 number);                                 /* format.c */
 #pragma aux HexDec  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
 /* The buttons of the map and their colours, of port/memory_t.c, which
-   MinMnu takes by their offsets; and what the assembly has for the map
-   in the part of the program that stays: the number of programs that
-   have stayed too, for each the segment where its vectors are noted, and
-   the name of the command processor. */
+   MinMnu takes by their offsets; and what the part of the program that
+   stays has for the map: the number of programs that have stayed too
+   and for each the segment where its vectors are noted, of struct Stays
+   there, and the name of the command processor. */
 extern const u8 __far Memo1_P[];
 extern const u8 __far Memo_D[];
-extern const u8 __far Counter[];
-extern const u8 __far PrgList[];
 extern const u8 __far Command[];
 #pragma aux Memo1_P "*"
 #pragma aux Memo_D "*"
-#pragma aux Counter "*"
-#pragma aux PrgList "*"
 #pragma aux Command "*"
+#define Counter STAYS(Counter)
+#define PrgList STAYS(PrgList)
 
 /* What a program that has stayed is noted with, in a segment of its own:
    the segment of the program, its name, the number of vectors it took

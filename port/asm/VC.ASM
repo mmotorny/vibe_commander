@@ -9,36 +9,53 @@
 
 ;-------------- The two parts of the program -----------
 ; The program is in two parts. One stays in the memory while a command
-; runs: it begins with the PSP, and is made of the four segments here,
-; in this order. RHEAD is what of it is still assembly, RTEXT its
-; compiled code, RDATA its data, which ends with the stack, and RGAP the
-; paragraph in which DOS keeps the header of the block of memory that
-; follows. The other part, which goes while a command runs, begins behind
-; them, at TrnBeg, and is all that follows. It begins with CONST, the
-; texts, and not with code: the machine of the tests is many times slower
-; at every write to a page of the memory that has code which it has run,
-; and the stack ends just in front. Behind the texts come the constants of
-; the C code, CONST2, which the compiler puts into this group, and the
-; tables here, _DATA, which are of the same class: a text that goes to C
-; still stands in front of the code. The segments are declared before the
-; model so that the linker puts them first, and they are of one group
-; with the rest of the assembly, so that every offset here counts from
-; the PSP.
+; runs: it begins with the PSP, and is C but for a few stubs,
+; port/resident.c. What is here of it is the order of its segments,
+; which the linker takes from the first object file: RHEAD is what of it
+; is still assembly, RTEXT its compiled code, the four that follow are
+; those that the compiler makes for its data, of which the last, R_BSS,
+; is the stack, and RGAP is the paragraph in which DOS keeps the header
+; of the block of memory that follows. The other part, which goes while
+; a command runs, begins behind them, at TrnBeg, and is all that
+; follows. It begins with the constants of the C code, CONST2, and not
+; with code: the machine of the tests is many times slower at every
+; write to a page of the memory that has code which it has run, and the
+; stack ends just in front. The tables here, _DATA, are of the same
+; class and stand there too. The segments are declared before the model
+; so that the linker puts them first.
+;
+; Every offset counts from the PSP, here and in the data of the part
+; that stays. That is by the groups. The assembly's begins with RHEAD
+; and has the compiled code of the part that stays, RTEXT, and the
+; constants of the C code. The data of the part that stays is in a group
+; that the compiler makes for port/resident.c alone, R_GROUP, of the
+; four segments that lie behind the code: RPSP, which is empty and the
+; first of all, is of that group so that it begins where the other does.
+RPSP	SEGMENT	PARA PUBLIC 'RPSP'
+RPSP	ENDS
 RHEAD	SEGMENT	PARA PUBLIC 'RHEAD'
 RHEAD	ENDS
 RTEXT	SEGMENT	BYTE PUBLIC 'RCODE'
 RTEXT	ENDS
-RDATA	SEGMENT	WORD PUBLIC 'RDATA'
-RDATA	ENDS
+RCONST	SEGMENT	WORD PUBLIC 'FAR_DATA'
+RCONST	ENDS
+RCONST2	SEGMENT	WORD PUBLIC 'FAR_DATA'
+RCONST2	ENDS
+R_DATA	SEGMENT	WORD PUBLIC 'FAR_DATA'
+R_DATA	ENDS
+R_BSS	SEGMENT	WORD PUBLIC 'FAR_DATA'
+R_BSS	ENDS
 RGAP	SEGMENT	PARA PUBLIC 'RGAP'
 RGAP	ENDS
 CONST	SEGMENT	WORD PUBLIC 'CONST'
+	PUBLIC	TrnBeg			; For tools/mkexe.c
 TrnBeg	LABEL	BYTE
 CONST	ENDS
 CONST2	SEGMENT	WORD PUBLIC 'DATA'
 CONST2	ENDS
 	.MODEL	Tiny
-DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST, CONST2
+DGROUP	GROUP	RHEAD, RTEXT, RGAP, CONST, CONST2
+R_GROUP	GROUP	RPSP
 
 ;------------------- Routines written in C -------------
 ; They are compiled into code segments of their own, which follow this
@@ -55,18 +72,11 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST, CONST2
 	EXTERN	New21:FAR, New27:FAR, CtrlC:FAR, SetBrk:FAR, Exit01:FAR
 	EXTERN	Release_r:NEAR
 
-; In the part that stays in the memory, what is kept while a command
-; runs: the copies of the two panels, of which the C code of the main
-; loop names the first, and of the main data, for F21_30_c to fill.
-	PUBLIC	WCB1sav, WCB2sav, ComnIni
-; What port/resident.c keeps of the interrupts and of the programs that
-; have stayed in the memory: its data is laid out here, in RDATA.
-	PUBLIC	IntTab, SavePtr, Vect21, Vect22, Vect27, NameBuf, TrnAdr
-; What it reads in the head of that part, and where it enters the part
-; that goes.
-	PUBLIC	RunPar, ChkFile, ImgEnd, TrnPrW, OvlPrm
-	PUBLIC	RelTab, RelCnt, ResPrW, DatPrW, ResCnt
-	PUBLIC	NoRun_S, FnFil_S, BadFl_S, Retr_S, Aloc_S
+; The data of that part is of port/resident.c too. What the assembly
+; reads of it: the segment that the part that goes runs in, and where
+; that part begins in the file, in paragraphs from the PSP.
+	EXTERN	RunPar:WORD, TrnPrW:WORD
+; Where port/resident.c enters the part that goes.
 	PUBLIC	Init00, Init11
 
 ; Call a routine written in C from where ES points at the main data
@@ -100,28 +110,16 @@ RHEAD	SEGMENT
 _md	LABEL	BYTE			; The main data segment, to C code:
 					; whatever is at offset 0 of DS
 	ORG	100h			; Behind the PSP
-
-;-------------- Layout of the linked program -----------
-; This block is expected at 100h by tools/mkexe.c, which fills in the
-; first three words and the last. Of the three between it reads the
-; offsets that the linker has put there, and writes them back in
-; paragraphs. The program is entered at Alloc0 of port/resident.c, which
-; the linker is told and tools/mkexe.c writes into the header of the
-; file.
-ImgEnd	DW	0			; End of the program, paragraphs from PSP
-RelTab	DW	0			; Relocation table, paragraphs from PSP
-RelCnt	DW	0			; Number of relocations
-TrnPrW	DW	OFFSET TrnBeg		; Transit part, paragraphs from PSP
-ResPrW	DW	OFFSET LastDat		; Size of the resident part
-DatPrW	DW	OFFSET IntTab		; Its data, paragraphs from PSP
-ResCnt	DW	0			; Number of relocations of that part
 RHEAD	ENDS
 
-; Neither is known before the program is linked, since compiled code
-; stands between the PSP and TrnBeg: they are read where SS is on the
-; resident part, which is everywhere but in the interrupt handlers.
+; Where the part that goes begins is not known before the program is
+; linked, since compiled code stands between the PSP and TrnBeg:
+; tools/mkexe.c writes it into a word of the part that stays, TrnPrW of
+; port/resident.c, which is read where SS is on that part: everywhere
+; but in the interrupt handlers. The program is entered at Alloc0 there,
+; which the linker is told and tools/mkexe.c writes into the header of
+; the file.
 TrnPar	EQU	<WORD PTR SS:TrnPrW>
-ResPar	EQU	<WORD PTR SS:ResPrW>
 
 PrgName	EQU	'Volkov Commander'
 HelpVer	EQU	'VC 4.05 Help'
@@ -129,10 +127,6 @@ VcVers	EQU	<'4.05'>
 VcApiVr	EQU	42
 
 MoDelay	EQU	40			; Mouse double click delay
-; The original has 100h bytes of stack. Compiled code uses more of it than
-; the assembly did, so the port has sixteen times that, and its use needs
-; no care. The stack is the end of the resident part: see DataSav.
-LenStk	EQU	1000h			; Stack size
 LenPath	EQU	68			; Length of path name
 LenColr	EQU	40			; Length of color table
 LenHist	EQU	512			; Length of hisory buffer
@@ -434,15 +428,6 @@ WCBdef	ENDS
 
 ;------------------- Begin of program ------------------
 RHEAD	SEGMENT
-RunPar	DW	0
-ChkFile	DW	0
-Command	DB	'COMMAND.COM', 0
-OvlPrm	DB	10, 'VVV', 0, 0, 0, 0, 0, 0, 0, 0Dh
-NoRun_S	DB	'There is not enough memory to run this command', 13,10,0
-FnFil_S	DB	13,10, "Can't find the file: ", 0
-BadFl_S	DB	13,10, "Bad or missing ", 0
-Retr_S	DB	13,10, "Press ENTER to try again or ESC to abort", 13,10,0
-Aloc_S	DB	'Program too big to fit in memory', 13,10,0
 
 ;------------------- Execute commands ------------------
 LoadSiz	EQU	WORD PTR DosBuf+0
@@ -487,27 +472,9 @@ Release	ENDP
 
 RHEAD	ENDS
 
-;--------------------- Release data --------------------
-RDATA	SEGMENT
-IntTab	DD	256	DUP(?)
-SavePtr	DD	?
-Vect21	DD	?
-Vect22	DD	?
-Vect27	DD	?
-TrnAdr	DD	?			; Where Stay calls the transit part
-Counter	DW	?
-PrgList	DW	MaxProg	DUP(?)
-NameBuf	DB	12	DUP(?)
-
-;------------------ Data save segment ------------------
-WCB1sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB1
-WCB2sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB2
-ComnIni	DB	CmnSave			DUP(?)	; Common data
-	PUBLIC	DataSav, VcStack	; For the tests: how long the stack is
-DataSav	DB	LenStk		DUP(?)	; Local stack
-VcStack:
-LastDat:
-RDATA	ENDS
+;---------- Release data, Data save segment ------------
+; C: port/resident.c, with struct Stays of port/vc.h. The stack is there
+; too, DataSav, the end of the part that stays.
 
 RGAP	SEGMENT
 	DB	16	DUP(?)		; The header of the transit part's block
@@ -570,8 +537,6 @@ ShadFl	EQU	38
 ; time,
 ; and its segment is what the C is told of it. Until Init11 has asked DOS
 ; for the main data there is none: the C does without DS up to there.
-; What it reads, writes and names of the assembly is made public here.
-	PUBLIC	Counter, Vect21, Vect22, Vect27, RelTab
 Init00:	CLD
 	MOV	AX,SS
 	CALL	FAR PTR Init00_c
