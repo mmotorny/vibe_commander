@@ -3,6 +3,257 @@
 Things that are known and not done. Standing instructions are in
 `CLAUDE.md`; this is the list of loose ends.
 
+## The last of the assembly
+
+Every routine of the program is C. What `port/asm/` still holds is data
+and glue, and the port ends without it. This is what is there, how it is
+held against the original while it moves, and in what order it can go.
+How one file is done is in `CLAUDE.md`, "Moving the data of a file to C";
+`VCHELP.INC` went that way, into `port/help_t.c`.
+
+### What is left
+
+Objects and bytes as they are linked, after the help's file had gone. An
+object is what stands from one label to the next. "Code" is all that is
+no data: stubs, entries and what jumps between them.
+
+| File | texts | boxes | dialogs | buttons, colours | tables | code | goes with |
+|---|---|---|---|---|---|---|---|
+| `VC.ASM` | 15 / 733 | 3 / 60 | 2 / 44 | 2 / 8 | 2 / 160 | 219 | `main.c`, `start.c` |
+| `VCFUNC.INC` | 16 / 186 | 4 / 68 | 4 / 88 | 1 / 5 | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
+| `VCMENU.INC` | 53 / 1,364 | 8 / 190 | 7 / 352 | 3 / 17 | 8 / 174 | 495 | `commands.c`, `menu.c` |
+| `VCF1.INC` | 48 / 959 | 25 / 502 | 22 / 660 | 4 / 24 | | 217 | `dirfunc.c` |
+| `VCCOPY.INC` | 24 / 487 | 14 / 336 | 9 / 231 | 4 / 28 | 1 / 10 | 82 | `copy.c` |
+| `VCVIEW.INC` | 16 / 256 | 9 / 160 | 5 / 110 | | | 180 | `view.c` |
+| `VCEDIT.INC` | 14 / 688 | 6 / 106 | 5 / 110 | 4 / 18 | | 26 | `edit.c` |
+| `VCMEM.INC` | | | | 2 / 8 | | 40 | `memory.c` |
+| `VCFIND.INC` | 2 / 15 | | 1 / 33 | 4 / 21 | | 22 | `find.c` |
+| `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
+| `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
+| `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
+| all | 203 / 4,919 | 72 / 1,474 | 56 / 1,650 | 25 / 134 | 13 / 420 | 2,420 | |
+
+Besides these, all in `VC.ASM`:
+
+- The part that stays in the memory: 213 bytes with contents (the seven
+  words at 100h that `tools/mkexe.c` fills in, `RunPar`, `ChkFile`, the
+  name `COMMAND.COM`, the command tail of the second copy, five texts),
+  29 bytes of code (`Exec`, `AlocEr`, `Exit00` and the stub of
+  `Release`), and room without contents: the 14,751 bytes of `RDATA`,
+  which are the table of vectors, the list of programs, the copies of
+  the panels and of the setup and the stack of 4,096, and the 16 of
+  `RGAP`.
+- The layout: the `STRUC` of the main data, 62,603 bytes that the
+  program asks DOS for, that of a panel, and a dozen small ones; in the
+  files those of the viewer, the editor and the file search, of which C
+  has its own; and the `EQU` of the colours and the lengths.
+- The compiler's helpers `__U4M` and `__U4D`, 92 bytes, in `CTEXT`.
+- The macros `CallC`, `MainC`, `CmdC`, `MnuC` and `PanC`; `FromC`,
+  `CallLine` and `TakeLine` have no use left.
+
+The tables are `Main_T`, the 79 places that the main loop goes on at, and
+`SecDat`, the word with the segment of the main data, in `VC.ASM`;
+`CmdNx_T` and `AltSr_T` in `VCFUNC.INC`; the seven tables of the menus'
+commands and `MnuNx_T` in `VCMENU.INC`; `F35_T` in `VCCOPY.INC`.
+
+The code is, by what it is there for:
+
+- The stubs of the commands, about 150 labels: a command is a label that
+  the main loop or a menu jumps to by a table, with the registers of its
+  family (`CmdC` with `CmdEnd` and `CmdNx_T` in `VCFUNC.INC`, `MnuC` and
+  `PanC` with `MnuEnd` and `MnuNx_T` in `VCMENU.INC`, `F1Next` in
+  `VCF1.INC`, `F35_T` in `VCCOPY.INC`), calls the C function and jumps on
+  to where that says, which may be another command.
+- The glue of the main loop in `VC.ASM`: the stubs of `Init00` and
+  `Init11`, the eight entries made with `MainC`, `MainGo`, `Exit`.
+- Stubs of routines that other stubs call: `AdrNum`, `NumAdr`, `ChgAdr`
+  and `F20_02` in `VCFUNC.INC`, `Dialog` in `VCSUB1.INC`, `ReDir` and
+  `ReadTre` in `VCSUB3.INC`, `DelTree` in `VCF1.INC`, and those that a
+  dialog names for Enter and F10: `F38_10`, `M30_60`, `F35_60`.
+- Entries for C: `ReDir_a` in `VC.ASM`; `MemRun_a`, `ResSeg_a` and
+  `Release_a` in `VCMEM.INC`; `AsmSeg_a` and `DialSub_a` in
+  `VCSUB1.INC`, with `CallPSP`.
+
+What names what:
+
+- C code names a text, a box, a dialog or buttons of the assembly as
+  `extern const u8 __far`, with `#pragma aux Name "*"`, and hands its
+  offset to `DialBox`, `Dialog`, `MinMnu` or `OncZoom`, or reads it
+  through the far pointer. The assembly has the name `PUBLIC`, in the
+  file that defines it.
+- An object names another by a word that holds its address: a box its
+  lines, a dialog its box, its buttons and the routine for Enter, a
+  table its labels. Sixteen are named from more than one file: `Ok_S`,
+  `OkMn_D`, `Var_S`, `Inc_S`, `Err_S` of `VC.ASM`; `Empty_S`, `Kov_S`,
+  `YesNo_S`, `YesNo_D` of `VCFUNC.INC`; `OkCan_S`, `OkCan_D` of
+  `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `VCF1.INC`; `EdFl_S` of
+  `VCVIEW.INC`; `Tree_S`, `PtMnu_S` of `VCSUB2.INC`. `VC.ASM` declares
+  those `EXTERNDEF`, so that either side can name one wherever it is.
+- Code of the assembly names data in one place: the stub of the menu bar
+  loads the offset of `PtMnu_S`.
+- The harness and the tools:
+  - `harness/driver.py` reads where `AutoTim` and `Clock` are in the
+    main data from the assembler's listing, `build/port/VC.LST`, and
+    where the stack is, `DataSav` and `VcStack`, from the linker's map;
+    `harness/ported.py` takes the stack from the map too. The two
+    offsets are those of the original, which the listing of
+    `build/shareware-layout/` has, as long as the main data is laid out
+    as the original's; the stack wants two names in the map.
+  - `harness/datacheck.py` reads `VC.LST` and `VC.OBJ` of the port for
+    what is still assembly, and does without them when they are gone.
+  - `harness/coverage.py`, `harness/reach.py` and `harness/notice.py`
+    read the listing of the original only, and need nothing.
+  - `tools/routines.py` and `tools/flagscan.py` read `port/asm/`: they
+    are for routines that are still assembly, and go with it.
+  - `tools/mkexe.c` reads the seven words at 100h, which the assembly
+    lays out, and the map.
+
+### What holds the data while it moves
+
+The test `data`, `harness/datacheck.py`, holds every object of the port
+that has the name of an object of the original against the original's
+bytes, without a machine: 96 constants of the C code, 2,976 bytes, and
+373 objects of the assembly, 8,545 bytes, when it was made. It names
+each. A word that holds an address is held by what it names: the
+original's source is assembled once more as an object file, whose
+relocations say which words those are, and the port has to have at such
+a word the address of what has that name in the port. So nothing
+describes an object to the tool; an object is written with the names of
+the assembly and the linker does the rest.
+
+It found five constants of the C code that were not as the original, all
+texts with a zero byte behind them that the original has not. Four made
+no difference, and are exact now: `SubDir`, `Ctrl_S`, `Byts_S`, `MenuLn`.
+The fifth did: the end of the banner, `CrLf_S`, is copied as far as a
+zero byte, and the original copies the text behind it along,
+`Press ENTER to return`, into the buffer that DOS writes from as far as
+the dollar sign. The C has the texts in one array now and copies as the
+original does. No screen shows it.
+
+What it does not hold, each listed in the tool with the reason:
+
+- Constants that the original has not as data: `PowersOfTen`, `Panel_T`,
+  `Scan_P`, `Fnc_T`.
+- `Suff_S`, the edition in the banner: it lies in room that is reserved
+  for what only the shipped binary has.
+- Data that became code: the tables of keys are `switch` statements, and
+  the scenarios answer for them.
+- Tables of the assembly that the original has not: `Main_T`, `CmdNx_T`,
+  `MnuNx_T`, `F35_T`.
+
+### The order
+
+**1. The data, file by file.** Several agents at once, one assembly file
+each, by the recipe in `CLAUDE.md`. The texts, boxes, dialogs, buttons
+and colours of the file go to a file of constants; the tables of
+commands and the code stay. Which file of constants:
+
+| Assembly | Constants |
+|---|---|
+| `VCFIND.INC` | `find_t.c` |
+| `VCMEM.INC` | `memory_t.c` |
+| `VCEDIT.INC` | `edit_t.c` |
+| `VCVIEW.INC` | `view_t.c` |
+| `VCCOPY.INC` | `copy_t.c` |
+| `VCF1.INC` | `dirfunc_t.c` |
+| `VCMENU.INC` | `commands_t.c` |
+| `VCFUNC.INC` | `keys_t.c` |
+| `VCSUB2.INC`, `VCSUB3.INC` | `bars_t.c`, `treebox_t.c`, `system_t.c` |
+| `VC.ASM`, its texts and boxes only | `main_t.c` |
+
+No two agents have the same assembly file, and `VCSUB2.INC` and
+`VCSUB3.INC` are one agent's. None of them needs to change a C file of
+code, a file of another agent or the lists of `VC.ASM`: a name stays what
+it is when its object moves. What all of them may add to, a line at a
+time, is the tables of `harness/datacheck.py` and the types of
+`port/tables.h`. `VCFIND.INC` and `VCMEM.INC` are the small ones to
+start with; `VCFIND.INC` has the two texts that are copied with what
+follows them.
+
+**2. The words that name a routine.** One agent, after 1, since it
+changes dialogs that are constants by then. A dialog names a routine for
+Enter and F10 in its header, `SubFunc`: `F38_10`, `M30_60`, `F35_60` and
+`F35_61`. They become a table of functions in `port/dialog.c`, and the
+word the place in it, as `FncAddr` did (see `Fnc_T` of
+`port/dirfunc.c`); `DialSub_a` and the stubs go, and the test `data` is
+told of each such word in `NAMED_OTHERWISE`, as a number.
+
+**3. The commands and the main loop.** One agent, or one after another,
+never two at once: all of it is one web of jumps through `port/main.c`,
+`port/menu.c` and the `.CODE` of every file. The loop of `port/main.c`
+calls the functions of the commands, by a `switch` where they take
+different things; the stubs of the commands go with `Main_T`, `CmdNx_T`,
+`MnuNx_T`, `F35_T`, `F1Next` and the tables of the menus, then `MainC`
+and `MainGo`: `Stay` of `port/resident.c` calls the loop, which wants DS
+on the main data, the one instruction that `FatErr` has too. The stubs
+that only stubs call go as their callers do, and `ReDir_a` when `ReDir`
+is one function. The other entries, tried as far as compiling:
+`ResSeg_a` is a function that returns the segment of a far pointer to a
+variable of its own, which compiles to `mov ax,ss`; `AsmSeg_a` is the
+segment of a far pointer to a constant of the group, `mov ax,seg Name`,
+a number that is relocated; `MemRun_a` reads two words of the part that stays through `ResSeg`;
+`Release_a` and `CallPSP` go when `Release` of `port/resident.c` is a
+far function that loads its own DS, as `SetBrk` is. With the last
+command the files of the assembly are empty and go, with their
+`INCLUDE` and their names in `CMakeLists.txt`.
+
+**4. What is not of one file.** After 3, but for the helpers, which can
+go at any time, side by side with everything.
+
+- The helpers `__U4M` and `__U4D` can be C. Tried: a function may have
+  such a name, `#pragma aux U4M "__U4M" __near parm [dx ax] [cx bx]
+  value [dx ax]`, and stays in `CTEXT` with its callers. The product is
+  made of products of two bytes, which need no helper, where a word by a
+  word as a number of 32 bits would call `__U4M` itself; the quotient by
+  shifting and subtracting, which need none either. What C cannot say is
+  that `__U4D` hands back the remainder in CX:BX next to the quotient:
+  a `#pragma aux` that holds no instruction, `parm [cx] [bx] modify
+  exact []`, has the compiler load the two as the last thing before the
+  result. That is no assembly, and it rests on what the compiler makes
+  of it: read the end of the function in the listing. Before it lands,
+  the C wants holding against the machine's own arithmetic on the
+  computer that builds, where the same source compiles, and `__U4D` for
+  a divisor of more than 16 bits, which no scenario runs.
+- The data and the stack of the part that stays: as its agent left it
+  below ("How the data that the assembly still lays out could go to C"),
+  one structure in `port/resident.c` in a group of its own that begins
+  at the PSP. Two things to add. The constants of that part, its five
+  texts, `Command` and the tail `OvlPrm`, are better arrays declared
+  `CODE` in `port/resident.c` than members: the test `data` finds an
+  object by its name, and a member has none. And the group of the
+  constants, the compiler's, need not begin at the PSP any more once no
+  assembly counts from there: a word in a table is held by what it
+  names, not by its number. `tools/mkexe.c` lets the object file of
+  `port/resident.c` have data then, and finds the seven words by a name
+  in the map; `harness/driver.py` and `harness/ported.py` find the stack
+  by two names there.
+- The layout of the main data: the `STRUC` goes with the last line of
+  assembly that names a field, which is a stub of 3 or the room of the
+  part that stays, sized by `CmnSave` and `WCBsave`. `struct MainDat` of
+  `port/vc.h` is then the only one, and `md` a type at offset 0 of DS.
+  Its layout stays the original's: boxes and dialogs hold places in it
+  as numbers, `MD_AT`, and the test `data` holds those against the
+  original's.
+- What stands between the stack and the code: the constants. A text
+  that goes to C leaves `CONST` for `CONST2`, which `VC.ASM` declares in
+  front of the code, and the assembly's tables, `_DATA`, are of the same
+  class and stand there too: 8,700 bytes where 4,096 are needed.
+  `tools/mkexe.c` stops the build when code comes within 4K of the
+  stack. When `VC.ASM` is gone the order is the linker's to be told, by
+  `order` in its command or by the first object file.
+- `tools/mkexe.c` and `CMakeLists.txt` when there is nothing to
+  assemble: the last step, by one agent. No `VC.OBJ`, no listing of the
+  port; the order of the segments and the two groups by the linker's
+  command; the relocations of the second group in `tools/mkexe.c` and
+  `Reloc`; `harness/driver.py` with the original's listing for `AutoTim`
+  and `Clock`; `tools/routines.py`, `tools/flagscan.py` and what
+  `CLAUDE.md` and the README say of stubs and of the listing taken out.
+  JWasm stays: it builds the original and the driver of the tests.
+
+What must not be done by two at once: one assembly file; `VC.ASM` beyond
+its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
+`tools/mkexe.c`; `CMakeLists.txt` beyond a name in a list.
+
 ## Known and not dealt with
 
 - The number of bytes that the editor has free is not compared with the
@@ -382,9 +633,9 @@ Things that are known and not done. Standing instructions are in
   all of the main data's segment. Ported like that; it takes a file made
   by hand.
 - `VCCOPY.INC` is C but for its boxes and texts, which `DialBox` and
-  `Dialog` read in the assembly, and the stubs: of the commands, of what
-  their dialogs call for the tree, and of `C00_00`, which `FncSel` and
-  `FncMas` call. Those two, in `VCF1.INC`, are C as well.
+  `Dialog` read in the assembly, and the stubs: of the commands and of
+  what their dialogs call for the tree. `C00_00`, which `FncSel` and
+  `FncMas` call, has none any more: they call the function.
 - What the commands of Copy and Rename do in the original and the port
   does after them; whether to mend any of it is not decided:
   - When a directory of a tree panel has been renamed, the current
@@ -1131,7 +1382,7 @@ Things that are known and not done. Standing instructions are in
 - `VCSUB1.INC`, `VCSUB2.INC` and `VCSUB3.INC`, the shared routines, hold
   no routine of the original any more but one, `CallPSP`. What is left
   in them, and goes when what needs it is C:
-  - Stubs, four of them: the routine's name, the call of the C
+  - Stubs, three of them: the routine's name, the call of the C
     function, and the registers and flags that the assembly which still
     calls it goes on with. `VCSUB1.INC` has one: `Dialog`, which the
     routine for DOS's critical error calls. The eight that the code
@@ -1139,19 +1390,19 @@ Things that are known and not done. Standing instructions are in
     `MvzLine`, `AddFile`, `CutPath`, `PathLin` and `Cursor`, went when
     that became C. `VCSUB2.INC` has
     none: it is the names of the menus and the title of the tree.
-    `VCSUB3.INC` has three: `ReDir`, for the entry `ReDir_a` of the main
-    loop, `ReadTre`, which the stub of `ReDir` calls, and `DiSi10`,
-    which nothing calls by its name: `DirSize` puts its address into
-    `FncAddr`. A stub that had lost its last caller went with this
+    `VCSUB3.INC` has two: `ReDir`, for the entry `ReDir_a` of the main
+    loop, and `ReadTre`, which the stub of `ReDir` calls. That of
+    `DiSi10`, whose address `DirSize` put into `FncAddr`, went when
+    `FncAddr` came to hold a number. A stub that had lost its last caller went with this
     batch, 58 of them, behind the 38 that went with Enter, each with
     its line in the `EXTERN` list and its function in
     `harness/ported.py`. `tools/routines.py` counts calls, not jumps:
     `Cursor` has fewer callers there than it has. The assembler says
     "Symbol not defined" for a stub that is taken out too early.
   - Entries for C: `AsmSeg_a`, the assembly's code segment, where its
-    boxes and texts are; `DialSub_a`, which calls what a dialog names
-    for Enter; `FncCall_a`, which calls what `FncAddr` names. None of
-    them calls an interrupt.
+    boxes and texts are, and `DialSub_a`, which calls what a dialog
+    names for Enter. Neither calls an interrupt. `FncCall_a`, which
+    called what `FncAddr` names, is a function of `port/dirfunc.c`.
   - Texts and tables that the assembly reads, or C at its offset there:
     the names of the menus, `PtMnu_S`; `Tree_S`; `Mask_S` and `Ext_F`;
     the name of the tree's file and the two boxes shown while it is

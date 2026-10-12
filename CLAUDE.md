@@ -137,6 +137,121 @@ derive the goldens again before anything else. If `git diff` then shows
 them changed, it is the machine that differs, QEMU or DOS, and not the
 port.
 
+### Moving the data of a file to C
+
+Every routine is C. What a file of `port/asm/` still holds is texts,
+boxes, dialogs, buttons and colours, which go to C a file at a time, and
+tables of commands and code, which go otherwise: `TODO.md`, "The last of
+the assembly", has what is left, who has which file, and the order.
+`VCHELP.INC` went first, into `port/help_t.c`: read that file and
+`port/tables.h` before anything else.
+
+For one file, in this order:
+
+1. Build, and run `python3 harness/datacheck.py build/shareware-layout
+   build/port`. Under `assembly` it names every object of the file that
+   has a name of the original, with its length. That is the list of what
+   moves, and each is as the original now.
+2. Write the file of constants, `port/NAME_t.c`, under the name that
+   `TODO.md` has for it. It includes `tables.h` and holds constants and
+   nothing else, in the order of the assembly:
+   - A text is `const u8 Name_S[] = "text";`, with the zero byte of
+     `DB 'text',0`. One that the assembly ends without a zero is an array
+     of its length, `Name_S[9]`. A byte that is no character of ASCII is
+     an octal escape, `\377\003`: the markup, and the frames, which are
+     characters of CP866, `\263` for the upright line. The source stays
+     ASCII; a comment may show the line as it looks. Take every byte
+     from the line of the assembly, read as bytes.
+   - Buttons and colours are arrays of `u8`.
+   - A box is `BOX(n)`, or `BOX1(n)` and `BOX2(n)` with texts put in; a
+     dialog is `DIALOG(n)`. A word that names something is a pointer,
+     written as the name. A place in the main data is `MD_AT(TmpBuf)`,
+     and `MD_AT(TmpErr[1])` for `TmpErr+1`; a number in a word that
+     names something elsewhere is `NUMBER(n)`. What `port/tables.h`
+     lacks, a place in a panel's segment say, is added there.
+   - A constant that only this file names is `static`. One that code or
+     another file names has `#pragma aux Name "*"`.
+   - What it names of another file, assembly or C alike, is `extern
+     const u8 Name[];` with `#pragma aux Name "*"`. If that is of the
+     assembly, it has to be `PUBLIC` there, in the file that defines it;
+     the sixteen that several files name are declared in `VC.ASM`
+     already. A routine that a dialog names is declared the same way,
+     and is the stub.
+   - Where the program copies more than an object has, the object is
+     written as long as what is copied, with the bytes that the original
+     has behind it: the test compares as many bytes as the object has.
+     `TODO.md` says "copied with what follows it" of each such text.
+3. Take the objects out of the assembly file, as bytes: CP866, CRLF, and
+   the 1Ah at its end. Take their names out of every `PUBLIC` line; the
+   assembler says "Symbol not defined" and the line. Where assembly
+   still names one, a box that stays or a stub, that file says `EXTERN
+   Name:BYTE` at its top: a file is included inside the code segment,
+   and there the assembler takes the name for one of its group, which
+   it is.
+4. The C code that uses them does not change: `extern const u8 __far`
+   with its `#pragma aux` reads a constant of C as it read the
+   assembly's.
+5. Build, and run the tests. `data` has to name each object of step 1
+   under the new file, as long as it was or longer, and pass; `port` has
+   to pass.
+6. A file with nothing left but comments goes: `git rm`, its `INCLUDE`
+   in `VC.ASM`, its name in `port_asm` of `CMakeLists.txt`.
+
+What the test `data` goes by is the name: an object is held against the
+label of the original that has its name, and a word that holds an
+address there against where the port has what that label names. Where
+the port is meant to be otherwise, `harness/datacheck.py` has four
+tables, each entry with its reason: `ELSEWHERE` for a constant that the
+original has under another name or inside another object, `OWN` for one
+that it has not as data, `DIFFERENT`, and `NAMED_OTHERWISE` for a word
+that names something the port has in another way. A difference that the
+test reports is mended in the C; it is listed only where the C is meant
+to differ.
+
+What was met on the way:
+
+- C code that names a constant of the compiler's group reads it through
+  DS, which is on the main data: the wrong bytes, without a warning.
+  That is why such constants have files of their own, and
+  `tools/mkexe.c` stops the build for an object file with both code and
+  constants. A constant that only code reads stays `static const ...
+  CODE` in the file of the code.
+- `__based(__segname("CONST2"))` does not put an object into the group:
+  it makes a segment of that name and the class FAR_DATA outside it,
+  and offsets count from there.
+- A structure for a table needs `#pragma pack(push, 1)`, or a byte is
+  followed by a gap.
+- A text written as a string has a zero byte behind it whether the
+  assembly has one or not. Five constants of the C code had one too
+  many; one of them, `CrLf_S`, made the banner be copied shorter than
+  the original copies it.
+- A hex escape runs on into letters that are hex digits: `"\xC4File"`
+  is not what it looks like. Octal escapes are three digits.
+- `#pragma aux default "*"` does not take the underscore off the names
+  of data; each name wants its own `#pragma aux`.
+- `EXTERNDEF` wants the type that the definition has, `BYTE` for what is
+  made with `DB`, `WORD` for `DW`, `BOXHD` for a dialog written as one,
+  or it is "Symbol type conflict".
+- A word that names a routine, `FncAddr` in the main data or the
+  routine of a dialog, cannot become a pointer to a function: that is
+  four bytes, and the layouts are the original's. It becomes the place
+  of the function in a table of functions of one type, `static FncFn *
+  const CODE Fnc_T[]` in `port/dirfunc.c`, and what called through the
+  word calls `Fnc_T[md.FncAddr](attributes)`. The type has the registers,
+  `#pragma aux FncFn parm [ax] value [ax] modify exact [ax]`; a function
+  that is far only by its own `#pragma aux` is cast to it, `(FncFn *)`,
+  or it is "Pointer type mismatch". The stubs of the routines go, with
+  the entry that called through the word, their lines in the `EXTERN`
+  list and their functions in `harness/ported.py`. Routines that take
+  different things, as the commands do, are called from a `switch`
+  instead.
+- The linker's map has the static objects too, `option static`, marked
+  with an `s`, and that is how the test finds a constant that is
+  `static`.
+- No code may come within 4K of the stack: `tools/mkexe.c` stops the
+  build. The constants stand between, `CONST2`, which `VC.ASM` declares
+  in front of the code.
+
 ### Stubs in the assembly
 
 - A stub hands back exactly the registers its remaining callers use, and
@@ -431,7 +546,9 @@ port.
   `DirFunc`, with the attributes in AL, and answers in AX: 1, 0, or
   100h to stop. Its callers go on with BX, DX and SI, so its stub saves
   all but AX. C code calls what `FncAddr` names with `FncCall` of
-  `port/vc.h`, whose entry keeps DS: `C00_00` does not.
+  `port/vc.h`, whose entry keeps DS: `C00_00` does not. `FncAddr`
+  holds a number since, and these stubs are gone: see "Moving the data
+  of a file to C".
 - A box may name a routine that `Dialog` calls when it is answered:
   `F38_10` and `M30_60`. It gets the answer in AL, with ES and DS on the
   main data, and hands back AL and the carry flag, set to go on with
@@ -948,7 +1065,10 @@ with it is less obvious:
 - There is no C library. String literals and static variables are refused
   by `tools/mkexe.c`. A text may be written as a string where it gives an
   array declared `CODE` its contents: `static const u8 CODE Name_S[] =
-  "text";` is in the code segment, with its zero byte.
+  "text";` is in the code segment, with its zero byte. Constants that
+  are named by their offsets, boxes and dialogs with their texts, are in
+  files of their own, without `CODE`: see "Moving the data of a file to
+  C".
 - For 32-bit numbers the compiler calls helper routines, near, in its own
   code segment. `__U4M`, which multiplies, and `__U4D`, which divides
   unsigned numbers, are at the end of `port/asm/VC.ASM`; of `__U4D` the
