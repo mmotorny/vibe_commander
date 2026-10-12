@@ -358,10 +358,11 @@ waits with every key taken, none of Shift, Ctrl and Alt held, nothing
 that it will do by itself after a while, and has gone round once more
 without changing the screen. A key is pressed when the original waits for
 one, so that it never finds one waiting. None of that is measured in
-time, and a busy computer makes a recording slower, not different. The
-exception is a key that a scenario wants pressed while the program is
-busy, as `find` does while a search runs: it is pressed when the key
-before it has been taken, wherever the program is by then.
+time, and a busy computer makes a recording slower, not different. Where
+a scenario wants the program to find a key while it works, as `find`
+does of a search, the key is written as one name with the key that
+starts the work, "Enter+Home": the two go down together, and the second
+is waiting when the first is taken.
 
 Where time is what the program goes by, it is the machine's: with the
 clock on, what blinks is found by looking at the screen every time the

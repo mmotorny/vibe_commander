@@ -376,12 +376,16 @@ class Machine:
         head, tail = struct.unpack("<HH", self._memory(KEYBOARD_BUFFER, 4))
         return head, tail
 
-    def press(self, keys, watch=None, ahead=0):
+    def press(self, keys, watch=None):
         """Press keys, given as in a scenario: names separated by spaces.
 
         A name is a key ("F3", "Enter", "a"), keys held down together
         ("Alt+F5", "Ctrl+o"), or a text to type in double quotes, which
-        may not contain spaces ("readme.txt").
+        may not contain spaces ("readme.txt"). Keys of one name that are
+        not Shift, Ctrl or Alt go down one behind the other with nothing
+        in between ("Enter+Home"): when the program takes the first, the
+        others are waiting, which is how a key gets to a program that
+        looks for keys while it works.
 
         A text with Russian letters is typed on the keys that the Russian
         keyboard has them on. It comes out as written only where that
@@ -397,9 +401,7 @@ class Machine:
         With `watch`, which knows where the program in the guest is (see
         watch.py), a key is pressed when the program waits for one, and
         Shift, Ctrl and Alt are held until it has seen them; the machine
-        is left paused. Without, they are held for KEY_TIME. The last
-        `ahead` keys are for a program that is busy and looks for keys
-        while it is: each is pressed when the one before has been taken.
+        is left paused. Without, they are held for KEY_TIME.
         """
         chords = []
         for name in keys.split():
@@ -410,17 +412,17 @@ class Machine:
                 chords += [keys_of(char) for char in text]
             else:
                 chords.append([_key(part) for part in name.split("+")])
-        for number, codes in enumerate(chords):
-            self._chord(codes, watch, number >= len(chords) - ahead)
+        for codes in chords:
+            self._chord(codes, watch)
 
-    def _chord(self, codes, watch=None, busy=False):
+    def _chord(self, codes, watch=None):
         """Press the keys `codes` together: Shift, Ctrl and Alt go down
         first, one after the other in the order given, and come up last,
         as under a hand, and long enough for the guest to see each held."""
         held = [code for code in codes if code in MODIFIERS]
         keys = [code for code in codes if code not in MODIFIERS]
         if watch:
-            watch.before_key(self, busy)
+            watch.before_key(self)
         for code in held:
             self._shift(code, True, watch)
         if keys:

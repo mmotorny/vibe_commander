@@ -114,7 +114,7 @@ cursor 8 18 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x5 0Fx74 07x1
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 4: "a:\*.*" Tab Ctrl+y Enter Home
+== 4: "a:\*.*" Tab Ctrl+y Enter+Home
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -310,7 +310,7 @@ cursor 8 18 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x5 0Fx74 07x1
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 11: "a:\freedos\bin\*.bat" Tab "startup" Enter Home
+== 11: "a:\freedos\bin\*.bat" Tab "startup" Enter+Home
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -366,7 +366,7 @@ cursor 8 18 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x5 0Fx74 07x1
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 13: "a:\freedos\bin\command.com" Tab "qzqz" Enter Right F1
+== 13: "a:\freedos\bin\command.com" Tab "qzqz" Enter+Right+Left+Space+Backspace+x+F1
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -394,7 +394,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x5 0Fx1 07x72 0Fx1 07x1
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 14: Esc Ctrl+c
+== 14: c+Esc
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -450,35 +450,63 @@ cursor 8 18 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x5 0Fx74 07x1
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 16: Enter q
-cursor 8 23 lines 6 7 mode 3
+== 16: Enter+F1
+cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+|║..                                                                          ──╢| 1Bx1 30x2 3Fx1 30x72 3Fx1 1Bx3
+|║DO    ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║SR    ║ Find files                                              Alt-F7 ║      ║| 1Bx3 3Fx1 30x5 3Fx10 30x46 3Ex6 30x5 07x1 0Bx1 03x1 1Bx1
+|║re    ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║he    ║  This command searches the current or specified directory for  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║no    ║  files not only by name, but by contents. Type  the  filename  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║da    ║  you wish to locate in the File Name text  box. You  can  use  ║      ║| 1Bx3 3Fx1 30x32 3Ex9 30x31 07x1 0Bx1 03x1 1Bx1
+|║ru    ║  DOS wildcard characters, described below.                     ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║em    ║                                                                ║    ──╢| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║      ║  To find files by Searching for Text type a partial  word  or  ║      ║| 1Bx3 3Fx1 30x23 3Fx18 30x31 07x1 0Bx1 03x1 1Bx1
+|║      ║  short phrase (or any fragment of text) in the Containing box  ║    y ║| 1Bx3 3Fx1 30x52 3Ex10 30x10 07x1 0Bx1 03x1 1Bx1
+|║      ║  that you know to be contained in  the  misplaced  file. It's  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║      ║  best to keep it short and avoid word breaks (word processors  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║      ║  may insert a "soft return" between words). The  filespec  in  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║      ║  the File Name text box will limit your  search  and  this is  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║      ║  important on large-capacity drives.                           ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║      ║                                                                ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|╟──    ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx3 3Fx1 30x12 0Fx8 30x52 07x1 0Bx1 03x1 1Bx1
+|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|╚══                                                                          ══╝| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
+|C:\WORK>                                                                        | 07x5 0Fx1 07x72 0Fx1 07x1
+|1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 17: Alt+F7
+== 17: Ctrl+Esc+c
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..                                                                          ──╢| 1Bx1 30x2 3Fx74 1Bx3
+|║DO   ╔═══════════════════════════ Find File ════════════════════════════╗     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║SR   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║re   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║he   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║no   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║da   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 0 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
+|║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
+|C:\WORK>                                                                        | 07x5 0Fx74 07x1
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 18: n
 cursor 8 18 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -506,7 +534,91 @@ cursor 8 18 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x5 0Fx74 07x1
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 18: "hello.*" Tab Ctrl+y Enter
+== 19: Enter
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..                                                                          ──╢| 1Bx1 30x2 3Fx74 1Bx3
+|║DO   ╔═══════════════════════════ Find File ════════════════════════════╗     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║SR   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║re   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║he   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║no   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║da   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 0 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
+|║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
+|C:\WORK>                                                                        | 07x5 0Fx74 07x1
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 20: q
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 21: Alt+F7
+cursor 8 18 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..                                                                          ──╢| 1Bx1 30x2 3Fx74 1Bx3
+|║DO   ╔═══════════════════════════ Find File ════════════════════════════╗     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║SR   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║re   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║he   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║no   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║da   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ File name:                                                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
+|║     ║ Containing:                                                      ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╟──   ║ qzqz                                                             ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
+|║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
+|╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
+|C:\WORK>                                                                        | 07x5 0Fx74 07x1
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 22: "hello.*" Tab Ctrl+y Enter
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -534,7 +646,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x5 0Fx74 07x1
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 19: Enter
+== 23: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45

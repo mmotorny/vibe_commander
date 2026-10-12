@@ -415,6 +415,14 @@ BATCHES = [
                 "FindFil, for less than 64 KB of memory to read a file "
                 "into: the bench has some 500 KB free"),
             **dict.fromkeys(
+                (0x8C0D, 0x8C0E, 0x8C0F, 0x8C11, 0x8C14),
+                "FindFil, stopped between two parts of a file that it "
+                "reads, or by a part that DOS will not read: a key gets "
+                "to a search only where it begins, with the key that "
+                "starts it, or behind the help, and both are before the "
+                "first file is opened; later it would be pressed at no "
+                "moment that the harness can name"),
+            **dict.fromkeys(
                 (0x8D60, 0x8D61, 0x8D64, 0x8D67, 0x8D69, 0x8D6B, 0x8D6D,
                  0x8D6F, 0x8D72, 0x8D75, 0x8D78, 0x8D7A, 0x8D7C, 0x8D7D,
                  0x8D7F, 0x8D82, 0x8D83, 0x8D85, 0x8D87, 0x8D88, 0x8D8B,

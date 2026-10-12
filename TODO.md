@@ -160,9 +160,6 @@ Things that are known and not done. Standing instructions are in
   the text for ^I. From the C they get the offset of the dialog there,
   and those two, which are C as well, name no text. None of the lines of
   their boxes has ^I, so nothing read it.
-- Deriving the golden of `find` stopped once in three times with "the
-  screen did not settle", at the step that ends in the help over a
-  search that runs. Not looked into: derive again.
 - Of the box in which a directory is chosen from the tree, what it does
   for the mouse has run in no scenario, 93 instructions of `ChTree`: a
   button held on a line, above the lines or below them, a second click
@@ -304,28 +301,17 @@ Things that are known and not done. Standing instructions are in
   timed by still screens throughout, and the tools say so. For the port,
   Shift, Ctrl and Alt are held for 20 ms of the host, not until the
   program has seen them.
-- A key that a scenario has pressed while the program is busy
-  (`Scenario.ahead`, in `find` only) is pressed when the key before it
-  has been taken, at no defined moment of the search. The screens of
-  `find` came out the same every time, but what ran did not: parts of
-  `FndBk`, `FndStuf` and `F67_18`, file offsets 8760-876E, 8BB4-8BBE and
-  8C1D-8C46, and others from one time to the next. So `find.ran` was left
-  as it was recorded the old way when the other goldens were derived
-  again. The cure is in the scenario and the harness, not in timing: have
-  the scenario name a place in the search, and the watch put the key in
-  when the original reaches it. Tried for the original, and it works:
-  steps written "Enter Right@FndBk1 F1@FndBk1", the machine stopped at
-  `FndBk1` from the key before on, and the key written into the keyboard
-  buffer of the BIOS there, since a paused machine takes no keys. Home
-  after the Enter of two more steps wants the same. Three derivations
-  then had the same `find.ran`, and the screens of the golden. What is
-  missing is the same moment in the port. Its search asks for a key
-  through `Int16_a`, which the map has, but another entry begins with
-  the same bytes, and the port was not found at the distance the map
-  gives from its first bytes or from the next symbol; it was not found
-  out why. A label of its own in the build that signals, where the
-  search looks for a key, would be surer. Shift, Ctrl and Alt of such a
-  key are held for 20 ms of the host.
+- A search can be given a key only where it begins: with the Enter
+  that starts it, written as one name, or behind the help that such a
+  key brings up. So `find` no longer has a key that stops a search
+  between two parts of a file it reads, and the five instructions of
+  `FindFil` that close the file then, `FnFl48`, are listed as out of
+  reach. To have that again, the harness would have to put a key in
+  when the search comes to a named place, in the original and in the
+  port alike. That was tried for the original and worked, with the key
+  written into the keyboard buffer of the BIOS at `FndBk1`; the same
+  place was not found in the port, which would want a label of its own
+  in the build that signals.
 - The machine's own clock runs with the host's while the machine runs,
   however much of the processor the machine gets. What the program does
   by its timer, following the cursor to a directory after 0.6 s or

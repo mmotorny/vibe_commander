@@ -221,22 +221,24 @@ out again (show.py --changes is how):
     cursor of the panel on the file, and Esc or "q" closes the box; Up,
     Down, PgUp, PgDn, Home and End move in the list, which shows 14 of
     its lines. A:\\ has 83 files and directories in all.
-  - Keys that follow, in the same step, the Enter that starts a search
-    are taken while it runs: Esc and Ctrl+c stop it, F1 is the help,
-    whose window covers all of the box that changes, Left and Right
-    move in "Stop, Go to, Quit" and a first letter answers. They arrive
-    a few milliseconds after the Enter, before DOS is first asked for a
-    file or after, as it happens; a key with Ctrl arrives 20 ms later
-    than one without. So a step may depend on a key arriving while the
-    search runs, if the search reads the floppy, but not on when.
+  - A search takes keys while it runs: Esc and Ctrl+c stop it, F1 is
+    the help, whose window covers all of the box that changes, Left,
+    Right, Space and Backspace move in "Stop, Go to, Quit" and a first
+    letter answers. The one way to give it a key is with the Enter that
+    starts it, as one name: "Enter+Home", "Enter+Right+Left+F1". The
+    keys go down together and the search finds them waiting when it
+    first looks, before DOS is asked for a file. Do not write a key
+    behind that Enter as a name of its own: the original gets it when
+    the search is over, and the port while it runs. From the help over
+    a search, "c+Esc" is Cancel for the help and Esc for the search,
+    and "Ctrl+Esc+c" Esc for the help and Ctrl+c for the search; in the
+    dialog Ctrl+m is Enter, so "Ctrl+m+c" stops a search as it begins.
+    No key can be given to a search later than that, between two files
+    or two parts of one.
   - The floppy is slow: a file of 46 KB takes most of a second to read.
-    A search by contents there stands still on "Scanning:" for longer
-    than the original is waited for, and the step is recorded in the
-    middle of it, where the port's ends with the search. Such a step has
-    to end stopped, or in the help: of A:\\FREEDOS\\BIN\\COMMAND.COM,
-    87,772 bytes, which the search reads in three parts, "Enter Right
-    F1" and then "Esc Ctrl+c". A search by contents of a few small files
-    there is fast enough: the three *.bat of that directory.
+    A:\\FREEDOS\\BIN\\COMMAND.COM, 87,772 bytes, is read in three parts
+    by a search for a text; the three *.bat of that directory are
+    small.
   - The box of F8 takes no key that was typed before it came up: "F8"
     and "Enter" are steps of their own, and a step "F8 Enter" leaves the
     box open. "Ctrl+a Space Enter" and 'F7 "name" Enter' do work as one
@@ -406,11 +408,6 @@ class Scenario:
     description: str
     steps: tuple = ()
     country: str = "us"           # see setups.COUNTRIES
-    # Step number -> how many of its last keys are pressed while the
-    # program is busy with what the key before them began, and are meant
-    # to find it so. The original is given any other key only when it
-    # waits for one (see watch.py).
-    ahead: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -1371,13 +1368,16 @@ SCENARIOS = {
 
     "find": Scenario(
         "Looking for files by name and by what they contain, with keys "
-        "pressed while the search runs",
+        "that a search finds waiting when it begins",
         steps=(
             "Alt+F7",
             'Tab "hello" Enter',          # of C:\\WORK, the one that has it
             "1 n",                        # a key that means nothing, and
                                           # New search
-            '"a:\\*.*" Tab Ctrl+y Enter Home',    # more than the box shows
+            # Keys written as one name go down together, and those behind
+            # the Enter are waiting when the search first looks for a key:
+            # Home, so that the list does not follow its end.
+            '"a:\\*.*" Tab Ctrl+y Enter+Home',    # more than the box shows
             "Home PgDn Up",               # the list a line down
             "Down Down",
             "End Down",
@@ -1385,19 +1385,25 @@ SCENARIOS = {
             "Home",
             "n",                          # the last of three files has it:
                                           # Home comes before the first line
-            '"a:\\freedos\\bin\\*.bat" Tab "startup" Enter Home',
-            "n",                          # a file read in three parts
-            '"a:\\freedos\\bin\\command.com" Tab "qzqz" Enter Right F1',
-            "Esc Ctrl+c",                 # out of the help, and stopped
+            '"a:\\freedos\\bin\\*.bat" Tab "startup" Enter+Home',
             "n",
-            "Enter q",                    # the same again, and Quit
+            # What the menu of a search that runs takes, a letter that is
+            # no answer, and F1: the help, over the search.
+            '"a:\\freedos\\bin\\command.com" Tab "qzqz" '
+            'Enter+Right+Left+Space+Backspace+x+F1',
+            "c+Esc",                      # Cancel leaves the help, and Esc
+                                          # is waiting: stopped
+            "n",
+            "Enter+F1",                   # once more,
+            "Ctrl+Esc+c",                 # and Ctrl+C stops it
+            "n",
+            "Enter",                      # to its end: a file read in
+                                          # three parts
+            "q",                          # Quit
             "Alt+F7",
             '"hello.*" Tab Ctrl+y Enter',
             "Enter",                      # Go to: the cursor on the file
-        ),
-        # Right and F1 while the search reads the floppy, and Ctrl+c when
-        # it goes on behind the help.
-        ahead={13: 2, 14: 1}),
+        )),
 
     "delete": Scenario(
         "Files and directories deleted: read-only ones, a directory with "
@@ -2079,8 +2085,7 @@ def run(scenario, program, bench, signals, trace=False):
             for number, step in enumerate(("",) + scenario.steps):
                 if number:
                     machine.resume()
-                    machine.press(step, watched,
-                                  scenario.ahead.get(number, 0))
+                    machine.press(step, watched)
                 where = f"step {number}, {step}" if number else "the start"
                 screen, waiting = wait(machine, where)
                 screens.append(screen)

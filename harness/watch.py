@@ -36,11 +36,11 @@ pass NotFn1 or Exit04 unseen, the machine never runs unwatched while a key
 is on its way: it runs with stops at both while a key is pressed, and one
 round at a time while a key is waiting to be taken.
 
-A scenario may want a key pressed while the program is busy, a search
-that looks for keys as it runs (Scenario.ahead). Such a key is pressed
-when the one before it has been taken, and where the program is in its
-work by then is not decided here: what it runs for that key may differ
-from one recording to the next, though the screens have not.
+A key is never pressed while the program is busy. Where a scenario wants
+the program to find a key while it works, a search that looks for keys
+as it runs, the key is written with the one that starts the work, as one
+name: they go down together, and the second is waiting when the first is
+taken (see Machine.press in dos.py).
 """
 import re
 import struct
@@ -118,7 +118,6 @@ class Watch:
         self._contents = program.contents
         self._ended = False             # it has come to Exit04
         self._inside = False            # it waits inside the BIOS
-        self._busy = False              # it is at work, and looks for keys
 
     def _find(self, machine):
         """Where in the machine's memory the three places are now:
@@ -161,20 +160,13 @@ class Watch:
         machine.step()
         self._inside = True
 
-    def before_key(self, machine, busy=False):
+    def before_key(self, machine):
         """Wait until the program waits for a key and has taken every key
-        pressed so far. If it is `busy`, and looks for keys while it is,
-        only until it has taken them, and from then on it counts as busy
-        until it has been waited for. The machine is left paused."""
+        pressed so far. The machine is left paused."""
         if self._ended:
             return
         machine.pause()
-        self._busy = self._busy or busy
-        if self._busy:
-            self._send(machine, lambda: machine.until(
-                machine.keys_taken, STEP_TIME,
-                "the program did not take the key before"))
-        if self._inside or self._busy:
+        if self._inside:
             return
         deadline = time.monotonic() + STEP_TIME
         while True:
@@ -221,7 +213,7 @@ class Watch:
             send()
             time.sleep(KEY_TIME)
             return
-        if self._inside or self._busy:
+        if self._inside:
             # It does not come round: the key is held for a while.
             self._send(machine, lambda: (send(), time.sleep(KEY_TIME)))
             return
@@ -247,7 +239,6 @@ class Watch:
         if self._ended:
             return machine.wait_for_prompt(STEP_TIME)
         machine.pause()
-        self._busy = False
         if self._inside:
             return machine.screen()
         deadline = time.monotonic() + STEP_TIME
