@@ -139,12 +139,15 @@ port.
 
 ### Moving the data of a file to C
 
-Every routine is C. What a file of `port/asm/` still holds is texts,
-boxes, dialogs, buttons and colours, which go to C a file at a time, and
-tables of commands and code, which go otherwise: `TODO.md`, "The last of
-the assembly", has what is left, who has which file, and the order.
-`VCHELP.INC` went first, into `port/help_t.c`: read that file and
-`port/tables.h` before anything else.
+This is how the texts, boxes, dialogs, buttons and colours of the
+assembly went to C, a file at a time. It is done: every file of
+`port/asm/` but `VC.ASM` is gone, and `TODO.md`, "The last of the
+assembly", has what that still holds. What is here of the assembly, its
+`PUBLIC` and `EXTERN` lines and its stubs, is of then; what is here of
+the files of constants and of the test `data` holds for a constant that
+is written or changed now. `VCHELP.INC` went first, into
+`port/help_t.c`: read that file and `port/tables.h` before anything
+else.
 
 For one file, in this order:
 
@@ -282,7 +285,9 @@ again:
   files had before the test was. A constant that moves keeps its name.
 - `OWN`, for a constant that the original has not as data, which is
   then not compared. Right for a table that only the port has, as
-  `Main_T`, `CmdNx_T`, `MnuNx_T` and `F35_T` will be when they are C.
+  `Trans_T` and `Fnc_T` are. The tables by which the stubs of the
+  commands went on, `CmdNx_T`, `MnuNx_T` and `F35_T`, became `switch`
+  statements and are no data.
   Wrong for anything that was in the published source: an entry here to
   quiet "no data called X" takes the object out of the test.
 - `NAMED_OTHERWISE`, for a word that names something the port has in
@@ -432,67 +437,44 @@ them. The copy may be in another file than the text: `User_S` of
   those is addresses of routines, or is not data of the port at all,
   and no layout of the constants can make it the original's.
 
-### Stubs in the assembly
+### What the assembly left in the C
 
-- A stub hands back exactly the registers its remaining callers use, and
-  no caller may rely on flags: C code leaves them undefined.
-- C code needs DS on the main data segment, where assembly often has ES
-  there and DS elsewhere; the stub arranges it and restores DS.
-- C code may destroy ES. A stub whose callers need ES saves it, or the
-  function's `#pragma aux` leaves ES out of what it modifies.
-- The direction flag must be clear when C is entered. C leaves it clear.
-- C code calls a routine that is still assembly through an entry made
-  with `FromC`, declared in `port/vc.h`. Registers go in and come back as
-  the routine has them. Flags do not come back: the entry of a routine
-  that answers in one turns the answer into a register.
-- ES is not always on the main data: `ReDir` calls `FnFile` and `NearFl`
-  with ES on the old list of files. A function that touches nothing of
-  the main data, only far pointers and constants, needs no DS, and its
-  stub leaves DS alone. A panel goes to C as its segment in a 16-bit
-  register, and `PANEL` of `port/vc.h` makes the pointer.
-- A routine that hands back two words can return them as a `u32` in
+The program was translated a few routines at a time, and what was still
+assembly called what was C through stubs, a few instructions for each
+routine that handed the registers over. There is no assembly code any
+more, and no stub. What they have left is how the C is written: a
+function has the registers that the assembly called it with, in its
+`#pragma aux`, and takes of them what the routine reads. These are the
+notes of the batches on what a reader of the C meets for that reason,
+and on the part of the program that stays in the memory, the compiler
+and the tests.
+
+- ES is not always on the main data in the original: `ReDir` calls
+  `FnFile` and `NearFl` with ES on the old list of files. So such
+  functions take what they read as far pointers. A function that touches
+  nothing of the main data, only far pointers and constants, needs no
+  DS. A panel is its segment as a number, and `PANEL` of `port/vc.h`
+  makes the pointer.
+- A routine that hands back two words returns them as a `u32` in
   `value [dx ax]`; one that hands back more gets room on the stack and a
-  `STACK` pointer to it in BX, and the stub pops the registers. Where the
-  flag a routine answers in follows from what it returns, the stub makes
-  it by comparing: `FnFile` has found a file if SI is below `EndBuf`.
-- A label inside a procedure may be an entry of its own that others call:
-  `TreNum` in `FilNum`, `NumAd1` in `NumAdr`. `tools/routines.py` does not
-  show such callers; the assembler does, with "Symbol not defined", once
-  the procedure is a stub. What they call stays, as a procedure of that
-  name.
-- A routine that saves every register gets a stub that saves AX only,
-  around the call: with `modify exact [ax]` the compiler saves what the
-  function uses.
-- A routine may be C in part: `PutFls` draws a panel of files in C, and
-  for the tree and the Info its stub pushes what the assembly behind it
-  pops, and jumps there.
-- A batch may leave a stub without a caller, as `PutFls` did that of
-  `SzDtTm`: `tools/routines.py` shows it with 0 callers, and it goes.
-- Data of the assembly that C code needs is made `PUBLIC` there and
-  declared in `port/vc.h` as `extern const u8 __far`, with a `#pragma
-  aux` that keeps its name: `Title_S`, `Var_S`, `Tree_S`.
-- Code that stands between two procedures belongs to none: `PutTre` and
-  `PutInf` stood behind `PutFls`, and `RdInfo` stands before it still.
-  `tools/routines.py` does not list such code. `harness/reach.py` and
-  `harness/ported.py` take it by its first label, as far as the next
-  procedure, or by a later label of it for what stands from there on:
-  such a stretch may hold the end of one file and the start of the
-  next, as `M60_00` of `VCMENU.INC` runs on into `F37_00` of `VCF1.INC`.
-- Code between procedures may be entered by a jump and left by jumps, as
-  the editor is: the viewer's code jumps to `T00_00` and the editor jumps
-  back to `V00_10`, `V13_00` or `V13_01`. Its stub keeps the label, calls
-  the C function, and jumps by what that returns.
-- Where every jump inside such code ends up back at one place, the wait
-  for the next key, each label that is jumped to can be a function, with
+  `STACK` pointer to it: `AdrNum`, with `struct Place`. A routine that
+  answers in a flag returns a number, and where it hands back a register
+  too, the flag is in the high word.
+- Code of the original that stands between two procedures belongs to
+  none: the commands, and `PutTre` and `PutInf` behind `PutFls`.
+  `harness/reach.py` and `harness/ported.py` take such code by its first
+  label, as far as the next procedure, or by a later label of it for
+  what stands from there on: such a stretch may hold the end of one file
+  and the start of the next, as `M60_00` of `VCMENU.INC` runs on into
+  `F37_00` of `VCF1.INC`.
+- Where every jump inside such code ends up back at one place, the
+  wait for the next key, each label that is jumped to is a function, with
   the registers that the jump carries as its arguments: a jump is a call
   and a return. `port/edit.c` has the editor's keys like that.
-- When the callers of a stub become C, the stub goes, and so does a
-  function that was only there for the stub: `T60_00_c` and `T61_00_c`
-  were listed in `harness/ported.py` and ran no more. The test says "not
-  executed in the port".
-- A text or a table of the assembly that C code reads is at its offset
-  in the segment that `AsmSeg_a` returns: `AT(AsmSeg(), OFFSET(text))`
-  costs no relocation, where naming the text as a far object does.
+- A text or a table that is known by its offset is read at that
+  offset in the segment that `AsmSeg` of `port/misc.c` returns:
+  `AT(AsmSeg(), OFFSET(text))` costs no relocation, where naming the
+  text as a far object does, four bytes of the file each time.
 - A table of colours for `NgLine` may be shorter than the four that the
   routine can ask for: `EdtH_P` is one byte, and what followed it was the
   editor's table of keys. With the table gone other bytes follow; the
@@ -508,66 +490,13 @@ them. The copy may be in another file than the text: `User_S` of
   key left it, where it deletes. `T53_00` goes by the number only where
   it is 0FFFFh, so the C hands it 0; read what the routine does with
   such a register before choosing.
-- A routine that answers in the carry flag and nothing else gets a stub
-  that makes the flag of what the function returns: `FilePan` returns 1
-  or 0, and `NEG AX` sets the carry for the 1. `POP` leaves flags alone.
-- A table that the assembly names by CS:BP goes to C as a far pointer in
-  `[es si]`. The stub puts ES on its own segment and exchanges SI and BP
-  around the call, which takes no stack: C code keeps both. `CallC` does
-  not serve there, since it takes DS from ES; see `PutTree`.
-- A stub may choose between C functions where the assembly jumped from
-  one piece to the next: that of `PutFls` goes to `PutFls_c`, `PutTre_c`
-  or `PutInf_c` by the kind of the panel.
-- A stub may also call several C functions one after the other: that of
-  `ReDir` calls `ReDir_c`, `ReDr45_c` and `ReDr50_c`, and has what the
-  first leaves for the last in room on the stack, as a structure that BX
-  points at. That was done to save stack when it was short, and need not
-  be done again.
-- A routine that answers in the carry flag gets an entry for C that
-  makes a number of it: `FromC Fantom, <SBB AX,AX>`. `Intr21`, which
-  calls DOS, had an entry that took the registers from a structure on
-  the stack, `struct DosRegs` of `port/vc.h`, DS among them, and put
-  back what DOS returns, as the function that it is now does; `OpenFil`
-  has one that takes the name as a far pointer. Such an entry puts ES on
-  the main data, as `FromC` does.
-- `MvzLine` copies what follows a text along with it, 68 bytes in all,
-  so a name that is copied with it is the assembly's own, made `PUBLIC`,
-  and not a constant of the C file: `Mask_S` and `Ext_F`. Once what
-  follows them in the assembly is translated, those bytes are others.
-- A flag may come back through several returns. `V30_00` answered, for
-  a screen that is full, with the carry that `V32_00` left, and that was
-  the one of an `ADD` in `Color`, always clear. `tools/flagscan.py` names
-  the instruction that reads such a flag; follow it back to the one that
-  set it, in `src/`, before deciding what the stub makes.
-- A place that the assembly keeps in two registers and answers for in
-  the carry flag as well, as `NextLin` does with SI and BX, goes to C as
-  a structure: the stub pushes the registers, the function gets BX on
-  them and returns the flag in AX, and the stub pops them and makes the
-  carry with `NEG AX` before it pops AX.
-- What the viewer keeps of a file, `ViewDat`, lies in `TmpBuf` from its
-  byte 200 on, and what the editor keeps, `EdData`, lies over it: `EdBase`
-  is `ViBase`, `EdSize` is `ViSize`, `EdTxHex` is `ViTxHex`. `port/view.c`
-  has the viewer's as a structure there. The text is in a segment of its
-  own, which the assembly has in DS and C gets as a number, like a panel;
-  the table of its lines is at the top of the same segment.
-- An entry for C to a routine of a file that another batch has in hand
-  can stand next to the stub that needs it: `FromC T70_00` was in
-  `VCVIEW.INC`, the routine in `VCEDIT.INC`, until both sides were C.
-- Where code that is jumped to goes on to one of several places, and the
-  next place takes registers, the function returns which place and the
-  registers come back in room on the stack: the stub of `V00_02` goes on
-  to `Func04`, to the editor at `T00_00` or to the viewer at `V00_10`.
-  Code of another file may jump into the middle of such code, as the
-  editor's stub does to `V00_10`, `V13_00` and `V13_01`: each of those
-  labels is a stub of a function of its own.
-- Two batches side by side may each keep a stub for the other: the
-  editor kept those of `T70_00` and `T71_00` for the viewer's assembly,
-  and wrote the viewer's `V80_00` out in C, while the viewer became C
-  and kept `V80_00` and `V82_00` for the editor's. After the rebase,
-  look for the callers of every stub of the batch and of every stub
-  that the batch was the caller of, in all of `port/asm/`, and take out
-  what has none; and have the C of the other batch call the function
-  where it wrote one out.
+- What the viewer keeps of a file, `ViewDat`, lies in `TmpBuf` from
+  its byte 200 on, and what the editor keeps, `EdData`, lies over it:
+  `EdBase` is `ViBase`, `EdSize` is `ViSize`, `EdTxHex` is `ViTxHex`.
+  `port/view.c` has the viewer's as a structure there. The text is in a
+  segment of its own, which the original has in DS and the C has as a
+  number, like a panel; the table of its lines is at the top of the same
+  segment.
 - A new scenario may reach what an earlier batch listed as out of
   reach, and the `port` test then fails on the stale entry, "listed as
   out of reach, but executed": take it out of that batch's list.
@@ -576,29 +505,21 @@ them. The copy may be in another file than the text: `User_S` of
 - A routine may read a panel through DS that no comment names: `PutPrm`
   takes the size of the panel in DS for where the prompt goes, and the
   viewer hands it the right panel's whichever is active.
-- A register that a routine stores without having set it, as `V32_00`
-  did DX where nothing found is on the screen, is handed to the C
-  function like an argument. That is less than showing that nothing
-  reads what was stored, which was done for `V32_00` when its callers
-  became C: see there.
-- A caller may go on with a register as the routine happens to leave it,
-  not only with what it returns: CX is 0 after `T70_00` and `T75_00`,
-  because a `REP` ended there, and `T21_00` and `T00_53` compare with CL
-  as if they had cleared it. Read in every caller what becomes of each
-  register that the routine changes. With `T75_00` the test showed it
-  only by chance, in a status line drawn where the original leaves it:
-  what went wrong was the count of free bytes, which is not compared.
-- BP cannot carry an argument to an entry for C. `DialBox` and `Dialog`
-  take their box at CS:BP, so their entries take its offset in AX. C code
-  has the offset of an object of the assembly as
-  `(u16)(u32)(const void __far *)object`, which compiles to the offset
-  alone and costs no relocation. `PUBLIC` for such an object can stand in
-  `VC.ASM`, whichever file defines it.
-- A routine that answers in the zero flag gets an entry for C that is
-  written out, where `FromC` has room for one instruction: `MOV AX,0`,
-  which leaves the flags, and `JNE` past an `INC AX`. `Int16_a` did it
-  with DX, while it was there. A stub makes the zero flag for its callers
-  of a function that returns 1 or 0 with `CMP AX,1`: `CmpSym`.
+- A register that a routine of the original stores without having
+  set it, as `V32_00` does DX where nothing found is on the screen, is an
+  argument of the function. That is less than showing that nothing reads
+  what was stored, which was done for `V32_00`: see there.
+- A caller may go on with a register as the routine happens to leave
+  it, not only with what it returns: CX is 0 after `T70_00` and `T75_00`
+  in the original, because a `REP` ended there, and `T21_00` and `T00_53`
+  compare with CL as if they had cleared it. With `T75_00` the test
+  showed it only by chance, in a status line drawn where the original
+  leaves it: what went wrong was the count of free bytes, which is not
+  compared.
+- `DialBox` and `Dialog` take their box as an offset, where the
+  original has it at CS:BP. C code has the offset of a constant as
+  `(u16)(u32)(const void __far *)object`, `OFFSET` in most files, which
+  compiles to the offset alone and costs no relocation.
 - Nothing in the program tells the tests where it is. The driver of the
   tests (`harness/DRIVER.ASM`) watches it from inside the machine: it
   takes a call of `INT 28h` for the program's when it comes from the
@@ -613,130 +534,59 @@ them. The copy may be in another file than the text: `User_S` of
   laid out as the original's. The port's stack it finds in the linker's
   map, `stack` of `harness/coverage.py`: it begins at `DataSav` of
   `port/resident.c` and is all of the segment `R_BSS`.
-- What a routine reads in the assembly's code segment may be read by
-  another file too, and then stays, `PUBLIC`, when the routine goes: the
-  menu finds the menu that the mouse is on by `PtMnu_S`, the names that
-  `PutMnu` writes. Look for every table and text that would go with a
-  routine in all of `port/asm/` first.
-- An entry that hands back a number of 32 bits is written out, with the
-  high word in DX and the low one in AX, whatever the routine has them
-  in, as `Timer_a` and `DosTime_a` were.
-- Registers that follow from what a function returns are made by the
-  stub: `T55_00` returns where the cursor gets to in the line, and its
-  stub makes SI of that, DI of where the cursor was, and the zero flag
-  by comparing the two, which is what `T23_00` goes on with.
-- An entry for C goes when its routine becomes C, and the C code that
-  used it calls the function: `T50_00_a`, `T51_00_a` and `T53_10_a` went
-  like that. A function that had the entry's convention, a result in SI
-  say, then has another: read every place that calls it.
-- The assembler does not tell capitals from small letters. `Help_c` is
-  `Help_C` to it, the number of a colour, and it says "Symbol
-  redefinition": the C function of `Help` is `Help00`.
 - A routine that jumps on by a table of keys, with `Case`, has the table
   as a `switch` in C. `Case` takes no key without a scan code, and an
   entry of the table without one takes the character with any.
-- `Case` jumps with SI behind the entry of its table that it found, and
-  what it jumps to may go on with that: `ChTr55` calls `DelTr0`, which
-  takes SI for the address of a path in the main data. With the table
-  gone, the C hands on the address that the table has in the original.
-  The listing has a table of `.DATA` by its offset in that segment only;
-  where it is in the program shows in `build/shareware-layout/VC.COM`, by
-  looking for its bytes.
-- A command is no routine: the main loop jumps to it by its table of
-  keys, and it jumps back to one of several places of the loop, or on
-  into another command or a routine of the menus. In C it is a function
-  that returns where the program goes on, a number, and its stub jumps
-  there by a table: `CmdC`, `CmdEnd` and `CmdNx_T` in `VCFUNC.INC`, with
-  `port/keys.c`. Where the place it goes on at takes registers, a panel
-  in DS and a byte in CL or CH for `M01_01`, `M03_00` and `M06_00`, the
-  function returns them too, in DX and the high byte of AX, and the piece
-  of the stub for that place loads them. Such a place may pop a DS that
-  the command had pushed: the stub pushes it, before the key.
-- A command is entered with the key in AX, and `F73_00`, where a key
-  goes that is one of the command line, takes it there: the stub keeps
-  it on the stack around the function. The menus enter a command with
-  their own numbers in AX and CX instead.
+- `Case` jumps with SI behind the entry of its table that it found,
+  and what it jumps to may go on with that: `ChTr55` calls `DelTr0`,
+  which takes SI for the address of a path in the main data. With the
+  table a `switch`, the C hands on the address that the table has in the
+  original. The listing has a table of `.DATA` by its offset in that
+  segment only; where it is in the program shows in
+  `build/shareware-layout/VC.COM`, by looking for its bytes.
+- A command is no routine in the original: the main loop jumps to it
+  by its table of keys and the menu bar by the tables of the menus, with
+  the current panel in DS, and it jumps back to one of several places of
+  the loop, or on into another command. In C it is a function that
+  returns where the program goes on, and the main loop calls it from a
+  `switch`: `Command` of `port/main.c`, with `CmdEnd`, `MnuEnd`, `F1Next`
+  and `F35_90` there, which make of what a function returns what stood
+  at the end of each family of commands in the original. "The commands"
+  in `port/vc.h` declares them, with the places that each family
+  returns. Where the place that a command goes on at takes registers, a
+  panel in DS and a byte in CL or CH for `M01_01`, `M03_00` and `M06_00`,
+  the function returns them too, in the high word and the high byte of
+  the low one.
 - A label inside a command may be an entry of its own, as inside a
   procedure: the menu comes in at `F17_01` and `F76_01`, the mouse at
   `F00_05`, `F01_05` and `F00_60`, with other registers than the key's
-  entry has. Each gets a stub and a function; what only the mouse reaches
-  runs in the port all the same where the function for the key calls it.
-- The stub of `PutFls` chooses between three C functions by the kind of
-  the panel, so C code that wants a panel written makes that choice
-  itself: `PtFs00` in `port/keys.c`.
+  entry has. Each is a function, and has a number of its own among the
+  commands, a `CMD_` of `port/vc.h`.
 - A routine may be called with DS somewhere that only happens to do:
   `F16_00` asks `BegBX` where a panel begins with DS on the main data,
   and takes the row, which is that of either panel.
-- A label names code between two procedures from there to the next
-  procedure, not to the next command: `F22_00` runs to `F42_10` and
-  holds `F80_00`, `F30_00` and `F32_00` as well. A batch that takes the
-  first commands of such a stretch and not the last answers in
-  `harness/ported.py` for the instructions of both.
-- An entry for C can be made for a label inside a procedure of another
-  file: `FromC DelTr0` was in `VCSUB3.INC`, the label in `DelTree` of
-  `VCF1.INC`, until `DelTree` became C. `OncZoom` hands back
-  three registers as `DialBox` does, into three words on the stack, and
-  takes the include line in DX: a function that has none to give leaves
-  DX out of its `parm`.
-- The `port` test can run before anything is translated: with the batch
-  listed in `harness/ported.py` without functions, it says whether the
-  new scenarios hold on the port as it is, and so tells a scenario that
-  cannot stay from a translation that is wrong.
-- What a routine of the assembly reads at an offset in its code segment
-  stays in the assembly and is made `PUBLIC`: the box that `Dialog`
-  shows, the buttons and the colours that `MinMnu` takes. Texts and
-  colours that only C code hands on, as a far pointer to `NgLine`, go to
-  the C file.
-- An entry for C can hand back a second register in DX, `FromC GetMous,
-  <MOV DX,CX>`, and make a number of two flags: that of `DoublMo` loads
-  AX with `MOV`, which leaves the flags, between its jumps. `MinMnu`
-  takes its colours at CS:BP and has an entry that takes them in DI;
-  `PgDn` has one that takes in BX what it has in BP.
+- A label of the original names code between two procedures from
+  there to the next procedure, not to the next command: `F22_00` runs to
+  `F42_10` and holds `F80_00`, `F30_00` and `F32_00` as well. That is
+  what a name in `routines` of `harness/ported.py` stands for.
 - `Input` calls `Help` for F1, so every routine that takes keys can have
   the help on the stack above it, and the help takes its own keys with
   `MinMnu`, which calls `Input`: F1 in the help enters `Help` again,
   which returns at once because `HlpPage` is 0FFh then.
-- The files of `port/asm/` end with a byte 1Ah behind the last line. A
-  script that takes one apart by lines keeps it.
-- A stub that only the code between procedures calls runs when a
-  scenario has that code call it: `FndAdr` is called from the assembly
-  by "Go to" of the file search alone, and the `port` test said "not
-  executed in the port: FndAdr_c" until a step did that.
-- A jump on a flag behind two calls may never be taken. `FndBack` has
-  `JC` behind `MnMn40` to go back for the next key, and `MnMn40` ends in
-  `Window`, which always leaves the carry clear. The C does what the
+- A jump on a flag behind two calls may never be taken. `FndBack`
+  has `JC` behind `MnMn40` to go back for the next key, and `MnMn40` ends
+  in `Window`, which always leaves the carry clear. The C does what the
   assembly did then, not what it meant: it goes on to `FndMove` with
-  what `MnMn40` left in AX, and the entry `FromC MnMn40` hands that back.
-- Two batches that run side by side may each make an entry for the same
-  routine, under the same name: the help and the file search both made
-  those of the mouse and of `PgUp` and `PgDn`. Git shows no conflict
-  where each put its entry in a file of its own, and the name is there
-  twice. After a rebase, look for the entries that have arrived, `FromC`
-  and `_a` in `port/asm/`, keep the one next to the routine, and go by
-  its registers and answers: those of `DoublMo` were the other way round.
-- The BIOS was called through an entry too, `Int16_a` for the keyboard,
-  which made a number of the zero flag. It is `Int16` of `port/dos.c`
-  now: see "C for the port".
-- The program has code in its data: `DirFunc` and what follows it,
-  `FncSel` and `FncExt`, stand behind a `.DATA` with no `.CODE` after
-  it. `harness/coverage.py` knows the procedures there, and code that
-  is no procedure by a label that has an instruction, as far as the next
-  procedure or the next data: `FncSel`, with `FncExt` in it.
-- A routine that a command puts into `FncAddr`, as `F38_40` deletes and
-  `M30_50` sets attributes, is called by `FncSel`, by `FncMas` and by
-  `DirFunc`, with the attributes in AL, and answers in AX: 1, 0, or
-  100h to stop. Its callers go on with BX, DX and SI, so its stub saves
-  all but AX. C code calls what `FncAddr` names with `FncCall` of
-  `port/vc.h`, whose entry keeps DS: `C00_00` does not. `FncAddr`
-  holds a number since, and these stubs are gone: see "Moving the data
-  of a file to C".
-- A box may name a routine that `Dialog` calls when it is answered:
-  `F38_10` and `M30_60`. It gets the answer in AL, with ES and DS on the
-  main data, and hands back AL and the carry flag, set to go on with
-  the dialog.
-- The label inside a procedure that others call may skip a test at its
-  start: `DelTr0` in `DelTree`. The stub keeps the test and the label,
-  and the C function is what follows the label.
+  what `MnMn40` left in AX, which the function returns.
+- A routine that a command puts into `FncAddr`, as `F38_40` deletes
+  and `M30_50` sets attributes, is called by `FncSel`, by `FncMas` and by
+  `DirFunc`, with the attributes of a file, and answers 1, 0, or 100h to
+  stop. `FncAddr` holds the number of the function, and `FncCall` of
+  `port/vc.h` calls it: see "Moving the data of a file to C".
+- A dialog may name a routine that `Dialog` calls when it is
+  answered: `F38_10`, `M30_60` and `F35_61`. The word in its header is a
+  number, a `SUB_` of `port/tables.h`, and `Dialog` calls the function
+  from a `switch`.
 - A caller may go on with what a routine leaves in AX when it reports
   no error: `^R` in a tree takes AL after `DelTr0` for the kind of the
   panel, the 1 that DOS answers for one byte written. Hand back all of
@@ -750,38 +600,17 @@ them. The copy may be in another file than the text: `User_S` of
   to the instruction that set it. A call that the assembly makes with
   `INT 21h` itself is `Int21d` of `port/dos.c` in C, which has the flag
   clear when DOS is called: `Fcb29` of `port/dirfunc.c`.
-- `EXTERN` for a C function stands in the list at the top of `VC.ASM`,
-  before any segment is open. In a file that is included inside the
-  code, the assembler takes the function for one of that segment and
-  makes of `CALL FAR PTR` a `PUSH CS` and a near call, without a word:
-  some such calls arrive and some do not, and the program ends in
-  "Invalid Opcode" somewhere else. `PUBLIC` can stand anywhere, and at
-  the top of the batch's own file, as in `VCF1.INC`, it does not meet
-  the line another batch adds.
-- A box and a dialog are tables in the assembly's code segment, and
-  `DialBox`, `Dialog`, `MinMnu`, `MnMn10` and `MnMn40`, which are C, take
-  them as offsets there, from the assembly and from C alike. The C reads
-  them through far pointers made of the offset and of the assembly's
-  segment, which an entry hands it: `AsmSeg_a`, and `AT` in
-  `port/dialog.c`. Naming something of the assembly gives the segment
-  too, as a number that is set when the program is loaded: it costs a
-  relocation, four bytes of the file. The `port` test knows such a
-  function all the same, by the file's table of relocations.
-- Where the assembly has DS elsewhere than on the main data and the
-  routine reads there, the stub hands DS to the C as a number: the filter
-  of a panel is a dialog whose fields are in the panel's segment. C code
-  that calls such a function passes `MAIN_SEG` of `port/vc.h`, which
-  compiles to a copy of DS.
-- A routine that the assembly names in a table and C code has to call,
-  as `Dialog` calls what a dialog has for Enter and F10, gets an entry
-  that takes its address in a register and calls that: `DialSub_a`, next
-  to the stub of `Dialog`. It sets DS and BP as the routine expects them
-  and makes a number of the carry flag. Such a routine may call the stub
-  of the function that called it: `M30_60` and `F38_10` call `Dialog`
-  from inside a dialog.
-- With `modify exact [ax]` the compiled function saves the registers its
-  arguments come in as well, BX, CX, DX, SI and DI, and ES: the stub of
-  `InSt10` is the call and nothing else.
+- A box and a dialog are constants of a file of constants, and
+  `DialBox`, `Dialog`, `MinMnu`, `MnMn10` and `MnMn40` take them as
+  offsets in the segment of the constants, as the original has them at
+  offsets in its one segment. The C reads them through far pointers made
+  of the offset and of that segment: `AsmSeg`, and `AT` in
+  `port/dialog.c`.
+- Where the original has DS elsewhere than on the main data and the
+  routine reads there, the function takes that segment as a number: the
+  filter of a panel is a dialog whose fields are in the panel's segment.
+  C code that means the main data passes `MAIN_SEG` of `port/vc.h`,
+  which compiles to a copy of DS.
 - C code may be entered again from what it calls: `C00_00` has `DirFunc`
   call it for everything in a directory. Nothing is needed for that, as
   long as the functions keep what they know on the stack or where the
@@ -793,76 +622,31 @@ them. The copy may be in another file than the text: `User_S` of
   file: a file without attributes cannot be appended to. Where a piece
   of a routine becomes a function, read what every jump to it has in
   each register that it reads.
-- A routine that is C whole, and whose helpers only it called, leaves
-  one stub: `C40_00`, `C50_00`, `SetDate` and `PerCent` are static
-  functions of `port/copy.c`. The boxes and the texts stay in the
-  assembly, made `PUBLIC` where they are defined.
-- A command is code between procedures that the main loop jumps to by
-  its table of keys, with DS on the active panel, and that ends by
-  jumping back: to `Func04` for the next key, to `Init50` to draw the
-  panels anew, to `FncSel`, `FncMas` or `FncExt`. Its C function returns
-  a number for where to go on, and the stub jumps by a table of its own,
-  `F35_T` in `VCCOPY.INC`; what the place it jumps to takes in a
-  register, the title in BX for `FncMas`, comes back in DX. A command
-  may read a register that it has not set, as Shift-F6 does BX and DX:
-  the stub hands them to the function as they come.
-- The address of a routine of the assembly, for `FncAddr`, is that of
-  an object like any other: `PUBLIC C00_00`, and in C `extern const u8
-  __far C00_00_s[]` with `#pragma aux C00_00_s "C00_00"`, since the C
-  function has the name already.
-- The stub of a routine that a dialog names saves AX around the call:
-  `Dialog` takes the answer from AL when the carry flag is clear, and
-  reads nothing of AX when it is set. See `F35_60`, which also keeps
-  the label that the other dialog names, `F35_61`, inside it.
-- The commands of `VCF1.INC` and the file search's go on the same way,
-  with numbers of their own, the `TO_` of `port/vc.h`: each stub is the
-  label, the call and `JMP F1Next`, which is in `VCF1.INC` and jumps to
-  `Func04`, `FncSel`, `FncExt` or `FncEx1`. `F67_00` returns the panel
-  for `F24_02` in DX, and its stub sees to that. `F38_40`, `M30_50` and
-  `FindFil` are public for `FncAddr` like `C00_00`.
+- Copy and Rename end where the commands that go through files do:
+  at `FncSel`, `FncMas` or `FncExt`, or back in the loop. `F35_90` of
+  `port/main.c` goes on from what they return, with the title for
+  `FncMas` in the high word. The commands of `port/dirfunc.c` and the
+  file search return a `TO_` of `port/vc.h`, and `F1Next` goes on from
+  that; `F67_00` returns the panel for `F24_02` in the high word.
 - A routine that reads through ES what its caller has at DS takes the
   wrong bytes where the two differ, and the C has to hand it the same
   wrong address: `ChgDisk` reads the path at ES:DX, and Go to of the
   file search calls it with DS on the list. Read what a routine takes
   its argument through, not only which register.
-- The header of a dialog has its bytes in the order of `BOXHD` in
-  `port/asm/VC.ASM`, the key bar first: `DB 1, 0FFh, 32, 10h` is key
-  bar 1, no menu item, help page 32, flags.
+- The header of a dialog has its bytes in the order of `struct BOXHD`
+  of `port/tables.h`, the key bar first: `DB 1, 0FFh, 32, 10h` of the
+  original is key bar 1, no menu item, help page 32, flags.
 - DOS called with `INT 21h` itself, where the original did not go
   through `Intr21`, is `Int21d` of `port/dos.c`, which takes `struct
   DosRegs` as `Intr21` does. `Int2F` is next to it.
-- When the last caller of a stub becomes C, the stub goes, with its
-  line in the `EXTERN` list, and the function is static if only its own
-  file calls it: `FndMove`, `FndCurs` and `F38_70`. Take such a function
-  out of the batch's `functions` in `harness/ported.py`, which are those
-  that the assembly calls.
-- The commands of `VCFUNC.INC` from `F80_00` on have stubs that jump on
-  by themselves, two ways each: `F32_00` to `Func04` or `F21_30`,
-  `F68_00` to `Func04` or `F21_25`, `F80_00` to `Func05` or `Func01`,
-  `F62_01` to `Func04` or `M06_10`, with the panel in DS and the item of
-  the menu in CL for that. Where the place jumped to takes the current
-  panel in DS, `Func01`, `Func05`, `Func12` and `F11_00`, the stub saves
-  DS around the call. A label that others jump to, `F73_00`, `Run_00`,
-  stays as such a stub.
-- A name given to `harness/ported.py` takes all that stands from its
-  label to the next procedure: `F80_00` takes `F30_00` and `F42_00` with
-  it, `F81_00` the commands down to `Run_00`, and `F61_00` the history
-  behind the box of the drives. Such a stretch is listed once all of it
-  is C or stub; what is left of it in the assembly is said in `TODO.md`.
-- A piece of a command that only hands registers to routines which are
-  still assembly, and takes the panel in DS for them, can stay assembly
-  as an entry that the C calls: `F77_10_a`, of the speed search, calls
-  `Search` and `F00_50`.
 - A routine that hands back the cursor of a line and the carry flag
-  returns both as a number of 32 bits: `EdLin`, which is C, has the
-  column in the low word and 1 in the high one for the flag, and its
-  stub makes DX and the carry of them. Its entry did the same while it
-  was assembly.
-- A routine that reads DS, as `ClsLine` reads `CrntCol`, and that is
-  once called with DS left elsewhere by a jump out of a loop, takes DS
-  as a number: `ClsLine` has the segment as an argument, MAIN_SEG for
-  the main data, and its stub hands over DS. `Run_00` leaves DS on the
-  panel when the commands have no room for a name, and passes that.
+  returns both as a number of 32 bits: `EdLin` has the column in the low
+  word and 1 in the high one for the flag.
+- A routine that reads DS, as `ClsLine` reads `CrntCol`, and that
+  is once called with DS left elsewhere by a jump out of a loop, takes
+  DS as a number: `ClsLine` has the segment as an argument, MAIN_SEG for
+  the main data. `Run_00` leaves DS on the panel when the commands have
+  no room for a name, and passes that.
 - What a command leaves in the registers goes round the main loop to
   the next command, and a command that is C does not leave what the
   assembly left there. `Func05` loads BX, so a command that comes back
@@ -875,54 +659,41 @@ them. The copy may be in another file than the text: `User_S` of
   goes round, look at every place that the code comes back to, not at
   the one that most commands use. The cursor's keys put what the
   original leaves into `struct Regs` of `port/vc.h` now.
-- Code that ends in a jump by a table, as the menu bar jumps to the
-  command of the item chosen, leaves the table and the jump in its stub:
-  the C function returns what was chosen and which table has it, and the
-  stub makes of that the registers as the code had them at the jump, all
-  but BP there, which no command reads. Reading the commands for what
-  they take is not enough where another batch has them in hand: Rename
-  goes by BX and DX as they come, which showed only when its batch
-  arrived with a stub that hands the two to its C function.
-- A stub can put ES back on the main data itself, `PUSH DS` and `POP ES`
-  before it restores DS, and the function then lists ES among what it
-  modifies: see `F39_01` in `VCMENU.INC`.
-- The address of a text in a file that another batch has in hand, the
-  bar's `PtMnu_S` in `VCSUB2.INC`, can come to the C in a register of
-  the stub, with `AsmSeg` for its segment: `F39_01` in `VCMENU.INC`.
-  An entry made for a label there, as one was for `PtMnu1`, goes when
-  that batch arrives with the routine in C: call the function then.
-- The program is in three parts: the assembly's code segment, the main
-  data, and the part that stays in the memory while a command runs,
-  where the stack is, with `Counter`, `PrgList`, `RunPar` and the
-  routines that `CallPSP` calls. The assembly reaches that part through
-  SS; C code gets its segment from an entry, `ResSeg_a` in `VCMEM.INC`,
-  and the offset of an object there like any other that it names. What
-  that part keeps is one structure, `struct Stays` of `port/vc.h`, and a
-  member has no name to the linker: `#define Counter STAYS(Counter)` at
-  the top of a file makes `OFFSET(Counter)` the member's place.
+- The menu bar says which item was chosen and which table has its
+  command, and `F39_01` of `port/main.c` makes of that the registers as
+  the original has them at its jump to the command, all but BP, which no
+  command reads, and finds the command in the tables of
+  `port/commands_t.c`. Reading the commands for what they take was not
+  enough while another batch had some in hand: Rename goes by BX and DX
+  as they come, which showed only when its batch arrived.
+- The program is in three parts: the part that goes while a command
+  runs, which is the code and the constants; the main data, which the
+  program asks DOS for; and the part that stays in the memory while a
+  command runs, where the stack is, with `Counter`, `PrgList`, `RunPar`
+  and the interrupt handlers. The original reaches that part through SS;
+  C code gets its segment from `ResSeg` of `port/misc.c`, which is SS
+  too, and the offset of an object there like that of any constant. What that part keeps is one
+  structure, `struct Stays` of `port/vc.h`, and a member has no name to
+  the linker: `#define Counter STAYS(Counter)` at the top of a file
+  makes `OFFSET(Counter)` the member's place.
 - The part that stays is the segments that the top of
   `port/asm/VC.ASM` declares before `.MODEL`, so that the linker puts
-  them first and in that order: `RHEAD`, what is assembly of it, behind
-  the PSP; `RTEXT`, its compiled code; the four that the compiler makes
-  for the data of `port/resident.c`, `RCONST`, `RCONST2`, `R_DATA` and
-  `R_BSS`, the last of which is the stack; `RGAP`, the paragraph of the
-  header of the next block of memory. The part that goes begins behind
-  them, at `TrnBeg`, on a paragraph, and `tools/mkexe.c` stops the build
-  if it does not. It begins with the constants of the C code, `CONST2`,
-  some 8,900 bytes of them: QEMU is many times slower at a write to a
-  page that has code which it has run, the stack ends just in front,
-  and with `_TEXT` there, whose stubs of the main loop ran at every
-  key, a scenario of the cursor's keys took 19.7 seconds where it takes
-  5.6.
-  Every offset of the assembly still counts from the PSP, and so does
-  every one in the data of the part that stays, which is a group of its
-  own (see below). Where the two parts begin and end is not known to
-  the assembler, with compiled code between them: `TrnPar` is a word of
-  the part that stays, `TrnPrW` of `port/resident.c`, which
-  `tools/mkexe.c` fills in, read through SS, and it cannot be added to
-  a constant where the program is assembled.
-- A label of one segment less a label of another is no number to the
-  assembler, also within one group: "Constant expected".
+  them first and in that order: `RHEAD`, the room of the PSP; `RTEXT`,
+  its compiled code; the four that the compiler makes for the data of
+  `port/resident.c`, `RCONST`, `RCONST2`, `R_DATA` and `R_BSS`, the last
+  of which is the stack; `RGAP`, the paragraph of the header of the
+  next block of memory. The part that goes begins behind them, at
+  `TrnBeg`, on a paragraph, and `tools/mkexe.c` stops the build if it
+  does not. It begins with the constants of the C code, `CONST2`, some
+  8,900 bytes of them: QEMU is many times slower at a write to a page
+  that has code which it has run, the stack ends just in front, and
+  with code there that ran at every key, a scenario of the cursor's
+  keys took 19.7 seconds where it takes 5.6. Every offset of the
+  constants counts from the PSP, and so does every one in the data of
+  the part that stays, which is a group of its own (see below). Where
+  the two parts begin and end is not known before the program is
+  linked: `TrnPrW` of `port/resident.c` is a word that `tools/mkexe.c`
+  fills in.
 - The compiled code of the part that stays is `port/resident.c`, a file
   of `port_c_resident` in `CMakeLists.txt`: compiled into `RTEXT` with
   `RESIDENT` defined. DS is the PSP's segment in all of it, not the main
@@ -935,10 +706,6 @@ them. The copy may be in another file than the text: `User_S` of
   copy with `_r` where the first has `_c`, by a macro in their `#pragma
   aux`, which the compiler expands. `Int21e` there calls DOS with ES as
   the structure has it, for a block of memory in ES.
-- The assembly of the part that stays calls a function of
-  `port/resident.c` near: `EXTERN GetStat_r:NEAR` in the list at the
-  top of `VC.ASM`, and `#pragma aux GetStat "*_r" __near` in the C.
-  Both are in the one group, so the call needs no relocation.
 - An `__interrupt` function of the compiler saves AX, CX, DX, BX, SP,
   BP, SI, DI, DS, ES and two words more, clears the direction flag and
   loads DS with its group, by a number that has to be relocated: the
@@ -985,15 +752,22 @@ them. The copy may be in another file than the text: `User_S` of
   far call or jump: an `__interrupt` function begins with one. List in
   `functions` of `harness/ported.py` the naked entry in front of it,
   `New21`, not the function.
-- The part that goes is called from the part that stays through a
-  pointer to a far function that is kept in memory, `TrnAdr`, in
-  `Stay` of `port/resident.c`: it comes back with every register
-  changed but SS and SP, BP too, which the compiler takes to be kept
-  whatever a `modify` list says. A pointer made on the stack, or a
-  variable of `Stay`, would be reached through BP after the call. Read
-  `Stay_r` and `Stay11_` in `build/port/resident.lst` after any change
-  there: no instruction between the call and the next may name BP or a
-  register.
+- The part that goes is called from the part that stays as a far
+  function: `TrnMain` of `port/main.c`, which `Stay` of
+  `port/resident.c` calls through a pointer. That part cannot name the
+  function, since a word of it that holds a segment is set once, when
+  the program is loaded, and the part that goes is somewhere else after
+  every command: `tools/mkexe.c` stops the build for such a word. So it
+  reads the far address in a constant of the part that goes, `Trans_T`
+  of `port/main_t.c`, at that constant's offset in the segment `RunPar`,
+  which is where the constant is as long as the group of the constants
+  begins at the PSP: the words of that part are set every time it is
+  loaded, by `Reloc`.
+  `TrnMain` puts DS on the main data when there is some, and back before
+  it returns. While that part came back through the assembly, it did so
+  with every register changed, BP too, which the compiler takes to be
+  kept: `Stay` keeps the pointer in memory, `TrnAdr`, and has no
+  variables, since then.
 - The program is entered at a C function, `Alloc0` of
   `port/resident.c`: the linker is told `option start=Alloc0`, and
   `tools/mkexe.c` takes the address from the linker's header. DOS enters
@@ -1060,10 +834,11 @@ them. The copy may be in another file than the text: `User_S` of
   `md` and the functions of other files.
 - A function that does not return is `#pragma aux name aborts`; the
   compiler then ends the caller there.
-- A far function of `port/resident.c` that the part that goes calls
-  through `CallPSP`, with DS anywhere, is `__far __loadds`: `SetBrk`.
-  Its first instructions load DS by a relocated number, so it cannot be
-  listed in `functions` of `harness/ported.py`.
+- A far function of `port/resident.c` that the part that goes
+  calls, through a pointer made of that part's segment and the
+  function's offset, with DS anywhere, is `__far __loadds`: `SetBrk`, and
+  `Release` for the map of the memory. Its first instructions load DS by
+  a relocated number.
 - Where the program has no stack, behind INT 2Eh, the instructions that
   set one are a function `__declspec(naked)` with `_asm`, which ends in
   a jump to a C function that does not return: `Int2E`. `offset
@@ -1073,111 +848,53 @@ them. The copy may be in another file than the text: `User_S` of
 - `_disable` and `_enable` are known only where a `#pragma intrinsic`
   names them, which is in `port/dos.c`: "No prototype found" elsewhere.
   Call `IntOff` and `IntOn`.
-- A command that is C whole and ends at `Func04` is a stub of two
-  lines: `CallC` and the jump. See `F65_00`.
-- A label that gets a stub takes what the stub takes, and whatever
-  jumps to the label has to bring that: a table too, not only `JMP` and
-  `CALL`. Drive... of a panel's menu went by the bar's table to `F62_01`
-  with the panel in DS and the menu in CL, as the original has it, after
-  the stub there had come to take them in AX and DX: the box came up for
-  a panel that was none, and no scenario chose the item. When a stub
-  changes what a label takes, look for the label in every table of
-  `port/asm/`, and have a scenario come in by each.
-- A command that finds a register pushed for it and takes it off on
-  every way out has a stub that takes it off: `PanC` and `PanEnd` in
-  `VCMENU.INC`, for the commands of a panel's menu, which find the
-  current panel on the stack. Where the assembly popped it to use it,
-  the C needs to know what it was: there `WCBcrn`, since every way into
-  a command has DS on the current panel. Look for what could change it
-  between the push and the pop: `F20_02` makes another panel the current
-  one, and `ReDir` may move a panel to another segment.
 - A command may come to a place with DS on the main data where the
   place reads a panel: `M60_02` of the menus writes the prompt and tests
   `Visible`, and the configuration and EGA lines jump there after a
   `PUSH ES`, `POP DS`. The C takes the segment as a number, MAIN_SEG for
   those, and reads there what the assembly read.
-- The BIOS called more than once with registers that go from one call
-  to the next, as EGA lines calls it for the font and the mode, takes
-  AX, BX, CX and DX from four words on the stack and puts them back:
-  `Int10` of `port/dos.c`, with `struct BiosRegs` of `port/vc.h`, which
-  was an entry, `Int10_a`, while the commands of the menus were
-  translated. `Int10m` is another thing: it takes the mouse pointer off
-  the screen around the call.
-- Code that is entered by jumps at several labels, falls from one into
-  the next, and leaves by jumps, never by a return, as the main loop
+- The BIOS called more than once with registers that go from one
+  call to the next, as EGA lines calls it for the font and the mode,
+  takes AX, BX, CX and DX from four words on the stack and puts them
+  back: `Int10` of `port/dos.c`, with `struct BiosRegs` of `port/vc.h`.
+  `Int10m` is another thing: it takes the mouse pointer off the screen
+  around the call.
+- Code that is entered by jumps at several labels, falls from one
+  into the next, and leaves by jumps, never by a return, as the main loop
   does, is one function that takes the number of the label and returns
-  the number of the place where the program goes on: `MainLoop` of
-  `port/main.c`, a `switch` whose cases fall into one another, in a
-  loop for what jumps back. Every label is a stub that pushes a word of
-  room and all the registers, as a structure that the function gets in
-  BX, and jumps to one piece of code that calls the function, puts the
-  address of the place into the room, pops the registers and returns
-  there: `MainC` and `MainGo` in `port/asm/VC.ASM`. So what goes round
-  in registers from one command to the next is what the function makes
-  of the structure.
-- A macro stands before its first use. JWasm says "Syntax error" at a
-  use that comes first, and names the macro.
-- An entry for a routine that takes a panel in DS is written out, with
-  the panel in a register: `ReDir_a` in `port/asm/VC.ASM`.
-- A routine that only C code calls any more leaves nothing in the
-  assembly but what it read there: `ErrRdy` left its box, `NoRd_P`,
-  made `PUBLIC`, and the table of its keys went.
-- The shared routines of `VCSUB1.INC` are C, and their entries for C
-  are gone: `port/vc.h` declares the functions, under the names the
-  entries had and with the same registers. A C file that still declares
-  one with `"*_a"` does not link, "undefined symbol", and the cure is to
-  take the declaration out. So are `SetPth`, `Fantom`, `ChgDisk` and
-  `OpenFil` of `VCSUB3.INC`. `GetMous`, `InWind`, `DoublMo`, `TstBrk`,
-  `TstDrv` and these four answer as their entries did, in numbers, 1
-  where an entry had 0FFFFh for a flag; `Int10m` returns DX
-  in the low word and CX in the high one; `OncZoom` always takes the
-  include line; `InvVar` takes a far pointer, since the assembly hands
-  it a byte of a panel too.
-- A routine that found the main data by `CS:SecDat`, as `Intr21` did,
-  has a stub that loads DS from there: its callers have DS anywhere.
-  The stub of `Intr21` pushes the registers in the order of
-  `struct DosRegs`, hands the carry flag it was called with to the C as
-  a number, `SBB AX,AX` behind the pushes, which leave the flags, and
-  pops what DOS returned, ES among it: the structure has a word for
-  ES as DOS leaves it, the last, and the stub pushes ES first.
-- Registers that a routine leaves as the BIOS left them, and that a
-  caller goes on with, come back in a structure on the stack: the code
+  where the program goes on: `Loop` of `port/main.c`, a `switch` whose
+  cases fall into one another, in a loop for what jumps back. What goes
+  round in registers from one command to the next is `struct Regs` of
+  `port/vc.h`, which `Loop` and `Command` keep as the original has the
+  registers wherever a command reads one: the top of `port/main.c` says
+  which are read.
+- The shared routines answer in numbers where the original answers
+  in flags: `GetMous`, `InWind`, `DoublMo`, `TstBrk`, `TstDrv`, `SetPth`,
+  `Fantom`, `ChgDisk` and `OpenFil` have 1 for a flag that is set, or the
+  flag in the high word; `Int10m` returns DX in the low word and CX in
+  the high one; `OncZoom` always takes the include line; `InvVar` takes
+  a far pointer, since the original hands it a byte of a panel too.
+- Registers that a routine leaves as the BIOS left them, and that
+  a caller goes on with, come back in a structure on the stack: the code
   that starts the program takes the mode in AL, the columns in AH and
-  the page in BH after `ChkMode`. The stub pushes BX as well, and the C
-  changes its high byte only.
-- A function that needs nothing of the main data, as those that only
-  call the BIOS, is called from its stub by `CALL FAR PTR` with DS as it
-  is. `ScrOffs` and `ChkSum` read through the caller's DS, which is the
-  main data wherever they are called, and are called so too.
-- A stub of a routine that answers in two flags makes them with a jump:
-  see `DoublMo`, which is CY for 2, NZ for 1 and ZR for 0.
-- When two batches land one behind the other, the stubs of the second
-  may have lost their callers to the first: after the rebase onto the
-  main loop, `ClrKbd`, `Beep`, `TypMous`, `DoublMo`, `TstDrv`, `ResUser`
-  and `SavScr` had none left in the assembly. Count the callers of
-  every stub of the batch again then, in all of `port/asm/`, and take
-  out the stub, its line in the `EXTERN` list and the function's name
-  in `functions` of `harness/ported.py`.
-- The places of `CmdNx_T` in `VCFUNC.INC`, by which a command of the
-  keys says where the program goes on, have names in two files: those
-  that `keys.c` returns in an `enum` of its own, and those of `enter.c`
-  and `view.c` as `NEXT_` in `port/vc.h`. A name in `port/vc.h` is seen
-  by every C file, so it must not be that of a routine: `keys.c` calls
-  three places `M01_01`, `M03_00` and `M06_00`, and a function of
-  those names could not be declared next to them. A new place to go on
-  at is a new entry at the end of the table and a new `NEXT_`.
+  the page in BH after `ChkMode`, which changes only the high byte of
+  what the structure has for BX.
+- The places by which a command says where the program goes on are
+  in `port/vc.h`, a family each: `NEXT_`, `MNU_`, `TO_` and `GO_`. A name
+  there is seen by every C file, so it must not be that of a routine:
+  `NEXT_M01_01` is a place, `M01_01` the function. The four families are
+  the original's, by the file that a command is in; nothing but that
+  keeps them apart.
 - A command that does not come back, as Enter does not when it runs
-  something, still returns to its stub, and the stub jumps: `CmdExe`
-  and `CmdIni`, to the part of the program that stays in the memory
-  and to `Init11`. Neither sets the stack pointer, so an entry called
-  from inside the C would leave the frames of the C on the stack, and
-  more of them with every command run.
+  something, returns all the same, `NEXT_EXEC` or `NEXT_INIT11`, and the
+  main loop returns for it, to `TrnMain`, which returns to the part of
+  the program that stays in the memory, or starts the program over. So
+  the stack is as deep after a command as before it.
 - A label in the middle of a command may be where the start of the
   program comes in: `Init45`, of the main loop, goes to `F21_31`, in
   Enter, to save the setup it has read where a command leaves it, and
-  start over from there. Before taking code out, look for every label of it
-  in all of `port/asm/`, not only for those that look like entries;
-  the assembler finds the rest, "Symbol not defined".
+  start over from there. That is a command of its own for the loop,
+  `CMD_F21_31`.
 - C code goes on after the main data has been given back to DOS, as
   the assembly did: `F21_31` frees it and then reads the copy in the
   part that stays, through far pointers made with `ResSeg`. DS stays
@@ -1187,22 +904,21 @@ them. The copy may be in another file than the text: `User_S` of
   where the BIOS takes a page and a colour. The C hands it the address
   that the original has there, from the listing of
   `build/shareware-layout/`, as for `DelTr0`.
-- The stub of code that stands in the data can stay there: `FncSel`.
-- The start of the program runs before there is main data, and is C
-  all the same: `Init00_c` and `Init11_c` of `port/start.c` get the
-  segment of the part that stays in the memory as a number, SS in their
-  stubs, and read and write through far pointers only. A function that
-  touches nothing of `md` can be entered with DS anywhere, and so can
-  what it calls if that reads none either: `ChkMode`, `Cursor`, `Int10`,
-  `Int21d`, `CutPath`, `MvzLine` and `AddFile` do not, `CaseMap`,
-  `PathLin`, `ScrOffs` and `HookVct` do. `Init11_c` returns the segment
-  of the main data that it has asked DOS for, its stub puts DS there,
-  and the rest is a third function, `IniData_c`.
-- A routine of the part that stays is called from C through a pointer
-  to a far function, made of that part's segment and the routine's
-  offset, with a `#pragma aux` on the type of the function that says
-  which registers it changes: `StaysFn` in `port/start.c`, for `SetBrk`.
-  It asks nothing of the assembly but `PUBLIC`.
+- The start of the program runs before there is main data:
+  `Init00` and `Init11` of `port/start.c` get the segment of the part
+  that stays in the memory as a number, and read and write through far
+  pointers only. A function that touches nothing of `md` can be entered
+  with DS anywhere, and so can what it calls if that reads none either:
+  `ChkMode`, `Cursor`, `Int10`, `Int21d`, `CutPath`, `MvzLine`, `AddFile`,
+  `AsmSeg`, `ResSeg` and `MemRun` do not, `CaseMap`, `PathLin`, `ScrOffs`
+  and `HookVct` do. `Init11` returns the segment of the main data that it
+  has asked DOS for, `TrnMain` of `port/main.c` puts DS there, and the
+  rest is a third function, `IniData`.
+- A routine of the part that stays is called from the part that
+  goes through a pointer to a far function, made of that part's segment
+  and the routine's offset, with a `#pragma aux` on the type of the
+  function that says which registers it changes: `StaysFn` in
+  `port/start.c`, for `SetBrk`, and `ReleaseFn` in `port/memory.c`.
 - A routine may know a thing by its offset alone. `MainPth` took the
   text of `NcPath` where it was to write at the offset of `TempDir`,
   whatever the segment, and its first call writes into another segment,
@@ -1229,13 +945,6 @@ them. The copy may be in another file than the text: `User_S` of
   showed it was the setup file that a program started on the defaults
   saves, held against the original's; `start-setup` ends with that
   file on its disk for this reason.
-- When the last callers of a stub in another file become C, the stub
-  goes there too: the start-up was the only caller left of `ChkMode`,
-  `Cursor`, `ScrOffs`, `AddFile`, `MvzLin0` with `MvzLine`, `CutPath`
-  and `PathLin` in `VCSUB1.INC` and of `HookVct`. `tools/routines.py`
-  run on the tree before and after shows them, in the lines that go from
-  some callers to none; look for each name in all of `port/asm/` before
-  taking it out.
 
 ### C for the port
 
@@ -1247,13 +956,13 @@ with it is less obvious:
   registers and mask them in C.
 - A 32-bit argument in a pair of registers does not arrive with its halves
   in the order written. Pass the halves as two 16-bit arguments.
-- DS cannot carry an argument: a far pointer in `[ds si]` is refused. The
-  stub moves the segment to another register.
+- DS cannot carry an argument: a far pointer in `[ds si]` is refused.
+  The segment comes in another register.
 - A far pointer in a pair of general registers has its segment in DX
   whichever is written first: `[bx dx]` and `[dx bx]` both put the
   offset in BX. Read the call in the listing.
 - A function that returns nothing may change AX all the same, whatever
-  `modify exact` says. List AX there and have the stub save it.
+  `modify exact` says. List AX there.
 - A pointer variable to a constant in the code segment makes the compiler
   load the segment by name, which costs a relocation. Index the constant
   array directly: that is addressed through CS. Handing the constant to a
@@ -1361,7 +1070,8 @@ with it is less obvious:
   dozen errors more. What `MvsBw` and `MvsColr` return is a far pointer;
   kept in a near one it is "Pointer truncated", which stops the build.
 - Warnings stop the build, and a parameter that is not read is one. A
-  function gets of the registers that its stub has only those it reads:
+  function gets of the registers that the original has only those it
+  reads:
   `parm [cx]` alone where the panel in AX is of no use to it.
 - A far call from one of the two code segments to the other costs a
   relocation, four bytes of the file, where one within a segment costs
@@ -1424,11 +1134,6 @@ with it is less obvious:
   on the key and then one on the character, if every character of the
   second kind stood behind the keys that have it too: Tab before ^I.
   `Func12` of `port/main.c`.
-- A stub is taken out when nothing of the assembly names it, and what
-  says so is the assembler, not `tools/routines.py`, which counts calls
-  and misses a jump to a routine and a routine named in a table. With
-  the stub go its line in the `EXTERN` list and its function in
-  `harness/ported.py`.
 - A number of 32 bits in a pair of registers has its halves by the
   registers, not by the order they are written in: `[dx cx]` has DX for
   the low word and CX for the high one, `[dx ax]` and `[bx ax]` have AX
