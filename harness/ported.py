@@ -127,7 +127,8 @@ BATCHES = [
         routines=("AddFile", "MvzLin0", "MvzLine", "FilZero", "StrLen",
                   "LowCase", "FndLet", "CutPath", "NormStr", "PathLin",
                   "LetLin", "ShrtLin", "MainFil"),
-        functions=("AddFile_c", "MvzLine_c", "CutPath_c", "PathLin_c"),
+        # None has a caller left in the assembly.
+        functions=(),
     ),
     Batch(
         title="Colours and the screen buffer",
@@ -138,8 +139,6 @@ BATCHES = [
         unreached={
             0xA28F: "ColAddr, for a palette that is none of the three: "
                     "the Configuration dialog sets no other",
-            0xA29C: "ColAddr, for a monochrome display: the machine has "
-                    "a colour one",
         },
     ),
     Batch(
@@ -758,7 +757,8 @@ BATCHES = [
         routines=("Init40", "Init46", "Mvz2lin", "Init49", "Init90",
                   "Func01", "Func15", "Func20", "Exit", "Quit", "RestVct",
                   "HookVct", "ErrRdy"),
-        functions=("MainLoop_c", "Exit_c", "HookVct_c"),
+        # HookVct has no caller left in the assembly.
+        functions=("MainLoop_c", "Exit_c"),
         unreached={
             **dict.fromkeys(
                 (0x0D87, 0x0D88, 0x0D8B, 0x0D8C, 0x0D8D, 0x0D8F, 0x0D92,
@@ -840,14 +840,9 @@ BATCHES = [
         routines=("ChkMode", "Cursor", "Cursor1", "ChgCur", "HidCur",
                   "Int10m", "ScrOffs", "SftEGA", "SavWin", "ResWin",
                   "ResUser", "Window", "SavScr", "MovScr"),
-        # ResUser and SavScr have no caller left in the assembly.
-        functions=("ChkMode_c", "Cursor_c", "ScrOffs_c"),
+        # None has a caller left in the assembly.
+        functions=(),
         unreached={
-            **dict.fromkeys(
-                (0x9376, 0x93B8),
-                "ChkMode and ChgCur, for a screen in mode 7, that of a "
-                "monochrome display: the bench has a VGA, in mode 3 when "
-                "the program starts and when a command has ended"),
             **dict.fromkeys(
                 (0x95A4, 0x95A6),
                 "ScrOffs, for a screen that shows another page than its "
@@ -958,6 +953,34 @@ BATCHES = [
         source="main.c",
         routines=("Case",),
         functions=(),
+    ),
+    Batch(
+        title="The start of the program: the setup file and the "
+              "defaults, the memory for the main data, and what the "
+              "machine says of itself",
+        source="start.c",
+        routines=("Init00", "CurNl", "OutStr1", "MainPth", "ReadOne",
+                  "Expand"),
+        functions=("Init00_c", "Init11_c", "IniData_c"),
+        unreached={
+            0x09E3: "Init11, where DOS refuses to make the block of the "
+                    "code larger for another reason than too little "
+                    "memory: the chain of its blocks would have to be "
+                    "broken",
+            0x0C1E: "Init32, where the status of the display has its "
+                    "lowest bit set seven times running: QEMU's VGA "
+                    "turns the bit over every time it is read",
+            **dict.fromkeys(
+                (0x0C44, 0x0C46),
+                "Init34, under TopView or DESQview, which show a buffer "
+                "in place of the display's memory: the bench has "
+                "neither"),
+            **dict.fromkeys(
+                (0x0C6B, 0x0C6D, 0x0C74, 0x0C77, 0x0C79),
+                "Init35, for a DOS before 5.0, which does not answer "
+                "for its true version, and for version 4.00: the bench "
+                "has FreeDOS, which is 7.10"),
+        },
     ),
 ]
 

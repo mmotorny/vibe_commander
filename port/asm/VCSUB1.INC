@@ -10,33 +10,6 @@
 ; switch in C now, the last of them that of the main loop's keys, Func12
 ; of port/main.c.
 
-;------------------ Check video mode -------------------
-;			   ZR - ok
-; C: ChkMode_c of port/window.c. It returns 1 for ok, and puts AX and BH
-; as the BIOS leaves them into the two words on the stack, struct
-; VideoMode of port/vc.h: the code that starts the program goes on with
-; the mode in AL, the columns in AH and the page in BH.
-ChkMode	PROC	NEAR
-	PUSH	BX
-	PUSH	AX
-	MOV	BX,SP
-	CALL	FAR PTR ChkMode_c
-	CMP	AX,1			; ZR for 1
-	POP	AX
-	POP	BX
-	RET
-ChkMode	ENDP
-
-;----------------------- Set cursor --------------------
-;			AL,AH - x, y
-; C: Cursor_c of port/window.c.
-Cursor	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR Cursor_c
-	POP	AX
-	RET
-Cursor	ENDP
-
 ;-------------- Get cursor size & set it ---------------
 ;	Return :	CX - cursor size
 ; C: ChgCur_c of port/window.c, which only C code calls.
@@ -59,16 +32,6 @@ Cursor	ENDP
 ;------------------ INT 10h with mouse -----------------
 ; C: Int10m_c of port/window.c, which only C code calls.
 
-;-------------------- Screen Offset --------------------
-; C: ScrOffs_c of port/window.c, which notes the offset in the main data,
-; where the callers have DS, and returns it in DI. AX and BH stay, where
-; the routine left what the BIOS says of the mode there.
-ScrOffs	PROC	NEAR
-	PUSH	AX
-	CALL	FAR PTR ScrOffs_c
-	POP	AX
-	RET
-ScrOffs	ENDP
 
 ;--------------- Shift windows in EGA lines ------------
 ; C: SftEGA_c of port/window.c, which only C code calls.
@@ -158,55 +121,7 @@ DialSub_a PROC	FAR
 	RET
 DialSub_a ENDP
 
-;			Add file name
-AddFile	PROC	NEAR
-	CALL	FAR PTR AddFile_c
-	MOV	AL,'\'
-	RET
-AddFile	ENDP
-;			DS:SI(B) -> ES:DI(B)
-MvzLin0	PROC	NEAR
-	MOV	CX,LenPath
-MvzLin0	ENDP
 
-MvzLine	PROC	NEAR
-	PUSH	DX
-	PUSH	DI
-	MOV	DX,DS
-	CALL	FAR PTR MvzLine_c
-	POP	DX			; Where the copy begins
-	ADD	SI,CX
-	ADD	CX,DX			; What the search for the end
-	SUB	CX,DI			; left of the count
-	DEC	CX
-	POP	DX
-	MOV	AL,0
-	RET
-MvzLine	ENDP
-
-;------------------------ Cut path ---------------------
-;			DS:SI - path
-CutPath	PROC	NEAR
-	PUSH	ES
-	PUSH	DS
-	POP	ES
-	CALL	FAR PTR CutPath_c
-	POP	ES
-	RET
-CutPath	ENDP
-
-;---------------------- Higher letter ------------------
-;			ES:SI - address of string
-PathLin	PROC	NEAR
-	PUSH	DS
-	PUSH	AX
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR PathLin_c
-	POP	AX
-	POP	DS
-	RET
-PathLin	ENDP
 
 ;------------------- Test drive letter -----------------
 ;			   AL - drive letter

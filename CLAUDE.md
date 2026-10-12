@@ -731,6 +731,54 @@ port.
   that the original has there, from the listing of
   `build/shareware-layout/`, as for `DelTr0`.
 - The stub of code that stands in the data can stay there: `FncSel`.
+- The start of the program runs before there is main data, and is C
+  all the same: `Init00_c` and `Init11_c` of `port/start.c` get the
+  segment of the part that stays in the memory as a number, SS in their
+  stubs, and read and write through far pointers only. A function that
+  touches nothing of `md` can be entered with DS anywhere, and so can
+  what it calls if that reads none either: `ChkMode`, `Cursor`, `Int10`,
+  `Int21d`, `CutPath`, `MvzLine` and `AddFile` do not, `CaseMap`,
+  `PathLin`, `ScrOffs` and `HookVct` do. `Init11_c` returns the segment
+  of the main data that it has asked DOS for, its stub puts DS there,
+  and the rest is a third function, `IniData_c`.
+- A routine of the part that stays is called from C through a pointer
+  to a far function, made of that part's segment and the routine's
+  offset, with a `#pragma aux` on the type of the function that says
+  which registers it changes: `StaysFn` in `port/start.c`, for `SetBrk`.
+  It asks nothing of the assembly but `PUBLIC`.
+- A routine may know a thing by its offset alone. `MainPth` took the
+  text of `NcPath` where it was to write at the offset of `TempDir`,
+  whatever the segment, and its first call writes into another segment,
+  at an offset 12h short of that in the original and 0Bh short in the
+  port. The C has an argument for it. Where the assembly compares an
+  address, look at every call for the segment it is made with.
+- A copy that runs on behind its table takes what follows the table in
+  the assembly. The defaults of a panel are 88 bytes of which the
+  original has 8, and the rest is its table of the keys, with the
+  addresses of the commands. Before calling such a thing a bug that
+  shows, find out where the bytes get to and what reads them: these lie
+  behind the end of two texts, in the memory, until `MkIni1` clears
+  them before the first key, and the setup file is made without them.
+  So the C has the 8 bytes as a table and zeros for the rest, now that
+  the table of the keys is a `switch` and has no bytes to take.
+- A text of the assembly may hold bytes that are no characters, and a
+  tool that shows the file as text leaves them out: the table of stars
+  is five bytes between two quotes, two letters and 07h, 04h and 0Fh,
+  and read as text it is two, with three bytes of the next table
+  seemingly taken along. Take the bytes of a table that goes to C from
+  the listing, `build/port/VC.LST`, or hold the C against the assembly
+  by a script before the table leaves it. The `port` test passed with
+  the three bytes wrong: no screen shows the stars of the blanker. What
+  showed it was the setup file that a program started on the defaults
+  saves, held against the original's; `start-setup` ends with that
+  file on its disk for this reason.
+- When the last callers of a stub in another file become C, the stub
+  goes there too: the start-up was the only caller left of `ChkMode`,
+  `Cursor`, `ScrOffs`, `AddFile`, `MvzLin0` with `MvzLine`, `CutPath`
+  and `PathLin` in `VCSUB1.INC` and of `HookVct`. `tools/routines.py`
+  run on the tree before and after shows them, in the lines that go from
+  some callers to none; look for each name in all of `port/asm/` before
+  taking it out.
 
 ### C for the port
 
@@ -868,10 +916,14 @@ with it is less obvious:
   needs a call of DOS fills a `struct DosRegs` and calls `Intr21` of
   `port/system.c`, which looks for DOS's critical error, or `Int21d`,
   where the original called DOS itself; an address that DOS answers
-  with in ES:BX is in `es` and `bx` there afterwards. A call of the
+  with in ES:BX is in `es` and `bx` there afterwards. `Int21d` calls
+  DOS with ES where DS is, on the main data; a call that takes a
+  block of the memory in ES which is not the main data goes through
+  `Int21e`, which takes ES from the structure too. A call of the
   BIOS for the screen fills a `struct BiosRegs` for `Int10`, and the
   registers stay in it from one call to the next, as they did in the
-  assembly. A call that these do
+  assembly. `TopScr` asks where the buffer is that TopView shows for
+  the screen, an address in ES:DI both ways. A call that these do
   not cover gets a function there, with a comment that says what it is
   for and which services go through it; nothing is added that hides
   DOS, as long as the translation goes on. `CaseMap`, `InPort`, `IntOff`

@@ -39,9 +39,6 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 ; They are compiled into a code segment of their own, which follows this
 ; one, and are called through the routines of the same names here. C code
 ; expects DS to point at the main data segment and may change ES.
-	EXTERN	AddFile_c:FAR, MvzLine_c:FAR
-	EXTERN	CutPath_c:FAR
-	EXTERN	PathLin_c:FAR
 	EXTERN	AdrNum_c:FAR, NumAdr_c:FAR, ChgAdr_c:FAR
 	EXTERN	F00_60_c:FAR, F00_00_c:FAR, F00_05_c:FAR
 	EXTERN	F01_00_c:FAR, F01_05_c:FAR, F02_00_c:FAR, F03_00_c:FAR
@@ -77,9 +74,7 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 	EXTERN	C00_00_c:FAR, F35_01_c:FAR, F45_01_c:FAR, F35_61_c:FAR
 	EXTERN	F65_00_c:FAR
 	EXTERN	MainLoop_c:FAR, Exit_c:FAR
-	EXTERN	HookVct_c:FAR
-	EXTERN	ChkMode_c:FAR, Cursor_c:FAR
-	EXTERN	ScrOffs_c:FAR
+	EXTERN	Init00_c:FAR, Init11_c:FAR, IniData_c:FAR
 	EXTERN	F21_00_c:FAR, F21_10_c:FAR, F21_25_c:FAR, F21_30_c:FAR
 	EXTERN	F21_31_c:FAR, F22_00_c:FAR, F23_00_c:FAR, F24_00_c:FAR
 	EXTERN	F24_01_c:FAR, F24_02_c:FAR, F25_00_c:FAR, F26_00_c:FAR
@@ -233,12 +228,9 @@ Part:	SUB	DX,CX
 PrgName	EQU	'Volkov Commander'
 HelpVer	EQU	'VC 4.05 Help'
 VcVers	EQU	<'4.05'>
-VcSuff	EQU	'freeware'
 VcApiVr	EQU	42
 
 MoDelay	EQU	40			; Mouse double click delay
-MiliSec	EQU	60			; auto CD time : sec x 0.01
-Sec	EQU	0			;                sec x 1
 ; The original has 100h bytes of stack. Compiled code uses more of it than
 ; the assembly did, so the port has sixteen times that, and its use needs
 ; no care. The stack is the end of the resident part: see DataSav.
@@ -1414,18 +1406,8 @@ RGAP	ENDS
 ;-------------------------- Data -----------------------
 	.CONST
 Title_S	DB	0FFh,14,'The ',PrgName,', Version ',VcVers,0
-Suff_S	DB	' ',VcSuff,0
-Copyr_S	DB	13,10, 'Copyright (C) 1991-2000 Vsevolod V. Volkov',0
-CrLf_S	DB	13,10, '$'
-Retrn_S	DB	13,10, 'Press ENTER to return ', 0
-	DB	13,10, 'to the ',PrgName, 0
-NoIni_S	DB	    'VC.INI is not correct.'
-	DB	13,10, 0
 Vers_S	DB	13,10, 'This program requires DOS 3.20 or later.'
 	DB	13,10, 0
-Comsp	DB	'COMSPEC='
-NcEnv	DB	'VC='
-TempEnv	DB	'TEMP='
 
 	.DATA
 Back_C	EQU	0
@@ -1468,610 +1450,45 @@ Sky1_C	EQU	36
 Sky2_C	EQU	37
 ShadFl	EQU	38
 
-Palets	DB	07h,07h,1Bh,07h,07h,07h	;  0 - Main windows
-	DB	70h,70h,30h,70h,70h,70h	;  1 - Cursor
-	DB	0Fh,0Fh,1Eh,0Fh,0Fh,0Fh	;  2 - Selected files
-	DB	7Fh,09h,3Eh,09h,70h,70h	;  3 - Cursor for selected files
-	DB	0Fh,0Fh,1Eh,0Fh,0Fh,0Fh	;  4 - "Name   Size ..."
-	DB	07h,07h,07h,07h,07h,07h	;  5 - Key bar numbers
-	DB	70h,70h,30h,70h,70h,70h	;  6 - Key bar titles
-	DB	70h,70h,30h,70h,70h,70h	;  7 - Menu bar
-	DB	0Fh,0Fh,0Fh,0Fh,0Fh,0Fh	;  8 - Menu bar cursor
-	DB	70h,70h,30h,70h,70h,70h	;  9 - Menu box border
-	DB	70h,70h,3Fh,70h,70h,70h	; 10 - Menu box text
-	DB	7Fh,70h,3Eh,70h,70h,70h	; 11 - Menu box high letters
-	DB	07h,0Fh,0Fh,0Fh,0Fh,0Fh	; 12 - Menu box text cursor
-	DB	0Fh,0Fh,0Eh,0Fh,0Fh,0Fh	; 13 - Menu box high letters cursor
-	DB	70h,70h,30h,70h,70h,70h	; 14 - Menu box dark lines
-	DB	70h,70h,33h,70h,70h,70h	; 15 - Menu box dark lines '-'
-	DB	07h,07h,70h,07h,07h,07h	; 16 - Function box
-	DB	0Fh,0Fh,7Eh,0Fh,0Fh,0Fh	; 17 - Function box bright
-	DB	70h,70h,30h,70h,70h,70h	; 18 - Function box cursor
-	DB	07h,07h,3Fh,07h,07h,07h	; 19 - Configuration window
-	DB	70h,70h,0Fh,70h,70h,70h	; 20 - Configuration cursor
-	DB	0Fh,0Fh,3Eh,0Fh,0Fh,0Fh	; 21 - Configuration window bright
-	DB	7Fh,09h,0Eh,09h,70h,70h	; 22 - Configuration cursor bright
-	DB	70h,70h,3Fh,70h,70h,70h	; 23 - History window
-	DB	07h,07h,0Fh,07h,07h,07h	; 24 - History cursor
-	DB	07h,07h,13h,07h,07h,07h	; 25 - Menu help border
-	DB	70h,70h,30h,70h,70h,70h	; 26 - Menu help window
-	DB	07h,07h,30h,07h,07h,07h	; 27 - Help window
-	DB	0Fh,0Fh,3Fh,0Fh,0Fh,0Fh	; 28 - Help window bold
-	DB	70h,70h,0Fh,70h,70h,70h	; 29 - Help reversive
-	DB	0Fh,09h,3Eh,09h,0Fh,0Fh	; 30 - Help underline
-	DB	07h,07h,4Fh,07h,07h,07h	; 31 - Error windows
-	DB	70h,70h,70h,70h,70h,70h	; 32 - Error window cursor
-	DB	0Fh,0Fh,4Eh,0Fh,0Fh,0Fh	; 33 - Error window bright
-	DB	70h,70h,30h,70h,70h,70h	; 34 - Clock
-	DB	0Fh,0Fh,1Eh,0Fh,0Fh,0Fh	; 35 - Arrows in view/edit
-	DB	07h,07h,0Bh,07h,07h,07h	; 36 - Screen blank
-	DB	0Fh,0Fh,0Fh,0Fh,0Fh,0Fh	; 37 - Screen blank light stars
-	DB	02h,02h,01h,02h,00h,00h	; 38 - Shadow flag
-	DB	02h,02h,02h,02h,02h,02h	; 39 - Blink / High background / None
-DefInit	DB	1			; FulScr
-	DB	0			; MenuVs
-	DB	1			; KeyBar
-	DB	1			; Prompt
-	DB	1			; InsDwn
-	DB	0			; AutoMnu
-	DB	1			; MiniSta
-	DB	0			; Clock
-	DB	1			; AutoCD
-	DB	1			; AutoSav
-	DB	1			; ColTyp
-	DB	5			; BlDelay
-	DB	1			; LoadFl
-	DB	1			; UnSlct
-	DB	1			; ErrSnd
-	DB	0			; LftMous
-	DB	1			; ZoomWin
-	DB	1			; AltBar
-	DB	1			; EscBar
-	DB	0			; ExecTyp
-	DB	0			; AutoSiz
-	DB	1			; HidDirs
-	DB	1			; QuitAck
-	DB	2			; SnowMod
-	DB	1			; AltView
-	DB	1			; AltEdit
-	DB	1			; ClrBuf
-	DB	1			; Active
-	DB	0			; Ctrl_O
-	DB	1			; ChkTSR
-	DB	1			; ChgTree
-	DB	1			; DriveB
-	DB	MiliSec, Sec		; DelayTm
-	DB	'ъщ'			; StarTab
-DefWCB	DB	0			; WinTyp
-	DB	0			; BrfFul
-	DB	1			; Visible
-	DB	1			; Hidden
-	DB	0			; MasTyp
-	DB	8			; SortTyp
-	DB	0			; Ctrl_L
-	DB	0			; DskMas
-
 ;--------------------- Main module ---------------------
 	.CODE
 
 ;------------------ Read configuration -----------------
+; C: Init00_c, Init11_c and IniData_c of port/start.c. The part of the
+; program that stays in the memory jumps here, far: to Init00 when the
+; program has been started, to Init11 when a command has run. CmdIni of
+; VCFUNC.INC jumps to Init11 too. The stack is in that part every time,
+; and its segment is what the C is told of it. Until Init11 has asked DOS
+; for the main data there is none: the C does without DS up to there.
+; What it reads, writes and names of the assembly is made public here.
+	PUBLIC	SecDat
+	PUBLIC	Counter, Vect21, Vect22, Vect27, RelTab
+	PUBLIC	New21, New27, Exit01, SetBrk
 Init00:	CALL	Reloc
-	MOV	ES,DS:[2Ch]
-	MOV	DI,OFFSET WCB1sav + WCBsave
-	MOV	DX,DI
-	CALL	MainPth
-	PUSH	DI
-	PUSH	DX
-	MOV	SI,OFFSET Init_F
-	MOV	BP,OFFSET ComnIni - (3 + 2*WCBini)
-	MOV	CX, 3 + 2*WCBini + CmnIni + 2 + 1
-	CALL	ReadOne
-	MOV	BX,0
-	JC	Init03
-	DEC	CX
-	SUB	AX,CX
-	JNE	Init02
-	DEC	CX
-	DEC	CX
-	MOV	SI,BP
-	XOR	DX,DX
-Init01:	LODSB
-	ADD	DX,AX
-	LOOP	Init01
-	LODSW
-	CMP	AX,DX
-	JNE	Init02
-	MOV	DI,BP
-	MOV	AL,'V'
-	MOV	CL,3
-	REPE	SCASB
-	JNE	Init02
-	MOV	SI,DI
-	MOV	DI,OFFSET WCB1sav
-	MOV	CL,WCBini
-	PUSH	CX
-	REP	MOVSB
-	POP	CX
-	MOV	DI,OFFSET WCB2sav
-	REP	MOVSB
-	JMP	Init04
-Init02:	MOV	BL,1
-
-;--------------------- Default init --------------------
-Init03:	PUSH	DS
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET Palets
-	MOV	DI,OFFSET ComnIni
-	MOV	CX,OFFSET ResIni
-	REP	MOVSB
-	MOV	CL,CmnIni-ResIni
-	MOV	AL,0
-	REP	STOSB
-	MOV	SI,OFFSET DefWCB
-	MOV	DI,OFFSET WCB1sav
-	MOV	CL,WCBini
-	REP	MOVSB
-	POP	DS
-	MOV	AH,19h
-	INT	21h
-	MOV	DL,AL
-	INC	DX
-	ADD	AL,'A'
-	MOV	DI,OFFSET WCB1sav.WinPath
-	STOSB
-	MOV	AX,'\:'
-	STOSW
-	MOV	SI,DI
-	MOV	AL,0
-	STOSB
-	MOV	AH,47h
-	INT	21h
-	MOV	SI,OFFSET WCB1sav
-	MOV	DI,OFFSET WCB2sav
-	MOV	CX,WCBini
-	REP	MOVSB
-	MOV	DS:WCB1sav.Visible,CL
-
-;--------------------- Output Report -------------------
-Init04:	CALL	ChkMode
-	JZ	Init05
-	MOV	AX,3
-	INT	10h
-Init05:
-	PUSH	CS			; Output message
-	POP	DS
-	MOV	DX,OFFSET ComnIni.ExtMain
-	MOV	DI,DX
-	MOV	SI,OFFSET Title_S+2
-	CALL	MvzLin0
-	MOV	SI,OFFSET Suff_S
-	CALL	MvzLin0
-	MOV	SI,OFFSET Copyr_S
-	CALL	MvzLin0
-	MOV	SI,OFFSET CrLf_S
-	CALL	MvzLin0
-	PUSH	ES
-	POP	DS
-	MOV	AH,9
-	INT	21h
-	OR	BL,BL			; Error in INI file
-	JE	Init09
-	MOV	SI,OFFSET NoIni_S
-	CALL	OutStr1
-
-;--------------- Read main extension file --------------
-Init09:	POP	DX
-	POP	DI
-	MOV	SI,OFFSET Ext_F
-	MOV	BP,OFFSET ComnIni.ExtMain
-	MOV	CX,LenExt-1
-	CALL	ReadOne
-	JC	Init10
-	ADD	BP,AX
-Init10:	MOV	BYTE PTR DS:[BP],1Ah
-
-;---------------- Initialize main data -----------------
-	MOV	BX,OFFSET ComnIni
-	MOV	SI,OFFSET WCB1sav
-	MOV	DI,OFFSET WCB2sav
-	MOV	AX,OFFSET DskBuf
-	MOV	DS:[SI].CurAdr,AX
-	MOV	DS:[DI].CurAdr,AX
-	MOV	DS:[SI].First,AX
-	MOV	DS:[DI].First,AX
-	MOV	DS:[SI].EndBuf,AX
-	MOV	DS:[DI].EndBuf,AX
-	XOR	AX,AX
-	MOV	DS:Counter,AX
-	MOV	DS:[BX].CrnPath,AL
-	MOV	DS:[BX].ViewFil,AL
-	MOV	DS:[BX].ToFile,AL
-	MOV	DS:[BX].SrchStr,AL
-	MOV	DS:[BX].HstBuf.Wrd,AX
-	MOV	DS:[BX].LastMnu,1
-	DEC	AX
-	MOV	DS:[BX].MouseX,AX
-	MOV	DS:[BX].MouseY,AX
-	MOV	DS:[BX].LoadRes,AL
-	MOV	AL,DS:[BX].AutoMnu
-	MOV	DS:[BX].MenuFl,AL
-	PUSH	DS
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET Mask_S+1
-	LEA	DI,[BX].SelMas
-	MOV	CX,4
-	REP	MOVSB
-	MOV	SI,OFFSET Mask_S
-	LEA	DI,[BX].FindStr
-	MOV	CL,5
-	REP	MOVSB
-	POP	DS
-	MOV	AX,OFFSET SetBrk
-	CALL	CallPSP
-	MOV	AX,OFFSET Exit01
-	XCHG	AX,DS:[0Ah].Offs
-	MOV	DS:Vect22.Offs,AX
-	MOV	AX,DS
-	XCHG	AX,DS:[0Ah].Segm
-	MOV	DS:Vect22.Segm,AX
-	CMP	DS:[BX].ChkTSR,0
-	JZ	Init11
-	MOV	AX,3521h
-	INT	21h
-	MOV	DS:Vect21.Offs,BX
-	MOV	DS:Vect21.Segm,ES
-	XOR	AX,AX
-	MOV	ES,AX
-	CLI
-	MOV	ES:[4*21h].Offs,OFFSET New21
-	MOV	ES:[4*21h].Segm,DS
-	STI
-	MOV	AX,3527h
-	INT	21h
-	MOV	DS:Vect27.Offs,BX
-	MOV	DS:Vect27.Segm,ES
-	MOV	DX,OFFSET New27
-	MOV	AH,25h
-	INT	21h
+	CLD
+	MOV	AX,SS
+	CALL	FAR PTR Init00_c
 
 ;------------ Allocate Secondary Data Segment ----------
+; The block of the memory that this code is in goes to the C in DX. What
+; comes back is the segment of the main data, or 0 if there is too
+; little memory: the part that stays says so and ends the program.
 Init11:	CALL	Reloc
-	MOV	AX,CS
-	ADD	AX,TrnPar
-	MOV	ES,AX
-	MOV	BX,0FFFFh
-	MOV	AH,4Ah
-	INT	21h
-	MOV	SI,BX
-	CMP	AX,WORD PTR 8
-	JE	Init12
-	XOR	SI,SI
-Init12:	MOV	BX,SS:RelTab		; The relocation table has been used
-	SUB	BX,TrnPar
-	MOV	AH,4Ah
-	INT	21h
-	PUSH	DS
-	POP	ES
-	MOV	BX,0FFFFh
-	MOV	AH,48h
-	INT	21h
-	MOV	AH,48h
-	INT	21h
-	MOV	ES,AX
-	MOV	DX,((SIZE MainDat-1) SHR 4)+1
-	MOV	DI,((SIZE WCBdef -1) SHR 4)+1
-	MOV	AX,((   MinView  -1) SHR 4)+1
-	ADD	AX,DX
-	ADD	AX,DI
-	ADD	AX,DI
-	CMP	AX,BX
-	JBE	Init13
+	CLD
+	MOV	AX,SS
+	MOV	DX,CS
+	ADD	DX,TrnPar
+	CALL	FAR PTR Init11_c
+	OR	AX,AX
+	JNZ	IniOk
 	MOV	AX,OFFSET AlocEr
 	PUSH	SS
 	PUSH	AX
 	RETF
-Init13:	MOV	ES:FreMem2,BX
-	CMP	SI,BX
-	JAE	Init14
-	MOV	SI,BX
-Init14:	MOV	ES:FreMem1,SI
-	MOV	AX,ES
-	ADD	AX,DX
-	MOV	ES:WCB1seg,AX
-	ADD	AX,DI
-	MOV	ES:WCB2seg,AX
-	ADD	AX,DI
-	MOV	ES:ViewSeg,AX
-	MOV	CS:SecDat,ES
-
-;------------------ Restore data segment ---------------
-	CLD
-	XOR	DI,DI
-	MOV	SI,OFFSET ComnIni
-	MOV	CX,CmnSave
-	REP	MOVSB
-	PUSH	ES
-	MOV	ES,ES:WCB1seg
-	MOV	SI,OFFSET WCB1sav
-	CALL	Expand
-	POP	ES
-	PUSH	ES
-	MOV	ES,ES:WCB2seg
-	MOV	SI,OFFSET WCB2sav
-	CALL	Expand
-	POP	DS
-
-;------------------- Set Error Vectors -----------------
-	CALL	HookVct
-	PUSH	ES
-	POP	DS
-
-;------------------ Set Display Segment ----------------
-	CALL	ChkMode
-	JZ	Init17
-	MOV	BL,AH
-	MOV	CX,2000h
-	MOV	AH,1
-	INT	10h
-	PUSH	DS
-	MOV	SI,OFFSET Retrn_S
-	CALL	OutStr1
-	INC	SI
-	CMP	BL,80
-	JB	Init15
-	INC	SI
-	INC	SI
-Init15:	CALL	OutStr1
-	POP	DS
-Init16:	MOV	AH,0
-	INT	16h
-	CMP	AL,0Dh
-	JNE	Init16
-	MOV	AL,DS:ScrMod
-	MOV	AH,0
-	INT	10h
-	MOV	AH,0Fh
-	INT	10h
-	AND	AL,7Fh
-Init17:	MOV	DS:ScrMod,AL
-	MOV	DS:ScrPage,BH
-
-;------------------ Correct cursor size ----------------
-	MOV	AH,3
-	INT	10h
-	CMP	CH,0Fh
-	JBE	Init18
-	MOV	CX,607h
-Init18:	CMP	CX,67h
-	JNE	Init19
-	MOV	CX,607h
-Init19:	CMP	DS:ScrMod,7
-	JNE	Init20
-	CMP	CX,607h
-	JNE	Init20
-	MOV	CX,0B0Ch
-Init20:	MOV	AH,1
-	INT	10h
-
-;---------------- Initialize data segment --------------
-IniSave	EQU	WCB1sav
-
-	MOV	DX,OFFSET Country	; Country
-	MOV	AX,3800h
-	INT	21h
-	MOV	DI,OFFSET TmpBuf	; Lower case table
-	MOV	SI,OFFSET LowTab
-	MOV	CX,80h
-	PUSH	DI
-	PUSH	CX
-Init21:	MOV	AL,CL
-	NEG	AL
-	MOV	DS:[SI],AL
-	INC	SI
-	CALL	DS:Country.CaseMap
-	STOSB
-	LOOP	Init21
-	POP	CX
-	POP	SI
-	MOV	BH,0
-	MOV	AH,80h
-Init22:	LODSB
-	CMP	AL,AH
-	JE	Init23
-	CMP	AL,80h
-	JB	Init23
-	MOV	BL,AL
-	MOV	DS:LowTab[BX-128],AH
-Init23:	INC	AH
-	LOOP	Init22
-	AND	DS:LoadFl,7Fh
-	MOV	AX,SS:[2]		; Memorys
-	MOV	DS:Memorys,AX
-	XOR	AX,AX
-	MOV	SS:IniSave,AL
-	MOV	DS:DosBuf,AL		; DosBuf
-	MOV	BX,OFFSET EPB		; EPB
-	MOV	DS:[BX].EnvSeg,AX
-	MOV	DS:[BX].FCB1.Offs,5Ch
-	MOV	DS:[BX].FCB1.Segm,ES
-	MOV	DS:[BX].FCB2.Offs,6Ch
-	MOV	DS:[BX].FCB2.Segm,ES
-	MOV	ES,SS:[2Ch]		; ComSpec
-	PUSH	DS
-	PUSH	CS
-	POP	DS
-	XOR	DI,DI
-Init24:	CMP	AL,ES:[DI]
-	JE	Init25
-	MOV	SI,OFFSET Comsp
-	MOV	CX,8
-	REPE	CMPSB
-	JE	Init26
-	DEC	DI
-	MOV	CH,0FFh
-	REPNE	SCASB
-	JMP	Init24
-Init25:	XOR	DI,DI
-Init26:	POP	DS
-	MOV	DS:ComSpec,DI
-	XOR	DI,DI			; OvlPth
-Init27:	CMP	AL,ES:[DI]
-	JE	Init28
-	MOV	CH,0FFh
-	REPNE	SCASB
-	JMP	Init27
-Init28:	ADD	DI,3
-	MOV	DS:OvlPth,DI
-	MOV	DI,OFFSET NcPath	; NcPath
-	PUSH	ES
-	PUSH	DI
-	CALL	MainPth
-	POP	SI
-	CALL	PathLin
-	POP	ES
-	MOV	DI,OFFSET TempDir	; TempDir
-	MOV	SI,OFFSET TempEnv
-	MOV	CX,5
-	CALL	MnPth0
-	XOR	AX,AX
-	MOV	DS:DosCol,AL		; DosCol
-	MOV	DS:BegCol,AL		; BegCol
-	MOV	DS:OutCol,AL		; OutCol
-	MOV	DS:Quote,AL		; Quote
-	MOV	DS:SftErr,AL		; SftErr
-	MOV	DS:BlocEr,AL		; BlocEr
-	MOV	DS:TstEGA,AL		; TstEGA
-	MOV	DS:WinMous,AL		; WinMous
-	MOV	DS:WinLeav,AL		; WinLeav
-	MOV	DS:HstAdr,OFFSET HstBuf	; HstAdr
-	MOV	DS:BarPrev,0FFh		; BarPrev
-	MOV	AH,19h			; DosChg
-	INT	21h
-	MOV	DS:DosChg[0],AL
-	MOV	AH,12h			; TstEGA
-	MOV	BX,0FF10h
-	INT	10h
-	CMP	BX,0FF10h
-	JE	Init29
-	MOV	DS:TstEGA,1
-Init29:	MOV	AL,25			; Lines
-	MOV	DL,0
-	CMP	DS:TstEGA,DL
-	JE	Init30
-	PUSH	ES
-	PUSH	AX
-	MOV	BH,0
-	MOV	AX,1130h
-	INT	10h
-	POP	AX
-	POP	ES
-	OR	DL,DL
-	JE	Init30
-	INC	DX
-	MOV	AL,MaxLins
-	CMP	AL,DL
-	JBE	Init30
-	MOV	AL,DL
-Init30:	MOV	DS:Lines,AL
-	MOV	AH,1			; Snow
-	CMP	DS:ScrMod,7
-	JE	Init33
-	CMP	DS:SnowMod,1
-	JE	Init33
-	MOV	DX,03DAh
-	MOV	BX,8000h
-	JB	Init31
-	CMP	DS:TstEGA,BL
-	JNE	Init33
-Init31:	STI
-	DEC	BX
-	JE	Init33
-	MOV	CX,7			; Const2_1 ???
-	CLI
-Init32:	IN	AL,DX
-	TEST	AL,1
-	JZ	Init31
-	LOOP	Init32
-	MOV	AH,0
-Init33:	STI
-	MOV	DS:Snow,AH
-	CALL	ScrOffs			; Screen Offset
-	MOV	BX,0B800h		; Screen Segment
-	CMP	DS:ScrMod,7
-	JNE	Init34
-	MOV	BH,0B0h
-Init34:	MOV	ES,BX			; Virtual screen buffer
-	MOV	AH,0FEh
-	INT	10h
-	MOV	CX,ES
+IniOk:	MOV	DS,AX
+	CALL	FAR PTR IniData_c
 	PUSH	DS
 	POP	ES
-	MOV	AL,0
-	CMP	CX,BX
-	JE	Init35
-	MOV	AL,1
-	MOV	DS:Snow,AL
-Init35:	MOV	DS:Screen.Segm,CX
-	MOV	DS:TopView,AL
-	MOV	CX,'DE'			; Check DESQWIEV
-	MOV	DX,'SQ'
-	MOV	AX,2B01h
-	INT	21h
-	INC	AX
-	MOV	DS:DesqVie,AL
-	XOR	BX,BX			; VerDOS
-	MOV	AX,3306h
-	INT	21h
-	XCHG	AX,BX
-	OR	AX,AX
-	JNE	Init36
-	MOV	AH,30h
-	INT	21h
-Init36:	CMP	AX,WORD PTR 4
-	JNE	Init37
-	CMP	BH,0FFh
-	JNE	Init37
-	MOV	AH,1
-Init37:	MOV	DS:VerDOS,AX
-	MOV	SI,DS:WCB1seg		; WCBseg
-	MOV	DI,DS:WCB2seg
-	PUSH	DS
-	MOV	DS,SI
-	MOV	DS:ChgFlg,1
-	MOV	DS,DI
-	MOV	DS:ChgFlg,1
-	POP	DS
-	CMP	DS:Active,0
-	JE	Init38
-	XCHG	DI,SI
-Init38:	MOV	DS:WCBcrn,SI
-	MOV	DS:WCBsec,DI
-
-;---------------------- Set DOS color ------------------
-	CALL	CurNl
-	MOV	AX,0E0Dh
-	INT	10h
-	MOV	AX,0E0Ah
-	INT	10h
-	CALL	CurNl
-	MOV	AH,8
-	INT	10h
-	PUSH	AX
-	MOV	DL,' '
-	MOV	AH,6
-	INT	21h
-	MOV	AX,0E0Dh
-	INT	10h
-	MOV	AH,8
-	INT	10h
-	MOV	DS:CrntCol,AH
-	POP	AX
-	MOV	BL,AH
-	MOV	CX,1
-	MOV	AH,9
-	INT	10h
 
 ;----------------------- Set cursor --------------------
 ; From here on the loop is C: MainLoop_c of port/main.c, which is entered
@@ -2120,27 +1537,6 @@ Reloc2:	POP	ES
 Reloc3:	POPF
 	RET
 Reloc	ENDP
-
-CurNl	PROC	NEAR
-	MOV	AH,0Fh
-	INT	10h
-	MOV	AH,3
-	INT	10h
-	MOV	AH,DS:Lines
-	CMP	DH,AH
-	JB	CurNl1
-	DEC	AH
-	MOV	AL,0
-	JMP	Cursor
-CurNl1:	RET
-CurNl	ENDP
-
-OutStr1	PROC	NEAR
-	PUSH	CS
-	POP	DS
-	MOV	AX,OFFSET OutStr
-	JMP	CallPSP
-OutStr1	ENDP
 
 ;-------------------------------------------------------
 ; The main loop is C: MainLoop_c of port/main.c. It is no routine: the
@@ -2236,15 +1632,6 @@ Exit:	CallC	Exit_c
 	PUSH	AX
 	MOV	AL,0
 	RETF
-
-;			   DS - main data
-;	Return :	   ES - main data
-HookVct	PROC	NEAR
-	CALL	FAR PTR HookVct_c
-	PUSH	DS
-	POP	ES
-	RET
-HookVct	ENDP
 
 ;--------------------- Fatal error ---------------------
 	.CONST
@@ -2445,120 +1832,6 @@ NoRd_P	DB	Err_C, ErInv_C, 0, 0
 	.CODE
 ; C: ErrRdy_c of port/main.c, which only C code calls. Its box stays
 ; here, where DialBox reads it.
-
-MainPth	PROC	NEAR
-	MOV	SI,OFFSET NcEnv
-	MOV	CX,3
-MnPth0:	PUSH	DS
-	PUSH	DI
-	PUSH	CS
-	POP	DS
-	XOR	DI,DI
-	MOV	AL,0
-MnPth1:	CMP	AL,ES:[DI]
-	JE	MnPth2
-	PUSH	DI
-	PUSH	SI
-	PUSH	CX
-	REPE	CMPSB
-	POP	CX
-	POP	SI
-	POP	DI
-	JE	MnPth3
-	PUSH	CX
-	MOV	CH,0FFh
-	REPNE	SCASB
-	POP	CX
-	JMP	MnPth1
-MnPth2:	LEA	SI,[DI+3]
-	PUSH	ES
-	POP	DS
-	POP	DI
-	POP	ES
-	CMP	DI,OFFSET TempDir
-	JNE	MnPth9
-	PUSH	ES
-	POP	DS
-	MOV	SI,OFFSET NcPath
-MnPth9:	MOV	CX,LenPath
-	PUSH	DI
-	PUSH	CX
-	REP	MOVSB
-	POP	CX
-	POP	SI
-	PUSH	ES
-	POP	DS
-	CALL	CutPath
-	MOV	DI,SI
-	JMP	MnPth4
-MnPth3:	MOV	SI,DI
-	ADD	SI,CX
-	PUSH	ES
-	POP	DS
-	POP	DI
-	POP	ES
-	MOV	CX,LenPath-2
-	CALL	MvzLine
-	CALL	AddFile
-MnPth4:	PUSH	ES
-	POP	DS
-	MOV	BYTE PTR DS:[DI],0
-	RET
-MainPth	ENDP
-
-ReadOne	PROC	NEAR
-	PUSH	CX
-	PUSH	CS
-	POP	DS
-	MOV	CX,13
-	REP	MOVSB
-	PUSH	ES
-	POP	DS
-	MOV	AX,3D20h
-	INT	21h
-	POP	CX
-	JC	RdOne1
-	MOV	BX,AX
-	MOV	DX,BP
-	MOV	AH,3Fh
-	INT	21h
-	PUSHF
-	PUSH	AX
-	MOV	AH,3Eh
-	INT	21h
-	POP	AX
-	POP	DX
-	JC	RdOne1
-	PUSH	DX
-	POPF
-RdOne1:	RET
-ReadOne	ENDP
-
-Expand	PROC	NEAR
-	XOR	DI,DI
-	MOV	CX,WCBsave
-	REP	MOVSB
-	MOV	DI,OFFSET DskBuf
-	MOV	AX,ES:EndBuf
-	SUB	AX,DI
-	XOR	DX,DX
-	MOV	CX,SIZE FilEnt
-	DIV	CX
-	MOV	CX,AX
-	JCXZ	Expnd2
-Expnd1:	PUSH	DI
-	PUSH	CX
-	MOV	CX,12
-	REP	MOVSB
-	MOV	AL,0
-	STOSB
-	MOVSB
-	POP	CX
-	POP	DI
-	ADD	DI,SIZE FilEnt
-	LOOP	Expnd1
-Expnd2:	RET
-Expand	ENDP
 
 	INCLUDE	VCSUB1.INC
 	INCLUDE	VCSUB2.INC

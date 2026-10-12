@@ -91,7 +91,13 @@ and goes to its command is C, with what the mouse does at the panels,
 and so are what it does on the way: drawing the two panels and reading
 what they show when that has changed, the box that asks for another
 drive when a disk cannot be read, and saving the setup when it has
-changed; and leaving the program. What starts the program, what runs a
+changed; and leaving the program. What the program does once it has
+been started, and again whenever a command has run, is C: reading the
+setup file and the main extension file, or taking the defaults, the
+banner, asking DOS for the memory of its data and making the data of
+what was kept, and finding out what the display, DOS and the
+environment are like. The entry of the program, which makes a block of
+the memory of the part that goes, what runs a
 command with most of the program out of the memory and loads it again,
 to which Enter hands over, and what answers the interrupts of DOS are
 still assembly. The help is C as a
@@ -245,7 +251,7 @@ bring: the program has none.
 
 DOS, the BIOS and the mouse driver are called by software interrupts,
 which C cannot express. The C code calls them in one file, `port/dos.c`,
-and nowhere else: ten small functions, each a line of C around the
+and nowhere else: twelve small functions, each a line of C around the
 instruction, which is inline assembly there, with the registers as its
 arguments; one has three such instructions that may not be parted. Four more are there for a port of the machine and its
 interrupt flag, for which the compiler has functions of its own, and for

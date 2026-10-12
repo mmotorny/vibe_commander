@@ -314,9 +314,10 @@ extern const u8 __far Tree_S[];         /* the title of the tree */
 #define Title_C 4                       /* the titles of the columns */
 
 /* The registers of a call of DOS. DS goes with DX: a pointer to what DOS
-   takes there, a name or a buffer, sets both. ES does not go to DOS,
-   which is called with it on the main data: it is what DOS leaves there,
-   for the calls that answer with an address in ES:BX. */
+   takes there, a name or a buffer, sets both. ES goes to DOS only by
+   Int21e of dos.c: otherwise DOS is called with it on the main data,
+   and it is what DOS leaves there, for the calls that answer with an
+   address in ES:BX. */
 struct DosRegs {
     u16 ax, bx, cx;
     const u8 __far *name;               /* DX, and DS behind it */
@@ -385,8 +386,10 @@ struct MouseAt {                        /* what the mouse driver says: */
 };
 u16 Int21d(struct DosRegs STACK *regs);
 u16 Int21f(struct DosRegs STACK *regs, u16 carry);
+u16 Int21e(struct DosRegs STACK *regs);
 void Int10(struct BiosRegs STACK *regs);
 void TopView(u16 __far *cells, u16 count);
+u16 __far *TopScr(u16 __far *screen);
 u32 Int16(u16 ax);
 u32 Int2F(u16 ax, u16 bx, u16 cx);
 u16 Int33(u16 ax, u16 bx, u16 cx, u16 dx);
@@ -399,8 +402,10 @@ void Int28(void);
 void DvPause(void);
 #pragma aux Int21d  "*_c" __far parm [bx] value [ax] modify exact [ax]
 #pragma aux Int21f  "*_c" __far parm [bx] [ax] value [ax] modify exact [ax]
+#pragma aux Int21e  "*_c" __far parm [bx] value [ax] modify exact [ax]
 #pragma aux Int10   "*_c" __far parm [bx] modify exact [ax]
 #pragma aux TopView "*_c" __far parm [es di] [cx] modify exact [ax]
+#pragma aux TopScr  "*_c" __far parm [es di] value [es di] modify exact [ax di es]
 #pragma aux Int16   "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux Int2F   "*_c" __far parm [ax] [bx] [cx] value [dx ax] modify exact [ax dx]
 #pragma aux Int33   "*_c" __far parm [ax] [bx] [cx] [dx] value [ax] modify exact [ax]

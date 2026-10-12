@@ -883,7 +883,62 @@ out again (show.py --changes is how):
     cannot be opened, and F3 does nothing then; with the main file
     gone, "del d:\\vc\\vcview.ext", and none in the directory, F3 is
     the program's own viewer.
-
+  - A program of a few bytes is typed in the editor, in hex: Shift+F4,
+    its name and two Enters, as many characters as it has bytes, F4,
+    Ctrl+Home, and the bytes as hex digits, which take the place of the
+    characters; F2 and Esc. Home in hex goes to the start of the row of
+    16 bytes, not of the file: a program of 17 bytes typed behind Home
+    was 16 letters with the program behind them, which ran as code and
+    went astray. Left and Right move by a digit, two to a byte, and Up
+    and Down by a row: 27 times Down and 20 times Right are byte 1BAh.
+    start-screen has three such programs, for what the bench has no
+    command for: "m" and a digit sets that video mode, "m 1" 40 columns,
+    "m 6" graphics, "m 7" monochrome and "m 3" the mode the program
+    wants; "c" gives the cursor a shape and puts it below the screen;
+    and k.com of start-memory stays in the memory with all of it but a
+    number of paragraphs. A:\\FREEDOS\\BIN has vcursor, which is on the
+    path: "vcursor" Space "hide".
+  - A batch file is made the same way, without F4: its lines, F2, Esc.
+    What "set" does in it holds for the commands that follow in it, so
+    "set vc=c:\\work" and "d:\\vc\\vc" start a second copy that looks for
+    its files in C:\\WORK, and "set comspec=" one that has no COMSPEC=.
+    A second copy that finds no setup file there, or one that is not
+    correct, starts with the defaults: the right panel only, on the
+    current directory, with the mini status, the clock off. It saves
+    its setup by itself, into C:\\WORK as it is left: a file of the
+    defaults, which the disks at the end of start-setup have. Shift+F5
+    with "d:\\vc\\vc.ini", Tab, "vc.ini", Enter, and Enter to
+    overwrite, puts the setup of the bench there instead.
+  - The setup file is 511 bytes, the last two their sum. A byte changed
+    in the editor makes it "not correct"; another byte changed the
+    other way makes the sum right again: 1BAh is Snow mode, 2, which no
+    menu sets, and 1CAh the first of the reserved bytes. See
+    start-setup. That is within the rule that a scenario sets up what
+    it needs through the program: the rule is against files prepared
+    outside and handed to a scenario, and this one is made inside it,
+    in the program's own editor. Nothing else makes a setup file that
+    is damaged, or that has a mode no menu sets.
+  - With the screen in another mode than text of 80 columns when a
+    command ends, the program asks for Enter, waiting in the BIOS, and
+    the step ends there: Enter is the next step. The test reads the
+    memory of the colour text screen whatever the mode is: 40 columns
+    are seen as half as many rows of 80, graphics as characters that
+    mean nothing, and in mode 7, monochrome, nothing of what the
+    program draws is seen, only the cursor and its shape.
+  - While the cursor is below the last row, every character that the
+    BIOS writes as a teletype scrolls the screen a line and takes the
+    cursor up a row. DOS writes six or more when a command ends, so a
+    cursor that a command leaves on row 30 is back on the screen when
+    the program looks, and one on row 255 is not.
+  - The memory that a second copy has for its data can be made too
+    little: its command, k.com, stays in the memory and leaves a number
+    of paragraphs free above itself. The copy then loads its code
+    again, into the gap of 72 KB that COMMAND.COM leaves below k.com,
+    and asks for its data in what is free above: with 66 to 83 KB free
+    the original gets its code back and has too little for the data,
+    which wants 84; start-memory leaves 75. The port, which is larger,
+    does not get as far as that and says the same, "Program too big to
+    fit in memory". The copy ends and releases k.com.
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
 is off, started in C:\\WORK. A scenario that wants something else arranges
@@ -4509,6 +4564,147 @@ SCENARIOS = {
             "Move@79,0 " + "Move@76,1 Move@79,0 " * 20 + "Click@77,0",
             "x",                          # the panels take keys again
         )),
+
+    "start-setup": Scenario(
+        "The program started where VC= in the environment says its files "
+        "are: without a setup file, with one that has Snow mode switched "
+        "off, which no menu sets, and with one whose sum is wrong; and "
+        "without COMSPEC=",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of a file made
+            "Ctrl+l",                     # two panels of files, and that
+            "Shift+F9 Enter",             # saved: a copy that starts from
+                                          # this setup shows no Info
+            "Shift+F4",
+            '"s.bat" Enter',
+            "Enter",
+            '"set" Space "vc=c:\\work" Enter '
+            '"set" Space "comspec=" Enter "d:\\vc\\vc"',
+            "F2 Esc",
+            '"s" Enter',                  # no setup file in C:\WORK: the
+                                          # defaults, one panel, the right
+            "Ctrl+o",                     # the banner and nothing else
+            "Ctrl+o",
+            "F10",
+            "Enter",                      # it has left a setup file there
+            "Shift+F5",                   # the setup of D:\VC over that
+            '"d:\\vc\\vc.ini" Tab "vc.ini" Enter',
+            "Enter",                      # overwrite
+            "Shift+F4",
+            '"vc.ini" Enter',
+            " ".join(["F4"] + ["Down"] * 27 + ["Right"] * 20),  # byte
+                                          # 1BAh: Snow mode
+            '"00"',                       # off, and the sum wrong by 2
+            "Down Left Left",             # byte 1CAh, the first that is
+            '"02"',                       # reserved: the sum is right
+            "F2 Esc",
+            '"s" Enter',                  # the setup as it was saved, and
+                                          # the screen tested for snow
+            "Ctrl+o",
+            "Ctrl+o",
+            "F10",
+            "Enter",
+            "Shift+F4",
+            '"vc.ini" Enter',
+            " ".join(["F4"] + ["Down"] * 28 + ["Right"] * 20),  # the
+            '"03"',                       # reserved byte again: the sum
+                                          # is wrong
+            "F2 Esc",
+            '"s" Enter',                  # the defaults again
+            "Ctrl+o",                     # "VC.INI is not correct."
+            "Ctrl+o",
+            "F10",
+            "Enter",                      # and the setup file that it
+                                          # leaves is that of the
+                                          # defaults, on the disk at the
+                                          # end
+        )),
+
+    "start-screen": Scenario(
+        "The program brought back from a command, and started, with the "
+        "screen as it does not want it: 40 columns, graphics, a "
+        "monochrome screen, and a cursor of no shape or below the last "
+        "line. The commands are programs of a few bytes, typed in hex",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of a file made
+            "Ctrl+l",                     # two panels of files, and that
+            "Shift+F9 Enter",             # saved: the second copy shows
+                                          # no Info
+            "Shift+F4",                   # m.com: the video mode that its
+            '"m.com" Enter',              # command line names by a digit
+            "Enter",
+            '"aaaaaaaaaa" F4 Ctrl+Home',       # ten bytes, then in hex
+            '"a08200240fb400cd10c3"',
+            "F2 Esc",
+            "Shift+F4",                   # c.com: a cursor from line 0
+            '"c.com" Enter',              # to line 67h, on row 255
+            "Enter",
+            '"aaaaaaaaaaaaaaaaa" F4 Ctrl+Home',
+            '"b401b96700cd10b402b700ba00ffcd10c3"',
+            "F2 Esc",
+            "Shift+F4",                   # t.bat: the program started on
+            '"t.bat" Enter',              # a screen of 40 columns
+            "Enter",
+            '"m" Space "1" Enter "d:\\vc\\vc"',
+            "F2 Esc",
+            '"m" Space "1" Enter',        # 40 columns: Enter is asked for,
+            "Enter",                      # on two lines
+            '"m" Space "6" Enter',        # graphics of 80 columns: on one
+            "Enter",                      # line, which the test does not
+                                          # see as text
+            '"m" Space "7" Enter',        # monochrome: the screen is in
+                                          # another place than the test
+                                          # looks at, the cursor's shape
+                                          # is seen
+            "F7",                         # and in a line that is typed
+            "Esc",                        # into
+            '"m" Space "3" Enter',        # colour again
+            '"vcursor" Space "hide" Enter',   # of A:\FREEDOS\BIN: no
+                                          # cursor, and it has one again
+            '"c" Enter',                  # a cursor of another shape,
+                                          # far below the screen: on the
+                                          # last line and as it should be
+            "Ctrl+o",                     # what DOS had shown, a line
+            "Ctrl+o",                     # further up
+            '"t" Enter',                  # the second copy sets the mode
+            "Ctrl+o",
+            "Ctrl+o",
+            "F10",
+            "Enter",
+        )),
+
+    "start-memory": Scenario(
+        "The program without the memory for its data when it comes back "
+        "from a command: a second copy of it, whose command keeps all "
+        "but 75 KB of the memory",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of a file made
+            "Shift+F4",                   # k.com stays in the memory with
+            '"k.com" Enter',              # all of it but 1250h paragraphs
+            "Enter",
+            '"aaaaaaaaaaaaaaaaa" F4 Ctrl+Home',
+            '"8b1602008cc82bd081ea5012b80031cd21"',
+            "F2 Esc",
+            '"d:\\vc\\vc" Space "k" Enter',   # the second copy runs it,
+                                          # cannot come back and ends,
+                                          # which releases k.com
+            "Ctrl+o",                     # what it said
+            "Ctrl+o",
+            "Ctrl+PgUp",                  # the first copy still works
+        )),
+
 }
 
 

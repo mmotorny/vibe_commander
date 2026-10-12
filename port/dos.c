@@ -36,20 +36,19 @@ void _enable(void);
 /* The interrupts. Each of these is put in place where it is called, as
    the instructions between the quotes. */
 
-/* INT 21h with the registers of `regs`, which is on the stack, and ES on
-   the main data; the carry flag is set first if `carry` is not 0, since
-   some calls of DOS leave it as they find it. AX, BX, CX, DX and ES go
-   back into `regs` as DOS leaves them, and what is returned is not 0 if
-   the carry flag is set then. PUSH, POP, MOV and LDS leave the flags
+/* INT 21h with the registers of `regs`, which is on the stack, ES among
+   them; the carry flag is set first if `carry` is not 0, since some
+   calls of DOS leave it as they find it. AX, BX, CX, DX and ES go back
+   into `regs` as DOS leaves them, and what is returned is not 0 if the
+   carry flag is set then. PUSH, POP, MOV and LDS leave the flags
    alone. */
 static u16 Dos(struct DosRegs STACK *regs, u16 carry);
 #pragma aux Dos = \
     "neg ax" \
     "push bp" \
     "push ds" \
-    "push ds" \
-    "pop es" \
     "mov bp,bx" \
+    "mov es,[bp+14]" \
     "mov ax,[bp]" \
     "mov bx,[bp+2]" \
     "mov cx,[bp+4]" \
@@ -84,13 +83,14 @@ static void Video(u16 ax, u16 bx, u16 cx, u16 dx,
     "mov ss:[si+6],dx" \
     parm [ax] [bx] [cx] [dx] [si] modify exact [ax bx cx dx es]
 
-/* INT 10h with an address in ES:DI. */
-static void VideoBuffer(u16 ax, u16 __far *cells, u16 count);
+/* INT 10h with an address in ES:DI, and the address that is there
+   afterwards. */
+static u16 __far *VideoBuffer(u16 ax, u16 __far *cells, u16 count);
 #pragma aux VideoBuffer = \
     "push bp" \
     "int 10h" \
     "pop bp" \
-    parm [ax] [es di] [cx] modify exact [ax bx cx dx si di]
+    parm [ax] [es di] [cx] value [es di] modify exact [ax bx cx dx si di es]
 
 /* INT 16h, with AX as it leaves it and, above that, the flags. */
 static u32 Keyboard(u16 ax);
@@ -150,12 +150,14 @@ typedef u16 __far CaseMapFn(u16 letter);
 #pragma aux CaseMapFn parm [ax] value [ax] modify exact [ax]
 
 /* DOS: any of its calls, with the registers of `regs` and their answer
-   there (see struct DosRegs in vc.h). Not 0 if DOS set the carry flag,
-   which is clear when DOS is called. The program calls DOS like this
-   where it does not look for the box of a drive that is not ready, and
-   through Intr21 of system.c where it does. */
+   there (see struct DosRegs in vc.h), and ES on the segment that DS is
+   on, the main data. Not 0 if DOS set the carry flag, which is clear
+   when DOS is called. The program calls DOS like this where it does not
+   look for the box of a drive that is not ready, and through Intr21 of
+   system.c where it does. */
 u16 Int21d(struct DosRegs STACK *regs)
 {
+    regs->es = MAIN_SEG;
     return Dos(regs, 0);
 }
 
@@ -163,7 +165,17 @@ u16 Int21d(struct DosRegs STACK *regs)
    0: for a call of DOS that leaves the flag as it finds it. */
 u16 Int21f(struct DosRegs STACK *regs, u16 carry)
 {
+    regs->es = MAIN_SEG;
     return Dos(regs, carry);
+}
+
+/* The same as Int21d with ES as `regs` has it: for the calls of DOS that
+   take a block of the memory there which is not the main data. The
+   program makes the block that its code is in another size like this
+   (AH 4Ah) when it starts. */
+u16 Int21e(struct DosRegs STACK *regs)
+{
+    return Dos(regs, 0);
 }
 
 /* The BIOS, for the screen: its call with the registers of `regs`, which
@@ -186,6 +198,14 @@ void Int10(struct BiosRegs STACK *regs)
 void TopView(u16 __far *cells, u16 count)
 {
     VideoBuffer(0xFF00, cells, count);
+}
+
+/* Ask TopView or DESQview where the buffer is that they show for the
+   display's memory at `screen` (AH 0FEh). The BIOS itself leaves the
+   address as it is: `screen` comes back where neither runs. */
+u16 __far *TopScr(u16 __far *screen)
+{
+    return VideoBuffer(0xFE00, screen, 0);
 }
 
 /* The BIOS, for the keyboard: its call with AX. Returns AX as the BIOS

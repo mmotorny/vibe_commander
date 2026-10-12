@@ -884,28 +884,19 @@ Things that are known and not done. Standing instructions are in
   want. The port ends with no assembly, and the order of preference is
   the user's: portable C, then C tied to the compiler or the machine,
   then intrinsics, then inline assembly where nothing else works.
-  - The start-up from `Init00` to `Init40`, 1,266 bytes, with `MainPth`,
-    `ReadOne`, `Expand`, `CurNl` and `OutStr1`: plain code, the next
-    batch. `Init00` to `Init11` runs before there is a main data
-    segment, with DS on the part that stays in the memory, where the
-    setup file and the main extension file are read to: C functions
-    that take that segment as far pointers and touch nothing of `md`.
-    From `Init11` on it is the main data. It asks much of the BIOS and
-    of DOS: the video mode set, the cursor's shape, the country, the
-    font's rows, DESQview, for which `Int10` and `Int21d` of
-    `port/dos.c` do, and the address of a virtual screen (INT 10h,
-    AH=FEh), which answers in ES:DI and has no function there yet. It
-    calls the routine of DOS that makes capitals through the far
-    pointer of the country information, with a character in AL: a far
-    function pointer with a `#pragma aux`. It writes two vectors into
-    the table at 0:0 with interrupts off, and looks for snow by reading
-    port 3DAh in a loop that is timed by its instructions: `inp()`,
-    `_disable()` and `_enable()` are intrinsics, and how many times the
-    loop has to see the bit clear will want measuring again in C.
-    `MainPth` is not reached for a `VC=` in the environment and
-    `CurNl` not for a cursor on the last line; a second copy of the
-    program run after `set vc=` and after enough lines of output would
-    reach both.
+  - The stubs of the start-up, `Init00` and `Init11`: the start-up is C,
+    `port/start.c`, and what is left of it in the assembly is what the
+    part that stays jumps to, the call of `Reloc`, the segment of that
+    part and the block of the code handed to the C, DS put on the main
+    data that `Init11_c` has asked DOS for, and the far jump to
+    `AlocEr` when there is none to have. They go when the part that
+    stays is C and calls the three functions itself; setting DS will
+    then want the two instructions of inline assembly that `FatErr`
+    wants too. What `port/start.c` names of that part is in one list at
+    its top: `ComnIni`, `WCB1sav`, `WCB2sav`, `Counter`, `Vect21`,
+    `Vect22`, `Vect27`, `RelTab`, the labels `Exit01`, `New21` and
+    `New27`, and `SetBrk`, which it calls through a pointer to a far
+    function.
   - `Reloc`, which the original has not: applies the linker's
     relocations to the copy of the program that has just been loaded.
     It cannot be called far before it has run, since a far call
@@ -933,8 +924,9 @@ Things that are known and not done. Standing instructions are in
     data does not exist: what the commands need is in the copy that
     `F21_31` keeps there, `ComnIni`.
   - The jumps between the two parts: `F21_31` to `Exec`, `Exec15` to
-    `Init11`, `Exit` to `Exit00`, `Init12` to `AlocEr`, and `CallPSP`,
-    by which the code that goes calls routines of the part that stays.
+    `Init11`, `Exit` to `Exit00`, the stub of `Init11` to `AlocEr`, and
+    `CallPSP`, by which the code that goes calls routines of the part
+    that stays: `Release` only, since the start-up is C.
     Each is a far address made of a segment known when the program
     runs and an offset: in C a call through a far function pointer. A
     jump is not a call, though: a call that never returns would leave
@@ -973,9 +965,13 @@ Things that are known and not done. Standing instructions are in
   - `Release`, 104 bytes, `GetStat` and `SetStat`, 68 bytes, `SetBrk`
     and `SetBrk0`, 39 bytes, `NotFind` and `OutStr0`, 54 bytes: plain
     routines that happen to be of the part that stays, called far from
-    the rest through `CallPSP`. `GetStat` and `SetStat` keep what they
-    found in BP from the one to the other: an argument in C. They wait
-    for the code segment of that part.
+    the rest. `GetStat` and `SetStat` keep what they found in BP from
+    the one to the other: an argument in C. They go with the C of
+    that part, for which `RTEXT` is the room: `Exec` calls all but
+    `Release` while the rest of the program, the compiled code with it,
+    is not in the memory, and `Exit00`, which calls `Release`, may be
+    come to from there. The start-up no longer calls `OutStr` there:
+    `OutStr1` of `port/start.c` writes its texts by the BIOS itself.
   - `FatErr`, 220 bytes: what DOS calls for a critical error. It is
     entered with nothing but CS known, takes its error in AX and DI
     and the device in BP:SI, shows a dialog, and returns the answer in
@@ -987,6 +983,48 @@ Things that are known and not done. Standing instructions are in
     from where the program keeps the segment is inline assembly, two
     or three instructions, here and wherever else the program is
     entered from outside.
+- Ported as they are, in `port/start.c`: see the comments of `Init00`
+  and `IniData` there. Three of them reach further:
+  - The original takes the two panels of a program that starts without
+    a setup file, or with one that is not correct, from 88 bytes of
+    which it has 8: the other 80 are what follows them, the first
+    twenty entries of its table of the keys, each a key and the address
+    of its command. They are in the mask of both panels behind its zero
+    byte, and behind their paths, in the memory only, until the main
+    loop first holds the setup against the one that was saved: `MkIni1`
+    fills both fields with zeros behind their texts, in the panel, before
+    the first key is taken, and the setup file is made of that. The
+    port has no such table any more, the keys are a `switch`, and
+    `Init00` of `port/start.c` puts zeros where the original has those
+    80 bytes. Nothing was found that reads them in between: the mask
+    and the path are read as texts, by `SetMask`, `PutPath`, `Init50`
+    and `ReDir`, and copied whole only as such. The file that a copy
+    started on the defaults saves is the original's byte for byte:
+    `start-setup` ends with it on its disk.
+  - The registers that the start-up leaves go to the first command
+    through the main loop, which sets all of them but BP before a
+    command reads them. BP was the offset of the font that the BIOS
+    answers with when it is asked for the rows of the screen; now it is
+    what the part that stays, or the command that ended in `CmdIni`,
+    left there. No command is known to read BP.
+  - The test for snow counts readings of the display's status, seven
+    running with the bit set, and compiled code reads more slowly than
+    the three instructions of the assembly did. It could not be
+    measured: QEMU's VGA turns the bit over at every reading, so the
+    test never succeeds on the bench, and its `MOV AH,0` is listed as
+    out of reach. On a CGA the bit stays set for the whole time that
+    the beam returns to the top, more than a millisecond, which is long
+    for seven readings either way.
+- What ran in the original is told by its bytes, wherever they are in
+  the memory, so a program that runs off into what is left there of
+  Volkov Commander counts as Volkov Commander running. A command of 33
+  bytes, sixteen of them `a`, which is POPA, and a RET behind them that
+  took its address from the PSP, went on at 7184h of the copy that DOS
+  had loaded there to bring the program back, and `harness/reach.py`
+  said that `CurNl` had been reached for a cursor below the screen. It
+  had not. A step whose program does not come back, or comes back to a
+  screen that it should not have left, is the sign; `start-screen` has
+  its programs typed right.
 - Ported as they are, in `port/main.c`:
   - When a panel cannot be read and another drive is chosen for it,
     the assembly notes the drive if none is noted as the one that
@@ -1025,13 +1063,13 @@ Things that are known and not done. Standing instructions are in
 - `VCSUB1.INC`, `VCSUB2.INC` and `VCSUB3.INC`, the shared routines, hold
   no routine of the original any more but one, `CallPSP`. What is left
   in them, and goes when what needs it is C:
-  - Stubs, twelve of them: the routine's name, the call of the C
+  - Stubs, four of them: the routine's name, the call of the C
     function, and the registers and flags that the assembly which still
-    calls it goes on with. `VCSUB1.INC` has nine: `ChkMode`, `ScrOffs`,
-    `MvzLin0`, `MvzLine`, `AddFile`, `CutPath` and `PathLin`, which the
-    code that starts the program calls, `Dialog`, which the routine for
-    DOS's critical error calls, and `Cursor`, which `CurNl` of the
-    start-up jumps to and the editor's stubs call. `VCSUB2.INC` has
+    calls it goes on with. `VCSUB1.INC` has one: `Dialog`, which the
+    routine for DOS's critical error calls. The eight that the code
+    which starts the program called, `ChkMode`, `ScrOffs`, `MvzLin0`,
+    `MvzLine`, `AddFile`, `CutPath`, `PathLin` and `Cursor`, went when
+    that became C. `VCSUB2.INC` has
     none: it is the names of the menus and the title of the tree.
     `VCSUB3.INC` has three: `ReDir`, for the entry `ReDir_a` of the main
     loop, `ReadTre`, which the stub of `ReDir` calls, and `DiSi10`,
@@ -1054,11 +1092,10 @@ Things that are known and not done. Standing instructions are in
     that asks for a diskette, `Fant_B`, with its box and texts.
   - `CallPSP`, 6 bytes: a far call, by way of the stack, of a routine in
     the part of the program that stays in the memory. It is no routine
-    to translate: C code makes such a call through a far pointer. Three
-    places of the assembly use it, none of this batch's: the code that
-    starts the program, for `OutStr` (`OutStr1`) and for `SetBrk`, and
-    `Release_a` of `VCMEM.INC`, by which the map of the memory has a
-    program released. It goes with the last of them.
+    to translate: C code makes such a call through a far pointer, as
+    `Init00` of `port/start.c` calls `SetBrk`. One place of the assembly
+    uses it still: `Release_a` of `VCMEM.INC`, by which the map of the
+    memory has a program released. It goes with that.
 - No entry in the assembly calls an interrupt for C code any more. A
   drive made the current one is `SelDrv` of `port/system.c`; the FCB
   that deleting by a mask has DOS make is `Fcb29` of `port/dirfunc.c`;
@@ -2017,6 +2054,56 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     one, and left the list; the three goldens were derived again for
     the pointer. The build passed at once, and the `port` test, ten
     minutes with 96 scenarios, too.
+- The start of the program, `Init00` to `Init40` with five routines,
+  1,478 bytes, an hour and a half to the commit, next to four
+  other agents. The translation ran when it was first built.
+  - 12 minutes: a program of 17 bytes for a scenario, typed in hex
+    behind Home, which goes to the start of the row and not of the
+    file: 16 letters ran as code before it. Two derivations waited out
+    the five minutes of `STEP_TIME` each, and before that
+    `harness/reach.py` had said that the instructions looked for were
+    reached, by code that had run astray (see above). At the top of
+    `harness/scenarios.py` now.
+  - 5 minutes: the table of stars read as two bytes where it is five,
+    three of them no characters, and a bug of the original made of
+    that, in the C and in three files of notes. The `port` test passed
+    with it. It showed when the setup file of a copy started on the
+    defaults was held against the original's, to see how they differ:
+    by those three bytes and nothing else. In `CLAUDE.md` now, and the
+    scenario ends with that file on its disk.
+  - 3 minutes: the flag for a setup file that is not correct was set
+    for every file that could be read, a mistake of the C. The two
+    scenarios with a second copy said so at once, in the line of the
+    banner.
+  - 25 minutes: four runs of the `port` test, five to nine minutes
+    each next to the tests of others, where it takes under two alone,
+    most of it spent writing the notes meanwhile. The
+    first failed on three instructions that two earlier batches had
+    listed as out of reach for want of a monochrome screen, which
+    `start-screen` has; `harness/reach.py` on the routines of the batch
+    does not show those of others.
+  - 5 minutes to get behind the shared routines, which landed while the
+    scenarios were written: one conflict, in the list of scenarios, and
+    the calls of DOS written against `port/dos.c` from the start. That
+    file calls DOS with ES on the main data, and the start has a block
+    of its own to make smaller: `Int21e`, and `TopScr` for an address
+    that the BIOS hands back.
+  - Most of the time went into finding steps for what the bench was
+    said not to have: 40 columns, a monochrome screen, a cursor without
+    a shape, too little memory, a setup file that no menu writes. A
+    program of ten bytes typed in the program's own editor does each;
+    `harness/reach.py --steps --changes` said in seconds whether it had.
+  - What saved time: `harness/compare.py` on the three new scenarios
+    and two old ones, ten seconds, before every run of the whole test.
+  - 10 minutes to get onto `main` behind sixteen commits, the layout of
+    the part that stays and the last shared routines among them: six
+    files in conflict, each where both sides had added or taken out.
+    `TrnPar` had become a word read through SS under the same name, so
+    the stub of `Init11` assembled as it was. The table of the keys was
+    gone, and with it the 80 bytes that the defaults of a panel took
+    from behind their own 8: the panel went to the C file, with zeros
+    there (see above). The three goldens came out the same, and the
+    `port` test took 78 seconds, alone on the machine.
 
 - What was left of the shared routines, seven of them with the screen
   blanker, 717 bytes, and the entries that called DOS for C code: some
