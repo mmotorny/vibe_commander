@@ -402,9 +402,11 @@ next step; after the last it resets the machine, which ends QEMU. The
 host starts the machine and reads the file and the disks afterwards.
 
 The original and the port are driven alike, and neither is changed for it.
-What the driver has to know of a program, where its idle routine is and
-two of its variables, it is told in the script, which takes it from the
-program's file and the listing of its assembly. None of this is measured
+What the driver has to know of a program, its name and where two of its
+variables are, it is told in the script, which takes that from the
+listing of the program's assembly. It knows the program's call of the
+idle interrupt from DOS's by where the call comes from: the memory of the
+program that DOS has as the current one, and that has that name. None of this is measured
 in time, and a busy computer makes a run slower, not different.
 
 Where time is what the program goes by, it is the machine's, and the

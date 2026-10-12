@@ -12,9 +12,9 @@
 ; port the same way (command D3h), for the mouse driver. Every call of
 ; INT 16h and of INT 28h goes on to whoever had the interrupt before.
 ;
-; The program is idle when it calls INT 28h, as LeaveTm does each time
-; Input0 has gone round without a key, or when it asks INT 16h to wait for
-; a key. When it is idle and the BIOS's keyboard buffer is empty, the next
+; The program is idle when it calls INT 28h, as it does each time it has
+; gone round waiting for a key (LeaveTm), or when it asks INT 16h to wait
+; for a key. When it is idle and the BIOS's keyboard buffer is empty, the next
 ; event of the script is due. A step has ended when the program has gone
 ; round twice like that with nothing left to take and nothing that it will
 ; do by itself after a while (AutoTim): the screen is then written out.
@@ -28,10 +28,12 @@
 ;			blinks
 ;	word, word	where the program's stack begins in its segment, and
 ;			how long it is, or 0 for not looking at it
-;	6 bytes		the code that follows INT 28h in LeaveTm: by it the
-;			program is told from DOS, which calls INT 28h too
+;	8 bytes		the program's name as DOS has it in the header of
+;			its memory, ended by a 0 if it is shorter: by it
+;			the program is told from DOS, which calls INT 28h
+;			too, and from what the program runs
 ;
-; and from byte 16 the events:
+; and from byte 18 the events:
 ;
 ;	01 n bytes	n bytes from the keyboard
 ;	02 n bytes	n bytes from the mouse
@@ -63,10 +65,12 @@
 
 OutPort	EQU	0E9h			; QEMU's debug console
 Cells	EQU	4000			; Bytes of an 80 x 25 text screen
-Events	EQU	16			; Where the events begin in a script
+Events	EQU	18			; Where the events begin in a script
 Rounds	EQU	2			; Idle rounds that end a step
 Blink	EQU	20			; Ticks to look for what blinks: 1.1 s
 FileLen	EQU	2048			; Bytes of the driver's file
+SecBuf	EQU	100h + FileLen		; Behind it in memory: a sector of
+Last	EQU	SecBuf + 512		; the script, and Cells bytes of screen
 
 	.code
 	org	100h
@@ -96,12 +100,12 @@ HAuto	dw	0FFFFh
 HClock	dw	0FFFFh
 HStack	dw	0
 HStLen	dw	0
-HSig	db	6 dup (0)
+HName	db	8 dup (0)
 
 ; The packet for INT 13h, AH=42h: one sector to SecBuf.
 Packet	db	10h, 0
 	dw	1
-	dw	offset SecBuf
+	dw	SecBuf
 PktSeg	dw	0
 PktLba	dw	0, 0, 0, 0
 
@@ -136,7 +140,7 @@ Peek	proc	near
 	cmp	ax,cs:SSec
 	je	Peek1
 	call	RdSec
-Peek1:	mov	al,cs:SecBuf[si]
+Peek1:	mov	al,cs:[si+SecBuf]
 	pop	si
 	ret
 Peek	endp
@@ -154,7 +158,7 @@ Load	proc	near
 	xor	ax,ax
 	call	RdSec
 	jc	Load1
-	cmp	word ptr cs:SecBuf,5AA5h
+	cmp	word ptr cs:[SecBuf],5AA5h
 	jne	Load1
 	pusha
 	push	ds
@@ -163,7 +167,7 @@ Load	proc	near
 	pop	ds
 	push	cs
 	pop	es
-	mov	si,offset SecBuf+2
+	mov	si,SecBuf+2
 	mov	di,offset HAuto
 	mov	cx,Events-2
 	cld
@@ -260,7 +264,7 @@ Screen	proc	near
 	push	cs
 	pop	es
 	xor	si,si
-	mov	di,offset Last
+	mov	di,Last
 	mov	cx,Cells
 	cld
 	or	al,al
@@ -440,8 +444,10 @@ Look2:	mov	cs:Watch,0
 Look	endp
 
 ;--------------------- Interrupts ----------------------
-; INT 28h: whoever calls is idle. DOS does while it waits for a key; the
-; program does in LeaveTm, and is known by the code that follows the call.
+; INT 28h: whoever calls is idle. DOS does while it waits for a key, for
+; the program that asked it; the program does by itself, and is known by
+; that: the call comes from the memory of the program that DOS has as the
+; current one, and that has the script's name.
 Int28:	push	ax
 	cmp	cs:Done,0
 	jne	I28X
@@ -451,25 +457,36 @@ Int28:	push	ax
 	push	bp
 	mov	bp,sp
 	pushf
+	push	bx
 	push	cx
 	push	si
 	push	di
 	push	ds
 	push	es
-	les	di,[bp+4]		; Where the call returns to
+	mov	ah,62h			; The current program's PSP, which
+	int	21h			; DOS may be asked for at any time
+	cmp	[bp+6],bx		; Does the call come from above it?
+	jb	I28N
+	dec	bx			; The header of its memory, with its
+	mov	es,bx			; name from the ninth byte on
+	mov	di,8
 	push	cs
 	pop	ds
-	mov	si,offset HSig
-	mov	cx,6
+	mov	si,offset HName
+	mov	cx,8
 	cld
-	repe	cmpsb
-	pop	es
+I28C:	lodsb
+	scasb
+	jne	I28N
+	or	al,al
+	loopnz	I28C
+	mov	cs:Prog,1
+I28N:	pop	es
 	pop	ds
 	pop	di
 	pop	si
 	pop	cx
-	jne	I28A
-	mov	cs:Prog,1
+	pop	bx
 I28A:	popf
 	pop	bp
 	cmp	cs:Prog,0
@@ -510,9 +527,6 @@ Int16:	cmp	cs:Done,0
 	pop	ax
 I16X:	jmp	cs:[Old16]
 
-SecBuf	db	512 dup (?)
-Last	label	byte			; Cells bytes, and the driver ends
-
 ;----------------------- Loading -----------------------
 Init:	mov	PktSeg,cs
 	mov	ax,3516h
@@ -529,13 +543,16 @@ Init:	mov	PktSeg,cs
 	mov	dx,offset Int28
 	mov	ax,2528h
 	int	21h
-	mov	dx,offset Last+Cells+15
+	mov	dx,Last+Cells+15
 	shr	dx,4
 	add	dx,Pad
 	mov	ax,3100h
 	int	21h
 
 ; The file is as long whatever is changed in the driver: its length shows
-; on the screen where a scenario lists the directory it is in.
+; on the screen where a scenario lists the directory it is in. And so is
+; what the driver keeps of the memory, which shows in the program's map
+; of it and decides where the program is loaded: behind the file, a
+; sector of the script and a screen.
 	db	(Start + FileLen - $) dup (0)
 	end	Start

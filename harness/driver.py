@@ -56,10 +56,9 @@ SCRIPT_DISK = 1 << 20
 # What the driver writes.
 SCREEN = COLUMNS * ROWS * 2 + 5
 
-IDLE = b"\xCD\x28"                # INT 28h
+NAME = 8                          # bytes of a program's name, as DOS has it
 COM_ORIGIN = 0x100                # where a .COM file is loaded
 EXE_HEADER = 0x20                 # of the port's VC.EXE, see tools/mkexe.c
-SIGNATURE = 6                     # bytes of code that LeaveTm is known by
 
 # Names for the keys of a US keyboard, as written in scenarios, and what
 # QEMU calls them. Letters, digits and F1-F12 name themselves.
@@ -116,7 +115,7 @@ EXTENDED = {"insert": 0x52, "delete": 0x53, "home": 0x47, "end": 0x4F,
 @dataclass(frozen=True)
 class Facts:
     """What the driver has to know of a program to watch it."""
-    signature: bytes              # the code that follows INT 28h in LeaveTm
+    name: bytes                   # its name, as DOS has it
     auto_time: int                # where AutoTim is in the main data
     clock: int                    # where Clock is there
     stack: int = 0                # where the stack begins in its segment
@@ -128,15 +127,11 @@ class Facts:
 
 
 def facts(program, stack=False):
-    """The Facts of `program`, a setups.Program, from its file and from
-    the listing of its assembly. With `stack`, where its stack is too."""
+    """The Facts of `program`, a setups.Program, from the name of its
+    file and from the listing of its assembly. With `stack`, where its
+    stack is too."""
     code = program.contents
-    if code.count(IDLE) != 1:
-        raise RuntimeError(
-            f"{program.filename} calls INT 28h in {code.count(IDLE)} places "
-            "and the driver knows the program by one: where it idles, "
-            "LeaveTm")
-    at = code.index(IDLE) + len(IDLE)
+    name = Path(program.filename).stem.upper().encode("ascii")
     if not program.listing or not Path(program.listing).exists():
         raise RuntimeError(
             f"the driver needs the listing of {program.filename}, which "
@@ -146,7 +141,7 @@ def facts(program, stack=False):
     def symbol(pattern):
         return int(re.search(pattern, text, re.M)[1], 16)
 
-    found = Facts(code[at:at + SIGNATURE],
+    found = Facts(name[:NAME].ljust(NAME, b"\0"),
                   symbol(r"^ *AutoTim [ .]*([0-9A-F]+) +DWord"),
                   symbol(r"^ *Clock [ .]*([0-9A-F]+) +Byte"))
     if stack:
@@ -252,7 +247,7 @@ def script(steps, known, blinking=False):
     out += struct.pack("<HHHH", known.auto_time,
                        known.clock if blinking else NONE,
                        known.stack, known.stack_size)
-    out += known.signature
+    out += known.name
     out += events("Enter")                      # ends the PAUSE
     for step in ("",) + tuple(steps):
         out += events(step)

@@ -305,13 +305,16 @@ port.
   of a function that returns 1 or 0 with `CMP AX,1`: `CmpSym`.
 - Nothing in the program tells the tests where it is. The driver of the
   tests (`harness/DRIVER.ASM`) watches it from inside the machine: it
-  knows the program by the code that follows `INT 28h` in `LeaveTm`,
-  which `Input0` of `port/input.c` calls every time it has gone round,
-  and it reads `AutoTim` and `Clock` in the main data, which
+  takes a call of `INT 28h` for the program's when it comes from the
+  memory of the program that DOS has as the current one, and that is
+  named as the file under test is. `LeaveTm` makes that call every time
+  `Input0` has gone round; whatever makes it has to do so with DS on the
+  main data and on the program's own stack, as C code does. And the
+  driver reads `AutoTim` and `Clock` in the main data, which
   `harness/driver.py` finds in the listing of the assembly,
-  `build/port/VC.LST`. `INT 28h` has to stay in one place of the
-  program, and when `LeaveTm` or those two variables become C,
-  `harness/driver.py` has to be shown where they are.
+  `build/port/VC.LST`, with the stack, `DataSav` and `VcStack`: when
+  those four are no longer assembly, `harness/driver.py` has to be shown
+  where they are.
 - What a routine reads in the assembly's code segment may be read by
   another file too, and then stays, `PUBLIC`, when the routine goes: the
   menu finds the menu that the mouse is on by `PtMnu_S`, the names that

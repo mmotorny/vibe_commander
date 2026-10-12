@@ -183,7 +183,7 @@ KEYBOARDS = {"ru": ("RU", 866, "KEYBRD2.SYS")}
 # stacks end, and what to write here should that have to change: the
 # memory map of the scenarios shows the driver with what it keeps, so
 # their goldens change with it.
-PLACE = {"us": 188, "ru": 233}
+PLACE = {"us": 114, "ru": 159}
 
 # What DOS runs on the test bench once it has booted. It loads the driver
 # of the tests and then waits for a key: that is where the machine's state
