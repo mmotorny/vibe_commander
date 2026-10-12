@@ -361,7 +361,7 @@ stack than the assembly it replaces, and a stack used beyond its bottom
 would overwrite data without a trace on the screen, so the port has 4,096
 bytes, of which the scenarios use some 200. The stack is the end of the
 part of the program that stays in memory while a command runs: that part
-is 19,472 bytes where it was 12,704, and a command has 6,768 bytes less
+is 19,584 bytes where it was 12,704, and a command has 6,880 bytes less
 than the original leaves it: 3,840 for the stack, and the rest because
 compiled code is longer than the assembly it replaces, and because the
 code that starts the program stays.

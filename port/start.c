@@ -24,10 +24,11 @@
 #include "vc.h"
 
 void Init00(u16 stays);
-u16 Init11(u16 stays, u16 block);
+u32 Init11(u16 stays, u16 block);
 void IniData(void);
 #pragma aux Init00  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux Init11  "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
+#pragma aux Init11  "*_c" __far parm [ax] [dx] value [dx ax] \
+                    modify exact [ax dx]
 #pragma aux IniData "*_c" __far modify exact [ax]
 
 /* AsmSeg returns the code segment of the assembly, and ResSeg the
@@ -548,12 +549,15 @@ Init04:                                 /* Output Report */
    block of the memory that the code is in, which is first cut down to
    the code: the linker's relocation table, behind it, has been used.
    Returns the segment of the main data, or 0 if there is not enough
-   memory for the least that the program needs.
+   memory for the least that the program needs, and then, in the high
+   word, how many paragraphs there were: the assembly has them in BX
+   when the part that stays says that there is no memory, where the BIOS
+   takes a page of the screen (see AlocEr of resident.c).
 
    FreMem2 is how much there was to have, in paragraphs, and FreMem1
    that or, if it is more, how large the block of the code could have
    been made. */
-u16 Init11(u16 stays, u16 block)
+u32 Init11(u16 stays, u16 block)
 {
     struct DosRegs regs;
     struct MainDat __far *data;
@@ -591,7 +595,7 @@ u16 Init11(u16 stays, u16 block)
     segment = regs.ax;
     if ((u16)(((MinView - 1) >> 4) + 1 + main_size + 2 * panel_size)
         > largest)
-        return 0;
+        return (u32)largest << 16;
     data = (struct MainDat __far *)AT(segment, 0);
     data->FreMem2 = largest;            /* Init13 */
     if (most < largest)

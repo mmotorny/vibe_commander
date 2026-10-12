@@ -335,7 +335,7 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   checks the number itself: that the port has less by what it is larger,
   at least. The same goes for what `mem` says in the scenario `command`,
   416K free under the original and some 7K less under the port, whose
-  part that stays is 6,768 bytes longer, 3,840 of them its stack. With
+  part that stays is 6,880 bytes longer, 3,840 of them its stack. With
   those numbers left out,
   no scenario shows any more that the program gives up its memory while
   a command runs: a check of its own would hold the port's figure
@@ -1234,10 +1234,15 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     at all and nothing is said: the prompt and the command are shown,
     and the program comes back. In `quick`.
   - The texts that the part that stays writes by itself, "Can't find
-    the file" and the others, are written with whatever BH holds for
-    the page of the screen: half of an address. The C hands the BIOS
-    page 0 there. The BIOS of the bench, like most, writes to the page
-    that shows whatever it is told, so no scenario can tell.
+    the file" and the others, and the commands it shows, are written
+    with whatever BH holds for the page of the screen: half of an
+    address of its own, or of a number that DOS answered. The C hands
+    the BIOS the same at each place, the address as the original has
+    it: 2Bh where a file was to be run, the high byte of where the
+    command lies for a prompt, 3 where there is no memory at the start.
+    The BIOS of the bench, like most, writes to the page that shows
+    whatever it is told, so no scenario can tell, and this rests on
+    reading the original's listing.
   - When DOS ends the program by itself and goes on at the address
     that the program keeps in its PSP for that, the program that
     started this one gets the registers as the assembly left them, in
@@ -1289,14 +1294,6 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     original's second copy was not full for INT 27h where the port's
     was. A watcher that runs the second copy itself, as its parent,
     would be on no list. The second rests on reading.
-  - The texts that the part writes by itself, "Can't find the file",
-    "There is not enough memory to run this command" and the others,
-    go to page 0 of the screen. The assembly handed the BIOS for a
-    page whatever BH held, the high byte of an address of its own
-    layout; most BIOSes, that of the bench among them, write to the
-    page that shows whatever they are told. As the original: no
-    assembly, the original's byte as a constant at each place that
-    writes one, read from its listing.
   - Where DOS has ended the program by itself and goes on at the
     address that the program keeps in its PSP for that, the program
     that started this one gets every register as DOS had it. The

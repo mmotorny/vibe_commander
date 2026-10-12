@@ -679,6 +679,9 @@ Init00:	CLD
 ; The block of the memory that this code is in goes to the C in DX. What
 ; comes back is the segment of the main data, or 0 if there is too
 ; little memory: the part that stays says so and ends the program.
+; DX is then how many paragraphs there were, and goes back to that
+; part as it is, through AlocEr there: the original has them in BX
+; when it says so, where the BIOS takes a page.
 Init11:	CLD
 	MOV	AX,SS
 	MOV	DX,CS

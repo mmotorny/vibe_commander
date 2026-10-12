@@ -181,6 +181,15 @@ extern const u8 __near Vers_S[];
 #define FLAGS_RESULT (FLAG_CARRY | FLAG_PARITY | FLAG_AUX | FLAG_ZERO \
                       | FLAG_SIGN | FLAG_OVERFLOW)
 
+/* Where things are in the original, as it was shipped: what its
+   registers hold when it calls the BIOS with them unset, and the BIOS
+   takes them for a page of the screen and a colour. ComnIni is at 25E5h
+   there and laid out as here; the part that stays is 31Ah paragraphs. */
+#define COMNINI_WAS 0x25E5
+#define WAS(address) ((u16)(address) - (u16)&ComnIni + COMNINI_WAS)
+#define EPB_WAS     WAS(&ComnIni.EPB)
+#define RESPARS_WAS 0x031A
+
 /* A record of a program that has stayed in the memory, in a segment of
    its own behind what the program keeps: the program's PSP, its name,
    how many interrupts it has taken, then for each its number and where
@@ -743,23 +752,27 @@ static u16 OutStr(const u8 __far *text, u16 bx)
     return (u16)(u32)text;
 }
 
-/* This segment's own texts go to the page 0.
+/* The same for a text of this segment.
 
-   Ported as it is, nearly: the assembly hands the BIOS for a page
-   whatever BH holds where it writes these, half of an address. The BIOS
-   of the bench writes to the page that shows, whatever it is told. */
-static void OutStr0(const u8 *text)
+   Ported as it is: the assembly sets no page where it writes these and
+   the commands, and hands the BIOS whatever BH holds, half of an
+   address of its own or of a number that DOS answered. Each place that
+   writes has in `bx` what the assembly has in BX there, an address as
+   it is in the original. Most BIOSes, that of the bench among them,
+   write to the page that shows, whatever they are told. */
+static void OutStr0(const u8 *text, u16 bx)
 {
-    OutStr((const u8 __far *)text, 0);
+    OutStr((const u8 __far *)text, bx);
 }
 
 /* Say that the file `name` is missing, after `text`, and wait for Enter
-   or Esc: 1 for Esc, to give up. */
+   or Esc: 1 for Esc, to give up. Both places that call have the address
+   of ComnIni.EPB in BX, which DOS was to run the file with. */
 static u16 NotFind(const u8 *text, const u8 __far *name)
 {
-    OutStr0(text);
-    OutStr(name, 0);
-    OutStr0(Retr_S);
+    OutStr0(text, EPB_WAS);
+    OutStr(name, EPB_WAS);
+    OutStr0(Retr_S, EPB_WAS);
     for (;;) {
         u8 key = (u8)Int16(0);
 
@@ -865,9 +878,11 @@ void __interrupt __far Exit05(struct Saved r, struct Frame on)
     on.flags &= ~FLAG_CARRY;
 }
 
-static void AlocEr(void)
+/* No memory: say so and leave. `bx` is what the assembly has in BX
+   where it jumps here, a number of DOS's or an address. */
+static void AlocEr(u16 bx)
 {
-    OutStr0(Aloc_S);
+    OutStr0(Aloc_S, bx);
     Exit00(1);
 }
 #pragma aux AlocEr aborts
@@ -978,7 +993,7 @@ static void Exec02(u16 behind)
                 if (!failed)
                     break;
                 if (regs.ax > 3) {
-                    OutStr0(NoRun_S);
+                    OutStr0(NoRun_S, EPB_WAS);
                     return;
                 }
             }
@@ -995,7 +1010,8 @@ static void Exec02(u16 behind)
             continue;
         }
         /* Exec08: the prompt, made where the interrupts are noted when a
-           program is run, and the command behind it. */
+           program is run, and the command behind it. BX is the address
+           of the command, for the texts and for the end of the line. */
         to = (u8 *)IntTab;
         *to++ = 0x0D;
         *to++ = 0x0A;
@@ -1015,10 +1031,11 @@ static void Exec02(u16 behind)
         }
         *to++ = '>';                    /* Exec09 */
         *to = 0;
-        OutStr0((const u8 *)IntTab);
-        OutStr0((const u8 *)ComnIni.BatAdr);
+        OutStr0((const u8 *)IntTab, WAS(ComnIni.BatAdr));
+        OutStr0((const u8 *)ComnIni.BatAdr, WAS(ComnIni.BatAdr));
         bios.ax = 0x0E0D;
-        bios.bx = bios.cx = bios.dx = 0;
+        bios.bx = WAS(ComnIni.BatAdr);
+        bios.cx = bios.dx = 0;
         Int10(&bios);
         bios.ax = 0x0E0A;
         Int10(&bios);
@@ -1076,8 +1093,15 @@ static void Exec10(void)
     block = regs.ax;
     SetStat(state);
     RunPar = block - TrnPrW;
-    if (block < TrnPrW)
-        AlocEr();
+    if (block < TrnPrW) {
+        /* BX is what setting DOS's way of looking for memory back has
+           left there, whether the upper memory was in the chain; or,
+           with a DOS that knows of none, the largest block that DOS
+           said it has. */
+        if (state == 0xFFFF)
+            AlocEr(regs.bx);
+        AlocEr(state & 0xFF);
+    }
     for (;;) {                          /* Exec12 */
         *(u16 *)ComnIni.DosBuf = ImgEnd;
         *(u16 *)(OvlPrm + OvlPrm[0] - 1) = RES_SEG;
@@ -1095,7 +1119,7 @@ static void Exec10(void)
                 return;
             }
         } else if ((u8)regs.ax > 3) {
-            AlocEr();
+            AlocEr(EPB_WAS);
         }
         if (NotFind(BadFl_S, file))     /* Exec13: VC.EXE not found */
             Exit00(1);
@@ -1124,15 +1148,18 @@ static void Exec(void)
 
 /*--------------------- The outermost loop ---------------------
    The part that goes is called far, in the segment RunPar, and comes
-   back when it has something for this part to do: a number in AX. It
+   back when it has something for this part to do: a number in AX, the
+   low word. With no memory for the main data it has in DX, the high
+   word, the paragraphs that DOS had, as Init11 of start.c returns them
+   and its stub leaves them: what the assembly has in BX there. It
    leaves no register as it was but SS and SP, and DS is put back by
    where it comes back through (Exec, AlocEr and Exit00 in RHEAD of
    port/asm/VC.ASM). So nothing here may be kept in a register or on the
    stack across the call, BP among them, which the compiler takes to be
    kept whatever is said: where to call is in memory, TrnAdr, and Stay
    and Stay11 have no variables. */
-typedef u16 __far Transit(void);
-#pragma aux Transit value [ax] modify exact [ax bx cx dx si di es]
+typedef u32 __far Transit(void);
+#pragma aux Transit value [dx ax] modify exact [ax bx cx dx si di es]
 
 #define TO_EXEC  0x100                  /* run the commands of DosBuf */
 #define TO_ALLOC 0x200                  /* there is no memory for the main
@@ -1142,12 +1169,14 @@ typedef u16 __far Transit(void);
 extern Transit * __near TrnAdr;
 #pragma aux TrnAdr "*"
 
-static void Go(u16 what)
+static void Go(u32 back)
 {
+    u16 what = (u16)back;
+
     if (what == TO_EXEC)
         Exec();
     else if (what == TO_ALLOC)
-        AlocEr();
+        AlocEr((u16)(back >> 16));
     else
         Exit00(what);
 }
@@ -1227,7 +1256,8 @@ static void Alloc9(void)
 {
     struct DosRegs regs;
 
-    OutStr0(Aloc_S);
+    OutStr0(Aloc_S, RESPARS_WAS);       /* BX: the paragraphs of the part
+                                           that stays */
     SetStat(0);
     regs.ax = DOS_EXIT + 1;
     Int21e(&regs);
@@ -1314,7 +1344,7 @@ void Alloc0(void)
         Int21e(&regs);
     }
     if (((regs.ax & 0xFF) << 8 | regs.ax >> 8) < 0x314) {
-        OutStr0(Vers_S);
+        OutStr0(Vers_S, regs.bx);       /* BX: as DOS answered */
         regs.ax = DOS_EXIT + 2;
         Int21e(&regs);
     }
