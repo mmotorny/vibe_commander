@@ -17,19 +17,12 @@
 
 #define SIZE_FILENT sizeof(struct FILENT)
 
-void SetMask(u16 panel);
 u16 TstExe(const u8 __far *name);
-void Sort(u16 panel);
-u16 FnFile(u16 panel, const u8 __far *name);
-u16 NearFl(u16 panel, const u8 __far *name, u16 end);
 u32 TotSel(u16 panel);
 
-/* How the assembly passes arguments to these, and what it expects back. */
-#pragma aux SetMask "*_c" __far parm [ax] modify exact [ax]
+/* How the assembly passes arguments to these, and what it expects back;
+   SetMask, Sort, FnFile and NearFl are in vc.h. */
 #pragma aux TstExe  "*_c" __far parm [dx si] value [ax] modify exact [ax]
-#pragma aux Sort    "*_c" __far parm [ax] modify exact [ax]
-#pragma aux FnFile  "*_c" __far parm [dx] [es di] value [si] modify exact [si]
-#pragma aux NearFl  "*_c" __far parm [dx] [es di] [bx] value [ax] modify exact [ax]
 #pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 
 /* The extensions of programs. Names in a list are in small letters. */

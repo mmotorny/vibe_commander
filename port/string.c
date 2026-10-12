@@ -12,9 +12,7 @@
 
 void FilZero(u8 __far *text, u16 length);
 u16 StrLen(const u8 __far *text);
-u16 LowCase(u16 letter);
 const u8 __far *FndLet(const u8 __far *text);
-const u8 __far *CutPath(const u8 __far *path);
 void NormStr(u8 __far *text);
 void PathLin(u8 __far *text);
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
@@ -25,9 +23,7 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);
    MvzLine, LetLin and ShrtLin are in vc.h. */
 #pragma aux FilZero "*_c" __far parm [es si] [cx] modify exact [ax]
 #pragma aux StrLen  "*_c" __far parm [es di] value [cx] modify exact [cx]
-#pragma aux LowCase "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
-#pragma aux CutPath "*_c" __far parm [es si] value [es si] modify exact [si es]
 #pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
 #pragma aux PathLin "*_c" __far parm [es si] modify exact [ax]
 #pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]

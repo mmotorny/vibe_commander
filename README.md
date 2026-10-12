@@ -66,9 +66,12 @@ in, those that read and write hex digits and numbers and hold a file name
 against a mask, those that filter and sort the list of files of a panel and
 find a file in it, those that say where the panels are and where in them
 the cursor is, those that draw a panel of files: its frame, its path, its
-files, its status line and the cursor, and those that draw what a panel
+files, its status line and the cursor, those that draw what a panel
 shows instead of files: the tree of directories, with the cursor on the
-current directory, and the Info.
+current directory, and the Info, and those that read from the disk what a
+panel shows: the files of a directory with its extension file and the
+sizes of its directories, and for the Info the sizes of the disk, its
+label and the text of dirinfo. Reading the tree is still assembly.
 
 ## Layout
 

@@ -335,6 +335,42 @@ u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width);
    below it. */
 u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width);
 #pragma aux BoxDubl "*_a" __far parm [di] [ax] [si] [cx] [dx] value [di] modify exact [di es]
+void Beep(void);                        /* if errors are to sound */
+#pragma aux Beep "*_a" __far modify exact [es]
+void SetDTA(void);                      /* have DOS put what it finds at DTA */
+#pragma aux SetDTA "*_a" __far modify exact [es]
+/* Ask for the disk of a drive that shares a floppy drive with another, if
+   that is in it: 1 for A:. Not 0 if the user would not change it. */
+u16 Fantom(u16 drive);
+#pragma aux Fantom "*_a" __far parm [ax] value [ax] modify exact [ax es]
+
+/* The registers of a call of DOS, as the entry of Intr21 takes them off
+   the stack. DS goes with DX: a pointer to what DOS takes there, a name
+   or a buffer, sets both. */
+struct DosRegs {
+    u16 ax, bx, cx;
+    const u8 __far *name;               /* DX, and DS behind it */
+    u16 si, di;
+};
+
+/* Call DOS, with ES on the main data. AX, BX, CX and DX come back in
+   `regs`, DX where the offset of `name` was. Not 0 if DOS set the carry
+   flag: AX is its error then, or 53h for a drive that is not ready. */
+u16 Intr21(struct DosRegs STACK *regs);
+#pragma aux Intr21 "*_a" __far parm [bx] value [ax] modify exact [ax bx cx dx si di es]
+/* Open a file, `mode` as DOS takes it in AL; where others have the file
+   open and the mode asks to share it, without sharing. Returns the handle
+   in the low word, or the error there and something that is not 0 in the
+   high one. */
+u32 OpenFil(const u8 __far *name, u16 mode);
+#pragma aux OpenFil "*_a" __far parm [dx bx] [ax] value [dx ax] modify exact [ax dx es]
+/* Where the routine is that DirSize has DirFunc call for every file, and a
+   call of what FncAddr names, for a file with these attributes at TmpBuf:
+   the high byte of what it returns is not 0 to stop. */
+u16 DiSi10(void);
+u16 FncCall(u16 attributes);
+#pragma aux DiSi10  "*_o" __far value [ax] modify exact [ax]
+#pragma aux FncCall "*_a" __far parm [ax] value [ax] modify exact [ax es]
 
 /* A line as the assembly hands it over: the registers that describe it,
    pushed in this order by CallLine in port/asm/VC.ASM. */
@@ -383,16 +419,28 @@ void CntLine(struct LineArgs STACK *args);
 #pragma aux CntLine "*_c" __far parm [bx] modify exact [ax bx cx dx es]
 u8 __far *AddFile(u8 __far *end);                       /* string.c */
 u8 __far *MvzLine(u8 __far *to, const u8 __far *from, u16 length);
+u16 LowCase(u16 letter);
+const u8 __far *CutPath(const u8 __far *path);
 void LetLin(u8 __far *text);
 void ShrtLin(u8 __far *text, u16 limit);
 #pragma aux AddFile "*_c" __far parm [es di] value [es di] modify exact [di es]
 #pragma aux MvzLine "*_c" __far parm [es di] [dx si] [cx] value [es di] modify exact [di es]
+#pragma aux LowCase "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux CutPath "*_c" __far parm [es si] value [es si] modify exact [si es]
 #pragma aux LetLin  "*_c" __far parm [es si] modify exact [ax]
 #pragma aux ShrtLin "*_c" __far parm [es si] [ax] modify exact [ax]
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */
 u16 *SzDtTm(const struct FILENT __far *file, u16 *screen, u16 color);
 #pragma aux Number  "*_c" __far parm [di] [bx] [cx] [ax] value [di] modify exact [di]
 #pragma aux SzDtTm  "*_c" __far parm [es si] [di] [ax] value [di] modify exact [di es]
+void SetMask(u16 panel);                                /* files.c */
+void Sort(u16 panel);
+u16 FnFile(u16 panel, const u8 __far *name);
+u16 NearFl(u16 panel, const u8 __far *name, u16 end);
+#pragma aux SetMask "*_c" __far parm [ax] modify exact [ax]
+#pragma aux Sort    "*_c" __far parm [ax] modify exact [ax]
+#pragma aux FnFile  "*_c" __far parm [dx] [es di] value [si] modify exact [si]
+#pragma aux NearFl  "*_c" __far parm [dx] [es di] [bx] value [ax] modify exact [ax]
 u16 BegBX(u16 panel);                                   /* place.c */
 u16 SizDX(void);
 u16 LnsAX(void);

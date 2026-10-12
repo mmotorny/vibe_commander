@@ -10,429 +10,38 @@ Mask_S	DB	'\*.*',0
 Ext_F	DB	'VC.EXT',0
 
 	.CODE
+;			   ES - main data
+;	Return :	CY=0 - what the panel shows has been read
 ReDir	PROC	NEAR
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
 	MOV	DS:ChgFlg,1
 	CMP	DS:WinTyp,0
-	JE	ReDr00
-	JMP	RdTree
-ReDr00:	PUSH	AX			; Expand WCB
-	MOV	BP,ES
-	ADD	BP,ES:FreMem2
-	MOV	AX,MinView-1
-	MOV	CL,4
-	SHR	AX,CL
-	INC	AX
-	SUB	BP,AX
-	MOV	CX,DS
-	ADD	CX,1000h
-	MOV	AX,DS
-	MOV	BX,ES:WCB1seg
-	CMP	AX,BX
-	JB	ReDr03
-	MOV	BX,ES:WCB2seg
-	CMP	AX,BX
-	JB	ReDr03
-	CMP	BP,CX
-	JBE	ReDr02
-	MOV	BP,CX
-ReDr02:	MOV	ES:ViewSeg,BP
-	JMP	ReDr08
-ReDr03:	MOV	AX,ES:ViewSeg
-	SUB	AX,BX
-	SUB	BP,AX
-	CMP	BP,CX
-	JBE	ReDr04
-	MOV	BP,CX
-ReDr04:	PUSH	AX
-	ADD	AX,BP
-	MOV	ES:ViewSeg,AX
-	POP	AX
-	MOV	CL,4
-	SHL	AX,CL
-	MOV	CX,AX
-	MOV	SI,AX
-	DEC	SI
-	MOV	DI,SI
-	PUSH	DS
-	PUSH	ES
-	MOV	DS,BX
-	MOV	ES,BP
-	STD
-	REP	MOVSB
-	CLD
-	POP	ES
-	POP	DS
-	CMP	BX,ES:WCB1seg
-	JNE	ReDr05
-	MOV	ES:WCB1seg,BP
-ReDr05:	CMP	BX,ES:WCB2seg
-	JNE	ReDr06
-	MOV	ES:WCB2seg,BP
-ReDr06:	CMP	BX,ES:WCBcrn
-	JNE	ReDr07
-	MOV	ES:WCBcrn,BP
-ReDr07:	CMP	BX,ES:WCBsec
-	JNE	ReDr08
-	MOV	ES:WCBsec,BP
-ReDr08:	MOV	AX,DS			; Save old files
-	SUB	BP,AX
-	CMP	BP,0FFFh
-	JBE	ReDr09
-	MOV	BP,0FFFh
-ReDr09:	MOV	CL,4
-	SHL	BP,CL
-	SUB	BP,SIZE FilEnt + SIZE FilEnt
-	POP	AX
-	MOV	SI,OFFSET DskBuf
-	XOR	DI,DI
-	PUSH	SI
-	PUSH	DI
-	PUSH	AX
-	MOV	BX,ES:ViewSeg
-	MOV	AX,ES
-	SUB	BX,AX
-	MOV	AX,ES:FreMem2
-	SUB	AX,BX
-	CMP	AX,0FFFh
-	JBE	ReDr10
-	MOV	AX,0FFFh
-ReDr10:	MOV	CL,4
-	SHL	AX,CL
-	MOV	CX,SIZE FilEnt
-	XOR	DX,DX
-	DIV	CX
-	MUL	CX
-	MOV	CX,DS:EndBuf
-	SUB	CX,SI
-	MOV	BX,DS:CurAdr
-	MOV	DX,DS:First
-	CMP	CX,AX
-	JBE	ReDr11
-	MOV	CX,AX
-	ADD	AX,SI
-	SUB	AX,WORD PTR (SIZE FilEnt)
-	CMP	BX,AX
-	JBE	ReDr11
-	MOV	BX,AX
-	CMP	DX,AX
-	JBE	ReDr11
-	MOV	DX,AX
-ReDr11:	PUSH	CX
-	PUSH	ES
-	MOV	ES,ES:ViewSeg
-	REP	MOVSB
-	POP	ES
-	POP	CX
-	ADD	CX,OFFSET DskBuf
-	XCHG	BX,CX
-	POP	AX
-	MOV	AH,0			; Read directory
+	JNE	ReDr01
 	PUSH	DX
-	PUSH	CX
 	PUSH	BX
-	PUSH	AX
-ReDr20:	MOV	SI,OFFSET WinPath
-	MOV	DI,OFFSET TmpBuf
-	MOV	DX,DI
-	CALL	MvzLin0
-	CALL	AddFile
-	PUSH	DS
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET Mask_S+1
-	CALL	MvzLin0
-	POP	DS
-	XOR	BX,BX
-	MOV	DI,OFFSET DskBuf
-	CMP	BL,DS:WinPath[3]
-	JE	ReDr21
-	PUSH	ES
-	PUSH	DS
-	POP	ES
-	MOV	AL,'.'
-	STOSB
-	STOSB
-	MOV	CX,SIZE FilEnt-2
-	MOV	AL,0
-	REP	STOSB
-	MOV	BYTE PTR DS:[DI-SIZE FilEnt+13],10h
-	MOV	WORD PTR DS:[DI-SIZE FilEnt+16],182Fh
-	INC	BX
-	POP	ES
-ReDr21:	MOV	AL,DS:WinPath
-	SUB	AL,'A'-1
-	CALL	Fantom
-	JC	ReDr26
-	CALL	SetDTA
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	POP	ES
-	MOV	CX,37h
-	MOV	AH,4Eh
-	CALL	Intr21
-	JNC	ReDr27
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	POP	ES
-	CMP	AX,WORD PTR 12h
-	JNE	ReDr22
-	JMP	ReDr34
-ReDr22:	CMP	AX,WORD PTR 3
-	JNE	ReDr26
-	POP	AX
-	MOV	AL,0
-	INC	AH
-	CMP	AH,2
-	PUSH	AX
-	JA	ReDr26
-	JB	ReDr24
-ReDr23:	MOV	AL,ES:DosPth[0]
-	MOV	DS:WinPath[0],AL
-	MOV	DS:WinPath[3],0
-ReDr24:	MOV	AL,DS:WinPath[0]
-	SUB	AL,'A'-1
-	CALL	Fantom
-	JC	ReDr26
-	MOV	SI,OFFSET WinPath+3
-	MOV	DL,AL
-	MOV	AH,47h
-	CALL	Intr21
-	JC	ReDr25
-	JMP	ReDr20
-ReDr25:	CMP	AX,WORD PTR 0Fh
-	JE	ReDr23
-ReDr26:	POP	AX
-	MOV	AL,0
-	PUSH	AX
-	JMP	ReDr35
-ReDr27:	MOV	DS:BlocEr,0		; Save entry
-	MOV	SI,OFFSET DTA.FilName
-	MOV	AH,DS:DTA.FilAttr
-	CMP	BYTE PTR DS:[SI],'.'
-	JNE	ReDr28
-	TEST	AH,10h
-	JZ	ReDr28
-	CMP	DS:WinPath[3],0
-	JE	ReDr32
-	PUSH	DI
-	AND	DS:DTA.FilAttr,0F9h
-	MOV	DI,OFFSET DskBuf.AttrF
-	JMP	ReDr31
-ReDr28:	MOV	ES:[DI].NumbF,BX
-	INC	BX
-	LEA	CX,[DI+SIZE FilEnt]
-	PUSH	CX
-	MOV	CX,13
-ReDr29:	LODSB
-	TEST	AH,10h
-	JNZ	ReDr30
-	PUSH	ES
-	PUSH	DS
-	POP	ES
-	CALL	LowCase
-	POP	ES
-ReDr30:	STOSB
-	LOOP	ReDr29
-ReDr31:	MOV	SI,OFFSET DTA.FilAttr
-	AND	BYTE PTR DS:[SI],3Fh
-	MOV	CX,9
-	REP	MOVSB
-	POP	DI
-ReDr32:	MOV	AH,4Fh			; Find next
-	CALL	Intr21
-	JC	ReDr33
-	CMP	DI,BP
-	JB	ReDr27
-	CALL	Beep
-ReDr33:	PUSH	DS
-	PUSH	ES
-	POP	DS
-	POP	ES
-	JNC	ReDr34
-	CMP	AX,WORD PTR 12h
-	JNE	ReDr35
-ReDr34:	MOV	DS:ChgFlg,0
-ReDr35:	MOV	DS:EndFul,DI
-	MOV	DS:EndBuf,DI
-	MOV	SI,OFFSET DskBuf
-	MOV	DS:CurAdr,SI
-	MOV	DS:First,SI
-	MOV	ES:BlocEr,0
-	CMP	DS:ChgFlg,0		; Read local extension file
-	JNZ	ReDr42
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	DX,OFFSET TmpBuf
-	MOV	SI,DX
-	CALL	CutPath
-	PUSH	CS
-	POP	DS
-	MOV	DI,SI
-	MOV	SI,OFFSET Ext_F
-	CALL	MvzLin0
-	PUSH	ES
-	POP	DS
-	MOV	AL,40h
-	CALL	OpenFil
-	POP	DS
-	JC	ReDr41
-	MOV	BX,AX
-	MOV	DX,OFFSET ExtBuf
-	MOV	CX,LenExt-1
-	MOV	AH,3Fh
-	CALL	Intr21
-	PUSHF
-	PUSH	AX
-	MOV	AH,3Eh
-	CALL	Intr21
+	SUB	SP,8			; struct OldList of port/read.c
+	MOV	BX,SP
+	MOV	DX,DS
+	CallC	ReDir_c			; The files: read them,
+	CallC	ReDr45_c		; filter and sort them,
+	CallC	ReDr50_c		; and give them what the old had
+	ADD	SP,8
 	POP	BX
-	POP	CX
-	JC	ReDr41
-	PUSH	CX
-	POPF
-	JC	ReDr41
-	MOV	BYTE PTR DS:ExtBuf[BX],1Ah
-	JMP	ReDr45
-ReDr41:	CMP	AL,53h
-	JNE	ReDr42
-	MOV	DS:ChgFlg,1
-ReDr42:	MOV	SI,OFFSET ExtMain
-	MOV	DI,OFFSET ExtBuf
-	MOV	CX,LenExt
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	POP	ES
-	REP	MOVSB
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	POP	ES
-ReDr45:	MOV	AL,0			; Scan directory sizes
-	MOV	DS:SizDir,AL
-	CMP	AL,DS:ChgFlg
-	JNZ	ReDr46
-	CMP	AL,ES:AutoSiz
-	JZ	ReDr46
-	CALL	DirSize
-ReDr46:	CALL	SetMask
-	CALL	Sort
-	POP	AX
-	POP	BX
-	POP	CX
 	POP	DX
-	POP	DI
-	POP	SI
-	SUB	BX,SI			; Restore cursor, selection
-	SUB	CX,SI
-	SUB	DX,SI
-	PUSH	ES
-	MOV	ES,ES:ViewSeg
-	JMP	ReDr53
-ReDr50:	MOV	AH,ES:[DI].AttrF
-	AND	AH,0C0h
-	JZ	ReDr52
-	CMP	AL,0
-	JNZ	ReDr51
-	AND	AH,80h
-	JZ	ReDr52
-ReDr51:	CALL	FnFile
-	JNC	ReDr52
-	OR	DS:[SI].AttrF,AH
-ReDr52:	ADD	DI,SIZE FilEnt
-ReDr53:	CMP	DI,BX
-	JB	ReDr50
-	CMP	AL,0
-	JZ	ReDr55
-	MOV	DI,CX
-	CALL	NearFl
-	MOV	CX,DS:CurAdr
-	JNC	ReDr54
-	MOV	CX,SI
-	MOV	DS:CurAdr,CX
-ReDr54:	MOV	DI,DX
-	CALL	NearFl
-	JNC	ReDr55
-	MOV	DS:First,SI
-ReDr55:	POP	ES
-	MOV	DI,DS:EndFul		; Compress WCB
-	ADD	DI,SIZE FilEnt
-	MOV	CL,4
-	DEC	DI
-	MOV	DX,SIZE WCBdef - 1
-	CMP	DI,DX
-	JAE	ReDr60
-	MOV	DI,DX
-ReDr60:	SHR	DI,CL
-	INC	DI
-	MOV	AX,DS
-	ADD	DI,AX
-	MOV	BP,DI
-	MOV	BX,ES:WCB1seg
-	CMP	AX,BX
-	JB	ReDr61
-	MOV	BX,ES:WCB2seg
-	CMP	AX,BX
-	JAE	ReDr65
-ReDr61:	MOV	AX,ES:ViewSeg
-	SUB	AX,BX
-	MOV	DX,BP
-	ADD	BP,AX
-	SHL	AX,CL
-	MOV	CX,AX
-	MOV	SI,0
-	MOV	DI,SI
-	PUSH	DS
-	PUSH	ES
-	MOV	DS,BX
-	MOV	ES,DX
-	CLD
-	REP	MOVSB
-	POP	ES
-	POP	DS
-	CMP	BX,ES:WCB1seg
-	JNE	ReDr62
-	MOV	ES:WCB1seg,DX
-ReDr62:	CMP	BX,ES:WCB2seg
-	JNE	ReDr63
-	MOV	ES:WCB2seg,DX
-ReDr63:	CMP	BX,ES:WCBcrn
-	JNE	ReDr64
-	MOV	ES:WCBcrn,DX
-ReDr64:	CMP	BX,ES:WCBsec
-	JNE	ReDr65
-	MOV	ES:WCBsec,DX
-ReDr65:	MOV	ES:ViewSeg,BP
-	CALL	CorPar
+	JMP	ReDr70
+ReDr01:	CMP	DS:WinTyp,1
+	JNE	ReDr02
+	CALL	ReadTre			; The tree
+	JC	ReDr70
+	MOV	DS:ChgFlg,0
+	JMP	ReDr70
+ReDr02:	MOV	AX,DS
+	CallC	RdInfo_c		; The Info
 ReDr70:	CMP	DS:ChgFlg,1		; Exit
 	CMC
 	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
 	RET
 ReDir	ENDP
-
-RdTree:	CMP	DS:WinTyp,1
-	JE	RdTre0
-	JMP	RdInfo
-RdTre0:	CALL	ReadTre
-	JC	RdTre1
-	MOV	DS:ChgFlg,0
-RdTre1:	JMP	ReDr70
 
 TreeErr	EQU	BYTE PTR TreHead[0]
 TreeLev	EQU	BYTE PTR TreHead[1]
@@ -860,69 +469,6 @@ TrCr20	ENDP
 DrIn_F	DB	'DIRINFO',0
 
 	.CODE
-RdInfo:	PUSH	DS
-	CMP	DS:WinTyp,2
-	JE	RdInf0
-	JMP	RdInf4
-RdInf0:	PUSH	ES
-	POP	DS
-	MOV	DS:ClstSiz,1
-	MOV	DS:Total,0
-	MOV	DS:FreeDsk,0
-	MOV	DS:InfoLen,0FFFFh
-	MOV	DS:Volume[0],0
-	MOV	AL,DS:DosPth[0]
-	SUB	AL,'A'-1
-	MOV	DL,AL
-	CALL	Fantom
-	JC	RdInf4
-	MOV	AH,36h
-	CALL	Intr21
-	JC	RdInf4
-	CMP	AX,WORD PTR 0FFFFh
-	JE	RdInf4
-	MOV	DS:Total,DX
-	MOV	DS:FreeDsk,BX
-	MUL	CX
-	MOV	DS:ClstSiz,AX
-	PUSH	CS
-	POP	DS
-	MOV	DX,OFFSET DrIn_F
-	MOV	AL,40h
-	CALL	OpenFil
-	PUSH	ES
-	POP	DS
-	JNC	RdInf1
-	CMP	AX,WORD PTR 2
-	JE	RdInf2
-	JMP	RdInf4
-RdInf1:	MOV	BX,AX
-	MOV	DX,OFFSET InfBuf
-	MOV	CX,(MaxLins-13)*38
-	MOV	AH,3Fh
-	CALL	Intr21
-	PUSHF
-	PUSH	AX
-	MOV	AH,3Eh
-	CALL	Intr21
-	POP	AX
-	POP	CX
-	JC	RdInf4
-	PUSH	CX
-	POPF
-	JC	RdInf4
-	MOV	DS:InfoLen,AX
-RdInf2:	MOV	SI,OFFSET Volume
-	CALL	GetVol
-	JNC	RdInf3
-	CMP	AX,WORD PTR 53h
-	JE	RdInf4
-RdInf3:	POP	DS
-	MOV	DS:ChgFlg,0
-	PUSH	DS
-RdInf4:	POP	DS
-	JMP	ReDr70
-
 ;---------------------- Output files -------------------
 ;			   DS - WCBseg
 PutFls	PROC	NEAR
@@ -1206,6 +752,7 @@ Fantm2:	POP	AX
 	POP	DS
 	RET
 Fantom	ENDP
+	FromC	Fantom, <SBB AX,AX>	; CY as a number
 
 ChgDisk	PROC	NEAR
 	PUSH	BX
@@ -1702,65 +1249,33 @@ ChTr50	PROC	NEAR
 	RET
 ChTr50	ENDP
 
+;	Work out the sizes of the directories of a panel
+;			   DS - WCBseg
+;			   ES - main data
 DirSize	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	MOV	ES:FncAddr,OFFSET DiSi10
-	MOV	SI,OFFSET WinPath
-	MOV	DI,OFFSET TmpBuf
-	MOV	CX,LenPath
-	CALL	MvzLine
-	MOV	SI,OFFSET DskBuf
-	MOV	AX,'\'
-	CMP	AL,ES:[DI-1]
-	JE	DiSi01
-	STOSW
-DiSi01:	CMP	SI,DS:EndFul
-	JAE	DiSi03
-	TEST	BYTE PTR DS:[SI+13],10h
-	JZ	DiSi02
-	CMP	BYTE PTR DS:[SI],'.'
-	JE	DiSi02
-	MOV	WORD PTR ES:[TmpBuf+90],0
-	MOV	WORD PTR ES:[TmpBuf+92],0
-	PUSH	SI
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	SI,OFFSET TmpBuf
-	CALL	CutPath
-	MOV	DI,SI
-	POP	DS
-	POP	SI
-	PUSH	SI
-	MOV	CX,13
-	REP	MOVSB
-	POP	SI
-	MOV	AL,10h
-	CALL	ES:FncAddr
-	CMP	AH,0
-	JNZ	DiSi04
-	MOV	AX,WORD PTR ES:[TmpBuf+90]
-	MOV	DS:[SI+18],AX
-	MOV	AX,WORD PTR ES:[TmpBuf+92]
-	MOV	DS:[SI+20],AX
-DiSi02:	ADD	SI,SIZE FilEnt
-	JMP	DiSi01
-DiSi03:	MOV	BYTE PTR DS:SizDir,1
-DiSi04:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
+	MOV	AX,DS
+	CallC	DirSize_c
+	POP	AX
 	RET
 DirSize	ENDP
+
+; For DirSize in C: where DiSi10 is, to put into FncAddr, and a call of
+; what FncAddr names, with the attributes of a file in AL.
+	PUBLIC	DiSi10_o, FncCall_a
+DiSi10_o PROC	FAR
+	MOV	AX,OFFSET DiSi10
+	RET
+DiSi10_o ENDP
+
+FncCall_a PROC	FAR
+	PUSH	BP
+	PUSH	DS
+	POP	ES
+	CALL	ES:FncAddr
+	POP	BP
+	RET
+FncCall_a ENDP
 
 DiSi10	PROC	NEAR
 	PUSH	DS
@@ -1792,64 +1307,16 @@ DiSi13:	POP	BX
 	RET
 DiSi10	ENDP
 
+;	Get the label of the current drive
+;			ES:SI - where to put it
+;	Return :	   CY - 0 for a drive of a network
+;			   AX - with CY, see GetVol in port/read.c
 GetVol	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
 	PUSH	DX
-	PUSH	CX
-	PUSH	ES
-	POP	DS
-	MOV	BYTE PTR DS:[SI],0
-	PUSH	SI
-	MOV	SI,OFFSET TmpErr
-	MOV	WORD PTR DS:[SI],'A'
-	MOV	DI,OFFSET TmpErr+100
-	MOV	AH,60h
-	CALL	Intr21
-	POP	SI
-	JC	GetVl6
-	MOV	AX,'\\'
-	SCASW
-	JNE	GetVl2
-	MOV	CX,100
-	REPNE	SCASB
-	XCHG	SI,DI
-	MOV	CX,11
-GetVl1:	LODSB
-	CMP	AL,'\'
-	JE	GetVl5
-	STOSB
-	LOOP	GetVl1
-	CLC
-	JMP	GetVl5
-GetVl2:	MOV	DI,SI
-	CALL	SetDTA
-	PUSH	CS
-	POP	DS
-	MOV	DX,OFFSET Mask_S
-	MOV	CX,8
-	MOV	AH,4Eh
-	CALL	Intr21
-	JC	GetVl5
-	PUSH	ES
-	POP	DS
-	MOV	SI,OFFSET DTA.FilName
-	CALL	Convert
-	MOV	SI,DI
-	MOV	CX,11
-GetVl3:	LODSB
-	CMP	AL,' '
-	JE	GetVl4
-	MOV	DI,SI
-GetVl4:	LOOP	GetVl3
-	STC
-GetVl5:	MOV	BYTE PTR ES:[DI],0
-GetVl6:	POP	CX
+	MOV	AX,SI
+	CallC	GetVol_c
+	NEG	DX
 	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
 	RET
 GetVol	ENDP
 
@@ -1868,4 +1335,19 @@ OpenFil	PROC	NEAR
 OpnFl1:	POP	BX
 	RET
 OpenFil	ENDP
+
+; C code opens a file: AX as OpenFil has it, DX:BX - the name. DX is not 0
+; afterwards if the carry flag was set.
+	PUBLIC	OpenFil_a
+OpenFil_a PROC	FAR
+	PUSH	DS
+	PUSH	DS
+	POP	ES
+	MOV	DS,DX
+	MOV	DX,BX
+	CALL	OpenFil
+	POP	DS
+	SBB	DX,DX
+	RET
+OpenFil_a ENDP
 

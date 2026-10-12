@@ -177,6 +177,28 @@ port.
   or `PutInf_c` by the kind of the panel. Chosen in C, by one function
   that calls the next, the registers the first one saves lie under the
   second: 12 bytes of the stack less, in every scenario.
+- A stub may also call several C functions one after the other, where
+  one would have too much on the stack when it calls something deep:
+  that of `ReDir` calls `ReDir_c`, `ReDr45_c` and `ReDr50_c`, and has
+  what the first leaves for the last in room on the stack, as a
+  structure that BX points at. As one function `ReDir` left 12 bytes of
+  the stack in every scenario, 46 less than the assembly.
+- The deepest that most scenarios get is the filter of a panel: `SetMask`
+  calls `Convert`, that `UpCase`, and that the routine of DOS for the
+  capital letters of the country, which runs on the caller's stack and
+  takes 62 bytes of it. `Convert` takes 110 bytes of the stack from
+  where C code calls it, `SetMask` 146. What counts in a routine that
+  calls either is what stands on the stack at that call.
+- A routine that answers in the carry flag gets an entry for C that
+  makes a number of it: `FromC Fantom, <SBB AX,AX>`. `Intr21`, which
+  calls DOS, has an entry that takes the registers from a structure on
+  the stack, `struct DosRegs` of `port/vc.h`, DS among them, and puts
+  back what DOS returns; `OpenFil` has one that takes the name as a far
+  pointer. Such an entry puts ES on the main data, as `FromC` does.
+- `MvzLine` copies what follows a text along with it, 68 bytes in all,
+  so a name that is copied with it is the assembly's own, made `PUBLIC`,
+  and not a constant of the C file: `Mask_S` and `Ext_F`. Once what
+  follows them in the assembly is translated, those bytes are others.
 
 ### C for the port
 
@@ -190,6 +212,9 @@ with it is less obvious:
   in the order written. Pass the halves as two 16-bit arguments.
 - DS cannot carry an argument: a far pointer in `[ds si]` is refused. The
   stub moves the segment to another register.
+- A far pointer in a pair of general registers has its segment in DX
+  whichever is written first: `[bx dx]` and `[dx bx]` both put the
+  offset in BX. Read the call in the listing.
 - A function that returns nothing may change AX all the same, whatever
   `modify exact` says. List AX there and have the stub save it.
 - A pointer variable to a constant in the code segment makes the compiler
@@ -220,6 +245,11 @@ with it is less obvious:
   routine that is, wants its variables few and its structures small.
 - Dividing a 16-bit number by another, or taking the remainder, needs no
   helper routine.
+- A structure among the variables of a function is in its frame whole,
+  and a function with a dozen variables keeps most of them there too:
+  `ReDir_c` takes 44 bytes and 14 for registers. A static function that
+  gets a pointer to the caller's structure, as `GetVol0` does to the
+  registers of `RdInfo`, has no second one on the stack.
 - The structures of `port/vc.h` are the assembly's, but a field that the
   assembly declares with `0 DUP`, a name for a place, is not in them:
   `TreList` is where `TreSum2` is, two bytes before the end of `DIRTREE`.

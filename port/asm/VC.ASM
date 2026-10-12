@@ -30,9 +30,11 @@
 	EXTERN	SetCur_c:FAR, FilDir_c:FAR, FilePan_c:FAR
 	EXTERN	PutTre_c:FAR, PutTree_c:FAR, TreeCur_c:FAR, TrCr10_c:FAR
 	EXTERN	TrCr20_c:FAR, PutInf_c:FAR
+	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
+	EXTERN	GetVol_c:FAR, DirSize_c:FAR, TstInfo_c:FAR
 
 ; Texts here that C code shows too.
-	PUBLIC	Title_S, Var_S, Tree_S
+	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.

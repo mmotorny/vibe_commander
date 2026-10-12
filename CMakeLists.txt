@@ -109,7 +109,7 @@ set(port_asm VC.ASM
     VCFUNC.INC VCMENU.INC VCF1.INC VCCOPY.INC VCVIEW.INC VCEDIT.INC
     VCHELP.INC VCMEM.INC VCFIND.INC VCSUB1.INC VCSUB2.INC VCSUB3.INC)
 set(port_c format.c line.c string.c screen.c digits.c mask.c files.c
-    place.c panel.c tree.c info.c)
+    place.c panel.c tree.c info.c read.c)
 list(TRANSFORM port_asm PREPEND ${CMAKE_SOURCE_DIR}/port/asm/)
 
 # mkexe turns the linker's output into the program that is run.

@@ -174,6 +174,7 @@ Beep	PROC	NEAR
 	POP	BP
 Beep1:	RET
 Beep	ENDP
+	FromC	Beep
 
 ;---------------------- Init mouse ---------------------
 IniMous	PROC	NEAR
@@ -2531,6 +2532,7 @@ SetDTA	PROC	NEAR
 	POP	DS
 	RET
 SetDTA	ENDP
+	FromC	SetDTA
 
 ;------------------- Test drive letter -----------------
 ;			   AL - drive letter
@@ -2600,6 +2602,33 @@ I21_02:	POPF
 	STC
 	RET
 Intr21	ENDP
+
+; C code calls DOS: Intr21 with the registers that struct DosRegs of
+; port/vc.h holds, at SS:BX. AX, BX, CX and DX are put back there as they
+; return, and AX is not 0 afterwards if the carry flag was set.
+	PUBLIC	Intr21_a
+Intr21_a PROC	FAR
+	PUSH	BP
+	PUSH	DS
+	PUSH	DS
+	POP	ES
+	MOV	BP,BX
+	MOV	AX,[BP]
+	MOV	BX,[BP+2]
+	MOV	CX,[BP+4]
+	MOV	SI,[BP+10]
+	MOV	DI,[BP+12]
+	LDS	DX,[BP+6]
+	CALL	Intr21
+	MOV	[BP],AX
+	MOV	[BP+2],BX
+	MOV	[BP+4],CX
+	MOV	[BP+6],DX
+	SBB	AX,AX
+	POP	DS
+	POP	BP
+	RET
+Intr21_a ENDP
 
 ;------------------- Invert variable -------------------
 ;			ES:BX - address of variable

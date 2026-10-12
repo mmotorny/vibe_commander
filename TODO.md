@@ -21,14 +21,37 @@ Things that are known and not done. Standing instructions are in
   loaded, and the port is larger than the original: the number differs,
   and no scenario shows it. To compare it, the comparison would have to
   leave it out (`harness/deviations.py`), as it does the editor's.
-- Every disk of the bench has a volume label, so no scenario shows the
-  Info of a disk without one, "has no label". The program asks whether
-  to delete a label and does not get it off under FreeDOS: a disk
-  without one would have to be made for the bench.
+- Every disk of the bench has a volume label, so no scenario has the
+  program look for one and find none. The Info does say "has no label"
+  in `reread`, where it does not look: a directory named DIRINFO stops
+  it before. The program asks whether to delete a label and does not
+  get it off under FreeDOS: a disk without one would have to be made for
+  the bench.
 - `tools/routines.py` lists procedures only. Code that stands between
-  two, like `RdInfo`, which reads what the Info panel shows and is still
-  assembly, is not in its list; `harness/reach.py` knows it by its first
+  two is not in its list; `harness/reach.py` knows it by its first
   label.
+- Nothing says where the stack is deepest, only how much of it is left.
+  It was found for one batch by having QEMU log the registers at every
+  block of code, `-d cpu,nochain` where `harness/dos.py` asks for
+  `in_asm`, 2.7 GB for the scenario `start`, and taking from the log the
+  blocks of the program with the lowest SP before the lowest of all:
+  that is the chain of calls. As a tool it would name the chain for a
+  scenario in half a minute.
+- What reading a directory does when a drive is not ready, when a list
+  has more files than there is room for, or when a drive has no current
+  directory to fall back on, runs in no scenario: the bench has no such
+  drive, and a step makes one file. The same goes for the label of a
+  drive of a network. They are listed as out of reach in
+  `harness/ported.py` and rest on reading.
+- `ReDir` reads byte 23 of the main data, a colour of the first palette,
+  where it means the fourth character of a panel's path, to decide
+  whether ".." gets the time and the attributes that DOS has for it. It
+  is ported like that. The colour is never 0, so it always does.
+- `GetVol` answers for a label that it has found with the carry flag
+  set and in AX what DOS left in AH and the eleventh character of the
+  label; `RdInfo` takes 53h there for a drive that is not ready. A
+  label of eleven characters that ends in S would do that, if DOS
+  leaves 0 in AH. Ported like that; not tried.
 - Of `__U4D` in `port/asm/VC.ASM`, which divides 32-bit numbers for the
   compiled code, no scenario runs the half for a divisor of more than 16
   bits: nothing divides by one yet. It was held against a model of its
@@ -87,6 +110,25 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - 2 minutes: the Info was 12 bytes deeper in the stack in every
     scenario, written from inside the function that chooses between it
     and the tree. The stub chooses now.
+
+- Reading what a panel shows, 5 routines, 38 minutes in all:
+  - 9 minutes: the stack. As one function `ReDir` left 12 bytes of it in
+    every scenario, and nothing said where it was deepest: the stack
+    dumped from the machine could not be read, and a log of the
+    registers from QEMU could (see above). It is deepest in the filter
+    of a panel, where DOS makes capital letters on the caller's stack.
+  - 6 minutes: `harness/notice.py`, six runs of it, and two scenarios
+    made longer for three branches that none had noticed, with their
+    goldens derived again, 50 seconds. No error in the translation was
+    found by it.
+  - 2 minutes: two tries of steps that failed after 12 and 17 seconds,
+    for a text with a space in it. Noted at the top of
+    `harness/scenarios.py`.
+  - 1 minute: a far pointer in `[bx dx]` had its halves the other way
+    round, so no file was opened; three scenarios showed it. In
+    `CLAUDE.md` now.
+  - 1 minute: `DrIn_F` went with `RdInfo` and the viewer uses it: found
+    by the assembler.
 
 ## Ideas put off
 

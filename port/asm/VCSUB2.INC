@@ -593,16 +593,13 @@ SetCur	PROC	NEAR
 SetCur	ENDP
 
 ;----------------------- Test info ---------------------
+;			   DS - WCBseg
+;			   ES - main data
 TstInfo	PROC	NEAR
-	PUSH	DS
 	PUSH	AX
-	MOV	AL,DS:WinTyp
-	CALL	InvWCB
-	CMP	AL,DS:WinTyp
-	JAE	TstIn1
-	MOV	BYTE PTR DS:ChgFlg,1
-TstIn1:	POP	AX
-	POP	DS
+	MOV	AX,DS
+	CallC	TstInfo_c
+	POP	AX
 	RET
 TstInfo	ENDP
 

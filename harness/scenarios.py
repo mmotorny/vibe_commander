@@ -86,6 +86,29 @@ out again (show.py --changes is how):
     volume label, and the program does not get one off: Ctrl+F4, Ctrl+y,
     Enter and Enter again ask whether to delete it and leave it where it
     is.
+  - A text that is typed has no space in it: 'rd work' is written
+    '"rd" Space "work"'.
+  - "F9 o d" switches Auto directory sizes: the mini status then has the
+    size of a directory, of all files in it and below, once its list has
+    been read. A new file comes last in an unsorted panel, so End goes to
+    it. F5, "src\\" and Enter copy the file under the cursor into the
+    directory SRC; F5, a name and Enter make a copy next to it.
+  - Ctrl+r reads the directory again and puts the cursor at the top with
+    nothing selected. What is selected stays so when the list is read
+    again after F7 has made a directory. Ctrl+PgUp puts the cursor on the
+    directory it came from. Ctrl+u has the panels change places. F8 on a
+    directory that is not empty asks twice: Enter each time; the other
+    panel, if it showed that directory, shows the current one then.
+  - Enter on a file runs the command that the extension file has for
+    its kind: the main one, of the program's directory, has zip, arj,
+    lzh and asm, and a directory may have a vc.ext of its own, a line
+    like "txt:", a tab and "echo !.!". Shift+F4, the name and one Enter
+    open the editor on it. Ctrl+o shows what a command printed.
+  - A directory named DIRINFO is what the Info panel cannot open: it
+    then says that the disk has no label, which it has not looked for.
+    Ctrl+F4 shows the label in a dialog, which Esc leaves.
+  - The dialog of Alt+F1 offers A, C and D: there is no drive B to be
+    asked for, and no drive that is not ready.
   - A step may press about 16 keys. The harness waits for each to reach
     the keyboard buffer, which holds 15, and fails when the program does
     not take them fast enough.
@@ -662,6 +685,75 @@ SCENARIOS = {
             "Alt+F10",                    # the tree in a box, to choose a
             "Up",                         # directory from
             "Esc",
+        )),
+
+    "reread": Scenario(
+        "A directory read again: what a panel keeps of the list it had, "
+        "and where it goes when its directory is gone",
+        steps=(
+            "Down Down Down Ins",         # a file selected
+            'F7 "dirinfo" Enter',         # the list is read again, with a
+                                          # directory more: the file stays
+                                          # selected. The Info cannot open
+                                          # a directory for its text, and
+                                          # says nothing of the label
+            "Home Down Ins Up Enter",     # a directory selected, and into
+                                          # it: its list has nothing of
+                                          # the one before
+            "Ctrl+PgUp",
+            'F7 "work" Enter',            # C:\\WORK\\WORK
+            "Ctrl+PgUp",
+            "Ins Up Enter",               # C:\\WORK selected, and into it:
+                                          # the WORK in there is not
+            "Ctrl+F4",                    # the label of the disk, to change
+            "Esc",
+            "Down Down Down",
+            'F5 "src\\" Enter',           # a file into C:\\WORK\\SRC
+            "Ctrl+l",                     # two panels of files
+            "Ctrl+u",                     # which change places: the one
+            "Ctrl+r",                     # that is first in the memory is
+            "Tab",                        # the right one now
+            "Ctrl+r",
+            "Tab",
+            "Home Down Down Enter Down",  # the right one in C:\\WORK\\SRC,
+            "Tab",                        # on the file
+            "Enter",
+            "Down Down",
+            "F8",                         # the left one deletes SRC with
+            "Enter",                      # what is in it: the right one
+            "Enter",                      # shows the current directory
+                                          # instead, from its top, though
+                                          # it has a file of that name
+        )),
+
+    "sizes": Scenario(
+        "The sizes of directories worked out as a panel is read, and an "
+        "extension file of the directory's own",
+        steps=(
+            "F9 o d",                     # Auto directory sizes
+            "Down",                       # a directory with nothing in it
+            "Ctrl+PgUp",                  # one with files
+            "Down",                       # and one with more than 4 GB
+            "Up Enter",
+            "Down Down Down",
+            'F5 "a.zip" Enter',           # a file of a kind that the main
+            "End Enter",                  # extension file has a command
+            "Ctrl+o",                     # for, which DOS does not find
+            "Ctrl+o",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of the file made
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",
+            '"vc.ext"',
+            "Enter",
+            '"txt:" Tab "echo" Space "!.!"',
+            "F2",
+            "Esc",                        # the directory is read again,
+            "Home Down Down Down Enter",  # and its vc.ext with it
+            "Ctrl+o",                     # what the command printed
+            "Ctrl+o",
         )),
 }
 

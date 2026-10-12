@@ -212,6 +212,46 @@ BATCHES = [
                     "have clusters of 512 bytes",
         },
     ),
+    Batch(
+        title="Reading what a panel shows: the files of a directory, and "
+              "for the Info the disk, its label and the text of dirinfo",
+        source="read.c",
+        routines=("ReDir", "RdInfo", "GetVol", "DirSize", "TstInfo"),
+        functions=("ReDir_c", "ReDr45_c", "ReDr50_c", "RdInfo_c",
+                   "GetVol_c", "DirSize_c", "TstInfo_c"),
+        unreached={
+            **dict.fromkeys(
+                (0xB8BE, 0xB8C0, 0xB8C2, 0xB8C5, 0xB8C7, 0xB8C9, 0xB8CB,
+                 0xB8CD, 0xB8CF),
+                "ReDir, for a list too long to be kept while the "
+                "directory is read: the room for it is the memory behind "
+                "the panels, some 490K on the bench, and a list is 64K "
+                "at the most"),
+            **dict.fromkeys(
+                (0xB95E, 0xB962, 0xB965, 0xB983, 0xB986),
+                "ReDir, for a drive that has no current directory to go "
+                "to when that of the panel is gone: DOS answers for "
+                "every drive that it has, and the program offers no "
+                "other"),
+            **dict.fromkeys(
+                (0xB988, 0xB989, 0xB98B, 0xB98C),
+                "ReDir, for a directory that cannot be read at all: the "
+                "disks of the bench are always ready, and it has no "
+                "second floppy drive to be asked for"),
+            0xB9E9: "ReDir, for more files than a panel has room for: "
+                    "2700 of them, where a step makes one",
+            0xBA61: "ReDir, for a drive that is not ready when the "
+                    "extension file is opened, just after its directory "
+                    "has been read",
+            0xBF56: "RdInfo, for a panel that shows neither files nor the "
+                    "tree nor the Info: nothing sets such a kind",
+            **dict.fromkeys(
+                (0xCBB7, 0xCBBA, 0xCBBC, 0xCBBE, 0xCBC1, 0xCBC2, 0xCBC4,
+                 0xCBC6, 0xCBC7, 0xCBC9, 0xCBCA),
+                "GetVol, for a drive of a network, which has the name it "
+                "is shared by for a label: the bench has none"),
+        },
+    ),
 ]
 
 
