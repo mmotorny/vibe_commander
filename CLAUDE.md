@@ -178,21 +178,12 @@ port.
   not serve there, since it takes DS from ES; see `PutTree`.
 - A stub may choose between C functions where the assembly jumped from
   one piece to the next: that of `PutFls` goes to `PutFls_c`, `PutTre_c`
-  or `PutInf_c` by the kind of the panel. Chosen in C, by one function
-  that calls the next, the registers the first one saves lie under the
-  second: 12 bytes of the stack less, in every scenario.
-- A stub may also call several C functions one after the other, where
-  one would have too much on the stack when it calls something deep:
-  that of `ReDir` calls `ReDir_c`, `ReDr45_c` and `ReDr50_c`, and has
-  what the first leaves for the last in room on the stack, as a
-  structure that BX points at. As one function `ReDir` left 12 bytes of
-  the stack in every scenario, 46 less than the assembly.
-- The deepest that most scenarios get is the filter of a panel: `SetMask`
-  calls `Convert`, that `UpCase`, and that the routine of DOS for the
-  capital letters of the country, which runs on the caller's stack and
-  takes 62 bytes of it. `Convert` takes 110 bytes of the stack from
-  where C code calls it, `SetMask` 146. What counts in a routine that
-  calls either is what stands on the stack at that call.
+  or `PutInf_c` by the kind of the panel.
+- A stub may also call several C functions one after the other: that of
+  `ReDir` calls `ReDir_c`, `ReDr45_c` and `ReDr50_c`, and has what the
+  first leaves for the last in room on the stack, as a structure that BX
+  points at. That was done to save stack when it was short, and need not
+  be done again.
 - A routine that answers in the carry flag gets an entry for C that
   makes a number of it: `FromC Fantom, <SBB AX,AX>`. `Intr21`, which
   calls DOS, has an entry that takes the registers from a structure on
@@ -239,10 +230,6 @@ port.
   `(u16)(u32)(const void __far *)object`, which compiles to the offset
   alone and costs no relocation. `PUBLIC` for such an object can stand in
   `VC.ASM`, whichever file defines it.
-- The box of DOS's critical error, `FatErr`, comes up inside a call of
-  DOS and is 46 bytes deeper in the stack than a dialog of the routine
-  that called DOS. What a C function has on the stack when it calls
-  `Intr21` is on top of that: see `TODO.md` for the editor's saving.
 - A routine that answers in the zero flag gets an entry for C that is
   written out, where `FromC` has room for one instruction: `MOV AX,0`,
   which leaves the flags, and `JNE` past an `INC AX`. See `CmpSym_a` in
@@ -285,33 +272,13 @@ with it is less obvious:
   `u16` for anything that is divided or counted.
 - The option `-nd` makes the compiler load a segment for every access to
   the main data. Do not use it.
-- The program's stack is 256 bytes, and compiled code uses more of it
-  than the assembly did. A static function that two routines share is
-  called, not expanded in place, and a multiplication has DX saved around
-  it. In a routine at the bottom of deep calls, write the sharing out and
-  shift instead of multiplying, and read what the compiler made of it,
-  in the listing next to the object, `build/port/*.lst`.
-  The `port` test says how much of the stack each scenario leaves
-  untouched, and fails below a limit. Its run in step 3 has the figures
-  of the new scenarios with the routines still assembly.
+- The port's stack is 4,096 bytes where the original's is 256, so stack
+  use needs no care. The `port` test reports how much each scenario
+  leaves and fails when less than half is left.
 - A static function is called, not expanded in place, also where only
-  one routine uses it. The call is near, two bytes, and the function
-  saves every register it uses but AX. So what is deep can be kept out
-  of the frame of the function that calls something deeper: `T80_00`
-  has only the place of its box, and calls `Dialog` with 22 bytes on the
-  stack where the assembly had 12; the registers for DOS, 14 bytes, are
-  in static functions that have returned by then.
-- The room a function takes for its variables is the `sub sp` at its
-  start in the listing. `PutFls_c` takes 46 bytes, and 14 for registers,
-  where the assembly pushed 16; no scenario is at its deepest there. A
-  routine that is, wants its variables few and its structures small.
+  one routine uses it.
 - Dividing a 16-bit number by another, or taking the remainder, needs no
   helper routine.
-- A structure among the variables of a function is in its frame whole,
-  and a function with a dozen variables keeps most of them there too:
-  `ReDir_c` takes 44 bytes and 14 for registers. A static function that
-  gets a pointer to the caller's structure, as `GetVol0` does to the
-  registers of `RdInfo`, has no second one on the stack.
 - The structures of `port/vc.h` are the assembly's, but a field that the
   assembly declares with `0 DUP`, a name for a place, is not in them:
   `TreList` is where `TreSum2` is, two bytes before the end of `DIRTREE`.
@@ -333,10 +300,6 @@ with it is less obvious:
   pointers: a far pointer steps its offset only, as SI and DI do, down as
   well as up. Where the assembly divides a 32-bit count into pieces for
   that, comparing and subtracting in the loop needs no helper routine.
-- The figures of the stack that the `port` test reports differ from one
-  run to the next, by 12 bytes or so in a scenario or two: an interrupt
-  that arrives when the calls are deep. What a batch costs shows in every
-  scenario that draws what was translated, and the same in each.
 
 ## A run of batches
 
@@ -362,8 +325,6 @@ several at a time.
   other batches under it, and `git push`. If the push is refused, another
   batch got there first: again from the pull. The agent settles a
   conflict of its batch itself and keeps what both sides added.
-- The stack is one budget for all the batches. What counts is what the
-  test says is left after the rebase.
 - The screens of the original cannot be recorded while other machines
   run: goldens came out different when they were. `harness/turn.py` has
   every run of the harness wait for its turn, a run that records the
