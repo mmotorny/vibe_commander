@@ -8,7 +8,7 @@ cursor 8 23 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
 |║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
@@ -92,7 +92,7 @@ cursor 8 23 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
 |║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
@@ -120,7 +120,7 @@ cursor 13 23 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
 |║            │            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
@@ -148,7 +148,7 @@ cursor 8 8 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║                                                                              ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ Edit ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ Edit the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -176,7 +176,7 @@ cursor 15 8 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║                                                                              ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ Edit ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ Edit the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
@@ -204,7 +204,7 @@ cursor 0 127 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║            │            │                           in drive C: is WORK      ║| 1Bx27 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
 |║            │            │   ╔══════ Edit ══════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
 |║            │            │   ║ Reading the file ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
@@ -281,9 +281,6 @@ cursor 0 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-blinks 46 0 to |1| 30
-blinks 57 0 to |0| 30
-blinks 68 0 to |8| 30
 
 == 10: Tab Tab Tab Tab Tab "x" Enter
 cursor 0 3 lines 6 7 mode 3
@@ -459,7 +456,7 @@ cursor 13 23 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║dirinfo     │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
 |║            │            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
@@ -487,7 +484,7 @@ cursor 13 23 lines 6 7 mode 3
 |Copyright (C) 1991-2000 Vsevolod V. Volk║  The Volkov Commander, Version 4.05  ║| 07x40 1Bx40
 |                                        ╟──────────────────────────────────────╢| 07x40 1Bx40
 |                                        ║         653,296 Bytes Memory         ║| 07x40 1Bx10 1Ex7 1Bx23
-|                                        ║          498,256 Bytes Free          ║| 07x40 1Bx11 1Ex7 1Bx22
+|                                        ║          ####### Bytes Free          ║| 07x40 1Bx11 1Ex7 1Bx22
 |                                        ║      Volume in drive C: is WORK      ║| 07x40 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
 |                                        ║  32,724,992 total bytes on drive C:  ║| 07x40 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
 |                                        ║  32,718,848 bytes free on drive C:   ║| 07x40 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
@@ -515,7 +512,7 @@ cursor 13 23 lines 6 7 mode 3
 |Copyright (C) 1991-2000 Vsevolod V. Volk║  The Volkov Commander, Version 4.05  ║| 07x40 1Bx40
 |                                        ╟──────────────────────────────────────╢| 07x40 1Bx40
 |                                        ║         653,296 Bytes Memory         ║| 07x40 1Bx10 1Ex7 1Bx23
-|                                        ║          498,256 Bytes Free          ║| 07x40 1Bx11 1Ex7 1Bx22
+|                                        ║          ####### Bytes Free          ║| 07x40 1Bx11 1Ex7 1Bx22
 |                                        ║      Volume in drive C: is WORK      ║| 07x40 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
 |                                        ║  32,724,992 total bytes on drive C:  ║| 07x40 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
 |                                        ║  32,718,848 bytes free on drive C:   ║| 07x40 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
@@ -543,7 +540,7 @@ cursor 13 23 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║dirinfo     │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║            │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
 |║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
 |║            │            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
