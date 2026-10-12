@@ -236,7 +236,10 @@ whenever it takes a key, waits for one, or ends, and so tells the tests
 exactly when it has finished what a key started. It also marks its stack
 when it has set it up, so that the tests can read from the machine how much
 of it the program never touches, which the `port` test reports for every
-scenario. The two differ by a few
+scenario. And it does not wait for the timer between the sizes of a box
+that grows as it opens, five times for every dialog: no screen is recorded
+while a box grows, and the waiting was most of the time that a scenario
+with dialogs took. The two differ by a few
 dozen instructions, all in macros at the top of `port/asm/VC.ASM`. A few
 of them are in the part of the program that stays in memory while a command
 runs, whose size shows on the screen as free memory; the variant makes up

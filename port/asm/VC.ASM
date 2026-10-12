@@ -273,6 +273,18 @@ Done:	POP	DI
 ENDIF
 	ENDM
 
+; The program waits for the next tick of the timer between two sizes of a
+; box that grows as it opens, five times for every box. The build that the
+; tests run does not: a box goes through all its sizes before the program
+; asks for a key again, so no step ends on one of them, and the waiting
+; was most of the time that a scenario with dialogs took. Stands where
+; the wait begins, in MinBx3 of VCSUB1.INC.
+NoTick	MACRO
+IFDEF	HARNESS
+	RET
+ENDIF
+	ENDM
+
 	.CODE
 	PUBLIC	_md
 _md	LABEL	BYTE			; The main data segment, to C code:
