@@ -11,7 +11,9 @@ that have been translated.
 
 A golden is derived, never edited. Where a build is meant to differ from
 the original, deviations.py says how, and the golden is derived with that
-difference in it: it holds what a build is expected to show.
+difference in it: it holds what a build is expected to show. What is not
+compared at all is blanked on both screens when a build is held against a
+golden, so a golden need not be derived again when more is left out.
 
     goldens.py derive [SCENARIO...]     derive goldens from the original;
                                         all of them if none is named
@@ -211,8 +213,10 @@ def differences(golden, run, programs):
         return ["the golden was derived for other steps than the scenario "
                 "has now: derive it again"]
     for number, step in enumerate(steps):
+        # Both are blanked, the golden's screen as well: one derived before
+        # a figure was left out of the comparison still holds it.
         found = screen_differences(
-            golden.screens[number],
+            deviations.compared(golden.screens[number], golden.scenario),
             deviations.compared(run.screens[number], golden.scenario))
         if found:
             report += [f"--- after step {number}: {step}"] + found

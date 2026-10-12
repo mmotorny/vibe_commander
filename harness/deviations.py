@@ -29,9 +29,11 @@ def expected(screen):
 
 
 def compared(screen, scenario):
-    """`screen` of `scenario` with what is not compared blanked out. A
-    golden holds its screens like this, and those of a build are held
-    against it like this."""
+    """`screen` of `scenario` with what is not compared blanked out. When a
+    build is held against a golden, both screens are made like this, that
+    of the golden too: it may have been derived before a figure was left
+    out. A golden that is derived now holds its screens like this already,
+    and blanking what is blanked changes nothing."""
     cells = bytearray(screen.cells)
     for row, line in enumerate(screen.lines()):
         for pattern in IGNORED + IGNORED_IN.get(scenario, []):
