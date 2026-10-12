@@ -699,3 +699,7 @@ several at a time.
   depending on timing.
 - The tests run the build of the port that signals where it is. The build
   that is shipped is not run by them.
+- A test does not put a stand-in where something is that the project does
+  not own: DOS, the BIOS, the machine. What a test knows of them it gets
+  from the real ones. A part of the program itself may be replaced in a
+  test build, since its source says what it is supposed to do.
