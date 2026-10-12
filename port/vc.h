@@ -371,6 +371,10 @@ u16 DiSi10(void);
 u16 FncCall(u16 attributes);
 #pragma aux DiSi10  "*_o" __far value [ax] modify exact [ax]
 #pragma aux FncCall "*_a" __far parm [ax] value [ax] modify exact [ax es]
+/* Asks DOS for the current drive and directory, into DosPth, with PathEr
+   set if that fails: not 0 then. */
+u16 SetPth(void);
+#pragma aux SetPth  "*_a" __far value [ax] modify exact [ax es]
 /* Checks the keyboard for Esc, Ctrl-C and F10, and takes them from it:
    not 0 if one was pressed. */
 u16 TstBrk(void);

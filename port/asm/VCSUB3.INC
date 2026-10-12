@@ -211,6 +211,7 @@ SetPt1:	POP	AX
 	POP	DS
 	RET
 SetPth	ENDP
+	FromC	SetPth, <SBB AX,AX>	; CY as a number
 
 ;---------------------- Save setup ---------------------
 	.CONST

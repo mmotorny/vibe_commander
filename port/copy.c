@@ -4,10 +4,11 @@
  *
  * Translated from VCCOPY.INC.
  *
- * The commands, which are still assembly, put the name of the target into
- * ToFile, as it was typed, and say in CopyMov what is wanted. They then
- * have C00_00 called for every file that is selected or that fits a mask,
- * with its name in CpSrc; for a directory C00_00 has DirFunc call it again
+ * The commands, at the end of this file, ask where to: they put the name
+ * of the target into ToFile, as it was typed, and say in CopyMov what is
+ * wanted. They then have C00_00 called for every file that is selected or
+ * that fits a mask, by FncSel and FncMas, which are still assembly, with
+ * its name in CpSrc; for a directory C00_00 has DirFunc call it again
  * for everything in the directory, with the name behind that of the
  * directory. What it keeps from one file to the next, and from one call
  * of DOS to the next, is in TmpBuf.
@@ -19,6 +20,9 @@
 #include "vc.h"
 
 /* What is kept in TmpBuf: the equates at the top of VCCOPY.INC. */
+#define CpInpt  (md.TmpBuf + 0)         /* Input buffer */
+#define CpVar1  (md.TmpBuf + 120)       /* Variable 1 */
+#define CpVar2  (md.TmpBuf + 140)       /* Variable 2 */
 #define CpSrc   (md.TmpBuf + 0)         /* Source filename */
 #define CpDest  (md.TmpBuf + 130)       /* Destination filename */
 #define CpDev1  md.TmpBuf[86]           /* Source is a device */
@@ -45,13 +49,17 @@
 
 #define LenName (LenPath + 13)          /* a path and a file name */
 
-u16 F35_40(void);
 u16 C00_00(u16 attributes);
+u32 F35_01(u16 panel, u16 command, u16 directories, u16 files);
+u32 F45_01(u16 panel, u16 command, u16 directories, u16 files);
+u16 F35_61(u16 answer, u16 place);
 
 /* How the assembly passes arguments to these, and what it expects back
    (see the stubs in port/asm/VCCOPY.INC). */
-#pragma aux F35_40 "*_c" __far value [dx] modify exact [dx]
 #pragma aux C00_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux F35_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
+#pragma aux F45_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
+#pragma aux F35_61 "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]
 
 /* Routines that are still assembly, by their entries for C. OncZoom puts
    a box on the screen with its middle at `place`, growing only if it is
@@ -71,25 +79,53 @@ u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
 #pragma aux Intr21f "*_a" __far parm [bx] [ax] value [ax] modify exact [ax bx cx dx si di es]
+/* AsmSeg returns the code segment of the assembly, where its texts are
+   (see port/dialog.c). SelDrv makes a drive the current one, 0 for A:,
+   by the call of DOS that the assembly makes without Intr21. */
+u16 AsmSeg(void);
+void SelDrv(u16 drive);
+#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
+#pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
 
 /* A dialog whose box is not on the screen yet, and which sets what it
    sets in the main data: Dialog of vc.h. The low byte of what it returns
    is the number of the answer, 0 for the first, and 0FFh for Esc. */
 #define Ask(box, include) Dialog(box, include, 0, 0, MAIN_SEG)
 
-/* C routines of other files that vc.h does not have. */
+/* C routines of other files that vc.h does not have. TotSel returns the
+   number of selected files in the high word and of selected directories
+   in the low one; FilDir writes "2 files", or what else such numbers
+   make, and returns the address behind its zero byte; ChTree has a
+   directory chosen from the tree, in a box that begins in a column, and
+   returns 0 if one was, with its path in TmpBuf. */
 const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 void NormStr(u8 __far *text);
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);       /* mask.c */
+u32 TotSel(u16 panel);                                  /* files.c */
+u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
+u16 ChTree(u16 column);                                 /* treebox.c */
 #pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
 #pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
 #pragma aux UnConv  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
+#pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
+#pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
 /* Boxes and texts of the assembly, which OncZoom and Dialog take by their
-   offsets in its code segment: only those are used here. */
+   offsets in its code segment: only those are used here, but for the
+   texts that the commands copy from there into what their dialogs show.
+   C00_00_s is the routine by which the assembly calls C00_00, for
+   FncAddr. */
 extern const u8 __far Copy0_S[];        /* " Copy " */
 extern const u8 __far Move0_S[];        /* " Move " */
 extern const u8 __far Ren0_S[];         /* " Rename " */
+extern const u8 __far RnMv_S[];         /* "Rename or move " */
+extern const u8 __far CopTo_S[];        /* "^V to" */
+extern const u8 __far CopFi_S[];        /* "Copying the file" */
+extern const u8 __far Copy1_B[];        /* the dialog of F5 and F6 */
+extern const u8 __far Copy2_B[];        /* and that of Shift-F5 and -F6 */
+extern const u8 __far Renam_B[];        /* "Rename ... to" */
+extern const u8 __far C00_00_s[];
 extern const u8 __far RenFi_P[];        /* "Renaming or moving the file" */
 extern const u8 __far CopFi_P[];        /* "Copying the file" */
 extern const u8 __far MovFi_P[];        /* "Moving the file" */
@@ -109,6 +145,13 @@ extern const u8 __far CntDi_B[];        /* "Can't delete the subdirectory" */
 #pragma aux Copy0_S "*"
 #pragma aux Move0_S "*"
 #pragma aux Ren0_S "*"
+#pragma aux RnMv_S "*"
+#pragma aux CopTo_S "*"
+#pragma aux CopFi_S "*"
+#pragma aux Copy1_B "*"
+#pragma aux Copy2_B "*"
+#pragma aux Renam_B "*"
+#pragma aux C00_00_s "C00_00"
 #pragma aux RenFi_P "*"
 #pragma aux CopFi_P "*"
 #pragma aux MovFi_P "*"
@@ -132,6 +175,7 @@ extern const u8 __far CntDi_B[];        /* "Can't delete the subdirectory" */
 static const u8 CODE AllIn_S[] = "\\*.*";
 
 #define Box_C 16                        /* the number of the colour of a box */
+#define BoxCu_C 18                      /* and of a line that is typed into */
 
 /* Errors of DOS, and the one that Intr21 makes of a drive that is not
    ready. */
@@ -165,7 +209,7 @@ static const u8 CODE AllIn_S[] = "\\*.*";
 
 /* The title of the boxes, as the offset of the text in the assembly:
    Copy, Move, or Rename once a file is being renamed. */
-u16 F35_40(void)
+static u16 F35_40(void)
 {
     if (CopyMov == 0)
         return OFFSET(Copy0_S);
@@ -1313,4 +1357,321 @@ u16 C00_00(u16 attributes)
     if (CopyMov != 0)
         CopyMov = 1;
     return result;
+}
+
+/*
+ * The commands: Copy and Rename, F5 and F6, for what is selected or what
+ * is under the cursor; with Ctrl for the file under the cursor alone; and
+ * with Shift for files whose name is asked for too. They ask where to,
+ * and say where the main loop is to go on.
+ */
+
+/* Where a command goes on, in the low word of what it returns: the stub
+   jumps there. With GO_MASKED the high word is the title of the boxes. */
+#define GO_KEYS     0                   /* Func04: the next key */
+#define GO_PANELS   1                   /* Init50: the panels drawn anew */
+#define GO_SELECTED 2                   /* FncSel: C00_00 for every file
+                                           that is selected */
+#define GO_MASKED   3                   /* FncMas: for those of a mask */
+#define GO_DONE     4                   /* FncExt: the panels drawn anew
+                                           if something was written */
+
+#define ASM(object, offset) AT(AsmSeg(), OFFSET(object) + (offset))
+
+/* Init variables: nothing has been copied yet, and C00_00 is what is
+   called for every file. */
+static void F35_70(void)
+{
+    CpCase = 0;
+    CpDev2 = 0;
+    CpTree1 = 0;
+    CpTree2 = 0;
+    CpAll = 0;
+    FncChg = 0;
+    md.FncAddr = OFFSET(C00_00_s);
+}
+
+/* Set default target path, in CpInpt: the directory of the other panel,
+   if that shows files or the tree, and else the last target; but for
+   Rename, of one file or with nothing selected, the name of the file
+   under the cursor. Also the title, in CpVar1, and in CpVar2 a line of
+   spaces that begins "Copy " or "Rename or move ". Returns the address
+   behind those words.
+
+   `directories` and `files` are the numbers of what is selected, where
+   the command has counted, and what BX and DX happened to hold where it
+   has not: after Shift-F6, or F6 with the panel switched off. */
+static u8 *F35_50(u16 panel, u16 directories, u16 files)
+{
+    const struct WCBdef __far *wcb;
+    const u8 __far *from;
+    u8 *to;
+    u16 other, title, words, length, i;
+
+    from = md.ToFile;                                   /* F35_55 */
+    if (md.OneFile == 0 || CopyMov == 0) {
+        other = InvWCB(panel);
+        wcb = PANEL(other);
+        if (wcb->Visible != 0 && wcb->WinTyp <= 1) {
+            from = md.CrnPath;
+            if (wcb->WinTyp == 0)
+                from = wcb->WinPath;
+            goto F35_57;
+        }
+        if (CopyMov == 0 || (directories | files) != 0)
+            goto F35_57;
+    }
+    wcb = PANEL(panel);                                 /* F35_54 */
+    if (wcb->CurAdr < wcb->EndBuf
+        && ENTRY(wcb, wcb->CurAdr)->NameF[0] != '.')
+        from = ENTRY(wcb, wcb->CurAdr)->NameF;
+F35_57:
+    for (i = 0; i < LenStr; i++)
+        CpInpt[i] = from[i];
+    CpInpt[LenStr] = 0;
+
+    title = OFFSET(Copy0_S);
+    words = OFFSET(Copy0_S) + 1;
+    length = 5;
+    if (CopyMov != 0) {
+        title = OFFSET(Ren0_S);
+        words = OFFSET(RnMv_S);
+        length = 15;
+    }
+    /* The title and what follows it in the assembly, 20 bytes. */
+    for (i = 0; i < CpVar2 - CpVar1; i++)
+        CpVar1[i] = *AT(AsmSeg(), title + i);
+    for (i = 0; i < LenStr; i++)
+        CpVar2[i] = ' ';
+    CpVar2[LenStr] = 0;
+    to = CpVar2;
+    for (i = 0; i < length; i++)
+        *to++ = *AT(AsmSeg(), words + i);
+    return to;
+}
+
+/* Copy or rename, as the 1 in the low byte of `command` says, files that
+   are asked for by name: Shift-F5 and Shift-F6, and F5 and F6 where the
+   panel shows no files. Returns where to go on. */
+u32 F45_01(u16 panel, u16 command, u16 directories, u16 files)
+{
+    u8 *to;
+    u16 i;
+
+    CopyMov = (u8)command;
+    md.HlpPage = (u8)(20 + command);
+    to = F35_50(panel, directories, files);
+    for (i = 0; i < 4; i++)                             /* "file" */
+        to[i] = *ASM(CopFi_S, 12 + i);
+    if ((u8)Ask(OFFSET(Copy2_B), F35_40()) != 0)
+        return GO_PANELS;
+    for (i = 0; i < LenStr + 1; i++)
+        md.ToFile[i] = CpInpt[i];
+    for (i = 0; i < LenStr + 1; i++)
+        CpSrc[i] = md.ViewFil[i];
+    if (md.ViewFil[0] == 0 || md.ToFile[0] == 0)
+        return GO_PANELS;
+    CpBgNam = (u16)NEAR(CutPath(CpSrc));
+    F35_70();
+    return PAIR(F35_40(), GO_MASKED);
+}
+
+/* Copy or rename the directory of the tree that the cursor is on, once
+   its new place is in ToFile, and take the current directory of DOS
+   along if it was that one or below it. Returns where to go on.
+
+   Ported as it is: the current directory counts as below the one that
+   was renamed if its path begins with that one's, whether a name ends
+   there or not. With DOCS renamed to X while DOCS2 is the current one,
+   the program goes to X2, if there is such a directory. */
+static u32 F36_04(void)
+{
+    struct DosRegs regs;
+    const u8 *rest;
+    u8 *to;
+    u16 length, i;
+
+    for (i = 0; i < LenPath; i++)
+        CpSrc[i] = md.CrnPath[i];
+    CpBgNam = (u16)NEAR(CutPath(CpSrc));
+    F35_70();
+    md.ZoomOne = 0;
+    if ((u8)C00_00(ATTR_DIRECTORY) == 0 || CopyMov == 0)
+        return GO_DONE;
+    length = 0;
+    while (length < LenName - 1 && md.CrnPath[length] != 0)
+        length++;
+    for (i = 0; i < length; i++)
+        if (md.CrnPath[i] != md.DosPth[i])
+            goto F36_05;
+    rest = md.DosPth + length;
+    to = NEAR(MvzLine(CpInpt, md.ToFile, LenStr + 1));
+    for (i = 0; i < LenPath; i++)
+        to[i] = rest[i];
+    regs.name = CpInpt + 2;
+    regs.ax = 0x3B00;
+    CALL(regs);
+F36_05:
+    for (i = 0; i < LenStr + 1; i++)
+        md.CrnPath[i] = md.ToFile[i];
+    return GO_DONE;
+}
+
+/* Copy or rename, as the 1 in the low byte of `command` says: F5 and F6,
+   and with OneFile set Ctrl-F5 and Ctrl-F6. In a panel of files that is
+   what is selected, or the file under the cursor if nothing is or if
+   only that one is wanted; in a tree, the directory under the cursor,
+   and to rename that only a name is asked for. `directories` and `files`
+   are what BX and DX hold when the key arrives: see F35_50. Returns
+   where to go on. */
+u32 F35_01(u16 panel, u16 command, u16 directories, u16 files)
+{
+    const struct WCBdef __far *wcb = PANEL(panel);
+    const u8 __far *from;
+    const u8 *name, *typed;
+    u8 *to, *end;
+    u32 pair;
+    u16 length, i;
+
+    command &= 0xFF;
+    CopyMov = (u8)command;
+    md.HlpPage = (u8)(20 + command);
+    if (wcb->Visible == 0 || wcb->WinTyp > 1)
+        return F45_01(panel, command, directories, files);
+    if (wcb->WinTyp == 1) {
+        if (md.TreAdr <= TRELIST)                       /* the root */
+            return GO_KEYS;
+        if (command != 0)
+            goto F36_03;
+    } else {
+        directories = 0;
+        files = 0;
+        if (md.OneFile == 0) {
+            pair = TotSel(panel);
+            directories = LOW(pair);
+            files = HIGH(pair);
+        }
+        if ((directories | files) == 0
+            && (wcb->CurAdr >= wcb->EndBuf
+                || ENTRY(wcb, wcb->CurAdr)->NameF[0] == '.'))
+            return GO_KEYS;
+    }
+
+    /* F35_04: what is to be copied, and the dialog. */
+    to = F35_50(panel, directories, files);
+    if (wcb->WinTyp == 1) {
+        for (i = 0; i < LenName; i++)
+            md.TmpErr[i] = md.CrnPath[i];
+        ShrtLin(md.TmpErr, LenStr - 10);
+        from = md.TmpErr;
+        length = LenStr;
+        goto F35_06;
+    }
+    if ((directories | files) != 0) {
+        to = FilDir(to, directories, files) - 1;
+    } else {
+        from = ENTRY(wcb, wcb->CurAdr)->NameF;
+        length = 13;
+F35_06:
+        *to++ = '"';
+        to = NEAR(MvzLine(to, from, length));
+        *to++ = '"';
+    }
+    for (i = 0; i < 3; i++)                             /* " to" */
+        *to++ = *ASM(CopTo_S, 2 + i);
+    end = CpVar2 + LenStr;
+    while (to < end)
+        *to++ = ' ';
+    *to = 0;
+    if ((u8)Ask(OFFSET(Copy1_B), F35_40()) != 0)
+        return GO_PANELS;
+    for (i = 0; i < LenStr + 1; i++)
+        md.ToFile[i] = CpInpt[i];
+    if (md.ToFile[0] == 0)
+        return GO_PANELS;
+    if (PANEL(md.WCBcrn)->WinTyp == 1)
+        return F36_04();
+    F35_70();
+    CpBgNam = (u16)CpSrc;
+    return GO_SELECTED;
+
+F36_03:
+    /* A new name for the directory, which stays where it is. */
+    for (i = 0; i < 13; i++)
+        CpDest[i] = *(const u8 *)(md.TreAdr + i);
+    if ((u8)Ask(OFFSET(Renam_B), 0) != 0)
+        return GO_KEYS;
+    typed = CpDest;
+    if (NEAR(CutPath(typed)) != typed)
+        goto F36_01;
+    for (i = 0; i < LenPath; i++)
+        CpInpt[i] = md.CrnPath[i];
+    name = NEAR(CutPath(CpInpt));
+    for (i = 0; i < 13; i++)
+        ((u8 *)name)[i] = typed[i];
+    for (i = 0; CpInpt[i] != 0; i++)
+        if (i == LenStr)
+            goto F36_01;                /* too long */
+    for (i = 0; i < LenStr + 1; i++)
+        md.ToFile[i] = CpInpt[i];
+    CopyMov = 3;
+    return F36_04();
+
+F36_01:
+    Ask(OFFSET(MkErr_B), F35_40());
+    return GO_KEYS;
+}
+
+/* What the dialogs of the commands have Dialog call for an answer:
+   `answer` is its number in the low byte, 1 for the button F10-Tree and
+   for F10 and Alt-F10, and in the high byte not 0 for F10 itself.
+   `place` is where the line is that the target is typed into. That
+   answer has a directory chosen from the tree, of the drive that was
+   typed if it was F10 and of the current one otherwise, and puts its
+   path into the line. Returns 1 if the dialog is to go on, as it is
+   after that answer, and 0 for any other. */
+u16 F35_61(u16 answer, u16 place)
+{
+    u8 *line = md.DosBuf + 124 + 10 + 3;        /* DosBuf+LenCmd+10+3 */
+    u8 *kept = md.MenuBuf + 350;
+    u8 *end;
+    u16 pair, left, i;
+
+    if ((answer & 0xFF) != 1)
+        return 0;
+    for (i = 0; i < LenPath; i++)
+        kept[i] = md.DosPth[i];
+    left = 0;
+    if (answer >> 8 != 0) {
+        for (i = 0; i < LenStr + 1; i++)
+            md.TmpBuf[i] = line[i];
+        NormStr(md.TmpBuf);
+        pair = *(u16 *)md.TmpBuf;
+        if (pair >> 8 == ':') {
+            SelDrv((u8)(UpCase(pair) - 'A'));
+            if (SetPth())
+                left = 1;
+        }
+    }
+    if (!left)
+        left = ChTree(28);
+    /* Back to the drive and the directory that were the current ones. */
+    pair = kept[0];
+    for (i = 0; i < LenPath; i++)
+        md.DosPth[i] = kept[i];
+    SelDrv((u8)(pair - 'A'));
+    if (left)
+        return 1;
+    end = NEAR(MvzLine(line, md.TmpBuf, LenName));
+    if (end[-1] != '\\') {
+        end[0] = '\\';
+        end[1] = 0;
+    }
+    line[LenStr] = 0;
+    for (i = 0; line[i] != 0; i++)
+        ;
+    *(u16 *)(line - 3) = i;             /* the cursor behind the path */
+    line[-1] = 1;                       /* and what is typed added to it */
+    InSt10(place, (u16)line, LenStr, BoxCu_C << 8);
+    return 1;
 }

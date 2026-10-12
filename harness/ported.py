@@ -546,7 +546,7 @@ BATCHES = [
         source="copy.c",
         routines=("F35_40", "C00_00", "C00_30", "C40_00", "C40_05",
                   "C40_10", "C50_00", "SetDate", "PerCent"),
-        functions=("F35_40_c", "C00_00_c"),
+        functions=("C00_00_c",),
         unreached={
             **dict.fromkeys(
                 (0x432B, 0x435A, 0x435D, 0x4BAB, 0x4BAE, 0x4CC7, 0x4CCA,
@@ -599,6 +599,12 @@ BATCHES = [
                     "size of the file: the size is what DOS says, or "
                     "for a device what was read",
         },
+    ),
+    Batch(
+        title="What Copy and Rename ask before anything is copied",
+        source="copy.c",
+        routines=("F36_00", "F35_50", "F35_60", "F35_70"),
+        functions=("F35_01_c", "F45_01_c", "F35_61_c"),
     ),
 ]
 

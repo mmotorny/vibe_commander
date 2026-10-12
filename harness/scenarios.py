@@ -316,6 +316,24 @@ out again (show.py --changes is how):
     that other tests were using.
   - "Ctrl+a", "Down Space Enter" takes the Archive attribute off a
     file, which then has none.
+  - Ctrl+F5 and Ctrl+F6 copy and rename the file under the cursor,
+    whatever is selected. Tab makes the Info the active panel, and F5
+    there asks for the source too, as Shift+F5 does and as F5 does with
+    the panels off, which Esc switches. F5 and F6 on ".." do nothing.
+  - In the dialog of F5 the keys go to the field that the cursor is in:
+    text typed while it is on the buttons is not taken, and Home goes
+    back to the line. Once F10 has put the path of a directory into the
+    line, what is typed is added to it: Ctrl+y empties the line first.
+    F10 shows the tree of the drive that the line names, "d:", and of
+    the current one for a drive that is not there, "z:"; Alt+F10 and
+    the button show the current drive's.
+  - In the Configuration dialog three Tabs go to "Auto change
+    directory". With that off the cursor of a tree panel moves without
+    the current directory of DOS following, until Enter: so a directory
+    that is not the current one can be renamed there, F6, which FreeDOS
+    does also for one above the current one. After F6 or F5 there the
+    tree is read again, in the order of the disk, and its cursor is on
+    the current directory, not on what was renamed.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -1685,6 +1703,89 @@ SCENARIOS = {
             "Enter",
             "Enter",
             "Enter",
+        )),
+
+    "copy-ask": Scenario(
+        "What Copy and Rename ask before anything is copied: for the "
+        "file under the cursor, for the selected ones, for a source "
+        "that is typed, with the panels off, and with the tree to "
+        "choose the target from",
+        steps=(
+            "F5",                         # on ..: nothing
+            "Ctrl+F5",                    # nor for that one entry
+            "Down Down Down",             # onto readme.txt
+            "Ctrl+F6",                    # offers its own name
+            '"r.txt" Enter',
+            "Ins Ins",                    # two files selected
+            "Ctrl+F5",                    # the file under the cursor all
+            '"one.txt" Enter',            # the same
+            "F5",                         # the two
+            "Esc",
+            "F6",                         # offers the last target
+            "Ctrl+y Enter",               # none: nothing is done
+            "Shift+F6",
+            "Esc",
+            "Shift+F5",
+            '"*.zzz" Tab "x" Enter',      # no such files
+            "Enter",
+            "Tab",                        # the Info is the active panel
+            "F5",                         # asks for the source too
+            "Esc",
+            "Tab",
+            "Esc",                        # the panels off
+            "F5",                         # the same
+            "Esc",
+            "F6",
+            "Esc",
+            "Esc",                        # and on
+            "F9 r t",                     # the tree next to the files
+            "F5",                         # offers its directory
+            '"d:" F10',                   # the tree of the drive typed
+            "Home Enter",                 # its root
+            "Enter",                      # the two files go there
+            "F5",
+            "F10",                        # the drive of what is offered
+            "Esc",
+            "Alt+F10",                    # the current drive
+            "Down Enter",
+            "Tab Right Enter",            # the button
+            "Esc",
+            'Home Ctrl+y "z:" F10',       # no such drive: the current one
+            "Esc",
+            "Esc",
+        )),
+
+    "copy-tree": Scenario(
+        "A directory of a tree panel copied and renamed, and the "
+        "current directory of DOS taken along",
+        steps=(
+            "F9 o c",
+            "Tab Tab Tab Space Enter",    # Auto change directory off
+            "F9 l t",                     # the tree in the left panel
+            "Home",                       # the root
+            "F5",                         # is not copied
+            "F6",                         # nor renamed
+            "Down Down",                  # DOCS
+            "F5",
+            '"docs2" Enter',              # copied with what is in it
+            "Down",                       # SRC
+            "F5",                         # offers the last target
+            '"x2" Enter',
+            "F6",
+            '"src1" Enter',               # renamed; the cursor goes to
+            "Down",                       # the current directory: DOCS
+            "F6",
+            '"a\\b" Enter',               # a path is no name
+            "Enter",
+            "F6",
+            "Esc",
+            "Down Down Enter",            # DOCS2 is the current directory
+            "Up Up",                      # DOCS, whose path that of DOCS2
+            "F6",                         # begins with
+            '"x" Enter',                  # the current one is X2 now
+            "Home Down",                  # WORK
+            "F6",
+            '"work2" Enter',              # the current one follows
         )),
 
     "copy-dirs": Scenario(

@@ -88,7 +88,10 @@ the keys taken while it runs; its dialog and what it does with the
 answer are still assembly. Deleting a file or a directory with what is
 in it, copying, renaming and moving one, and setting attributes, a date
 and a time, are C, and so is what goes through the files of a directory
-for these, the sizes of directories and the file search; what these
+for these, the sizes of directories and the file search. Copy and Rename
+are C from the key on: what they offer as the target, their dialogs, the
+tree to choose the target from, and the renaming of a directory of a tree
+panel. What the other of these
 commands ask first, and going through the selected files of a panel, are
 still assembly, and so is what the viewer and the editor do with their
 keys. The dialogs are C: a box with its lines of text, the fields of a

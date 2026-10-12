@@ -176,12 +176,27 @@ Things that are known and not done. Standing instructions are in
   says 0 or 4096 and has no entries has its sum taken over 65536 bytes,
   all of the main data's segment. Ported like that; it takes a file made
   by hand.
-- Of `VCCOPY.INC`, what Copy and Rename do before anything is copied is
-  still assembly: the commands themselves, `F35_00` to `F56_01`, 570
-  bytes that are no procedure, with `F35_50`, which fills in the target
-  that the dialog offers, `F35_60`, which has the tree chosen from in the
-  dialog, and `F35_70`. They belong together as the next batch there.
-  `F35_40` has a stub for them.
+- `VCCOPY.INC` is C but for its boxes and texts, which `DialBox` and
+  `Dialog` read in the assembly, and the stubs: of the commands, of what
+  their dialogs call for the tree, and of `C00_00`, which `FncSel` and
+  `FncMas` call. Those two, in `VCF1.INC`, are assembly still.
+- What the commands of Copy and Rename do in the original and the port
+  does after them; whether to mend any of it is not decided:
+  - When a directory of a tree panel has been renamed, the current
+    directory of DOS is taken along if its path begins with that of the
+    directory, whether a name ends there or not: with DOCS renamed to X
+    while DOCS2 is the current directory, the program goes to X2 if
+    there is one, and stays where it is if there is not. In `copy-tree`.
+  - Shift-F6, and F6 with the panels off or the Info active, offer the
+    name of the file under the cursor or the last target according to
+    BX and DX, which hold the numbers of selected files only where F5
+    and F6 have counted them: there they are what the key left. The
+    stub hands them on as they are. In `copy-ask`, where either way
+    shows the same.
+- A new name for a directory of the tree that makes its path longer
+  than 64 characters is reported as "Can't create the directory", as a
+  name with a path in it is. The first rests on reading: it takes a
+  tree some ten levels deep.
 - Copying and moving in C rest on reading where DOS would have to
   refuse what it has just allowed, or a drive not be ready: 32
   instructions, listed in `harness/ported.py`. So does going on with
@@ -692,6 +707,17 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     lines around `scenarios.run` and `show.print_screens` ran a whole
     scenario of `scenarios.py` that way; four scenarios of sixty steps
     were right when their goldens were first derived.
+
+- What Copy and Rename ask first, the code of six commands and three
+  routines, 903 bytes, 25 minutes to the commit, next to seven other
+  batches. The translation passed the first time it was tested, and no
+  run waited: nothing takes turns any more. Two goldens were derived in
+  20 seconds, the first `port` test took 151 seconds.
+  - 3 minutes: three drafts of the scenarios, tried on the port's build
+    that signals, 10 seconds each. A step typed into the buttons of the
+    dialog instead of its line, and after a directory of the tree is
+    renamed the cursor is on another line. Both are at the top of
+    `harness/scenarios.py` now.
 
 ## Ideas put off
 

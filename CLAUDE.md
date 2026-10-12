@@ -380,6 +380,23 @@ port.
   one stub: `C40_00`, `C50_00`, `SetDate` and `PerCent` are static
   functions of `port/copy.c`. The boxes and the texts stay in the
   assembly, made `PUBLIC` where they are defined.
+- A command is code between procedures that the main loop jumps to by
+  its table of keys, with DS on the active panel, and that ends by
+  jumping back: to `Func04` for the next key, to `Init50` to draw the
+  panels anew, to `FncSel`, `FncMas` or `FncExt`. Its C function returns
+  a number for where to go on, and the stub jumps by a table of its own,
+  `F35_T` in `VCCOPY.INC`; what the place it jumps to takes in a
+  register, the title in BX for `FncMas`, comes back in DX. A command
+  may read a register that it has not set, as Shift-F6 does BX and DX:
+  the stub hands them to the function as they come.
+- The address of a routine of the assembly, for `FncAddr`, is that of
+  an object like any other: `PUBLIC C00_00`, and in C `extern const u8
+  __far C00_00_s[]` with `#pragma aux C00_00_s "C00_00"`, since the C
+  function has the name already.
+- The stub of a routine that a dialog names saves AX around the call:
+  `Dialog` takes the answer from AL when the carry flag is clear, and
+  reads nothing of AX when it is set. See `F35_60`, which also keeps
+  the label that the other dialog names, `F35_61`, inside it.
 
 ### C for the port
 
