@@ -23,7 +23,7 @@ but code in its row has its data in C.
 | `VC.ASM` | 15 / 733 | 3 / 60 | 2 / 44 | 2 / 8 | 2 / 160 | 219 | `main.c`, `start.c` |
 | `VCFUNC.INC` | | | | | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
 | `VCMENU.INC` | 53 / 1,364 | 8 / 190 | 7 / 352 | 3 / 17 | 8 / 174 | 495 | `commands.c`, `menu.c` |
-| `VCF1.INC` | 48 / 959 | 25 / 502 | 22 / 660 | 4 / 24 | | 217 | `dirfunc.c` |
+| `VCF1.INC` | | | | | | 217 | `dirfunc.c` |
 | `VCCOPY.INC` | | | | | 1 / 10 | 82 | `copy.c` |
 | `VCVIEW.INC` | 16 / 256 | 9 / 160 | 5 / 110 | | | 180 | `view.c` |
 | `VCEDIT.INC` | 14 / 688 | 6 / 106 | 5 / 110 | 4 / 18 | | 26 | `edit.c` |
@@ -32,7 +32,7 @@ but code in its row has its data in C.
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 161 / 4,231 | 54 / 1,070 | 42 / 1,298 | 14 / 72 | 13 / 420 | 2,420 | |
+| all | 113 / 3,272 | 29 / 568 | 20 / 638 | 10 / 48 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -88,7 +88,8 @@ What names what:
   `OkMn_D`, `Var_S`, `Inc_S`, `Err_S` of `VC.ASM`; `Empty_S`, `Kov_S`,
   `YesNo_S`, `YesNo_D` of `port/keys_t.c`, which were of
   `VCFUNC.INC`; `OkCan_S`, `OkCan_D` of
-  `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `VCF1.INC`; `EdFl_S` of
+  `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`, which were of
+  `VCF1.INC`; `EdFl_S` of
   `VCVIEW.INC`; `Tree_S`, `PtMnu_S` of `VCSUB2.INC`. `VC.ASM` declares
   those `EXTERNDEF`, so that either side can name one wherever it is.
 - Code of the assembly names data in one place: the stub of the menu bar
@@ -173,7 +174,7 @@ that are copied with what follows them are written as long as what is
 copied; `VCCOPY.INC`, where the titles `Copy0_S` and `Ren0_S` are such
 texts too, 20 bytes each; `VCFUNC.INC`, where the names of the menu file
 and of the list file are, 13 bytes each, and whose `AltSr_T` stays with
-the tables.
+the tables; `VCF1.INC`, where `DlWr4_S` is one, 81 bytes.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for
@@ -892,12 +893,13 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   Cancel for a read-only file stops the command. `M30_50` does not ask
   whether DOS could read or set the date and the time of a file. All
   ported as they are.
-- `VCF1.INC` is C but for its boxes and texts and the stubs: `FncSel`,
-  which goes through the selected files of a panel, and `FncExt`, where
-  a command ends that may have changed the disk, are functions of
-  `port/dirfunc.c`, and their stubs are what `F1Next` and the table of
-  Copy and Rename jump to. They were code in the program's data, behind
-  `DirFunc`; `harness/coverage.py` names such code by its label now.
+- `VCF1.INC` is C but for the stubs; its boxes and texts are constants
+  of `port/dirfunc_t.c`. `FncSel`, which goes through the selected files
+  of a panel, and `FncExt`, where a command ends that may have changed
+  the disk, are functions of `port/dirfunc.c`, and their stubs are what
+  `F1Next` and the table of Copy and Rename jump to. They were code in
+  the program's data, behind `DirFunc`; `harness/coverage.py` names such
+  code by its label now.
 - A command that is C returns where it goes on, and its stub jumps
   there: `F1Next` in `VCF1.INC`, with the `TO_` of `port/vc.h`. The
   commands of the other files can use the same; one that goes on

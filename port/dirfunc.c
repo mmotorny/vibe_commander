@@ -131,8 +131,9 @@ u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
 #pragma aux PutTime "*_c" __far parm [ax] [bx] modify exact [ax bx cx dx]
 #pragma aux BufTime "*_c" __far parm [bx] [di] value [di] modify exact [ax bx di]
 
-/* Boxes and texts of the assembly, which OncZoom and Dialog take by their
-   offsets in its code segment: only those are used here. */
+/* Boxes and texts, constants of port/dirfunc_t.c but for Empty_S, which
+   OncZoom and Dialog take by their offsets in the segment that the
+   constants are in: only those are used here. */
 extern const u8 __far DelFl_P[];        /* "Deleting the file" */
 extern const u8 __far DelDr_P[];        /* "Deleting the subdirectory" */
 extern const u8 __far DelCo_B[];        /* "You are DELETING ... from" */
