@@ -26,13 +26,13 @@ but code in its row has its data in C.
 | `VCF1.INC` | | | | | | 217 | `dirfunc.c` |
 | `VCCOPY.INC` | | | | | 1 / 10 | 82 | `copy.c` |
 | `VCVIEW.INC` | | | | | | 180 | `view.c` |
-| `VCEDIT.INC` | 14 / 688 | 6 / 106 | 5 / 110 | 4 / 18 | | 26 | `edit.c` |
+| `VCEDIT.INC` | | | | | | 26 | `edit.c` |
 | `VCMEM.INC` | | | | | | 40 | `memory.c` |
 | `VCFIND.INC` | | | | | | 22 | `find.c` |
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 44 / 1,652 | 12 / 218 | 8 / 176 | 7 / 31 | 13 / 420 | 2,420 | |
+| all | 30 / 964 | 6 / 112 | 3 / 66 | 3 / 13 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -178,7 +178,7 @@ the tables; `VCF1.INC`, where `DlWr4_S` is one, 81 bytes; `VCMENU.INC`,
 where the title `ExFl_S` is one, 80 bytes, and `Chk1_S`, which is read
 as far as the end of `Chk2_S` behind it, is ten; `VCVIEW.INC`, where
 the names of the two extension files are such texts, 13 bytes each, and
-`Run2_S`, 80 bytes.
+`Run2_S`, 80 bytes; `VCEDIT.INC`, which has none.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for

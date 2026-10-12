@@ -78,7 +78,8 @@ and the way back to the panels; its texts, boxes and dialogs are
 constants of C, in `port/view_t.c`. The editor is C as a whole: the text in
 the memory with the buffer of the line that the cursor is in, the screen
 brought up to where the cursor is, as text or in hex, with its status
-line, what every key does, the search, and saving the file. The commands
+line, what every key does, the search, and saving the file, with its
+texts, boxes and dialogs constants of C in `port/edit_t.c`. The commands
 that start the two are C as well, by themselves or by a program that an
 extension file names, which is run with the viewer's memory given up
 for it. The keys of the
