@@ -448,6 +448,22 @@ files. The picture at the top is `screen.png` from
 `python3 harness/screenshot.py --scale 3x4`, which enlarges the 720x400
 display to roughly the 4:3 shape it had on a monitor.
 
+## Using the port by hand
+
+Needs the project built, and a terminal of 80 columns by 25 lines at least.
+
+```sh
+python3 harness/play.py
+```
+
+This starts the port, `build/port/VC.EXE`, on the machine of the tests, with
+its screen in the terminal and the terminal's keyboard: FreeDOS from its
+floppy, the bench's files on `C:` and the program on `D:`. `--original` runs
+the original there, `--country ru` uses the Russian bench, and
+`--display gtk` opens a window where there is a desktop. F10 leaves the
+program, and the machine then switches itself off. The disks are made anew
+every time, so nothing done there is kept.
+
 ## Origins
 
 ### The source
