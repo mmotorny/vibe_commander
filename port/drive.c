@@ -16,8 +16,7 @@ u16 F62_01(u16 panel, u16 item);
 #pragma aux F62_01 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 
 /* Routines of the rest of the program that are still assembly, by their
-   entries for C. HidCur puts the cursor below the screen. PutMnu draws
-   the menu bar, if that is always shown, with an item of it marked.
+   entries for C. HidCur puts the cursor below the screen.
    SavWin keeps what the screen buffer has where a window is to be, ResWin
    puts it back; MinBox draws a box with a shadow there. SftEGA moves a
    place down on a screen of more than 25 lines, by half of what it has
@@ -26,8 +25,8 @@ u16 F62_01(u16 panel, u16 item);
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, or `place` as it was if there is no mouse.
    TypMous gives the mouse pointer the look of a character, or its own for
-   0. InWind is not 0 if a place is outside a window. Input waits for a
-   key, with the key bar `bar` on the screen, and shows the help for F1.
+   0. InWind is not 0 if a place is outside a window. PutMnu and Input
+   are C, of vc.h.
 
    TstDrv is 1 if DOS has a drive of the letter in the low byte of
    `letter`. ErrRdy says that a drive is not ready and asks for another:
@@ -36,7 +35,6 @@ u16 F62_01(u16 panel, u16 item);
    answer there, but not through Intr21, where the assembly called DOS
    itself. */
 void HidCur(void);
-void PutMnu(u16 item);
 void SavWin(u16 begin, u16 size, u16 buffer);
 void ResWin(u16 begin, u16 size, u16 buffer);
 void MinBox(u16 begin, u16 size, u16 color);
@@ -44,12 +42,10 @@ u16 SftEGA(u16 place);
 u32 GetMous(u16 place);
 void TypMous(u16 look);
 u16 InWind(u16 place, u16 begin, u16 size);
-u16 Input(u16 bar);
 u16 TstDrv(u16 letter);
 u16 ErrRdy(u16 letter);
 u16 Int21d(struct DosRegs STACK *regs);
 #pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux PutMnu  "*_a" __far parm [ax] modify exact [es]
 #pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
@@ -57,7 +53,6 @@ u16 Int21d(struct DosRegs STACK *regs);
 #pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
 #pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
 #pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux Input   "*_a" __far parm [ax] value [ax] modify exact [ax es]
 #pragma aux TstDrv  "*_a" __far parm [ax] value [ax] modify exact [ax es]
 #pragma aux ErrRdy  "*_a" __far parm [ax] value [ax] modify exact [ax es]
 #pragma aux Int21d  "*_a" __far parm [bx] value [ax] modify exact [ax bx cx dx si di es]

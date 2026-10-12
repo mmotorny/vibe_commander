@@ -1110,23 +1110,6 @@ Dialog	PROC	NEAR
 	RET
 Dialog	ENDP
 
-; Entries for the C code of the dialogs to routines of other files (see
-; FromC in VC.ASM, and port/dialog.c for what they take and return).
-	FromC	PutMnu
-	FromC	PutKey
-
-; EdLin for C code: where the cursor is comes back in AX, and DX is not 0
-; if the routine set the carry flag, for a line or a cursor that changed.
-	PUBLIC	EdLin_a
-EdLin_a	PROC	FAR
-	PUSH	DS
-	POP	ES
-	CALL	EdLin
-	MOV	AX,DX
-	SBB	DX,DX
-	RET
-EdLin_a	ENDP
-
 ; The code segment of the assembly, where the boxes and the dialogs are
 ; that C code reads.
 	PUBLIC	AsmSeg_a

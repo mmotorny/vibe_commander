@@ -2,6 +2,10 @@
 ;		Version :	16.10.1999
 ;-------------------------------------------------------
 
+	PUBLIC	PtMnu_S
+	PUBLIC	Timer_a, DosTime_a, InpKey_a
+	PUBLIC	SigNew_a, SigKeys_a, SigWait_a
+
 ;------------------ Begin of main windows --------------
 ;			   DS - WCBseg
 ;	Return :	BH,BL - Begin
@@ -26,200 +30,36 @@ LnsAX	ENDP
 
 ;------------------- Clear screen line -----------------
 ;			   BH - line
+; C: ClsLine_c of port/bars.c. The routine read the colour in the caller's
+; DS, so DS goes to the C as a number. The one caller that could come with
+; DS on a panel, what makes the commands of a line of a menu, is C itself
+; and hands that segment over.
 ClsLine	PROC	NEAR
-	PUSH	CX
 	MOV	BL,0
-	CALL	BasAdr
-	MOV	CX,80
+	MOV	AX,DS
+	CallC	ClsLine_c		; DI: behind the line
 	MOV	AH,DS:CrntCol
 	MOV	AL,' '
-	REP	STOSW
-	POP	CX
 	RET
 ClsLine	ENDP
 
 ;-------------------- Output key bar -------------------
 ;			   AL - Case
-	.DATA
-KeyB_T	DB	 1, 2, 3, 4		;  0
-	DB	 7, 0, 0, 0		;  1
-	DB	 8, 0, 0, 0		;  2
-	DB	 9,12, 0, 0		;  3
-	DB	10,12, 0, 0		;  4
-	DB	11,12, 0, 0		;  5
-	DB	13,16, 0, 0		;  6
-	DB	14,16, 0, 0		;  7
-	DB	 6, 0, 0,17		;  8
-	DB	 1, 2, 3, 5		;  9
-	DB	15,16, 0, 0		; 10
-	DB	 1, 1, 1, 1		; 11
-	DB	 2, 2, 2, 2		; 12
-	DB	 4, 4, 4, 4		; 13
-	DB	18, 0, 0, 0		; 14
-LenKeyB	=	$ - KeyB_T
-
-KeyC_T	DB	 0,  0,  0,  0,  0,  0,  0,  0,  0,  0	;  0
-	DB	 1,  2,  3,  4,  5,  6,  7,  8,  9, 10	;  1
-	DB	 0, 31,  3,  4,  5,  6,  7,  8, 11, 12	;  2
-	DB	13, 14,  0, 32,  5,  6,  0,  8,  0,  0	;  3
-	DB	13, 14, 15, 16, 30, 17, 18, 19, 20, 21	;  4
-	DB	13, 14, 15, 16, 30, 17, 18, 19,  0, 21	;  5
-	DB	 1,  0,  0,  0,  0,  0,  0,  0,  0, 21	;  6
-	DB	 1,  0,  0,  0,  0,  0,  0,  0,  0, 10	;  7
-	DB	 0,  0,  0,  0,  0,  0,  0,  0,  0, 10	;  8
-	DB	 1,  0, 10, 22,  0,  0, 26,  0,  0, 10	;  9
-	DB	 1, 24, 10, 23,  0,  0, 26,  0,  0, 10	; 10
-	DB	 1, 25, 10, 23,  0,  0, 26,  0,  0, 10	; 11
-	DB	 0,  0,  0,  0,  0,  0, 26,  0,  0,  0	; 12
-	DB	 1, 27,  0, 22,  0,  0, 26,  0,  0, 10	; 13
-	DB	 1, 27,  0, 23,  0,  0, 26,  0,  0, 10	; 14
-	DB	 1, 27,  0,  0,  0,  0, 26,  0,  0, 10	; 15
-	DB	 0, 28,  0,  0,  0,  0, 26,  0,  0, 29	; 16
-	DB	 0,  0,  0,  0,  0,  0,  0,  0,  0, 21	; 17
-	DB	 1, 33,  0,  0,  0,  0,  0,  0,  0, 10	; 18
-
-	.CONST
-Key_S	DB	'      '		;  0
-	DB	'Help  '		;  1
-	DB	'Menu  '		;  2
-	DB	'View  '		;  3
-	DB	'Edit  '		;  4
-	DB	'Copy  '		;  5
-	DB	'RenMov'		;  6
-	DB	'Mkdir '		;  7
-	DB	'Delete'		;  8
-	DB	'PullDn'		;  9
-	DB	'Quit  '		; 10
-	DB	'SavSet'		; 11
-	DB	'PullDn'		; 12
-	DB	'Left  '		; 13
-	DB	'Right '		; 14
-	DB	'View..'		; 15
-	DB	'Edit..'		; 16
-	DB	'DirSiz'		; 17
-	DB	'Find  '		; 18
-	DB	'Histry'		; 19
-	DB	'EGA Ln'		; 20
-	DB	'Tree  '		; 21
-	DB	'ASCII '		; 22
-	DB	'Hex   '		; 23
-	DB	'Wrap  '		; 24
-	DB	'Unwrap'		; 25
-	DB	'Search'		; 26
-	DB	'Save  '		; 27
-	DB	'Save..'		; 28
-	DB	'Q&Save'		; 29
-	DB	'Memory'		; 30
-	DB	'Main  '		; 31
-	DB	'Label '		; 32
-	DB	'Rescan'		; 33
-
-	.CODE
+; C: PutKey_c of port/bars.c, with PutKey0 and the names of the keys.
 PutKey	PROC	NEAR
-	CMP	ES:KeyBar,0
-	JNZ	PutKy1
-	MOV	ES:BarPrev,0FFh
-	SigKeys	0
-	RET
-PutKy1:	PUSH	BX
 	PUSH	AX
-	MOV	BL,AL
-	MOV	AH,2
-	INT	16h
-	SigKeys
-	MOV	AH,3
-	TEST	AL,8
-	JNZ	PutKy2
-	DEC	AH
-	TEST	AL,4
-	JNZ	PutKy2
-	DEC	AH
-	TEST	AL,3
-	JNZ	PutKy2
-	DEC	AH
-PutKy2:	MOV	AL,BL
-	CALL	PutKey0
+	CallC	PutKey_c
 	POP	AX
-	POP	BX
 	RET
 PutKey	ENDP
 
-PutKey0	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	SHL	AL,1
-	SHL	AL,1
-	OR	AL,AH
-	MOV	AH,0
-	MOV	BX,AX
-	MOV	AL,0
-	CMP	BL,LenKeyB
-	JAE	PutKy3
-	MOV	AL,CS:KeyB_T[BX]
-PutKy3:	CMP	AL,ES:BarPrev
-	JE	PutKy7
-	MOV	ES:BarPrev,AL
-	MOV	AH,10
-	MUL	AH
-	MOV	SI,AX
-	MOV	BH,ES:Lines
-	DEC	BH
-	MOV	BL,0
-	CALL	BasAdr
-	MOV	AH,KeyTi_C
-	CALL	Color
-	MOV	DH,AH
-	MOV	AH,KeyNu_C
-	CALL	Color
-	MOV	DL,'1'
-PutKy4:	MOV	AL,DL
-PutKy5:	STOSW
-	XCHG	AH,DH
-	PUSH	SI
-	PUSH	AX
-	MOV	CX,6
-	MOV	AL,CS:KeyC_T[SI]
-	MUL	CL
-	ADD	AX,OFFSET Key_S
-	MOV	SI,AX
-	POP	AX
-	CALL	MvsBwc
-	POP	SI
-	INC	SI
-	INC	DX
-	CMP	DL,'9'+1
-	JA	PutKy6
-	XCHG	AH,DH
-	MOV	AL,' '
-	STOSW
-	JB	PutKy4
-	MOV	AL,'1'
-	STOSW
-	MOV	AL,'0'
-	JMP	PutKy5
-PutKy6:	MOV	DX,150h
-	CALL	Window
-PutKy7:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	RET
-PutKey0	ENDP
-
 ;-------------------- Output menu bar ------------------
 ;			   AL - Case
+; C: PtMnu1_c of port/bars.c. The names of the menus stay here: the menu
+; reads them too, to find the one that the mouse is on (F40_50).
 	.CONST
 PtMnu_S	DB	0FFh,4,'Left',0FFh,4,'Files',0FFh,4,'Commands'
 	DB	0FFh,4,'Options',0FFh,4,'Right',0FFh,31,0
-
-	.DATA
-PtMnu_B	DB	Menu_C
 
 	.CODE
 PutMnu3	PROC	NEAR
@@ -230,172 +70,29 @@ PutMnu	PROC	NEAR
 	CMP	ES:MenuVs,0
 	JNZ	PtMnu1
 	RET
-PtMnu1:	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	PUSH	CS
-	POP	DS
-	CBW
-	MOV	CX,AX
-	XOR	BX,BX
-	CALL	BasAdr
-	MOV	SI,OFFSET PtMnu_S
-	PUSH	SI
-	MOV	BP,OFFSET PtMnu_B
-	MOV	AL,80
-	CALL	NgLine
-	POP	SI
-	CMP	CL,5
-	JA	PtMnu4
-	JCXZ	PtMnu4
-	MOV	BL,-2
-PtMnu2:	LODSB
-	INC	BX
-	CMP	AL,0FFh
-	JNE	PtMnu2
-	LODSB
-	DEC	BX
-	ADD	BL,AL
-	LOOP	PtMnu2
-	MOV	BH,0
-	MOV	CX,4-1
-PtMnu3:	LODSB
-	INC	CX
-	CMP	AL,0FFh
-	JNE	PtMnu3
-	CALL	BasAdr
-	MOV	AH,MnCur_C
-	CALL	Color
-	MOV	AL,AH
-	CALL	MvsColr
-PtMnu4:	XOR	BX,BX
-	MOV	DX,150h
-	CALL	Window
+PtMnu1:	PUSH	AX			; The menu draws it wherever it is
+	CallC	PtMnu1_c
 	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
 	RET
 PutMnu	ENDP
 
 ;--------------------- Output prompt -------------------
+;			   DS - WCBseg
+; C: PutPrm_c of port/bars.c.
 PutPrm	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	BX
 	PUSH	AX
-	CALL	BegBX
-	CALL	SizDX
-	ADD	DH,BH
-	PUSH	ES
-	POP	DS
-	MOV	BH,DS:DosLin
-	CMP	BH,DH
-	JAE	PutPr1
-	PUSH	DS
-	MOV	DS,DS:WCBcrn
-	CMP	DS:Visible,0
-	POP	DS
-	JZ	PutPr1
-	MOV	BH,DH
-	MOV	DS:DosLin,BH
-PutPr1:	MOV	BL,0
-	CALL	BasAdr
-	MOV	AH,DS:CrntCol
-	MOV	SI,OFFSET DosPth
-	LODSB
-	STOSW
-	INC	BX
-	CMP	DS:Prompt,0
-	JZ	PutPr3
-PutPr2:	LODSB
-	CMP	AL,0
-	JE	PutPr3
-	STOSW
-	INC	BX
-	JMP	PutPr2
-PutPr3:	CMP	DS:PathEr,0
-	JZ	PutPr4
-	MOV	AL,'?'
-	STOSW
-	INC	BX
-PutPr4:	MOV	AL,'>'
-	STOSW
-	INC	BX
-	MOV	DS:BegCol,BL
-	CALL	DosCom
+	MOV	AX,DS
+	CallC	PutPrm_c
 	POP	AX
-	POP	BX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
 	RET
 PutPrm	ENDP
 
 ;------------------ Output command line ----------------
+; C: DosCom_c of port/bars.c.
 DosCom	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	PUSH	ES
-	POP	DS
-	MOV	AL,DS:DosCol
-	MOV	BH,AL
-	MOV	BL,0
-	SUB	AL,5
-	JB	DosCm1
-	MOV	BL,DS:OutCol
-	CMP	AL,BL
-	JAE	DosCm1
-	MOV	BL,AL
-DosCm1:	MOV	CX,79
-	SUB	CL,DS:BegCol
-	SUB	BH,CL
-	JB	DosCm2
-	CMP	BH,BL
-	JBE	DosCm2
-	MOV	BL,BH
-DosCm2:	MOV	DS:OutCol,BL
-	MOV	BH,0
-	LEA	SI,[BX].DosBuf
-	INC	CX
-	MOV	BH,DS:DosLin
-	MOV	BL,DS:BegCol
-	CALL	BasAdr
-	MOV	AH,DS:CrntCol
-DosCm3:	LODSB
-	CMP	AL,0
-	JNE	DosCm4
-	DEC	SI
-	MOV	AL,' '
-DosCm4:	STOSW
-	LOOP	DosCm3
-	MOV	BL,0
-	MOV	DX,150h
-	CALL	Window
+	CallC	DosCom_c
 	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
 	RET
 DosCom	ENDP
 
@@ -632,418 +329,82 @@ InvWCB	PROC	NEAR
 InvWCB	ENDP
 
 ;------------ Find iten in extension file ------------
-;			DS:SI - file buffer
-;	Return :	ES:SI - address of item
-FndItem	PROC	NEAR
-	MOV	AX,DS:[SI]
-	CMP	AL," "
-	JE	FndIt1
-	CMP	AL,9
-	JE	FndIt1
-	CMP	AL,"'"
-	JE	FndIt1
-	CALL	IsCrLf
-	JE	FndIt1
-	CMP	AL,1Ah
-	JE	FndIt2
-	CLC
-	RET
-FndIt1:	CALL	IsCrLfS
-	JE	FndItem
-	DEC	SI
-	CMP	AL,1Ah
-	JNE	FndIt1
-FndIt2:	STC
-	RET
-FndItem	ENDP
+; C: FndItem_c of port/extfile.c, which only C code calls.
 
 ;------------ Find string in extension file ------------
 ;			DS:SI - file
 ;	Return :	ES:SI - string, 0 - if not found
+;			 CY=1 - not found
+; C: FindExt_c of port/extfile.c.
 FindExt	PROC	NEAR
-	MOV	DI,OFFSET TmpErr
-	MOV	CX,3
-FnEx01:	LODSB
-	CMP	AL,'.'
-	JE	FnEx02
-	CMP	AL,0
-	JNE	FnEx01
-	DEC	SI
-FnEx02:	LODSB
-	CMP	AL,0
-	JNE	FnEx03
-	DEC	SI
-	MOV	AL,' '
-FnEx03:	STOSB
-	LOOP	FnEx02
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	SI,OFFSET MenuBuf
-FnEx04:	CALL	FndItem
-	JC	FnEx13
-FnEx05:	MOV	DI,OFFSET TmpErr
-	MOV	CX,3
-FnEx06:	LODSB
-	CMP	AL,':'
-	JE	FnEx10
-	CMP	AL,9
-	JE	FnEx11
-	CMP	AL,'*'
-	JE	FnEx09
-	CMP	AL,'?'
-	JE	FnEx08
-	CALL	LowCase
-	CMP	AL,DS:[DI]
-	JNE	FnEx12
-FnEx08:	INC	DI
-	LOOP	FnEx06
-FnEx09:	CALL	IsCrLfS
-	JE	FnEx04
-	DEC	SI
-	CMP	AL,1Ah
-	JE	FnEx13
-	CMP	AL,':'
-	JNE	FnEx09
-	POP	DS
+	PUSH	DX
+	MOV	DX,DS
+	CallC	FindExt_c		; SI: the command, or 0
+	POP	DX
+	CMP	SI,1			; CY for 0
 	RET
-FnEx10:	DEC	SI
-FnEx11:	MOV	AL,' '
-	REPE	SCASB
-	JE	FnEx09
-FnEx12:	CALL	FndIt1
-	JNC	FnEx05
-FnEx13:	XOR	SI,SI
-	POP	DS
-	STC
-	RET
-FindExt ENDP
+FindExt	ENDP
 
 ;------------------- Keyboard input --------------------
 ;			   AL - Key bar case
 ;	Return:		   AX - Key code
+; C: Input_c of port/input.c, which calls the help for F1.
 Input	PROC	NEAR
-	PUSH	AX
-	CALL	Input0
-	CMP	AX,3B00h
-	JNE	Input1
-	CALL	Help
-	POP	AX
-	JMP	Input
-Input1:	INC	SP
-	INC	SP
+	CallC	Input_c
 	RET
 Input	ENDP
 
-Input0	PROC	NEAR C USES DS SI DI DX CX BX
-	LOCAL	IKeyBar[2]:BYTE	,\	; Each byte takes a word of stack
-		BlMouse[2]:BYTE	,\
-		KbdFlgs[2]:BYTE	,\
-		AltLock[2]:BYTE	,\
-		ClkFlag[2]:BYTE	,\
-		ClkBuf[6]:WORD	,\
-		BlTime	:DWORD	,\
-		AltTime	:DWORD
-	PUSH	ES
-	POP	DS
-	MOV	IKeyBar,AL
-	SigNew
-	MOV	AH,1
-	INT	16h
-	JZ	Inpt02
-	MOV	AH,0
-	INT	16h
-	Signal	'K'
-Inpt01:	JMP	Inpt41
-Inpt02:	XOR	AX,AX
-	CALL	GetMous
-	MOV	AH,0FCh
-	JNZ	Inpt01
+; Input0, which waits for the key, is C too, and only C code calls it.
+
+; What Input0 and PutKey ask of the BIOS, of DOS and of the tests, now
+; that they are C (see FromC in VC.ASM, and port/input.c for what the
+; entries take and return).
+	FromC	LeaveTm
+	FromC	Blank
+
+; The BIOS's count of timer ticks, as a number of 32 bits in DX and AX.
+Timer_a	PROC	FAR
 	CALL	Timer
-	MOV	AltTime.Lo,DX
-	MOV	AltTime.Hi,CX
-	PUSH	ES
-	PUSH	SS
-	POP	ES
-	MOV	SI,OFFSET ScrBuf+2*74
-	LEA	DI,ClkBuf
-	MOV	CX,6
-	REP	MOVSW
-	POP	ES
-	MOV	AH,2
-	INT	16h
-	MOV	KbdFlgs,AL
-	MOV	AltLock,0
-Inpt03:	MOV	ClkFlag,0
-	MOV	BlMouse,0
-Inpt04:	MOV	CX,0FFFFh
-	CMP	DS:BlDelay,0
-	JE	Inpt05
+	MOV	AX,DX
+	MOV	DX,CX
+	RET
+Timer_a	ENDP
+
+; The time of day: the hours and the minutes in AX, the seconds and their
+; hundredths in DX.
+DosTime_a PROC	FAR
 	MOV	AH,2Ch
 	INT	21h
-	ADD	CL,DS:BlDelay
-	CMP	CL,60
-	JB	Inpt05
-	SUB	CL,60
-	INC	CH
-Inpt05:	MOV	BlTime.Lo,DX
-	MOV	BlTime.Hi,CX
-Inpt10:	MOV	AL,IKeyBar
-	CALL	PutKey
-	CALL	LeaveTm
-	CMP	DS:BlDelay,0
-	JE	Inpt20
-	MOV	AH,2Ch
-	INT	21h
-	CMP	CH,0
-	JNE	Inpt11
-	CMP	BYTE PTR BlTime[3],24
-	JB	Inpt11
-	MOV	BYTE PTR BlTime[3],CH
-Inpt11:	CMP	CX,BlTime.Hi
-	JB	Inpt20
-	JA	Inpt12
-	CMP	DX,BlTime.Lo
-	JB	Inpt20
-Inpt12:	CALL	Blank
-	XOR	BX,BX
-	MOV	DH,DS:Lines
-	MOV	DL,80
-	CALL	Window
-Inpt13:	XOR	AX,AX
-	CALL	GetMous
-	JNZ	Inpt13
-	JMP	Inpt03
-Inpt20:	CMP	DS:Clock,0
-	JE	Inpt30
-	MOV	DI,OFFSET ScrBuf+2*75
-	MOV	AH,2Ch
-	INT	21h
-	MOV	AL,CH
-	MOV	AH,0
-	CMP	DS:Country.TimeFmt,0
-	JNZ	Inpt22
-	DEC	DI
-	DEC	DI
-	MOV	BL,12
-	DIV	BL
-	CMP	AH,0
-	JNE	Inpt21
-	MOV	AH,12
-Inpt21:	CMP	AL,0
-	MOV	AL,AH
-	MOV	BH,'a'
-	JE	Inpt22
-	MOV	BH,'p'
-Inpt22:	MOV	BL,' '
-	CMP	DL,50
-	JB	Inpt23
-	MOV	BL,DS:Country.TimeSep
-Inpt23:	CMP	BL,ClkFlag
-	JE	Inpt30
-	MOV	ClkFlag,BL
-	CALL	HexDec
-	MOV	DX,AX
-	MOV	AL,CL
-	CALL	HexDec
-	MOV	CX,AX
-	MOV	AH,Clock_C
-	CALL	Color
-	MOV	AL,DL
-	CMP	AL,'0'
-	JNE	Inpt24
-	MOV	AL,' '
-Inpt24:	STOSW
-	MOV	AL,DH
-	STOSW
-	MOV	AL,BL
-	STOSW
-	MOV	AL,CL
-	STOSW
-	MOV	AL,CH
-	STOSW
-	CMP	DS:Country.TimeFmt,0
-	JNZ	Inpt25
-	MOV	AL,BH
-	STOSW
-Inpt25:	MOV	BX,74
-	MOV	DX,106h
-	CALL	Window
-Inpt30:	CMP	DS:AutoTim.Lo,0FFFFh
-	JE	Inpt31
-	MOV	BX,DX
-	MOV	AH,2Ch
-	INT	21h
-	XCHG	BX,DX
-	MOV	AX,0FE00h
-	CMP	CX,DS:AutoTim.Lo
-	JB	Inpt31
-	JA	Inpt32
-	CMP	BX,DS:AutoTim.Hi
-	JAE	Inpt32
-Inpt31:	SigWait
-	CALL	Rnd
-	MOV	AH,1
-	INT	16h
-	JZ	Inpt33
-	MOV	AH,0
-	INT	16h
-	Signal	'K'
-Inpt32:	JMP	Inpt40
-Inpt33:	XOR	AX,AX
-	CALL	GetMous
-	MOV	AH,0FCh
-	JNZ	Inpt32
-	MOV	AH,2
-	INT	16h
-	MOV	BL,AL
-	XCHG	BL,KbdFlgs
-	CMP	DS:DesqVie,0
-	JNZ	Inpt34
-	CMP	DS:AltBar,0
-	JZ	Inpt34
-	PUSH	BX
-	PUSH	AX
-	CALL	Timer
 	MOV	AX,CX
-	MOV	BX,DX
-	XCHG	DX,AltTime.Lo
-	XCHG	CX,AltTime.Hi
-	SUB	BX,DX
-	SBB	AX,CX
-	CMP	BX,3
-	CMC
-	ADC	AX,AX
-	POP	AX
-	POP	BX
-	JNE	Inpt34
-	MOV	AH,BL
-	XOR	AH,AL
-	JZ	Inpt34
-	CMP	AH,8
-	JNE	Inpt34
-	MOV	BH,1
-	TEST	AL,8
-	JNZ	Inpt38
-	CMP	AltLock,0
-	JE	Inpt34
-	MOV	AX,0FD00h
-	JMP	Inpt40
-Inpt34:	AND	BL,0F0h
-	XOR	AL,BL
-	JNZ	Inpt37
-	XOR	CX,CX
-	CALL	GetMous
-	MOV	DX,102h
-	MOV	BX,78
-	CALL	InWind
-	JC	Inpt35
-	CMP	BlMouse,0
-	JE	Inpt36
-	JMP	Inpt12
-Inpt35:	MOV	BlMouse,1
-Inpt36:	MOV	BH,DS:Lines
-	DEC	BH
-	CALL	InWind
-	JNC	Inpt39
-	JMP	Inpt10
-Inpt37:	TEST	AL,0F7h
-	JZ	Inpt39
-	MOV	BH,0
-Inpt38:	MOV	AltLock,BH
-Inpt39:	JMP	Inpt04
-Inpt40:	CMP	DS:Clock,0
-	JZ	Inpt41
-	PUSH	DS
-	PUSH	SS
-	POP	DS
-	LEA	SI,ClkBuf
-	MOV	DI,OFFSET ScrBuf+2*74
-	MOV	CX,6
-	REP	MOVSW
-	POP	DS
-	MOV	BX,74
-	MOV	DX,106h
-	CALL	Window
-Inpt41:	MOV	DS:AutoTim.Lo,0FFFFh
-	CMP	AH,0FCh
-	JNE	Inpt55
-	CMP	DS:KeyBar,0
-	JZ	Inpt55
-	CALL	GetMous
-	MOV	AH,0FCh
-	INC	CH
-	CMP	CH,DS:Lines
-	JNE	Inpt55
-	DEC	CH
-	MOV	BL,CL
-	AND	BX,0F8h
-	XOR	SI,SI
-	XOR	DI,DI
-Inpt50:	PUSH	BX
-	MOV	BH,DS:Lines
-	DEC	BH
-	MOV	DX,108h
-	CALL	InWind
-	POP	DX
-	MOV	BH,AL
-	MOV	AL,0
-	JC	Inpt51
-	OR	DI,DI
-	JZ	Inpt52
-	MOV	AL,'û'
-Inpt51:	MOV	AH,0
-	CMP	AX,SI
-	JE	Inpt52
-	MOV	SI,AX
-	CALL	TypMous
-Inpt52:	MOV	AH,3
-	TEST	BH,2
-	JNZ	Inpt54
-	MOV	AH,1
-	TEST	BH,4
-	JNZ	Inpt54
+	RET
+DosTime_a ENDP
+
+; Take the key that waits, and tell the tests so.
+InpKey_a PROC	FAR
 	MOV	AH,0
-	TEST	BH,1
-	JZ	Inpt56
-Inpt54:	MOV	AL,IKeyBar
-	CALL	PutKey0
-	CALL	GetMous
-	OR	DI,DI
-	JNZ	Inpt50
-	PUSH	BX
-	CMP	BL,72
-	CMC
-	ADC	BL,1
-	MOV	BH,CH
-	CALL	BasAdr
-	POP	BX
-	CMP	BYTE PTR DS:[DI],' '
-	JNE	Inpt50
-	MOV	AH,0FCh
-Inpt55:	CLC
-	JMP	Inpt59
-Inpt56:	CMP	AL,0
-	JE	Inpt57
-	MOV	AL,0
-	CALL	TypMous
-	MOV	AH,68h
-	TEST	DH,2
-	JNZ	Inpt58
-	MOV	AH,54h
-	TEST	DH,4
-	JNZ	Inpt58
-	MOV	AH,3Bh
-	TEST	DH,1
-	JNZ	Inpt58
-Inpt57:	JMP	Inpt02
-Inpt58:	MOV	CL,3
-	SHR	BL,CL
-	ADD	AH,BL
-	MOV	AL,0
-	STC
-Inpt59:	RET
-Input0	ENDP
+	INT	16h
+	Signal	'K'
+	RET
+InpKey_a ENDP
+
+; The other signals to the tests of Input0 and PutKey (see "Signals to the
+; tests" in VC.ASM): before the program looks for a key, the shift keys in
+; AL that the key bar has been drawn for, and that the program has found
+; no key and waits. In the build that is shipped they do nothing.
+SigNew_a PROC	FAR
+	SigNew
+	RET
+SigNew_a ENDP
+
+SigKeys_a PROC	FAR
+	SigKeys
+	RET
+SigKeys_a ENDP
+
+SigWait_a PROC	FAR
+	SigWait
+	RET
+SigWait_a ENDP
 
 LeaveTm	PROC	NEAR
 	INT	28h
@@ -1260,23 +621,9 @@ Blnk14:	MOV	AH,0Fh
 	RET
 Blank	ENDP
 
+; C: Rnd_c of port/input.c.
 Rnd	PROC	NEAR
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	MOV	BX,3
-	MOV	AX,ES:Rand1
-	MUL	BX
-	MOV	CX,AX
-	MOV	AX,ES:Rand2
-	MOV	ES:Rand1,AX
-	MUL	BX
-	ADD	AX,CX
-	ADD	AX,23457
-	MOV	ES:Rand2,AX
-	POP	BX
-	POP	CX
-	POP	DX
+	CallC	Rnd_c
 	RET
 Rnd	ENDP
 
@@ -1288,194 +635,27 @@ Rnd	ENDP
 ;	Return :	 CY=0 - no change
 ;			 CY=1 - change
 ;			   DX - cursor
-	.DATA
-EdKeys	DW	0013h, E01_00		; ^S
-	DW	4B00h, E01_00		; Left
-	DW	0004h, E02_00		; ^D
-	DW	4D00h, E02_00		; Right
-	DW	0001h, E03_00		; ^A
-	DW	7300h, E03_00		; ^Left
-	DW	0006h, E04_00		; ^F
-	DW	7400h, E04_00		; ^Right
-	DW	4700h, E05_00		; Home
-	DW	4F00h, E06_00		; End
-	DW	7700h, E05_00		; ^Home
-	DW	7500h, E06_00		; ^End
-	DW	0008h, E07_00		; BackSpace
-	DW	0007h, E08_00		; ^G
-	DW	5300h, E08_00		; Del
-	DW	0019h, E09_00		; ^Y
-	DW	000Bh, E10_00		; ^K
-	DW	0017h, E11_00		; ^W
-	DW	007Fh, E11_00		; ^BackSpace
-	DW	0014h, E12_00		; ^T
-	DW	0011h, E13_00		; ^Q
-	DW	0
-
-	.CODE
+; C: EdLin_c of port/input.c, with EdSub2. The line is in the main data.
 EdLin	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
 	PUSH	AX
-	PUSH	ES
-	POP	DS
-	MOV	DI,SI
-	CMP	DS:Quote,0
-	JNZ	E00_03
-	MOV	SI,OFFSET EdKeys
-	CALL	Case
-	OR	AX,AX
-	JE	E00_04
-	OR	AH,AH
-	JE	E00_01
-	CMP	AL,' '
-	JB	E00_04
-E00_01:	CMP	DX,CX			; Symbols
-	JB	E00_02
-	CALL	Beep
-	JMP	E00_04
-E00_02:	PUSH	DI
-	ADD	DI,CX
-	MOV	SI,DI
-	DEC	SI
-	PUSH	DI
-	SUB	CX,DX
-	STD
-	REP	MOVSB
-	CLD
-	POP	DI
-	MOV	BYTE PTR DS:[DI],0
-	POP	SI
-	ADD	SI,DX
-	MOV	DS:[SI],AL
-	INC	DX
-	JMP	E00_06
-E00_03:	MOV	DS:Quote,0
-	CMP	AL,0
-	JNE	E00_01
-E00_04:	CLC
-	JMP	E00_07
-E00_05:	LODSB
-	STOSB
-	CMP	AL,0
-	JNE	E00_05
-E00_06:	STC
-E00_07:	POP	AX
-	POP	CX
-	POP	DI
-	POP	SI
-	POP	DS
+	CallC	EdLin_c			; AX: the cursor, DX: 1 for a change
+	NEG	DX			; CY then
+	MOV	DX,AX
+	POP	AX
 	RET
-
-E01_00:	OR	DX,DX			; Left,   ^S
-	JE	E00_04
-	DEC	DX
-	JMP	E00_06
-E02_00:	ADD	DI,DX			; Right,  ^D
-	CMP	BYTE PTR DS:[DI],0
-	JE	E00_04
-	INC	DX
-	JMP	E00_06
-E03_00:	CALL	EdSub1			; ^Left,  ^A
-	JMP	E00_06
-E04_00:	CALL	EdSub2			; ^Right, ^F
-	JMP	E00_06
-E05_00:	XOR	DX,DX			; Home
-	JMP	E00_06
-E06_00:	MOV	SI,DI			; End
-	MOV	AL,0
-	INC	CX
-	REPNE	SCASB
-	DEC	DI
-	MOV	DX,DI
-	SUB	DX,SI
-	JMP	E00_06
-E07_00:	OR	DX,DX			; BackSpace
-	JE	E00_04
-	DEC	DX
-E08_00:	ADD	DI,DX			; Del, ^G
-	CMP	BYTE PTR DS:[DI],0
-	JE	E00_04
-	LEA	SI,[DI+1]
-	JMP	E00_05
-E09_00:	XOR	DX,DX			; ^Y
-E10_00:	ADD	DI,DX			; ^K
-	MOV	BYTE PTR ES:[DI],0
-	JMP	E00_06
-E11_00:	CALL	EdSub1			; ^BackSpace, ^W
-	JMP	E00_05
-E12_00:	PUSH	DX			; ^T
-	CALL	EdSub2
-	POP	DX
-	JMP	E00_05
-E13_00:	MOV	DS:Quote,1		; ^Q
-	JMP	E00_04
 EdLin	ENDP
 
-EdSub1	PROC	NEAR
-	ADD	DI,DX
-	MOV	SI,DI
-ES1_01:	OR	DX,DX
-	JE	ES1_03
-	DEC	DX
-	DEC	DI
-	MOV	AL,ES:[DI]
-	CALL	CmpSym
-	JE	ES1_01
-ES1_02:	OR	DX,DX
-	JE	ES1_03
-	DEC	DX
-	DEC	DI
-	MOV	AL,ES:[DI]
-	CALL	CmpSym
-	JNE	ES1_02
-	INC	DX
-	INC	DI
-ES1_03:	CMP	SI,DI
-	RET
-EdSub1	ENDP
-
-EdSub2	PROC	NEAR
-	ADD	DI,DX
-	MOV	SI,DI
-ES2_01:	CMP	BYTE PTR ES:[SI],0
-	JE	ES2_03
-	INC	SI
-	INC	DX
-	MOV	AL,ES:[SI]
-	CALL	CmpSym
-	JE	ES2_01
-ES2_02:	CMP	BYTE PTR ES:[SI],0
-	JE	ES2_03
-	INC	SI
-	INC	DX
-	MOV	AL,ES:[SI]
-	CALL	CmpSym
-	JNE	ES2_02
-ES2_03:	CMP	SI,DI
-	RET
-EdSub2	ENDP
+; EdSub1, which finds where a word begins, is C too: only C code calls it.
 
 ;-------------------- Compare symbol -------------------
 ;			   AL - Symbol
-	.DATA
-CtEn_T	DB	' +:.,><|\',9
-
-	.CODE
+;	Return :	   ZR - it is one that words end at
+; C: CmpSym_c of port/input.c, which needs no DS.
 CmpSym	PROC	NEAR
-	PUSH	ES
-	PUSH	DI
-	PUSH	CX
-	PUSH	CS
-	POP	ES
-	MOV	DI,OFFSET CtEn_T
-	MOV	CX,10
-	REPNE	SCASB
-	POP	CX
-	POP	DI
-	POP	ES
+	PUSH	AX
+	CALL	FAR PTR CmpSym_c	; AX: 1 for one of them
+	CMP	AX,1			; ZR then
+	POP	AX
 	RET
 CmpSym	ENDP
 
@@ -1488,82 +668,19 @@ CmpSym	ENDP
 ;	Return :	Z = 0 - not found
 ;			Z = 1 - found
 ;			   SI - new address
+; C: Search_c of port/input.c. The names are in the caller's DS, which
+; goes there as a number, and the end in CX.
 Search	PROC	NEAR
-	PUSH	SI
-	CMP	AL,0Ah
-	JNE	Srch01
-	ADD	SI,DX
-	CMP	SI,BP
-	JB	Srch01
-	MOV	SI,BX
-Srch01:	PUSH	SI
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	SI,OFFSET MenuBuf+228
-	MOV	DI,OFFSET MenuBuf+208
-	MOV	CX,15
-	REP	MOVSB
-	POP	DS
-	CMP	AL,0Ah
-	JE	Srch02
-	PUSH	DX
-	MOV	CX,12
-	MOV	SI,OFFSET MenuBuf+210
-	MOV	DX,WORD PTR ES:[MenuBuf+208]
-	CALL	EdLin
-	MOV	WORD PTR ES:[MenuBuf+208],DX
-	POP	DX
-Srch02:	PUSH	DS
-	PUSH	ES
-	POP	DS
-	MOV	SI,OFFSET MenuBuf+210
-	MOV	DI,OFFSET MenuBuf
-	MOV	CX,13
-	PUSH	DI
-	CALL	MvzLine
-	MOV	CX,DI
-	POP	DI
-	SUB	CX,DI
-	POP	DS
-	MOV	SI,DI
-	CALL	PathLin
-	POP	SI
-	POP	AX
-	JCXZ	Srch06
-	CMP	BP,BX
-	JBE	Srch07
-Srch03:	PUSH	SI
-	PUSH	DI
 	PUSH	CX
-	PUSH	AX
-Srch04:	LODSB
-	CALL	UpCase
-	SCASB
-	LOOPE	Srch04
-	POP	AX
-	POP	CX
-	POP	DI
-	POP	SI
-	JE	Srch06
-	ADD	SI,DX
-	CMP	SI,BP
-	JB	Srch05
-	MOV	SI,BX
-Srch05:	CMP	SI,AX
-	JNE	Srch03
-	JMP	Srch07
-Srch06:	PUSH	DS
-	PUSH	ES
-	POP	DS
+	PUSH	DI
 	PUSH	SI
-	MOV	SI,OFFSET MenuBuf+208
-	MOV	DI,OFFSET MenuBuf+228
-	MOV	CX,15
-	REP	MOVSB
-	POP	SI
-	POP	DS
-Srch07:	CMP	SI,AX
+	MOV	DI,DS
+	MOV	CX,BP
+	CallC	Search_c		; SI: the name it found
+	POP	AX			; Where it began
+	POP	DI
+	POP	CX
+	CMP	SI,AX
 	RET
 Search	ENDP
 

@@ -150,47 +150,37 @@ u16 T80_00(void);
    covers, Window shows it. ChgDisk asks for the disk of a drive that
    shares the floppy drive with another, and is not 0 if the user would
    not change it. Int10m calls the BIOS for the screen, with the mouse
-   pointer out of the way. CmpSym is not 0 for a character that stands
-   between words: a space, a tab or one of +:.,><|\ */
+   pointer out of the way. */
 void ResWin(u16 begin, u16 size, u16 saved);
 u16 ChgDisk(const u8 *path);
 void Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
-u16 CmpSym(u16 symbol);
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
 #pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] modify exact [ax bx cx dx es]
-#pragma aux CmpSym  "*_a" __far parm [ax] value [ax] modify exact [ax]
 /* HidCur hides the cursor and Cursor puts it at a row, in the high byte,
    and a column; ChgCur gives it the editor's shape and returns the one it
    had, which CurShp gives it back. ClrKbd empties the keyboard buffer, if
-   the setup has it so. Input waits for a key and returns it, the scan
-   code in the high byte, 0FCh there for none; `bar` is the key bar to
-   show meanwhile. GetMous returns the buttons of the mouse that are down
+   the setup has it so. GetMous returns the buttons of the mouse that are down
    and in the high word where it is; what it is given comes back there if
    there is no mouse. InWind is not 0 if that is outside a window. AsmSeg
-   is the code segment of the assembly. EdSub1 returns where the word
-   begins that the character before `cursor` in `buffer` is in, or the
-   word before. */
+   is the code segment of the assembly. Input, EdSub1 and CmpSym are C,
+   of vc.h. */
 void HidCur(void);
 void Cursor(u16 place);
 u16 ChgCur(void);
 void CurShp(u16 shape);
 void ClrKbd(void);
-u16 Input(u16 bar);
 u32 GetMous(u16 place);
 u16 InWind(u16 place, u16 begin, u16 size);
 u16 AsmSeg(void);
-u16 EdSub1(u16 buffer, u16 cursor);
 #pragma aux HidCur  "*_a" __far modify exact [es]
 #pragma aux Cursor  "*_a" __far parm [ax] modify exact [es]
 #pragma aux ChgCur  "*_a" __far value [ax] modify exact [ax cx es]
 #pragma aux CurShp  "*_a" __far parm [cx] modify exact [ax]
 #pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux Input   "*_a" __far parm [ax] value [ax] modify exact [ax es]
 #pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
 #pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux EdSub1  "*_a" __far parm [di] [dx] value [ax] modify exact [ax dx si di es]
 
 /* C routines of other files that vc.h does not have. */
 u16 __far *HexByt(u16 __far *screen, u16 byte);         /* digits.c */
@@ -2035,7 +2025,7 @@ static u16 T00_83(u16 key)
         case 0x17:                      /* ^W: T22_00 */
             if (ed.EdTxHex != 0)
                 return 0;
-            cursor = EdSub1((u16)EditBuf, ed.EdCursr);
+            cursor = EdSub1(EditBuf, ed.EdCursr);
             if (cursor == ed.EdCursr)
                 return 0;
             T20_02(EditBuf + cursor, EditBuf + ed.EdCursr);
@@ -2074,7 +2064,7 @@ right:
         case 0x73:                      /* ^Left: T07_00 */
 word_left:
             if (ed.EdTxHex == 0)
-                ed.EdCursr = EdSub1((u16)EditBuf, ed.EdCursr);
+                ed.EdCursr = EdSub1(EditBuf, ed.EdCursr);
             return 0;
         case 0x74:                      /* ^Right: T08_00 */
 word_right:

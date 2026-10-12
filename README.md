@@ -104,8 +104,12 @@ box that asks for the drive of a panel. The dialogs are C: a box with its lines 
 dialog, a line to type
 into, a group to choose from, a box to tick and a line of buttons, with
 the keys and the mouse that each takes, and what the fields hold handed
-back at the end. Waiting for a key and what a key does to a line that is
-typed into are still assembly, and so is drawing the frame of a box.
+back at the end. Waiting for a key is C, with the clock that it keeps on
+the screen, the tap on Alt and the keys that the mouse clicks on the key
+bar, and so are what a key does to a line that is typed into, the speed
+search, the key bar, the menu bar, the command line with its prompt, and
+finding what an extension file says for a file. The screen blanker is
+still assembly, and so is drawing the frame of a box.
 
 ## Layout
 

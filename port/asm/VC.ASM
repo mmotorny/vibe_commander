@@ -30,6 +30,10 @@
 	EXTERN	SetCur_c:FAR, FilDir_c:FAR, FilePan_c:FAR
 	EXTERN	PutTre_c:FAR, PutTree_c:FAR, TreeCur_c:FAR, TrCr10_c:FAR
 	EXTERN	TrCr20_c:FAR, PutInf_c:FAR
+	EXTERN	ClsLine_c:FAR, PutKey_c:FAR, PtMnu1_c:FAR, PutPrm_c:FAR
+	EXTERN	DosCom_c:FAR, FindExt_c:FAR
+	EXTERN	Input_c:FAR, Rnd_c:FAR, EdLin_c:FAR
+	EXTERN	CmpSym_c:FAR, Search_c:FAR
 	EXTERN	ReadTre_c:FAR, ChTree_c:FAR
 	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
 	EXTERN	GetVol_c:FAR, DirSize_c:FAR, TstInfo_c:FAR
@@ -137,6 +141,11 @@ TakeLine MACRO	First, Scratch
 ;
 ; Without this the tests could only guess when the program has finished
 ; what a key started. The build that is shipped does none of it.
+;
+; Where the program waits for a key is C, Input0 of port/input.c, and
+; compiled code is the same in both builds. It signals through entries that
+; hold these macros, next to its stub in VCSUB2.INC: SigNew_a, SigKeys_a,
+; SigWait_a and InpKey_a.
 ;
 ; The resident part must be as long in one build as in the other: the
 ; memory it leaves free is shown on the screen. So what Signal and SigAsks

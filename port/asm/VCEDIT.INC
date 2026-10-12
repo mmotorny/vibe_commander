@@ -177,20 +177,6 @@ T00_01:	JMP	V13_00			; Not read
 T00_02:	MOV	CL,DS:EdWrite		; Edited
 	JMP	V13_01
 
-; C code asks where a word begins: EdSub1, for the buffer at DI and the
-; cursor in DX.
-	FromC	EdSub1, <MOV AX,DX>
-
-; C code asks whether a character stands between words: CmpSym for AL.
-	PUBLIC	CmpSym_a
-CmpSym_a PROC	FAR
-	CALL	CmpSym
-	MOV	AX,0			; ZR as a number
-	JNE	CmSy_a
-	INC	AX
-CmSy_a:	RET
-CmpSym_a ENDP
-
 T70_00	PROC	NEAR			; Clear line #AL
 	PUSH	DX
 	PUSH	AX

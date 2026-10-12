@@ -1352,22 +1352,10 @@ Run_0B:	JMP	F21_30
 
 ; Entries for the C code of this file's commands to routines of files
 ; that are being translated elsewhere (see FromC in VC.ASM, and
-; port/usermenu.c and port/cmdline.c for what they take and return).
-	FromC	DosCom
-
-; FndItem, F34_30 and F34_40 take a place in MenuBuf in SI and hand one
-; back, here in DX, and AX is not 0 if they set the carry flag. F34_40
-; takes in CX what it has in BP.
-	PUBLIC	FndItem_a, F34_30_a, F34_40_a
-FndItem_a PROC	FAR
-	PUSH	DS
-	POP	ES
-	CALL	FndItem
-	MOV	DX,SI
-	SBB	AX,AX
-	RET
-FndItem_a ENDP
-
+; port/usermenu.c for what they take and return). F34_30 and F34_40 take a
+; place in MenuBuf in SI and hand one back, here in DX, and AX is not 0 if
+; they set the carry flag. F34_40 takes in CX what it has in BP.
+	PUBLIC	F34_30_a, F34_40_a
 F34_30_a PROC	FAR
 	PUSH	DS
 	POP	ES
@@ -1389,25 +1377,4 @@ F34_40_a PROC	FAR
 	RET
 F34_40_a ENDP
 
-; Input0, and DX is not 0 if it set the carry flag.
-	PUBLIC	Input0_a
-Input0_a PROC	FAR
-	PUSH	DS
-	POP	ES
-	CALL	Input0
-	SBB	DX,DX
-	RET
-Input0_a ENDP
-
-; ClsLine, with in AX what it is to have in DS.
-	PUBLIC	ClsLine_a
-ClsLine_a PROC	FAR
-	PUSH	DS
-	PUSH	DS
-	POP	ES
-	MOV	DS,AX
-	CALL	ClsLine
-	POP	DS
-	RET
-ClsLine_a ENDP
 

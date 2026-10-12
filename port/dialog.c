@@ -121,15 +121,7 @@ LAID_OUT(BOXMN, 11);
    gives back. ClrKbd empties the keyboard buffer if the setup has it so.
    SavWin keeps what the screen buffer has where a window is to be, ResWin
    puts it back; MinBox draws a box with a shadow there, growing if
-   windows are to zoom, in the colour in the high byte of `color`. PutMnu
-   shows the menu bar, if it is always visible, with an item marked;
-   PutKey shows a key bar, if there is one.
-
-   Input waits for a key, with the key bar `bar`, and returns it: the
-   scan code in the high byte, where FCh says that the mouse did
-   something. EdLin has a line that is typed into take a key: `text` is
-   where it is in the main data, `length` how long it may get. It returns
-   the column of the cursor.
+   windows are to zoom, in the colour in the high byte of `color`.
 
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, or `place` as it was if there is no mouse.
@@ -156,10 +148,6 @@ void ClrKbd(void);
 void SavWin(u16 begin, u16 size, u16 buffer);
 void ResWin(u16 begin, u16 size, u16 buffer);
 void MinBox(u16 begin, u16 size, u16 color);
-void PutMnu(u16 item);
-void PutKey(u16 bar);
-u16 Input(u16 bar);
-u16 EdLin(u16 key, u16 text, u16 cursor, u16 length);
 u32 GetMous(u16 place);
 void TypMous(u16 look);
 u16 InWind(u16 place, u16 begin, u16 size);
@@ -173,10 +161,6 @@ u32 DialSub(u16 key, u16 begin, u16 field, u16 routine, u16 segment, u16 box);
 #pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux PutMnu  "*_a" __far parm [ax] modify exact [es]
-#pragma aux PutKey  "*_a" __far parm [ax] modify exact [es]
-#pragma aux Input   "*_a" __far parm [ax] value [ax] modify exact [ax es]
-#pragma aux EdLin   "*_a" __far parm [ax] [si] [dx] [cx] value [ax] modify exact [ax dx es]
 #pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
 #pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
 #pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
@@ -622,7 +606,7 @@ static u32 InpStr(u16 place, u8 *text, u16 cursor, u16 length, u16 color,
                 text[0] = 0;
         }
 InSt04:
-        cursor = EdLin(key, (u16)text, cursor, length);
+        cursor = (u16)EdLin(key, text, cursor, length);
     }
 InSt08:
     return key | (u32)cursor << 16;

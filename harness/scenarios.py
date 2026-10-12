@@ -109,6 +109,26 @@ out again (show.py --changes is how):
     where it is.
   - A text that is typed has no space in it: 'rd work' is written
     '"rd" Space "work"'.
+  - At the panels the command line takes the keys that the panels do
+    not: Ctrl+Left and Ctrl+Right go by words, Ctrl+Home and Ctrl+End to
+    the ends, Ctrl+s and Ctrl+d by a character; Ctrl+g, Ctrl+t, Ctrl+w,
+    Ctrl+k and Ctrl+y delete a character, a word forwards and backwards,
+    the rest and all; Ctrl+q has the next key typed as it is. Ctrl+Enter
+    puts the name under the cursor of the panel into the line, when the
+    cursor of the line is at its start or behind a character that words
+    end at, and looks in the history otherwise. The line holds 123
+    characters and the screen shows some 70 of them: seven names of
+    eleven make it move, twelve fill it. The beep of a full line does not
+    scroll the screen, with the cursor in the line. Ctrl+b switches the
+    key bar off and on.
+  - "time", Space, "9:59" and Enter set the machine's clock by DOS's
+    command. A scenario that shows the clock then does so within the
+    minute that begins there, and makes no file afterwards: the harness
+    takes a time stamp for one of the run only in the ten minutes from
+    noon.
+  - A line of an extension file that begins with a colon is for files
+    without an extension. In the editor Ctrl+Left goes back to where a
+    word begins and Ctrl+Backspace deletes back to there.
   - "F9 o d" switches Auto directory sizes: the mini status then has the
     size of a directory, of all files in it and below, once its list has
     been read. A new file comes last in an unsorted panel, so End goes to
@@ -591,6 +611,13 @@ _CLOCK_PATH_STEPS = (
     "Enter",                              # and the clock in it
 )
 
+# The time of day set by DOS's command, and the clock switched on: the
+# scenario shows it within the minute that begins then.
+_CLOCK_EARLY_STEPS = (
+    '"time" Space "9:59"',
+    "Enter",
+)
+
 SCENARIOS = {
     "start": Scenario(
         "The program as it starts"),
@@ -927,6 +954,56 @@ SCENARIOS = {
             "Ctrl+PgUp",                  # and the program still works
         )),
 
+    "command-edit": Scenario(
+        "The command line typed into and edited, longer than the screen "
+        "is wide and until it is full; the key bar off; and a file run by "
+        "what the extension file says for its kind",
+        steps=(
+            "Down Down Down",             # onto readme.txt
+            " ".join(["Ctrl+Enter"] * 7), # its name seven times: the line
+                                          # is too long and moves to the left
+            " ".join(["Ctrl+Left"] * 7),  # back by words, ^A
+            " ".join(["Ctrl+Left"] * 6),  # until the line moves back
+            "Ctrl+Right Ctrl+Right",      # on by words, ^F at the panels
+                                          # is the filter
+            "Ctrl+Home",
+            "Ctrl+d Ctrl+d Ctrl+d",       # right
+            "Ctrl+t",                     # the rest of the word goes
+            "Ctrl+End",
+            "Ctrl+w",                     # and the word before the cursor
+            "Ctrl+s Ctrl+s Ctrl+g",       # left, and a character deleted
+            "Ctrl+q Ctrl+a",              # the next key as it is: ^A
+            "Ctrl+q Left",                # which a key without a character
+                                          # is not
+            "Ctrl+End",
+            " ".join(["Ctrl+Enter"] * 5), # until the line is full: a beep
+            "x",                          # and another
+            "Ctrl+y",
+            "Ctrl+b",                     # the key bar off
+            "Ctrl+b",                     # and on
+            "Down Down",
+            "Enter",                      # notes.doc: no command for doc
+            "F5",
+            '"noext" Enter',              # a file without an extension
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of the file made
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",
+            '"vc.ext"',
+            "Enter",                      # a command for no extension
+            '":" Tab "echo" Space "!.!" Space "x.y"',
+            "Ctrl+Left",                  # in the editor: back a word
+            "Ctrl+Backspace",             # and the word before deleted
+            "F2",
+            "Esc",
+            "End Up",
+            "Enter",                      # noext is run by it
+            "Ctrl+o",                     # what the command printed
+            "Ctrl+o",
+        )),
+
     "lost": Scenario(
         "The program file gone when the program wants to load itself "
         "again after a command",
@@ -1255,6 +1332,16 @@ SCENARIOS = {
     "clock-path-russia": Scenario(
         "The same where the clock has 24 hours and is wider",
         country="ru", steps=_CLOCK_PATH_STEPS),
+
+    "clock-morning": Scenario(
+        "The clock before ten in the morning, a minute before the hour",
+        steps=_CLOCK_EARLY_STEPS + ("F9 o l",)),
+
+    "clock-night-russia": Scenario(
+        "The clock after midnight where it has 24 hours",
+        country="ru",
+        steps=('"time" Space "0:59"',) + _CLOCK_EARLY_STEPS[1:]
+        + ("F9 o l",)),
 
     "laptop": Scenario(
         "The marks of selected and of hidden files in the laptop palette, "

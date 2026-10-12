@@ -426,23 +426,6 @@ ChTree	PROC	NEAR
 	RET
 ChTree	ENDP
 
-; C code waits for a key.
-	FromC	Input
-
-; C code has a key looked at for the speed search: Search, which takes in
-; CX what it has in BP, and hands back SI.
-	PUBLIC	Search_a
-Search_a PROC	FAR
-	PUSH	BP
-	PUSH	DS
-	POP	ES
-	MOV	BP,CX
-	CALL	Search
-	MOV	AX,SI
-	POP	BP
-	RET
-Search_a ENDP
-
 ;	Work out the sizes of the directories of a panel
 ;			   DS - WCBseg
 ;			   ES - main data

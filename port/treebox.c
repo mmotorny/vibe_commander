@@ -47,14 +47,6 @@ u16 ChTree(u16 column);
    PgUp and PgDn turn a list by a page of `lines`: they return the line of
    the cursor, and in the high word the first line shown.
 
-   Input waits for a key, with the key bar `bar` on the screen, and shows
-   the help for F1; the high byte of what it returns is FCh for a button
-   of the mouse. Search takes a key for the speed search,
-   whose text it keeps in MenuBuf, and looks for the next name that begins
-   with the text: in a list from `begin` to `end` whose entries are `step`
-   bytes apart, from the entry at `at` on, or from the one behind it for
-   Ctrl+Enter. It returns where it found one, or `at`.
-
    ChkSum adds up `length` bytes at `at` in the main data. OncZoom
    puts the box on the screen that the assembly describes at `box`, an
    offset in its code segment, with its middle at `place`; only the first
@@ -72,8 +64,6 @@ u16 DoublMo(u16 begin, u16 size, u16 line);
 void ClrKbd(void);
 u32 PgUp(u16 cursor, u16 first, u16 lines);
 u32 PgDn(u16 cursor, u16 first, u16 lines, u16 all);
-u16 Input(u16 bar);
-u16 Search(u16 at, u16 begin, u16 end, u16 step, u16 key);
 u16 ChkSum(u16 at, u16 length);
 void OncZoom(u16 place, u16 box, struct Box STACK *where);
 #pragma aux HidCur  "*_a" __far modify exact [es]
@@ -89,8 +79,6 @@ void OncZoom(u16 place, u16 box, struct Box STACK *where);
 #pragma aux ClrKbd  "*_a" __far modify exact [es]
 #pragma aux PgUp    "*_a" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx si di]
 #pragma aux PgDn    "*_a" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx si di]
-#pragma aux Input   "*_a" __far parm [ax] value [ax] modify exact [ax es]
-#pragma aux Search  "*_a" __far parm [si] [bx] [cx] [dx] [ax] value [ax] modify exact [ax cx si di es]
 #pragma aux ChkSum  "*_a" __far parm [si] [cx] value [ax] modify exact [ax es]
 #pragma aux OncZoom "*_a" __far parm [bx] [ax] [di] modify exact [bx dx si es]
 
@@ -635,7 +623,7 @@ ChTr20:                                 /* the speed search, and a key */
         }
     }
     /* Another key is for the speed search. */
-    n = Search(md.TreAdr, TRELIST, ADDRESS(TREE->TreeLen),
+    n = Search(MAIN_SEG, md.TreAdr, TRELIST, ADDRESS(TREE->TreeLen),
                sizeof(struct DIRENT), key);
     if (n == md.TreAdr)
         goto ChTr20;

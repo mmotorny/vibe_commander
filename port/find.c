@@ -88,8 +88,7 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
    what it returns is 1 if the zero flag was set. Help00 is the help,
    which is C, as is DirFunc, of vc.h.
 
-   HidCur puts the cursor below the screen and PutMnu shows the menu bar,
-   if it is always visible, with an item marked. SavWin keeps what the
+   HidCur puts the cursor below the screen. SavWin keeps what the
    screen buffer has where a window is to be, ResWin puts it back, and
    MinBox draws a box with a shadow there, in the colour in the high byte
    of `color`. StdLine writes a line of such a box at `place`, of the
@@ -112,7 +111,6 @@ u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
 u32 Int16(u16 ax);
 u16 ChgDisk(const u8 *path);
 void HidCur(void);
-void PutMnu(u16 item);
 void SavWin(u16 begin, u16 size, u16 buffer);
 void ResWin(u16 begin, u16 size, u16 buffer);
 void MinBox(u16 begin, u16 size, u16 color);
@@ -131,7 +129,6 @@ void Help00(void);                                      /* help.c */
 #pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
 #pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux PutMnu  "*_a" __far parm [ax] modify exact [es]
 #pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]

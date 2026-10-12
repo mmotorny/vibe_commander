@@ -526,6 +526,51 @@ u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table);
 #pragma aux MinMnu  "*_c" __far parm [si] [bx] [dx] [di] [ax] [cx] value [dx ax] modify exact [ax dx]
 #pragma aux MnMn10  "*_c" __far parm [ax] [bx] [cx] [dx] [di] value [dx ax] modify exact [ax dx]
 #pragma aux MnMn40  "*_c" __far parm [ax] [bx] [cx] [dx] [di] value [ax] modify exact [ax]
+/* The key bar and the menu bar, the command line and its prompt: see
+   each in bars.c. `segment` is where ClsLine reads the colour, MAIN_SEG. */
+u16 *ClsLine(u16 place, u16 segment);
+void PutKey(u16 bar);
+void PutKey0(u16 bar, u16 shift);
+void PutMnu(u16 item);
+void PtMnu1(u16 item);
+void PutPrm(u16 panel);
+void DosCom(void);
+#pragma aux ClsLine "*_c" __far parm [bx] [ax] value [di] modify exact [ax di]
+#pragma aux PutKey  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux PutKey0 "*_c" __far parm [ax] [dx] modify exact [ax]
+#pragma aux PutMnu  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux PtMnu1  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux PutPrm  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux DosCom  "*_c" __far modify exact [ax]
+/* The entries of an extension file or a menu file: FndItem returns where
+   the next one is, the offset in the low word, and 1 in the high one at
+   the end of the file; FindExt where in the main data the command for a
+   file's extension is, or 0. See extfile.c. */
+u32 FndItem(const u8 __far *file);
+u16 FindExt(const u8 __far *name);
+#pragma aux FndItem "*_c" __far parm [dx si] value [dx ax] modify exact [ax dx]
+#pragma aux FindExt "*_c" __far parm [dx si] value [si] modify exact [ax si]
+/* Waiting for a key, and a line that is typed into: see each in input.c.
+   Input and Input0 return the key, the scan code in the high byte, where
+   FCh says that the mouse did something; Input0 has 1 in the high word
+   for a key clicked on the key bar. EdLin returns the column of the
+   cursor, and 1 in the high word if anything changed. CmpSym is 1 for a
+   character that words end at. Search is the speed search among names
+   in the segment `segment`. */
+u16 Input(u16 bar);
+u32 Input0(u16 bar);
+u16 Rnd(void);
+u32 EdLin(u16 key, u8 *text, u16 cursor, u16 length);
+u16 EdSub1(const u8 *line, u16 cursor);
+u16 CmpSym(u16 symbol);
+u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
+#pragma aux Input   "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux Input0  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux Rnd     "*_c" __far value [ax] modify exact [ax]
+#pragma aux EdLin   "*_c" __far parm [ax] [si] [dx] [cx] value [dx ax] modify exact [ax dx]
+#pragma aux EdSub1  "*_c" __far parm [di] [ax] value [ax] modify exact [ax]
+#pragma aux CmpSym  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux Search  "*_c" __far parm [di] [si] [bx] [cx] [dx] [ax] value [si] modify exact [ax si]
 
 /* The segment of the main data, as a number. */
 #define MAIN_SEG ((u16)((u32)(void __far *)&md >> 16))

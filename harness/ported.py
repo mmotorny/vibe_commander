@@ -688,6 +688,62 @@ BATCHES = [
         },
     ),
     Batch(
+        title="The key bar, the menu bar and the command line",
+        source="bars.c",
+        routines=("ClsLine", "PutKey", "PutKey0", "PutMnu", "PutPrm",
+                  "DosCom"),
+        functions=("ClsLine_c", "PutKey_c", "PtMnu1_c", "PutPrm_c",
+                   "DosCom_c"),
+        unreached={
+            **dict.fromkeys(
+                (0xA867, 0xA869, 0xA86A),
+                "PutPrm, for a drive whose current directory DOS will "
+                "not tell: the disks of the bench are always ready"),
+        },
+    ),
+    Batch(
+        title="The entries of an extension file",
+        source="extfile.c",
+        routines=("FndItem", "FindExt"),
+        functions=("FindExt_c",),
+    ),
+    Batch(
+        title="Waiting for a key, and a line that is typed into",
+        source="input.c",
+        routines=("Input", "Input0", "Rnd", "EdLin", "EdSub1", "EdSub2",
+                  "CmpSym", "Search"),
+        functions=("Input_c", "Rnd_c", "EdLin_c", "CmpSym_c", "Search_c"),
+        unreached={
+            **dict.fromkeys(
+                (0xB1E6, 0xB1EE, 0xB1F0, 0xB1F3, 0xB1F5, 0xB1F8, 0xB1FA,
+                 0xB1FE, 0xB200, 0xB203, 0xB205, 0xB208, 0xB20A),
+                "Input0, when the time has come to blank the screen, or "
+                "its minute, or midnight has passed meanwhile: a minute "
+                "at the least of the machine's time in which no key is "
+                "pressed, and the harness presses the next one as soon "
+                "as the program waits"),
+            **dict.fromkeys(
+                (0xB328, 0xB32C, 0xB32E),
+                "Input0, for the mouse in the corner of the screen that "
+                "blanks it. The bench has no mouse"),
+            **dict.fromkeys(
+                (0xB379, 0xB37E, 0xB380, 0xB383, 0xB385, 0xB387, 0xB38B,
+                 0xB38D, 0xB38F, 0xB391, 0xB395, 0xB397, 0xB399, 0xB39A,
+                 0xB39E, 0xB3A0, 0xB3A3, 0xB3A6, 0xB3A7, 0xB3A9, 0xB3AB,
+                 0xB3AD, 0xB3AF, 0xB3B1, 0xB3B3, 0xB3B5, 0xB3B7, 0xB3B9,
+                 0xB3BB, 0xB3BE, 0xB3C0, 0xB3C3, 0xB3C5, 0xB3C7, 0xB3CA,
+                 0xB3CC, 0xB3CE, 0xB3D1, 0xB3D3, 0xB3D6, 0xB3D9, 0xB3DC,
+                 0xB3DE, 0xB3E0, 0xB3E1, 0xB3E4, 0xB3E5, 0xB3E8, 0xB3EA,
+                 0xB3ED, 0xB3EE, 0xB3F1, 0xB3F3, 0xB3F8, 0xB3FA, 0xB3FC,
+                 0xB3FE, 0xB401, 0xB403, 0xB406, 0xB408, 0xB40A, 0xB40D,
+                 0xB40F, 0xB411, 0xB414, 0xB416, 0xB419, 0xB41B, 0xB41D,
+                 0xB41F, 0xB421),
+                "Input0, for the mouse: a button held on a key of the "
+                "key bar, and the key that is pressed when it is let go "
+                "there"),
+        },
+    ),
+    Batch(
         title="Copying, renaming and moving a file or a directory",
         source="copy.c",
         routines=("F35_40", "C00_00", "C00_30", "C40_00", "C40_05",

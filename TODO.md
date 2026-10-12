@@ -37,6 +37,49 @@ Things that are known and not done. Standing instructions are in
   has set: `DEC AX` and then `JE`, `STC` and then `JNC`. It should follow
   each flag by itself.
 
+- Of `VCSUB2.INC` three routines are still assembly: `Blank`, the
+  screen blanker, 402 bytes, `LeaveTm`, 46, which tells DOS, Windows and
+  DESQview that the program is idle, and the two bytes of `PutMnu3`,
+  which load a 3 and run into the stub of `PutMnu`. `Input0`, which is C,
+  calls the first two through entries. `Blank` runs when no key has been
+  pressed for as many minutes as the setup says, one at the least, and
+  the harness has no step that waits: it presses the next key as soon as
+  the program waits for one. A step that lets the machine run until its
+  BIOS has counted a minute of timer ticks would do, for the original in
+  `harness/watch.py`, which counts them for the clock already, and for
+  the port next to its signals. What `Blank` shows could still not be
+  compared: where its stars are is drawn from random numbers that the
+  program steps every time it goes round while it waits. That the screen
+  comes back with a key could. `LeaveTm` is three calls of interrupts
+  and little else; of its 17 instructions six, for DESQview, run in no
+  scenario.
+- Of `Input0` in C, 88 instructions of the original ran in no scenario
+  and are translated by reading: 72 for a button of the mouse held on a
+  key of the key bar, three for the mouse in the corner that blanks the
+  screen, and 13 around the call of `Blank`, where the time to blank
+  has come, with its minute and with midnight passing meanwhile. They
+  are listed as out of reach in `harness/ported.py`, and so are three of
+  `PutPrm`, the question mark in the prompt of a drive whose directory
+  DOS will not tell.
+- `ClsLine` fills a row with the colour that DOS writes in, and reads
+  that colour through DS, where every other routine of its kind goes by
+  ES. One caller comes with DS on a panel: a command of a menu or of an
+  extension file that begins with `@` and gets longer than the 998
+  characters it may have while the name of the file under the cursor is
+  put into it (`Run_22` to `Run_31`). The row is then filled in whatever colour
+  the byte at that offset of the panel's segment makes, which is in the
+  panel's list of files. Ported like that, by reading: `ClsLine` takes
+  the segment as an argument, and `Run_00`, which is C too, passes the
+  panel's there. No scenario has it.
+- Backspace in a line that is typed into, with the cursor behind the end
+  of the text, moves the cursor back and says that nothing has changed,
+  so the caller does not draw it. Whether a caller can leave the cursor
+  there has not been looked into. Ported like that.
+- In the build that is shipped, three of the entries through which
+  `Input0` and `PutKey` signal to the tests are a far call of nothing,
+  once for every time the program goes round while it waits. They go
+  when the signals are C, or with the harness's need of them.
+
 - The Info panel says how much memory is free: what the part of the
   program that stays during a command leaves, or with Memory allocation
   switched off, "F9 o m", what is left with all of the program loaded.
@@ -764,6 +807,61 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     routines stay. It had also made an entry for `DelTr0`, which is C
     now: the entry went, and the tree's box calls the function. A build
     and a test of 146 seconds, which passed at once.
+
+- Waiting for a key, the line that is typed into, the bars and the
+  command line, 16 routines, 1,849 bytes, 72 minutes in all, next to
+  seven other batches. The translation passed the first time it was
+  tested, and no golden was derived twice.
+  - 1 minute: `PtMnu1`, a label inside `PutMnu` that the menu calls, and
+    `PtMnu_S`, which the menu reads: the first found by the assembler,
+    the second by looking for every table that was to go. In `CLAUDE.md`
+    now.
+  - 3 minutes: the `port` test took 268 seconds next to the tests and the
+    recordings of seven other batches, where it takes 105 by itself. The
+    steps were tried on the port's build that signals first, 6 to 10
+    seconds a run, and the three goldens were derived once, in 19
+    seconds.
+  - 2 minutes: the commit had the message of another batch. The file
+    it was written to was in the directory for scratch files that the
+    session gives its agents, which all of them share, and another agent
+    had written one of the same name meanwhile. Seen in the log before
+    anything was pushed. Such files belong in the checkout's own
+    `build/`.
+  - 55 minutes for getting onto `main`, six times. The first rebase met no
+    conflict and no entry twice, and its `port` test failed after 324
+    seconds in `copy-full`, a scenario of the copying: step 42, '"c4"
+    Enter', a copy of 3 MB, was still copying when the 20 seconds were
+    over that a step might take, with a load of 14 on the two
+    processors. The other 57 scenarios were as the original, and by
+    itself, with the same build, `copy-full` passed, in 92 seconds where
+    it takes 33 on an idle machine. The batch stopped there, committed
+    and not pushed, as its instructions said for a test that comes out
+    different from one run to the next; a step has 300 seconds since.
+    The second rebase, twenty minutes later and behind the commands of
+    `VCF1.INC` and the file search, met no conflict either; the file
+    search called `PutMnu` by its entry, which was gone, and calls the
+    function now. The test took 337 seconds and passed, and meanwhile
+    the signals had been changed on `main`: W, S and T say where the
+    keyboard buffer ended. That is all in the macros, which the entries
+    of `Input0` hold, so the third rebase needed nothing; its test took
+    247 seconds, and by then the scenario `find` had been changed on
+    `main`. The fourth was clean too, and its test took 340 seconds;
+    the user menu and the command line of the panels had landed by
+    then. The fifth had four files in conflict: `harness/ported.py` and
+    `VCSUB1.INC`, where both had written in the same place, and the two
+    files of a golden, because both batches had named a scenario
+    `command-line`: this one's is `command-edit` now, and its golden was
+    derived again, 14 seconds. What git did not show: that batch had
+    made entries for `DosCom`, `FndItem`, `Input0` and `ClsLine`, and
+    its three C files called these and `PutMnu`, `PutKey`, `Input` and
+    `EdLin` by entries. The entries went, the C calls the functions,
+    with `FndItem`'s answer turned round in a function of the user
+    menu's, and the stubs of `FndItem` and `Input0` went too, having no
+    caller left. Ten minutes, and a test of 195 seconds, during which
+    the editor landed. The sixth had `port/edit.c` and `VCEDIT.INC` in
+    conflict; the editor's entries for `EdSub1` and `CmpSym` went, it
+    calls the functions and `Input`, and the stub of `EdSub1` went. Its
+    test took 162 seconds.
 
 - The dialogs, 15 routines, 2,190 bytes, 50 minutes in all, next to
   three other batches. The translation passed the first time it was

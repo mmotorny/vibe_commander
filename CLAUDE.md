@@ -264,9 +264,26 @@ port.
   `VC.ASM`, whichever file defines it.
 - A routine that answers in the zero flag gets an entry for C that is
   written out, where `FromC` has room for one instruction: `MOV AX,0`,
-  which leaves the flags, and `JNE` past an `INC AX`. See `CmpSym_a` in
-  `VCEDIT.INC`. A stub makes the zero flag for its callers of a function
-  that returns 1 or 0 with `CMP AX,1`.
+  which leaves the flags, and `JNE` past an `INC AX`. `Int16_a` in
+  `VCFIND.INC` does it with DX. A stub makes the zero flag for its callers
+  of a function that returns 1 or 0 with `CMP AX,1`: `CmpSym`.
+- C code is compiled once, for the build that is shipped and for the one
+  that signals, so it cannot signal by itself. Waiting for a key is C,
+  `Input0` of `port/input.c`, and says where it is through entries that
+  hold the macros, next to its stub in `VCSUB2.INC`: `SigNew_a`,
+  `SigKeys_a` and `SigWait_a`, which have nothing in them in the build
+  that is shipped, and `InpKey_a`, which takes the key from the BIOS and
+  signals K. What the signals say is all in the macros, so a change to
+  them reaches the C by itself. C code that takes keys from the BIOS
+  otherwise, as the file search does through `Int16_a`, signals nothing.
+- What a routine reads in the assembly's code segment may be read by
+  another file too, and then stays, `PUBLIC`, when the routine goes: the
+  menu finds the menu that the mouse is on by `PtMnu_S`, the names that
+  `PutMnu` writes. Look for every table and text that would go with a
+  routine in all of `port/asm/` first.
+- An entry that hands back a number of 32 bits is written out, with the
+  high word in DX and the low one in AX, whatever the routine has them
+  in: `Timer_a`, `DosTime_a`.
 - Registers that follow from what a function returns are made by the
   stub: `T55_00` returns where the cursor gets to in the line, and its
   stub makes SI of that, DI of where the cursor was, and the zero flag
@@ -290,8 +307,7 @@ port.
   looking for its bytes.
 - An entry for C can be made for a label inside a procedure of another
   file: `FromC DelTr0` was in `VCSUB3.INC`, the label in `DelTree` of
-  `VCF1.INC`, until `DelTree` became C. `Search` takes an argument in
-  BP, and its entry, written out, takes it in CX; `OncZoom` hands back
+  `VCF1.INC`, until `DelTree` became C. `OncZoom` hands back
   three registers as `DialBox` does, into three words on the stack, and
   takes the include line in DX: a function that has none to give leaves
   DX out of its `parm`.
@@ -467,14 +483,16 @@ port.
   still assembly, and takes the panel in DS for them, can stay assembly
   as an entry that the C calls: `F77_10_a`, of the speed search, calls
   `Search` and `F00_50`.
-- An entry that hands back the cursor of a line and the carry flag:
-  `EdLin_a` has the column in AX and the flag in DX. C code that wants
-  only the column declares it with `value [ax]` and DX among what is
-  modified.
-- A routine that reads DS, as `ClsLine` reads `CrntCol`, and that the
-  assembly once calls with DS left elsewhere by a jump out of a loop,
-  gets an entry that takes DS as a number: `ClsLine_a`. `Run_00` leaves
-  DS on the panel when the commands have no room for a name.
+- A routine that hands back the cursor of a line and the carry flag
+  returns both as a number of 32 bits: `EdLin`, which is C, has the
+  column in the low word and 1 in the high one for the flag, and its
+  stub makes DX and the carry of them. Its entry did the same while it
+  was assembly.
+- A routine that reads DS, as `ClsLine` reads `CrntCol`, and that is
+  once called with DS left elsewhere by a jump out of a loop, takes DS
+  as a number: `ClsLine` has the segment as an argument, MAIN_SEG for
+  the main data, and its stub hands over DS. `Run_00` leaves DS on the
+  panel when the commands have no room for a name, and passes that.
 - What a command leaves in DX and BP goes round the main loop to the
   next command, and a command that is C does not leave what the
   assembly left there. BX does not get round: `Func05` loads it, but

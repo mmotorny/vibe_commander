@@ -50,34 +50,26 @@ u32 F77_00(u16 key, u16 panel);
 
    F77_10 is the piece of the speed search that stays assembly: it hands
    a key to Search, for the list of the panel `panel` or the tree, and
-   has F00_50 move the cursor to what Search found. */
+   has F00_50 move the cursor to what Search found.
+
+   PutMnu, PutKey, Input, EdLin and DosCom are C, of vc.h. */
 void HidCur(void);
 void Cursor(u16 place);
 void Cursor1(void);
-void PutMnu(u16 item);
-void PutKey(u16 bar);
 void SavWin(u16 begin, u16 size, u16 buffer);
 void ResWin(u16 begin, u16 size, u16 buffer);
 void MinBox(u16 begin, u16 size, u16 color);
 u16 SftEGA(u16 place);
 u32 GetMous(u16 place);
-u16 Input(u16 bar);
-u32 EdLin(u16 key, u16 buffer, u16 column, u16 length);
-void DosCom(void);
 void F77_10(u16 key, u16 panel);
 #pragma aux HidCur  "*_a" __far modify exact [es]
 #pragma aux Cursor  "*_a" __far parm [ax] modify exact [es]
 #pragma aux Cursor1 "*_a" __far modify exact [es]
-#pragma aux PutMnu  "*_a" __far parm [ax] modify exact [es]
-#pragma aux PutKey  "*_a" __far parm [ax] modify exact [es]
 #pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
 #pragma aux SftEGA  "*_a" __far parm [bx] value [bx] modify exact [bx es]
 #pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux Input   "*_a" __far parm [ax] value [ax] modify exact [ax es]
-#pragma aux EdLin   "*_a" __far parm [ax] [si] [dx] [cx] value [dx ax] modify exact [ax dx es]
-#pragma aux DosCom  "*_a" __far modify exact [es]
 #pragma aux F77_10  "*_a" __far parm [ax] [cx] modify exact [ax cx si di es]
 
 /* C routines of other files that vc.h does not have. */
@@ -130,7 +122,7 @@ static const u8 CODE Ascii_T[38] = "1234567890-=qwertyuiopasdfghjklzxcvbnm";
    changed it. */
 void F73_00(u16 key)
 {
-    u32 pair = EdLin(key, (u16)md.DosBuf, md.DosCol, LenCmd - 1);
+    u32 pair = EdLin(key, md.DosBuf, md.DosCol, LenCmd - 1);
 
     if (HIGH(pair)) {
         md.DosCol = (u8)pair;
@@ -196,11 +188,11 @@ F80_05:                                 /* is there room for it */
         goto F80_10;
     column = md.DosCol;
     for (i = 0; (c = file->NameF[i]) != 0; i++)
-        column = LOW(EdLin(c, (u16)md.DosBuf, column, LenCmd - 1));
+        column = LOW(EdLin(c, md.DosBuf, column, LenCmd - 1));
     if (file->AttrF & ATTR_DIRECTORY)
         for (i = 0; (c = Mask_S[i]) != 0; i++)
-            column = LOW(EdLin(c, (u16)md.DosBuf, column, LenCmd - 1));
-    column = LOW(EdLin(' ', (u16)md.DosBuf, column, LenCmd - 1));
+            column = LOW(EdLin(c, md.DosBuf, column, LenCmd - 1));
+    column = LOW(EdLin(' ', md.DosBuf, column, LenCmd - 1));
     md.DosCol = (u8)column;
     if (any == 0)
         goto F80_10;
@@ -230,14 +222,14 @@ static u16 F68_25(const u8 __far *text, u16 column, u16 scan, u16 end)
         if (c == 0)
             goto F68_90;
         text++;
-        pair = EdLin(scan | c, (u16)md.DosBuf, column, LenCmd - 1);
+        pair = EdLin(scan | c, md.DosBuf, column, LenCmd - 1);
         column = LOW(pair);
         if (!HIGH(pair))
             goto F68_27;
     }
 F68_90:
     if ((end & 0xFF) != 0 && (end & 0xFF) != text[-1])
-        column = LOW(EdLin(end, (u16)md.DosBuf, column, LenCmd - 1));
+        column = LOW(EdLin(end, md.DosBuf, column, LenCmd - 1));
 F68_27:
     md.DosCol = (u8)column;
     DosCom();

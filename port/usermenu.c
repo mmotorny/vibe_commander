@@ -37,8 +37,7 @@ u16 Run_00(u16 text, u16 view);
 
 /* Routines of the rest of the program that are still assembly, by their
    entries for C. HidCur puts the cursor below the screen and Cursor1 at
-   its place in the command line. PutMnu draws the menu bar, if that is
-   always shown, with an item of it marked. SavWin keeps what the screen
+   its place in the command line. SavWin keeps what the screen
    buffer has where a window is to be, ResWin puts it back; MinBox draws a
    box with a shadow there. SftEGA moves a place down on a screen of more
    than 25 lines, by half of what it has more.
@@ -51,25 +50,18 @@ u16 Run_00(u16 text, u16 view);
    it, 1 for the second, 0 for a second one that ended elsewhere. ClrKbd
    empties the keyboard buffer if the setup has it so.
 
-   Input0 waits for a key, with the key bar `bar` on the screen; the high
-   word of what it returns is not 0 for a key that is a click on the key
-   bar. ChgDisk has the disk of a drive that shares a floppy drive put in,
+   ChgDisk has the disk of a drive that shares a floppy drive put in,
    for the path at `path` in the main data, and is not 0 if the user would
    not.
 
-   FndItem looks for the next line of a menu or an extension file that is
-   neither empty, nor a comment, nor a command: where it is comes back in
-   the high word, and the low one is not 0 if there is none. F34_30 looks
-   for the next command of a line, and F34_40 at whether a command is the
-   name of a file of the kind that is being read, a menu here: then it has
-   put the path of that file at TmpBuf. Both answer like FndItem.
+   F34_30 looks for the next command of a line, and F34_40 at whether a
+   command is the name of a file of the kind that is being read, a menu
+   here: then it has put the path of that file at TmpBuf. Both return a
+   place in the high word, and the low one is not 0 if there is none.
 
-   DosCom draws the command line. ClsLine fills a row of the screen buffer
-   with spaces in the colour that DOS writes in, CrntCol of the segment
-   `segment`. */
+   PutMnu, Input0, FndItem, DosCom and ClsLine are C, of vc.h. */
 void HidCur(void);
 void Cursor1(void);
-void PutMnu(u16 item);
 void SavWin(u16 begin, u16 size, u16 buffer);
 void ResWin(u16 begin, u16 size, u16 buffer);
 void MinBox(u16 begin, u16 size, u16 color);
@@ -79,16 +71,11 @@ void TypMous(u16 look);
 u16 InWind(u16 place, u16 begin, u16 size);
 u16 DoublMo(u16 begin, u16 size, u16 line);
 void ClrKbd(void);
-u32 Input0(u16 bar);
 u16 ChgDisk(u16 path);
-u32 FndItem(u16 text);
 u32 F34_30(u16 text);
 u32 F34_40(u16 text, u16 view);
-void DosCom(void);
-void ClsLine(u16 row, u16 segment);
 #pragma aux HidCur  "*_a" __far modify exact [es]
 #pragma aux Cursor1 "*_a" __far modify exact [es]
-#pragma aux PutMnu  "*_a" __far parm [ax] modify exact [es]
 #pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
@@ -98,13 +85,20 @@ void ClsLine(u16 row, u16 segment);
 #pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux DoublMo "*_a" __far parm [bx] [dx] [si] value [ax] modify exact [ax cx es]
 #pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux Input0  "*_a" __far parm [ax] value [dx ax] modify exact [ax dx es]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
-#pragma aux FndItem "*_a" __far parm [si] value [dx ax] modify exact [ax dx si es]
 #pragma aux F34_30  "*_a" __far parm [si] value [dx ax] modify exact [ax dx si es]
 #pragma aux F34_40  "*_a" __far parm [si] [cx] value [dx ax] modify exact [ax bx cx dx si di es]
-#pragma aux DosCom  "*_a" __far modify exact [es]
-#pragma aux ClsLine "*_a" __far parm [bx] [ax] modify exact [ax bx di es]
+
+/* FndItem of vc.h, which is C, for a place in the main data, with its
+   answer as F34_30 and F34_40 have theirs: where the next line of a menu
+   is that is neither empty, nor a comment, nor a command, in the high
+   word, and the low one not 0 if there is none. */
+static u32 MenuItem(u16 text)
+{
+    u32 item = FndItem((const u8 *)text);
+
+    return (u32)(u16)item << 16 | (u16)(item >> 16);
+}
 
 /* C routines of other files that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
@@ -614,7 +608,7 @@ F32_05:                                 /* read it */
         goto F32_04;
     md.MenuBuf[count] = EOF_CHAR;
     include = (u16)md.MenuBuf;
-    pair = FndItem((u16)md.MenuBuf);
+    pair = MenuItem((u16)md.MenuBuf);
     if (LOW(pair))
         goto F32_03;
     text = (const u8 *)HIGH(pair);
@@ -695,7 +689,7 @@ F32_16:
         goto F32_18;
     if ((u8)lines >= (u8)(md.Lines - 6))
         goto F32_18;
-    pair = FndItem((u16)text);
+    pair = MenuItem((u16)text);
     if (LOW(pair))
         goto F32_18;
     text = (const u8 *)HIGH(pair);
@@ -725,7 +719,7 @@ F32_18:                                 /* the box */
     to = begin + 0x205;
     text = md.MenuBuf;
 F32_22:
-    text = (const u8 *)HIGH(FndItem((u16)text));
+    text = (const u8 *)HIGH(MenuItem((u16)text));
     screen = BasAdr(to);
     if (*key != 0) {
         i = 0;
@@ -855,7 +849,7 @@ F32_50:                                 /* Enter: the commands of the line */
     text = md.MenuBuf;
     i = (u8)(row + 1);
 F32_51:
-    text = (const u8 *)HIGH(FndItem((u16)text));
+    text = (const u8 *)HIGH(MenuItem((u16)text));
 F32_52:
     answer = WORD_AT(text);
     text += 2;
