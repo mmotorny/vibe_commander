@@ -86,12 +86,13 @@ chosen from it. Of the file search, the search itself is C, by name and
 by contents through a directory and those below it, with its list and
 the keys taken while it runs; its dialog and what it does with the
 answer are still assembly. Deleting a file or a directory with what is
-in it, and setting attributes, a date and a time, are C, and so is what
-goes through the files of a directory for these and for copying, the
-sizes of directories and the file search; what these commands ask first,
-and going through the selected files of a panel, are still assembly, and
-so is what the viewer and the editor do with their keys. The dialogs are
-C: a box with its lines of text, the fields of a dialog, a line to type
+in it, copying, renaming and moving one, and setting attributes, a date
+and a time, are C, and so is what goes through the files of a directory
+for these, the sizes of directories and the file search; what these
+commands ask first, and going through the selected files of a panel, are
+still assembly, and so is what the viewer and the editor do with their
+keys. The dialogs are C: a box with its lines of text, the fields of a
+dialog, a line to type
 into, a group to choose from, a box to tick and a line of buttons, with
 the keys and the mouse that each takes, and what the fields hold handed
 back at the end. Waiting for a key and what a key does to a line that is

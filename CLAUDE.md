@@ -363,6 +363,21 @@ port.
 - With `modify exact [ax]` the compiled function saves the registers its
   arguments come in as well, BX, CX, DX, SI and DI, and ES: the stub of
   `InSt10` is the call and nothing else.
+- C code may be entered again from what it calls: `C00_00` has `DirFunc`
+  call it for everything in a directory. Nothing is needed for that, as
+  long as the functions keep what they know on the stack or where the
+  assembly kept it.
+- Within one routine, too, a register may be read long after it was set,
+  and not by what was meant to set it. `C20_00` takes CX for whether the
+  name of the target is short enough, and `C10_00` jumps there with CX as
+  comparing two names left it, or as DOS returned the attributes of a
+  file: a file without attributes cannot be appended to. Where a piece
+  of a routine becomes a function, read what every jump to it has in
+  each register that it reads.
+- A routine that is C whole, and whose helpers only it called, leaves
+  one stub: `C40_00`, `C50_00`, `SetDate` and `PerCent` are static
+  functions of `port/copy.c`. The boxes and the texts stay in the
+  assembly, made `PUBLIC` where they are defined.
 
 ### C for the port
 

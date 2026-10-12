@@ -176,6 +176,80 @@ Things that are known and not done. Standing instructions are in
   says 0 or 4096 and has no entries has its sum taken over 65536 bytes,
   all of the main data's segment. Ported like that; it takes a file made
   by hand.
+- Of `VCCOPY.INC`, what Copy and Rename do before anything is copied is
+  still assembly: the commands themselves, `F35_00` to `F56_01`, 570
+  bytes that are no procedure, with `F35_50`, which fills in the target
+  that the dialog offers, `F35_60`, which has the tree chosen from in the
+  dialog, and `F35_70`. They belong together as the next batch there.
+  `F35_40` has a stub for them.
+- Copying and moving in C rest on reading where DOS would have to
+  refuse what it has just allowed, or a drive not be ready: 32
+  instructions, listed in `harness/ported.py`. So does going on with
+  another disk when one is full, where the directories of the target
+  are made on the new disk, 31 instructions: the same disk is still
+  there on the bench.
+- What the original does and the port does after it, found while
+  `C00_00` was translated; whether to mend any of it is not decided:
+  - F6 on a directory offers its own name, and Enter on that moves the
+    directory into itself: `DOCS\DOCS` is made, then found in `DOCS`
+    and moved into itself in turn, until the path is too long, with a
+    box for every level and the directories left behind. In no
+    scenario.
+  - A directory that is moved and cannot be removed afterwards, because
+    a file in it was skipped, is searched once to see whether it is
+    empty. That search takes the place of the one that walks the
+    directory above, which then goes on with the entries of the
+    directory below as if they were its own: `SRC\PAPERS\README.TXT`
+    is tried once more as `SRC\README.TXT`, and cannot be opened. In
+    `copy-dirs`.
+  - Renaming a file onto one that is there, with aPpend for an answer,
+    says that it cannot open the file if that file has no attribute at
+    all: the copying takes the attributes for the room that the name
+    has left. In `move`. By the same way a file that DOS will not
+    rename, for another reason than one in the way, is not copied
+    instead if the target's path is the start of the source's: by
+    reading.
+  - When copying stops, by Esc, an error or a full disk, the target is
+    deleted, also one that was being appended to and had been there
+    before. Seen while `copy-full` was written; as it is now it has no
+    such step.
+  - A directory of the tree that DOS will not rename, the current one
+    under FreeDOS, is made under the new name and its contents moved.
+    The first entry is then given the new directory itself for a
+    target: an empty directory in it is removed, as if moved, and a
+    file cannot be renamed. The entries after it get the name of the
+    old directory behind that of the new one, which is nowhere. In
+    `move`.
+  - A source that turns out to be the console, or whose attributes DOS
+    will not tell, is left open, and so is a target that is the
+    console: `copy` does both.
+  - After a write that is short, on a disk that is full, the next one
+    begins where a whole number of paragraphs ends: up to 15 bytes are
+    written twice, and as many are missing where what was in the memory
+    ends. That happens when a file is appended to one whose size is no
+    whole number of clusters, the disk gets full, and the user goes on
+    and has the target overwritten. `copy-full` did that at first: the
+    port left a file of the same size and other contents, because where
+    the memory ends depends on how much of it the program takes. It
+    copies to new files now, so no scenario has it.
+  - Of a device that gives its bytes in several calls of DOS to a
+    piece, the room left in the memory is counted down by the last
+    call only. By reading: the bench has no such device.
+- The functions of `port/copy.c` are on the stack when DOS brings up
+  its box for a critical error during a copy, a copy to the floppy A:
+  for one. No scenario has that.
+- `copy-full` fills C: by copies, 32 MB, in half a minute. So a full
+  disk can be made on the bench after all, and what the editor does when
+  it saves to one, listed as out of reach for `T80_00`, could be shown.
+- The `port` test has five scenarios more for copying, 304 steps, which
+  take two and a half minutes of machine time between them: `copy-full`
+  alone 33 seconds on an idle machine and a minute next to the tests of
+  other batches, the longest of all. It moves some 80 MB. Its first
+  form did that in steps of up to 25 MB, and a step ran into the 20
+  seconds that a step may take, twice, with other `port` tests and
+  runs of goldens under way; no step moves more than 6 MB now. If the
+  test is to be faster, this is the scenario to drop: 74 instructions
+  of `C00_00` would go to the list of what is out of reach.
 - When the editor has no room left for a line that has grown, `T51_00`
   beeps and takes what room there is, but moves what follows the line up
   by as much as it had asked for: the end of the text is lost, by what
@@ -545,6 +619,56 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     script; its C file called `Dialog` by the entry that is gone, in
     seven places, and had `struct Box` too. The third was clean. A build
     and a test each time, 78, 142 and 75 seconds.
+
+- Copying, renaming and moving, 9 routines, 3,018 bytes, 100 minutes in
+  all, next to three other batches at a time, seven of which got onto
+  `main` first:
+  - 14 minutes: keys that did not arrive. 'F5 "readme.txt" Enter' as
+    one step failed with "the key t did not arrive", in three runs of
+    the original, 3 minutes of them, before a run of the port with the
+    keyboard buffer printed at every key showed what it was: after a
+    box with an error the dialog of F5 comes up slowly, and the keys
+    behind F5 fill the buffer. It looked like one letter of one name,
+    because the sixteenth key was a `t` each time. `reach.py`,
+    `show.py` and `goldens.py` say which key and not which step, and
+    print no screen of the steps before. Noted at the top of
+    `harness/scenarios.py`.
+  - 19 minutes waiting for a turn at the computer, in 43 runs, about
+    half of them while other work went on: a derivation of goldens
+    waited a minute or two each time, eight times, and the last `port`
+    test took four minutes where it takes one and a half.
+  - 12 minutes: goldens derived again. `move` three times, 2 minutes
+    each with the waiting: once for steps added, once because a step of
+    the editor in hex stopped with "the screen did not settle"; the
+    file it was to make is now copied from the help file. `copy-full`
+    four times, 2 or 3 minutes each: for a better ending; because that
+    ending, going on after a full disk with a file that was appended
+    to, left other contents in the port than in the original (see
+    above), which the `port` test found after the rebase; and for
+    smaller steps, after a `port` test of four minutes that stopped in
+    it at the 20 seconds a step may take.
+  - 1 minute: F6 and Enter on a directory, which moves it into itself.
+  - 31 minutes from the first rebase to the push: four rebases, each
+    with a build and a `port` test of two and a half to four minutes,
+    and each but the last overtaken by another batch while its test
+    ran. Six or seven files in conflict each time, `CLAUDE.md`,
+    `README.md`, `TODO.md`, `ported.py`, `scenarios.py` and `VC.ASM`,
+    wherever both sides had added at the same place: settled by a
+    script that puts one side behind the other with the lines they
+    share between them, a minute or two each time. What did not show
+    as a conflict: `DirFunc_a`, `OncZoom_a` and `TstBrk_a` were there
+    twice, made by other batches too, the same instruction for
+    instruction; then `DirFunc`, `DelTree` and `Dialog` had become C,
+    with other arguments, and the entries were gone. The C of this
+    batch was changed to call what is there each time. Two of the
+    tests failed: on the contents that `copy-full` left, and on its
+    long step (see above).
+  - What saved time: steps tried on the port's build that signals,
+    which is the original's code until something is translated, needs
+    no turn alone and takes a tenth of the time. A script of fifteen
+    lines around `scenarios.run` and `show.print_screens` ran a whole
+    scenario of `scenarios.py` that way; four scenarios of sixty steps
+    were right when their goldens were first derived.
 
 ## Ideas put off
 

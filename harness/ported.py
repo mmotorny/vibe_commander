@@ -540,6 +540,65 @@ BATCHES = [
                 "held on one"),
         },
     ),
+    Batch(
+        title="Copying, renaming and moving a file or a directory",
+        source="copy.c",
+        routines=("F35_40", "C00_00", "C00_30", "C40_00", "C40_05",
+                  "C40_10", "C50_00", "SetDate", "PerCent"),
+        functions=("F35_40_c", "C00_00_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x432B, 0x435A, 0x435D, 0x4BAB, 0x4BAE, 0x4CC7, 0x4CCA,
+                 0x4CD9),
+                "C00_00, for a drive that is not ready, or one that "
+                "shares the floppy drive and whose disk the user will "
+                "not put in, where no box is open for a file: the disks "
+                "of the bench are always ready, and it has no second "
+                "floppy drive to be asked for"),
+            **dict.fromkeys(
+                (0x44EF, 0x44F2),
+                "C00_00, renaming onto a file that DOS will not delete "
+                "though it is not read-only, or will not make writable"),
+            0x46EA: "C00_00, for a device that gives something to copy: "
+                    "the console is refused, NUL gives nothing, and the "
+                    "bench has no other that comes to an end",
+            0x4714: "C00_00, for a device that can be opened to look at "
+                    "and not to write to",
+            0x485D: "C00_00, for a file to append to whose last byte "
+                    "cannot be read",
+            **dict.fromkeys(
+                (0x496C, 0x496E, 0x49B3, 0x49C3, 0x49C6),
+                "C00_00, for a disk that is full and DOS says otherwise, "
+                "or will not write what it says there is room for, or "
+                "delete or give its attributes to what was written"),
+            **dict.fromkeys(
+                (0x4A3D, 0x4A40, 0x4A42, 0x4A44, 0x4A48, 0x4A4A, 0x4A4B,
+                 0x4A4C, 0x4A4F, 0x4A51, 0x4A52, 0x4A53, 0x4A55, 0x4A57,
+                 0x4A59, 0x4A5B, 0x4A5F, 0x4A61, 0x4A63, 0x4A65, 0x4A68,
+                 0x4A6A, 0x4A6D, 0x4A6F, 0x4A71, 0x4A74, 0x4A76, 0x4A78,
+                 0x4A79, 0x4A7B, 0x4A7F),
+                "C00_00, going on with another disk when one is full, "
+                "where it makes the directories of the target on the "
+                "new one: a hard disk is not taken out, and the floppy "
+                "of the bench is write-protected"),
+            **dict.fromkeys(
+                (0x4AA6, 0x4AA9),
+                "C00_00, for a file that DOS has written and closed and "
+                "then refuses the attributes of"),
+            **dict.fromkeys(
+                (0x4AE9, 0x4AEC, 0x4AEE, 0x4AF1, 0x4AF4, 0x4AF7, 0x4AF9,
+                 0x4AFC, 0x4AFF, 0x4B02),
+                "C00_00, moving a file that DOS will not delete once it "
+                "is copied, though it is not read-only, or will not "
+                "make writable"),
+            0x4C31: "C00_00, for a directory that DOS will not remove, "
+                    "and not because something is in it or because it "
+                    "is the current one",
+            0x4E03: "PerCent, for more read and written than twice the "
+                    "size of the file: the size is what DOS says, or "
+                    "for a device what was read",
+        },
+    ),
 ]
 
 

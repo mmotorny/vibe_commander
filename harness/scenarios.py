@@ -173,12 +173,12 @@ out again (show.py --changes is how):
     below the last row: the editor's first row stays like that until it
     is drawn again.
   - The floppy A: is write-protected, and the hard disks have 32 MB
-    free: no disk can be filled. Writing to A: brings up the box of
-    DOS's critical error, from inside the call of DOS, and that is 46
-    bytes deeper in the stack than a dialog of the routine that called:
-    saving to A: in the editor left 4 bytes of the stack while that was
-    still assembly and the stack 256 bytes. No scenario has it yet; with
-    the stack of 4,096 bytes one can.
+    free: the editor fills neither, copies do (see below). Writing to
+    A: brings up the box of DOS's critical error, from inside the call
+    of DOS, and that is 46 bytes deeper in the stack than a dialog of
+    the routine that called: saving to A: in the editor left 4 bytes of
+    the stack while that was still assembly and the stack 256 bytes. No
+    scenario has it yet; with the stack of 4,096 bytes one can.
   - In the editor Ctrl+Right goes to the next word and Ctrl+t deletes up
     to it; Ctrl+k cuts off the line at the cursor. End in a line of 3900
     characters or more stops on the 3900th, and Del there deletes that
@@ -277,6 +277,45 @@ out again (show.py --changes is how):
     choose from: Enter there types the path of the directory into the
     line. "F9 r l" with the left panel active is the filter of the right
     one, in the right half of the screen, three Tabs from its buttons.
+  - F5 and F6 go in a step of their own, the name and Enter in the
+    next: 'F5 "name" Enter' as one step works at first, but once a box
+    with an error has been shown the dialog is slow to come up, the
+    keys behind F5 fill the keyboard buffer, and the step fails with
+    "the key t did not arrive", whatever the sixteenth key is. An
+    answer to a box that the copying brings up is a step of its own
+    too: Esc typed behind the Enter that starts the copying is taken
+    for a break, if it gets there in time.
+  - With the Info next to it a panel's F5 offers the last target again,
+    so "F5", "Enter" and an answer repeat a copy; with a panel of files
+    next to it, that panel's directory. F6 offers the name of the file
+    itself, which does nothing to a file. Do not press Enter on that
+    for a directory: it is moved into itself, a directory deeper every
+    time, until the path is too long, with a box and a beep for each.
+    Shift+F5 and Shift+F6 ask for the source too: its name, Tab, the
+    target.
+  - "The following file exists" takes Enter to overwrite, "a" for all,
+    "p" to append and "s" to skip; "Yes No" takes "Right Enter" for
+    no; "Ok Cancel" Enter and Esc; "Abort Continue", of a full disk,
+    Enter and "Right Enter"; "Delete Skip Cancel", of a read-only file
+    that was moved, Enter, "s" and Esc.
+  - Names that lead somewhere: "*." is the name of the source without
+    its extension, which may be that of a directory; ".\\" thirty times
+    and "src\\" are the 64 characters that a target may have, and name
+    C:\\WORK\\SRC; "nul" is a device and "con" one that is refused, as
+    target and, with Shift+F5, as source; "nul." is a device too.
+    D:\\VC\\VC.HLP ends with the end-of-file character, 1Ah.
+  - "F9 l t" makes the left panel the tree, and F6 there asks for a new
+    name of the current directory. FreeDOS does not rename that one,
+    nor remove it, so the program moves what is in it instead and says
+    what it could not do.
+  - A disk gets full by copies: COMMAND.COM of A: as two files, each
+    appended to the other in turn, seven times, and nine copies of the
+    3 MB that makes. The scenario copy-full does it and takes half a
+    minute when a build is tested. Keep what a step copies small: 25 MB
+    in one step took more than the 20 seconds a step may, on a machine
+    that other tests were using.
+  - "Ctrl+a", "Down Space Enter" takes the Archive attribute off a
+    file, which then has none.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -1477,6 +1516,296 @@ SCENARIOS = {
             "Alt+F10",                    # the tree again
             "Esc",                        # nothing chosen
             "Esc",
+        )),
+
+    "copy": Scenario(
+        "A file copied: where the name it is given leads, onto a file "
+        "that is there, onto one that is read-only, onto itself, to a "
+        "device and from one",
+        steps=(
+            "Ctrl+l",                     # the right panel in C:\\
+            "Down Down Down",             # onto readme.txt
+            "F5",                         # offers the other directory
+            "Enter",
+            "F5",
+            '"docs" Enter',               # a directory, named without \\
+            "F5",
+            '"nul" Enter',                # a device
+            "F5",
+            '"con" Enter',                # the console: refused
+            "Enter",
+            "F5",
+            '"*.bak" Enter',              # a mask: readme.bak
+            "F5",
+            '"readme.bak" Enter',         # which is there now: asks
+            "Enter",                      # overwrite
+            "F5",
+            '"readme.bak" Enter',
+            "p",                          # append
+            "F5",
+            '"readme.bak" Enter',
+            "s",                          # skip
+            "F5",
+            '"readme.bak" Enter',
+            "Esc",
+            "F5",
+            '"readme.txt" Enter',         # onto itself
+            "Enter",
+            "F5",
+            '"c:readme.txt" Enter',       # the same with its drive
+            "Esc",
+            "F5",
+            '"\\work\\readme.txt" Enter', # and by its path
+            "Enter",
+            "F5",
+            '".." Enter',                 # the directory above, where it
+            "Enter",                      # is already: overwrite
+            "End",                        # readme.bak
+            "Ctrl+a",
+            "Space Enter",                # read-only
+            "Home",
+            "Down Down Down",
+            "F5",
+            '"readme.bak" Enter',
+            "p",                          # append: asks once more
+            "Right Enter",                # no
+            "F5",
+            '"readme.bak" Enter',
+            "p",
+            "Enter",                      # yes: it stays read-only
+            "F5",
+            '"readme.bak" Enter',
+            "Enter",                      # overwrite: asks once more
+            "Right Enter",                # no
+            "F5",
+            '"readme.bak" Enter',
+            "Enter",
+            "Enter",                      # yes
+            "Ins Ins",                    # two files into DOCS, where
+            "F5",
+            '"docs" Enter',               # the first is already
+            "a",                          # all
+            "Shift+F5",                   # a file named by hand
+            '"nul" Tab "x"',              # a device that gives nothing
+            "Enter",
+            "Shift+F5",
+            '"con" Tab "x" Enter',        # the console: refused
+            "Enter",
+        )),
+
+    "move": Scenario(
+        "A file renamed or moved: onto itself, onto a file that is "
+        "there, onto a directory, to another drive, and one that is "
+        "read-only",
+        steps=(
+            "Down Down",                  # onto SRC, which is empty
+            "F6",
+            '"d:\\" Enter',               # made there and removed here
+            "F6",                         # readme.txt: offers its name
+            "Enter",                      # onto itself: nothing
+            "F6",
+            '"first.txt" Enter',          # renamed
+            "F6",
+            '"hello.txt" Enter',          # onto a file that is there
+            "Enter",                      # overwrite
+            "F6",
+            '"notes.doc" Enter',
+            "p",                          # append
+            "F6",
+            '"data.bin" Enter',
+            "s",                          # skip
+            "F6",
+            '"data.bin" Enter',
+            "a",                          # all
+            "Down",                       # run.bat
+            "Ctrl+a",
+            "Space Enter",                # read-only
+            "Up",
+            "F6",
+            '"run.bat" Enter',
+            "Enter",                      # overwrite: asks once more
+            "Right Enter",                # no
+            "F6",
+            '"run.bat" Enter',
+            "Enter",
+            "Enter",                      # yes
+            "F5",
+            '"docs.txt" Enter',
+            "Home Down Down",             # onto docs.txt
+            "F6",
+            '"*." Enter',                 # DOCS, which is a directory
+            "Esc",
+            "F5",                         # a copy named so: asks whether
+            '"*." Enter',                 # to overwrite it
+            "Enter",                      # and cannot
+            "Enter",
+            "F5",
+            '"con" Enter',                # the console, and cancelled
+            "Esc",
+            "F5",
+            '"nul." Enter',               # a device with a full stop
+            "End",                        # empty.dat
+            "Ctrl+a",
+            "Down Space Enter",           # no attribute at all
+            "Home Down Down",
+            "F6",
+            '"empty.dat" Enter',          # appended to that: taken for a
+            "p",                          # name too long
+            "Enter",
+            "F6",
+            '"nodir\\x" Enter',           # no such directory
+            "Esc",
+            "F6",
+            '"d:\\" Enter',               # to another drive
+            "Ctrl+a",                     # run.bat
+            "Space Enter",                # read-only
+            "F6",
+            '"d:\\" Enter',               # copied; asks before deleting
+            "s",                          # skip: it stays
+            "F6",
+            '"d:\\" Enter',               # it is there now, read-only
+            "Enter",                      # overwrite
+            "Enter",                      # yes
+            "Esc",                        # not deleted here
+            "F6",
+            '"d:\\" Enter',
+            "Enter",
+            "Enter",
+            "Enter",                      # deleted
+            "Shift+F5",                   # the help file ends with the
+            '"d:\\vc\\vc.hlp" Tab "h"',   # character for the end of a
+            "Enter",                      # file
+            "Shift+F5",
+            '"d:\\vc\\vc.mnu" Tab "h"',   # appended to it: over that
+            "Enter",                      # character
+            "p",
+            "F9 l t",                     # the tree in the left panel
+            "F6",                         # asks for a name only
+            '"work2" Enter',
+            "Enter",
+            "Enter",
+            "Enter",
+        )),
+
+    "copy-dirs": Scenario(
+        "Directories copied, renamed and moved, with what is in them, "
+        "and names too long for it",
+        steps=(
+            "Down Enter",                 # into DOCS
+            'F7 "subdir.dir" Enter',      # the time of day, in the first
+            "Ctrl+PgUp",                  # minute
+            "Down Down",                  # onto readme.txt
+            "F5",
+            '"docs\\" Enter',
+            "Up Up",                      # onto DOCS
+            "F5",
+            '"hello.txt" Enter',          # a file of that name: an error
+            "Enter",
+            "F5",
+            '"nodir\\x" Enter',           # no such directory
+            "Enter",
+            "F5",
+            '"nul" Enter',                # its files to a device
+            "F5",                         # into SRC by 64 characters:
+            '"' + ".\\" * 30 + 'src\\"',  # what is in it gets a name
+            "Enter",                      # too long
+            "Enter",
+            "Enter",
+            "F6",                         # the same moved: the directory
+            '"' + ".\\" * 30 + 'src\\"',  # is there, so what is in it is
+            "Enter",                      # renamed one by one
+            "Enter",
+            "Enter",
+            "F6",
+            '"papers" Enter',             # renamed
+            "F5",
+            '"src\\" Enter',              # into SRC, with what is in it
+            "F5",
+            '"src\\" Enter',              # again: the file is there
+            "Enter",
+            "F6",
+            '"src\\" Enter',              # moved there: file by file
+            "s",                          # skip: the directory stays
+            "F6",
+            '"src\\" Enter',
+            "Enter",                      # overwrite: it goes
+            "F5",
+            '"d:\\" Enter',               # SRC to another drive
+            "F6",
+            '"d:\\" Enter',               # moved: the file is there
+            "s",                          # skip: PAPERS stays, and its
+                                          # file is then taken for one of
+            "Enter",                      # SRC, where there is none
+            "F6",
+            '"d:\\" Enter',
+            "Enter",                      # overwrite: all of it goes
+        )),
+
+    "copy-big": Scenario(
+        "A file that is read in several pieces, and one that the memory "
+        "does not hold",
+        steps=(
+            "Shift+F5",
+            '"a:\\freedos\\bin\\command.com" Tab "big"',
+            "Enter",
+            "End",                        # onto it
+            "F5",
+            '"huge" Enter',
+            *("F5", "Enter", "p") * 5,    # itself appended five times
+            "End",
+            "F5",
+            '"huge2" Enter',              # read and written in two parts
+            "F5",
+            '"huge2" Enter',
+            "s",                          # skip: not all of it was read
+        )),
+
+    "copy-full": Scenario(
+        "A disk that gets full while a file is copied to it",
+        steps=(
+            "Shift+F5",
+            '"a:\\freedos\\bin\\command.com" Tab "a"',
+            "Enter",
+            "End",                        # onto it
+            "F5",
+            '"b" Enter',
+            # Each appended to the other in turn, seven times: b is 3 MB
+            # then, and the disk has 28 free.
+            *("F5", '"b" Enter', "p", "Down",
+              "F5", '"a" Enter', "p", "Up") * 3,
+            "F5",
+            '"b" Enter',
+            "p",
+            "Down",                       # onto b
+            # Nine copies of it. No step moves more than 3 MB: a step
+            # may take 20 seconds, on a machine that others use too.
+            *(step for number in range(1, 10)
+              for step in ("F5", f'"c{number}" Enter')),
+            "F5",
+            '"d" Enter',                  # the tenth: the disk is full
+            "Right Enter",                # go on: what is there of d is
+            "Enter",                      # in the way, overwrite it;
+                                          # full again
+            "Enter",                      # abort: d is deleted
+            "Ctrl+a",
+            "Space Enter",                # b read-only, and so its copies
+            "F5",
+            '"d" Enter',                  # full
+            "Enter",                      # abort: what is there of d is
+                                          # deleted, read-only as it is
+            "F5",
+            '"docs\\d" Enter',            # full once more, in a directory
+            "Right Enter",                # go on
+            "s",                          # skip: the part stays
+            "Shift+F5",                   # nothing is free now
+            '"hello.txt" Tab "x"',
+            "Enter",                      # not a byte written
+            "Enter",                      # abort
+            "Shift+F5",
+            '"hello.txt" Tab "x"',
+            "Enter",
+            "Right Enter",                # go on: the same again
+            "Enter",
         )),
 }
 
