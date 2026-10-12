@@ -465,13 +465,20 @@ several at a time.
   other batches under it, and `git push`. If the push is refused, another
   batch got there first: again from the pull. The agent settles a
   conflict of its batch itself and keeps what both sides added.
-- The screens of the original cannot be recorded while other machines
-  run: goldens came out different when they were. `harness/turn.py` has
-  every run of the harness wait for its turn, a run that records the
-  original by itself, tests of the port together. So, while other batches
-  run, derive the goldens of the scenarios at hand and never all of
-  them; and when the `port` test fails where the change cannot explain
-  it, derive again the golden of the scenario that failed.
+- Nothing in the harness takes turns: recordings of the original and
+  tests of the port run at the same time, in as many checkouts as there
+  are, and other machines only make them slower. The original is
+  recorded by watching it come back to its wait for a key
+  (`harness/watch.py`), not by the clock. Where a recording or a test
+  does come out different under load, that is a flaw to report, not
+  something to wait out.
+- A routine of the assembly that C code calls has one entry for C,
+  named after it with `_a`, that takes and hands back the registers as
+  the routine has them, and one declaration in `port/vc.h`. A batch that
+  wants its arguments otherwise wraps the entry in its own C file. Look
+  for an entry before making one, and again after a rebase: two batches
+  have made the same entry with different arguments, and git saw no
+  conflict in it.
 - The tools and the harness are improved during a run, between batches
   and without waiting for confirmation, each improvement a commit of its
   own. What decides is the total cost: an improvement is made when it
