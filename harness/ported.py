@@ -968,10 +968,12 @@ BATCHES = [
         # Exec is code between procedures, as far as NotFind: with the
         # commands run, Exec10, which loads the program again, AlocEr,
         # and Exit00 to Exit05. The assembly calls none of it any more.
-        # Exit05, the interrupt function that DOS goes on in when it has
-        # ended the program, runs in no scenario, as in the original.
+        # The functions are SetBrk, which the part that goes calls, and
+        # Exit01 with Exit05, the interrupt function that it goes on in:
+        # where DOS goes on when it has ended the program, which the
+        # scenario ended has it do.
         routines=("Exec", "NotFind", "OutStr0", "SetBrk0", "SetBrk"),
-        functions=("SetBrk",),
+        functions=("SetBrk", "Exit01", "Exit05_"),
         unreached={
             0x032B: "Exec11, where DOS has no block for the part of "
                     "the program that is loaded again after a command: "
@@ -980,10 +982,6 @@ BATCHES = [
                     "command in it and has ended. A program that stays "
                     "with most of the memory, which was tried, stays "
                     "behind that block",
-            0x0405: "Exit05, where DOS has ended the program and goes "
-                    "on at the address that the program has put into "
-                    "its PSP: nothing of the bench ends the program "
-                    "but the program",
         },
     ),
     Batch(

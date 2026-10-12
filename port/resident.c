@@ -810,18 +810,40 @@ void __far __loadds SetBrk(void)
    where it went on: then return.
 
    The last program of the list is released as many times as the list is
-   long; releasing it takes it off the list, by New21 (see FreeBlk). */
-static void Exit02(u16 code)
+   long; releasing it takes it off the list, by New21 (see FreeBlk).
+
+   `r` and `flags` are the registers and the flags that this was entered
+   with, and they are left as the assembly leaves its own, for the
+   program that this returns to when DOS has ended this one: ES on this
+   segment; CX 0, the count of the programs run down; SI twice the
+   length of the list when the last program was released, and DS on its
+   record, if there was one; DS:DX the address that INT 27h went to
+   before, which DOS was told last, if the program had taken the
+   interrupts, and else DL as DOS was told to look for Ctrl-C. AX, BX,
+   DI and BP are as they came. The flags are those of the segment that
+   the program goes on in, compared with 0; the direction flag is clear
+   if a program was released, and interrupts are let in if its record
+   was whole. */
+static void Exit02(u16 code, struct Saved STACK *r, u16 STACK *flags)
 {
     struct DosRegs regs;
     u16 count;
 
-    regs.name = 0;                      /* Exit01 */
+    r->es = RES_SEG;                    /* Exit01 */
+    r->dx = r->dx & 0xFF00 | ComnIni.BreakFl;
+    regs.name = 0;
     DX_OF(regs) = ComnIni.BreakFl;
     regs.ax = DOS_BREAK + 1;
     Int21e(&regs);
-    for (count = Counter; count; count--)
-        Release(*(PrgList + Counter - 1));
+    for (count = Counter; count; count--) {
+        r->si = Counter << 1;
+        r->ds = *(PrgList + Counter - 1);
+        *flags &= ~FLAG_DIRECTION;
+        if (ChkBlk(r->ds))
+            *flags |= FLAG_INTERRUPT;
+        Release(r->ds);
+    }
+    r->cx = 0;
     if (ComnIni.ChkTSR != 0) {          /* Exit03 */
         regs.name = (const u8 __far *)Vect21;
         regs.ax = DOS_VECTOR + 0x21;
@@ -829,20 +851,27 @@ static void Exit02(u16 code)
         regs.name = (const u8 __far *)Vect27;
         regs.ax = DOS_VECTOR + 0x27;
         Int21e(&regs);
+        r->ds = (u16)(Vect27 >> 16);
+        r->dx = (u16)Vect27;
     }
     if ((u16)(Vect22 >> 16) == 0) {     /* Exit04 */
         regs.ax = DOS_EXIT | code & 0xFF;
         Int21e(&regs);
     }
+    *flags = *flags & ~FLAGS_RESULT | Taken((u16)(Vect22 >> 16), 0);
 }
 
 /* Leave the program with `code`: the PSP gets back the address at which
-   the program that started this one goes on, and DOS ends this one. */
+   the program that started this one goes on, and DOS ends this one.
+   Nobody gets the registers that Exit02 leaves. */
 static void Exit00(u16 code)
 {
+    struct Saved r;
+    u16 flags;
+
     PSP_EXIT = Vect22;
     Vect22 &= 0xFFFF;
-    Exit02(code);
+    Exit02(code, &r, &flags);
 }
 #pragma aux Exit00 aborts
 
@@ -850,13 +879,12 @@ static void Exit00(u16 code)
    when the program has ended: so if DOS ends it, by whatever means, DOS
    goes on there, on the stack of the program that started this one, and
    what Exit02 does is done all the same. Then on to where that program
-   goes on, with the stack as it is. That is done as for an interrupt
-   that goes on in the handler before it, see New21: four instructions
-   of assembly for room on the stack, and an interrupt function that
-   returns into that room.
-
-   Not as the assembly: the registers come to that program as DOS left
-   them, where the assembly left its own in six of them. */
+   goes on, with the stack as it is, and with the registers and the
+   flags as Exit02 leaves them. That is done as for an interrupt that
+   goes on in the handler before it, see New21: four instructions of
+   assembly for room on the stack, and an interrupt function that
+   returns into that room. The assembly took of that program's stack
+   here too. */
 void __interrupt __far Exit05(struct Saved r, struct Frame on);
 
 __declspec(naked) void __far Exit01(void)
@@ -872,10 +900,9 @@ __declspec(naked) void __far Exit01(void)
 
 void __interrupt __far Exit05(struct Saved r, struct Frame on)
 {
-    Exit02(r.ax);
+    Exit02(r.ax, &r, &on.flags);
     on.ip = (u16)Vect22;
     on.cs = (u16)(Vect22 >> 16);
-    on.flags &= ~FLAG_CARRY;
 }
 
 /* No memory: say so and leave. `bx` is what the assembly has in BX

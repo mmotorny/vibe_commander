@@ -335,7 +335,7 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   checks the number itself: that the port has less by what it is larger,
   at least. The same goes for what `mem` says in the scenario `command`,
   416K free under the original and some 7K less under the port, whose
-  part that stays is 6,880 bytes longer, 3,840 of them its stack. With
+  part that stays is 7,008 bytes longer, 3,840 of them its stack. With
   those numbers left out,
   no scenario shows any more that the program gives up its memory while
   a command runs: a check of its own would hold the port's figure
@@ -1245,9 +1245,12 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     reading the original's listing.
   - When DOS ends the program by itself and goes on at the address
     that the program keeps in its PSP for that, the program that
-    started this one gets the registers as the assembly left them, in
-    the port as DOS had them. No program can rely on either. Nothing
-    of the bench ends the program but the program.
+    started this one gets the registers as the original leaves its
+    own: ES on the program, which is free memory by then, CX 0, DS:DX
+    the address that INT 27h went to before, and SI twice the length
+    of its list when the last program on it was released. No program
+    can rely on them. In `ended`, where a program made for it has DOS
+    end a second copy.
 - What the critical error does in the original, and in the port after
   it (`FatErr` in `port/main.c`):
   - The number of the error is all of DI, of which DOS defines the low
@@ -1294,14 +1297,6 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     original's second copy was not full for INT 27h where the port's
     was. A watcher that runs the second copy itself, as its parent,
     would be on no list. The second rests on reading.
-  - Where DOS has ended the program by itself and goes on at the
-    address that the program keeps in its PSP for that, the program
-    that started this one gets every register as DOS had it. The
-    assembly left its own in AX's neighbours: ES and DS on its
-    segment, and BX, CX, DX and SI as its last calls left them. No
-    program can go by either. As the original: no assembly, six
-    assignments to the saved registers in `Exit05`, of values that
-    are addresses of the original's layout or what DOS answered.
   - The second way of the entry is not there: the original, when DOS
     will not make its block of memory as long as the program needs,
     asks for a block elsewhere for the part that goes, so it can be

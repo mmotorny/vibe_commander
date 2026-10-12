@@ -958,6 +958,17 @@ out again (show.py --changes is how):
     that they are loaded from, and says "Program too big to fit in
     memory", where the original, of 51K and 64K, has. "F9 o m" in the
     copy, Memory allocation off, keeps all of it loaded: passed-on.
+  - DOS ends the program for whoever asks while the program is the one
+    that runs. p.com of ended runs a second copy itself, by DOS's call
+    4Bh, having taken INT 28h, which the program calls when it waits
+    for a key, and calls DOS's 4Ch there. DOS goes on at the address
+    that the copy's PSP has, which is the copy's own, and that goes on
+    in p.com with the registers as the copy leaves them. p.com has to
+    name the file: vc.com, and vc.exe if DOS finds no such file. It
+    gets the stack it called with, and of the flags nothing that it
+    had: FreeDOS goes on with 0202h or so, the direction flag clear.
+    A copy that is ended like that leaves its panels on the screen
+    and the cursor below it: p.com sets the mode, which clears both.
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
 is off, started in C:\\WORK. A scenario that wants something else arranges
@@ -2816,6 +2827,79 @@ SCENARIOS = {
             "Ctrl+o",                     # with the flags of who calls
             "F10",
             "Enter",                      # the watcher released
+        )),
+
+    "ended": Scenario(
+        "DOS ends the program, not the program itself: a program made in "
+        "the editor, in hex, runs a second copy, has DOS end it the "
+        "first time it idles, and prints the registers that it gets "
+        "back, once with a program that has stayed in the memory from "
+        "the copy, which the copy releases all the same",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            # The parent, p.com. It keeps 800h bytes of its memory, with
+            # its stack, takes INT 28h, and runs d:\vc\vc.com, or vc.exe
+            # if there is no such file, with its own command tail and
+            # with 1111h in SI and 2222h in CX. The program calls INT 28h
+            # when it waits for a key: the parent asks DOS there which
+            # program is running, AH 62h, and has DOS end it, AH 4Ch. DOS
+            # goes on where the program's PSP says, in the program, and
+            # that goes on in the parent, behind its call. There the
+            # parent gives INT 28h back, clears the screen by setting its
+            # mode, and prints CX, SI, DX less the offset and DS less the
+            # segment of where INT 27h goes now, ES less the segment of
+            # the program that was ended, and the flags but for the
+            # parity, which is that of a segment.
+            "Shift+F4",
+            '"p.com"',
+            "Enter",
+            "Enter",                      # a new file
+            "F4",                         # in hex
+            '"bc0008bb8000b44acd21"',     # SP 800h, and the block 80h
+                                          # paragraphs
+            '"b82835cd21891ec3018c06c501"',   # where INT 28h goes, kept
+            '"ba8201b82825cd21"',         # INT 28h to 182h here
+            '"0e078c0eb901"',             # ES back; the tail's segment
+            '"bbb501baa801be1111b92222"',     # ES:BX the block, DS:DX the
+                                          # name, SI and CX
+            '"b8004bcd21730d"',           # run it; back without the carry
+            '"c706b1014558c606b30145ebe0"',   # or "exe" for "com", again
+            '"9c061e525651"',             # the flags, ES, DS, DX, SI, CX
+            '"0e1f1ec516c301b82825cd211f"',   # DS back; INT 28h given back
+            '"b82735cd21"',               # where INT 27h goes: ES:BX
+            '"8bec295e048cc0294606"',     # DX and DS less that
+            '"a1c70129460880660afb"',     # ES less the program; no parity
+            '"b80300cd10"',               # mode 3
+            '"bd06005be813004d75f9cd20"',     # six words printed, and out
+            '"b462cd212e891ec701b8004ccd21"',     # 182h: which program;
+                                          # ended
+            '"b90400c1c304"',             # four digits of BX, from the top
+            '"8ac3240f3c0a1c692f"',
+            '"cd29e2f0b020cd29c3"',       # by INT 29h, and a space
+            '"643a5c76635c76632e636f6d00"',   # d:\vc\vc.com
+            '"0000800000000000000000000000"',     # the block: the tail at
+                                          # 80h of the PSP, no more
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"t.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"ba1001cd27"',               # stays by INT 27h, 110h bytes
+            "F2",
+            "Esc",
+            '"p" Enter',                  # the copy starts and is ended
+            "Ctrl+o",                     # CX 0, SI as it went, DS:DX on
+            "Ctrl+o",                     # INT 27h, ES on the program
+            '"p" Space "t" Enter',        # the copy runs t.com first, which
+                                          # stays
+            "Ctrl+o",                     # SI is twice the one program that
+            "Ctrl+o",                     # the copy had to release
+            "Alt+F5",                     # nothing has stayed
+            "Esc",
         )),
 
     "tree-deep": Scenario(
