@@ -131,6 +131,33 @@ Things that are known and not done. Standing instructions are in
 - Deriving the golden of `find` stopped once in three times with "the
   screen did not settle", at the step that ends in the help over a
   search that runs. Not looked into: derive again.
+- Of the box in which a directory is chosen from the tree, what it does
+  for the mouse has run in no scenario, 93 instructions of `ChTree`: a
+  button held on a line, above the lines or below them, a second click
+  on a line, a click outside the box. It is translated by reading, and
+  listed as out of reach in `harness/ported.py`. So are 17 instructions
+  of `ReadTre`: for a drive that is not ready, at first or while its
+  directories are read, for a tree of 767 entries, which has no room
+  for another, and for hidden directories left out, which only a setup
+  file made elsewhere asks for: `HidDirs` is in no menu.
+- F2 and Ctrl+R in that box have `DelTr0` spoil the tree file so that
+  the disk is read again, and `DelTr0` is told the drive by a path at
+  ES:SI. `ChTree` leaves in SI what `Case` had there, the address behind
+  the key's entry in its table of keys, in the code segment; in the main
+  data that is in `TreeBuf`, in the name of the 510th entry of the
+  tree. If the third character of that name were a colon, or for Ctrl+R
+  the seventh, the file of the drive named before it would be spoiled
+  instead of the current one's. DOS gives no name with a colon, so it
+  takes a tree file made by hand. Ported like that: the C hands `DelTr0`
+  the two addresses of the original, E45Ah and E45Eh.
+- `ReadTre` takes a tree file for good if its two sums are right and its
+  length is that of its number of directories, worked out in 16 bits: a
+  file with the entries of ten directories that says 4106 passes, and
+  the tree is then drawn from what lies behind `TreeBuf`. A file that
+  says 0 or 4096 and has no entries has its sum taken over 65536 bytes,
+  all of the main data's segment. Ported like that; it takes a file made
+  by hand.
+
 - `wait_for_screen` takes a change of one cell for blinking. In `columns`
   the editor closes its box after F2 and clears the `*` in its first row
   some 10 ms later; a sample between the two has the harness wait 20
@@ -360,6 +387,24 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     a conflict; those of this batch went, and its C took the arguments
     and the answers of the others. A build and a test, 76 seconds,
     passed at once.
+
+- The tree read from the disk and its box, 3 routines, 1,792 bytes,
+  34 minutes in all, next to three other batches. The translation
+  passed the first time it was tested, and nothing but waiting was lost.
+  - 8 minutes waiting for a turn at the computer before the rebase, in
+    four runs: 158 seconds before the goldens of the two scenarios were
+    derived, which then took a minute, 143 and 134 before the two `port`
+    tests, the one before translating and the one after, and 43 before a
+    comparison of four scenarios. Two runs of `harness/reach.py` with
+    steps, 20 and 36 seconds, did not wait.
+  - 4 minutes for getting onto `main`, behind find file: two files in
+    conflict, `README.md` and this one, each where both batches had
+    written in the same place, and a script kept both. The lists of
+    batches, of scenarios and of the C functions that the assembler is
+    told of merged by themselves: this batch has its entries behind
+    those of the tree in a panel, not at the end, and its entries for C
+    next to its stubs. A build and a test, which waited 86 seconds for
+    a turn and passed at once.
 
 ## Ideas put off
 

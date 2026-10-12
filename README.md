@@ -80,11 +80,13 @@ line to the next, to the one before and to the next word, that draw a
 line of the text, as text or in hex, and the status line, and that save
 the file. The help is C as a whole: reading its file, showing the index
 and the pages in their window, and taking the keys and the mouse there.
-Of the file search, the search itself is C, by name and by contents
-through a directory and those below it, with its list and the keys taken
-while it runs; its dialog and what it does with the answer are still
-assembly. Reading the tree is still assembly, and so is what the viewer
-and the editor do with their keys.
+So is the tree of directories away from its panel: reading it from the
+disk, keeping it in its file there, and the box in which a directory is
+chosen from it. Of the file search, the search itself is C, by name and
+by contents through a directory and those below it, with its list and
+the keys taken while it runs; its dialog and what it does with the
+answer are still assembly, and so is what the viewer and the editor do
+with their keys.
 
 ## Layout
 

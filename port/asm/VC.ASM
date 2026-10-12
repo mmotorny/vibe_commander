@@ -30,6 +30,7 @@
 	EXTERN	SetCur_c:FAR, FilDir_c:FAR, FilePan_c:FAR
 	EXTERN	PutTre_c:FAR, PutTree_c:FAR, TreeCur_c:FAR, TrCr10_c:FAR
 	EXTERN	TrCr20_c:FAR, PutInf_c:FAR
+	EXTERN	ReadTre_c:FAR, ChTree_c:FAR
 	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
 	EXTERN	GetVol_c:FAR, DirSize_c:FAR, TstInfo_c:FAR
 	EXTERN	NextLin_c:FAR, PrevLin_c:FAR, V20_00_c:FAR, V25_00_c:FAR
@@ -47,6 +48,9 @@
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
+; The name of the tree file, and the boxes shown while the tree is read
+; and saved, which C code hands to OncZoom.
+	PUBLIC	Tree_F, Tree_P, TrSav_P
 ; Boxes and a text that C code hands to DialBox and Dialog.
 	PUBLIC	SavFi_P, SavEr_B, Prot_B, EdFl_S
 ; A text, a box, and buttons with their colours, of the help.

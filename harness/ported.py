@@ -202,6 +202,52 @@ BATCHES = [
         },
     ),
     Batch(
+        title="The tree read from the disk and kept in its file, and the "
+              "box in which a directory is chosen from it",
+        source="treebox.c",
+        routines=("ReadTre", "ChTree", "ChTr50"),
+        functions=("ReadTre_c", "ChTree_c"),
+        unreached={
+            **dict.fromkeys(
+                (0xBBC0, 0xBBC3, 0xBBC4, 0xBBC7, 0xBBC9, 0xBBCB, 0xBBCC,
+                 0xBBCF, 0xBBD3, 0xBBD9, 0xBBDE),
+                "ReadTre, for a disk that is not there: a drive that is "
+                "not ready, a disk that the user would not put into a "
+                "drive which stands for two, or a tree file that DOS "
+                "opens and will not read. The bench has no such drive"),
+            **dict.fromkeys(
+                (0xBCE5, 0xBCEA),
+                "ReadTre, with hidden directories left out of the tree: "
+                "no menu has that option, only a setup file made "
+                "elsewhere"),
+            **dict.fromkeys(
+                (0xBD02, 0xBD05, 0xBD07),
+                "ReadTre, for more directories than the tree has room "
+                "for, 766 and the root: a step makes one"),
+            0xBD0E: "ReadTre, for a drive that is no longer ready while "
+                    "its directories are read",
+            **dict.fromkeys(
+                (0xC94E, 0xC9C1, 0xC9C3, 0xC9C6, 0xC9C8, 0xC9CA, 0xC9CD,
+                 0xC9CF, 0xC9D1, 0xC9D3, 0xC9D5, 0xC9D7, 0xC9D9, 0xC9DB,
+                 0xC9DD, 0xC9DF, 0xC9E2, 0xC9E6, 0xC9E8, 0xC9E9, 0xC9EA,
+                 0xC9EE, 0xC9F2, 0xC9F4, 0xC9F7, 0xC9F8, 0xC9F9, 0xC9FB,
+                 0xCA00, 0xCA02, 0xCA04, 0xCA06, 0xCA08, 0xCA0A, 0xCA0C,
+                 0xCA0F, 0xCA11, 0xCA13, 0xCA15, 0xCA17, 0xCA19, 0xCA1B,
+                 0xCA1D, 0xCA1E, 0xCA20, 0xCA23, 0xCA25, 0xCA28, 0xCA2A,
+                 0xCA2C, 0xCA2E, 0xCA30, 0xCA32, 0xCA34, 0xCA39, 0xCA3B,
+                 0xCA3C, 0xCA3D, 0xCA3F, 0xCA43, 0xCA46, 0xCA47, 0xCA48,
+                 0xCA4A, 0xCA4D, 0xCA52, 0xCA54, 0xCA56, 0xCA58, 0xCA59,
+                 0xCA5B, 0xCA5C, 0xCA5D, 0xCA5E, 0xCA62, 0xCA64, 0xCA67,
+                 0xCA69, 0xCA6C, 0xCA6D, 0xCA6E, 0xCA6F, 0xCA71, 0xCA73,
+                 0xCA77, 0xCA78, 0xCA7A, 0xCA7C, 0xCA7E, 0xCA81, 0xCA83,
+                 0xCA85, 0xCA88),
+                "ChTree, for the mouse: a button held on a line of the "
+                "tree, above the lines or below them, a second click on "
+                "a line, and a click outside the box. The bench has no "
+                "mouse"),
+        },
+    ),
+    Batch(
         title="The Info panel: memory, the disk, the files of the other "
               "panel and the text of dirinfo",
         source="info.c",

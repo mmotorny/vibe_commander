@@ -77,6 +77,25 @@ out again (show.py --changes is how):
     levels deep. "F9 r t" shows the tree in the right panel; it is read
     from the disk again when directories have been made. Alt+F10 shows
     it in a box, to choose a directory from; Esc leaves that.
+  - In the box of Alt+F10 a letter is the speed search: the cursor goes
+    to the next directory whose name begins with what has been typed,
+    from where it is; Ctrl+Enter goes to the one after that and round,
+    Backspace takes a letter back, and a letter that fits no name is not
+    taken. F2 and Ctrl+r read the disk again, Enter goes to the directory
+    and Esc or F10 leaves. On a screen of 25 lines the box has 14 lines.
+    The tree of a disk is kept in a file in its root, TREEINFO.NCD, when
+    it has five entries or more, the root counted: C: has six, and A:
+    five, FREEDOS with BIN, NLS and CONFIGS in it. "Down Ins Ins F8" and
+    two Enters at the start delete DOCS and SRC, which leaves four. A
+    directory of the file's name, F7 and "\\treeinfo.ncd", keeps the file
+    from being written: that beeps, and the screen is a line further up.
+    On A: it cannot be written either, and nothing says so.
+  - Keys of one name, "F2+Esc", go down together and reach the keyboard
+    buffer one behind the other, with nothing in between: the second is
+    waiting when the program takes the first. That is how a key stops
+    what the program does without waiting for one, the reading of the
+    tree: pressed as a key of its own, in the same step or the next, it
+    arrives when the reading is over.
   - The Info panel shows the file dirinfo of the directory of the other
     panel, once that has been read again, as it is after the editor.
     "F9 o m" switches Memory allocation, and the Info then says how much
@@ -884,6 +903,69 @@ SCENARIOS = {
             "Alt+F10",                    # the tree in a box, to choose a
             "Up",                         # directory from
             "Esc",
+        )),
+
+    "tree-box": Scenario(
+        "The box of the tree with more directories than it has lines: the "
+        "keys that move in it, the speed search, and the disk read again, "
+        "once with a key that stops it",
+        steps=(
+            "Ctrl+l",                     # the Info panel off: two panels
+            *(f'F7 "{letter}" Enter Enter'    # a directory, and into it
+              for letter in "abcdefghijklm"),
+            "Alt+F10",                    # 19 directories, read from the
+                                          # disk and saved: the cursor on
+                                          # the current one, the last lines
+            "Home",
+            "Home",                       # nothing to do
+            "Up",
+            "PgDn",                       # the lines turn, the cursor stays
+            "PgDn",                       # no more lines: to the last one
+            "Down",
+            "PgUp",
+            "PgUp",                       # the first lines: to the first one
+            "Down Down Down Down Down Down Down "
+            "Down Down Down Down Down Down Down",     # one more than fit:
+                                          # the screen moves up a line
+            "PgUp",                       # and down a line
+            "End",
+            "Up",
+            '"d"',                        # the next one that begins so
+            "Ctrl+Enter",                 # and the one after it
+            "F2+Esc",                     # read again, and Esc waiting when
+                                          # the disk is asked: only the root
+            "Ctrl+r",                     # read again, all of it
+            "F2",                         # and again: the same
+            "F10",
+        )),
+
+    "tree-choose": Scenario(
+        "A directory chosen from the tree, of a disk with few directories "
+        "and of one whose tree cannot be saved",
+        steps=(
+            "Down Ins Ins F8",            # DOCS and SRC
+            "Enter",
+            "Enter",                      # deleted: three directories left
+            "Alt+F10",                    # too few for a tree file
+            '"s"',                        # the next one with an s: STAMPS
+            "Ctrl+Enter",                 # SUB
+            "Ctrl+Enter",                 # and round to STAMPS
+            '"u"',                        # SUB
+            '"x"',                        # there is no SUX
+            "Backspace",
+            "Enter",                      # into it
+            'F7 "\\treeinfo.ncd" Enter',  # a directory where the tree
+                                          # file would be
+            "Alt+F10",                    # five to save now: the file
+                                          # cannot be made, and that beeps
+            "Esc",
+            "Alt+F1 a",                   # a disk that cannot be written
+            "Alt+F10",                    # five directories too: no beep
+            "Down Enter",                 # A:\\FREEDOS
+            "Ctrl+l",                     # the right panel one of files,
+            "F9 l t",                     # the left one the tree
+            "Alt+F10",                    # the box next to it
+            "F10",
         )),
 
     "reread": Scenario(

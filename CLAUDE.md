@@ -249,6 +249,22 @@ port.
 - A routine that jumps on by a table of keys, with `Case`, has the table
   as a `switch` in C. `Case` takes no key without a scan code, and an
   entry of the table without one takes the character with any.
+- `Case` jumps with SI behind the entry of its table that it found, and
+  what it jumps to may go on with that: `ChTr55` calls `DelTr0`, which
+  takes SI for the address of a path in the main data. With the table
+  gone, the C hands on the address that the table has in the original.
+  The listing has a table of `.DATA` by its offset in that segment only;
+  where it is in the program shows in `build/shareware-layout/VC.COM`, by
+  looking for its bytes.
+- An entry for C can be made for a label inside a procedure of another
+  file: `FromC DelTr0` is in `VCSUB3.INC`, the label in `DelTree` of
+  `VCF1.INC`. `Search` takes an argument in BP, and its entry, written
+  out, takes it in CX; `OncZoom` hands back three registers as `DialBox`
+  does, into three words on the stack.
+- The `port` test can run before anything is translated: with the batch
+  listed in `harness/ported.py` without functions, it says whether the
+  new scenarios hold on the port as it is, and so tells a scenario that
+  cannot stay from a translation that is wrong.
 - What a routine of the assembly reads at an offset in its code segment
   stays in the assembly and is made `PUBLIC`: the box that `Dialog`
   shows, the buttons and the colours that `MinMnu` takes. Texts and

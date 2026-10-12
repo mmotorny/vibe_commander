@@ -18,15 +18,6 @@ AdrNum	PROC	NEAR
 	RET
 AdrNum	ENDP
 
-; The half of FilNum that ChTree calls. The other is in AdrNum_c.
-TreNum	PROC	NEAR
-	SUB	AX,OFFSET TreeBuf.TreList
-	MOV	BX,SIZE DirEnt
-	XOR	DX,DX
-	DIV	BX
-	RET
-TreNum	ENDP
-
 NumAdr	PROC	NEAR
 	MOV	AX,DS
 	CALL	FAR PTR NumAdr_c
@@ -34,15 +25,6 @@ NumAdr	PROC	NEAR
 	XOR	DX,DX
 	RET
 NumAdr	ENDP
-
-; The half of NumAdr that ChTree calls. The other is in NumAdr_c.
-NumAd1	PROC	NEAR
-	MOV	AX,SIZE DirEnt
-	MUL	SI
-	ADD	AX,OFFSET TreeBuf.TreList
-	MOV	SI,AX
-	RET
-NumAd1	ENDP
 
 ChgAdr	PROC	NEAR
 	PUSH	DX
