@@ -466,10 +466,9 @@ port.
   them through far pointers made of the offset and of the assembly's
   segment, which an entry hands it: `AsmSeg_a`, and `AT` in
   `port/dialog.c`. Naming something of the assembly gives the segment
-  too, but as a number that is set when the program is loaded, and the
-  `port` test knows code by its bytes in the file: a function that had
-  such a number among its first instructions, before its first call or
-  jump, was reported as "not executed in the port".
+  too, as a number that is set when the program is loaded: it costs a
+  relocation, four bytes of the file. The `port` test knows such a
+  function all the same, by the file's table of relocations.
 - Where the assembly has DS elsewhere than on the main data and the
   routine reads there, the stub hands DS to the C as a number: the filter
   of a panel is a dialog whose fields are in the panel's segment. C code
