@@ -4,8 +4,8 @@ Each deviation is declared here, with its reason. A golden is derived from
 the original with these differences made to it (see goldens.py), so that it
 holds exactly what a build is expected to show.
 
-One thing that a build shows is not held against the original at all, and
-is declared here too: see IGNORED.
+Two figures that a build shows are not held against the original at all,
+and are declared here too: see IGNORED and IGNORED_IN.
 """
 import re
 from dataclasses import replace
@@ -28,13 +28,13 @@ def expected(screen):
     return replace(screen, cells=bytes(cells))
 
 
-def compared(screen):
-    """`screen` with what is not compared blanked out. A golden holds its
-    screens like this, and those of a build are held against it like
-    this."""
+def compared(screen, scenario):
+    """`screen` of `scenario` with what is not compared blanked out. A
+    golden holds its screens like this, and those of a build are held
+    against it like this."""
     cells = bytearray(screen.cells)
     for row, line in enumerate(screen.lines()):
-        for pattern in IGNORED:
+        for pattern in IGNORED + IGNORED_IN.get(scenario, []):
             match = pattern.search(line)
             if match:
                 for column in range(*match.span(1)):
@@ -68,6 +68,23 @@ IGNORED = [
     # that. The field is the number and the room in front of it.
     re.compile(r"^Edit: .* Col \d+( [\d, ]+) Free"),
 ]
+
+# The same, for what is not compared in the scenarios named and is
+# compared in every other.
+IGNORED_IN = {
+    # The Info panel says how much memory is free. As the program is
+    # configured that is what a command gets: all but the part of the
+    # program that stays while one runs, which is assembly still and as
+    # long in the port as in the original. So the number is the same, and
+    # every scenario that shows the Info compares it. With Memory
+    # allocation switched off it is what is left with all of the program
+    # loaded, and follows the size of the build like the editor's. This
+    # scenario switches it off, and has the number left out on all of its
+    # screens. The field is the number only: the line is centred, so a
+    # number of another length would move the words too, and that is
+    # noticed.
+    "memory": [re.compile(r"(\d[\d,]*) Bytes Free")],
+}
 
 # Deviations that show on no screen, and so change no golden. They are
 # listed here all the same, so that this is the whole list.

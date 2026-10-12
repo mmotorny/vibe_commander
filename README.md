@@ -227,11 +227,12 @@ than the binaries shipped in 2000. And the program names its own file when
 it cannot load it again after a command: the original is `VC.COM`, the port
 `VC.EXE`.
 
-One thing on the screen is not compared at all: the number of bytes that
-the editor says it has free. The port is larger than the original and has
-less, by more with every routine translated, and the number is not worth
-an expectation that follows the size of the build. A golden has `#` in its
-place.
+Two numbers on the screen are not compared at all: the bytes that the
+editor says it has free, and the memory that the Info panel says is free
+when Memory allocation is switched off, which one scenario does. The port
+is larger than the original and has less, by more with every routine
+translated, and the numbers are not worth an expectation that follows the
+size of the build. A golden has `#` in their place.
 
 Two more deviations show on no screen, and are listed in the same file.
 When the original tries again to load itself after a command, it stores a

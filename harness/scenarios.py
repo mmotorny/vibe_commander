@@ -82,10 +82,11 @@ out again (show.py --changes is how):
     "F9 o m" switches Memory allocation, and the Info then says how much
     memory is free with all of the program loaded: that depends on the
     size of the program, so the port shows another number than the
-    original, and no scenario can do it. Every disk of the bench has a
-    volume label, and the program does not get one off: Ctrl+F4, Ctrl+y,
-    Enter and Enter again ask whether to delete it and leave it where it
-    is.
+    original. Only the scenario memory does it, and deviations.py has
+    the number left out of the comparison there. Every disk of the bench
+    has a volume label, and the program does not get one off: Ctrl+F4,
+    Ctrl+y, Enter and Enter again ask whether to delete it and leave it
+    where it is.
   - A text that is typed has no space in it: 'rd work' is written
     '"rd" Space "work"'.
   - "F9 o d" switches Auto directory sizes: the mini status then has the
@@ -674,6 +675,16 @@ SCENARIOS = {
                                           # half the screen high, without
                                           # the files and with three lines
             "Ctrl+F1",                    # of the text
+        )),
+
+    "memory": Scenario(
+        "The Info panel with Memory allocation off: the memory that is "
+        "free is what all of the program leaves, a number that is not "
+        "compared",
+        steps=(
+            "F9 o m",                     # off: the number is another
+            "F9 o",                       # and the menu has it without
+                                          # its mark
         )),
 
     "tree-deep": Scenario(

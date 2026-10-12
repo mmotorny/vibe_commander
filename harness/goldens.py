@@ -212,7 +212,8 @@ def differences(golden, run, programs):
                 "has now: derive it again"]
     for number, step in enumerate(steps):
         found = screen_differences(
-            golden.screens[number], deviations.compared(run.screens[number]))
+            golden.screens[number],
+            deviations.compared(run.screens[number], golden.scenario))
         if found:
             report += [f"--- after step {number}: {step}"] + found
     want, got = golden.disks, disk_lines(run.disks, programs)
@@ -273,7 +274,7 @@ def derive(name, benches):
     run = scenarios.run(scenario, original, benches[scenario.country],
                         signals=False, trace=True)
     write(Golden(name, setups.codepage(scenario.country), [],
-                 [deviations.compared(deviations.expected(screen))
+                 [deviations.compared(deviations.expected(screen), name)
                   for screen in run.screens],
                  disk_lines(run.disks, {original.filename})))
     write_ran(name, run.executed)

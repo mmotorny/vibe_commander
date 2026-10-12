@@ -18,9 +18,15 @@ Things that are known and not done. Standing instructions are in
 
 - The Info panel says how much memory is free. With Memory allocation
   switched off, "F9 o m", that is the memory left with all of the program
-  loaded, and the port is larger than the original: the number differs,
-  and no scenario shows it. To compare it, the comparison would have to
-  leave it out (`harness/deviations.py`), as it does the editor's.
+  loaded, and the port is larger than the original: the number differs.
+  The scenario `memory` shows it with the number left out of the
+  comparison (see `harness/deviations.py`), so nothing checks the number
+  itself: that the port has less by what it is larger, at least. With
+  Memory allocation on, the number is what the part of the program that
+  stays during a command leaves, and every scenario with the Info
+  compares it. That part is assembly still. Once it is translated and
+  larger, this number differs too, and is to be left out in every
+  scenario, with every golden derived again.
 - Every disk of the bench has a volume label, so no scenario has the
   program look for one and find none. The Info does say "has no label"
   in `reread`, where it does not look: a directory named DIRINFO stops
