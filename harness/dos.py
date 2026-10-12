@@ -37,6 +37,20 @@ BOOTED = b"BOOTED"
 # How long Shift, Ctrl and Alt are held down before and after the key they
 # go with, or on their own, in seconds.
 KEY_TIME = 0.02
+
+# How long the harness waits, in seconds, before it takes something for
+# stuck. These are for what hangs, and are long on purpose: a machine that
+# many tests share is slow, and must not look like one that hangs. A QEMU
+# that has ended is noticed at once, whatever these say.
+START_TIME = 60     # QEMU, to open the sockets it is spoken to through
+LOAD_TIME = 120     # a saved state, to be loaded
+SAVE_TIME = 120     # a state, to be saved
+BOOT_TIME = 300     # DOS, to boot; and a screen, to stand still after it
+REPLY_TIME = 60     # QEMU's debugger, to answer or to let the machine run
+# A key, to get into the keyboard buffer. Shorter than the others: what
+# usually keeps a key out is a buffer that a step has filled, a mistake in
+# a scenario that wants to be heard of soon.
+ARRIVE_TIME = 30
 MODIFIERS = {"ctrl", "alt", "shift", "shift_r"}
 
 # Names for the keys of a US keyboard, as written in scenarios, and the
@@ -288,11 +302,12 @@ class Machine:
         self._debugger = None
         if state:
             self.until(lambda: self._command("query-status")["status"]
-                        != "inmigrate", 10, "the saved state did not load")
+                        != "inmigrate", LOAD_TIME,
+                       "the saved state did not load")
 
     def _connect(self, path):
         connection = socket.socket(socket.AF_UNIX)
-        deadline = time.monotonic() + 10
+        deadline = time.monotonic() + START_TIME
         while True:
             try:
                 connection.connect(str(path))
@@ -353,7 +368,7 @@ class Machine:
                 raise MachineError(failure)
             time.sleep(pause)
 
-    def wait_for_boot(self, timeout=60):
+    def wait_for_boot(self, timeout=BOOT_TIME):
         """Wait until DOS has booted and is about to run its commands."""
         self.until(lambda: BOOTED in self._serial.read_bytes(), timeout,
                     "DOS did not finish booting", pause=0.05)
@@ -363,7 +378,8 @@ class Machine:
         self._command("stop")
         self._command("migrate", uri=f"file:{path}")
         self.until(lambda: self._command("query-migrate").get("status")
-                    == "completed", 30, "the machine's state was not saved")
+                    == "completed", SAVE_TIME,
+                   "the machine's state was not saved")
 
     def pause(self):
         self._command("stop")
@@ -443,7 +459,7 @@ class Machine:
                 else:
                     self._keys(keys, True)
                     self._keys(keys[::-1], False)
-                self.until(lambda: self._keyboard()[1] != tail, 5,
+                self.until(lambda: self._keyboard()[1] != tail, ARRIVE_TIME,
                            f"the key {'+'.join(codes)} did not arrive: the "
                            "keyboard buffer is full, or the guest is stuck")
             if watch:
@@ -514,7 +530,7 @@ class Machine:
             cursor_lines=(bios[0x61], bios[0x60]),
             video_mode=bios[0x49])
 
-    def wait_for_screen(self, settle=2.0, timeout=30):
+    def wait_for_screen(self, settle=2.0, timeout=BOOT_TIME):
         """Wait until the text screen stands still, then return it.
 
         This is a guess, for where nothing better is known about the
@@ -593,7 +609,7 @@ class Machine:
                 raise MachineError("DOS did not come to its prompt")
             time.sleep(0.002)
 
-    def _debug(self, packet=None, timeout=5, reply=True):
+    def _debug(self, packet=None, timeout=REPLY_TIME, reply=True):
         """Send a packet of GDB's remote protocol, if one is given, and
         return the reply, or None if none came within `timeout` seconds.
         Without `reply` it is not waited for. Attaching stops the
@@ -636,7 +652,8 @@ class Machine:
             return b"$" in self._unread
 
         self.until(lambda: self._command("query-status")["running"]
-                   or stopped_again(), 5, "the machine did not go on")
+                   or stopped_again(), REPLY_TIME,
+                   "the machine did not go on")
 
     def stopped(self, timeout=0):
         """Wait `timeout` seconds for the machine that start() let run to

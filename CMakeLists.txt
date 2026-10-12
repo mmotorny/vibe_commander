@@ -209,3 +209,7 @@ add_test(NAME port
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
             ${signalling_dir}/VC.EXE ${signalling_dir}/VC.MAP
             ${layout_dir}/VC.LST ${port_dir}/VC.EXE)
+# The port's test runs every scenario, and on a machine that other tests
+# share it takes many times as long as by itself: it gets an hour before
+# it counts as stuck, where CTest would give it 25 minutes.
+set_tests_properties(port PROPERTIES TIMEOUT 3600)
