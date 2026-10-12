@@ -17,7 +17,9 @@ A routine is a procedure, or code that stands between two procedures,
 which goes by its first label: PutInf, between PutTree and PtIn20. A
 later label of such code names what stands from there to the next
 procedure: F37_00, where the stretch that begins with M60_00 goes from
-one file of the source into the next.
+one file of the source into the next. Two labels with two full stops
+between them name what stands from the first to the second, where only
+the beginning of such a stretch is meant: Alloc0..Init00.
 
 An instruction is named by its address in the listing, and instructions
 that follow one another by the first and the last of them. With --list

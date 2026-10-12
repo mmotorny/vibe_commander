@@ -103,6 +103,29 @@ class Line:
     text: str
 
 
+class _Procedures(dict):
+    """Procedures by name, and code from one label to another by the two
+    names with two full stops between them."""
+
+    def __init__(self, labels):
+        super().__init__()
+        self.labels = labels
+
+    def __missing__(self, name):
+        first, stops, last = name.partition("..")
+        if not stops or first not in self.labels or last not in self.labels:
+            raise KeyError(name)
+        start = self.labels[first]
+        return start, self.labels[last] - start
+
+    def __contains__(self, name):
+        try:
+            self[name]
+        except KeyError:
+            return False
+        return True
+
+
 class Listing:
     """A JWasm listing of a tiny-model program: its code, line by line.
 
@@ -113,17 +136,23 @@ class Listing:
     with no .CODE behind it, DirFunc and the code after it. The listing
     counts the addresses of that from where the data begins, and says
     where that is in its map of the file, at its end.
+
+    Code that is no procedure also goes by two labels of the code
+    segment, "Alloc0..Init00": what stands from the first to the second.
+    That is for a stretch of which only the beginning is meant, where a
+    single label names all that stands from there to the next procedure.
     """
 
     def __init__(self, path):
         self.lines = []
-        self.procedures = {}                 # name -> (address, length)
+        # name -> (address, length)
+        self.procedures = _Procedures(labels := {})
         # As the listing has them, counted from where their segment
         # begins: segment -> ...
         lines = {"_TEXT": [], "_DATA": []}   # [(address, text)]
         data = {"_TEXT": [], "_DATA": []}    # addresses of what is no code
         procedures = {"_TEXT": {}, "_DATA": {}}  # name -> (address, length)
-        labels = {"_TEXT": {}, "_DATA": {}}  # name -> address
+        labels = {"_TEXT": labels, "_DATA": {}}  # name -> address
         begins = {}                          # segment -> where it begins
         segment = "_TEXT"
         table = False
