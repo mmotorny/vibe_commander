@@ -179,13 +179,6 @@ out again (show.py --changes is how):
     saving to A: in the editor left 4 bytes of the stack while that was
     still assembly and the stack 256 bytes. No scenario has it yet; with
     the stack of 4,096 bytes one can.
-  - A step of the original is recorded when the screen stands still, and
-    two screens that differ in four bytes or fewer are taken for one that
-    blinks, of which the greater is waited for. So a step that changes
-    that little and to less, Up in the editor where only "Line 4" becomes
-    "Line 3", is never recorded: "the screen did not settle", after 20
-    seconds, every time. Have such a step change more: 'Up "xy"'. A step
-    that ends on the screen it began with is fine.
   - In the editor Ctrl+Right goes to the next word and Ctrl+t deletes up
     to it; Ctrl+k cuts off the line at the cursor. End in a line of 3900
     characters or more stops on the 3900th, and Del there deletes that
@@ -295,16 +288,15 @@ from pathlib import Path
 import coverage
 import fat
 import setups
+import watch
 from dos import MachineError
 
 # How long the screen must stand still to count as finished, in seconds,
-# where that is all there is to go by: for a program that does not signal,
-# and for DOS. It has to cover the longest the program waits before it does
-# something by itself, 0.6 s for following the cursor to another directory,
-# and both states of the blinking colon of its clock.
+# where that is all there is to go by: for a program that neither signals
+# nor is the original. It has to cover the longest the program waits before
+# it does something by itself, 0.6 s for following the cursor to another
+# directory, and both states of the blinking colon of its clock.
 SETTLE = 0.8
-# The same for what DOS shows when the program has ended.
-DOS_SETTLE = 0.3
 # How long a step may take before the program counts as stuck, in seconds.
 STEP_TIME = 20
 
@@ -314,6 +306,11 @@ class Scenario:
     description: str
     steps: tuple = ()
     country: str = "us"           # see setups.COUNTRIES
+    # Step number -> how many of its last keys are pressed while the
+    # program is busy with what the key before them began, and are meant
+    # to find it so. The original is given any other key only when it
+    # waits for one (see watch.py).
+    ahead: dict = field(default_factory=dict)
 
 
 @dataclass
@@ -1297,7 +1294,10 @@ SCENARIOS = {
             "Alt+F7",
             '"hello.*" Tab Ctrl+y Enter',
             "Enter",                      # Go to: the cursor on the file
-        )),
+        ),
+        # Right and F1 while the search reads the floppy, and Ctrl+c when
+        # it goes on behind the help.
+        ahead={13: 2, 14: 1}),
 
     "delete": Scenario(
         "Files and directories deleted: read-only ones, a directory with "
@@ -1435,19 +1435,28 @@ def run(scenario, program, bench, signals, trace=False):
     `bench` is the setups.Bench for the scenario's country. With `signals`
     the program is taken to be a build that signals where it is, and each
     screen is recorded the moment it says that it waits for a key and has
-    nothing left to do by itself. Without, the moment is guessed: when the
-    screen has stood still for a while.
+    nothing left to do by itself. The original is watched from outside for
+    the same moment (see watch.py). For any other program the moment is
+    guessed: when the screen has stood still for a while.
     """
     with tempfile.TemporaryDirectory() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None
         with bench.start(workdir, program, log) as machine:
-            wait = _signalled if signals else _settled
+            watched = None
+            if signals:
+                wait = _signalled
+            elif watch.available(program):
+                watched = watch.Watch(program)
+                wait = _watched(watched)
+            else:
+                wait = _settled
             screens, left = [], []
             for number, step in enumerate(("",) + scenario.steps):
                 if number:
                     machine.resume()
-                    machine.press(step)
+                    machine.press(step, watched,
+                                  scenario.ahead.get(number, 0))
                 where = f"step {number}, {step}" if number else "the start"
                 screen, waiting = wait(machine, where)
                 screens.append(screen)
@@ -1490,6 +1499,18 @@ def _settled(machine, where):
         raise MachineError(f"after {where}: {error}") from None
 
 
+def _watched(watched):
+    """What waits for the original to have finished a step, with the
+    watch.Watch on its machine, and returns the screen, and that it is not
+    asked how much of its stack the program has left."""
+    def wait(machine, where):
+        try:
+            return watched.wait(machine), False
+        except MachineError as error:
+            raise MachineError(f"after {where}: {error}") from None
+    return wait
+
+
 def _signalled(machine, where):
     """Wait for the program to signal that it waits for a key, or that it
     has ended, and return the screen and which of the two: whether it
@@ -1516,7 +1537,7 @@ def _signalled(machine, where):
             f"within {STEP_TIME} s; it signalled {heard!r} and shows\n"
             f"{shown}") from None
     if heard.endswith("X"):
-        # The program has ended; what DOS then shows comes without signals.
-        return machine.wait_for_screen(DOS_SETTLE, STEP_TIME), False
+        # The program has ended; DOS then shows its prompt.
+        return machine.wait_for_prompt(STEP_TIME), False
     machine.pause()
     return machine.screen(), True

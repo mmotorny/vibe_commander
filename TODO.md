@@ -157,18 +157,6 @@ Things that are known and not done. Standing instructions are in
   says 0 or 4096 and has no entries has its sum taken over 65536 bytes,
   all of the main data's segment. Ported like that; it takes a file made
   by hand.
-
-- `wait_for_screen` takes a change of one cell for blinking. In `columns`
-  the editor closes its box after F2 and clears the `*` in its first row
-  some 10 ms later; a sample between the two has the harness wait 20
-  seconds for the `*` to come back, and the derivation stops with "the
-  screen did not settle". That happened in 8 of 22 derivations of
-  `columns` on an idle machine. It never made a wrong golden: derive
-  again. The same makes a step impossible that changes four bytes of the
-  screen or fewer and leaves less than there was, Up in the editor from
-  line 4 to line 3: the harness waits for the screen before the key to
-  come back, every time. Such a step is written to change more (see the
-  top of `harness/scenarios.py`).
 - When the editor has no room left for a line that has grown, `T51_00`
   beeps and takes what room there is, but moves what follows the line up
   by as much as it had asked for: the end of the text is lost, by what
@@ -189,10 +177,30 @@ Things that are known and not done. Standing instructions are in
 - Three instructions of `T53_00` are listed as out of reach: in hex, for
   16 bytes that go beyond the end of their segment. The address it gets
   there has an offset below 16, or is a window of lines further on.
-- What ran in the original is not the same every time. Three instructions
-  of `Input0`, B16A to B16E, take a key that is already waiting when the
-  program first asks, and `command.ran` came out with them once. The
-  goldens of `quit`, `select` and `start` are without them too.
+- What still goes by the time of the host, in the harness. The bench
+  waits for a still screen when DOS has booted, before it saves the
+  machine's state. A build that neither signals nor is the original is
+  timed by still screens throughout. For the port, Shift, Ctrl and Alt are held for 20
+  ms of the host, not until the program has seen them.
+- A key that a scenario has pressed while the program is busy
+  (`Scenario.ahead`, in `find` only) is pressed when the key before it
+  has been taken, and finds the search wherever it has got to. The
+  screens of `find` came out the same every time, but what ran did not:
+  parts of `FndBk`, `FndStuf` and `F67_18`, file offsets 8760-876E,
+  8BB4-8BBE and 8C1D-8C46, are in the committed `find.ran` and were not
+  in a new derivation. Pressing such a key where the search looks for
+  one, at a stop of the debugger there, would settle it. Shift, Ctrl and
+  Alt of such a key are held for 20 ms of the host.
+- The machine's own clock runs with the host's while the machine runs,
+  however much of the processor the machine gets. What the program does
+  by its timer, following the cursor to a directory after 0.6 s or
+  telling a tap on Alt by three ticks, comes sooner in its work on a busy
+  host. No golden has been seen to change by that. QEMU can count time in
+  instructions executed (`-icount`), which would end it; not tried.
+- `Machine.wait_for_prompt` takes a `>` before the cursor for the prompt
+  of DOS. A command that leaves one there before it has finished would
+  be taken for it; nothing runs after the program has ended in any
+  scenario.
 - `cmake --build build -j4` failed once in a new checkout, "The object is
   zero length" for one C file. Building without `-j` works.
 - A run of the harness that is killed outright leaves its QEMU running,
@@ -487,12 +495,6 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
 
 ## Ideas put off
 
-- Deriving goldens side by side, as the tests now run their scenarios. The
-  original cannot say when it has finished a step, so the harness waits
-  for the screen to stand still, and a machine slowed down by its
-  neighbours may stand still before it has finished. Deriving all goldens
-  takes two and a half minutes, and only a change to the bench asks for
-  it.
 - Keeping the booted bench from one run of a tool to the next. Booting DOS
   for the two countries and making the bench's setup file take about five
   seconds of every run. What is kept would have to be thrown away whenever

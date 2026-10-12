@@ -54,13 +54,23 @@ def executed(trace_path, contents):
     """Offset -> length in `contents` (a program file) of what was executed."""
     logged = list(blocks(trace_path))
     votes = Counter()
-    for block in logged:
+    # Instructions that follow one another in memory vote as one block
+    # too: with a breakpoint near, QEMU translates one at a time.
+    runs = []
+    for address, code in sorted({instruction for block in logged
+                                 for instruction in block}):
+        if runs and runs[-1][-1][0] + len(runs[-1][-1][1]) == address:
+            runs[-1].append((address, code))
+        else:
+            runs.append([(address, code)])
+    for block in logged + runs:
         code = b"".join(code for _, code in block)
         if len(code) < MIN_BLOCK:
             continue
         offset = contents.find(code)
         if offset >= 0 and contents.find(code, offset + 1) < 0:
-            votes[block[0][0] - offset] += 1
+            # A long stretch counts for as many blocks as it could be.
+            votes[block[0][0] - offset] += len(code) // MIN_BLOCK
     bases = [base for base, count in votes.most_common()
              if count >= MIN_VOTES]
 

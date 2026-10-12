@@ -24,6 +24,7 @@ from pathlib import Path
 
 import deps
 import turn
+import watch
 from dos import FatImage, Machine, boot_floppy, timestamp
 
 # The PC's clock at power-on, and the date given to directories and to the
@@ -41,8 +42,9 @@ SETUP_FILE = "VC.INI"
 # menu, and those that save the setup.
 CLOCK_KEYS = "F9 o l"
 SAVE_SETUP_KEYS = "Shift+F9 Enter"
-# How long the screen must stand still for DOS, or the original while it
-# makes the bench's setup file, to count as finished, in seconds.
+# How long the screen must stand still for DOS when it has booted, or for
+# the original where it cannot be watched while it makes the bench's setup
+# file, to count as finished, in seconds.
 SETTLE = 0.5
 
 # The contents of C:\WORK on the test bench, in directory order.
@@ -200,10 +202,17 @@ class Bench:
         original = original_vc()
         disk = self._new_disk("setup.img", original, shipped)
         with self._machine(workdir, disk) as machine:
-            machine.wait_for_screen(SETTLE)
-            machine.resume()
-            machine.press(f"{CLOCK_KEYS} {SAVE_SETUP_KEYS}")
-            machine.wait_for_screen(SETTLE)
+            if watch.available(original):
+                watched = watch.Watch(original)
+                watched.wait(machine)
+                machine.resume()
+                machine.press(f"{CLOCK_KEYS} {SAVE_SETUP_KEYS}", watched)
+                watched.wait(machine)
+            else:
+                machine.wait_for_screen(SETTLE)
+                machine.resume()
+                machine.press(f"{CLOCK_KEYS} {SAVE_SETUP_KEYS}")
+                machine.wait_for_screen(SETTLE)
             written = machine.disks["D"]
         # The machine has been shut down: the disk image is complete.
         setup = FatImage(written, workdir, EPOCH,
@@ -284,8 +293,9 @@ class Benches:
     The statement also waits for a turn at the computer, which other
     checkouts may be running their machines on, and has it until it ends
     (see turn.py). `alone` says which kind: whether the machines are timed
-    by a still screen, as those of the original are, and so must have the
-    computer to themselves, or run a build that signals.
+    by a still screen, and so must have the computer to themselves, or run
+    a build that signals, or the original, which is watched (see
+    watch.py).
     """
 
     def __init__(self, alone):

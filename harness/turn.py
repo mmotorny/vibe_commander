@@ -2,19 +2,20 @@
 
 The project may be worked on in several checkouts on one computer at the
 same time, and each runs its machines in QEMU. Where the program says when
-it has finished a step, a run only gets slower when others run beside it.
-Where it cannot say, the harness waits for the screen to stand still, and
-on a busy computer the screen of a machine stands still before the program
-has finished: the original then comes out with other goldens, and nothing
-says that they are wrong.
+it has finished a step, or is watched from outside until it has, as the
+original is (see watch.py), a run only gets slower when others run beside
+it. Where neither can be done, the harness waits for the screen to stand
+still, and on a busy computer the screen of a machine stands still before
+the program has finished: the run then comes out different, and nothing
+says that it is wrong.
 
 So a run takes a turn before it starts a machine, and has it until its
 last one has ended:
 
   alone     for a run that is timed by a still screen. No other run on
             the computer has a turn meanwhile.
-  shared    for a run of a build that signals. Any number of them have
-            their turns together.
+  shared    for a run of a build that signals, or of the original. Any
+            number of them have their turns together.
 
 A run that wants to be alone waits for the turns that others have to end,
 and those who come after it wait behind it, so that it is not kept waiting

@@ -28,6 +28,7 @@ import argparse
 
 import scenarios
 import setups
+import watch
 
 # With --changes, how many rows have to be as they were after an earlier
 # step for them to be named in a line instead of printed.
@@ -122,7 +123,8 @@ def main():
     program = setups.Program.load(args.program) if args.program \
         else setups.original_vc()
     scenario = scenarios.Scenario("", tuple(args.step), args.country)
-    with setups.Benches(alone=not args.signals) as benches:
+    alone = not args.signals and not watch.available(program)
+    with setups.Benches(alone) as benches:
         run = scenarios.run(scenario, program, benches[args.country],
                             args.signals)
     print_screens(scenario.steps, run.screens, setups.codepage(args.country),

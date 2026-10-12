@@ -8,9 +8,10 @@ step, cell by cell, character and colour attribute, with the same cursor
 and video mode, and leave the same files on its disks.
 
 A build that signals where it is (see "Signals to the tests" in
-port/asm/VC.ASM) is waited for exactly. For any other build, such as the
-original itself, the harness waits until the screen has stood still, which
-takes most of a second for every step.
+port/asm/VC.ASM) is waited for exactly, and so is the original, which is
+watched from outside (see watch.py). For any other build the harness waits
+until the screen has stood still, which takes most of a second for every
+step.
 
 Scenarios run side by side, each on a machine of its own, and are reported
 in their order.
@@ -26,6 +27,7 @@ from concurrent.futures import ThreadPoolExecutor
 import goldens
 import scenarios
 import setups
+import watch
 
 
 # How many scenarios run side by side: each has a machine of its own,
@@ -50,7 +52,8 @@ def compare(names, program, signals, trace=False, together=None):
 
     failed = False
     runs = []
-    with setups.Benches(alone=not signals) as benches, \
+    alone = not signals and not watch.available(program)
+    with setups.Benches(alone) as benches, \
             ThreadPoolExecutor(together or TOGETHER) as pool:
         # In the order of `names`, as each is done.
         for name, (run, took) in zip(names, pool.map(one, names)):

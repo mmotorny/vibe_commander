@@ -333,9 +333,28 @@ starts from. One scenario, `clock`, switches the clock on again.
 The screen has to be read when the program has done all that a key makes
 it do, and not before. The variant of the port that the tests run says so
 itself (see [The port](#the-port)), and a scenario of twenty steps takes a
-second or two. The original cannot say, so when its goldens are derived
-the harness waits for the screen to stand still after every step. That is
-slow, and needed only when a scenario is new or has changed.
+second or two. The original cannot say, but it can be watched
+(`harness/watch.py`): the build of the source that is laid out like it is
+the same byte for byte, so its listing says where the original goes round
+while it waits for a key, and where it ends. QEMU's debugger stops the
+machine when the original comes there, and it has finished a step when it
+waits with every key taken, none of Shift, Ctrl and Alt held, nothing
+that it will do by itself after a while, and has gone round once more
+without changing the screen. A key is pressed when the original waits for
+one, so that it never finds one waiting. None of that is measured in
+time, and a busy computer makes a recording slower, not different. The
+exception is a key that a scenario wants pressed while the program is
+busy, as `find` does while a search runs: it is pressed when the key
+before it has been taken, wherever the program is by then.
+
+Where time is what the program goes by, it is the machine's: with the
+clock on, what blinks is found by looking at the screen every time the
+original comes round, over more than a second of the BIOS's timer ticks.
+And when the program has ended, the harness waits for the prompt of DOS.
+
+A still screen is waited for only where nothing better is known: when DOS
+has booted for the bench, and for a build that neither signals nor is the
+original.
 
 Nothing waits without a limit. A program that hangs or resets its machine
 fails its scenario within seconds, with the screen it got stuck on.
@@ -343,9 +362,9 @@ fails its scenario within seconds, with the screen it got stuck on.
 A screen that stands still says that the program has finished only on a
 computer that is not busy. The project may be worked on in several
 checkouts on one computer at once, so a run takes a turn before it starts
-its machines (`harness/turn.py`): a run that waits for still screens, as
-every run of the original does, has its turn alone, and runs of the build
-that signals have theirs together, when no such run has one. A run that
+its machines (`harness/turn.py`): a run that waits for still screens has
+its turn alone, and runs of the build that signals and of the original
+have theirs together, when no such run has one. A run that
 has to wait says so, and every turn leaves a line in
 `/tmp/vibe-commander/turn.log`: the tool, its checkout, how long it
 waited and how long it had the turn.
