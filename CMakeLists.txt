@@ -139,7 +139,7 @@ foreach(source ${port_c})
     #
     # What the compiler made of it is written next to the object, as a
     # listing: that is where to read which registers a function saves and
-    # how much stack it takes, which the program has little of.
+    # how much stack it takes.
     add_custom_command(
         OUTPUT ${object}
         COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -ms -os -s -zu -zl -zls

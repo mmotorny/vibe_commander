@@ -258,7 +258,10 @@ VcApiVr	EQU	42
 MoDelay	EQU	40			; Mouse double click delay
 MiliSec	EQU	60			; auto CD time : sec x 0.01
 Sec	EQU	0			;                sec x 1
-LenStk	EQU	100h			; Stack size
+; The original has 100h bytes of stack. Compiled code uses more of it than
+; the assembly did, so the port has sixteen times that, and its use needs
+; no care. The stack is the end of the resident part: see DataSav.
+LenStk	EQU	1000h			; Stack size
 LenPath	EQU	68			; Length of path name
 LenColr	EQU	40			; Length of color table
 LenHist	EQU	512			; Length of hisory buffer
@@ -1266,6 +1269,7 @@ NameBuf	DB	12	DUP(?)
 WCB1sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB1
 WCB2sav	DB	WCBsave + 13 * MinFls	DUP(?)	; WCB2
 ComnIni	DB	CmnSave			DUP(?)	; Common data
+	PUBLIC	DataSav, VcStack	; For the tests: how long the stack is
 DataSav	DB	LenStk - SigRes		DUP(?)	; Local stack
 VcStack:
 LastDat:

@@ -12,18 +12,18 @@ below, this also checks that
     there,
   - every C function that replaces them ran in the port,
   - the port is no more than three times the size of the original, and
-  - the port leaves some of its stack untouched in every scenario.
+  - the port leaves half of its stack untouched in every scenario.
 
-The stack is 256 bytes, a few less in the build that is tested, and
-compiled code uses more of it than the assembly it replaces. The build
-that is tested marks its stack when it has set it up, and how much of the
+Compiled code uses more of the stack than the assembly it replaces, so
+the port has a stack many times as long as the original's 256 bytes:
+LenStk in port/asm/VC.ASM, a few bytes less in the build that is tested.
+That build marks its stack when it has set it up, and how much of the
 mark is left is read from the machine every time the program waits for a
 key (see scenarios.py). A stack used beyond its bottom overwrites what the
 program saves of its panels and its setup while a command runs, and no
-screen would show that. What every scenario leaves is reported, not only
-the least: a new scenario may go deeper than any before it by itself, and
-what it leaves before a batch is translated and after says which it was,
-the scenario or the batch.
+screen would show that. How long the stack is, is taken from the link
+map, so the limit follows it. What every scenario leaves is reported, not
+only the least.
 
 A comparison that finds nothing is only worth something if it would have
 found a difference. So one cell of a screen that the port has shown is
@@ -56,12 +56,16 @@ EXE_HEADER = 0x20                 # of the port's VC.EXE, see tools/mkexe.c
 # aim is to stay well below; this is where growth must have gone wrong.
 SIZE_LIMIT = 3
 
-# How many bytes of its stack the port must leave untouched in every
-# scenario. When this was set the scenarios left 36 at the least, and had
-# done since before the first routine was translated. What the limit
-# keeps is room for what no scenario has: an interrupt that arrives when
-# the calls are at their deepest.
-STACK_LEFT = 24
+# How much of its stack the port must leave untouched in every scenario:
+# one part in this many, half of it. The stack is made long enough for
+# its use to need no care while the program is translated, and this is
+# where that would have stopped being true. The rest is room for what no
+# scenario has: a critical error of DOS at the bottom of deep calls, an
+# interrupt that arrives there.
+STACK_LEFT = 2
+
+# The bottom and the top of the stack, as the link map names them.
+STACK = ("DataSav", "VcStack")
 
 
 @dataclass(frozen=True)
@@ -346,23 +350,29 @@ def check_port(link_map, executed):
     return passed
 
 
-def check_stack(names, runs):
+def check_stack(link_map, names, runs):
     """Report on how much of its stack the port left untouched; return
     success."""
+    symbols = coverage.link_map(link_map)
+    (segment, bottom), (same, top) = (symbols[name] for name in STACK)
+    assert segment == same
+    size = top - bottom
+    limit = size // STACK_LEFT
     left = {name: run.stack_left for name, run in zip(names, runs)}
     least = min(left, key=left.get)
-    print(f"The stack: {left[least]} bytes of it are left untouched at the "
-          f"least, in {least}; the limit is {STACK_LEFT}")
+    print(f"The stack: {left[least]} of its {size} bytes are left untouched "
+          f"at the least, in {least}; the limit is 1/{STACK_LEFT} of it, "
+          f"{limit}")
     print(textwrap.fill(
         "in each scenario: " + ", ".join(f"{name} {left[name]}"
                                          for name in names),
         width=78, initial_indent="  ", subsequent_indent="    ",
         break_on_hyphens=False))
     for name in names:
-        if left[name] < STACK_LEFT:
+        if left[name] < limit:
             print(f"  too little of the stack left: {left[name]} bytes in "
                   f"{name}")
-    return left[least] >= STACK_LEFT
+    return left[least] >= limit
 
 
 def check_comparison(name, run, program):
@@ -423,7 +433,7 @@ def main():
         in_port.update(run.executed)
     passed = check_original(coverage.Listing(args.listing), in_original)
     passed = check_port(args.link_map, in_port) and passed
-    passed = check_stack(names, runs) and passed
+    passed = check_stack(args.link_map, names, runs) and passed
     passed = check_comparison(names[0], runs[0], port) and passed
     sys.exit(failed or not passed or size > limit)
 

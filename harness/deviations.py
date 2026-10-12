@@ -4,8 +4,8 @@ Each deviation is declared here, with its reason. A golden is derived from
 the original with these differences made to it (see goldens.py), so that it
 holds exactly what a build is expected to show.
 
-Two figures that a build shows are not held against the original at all,
-and are declared here too: see IGNORED.
+Figures that follow the size of the program are not held against the
+original at all, and are declared here too: see IGNORED.
 """
 import re
 from dataclasses import replace
@@ -60,7 +60,9 @@ DEVIATIONS = [
 BLANK = "#"
 
 # What a build shows that is not compared with the original: the part of a
-# line that the pattern's group matches. Its colours are compared.
+# line that the pattern's group matches. Its colours are compared. Every
+# pattern is tried on the line as the screen has it, so two of them can
+# each take a number of the same line.
 IGNORED = [
     # The editor says in its first line how many bytes it has free for the
     # text. That is what the program leaves of the memory, and the port is
@@ -81,6 +83,26 @@ IGNORED = [
     # country has between its thousands: the line is centred, so a number
     # of another length would move the words too, and that is noticed.
     re.compile(r"(\d+(?:[, ]\d{3})*) Bytes Free"),
+    # The same line where a box covers its words and the end of the
+    # number, as the tree of Alt+F10 does: there is nothing to know the
+    # line by but its place. It is the one line of the Info that begins
+    # ten cells into the panel, a number of seven cells and two words in
+    # 38; the total above it begins nine cells in. The box has three cells
+    # of room in front of its frame.
+    re.compile(r"^║ {10}(\d(?:[\d, ]*\d)?) {3}║"),
+    # MEM of DOS, run as a command, says how much memory is in use and how
+    # much is free while it runs: the first includes the part of the
+    # program that stays, the second is what that part leaves. The fields
+    # are the two numbers in each of three lines, and both numbers of the
+    # largest program that would fit.
+    re.compile(r"^(?:Conventional|Total memory|Total under 1 MB) +[\d,]+K"
+               r" +([\d,]+)K +[\d,]+K"),
+    re.compile(r"^(?:Conventional|Total memory|Total under 1 MB) +[\d,]+K"
+               r" +[\d,]+K +([\d,]+)K"),
+    re.compile(r"^Largest executable program size +([\d,]+)K "
+               r"\([\d,]+ bytes\)"),
+    re.compile(r"^Largest executable program size +[\d,]+K "
+               r"\(([\d,]+) bytes\)"),
 ]
 
 # Deviations that show on no screen, and so change no golden. They are

@@ -13,18 +13,10 @@ Things that are known and not done. Standing instructions are in
   calls handed back another CX. Held against the original by hand since,
   over eight steps in text and in hex: 9,712 less in each.
 - Saving in the editor to a disk that cannot be written, the floppy A:
-  of the bench, goes beyond the stack. DOS's critical error brings up
-  its box from inside the call of DOS, 46 bytes deeper than a dialog:
-  with `T80_00` still assembly that left 4 bytes of the stack, under the
-  limit of the `port` test already, and with it in C none: its function
-  that writes the file has some 50 bytes more on the stack at the call
-  of DOS than the assembly had. No scenario has the step, and none can
-  as long as the stack is 256 bytes. What lies below the stack is the
-  end of the copy of the main data that is kept while a command runs,
-  the last bytes of the command line; it is written whole before a
-  command and read whole after, so nothing reads what the stack leaves
-  there. The same goes for any other call of DOS from C that meets a
-  critical error at the bottom of deep calls.
+  of the bench, with the box of DOS's critical error, is in no scenario:
+  it went beyond the stack of 256 bytes that the port had when the
+  editor's saving was translated. With the stack of 4,096 bytes it can go
+  back into one.
 - `T80_00` takes what the program knows of the main extension file from
   the editor's text after saving it, and does so whether the file was
   written or not: a save of VC.EXT that fails changes what the program
@@ -48,7 +40,13 @@ Things that are known and not done. Standing instructions are in
   Both follow the size of the port, and the number is left out of the
   comparison in every scenario (see `harness/deviations.py`). So nothing
   checks the number itself: that the port has less by what it is larger,
-  at least.
+  at least. The same goes for what `mem` says in the scenario `command`,
+  416K free under the original and 412K under the port, whose part that
+  stays is 3,840 bytes longer by its stack. With those numbers left out,
+  no scenario shows any more that the program gives up its memory while
+  a command runs: a check of its own would hold the port's figure
+  against the original's less what the link map says the part has grown
+  by.
 - Every disk of the bench has a volume label, so no scenario has the
   program look for one and find none. The Info does say "has no label"
   in `reread`, where it does not look: a directory named DIRINFO stops
@@ -58,13 +56,6 @@ Things that are known and not done. Standing instructions are in
 - `tools/routines.py` lists procedures only. Code that stands between
   two is not in its list; `harness/reach.py` knows it by its first
   label.
-- Nothing says where the stack is deepest, only how much of it is left.
-  It was found for one batch by having QEMU log the registers at every
-  block of code, `-d cpu,nochain` where `harness/dos.py` asks for
-  `in_asm`, 2.7 GB for the scenario `start`, and taking from the log the
-  blocks of the program with the lowest SP before the lowest of all:
-  that is the chain of calls. As a tool it would name the chain for a
-  scenario in half a minute.
 - What reading a directory does when a drive is not ready, when a list
   has more files than there is room for, or when a drive has no current
   directory to fall back on, runs in no scenario: the bench has no such
@@ -168,7 +159,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - 9 minutes: the stack. As one function `ReDir` left 12 bytes of it in
     every scenario, and nothing said where it was deepest: the stack
     dumped from the machine could not be read, and a log of the
-    registers from QEMU could (see above). It is deepest in the filter
+    registers from QEMU could. It is deepest in the filter
     of a panel, where DOS makes capital letters on the caller's stack.
   - 6 minutes: `harness/notice.py`, six runs of it, and two scenarios
     made longer for three branches that none had noticed, with their

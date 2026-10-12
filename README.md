@@ -189,14 +189,21 @@ assembled with `HARNESS` defined. It writes a letter to a port of the PC
 whenever it takes a key, waits for one, or ends, and so tells the tests
 exactly when it has finished what a key started. It also marks its stack
 when it has set it up, so that the tests can read from the machine how much
-of the 256 bytes the program never touches, which the `port` test reports
-for every scenario: compiled code uses more stack
-than the assembly it replaces, and a stack used beyond its bottom would
-overwrite data without a trace on the screen. The two differ by a few
+of it the program never touches, which the `port` test reports for every
+scenario. The two differ by a few
 dozen instructions, all in macros at the top of `port/asm/VC.ASM`. A few
 of them are in the part of the program that stays in memory while a command
 runs, whose size shows on the screen as free memory; the variant makes up
-for them with a stack that is as many bytes shorter, 18 of 256.
+for them with a stack that is as many bytes shorter, 18 of 4,096.
+
+The stack is where the port departs from the original in what it takes of
+the memory. The original has 256 bytes of it. Compiled code uses more
+stack than the assembly it replaces, and a stack used beyond its bottom
+would overwrite data without a trace on the screen, so the port has 4,096
+bytes, of which the scenarios use some 200. The stack is the end of the
+part of the program that stays in memory while a command runs: that part
+is 16,544 bytes where it was 12,704, and a command has 3,840 bytes less
+than the original leaves it.
 
 ## Testing
 
@@ -209,7 +216,7 @@ ctest --test-dir build --output-on-failure
 | Test | What it checks |
 |---|---|
 | `bytes-match-original` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
-| `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original, and leaves at least 24 bytes of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
+| `port` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens
 
@@ -231,10 +238,11 @@ than the binaries shipped in 2000. And the program names its own file when
 it cannot load it again after a command: the original is `VC.COM`, the port
 `VC.EXE`.
 
-Two numbers on the screen are not compared at all: the bytes that the
-editor says it has free, and the memory that the Info panel says is free.
-Both follow the size of the program, the Info's the size of the part that
-stays in memory while a command runs, or of all of it when Memory
+Some numbers on the screen are not compared at all: the bytes that the
+editor says it has free, the memory that the Info panel says is free, and
+what `mem`, run as a command, says is in use and free. All follow the
+size of the program, the last two the size of the part that stays in
+memory while a command runs, or the Info's that of all of it when Memory
 allocation is switched off. The port is larger than the original and has
 less, by more with every routine translated, and the numbers are not
 worth an expectation that follows the size of the build. Both screens

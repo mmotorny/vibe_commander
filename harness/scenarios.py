@@ -158,8 +158,8 @@ out again (show.py --changes is how):
     DOS's critical error, from inside the call of DOS, and that is 46
     bytes deeper in the stack than a dialog of the routine that called:
     saving to A: in the editor left 4 bytes of the stack while that was
-    still assembly. No scenario can have it as long as the stack is 256
-    bytes.
+    still assembly and the stack 256 bytes. No scenario has it yet; with
+    the stack of 4,096 bytes one can.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
