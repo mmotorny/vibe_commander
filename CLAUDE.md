@@ -422,8 +422,9 @@ port.
   now: see "C for the port".
 - The program has code in its data: `DirFunc` and what follows it,
   `FncSel` and `FncExt`, stand behind a `.DATA` with no `.CODE` after
-  it. `harness/coverage.py` knows the procedures there; code between
-  procedures it names in the code only.
+  it. `harness/coverage.py` knows the procedures there, and code that
+  is no procedure by a label that has an instruction, as far as the next
+  procedure or the next data: `FncSel`, with `FncExt` in it.
 - A routine that a command puts into `FncAddr`, as `F38_40` deletes and
   `M30_50` sets attributes, is called by `FncSel`, by `FncMas` and by
   `DirFunc`, with the attributes in AL, and answers in AX: 1, 0, or

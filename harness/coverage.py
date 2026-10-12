@@ -121,6 +121,7 @@ class Listing:
         # As the listing has them, counted from where their segment
         # begins: segment -> ...
         lines = {"_TEXT": [], "_DATA": []}   # [(address, text)]
+        data = {"_TEXT": [], "_DATA": []}    # addresses of what is no code
         procedures = {"_TEXT": {}, "_DATA": {}}  # name -> (address, length)
         labels = {"_TEXT": {}, "_DATA": {}}  # name -> address
         begins = {}                          # segment -> where it begins
@@ -154,6 +155,8 @@ class Listing:
                 match = re.match(r"([0-9A-F]{4}) [0-9A-F]{2}", line)
                 if match and segment and not _is_data(text):
                     lines[segment].append((int(match[1], 16), text))
+                elif match and segment:
+                    data[segment].append(int(match[1], 16))
 
         for segment in lines:
             # The listing counts the code from 100h already.
@@ -164,19 +167,27 @@ class Listing:
             # begins. A stretch may hold the code of two files, the end
             # of VCMENU.INC and the commands that VCF1.INC begins with,
             # so a later label of it names what stands from there to the
-            # same end: F37_00 in the stretch M60_00. Not in the data,
-            # where a label may stand in a table and no procedure follows
-            # the code: FncSel, behind DirFunc, cannot be named yet.
+            # same end: F37_00 in the stretch M60_00. In the data no
+            # procedure need follow the code, and a label may stand in a
+            # table: there a stretch begins at a label that has an
+            # instruction, and ends where the next data begin as well:
+            # FncSel, behind DirFunc.
             inside = sorted(procedures[segment].values())
             starts = [start for start, _ in inside]
+            code = {address for address, _ in lines[segment]}
             for name, address in sorted(labels[segment].items(),
                                         key=lambda item: item[1]):
-                if segment == "_DATA":
-                    break
                 before = bisect.bisect_right(starts, address)
                 if before and address < sum(inside[before - 1]):
                     continue
                 end = starts[before] if before < len(starts) else None
+                if segment == "_DATA":
+                    if address not in code:
+                        continue
+                    behind = [there for there in data[segment]
+                              if there > address]
+                    if behind and (end is None or min(behind) < end):
+                        end = min(behind)
                 if end is not None:
                     procedures[segment][name] = (address, end - address)
             # What is not in a procedure of the data is data, whatever
