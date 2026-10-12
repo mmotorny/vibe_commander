@@ -17,9 +17,8 @@
 /* The commands of this file are declared in vc.h: see "The commands"
    there. */
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    HidCur puts the cursor below the screen, Cursor at a row and a column,
    the row in the high byte, and Cursor1 at its place in the command line.

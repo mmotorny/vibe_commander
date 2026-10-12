@@ -46,8 +46,8 @@ u32 M30_60(u16 answer);
 static u32 F38_60(void);
 static u16 FncMs1(u16 include);
 
-/* The registers of these are those that their stubs had in the assembly,
-   when it called them. DirFunc and DelTr0 are in vc.h. */
+/* The registers of these are those that the assembly called them with,
+   while it did. DirFunc and DelTr0 are in vc.h. */
 #pragma aux F38_10  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux F38_40  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux M30_50  "*_c" __far parm [ax] value [ax] modify exact [ax]
@@ -55,9 +55,8 @@ static u16 FncMs1(u16 include);
 /* The commands, with FncMas, FncSel and FncExt, are declared in vc.h:
    see "The commands" there. */
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    OncZoom puts a box on the screen with its middle at `place`, zooming it
    only for the first box of a command: `box` is where the assembly
@@ -911,10 +910,9 @@ u16 DirFunc(void)
    file that may not be written, and a disk that is full, are a beep and
    no error.
 
-   This is DelTree of the assembly from its label DelTr0 on, which ^R in
-   a tree and the tree in a box call, the box from C. DelTree itself does nothing unless
-   the tree is read again by itself, ChgTree: its stub sees to that, and
-   F38_40 here.
+   This is DelTree of the original from its label DelTr0 on, which ^R in
+   a tree and the tree in a box call. DelTree itself does nothing unless
+   the tree is read again by itself, ChgTree: F38_40 here sees to that.
 
    Ported as they are. When the file cannot be closed, what is returned
    for the error is what writing answered, the 1 byte written. And ^R in

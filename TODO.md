@@ -5,64 +5,53 @@ Things that are known and not done. Standing instructions are in
 
 ## The last of the assembly
 
-Every routine of the program is C. What `port/asm/` still holds is data
-and glue, and the port ends without it. This is what is there, how it is
-held against the original while it moves, and in what order it can go.
-How one file is done is in `CLAUDE.md`, "Moving the data of a file to C";
-`VCHELP.INC` went that way, into `port/help_t.c`.
+All the code of the program is C, and all its texts and tables. What
+`port/asm/` still holds is one file that lays data out, and the port
+ends without it. This is what is there, how the data was held against
+the original while it moved, and in what order the rest can go. How a
+file of data was done is in `CLAUDE.md`, "Moving the data of a file to
+C".
 
 ### What is left
 
-Objects and bytes as they are linked, once the main loop calls every
-command. An object is what stands from one label to the next. "Code" is
-all that is no data: stubs, entries and what jumps between them. The
-texts, boxes, dialogs, buttons and colours are all C, and so are the
-tables of the commands. Seven files went with the stubs of the commands:
+`port/asm/VC.ASM` is the one file of assembly, 336 lines. It has no
+instruction and no data: every byte of the program is made by the
+compiler. What it still says is how the program is laid out, and the
+layout of the main data, which nothing reads there. By kind, with its
+lines:
+
+| Lines | What |
+|---|---|
+| 1 to 9 | The heading and two options of the assembler |
+| 10 to 57 | The segments in the order that the linker is to have them in, with the note on why: `RPSP`, `RHEAD`, `RTEXT`, the compiler's four for the data of the part that stays, `RCONST`, `RCONST2`, `R_DATA` and `R_BSS`, `RGAP`, `CONST` with the label `TrnBeg`, which is `PUBLIC` for `tools/mkexe.c`, and `CONST2`; and the two groups, `DGROUP` of `RHEAD`, `RTEXT`, `RGAP`, `CONST` and `CONST2`, and `R_GROUP`, to which it adds `RPSP` |
+| 59 to 71 | In `RHEAD`: `_md`, `PUBLIC`, the name that C code has for the main data, at offset 0, and `ORG 100h`, the 256 bytes where the PSP is |
+| 73 to 85 | Thirteen `EQU`, the lengths that the structures are made with |
+| 87 to 155 | Seven structures that the main data and a panel are made of: `DTAs`, `EPBs`, `CNTRY`, `FILENT`, `DIRENT`, `DIRTREE`, `STAR` |
+| 157 to 294 | `STRUC MainDat`, the main data, 62,603 bytes that the program asks DOS for |
+| 296 to 321 | `STRUC WCBdef`, a panel |
+| 323 to 330 | `RGAP`, the 16 bytes of the header of the next block of memory |
+| 332 to 336 | A note on where the constants are, and `END` |
+
+Nothing names a field of the two `STRUC` or one of the lengths: the C
+has structures of its own, in `port/vc.h`, and the harness takes
+`AutoTim` and `Clock` from the original's listing. So lines 73 to 321
+go with the file as they are; what the last step has to say otherwise
+is in lines 10 to 71 and 328 to 330, and "The order" below has how.
+The test `data` counts no object of the assembly any more.
+
+What went last, with the commands and the main loop: ten files,
 `VCFUNC.INC`, `VCMENU.INC`, `VCF1.INC`, `VCCOPY.INC`, `VCVIEW.INC`,
-`VCEDIT.INC` and `VCFIND.INC`.
-
-| File | tables | code | goes with |
-|---|---|---|---|
-| `VC.ASM` | 1 / 6 | 143 | `main.c`, `start.c` |
-| `VCMEM.INC` | | 30 | `memory.c` |
-| `VCSUB1.INC` | | 9 | `dialog.c` |
-| `VCSUB3.INC` | | 109 | `treebox.c`, `read.c` |
-| all | 1 / 6 | 291 | |
-
-Besides these, all in `VC.ASM`:
-
-- Of the part that stays in the memory: 29 bytes of code (`Exec`,
-  `AlocEr`, `Exit00` and the stub of `Release`), which go with step 3;
-  the 256 bytes in front of them, where the PSP is; the 16 of `RGAP`
-  behind that part; the order of its segments; and `RPSP`, a segment
-  without contents by which the group of its data begins at the PSP.
-  Its data and its stack are C, `port/resident.c`.
-- The layout: the `STRUC` of the main data, 62,603 bytes that the
-  program asks DOS for, that of a panel, and a dozen small ones, and
-  the `EQU` of the colours and the lengths.
-- The macros `CallC` and `MainC`.
-
-The table is `Main_T`, the three places that the stub of the main loop
-goes on at when the loop returns.
-
-The code is, by what it is there for:
-
-- The glue of the main loop in `VC.ASM`: the stubs of `Init00` and
-  `Init11`, `Init40`, which enters the loop, `MainGo`, and where the loop
-  returns to: `CmdIni`, `CmdExe` and `Exit`.
-- Stubs of routines that only an entry calls: `ReDir` and `ReadTre` in
-  `VCSUB3.INC`.
-- Entries for C: `ReDir_a` in `VC.ASM`; `MemRun_a`, `ResSeg_a` and
-  `Release_a` in `VCMEM.INC`; `AsmSeg_a` in `VCSUB1.INC`, with
-  `CallPSP`.
+`VCEDIT.INC`, `VCFIND.INC`, `VCMEM.INC`, `VCSUB1.INC` and `VCSUB3.INC`;
+the macros; the `EQU` of the colours and the structures of a dialog,
+`BOXHD` and `BOXMN`, of which `port/tables.h` has its own; and the list
+of the C functions that the assembly called.
 
 What names what:
 
-- C code names a text, a box, a dialog or buttons of the assembly as
-  `extern const u8 __far`, with `#pragma aux Name "*"`, and hands its
-  offset to `DialBox`, `Dialog`, `MinMnu` or `OncZoom`, or reads it
-  through the far pointer. The assembly has the name `PUBLIC`, in the
-  file that defines it.
+- C code names a text, a box, a dialog or buttons as `extern const u8
+  __far`, with `#pragma aux Name "*"`, and hands its offset to
+  `DialBox`, `Dialog`, `MinMnu` or `OncZoom`, or reads it through the
+  far pointer.
 - An object names another by a word that holds its address: a box its
   lines, a dialog its box and its buttons, the table of the menus'
   tables each of them. Sixteen are named from more than one file: `Ok_S`,
@@ -70,8 +59,16 @@ What names what:
   `Kov_S`, `YesNo_S`, `YesNo_D` of `port/keys_t.c`; `OkCan_S`, `OkCan_D`
   of `port/system_t.c`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`;
   `EdFl_S` of `port/view_t.c`; `Tree_S` of `port/treebox_t.c` and
-  `PtMnu_S` of `port/bars_t.c`. Nothing of the assembly names any of
-  them any more.
+  `PtMnu_S` of `port/bars_t.c`.
+- The part of the program that stays in the memory finds the rest by
+  one constant, `Trans_T` of `port/main_t.c`, which holds the far
+  address of `TrnMain` of `port/main.c`: it reads that at the
+  constant's offset in the segment `RunPar`, which holds as long as the
+  group of the constants begins at the PSP (see the last step, below).
+  The rest finds that part by `ResSeg` of `port/misc.c`, which is SS,
+  and what it names there by `STAYS` of `port/vc.h` or by a far name;
+  and the constants by `AsmSeg` of `port/misc.c`, the segment of one of
+  them.
 - The harness and the tools:
   - `harness/driver.py` reads where `AutoTim` and `Clock` are in the
     main data from the listing of the original, in
@@ -84,10 +81,12 @@ What names what:
     reads anything of the port that an assembler has made.
   - `harness/datacheck.py` reads `VC.LST` and `VC.OBJ` of the port for
     what is still assembly, and does without them when they are gone.
+    It reads `port/vc.h` for the numbers of the commands.
   - `harness/coverage.py`, `harness/reach.py` and `harness/notice.py`
     read the listing of the original only, and need nothing.
   - `tools/routines.py` and `tools/flagscan.py` read `port/asm/`: they
-    are for routines that are still assembly, and go with it.
+    were for routines that are still assembly, find none, and go with
+    it.
   - `tools/mkexe.c` goes by the map: the seven words that it fills in
     and the stack by their names of `port/resident.c`, and one name
     that is still the assembly's, `TrnBeg`, where the part that goes
@@ -125,10 +124,11 @@ What it does not hold, each listed in the tool with the reason:
   for what only the shipped binary has.
 - Data that became code: the tables of keys are `switch` statements, and
   the scenarios answer for them.
-- The table of the assembly that the original has not, `Main_T`. The
-  tables by which the stubs of the commands went on are gone with them,
-  `CmdNx_T`, `MnuNx_T` and `F35_T`: they are `switch` statements of
-  `port/main.c`, as the tables of keys are.
+- `Trans_T`, the far address at which the part that stays calls the
+  rest, which the original has not. The tables by which the stubs of
+  the commands went on are gone with them, `Main_T`, `CmdNx_T`,
+  `MnuNx_T` and `F35_T`: they are `switch` statements of `port/main.c`,
+  as the tables of keys are.
 
 The tables of the menus' commands it holds in a way of their own. The
 original has the address of a command for every item; the port has the
@@ -214,7 +214,7 @@ Enter and F10 in its header, `SubFunc`: `F38_10`, `M30_60`, `F35_60` and
 things. `DialSub_a` and the stubs are gone, and the test `data` has each
 such word in `NAMED_OTHERWISE`, as a number.
 
-**3. The commands and the main loop.** Next. One agent, or one after
+**3. The commands and the main loop.** Done. One agent, or one after
 another, never two at once: all of it is one web of jumps through
 `port/main.c`, `port/menu.c` and the `.CODE` of every file. What was
 there is 192 labels and 2,359 bytes of code: the stubs of the commands
@@ -246,26 +246,34 @@ each a commit that the tests pass, in this order:
   the 67 items were chosen in no scenario until `menu-items` and
   `menu-held`. With the stubs of the commands went `CmdNx_T`,
   `MnuNx_T`, `F35_T`, `F1Next` and seven files of the assembly.
-- The glue and the entries. `Stay` of `port/resident.c` calls the
-  loop, which wants DS on the main data, the one instruction that
-  `FatErr` has too; `MainC` and `MainGo` go. The stubs that only stubs
-  call go as their callers do, and `ReDir_a` when `ReDir` is one
-  function. The other entries, tried as far as compiling: `ResSeg_a`
-  is a function that returns the segment of a far pointer to a variable
-  of its own, which compiles to `mov ax,ss`; `AsmSeg_a` is the segment
-  of a far pointer to a constant of the group, `mov ax,seg Name`, a
-  number that is relocated; `MemRun_a` reads two words of the part that
-  stays through `ResSeg`; `Release_a` and `CallPSP` go when `Release`
-  of `port/resident.c` is a far function that loads its own DS, as
-  `SetBrk` is. With the last command the files of the assembly are
-  empty and go, with their `INCLUDE` and their names in
-  `CMakeLists.txt`.
+- The glue and the entries. Done. `Stay` of `port/resident.c` calls
+  the rest of the program as a function, `TrnMain` of `port/main.c`,
+  which starts the program, puts DS on the main data, by the one
+  instruction that `FatErr` has too, runs the loop, and puts DS back
+  before it returns what that part is to do; `MainC`, `MainGo` and the
+  three labels of that part that the rest jumped back to are gone. That
+  part cannot name a function of the rest, whose segments are set anew
+  after every command, and `tools/mkexe.c` stops the build for it: so
+  `Stay` reads the far address in a constant of the rest, `Trans_T`.
+  `ReDir` is one function of `port/read.c`. `ResSeg` returns the
+  segment of a far pointer to a variable of its own, which compiles to
+  `mov ax,ss`; `AsmSeg` the segment of a far pointer to a constant,
+  `mov ax,seg Title_S`, a number that is relocated; `MemRun` reads two
+  words of the part that stays through `ResSeg`: all three in
+  `port/misc.c`. `Release` of `port/resident.c` is a far function that
+  loads its own DS, as `SetBrk` is, and the map of the memory calls it
+  through a pointer. With that the last three files went, and what
+  `VC.ASM` held of code, of macros and of `EQU` and structures that
+  only code used.
 
-The code is small and the reading is not: each stub hands over and
-takes back registers of its own, and a command goes on in another with
+The code was small and the reading was not: each stub handed over and
+took back registers of its own, and a command goes on in another with
 what it leaves. The `port` test is strong here, since every command
-runs in some scenario, and weak in one place, the registers that go
-round the loop to a command that happens to read them.
+runs in some scenario, and was weak in one place, the registers that go
+round the loop to a command that happens to read them: reading the
+stubs found the cursor's keys leaving other values in BX and DX than
+the original, which Rename reads (see "Known and not dealt with", and
+`rename-keys`).
 
 **4. What is not of one file.** After 3. The compiler's helpers,
 `__U4M` and `__U4D`, went ahead: they are `port/arith.c`.
@@ -295,10 +303,13 @@ round the loop to a command that happens to read them.
   once no assembly counts from there: a word in a table is held by what
   it names, not by its number.
 - The layout of the main data: the `STRUC` goes with the last line of
-  assembly that names a field, which is a stub of 3: the room of the
-  part that stays, sized by `CmnSave` and `WCBsave`, is C. `struct
-  MainDat` of `port/vc.h` is then the only one, and `md` no label of
-  the assembly: see the last item for what it is to the linker.
+  assembly that names a field, and none does any more: the room of the
+  part that stays, sized by `CmnSave` and `WCBsave`, is C, and the stubs
+  of step 3 are gone. So the `STRUC` of the main data and that of a
+  panel go with the file, and the lengths and the seven small
+  structures that they are made of. `struct MainDat` of `port/vc.h` is
+  then the only one, and `md` no label of the assembly: see the last
+  item for what it is to the linker.
   Its layout stays the original's: boxes and dialogs hold places in it
   as numbers, `MD_AT`, and the test `data` holds those against the
   original's.
@@ -385,26 +396,34 @@ round the loop to a command that happens to read them.
     a function that takes a far one. Based on the data segment,
     `__based(__segname("_DATA"))`, the addresses of its fields are far,
     and every near pointer into the main data is "Pointer truncated".
-    The `STRUC` of the main data goes: nothing of the glue names a
-    field of it. That of a panel stays as long as the stub of `ReDir`
-    reads `WinTyp` and `ChgFlg`.
+    The `STRUC` of the main data goes, and that of a panel: the glue
+    of step 3 is C, and nothing names a field of either.
   - The group of the constants, `DGROUP`, then begins where its first
     segment is, behind the part that stays, and no longer at the PSP:
     nothing of C can hold it there, since the first bytes of the file
     are of the other group. Three things took it to begin there.
     `Init11` of `port/start.c` works out how long the block of the part
     that goes is from `block - code`, which is `TrnPrW` only then: it
-    reads `TrnPrW`. `port/resident.c` reads `Vers_S` through DS and
-    enters the part that goes at `RunPar` with the offset of `Init00`
-    or `Init11`: it wants the segment of each as the linker has it, in
-    paragraphs from the PSP, which is the high word of a far pointer to
-    the thing, added to the PSP for the text and to `RunPar` for the
-    entry; and `tools/mkexe.c` leaves such a number as it is, where it
-    stopped the build for a segment of the part that goes named in the
-    part that stays. It tells the two apart by the number: the part
-    that stays is one group and its segment is 0. The glue of the
-    assembly took the block of the part that goes to be CS and
-    `TrnPar`, in `Init11` and `CmdExe`: it is `RunPar` and `TrnPar`.
+    reads `TrnPrW`. `port/resident.c` reads `Vers_S` through DS, and
+    enters the part that goes by a constant of that part: `Stay` and
+    `Stay11` read the far address of `TrnMain` of `port/main.c` in
+    `Trans_T` of `port/main_t.c`, as `*(Transit * __far *)AT(RunPar,
+    OFFSET(Trans_T))`, the offset of the constant in `DGROUP` taken in
+    the segment `RunPar`. That is where the constant is only while
+    `DGROUP` begins at the PSP; what it holds, the address of the
+    function, is set by `Reloc` and holds wherever the group begins.
+    So for `Vers_S` and for `Trans_T` that code wants the segment of
+    each as the linker has it, in paragraphs from the PSP, which is the
+    high word of a far pointer to the thing, added to the PSP for the
+    text and to `RunPar` for the constant; and `tools/mkexe.c` leaves
+    such a number as it is, where it stops the build for a segment of
+    the part that goes named in the part that stays. It tells the two
+    apart by the number: the part that stays is one group and its
+    segment is 0. With that rule `Stay` could as well take the segment
+    of `TrnMain` itself and add `RunPar`, and `Trans_T` would go. The
+    block of the part that goes is `RunPar` and `TrnPrW` to `TrnMain`,
+    by `MemRun` of `port/misc.c`, which holds either way; so do
+    `AsmSeg`, a segment that `Reloc` sets, and `ResSeg`, which is SS.
     The test `data` is ready: it holds a word that names something
     against the offset of that in its group, as the map has it, where
     it held it against the place from the PSP.
@@ -692,15 +711,12 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   tried. The scenarios search three levels. DOS's critical error can come up with
   all of that on the stack: `FindFil` calls DOS for the files, and to
   open and read them.
-- `VCMENU.INC` is C but for what the assembly needs of it: the tables by
-  which the stub of the menu bar jumps to the commands, and the stubs of
-  the commands, 28 of them with `M17_00`, which hands Drive... to the
-  box of the drives. Its boxes, dialogs and texts are constants of
-  `port/commands_t.c`. The stubs
-  go when the loop that jumps to
-  them is C, and with it `CmdM01`, `CmdM03` and `CmdM06` of
-  `VCFUNC.INC`, by which the keys of the panels go on in three of the
-  commands: `port/keys.c` can call the functions then.
+- `VCMENU.INC` is C whole: the tables by which the menu bar finds the
+  command of an item are constants of `port/commands_t.c`, with its
+  boxes, dialogs and texts, and the main loop calls the commands. Where
+  the keys of the panels go on in three of them, `M01_01`, `M03_00` and
+  `M06_00`, the loop calls those too, by what the key's command returns:
+  `CmdEnd` of `port/main.c`.
 - Of the commands of the menus, two instructions are listed as out of
   reach: one for a display that is neither EGA nor VGA, and one for a
   kind of panel that nothing asks for. The one of EGA lines that keeps
@@ -1284,54 +1300,33 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   registers that the call does not read, BX to DX of the call for the
   video mode, BX and CX of those that set a vector, is 0 where the
   assembly had what was left there.
-- What of `port/asm/VC.ASM` is still assembly, and what each piece will
-  want. The port ends with no assembly, and the order of preference is
-  the user's: portable C, then C tied to the compiler or the machine,
-  then intrinsics, then inline assembly where nothing else works.
-  - The stubs of the start-up, `Init00` and `Init11`: the start-up is C,
-    `port/start.c`, and what is left of it in the assembly is what the
-    part that stays calls, far, the segment of that part and the block
-    of the code handed to the C, DS put on the main data that
-    `Init11_c` has asked DOS for, and the far jump to `AlocEr` when
-    there is none to have. `Stay` of `port/resident.c` could call the
-    three functions itself, but for DS: `IniData_c` and the main loop
-    behind it want it on the main data, which C cannot set; that is
-    the instruction of inline assembly that `FatErr` wants too. What
-    `port/start.c` names of the part that stays is in one list at its
-    top: `ComnIni`, `WCB1sav`, `WCB2sav`, `Counter`, `Vect22` and
-    `Vect27`, which are members of `struct Stays`, `Vect21`, `RelTab`,
-    the functions `Exit01`, `New21` and `New27`, by their offsets, and
-    `SetBrk`, which it calls through a pointer to a far function.
-  - The part that stays in the memory is C, `port/resident.c`: the
-    entry of the program, `Alloc0`, which DOS enters; `Reloc`, which
-    that part applies to the other whenever it has loaded it; the
+- Nothing of `port/asm/VC.ASM` is code any more. What was said here of
+  each piece that was, and what became of it:
+  - The stubs of the start-up, `Init00` and `Init11`, are `TrnMain` of
+    `port/main.c`, which the part that stays calls: it calls the three
+    functions of `port/start.c` and the main loop, and puts DS on the
+    main data and back by the instruction of inline assembly that
+    `FatErr` has. What `port/start.c` names of the part that stays is
+    in one list at its top: `ComnIni`, `WCB1sav`, `WCB2sav`, `Counter`,
+    `Vect22` and `Vect27`, which are members of `struct Stays`,
+    `Vect21`, `RelTab`, the functions `Exit01`, `New21` and `New27`, by
+    their offsets, and `SetBrk`, which it calls through a pointer to a
+    far function.
+  - The part that stays in the memory is C, `port/resident.c`, with its
+    data: the entry of the program, `Alloc0`, which DOS enters; `Reloc`,
+    which that part applies to the other whenever it has loaded it; the
     outermost loop of the program, `Stay`, which calls the part that
-    goes, far, at `Init00` and after every command at `Init11`; `Exec`,
-    which runs the commands and loads the program again; `Exit00` to
-    `Exit05`; `New21` and `New27` with what keeps the list of the
-    programs that stay in the memory; `SetBrk`, `NotFind`, `OutStr`,
-    `GetStat` and `SetStat`. Its data is C too, of the same file. What
-    is left of its assembly, in `RHEAD` of `VC.ASM`, is two kinds of
-    stub:
-    - `Exec`, `AlocEr` and `Exit00`, three instructions each. The part
-      that goes still comes back by a far jump to one of them, from
-      `CmdExe` in `VCFUNC.INC`, from the stub of `Init11` and from
-      `Exit`, with the
-      stack as it was when `Stay` called it: each loads a number and
-      returns far, into `Stay`. They go when those three places return
-      by themselves, which they can as soon as they are of a function
-      that `Stay` calls: `PUSH SS`, `POP DS`, the number in AX, `RETF`.
-    - `Release`, a stub: for `Release_a` of `VCMEM.INC`, which the map
-      of the memory calls through `CallPSP` with the record in DS.
-      `SetBrk` and `Exit01` have none: `port/start.c` names the C
-      functions themselves, by their offsets, as it named the labels,
-      and calls `SetBrk` through a pointer to a far function.
-    - `CallPSP` itself, in `VCSUB1.INC`, is of the part that goes.
+    goes, far; `Exec`, which runs the commands and loads the program
+    again; `Exit00` to `Exit05`; `New21` and `New27` with what keeps
+    the list of the programs that stay in the memory; `Release`, which
+    the map of the memory calls through a pointer to a far function;
+    `SetBrk`, `NotFind`, `OutStr`, `GetStat` and `SetStat`. The three
+    labels that the part that goes jumped back to, and the stub of
+    `Release` with `CallPSP`, are gone.
   - `FatErr`, what DOS calls for a critical error, is C, an interrupt
-    function in `port/main.c`, and nothing of it is left in the
-    assembly. Its texts and its two boxes are constants of
-    `port/main_t.c`, and so is `SecDat`, the word that holds the
-    segment of the main data, but that it is a variable:
+    function in `port/main.c`. Its texts and its two boxes are
+    constants of `port/main_t.c`, and so is `SecDat`, the word that
+    holds the segment of the main data, but that it is a variable:
     `port/start.c` writes it, and `FatErr` loads DS from it, by the one
     instruction of inline assembly there.
 - Ported as they are, in `port/start.c`: see the comments of `Init00`
@@ -1620,54 +1615,27 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   - When nothing is pending for the tree, the high word of `AutoTim`
     is whatever DX holds, and nothing reads it then.
   - `Mvz2lin` had no caller, and is gone.
-- `AltSr_T`, the scan codes that begin the speed search, is read by the
-  main loop where it is, in `port/asm/VCFUNC.INC`, and the place behind
+- `AltSr_T`, the scan codes that begin the speed search, is a constant
+  of `port/keys_t.c`, which the main loop reads, and the place behind
   the code found goes round in DI as in the assembly. `port/cmdline.c`
-  has a copy of its own. When that file of the assembly goes, the table
-  wants one home.
+  has a copy of its own: the table wants one home.
 - The list file gets, behind its name at TmpBuf+100, the six bytes that
   follow `vc.lst` in the assembly, and the menu's name at TmpBuf the six
   that follow `VC.MNU`: both are copied from the assembly, `List_F` and
   `Menu_F`, as long as it has them. Nothing reads the six.
 
-- `VCSUB1.INC` and `VCSUB3.INC`, the shared routines, hold no routine
-  of the original any more but one, `CallPSP`; `VCSUB2.INC` is gone.
-  What is left in them, and goes when what needs it is C:
-  - Stubs, three of them: the routine's name, the call of the C
-    function, and the registers and flags that the assembly which still
-    calls it goes on with. `VCSUB1.INC` has one: `Dialog`, which the
-    routine for DOS's critical error calls. The eight that the code
-    which starts the program called, `ChkMode`, `ScrOffs`, `MvzLin0`,
-    `MvzLine`, `AddFile`, `CutPath`, `PathLin` and `Cursor`, went when
-    that became C. `VCSUB3.INC` has two: `ReDir`, for the entry
-    `ReDir_a` of the main loop, and `ReadTre`, which the stub of `ReDir`
-    calls. That of
-    `DiSi10`, whose address `DirSize` put into `FncAddr`, went when
-    `FncAddr` came to hold a number. A stub that had lost its last caller went with this
-    batch, 58 of them, behind the 38 that went with Enter, each with
-    its line in the `EXTERN` list and its function in
-    `harness/ported.py`. `tools/routines.py` counts calls, not jumps:
-    `Cursor` has fewer callers there than it has. The assembler says
-    "Symbol not defined" for a stub that is taken out too early.
-  - An entry for C: `AsmSeg_a`, the assembly's code segment, where its
-    boxes and texts are. `FncCall_a`, which called what `FncAddr`
-    names, is a function of `port/dirfunc.c`, and `DialSub_a`, which
-    called what a dialog names for Enter, is a `switch` in `Dialog`.
-  - No text or table: those are constants of `port/bars_t.c`,
-    `port/treebox_t.c` and `port/system_t.c`. Four names of files are
-    copied with what follows them, and are written there as long as what
-    is copied, with what the original has behind each: `Mask_S` and
-    `Ext_F`, 68 bytes by `MvzLine`, `DrIn_F` and `Init_F`, the 13 of a
-    name. While they were assembly the port had behind them what its
-    assembly still had, which was the original's as far as the name of
-    the tree's file and no further. Nothing is known to read those
-    bytes where they get to.
-  - `CallPSP`, 6 bytes: a far call, by way of the stack, of a routine in
-    the part of the program that stays in the memory. It is no routine
-    to translate: C code makes such a call through a far pointer, as
-    `Init00` of `port/start.c` calls `SetBrk`. One place of the assembly
-    uses it still: `Release_a` of `VCMEM.INC`, by which the map of the
-    memory has a program released. It goes with that.
+- `VCSUB1.INC`, `VCSUB2.INC` and `VCSUB3.INC`, the shared routines, are
+  gone. Their last stubs were `ReDir` and `ReadTre`: `ReDir` is one
+  function of `port/read.c`. Their last entries for C were `AsmSeg_a`,
+  which is `AsmSeg` of `port/misc.c`, and `CallPSP`, by which the map of
+  the memory had a program released: C code makes such a call through
+  a pointer to a far function. Their texts and tables are constants of
+  `port/bars_t.c`, `port/treebox_t.c` and `port/system_t.c`. Four names
+  of files are copied with what follows them, and are written there as
+  long as what is copied, with what the original has behind each:
+  `Mask_S` and `Ext_F`, 68 bytes by `MvzLine`, `DrIn_F` and `Init_F`,
+  the 13 of a name. Nothing is known to read those bytes where they
+  get to.
 - No entry in the assembly calls an interrupt for C code any more. A
   drive made the current one is `SelDrv` of `port/system.c`; the FCB
   that deleting by a mask has DOS make is `Fcb29` of `port/dirfunc.c`;
@@ -1676,14 +1644,13 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   the assembly called DOS itself there, without `Intr21`. `LeaveTm`'s
   three interrupts are `Int28`, `Int2F` and `DvPause` there.
 - The jump of the main loop to the command of a key is a `switch`,
-  `Func12` of `port/main.c`, and `Case` is gone. The commands are still
-  labels of the assembly, stubs of the C functions with one way of
-  handing registers over for each file, so the function returns the
-  number of a place and the stub of the loop jumps there by `Main_T` in
-  `VC.ASM`, which has 79 places now. With Enter and the commands of the
-  viewer and the editor in C too, the loop can call the functions: the
-  table, the stubs of the commands and the structure of registers go
-  then.
+  `Func12` of `port/main.c`, and `Case` is gone. The loop calls the
+  commands, from a second `switch`, `Command`. The structure of
+  registers is still there: `struct Regs` of `port/vc.h`, for the few
+  that one command reads as another left them. Its fields SI, DI and BP
+  are read by the mouse's commands alone, which the loop sets them for
+  just before, and what else the loop writes there, as the original
+  leaves those registers, nothing reads.
 - What the routines of this batch do in the original and the port does
   after them; whether to mend any of it is not decided:
   - `SaveSet` makes the setup file anew before it writes it: when the

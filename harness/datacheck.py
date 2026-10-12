@@ -92,6 +92,9 @@ OWN = {
         "a number of how the file is laid out, which tools/mkexe.c writes "
         "there: the original's assembler works such numbers into its "
         "instructions"),
+    "Trans_T": "the far address at which the part of the program that "
+               "stays in the memory calls the rest: the original's two "
+               "parts are one segment and jump to each other's labels",
 }
 
 # The tables of the menus' commands. Where the original has the address

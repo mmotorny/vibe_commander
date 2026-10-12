@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the port: the program that is part assembly and part C.
+"""Check the port: the program as it has been translated to C.
 
 The port is taken through every scenario and must show the same screens
 and leave the same disks as the original did, which the goldens record
@@ -74,7 +74,9 @@ class Batch:
     # procedures, each by its first label, or by a later one for what
     # stands from there on (see coverage.Listing).
     routines: tuple
-    functions: tuple              # its functions that the assembly calls
+    # Its functions that other files call, which the assembly called
+    # while there was some: each has to have run in the port.
+    functions: tuple
     # Address in the original -> why no scenario executes the instruction.
     unreached: dict = field(default_factory=dict)
 
@@ -315,7 +317,7 @@ BATCHES = [
               "for the Info the disk, its label and the text of dirinfo",
         source="read.c",
         routines=("ReDir", "RdInfo", "GetVol", "DirSize", "TstInfo"),
-        functions=("ReDir_c", "ReDr45_c", "ReDr50_c", "RdInfo_c"),
+        functions=("ReDir_c",),
         unreached={
             **dict.fromkeys(
                 (0xB8BE, 0xB8C0, 0xB8C2, 0xB8C5, 0xB8C7, 0xB8C9, 0xB8CB,
@@ -726,7 +728,7 @@ BATCHES = [
                   "Func01", "Func15", "Func20", "Exit", "Quit", "RestVct",
                   "HookVct", "ErrRdy"),
         # HookVct has no caller left in the assembly.
-        functions=("MainLoop_c", "Exit_c"),
+        functions=("TrnMain_c",),
         unreached={
             **dict.fromkeys(
                 (0x0D87, 0x0D88, 0x0D8B, 0x0D8C, 0x0D8D, 0x0D8F, 0x0D92,
@@ -945,12 +947,12 @@ BATCHES = [
         # Ctrl-Break, and behind it New21 and New27, which the listing
         # has as far procedures. The functions are New21 and New27, where
         # the interrupts arrive, the interrupt functions that those go on
-        # in, by the names that the compiler gives them, and what the
-        # assembly still calls. CtrlC, an interrupt function too, runs in
-        # no scenario, as in the original.
+        # in, by the names that the compiler gives them, and Release,
+        # which the map of the memory calls. CtrlC, an interrupt function
+        # too, runs in no scenario, as in the original.
         routines=("CtrlC", "ExeProg", "AddProg", "FreeBlk", "ChkBlk",
                   "Release", "GetStat", "SetStat"),
-        functions=("New21", "New27", "Int21_", "Int27_", "Release_r"),
+        functions=("New21", "New27", "Int21_", "Int27_", "Release"),
         unreached={
             0x04AB: "CtrlC, where Ctrl-Break or DOS's Ctrl-C arrives: "
                     "the BIOS of the bench makes no interrupt of Ctrl "

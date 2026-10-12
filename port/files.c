@@ -9,9 +9,8 @@
  * the files of the directory that the panel's filter leaves out. A place
  * in the list is an address in the segment, as the assembly has it.
  *
- * Nothing here but SetMask touches the main data, and so only SetMask
- * needs DS to point at it: FnFile and NearFl are called where ES, which
- * the stubs would take it from, points elsewhere.
+ * Nothing here but SetMask touches the main data: FnFile and NearFl
+ * take what they read as far pointers.
  */
 #include "vc.h"
 

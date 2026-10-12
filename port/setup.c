@@ -9,7 +9,7 @@
  * INI_LEN bytes, of vc.h. The main loop makes the same bytes every time
  * it comes round, to see whether the setup has changed since it was
  * saved (Func05 in main.c); the code that starts the program reads the
- * file, and is still assembly.
+ * file (start.c).
  */
 #include "vc.h"
 
@@ -22,12 +22,10 @@
     ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
-/* AsmSeg returns the code segment of the assembly, which the constants
-   of C are in too: the name of the file is one of port/system_t.c, and
-   the code that starts the program reads it there too. */
-u16 AsmSeg(void);
+/* AsmSeg, of vc.h, returns the segment of the program's constants: the
+   name of the file is one of port/system_t.c, and the code that starts
+   the program reads it there too. */
 extern const u8 __far Init_F[];
-#pragma aux AsmSeg "*_a" __far value [ax] modify exact [ax]
 #pragma aux Init_F "*"
 
 /* C routines of other files that vc.h does not have. */

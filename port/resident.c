@@ -149,15 +149,16 @@ u8 DataSav[LenStk];
 u32 CODE Vect21;
 #pragma aux Vect21 "*"
 
-/* Where the part that goes is entered: when the program starts, and
-   when it has run a command. Both are of the assembly there, and only
-   their offsets are of use: the segment is RunPar. And a text of that
-   part, which is where the file has it when the program begins. */
-extern const u8 __far Init00[];
-extern const u8 __far Init11[];
+/* Where the part that goes is entered, when the program starts and when
+   it has run a command: Trans_T of port/main_t.c is a constant of that
+   part which holds the far address of the function, TrnMain of
+   port/main.c. Only its offset is of use here: its segment is RunPar,
+   as long as the group of the constants begins at the PSP, as this
+   part does. And a text of that part, which is where the file has it
+   when the program begins. */
+extern const u8 __far Trans_T[];
 extern const u8 __near Vers_S[];
-#pragma aux Init00 "*"
-#pragma aux Init11 "*"
+#pragma aux Trans_T "*"
 #pragma aux Vers_S "*"
 
 /* The PSP, which this segment begins with: where the program goes on
@@ -247,10 +248,10 @@ struct Frame {
 /* DX of a call of DOS that is no address. */
 #define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
-/* What the assembly still calls, for the map of the memory: near, with
-   DS on this segment, and every register kept but AX. */
-void Release(u16 record);
-#pragma aux Release "*_r" __near parm [ax] modify exact [ax]
+/* What the map of the memory calls, of the part that goes: far, with
+   DS anywhere, as SetBrk is. Every register is kept but AX. */
+void __far __loadds Release(u16 record);
+#pragma aux Release "*" parm [ax] modify exact [ax]
 
 static u16 GetStat(void);
 static void SetStat(u16 state);
@@ -478,7 +479,7 @@ static u16 AddProg(struct Saved STACK *r)
    Take the program whose record is in the segment `record` out of the
    memory: give the interrupts that it took back to who had them before,
    and free every block of memory that is its own. */
-void Release(u16 record)
+void __far __loadds Release(u16 record)
 {
     volatile u16 table = 0;
     struct DosRegs regs;
@@ -821,7 +822,7 @@ static u16 NotFind(const u8 *text, const u8 __far *name)
 
 /* Note whether DOS looks for Ctrl-C at every call, have it not do so,
    and take Ctrl-C: when the program starts, and after every command.
-   The code that starts the program calls this through CallPSP, far and
+   The code that starts the program calls this through a far pointer,
    with DS anywhere. */
 void __far __loadds SetBrk(void)
 {
@@ -1210,19 +1211,20 @@ static void Exec(void)
 }
 
 /*--------------------- The outermost loop ---------------------
-   The part that goes is called far, in the segment RunPar, and comes
-   back when it has something for this part to do: a number in AX, the
-   low word. With no memory for the main data it has in DX, the high
-   word, the paragraphs that DOS had, as Init11 of start.c returns them
-   and its stub leaves them: what the assembly has in BX there. It
-   leaves no register as it was but SS and SP, and DS is put back by
-   where it comes back through (Exec, AlocEr and Exit00 in RHEAD of
-   port/asm/VC.ASM). So nothing here may be kept in a register or on the
-   stack across the call, BP among them, which the compiler takes to be
-   kept whatever is said: where to call is in memory, TrnAdr, and Stay
-   and Stay11 have no variables. */
-typedef u32 __far Transit(void);
-#pragma aux Transit value [dx ax] modify exact [ax bx cx dx si di es]
+   The part that goes is called far, at the address that it has in
+   Trans_T, with something that is not 0 when the program has just been
+   loaded, and comes back when it has something for this part to do: a
+   number in AX, the low word. With no memory for the main data it has
+   in DX, the high word, the paragraphs that DOS had, as Init11 of
+   start.c returns them: what the assembly has in BX there. It is a
+   function of C, TrnMain of main.c, which has DS elsewhere meanwhile
+   and puts it back. Where to call is kept in memory, TrnAdr, and Stay
+   and Stay11 have no variables: that was needed while the part came
+   back through the assembly, with no register as it was, BP among them,
+   which the compiler takes to be kept whatever is said. */
+typedef u32 __far Transit(u16 first);
+#pragma aux Transit parm [ax] value [dx ax] \
+                    modify exact [ax bx cx dx si di es]
 
 #define TO_EXEC  0x100                  /* run the commands of DosBuf */
 #define TO_ALLOC 0x200                  /* there is no memory for the main
@@ -1243,23 +1245,23 @@ static void Go(u32 back)
         Exit00(what);
 }
 
-/* Call the part that goes, at Init11, where it sets itself up after a
-   command, and do what it comes back with: for ever. */
+/* Call the part that goes, where it sets itself up after a command,
+   Init11 of the original, and do what it comes back with: for ever. */
 static void Stay11(void)
 {
     for (;;) {
-        TrnAdr = (Transit *)AT(RunPar, OFFSET(Init11));
-        Go(TrnAdr());
+        TrnAdr = *(Transit * __far *)AT(RunPar, OFFSET(Trans_T));
+        Go(TrnAdr(0));
     }
 }
 #pragma aux Stay11 aborts
 
-/* The same from the start of the program, where that part is entered at
-   Init00 and reads the setup first. */
+/* The same from the start of the program, where that part reads the
+   setup first: Init00 of the original. */
 static void Stay(void)
 {
-    TrnAdr = (Transit *)AT(RunPar, OFFSET(Init00));
-    Go(TrnAdr());
+    TrnAdr = *(Transit * __far *)AT(RunPar, OFFSET(Trans_T));
+    Go(TrnAdr(1));
     Stay11();
 }
 

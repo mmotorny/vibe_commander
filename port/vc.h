@@ -1,9 +1,10 @@
 /*
- * Volkov Commander in C: what the translated parts share.
+ * Volkov Commander in C: what its parts share.
  *
- * The program is being translated from assembly a few routines at a time,
- * and both halves run as one program. The C code therefore lives in the
- * world the assembly built, which is not the one a C compiler assumes:
+ * The program was translated from assembly a few routines at a time, with
+ * both halves running as one program all the while. So the C code lives
+ * in the world the assembly built, which is not the one a C compiler
+ * assumes:
  *
  *   - DS points at the main data segment, a block that the program
  *     allocates when it starts. It holds one struct MainDat and nothing
@@ -18,7 +19,8 @@
  *   - Each file panel has a segment to itself, reached by far pointers.
  *
  * Routines keep the names they have in the assembly source, and data keeps
- * its layout: the structures below mirror those of port/asm/VC.ASM.
+ * its layout: the structures below mirror those of port/asm/VC.ASM, which
+ * holds no code and no data any more.
  */
 #ifndef VC_H
 #define VC_H
@@ -410,6 +412,34 @@ u16 ErrRdy(u16 letter);
 #pragma aux HookVct "*_c" __far value [ax] modify exact [ax]
 #pragma aux Quit    "*_c" __far modify exact [ax]
 #pragma aux ErrRdy  "*_c" __far parm [ax] value [ax] modify exact [ax]
+/* The start of the program, start.c. Init00 reads the setup, when the
+   program has been loaded, and Init11 asks DOS for the main data, when it
+   has, and after every command: `stays` is the segment of the part of
+   the program that stays in the memory while a command runs, and `block`
+   that of the block of memory that the rest is in. Init11 returns the
+   segment of the main data, or 0 if there is too little memory, and then
+   in the high word how many paragraphs there were. Neither has DS on the
+   main data. IniData, which has, makes the main data of what that part
+   has kept, and finds out about the machine. TrnMain of main.c is what
+   the part that stays calls, with something that is not 0 when the
+   program has just been loaded: it calls these and the main loop, and
+   returns what that part is to do, in the low word: 100h to run the
+   commands of DosBuf, 200h to say that there is no memory and leave,
+   with the paragraphs in the high word, and less to leave, with that
+   for DOS. See Go of resident.c. */
+void Init00(u16 stays);
+u32 Init11(u16 stays, u16 block);
+void IniData(void);
+u32 TrnMain(u16 first);
+#pragma aux Init00  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux Init11  "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
+#pragma aux IniData "*_c" __far modify exact [ax]
+#pragma aux TrnMain "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+/* Read what a panel shows, keeping the cursor of a list of files and
+   what is selected in it if `keep` is not 0: not 0 if it could not be
+   read. See read.c. */
+u16 ReDir(u16 panel, u16 keep);
+#pragma aux ReDir   "*_c" __far parm [dx] [ax] value [ax] modify exact [ax]
 /* The setup file: see each in setup.c. MakeIni writes into MenuBuf what
    the file holds, and returns how long that is. SaveSet writes it to the
    file: 1 in the high word if it could not, with what DOS answered in
@@ -484,8 +514,8 @@ struct Saved {
     u16 gs, fs, es, ds, di, si, bp, sp, bx, dx, cx, ax;
 };
 
-/* A line as the assembly hands it over: the registers that describe it,
-   pushed in this order by CallLine in port/asm/VC.ASM. */
+/* A line as the original hands it over: the registers that describe
+   it. */
 struct LineArgs {
     u16 value;                          /* AX or BX: see each routine */
     u16 *screen;                        /* DI: where in the screen buffer */
@@ -494,8 +524,8 @@ struct LineArgs {
     const u8 __far *include;            /* CS:DX */
 };
 
-/* What AdrNum hands back, in the order in which its stub takes it off the
-   stack. */
+/* What AdrNum hands back: the original has these in SI, DI, DX and
+   AX. */
 struct Place {
     u16 cursor;                         /* the number of the cursor's entry */
     u16 first;                          /* of the first one shown */
@@ -508,9 +538,8 @@ struct Place {
 #define NUM_SEPARATED 1                 /* put the country's separator in */
 #define NUM_PADDED    2                 /* fill with spaces up to full width */
 
-/* Routines that are C, for C code in other files than theirs to call.
-   The assembly calls them too, by these conventions (see the stubs in
-   port/asm). */
+/* Routines for C code in other files than theirs to call. The registers
+   of each are those that the assembly called it with, while it did. */
 u16 Color(u16 number);                  /* screen.c */
 u16 *BasAdr(u16 place);
 u16 __far *MvsColr(u16 __far *screen, u16 count, u16 color);
@@ -573,8 +602,8 @@ void CorPar(u16 panel);
 #pragma aux CorPar  "*_c" __far parm [ax] modify exact [ax]
 u8 *PtPt10(u16 panel);                                  /* panel.c */
 #pragma aux PtPt10  "*_c" __far parm [ax] value [di] modify exact [ax di]
-/* The colours of the tree are four numbers in the code, of the assembly's
-   or of the C's: the stub has ES on its own segment for them. */
+/* The colours of the tree are four numbers in the code, which come as a
+   far pointer. */
 void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors);
 #pragma aux PutTree "*_c" __far parm [ax] [bx] [dx] [es si] modify exact [ax es]  /* tree.c */
 void PutInf(u16 panel);                                 /* info.c */
@@ -1225,7 +1254,18 @@ void LeaveTm(void);
 #pragma aux Blank   "*_c" __far modify exact [ax]
 #pragma aux LeaveTm "*_c" __far modify exact [ax]
 /* Small ones: see each in misc.c. PgUp and PgDn return the cursor in the
-   low word and the first line shown in the high one. */
+   low word and the first line shown in the high one. AsmSeg is the
+   segment of the program's constants, the texts and tables of the files
+   whose names end in _t, where what is known by its offset is read;
+   ResSeg that of the part of the program that stays in the memory while
+   a command runs, where the stack is; and MemRun that of the part that
+   goes then, which this code is of. None of the three needs DS. */
+u16 AsmSeg(void);
+u16 ResSeg(void);
+u16 MemRun(void);
+#pragma aux AsmSeg  "*_c" __far value [ax] modify exact [ax]
+#pragma aux ResSeg  "*_c" __far value [ax] modify exact [ax]
+#pragma aux MemRun  "*_c" __far value [ax] modify exact [ax]
 u16 IsCrLf(u16 word);
 u16 InvVar(u8 __far *variable);
 u16 ChkSum(const u8 *data, u16 length);

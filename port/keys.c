@@ -52,9 +52,8 @@ u16 StrLen(const u8 __far *text);                       /* string.c */
 #pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux StrLen  "*_c" __far parm [es di] value [cx] modify exact [cx]
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    HidCur puts the cursor below the screen and Cursor1 on the command line;
    Int10m calls the BIOS with the mouse cursor off, and hands back what
@@ -103,8 +102,8 @@ extern const u8 __far Inv_S[];          /* "Invert" */
 #define ERR_PATH  3                     /* its error: there is no such */
 
 /* What a panel shows, written to the screen buffer: PutFls of the
-   assembly, whose stub there chooses between these three by the kind of
-   the panel. */
+   original, which goes on in what writes the tree or the Info for a
+   panel of that kind. */
 static void PtFs00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);

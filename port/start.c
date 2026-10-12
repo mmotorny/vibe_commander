@@ -18,26 +18,18 @@
  * IniData, a name that the assembly does not have, is the rest, as far
  * as the main loop (see main.c).
  *
- * The three labels are stubs in port/asm/VC.ASM for as long as the part
- * that stays is assembly: it jumps to them.
+ * TrnMain of main.c calls the three, with the segment of that part, and
+ * puts DS on the main data when Init11 has returned its segment.
  */
 #include "vc.h"
 
-void Init00(u16 stays);
-u32 Init11(u16 stays, u16 block);
-void IniData(void);
-#pragma aux Init00  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux Init11  "*_c" __far parm [ax] [dx] value [dx ax] \
-                    modify exact [ax dx]
-#pragma aux IniData "*_c" __far modify exact [ax]
+/* Init00, Init11 and IniData are declared in vc.h: TrnMain of main.c
+   calls them. */
 
-/* AsmSeg returns the code segment of the assembly, and ResSeg the
-   segment of the part of the program that stays in the memory while a
-   command runs: its PSP is there, and its stack. */
-u16 AsmSeg(void);
-u16 ResSeg(void);
-#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux ResSeg  "*_a" __far value [ax] modify exact [ax]
+/* AsmSeg, of vc.h, returns the segment of the program's constants, and
+   ResSeg the segment of the part of the program that stays in the memory
+   while a command runs: its PSP is there, and its stack. Neither needs
+   DS. */
 
 /* What this reads, writes or names of other files. In the group of the
    constants: the names of the setup file and of the main extension file,

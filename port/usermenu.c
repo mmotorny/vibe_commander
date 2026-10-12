@@ -34,9 +34,8 @@ u16 Run_00(u16 text, u16 view);
 #pragma aux F32_70 "*_c" __far parm [bx] [dx] value [ax] modify exact [ax]
 #pragma aux Run_00 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    HidCur puts the cursor below the screen and Cursor1 at its place in the
    command line. SavWin keeps what the screen buffer has where a window is

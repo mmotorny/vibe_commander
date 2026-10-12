@@ -9,10 +9,10 @@
 
 ;-------------- The two parts of the program -----------
 ; The program is in two parts. One stays in the memory while a command
-; runs: it begins with the PSP, and is C but for a few stubs,
-; port/resident.c. What is here of it is the order of its segments,
-; which the linker takes from the first object file: RHEAD is what of it
-; is still assembly, RTEXT its compiled code, the four that follow are
+; runs: it begins with the PSP, and is C, port/resident.c. What is here
+; of it is the order of its segments, which the linker takes from the
+; first object file: RHEAD is the room of the PSP, which the file has as
+; nothing, RTEXT its compiled code, the four that follow are
 ; those that the compiler makes for its data, of which the last, R_BSS,
 ; is the stack, and RGAP is the paragraph in which DOS keeps the header
 ; of the block of memory that follows. The other part, which goes while
@@ -20,8 +20,7 @@
 ; follows. It begins with the constants of the C code, CONST2, and not
 ; with code: the machine of the tests is many times slower at every
 ; write to a page of the memory that has code which it has run, and the
-; stack ends just in front. The tables here, _DATA, are of the same
-; class and stand there too. The segments are declared before the model
+; stack ends just in front. The segments are declared before the model
 ; so that the linker puts them first.
 ;
 ; Every offset counts from the PSP, here and in the data of the part
@@ -57,53 +56,12 @@ CONST2	ENDS
 DGROUP	GROUP	RHEAD, RTEXT, RGAP, CONST, CONST2
 R_GROUP	GROUP	RPSP
 
-;------------------- Routines written in C -------------
-; They are compiled into code segments of their own, which follow this
-; one. C code expects DS to point at the main data segment and may change
-; ES. What is called from here is the main loop, which calls everything
-; else, the start of the program, and what a panel is read by.
-	EXTERN	MainLoop_c:FAR, Exit_c:FAR
-	EXTERN	Init00_c:FAR, Init11_c:FAR, IniData_c:FAR
-	EXTERN	ReadTre_c:FAR
-	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
-; The compiled code of the part that stays in the memory, port/resident.c:
-; the interrupt handlers, which the code that starts the program names,
-; and what the assembly of that part calls, near and in its own group.
-	EXTERN	New21:FAR, New27:FAR, CtrlC:FAR, SetBrk:FAR, Exit01:FAR
-	EXTERN	Release_r:NEAR
-
-; The data of that part is of port/resident.c too. What the assembly
-; reads of it: the segment that the part that goes runs in, and where
-; that part begins in the file, in paragraphs from the PSP.
-	EXTERN	RunPar:WORD, TrnPrW:WORD
-; Where port/resident.c enters the part that goes.
-	PUBLIC	Init00, Init11
-
-; Call a routine written in C from where ES points at the main data
-; segment and DS may not.
-CallC	MACRO	Name
-	PUSH	DS
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR Name
-	POP	DS
-	ENDM
-
-; Enter the main loop, which is C, at the place Entry: see MainGo. The
-; registers go on the stack as struct Regs of port/main.c has them.
-MainC	MACRO	Entry
-	PUSH	AX			; Room for where the program goes on
-	PUSH	DS
-	PUSH	BP
-	PUSH	DI
-	PUSH	SI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	AX,Entry
-	JMP	MainGo
-	ENDM
+;------------------- What is left here -------------------
+; All the code of the program is C, port/*.c, and so are its data, its
+; texts and its tables. What is left here is the order of the segments,
+; above, the name that C code has for the main data, and the main data
+; and a panel laid out, which nothing here uses any more: the C code has
+; structures of its own for them, in port/vc.h.
 
 RHEAD	SEGMENT
 	PUBLIC	_md
@@ -112,61 +70,21 @@ _md	LABEL	BYTE			; The main data segment, to C code:
 	ORG	100h			; Behind the PSP
 RHEAD	ENDS
 
-; Where the part that goes begins is not known before the program is
-; linked, since compiled code stands between the PSP and TrnBeg:
-; tools/mkexe.c writes it into a word of the part that stays, TrnPrW of
-; port/resident.c, which is read where SS is on that part: everywhere
-; but in the interrupt handlers. The program is entered at Alloc0 there,
-; which the linker is told and tools/mkexe.c writes into the header of
-; the file.
-TrnPar	EQU	<WORD PTR SS:TrnPrW>
-
-PrgName	EQU	'Volkov Commander'
-HelpVer	EQU	'VC 4.05 Help'
-VcVers	EQU	<'4.05'>
-VcApiVr	EQU	42
-
-MoDelay	EQU	40			; Mouse double click delay
 LenPath	EQU	68			; Length of path name
 LenColr	EQU	40			; Length of color table
 LenHist	EQU	512			; Length of hisory buffer
 LenExt	EQU	512			; Length of extension file buffer
 LenMenu	EQU	4000			; Length of menu buffer
 LenStr	EQU	64			; Length of path & file string
-LenCmd	EQU	124			; Length of command line
 LenBat	EQU	1000			; Length of full command line
 LenHelp	EQU	3000			; Maximal length of help page
 MinFls	EQU	256			; Minimum files in window
 MinTree	EQU	768			; Minimum tree size
-MinView	EQU	8000			; Minimum view buffer size
 MaxLins	EQU	50			; Maximum screen lines
 MaxProg	EQU	18			; Maximal resident quantaty
 NmbStrs	EQU	32			; Number of stars
 
 ;------------------ Global structures ------------------
-TYPES	UNION
-  Byt	DB	?			; Byte definition
-  Wrd	DW	?			; Word definition
-TYPES	ENDS
-
-; Far address structure definition.
-FARAD	STRUC
-  Offs	DW	?			; Offset
-  Segm	DW	?			; Segment
-FARAD	ENDS
-
-; Long type structure definition.
-LONG	STRUC
-  Lo	DW	?			; Low word
-  Hi	DW	?			; High word
-LONG	ENDS
-
-; Coordinates structure definition.
-COORD	STRUC
-  X	DB	?			; Column
-  Y	DB	?			; Row
-COORD	ENDS
-
 ; DTA structure definition.
 DTAs	STRUC
 	  DB	15h DUP(?)
@@ -228,30 +146,6 @@ DIRTREE	STRUC
   TreList  DB	   0 DUP(?)		; List of subdirectories
   TreSum2  DW	   ?			; Check sum of the list
 DIRTREE	ENDS
-
-; The dialog box header structure definition.
-BOXHD	STRUC
-  pDiBox  DW	?			; Pointer to DialBox structure
-  BoxBase DW	?			; The dialog box begin-center
-  SubFunc DW	?			; Subfunction
-  bKeyBar DB	?			; KeyBar
-  bMenu   DB	0FFh			; PutMnu
-  bHelp   DB	0			; HlpPage
-  bFlags  DB	0			; Flags
-BOXHD	ENDS
-
-; The dialog box header structure definition.
-BOXMN	STRUC
-  mType	  DB	?			; Menu type
-  mUp	  DB	0			; Up link
-  mDown	  DB	0			; Down link
-  mLeft	  DB	0			; Left link
-  mRight  DB	0			; Right link
-  mBase	  DW	?			; Menu base
-  mPoint  DW	?
-  mCtrl	  DW	?
-BOXMN	ENDS
-mSelTot	=	BYTE PTR mCtrl
 
 ; The star structure definition.
 STAR	STRUC
@@ -427,54 +321,9 @@ DskBuf	DB	MinFls * SIZE FilEnt DUP(?)
 WCBdef	ENDS
 
 ;------------------- Begin of program ------------------
-RHEAD	SEGMENT
-
-;------------------- Execute commands ------------------
-LoadSiz	EQU	WORD PTR DosBuf+0
-
-; C: port/resident.c. The part that stays has the outermost loop of the
-; program there, Stay, which calls the part that goes, far: at Init00
-; when the program starts and at Init11 after every command. That part
-; comes back by a far jump to one of the three labels here, as it always
-; has, with the stack as it was when it was called: so a far return from
-; here goes back into Stay, with what to do in AX. They go when what
-; jumps here returns by itself.
-Exec:	PUSH	CS			; Run the commands of DosBuf
-	POP	DS
-	MOV	AX,100h
-	RETF
-AlocEr:	PUSH	CS			; No memory for the main data
-	POP	DS
-	MOV	AX,200h
-	RETF
-Exit00:	PUSH	CS			; Leave, with AL for DOS
-	POP	DS
-	MOV	AH,0
-	RETF
-
-;-------- Programs that stay in the memory, and DOS's memory --------
-; C: port/resident.c, which has the interrupt handlers New21 and New27,
-; CtrlC, what they keep of the programs that have stayed in the memory,
-; and Release, which the map of the memory still calls, through CallPSP:
-; near, in RTEXT, with DS on this segment.
-;			   DS - PrgSeg
-Release	PROC	NEAR
-	PUSH	DS
-	PUSH	AX
-	MOV	AX,DS
-	PUSH	CS
-	POP	DS
-	CALL	Release_r
-	POP	AX
-	POP	DS
-	RETF
-Release	ENDP
-
-RHEAD	ENDS
-
-;---------- Release data, Data save segment ------------
-; C: port/resident.c, with struct Stays of port/vc.h. The stack is there
-; too, DataSav, the end of the part that stays.
+; C: port/resident.c, the part of the program that stays in the memory
+; while a command runs, with its data, struct Stays of port/vc.h, and
+; the stack, DataSav, at its end.
 
 RGAP	SEGMENT
 	DB	16	DUP(?)		; The header of the transit part's block
@@ -483,192 +332,6 @@ RGAP	ENDS
 ;-------------------------- Data -----------------------
 ; The texts, the boxes, the dialogs and the tables of the program are C:
 ; the files of constants, port/*_t.c.
-	.DATA
-Back_C	EQU	0
-Cursr_C	EQU	1
-Slct_C	EQU	2
-CurSl_C	EQU	3
-Title_C	EQU	4
-KeyNu_C	EQU	5
-KeyTi_C	EQU	6
-Menu_C	EQU	7
-MnCur_C	EQU	8
-MnuBx_C	EQU	9
-MnuTx_C	EQU	10
-MnuBr_C	EQU	11
-MnuCu_C	EQU	12
-MnuCB_C	EQU	13
-MnuDr_C	EQU	14
-MnuMi_C	EQU	15
-Box_C	EQU	16
-BoxBr_C	EQU	17
-BoxCu_C	EQU	18
-Conf_C	EQU	19
-CnfRe_C	EQU	20
-CnfBo_C	EQU	21
-CnfUn_C	EQU	22
-Hist_C	EQU	23
-HstCu_C	EQU	24
-HlBrd_C	EQU	25
-HlpMn_C	EQU	26
-Help_C	EQU	27
-HlpBo_C	EQU	28
-HlpRe_C	EQU	29
-HlpUn_C	EQU	30
-Err_C	EQU	31
-ErInv_C	EQU	32
-ErBr_C	EQU	33
-Clock_C	EQU	34
-Arrow_C	EQU	35
-Sky1_C	EQU	36
-Sky2_C	EQU	37
-ShadFl	EQU	38
-
-;--------------------- Main module ---------------------
-	.CODE
-
-;------------------ Read configuration -----------------
-; C: Init00_c, Init11_c and IniData_c of port/start.c. The part of the
-; program that stays in the memory calls here, far, and is come back to
-; by a far jump to one of three labels of its own (see Exec in RHEAD): at
-; Init00 when the program has been started, at Init11 when a command has
-; run. It has relocated this part by then: Reloc of port/resident.c.
-; CmdIni of VCFUNC.INC jumps to Init11. The stack is in that part every
-; time,
-; and its segment is what the C is told of it. Until Init11 has asked DOS
-; for the main data there is none: the C does without DS up to there.
-Init00:	CLD
-	MOV	AX,SS
-	CALL	FAR PTR Init00_c
-
-;------------ Allocate Secondary Data Segment ----------
-; The block of the memory that this code is in goes to the C in DX. What
-; comes back is the segment of the main data, or 0 if there is too
-; little memory: the part that stays says so and ends the program.
-; DX is then how many paragraphs there were, and goes back to that
-; part as it is, through AlocEr there: the original has them in BX
-; when it says so, where the BIOS takes a page.
-Init11:	CLD
-	MOV	AX,SS
-	MOV	DX,CS
-	ADD	DX,TrnPar
-	CALL	FAR PTR Init11_c
-	OR	AX,AX
-	JNZ	IniOk
-	MOV	AX,OFFSET AlocEr
-	PUSH	SS
-	PUSH	AX
-	RETF
-IniOk:	MOV	DS,AX
-	CALL	FAR PTR IniData_c
-	PUSH	DS
-	POP	ES
-
-;----------------------- Set cursor --------------------
-; From here on the program is C: MainLoop_c of port/main.c, the main
-; loop, which calls every command. The code above falls into it. The
-; function gets the number of the place where the loop is entered, 0 for
-; its start, and room on the stack for the registers that go round it
-; (struct Regs of port/vc.h): MainC, at the top of this file, pushes them.
-; It returns when the program goes on outside it, with the place in AX, a
-; number of Main_T.
-Init40:	MainC	0
-
-MainGo:	MOV	BX,SP
-	PUSH	ES
-	POP	DS
-	CLD
-	CALL	FAR PTR MainLoop_c
-	PUSH	DS
-	POP	ES
-	MOV	BX,AX
-	ADD	BX,BX
-	MOV	AX,CS:Main_T[BX]
-	MOV	BX,SP
-	MOV	SS:[BX+16],AX
-	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	SI
-	POP	DI
-	POP	BP
-	POP	DS
-	RET				; To the place of Main_T
-
-; Where the program goes on when the loop returns: it starts over, has a
-; command run first, or leaves. port/main.c has these as ASM_.
-	.DATA
-Main_T	DW	CmdIni, CmdExe, Exit
-
-	.CODE
-; An entry for the C code of the loop (see port/main.c for what it takes
-; and returns). Read what a panel shows: ReDir, with the panel in DX and
-; in AL whether to keep the cursor and the marks. AX is not 0 if it set
-; the carry flag.
-	PUBLIC	ReDir_a
-ReDir_a	PROC	FAR
-	PUSH	DS
-	PUSH	DS
-	POP	ES
-	MOV	DS,DX
-	CALL	ReDir
-	SBB	AX,AX
-	POP	DS
-	RET
-ReDir_a	ENDP
-
-	INCLUDE	VCMEM.INC
-
-;------------------- Start over, or run -----------------
-; Enter does not come back when it runs something: F21_30_c of
-; port/enter.c has saved what the program needs in the part that stays in
-; the memory, and given the main data back to DOS. That part runs the
-; commands: Exec there, which gets in ES the block of the memory that the
-; rest of the program is in, to give it back to DOS as well. With nothing
-; to run the program starts over at once.
-CmdExe:	PUSH	SS
-	POP	DS
-	MOV	AX,CS
-	ADD	AX,TrnPar
-	MOV	ES,AX
-	MOV	AX,OFFSET Exec
-	PUSH	DS
-	PUSH	AX
-	RETF
-CmdIni:	PUSH	SS
-	PUSH	SS
-	POP	DS
-	POP	ES
-	JMP	Init11
-
-;------------------------ Exit -------------------------
-; C: Exit_c of port/main.c puts the screen back. The part of the program
-; that stays in the memory ends it.
-Exit:	CallC	Exit_c
-	MOV	AX,OFFSET Exit00
-	PUSH	SS
-	PUSH	AX
-	MOV	AL,0
-	RETF
-
-;--------------------- Fatal error ---------------------
-; C: FatErr of port/main.c, an interrupt function of the compiler's. Its
-; texts and its boxes are C too, port/main_t.c, and so is SecDat, where
-; it finds the main data.
-
-;-------------------- Not ready error ------------------
-;			   AL - Drive letter
-;	Return:		   AL - Drive letter
-; C: ErrRdy_c of port/main.c, which only C code calls, with its box in
-; port/main_t.c.
-
-	INCLUDE	VCSUB1.INC
-	INCLUDE	VCSUB3.INC
-
-	.CONST
-	ASSUME	CS:DGROUP
-Last:
 
 	END
 

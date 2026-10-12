@@ -68,21 +68,20 @@ LAID_OUT(MemLine, 7 + 12 + 1 + MaxVect);
 
 /* F65_00 is declared in vc.h: see "The commands" there. */
 
-/* Routines that are still assembly, by their entries for C. The routines
-   of the screen, the mouse and the keyboard that this file calls are C,
-   of vc.h, and so is Int21d, by which DOS is asked for the map without
-   Intr21, as in the original: see Dos5802 to Dos2523 below.
+/* The routines of the screen, the mouse and the keyboard that this file
+   calls are C, of vc.h, and so is Int21d, by which DOS is asked for the
+   map without Intr21, as in the original: see Dos5802 to Dos2523 below.
 
    MemRun returns the segment of the part of the program that goes while
    a command runs, and ResSeg that of the part that stays, where Counter,
-   PrgList and Command are. Release releases a program that has stayed in
-   the memory: `program` is what PrgList has of it. */
-u16 MemRun(void);
-u16 ResSeg(void);
-void Release(u16 program);
-#pragma aux MemRun  "*_a" __far value [ax] modify exact [ax]
-#pragma aux ResSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux Release "*_a" __far parm [ax] modify exact [ax es]
+   PrgList and Command are: both of vc.h. Release, of that part
+   (resident.c), releases a program that has stayed in the memory:
+   `record` is what PrgList has of it. It is called far, at its offset in
+   that part's segment, and loads its own DS. */
+typedef void __far ReleaseFn(u16 record);
+#pragma aux ReleaseFn parm [ax] modify exact [ax]
+extern const u8 __far Release[];
+#pragma aux Release "*"
 
 /* C routines of other files that vc.h does not have. MvsBw writes `count`
    characters to the screen buffer in the colour in the high byte of
@@ -883,7 +882,7 @@ F65_74:
                     break;
                 }
         if (release)
-            Release(program);
+            ((ReleaseFn *)((u32)ResSeg() << 16 | OFFSET(Release)))(program);
         else
             for (i = 0; i < n; i++)
                 ((u8 *)md.ErrBuf)[*AT(program, PRG_VECTOR(i))] = 1;

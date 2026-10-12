@@ -89,9 +89,8 @@
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    HidCur puts the cursor below the screen, Cursor at a row and a column,
    the row in the high byte. ChgCur gives the cursor the shape it has in
@@ -106,11 +105,11 @@
    TypMous gives the mouse pointer the look of a character, or its own for
    0. InWind is not 0 if a place is outside a window.
 
-   AsmSeg returns the code segment of the assembly, where the boxes and
-   the dialogs are. Naming something of the assembly would give it too,
-   as a number that is set when the program is loaded; the test of the
-   port knows code by its bytes in the file and would not see a function
-   run that begins with such a number.
+   AsmSeg returns the segment of the program's constants, where the boxes
+   and the dialogs are. Naming one of them would give it too, as a number
+   that is set when the program is loaded; the test of the port knows
+   code by its bytes in the file and would not see a function run that
+   begins with such a number.
 
    The routines that a dialog may name for Enter and F10, the SUB_ of
    tables.h, get the answer as Dialog has it, the key. F38_10 returns the
@@ -118,11 +117,9 @@
    is not 0 to go on with the dialog. F35_61 gets the place of the line
    that the tree is for as well, and is not 0 to go on with the dialog;
    the answer stays what it was. */
-u16 AsmSeg(void);
 u16 F38_10(u16 answer);                                 /* dirfunc.c */
 u32 M30_60(u16 answer);
 u16 F35_61(u16 answer, u16 place);                      /* copy.c */
-#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
 #pragma aux F38_10  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux M30_60  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux F35_61  "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]

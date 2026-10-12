@@ -13,22 +13,22 @@
  * panels: what was selected in it and where the cursor was is looked up
  * in the new one by name.
  *
- * Which of the three kinds a panel is of is chosen by the stub of ReDir,
- * in the assembly: it calls RdInfo for the Info, for the tree ReadTre,
- * which is still assembly, and for files ReDir, ReDr45 and ReDr50 here, one
- * after the other. The stub also makes the carry flag that ReDir answers
- * in, of ChgFlg: 0 there says that what the panel shows has been read.
+ * ReDir chooses by which of the three kinds a panel is of: RdInfo for
+ * the Info, for the tree ReadTre of treebox.c, and for files ReDr00,
+ * ReDr45 and ReDr50 here, one after the other. It answers by ChgFlg: 0
+ * there says that what the panel shows has been read.
  *
- * ReDir is three functions for the sake of the stack. Filtering the list
- * is the deepest that most of what the program does ever gets, by way of
- * the capital letters of a mask, which DOS makes on the stack of whoever
- * asks, in 62 bytes: so that is called with nothing of what reading the
- * directory needed left on the stack. For the same reason GetVol shares
- * the registers of RdInfo.
+ * Reading the files is three functions for the sake of the stack, from
+ * when that was 256 bytes. Filtering the list is the deepest that most
+ * of what the program does ever gets, by way of the capital letters of
+ * a mask, which DOS makes on the stack of whoever asks, in 62 bytes: so
+ * that is called with nothing of what reading the directory needed left
+ * on the stack. For the same reason GetVol shares the registers of
+ * RdInfo.
  */
 #include "vc.h"
 
-/* What ReDir keeps of the list that a panel had, for ReDr50: the stub has
+/* What ReDr00 keeps of the list that a panel had, for ReDr50: ReDir has
    it on the stack between the two. The list itself is at ViewSeg. */
 struct OldList {
     u16 keep;                           /* not 0: the cursor and what is
@@ -38,21 +38,20 @@ struct OldList {
     u16 first;                          /* and the first entry shown */
 };
 
-void ReDir(u16 panel, u16 keep, struct OldList STACK *old);
-void ReDr45(u16 panel);
-void ReDr50(u16 panel, struct OldList STACK *old);
-void RdInfo(u16 panel);
+static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old);
+static void ReDr45(u16 panel);
+static void ReDr50(u16 panel, struct OldList STACK *old);
+static void RdInfo(u16 panel);
+u16 ReadTre(void);                                      /* treebox.c */
 u32 GetVol(u8 *volume);
 void DirSize(u16 panel);
 u16 DiSi10(u16 attributes);
 void TstInfo(u16 panel);
 static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
 
-/* How the assembly passes arguments to these, and what it expects back. */
-#pragma aux ReDir   "*_c" __far parm [dx] [ax] [bx] modify exact [ax]
-#pragma aux ReDr45  "*_c" __far parm [dx] modify exact [ax]
-#pragma aux ReDr50  "*_c" __far parm [dx] [bx] modify exact [ax]
-#pragma aux RdInfo  "*_c" __far parm [ax] modify exact [ax]
+/* The registers of these are those that the assembly called them with,
+   while it did. ReDir is in vc.h. */
+#pragma aux ReadTre "*_c" __far value [ax] modify exact [ax]
 #pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux DirSize "*_c" __far parm [ax] modify exact [ax]
 #pragma aux DiSi10  "*_c" __far parm [ax] value [ax] modify exact [ax]
@@ -83,7 +82,8 @@ static const u8 CODE DrIn_F[] = "DIRINFO";
 /* The segment that a pointer into the main data is in. */
 #define SEGMENT(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))
 
-/* Read the directory of a panel of files, and its extension file. What
+/* Read the directory of a panel of files, and its extension file: ReDir
+   of the original from ReDr00 on. What
    the panel had before is left for ReDr50 at ViewSeg and in `old`, with
    `keep`, of which the low byte counts; that is made 0 if the directory
    was not there.
@@ -108,7 +108,7 @@ static const u8 CODE DrIn_F[] = "DIRINFO";
    lies where the fourth character of the path lies in a panel, which is
    the 24th colour of the first palette: the assembly has DS on the main
    data there. */
-void ReDir(u16 panel, u16 keep, struct OldList STACK *old)
+static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct DosRegs regs;
@@ -331,7 +331,7 @@ done:
 /* When the directory has been read: work out the sizes of the
    directories, if that is switched on and the directory was read, and
    filter and sort the list. */
-void ReDr45(u16 panel)
+static void ReDr45(u16 panel)
 {
     PANEL(panel)->SizDir = 0;
     if (PANEL(panel)->ChgFlg == 0 && md.AutoSiz != 0)
@@ -347,7 +347,7 @@ void ReDr45(u16 panel)
    on, or on the nearest that are left, and what was selected stays
    selected. Without, only what Ctrl-M would select again is taken over,
    and by name alone: a file of that name in another directory gets it. */
-void ReDr50(u16 panel, struct OldList STACK *old)
+static void ReDr50(u16 panel, struct OldList STACK *old)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     u8 __far *to;
@@ -423,7 +423,7 @@ void ReDr50(u16 panel, struct OldList STACK *old)
    set, and what is in AX then counts as the error of a drive that is not
    ready if it is 53h: what DOS left in AH, and the eleventh character of
    the label. */
-void RdInfo(u16 panel)
+static void RdInfo(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct DosRegs regs;
@@ -472,6 +472,29 @@ void RdInfo(u16 panel)
     wcb->ChgFlg = 0;
 }
 
+/* Read what a panel shows: the files of its directory, the tree of the
+   disk or what the Info says, by the kind of the panel. With `keep` the
+   cursor of a list of files and what is selected in it stay where they
+   are. Returns 0 if it has been read, and else something that is not 0:
+   the original answers in the carry flag, which it makes of ChgFlg. */
+u16 ReDir(u16 panel, u16 keep)
+{
+    struct WCBdef __far *wcb = PANEL(panel);
+    struct OldList old;
+
+    wcb->ChgFlg = 1;
+    if (wcb->WinTyp == 0) {
+        ReDr00(panel, keep, (struct OldList STACK *)&old);
+        ReDr45(panel);
+        ReDr50(panel, (struct OldList STACK *)&old);
+    } else if (wcb->WinTyp == 1) {      /* ReDr01: the tree */
+        if (!ReadTre())
+            wcb->ChgFlg = 0;
+    } else                              /* ReDr02: the Info */
+        RdInfo(panel);
+    return wcb->ChgFlg;                 /* ReDr70 */
+}
+
 /* Get the label of the current drive, as a text of at most 11 characters
    at `volume` in the main data: for a drive of a network the name it is
    shared by, which follows the name of the server in what DOS makes of a
@@ -479,8 +502,8 @@ void RdInfo(u16 panel)
    is a label, without the full stop and the spaces of a file name. An
    empty text if there is none.
 
-   Returns in the high word whether the carry flag is set, which the stub
-   makes of it, and in the low one AX. The flag is clear for a drive of a
+   Returns in the high word whether the original has the carry flag set,
+   and in the low one AX. The flag is clear for a drive of a
    network, and set for any other, with a label or without. AX is the
    error of DOS where it could not say what the drive is or found no
    label; for a label it is what DOS left in AH with the last of the 11

@@ -67,8 +67,8 @@ LAID_OUT(ViewDat, 43);
 #define Arrow_C 35                      /* the colour of the arrows at the
                                            ends of a line that goes on */
 
-/* A place in the text, and the entry of the table of lines for it. The
-   stubs of NextLin and PrevLin push BX and SI to make one. */
+/* A place in the text, and the entry of the table of lines for it: what
+   the original has in SI and BX for NextLin and PrevLin. */
 struct Line {
     u16 at;                             /* SI */
     u16 entry;                          /* BX */
@@ -111,9 +111,8 @@ u32 V82_00(u16 segment, u16 at, u16 count);
 #pragma aux V81_00  "*_c" __far modify exact [ax]
 #pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    ClrKbd empties the keyboard buffer if the setup has it so; the bars and
    the key that is waited for are C, in vc.h. GetMous returns the buttons
@@ -121,10 +120,8 @@ u32 V82_00(u16 segment, u16 at, u16 count);
    `place` as it was if there is no mouse. InWind is not 0 if a place is
    outside a window. ChgDisk asks for the disk of a drive that shares the
    floppy drive with another, and is not 0 if the user would not change it.
-   ResWin puts back what a box covers. AsmSeg returns the code segment of
-   the assembly, where the boxes and texts are. */
-u16 AsmSeg(void);
-#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
+   ResWin puts back what a box covers. AsmSeg returns the segment of the
+   program's constants, where the boxes and texts are. */
 
 /* C routines of other files that vc.h does not have: a panel's frame,
    the path over it and what it lists, as files or as the tree; characters
@@ -1412,8 +1409,8 @@ void V13_00(void)
     V13_01(0);
 }
 
-/* What the stub of PutFls does: a panel shows files, the tree or the
-   Info. */
+/* What PutFls of the original does: a panel shows files, the tree or
+   the Info. */
 static void Files(u16 panel)
 {
     if (PANEL(panel)->WinTyp == 0)

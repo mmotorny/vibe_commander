@@ -56,9 +56,10 @@ The planned stages:
    put modern operating systems under it next to DOS.
 
 Where it stands: the first stage is done. Outside the reserved room, both
-programs come out identical to the originals. The second stage has begun:
-the program builds as `VC.EXE` from assembly and C together, and the first
-routines run as C: those that write numbers, sizes, dates and times, those
+programs come out identical to the originals. The second stage is nearly
+done: the program builds as `VC.EXE`, and every routine of it runs as
+C. In the order in which they were translated: those that write
+numbers, sizes, dates and times, those
 that write lines of text with their markup, those that copy, trim and
 shorten texts, paths and file names, those that look up colours and put
 characters and colours into the copy of the screen that the program draws
@@ -169,11 +170,9 @@ the keys that wait, the bell, capitals, every call of DOS with the error
 that it may end in, opening a file, asking DOS for the current directory,
 and asking the user for the disk of a drive that shares the floppy drive
 with another. Saving the setup is C, and so is the jump from a key to its
-command, which was a table in the assembly. Of the three files of shared
-routines one is gone, and nothing is left of the others but what passes
-the rest of the assembly on to the C: the names of the menus in the
-menu bar are constants of C, in `port/bars_t.c`, and the names of the
-files that the program reads and the dialog that asks for a disk in
+command, which was a table in the assembly. The names of the menus in
+the menu bar are constants of C, in `port/bars_t.c`, and the names of
+the files that the program reads and the dialog that asks for a disk in
 `port/system_t.c`.
 The pull-down menus of the menu bar are C as well: the five menus with
 their ticks and the items that cannot be chosen as things are, and the
@@ -193,15 +192,20 @@ places, or on into another command. Each is a function now, which
 returns where the program goes on, and the loop calls it from a `switch`
 (`Command` of `port/main.c`); the tables of the menus hold the commands
 by their numbers. What a command finds in the registers, as the command
-before left them, is kept where one reads it.
+before left them, is kept where one reads it. With that no instruction
+of the program is assembly but those that are written into the C, and
+no text or table, and no byte of the program is made by the assembler:
+`port/asm/` holds one file, which says in what order the linker is to
+have the program's segments, and has the layout of the main data, which
+nothing reads there (`TODO.md` has what is left to do about it).
 
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `port/` | The program on its way to C: `port/*.c` is what has been translated, with the tables of a file in the one next to it whose name ends in `_t`, and `port/asm/` what is still assembly |
-| `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces; `routines.py` lists the routines that are still assembly; `flagscan.py` examines the callers of a routine before it is translated |
+| `port/` | The program in C: `port/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and in `port/asm/` the one file of assembly that is left, which holds no code and no data: the order of the program's segments |
+| `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces; `routines.py` listed the routines that were still assembly, and `flagscan.py` examined the callers of a routine before it was translated: there are none left |
 | `CMakeLists.txt` | Builds the assembler and the programs, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
 | `docs/` | Pictures for this README |
@@ -276,16 +280,18 @@ harmless: the program laid out this way still runs.
 
 ## The port
 
-`port/` starts as a copy of the assembly in `src/` and ends as a C program.
-In between it is both. A routine that has been translated is deleted from
-`port/asm/` and leaves a few instructions behind that pass its callers on
-to the C function; `git diff --no-index src port/asm` shows what is gone.
-The C code keeps the names the routines and their data have in the
-assembly, so that either can be found from the other. Where C code needs a
-routine that is still assembly, the assembly gets an entry for it that C
-can call. The two routines that the compiler calls to multiply and to
-divide numbers of 32 bits, which a C library would bring, are C too,
-`port/arith.c`: the program has no C library.
+`port/` started as a copy of the assembly in `src/` and ends as a C
+program. In between it was both. A routine that had been translated was
+deleted from `port/asm/` and left a few instructions behind that passed
+its callers on to the C function, and where C code needed a routine that
+was still assembly, the assembly got an entry for it that C could call.
+All of the code is C now, and those are gone. The C code keeps the names
+the routines and their data have in the assembly, so that either can be
+found from the other, and a function still takes its arguments in the
+registers that the assembly called it with. The two routines that the
+compiler calls to multiply and to divide numbers of 32 bits, which a C
+library would bring, are C too, `port/arith.c`: the program has no C
+library.
 
 DOS, the BIOS and the mouse driver are called by software interrupts,
 which C cannot express. The C code calls them in one file, `port/dos.c`,
@@ -296,13 +302,11 @@ interrupt flag, for which the compiler has functions of its own, and for
 DOS's routine that makes capitals. Everything else is plain C that calls
 these, and reads the BIOS's data and the memory of the display through
 pointers. That file is where the program will meet another operating
-system; until the translation is done it hides nothing of DOS. The
-assembly that is left calls interrupts itself; nothing in it does so for
-C code.
+system; until the translation is done it hides nothing of DOS.
 
 The part of the program that stays in the memory while a command runs is
-C in `port/resident.c`, as far as it is translated. The rest of the
-program is not in the memory then, `port/dos.c` with it, so the build
+C in `port/resident.c`, with its data. The
+rest of the program is not in the memory then, `port/dos.c` with it, so the build
 compiles that file a second time, into that part: one source, two copies
 of its code. `port/resident.c` has the only other inline assembly of the
 port, four instructions where an interrupt arrives that the program has
@@ -326,13 +330,15 @@ instructions are the interrupt by which the COMMAND.COM in the memory
 runs a command, INT 2Eh: it comes back with no stack and no data
 segment, so both are set there, from the code segment, before any
 compiled instruction runs, and the program goes on in a function of its
-own on an empty stack. `port/main.c` has one instruction: where DOS
-calls the program for a critical error, DS is loaded with the segment
-of the main data, which is known only when the program runs.
+own on an empty stack. `port/main.c` has one instruction, which loads
+DS with the segment of the main data, known only when the program runs:
+where DOS calls the program for a critical error, and where the part
+that stays in the memory calls the rest of the program, which is one
+function to it, and gets DS back as it was.
 
-The halves are linked into one program, `VC.EXE`, which is not built the
-way a C program usually is. It still loads and starts like the `.COM` file
-it was, keeps its data where the assembly put it, and gives up and reloads
+The program is linked as `VC.EXE`, which is not built the way a C
+program usually is. It still loads and starts like the `.COM` file it
+was, keeps its data where the assembly put it, and gives up and reloads
 most of itself at run time, compiled code included. `port/vc.h` describes
 what that asks of the C code, and `tools/mkexe.c` how the file is made.
 The code that begins the program and reloads it after a command had to
@@ -340,9 +346,9 @@ change for this: it measures in paragraphs and relocates what it has
 loaded.
 
 The file is the program as it lies in the memory. First comes the part
-that stays there while a command runs: what is left of its assembly, its
-compiled code, and its data with the stack at the end, which are nothing
-but room in the file. That data is of `port/resident.c`, the one C file
+that stays there while a command runs: its compiled code, and its data
+with the stack at the end, which are nothing but room in the file. That
+data is of `port/resident.c`, the one C file
 with data of its own, in a group that the compiler makes for it and
 that begins at the PSP, as the program's one segment did when it was a
 `.COM` file: its texts, the numbers that `tools/mkexe.c` writes, which

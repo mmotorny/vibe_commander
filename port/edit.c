@@ -76,7 +76,8 @@ struct EdData {
 
 /* A line of the text, as the assembly has it in DS:SI and DI: the address
    of its first byte and its number, counted from 0. In the order in which
-   the stubs of T53_00 and T54_00 have them on the stack. */
+   the assembly had them on the stack where it called T53_00 and
+   T54_00. */
 struct Where {
     u16 offset;
     u16 segment;
@@ -117,9 +118,9 @@ void T75_00(u16 number, u16 *screen, u16 color);
 void T76_00(u16 place, u16 segment, u16 text, u16 colors);
 u16 T80_00(void);
 
-/* T00_00, the editor itself, is declared in vc.h. The others had stubs
-   in the assembly, until what called them became C: the viewer calls
-   T70_00 and T71_00. */
+/* T00_00, the editor itself, is declared in vc.h. The registers of the
+   others are those that the assembly called them with, while it did:
+   the viewer calls T70_00 and T71_00. */
 #pragma aux T50_00 "*_c" __far modify exact [ax]
 #pragma aux T51_00 "*_c" __far modify exact [ax]
 #pragma aux T53_00 "*_c" __far parm [bx] value [ax] modify exact [ax]
@@ -143,9 +144,8 @@ u16 T80_00(void);
 #pragma aux T76_00 "*_c" __far parm [bx] [dx] [si] [ax] modify exact [ax]
 #pragma aux T80_00 "*_c" __far value [ax] modify exact [ax bx cx dx si di]
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    ResWin puts back in the screen buffer what a box covers, Window shows
    it. ChgDisk asks for the disk of a drive that shares the floppy drive
@@ -158,10 +158,7 @@ u16 T80_00(void);
    the setup has it so. GetMous returns the buttons of the mouse that are down
    and in the high word where it is; what it is given comes back there if
    there is no mouse. InWind is not 0 if that is outside a window. AsmSeg
-   is the code segment of the assembly. Input, EdSub1 and CmpSym are C,
-   of vc.h. */
-u16 AsmSeg(void);
-#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
+   is the segment of the program's constants. */
 
 /* C routines of other files that vc.h does not have. */
 u16 __far *HexByt(u16 __far *screen, u16 byte);         /* digits.c */

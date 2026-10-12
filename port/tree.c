@@ -120,11 +120,11 @@ static const u8 CODE PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
 /* Write the tree into a panel that shows it, after setting right its
    first line.
 
-   In the assembly this is where PutFls goes for a panel that does not
+   In the original this is where PutFls goes for a panel that does not
    show files, and it goes on to PutInf if the panel does not show the
-   tree either. That choice is made by the stub of PutFls, so that the
-   Info is not written from inside another function: it is deep enough
-   in the stack as it is. */
+   tree either. That choice is made by who wants a panel written, PtFs00
+   of keys.c and its like, so that the Info is not written from inside
+   another function. */
 void PutTre(u16 panel)
 {
     CorPar(panel);

@@ -3,8 +3,9 @@
  * that is too old, and the boxes of port/main.c, which are that of DOS's
  * critical error and that of a drive that is not ready. With them the
  * texts and the button that the boxes of every file name: Error, Ok, and
- * the two lines that stand for a text put in. And one word that is no
- * constant: SecDat, where the main data is.
+ * the two lines that stand for a text put in. And two things that are
+ * no constants of the original: SecDat, a word where the main data is,
+ * and where the rest of the program is entered.
  *
  * From VC.ASM.
  */
@@ -28,6 +29,7 @@
 #pragma aux FtEr2_B "*"
 #pragma aux OkMn_D "*"
 #pragma aux NoRd_P "*"
+#pragma aux Trans_T "*"
 
 /* The title: of the help's window as it is, with the two bytes that set
    its colour, and without them in the panel of the Info and in the
@@ -142,3 +144,15 @@ const BOX1(4) NoRd_P = {
     { { MD_AT(TmpErr[1]), 0, 55 } },
     { Err_S, NoRd1_S, NoRd2_S, NoRd3_S }
 };
+
+/* Where the part of the program that goes while a command runs is
+   entered: TrnMain of port/main.c, as a far address. The part that stays
+   in the memory, port/resident.c, calls it there. That part cannot name
+   the function: the rest of the program is loaded again after a
+   command, somewhere else, and the words of it that hold a segment are
+   set then, this one among them; those of the part that stays are set
+   once. So that part reads the address here, at the offset of this
+   constant in the segment that the rest is counted from. In the original
+   the two parts are one segment, and jump to each other's labels. */
+typedef u32 __far TransFn(u16 first);
+TransFn * const Trans_T = (TransFn *)TrnMain;

@@ -23,9 +23,9 @@
 u16 ReadTre(void);
 u16 ChTree(u16 column);
 
-/* How the assembly calls these (see the stubs in port/asm/VCSUB3.INC):
-   both save every register, as the routines did, and make the carry flag
-   of what is returned. */
+/* How ReDir of read.c calls ReadTre, and the tree in its box and Copy
+   and Rename ChTree: both save every register, as the routines did, and
+   return what those answered in the carry flag. */
 #pragma aux ReadTre "*_c" __far value [ax] modify exact [ax]
 #pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
 

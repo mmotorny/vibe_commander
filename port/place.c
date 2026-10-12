@@ -78,8 +78,8 @@ u16 InvWCB(u16 panel)
     return panel == md.WCB1seg ? md.WCB2seg : md.WCB1seg;
 }
 
-/* Whether a panel shows files and is not switched off. Its stub makes
-   the carry flag of this, which is how the assembly answers. */
+/* Whether a panel shows files and is not switched off: the original
+   answers in the carry flag. */
 u16 FilePan(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);

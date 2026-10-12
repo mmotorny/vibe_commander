@@ -8,7 +8,7 @@
  * left to the caller to put that on the screen. A panel that shows the
  * tree or the Info has its frame, its title and its cursor from here; what
  * is in it is written by PutTre of tree.c and PutInf of info.c, which
- * PutFls's stub goes to.
+ * who wants a panel written calls for a panel of that kind.
  *
  * What PutName and Panel8 are in the assembly is written out where it is
  * used: these routines are called from deep down, and a function called

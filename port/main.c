@@ -9,7 +9,11 @@
  * program falls into it; it jumps to the command of a key, which is no
  * routine either, and the command jumps back into it at one of several
  * places, or on into another command. Here the loop is two functions and
- * a third that has them take turns, MainLoop. Loop is entered at a place,
+ * a third that has them take turns, MainLoop, which TrnMain calls, at
+ * the end of this file, when it has started the program: that is what
+ * the part of the program that stays in the memory calls, and where the
+ * loop comes back to when the program ends, or starts over for a command
+ * of DOS. Loop is entered at a place,
  * the numbers below, and returns the command that a key or the mouse
  * asks for: Func12 has the keys. Command calls the function of that
  * command (see "The commands" in vc.h), and returns the place of the loop
@@ -29,30 +33,21 @@
  * is why. Func05 loads BX, with a number that is not 0, so a command that
  * goes back to the loop there or before leaves nothing in BX and DX that
  * Rename could tell; the cursor's keys go back behind it, at Func07.
- *
- * What ends the program, starts it over or has a command run first is
- * still assembly: for those MainLoop returns to its stub, MainGo of
- * port/asm/VC.ASM, which jumps on.
  */
 #include "vc.h"
 
-/* The registers that go round the loop are struct Regs of vc.h: the stub
-   of the loop pushes them so. */
-u16 MainLoop(u16 entry, struct Regs STACK *r);
+/* The registers that go round the loop are struct Regs of vc.h. */
 static u16 CmdEnd(u32 answer, struct Regs STACK *r);
 static u16 Command(u16 command, u16 panel, struct Regs STACK *r);
 u16 ErrRdy(u16 letter);
-void Exit(void);
+static void Exit(void);
 /* Quit, RestVct and HookVct are in vc.h. */
 void RstVc1(void);
 
-#pragma aux MainLoop "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]
 #pragma aux ErrRdy   "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux Exit     "*_c" __far modify exact [ax]
 #pragma aux RstVc1   "*_c" __far modify exact [ax dx]
 
-/* Where the loop is entered: what MainC of port/asm/VC.ASM hands over,
-   and what Command returns. */
+/* Where the loop is entered: what Command returns. */
 enum {
     INIT40,                             /* find the command line on the
                                            screen, keep what DOS shows,
@@ -72,14 +67,13 @@ enum {
                                            what is in the low byte */
 };
 
-/* Where the stub of the loop goes on when MainLoop returns: the places of
-   Main_T in port/asm/VC.ASM. */
+/* Why the loop is left: what MainLoop returns. */
 enum {
-    ASM_INIT11,                         /* start the program over */
-    ASM_EXEC,                           /* have the part of the program
+    END_INIT11,                         /* to start the program over */
+    END_EXEC,                           /* to have the part of the program
                                            that stays in the memory run
                                            the commands of DosBuf first */
-    ASM_EXIT                            /* leave the program */
+    END_EXIT                            /* to leave the program */
 };
 
 /* What Func21 returns besides a command. */
@@ -94,9 +88,8 @@ enum {
     ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    HidCur puts the cursor below the screen, Cursor at a row and a column,
    the row in the high byte, and Cursor1 on the command line. ClrKbd empties the
@@ -122,15 +115,9 @@ enum {
    keeping the cursor and the marks if `keep` is not 0: not 0 if it could
    not be read.
 
-   AsmSeg returns the code segment of the assembly and ResSeg the segment
-   of the part of the program that stays in the memory while a command
-   runs, where the stack is. */
-u16 ReDir(u16 panel, u16 keep);
-u16 AsmSeg(void);
-u16 ResSeg(void);
-#pragma aux ReDir   "*_a" __far parm [dx] [ax] value [ax] modify exact [ax es]
-#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux ResSeg  "*_a" __far value [ax] modify exact [ax]
+   AsmSeg returns the segment of the program's constants and ResSeg the
+   segment of the part of the program that stays in the memory while a
+   command runs, where the stack is. */
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
@@ -185,8 +172,8 @@ extern const u8 __far CtrlC[];
                                            stands for several */
 
 /* What a panel shows, written to the screen buffer: PutFls of the
-   assembly, whose stub there chooses between these three by the kind of
-   the panel. */
+   original, which goes on in what writes the tree or the Info for a
+   panel of that kind. */
 static void PtFs00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
@@ -995,9 +982,9 @@ static u16 CmdEnd(u32 answer, struct Regs STACK *r)
     case NEXT_M06_00:                   /* CmdM06 */
         return MnuEnd(M06_00(panel, byte << 8 | byte), r);
     case NEXT_INIT11:                   /* CmdIni */
-        return LEAVE | ASM_INIT11;
+        return LEAVE | END_INIT11;
     case NEXT_EXEC:                     /* CmdExe */
-        return LEAVE | ASM_EXEC;
+        return LEAVE | END_EXEC;
     case NEXT_VIEW:                     /* V00_00: with the Files menu
                                            marked, and in DL whether to
                                            edit */
@@ -1005,7 +992,7 @@ static u16 CmdEnd(u32 answer, struct Regs STACK *r)
     case NEXT_DIRINFO:                  /* CmdV02 */
         return V00_03(2, 1, 0);
     default:                            /* NEXT_EXIT */
-        return LEAVE | ASM_EXIT;
+        return LEAVE | END_EXIT;
     }
 }
 
@@ -1095,7 +1082,7 @@ static u16 F39_01(u16 again, struct Regs STACK *r)
 /* Do a command: call its function, with what it reads of the registers,
    and go on by what that returns. Returns the place of the loop where the
    program goes on, with the registers as that place and the next command
-   get them, or LEAVE with what the stub of the loop is to go on in.
+   get them, or LEAVE with why the loop is left.
 
    `panel` is the panel that the command is for, which the original has
    in DS when it jumps to the command: the current panel, `r->ds`, but for
@@ -1276,14 +1263,19 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     }
 }
 
-/* The main loop: see the top of this file. `entry` is where it is
-   entered and `r` the registers as its stub has pushed them. It returns
-   when the stub is to go on somewhere, a place of Main_T there, with the
-   registers as that place gets them. */
-u16 MainLoop(u16 entry, struct Regs STACK *r)
+/* The main loop: see the top of this file. It is entered where the
+   original falls into it when the program has started, Init40, and
+   returns when the loop is left, with why: an END_ above. */
+static u16 MainLoop(void)
 {
+    struct Regs regs;
+    struct Regs STACK *r = (struct Regs STACK *)&regs;
+    u16 entry = INIT40;
     u16 command;
 
+    /* What the start of the program leaves in the registers: nothing of
+       it is read. Loop sets each before it is. */
+    r->ax = r->bx = r->cx = r->dx = r->si = r->di = r->bp = r->ds = 0;
     for (;;) {
         command = Loop(entry, r);
         entry = Command(command, r->ds, r);
@@ -1552,7 +1544,9 @@ FtErr5:
    constants, where SecDat is: the segment of the main data, which
    the program asks DOS for when it starts and after every command. C
    has no words for loading a segment register, and the compiler takes
-   none for an argument: this is the one instruction. */
+   none for an argument: this is the one instruction. TrnMain, at the
+   end of this file, has it too, to put DS there when the program has
+   asked for the main data, and back where it was. */
 static void DataSeg(u16 segment);
 #pragma aux DataSeg = "mov ds,ax" parm [ax] modify exact []
 
@@ -1581,13 +1575,13 @@ u16 HookVct(void)
 }
 
 /* Leave the program: the screen as DOS had it, with the cursor on the
-   line above the command line. The stub goes on to the part of the
-   program that stays in the memory, which ends the program.
+   line above the command line. The part of the program that stays in
+   the memory ends the program.
 
    Ported as it is: of the two interrupts that the program has taken,
    only Ctrl-Break is given back here. DOS itself puts the critical error
    back when a program ends. */
-void Exit(void)
+static void Exit(void)
 {
     RstVc1();
     Quit();
@@ -1595,4 +1589,51 @@ void Exit(void)
     Window(0, (u16)md.Lines << 8 | 80);
     CurMous(0);
     Cursor((u16)(u8)(md.DosLin - 1) << 8);
+}
+
+/* What the part of the program that stays in the memory is to do when
+   this part comes back to it: see Go of resident.c. Anything less is to
+   leave, with that for DOS. */
+#define STAY_EXEC  0x100                /* run the commands of DosBuf */
+#define STAY_ALLOC 0x200                /* there is no memory for the main
+                                           data: say so and leave */
+
+/* The part of the program that goes while a command runs, all of it: the
+   part that stays calls this when the program has been loaded, with
+   `first`, and again whenever it has run a command, and this returns
+   when there is something for that part to do. In the original that
+   part jumps here, to Init00 or to Init11, and is jumped back to.
+
+   The program is started, at Init11 after a command, where the setup
+   need not be read again; the main loop runs, until the program is to
+   end or has commands of DOS to run, which Enter has left in DosBuf; and
+   with nothing to run after all it starts over at once.
+
+   DS is not on the main data when this is called, and there is none
+   until Init11 has asked DOS for it: DS is put there then, and back
+   where it was before this returns, by DataSeg above. The main data may
+   be given back to DOS by then, as Enter does before a command runs. */
+u32 TrnMain(u16 first)
+{
+    u16 stays = ResSeg();
+    u32 data;
+    u16 end;
+
+    if (first)
+        Init00(stays);
+    for (;;) {
+        data = Init11(stays, MemRun());
+        if ((u16)data == 0)             /* AlocEr */
+            return data & 0xFFFF0000UL | STAY_ALLOC;
+        DataSeg((u16)data);             /* IniOk */
+        IniData();
+        end = MainLoop();
+        if (end == END_EXIT)
+            Exit();
+        DataSeg(stays);
+        if (end == END_EXEC)            /* CmdExe */
+            return STAY_EXEC;
+        if (end == END_EXIT)
+            return 0;                   /* Exit00 */
+    }                                   /* CmdIni */
 }

@@ -25,15 +25,12 @@
    F21_30, which other files call too. */
 
 /* ResSeg is the segment of the part of the program that stays in the
-   memory while a command runs: an entry of the assembly, which has that
-   part. What else is called of the rest of the program is C, of vc.h:
-   HidCur and Cursor1 for the cursor, InvVar, which makes of a byte 1 if
-   it is 0 and 0 otherwise, Int16 and Int10, the BIOS for the keyboard
-   and for the screen, Int21d, DOS as it is where the assembly did not go
-   through Intr21, and Fantom, SetDTA, Intr21, SetPth, UpCase, RestVct,
-   SavMous, CurMous, Quit and Window. */
-u16 ResSeg(void);
-#pragma aux ResSeg  "*_a" __far value [ax] modify exact [ax]
+   memory while a command runs. It and what else is called of the rest
+   of the program are of vc.h: HidCur and Cursor1 for the cursor, InvVar,
+   which makes of a byte 1 if it is 0 and 0 otherwise, Int16 and Int10,
+   the BIOS for the keyboard and for the screen, Int21d, DOS as it is
+   where the assembly did not go through Intr21, and Fantom, SetDTA,
+   Intr21, SetPth, UpCase, RestVct, SavMous, CurMous, Quit and Window. */
 
 /* C routines of other files that vc.h does not have. TstExe is 1 for a
    name that DOS can run: com, exe or bat. TrCr10 finds the current

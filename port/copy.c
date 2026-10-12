@@ -59,9 +59,8 @@ u16 F35_61(u16 answer, u16 place);
 #pragma aux C00_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux F35_61 "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    OncZoom puts a box on the screen with its middle at `place`, growing
    only if it is the first of a command: `box` is where the assembly
@@ -72,11 +71,9 @@ u16 F35_61(u16 answer, u16 place);
    and is not 0 to stop. Intr21f is Intr21 with the carry flag set before
    DOS is called if `carry` is not 0, and clear if it is: for a call that
    leaves the flag as it finds it. */
-/* AsmSeg returns the code segment of the assembly, where its texts are
-   (see port/dialog.c). SelDrv makes a drive the current one, 0 for A:,
-   by the call of DOS that the assembly makes without Intr21. */
-u16 AsmSeg(void);
-#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
+/* AsmSeg returns the segment of the program's constants, where its
+   texts are (see port/dialog.c). SelDrv makes a drive the current one, 0
+   for A:, by the call of DOS that the assembly makes without Intr21. */
 
 /* A dialog whose box is not on the screen yet, and which sets what it
    sets in the main data: Dialog of vc.h. The low byte of what it returns

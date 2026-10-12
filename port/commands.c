@@ -58,20 +58,17 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
 #pragma aux Help00  "*_c" __far modify exact [ax]
 #pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
-/* Routines of the rest of the program that this file calls. Those that
-   are declared below are still assembly, and are called by their entries
-   for C; the others are C, of vc.h.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
    HidCur puts the cursor below the screen. ResUser writes what DOS has shown, which
    the panels cover, to the screen buffer, for a window given like
    Window's, and ResWin what a box covers, from where it was kept. SelDrv
    is the call of DOS that makes a drive the current one, 0 for A:, which
-   the assembly makes without Intr21. AsmSeg returns the code segment of
-   the assembly. ScrOffs asks the BIOS where in the memory of the screen
-   the page begins that is shown. Int10 calls the BIOS for the screen,
-   and SaveSet writes the setup to its file. */
-u16 AsmSeg(void);
-#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
+   the assembly makes without Intr21. AsmSeg returns the segment of the
+   program's constants. ScrOffs asks the BIOS where in the memory of the
+   screen the page begins that is shown. Int10 calls the BIOS for the
+   screen, and SaveSet writes the setup to its file. */
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what
@@ -136,8 +133,8 @@ extern const u8 __far SetEr_B[];        /* "There was an error while saving
 static const u8 CODE Delay_T[] = { 40, 20, 5, 3, 1, 0 };
 
 /* What a panel shows, written to the screen buffer: PutFls of the
-   assembly, whose stub there chooses between these three by the kind of
-   the panel. */
+   original, which goes on in what writes the tree or the Info for a
+   panel of that kind. */
 static void PtFs00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
