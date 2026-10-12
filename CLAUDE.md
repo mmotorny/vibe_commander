@@ -671,6 +671,9 @@ several at a time.
   translate: it starts each agent, checks what the agent left, which is
   the commit, the push and `LastTest.log`, and keeps its report. An
   improvement to the tools is handed to an agent in the same way.
+- An agent is given no time limit for work that is going well. The
+  session watches what its agents are doing, and turns one round that is
+  spending its time on something of little use.
 - An agent knows only what the repository tells it. What a batch learns
   that the next one needs is written down before the batch is committed:
   about the compiler and the stubs here, about driving the dialogs at the
