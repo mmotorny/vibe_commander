@@ -1181,12 +1181,23 @@ with it is less obvious:
   C".
 - For 32-bit numbers the compiler calls helper routines, near, in its own
   code segment. `__U4M`, which multiplies, and `__U4D`, which divides
-  unsigned numbers, are at the end of `port/asm/VC.ASM`; of `__U4D` the
-  scenarios run only the half for a divisor of 16 bits. A helper that is
-  missing shows as an undefined symbol when the port is linked: signed
-  division would be `__I4D`. Shifting a 32-bit number by a constant needs
-  none. `/` and `%` of the same numbers are two calls: take the remainder
-  by multiplying back where it is known to fit 16 bits.
+  unsigned numbers, are functions of `port/arith.c`, written without
+  what they are there for; of `__U4D` the scenarios run only a division
+  by 16 bits. They are held against Python's arithmetic by
+  `harness/arithcheck.py`, which runs their bytes on a model of the
+  processor: run it after any change there or to the compiler. A helper
+  that is missing shows as an undefined symbol when the port is linked:
+  signed division would be `__I4D`. Shifting a 32-bit number by a
+  constant needs none. `/` and `%` of the same numbers are two calls:
+  take the remainder by multiplying back where it is known to fit 16
+  bits.
+- A function may have a name that C cannot give it, `#pragma aux U4M
+  "__U4M"`, and be near in a segment of far ones, `__near` there. A
+  number of 64 bits comes back in four registers, AX, BX, CX and DX from
+  its highest word down, whichever order `value` has them in: that is
+  how `U4D` returns the quotient in DX:AX and the remainder in CX:BX,
+  as a union of such a number and its four words. Assigning the words
+  needs no helper; arithmetic on 64 bits would.
 - `REP MOVSB` from one segment to another is a loop over two far
   pointers: a far pointer steps its offset only, as SI and DI do, down as
   well as up. Where the assembly divides a 32-bit count into pieces for

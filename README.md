@@ -275,9 +275,9 @@ to the C function; `git diff --no-index src port/asm` shows what is gone.
 The C code keeps the names the routines and their data have in the
 assembly, so that either can be found from the other. Where C code needs a
 routine that is still assembly, the assembly gets an entry for it that C
-can call. The assembly also holds the two routines that the compiler calls
-to multiply and to divide numbers of 32 bits, which a C library would
-bring: the program has none.
+can call. The two routines that the compiler calls to multiply and to
+divide numbers of 32 bits, which a C library would bring, are C too,
+`port/arith.c`: the program has no C library.
 
 DOS, the BIOS and the mouse driver are called by software interrupts,
 which C cannot express. The C code calls them in one file, `port/dos.c`,
@@ -467,6 +467,12 @@ port, builds it, and says which scenario notices, or that none does. That
 an instruction ran in the original does not mean that a screen shows what
 it is for; this is how to find out, for a branch whose effect cannot be
 pointed to in a golden.
+
+`python3 harness/arithcheck.py build/port` holds the two routines of
+`port/arith.c` against Python's arithmetic: it runs them, as the bytes
+that the compiler made of them, on a model of the processor, with as
+many pairs of numbers as it is told. No scenario would show a product
+or a quotient that is wrong for some numbers only.
 
 ### The machines
 

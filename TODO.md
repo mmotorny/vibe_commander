@@ -49,7 +49,6 @@ Besides these, all in `VC.ASM`:
   program asks DOS for, that of a panel, and a dozen small ones; in the
   files those of the viewer, the editor and the file search, of which C
   has its own; and the `EQU` of the colours and the lengths.
-- The compiler's helpers `__U4M` and `__U4D`, 92 bytes, in `CTEXT`.
 - The macros `CallC`, `MainC`, `CmdC`, `MnuC` and `PanC`; `FromC`,
   `CallLine` and `TakeLine` have no use left.
 
@@ -215,23 +214,9 @@ far function that loads its own DS, as `SetBrk` is. With the last
 command the files of the assembly are empty and go, with their
 `INCLUDE` and their names in `CMakeLists.txt`.
 
-**4. What is not of one file.** After 3, but for the helpers, which can
-go at any time, side by side with everything.
+**4. What is not of one file.** After 3. The compiler's helpers,
+`__U4M` and `__U4D`, went ahead: they are `port/arith.c`.
 
-- The helpers `__U4M` and `__U4D` can be C. Tried: a function may have
-  such a name, `#pragma aux U4M "__U4M" __near parm [dx ax] [cx bx]
-  value [dx ax]`, and stays in `CTEXT` with its callers. The product is
-  made of products of two bytes, which need no helper, where a word by a
-  word as a number of 32 bits would call `__U4M` itself; the quotient by
-  shifting and subtracting, which need none either. What C cannot say is
-  that `__U4D` hands back the remainder in CX:BX next to the quotient:
-  a `#pragma aux` that holds no instruction, `parm [cx] [bx] modify
-  exact []`, has the compiler load the two as the last thing before the
-  result. That is no assembly, and it rests on what the compiler makes
-  of it: read the end of the function in the listing. Before it lands,
-  the C wants holding against the machine's own arithmetic on the
-  computer that builds, where the same source compiles, and `__U4D` for
-  a divisor of more than 16 bits, which no scenario runs.
 - The data and the stack of the part that stays: as its agent left it
   below ("How the data that the assembly still lays out could go to C"),
   one structure in `port/resident.c` in a group of its own that begins
@@ -258,7 +243,10 @@ go at any time, side by side with everything.
   class and stand there too: 8,700 bytes where 4,096 are needed.
   `tools/mkexe.c` stops the build when code comes within 4K of the
   stack. When `VC.ASM` is gone the order is the linker's to be told, by
-  `order` in its command or by the first object file.
+  `order` in its command or by the first object file. That is how
+  `CTEXT` stands in front of `CTEXT2` already, since the helpers left
+  `VC.ASM`, which named it: the first object file of the compiled code,
+  `arith.obj`, is of `CTEXT`.
 - `tools/mkexe.c` and `CMakeLists.txt` when there is nothing to
   assemble: the last step, by one agent. No `VC.OBJ`, no listing of the
   port; the order of the segments and the two groups by the linker's
@@ -452,10 +440,32 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     room for gets that length for the bytes in the memory, until the
     table of lines is made, which cuts it down. Nothing reads it in
     between.
-- Of `__U4D` in `port/asm/VC.ASM`, which divides 32-bit numbers for the
-  compiled code, no scenario runs the half for a divisor of more than 16
-  bits: nothing divides by one yet. It was held against a model of its
-  steps, not run.
+- Of `__U4D`, which divides 32-bit numbers for the compiled code, no
+  scenario runs a division by more than 16 bits: nothing divides by one
+  yet. And a product or a quotient that is wrong for some numbers only
+  would pass the scenarios: three files divide and one multiplies such
+  numbers, `find.c`, `info.c` and `copy.c`. So the two helpers, which
+  are C, `U4M` and `U4D` of `port/arith.c`, are held against other
+  arithmetic, in two ways, neither of them a test of the build:
+  - `python3 harness/arithcheck.py build/port` runs their bytes, as the
+    linked program has them, on a model of the 8086 that knows the
+    instructions they are made of, and holds the product, the quotient
+    and the remainder against Python's, for 729 pairs of numbers at the
+    edges and as many random ones as it is told, 20,000 unless told, in
+    17 seconds. It also says if a register that is to be kept comes back
+    changed, if the stack of the caller is written to, and if a division
+    by 0 is not the processor's divide error. The two routines in
+    assembly that were there before passed it on the same 200,729 pairs
+    as the C does; four changes of one instruction made to see it work
+    were each found. Making it a fourth test wants a line in
+    `CMakeLists.txt`.
+  - `port/arith.c` compiles for the computer that builds as it is, with
+    `-DVC_H` and the three types of `port/vc.h` at their widths: there
+    it was held against that computer's arithmetic on 101 million pairs
+    for the product and 98 million for the division, 47 million of them
+    by more than 16 bits. The program that did it is not kept.
+  Each covers what the other does not: the second knows nothing of the
+  registers, and the first runs a thousand times fewer numbers.
 
 - Of the help, one instruction for the mouse is listed as out of reach
   in `harness/ported.py`: a click below the last line of an index that
@@ -2530,6 +2540,37 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     the `switch` again, by a script, 72 entries the same. The two
     goldens came out as before on the new bench, and the `port` test
     passed the first time, 150 seconds.
+
+- The data of `VC.ASM`, `VCSUB2.INC` and `VCSUB3.INC`, and the
+  compiler's helpers, with four other files of data moving in checkouts
+  of their own:
+  - 5 minutes: `port/vc.h` declares `Title_S`, `Var_S` and `Tree_S` for
+    the code, far, and `port/tables.h` includes it. A file of constants
+    that defines one of the three was "Modifiers disagree with previous
+    definition", and one whose box names one "Pointer truncated", which
+    stops the build. Every checkout met it. These files got round it by
+    a `#define` around the `#include`, until `port/tables.h` came with
+    the rebase, which gives each of the three a near name: the file
+    that defines one writes it under its name and no `#pragma aux`.
+  - 3 minutes: the first of the sixteen names that `VC.ASM` declares
+    `EXTERNDEF` went to C, and the test `data` failed on each, "the
+    port has 53h": the assembler's listing has such a name in `CONST`
+    at 0, marked `External`, and `harness/datacheck.py` took it for an
+    object of the assembly. Two checkouts mended that, each for itself;
+    the one that landed first is what is there.
+  - 4 minutes, at the rebase: with the last text gone from the
+    assembly's `CONST`, `harness/datacheck.py` stopped at `TrnBeg`, the
+    label at its start, "min() iterable argument is empty". A label
+    with nothing of the assembly behind it is no object now. And
+    `TODO.md` was in conflict in every commit: its changes were made
+    again on the new text by the scripts that had made them, and the
+    last row of the inventory added up from the others.
+  - The `port` test took 320 and 219 seconds where it takes 150, with
+    the other checkouts testing. Nothing came out different.
+  - What saved time: the lines of the assembly were taken out by a
+    script that names the lines it expects, and the names of the test's
+    output were held against those of before by another, which also
+    says which objects have another length.
 
 ## Ideas put off
 

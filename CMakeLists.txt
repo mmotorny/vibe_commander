@@ -134,8 +134,8 @@ file(GLOB port_c CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR}/port
 # The compiled code is more than one segment holds, so it has two: CTEXT,
 # and CTEXT2 for the files named here. Functions of different files call
 # each other far, so a file may be in either. The routines that the
-# compiler calls near for arithmetic on 32 bits, __U4M and __U4D at the end
-# of port/asm/VC.ASM, are in CTEXT only: a file that needs them stays
+# compiler calls near for arithmetic on 32 bits, __U4M and __U4D of
+# port/arith.c, are in CTEXT only: a file that needs them stays
 # there, or the linker says that it cannot reach them. A segment holds
 # F000h bytes, not 64K: tools/mkexe.c says why, and stops the build when
 # one is fuller. Name another file here then.
