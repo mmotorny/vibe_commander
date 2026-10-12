@@ -12,8 +12,8 @@ before the program (see driver.py and DRIVER.ASM). It hands the keyboard
 controller what the keyboard would send, one key when the program waits
 for a key and has taken the one before, and writes the screen out when a
 step has no key left and the program waits, with nothing that it will do
-by itself after a while. The original and the port are driven alike, as
-they are: nothing in either knows of the tests.
+by itself after a while. The original and the C translation are driven
+alike, as they are: nothing in either knows of the tests.
 
 Steps are written as driver.py takes them: key names separated by
 spaces, "Alt+F1" for keys held together, and text to type in double quotes.
@@ -74,9 +74,9 @@ out again (show.py --changes is how):
     "12:00:00p" is the time of the bench's files.
   - The editor empties the keyboard buffer after every key it takes, and
     once more before it draws: a key that arrives while it deals with the
-    one before is lost, now and then, and more often in the port, which
-    the tests run side by side. A scenario that types more than one key
-    to a step there first switches that off: "F9 o o" is the dialog of
+    one before is lost, now and then, and more often in the translation,
+    which the tests run side by side. A scenario that types more than one
+    key to a step there first switches that off: "F9 o o" is the dialog of
     advanced options, five times Down goes to "Clear keyboard buffer",
     Space and Enter. Tab types a tab there and Enter ends a line.
   - F7, a name and Enter make a directory and leave the cursor on it, so
@@ -107,7 +107,7 @@ out again (show.py --changes is how):
     panel, once that has been read again, as it is after the editor.
     "F9 o m" switches Memory allocation, and the Info then says how much
     memory is free with all of the program loaded: that depends on the
-    size of the program, so the port shows another number than the
+    size of the program, so the translation shows another number than the
     original. The scenario memory does it. deviations.py has the Info's
     free memory left out of the comparison, there and in every other
     scenario. Every disk of the bench
@@ -301,12 +301,12 @@ out again (show.py --changes is how):
     hundredths of the time of day at the first click. To have a click
     come late, let time pass first, "Wait*30": 30 ticks of the timer,
     1.6 seconds. The time of day is the same to the hundredth
-    every time a scenario is run with the same program, but the port
+    every time a scenario is run with the same program, but the translation
     gets to a click some hundredths later than the original: nothing
     may depend on which side of a second a click is.
   - The pointer in the top right corner of the screen blanks it, and
     the stars that are shown then are not the same in the original and
-    in the port: take it there and away in one step, "Move@79,0
+    in the translation: take it there and away in one step, "Move@79,0
     Move@40,12". The screen is drawn again from what the program has
     of it, which shows when a beep has moved the screen up a line.
   - The button of a click comes up when the program has asked for the
@@ -315,7 +315,7 @@ out again (show.py --changes is how):
     again, and "*1" not see it at all.
   - A button held where the program goes on doing something, the right
     one below a list, which selects the file that comes into the panel,
-    does it nine times with "*12", in the original and in the port
+    does it nine times with "*12", in the original and in the translation
     alike.
   - In the map of the memory a letter is taken by the buttons, whether
     it is one of theirs or not; Tab is a key that gets to the map and
@@ -353,7 +353,7 @@ out again (show.py --changes is how):
     look after the one that found it on a name. Left, Down and Enter
     there open a menu that is none, from behind the table of the
     menus, and F1 a page of the help by a byte that is not the same
-    in the original and in the port: do not press them.
+    in the original and in the translation: do not press them.
   - "MiddleClick@40,12" is the middle button. The mouse driver takes a
     PS/2 mouse for one of two buttons and hands the third on only when
     it has been told, so the bench loads it with /3: that is in
@@ -423,8 +423,8 @@ out again (show.py --changes is how):
     rows 0 and 1, and goes with a key, which it takes, with Shift, Ctrl
     or Alt, with a button, or with the mouse elsewhere. Its stars are
     drawn from random numbers that begin with whatever the memory held,
-    which is why the port's are others: so the key or the movement that
-    ends it is in the same step, "Move@79,0 x". The sky changes when
+    which is why the translation's are others: so the key or the movement
+    that ends it is in the same step, "Move@79,0 x". The sky changes when
     the timer has ticked, 18 times a second, and the machine's time is
     counted in instructions: one movement of the mouse within the
     corner, which is 500 bytes of a script, lets about half a tick
@@ -438,7 +438,7 @@ out again (show.py --changes is how):
     least before it changes, so "Wait*1300 x" has the blanker come up,
     every kind of star, and a key to end it, in one step: a step may
     not end with the sky on the screen. That wait takes some four
-    seconds to run in the original and eight in the port: keep such
+    seconds to run in the original and eight in the translation: keep such
     waits few. See blank-timed, which has the minute end after
     midnight as well, the time set by DOS's command first.
   - The setup file is written to the program's directory whatever the
@@ -488,11 +488,11 @@ out again (show.py --changes is how):
     last upwards, "Up End Del" for each, are a line of more than 64K. In
     hex Up and Down go by 16 bytes, and F4 puts the cursor into the line
     of the text that its byte is in.
-  - The editor has 358,752 bytes for a text on the bench, and the port
-    fewer, by what it is larger. Ctrl+u puts back a line that Ctrl+y has
-    cut as often as it is pressed, 14 times to a step, until the editor
-    beeps: no room. The port gets there some presses before the
-    original, so every such step ends where both show the same whatever
+  - The editor has 358,752 bytes for a text on the bench, and the
+    translation fewer, by what it is larger. Ctrl+u puts back a line that
+    Ctrl+y has cut as often as it is pressed, 14 times to a step, until the
+    editor beeps: no room. The translation gets there some presses before
+    the original, so every such step ends where both show the same whatever
     is at the end of the text: Ctrl+Home, the top. A beep scrolls the
     screen, so the step also has to draw all of it again, which Ctrl+Home
     from the end of the text does.
@@ -515,10 +515,10 @@ out again (show.py --changes is how):
     active one, and files in the right. With the Info in both panels a
     row has "Bytes Free" twice, and only the first is left out of the
     comparison.
-  - The editor has room for 358,752 bytes of text, and the port for
+  - The editor has room for 358,752 bytes of text, and the translation for
     some 328,000 by now, less with every batch: a file that a scenario edits
-    has to fit the port for long, and one that is to be too large is so
-    for both. The original compares the low words of size and room for
+    has to fit the translation for long, and one that is to be too large is
+    so for both. The original compares the low words of size and room for
     a file of 358,752 to 393,215 bytes only: four times COMMAND.COM and
     a:\\freedos\\bin\\country.sys behind them are 381,338. The files
     of C:\\STAMPS have no bytes behind their sizes: the editor opens
@@ -529,7 +529,7 @@ out again (show.py --changes is how):
     another mode, or of Shift, Ctrl or Alt held down. Every key of a
     step is given to the program when it waits, so the bar is drawn
     between any two keys as it would be between two steps. That was not
-    so while the port's keys were pressed by the clock, and
+    so while the translation's keys were pressed by the clock, and
     `editor-full` has "F4" as a step of its own from then.
   - In the help Up, Down, PgUp, PgDn, Home and End move the cursor in
     the index and the text of a page; Left and Right go from button to
@@ -754,8 +754,9 @@ out again (show.py --changes is how):
     cursor no further than that; the next PgDn goes to the last entry.
   - With the right panel off, Ctrl+p or Ctrl+F2, what DOS has shown is
     behind it, and at the start that is the end of the program's
-    banner, "ware" for the original and "are" for the port. deviations.py
-    knows the banner there too, by the line below it: see banner.
+    banner, "ware" for the original and "are" for the translation.
+    deviations.py knows the banner there too, by the line below it: see
+    banner.
   - Ctrl+z puts the tree into the other panel and Ctrl+l the Info; each
     pressed again brings back what the panel showed before, which is
     the other of the two once both have been there, and never files:
@@ -792,8 +793,8 @@ out again (show.py --changes is how):
   - An item of the Files menu chosen with Shift or Ctrl held down,
     "Shift+Enter" or "Ctrl+Enter" on Copy, is the command that F5 has
     with that key. The program asks for Shift and Ctrl after it has
-    taken the Enter, and the harness holds them for 20 ms for the port:
-    it worked when tried, and is in no scenario.
+    taken the Enter, and the harness holds them for 20 ms for the
+    translation: it worked when tried, and is in no scenario.
   - Ctrl+c, "F9 c c", compares the directories of two panels of files
     and selects in each what the other has not or has older, by date
     and time; with nothing to select a box says that they are the
@@ -939,9 +940,9 @@ out again (show.py --changes is how):
     again, into the gap of 72 KB that COMMAND.COM leaves below k.com,
     and asks for its data in what is free above: with 66 to 83 KB free
     the original gets its code back and has too little for the data,
-    which wants 84; start-memory leaves 75. The port, which is larger,
-    does not get as far as that and says the same, "Program too big to
-    fit in memory". The copy ends and releases k.com.
+    which wants 84; start-memory leaves 75. The translation, which is
+    larger, does not get as far as that and says the same, "Program too big
+    to fit in memory". The copy ends and releases k.com.
   - What a copy of the program hands on to DOS is seen by a program
     that has taken INT 21h and stays, with a second copy started after
     it: every call of DOS that the copy makes, and what it runs, comes
@@ -953,8 +954,8 @@ out again (show.py --changes is how):
     which is full sooner if something stayed before the copy started.
   - A program that stays lies behind the COMMAND.COM that ran it, and
     that leaves a gap of 71K when it ends. With one program staying in
-    front of a second copy and one run from it, the port has no room to
-    load itself again after the command, 111K and the file of 130K
+    front of a second copy and one run from it, the translation has no room
+    to load itself again after the command, 111K and the file of 130K
     that they are loaded from, and says "Program too big to fit in
     memory", where the original, of 51K and 64K, has. "F9 o m" in the
     copy, Memory allocation off, keeps all of it loaded: passed-on.
@@ -979,15 +980,16 @@ The machine's clock is counted in the instructions that the machine
 executes, 256 nanoseconds for each (see CLOCK_SHIFT in dos.py), and
 nothing of the host's time gets into it: a scenario comes to each of its
 steps at the same hundredth of a second of the time of day whenever it is
-run, on whichever bench and however busy the host is. But the port takes
-more instructions to do a thing than the original, so the two do not
+run, on whichever bench and however busy the host is. But the translation
+takes more instructions to do a thing than the original, so the two do not
 agree on the time for long. Nothing on the bench shows the time of day, so
 that does not matter. A scenario that does show it, by switching the
 clock on or by listing a file it has made, has to be done with that
 before the machine's first minute is over. The original shows its first
-screen 9.6 seconds past noon and the port 9.9; `copy`, of 68 steps, ends
-26.9 seconds past noon in the original and 28.1 in the port, and
-`delete`, of 63, 25.8 and 28.6: the port has taken up to a sixth longer.
+screen 9.6 seconds past noon and the translation 9.9; `copy`, of 68 steps,
+ends 26.9 seconds past noon in the original and 28.1 in the translation, and
+`delete`, of 63, 25.8 and 28.6: the translation has taken up to a sixth
+longer.
 """
 import tempfile
 from dataclasses import dataclass, field
@@ -1729,7 +1731,7 @@ SCENARIOS = {
         "The banner that the program printed when it started, behind one "
         "panel: its end next to a panel on the left, its beginning next "
         "to one on the right. It names the edition, which is another in "
-        "the original than in the port (see deviations.py)",
+        "the original than in the translation (see deviations.py)",
         steps=(
             "Ctrl+p",                     # the right panel off
             "Ctrl+p",
@@ -2907,10 +2909,10 @@ SCENARIOS = {
                                           # list empty
             "F9 o m",                     # Memory allocation off: with two
                                           # programs staying behind the
-                                          # shells that ran them, the port,
-                                          # which is larger, has no room to
-                                          # load itself again after a
-                                          # command
+                                          # shells that ran them, the
+                                          # translation, which is larger,
+                                          # has no room to load itself again
+                                          # after a command
             '"t" Enter',                  # stays, by the copy's INT 27h
             '"u" Enter',                  # and by its INT 21h
             '"q" Enter',
@@ -3542,8 +3544,8 @@ SCENARIOS = {
                                           # is room for: none is free
             "F4",                         # in hex: a beep for the two
             # A byte typed behind the last one has no room either: a
-            # beep, at the end of the text, which the port has elsewhere.
-            # The key bar is gone with it; F4 brings another.
+            # beep, at the end of the text, which the translation has
+            # elsewhere. The key bar is gone with it; F4 brings another.
             'Ctrl+End "4" Ctrl+Home F4',
             "Del Del",                    # the two taken out again
             "Esc",                        # changed: asks
@@ -5301,7 +5303,7 @@ def run(scenario, program, bench, trace=False, blinking=False,
     program is ready for them and writes the screen out when the program
     waits for a key with every key of the step taken and nothing left to
     do by itself (see driver.py and DRIVER.ASM). The original and a build
-    of the port are driven alike, and neither is changed for it.
+    of the translation are driven alike, and neither is changed for it.
 
     With `trace`, what the program executed is recorded. With `blinking`,
     a screen with the program's clock on is recorded in both its states,

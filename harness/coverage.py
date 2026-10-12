@@ -10,9 +10,9 @@ Volkov Commander moves itself about in memory, but its code can be told
 from everything else by its bytes: a block whose bytes occur in the program
 file exactly once shows where in memory that part of the file sat.
 
-The port's file is an .EXE that DOS does not relocate: the program adds
-the segment it is at to the words that its relocation table names, in the
-part of it that stays in the memory once, and in the other part every
+The C translation's file is an .EXE that DOS does not relocate: the program
+adds the segment it is at to the words that its relocation table names, in
+the part of it that stays in the memory once, and in the other part every
 time it has loaded that (see tools/mkexe.c, and Reloc in
 src/c/resident.c). Code that holds such a word is not in the memory as it
 is in the file, once that is done. So a block is held against the file as
@@ -34,9 +34,9 @@ MIN_VOTES = 4
 
 FAR_CALL, FAR_JUMP = 0x9A, 0xEA
 
-# The port's file, as tools/mkexe.c makes it: a header, and behind it the
-# program from offset 100h of the segment it is loaded into, where a .COM
-# file's begins. The program has the numbers it relocates itself by in
+# The translation's file, as tools/mkexe.c makes it: a header, and behind it
+# the program from offset 100h of the segment it is loaded into, where a
+# .COM file's begins. The program has the numbers it relocates itself by in
 # words of src/c/resident.c, which the linker's map names: where its
 # relocation table is, in paragraphs from the segment's start, how many
 # entries that has for the part that goes while a command runs, and how
@@ -75,9 +75,9 @@ def blocks(trace_path):
 
 def relocated(contents, linked=None):
     """The offsets in `contents`, a program file, of the words that the
-    program adds its segment to when it is loaded: those of the port's
-    relocation table, with the linker's map of the port at `linked`. None
-    of them for a file that is no .EXE, the original."""
+    program adds its segment to when it is loaded: those of the
+    translation's relocation table, with the linker's map of the translation
+    at `linked`. None of them for a file that is no .EXE, the original."""
     if contents[:2] != b"MZ":
         return ()
     in_file = EXE_HEADER - COM_ORIGIN       # from the segment to the file
@@ -108,7 +108,7 @@ def _loaded(contents, words, base):
 
 def executed(trace_path, contents, linked=None):
     """Offset -> length in `contents` (a program file) of what was
-    executed. `linked` is the linker's map of the port, for where its
+    executed. `linked` is the linker's map of the translation, for where its
     relocation table is."""
     logged = list(blocks(trace_path))
     votes = Counter()
@@ -318,14 +318,14 @@ def link_map(path):
     return symbols
 
 
-# The port's stack, as its link map names it: an array of src/c/resident.c,
-# and the segment that the compiler has it in, of which it is all. See
-# tools/mkexe.c, which stops the build if it is not.
+# The translation's stack, as its link map names it: an array of
+# src/c/resident.c, and the segment that the compiler has it in, of which it
+# is all. See tools/mkexe.c, which stops the build if it is not.
 STACK = ("DataSav", "R_BSS")
 
 
 def stack(path):
-    """Where the port's stack begins and ends, by the wlink map at
+    """Where the translation's stack begins and ends, by the wlink map at
     `path`: two offsets from where the program is loaded, which is where
     its stack segment is."""
     array, segment = STACK

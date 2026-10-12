@@ -33,7 +33,7 @@ import re
 import sys
 from pathlib import Path
 
-EXE_HEADER = 0x20           # of the port's file: see tools/mkexe.c
+EXE_HEADER = 0x20           # of the translation's file: see tools/mkexe.c
 STACK = 0x100               # of the model, and where a call begins in it
 ENTERED = 0xC0
 AX, CX, DX, BX, SP, BP, SI, DI = range(8)
@@ -378,13 +378,14 @@ class Machine:
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("port", type=Path,
-                        help="the directory of the port: VC.EXE, VC.MAP")
+    parser.add_argument("translation", type=Path,
+                        help="the directory of the translation: VC.EXE, "
+                             "VC.MAP")
     parser.add_argument("--pairs", type=int, default=4000, metavar="N",
                         help="how many random pairs of numbers, besides "
                              "those at the edges (4000)")
     args = parser.parse_args()
-    directory = args.port
+    directory = args.translation
     count = args.pairs
     image = (directory / "VC.EXE").read_bytes()
     segment = None

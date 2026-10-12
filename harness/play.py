@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the port, or the original, on the test bench, to use it by hand.
+"""Run the translation, or the original, on the test bench, to use it by hand.
 
 The machine is the one of the tests: FreeDOS booted from its floppy, the
 bench's files on C:, the program with what it reads on D:, and the program
@@ -8,7 +8,7 @@ floppy, is not loaded. Its screen is shown in the terminal, which
 has to be 80 columns by 25 lines at least, and its keyboard is the
 terminal's. Nothing is kept: the disks are made anew every time.
 
-    play.py                     the port, build/c/VC.EXE
+    play.py                     the C translation, build/c/VC.EXE
     play.py --original          the original, VC.COM
     play.py --country ru        on the Russian bench
     play.py PROGRAM             another build

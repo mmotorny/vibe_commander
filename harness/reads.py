@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """How much the C code reads of each of the program's constants.
 
-The test of the port's data (datacheck.py) compares as many bytes as an
-object has. The program reads more of some: it copies a name as 13 bytes
-whatever its length, a title as 80, and writes a line with a table of
+The test of the C translation's data (datacheck.py) compares as many bytes
+as an object has. The program reads more of some: it copies a name as 13
+bytes whatever its length, a title as 80, and writes a line with a table of
 colours of which the line may ask for the fourth. What lies behind such
-an object in the original is read too, so the port has to have the object
-that long, with those bytes; then the comparison holds them.
+an object in the original is read too, so the translation has to have the
+object that long, with those bytes; then the comparison holds them.
 
 This lists every place where the code names a constant, a text or a table
 of the files of constants or of the code's own, and says
@@ -265,7 +265,7 @@ def _form(statement, name, sizes):
 
 def places(objects, variables=()):
     """Every place where a file of code names one of `objects`, a list
-    of (file, name, address, length) as datacheck.Port has them:
+    of (file, name, address, length) as datacheck.Translation has them:
     (file, line, name, the file of the object, its length, what is read
     there, how that is known). `variables` are names among them that are
     no constants."""
@@ -361,12 +361,13 @@ def check(objects, contents, variables=()):
 
 def main():
     import datacheck
-    port = datacheck.Port(Path(sys.argv[1]))
+    translation = datacheck.Translation(Path(sys.argv[1]))
     for file, line, name, module, length, read, how in places(
-            port.objects, port.variables):
+            translation.objects, translation.variables):
         print(f"{file + ':' + str(line):18} {name:11} {length:4} of "
               f"{module:13} {read}{'' if how == 'by its form' else ': ' + how}")
-    for line in check(port.objects, port.bytes, port.variables):
+    for line in check(translation.objects, translation.bytes,
+                      translation.variables):
         print("WRONG   ", line)
 
 

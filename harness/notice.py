@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""Say whether the scenarios notice a change to the port.
+"""Say whether the scenarios notice a change to the C translation.
 
 Every instruction of a routine that has been translated ran in the
 original, in some scenario (see ported.py). That does not mean that a
 screen shows what the instruction is for: a branch can run and leave
-nothing to see. This makes one change to a copy of the port, builds it,
-and takes it through scenarios until one differs from its golden:
+nothing to see. This makes one change to a copy of the translation, builds
+it, and takes it through scenarios until one differs from its golden:
 
     notice.py src/c/string.c "c == ':' || " "" --routine CutPath
 
@@ -27,8 +27,8 @@ reading them.
 
 The copy is built by the project's CMakeLists.txt, in build/notice, with
 the compiler that build/ has fetched; build/ has to exist. Exits with
-status 0 if a scenario notices, 1 if none does, and 2 if the changed port
-does not build.
+status 0 if a scenario notices, 1 if none does, and 2 if the changed
+translation does not build.
 """
 import argparse
 import subprocess
@@ -47,12 +47,12 @@ BUILD = deps.ROOT / "build"
 LISTING = BUILD / "shareware-layout" / "VC.LST"
 COPY = BUILD / "notice" / "source"
 COPY_BUILD = BUILD / "notice" / "build"
-# What the port is built from, of all that the project holds.
+# What the translation is built from, of all that the project holds.
 BUILT_FROM = ["CMakeLists.txt", "tools/mkexe.c", "src/c"]
 COM_ORIGIN = 0x100                # where a .COM file is loaded
 
 
-def copy_port():
+def copy_translation():
     """Make COPY hold what the project holds of BUILT_FROM. A file that is
     the same already is left alone, so that it is not built again."""
     wanted = {}
@@ -73,7 +73,7 @@ def copy_port():
 
 
 def build():
-    """Build the port of COPY; return it, or None with what the build
+    """Build the translation of COPY; return it, or None with what the build
     said printed."""
     fetched = BUILD / "_deps"
     steps = [
@@ -170,7 +170,7 @@ def main():
         sys.exit("no scenario ran " + ", ".join(args.routine)
                  + " in the original")
 
-    copy_port()
+    copy_translation()
     if not target.is_file():
         sys.exit(f"no file {args.file}")
     # The assembly is CP866 text; the C is ASCII.
@@ -183,7 +183,7 @@ def main():
 
     program = build()
     if not program:
-        print("The changed port does not build.")
+        print("The changed translation does not build.")
         sys.exit(2)
     found = noticed(program, names)
     if not found:

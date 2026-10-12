@@ -8,10 +8,10 @@
  * assembly, in a #pragma aux of its own, with as little beside it as
  * will do. The registers go into the instruction and come out of it as
  * arguments and as what the function returns; the compiler loads them.
- * Nothing else in the port has inline assembly, and no other file calls
- * an interrupt: the rest of the program calls these functions in plain
- * C. The ports of the machine and its interrupt flag are here too. They
- * need no assembly, the compiler has intrinsic functions for them, but
+ * Nothing else in the C translation has inline assembly, and no other file
+ * calls an interrupt: the rest of the program calls these functions in
+ * plain C. The ports of the machine and its interrupt flag are here too.
+ * They need no assembly, the compiler has intrinsic functions for them, but
  * they are the machine all the same.
  *
  * What is in the memory of the machine is not here: the BIOS's data and

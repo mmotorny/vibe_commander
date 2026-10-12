@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Say where the stacks of the original and of the port end in the memory
-of the test bench, and where the driver of the tests would put them.
+"""Say where the stacks of the original and of the C translation end in the
+memory of the test bench, and where the driver of the tests would put them.
 
 QEMU translates the code that the machine runs, a page of 4,096 bytes at
 a time, and has to look at every write to a page with code that it has
@@ -14,9 +14,9 @@ clock counted in instructions it is most of a scenario's time.
 Where DOS loads the program follows from what is loaded before it, and
 the driver of the tests can keep some memory more than it needs:
 setups.PLACE, in paragraphs of 16 bytes, for each country's bench. This
-prints, for each bench, where the stack of the original and of the port
-ends in its page, and the PLACE that would end the original's stack on a
-page. The original is the one to go by: it does not change.
+prints, for each bench, where the stack of the original and of the
+translation ends in its page, and the PLACE that would end the original's
+stack on a page. The original is the one to go by: it does not change.
 
     place.py
 

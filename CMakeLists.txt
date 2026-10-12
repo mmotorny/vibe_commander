@@ -5,9 +5,10 @@ project(vibe_commander LANGUAGES C)
 # The assembler that builds src/asm/, the original program as its author
 # published it, and the driver of the tests: a free, MASM-compatible
 # assembler that runs natively and writes .COM files directly. It is
-# fetched at a pinned commit and built from source. Nothing of the port is
-# assembled: the tests hold the port against the original, and hold the
-# original, built here, against the binary that was shipped.
+# fetched at a pinned commit and built from source. Nothing of the C
+# translation is assembled: the tests hold the translation against the
+# original, and hold the original, built here, against the binary that was
+# shipped.
 
 include(FetchContent)
 FetchContent_Declare(jwasm
@@ -29,10 +30,10 @@ set_target_properties(jwasm PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
 # --- Open Watcom --------------------------------------------------------------
-# The C compiler and the linker that build the port: an open-source compiler
-# for 16-bit DOS, among other targets. It takes hours to build from source,
-# so the project's own snapshot of 1 October 2026 is fetched, pinned by its
-# SHA-256, and the tools that run on this computer are used from it.
+# The C compiler and the linker that build the translation: an open-source
+# compiler for 16-bit DOS, among other targets. It takes hours to build from
+# source, so the project's own snapshot of 1 October 2026 is fetched, pinned
+# by its SHA-256, and the tools that run on this computer are used from it.
 
 FetchContent_Declare(open_watcom
     URL https://github.com/open-watcom/open-watcom-v2/releases/download/2026-10-01-Build/ow-snapshot.tar.xz
@@ -103,7 +104,7 @@ add_programs(shareware-layout ${layout_dir} -DSHAREWARE_LAYOUT)
 
 # And VC once more with that layout, as an object file: its relocations say
 # which words of the original hold the address of something, and of what.
-# The test of the port's data goes by them (harness/datacheck.py).
+# The test of the translation's data goes by them (harness/datacheck.py).
 list(TRANSFORM VC_includes PREPEND ${CMAKE_SOURCE_DIR}/src/asm/
      OUTPUT_VARIABLE layout_includes)
 add_custom_command(
@@ -118,12 +119,12 @@ add_custom_command(
     VERBATIM)
 add_custom_target(shareware-relocations ALL DEPENDS ${layout_dir}/VC.OBJ)
 
-# --- The port -----------------------------------------------------------------
+# --- The C translation --------------------------------------------------------
 # Volkov Commander in C: src/c/*.c, compiled and linked into one program,
 # VC.EXE. Nothing of it is assembled: the assembler above builds the
-# original, for the tests to hold the port against, and the driver of the
-# tests. See src/c/vc.h and tools/mkexe.c for how the program is laid out
-# and what that asks of the C.
+# original, for the tests to hold the translation against, and the driver
+# of the tests. See src/c/vc.h and tools/mkexe.c for how the program is
+# laid out and what that asks of the C.
 
 set(c_dir ${CMAKE_BINARY_DIR}/c)
 # Every C file in src/c/ is part of the program, in the order of their
@@ -179,7 +180,7 @@ set_target_properties(mkexe PROPERTIES
     C_STANDARD 99
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
-# The compiled code, which every build of the port shares.
+# The compiled code, which every build of the translation shares.
 file(MAKE_DIRECTORY ${c_dir})
 set(c_compiled "")
 # c_compile(<source> <object> <segment> <class> [<option>...]) compiles
@@ -265,7 +266,7 @@ add_custom_command(
     COMMAND mkexe ${c_dir}/linked.exe ${c_dir}/VC.MAP
             ${c_dir}/VC.EXE ${c_compiled}
     DEPENDS mkexe ${c_compiled}
-    COMMENT "Linking the port"
+    COMMENT "Linking the C translation"
     VERBATIM)
 # The program as it is shipped.
 add_custom_target(c ALL DEPENDS ${c_dir}/VC.EXE)
@@ -279,7 +280,8 @@ enable_testing()
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 # The driver of the tests: a resident program that takes the original and
-# the port through the scenarios, in the machine. See harness/DRIVER.ASM.
+# the translation through the scenarios, in the machine. See
+# harness/DRIVER.ASM.
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/DRIVER.COM
     COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
@@ -294,7 +296,7 @@ add_custom_target(driver ALL DEPENDS ${CMAKE_BINARY_DIR}/DRIVER.COM)
 add_test(NAME asm-bytes
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/bytecheck.py
             ${layout_dir}/VC.COM ${layout_dir}/VCSETUP.COM)
-# The texts and tables of the port against the original's, by their
+# The texts and tables of the translation against the original's, by their
 # names: see harness/datacheck.py.
 add_test(NAME c-data
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
@@ -308,7 +310,7 @@ add_test(NAME c-arith
 add_test(NAME c-scenarios
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
             ${c_dir}/VC.EXE ${c_dir}/VC.MAP ${layout_dir}/VC.LST)
-# The port's test runs every scenario, and on a machine that other tests
+# That test runs every scenario, and on a machine that other tests
 # share it takes many times as long as by itself: it gets an hour before
 # it counts as stuck, where CTest would give it 25 minutes.
 set_tests_properties(c-scenarios PROPERTIES TIMEOUT 3600)

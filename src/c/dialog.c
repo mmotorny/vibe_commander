@@ -107,8 +107,8 @@
 
    AsmSeg returns the segment of the program's constants, where the boxes
    and the dialogs are. Naming one of them would give it too, as a number
-   that is set when the program is loaded; the test of the port knows
-   code by its bytes in the file and would not see a function run that
+   that is set when the program is loaded; the test of the C translation
+   knows code by its bytes in the file and would not see a function run that
    begins with such a number.
 
    The routines that a dialog may name for Enter and F10, the SUB_ of

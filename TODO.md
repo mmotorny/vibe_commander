@@ -5,10 +5,10 @@ Things that are known and not done. Standing instructions are in
 
 ## The last of the assembly
 
-Done: the port has no assembly file, and its build runs no assembler
-for it. The assembler that the build fetches, JWasm, builds the
-original from `src/asm/`, which the tests hold the port against and hold
-against the shipped binary, and the driver of the tests. This is a
+Done: the C translation has no assembly file, and its build runs no
+assembler for it. The assembler that the build fetches, JWasm, builds the
+original from `src/asm/`, which the tests hold the translation against and
+hold against the shipped binary, and the driver of the tests. This is a
 short account of how the rest went, for whoever reads the history.
 
 When every routine was C, `src/c/asm/` still held the data and the glue.
@@ -33,7 +33,7 @@ It went in this order:
    left, `VC.ASM`, still said without an instruction or a byte of data:
    how the program is laid out. That is said by two options of the
    compiler and by the linker's command, and held by `tools/mkexe.c`:
-   the README has it under "The port", and each place that rests on
+   the README has it under "The C translation", and each place that rests on
    the compiler under "What rests on Open Watcom". The layout of the
    main data that the file had, its `STRUC`, nothing read any more:
    `struct MainDat` of `src/c/vc.h` is the only one.
@@ -55,7 +55,7 @@ What the last step found, beyond what the README says:
   of the table of relocations.
 - `md` is still an `extern` object, named to the linker as `Psp`. A
   layout at the number 0 does not work with this compiler, and neither
-  does one based on the data segment: `CLAUDE.md`, "C for the port",
+  does one based on the data segment: `CLAUDE.md`, "C for the translation",
   has why.
 - Looked at and not taken: an object file without code or data that a
   tool writes, for the segments and the groups, which would do the same
@@ -67,15 +67,15 @@ What the last step found, beyond what the README says:
 
 ### What holds the data
 
-The test `c-data`, `harness/datacheck.py`, holds every object of the port
-that has the name of an object of the original against the original's
-bytes, without a machine: 96 constants of the C code, 2,976 bytes, and
-373 objects of the assembly, 8,545 bytes, when it was made, and 469
-objects of the C code, 11,973 bytes, now that all are C. It names
+The test `c-data`, `harness/datacheck.py`, holds every object of the
+translation that has the name of an object of the original against the
+original's bytes, without a machine: 96 constants of the C code, 2,976
+bytes, and 373 objects of the assembly, 8,545 bytes, when it was made, and
+469 objects of the C code, 11,973 bytes, now that all are C. It names
 each. A word that holds an address is held by what it names: the
 original's source is assembled once more as an object file, whose
-relocations say which words those are, and the port has to have at such
-a word the address of what has that name in the port. So nothing
+relocations say which words those are, and the translation has to have at
+such a word the address of what has that name in the translation. So nothing
 describes an object to the tool; an object is written with the names of
 the assembly and the linker does the rest.
 
@@ -104,8 +104,8 @@ What it does not hold, each listed in the tool with the reason:
   `switch` statements of `src/c/main.c`, as the tables of keys are.
 
 The tables of the menus' commands it holds in a way of their own. The
-original has the address of a command for every item; the port has the
-number of the command, a `CMD_` of `src/c/vc.h` that is named after the
+original has the address of a command for every item; the translation has
+the number of the command, a `CMD_` of `src/c/vc.h` that is named after the
 original's label, and the test reads those numbers there: an item that
 has another command than the original's fails it.
 
@@ -121,7 +121,7 @@ than the assembly has them for this; `User_S` was the last found.
 Weighed against that, and not done: the constants laid out as one
 block in the original's order, so that what follows each object is the
 original's by construction. What it would take: the original's two
-segments of data are 13,096 bytes; the port has 11,568 of them under
+segments of data are 13,096 bytes; the translation has 11,568 of them under
 their names, in thirteen files of constants and some ninety arrays that
 the code files read through CS, and the rest is gone, tables of keys
 that are `switch` statements and tables of addresses. One block is one
@@ -133,7 +133,7 @@ by side. What it would cure beyond the sweep is nothing that is known.
 The reads that the sweep cannot make good, the menu that is none and
 the 88 bytes of a panel's defaults, go on into addresses of routines
 and into what is no data, and a word that holds an address is another
-number in the port wherever it stands. What the block would have and
+number in the translation wherever it stands. What the block would have and
 the sweep has not is that it needs no reading of the code: the tool
 goes by the text of the C, and a read that it takes for another form
 than it is would pass.
@@ -148,11 +148,11 @@ than it is would pass.
   called handed back another CX. Held against the original by hand when
   the editor's keys were translated, over some thirty steps of
   `editor-keys`, `editor-hex-keys` and `editor-buffer`, in text and in
-  hex: 27,104 less in each, 331,648 for an empty text, with the port
+  hex: 27,104 less in each, 331,648 for an empty text, with the translation
   at 90,560 bytes.
 - Saving in the editor to a disk that cannot be written, the floppy A:
   of the bench, with the box of DOS's critical error, is in no scenario:
-  it went beyond the stack of 256 bytes that the port had when the
+  it went beyond the stack of 256 bytes that the translation had when the
   editor's saving was translated. With the stack of 4,096 bytes it can go
   back into one.
 - `T80_00` takes what the program knows of the main extension file from
@@ -173,7 +173,7 @@ than it is would pass.
   the program's random numbers say, and nothing sets the two words that
   those are made of, `Rand1` and `Rand2`, when the program starts: the
   sky follows from what the memory held where the main data is. On the
-  bench that is 0 for the original, and something else for the port,
+  bench that is 0 for the original, and something else for the translation,
   whose main data is elsewhere, another thing with every build. So a
   step may not end in the blanker. The scenario `blank` brings it up,
   with the mouse in the top right corner, and ends it in the same step,
@@ -183,8 +183,8 @@ than it is would pass.
   could end in the sky and a golden could hold it; that would be other
   behaviour than the original's, and is not decided.
   The C was held against the original by hand instead, once, outside
-  the tests: with the port's two words set, in a build made for it, to
-  what the original's are when the blanker comes up first, and with a
+  the tests: with the translation's two words set, in a build made for it,
+  to what the original's are when the blanker comes up first, and with a
   step that lets the program go round without ending, both were taken
   through a sky of some hundreds of turns, and every screen of either
   was one that a model of the routine, written from the assembly, has
@@ -209,15 +209,15 @@ than it is would pass.
 - The Info panel says how much memory is free: what the part of the
   program that stays during a command leaves, or with Memory allocation
   switched off, "F9 o m", what is left with all of the program loaded.
-  Both follow the size of the port, and the number is left out of the
+  Both follow the size of the translation, and the number is left out of the
   comparison in every scenario (see `harness/deviations.py`). So nothing
-  checks the number itself: that the port has less by what it is larger,
-  at least. The same goes for what `mem` says in the scenario `command`,
-  416K free under the original and some 7K less under the port, whose
-  part that stays is 7,008 bytes longer, 3,840 of them its stack. With
-  those numbers left out,
+  checks the number itself: that the translation has less by what it is
+  larger, at least. The same goes for what `mem` says in the scenario
+  `command`, 416K free under the original and some 7K less under the
+  translation, whose part that stays is 7,008 bytes longer, 3,840 of them
+  its stack. With those numbers left out,
   no scenario shows any more that the program gives up its memory while
-  a command runs: a check of its own would hold the port's figure
+  a command runs: a check of its own would hold the translation's figure
   against the original's less what the link map says the part has grown
   by.
 - Every disk of the bench has a volume label, so no scenario has the
@@ -245,8 +245,8 @@ than it is would pass.
   has run in a scenario, those that tell a program run as the viewer of
   the mouse too, since the bench has one; what they tell it shows on no
   screen.
-- What the commands that view and edit do in the original and the port
-  does after them; whether to mend any of it is not decided:
+- What the commands that view and edit do in the original and the
+  translation does after them; whether to mend any of it is not decided:
   - An extension file of the viewer, `VCVIEW.EXT` of the current
     directory, that DOS will not open for another reason than that it
     is not there, has F3 do nothing, without a word: a directory of
@@ -287,7 +287,7 @@ than it is would pass.
   steps for eight instructions. What they do then looks like a slip:
   the next part is read and shown from its start, half of the memory
   further on, and the lines between are skipped.
-- What the viewer does and the port does after it, found while its
+- What the viewer does and the translation does after it, found while its
   keys were translated; whether to mend any of it is not decided:
   - Esc, Ctrl-C or F10 typed while a file is being opened for the
     viewer or the editor stops it, and the file stays open: `V00_02`
@@ -395,8 +395,8 @@ than it is would pass.
   written with what follows it in the original.
 - `FindFil` calls itself, through `DirFunc`, once for every level of
   the directories it searches. The original took 18 bytes of its stack
-  of 256 for a level, by reading; what the port takes of its 4,096 has
-  not been measured, and how deep a tree either can search has not been
+  of 256 for a level, by reading; what the translation takes of its 4,096
+  has not been measured, and how deep a tree either can search has not been
   tried. The scenarios search three levels. DOS's critical error can come up with
   all of that on the stack: `FindFil` calls DOS for the files, and to
   open and read them.
@@ -411,7 +411,7 @@ than it is would pass.
   kind of panel that nothing asks for. The one of EGA lines that keeps
   the pointer of the mouse on the screen when it is below the 25th row
   and 50 lines become 25 runs at the end of `mouse-help`.
-- What the commands of the menus do in the original and the port does
+- What the commands of the menus do in the original and the translation does
   after them; whether to mend any of it is not decided:
   - The configuration and EGA lines end by writing the prompt and
     drawing the panels again "if the panel is on", with DS on the main
@@ -433,7 +433,7 @@ than it is would pass.
     program, and the name of the file as 13; the 64 bytes that become
     the name of the file to edit have those behind the name's end. The
     C copies them from the assembly, as long as that has them. Behind
-    " User Menu " the port has other bytes than the original from the
+    " User Menu " the translation has other bytes than the original from the
     42nd on: the texts of the box of the drives stood there, and are in
     `src/c/drive.c` now. Nothing reads them.
   - The boxes of Save setup and of Compare directories are shown with
@@ -442,7 +442,7 @@ than it is would pass.
   - The configuration loads CL with whether the menu bar is always
     visible, before its dialog, and nothing reads it.
 - Drive... of a panel's menu, "F9 l d", showed the box for a panel that
-  was none in the port, from the batch of the menu bar until that of
+  was none in the translation, from the batch of the menu bar until that of
   the commands: the bar's table jumped to the stub of `F62_01` with the
   registers of the original, and the stub takes others. The box said
   "right" for the left panel and wrote to a segment made of the item's
@@ -468,15 +468,15 @@ than it is would pass.
   tables in its own place, so what it reads there is something else.
   `mouse-drag-menu` has the bar left like that, "Click@70,0*5>25,0*1",
   and Right there, which goes to the first menu in the original and in
-  the port. It does not press F1: the page of the help is a byte that
-  the original takes from its data and the port from its code, the
+  the translation. It does not press F1: the page of the help is a byte that
+  the original takes from its data and the translation from its code, the
   word behind the table of the pages read as a place in that table.
   Tried by hand, both showed the same box, "There was error reading
   data from the help file", for a page that is none; another build of
-  the port may have another byte there. Enter, Down and Left there
+  the translation may have another byte there. Enter, Down and Left there
   were not tried, and F1 stays out of the scenario: they open a menu
   from behind the table, or show a page by that byte, so the original
-  goes by stray memory there and the port cannot be held to it.
+  goes by stray memory there and the translation cannot be held to it.
 - In an open menu the key of an item that is dark, Ctrl+a in the Files
   menu of a tree, is not dropped: the number of the item is looked for
   among the letters of the items, where it is not. And the table of
@@ -530,8 +530,8 @@ than it is would pass.
   says 0 or 4096 and has no entries has its sum taken over 65536 bytes,
   all of the main data's segment. Ported like that; it takes a file made
   by hand.
-- What the commands of Copy and Rename do in the original and the port
-  does after them; whether to mend any of it is not decided:
+- What the commands of Copy and Rename do in the original and the
+  translation does after them; whether to mend any of it is not decided:
   - When a directory of a tree panel has been renamed, the current
     directory of DOS is taken along if its path begins with that of the
     directory, whether a name ends there or not: with DOCS renamed to X
@@ -549,7 +549,7 @@ than it is would pass.
     size in DX. So the name is never offered, which `rename-keys` and
     `copy-ask` show.
 - The map of the memory, Alt+F5, names the program by its file: VC.COM
-  in the original and VC.EXE in the port. `harness/deviations.py` has
+  in the original and VC.EXE in the translation. `harness/deviations.py` has
   the golden expect VC.EXE there, as it does where the program cannot
   be loaded again. That is no figure that follows the size of the
   program, and no scenario can show the map without that line: the
@@ -572,7 +572,7 @@ than it is would pass.
   leaves the map, and in `mouse-drag-lists` a button that is moved
   while it is down, from a line to above the lines or below them, where
   the cursor goes on, and from beside the lines onto the buttons.
-- What the map does in the original and the port does after it:
+- What the map does in the original and the translation does after it:
   - A line with exactly eight vectors shows seven and three full stops,
     as one with more does: `MemItem` counts the vectors down in AL and
     tests all of AX, whose other half holds the colour of the line. By
@@ -595,7 +595,7 @@ than it is would pass.
   another disk when one is full, where the directories of the target
   are made on the new disk, 31 instructions: the same disk is still
   there on the bench.
-- What the original does and the port does after it, found while
+- What the original does and the translation does after it, found while
   `C00_00` was translated; whether to mend any of it is not decided:
   - F6 on a directory offers its own name, and Enter on that moves the
     directory into itself: `DOCS\DOCS` is made, then found in `DOCS`
@@ -636,8 +636,8 @@ than it is would pass.
     ends. That happens when a file is appended to one whose size is no
     whole number of clusters, the disk gets full, and the user goes on
     and has the target overwritten. `copy-full` did that at first: the
-    port left a file of the same size and other contents, because where
-    the memory ends depends on how much of it the program takes. It
+    translation left a file of the same size and other contents, because
+    where the memory ends depends on how much of it the program takes. It
     copies to new files now, so no scenario has it.
   - Of a device that gives its bytes in several calls of DOS to a
     piece, the room left in the memory is counted down by the last
@@ -705,9 +705,9 @@ than it is would pass.
   that DOS will not read, and three where the window would move up by
   fewer lines than it does, or begin above line 0.
 - `editor-big` has a file of 381,338 bytes that is too large for the
-  editor, of the original and of the port alike. One that fits, with a
-  size in the same 64K as the room, has no place in a scenario: the
-  port's room was 27,104 bytes less than the original's then and
+  editor, of the original and of the translation alike. One that fits, with
+  a size in the same 64K as the room, has no place in a scenario: the
+  translation's room was 27,104 bytes less than the original's then and
   shrinks with every batch. So of the two instructions that compare the low words,
   the scenarios take the jump one way only.
 - `T54_00`, which goes to the line before, looks backwards for where a
@@ -726,13 +726,13 @@ than it is would pass.
   `FindFil` that close the file then, `FnFl48`, are listed as out of
   reach. To have that again, the driver of the tests would have to hand
   a key over when the search comes to a named place, in the original and
-  in the port alike: it would have to be told where that is in each, as
-  it is told where `LeaveTm` is.
+  in the translation alike: it would have to be told where that is in each,
+  as it is told where `LeaveTm` is.
 - The bench has a mouse now, and scenarios use it: `mouse-panel`,
   `mouse-bars` and `mouse-dialog`, with which 349 of the instructions
   that `harness/ported.py` listed as out of reach for the mouse came off
   the lists, and the scenarios that followed with nearly all the
-  others. What is still listed, by the file of the port that has it:
+  others. What is still listed, by the file of the translation that has it:
   - `help.c`, 1: a click below the last line of an index shorter than
     the window; the file has none.
   - `menu.c`, none: `mouse-menu` has the rest of the menu bar.
@@ -765,8 +765,8 @@ than it is would pass.
   what `DelTr0` leaves in AL for the kind of the panel: 1, the one byte
   that DOS has written. With the file read-only the byte is not
   written, the routine beeps and leaves DOS's error there, 5: the panel
-  is then one of a kind that there is not. The port hands back the same
-  5. No scenario does it: what the C code of the panels makes of a
+  is then one of a kind that there is not. The translation hands back the
+  same 5. No scenario does it: what the C code of the panels makes of a
   fourth kind rests on reading, and whether it is what the original
   makes of it has not been tried. `delete` has `^R` with the file
   writable.
@@ -776,7 +776,7 @@ than it is would pass.
   takes it for an error. Ported like that, through `Intr21f`; `delete`
   has it. It rests on FreeDOS leaving the flag: of another DOS that
   clears it the original would say "Can't find files", and so would the
-  port.
+  translation.
 - When DOS deletes the files of a directory at one call, it stops at
   the first that is read-only; the others are deleted one by one
   afterwards. Cancel in the box about a directory that is not empty
@@ -831,7 +831,7 @@ than it is would pass.
   Enter tells it to make current first when the program was started
   on another: it reads that for `INT 2Eh` only. The C sets it by
   reading.
-- What Enter and the keys next to it do in the original and the port
+- What Enter and the keys next to it do in the original and the translation
   does after them; whether to mend any of it is not decided:
   - Enter on a file that is no program copies 3,999 bytes from where
     the panel keeps the extension file of its directory, which is 512:
@@ -860,8 +860,8 @@ than it is would pass.
   `F20_02`: whatever removes or renames a directory has both panels
   read again, and the drives of the bench are ready. What they do for
   the mouse runs in `mouse-panel`, `mouse-list` and `mouse-select`.
-- What the keys of the panels do in the original, and in the port after
-  it; whether to mend any of it is not decided:
+- What the keys of the panels do in the original, and in the translation
+  after it; whether to mend any of it is not decided:
   - Ctrl+R in a tree panel reads nothing if the disk has no tree file,
     as a disk with fewer than five directories has none: `DelTr0` cannot
     open the file to mark it, and the command takes that for a failure.
@@ -883,9 +883,9 @@ than it is would pass.
   `M30_60` where the year is written first, and `DirFunc` for a path
   of 68 characters or more ran in no scenario and rest on reading.
 - A directory deleted with what is below it takes about 90 bytes of
-  the stack for every level in the port, where the assembly took 22.
-  The 32 levels that a path of DOS can have fit the port's stack; they
-  did not fit the original's 256 bytes.
+  the stack for every level in the translation, where the assembly took 22.
+  The 32 levels that a path of DOS can have fit the translation's stack;
+  they did not fit the original's 256 bytes.
 
 - Of the user menu, the history and the box of the drives, these have
   run in no scenario and are listed as out of reach in
@@ -898,7 +898,7 @@ than it is would pass.
   and `mouse-drag-lists`. A click on F1 or F10 of the key bar is the help or
   leaves the user menu, where the key itself is a line's if the menu
   has one for it: `Input0` says which of the two a key was.
-- What the original does and the port does after it, found while the
+- What the original does and the translation does after it, found while the
   user menu was translated; whether to mend any of it is not decided:
   - A line of a menu that has no command, at the end of the file, is
     run from the byte behind the end-of-file character: what MenuBuf has
@@ -921,8 +921,8 @@ than it is would pass.
     stack, and, for the name of a file of the panel, with DS on the
     panel: the line of a command that begins with "@" is then cleared in
     the colour that the byte of the panel at the place of `CrntCol` is.
-    The port clears it in that colour too; the word on the stack it does
-    not leave. No scenario has commands that long.
+    The translation clears it in that colour too; the word on the stack it
+    does not leave. No scenario has commands that long.
   - The speed search hands `Input` the column of its cursor for the key
     bar to show. The key bar is off while it runs.
 - What a command leaves in the registers reaches the next command
@@ -931,7 +931,7 @@ than it is would pass.
   `src/c/main.c`, found by reading every stub when the loop came to call
   the commands: the mouse's commands, the key for the command line, CX
   by EGA lines, and BX and DX by Rename and Copy where they do not
-  count what is selected. For the last the port was wrong until then,
+  count what is selected. For the last the translation was wrong until then,
   and no scenario showed it. The note here said that `Func05` loads BX
   with an address whenever a command has run, so that DX decides
   nothing. That holds for a command that comes back to the loop at
@@ -945,9 +945,9 @@ than it is would pass.
   hands on BX, DX, SI and CX as the assembly left them.
 - What the program does by the hundredths of the time of day is the
   same every time a scenario is run with the same program, but need not
-  be the same in the port, which gets to a step some instructions later
-  than the original, and so some hundredths. `DoublMo` adds 0.4 seconds
-  to the time of day of a click, and three instructions of it, `INC
+  be the same in the translation, which gets to a step some instructions
+  later than the original, and so some hundredths. `DoublMo` adds 0.4
+  seconds to the time of day of a click, and three instructions of it, `INC
   DH`, `CMP DH,60` and `JB DblMo2` at 9506h, run when the hundredths
   are 60 or more; `SUB DL,100` in `Func07` is such a place too. Which
   way they went in the original is in the golden; a scenario that has
@@ -1008,7 +1008,7 @@ than it is would pass.
     loop first holds the setup against the one that was saved: `MkIni1`
     fills both fields with zeros behind their texts, in the panel, before
     the first key is taken, and the setup file is made of that. The
-    port has no such table any more, the keys are a `switch`, and
+    translation has no such table any more, the keys are a `switch`, and
     `Init00` of `src/c/start.c` puts zeros where the original has those
     80 bytes. Nothing was found that reads them in between: the mask
     and the path are read as texts, by `SetMask`, `PutPath`, `Init50`
@@ -1040,8 +1040,8 @@ than it is would pass.
   screen that it should not have left, is the sign; `start-screen` has
   its programs typed right.
 - What the program's watch on DOS does in the original, and in the
-  port after it (`src/c/resident.c`); whether to mend any of it is not
-  decided:
+  translation after it (`src/c/resident.c`); whether to mend any of it is
+  not decided:
   - The call by which another program asks for the program's data,
     INT 21h with AH 2Bh, CX 'VC' and DX 'OM', returns with the flags as
     the handler has them, not as the caller had them: the carry flag
@@ -1065,7 +1065,7 @@ than it is would pass.
   - The twelve bytes of a program's name are taken from where the name
     begins in what DOS was asked to run, whatever follows the name
     there.
-- The entry of the program, in the original and in the port:
+- The entry of the program, in the original and in the translation:
   - The program sets how DOS looks for memory to what it is when DOS
     starts, the lowest block that fits and no upper memory, whatever it
     was when the program was run. Ported as it is.
@@ -1074,19 +1074,19 @@ than it is would pass.
     memory by the data of the part that stays, and then asks DOS for a
     block elsewhere for the part that goes: so it can be loaded into
     a block that holds its file and little more, the upper memory for
-    one. The port's file is as long as the program in the memory, so
+    one. The translation's file is as long as the program in the memory, so
     DOS loads it where all of it fits or not at all, and that second
-    way is not in the port: it could only be taken with DOS's chain of
-    blocks destroyed, where it fails too. The port ends then as the
-    original does when both ways fail, "Program too big to fit in
+    way is not in the translation: it could only be taken with DOS's chain
+    of blocks destroyed, where it fails too. The translation ends then as
+    the original does when both ways fail, "Program too big to fit in
     memory".
   - The check sum by which the program knows its file again after a
-    command leaves out the data of the part that stays, in the port:
+    command leaves out the data of the part that stays, in the translation:
     the stack is there and in use while the sum is taken.
-  - A DOS before version 3 is left by its function 0 in the port,
+  - A DOS before version 3 is left by its function 0 in the translation,
     where the original returns to the INT 20h that a .COM file has at
     the bottom of its stack. Both end the program the old way.
-- What running a command does in the original, and in the port after
+- What running a command does in the original, and in the translation after
   it (`src/c/resident.c`); whether to mend any of it is not decided:
   - Whether DOS had a block of memory for the part of the program that
     is loaded again is taken from the block's address less a number of
@@ -1117,7 +1117,7 @@ than it is would pass.
     of its list when the last program on it was released. No program
     can rely on them. In `ended`, where a program made for it has DOS
     end a second copy.
-- What the critical error does in the original, and in the port after
+- What the critical error does in the original, and in the translation after
   it (`FatErr` in `src/c/main.c`):
   - The number of the error is all of DI, of which DOS defines the low
     byte. A number of 21 or more is "Unknown error.", and so is any
@@ -1145,7 +1145,7 @@ than it is would pass.
     would have to be assembly again, or run on a stack of the
     program's own, which is assembly too and not what the original
     does.
-  - Where the processor leaves the auxiliary flag undefined, the port
+  - Where the processor leaves the auxiliary flag undefined, the translation
     has it clear in the flags that it enters DOS with: after the `XOR`
     of a list that is full, and after the `SHL` of INT 27h. The
     processor of the bench leaves it clear after `SHL` as well.
@@ -1154,20 +1154,20 @@ than it is would pass.
     The first was tried by hand, with nineteen programs from the second
     copy of `passed-on`: a program that is ended for a full list, AH
     31h made 4Ch, came to the watcher with zero, parity, carry and
-    interrupts let in, 0247h, under the original and under the port
+    interrupts let in, 0247h, under the original and under the translation
     alike. It is not kept. The watcher is on the first copy's list, so
     that list is full a program sooner, and the first copy ends the
     eighteenth, of which the second has a record all the same; whether
     it still has it when the next one comes follows where the memory
     was taken, which follows the size of the program, and so the
-    original's second copy was not full for INT 27h where the port's
+    original's second copy was not full for INT 27h where the translation's
     was. A watcher that runs the second copy itself, as its parent,
     would be on no list. The second rests on reading.
   - The second way of the entry is not there: the original, when DOS
     will not make its block of memory as long as the program needs,
     asks for a block elsewhere for the part that goes, so it can be
     loaded into a block that holds its file and little more. The
-    port's file is as long as the program in the memory, so DOS loads
+    translation's file is as long as the program in the memory, so DOS loads
     it where all of it fits or not at all (see the entry, above). As
     the original: the file would have to be shorter than the program
     again, with the data of the part that stays laid over what
@@ -1177,24 +1177,24 @@ than it is would pass.
     of assembly (`CLI`, SS, SP, `STI`) and a jump as behind INT 2Eh,
     and the check sum and `harness/driver.py`, which knows what the
     stack holds when loaded, would follow the new layout.
-- Where the size of the port becomes other behaviour, for the user to
-  weigh. A second copy of the port that runs a program which stays in
+- Where the size of the translation becomes other behaviour, for the user to
+  weigh. A second copy of the translation that runs a program which stays in
   the memory may have no room to load itself again afterwards, and
   ends with "Program too big to fit in memory", where the original
-  goes on. It follows from how large the port is in the memory and in
+  goes on. It follows from how large the translation is in the memory and in
   its file, and from nothing else: the translation does there what the
   original does. A program that stays lies behind the COMMAND.COM that
   ran it, a gap of 71K when that has ended. The part that is loaded
-  again is 111K in the port and 51K in the original: the original's
-  fits the gap, the port's goes behind the program that stays. And it
+  again is 111K in the translation and 51K in the original: the original's
+  fits the gap, the translation's goes behind the program that stays. And it
   is loaded from the program's file, which wants its own length behind
-  that once more, 130K in the port and 64K in the original. With
+  that once more, 130K in the translation and 64K in the original. With
   another program staying in front of the copy, behind a gap of its
   own, the watcher of `passed-on`, that is more than the bench has
-  left; without one in front the port has room, which was tried. The
+  left; without one in front the translation has room, which was tried. The
   scenario switches Memory allocation off in the copy, which keeps all
-  of it loaded. The port may use more memory than the original as long
-  as it behaves the same: this is a place where it does not.
+  of it loaded. The translation may use more memory than the original as
+  long as it behaves the same: this is a place where it does not.
 - How the part that stays in the memory is laid out by C, and what it
   rests on (`src/c/resident.c`, `tools/mkexe.c`). Each of these is in
   the README's list, "What rests on Open Watcom"; this is what would
@@ -1243,9 +1243,9 @@ than it is would pass.
 - `CtrlC`, the routine that the program has for Ctrl-C of DOS and for
   Ctrl-Break of the BIOS, runs in no scenario: the BIOS of the bench
   makes no interrupt of Ctrl and ScrollLock, which was tried with a key
-  added to `harness/driver.py` for it and taken out again. In the port
-  it is an interrupt function without a body, which saves the registers
-  and puts them back where the original has one instruction.
+  added to `harness/driver.py` for it and taken out again. In the
+  translation it is an interrupt function without a body, which saves the
+  registers and puts them back where the original has one instruction.
 - Ported as they are, in `src/c/main.c`:
   - When a panel cannot be read and another drive is chosen for it,
     the assembly notes the drive if none is noted as the one that
@@ -1307,8 +1307,8 @@ than it is would pass.
   are read by the mouse's commands alone, which the loop sets them for
   just before, and what else the loop writes there, as the original
   leaves those registers, nothing reads.
-- What the routines of this batch do in the original and the port does
-  after them; whether to mend any of it is not decided:
+- What the routines of this batch do in the original and the translation
+  does after them; whether to mend any of it is not decided:
   - `SaveSet` makes the setup file anew before it writes it: when the
     writing fails, what the file held is gone. A file that could not be
     written whole stays as it is, and the error that comes back has a
@@ -1354,8 +1354,8 @@ than it is would pass.
   `MovScr` wait for it not to draw, 20; and TopView or DESQview, two of
   `Window`. Which of these the machine is, the program finds out when it
   starts, and no menu says otherwise.
-- What these routines do in the original and the port does after them;
-  whether to mend any of it is not decided:
+- What these routines do in the original and the translation does after
+  them; whether to mend any of it is not decided:
   - `Window` tells TopView or DESQview which cells of their buffer have
     changed with ES on the main data, where the call takes the segment
     of the buffer. By reading: the bench runs neither.
@@ -1415,7 +1415,7 @@ the program waiting for the timer while a box grows; pressing keys is
 four is in use; each is on a local branch of the checkout named, not
 pushed.
 
-- A build of the port that tests itself (`proto-selftest`, checkout
+- A build of the translation that tests itself (`proto-selftest`, checkout
   `.8`). The program's own routines that call the keyboard BIOS, 14
   places, and its mouse routines ask a driver in place of the BIOS; DOS,
   the disks, the screen and the clock are the real ones. 71 of 72
@@ -1540,10 +1540,10 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     stopped both times at step 36, '"c1" Enter', a copy of 3 MB that did
     not end within the 20 seconds a step had then. `move` differed at
     step 66, '"d:\" Enter', in the full run and not by itself: the
-    port's screen was taken with the dialog of F6 off the screen and the
-    box of the move not yet drawn, and the next two screens were a step
-    behind. The end of a step of the port has been tied to the keys it
-    has taken since. The other 56
+    translation's screen was taken with the dialog of F6 off the screen and
+    the box of the move not yet drawn, and the next two screens were a step
+    behind. The end of a step of the translation has been tied to the keys
+    it has taken since. The other 56
     scenarios were as the original, and the checks that the test makes
     after the comparison were run for the viewer's scenarios by a
     script of thirty lines around the functions of `harness/ported.py`,
@@ -1553,13 +1553,13 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     one run.
   - 1 minute: a search expected to begin at the top of the file again,
     which begins at the place found last: one trial of 19 seconds on
-    the port's build that signals. At the top of `harness/scenarios.py`
-    now.
+    the translation's build that signals. At the top of
+    `harness/scenarios.py` now.
   - 1 minute: the golden of `view-keys` derived twice, 21 seconds the
     second time, for a file between what the viewer holds and 64K,
     which `harness/reach.py` showed to be missing when the rest was
     reached.
-  - What saved time: trying every scenario on the port's build that
+  - What saved time: trying every scenario on the translation's build that
     signals before deriving its golden, 20 seconds for 58 steps, by the
     script that the batch before last describes; and a file of
     C:\STAMPS, which has a megabyte by its entry in the directory and
@@ -1586,9 +1586,9 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `c-scenarios` test before anything was translated. It showed D:\VC in a
     panel, where the program's file has another name and size; and it
     saved to the write-protected floppy, which left 4 bytes of the stack
-    in the port as it was. Two goldens derived again, 33 seconds each,
-    and the stack of every step read from the machine by a script of ten
-    lines around `scenarios._stack_left`: `ported.py` says how much a
+    in the translation as it was. Two goldens derived again, 33 seconds
+    each, and the stack of every step read from the machine by a script of
+    ten lines around `scenarios._stack_left`: `ported.py` says how much a
     scenario leaves, not after which step.
   - 4 minutes: `T75_00` left CX as it came, where the original leaves
     0, and its caller goes on with CL. The test failed on a status line
@@ -1627,8 +1627,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   passed the first time it was tested, but for two functions of earlier
   batches that nothing called any more.
   - 4 minutes: a file of 332,152 bytes for the editor, which fitted the
-    original and the port as it was, and was 504 bytes too large for
-    the port with the editor in C: the scenario failed on the first
+    original and the translation as it was, and was 504 bytes too large for
+    the translation with the editor in C: the scenario failed on the first
     run of the translation. It has a file now that is too large for
     both. At the top of `harness/scenarios.py`.
   - 3 minutes and a half: a full `c-scenarios` test that failed on nothing
@@ -1644,14 +1644,14 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     were derived next to other runs; and A:\SETUP.BAT, which the
     bench's floppy has not.
   - 14 minutes: a step of five keys in `editor-full` with two beeps in
-    it and F4 before and after them, which the port passed twice and
+    it and F4 before and after them, which the translation passed twice and
     then failed, in a full `c-scenarios` test of nine minutes: the key bar
     was missing. It is drawn only where the program waits and finds no
-    key, and the port need not wait within a step. Found by reading
+    key, and the translation need not wait within a step. Found by reading
     `Input0` and `PutKey0`; at the top of `harness/scenarios.py` now.
   - What saved time: `harness/reach.py` with steps and `--changes`
     written to a file, 10 seconds for 30 steps, and the scenarios run
-    on the port before anything was translated, with
+    on the translation before anything was translated, with
     `harness/compare.py` and the build that signals: 30 seconds for
     all of the editor's.
 
@@ -1702,7 +1702,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - 1 minute and a half: a derivation that stopped, "the screen did not
     settle", at the step that ends in the help; the next one went
     through.
-  - 1 minute: `FndAdr_c` not executed in the port. Its stub is called
+  - 1 minute: `FndAdr_c` not executed in the translation. Its stub is called
     by Go to alone, which no scenario had: three steps more, and the
     golden derived again.
   - The `c-scenarios` test failed on the stack alone, none of 256 bytes left
@@ -1741,15 +1741,15 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - 10 minutes waiting for a turn at the computer, in seven runs: 99
     seconds before a run of `harness/reach.py` with steps, 42, 157, 104
     and 77 before the goldens were derived, 27 before a `c-scenarios` test
-    and 98 before a run of `harness/show.py` on the port. The others' tests
-    follow one another, and a run that wants the computer alone waits
+    and 98 before a run of `harness/show.py` on the translation. The others'
+    tests follow one another, and a run that wants the computer alone waits
     for a gap.
   - 6 minutes: `EXTERN` for the C functions at the top of `VCF1.INC`,
     which is included inside the code. The assembler made near calls of
     the far ones without a word; deleting worked and the attributes
     ended in "Invalid Opcode". A `c-scenarios` test failed, 77 seconds,
-    three runs of `harness/show.py` on the port, and the bytes of a stub
-    read in the program file. In `CLAUDE.md` now.
+    three runs of `harness/show.py` on the translation, and the bytes of a
+    stub read in the program file. In `CLAUDE.md` now.
   - 6 minutes: the golden of `delete` derived four times, 71 seconds
     each. The tree's file is gone from the root after a directory has
     been deleted from the tree; a panel lists the new one only when it
@@ -1784,7 +1784,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     now.
   - 3 minutes: the `c-scenarios` test took 268 seconds next to the tests and
     the recordings of seven other batches, where it takes 105 by itself. The
-    steps were tried on the port's build that signals first, 6 to 10
+    steps were tried on the translation's build that signals first, 6 to 10
     seconds a run, and the three goldens were derived once, in 19
     seconds.
   - 2 minutes: the commit had the message of another batch. The file
@@ -1845,7 +1845,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     golden was derived, 100 before the `c-scenarios` test with the routines
     still assembly; and the first test of the C took 156 seconds where
     it takes 78 by itself.
-  - 3 minutes: "not executed in the port" for three functions that
+  - 3 minutes: "not executed in the translation" for three functions that
     began by loading the segment of the assembly as `seg Title_S`, a
     number that is set when the program is loaded. A test of 139
     seconds, and an entry that hands the segment over instead. In
@@ -1872,13 +1872,13 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     which another batch has; they were left. In `CLAUDE.md` now.
   - 2 minutes: the golden of `panel-keys` derived four times, 12 to 17
     seconds each. With the right panel off the end of the program's
-    banner shows, which the original and the port have differently:
-    found by `harness/compare.py` on the port before anything was
+    banner shows, which the original and the translation have differently:
+    found by `harness/compare.py` on the translation before anything was
     translated, 20 seconds. Then a step for the one instruction left,
     and one for the function that only the menu calls. At the top of
     `harness/scenarios.py` now.
-  - What saved time: the scenarios were tried on the port's build that
-    signals, six seconds for twenty steps, by a script of ten lines
+  - What saved time: the scenarios were tried on the translation's build
+    that signals, six seconds for twenty steps, by a script of ten lines
     around `scenarios.run` and `show.print_screens`, and held against
     their goldens with `harness/compare.py` before the translation and
     after it, 20 seconds; the full `c-scenarios` test ran once before the
@@ -1914,11 +1914,11 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   routines, some 65 minutes in all, next to seven other batches. The
   translation passed the full test the first time that ran.
   - 3 minutes: the end of the banner. The scenario switched the right
-    panel off next to the left one, and the port showed "are" where the
-    golden has "ware": `harness/deviations.py` knows the banner by its
+    panel off next to the left one, and the translation showed "are" where
+    the golden has "ware": `harness/deviations.py` knows the banner by its
     beginning only (see above). It looked like the translation, and was
-    in the port without it: the original and the port were run through
-    "Ctrl+l" and "Ctrl+p" with `harness/show.py`, and the scenario
+    in the translation without it: the original and the translation were run
+    through "Ctrl+l" and "Ctrl+p" with `harness/show.py`, and the scenario
     switches the left panel off now. The `c-scenarios` test with the batch
     listed without functions, before translating, would have said so
     at once; it was left out to save a run of three minutes.
@@ -1926,9 +1926,9 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     the pages was a constant of two dimensions, which the compiler read
     in the main data. Found in the listing; in `CLAUDE.md` now.
   - What saved time: `harness/compare.py` with `--signals` and the name
-    of the one scenario holds the port against its golden in ten
+    of the one scenario holds the translation against its golden in ten
     seconds, and both of these showed there, not in the full test.
-    `harness/show.py` on the port's build that signals tried the 49
+    `harness/show.py` on the translation's build that signals tried the 49
     steps in nine seconds before the golden was derived, which took
     nine more.
   - 4 minutes: the registers at the jump to a command. The stub gave
@@ -1967,8 +1967,8 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   `main` first:
   - 14 minutes: keys that did not arrive. 'F5 "readme.txt" Enter' as
     one step failed with "the key t did not arrive", in three runs of
-    the original, 3 minutes of them, before a run of the port with the
-    keyboard buffer printed at every key showed what it was: after a
+    the original, 3 minutes of them, before a run of the translation with
+    the keyboard buffer printed at every key showed what it was: after a
     box with an error the dialog of F5 comes up slowly, and the keys
     behind F5 fill the buffer. It looked like one letter of one name,
     because the sixteenth key was a `t` each time. `reach.py`,
@@ -1985,7 +1985,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     file it was to make is now copied from the help file. `copy-full`
     four times, 2 or 3 minutes each: for a better ending; because that
     ending, going on after a full disk with a file that was appended
-    to, left other contents in the port than in the original (see
+    to, left other contents in the translation than in the original (see
     above), which the `c-scenarios` test found after the rebase; and for
     smaller steps, after a `c-scenarios` test of four minutes that stopped
     in it at the 20 seconds a step may take.
@@ -2005,7 +2005,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     batch was changed to call what is there each time. Two of the
     tests failed: on the contents that `copy-full` left, and on its
     long step (see above).
-  - What saved time: steps tried on the port's build that signals,
+  - What saved time: steps tried on the translation's build that signals,
     which is the original's code until something is translated, needs
     no turn alone and takes a tenth of the time. A script of fifteen
     lines around `scenarios.run` and `show.print_screens` ran a whole
@@ -2017,9 +2017,9 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   batches. The translation passed the first time it was tested, and no
   run waited: nothing takes turns any more. Two goldens were derived in
   20 seconds, the first `c-scenarios` test took 151 seconds.
-  - 3 minutes: three drafts of the scenarios, tried on the port's build
-    that signals, 10 seconds each. A step typed into the buttons of the
-    dialog instead of its line, and after a directory of the tree is
+  - 3 minutes: three drafts of the scenarios, tried on the translation's
+    build that signals, 10 seconds each. A step typed into the buttons of
+    the dialog instead of its line, and after a directory of the tree is
     renamed the cursor is on another line. Both are at the top of
     `harness/scenarios.py` now.
 
@@ -2036,7 +2036,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     wrong byte of the dialog's header, 32, which is its help page. Four
     scenarios showed it at once: 45 seconds, and the `STRUC` read
     again.
-  - What saved time: all steps tried on the port's build that signals
+  - What saved time: all steps tried on the translation's build that signals
     first, six runs of `harness/show.py --changes` of 5 to 15 seconds,
     before the goldens were derived, which then took 21 seconds for
     four scenarios and were right, but for Ctrl+F8, which was added.
@@ -2069,16 +2069,16 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
   - 3 minutes: scenarios that could not stay as tried. A new file in the
     editor wants Enter once more, but not vc.mnu; a comment behind a Tab
     is run; the Info next to a panel on D: shows free bytes that follow
-    the size of the program, found by comparing the port as it was with
-    the new golden, which was derived again, 33 seconds.
+    the size of the program, found by comparing the translation as it was
+    with the new golden, which was derived again, 33 seconds.
   - 2 minutes: three builds for a variable named `far`, and for a far
     pointer kept in a near one. In `CLAUDE.md` now.
   - 1 minute: the scratchpad directory is one for all agents, and a
     directory made there for a second derivation held another agent's
     goldens under the same name. Nothing was lost; the files are in
     `build/` since.
-  - What saved time: steps tried on the port's build that signals, six
-    seconds for twenty steps; the four scenarios, 272 steps, were right
+  - What saved time: steps tried on the translation's build that signals,
+    six seconds for twenty steps; the four scenarios, 272 steps, were right
     on the original when first derived, but for the figure of D:. And
     `harness/coverage.py` came to name a later label of a stretch while
     this batch was at work, so `F80_00` could be listed after all.
@@ -2111,7 +2111,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     on `main` as it was, 17 seconds, and with `memory.c` in the second
     segment, where the first has 61,177 bytes; the second test, 254
     seconds, passed. Why the program fails with a first segment that
-    full was found out afterwards: see `CLAUDE.md`, "C for the port".
+    full was found out afterwards: see `CLAUDE.md`, "C for the translation".
 
 - The commands of the menus, 28 commands and three routines, 1,210
   bytes, 50 minutes in all, next to three other batches and the mouse of
@@ -2128,11 +2128,11 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     beforehand only for a routine that is asked about: after goldens are
     derived it could say for every batch which of its listed
     instructions have run.
-  - 4 minutes: Drive... of a panel's menu, which the port got wrong
+  - 4 minutes: Drive... of a panel's menu, which the translation got wrong
     before this batch (see above). It showed in reading what the menu's
     table jumps to, before any scenario chose the item.
   - 3 minutes: a scenario with the Info in both panels, which fails on
-    the port by the second "Bytes Free" of a row. The top of
+    the translation by the second "Bytes Free" of a row. The top of
     `harness/scenarios.py` had said so.
   Nothing was lost to the compiler or to the stubs: both were written
   by the notes of `CLAUDE.md`, and the first build ran.
@@ -2308,9 +2308,9 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     before anything was changed and 612 for the batch, where it takes 100
     alone. The base need not have been tested: the batch before had
     just passed on it.
-  - 8 minutes: why the port's sky is another than the original's. A
+  - 8 minutes: why the translation's sky is another than the original's. A
     model of the routine in Python, 40 lines, found the original's
-    stars for a seed of 0 and none of the port's for any number of
+    stars for a seed of 0 and none of the translation's for any number of
     turns before: the numbers are never seeded. With that known, no
     step may end in the blanker, and the scenario was written so.
   - 3 minutes: a step of 1,300 movements of the mouse, to wait out the
@@ -2327,7 +2327,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     model, a step that has the driver wait for the mouse to be asked
     255 times, made of the driver's event 05 by a wrapper around
     `driver.events` that is not in the repository, and a build of the
-    port with `Rand1` and `Rand2` set as `Blank` begins, 5BA1h and
+    translation with `Rand1` and `Rand2` set as `Blank` begins, 5BA1h and
     6E84h, which is what the original has there when the blanker is
     the first thing a scenario does. 151 screens of the original over
     674 turns and 151 of that build over 776 were each the sky that
@@ -2362,7 +2362,7 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     that defines one writes it under its name and no `#pragma aux`.
   - 3 minutes: the first of the sixteen names that `VC.ASM` declares
     `EXTERNDEF` went to C, and the test `c-data` failed on each, "the
-    port has 53h": the assembler's listing has such a name in `CONST`
+    translation has 53h": the assembler's listing has such a name in `CONST`
     at 0, marked `External`, and `harness/datacheck.py` took it for an
     object of the assembly. Two checkouts mended that, each for itself;
     the one that landed first is what is there.

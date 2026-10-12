@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
-"""Check the port: the program as it has been translated to C.
+"""Check the C translation: the program as it has been translated to C.
 
-The port is taken through every scenario and must show the same screens
-and leave the same disks as the original did, which the goldens record
-(see compare.py and goldens.py). That alone would say little about a
+The translation is taken through every scenario and must show the same
+screens and leave the same disks as the original did, which the goldens
+record (see compare.py and goldens.py). That alone would say little about a
 routine no scenario reaches, so for the routines translated so far, listed
 below, this also checks that
 
   - every instruction of the assembly they replace ran in the original, in
     some scenario, unless it is listed here with the reason why none gets
     there,
-  - every C function that replaces them ran in the port,
-  - the port is no more than three times the size of the original, and
-  - the port leaves half of its stack untouched in every scenario.
+  - every C function that replaces them ran in the translation,
+  - the translation is no more than three times the size of the
+    original, and
+  - the translation leaves half of its stack untouched in every scenario.
 
 Compiled code uses more of the stack than the assembly it replaces, so
-the port has a stack many times as long as the original's 256 bytes:
+the translation has a stack many times as long as the original's 256 bytes:
 LenStk in src/c/resident.c. When the program has been loaded its stack
 holds what its file has there, which is nothing, zeros; how much of that
 is still there, from the bottom up, is looked at every time a step ends
@@ -27,15 +28,16 @@ the limit follows it. What every scenario leaves is reported, not only
 the least.
 
 A comparison that finds nothing is only worth something if it would have
-found a difference. So one cell of a screen that the port has shown is
-changed, and then one entry is taken off a disk it has left, and the
+found a difference. So one cell of a screen that the translation has shown
+is changed, and then one entry is taken off a disk it has left, and the
 comparison must report each.
 
-The build of the port that is tested is the one that is shipped. What
-ran in the original was recorded with the goldens; what runs in the port
-is read from QEMU's log of the code it executed (see coverage.py).
-The assembly is identified by the listing of the build that is laid out
-like the original, and the C functions by the port's link map.
+The build of the translation that is tested is the one that is shipped. What
+ran in the original was recorded with the goldens; what runs in the
+translation is read from QEMU's log of the code it executed (see
+coverage.py). The assembly is identified by the listing of the build that is
+laid out like the original, and the C functions by the translation's link
+map.
 
 Exits with status 0 if all of this holds and 1 otherwise.
 """
@@ -52,13 +54,13 @@ import scenarios
 import setups
 
 
-# How large the port may grow, as a multiple of the original's size. The
-# aim is to stay well below; this is where growth must have gone wrong.
+# How large the translation may grow, as a multiple of the original's size.
+# The aim is to stay well below; this is where growth must have gone wrong.
 SIZE_LIMIT = 3
 
-# How much of its stack the port must leave untouched in every scenario:
-# one part in this many, half of it. The stack is made long enough for
-# its use to need no care while the program is translated, and this is
+# How much of its stack the translation must leave untouched in every
+# scenario: one part in this many, half of it. The stack is made long enough
+# for its use to need no care while the program is translated, and this is
 # where that would have stopped being true. The rest is room for what no
 # scenario has: a critical error of DOS at the bottom of deep calls, an
 # interrupt that arrives there.
@@ -75,7 +77,7 @@ class Batch:
     # stands from there on (see coverage.Listing).
     routines: tuple
     # Its functions that other files call, which the assembly called
-    # while there was some: each has to have run in the port.
+    # while there was some: each has to have run in the translation.
     functions: tuple
     # Address in the original -> why no scenario executes the instruction.
     unreached: dict = field(default_factory=dict)
@@ -744,8 +746,8 @@ BATCHES = [
                 "Func08, where the cursor of the tree has moved in the "
                 "last 0.6 seconds of a minute, of an hour and of a day: "
                 "the machine's clock is counted in instructions, of "
-                "which the port takes others than the original, so no "
-                "step falls into that time for both"),
+                "which the translation takes others than the original, so "
+                "no step falls into that time for both"),
             0x10DA: "Func10, for a screen that is neither EGA nor VGA, "
                     "whose key bar has no Alt-F9: the bench has VGA",
             0x128C: "Func61, where the button of a second click comes up "
@@ -1010,8 +1012,8 @@ BATCHES = [
                 "as long as the program needs it and the part that "
                 "goes is moved to a block elsewhere: how much memory "
                 "there is to it follows the size of the program. The "
-                "port has no such way: its block holds its file, which "
-                "is as long as the program in the memory"),
+                "translation has no such way: its block holds its file, "
+                "which is as long as the program in the memory"),
             **dict.fromkeys(
                 (0x07D8, 0x07DB, 0x07DC, 0x07DF, 0x07E2, 0x07E5),
                 "Alloc9, where there is no memory for the program "
@@ -1069,7 +1071,7 @@ def check_original(listing, ran):
     return passed
 
 
-def check_port(link_map, executed):
+def check_translation(link_map, executed):
     """Report on the C functions that replace it; return success."""
     symbols = coverage.link_map(link_map)
     passed = True
@@ -1079,15 +1081,15 @@ def check_port(link_map, executed):
             start = segment * 16 + offset
             if start - COM_ORIGIN + EXE_HEADER not in executed:
                 passed = False
-                print(f"  not executed in the port: {name}")
+                print(f"  not executed in the translation: {name}")
         print(f"{batch.title}: {len(batch.functions)} C functions of "
               f"{batch.source} checked")
     return passed
 
 
 def check_stack(link_map, names, runs):
-    """Report on how much of its stack the port left untouched; return
-    success."""
+    """Report on how much of its stack the translation left untouched;
+    return success."""
     bottom, top = coverage.stack(link_map)
     size = top - bottom
     limit = size // STACK_LEFT
@@ -1142,29 +1144,31 @@ def check_comparison(name, run, program):
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("port", help="the port's VC.EXE")
+    parser.add_argument("translation", help="the translation's VC.EXE")
     parser.add_argument("link_map", help="its link map")
     parser.add_argument("listing", help="the listing of VC.COM laid out "
                                         "like the original")
     args = parser.parse_args()
 
-    original, port = setups.original_vc(), setups.Program.load(args.port)
-    size = len(port.contents)
+    original = setups.original_vc()
+    translation = setups.Program.load(args.translation)
+    size = len(translation.contents)
     limit = SIZE_LIMIT * len(original.contents)
     print(f"VC.EXE is {size} bytes, {size / len(original.contents):.2f} "
           f"times the original's {len(original.contents)}; the limit is "
           f"{SIZE_LIMIT} times")
 
     names = list(scenarios.SCENARIOS)
-    failed, runs = compare.compare(names, port, trace=True, stack=True)
-    in_original, in_port = set(), {}
+    failed, runs = compare.compare(names, translation, trace=True,
+                                   stack=True)
+    in_original, in_translation = set(), {}
     for name, run in zip(names, runs):
         in_original |= goldens.read_ran(name)
-        in_port.update(run.executed)
+        in_translation.update(run.executed)
     passed = check_original(coverage.Listing(args.listing), in_original)
-    passed = check_port(args.link_map, in_port) and passed
+    passed = check_translation(args.link_map, in_translation) and passed
     passed = check_stack(args.link_map, names, runs) and passed
-    passed = check_comparison(names[0], runs[0], port) and passed
+    passed = check_comparison(names[0], runs[0], translation) and passed
     sys.exit(failed or not passed or size > limit)
 
 

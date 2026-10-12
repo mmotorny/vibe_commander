@@ -1,7 +1,7 @@
 ; The driver of the tests: a program that stays resident in the machine and
-; takes Volkov Commander, the original or a build of the port, through the
-; steps of a scenario. See harness/driver.py, which writes its script and
-; reads what it writes, and harness/scenarios.py.
+; takes Volkov Commander, the original or a build of the C translation,
+; through the steps of a scenario. See harness/driver.py, which writes its
+; script and reads what it writes, and harness/scenarios.py.
 ;
 ; It feeds the program and watches it; it answers nothing in place of the
 ; BIOS, of DOS or of a driver. Keys are scan codes handed to the keyboard

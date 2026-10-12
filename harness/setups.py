@@ -89,20 +89,20 @@ class Program:
     # driver of the tests reads there where the program keeps what it
     # watches. Two programs are the same if their files are.
     listing: Path = field(default=None, compare=False)
-    # Of the port, the linker's map: where its stack is.
+    # Of the C translation, the linker's map: where its stack is.
     linked: Path = field(default=None, compare=False)
 
     @classmethod
     def load(cls, path):
         """The program in the file `path`, with the listing that the
         build writes next to it, or with the linker's map if it is the
-        port."""
+        translation."""
         path = Path(path)
         contents = path.read_bytes()
         if contents[:2] == b"MZ":
-            # The port has no assembly of its own to list: its main data
-            # is laid out as the original's, and what the driver watches
-            # there is where the original has it.
+            # The translation has no assembly of its own to list: its main
+            # data is laid out as the original's, and what the driver
+            # watches there is where the original has it.
             return cls(path.name.upper(), contents, LISTING,
                        path.with_suffix(".MAP"))
         listing = path.with_suffix(".LST")
@@ -203,9 +203,9 @@ LOAD_MOUSE = "CTMOUSE /3>NUL"
 # program. They are chosen so that the original's stack ends where a page
 # of the machine's memory ends, 4,096 bytes: QEMU is slow to write to a
 # page that has code in it which it has run, and behind its stack the
-# program has its code. The port's stack ends 249 bytes short of a page
-# like that, and few of them are code that runs. place.py says where the
-# stacks end, and what to write here should that have to change: the
+# program has its code. The translation's stack ends 249 bytes short of a
+# page like that, and few of them are code that runs. place.py says where
+# the stacks end, and what to write here should that have to change: the
 # memory map of the scenarios shows the driver with what it keeps, so
 # their goldens change with it.
 PLACE = {"us": 176, "ru": 159}

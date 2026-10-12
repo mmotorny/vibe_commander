@@ -1,28 +1,28 @@
 #!/usr/bin/env python3
-"""Hold the data of the port against the original's, byte for byte.
+"""Hold the data of the C translation against the original's, byte for byte.
 
 The scenarios compare screens and disks. A table that no screen shows can
 be wrong and pass them: a text that is copied with what follows it, the
 defaults of a setup, a colour of a box that never comes up. So every data
-object of the port that has the name of one of the original, a text, a
-box, a dialog, a table, is compared with the original's bytes here, with
+object of the translation that has the name of one of the original, a text,
+a box, a dialog, a table, is compared with the original's bytes here, with
 no machine involved.
 
 The original is the build of the published source that is laid out like
 the shipped binary, build/shareware-layout/VC.COM, which the test
-asm-bytes holds against that binary. Its listing says where
-every label is. The port is build/c/VC.EXE, and the linker's map says
-where each of its objects landed, static ones too; how long an object
-is, its object file says. Nothing of the port is assembled, and no
+asm-bytes holds against that binary. Its listing says where every label
+is. The translation is build/c/VC.EXE, and the linker's map says where
+each of its objects landed, static ones too; how long an object is, its
+object file says. Nothing of the translation is assembled, and no
 listing of it is read.
 
 A word that holds the address of something else cannot be equal as a
 number: a box that names its text, a dialog that names its box, a table of
 commands. Which words those are is not described here. The original
 source is assembled a second time, as an object file, whose relocations
-name every such word and what it points at; here the word of the port is
-then held against where the port has the thing of that name, with the
-same distance from it: the offset in its group, which is what such a
+name every such word and what it points at; here the word of the translation
+is then held against where the translation has the thing of that name, with
+the same distance from it: the offset in its group, which is what such a
 word holds. So an object is written in C as it is in the assembly, with
 the names of what it names, and the compiler and the linker see to the
 addresses.
@@ -52,7 +52,7 @@ from bytecheck import REGIONS
 import reads
 
 COM_ORIGIN = 0x100          # where a .COM file is loaded, and the PSP ends
-EXE_HEADER = 0x20           # of the port's file: see tools/mkexe.c
+EXE_HEADER = 0x20           # of the translation's file: see tools/mkexe.c
 
 # Records of an object file (OMF).
 LNAMES, SEGDEF, GRPDEF, EXTDEF, LEXTDEF = 0x96, 0x98, 0x9A, 0x8C, 0xB4
@@ -98,21 +98,21 @@ OWN = {
 }
 
 # The tables of the menus' commands. Where the original has the address
-# of a command there, the port has the number of the command: the CMD_ of
-# src/c/vc.h that has the name of the original's label. So an item that
-# names another command than the original's fails the test, though no
+# of a command there, the translation has the number of the command: the
+# CMD_ of src/c/vc.h that has the name of the original's label. So an item
+# that names another command than the original's fails the test, though no
 # screen shows a table of the menus until its item is chosen.
 COMMAND_TABLES = {"Menu1_T", "Menu2_T", "Menu3_T", "Menu4_T", "MenuS_T",
                   "MenuC_T"}
 
-# Objects of the port that have the name of one of the original and are
-# meant to be otherwise: name -> why. Each is still compared, and has to
+# Objects of the translation that have the name of one of the original and
+# are meant to be otherwise: name -> why. Each is still compared, and has to
 # differ: an entry that no longer applies fails the test.
 DIFFERENT = {
 }
 
-# Words of an object that hold an address in the original, where the port
-# has something else than the address of the thing of that name:
+# Words of an object that hold an address in the original, where the
+# translation has something else than the address of the thing of that name:
 # (object, offset) -> (how, what, why). "at" is the address of the label
 # `what` instead; "behind" is a number, how far what the original names
 # there is behind the label `what` of the original; "is" is the number
@@ -369,8 +369,8 @@ class Original:
                    for offset, size, _, _ in REGIONS["VC.COM"])
 
 
-class Port:
-    """The port: the bytes of its file, and where its objects are."""
+class Translation:
+    """The translation: the bytes of its file, and where its objects are."""
 
     def __init__(self, directory):
         self.image = (directory / "VC.EXE").read_bytes()
@@ -450,11 +450,11 @@ class Port:
         return None
 
 
-def compare(original, port, name, there, address, length):
-    """Hold `length` bytes of the port at `address` against the original
-    at `there`, for the object `name`. Returns None if they are the same,
-    or a line that says where they are not."""
-    ours = port.bytes(address, length)
+def compare(original, translation, name, there, address, length):
+    """Hold `length` bytes of the translation at `address` against the
+    original at `there`, for the object `name`. Returns None if they are the
+    same, or a line that says where they are not."""
+    ours = translation.bytes(address, length)
     theirs = original.image[there - COM_ORIGIN:there - COM_ORIGIN + length]
     if len(theirs) < length:
         return f"{name} goes on beyond the end of the original"
@@ -463,8 +463,8 @@ def compare(original, port, name, there, address, length):
         named = original.named.get(there + at)
         if named is None or at + 2 > length:
             if ours[at] != theirs[at]:
-                return (f"{name}+{at}: the port has {ours[at]:02X}h, the "
-                        f"original {theirs[at]:02X}h")
+                return (f"{name}+{at}: the translation has {ours[at]:02X}h, "
+                        f"the original {theirs[at]:02X}h")
             at += 1
             continue
         word = struct.unpack_from("<H", ours, at)[0]
@@ -475,7 +475,8 @@ def compare(original, port, name, there, address, length):
             wanted = [named - original.labels[label]]
             instead = f"how far {said} is behind {label}"
         elif how == "at":
-            wanted = [offset for offset, _ in port.named.get(label, [])]
+            wanted = [offset
+                      for offset, _ in translation.named.get(label, [])]
             instead = f"where it has {label}"
         elif how == "is":
             wanted = [label]
@@ -488,25 +489,27 @@ def compare(original, port, name, there, address, length):
         else:
             groups = {offset + behind & 0xFFFF: group
                       for candidate in names
-                      for offset, group in port.named.get(candidate, [])}
+                      for offset, group
+                      in translation.named.get(candidate, [])}
             wanted = list(groups)
             instead = f"where it has {said}"
             if not wanted:
                 return (f"{name}+{at}: the original names {said} there, "
-                        f"which the port has not by that name: see "
+                        f"which the translation has not by that name: see "
                         f"NAMED_OTHERWISE in {Path(__file__).name}")
         if word not in wanted:
-            return (f"{name}+{at}: the port has {word:04X}h, which is not "
-                    f"{instead}, "
+            return (f"{name}+{at}: the translation has {word:04X}h, which "
+                    f"is not {instead}, "
                     f"{' or '.join(f'{w:04X}h' for w in wanted) or 'nowhere'}"
                     f": the original names {said} there")
         # A text that is named so is read as far as a zero byte, and has
-        # to have that within itself: behind it the port has other bytes
-        # than the original.
+        # to have that within itself: behind it the translation has other
+        # bytes than the original.
         if not how and original.segment_of[names[0]] == "CONST":
             text = groups[word] + word
-            end = port.end_of(text)
-            if end is not None and 0 not in port.bytes(text, end - text):
+            end = translation.end_of(text)
+            if end is not None and \
+                    0 not in translation.bytes(text, end - text):
                 return (f"{name}+{at}: names {said}, a text without a "
                         f"zero byte of its own: what reads it goes on into "
                         f"what follows it, which is not what follows it in "
@@ -522,16 +525,16 @@ def main():
     parser.add_argument("layout", type=Path,
                         help="the directory of the original laid out like "
                              "the shipped binary: VC.COM, VC.LST, VC.OBJ")
-    parser.add_argument("port", type=Path,
-                        help="the directory of the port: VC.EXE, VC.MAP "
-                             "and the object files")
+    parser.add_argument("translation", type=Path,
+                        help="the directory of the translation: VC.EXE, "
+                             "VC.MAP and the object files")
     parser.add_argument("--quiet", action="store_true",
                         help="do not name every object that was compared")
     args = parser.parse_args()
 
     try:
         original = Original(args.layout)
-        port = Port(args.port)
+        translation = Translation(args.translation)
     except Problem as problem:
         sys.exit(f"datacheck: {problem}")
 
@@ -539,7 +542,7 @@ def main():
     count = bytes_held = 0
     stale = set(DIFFERENT) | set(ELSEWHERE) | set(OWN)
     used = set()
-    for module, name, address, length in port.objects:
+    for module, name, address, length in translation.objects:
         stale.discard(name)
         if name in OWN:
             if not args.quiet:
@@ -559,7 +562,8 @@ def main():
                       "in the room reserved for what only the shipped "
                       "binary has")
             continue
-        difference = compare(original, port, name, there, address, length)
+        difference = compare(original, translation, name, there, address,
+                             length)
         used |= {key for key in NAMED_OTHERWISE if key[0] == name}
         if name in DIFFERENT:
             if difference is None:
@@ -587,10 +591,11 @@ def main():
                       "C code has no constant of that name")
     # An object is compared as long as it is. Where the code reads more
     # of it, the object has to be that long: see reads.py.
-    failed += reads.check(port.objects, port.bytes, port.variables)
+    failed += reads.check(translation.objects, translation.bytes,
+                          translation.variables)
     for name, at in sorted(set(NAMED_OTHERWISE) - used):
         failed.append(f"{name}+{at} is listed in {Path(__file__).name}, "
-                      "and the port has no object of that name")
+                      "and the translation has no object of that name")
 
     print(f"{count} objects of the C code, {bytes_held} bytes, are as the "
           "original")

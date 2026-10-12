@@ -12,7 +12,13 @@
 A faithful recreation of
 [Volkov Commander](https://en.wikipedia.org/wiki/Volkov_Commander) 4.05, the
 DOS file manager written by Vsevolod V. Volkov, carried from its original
-assembly source to a port for modern operating systems.
+assembly source to C, and from DOS to modern operating systems.
+
+The program is here in three trees, the third of them still to come.
+`src/asm/` is the assembly: Volkov Commander 4.05 as its author published
+it. `src/c/` is the C translation: that program translated to C for DOS,
+behaving as the original does, bugs included. `src/portable_c/` will be the
+portable C: the line that leaves DOS behind, starting as a copy of `src/c/`.
 
 The project is also an experiment in how far an AI coding agent can take such
 a recreation on its own. The engineering work is done by Claude; a human sets
@@ -32,7 +38,7 @@ Fidelity is judged against the original program, at two levels:
   attribute, the cursor, and the files it leaves on disk. The original is
   run under DOS in an emulator and fed keystrokes, and what it does is
   recorded; a candidate fed the same keystrokes has to do the same. This is
-  the test that will carry over to the port.
+  the test that will carry over to the C translation and the portable C.
 
 The byte comparison has one complication. The binaries Volkov shipped were
 shareware, and contain registration code, tables and strings that the source
@@ -194,20 +200,20 @@ returns where the program goes on, and the loop calls it from a `switch`
 by their numbers. What a command finds in the registers, as the command
 before left them, is kept where one reads it. With that no instruction
 of the program is assembly but those that are written into the C, and
-no text or table. And nothing of it is assembled: the port has no
+no text or table. And nothing of it is assembled: the translation has no
 assembly file, and its build runs no assembler for it. What the last
 such file said, in what order the program's segments lie and which of
 them count from the PSP, is said by options of the compiler and by the
-linker's command (see [The port](#the-port)).
+linker's command (see [The C translation](#the-c-translation)).
 
 ## Layout
 
 | Path | Contents |
 |---|---|
-| `src/asm/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `src/c/` | The program in C, all of it: `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
-| `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces |
-| `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the port, and registers the tests |
+| `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
+| `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
+| `tools/` | `mkexe.c` makes the translation's `VC.EXE` out of what the linker produces |
+| `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the translation, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
 | `docs/` | Pictures for this README |
 
@@ -236,7 +242,7 @@ what says where the original has its routines and its data. The
 assembler also builds the driver of the tests, `harness/DRIVER.ASM`,
 which is no part of either program.
 
-The port is compiled: `build/c/VC.EXE`, which is what the tests run
+The translation is compiled: `build/c/VC.EXE`, which is what the tests run
 and hold against the original. It is C and nothing else, `src/c/*.c`,
 and no assembler has a hand in it. What the compiler made of each C
 file is written out as a listing, `build/c/*.lst`. For this the build
@@ -290,7 +296,7 @@ When `SHAREWARE_LAYOUT` is defined they generate that many NOPs or zeros, so
 that what follows lands where it does in the shipped binaries. The filler is
 harmless: the program laid out this way still runs.
 
-## The port
+## The C translation
 
 `src/c/` started as a copy of the assembly in `src/asm/` and ends as a C
 program. In between it was both. A routine that had been translated was
@@ -323,11 +329,11 @@ C in `src/c/resident.c`, with its data. The
 rest of the program is not in the memory then, `src/c/dos.c` with it, so the
 build compiles that file a second time, into that part: one source, two
 copies of its code. `src/c/resident.c` has the only other inline assembly of
-the port, four instructions where an interrupt arrives that the program has
-taken, INT 21h and INT 27h: they make room on the stack for a second
-return address, and an interrupt function of the compiler's takes over,
-which saves the registers and finds the program's data. Such a function
-has to go on in the handler that had the interrupt before, with the
+the translation, four instructions where an interrupt arrives that the
+program has taken, INT 21h and INT 27h: they make room on the stack for a
+second return address, and an interrupt function of the compiler's takes
+over, which saves the registers and finds the program's data. Such a
+function has to go on in the handler that had the interrupt before, with the
 stack as the interrupt left it, and C cannot change how deep the stack is
 that it returns on: so it writes that handler's address into the room,
 and returns there. The same four stand where DOS goes on when it has
@@ -375,8 +381,8 @@ paragraph further on, the part that goes while a command runs: its
 constants first, which are a group of their own, then its code, in two
 segments. The
 original has that part where the data of the first will be and moves it
-up as it starts, over itself; the port is loaded with it in place, on its
-own stack from the first instruction, and has only to make a block of
+up as it starts, over itself; the translation is loaded with it in place, on
+its own stack from the first instruction, and has only to make a block of
 memory of it. That costs 6,384 bytes of the file, and it is what let
 compiled code stand in the first part at all: nothing can lay
 data over code that the compiler has yet to make. It also leaves the
@@ -416,12 +422,12 @@ is finished](#when-a-step-is-finished)). The driver also writes the
 program's stack out whenever a step ends, and the `c-scenarios` test reports
 for every scenario how much of it the program never used.
 
-The stack is where the port departs from the original in what it takes of
-the memory. The original has 256 bytes of it. Compiled code uses more
-stack than the assembly it replaces, and a stack used beyond its bottom
-would overwrite data without a trace on the screen, so the port has 4,096
-bytes, of which the scenarios use some 200. The stack is the end of the
-part of the program that stays in memory while a command runs: that part
+The stack is where the translation departs from the original in what it
+takes of the memory. The original has 256 bytes of it. Compiled code uses
+more stack than the assembly it replaces, and a stack used beyond its bottom
+would overwrite data without a trace on the screen, so the translation has
+4,096 bytes, of which the scenarios use some 200. The stack is the end of
+the part of the program that stays in memory while a command runs: that part
 is 19,728 bytes where it was 12,704, and a command has 7,024 bytes less
 than the original leaves it: 3,840 for the stack, and the rest because
 compiled code is longer than the assembly it replaces, and because the
@@ -429,7 +435,7 @@ code that starts the program stays.
 
 ### What rests on Open Watcom
 
-The port is C, but it is not all C that any compiler would take or
+The translation is C, but it is not all C that any compiler would take or
 would make the same program of. These are the places, so that whoever
 carries the program to another compiler has them in one list. Each has
 a comment where it is done.
@@ -474,7 +480,7 @@ the first eleven does not hold; the others would show in the tests.
 | 16 | `_enable` is `STI` and `CLD`: the first call of the program, `IntOn`, clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/c/resident.c`, `Alloc0` | every scenario |
 | 17 | A far call to a function of the same segment is made `push cs` and a near call by the linker, and needs no relocation: so the part that stays can call its own far functions before its relocations are applied | `src/c/resident.c`, `Alloc0` | every scenario |
 
-What else the notes of `CLAUDE.md` have under "C for the port" is how
+What else the notes of `CLAUDE.md` have under "C for the translation" is how
 to write for this compiler, not what the program rests on: a register
 that it ignores in a `#pragma aux`, a pointer that it truncates.
 
@@ -521,9 +527,9 @@ machine that does nothing else.
 | Test | What it checks |
 |---|---|
 | `asm-bytes` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
-| `c-data` | Every text, box, dialog and table of the port that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
+| `c-data` | Every text, box, dialog and table of the translation that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
 | `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
-| `c-scenarios` | The port does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the port. The port is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
+| `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens
 
@@ -544,16 +550,16 @@ banner names the edition, and the published source is of another edition
 than the binaries shipped in 2000: that holds for as much of the name as
 shows, its beginning next to a panel on the right or its end next to one
 on the left. And the program names its own file when
-it cannot load it again after a command: the original is `VC.COM`, the port
-`VC.EXE`.
+it cannot load it again after a command: the original is `VC.COM`, the
+translation `VC.EXE`.
 
 Some numbers on the screen are not compared at all: the bytes that the
 editor says it has free, the memory that the Info panel says is free, and
 what `mem`, run as a command, says is in use and free. All follow the
 size of the program, the last two the size of the part that stays in
 memory while a command runs, or the Info's that of all of it when Memory
-allocation is switched off. The port is larger than the original and has
-less, by more with every routine translated, and the numbers are not
+allocation is switched off. The translation is larger than the original and
+has less, by more with every routine translated, and the numbers are not
 worth an expectation that follows the size of the build. Both screens
 have `#` in their place when a build is held against a golden, so a
 golden that was derived with a number still in it need not be derived
@@ -562,18 +568,18 @@ again.
 Two more deviations show on no screen, and are listed in the same file.
 When the original tries again to load itself after a command, it stores a
 word through a segment register that is left on the DOS environment, and
-the word lands in other data of its own. The port stores it where it
+the word lands in other data of its own. The translation stores it where it
 belongs. And of two codes in the markup of its texts, one for a colour and
 one for a character, the original's routine that writes a line has each
 for the other, unlike the routine that measures it and unlike Norton
-Guides, where the markup comes from. The port has them agree. No text
+Guides, where the markup comes from. The translation has them agree. No text
 uses either code.
 
 `python3 harness/compare.py FILE [SCENARIO...]` takes any
 `VC.COM` or `VC.EXE` through scenarios and reports where it departs from
 the goldens. For a `VC.COM` it needs the listing that the build writes
-next to the file, and for the port's `VC.EXE` the linker's map there. No
-test runs the programs assembled from `src/asm/`, which the
+next to the file, and for the translation's `VC.EXE` the linker's map there.
+No test runs the programs assembled from `src/asm/`, which the
 byte comparison answers for; this is how to run them. The copy with the
 reserved room has no edition name in its banner, and differs from the
 goldens wherever the banner shows.
@@ -595,9 +601,9 @@ the listing has them. With `--steps` it says which of them some steps
 would reach, and takes `--limit` like `show.py`.
 
 `python3 harness/notice.py FILE OLD NEW` makes one change to a copy of the
-port, builds it, and says which scenario notices, or that none does. That
-an instruction ran in the original does not mean that a screen shows what
-it is for; this is how to find out, for a branch whose effect cannot be
+translation, builds it, and says which scenario notices, or that none does.
+That an instruction ran in the original does not mean that a screen shows
+what it is for; this is how to find out, for a branch whose effect cannot be
 pointed to in a golden.
 
 `python3 harness/arithcheck.py build/c` is the test `c-arith` by
@@ -635,11 +641,11 @@ memory more than it needs, so that the original's stack ends where a page
 of the machine's memory ends. QEMU has to look at every write to a page
 with code in it that it has run, and the program has its code right
 behind its stack: a push is many times slower there than elsewhere, which
-is a third of the time of a scenario with dialogs or more. The port has
-its texts behind its stack, more than a page of them, and does not
+is a third of the time of a scenario with dialogs or more. The translation
+has its texts behind its stack, more than a page of them, and does not
 depend on where it is loaded.
 `python3 harness/place.py` says where the stacks of the original and of
-the port end on each bench.
+the translation end on each bench.
 
 Both machines have a mouse: the PS/2 mouse of QEMU's PC, and FreeDOS's
 driver for it, CuteMouse, which the boot floppy lacks and the harness adds.
@@ -662,8 +668,8 @@ letter beyond ASCII: Alt with the numeric keypad types nothing there.
 The program is set up as its distribution sets it up, with one exception:
 the clock in the corner of the screen is off. It would put the time of day
 on every screen, and the machine's time is counted in the instructions it
-executes (see below), of which the port takes more than the original to
-get through a scenario. No setup file
+executes (see below), of which the translation takes more than the original
+to get through a scenario. No setup file
 is prepared for this. Whenever the harness sets up its machines, the
 original is started once, made to switch the clock off in its Options menu
 and to save its setup, and the `VC.INI` it writes is what every scenario
@@ -720,10 +726,10 @@ the cursor, to a port that QEMU keeps in a file, and goes on with the
 next step; after the last it resets the machine, which ends QEMU. The
 host starts the machine and reads the file and the disks afterwards.
 
-The original and the port are driven alike, and neither is changed for it.
-What the driver has to know of a program, its name and where two of its
-variables are, it is told in the script, which takes that from the
-listing of the original's assembly: the port keeps those variables
+The original and the translation are driven alike, and neither is changed
+for it. What the driver has to know of a program, its name and where two of
+its variables are, it is told in the script, which takes that from the
+listing of the original's assembly: the translation keeps those variables
 where the original does. It knows the program's call of the
 idle interrupt from DOS's by where the call comes from: the memory of the
 program that DOS has as the current one, and that has that name. None of this is measured
@@ -745,7 +751,7 @@ instruction and the same time of day, and gets to each of its steps at
 the same hundredth of a second, in every run and on a computer however
 busy. The program's first screen comes some ten seconds past noon. A
 scenario that shows the time of day still has to do so early, within the
-machine's first minute: the port and the original do not execute the
+machine's first minute: the translation and the original do not execute the
 same number of instructions, and their clocks drift apart by that.
 
 With the clock on, when a golden is derived, the driver looks at the
@@ -764,9 +770,9 @@ Which code ran is taken from QEMU's log of the code it translates, which
 `harness/coverage.py` matches against the program file. For the original
 it is recorded with the goldens, and mapped to source lines through the
 listing of the build in `build/shareware-layout/`, which has every
-instruction at the address it has in the original. The port's code is not
-in the memory quite as it is in its file: the program adds the segment it
-is loaded at to the words that its relocation table names, and the file
+instruction at the address it has in the original. The translation's code is
+not in the memory quite as it is in its file: the program adds the segment
+it is loaded at to the words that its relocation table names, and the file
 is held against the log with those words as the program has them where
 it is.
 
@@ -799,7 +805,7 @@ files. The picture at the top is `screen.png` from
 `python3 harness/screenshot.py --scale 3x4`, which enlarges the 720x400
 display to roughly the 4:3 shape it had on a monitor.
 
-## Using the port by hand
+## Using the C translation by hand
 
 Needs the project built, and a terminal of 80 columns by 25 lines at least.
 
@@ -807,10 +813,10 @@ Needs the project built, and a terminal of 80 columns by 25 lines at least.
 python3 harness/play.py
 ```
 
-This starts the port, `build/c/VC.EXE`, on the machine of the tests, with
-its screen in the terminal and the terminal's keyboard: FreeDOS from its
-floppy, the bench's files on `C:` and the program on `D:`. `--original` runs
-the original there, `--country ru` uses the Russian bench, and
+This starts the translation, `build/c/VC.EXE`, on the machine of the tests,
+with its screen in the terminal and the terminal's keyboard: FreeDOS from
+its floppy, the bench's files on `C:` and the program on `D:`. `--original`
+runs the original there, `--country ru` uses the Russian bench, and
 `--display gtk` opens a window where there is a desktop. F10 leaves the
 program, and the machine then switches itself off. The disks are made anew
 every time, so nothing done there is kept.
@@ -856,7 +862,7 @@ CMake fetches these into the build directory, as pinned in
 
 Both are open source under the Sybase Open Watcom Public License, which is
 about the tools' own code. None of that code ends up in the programs built
-here: the port is linked without Open Watcom's libraries.
+here: the translation is linked without Open Watcom's libraries.
 
 ## Licence
 

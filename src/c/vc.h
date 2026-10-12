@@ -20,7 +20,7 @@
  *
  * Routines keep the names they have in the assembly source, and data keeps
  * its layout: the structures below are those of the original's VC.ASM, in
- * src/asm/, and the only ones that the port has.
+ * src/asm/, and the only ones that the C translation has.
  */
 #ifndef VC_H
 #define VC_H

@@ -70,7 +70,7 @@ DEVIATIONS = [
     (re.compile(r"^[╔║╟╚].{38}[╗║╢╝](ware) {30}"), "are ",
      re.compile(r"^[╔║╟╚].{38}[╗║╢╝]ov {30}")),
     # The program names its own file when it cannot load it again after a
-    # command. The original is VC.COM; the port is VC.EXE.
+    # command. The original is VC.COM; the C translation is VC.EXE.
     (re.compile(r"^Bad or missing D:\\VC\\VC\.(COM)"), "EXE", None),
     # And in the map of the memory, Alt+F5, which has a line for every
     # program with the name of its file. No scenario can show the map
@@ -89,18 +89,18 @@ BLANK = "#"
 # each take a number of the same line.
 IGNORED = [
     # The editor says in its first line how many bytes it has free for the
-    # text. That is what the program leaves of the memory, and the port is
-    # larger than the original, by more with every routine translated. An
-    # expected number would have to follow the size of the build that is
-    # tested; the number says too little about the program to be worth
-    # that. The field is the number and the room in front of it.
+    # text. That is what the program leaves of the memory, and the
+    # translation is larger than the original, by more with every routine
+    # translated. An expected number would have to follow the size of the
+    # build that is tested; the number says too little about the program to
+    # be worth that. The field is the number and the room in front of it.
     re.compile(r"^Edit: .* Col \d+( [\d, ]+) Free"),
     # The Info panel says how much memory is free. As the program is
     # configured that is what a command gets: all but the part of the
     # program that stays while one runs. That part holds the program's
     # stack, and it is to be translated: it does not stay as long in the
-    # port as in the original. With Memory allocation switched off the
-    # number is what is left with all of the program loaded, and follows
+    # translation as in the original. With Memory allocation switched off
+    # the number is what is left with all of the program loaded, and follows
     # the size of the build like the editor's. Either way it is left out,
     # in every scenario. The field is the number only, as much of it as a
     # box in front leaves to see, with the comma or the space that a
@@ -129,14 +129,14 @@ IGNORED = [
                r"\(([\d,]+) bytes\)"),
     # The map of the memory, Alt+F5, has a line for every program and
     # every stretch of free memory: where it begins, a segment in hex, the
-    # number of its blocks and its size. The program is larger in the port,
-    # so it has another size there, and what lies behind it, free memory
-    # and a program that was started from it and stays, begins elsewhere
-    # and has other sizes, and is other blocks: what the program takes
-    # again after a command fits before a program that stays, or does not.
-    # Left out are the size of the program; of every line of free memory
-    # where it begins, its blocks and its size, also of the one that lies
-    # before the program, which a line by itself does not tell from the
+    # number of its blocks and its size. The program is larger in the
+    # translation, so it has another size there, and what lies behind it,
+    # free memory and a program that was started from it and stays, begins
+    # elsewhere and has other sizes, and is other blocks: what the program
+    # takes again after a command fits before a program that stays, or does
+    # not. Left out are the size of the program; of every line of free
+    # memory where it begins, its blocks and its size, also of the one that
+    # lies before the program, which a line by itself does not tell from the
     # others; and where a program begins that a scenario has stay: FDAPM
     # in memory-map, T.COM and U.COM in stay. A field is left out whole,
     # with the room in front of the number, so that a number with fewer
@@ -155,12 +155,12 @@ IGNORED = [
 #   into other data of the program: which, depends on how long the
 #   environment is. And the place it was meant for keeps what the last
 #   attempt left there, which is wrong if that attempt found a file and it
-#   was not the program. The port stores the size where it belongs.
+#   was not the program. The translation stores the size where it belongs.
 #   (Exec12 of the original; Exec10 in src/c/resident.c.)
 #
 # - In a line of text, ^A and two hex digits set a colour and ^C and two
 #   hex digits stand for a character: that is the markup of Norton Guides,
 #   and how the original's LnStr counts the cells of a line. Its NgLine,
 #   which writes the line, takes ^A for the character and ^C for the
-#   colour. The port's NgLine takes them as LnStr does. No text of the
-#   program or of its help file has either. (NgLine in src/c/line.c.)
+#   colour. The translation's NgLine takes them as LnStr does. No text of
+#   the program or of its help file has either. (NgLine in src/c/line.c.)

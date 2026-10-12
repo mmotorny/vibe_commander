@@ -40,11 +40,11 @@ of those ticks: later than one tick less than was asked for, and no later
 than the ticks asked for and one round of the program. The machine's time
 is counted in the instructions it executes, so that is the same
 instruction every time a program is taken through the scenario. The
-original and the port do not get to the wait at the same time, and each
-counts its ticks from where it is: their waits are of one length to
+original and the C translation do not get to the wait at the same time, and
+each counts its ticks from where it is: their waits are of one length to
 within a tick, and both go on just behind a tick. A wait may have 65535
 ticks, an hour; a minute of them takes four seconds to run with the
-original and eight with the port.
+original and eight with the translation.
 
 The mouse is written with the cell of the screen it goes to, column and
 row from 0: "Click@1,24" moves the pointer there, presses the left
@@ -107,7 +107,8 @@ SCREEN = COLUMNS * ROWS * 2 + 5
 
 NAME = 8                          # bytes of a program's name, as DOS has it
 COM_ORIGIN = 0x100                # where a .COM file is loaded
-EXE_HEADER = 0x20                 # of the port's VC.EXE, see tools/mkexe.c
+EXE_HEADER = 0x20                 # of the translation's VC.EXE, see
+                                  # tools/mkexe.c
 
 # Names for the keys of a US keyboard, as written in scenarios, and what
 # QEMU calls them. Letters, digits and F1-F12 name themselves.
@@ -172,24 +173,24 @@ class Facts:
     # What the stack holds when the program has been loaded: the bytes of
     # the program's file that are loaded there. The original has code
     # there, which it moves elsewhere as it starts and leaves behind; the
-    # port has zeros.
+    # translation has zeros.
     stack_loaded: bytes = b""
 
 
 def facts(program, stack=False):
     """The Facts of `program`, a setups.Program: its name, from that of
     its file, and where AutoTim and Clock are in its main data, from the
-    listing of its assembly. The port has the listing of the original
+    listing of its assembly. The translation has the listing of the original
     for that: its main data is laid out as the original's. With `stack`,
-    where its stack is too: by the same listing, or for the port by the
-    linker's map, which the build writes next to it."""
+    where its stack is too: by the same listing, or for the translation by
+    the linker's map, which the build writes next to it."""
     code = program.contents
     name = Path(program.filename).stem.upper().encode("ascii")
     if not program.listing or not Path(program.listing).exists():
         raise RuntimeError(
             f"the driver needs a listing for {program.filename}: its own, "
-            "which the build writes next to it, or for the port that of "
-            "the original, in build/shareware-layout")
+            "which the build writes next to it, or for the translation "
+            "that of the original, in build/shareware-layout")
     text = Path(program.listing).read_text(encoding="cp866")
 
     def symbol(pattern):

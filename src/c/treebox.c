@@ -625,7 +625,7 @@ ChTr55:                                 /* the disk read again */
        character for F2, the sixth and seventh for Ctrl+R. No name that
        DOS gives has a colon, so it is the current drive unless a tree
        file has such a name. The addresses are the original's here, since
-       the table is not in the port. */
+       the table is not in the C translation. */
     place = begin + 0x205;
     n = size - 0x80C;
     cell = Color(ChTr_P[0]) << 8 | ' ';
