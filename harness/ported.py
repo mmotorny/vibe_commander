@@ -409,9 +409,49 @@ BATCHES = [
                 "or with another line of the table than its own: every "
                 "caller has both from V20_00, from PrevLin itself or "
                 "from the end of the table"),
-            0x5B88: "V25_00, for a viewer without a status line: it has "
-                    "one whenever its window is 80 columns wide, and "
-                    "only the editor is given a narrower one",
+        },
+    ),
+    Batch(
+        title="The viewer: opening a file for it or for the editor, the "
+              "keys and the mouse, a text looked for, and the way back to "
+              "the panels",
+        source="view.c",
+        routines=("V00_00", "V80_00"),
+        functions=("V00_02_c", "V00_10_c", "V13_00_c", "V13_01_c",
+                   "V80_00_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x5351, 0x5354, 0x5359, 0x535E, 0x5364, 0x5366, 0x5369,
+                 0x536B, 0x5371, 0x5372, 0x5374, 0x5375, 0x5377, 0x5379,
+                 0x537B, 0x537D, 0x537E, 0x5380, 0x5383, 0x5385, 0x5387,
+                 0x5389, 0x538B, 0x538E, 0x5390, 0x5392, 0x5394, 0x5396,
+                 0x5398, 0x539A, 0x539C, 0x539E, 0x53A0, 0x53A2, 0x53A4,
+                 0x53A6),
+                "the viewer, for a button of the mouse held in its "
+                "window: the bench has no mouse"),
+            **dict.fromkeys(
+                (0x541D, 0x541F),
+                "the viewer, for a line moved to the left as far as it "
+                "goes, by 65455 columns: 1637 times Ctrl+Right, and a "
+                "text that is found moves it by less than a part of a "
+                "file is long"),
+            0x549F: "the viewer, for Up to a line that has none behind "
+                    "it: the line it came from is behind it",
+            **dict.fromkeys(
+                (0x54DE, 0x54E1, 0x54E3, 0x54E8, 0x54E9, 0x54EA, 0x54F7,
+                 0x54FA),
+                "the viewer, for Down on the last line of a part that "
+                "ends in the first half of the memory, with more of the "
+                "file to come: the table of lines takes the other half "
+                "only where the file has a line end in every two bytes, "
+                "16376 of them on the bench, which has no such file"),
+            **dict.fromkeys(
+                (0x595C, 0x595E),
+                "the viewer, for a text found by reading the file on, "
+                "less than 2000 bytes into it: the file is read on "
+                "behind what is in the memory, and where the file has "
+                "more, that is half of what the viewer has room for at "
+                "the least, 32752 bytes on the bench"),
         },
     ),
     Batch(

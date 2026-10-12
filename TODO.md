@@ -117,15 +117,61 @@ Things that are known and not done. Standing instructions are in
   label; `RdInfo` takes 53h there for a drive that is not ready. A
   label of eleven characters that ends in S would do that, if DOS
   leaves 0 in AH. Ported like that; not tried.
-- Of the viewer, what looks at its keys is still assembly, the code of
-  `VCVIEW.INC` between its procedures, and with it `V80_00`, which only
-  calls `DialBox` for the search, and `F34_30` and `F34_40`, which read
-  the extension files of the viewer and the editor.
+- Of `VCVIEW.INC`, the commands that start the viewer or the editor
+  are still assembly: `F43_00`, `F44_00`, `F63_00`, `F64_00`, `F33_00`
+  and `F34_00`, 662 bytes that are no procedure, as far as `Aexec3`,
+  with `F34_30` and `F34_40`, which read a line of an extension file,
+  171 bytes; the user menu, which is C, calls those two by entries in
+  `VCFUNC.INC`. They belong together as the next batch there. The code
+  asks for a
+  name, takes the file under the cursor or the dirinfo of an Info
+  panel, looks in `VCVIEW.EXT` or `VCEDIT.EXT` for a command or a
+  program for the file's extension, and runs that program itself, with
+  the memory given up and a parameter block behind the name; else it
+  jumps to `V00_00` or `V00_02`, which are stubs of the C. 118 of its
+  273 instructions have run in no scenario, and 7 of the 87 of the two
+  routines: Alt+F3 and Alt+F4, an extension file with a program in it,
+  one named with its drive, and a program that DOS will not run. It
+  calls DOS for memory with `INT 21h` itself, three times, and the
+  BIOS for the cursor: entries of their own.
 - `PrevLin` has three instructions for a place that is not the start of
   a line and one for a line of the table that is not its own. No caller
   hands it either, so they ran in no scenario and are translated by
-  reading; so is `V25_00` without a status line, which the viewer always
-  has.
+  reading.
+- Of the viewer's keys, 49 instructions have run in no scenario and are
+  translated by reading, listed in `harness/ported.py`: the mouse, 36
+  of them; Ctrl+Right at column 65455; Up to a line with none behind
+  it, which cannot be; Down on the last line of a part that ends in the
+  first half of the memory; and a text found by reading the file on
+  less than 2000 bytes into it, which cannot be either. The fourth is
+  within reach of a scenario that makes a file of more than 16376 line
+  ends with nothing between them, by appending a file to itself some
+  twenty times, and pages down a hundred times in hex: about a hundred
+  steps for eight instructions. What they do then looks like a slip:
+  the next part is read and shown from its start, half of the memory
+  further on, and the lines between are skipped.
+- What the viewer does and the port does after it, found while its
+  keys were translated; whether to mend any of it is not decided:
+  - Esc, Ctrl-C or F10 typed while a file is being opened for the
+    viewer or the editor stops it, and the file stays open: `V00_02`
+    asks for the key when DOS has opened the file and does not close
+    it.
+  - Once a text has been found, the next search begins on the line
+    behind the first line of the screen, so the same text is not found
+    twice; in a file that is one line, or with the text in the last
+    line, nothing more is found at all. And where fewer bytes are left
+    in the memory than the text is long, the search says that it could
+    not find the string without reading the file on. In `view-keys`.
+  - A dirinfo that is too large for the editor is viewed in the window
+    that the editor would have had in the Info panel. The box "Reading
+    the file" stays on the screen above it, with its title changed to
+    View; and in hex the viewer writes its lines, 77 columns, from the
+    left edge of a window of 38: over the frame, into the row below,
+    and into the other panel's half of it. In `view-window`.
+  - A file whose length is below 64K but above what the viewer has
+    room for gets that length for the bytes in the memory, until the
+    table of lines is made, which cuts it down. Nothing reads it in
+    between.
 - Of `__U4D` in `port/asm/VC.ASM`, which divides 32-bit numbers for the
   compiled code, no scenario runs the half for a divisor of more than 16
   bits: nothing divides by one yet. It was held against a model of its
@@ -698,6 +744,57 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     of A:\ instead of a directory and so ran `fdauto.bat`; the files
     there are not in the order of the bench's. Noted at the top of
     `harness/scenarios.py`.
+
+- The viewer's keys, 2,290 bytes that are no procedure but for 20 of
+  them, 40 minutes to a translation that passed its own scenarios the
+  first time it was built, next to seven other batches; then the `port`
+  test did not pass, for scenarios of copying, and the batch waited an
+  hour and a quarter for its turn to land:
+  - 7 minutes: the first full `port` test, 4 minutes 6 seconds at a load
+    of 17 on two processors, and the two scenarios it failed in run
+    again by themselves, a minute and a half and 44 seconds. `copy-full`
+    stopped both times at step 36, '"c1" Enter', a copy of 3 MB that did
+    not end within the 20 seconds a step had then. `move` differed at
+    step 66, '"d:\" Enter', in the full run and not by itself: the
+    port's screen was taken with the dialog of F6 off the screen and the
+    box of the move not yet drawn, and the next two screens were a step
+    behind. The end of a step of the port has been tied to the keys it
+    has taken since. The other 56
+    scenarios were as the original, and the checks that the test makes
+    after the comparison were run for the viewer's scenarios by a
+    script of thirty lines around the functions of `harness/ported.py`,
+    49 seconds: every instruction ran or is listed, every function ran.
+    A `port` test that could leave a scenario out, or that went on to
+    its checks after a scenario has failed, would have said the same in
+    one run.
+  - 1 minute: a search expected to begin at the top of the file again,
+    which begins at the place found last: one trial of 19 seconds on
+    the port's build that signals. At the top of `harness/scenarios.py`
+    now.
+  - 1 minute: the golden of `view-keys` derived twice, 21 seconds the
+    second time, for a file between what the viewer holds and 64K,
+    which `harness/reach.py` showed to be missing when the rest was
+    reached.
+  - What saved time: trying every scenario on the port's build that
+    signals before deriving its golden, 20 seconds for 58 steps, by the
+    script that the batch before last describes; and a file of
+    C:\STAMPS, which has a megabyte by its entry in the directory and
+    no contents, for a dirinfo too large for the editor.
+  - 12 minutes for getting onto `main`, behind thirteen commits, the
+    editor's keys and the bars and the input among them. Three files
+    in conflict, `README.md`, this one and the list of C functions in
+    `VC.ASM`. What git did not show: the editor's batch had kept the
+    stubs of `T70_00` and `T71_00` for the viewer's assembly and
+    written `V80_00` out for itself, while this one had kept the stubs
+    of `V80_00` and `V82_00` for the editor's; `PutPrm`, `PutMnu`,
+    `PutKey` and `Input` were functions, and their entries gone, the
+    one this batch had made for `PutPrm` with them; a scenario could no
+    longer have a key pressed ahead, so the Esc that stops a search is
+    "Enter+Esc" and that golden was derived again, 19 seconds; and the
+    compiled code was 1830 bytes over the 64K of its segment, so
+    `view.c` is in the second one. All four stubs went, the editor
+    calls `V80_00`, and the build, the viewer's scenarios and the
+    `port` test, 5 minutes 33 seconds, passed at once.
 
 - The editor: addresses in its text, a line on the screen, saving, 13
   routines, 1079 bytes, 40 minutes in all, next to the viewer's batch:

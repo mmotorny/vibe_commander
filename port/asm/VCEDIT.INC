@@ -176,21 +176,4 @@ T00_00:	PUSH	BX
 T00_01:	JMP	V13_00			; Not read
 T00_02:	MOV	CL,DS:EdWrite		; Edited
 	JMP	V13_01
-
-T70_00	PROC	NEAR			; Clear line #AL
-	PUSH	DX
-	PUSH	AX
-	CallC	T70_00_c		; AX: the line in ScrBuf, DX: on the screen
-	MOV	DI,AX
-	MOV	BX,DX
-	POP	AX
-	POP	DX
-	XOR	CX,CX			; As REP left it
-	RET
-T70_00	ENDP
-
-T71_00	PROC	NEAR			; Scroll screen up / down
-	CALL	FAR PTR T71_00_c
-	RET
-T71_00	ENDP
 

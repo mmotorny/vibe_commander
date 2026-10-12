@@ -71,13 +71,15 @@ shows instead of files: the tree of directories, with the cursor on the
 current directory, and the Info, and those that read from the disk what a
 panel shows: the files of a directory with its extension file and the
 sizes of its directories, and for the Info the sizes of the disk, its
-label and the text of dirinfo, those of the viewer that find the lines
-of a file, keep a part of it in the memory, write the screen and look for
-a text. The editor is C as a whole: opening a file, the text in the
-memory with the buffer of the line that the cursor is in, the screen
+label and the text of dirinfo. The viewer is C: opening a file, for the
+editor too, finding the lines, keeping a part of a large file in the
+memory, writing the screen, its keys and the mouse, looking for a text,
+and the way back to the panels. The editor is C as a whole: the text in
+the memory with the buffer of the line that the cursor is in, the screen
 brought up to where the cursor is, as text or in hex, with its status
-line, what every key does, the search, and saving the file; only the
-viewer's code that opens the file for it is assembly. Of the keys of the
+line, what every key does, the search, and saving the file. The commands
+that start the two, by themselves or by a program that an extension file
+names, are still assembly. Of the keys of the
 panels, those are C that move the cursor by lines, columns and pages,
 select files one by one and by a mask, switch the panels off and on,
 swap them, make them of another kind and read them again, and Tab;
@@ -100,8 +102,7 @@ the key on: Copy and Rename with what they offer as the target, their
 dialogs, the tree to choose the target from, and the renaming of a
 directory of a tree panel, and those that make a directory, delete, set
 attributes and change the volume label. Going through the selected files
-of a panel is still assembly, and so is what the viewer does with its
-keys. At the panels the user menu is C, with what makes
+of a panel is still assembly. At the panels the user menu is C, with what makes
 the commands of a line of a menu or of an extension file and writes the
 list of the selected files for them, and so are the command line, with
 Esc and the names of the selected files and the paths of the panels put

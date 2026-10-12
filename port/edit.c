@@ -118,9 +118,10 @@ void T75_00(u16 number, u16 *screen, u16 color);
 void T76_00(u16 place, u16 segment, u16 text, u16 colors);
 u16 T80_00(void);
 
-/* How the assembly passes arguments to T00_00, T70_00 and T71_00, and
-   what it expects back (see the stubs in port/asm/VCEDIT.INC). The others
-   had stubs too, until what called them became C. */
+/* How the assembly passes arguments to T00_00, and what it expects back
+   (see the stub in port/asm/VCEDIT.INC). The others had stubs too, until
+   what called them became C: the viewer, which is C, calls T70_00 and
+   T71_00. */
 #pragma aux T00_00 "*_c" __far parm [bx] [ax] [dx] [si] value [ax] modify exact [ax bx cx dx si di es]
 #pragma aux T50_00 "*_c" __far modify exact [ax]
 #pragma aux T51_00 "*_c" __far modify exact [ax]
@@ -190,16 +191,17 @@ void PathLin(u8 __far *text);                           /* string.c */
 #pragma aux HexByt  "*_c" __far parm [es di] [ax] value [es di] modify exact [di es]
 #pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
 #pragma aux PathLin "*_c" __far parm [es si] modify exact [ax]
-/* The viewer's search: V81_00 makes ready what is looked for, SrchStr,
-   and V82_00 looks for it in `count` bytes. Behind what it finds is the
-   high word of what it returns; the low word is 1 for the text found, 0
-   for the bytes that it names in hex, and 100h for neither. */
-void V81_00(void);                                      /* view.c */
+/* The viewer's search: V80_00 shows the box "Searching for" under the
+   title `include`, says where it is, and makes ready what is looked for,
+   SrchStr; V82_00 looks for it in `count` bytes. Behind what it finds is
+   the high word of what it returns; the low word is 1 for the text found,
+   0 for the bytes that it names in hex, and 100h for neither. */
+void V80_00(u16 include, struct Box STACK *where);      /* view.c */
 u32 V82_00(u16 segment, u16 at, u16 count);
-#pragma aux V81_00  "*_c" __far modify exact [ax]
+#pragma aux V80_00  "*_c" __far parm [ax] [bx] modify exact [ax]
 #pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
-/* How long the text is that V81_00 has made ready. */
+/* How long the text is that V80_00 has made ready. */
 #define SrchLen (*(u16 *)(md.HelpBuf + 90))
 
 /* Boxes, dialogs and texts of the assembly. DialBox and Dialog take
@@ -215,7 +217,6 @@ extern const u8 __far NewFi_B[];        /* "Can't find the file" */
 extern const u8 __far SavAs_B[];        /* "Save this file as" */
 extern const u8 __far SavCn_B[];        /* "You've made changes ..." */
 extern const u8 __far Srch_B[];         /* "Search for the string" */
-extern const u8 __far SrFor_P[];        /* "Searching for" */
 extern const u8 __far SrEr_B[];         /* "Could not find the string" */
 extern const u8 __far Menu_F[];         /* the names of the menu file and */
 extern const u8 __far Ext_F[];          /* of the three extension files */
@@ -239,7 +240,6 @@ extern const u8 __far EdtH2_S[];        /* an extension file the title
 #pragma aux SavAs_B "*"
 #pragma aux SavCn_B "*"
 #pragma aux Srch_B "*"
-#pragma aux SrFor_P "*"
 #pragma aux SrEr_B "*"
 #pragma aux Menu_F "*"
 #pragma aux Ext_F "*"
@@ -1923,11 +1923,7 @@ static void T32_00(void)
     if (md.SrchStr[0] == 0)
         return;
     T51_00();
-    /* V80_00 of the viewer: the box, and what is looked for made ready. */
-    DialBox(0x528, OFFSET(SrFor_P), OFFSET(EdFl_S), MAIN_SEG,
-            (struct Box STACK *)&box);
-    Window(box.begin, box.size);
-    V81_00();
+    V80_00(OFFSET(EdFl_S), (struct Box STACK *)&box);
     place = ed.EdOffst + ed.EdCursr;
     for (;;) {                          /* T32_01 */
         if (TstBrk())

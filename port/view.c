@@ -1,6 +1,7 @@
 /*
- * The viewer: the lines of the file it shows, the part of the file that
- * is in the memory, what the screen shows of it, and a text looked for.
+ * The viewer: opening a file for it or for the editor, the lines of the
+ * file it shows, the part of the file that is in the memory, what the
+ * screen shows of it, its keys, and a text looked for.
  *
  * Translated from VCVIEW.INC.
  *
@@ -73,13 +74,25 @@ struct Line {
     u16 entry;                          /* BX */
 };
 
+/* What V00_02 hands back, in the order in which its stub takes it off the
+   stack: the file, and where the box "Reading the file" is. */
+struct Open {
+    u16 handle;                         /* BX; 0FFFFh for a new file */
+    struct Box box;                     /* AX, DX and SI */
+};
+
+u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open);
+void V00_10(u16 handle);
+void V13_00(void);
+void V13_01(u16 changed);
+void V80_00(u16 include, struct Box STACK *where);
 u16 NextLin(u16 segment, struct Line STACK *line);
 u16 PrevLin(u16 segment, struct Line STACK *line);
 u16 V20_00(u16 segment);
 void V25_00(void);
-u16 V30_00(u16 segment, u16 dx);
+u16 V30_00(u16 segment);
 void V31_00(u16 place);
-void V32_00(u16 segment, u16 number, u16 at, u16 end, u16 dx);
+void V32_00(u16 segment, u16 number, u16 at, u16 end);
 u16 V40_00(void);
 void V50_00(u16 segment);
 void V51_00(u16 segment);
@@ -88,15 +101,24 @@ void V60_00(u16 segment, u16 at, u16 table);
 void V81_00(void);
 u32 V82_00(u16 segment, u16 at, u16 count);
 
-/* How the assembly passes arguments to these, and what it expects back.
-   The segment of the text is what the assembly has in DS. */
+/* How the assembly passes arguments to those that it jumps to, and what
+   it expects back: V00_02, V00_10, V13_00 and V13_01 (see the stubs in
+   port/asm/VCVIEW.INC). The others are called from C only, since the keys
+   of the viewer are looked at here: V80_00 and V82_00 by the editor too,
+   V82_00 by the file search. The segment of the text is what the
+   assembly has in DS. */
+#pragma aux V00_02  "*_c" __far parm [ax] [dx] [bx] [di] value [ax] modify exact [ax]
+#pragma aux V00_10  "*_c" __far parm [bx] modify exact [ax]
+#pragma aux V13_00  "*_c" __far modify exact [ax]
+#pragma aux V13_01  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux V80_00  "*_c" __far parm [ax] [bx] modify exact [ax]
 #pragma aux NextLin "*_c" __far parm [dx] [bx] value [ax] modify exact [ax]
 #pragma aux PrevLin "*_c" __far parm [dx] [bx] value [ax] modify exact [ax]
 #pragma aux V20_00  "*_c" __far parm [ax] value [si] modify exact [si]
 #pragma aux V25_00  "*_c" __far modify exact [ax]
-#pragma aux V30_00  "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
+#pragma aux V30_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux V31_00  "*_c" __far parm [bx] modify exact [ax]
-#pragma aux V32_00  "*_c" __far parm [bx] [ax] [si] [cx] [dx] modify exact [ax]
+#pragma aux V32_00  "*_c" __far parm [bx] [ax] [si] [cx] modify exact [ax]
 #pragma aux V40_00  "*_c" __far value [ax] modify exact [ax]
 #pragma aux V50_00  "*_c" __far parm [ax] modify exact [ax]
 #pragma aux V51_00  "*_c" __far parm [ax] modify exact [ax]
@@ -105,10 +127,84 @@ u32 V82_00(u16 segment, u16 at, u16 count);
 #pragma aux V81_00  "*_c" __far modify exact [ax]
 #pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
-/* The editor's routine that clears a line of the window, by its number:
-   still assembly. */
-void T70_00(u16 number);
-#pragma aux T70_00 "*_a" __far parm [ax] modify exact [bx cx di es]
+/* Routines of the rest of the program that are still assembly, by their
+   entries for C. ClrKbd empties the keyboard buffer if the setup has it
+   so; the bars and the key that is waited for are C, in vc.h. GetMous
+   returns the buttons
+   of the mouse that are down, and in the high word where the mouse is, or
+   `place` as it was if there is no mouse. InWind is not 0 if a place is
+   outside a window. ChgDisk asks for the disk of a drive that shares the
+   floppy drive with another, and is not 0 if the user would not change
+   it. ResWin puts back what a box covers. AsmSeg returns the code segment
+   of the assembly, where its boxes and texts are. */
+void ClrKbd(void);
+u32 GetMous(u16 place);
+u16 InWind(u16 place, u16 begin, u16 size);
+u16 ChgDisk(const u8 *path);
+void ResWin(u16 begin, u16 size, u16 saved);
+u16 AsmSeg(void);
+#pragma aux ClrKbd  "*_a" __far modify exact [es]
+#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
+#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
+#pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
+#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
+#pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
+
+/* C routines of other files that vc.h does not have: a panel's frame,
+   the path over it and what it lists, as files or as the tree; characters
+   written to the screen buffer in a colour; and the editor's routines
+   that clear a line of the window, by its number, and move the lines of
+   the window up or down by one (see each). */
+void Panel(u16 panel);                                  /* panel.c */
+void PutPath(u16 panel);
+void PutFls(u16 panel);
+void PutTre(u16 panel);                                 /* tree.c */
+u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
+                 u16 color);                            /* screen.c */
+u32 T70_00(u16 line);                                   /* edit.c */
+void T71_00(u16 function, u16 place, u16 step);
+#pragma aux Panel   "*_c" __far parm [ax] modify exact [ax]
+#pragma aux PutPath "*_c" __far parm [ax] modify exact [ax]
+#pragma aux PutFls  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux PutTre  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux MvsBw   "*_c" __far parm [es di] [dx si] [cx] [ax] value [es di] modify exact [di es]
+#pragma aux T70_00  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux T71_00  "*_c" __far parm [ax] [bx] [dx] modify exact [ax bx cx dx si di]
+
+/* Boxes, dialogs and texts of the assembly, which DialBox and Dialog take
+   by their offsets in its code segment. */
+extern const u8 __far ViFl_S[];         /* " View " */
+extern const u8 __far EdFl_S[];         /* " Edit " */
+extern const u8 __far Col_S[];          /* "Col" */
+extern const u8 __far RdFil_P[];        /* "Reading the file" */
+extern const u8 __far FndEr_B[];        /* "Can't find the file" */
+extern const u8 __far Srch_B[];         /* "Search for the string" */
+extern const u8 __far SrFor_P[];        /* "Searching for" */
+extern const u8 __far SrEr_B[];         /* "Could not find the string" */
+#pragma aux ViFl_S "*"
+#pragma aux EdFl_S "*"
+#pragma aux Col_S "*"
+#pragma aux RdFil_P "*"
+#pragma aux FndEr_B "*"
+#pragma aux Srch_B "*"
+#pragma aux SrFor_P "*"
+#pragma aux SrEr_B "*"
+
+#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
+#define AT(segment, offset) ((u8 __far *)((u32)(segment) << 16 | (offset)))
+#define LOW(pair)  ((u16)(pair))
+#define HIGH(pair) ((u16)((pair) >> 16))
+
+/* What the status line says behind the size of the file. */
+static const u8 CODE Byts_S[] = " Bytes";
+
+#define Menu_C 7                        /* the colour of the menu bar, and of
+                                           the status line */
+
+/* An error of DOS: no such file; and what Intr21 makes of a drive that is
+   not ready. */
+#define ERR_NO_FILE   0x02
+#define ERR_NOT_READY 0x53
 
 /* The text in a segment, and a word of it or of the table of lines. */
 #define TEXT(segment) ((u8 __far *)((u32)(segment) << 16))
@@ -116,6 +212,87 @@ void T70_00(u16 number);
 
 /* Whether two bytes end a line: CR LF, or LF CR. */
 #define IS_CRLF(word) ((word) == 0x0A0D || (word) == 0x0D0A)
+
+/* Open the file ViewFil for the viewer or, if `edit` is not 0, for the
+   editor, with the box "Reading the file" on the screen: `menu` is the
+   item of the menu bar to mark, and `whole` is not 0 for a window that
+   is all of the screen between the status line and the key bar, where
+   else the window is set already, for the dirinfo of an Info panel.
+
+   Returns 0 if there is nothing to show: the file is not there, which a
+   box says, its disk is not put in, or a key has stopped it. The box is
+   off the screen then. Else `open` has the file and where the box is,
+   ViLen how long the file is, and 1 is returned for the editor and 2 for
+   the viewer. A file that is not there is a new one to the editor, with
+   0FFFFh for a handle.
+
+   A key that stops it, Esc, leaves the file open, as the assembly
+   does. */
+u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open)
+{
+    struct DosRegs regs;
+    u32 file, length;
+    u16 include, handle;
+
+    if (whole) {
+        VI->ViBase = 0x100;
+        VI->ViSize = (u16)(u8)(md.Lines - 2) << 8 | 80;
+    }
+    md.WinMous = 0;
+    PutMnu(menu);
+    VI->ViewEdit = (u8)edit;
+    include = OFFSET(ViFl_S);
+    if ((u8)edit != 0)
+        include = OFFSET(EdFl_S);
+    DialBox(0x528, OFFSET(RdFil_P), include, MAIN_SEG,
+            (struct Box STACK *)&open->box);
+    Window(open->box.begin, open->box.size);
+    if (ChgDisk(md.ViewFil))
+        goto none;
+    file = OpenFil(md.ViewFil, 0x40);
+    handle = LOW(file);
+    if (HIGH(file) != 0) {
+        if (handle == ERR_NOT_READY)
+            goto none;
+        include = OFFSET(ViFl_S);
+        if (VI->ViewEdit != 0) {
+            if (handle == ERR_NO_FILE) {
+                handle = 0xFFFF;
+                goto opened;
+            }
+            include = OFFSET(EdFl_S);
+        }
+        Dialog(OFFSET(FndEr_B), include, 0, 0, MAIN_SEG);
+        goto none;
+    }
+opened:
+    if (TstBrk())
+        goto none;
+    VI->ViHandle = handle;
+    length = 0;
+    regs.bx = handle;
+    if (handle != 0xFFFF) {
+        regs.ax = 0x4202;
+        regs.cx = 0;
+        regs.name = AT(MAIN_SEG, 0);                    /* DX */
+        if (!Intr21((struct DosRegs STACK *)&regs))
+            length = (u32)(u16)(u32)regs.name << 16 | regs.ax;
+    }
+    VI->ViLen = length;
+    regs.ax = 0x4200;
+    regs.cx = 0;
+    regs.name = AT(MAIN_SEG, 0);
+    Intr21((struct DosRegs STACK *)&regs);
+    VI->ViKeyBar = (u16)md.KeyBar << 8 | md.Clock;
+    open->handle = handle;
+    if (VI->ViewEdit != 0)
+        return 1;
+    return 2;
+none:
+    ResWin(open->box.begin, open->box.size, open->box.saved);
+    Window(open->box.begin, open->box.size);
+    return 0;
+}
 
 /* Find where the line behind the one at `line` begins. Returns 0 and
    leaves it there, or 1 if the part in the memory has no line behind
@@ -328,9 +505,8 @@ void V25_00(void)
 
 /* Write the screen: the window cleared, and a line of the text in each
    of its rows, from the line that ViFirst is in. Returns 1 if the part in
-   the memory ends before the window is full, and else 0. `dx` is what
-   the assembly has in DX, which V32_00 may store. */
-u16 V30_00(u16 segment, u16 dx)
+   the memory ends before the window is full, and else 0. */
+u16 V30_00(u16 segment)
 {
     const u8 __far *text = TEXT(segment);
     struct Line line;
@@ -351,7 +527,7 @@ u16 V30_00(u16 segment, u16 dx)
         at = line.at;
         if (NextLin(segment, (struct Line STACK *)&line))
             break;
-        V32_00(segment, number, at, line.at, dx);
+        V32_00(segment, number, at, line.at);
         number++;
         if (--count == 0) {
             result = 0;
@@ -366,7 +542,7 @@ u16 V30_00(u16 segment, u16 dx)
         if (last == 0x0D || last == 0x0A)
             end--;
     }
-    V32_00(segment, number, at, end, dx);
+    V32_00(segment, number, at, end);
     result = 1;
 show:
     Window(VI->ViBase, VI->ViSize);
@@ -393,10 +569,14 @@ void V31_00(u16 place)
    to a group, and the same bytes as characters. What was found last has
    the colour of the cursor.
 
-   `dx` is what the assembly has in DX: it is stored for the last byte of
-   what was found where nothing found is in this part of the file. Nothing
-   reads it then. */
-void V32_00(u16 segment, u16 number, u16 at, u16 end, u16 dx)
+   Where nothing found is in this part of the file, ViTmp1 says so and
+   ViTmp2 stays as it is. The assembly stores there what DX happens to
+   hold. Nothing reads it: a place is held against ViTmp2 only if it is
+   not below ViTmp1, 0FFFFh then, and no place is that far, the part
+   being 0FFE0h bytes at the most; and the editor, which has the shape of
+   the cursor in the same word, EdShape, sets that when it opens a
+   file. */
+void V32_00(u16 segment, u16 number, u16 at, u16 end)
 {
     const u8 __far *text = TEXT(segment);
     u8 *screen = (u8 *)BasAdr(VI->ViBase + (number << 8));
@@ -409,10 +589,9 @@ void V32_00(u16 segment, u16 number, u16 at, u16 end, u16 dx)
     found = VI->ViSearch + 1 - VI->ViOffset;
     if ((u16)(found >> 16) == 0) {
         first = (u16)found;
-        dx = first + VI->ViSrLen - 1;
+        VI->ViTmp2 = first + VI->ViSrLen - 1;
     }
     VI->ViTmp1 = first;
-    VI->ViTmp2 = dx;
 
     if (VI->ViTxHex == 0) {
         column = 0;
@@ -661,6 +840,656 @@ done:
     VI->ViLoaded = loaded;
     VI->ViEndTab = table;
     VI->ViPoint = VI->ViSpace - 2;
+}
+
+/* Write the status line of the viewer but for the column and the per
+   cent, which V25_00 writes: the name of the file and its size. */
+static void Status(void)
+{
+    u16 __far *screen;
+    u16 cell = Color(Menu_C) << 8 | ' ';
+    u16 code = AsmSeg();
+    u16 count;
+
+    for (count = 0; count != 80; count++)
+        md.ScrBuf[count] = cell;
+    screen = MvsBw(md.ScrBuf, AT(code, OFFSET(ViFl_S) + 1), 4, cell);
+    *screen = cell & 0xFF00 | ':';
+    MvsBw(md.ScrBuf + 40, AT(code, OFFSET(Col_S)), 3, cell);
+    for (count = 0; count != LenPath + 13; count++)
+        md.TmpBuf[count] = md.ViewFil[count];
+    LetLin(md.TmpBuf);
+    ShrtLin(md.TmpBuf, 33);
+    MovDz0(md.ScrBuf + 6, md.TmpBuf);
+    Number(md.TmpBuf, HIGH(VI->ViLen), LOW(VI->ViLen),
+           NUM_SEPARATED | NUM_PADDED);
+    screen = MovDz0(md.ScrBuf + 51, md.TmpBuf);
+    count = 6;
+    if (VI->ViLen == 1)
+        count--;
+    MvsBw(screen, Byts_S, count, cell);
+    *(u8 *)(md.ScrBuf + 78) = '%';
+}
+
+/* The first line of the screen, as V20_00 finds it, the line behind
+   `line` and the one before it. */
+#define FIRST() (line.at = V20_00(segment), line.entry = VI->ViPoint)
+#define NEXT()  NextLin(segment, (struct Line STACK *)&line)
+#define PREV()  PrevLin(segment, (struct Line STACK *)&line)
+
+/* The viewer: read the file `handle`, whose length is in ViLen, show it
+   in the window ViBase and ViSize, with a status line if that is as wide
+   as the screen, and do what the keys and the mouse ask for, until Esc,
+   F3 or F10 leave it. Then the file is closed and the panels are on the
+   screen again.
+
+   A button of the mouse held in the upper or the lower third of the
+   window is Up or Down, and in the left or the right quarter of what is
+   between them Left or Right. */
+void V00_10(u16 handle)
+{
+    u16 segment = md.ViewSeg;
+    const u8 __far *text = TEXT(segment);
+    struct Line line;
+    struct Box box;
+    struct DosRegs regs;
+    u32 pair, rest, position;
+    u16 count, key, bar, step, column, at, end, number, begin, size;
+    u16 starts, panel, length, behind, in_file, result, edge;
+    u16 mouse = 0;
+    u8 third, quarter;
+
+    count = MAIN_SEG + md.FreMem2 - md.ViewSeg;
+    if (count > 0xFFE)
+        count = 0xFFE;
+    count <<= 4;
+    VI->ViSpace = count;
+    V55_00(segment, 0, count, handle);
+    if (HIGH(VI->ViLen) == 0)
+        count = LOW(VI->ViLen);
+    VI->ViLoaded = count;
+    VI->ViOffset = 0;
+    VI->ViFirst = 0;
+    VI->ViCol = 0;
+    VI->ViTxHex = 0;
+    md.Clock = 0;
+    md.KeyBar = 1;
+    VI->ViWrap = 1;
+    VI->ViSearch = 0xFFFFFFF0;
+    md.HlpPage = 3;
+    if ((u8)VI->ViSize < 79) {
+        VI->ViStatus = 0;
+    } else {
+        Status();
+        VI->ViStatus = 1;
+    }
+
+V00_15:                                 /* the part in the memory is new */
+    V60_00(segment, 0, VI->ViSpace);
+V00_20:                                 /* write the screen */
+    V25_00();
+    if (!V30_00(segment))
+        goto V00_30;
+V00_21:                                 /* the text ends on the screen */
+    if (!V40_00())
+        goto V00_30;
+    if (VI->ViFirst < VI->ViSpace >> 1)
+        goto V00_30;
+    V50_00(segment);
+V00_22:
+    V30_00(segment);
+
+V00_30:                                 /* the mouse */
+    pair = GetMous(mouse);
+    mouse = HIGH(pair);
+    if (LOW(pair) == 0) {
+        md.WinMous = 0;
+        goto V00_40;
+    }
+    ClrKbd();
+    begin = VI->ViBase;
+    size = VI->ViSize;
+    if (md.WinMous == 0 && InWind(mouse, begin, size))
+        goto V00_30;
+    md.WinMous = 1;
+    third = (u8)((u16)(signed char)(size >> 8) / 3);
+    if ((u8)(mouse >> 8) < (u8)((begin >> 8) + third))
+        goto V05_00;
+    if ((u8)(mouse >> 8) >= (u8)((begin >> 8) + (size >> 8) - third))
+        goto V06_00;
+    quarter = (u8)size >> 2;
+    if ((u8)mouse < (u8)(begin + quarter))
+        goto V01_00;
+    if ((u8)mouse >= (u8)(begin + size - quarter))
+        goto V03_00;
+
+V00_40:                                 /* a key */
+    bar = 3;
+    if (VI->ViTxHex == 0) {
+        bar = 4;
+        if (VI->ViWrap != 0)
+            bar = 5;
+    }
+    key = Input(bar);
+    ClrKbd();
+    /* The mouse, or a key without a scan code: Case takes none. */
+    if (key >> 8 == 0xFC || key >> 8 == 0)
+        goto V00_30;
+    switch (key & 0xFF) {
+    case 0x1B:                          /* Esc */
+        goto leave;
+    case 0x13:                          /* ^S */
+        goto V01_00;
+    case 0x04:                          /* ^D */
+        goto V03_00;
+    case 0x01:                          /* ^A */
+        goto V02_00;
+    case 0x06:                          /* ^F */
+        goto V04_00;
+    case 0x05:                          /* ^E */
+        goto V05_00;
+    case 0x18:                          /* ^X */
+        goto V06_00;
+    case 0x12:                          /* ^R */
+        goto V07_00;
+    case 0x03:                          /* ^C */
+        goto V08_00;
+    case 0x0D:                          /* Enter */
+        goto V11_00;
+    }
+    switch (key) {
+    case 0x3D00:                        /* F3 */
+    case 0x4400:                        /* F10 */
+        goto leave;
+    case 0x4B00:                        /* Left */
+        goto V01_00;
+    case 0x4D00:                        /* Right */
+        goto V03_00;
+    case 0x7300:                        /* ^Left */
+        goto V02_00;
+    case 0x7400:                        /* ^Right */
+        goto V04_00;
+    case 0x4800:                        /* Up */
+        goto V05_00;
+    case 0x5000:                        /* Down */
+        goto V06_00;
+    case 0x4900:                        /* PgUp */
+        goto V07_00;
+    case 0x5100:                        /* PgDn */
+        goto V08_00;
+    case 0x4700:                        /* Home, ^Home, ^PgUp */
+    case 0x7700:
+    case 0x8400:
+        goto V09_00;
+    case 0x4F00:                        /* End, ^End, ^PgDn */
+    case 0x7500:
+    case 0x7600:
+        goto V10_00;
+    case 0x3E00:                        /* F4 */
+        goto V11_00;
+    case 0x3C00:                        /* F2 */
+        goto V12_00;
+    case 0x4100:                        /* F7 */
+        goto V14_00;
+    case 0x5A00:                        /* Shift-F7 */
+        goto V15_00;
+    }
+    goto V00_30;
+
+V01_00:                                 /* Left */
+    step = 1;
+    goto V02_01;
+V02_00:                                 /* ^Left */
+    step = 40;
+V02_01:
+    if (VI->ViTxHex != 0)
+        goto V00_30;
+    column = VI->ViCol;
+    if (column == 0)
+        goto V00_30;
+    if (column < step)
+        column = 0;
+    else
+        column -= step;
+V02_02:
+    if (column == VI->ViCol)
+        goto V00_30;
+    VI->ViCol = column;
+    goto V00_20;
+
+V03_00:                                 /* Right */
+    step = 1;
+    goto V04_01;
+V04_00:                                 /* ^Right */
+    step = 40;
+V04_01:
+    if (VI->ViTxHex != 0)
+        goto V00_30;
+    column = VI->ViCol;
+    if (column >= 0xFFFF - 80)
+        goto V00_30;
+    column += step;
+    if (column >= 0xFFFF - 80)
+        column = 0xFFFF - 80;
+    goto V02_02;
+
+V05_00:                                 /* Up */
+    FIRST();
+    if (line.at == 0 && VI->ViOffset == 0)
+        goto V00_30;
+    if (PREV())
+        goto V05_01;
+    if (line.at != 0)
+        goto V05_02;
+    if (VI->ViSpace >> 1 <= VI->ViFirst)
+        goto V05_02;
+V05_01:                                 /* the part before, if there is one */
+    if (VI->ViOffset == 0)
+        goto V05_02;
+    V51_00(segment);
+    FIRST();
+    PREV();
+    VI->ViFirst = line.at;
+    VI->ViPoint = line.entry;
+    V25_00();
+    goto V00_22;
+V05_02:                                 /* the window a line down, and the
+                                           new line in its first row */
+    VI->ViFirst = line.at;
+    VI->ViPoint = line.entry;
+    V25_00();
+    begin = VI->ViBase;
+    T71_00(0x700, begin + ((VI->ViSize >> 8) - 1 << 8), (u16)-(2 * 80));
+    V31_00(begin);
+    FIRST();
+    at = line.at;
+    end = VI->ViLoaded;
+    if (!NEXT())
+        end = line.at;
+    V32_00(segment, 0, at, end);
+    Window(VI->ViBase, 0x100 | (u8)VI->ViSize);
+    /* Whether the window is full: from the first line again, with the
+       entry of the table that the line behind it has left. */
+    line.at = at;
+    count = VI->ViSize >> 8;
+    do {
+        if (NEXT())
+            goto V06_05;
+    } while (--count);
+    goto V00_30;
+
+V06_00:                                 /* Down */
+    if (VI->Vi100pc != 0)
+        goto V00_30;
+    FIRST();
+    if (NEXT()) {
+        V50_00(segment);
+        VI->ViFirst = 0;
+        VI->ViPoint = VI->ViSpace - 2;
+        V25_00();
+        goto V00_22;
+    }
+    VI->ViFirst = line.at;
+    VI->ViPoint = line.entry;
+    V25_00();
+    /* The window a line up, and the new line in its last row. */
+    begin = VI->ViBase;
+    T71_00(0x600, begin, 2 * 80);
+    V31_00(begin + ((VI->ViSize >> 8) - 1 << 8));
+    number = (u16)(signed char)(VI->ViSize >> 8) - 1;
+    count = number;
+    FIRST();
+    do {
+        if (NEXT())
+            goto V06_05;
+    } while (--count);
+    at = line.at;
+    end = VI->ViLoaded;
+    result = NEXT();
+    if (!result)
+        end = line.at;
+    V32_00(segment, number, at, end);
+    Window(VI->ViBase + (number << 8), 0x100 | (u8)VI->ViSize);
+    if (!result)
+        goto V00_30;
+V06_05:
+    V40_00();
+    goto V00_21;
+
+V07_00:                                 /* PgUp */
+    FIRST();
+    if (line.at == 0 && VI->ViOffset == 0)
+        goto V00_30;
+    count = (VI->ViSize >> 8) - 2;
+    do {
+        if (PREV())
+            goto V07_02;
+    } while (--count);
+    if (line.at != 0)
+        goto V07_04;
+V07_02:                                 /* the part before, if there is one */
+    if (VI->ViSpace >> 1 <= VI->ViFirst)
+        goto V07_04;
+    if (VI->ViOffset == 0)
+        goto V07_04;
+    V51_00(segment);
+    FIRST();
+    count = (u8)(md.Lines - 4);
+    do {
+        if (PREV())
+            break;
+    } while (--count);
+V07_04:
+    VI->ViFirst = line.at;
+    VI->ViPoint = line.entry;
+    V25_00();
+    goto V00_22;
+
+V08_00:                                 /* PgDn */
+    if (VI->Vi100pc != 0)
+        goto V00_30;
+    FIRST();
+    /* Where the lines below begin goes to TmpBuf, a word for each: the
+       last of them is the first line of the next screen. */
+    starts = (u16)md.TmpBuf - 2;
+    count = (VI->ViSize >> 8) - 2;
+    do {
+        if (NEXT())
+            goto V08_06;
+        starts += 2;
+        *(u16 *)starts = line.at;
+    } while (--count);
+    /* And a screen from there: where it is not full and the file ends,
+       back by as many lines as it lacks. */
+    count = (VI->ViSize >> 8) - 1;
+    do {
+        if (NEXT())
+            goto V08_03;
+    } while (--count);
+    goto V08_05;
+V08_03:
+    if (VI->ViOffset + VI->ViLoaded < VI->ViLen)
+        goto V08_05;
+    count += count;
+    if (starts < count)
+        goto V00_30;
+    starts -= count;
+    if (starts < (u16)md.TmpBuf)
+        goto V00_30;
+V08_05:
+    VI->ViFirst = *(u16 *)starts;
+    goto V00_20;
+V08_06:                                 /* the part ends: the next one */
+    V50_00(segment);
+    VI->ViFirst = 0;
+    VI->ViPoint = VI->ViSpace - 2;
+    goto V00_20;
+
+V09_00:                                 /* Home */
+    if (VI->ViOffset == 0) {
+        if ((VI->ViFirst | VI->ViCol) == 0)
+            goto V00_30;
+        VI->ViFirst = 0;
+        VI->ViCol = 0;
+        goto V00_20;
+    }
+    VI->ViOffset = 0;
+    VI->ViFirst = 0;
+    VI->ViCol = 0;
+    count = VI->ViSpace;
+    if (HIGH(VI->ViLen) == 0 && count > LOW(VI->ViLen))
+        count = LOW(VI->ViLen);
+    VI->ViLoaded = count;
+    regs.ax = 0x4200;
+    regs.bx = VI->ViHandle;
+    regs.cx = 0;
+    regs.name = text;                                   /* DX */
+    Intr21((struct DosRegs STACK *)&regs);
+    V55_00(segment, 0, count, regs.bx);
+    goto V00_15;
+
+V10_00:                                 /* End */
+    if (VI->Vi100pc != 0)
+        goto V00_30;
+    rest = VI->ViLen - VI->ViOffset;
+    if (HIGH(rest) != 0 || LOW(rest) > VI->ViLoaded) {
+        /* The end of the file is not in the memory: half a part of it,
+           from an offset that is a multiple of 16. */
+        count = (VI->ViSpace >> 1) - 0x10 + (LOW(VI->ViLen) & 0xF);
+        VI->ViOffset = VI->ViLen - count;
+        VI->ViLoaded = count;
+        VI->ViFirst = 0;
+        Load(segment, VI->ViOffset, 0, VI->ViLoaded);
+        V60_00(segment, 0, VI->ViSpace);
+    }
+    line.entry = VI->ViEndTab;
+    line.at = WORD_AT(text, line.entry);
+    count = (VI->ViSize >> 8) - 1;
+    if (VI->ViTxHex != 0)
+        line.at = VI->ViLoaded - 1;
+    do {
+        if (PREV())
+            break;
+    } while (--count);
+    VI->ViFirst = line.at;
+    VI->ViPoint = line.entry;
+    goto V00_20;
+
+V11_00:                                 /* F4 - ASCII / Hex */
+    VI->ViTxHex = VI->ViTxHex == 0;
+    goto V00_20;
+
+V12_00:                                 /* F2 - Wrap / Unwrap */
+    if (VI->ViTxHex != 0)
+        goto V00_30;
+    VI->ViWrap = VI->ViWrap == 0;
+    goto V00_20;
+
+V14_00:                                 /* F7 - search */
+    if ((u8)Dialog(OFFSET(Srch_B), OFFSET(ViFl_S), 0, 0, MAIN_SEG) != 0)
+        goto V00_30;
+V15_00:                                 /* Continue search */
+    if (md.SrchStr[0] == 0)
+        goto V00_30;
+    V80_00(OFFSET(ViFl_S), (struct Box STACK *)&box);
+    /* From the first line of the screen, or from the line behind it if
+       something has been found before. */
+    at = VI->ViFirst;
+    if (HIGH(VI->ViSearch) != 0xFFFF) {
+        line.at = at;
+        line.entry = VI->ViPoint;
+        at = VI->ViLoaded;
+        if (!NEXT())
+            at = line.at;
+    }
+    VI->ViSearch = VI->ViOffset + at;
+    if (VI->ViLoaded < at)
+        goto V15_04;
+    /* In what is in the memory. */
+    count = VI->ViLoaded - at;
+    pair = V82_00(segment, at, count);
+    if (LOW(pair) & 0x100)
+        goto V15_06;
+    behind = HIGH(pair) - at;
+    panel = LOW(pair);
+    in_file = 0;
+    goto V15_10;
+V15_04:                                 /* and on in the file, a piece of
+                                           it at a time in MenuBuf */
+    if (TstBrk()) {
+        result = 2;
+        goto V15_22;
+    }
+    if (VI->ViLen <= VI->ViSearch)
+        goto V15_07;
+    rest = VI->ViLen - VI->ViSearch;
+    count = LenMenu;
+    if (HIGH(rest) == 0 && count > LOW(rest))
+        count = LOW(rest);
+    regs.ax = 0x4200;
+    regs.bx = VI->ViHandle;
+    regs.cx = HIGH(VI->ViSearch);
+    regs.name = text + LOW(VI->ViSearch);               /* DX */
+    Intr21((struct DosRegs STACK *)&regs);
+    if (regs.ax != LOW(VI->ViSearch)
+        || (u16)(u32)regs.name != HIGH(VI->ViSearch))
+        goto V15_07;
+    regs.ax = 0x3F00;
+    regs.cx = count;
+    regs.name = md.MenuBuf;
+    result = Intr21((struct DosRegs STACK *)&regs);
+    count = regs.ax;
+    if (result) {
+        result = 2;
+        goto V15_22;
+    }
+    pair = V82_00(MAIN_SEG, (u16)md.MenuBuf, count);
+    behind = HIGH(pair) - (u16)md.MenuBuf;
+    panel = LOW(pair);
+    in_file = 1;
+    if (!(LOW(pair) & 0x100))
+        goto V15_10;
+V15_06:                                 /* not in these `count` bytes: on
+                                           from where it may begin */
+    if (count < SRCH_LEN)
+        goto V15_07;
+    count = count - SRCH_LEN + 1;
+    VI->ViSearch += count;
+    goto V15_04;
+V15_07:
+    Dialog(OFFSET(SrEr_B), OFFSET(ViFl_S), 0, 0, MAIN_SEG);
+    result = 3;
+    goto V15_22;
+V15_10:                                 /* found, as text or as bytes */
+    VI->ViSrPan = (u8)panel;
+    length = SRCH_LEN;
+    if ((u8)panel == 0)
+        length = HexLen;
+    VI->ViSrLen = (u8)length;
+    behind -= length;
+    VI->ViSearch += behind;
+    if (in_file) {
+        /* The part of the file that begins 2000 bytes before it, at a
+           multiple of 16. */
+        position = 0;
+        if (VI->ViSearch >= 2000)
+            position = VI->ViSearch - 2000;
+        position &= 0xFFFFFFF0;
+        VI->ViOffset = position;
+        rest = VI->ViLen - position;
+        count = VI->ViSpace;
+        if (HIGH(rest) == 0 && count > LOW(rest))
+            count = LOW(rest);
+        VI->ViLoaded = count;
+        Load(segment, VI->ViOffset, 0, VI->ViLoaded);
+        V60_00(segment, 0, VI->ViSpace);
+    }
+    count = LOW(VI->ViSearch) - LOW(VI->ViOffset);
+    VI->ViFirst = count;
+    if (VI->ViTxHex != 0)
+        goto V15_21;
+    /* The column it is in, and the line moved so that it shows. */
+    at = V20_00(segment);
+    if (count < at)
+        goto V15_21;
+    count -= at;
+    column = 0;
+    for (; count; count--) {
+        if (text[at++] == 9)
+            column |= 7;
+        column++;
+    }
+    if (column > VI->ViCol) {
+        column += VI->ViSrLen;
+        edge = VI->ViCol + (u8)VI->ViSize;
+        if (column < edge)
+            goto V15_21;
+        column = column - (u8)VI->ViSize + 1;
+    } else if (column != 0) {
+        column--;
+    }
+    VI->ViCol = column;
+V15_21:
+    result = 0;
+V15_22:
+    ResWin(box.begin, box.size, box.saved);
+    Window(box.begin, box.size);
+    if (result == 0)
+        goto V00_20;
+    VI->ViSearch = 0xFFFFFFF0;
+    goto V00_30;
+
+leave:
+    V13_00();
+}
+
+/* Close the file of the viewer, or of an editor that could not read it,
+   and go back to the panels. */
+void V13_00(void)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x3E00;
+    regs.bx = VI->ViHandle;
+    regs.name = md.TmpBuf;
+    Intr21((struct DosRegs STACK *)&regs);
+    V13_01(0);
+}
+
+/* What the stub of PutFls does: a panel shows files, the tree or the
+   Info. */
+static void Files(u16 panel)
+{
+    if (PANEL(panel)->WinTyp == 0)
+        PutFls(panel);
+    else if (PANEL(panel)->WinTyp == 1)
+        PutTre(panel);
+    else
+        PutInf(panel);
+}
+
+/* Go back to the panels from the viewer or the editor: what DOS had on
+   the screen, the clock and the key bar as they were, the panels that
+   are visible, the prompt, the menu bar and the key bar. `changed` is
+   not 0 in its low byte if a file has been written, so that the panels
+   are read again. */
+void V13_01(u16 changed)
+{
+    u16 panel;
+
+    Quit();
+    md.Clock = (u8)VI->ViKeyBar;
+    md.KeyBar = (u8)(VI->ViKeyBar >> 8);
+    panel = md.WCB1seg;
+    if (PANEL(panel)->Visible != 0) {
+        Panel(panel);
+        PutPath(panel);
+        Files(panel);
+    }
+    PANEL(panel)->ChgFlg |= (u8)changed;
+    panel = md.WCB2seg;
+    if (PANEL(panel)->Visible != 0) {
+        Panel(panel);
+        PutPath(panel);
+        Files(panel);
+    }
+    PANEL(panel)->ChgFlg |= (u8)changed;
+    PutPrm(panel);
+    PutMnu(0);
+    PutKey(0xFF);
+    Window(0, (u16)md.Lines << 8 | 80);
+    md.WinMous = 0;
+}
+
+/* Show the box "Searching for" with the text that is looked for, and
+   prepare the search: for the viewer and for the editor. `include` is
+   the title of the box, an offset in the assembly, and `where` gets
+   where the box is. */
+void V80_00(u16 include, struct Box STACK *where)
+{
+    DialBox(0x528, OFFSET(SrFor_P), include, MAIN_SEG, where);
+    Window(where->begin, where->size);
+    V81_00();
 }
 
 /* Make of the text that is looked for, SrchStr, what the search compares

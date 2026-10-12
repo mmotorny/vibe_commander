@@ -1,0 +1,593 @@
+Volkov Commander 4.05 in the scenario view-search: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 1: F9 o o
+cursor 25 6 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 2: Down Down Down Down Down Space
+cursor 25 13 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 3: Enter
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 4: Shift+F3
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 5: "a:\freedos\bin\command.com"
+cursor 34 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 6: Enter
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ     | 1Bx80
+|␀␀#◙␀␀3↕␀␀O↕␀␀a↕␀␀|↕␀␀M↓␀␀▓↓␀␀Ω→␀␀⍽→␀␀╪←␀␀ü∟␀␀û∟␀␀▓∟␀␀┐∟␀␀╪∟␀␀Σ∟␀␀≡∟␀␀&▲␀␀♠▼␀␀─▼| 1Bx80
+|␀␀▀▼␀␀φ▼␀␀/ ␀␀B ␀␀↔0␀␀║0␀␀╬0␀␀▄0␀␀∩_␀␀Gr␀␀ou␀␀üu␀␀Åu␀␀òu␀␀\v␀␀ov␀␀}v␀␀◄ë␀␀¥ë␀␀éè| 1Bx80
+|␀␀eï␀␀␀␀␀␀␀␀␀␀␀␀␀␀╠δ²ÉÉÉÉ␀␀␀␀␀␀␀␀␀␀␀.⍽♠►␀°╩☻␀␀␀␀␀␀␀␀␀î╚Ä╪Ä╨╝☼•■♫;•u(í▼␀Ä└ë├┤P═!í| 1Bx80
+|←␀&ú◙␀í↔␀&ú♀␀í!␀&ú▬␀Φö•╕⍽L═!║d␀┤        ═!⌠δ²                                   | 1Bx80
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻êα| 1Bx80
+|$♥♦♦óh☻êα$♦óù☻êα$◘óò☻ÇΣ►ê&ö☻ë°♦☼ói☻│☻X╨Σs1Ä▌÷D♣Çt)╣◘␀â╞◙┐o☻┤ ⁿ¼8αs☻êα¬Γ÷╣◘␀êα²O≤| 1Bx80
+|«&êm☻î╔│♥░⍽ⁿÄ┘S╗x☻┐o☻⍽•t☼<→s♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë>Ω☺┤b═!Ä├&─▲4␀&èG☻ê─&ç•ú╪☺ë▲c☻î♠e☻[Ä┴| 1Bx80
+|Φé␀Φ╦␀│◙Φz␀│␀Φa␀│☺Φ\␀│♥ΦW␀│♀Φf␀δ◙[│♥δ3░•Φ¡␀ï>║☻1└è♣Gë┴ë├╕•♀═!≥«uσèY⍽èçö☻◘└t┌Φé␀─| 1Bx80
+|>c☻╕4↕&ë♣Xê╪<☻t◘<♥t♦■♫4↕[Y_^]▼•Z╧╖␀◙┐ö☻tWÇ├5ê▲¢☻╗ÿ☻δEá¥☻8├r☻ê├╖␀☺█ïƒ₧☻δ2S╗o☻Φ+␀δ| 1Bx80
+|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx80
+|◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻␀♥▼♥6♥:♥>♥C♥H♥Q♥Y♥a♥h♥k♥n♥⌂| 1Bx80
+|♥ñ♥╝♥╠♥∞♥☺♦,♦7♦J♦[♦p♦|♦ç♦ù♦⌐♦╕♦╠♦▄♦⌠♦•♣¶♣,♣reading from␀writing to␀Error %1 driv| 1Bx80
+|e %A: %2 area: %3␀Error %1 device %A: %3␀DOS␀FAT␀root␀data␀(I)gnore␀(R)etry␀(A)b| 1Bx80
+|ort␀(F)ail␀? ␀, ␀◘iIrRaAfF␀␀☺☺☻☻♥♥write-protection violation attempted␀unknown u| 1Bx80
+|nit for driver␀drive not ready␀unknown command given to driver␀data error (bad C| 1Bx80
+|RC)␀bad device driver request structure length␀seek error␀unknown media type␀sec| 1Bx80
+|tor not found␀printer out of paper␀write fault␀read fault␀general failure␀sharin| 1Bx80
+|g violation␀lock violation␀invalid disk change␀FCB unavailable␀sharing buffer ov| 1Bx80
+|erflow␀code page mismatch␀out of input␀insufficient disk space␀Unknown error cod| 1Bx80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 7: F2
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 8: Down Down Down Down
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes     100% | 30x80
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
+|♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
+|♥←☺☺☻☻♥♥♥♥☺☺♥☻Control-Break pressed.                                            | 1Bx80
+|Terminate batch file '%s' (Yes/No/All) ? ␀♂YyNnAaQq♥♪←☺☺☻☻♥♥♦♦♦☺☻Overwrite '%s'→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 9: Home
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 10: PgDn
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes     100% | 30x80
+|╣‼␀┐;~≥»&ïE"⍽αà÷vkïF°à└vd9╞uJï₧≥■☺├╞G⍽␀Φe²=☺␀t  ╕t◙Φ♣■Θÿ␀Φo²ê┬■╩0÷╗J␀╕@␀Ä└&è•0Σ→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
+|♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
+|♥←☺☺☻☻♥♥♥♥☺☺♥☻Control-Break pressed.                                            | 1Bx80
+|Terminate batch file '%s' (Yes/No/All) ? ␀♂YyNnAaQq♥♪←☺☺☻☻♥♥♦♦♦☺☻Overwrite '%s'→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 11: Up
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 12: F7
+cursor 8 8 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*                                                                          ␀␀→| 1Bx3 70x74 1Bx2 1Ex1
+|␀␀o   ╔══════════════════════════════ View ══════════════════════════════╗   ␀,→| 1Bx3 70x74 03x2 1Ex1
+|␀%s   ║ Search for the string                                            ║   n␀→| 1Bx3 70x74 03x2 1Ex1
+|      ║                                                                  ║      | 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|The   ╚══════════════════════════════════════════════════════════════════╝      | 1Bx3 70x74 03x2 1Bx1
+|for                                                                             | 1Bx3 70x74 03x2 1Bx1
+|You must reboot the system or, if this shell runs in                            | 1Bx5 03x74 1Bx1
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 13: "backslash"
+cursor 17 8 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*                                                                          ␀␀→| 1Bx3 70x74 1Bx2 1Ex1
+|␀␀o   ╔══════════════════════════════ View ══════════════════════════════╗   ␀,→| 1Bx3 70x74 03x2 1Ex1
+|␀%s   ║ Search for the string                                            ║   n␀→| 1Bx3 70x74 03x2 1Ex1
+|      ║ backslash                                                        ║      | 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|The   ╚══════════════════════════════════════════════════════════════════╝      | 1Bx3 70x74 03x2 1Bx1
+|for                                                                             | 1Bx3 70x74 03x2 1Bx1
+|You must reboot the system or, if this shell runs in                            | 1Bx5 03x74 1Bx1
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 14: Enter
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 1,943         87,772 Bytes     100% | 30x80
+|←ly qualified!◙That means including drive letter and beginning with a backslash→| 1Ex1 1Bx69 30x9 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←evelopers, please refer◙to the enclosed HISTORY.TXT file.◙◙Send bug reports to→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←the name of or changes the current directory and drive.◙◙CDD [drive:][path]◙CD→| 1Ex1 1Bx78 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 15: Home
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 16: F7
+cursor 8 8 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞                                                                          êî→| 1Bx3 70x74 1Bx2 1Ex1
+|␀␀C   ╔══════════════════════════════ View ══════════════════════════════╗   .\→| 1Bx3 70x74 03x2 1Ex1
+|␀␀*   ║ Search for the string                                            ║   ␀␀→| 1Bx3 70x74 03x2 1Ex1
+|␀␀o   ║ backslash                                                        ║   ␀,→| 1Bx3 70x5 30x64 70x5 03x2 1Ex1
+|␀%s   ╚══════════════════════════════════════════════════════════════════╝   n␀→| 1Bx3 70x74 03x2 1Ex1
+|                                                                                | 1Bx3 70x74 03x2 1Bx1
+|The shell is about to be terminated, though, this is                            | 1Bx5 03x74 1Bx1
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 17: "qqqq"
+cursor 12 8 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞                                                                          êî→| 1Bx3 70x74 1Bx2 1Ex1
+|␀␀C   ╔══════════════════════════════ View ══════════════════════════════╗   .\→| 1Bx3 70x74 03x2 1Ex1
+|␀␀*   ║ Search for the string                                            ║   ␀␀→| 1Bx3 70x74 03x2 1Ex1
+|␀␀o   ║ qqqq                                                             ║   ␀,→| 1Bx3 70x5 30x64 70x5 03x2 1Ex1
+|␀%s   ╚══════════════════════════════════════════════════════════════════╝   n␀→| 1Bx3 70x74 03x2 1Ex1
+|                                                                                | 1Bx3 70x74 03x2 1Bx1
+|The shell is about to be terminated, though, this is                            | 1Bx5 03x74 1Bx1
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 18: Enter+Esc
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 19: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

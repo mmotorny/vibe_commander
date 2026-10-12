@@ -161,6 +161,39 @@ out again (show.py --changes is how):
     leaves the part: that is three steps to the reading of the next part
     and of the one before, where wrapped it is some twenty PgDn. The
     file of all bytes, data.bin, has no line end at all.
+  - A search in the viewer begins at the first line of the screen, and
+    once a text has been found, on the line behind it: in a file of one
+    line, data.bin not wrapped, the search after one that found
+    something finds nothing. A search that finds nothing has the next
+    one begin at the place found last, not on the line behind. What is
+    found off the screen moves the line: "xyz" is found as XYZ, in
+    column 94 of data.bin. "backslash" is in the shell of A: once, at
+    66317, behind what the viewer holds of it: the file is read on for
+    it and the part around the place shown. Not wrapped, the fifth line
+    of that file begins in the second half of the part, so four times
+    Down read the next part; PgDn at the start does too, and Up at the
+    start of that part reads the one before.
+  - A key stops a search of the viewer where it goes on from what is
+    in the memory to reading the file: "Enter+Esc" in the dialog of F7,
+    as in the editor, with "Clear keyboard buffer" switched off first.
+    The screen is the same as if Esc had closed the box "Could not find
+    the string" afterwards; what ran says which.
+  - The files of C:\\STAMPS have a size in the directory and no
+    contents: DOS reads nothing of them, and the viewer shows zeros, a
+    megabyte of them for noon.dat. Renamed to dirinfo, F6, that is a
+    dirinfo too large for the editor: Tab makes the Info the active
+    panel, F4 there edits the dirinfo in the lower part of the panel,
+    and the box that offers View instead takes Enter. That is the one
+    way to a viewer in a narrow window, without a status line; in hex
+    it writes its lines over what is to the right of the window.
+  - Shift+F5 with the name of a file of A:, Tab and a name makes a
+    file without leaving C:\\WORK; the same again with another file and
+    "p" appends. format.exe and xcopy.exe of A:\\FREEDOS\\BIN are 65109
+    bytes together: less than 64K and more than the viewer holds, so
+    End and Home there read parts of a file whose length has 16 bits.
+  - The box "Can't find the file" of the viewer and the editor beeps,
+    which scrolls the screen (see below); "Could not find the string"
+    does not.
   - Enter on a file with the extension bat runs it: on A:\\ the second
     file is fdauto.bat, which starts the bench again.
   - A step may press about 16 keys. The harness waits for each to reach
@@ -1885,6 +1918,130 @@ SCENARIOS = {
             "Up",
             "End",
             "Esc",
+        )),
+
+    "view-keys": Scenario(
+        "The viewer: a file that is not there, its keys where they have "
+        "nothing to do, the last lines of a file, a text found off the "
+        "screen, and a file of one byte",
+        steps=(
+            "Shift+F3",
+            '"nosuch.txt"',
+            "Enter",                      # no such file: a box
+            "Enter",
+            "Shift+F4",                   # the editor says so too, where
+            '"nodir\\x.txt"',             # it is the directory that is
+            "Enter",                      # not there
+            "Enter",
+            "Down Down Down Down Down",   # onto notes.doc, of three lines
+            "F3",
+            "Home",                       # at the start already
+            "Shift+F7",                   # nothing to look for yet
+            "F7",
+            "Esc",                        # nor now
+            "F7",
+            '"three"',
+            "Enter",                      # found in the last line
+            "Shift+F7",                   # and no line behind that to look
+            "Esc",                        # in: not found, a box
+            "Esc",
+            "Down",                       # the file of all bytes
+            "F3",
+            "F2",                         # not wrapped: one line
+            "Right",
+            "Ctrl+Left",                  # back by forty: to the first
+            "F7",                         # column, not beyond it
+            '"xyz"',
+            "Enter",                      # found to the right of the
+            "F7",                         # screen: the line is moved
+            '"qq"',
+            "Enter",                      # not found, so the next search
+            "Esc",                        # begins where the last one found
+            "Ctrl+Right Ctrl+Right",      # something
+            "F7",
+            '"xyz"',
+            "Enter",                      # found to the left of the screen
+            "F4",                         # in hex
+            "F2",                         # no wrapping there
+            "Home",
+            "End",                        # the last 23 lines of 64
+            "Home",
+            "PgDn",
+            "PgDn",                       # no further than the end
+            "Up",
+            "Down",                       # the last line comes up again
+            "Esc",
+            "Shift+F4",                   # make a file of one byte
+            '"one"',
+            "Enter",
+            "Enter",
+            '"a"',
+            "F2",
+            "Esc",
+            "Shift+F3",                   # which the status line counts as
+            '"one"',                      # 1 Byte
+            "Enter",
+            "Esc",
+            "Shift+F5",                   # and one of 65109 bytes, of two
+            '"a:\\freedos\\bin\\format.exe" Tab "big" Enter',
+            "Shift+F5",                   # programs: less than 64K, and
+            '"a:\\freedos\\bin\\xcopy.exe" Tab "big" Enter',
+            "p",                          # more than the viewer holds
+            "Shift+F3",
+            '"big"',
+            "Enter",
+            "End",                        # the end, read from the middle on
+            "Home",                       # and the start again
+            "Esc",
+        )),
+
+    "view-window": Scenario(
+        "A dirinfo that is too large for the editor, viewed in the window "
+        "of the Info panel, which is narrow and has no status line",
+        steps=(
+            "Home Enter",
+            "Down Down Enter",            # C:\\STAMPS
+            "Down Down Down Down Down",   # a megabyte, by its entry in
+            "F6",                         # the directory, and no contents
+            '"dirinfo" Enter',
+            "Tab",                        # to the Info panel
+            "F4",                         # its dirinfo: too large to edit
+            "Enter",                      # View
+            "Down",
+            "F2",
+            "F4",                         # in hex, a line is wider than
+            "End",                        # the window
+            "Home",
+            "Esc",
+        )),
+
+    "view-search": Scenario(
+        "A text looked for in a file larger than the memory the viewer "
+        "has for it, found in a part that is read for it, and a search "
+        "stopped by a key",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # a key that is to wait
+            "Enter",
+            "Shift+F3",                   # the shell that DOS started from
+            '"a:\\freedos\\bin\\command.com"',
+            "Enter",
+            "F2",                         # not wrapped
+            "Down Down Down Down",        # the fifth line begins in the
+                                          # second half: the next part is
+                                          # read
+            "Home",                       # and the first again
+            "PgDn",                       # the next part, from its start
+            "Up",                         # the one before it
+            "F7",
+            '"backslash"',                # behind what is in the memory:
+            "Enter",                      # the file is read on, and the
+                                          # part around the place shown
+            "Home",
+            "F7",
+            '"qqqq"',                     # nowhere: Esc is waiting when the
+            "Enter+Esc",                  # file is to be read on, and stops
+            "Esc",                        # the search
         )),
 
     "editor-hex": Scenario(

@@ -379,6 +379,10 @@ u16 SetPth(void);
    not 0 if one was pressed. */
 u16 TstBrk(void);
 #pragma aux TstBrk  "*_a" __far value [ax] modify exact [ax es]
+/* Put back what DOS had on the screen before the program drew over it,
+   but for the line of the key bar, which is blank if there is one. */
+void Quit(void);
+#pragma aux Quit    "*_a" __far modify exact [ax bx dx di es]
 
 /* A line as the assembly hands it over: the registers that describe it,
    pushed in this order by CallLine in port/asm/VC.ASM. */

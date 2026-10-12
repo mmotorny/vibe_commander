@@ -46,11 +46,8 @@
 	EXTERN	ReadTre_c:FAR, ChTree_c:FAR
 	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
 	EXTERN	GetVol_c:FAR, DirSize_c:FAR, TstInfo_c:FAR
-	EXTERN	NextLin_c:FAR, PrevLin_c:FAR, V20_00_c:FAR, V25_00_c:FAR
-	EXTERN	V30_00_c:FAR, V31_00_c:FAR, V32_00_c:FAR, V40_00_c:FAR
-	EXTERN	V50_00_c:FAR, V51_00_c:FAR, V55_00_c:FAR, V60_00_c:FAR
-	EXTERN	V81_00_c:FAR, V82_00_c:FAR
-	EXTERN	T00_00_c:FAR, T70_00_c:FAR, T71_00_c:FAR
+	EXTERN	V00_02_c:FAR, V00_10_c:FAR, V13_00_c:FAR, V13_01_c:FAR
+	EXTERN	T00_00_c:FAR
 	EXTERN	Help00_c:FAR
 	EXTERN	F32_00_c:FAR, Run_00_c:FAR, F62_01_c:FAR, F68_00_c:FAR
 	EXTERN	F82_01_c:FAR, F74_00_c:FAR, F73_00_c:FAR, F77_00_c:FAR
@@ -2935,6 +2932,7 @@ Quit01:	MOV	DH,BH
 	CALL	ResUser
 	RET
 Quit	ENDP
+	FromC	Quit
 
 ;--------------- Restore and Hook vectots --------------
 RestVct	PROC	NEAR

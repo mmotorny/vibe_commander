@@ -243,12 +243,36 @@ port.
   own, which the assembly has in DS and C gets as a number, like a panel;
   the table of its lines is at the top of the same segment.
 - An entry for C to a routine of a file that another batch has in hand
-  can stand next to the stub that needs it: `FromC T70_00` is in
-  `VCVIEW.INC`, the routine in `VCEDIT.INC`.
+  can stand next to the stub that needs it: `FromC T70_00` was in
+  `VCVIEW.INC`, the routine in `VCEDIT.INC`, until both sides were C.
+- Where code that is jumped to goes on to one of several places, and the
+  next place takes registers, the function returns which place and the
+  registers come back in room on the stack: the stub of `V00_02` goes on
+  to `Func04`, to the editor at `T00_00` or to the viewer at `V00_10`.
+  Code of another file may jump into the middle of such code, as the
+  editor's stub does to `V00_10`, `V13_00` and `V13_01`: each of those
+  labels is a stub of a function of its own.
+- Two batches side by side may each keep a stub for the other: the
+  editor kept those of `T70_00` and `T71_00` for the viewer's assembly,
+  and wrote the viewer's `V80_00` out in C, while the viewer became C
+  and kept `V80_00` and `V82_00` for the editor's. After the rebase,
+  look for the callers of every stub of the batch and of every stub
+  that the batch was the caller of, in all of `port/asm/`, and take out
+  what has none; and have the C of the other batch call the function
+  where it wrote one out.
+- A new scenario may reach what an earlier batch listed as out of
+  reach, and the `port` test then fails on the stale entry, "listed as
+  out of reach, but executed": take it out of that batch's list.
+  `harness/reach.py` shows it beforehand, as a routine with nothing
+  left.
+- A routine may read a panel through DS that no comment names: `PutPrm`
+  takes the size of the panel in DS for where the prompt goes, and the
+  viewer hands it the right panel's whichever is active.
 - A register that a routine stores without having set it, as `V32_00`
-  does DX where nothing found is on the screen, is handed to the C
+  did DX where nothing found is on the screen, is handed to the C
   function like an argument. That is less than showing that nothing
-  reads what was stored.
+  reads what was stored, which was done for `V32_00` when its callers
+  became C: see there.
 - A caller may go on with a register as the routine happens to leave it,
   not only with what it returns: CX is 0 after `T70_00` and `T75_00`,
   because a `REP` ended there, and `T21_00` and `T00_53` compare with CL
