@@ -74,7 +74,8 @@ class Batch:
     title: str
     source: str                   # the C file in port/
     # The assembly procedures it replaces, and stretches of code between
-    # procedures, each by its first label (see coverage.Listing).
+    # procedures, each by its first label, or by a later one for what
+    # stands from there on (see coverage.Listing).
     routines: tuple
     functions: tuple              # its functions that the assembly calls
     # Address in the original -> why no scenario executes the instruction.

@@ -161,12 +161,14 @@ class Listing:
             # Code that stands between two procedures belongs to neither.
             # Such a stretch counts as a procedure of its own: it has the
             # name of its first label, and ends where the next procedure
-            # begins. Not in the data, where a label may stand in a table
-            # and no procedure follows the code: FncSel, behind DirFunc,
-            # cannot be named yet.
+            # begins. A stretch may hold the code of two files, the end
+            # of VCMENU.INC and the commands that VCF1.INC begins with,
+            # so a later label of it names what stands from there to the
+            # same end: F37_00 in the stretch M60_00. Not in the data,
+            # where a label may stand in a table and no procedure follows
+            # the code: FncSel, behind DirFunc, cannot be named yet.
             inside = sorted(procedures[segment].values())
             starts = [start for start, _ in inside]
-            stretches = {}                   # where it ends -> name
             for name, address in sorted(labels[segment].items(),
                                         key=lambda item: item[1]):
                 if segment == "_DATA":
@@ -175,8 +177,7 @@ class Listing:
                 if before and address < sum(inside[before - 1]):
                     continue
                 end = starts[before] if before < len(starts) else None
-                if end is not None and end not in stretches:
-                    stretches[end] = name
+                if end is not None:
                     procedures[segment][name] = (address, end - address)
             # What is not in a procedure of the data is data, whatever
             # directive made it.

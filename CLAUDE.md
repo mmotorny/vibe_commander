@@ -168,7 +168,9 @@ port.
   `PutInf` stood behind `PutFls`, and `RdInfo` stands before it still.
   `tools/routines.py` does not list such code. `harness/reach.py` and
   `harness/ported.py` take it by its first label, as far as the next
-  procedure.
+  procedure, or by a later label of it for what stands from there on:
+  such a stretch may hold the end of one file and the start of the
+  next, as `M60_00` of `VCMENU.INC` runs on into `F37_00` of `VCF1.INC`.
 - A routine that answers in the carry flag and nothing else gets a stub
   that makes the flag of what the function returns: `FilePan` returns 1
   or 0, and `NEG AX` sets the carry for the 1. `POP` leaves flags alone.
