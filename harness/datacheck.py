@@ -380,6 +380,9 @@ class Port:
         self.image = (directory / "VC.EXE").read_bytes()
         self.segments = {}          # (name, class) -> where it begins
         self.places = defaultdict(list)     # name -> [address]
+        # name -> [(what a word has that names it, from where that
+        # counts)]: the offset in its group, and where the group begins.
+        self.named = defaultdict(list)
         self.objects = []           # (module, name, address, length)
         self.assembly = {}          # label -> (address, kind, segment)
         modules = defaultdict(list)     # module -> [(name, address)]
@@ -400,6 +403,9 @@ class Port:
                 if match:
                     address = int(match[1], 16) * 16 + int(match[2], 16)
                     modules[module].append((match[3], address))
+                    if module != "VC":
+                        self.named[match[3].lstrip("_")].append(
+                            (int(match[2], 16), int(match[1], 16) * 16))
         if not modules:
             raise Problem("the linker's map lists no symbols")
 
@@ -426,6 +432,7 @@ class Port:
         self.variables = set()
         for name, (address, kind, segment) in self.assembly.items():
             self.places[name].append(address)
+            self.named[name].append((address, 0))
             if kind == "data" and segment != "RGAP":
                 # A label with nothing of the assembly behind it is no
                 # object: TrnBeg, once the assembly's texts are gone.
@@ -503,7 +510,7 @@ def compare(original, port, name, there, address, length):
             wanted = [named - original.labels[label]]
             instead = f"how far {said} is behind {label}"
         elif how == "at":
-            wanted = port.places.get(label, [])
+            wanted = [offset for offset, _ in port.named.get(label, [])]
             instead = f"where it has {label}"
         elif how == "is":
             wanted = [label]
@@ -514,8 +521,10 @@ def compare(original, port, name, there, address, length):
                       if candidate in numbers]
             instead = f"the number of the command {said} in port/vc.h"
         else:
-            wanted = [place + behind & 0xFFFF for candidate in names
-                      for place in port.places.get(candidate, [])]
+            groups = {offset + behind & 0xFFFF: group
+                      for candidate in names
+                      for offset, group in port.named.get(candidate, [])}
+            wanted = list(groups)
             instead = f"where it has {said}"
             if not wanted:
                 return (f"{name}+{at}: the original names {said} there, "
@@ -530,8 +539,9 @@ def compare(original, port, name, there, address, length):
         # to have that within itself: behind it the port has other bytes
         # than the original.
         if not how and original.segment_of[names[0]] == "CONST":
-            end = port.end_of(word)
-            if end is not None and 0 not in port.bytes(word, end - word):
+            text = groups[word] + word
+            end = port.end_of(text)
+            if end is not None and 0 not in port.bytes(text, end - text):
                 return (f"{name}+{at}: names {said}, a text without a "
                         f"zero byte of its own: what reads it goes on into "
                         f"what follows it, which is not what follows it in "
