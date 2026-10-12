@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 3.24)
 project(vibe_commander LANGUAGES C)
 
 # --- JWasm ------------------------------------------------------------------
-# The assembler that builds src/: a free, MASM-compatible assembler that runs
-# natively and writes .COM files directly. It is fetched at a pinned commit
-# and built from source.
+# The assembler that builds src/, the original program as its author
+# published it, and the driver of the tests: a free, MASM-compatible
+# assembler that runs natively and writes .COM files directly. It is
+# fetched at a pinned commit and built from source. Nothing of the port is
+# assembled: the tests hold the port against the original, and hold the
+# original, built here, against the binary that was shipped.
 
 include(FetchContent)
 FetchContent_Declare(jwasm
@@ -116,19 +119,27 @@ add_custom_command(
 add_custom_target(shareware-relocations ALL DEPENDS ${layout_dir}/VC.OBJ)
 
 # --- The port -----------------------------------------------------------------
-# Volkov Commander on its way from assembly to C: port/asm holds what is
-# still assembly, port/*.c what has been translated, and both are linked
-# into one program, VC.EXE. See port/vc.h and tools/mkexe.c for how the two
-# halves live together.
+# Volkov Commander in C: port/*.c, compiled and linked into one program,
+# VC.EXE. Nothing of it is assembled: the assembler above builds the
+# original, for the tests to hold the port against, and the driver of the
+# tests. See port/vc.h and tools/mkexe.c for how the program is laid out
+# and what that asks of the C.
 
 set(port_dir ${CMAKE_BINARY_DIR}/port)
-set(port_asm VC.ASM)
 # Every C file in port/ is part of the program, in the order of their
 # names: a new one needs no mention here. The build looks again each time
 # it runs. One whose name ends in _t holds constants and no code: the
 # tables of the file it is named after (see port/tables.h).
 file(GLOB port_c CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR}/port
      ${CMAKE_SOURCE_DIR}/port/*.c)
+# Two files are linked before the others, whatever their names. The file
+# is the program as it lies in the memory, and it begins with the part
+# that stays there while a command runs: resident.c, whose code begins
+# with the room of the PSP. A segment holds what the object files have of
+# it in their order. And the part that goes begins with transit_t.c, the
+# room of the header that DOS keeps in front of its block of memory.
+list(REMOVE_ITEM port_c resident.c transit_t.c)
+list(PREPEND port_c resident.c transit_t.c)
 # The compiled code is more than one segment holds, so it has two: CTEXT,
 # and CTEXT2 for the files named here. Functions of different files call
 # each other far, so a file may be in either. The routines that the
@@ -140,18 +151,26 @@ file(GLOB port_c CONFIGURE_DEPENDS RELATIVE ${CMAKE_SOURCE_DIR}/port
 set(port_c_second blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c
     keys.c main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c
     view.c window.c)
-list(TRANSFORM port_asm PREPEND ${CMAKE_SOURCE_DIR}/port/asm/)
 # The part of the program that stays in the memory while a command runs
-# has compiled code too, in a segment of its own, RTEXT, which
-# port/asm/VC.ASM places behind the PSP: the files named here. That part
-# cannot call the rest of the program, which is not in the memory then,
-# so dos.c, the one file that calls DOS and the BIOS, is compiled a second
-# time for it, into RTEXT as well: one source, two copies of its code.
-# RESIDENT is defined for both, and by it port/vc.h gives the functions of
-# the second copy names of their own. The files named here have data too,
-# that of the part that stays, which the compiler puts into a group of
-# their own, R_GROUP, and reads through DS: the option -nd=R. The second
-# copy of dos.c has none and is compiled without.
+# has a code segment of its own, RTEXT, which is the first of the file:
+# the files named here. That part cannot call the rest of the program,
+# which is not in the memory then, so dos.c, the one file that calls DOS
+# and the BIOS, is compiled a second time for it, into RTEXT as well: one
+# source, two copies of its code. RESIDENT is defined for both, and by it
+# port/vc.h gives the functions of the second copy names of their own.
+#
+# That part is one segment to the program, the PSP's, as the whole
+# program was when it was a .COM file: CS, DS and SS are on the PSP there,
+# and every offset counts from it. Two options of Open Watcom make it so,
+# and nothing of the C language does (see the README, "What rests on Open
+# Watcom"):
+#   -nd=R        the data of a file is in a group of its own, R_GROUP,
+#                which the code reads through DS, in four segments of
+#                the class FAR_DATA: RCONST, RCONST2, R_DATA, R_BSS
+#   -g=R_GROUP   the code segment is of a group of that name
+# With both the object file names two groups of one name, and the linker
+# makes one of them, which begins with the code and so with the PSP. The
+# second copy of dos.c has no data and gets the second option alone.
 set(port_c_resident resident.c)
 
 # mkexe turns the linker's output into the program that is run.
@@ -200,7 +219,8 @@ endfunction()
 foreach(source ${port_c})
     string(REGEX REPLACE "\\.c$" "" object ${source})
     if(source IN_LIST port_c_resident)
-        port_compile(${source} ${object} RTEXT RCODE -dRESIDENT -nd=R)
+        port_compile(${source} ${object} RTEXT RCODE -dRESIDENT -nd=R
+                     -g=R_GROUP)
     elseif(source IN_LIST port_c_second)
         port_compile(${source} ${object} CTEXT2 CCODE)
     else()
@@ -208,47 +228,47 @@ foreach(source ${port_c})
     endif()
     list(APPEND port_compiled ${port_dir}/${object}.obj)
 endforeach()
-port_compile(dos.c dos_r RTEXT RCODE -dRESIDENT)
+port_compile(dos.c dos_r RTEXT RCODE -dRESIDENT -g=R_GROUP)
 list(APPEND port_compiled ${port_dir}/dos_r.obj)
 
-# add_port(<target> <directory> [<jwasm option>...]) assembles port/asm and
-# links it with the compiled code into <directory>/VC.EXE, with a link map
-# next to it.
-function(add_port target directory)
-    file(MAKE_DIRECTORY ${directory})
-    add_custom_command(
-        OUTPUT ${directory}/VC.OBJ
-        COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
-                $<TARGET_FILE:jwasm> -nologo -q -omf ${ARGN}
-                -I${CMAKE_SOURCE_DIR}/port/asm -Fo ${directory}/VC.OBJ
-                -Fl=${directory}/VC.LST
-                ${CMAKE_SOURCE_DIR}/port/asm/VC.ASM
-        DEPENDS jwasm ${port_asm}
-        COMMENT "Assembling the port (${target})"
-        VERBATIM)
-    # The assembly comes first: it lays the program out, and expects the
-    # compiled code behind it. The program starts at Alloc0, a function of
-    # port/resident.c. Warning 1014 says that there is no stack segment:
-    # the stack is of the part that stays in the memory, and
-    # tools/mkexe.c names it in the header of the file.
-    list(JOIN port_compiled "," compiled)
-    add_custom_command(
-        OUTPUT ${directory}/VC.EXE ${directory}/VC.MAP
-        COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
-                name ${directory}/linked.exe
-                file ${directory}/VC.OBJ,${compiled}
-                option map=${directory}/VC.MAP,start=Alloc0,static
-                disable 1014
-        COMMAND mkexe ${directory}/linked.exe ${directory}/VC.MAP
-                ${directory}/VC.EXE ${port_compiled}
-        DEPENDS mkexe ${directory}/VC.OBJ ${port_compiled}
-        COMMENT "Linking the port (${target})"
-        VERBATIM)
-    add_custom_target(${target} ALL DEPENDS ${directory}/VC.EXE)
-endfunction()
-
+# The program is linked of the compiled code alone, with a link map next
+# to it, and tools/mkexe.c makes the file that is run of what the linker
+# writes. It starts at Alloc0, a function of port/resident.c.
+#
+# The order of the segments is said here, by their classes and within a
+# class by their names: the linker would have them as it first meets
+# them in the object files, and every object file of C names its code
+# segment first. The code of the part that stays, with the PSP's room;
+# its data, which ends with the stack; the constants of the rest, which
+# begin with the room of a block's header; and the code of the rest. No
+# code of the rest may stand within a page of the stack: tools/mkexe.c
+# says why, and stops the build if it does. The directive is Open
+# Watcom's, and its help does not list it for DOS (see the README, "What
+# rests on Open Watcom").
+#
+# Warning 1014 says that there is no stack segment: the stack is of the
+# part that stays in the memory, and tools/mkexe.c names it in the header
+# of the file.
+list(JOIN port_compiled "," compiled)
+add_custom_command(
+    OUTPUT ${port_dir}/VC.EXE ${port_dir}/VC.MAP
+    COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
+            name ${port_dir}/linked.exe
+            order clname RCODE
+                  clname FAR_DATA segment RCONST segment RCONST2
+                                  segment R_DATA segment R_BSS
+                  clname DATA segment CONST segment CONST2 segment _DATA
+                  clname CCODE segment CTEXT segment CTEXT2
+            file ${compiled}
+            option map=${port_dir}/VC.MAP,start=Alloc0,static
+            disable 1014
+    COMMAND mkexe ${port_dir}/linked.exe ${port_dir}/VC.MAP
+            ${port_dir}/VC.EXE ${port_compiled}
+    DEPENDS mkexe ${port_compiled}
+    COMMENT "Linking the port"
+    VERBATIM)
 # The program as it is shipped.
-add_port(port ${port_dir})
+add_custom_target(port ALL DEPENDS ${port_dir}/VC.EXE)
 
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS

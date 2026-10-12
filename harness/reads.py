@@ -9,7 +9,7 @@ an object in the original is read too, so the port has to have the object
 that long, with those bytes; then the comparison holds them.
 
 This lists every place where the code names a constant, a text or a table
-of the files of constants, of the assembly or of the code's own, and says
+of the files of constants or of the code's own, and says
 how many bytes of it are read there. Most places it knows by their form:
 a loop to a count, MvzLine, MvsBw and MainFil with their lengths, a text
 that is read as far as its zero byte, a box or a dialog that is handed
@@ -314,7 +314,7 @@ def places(objects, variables=()):
                 own = [(module, length) for module, length in by_name[name]
                        if module == path.name]
                 other = [(module, length) for module, length in by_name[name]
-                         if module.endswith("_t.c") or module == "assembly"]
+                         if module.endswith("_t.c")]
                 module, length = (own or other or by_name[name])[0]
                 read = _form(statement, name, sizes | {name: length})
                 how = "by its form"

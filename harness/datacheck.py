@@ -12,10 +12,9 @@ The original is the build of the published source that is laid out like
 the shipped binary, build/shareware-layout/VC.COM, which the test
 bytes-match-original holds against that binary. Its listing says where
 every label is. The port is build/port/VC.EXE, and the linker's map says
-where each of its objects landed, static ones too; how long an object of
-the C code is, its object file says. Of the assembly that is left the
-listing says where a label is in its segment, and an object there goes
-as far as the next label.
+where each of its objects landed, static ones too; how long an object
+is, its object file says. Nothing of the port is assembled, and no
+listing of it is read.
 
 A word that holds the address of something else cannot be equal as a
 number: a box that names its text, a dialog that names its box, a table of
@@ -23,9 +22,10 @@ commands. Which words those are is not described here. The original
 source is assembled a second time, as an object file, whose relocations
 name every such word and what it points at; here the word of the port is
 then held against where the port has the thing of that name, with the
-same distance from it. So an object is written in C as it is in the
-assembly, with the names of what it names, and the compiler and the
-linker see to the addresses.
+same distance from it: the offset in its group, which is what such a
+word holds. So an object is written in C as it is in the assembly, with
+the names of what it names, and the compiler and the linker see to the
+addresses.
 
 An object is compared as long as it is, and the program reads more of
 some than their own bytes: a name that it copies as 13 bytes whatever
@@ -83,6 +83,9 @@ OWN = {
                    "instructions",
     "Scan_P": "the four colours of a box that the C draws without the "
               "table of one",
+    "TrnBeg": "room for the header that DOS keeps in front of a block of "
+              "memory, zeros: the original is loaded over that paragraph "
+              "and has TrnBeg as a label of its code",
     "Stays": "what the part that stays in the memory keeps there, zeros "
              "in the file: the original lays it over the code that starts "
              "the program",
@@ -269,13 +272,6 @@ def listed_symbols(path):
                 table = True
             if not table:
                 continue
-            # A name that the assembly declares and a C file defines has a
-            # line here too, with the segment that the declaration stands
-            # in and no place in it. It ends in "External" while something
-            # of the assembly names the object, and in "*External" once
-            # nothing does: the end of the word is what is held.
-            if line.rstrip().endswith("External"):
-                continue
             match = re.match(r"(\S+) [ .]*P Near +([0-9A-F]+) +(\w+) ", line)
             if match:
                 symbols[match[1]] = (match[3], int(match[2], 16), "code")
@@ -384,7 +380,6 @@ class Port:
         # counts)]: the offset in its group, and where the group begins.
         self.named = defaultdict(list)
         self.objects = []           # (module, name, address, length)
-        self.assembly = {}          # label -> (address, kind, segment)
         modules = defaultdict(list)     # module -> [(name, address)]
         module = None
         with open(directory / "VC.MAP") as text:
@@ -403,43 +398,16 @@ class Port:
                 if match:
                     address = int(match[1], 16) * 16 + int(match[2], 16)
                     modules[module].append((match[3], address))
-                    if module != "VC":
-                        self.named[match[3].lstrip("_")].append(
-                            (int(match[2], 16), int(match[1], 16) * 16))
+                    self.named[match[3].lstrip("_")].append(
+                        (int(match[2], 16), int(match[1], 16) * 16))
         if not modules:
             raise Problem("the linker's map lists no symbols")
 
-        # The assembly, as long as there is any. It is linked first, so
-        # that what it has of a segment begins where the segment does.
-        ends = defaultdict(list)
-        listed = {}
-        if (directory / "VC.LST").exists():
-            listed = listed_symbols(directory / "VC.LST")
-            own = ObjectFile(directory / "VC.OBJ")
-            for name, cls, length in own.segments[1:]:
-                if (name, cls) in self.segments:
-                    ends[name].append(self.segments[name, cls][0] + length)
-        for name, (segment, value, kind) in listed.items():
-            for (known, _), (begin, size) in self.segments.items():
-                if known == segment:
-                    self.assembly[name] = (begin + value, kind, segment)
-                    ends[segment].append(begin + value)
-                    break
         # What is no constant, though it has contents: the variables of
         # the C code that have a value in the file. The compiler has them
         # in a segment of their own, _DATA, and R_DATA for those of the
         # part that stays in the memory.
         self.variables = set()
-        for name, (address, kind, segment) in self.assembly.items():
-            self.places[name].append(address)
-            self.named[name].append((address, 0))
-            if kind == "data" and segment != "RGAP":
-                # A label with nothing of the assembly behind it is no
-                # object: TrnBeg, once the assembly's texts are gone.
-                behind = [there for there in ends[segment] if there > address]
-                if behind:
-                    self.objects.append(("assembly", name, address,
-                                         min(behind) - address))
 
         # The C code: an object of it is a symbol of a segment that is
         # no code, or one in the code that has an underscore in front, as
@@ -447,8 +415,6 @@ class Port:
         # What has no value in the file is no object here: the stack of
         # the part that stays, in R_BSS.
         for module, symbols in modules.items():
-            if module == "VC":
-                continue
             for name, address in symbols:
                 self.places[name.lstrip("_")].append(address)
             compiled = ObjectFile(directory / f"{module}.obj")
@@ -470,8 +436,7 @@ class Port:
                           if there > offset)
                 self.objects.append((f"{module}.c", name.lstrip("_"),
                                      where[name], end - offset))
-        self.objects.sort(key=lambda found: (found[0] == "assembly",
-                                             found[0], found[2]))
+        self.objects.sort(key=lambda found: (found[0], found[2]))
 
     def bytes(self, address, length):
         at = address - COM_ORIGIN + EXE_HEADER
@@ -558,8 +523,8 @@ def main():
                         help="the directory of the original laid out like "
                              "the shipped binary: VC.COM, VC.LST, VC.OBJ")
     parser.add_argument("port", type=Path,
-                        help="the directory of the port: VC.EXE, VC.MAP, "
-                             "VC.LST and the object files")
+                        help="the directory of the port: VC.EXE, VC.MAP "
+                             "and the object files")
     parser.add_argument("--quiet", action="store_true",
                         help="do not name every object that was compared")
     args = parser.parse_args()
@@ -571,25 +536,21 @@ def main():
         sys.exit(f"datacheck: {problem}")
 
     failed = []
-    count = defaultdict(lambda: [0, 0])
+    count = bytes_held = 0
     stale = set(DIFFERENT) | set(ELSEWHERE) | set(OWN)
     used = set()
     for module, name, address, length in port.objects:
-        kind = "assembly" if module == "assembly" else "C"
-        label, behind = name, 0
-        if kind == "C":
-            stale.discard(name)
-            if name in OWN:
-                if not args.quiet:
-                    print(f"  {module:12} {name:11} {length:4}  not "
-                          f"compared: {OWN[name]}")
-                continue
-            label, behind = ELSEWHERE.get(name, (name, 0))
+        stale.discard(name)
+        if name in OWN:
+            if not args.quiet:
+                print(f"  {module:12} {name:11} {length:4}  not "
+                      f"compared: {OWN[name]}")
+            continue
+        label, behind = ELSEWHERE.get(name, (name, 0))
         if original.kinds.get(label) != "data":
-            if kind == "C":
-                failed.append(f"{module}: the original has no data called "
-                              f"{label}: say in ELSEWHERE or in OWN of "
-                              f"{Path(__file__).name} what {name} is")
+            failed.append(f"{module}: the original has no data called "
+                          f"{label}: say in ELSEWHERE or in OWN of "
+                          f"{Path(__file__).name} what {name} is")
             continue
         there = original.labels[label] + behind
         if original.reserved(there, length):
@@ -611,8 +572,8 @@ def main():
         if difference is not None:
             failed.append(f"{module}: {difference}")
             continue
-        count[kind][0] += 1
-        count[kind][1] += length
+        count += 1
+        bytes_held += length
         if not args.quiet:
             whole = original.extent(label) - behind
             note = "" if length == whole else (
@@ -631,9 +592,8 @@ def main():
         failed.append(f"{name}+{at} is listed in {Path(__file__).name}, "
                       "and the port has no object of that name")
 
-    for kind in ("C", "assembly"):
-        print(f"{count[kind][0]} objects of the {kind} code, "
-              f"{count[kind][1]} bytes, are as the original")
+    print(f"{count} objects of the C code, {bytes_held} bytes, are as the "
+          "original")
     for line in failed:
         print(f"DIFFERS  {line}")
     sys.exit(1 if failed else 0)

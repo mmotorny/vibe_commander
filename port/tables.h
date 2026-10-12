@@ -9,21 +9,21 @@
  *
  * In C such a thing is a constant like any other, written with the names
  * of what it names, in a file of nothing else: help_t.c has those of
- * help.c. The compiler puts a constant into its group of data, which is
- * the assembly's group, so a pointer in it is the word that the assembly
- * has there, and the assembly and C can name each other's. A file of
- * constants holds no code, and a file of code no constant of this kind:
- * the code has DS on the main data, not on that group, and would read a
- * constant that it names in the wrong segment, without a warning. It
- * declares what it uses as `extern const u8 __far`, as it does what the
- * assembly defines, and so reads it in the right one. tools/mkexe.c
- * stops the build for an object file that holds both.
+ * help.c. The compiler puts a constant into its group of data, DGROUP,
+ * so a pointer in it is the offset of what it names in that group: the
+ * word that the assembly has there, counted from another place. A file
+ * of constants holds no code, and a file of code no constant of this
+ * kind: the code has DS on the main data, not on that group, and would
+ * read a constant that it names in the wrong segment, without a
+ * warning. It declares what it uses as `extern const u8 __far`, and so
+ * reads it in the right one. tools/mkexe.c stops the build for an
+ * object file that holds both.
  *
  * A constant that only its own file names is static. One that code or
  * another file names has the name that it has in the assembly, without
  * the underscore that the compiler would put in front: `#pragma aux
  * Name "*"`, where it is defined and wherever it is declared. So nothing
- * that names it changes when it goes from the assembly to C.
+ * that named it changed when it went from the assembly to C.
  *
  * Every object of such a file is held against the original's bytes by
  * the test `data` (harness/datacheck.py), by its name, and so is what it

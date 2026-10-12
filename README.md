@@ -194,19 +194,20 @@ returns where the program goes on, and the loop calls it from a `switch`
 by their numbers. What a command finds in the registers, as the command
 before left them, is kept where one reads it. With that no instruction
 of the program is assembly but those that are written into the C, and
-no text or table, and no byte of the program is made by the assembler:
-`port/asm/` holds one file, which says in what order the linker is to
-have the program's segments, and has the layout of the main data, which
-nothing reads there (`TODO.md` has what is left to do about it).
+no text or table. And nothing of it is assembled: the port has no
+assembly file, and its build runs no assembler for it. What the last
+such file said, in what order the program's segments lie and which of
+them count from the PSP, is said by options of the compiler and by the
+linker's command (see [The port](#the-port)).
 
 ## Layout
 
 | Path | Contents |
 |---|---|
 | `src/` | The Volkov Commander 4.05 source, adapted to assemble with JWasm |
-| `port/` | The program in C: `port/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and in `port/asm/` the one file of assembly that is left, which holds no code and no data: the order of the program's segments |
-| `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces; `routines.py` listed the routines that were still assembly, and `flagscan.py` examined the callers of a routine before it was translated: there are none left |
-| `CMakeLists.txt` | Builds the assembler and the programs, and registers the tests |
+| `port/` | The program in C, all of it: `port/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
+| `tools/` | `mkexe.c` makes the port's `VC.EXE` out of what the linker produces |
+| `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the port, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
 | `docs/` | Pictures for this README |
 
@@ -219,16 +220,27 @@ cmake -B build
 cmake --build build
 ```
 
-This fetches [JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
-MASM-compatible assembler, at a pinned commit, builds it, and assembles
-`src/` into `build/VC.COM` and `build/VCSETUP.COM`. It also assembles a
-second copy of both into `build/shareware-layout/`, with the room reserved
-that the byte comparison needs, and `VC` there once more as an object
-file, for its relocations; only the tests use those.
+Two programs are built, by two sets of tools, and neither set touches
+the other's program.
 
-It then builds the port, `build/port/VC.EXE`, which is what the tests
-run. What the compiler made of each C file is written out as a listing,
-`build/port/*.lst`, and the assembler's listing is `build/port/VC.LST`. For this it fetches a pinned
+The original is assembled. The build fetches
+[JWasm](https://github.com/Baron-von-Riedesel/JWasm), a free
+MASM-compatible assembler, at a pinned commit, builds it, and assembles
+`src/`, the source as its author published it, into `build/VC.COM` and
+`build/VCSETUP.COM`. It also assembles a second copy of both into
+`build/shareware-layout/`, with the room reserved that the byte
+comparison needs, and `VC` there once more as an object file, for its
+relocations; only the tests use those. That is what the test
+`bytes-match-original` holds against the binaries that were shipped, and
+what says where the original has its routines and its data. The
+assembler also builds the driver of the tests, `harness/DRIVER.ASM`,
+which is no part of either program.
+
+The port is compiled: `build/port/VC.EXE`, which is what the tests run
+and hold against the original. It is C and nothing else, `port/*.c`,
+and no assembler has a hand in it. What the compiler made of each C
+file is written out as a listing, `build/port/*.lst`. For this the build
+fetches a pinned
 snapshot of [Open Watcom](https://github.com/open-watcom/open-watcom-v2), a
 download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
 and ARM and for Windows on x86-64; the build has been run on Linux x86-64
@@ -285,7 +297,9 @@ program. In between it was both. A routine that had been translated was
 deleted from `port/asm/` and left a few instructions behind that passed
 its callers on to the C function, and where C code needed a routine that
 was still assembly, the assembly got an entry for it that C could call.
-All of the code is C now, and those are gone. The C code keeps the names
+All of the code is C now, and those are gone, and `port/asm/` with them:
+the last file there held no instruction and no data any more, only the
+order of the program's segments. The C code keeps the names
 the routines and their data have in the assembly, so that either can be
 found from the other, and a function still takes its arguments in the
 registers that the assembly called it with. The two routines that the
@@ -338,7 +352,7 @@ function to it, and gets DS back as it was.
 
 The program is linked as `VC.EXE`, which is not built the way a C
 program usually is. It still loads and starts like the `.COM` file it
-was, keeps its data where the assembly put it, and gives up and reloads
+was, keeps its data where the original has it, and gives up and reloads
 most of itself at run time, compiled code included. `port/vc.h` describes
 what that asks of the C code, and `tools/mkexe.c` how the file is made.
 The code that begins the program and reloads it after a command had to
@@ -346,23 +360,36 @@ change for this: it measures in paragraphs and relocates what it has
 loaded.
 
 The file is the program as it lies in the memory. First comes the part
-that stays there while a command runs: its compiled code, and its data
+that stays there while a command runs: room for the PSP, which
+`tools/mkexe.c` takes off, its compiled code, and its data
 with the stack at the end, which are nothing but room in the file. That
 data is of `port/resident.c`, the one C file
-with data of its own, in a group that the compiler makes for it and
-that begins at the PSP, as the program's one segment did when it was a
-`.COM` file: its texts, the numbers that `tools/mkexe.c` writes, which
-it finds by their names in the linker's map, one structure for what the
-part keeps, in the order of the original, and the stack. Then, a
-paragraph further on, the part that goes while a command runs. The
+with data of its own: its texts, the numbers that `tools/mkexe.c`
+writes, which it finds by their names in the linker's map, one
+structure for what the part keeps, in the order of the original, and
+the stack. Code and data of that part are one group to the linker,
+which begins at the PSP, as the program's one segment did when it was a
+`.COM` file: CS, DS and SS are on the PSP there, and every offset
+counts from it. Then, a
+paragraph further on, the part that goes while a command runs: its
+constants first, which are a group of their own, then its code, in two
+segments. The
 original has that part where the data of the first will be and moves it
 up as it starts, over itself; the port is loaded with it in place, on its
 own stack from the first instruction, and has only to make a block of
-memory of it. That costs 6,384 bytes of the file, and it is what lets
-compiled code stand in the first part at all: the assembler cannot lay
+memory of it. That costs 6,384 bytes of the file, and it is what let
+compiled code stand in the first part at all: nothing can lay
 data over code that the compiler has yet to make. It also leaves the
 code that begins the program in the memory, where the original lays its
 data over that code.
+
+None of that layout is in the C language. The order of the segments is
+the linker's to be told, in its command; that the code and the data of
+the first part are one group, and where each kind of data goes, are
+options of the compiler; and `tools/mkexe.c` holds what comes out
+against what the program needs, and stops the build where it differs.
+[What rests on Open Watcom](#what-rests-on-open-watcom) has each such
+place.
 
 Every step is checked by the `port` test below, and nothing else decides
 whether a translation is right. The routines translated so far are listed
@@ -375,8 +402,8 @@ another by address, words that are offsets in the one segment the
 assembly has them in. In C they are constants written with the names of
 what they name, in files that hold nothing else (`port/help_t.c`, with
 `port/tables.h` for how they are written): the compiler puts them into
-the same group as the assembly's, so the two can name each other's while
-both exist. They are apart from the code because the code has its data
+a group of their own, where a word that names one is its offset, as it
+is in the original's one segment. They are apart from the code because the code has its data
 segment on memory that the program asks DOS for, and would read a
 constant that it names there. The test holds each against the original
 by its name: the bytes, and for a word that holds an address the thing
@@ -395,7 +422,7 @@ stack than the assembly it replaces, and a stack used beyond its bottom
 would overwrite data without a trace on the screen, so the port has 4,096
 bytes, of which the scenarios use some 200. The stack is the end of the
 part of the program that stays in memory while a command runs: that part
-is 19,712 bytes where it was 12,704, and a command has 7,008 bytes less
+is 19,728 bytes where it was 12,704, and a command has 7,024 bytes less
 than the original leaves it: 3,840 for the stack, and the rest because
 compiled code is longer than the assembly it replaces, and because the
 code that starts the program stays.

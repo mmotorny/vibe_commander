@@ -2,8 +2,10 @@
  * The part of the program that stays in the memory while a command runs.
  *
  * It begins with the PSP and is one segment, as the program was when it
- * was a .COM file: the code here, the data behind it, which is of this
- * file too, and the stack at the end. DS is that segment in every
+ * was a .COM file: the room of the PSP, the code here, the data behind
+ * it, which is of this file too, and the stack at the end. The compiler
+ * has the code and the data in one group for that, by two options of
+ * the build, -nd=R and -g=R_GROUP. DS is that segment in every
  * function of this file, where vc.h says that DS is the main data: the
  * main data is not in the memory while a command runs, and neither is
  * the C code of the rest of the program. So nothing here uses `md` or
@@ -30,14 +32,27 @@
  */
 #include "vc.h"
 
+/* Where the PSP is, the 256 bytes that DOS keeps of a program in front
+   of it: this part begins with them, and the file is the program as it
+   lies in the memory, so it begins with room for them, which
+   tools/mkexe.c takes off. The room is of the code segment, the first of
+   the program, and has to be the first thing of that: this file is
+   linked first, and nothing of the code segment stands in front of this
+   line. That the compiler then writes it first rests on the compiler,
+   not on the language; tools/mkexe.c stops the build if it is not at 0.
+   It is the main data to the linker as well: see md in vc.h. */
+const u8 CODE Psp[0x100] = { 0 };
+#pragma aux Psp "*"
+
 #define LenStk  0x1000                  /* Stack size */
 #define LenCmd  124                     /* Length of command line */
 #define VcApiVr 42
 
 /*----------------------- The data -----------------------
    The data of this part is of this file, in a group of the compiler's
-   that only this file has, R_GROUP (the option -nd=R of the build). The
-   group begins at the PSP, as that of the code does: so DS is on it, and
+   that only this part has, R_GROUP (the option -nd=R of the build). The
+   code of this part is of the same group (the option -g=R_GROUP), and
+   is its first segment, so the group begins at the PSP: DS is on it, and
    SS, and an offset here is one from the PSP. It lies behind the code in
    the order of the compiler's segments: the constants, what has a value
    when the program is loaded, and last what has none, which is the stack
@@ -145,8 +160,11 @@ u8 DataSav[LenStk];
 
 /* Where INT 21h went before the program took it. This one is of the
    code's segment, not of the data: New21 passes a call of DOS on with
-   no register to find the data by, and CS is all that it has. */
-u32 CODE Vect21;
+   no register to find the data by, and CS is all that it has. It is
+   given a value, 0, which it needs for nothing else: the compiler
+   writes what has none in front of what has one, in the code segment
+   too, and this would stand where the PSP's room is to. */
+u32 CODE Vect21 = 0;
 #pragma aux Vect21 "*"
 
 /* Where the part that goes is entered, when the program starts and when
@@ -155,7 +173,7 @@ u32 CODE Vect21;
    its address. And a text of that part, which is where the file has it
    when the program begins. */
 extern const u8 __far TrnMain_s[];
-extern const u8 __near Vers_S[];
+extern const u8 __far Vers_S[];
 #pragma aux TrnMain_s "TrnMain_c"
 #pragma aux Vers_S "*"
 
@@ -164,8 +182,9 @@ extern const u8 __near Vers_S[];
    holds a segment has the place of the program added when that is
    loaded. This one is of the part that stays and names the part that
    goes, which is somewhere else after every command: tools/mkexe.c
-   leaves it as it is, and what uses it adds where that part is,
-   RunPar. */
+   leaves it as it is, and what uses it adds where that part is: RunPar,
+   or the PSP when the program begins and the part is where the file has
+   it. */
 #define TRN_SEG(object) ((u16)((u32)(const void __far *)(object) >> 16))
 
 /* The PSP, which this segment begins with: where the program goes on
@@ -1417,7 +1436,8 @@ void Alloc0(void)
         Int21e(&regs);
     }
     if (((regs.ax & 0xFF) << 8 | regs.ax >> 8) < 0x314) {
-        OutStr0(Vers_S, regs.bx);       /* BX: as DOS answered */
+        OutStr(AT(psp + TRN_SEG(Vers_S), OFFSET(Vers_S)),
+               regs.bx);                /* BX: as DOS answered */
         regs.ax = DOS_EXIT + 2;
         Int21e(&regs);
     }

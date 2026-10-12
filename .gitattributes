@@ -1,5 +1,3 @@
 # The original sources are CP866 text with CRLF line endings. Keep them
-# byte-exact: no line-ending conversion. The same goes for what is still
-# assembly in the port.
+# byte-exact: no line-ending conversion.
 src/** -text
-port/asm/** -text

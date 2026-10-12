@@ -19,8 +19,8 @@
  *   - Each file panel has a segment to itself, reached by far pointers.
  *
  * Routines keep the names they have in the assembly source, and data keeps
- * its layout: the structures below mirror those of port/asm/VC.ASM, which
- * holds no code and no data any more.
+ * its layout: the structures below are those of the original's VC.ASM, in
+ * src/, and the only ones that the port has.
  */
 #ifndef VC_H
 #define VC_H
@@ -296,8 +296,20 @@ LAID_OUT(FILENT, 0x18);
 LAID_OUT(MainDat, 0xF48B);
 LAID_OUT(WCBdef, 0x1A62);
 
-/* The main data segment, which DS points at. */
+/* The main data segment, which DS points at: a block of the memory that
+   the program asks DOS for, and so no object of the program's but a
+   layout at offset 0 of DS. To the compiler it is an object like any
+   other, of which it takes near addresses and makes far ones with DS.
+   To the linker it has to be at offset 0 of something, and is named as
+   what the program has there: Psp of resident.c, the room of the PSP.
+   That rests on this compiler and its linker, which takes the offset
+   of an object in the group that the object is of. A layout at the
+   number 0 will not do, (*(struct MainDat __near *)0): the compiler
+   makes a far pointer of an address that is a number with the segment
+   0, not with DS, where a text of the main data is handed to a
+   function that takes a far one. */
 extern struct MainDat __near md;
+#pragma aux md "Psp"
 
 /* What the part of the program that stays in the memory while a command
    runs keeps there (resident.c), in the order of the original: the

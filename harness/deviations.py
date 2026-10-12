@@ -156,7 +156,7 @@ IGNORED = [
 #   environment is. And the place it was meant for keeps what the last
 #   attempt left there, which is wrong if that attempt found a file and it
 #   was not the program. The port stores the size where it belongs.
-#   (Exec12 in port/asm/VC.ASM.)
+#   (Exec12 of the original; Exec10 in port/resident.c.)
 #
 # - In a line of text, ^A and two hex digits set a colour and ^C and two
 #   hex digits stand for a character: that is the markup of Norton Guides,

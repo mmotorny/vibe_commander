@@ -140,9 +140,8 @@ port.
 ### Moving the data of a file to C
 
 This is how the texts, boxes, dialogs, buttons and colours of the
-assembly went to C, a file at a time. It is done: every file of
-`port/asm/` but `VC.ASM` is gone, and `TODO.md`, "The last of the
-assembly", has what that still holds. What is here of the assembly, its
+assembly went to C, a file at a time. It is done, and `port/asm/` is
+gone. What is here of the assembly, its
 `PUBLIC` and `EXTERN` lines and its stubs, is of then; what is here of
 the files of constants and of the test `data` holds for a constant that
 is written or changed now. `VCHELP.INC` went first, into
@@ -348,8 +347,8 @@ What was met on the way:
   with an `s`, and that is how the test finds a constant that is
   `static`.
 - No code may come within 4K of the stack: `tools/mkexe.c` stops the
-  build. The constants stand between, `CONST2`, which `VC.ASM` declares
-  in front of the code.
+  build. The constants stand between, `CONST2`, which the linker's
+  command has in front of the code.
 
 What the agents found who moved the other files, each in ten to fifteen
 minutes by the steps above, and what those steps did not say:
@@ -676,24 +675,27 @@ and the tests.
   structure, `struct Stays` of `port/vc.h`, and a member has no name to
   the linker: `#define Counter STAYS(Counter)` at the top of a file
   makes `OFFSET(Counter)` the member's place.
-- The part that stays is the segments that the top of
-  `port/asm/VC.ASM` declares before `.MODEL`, so that the linker puts
-  them first and in that order: `RHEAD`, the room of the PSP; `RTEXT`,
-  its compiled code; the four that the compiler makes for the data of
-  `port/resident.c`, `RCONST`, `RCONST2`, `R_DATA` and `R_BSS`, the last
-  of which is the stack; `RGAP`, the paragraph of the header of the
-  next block of memory. The part that goes begins behind them, at
-  `TrnBeg`, on a paragraph, and `tools/mkexe.c` stops the build if it
-  does not. It begins with the constants of the C code, `CONST2`, some
-  8,900 bytes of them: QEMU is many times slower at a write to a page
-  that has code which it has run, the stack ends just in front, and
-  with code there that ran at every key, a scenario of the cursor's
-  keys took 19.7 seconds where it takes 5.6. Every offset of the
-  constants counts from the PSP, and so does every one in the data of
-  the part that stays, which is a group of its own (see below). Where
-  the two parts begin and end is not known before the program is
-  linked: `TrnPrW` of `port/resident.c` is a word that `tools/mkexe.c`
-  fills in.
+- The part that stays is the first five segments of the file, in the
+  order that the linker's command has them in (`order` in
+  `CMakeLists.txt`): `RTEXT`, its compiled code, which begins with the
+  room of the PSP, `Psp` of `port/resident.c`; and the four that the
+  compiler makes for the data of that file, `RCONST`, `RCONST2`,
+  `R_DATA` and `R_BSS`, the last of which is the stack. The five are
+  one group, `R_GROUP`, which begins at the PSP: every offset in that
+  part counts from there. The part that goes begins behind them, on a
+  paragraph, behind the paragraph of its block's header: both are in
+  `TrnBeg` of `port/transit_t.c`, 32 bytes that the linker puts where
+  the stack ends, and `tools/mkexe.c` works out where from them. It
+  begins with the constants of the C code, `CONST2`, some 8,900 bytes
+  of them: QEMU is many times slower at a write to a page that has code
+  which it has run, the stack ends just in front, and with code there
+  that ran at every key, a scenario of the cursor's keys took 19.7
+  seconds where it takes 5.6. The constants are a group of their own,
+  `DGROUP`, which begins where they do, not at the PSP: a word of a box
+  that names a text is an offset in that group, and `AsmSeg` of
+  `port/misc.c` is its segment. Where the two parts begin and end is
+  not known before the program is linked: `TrnPrW` of `port/resident.c`
+  is a word that `tools/mkexe.c` fills in.
 - The compiled code of the part that stays is `port/resident.c`, a file
   of `port_c_resident` in `CMakeLists.txt`: compiled into `RTEXT` with
   `RESIDENT` defined. DS is the PSP's segment in all of it, not the main
@@ -708,8 +710,8 @@ and the tests.
   the structure has it, for a block of memory in ES.
 - An `__interrupt` function of the compiler saves AX, CX, DX, BX, SP,
   BP, SI, DI, DS, ES and two words more, clears the direction flag and
-  loads DS with its group, by a number that has to be relocated: the
-  group is the assembly's, so in `RTEXT` it is the PSP. Its parameters
+  loads DS with its group, by a number that has to be relocated: in
+  `RTEXT` the group is that of the part that stays, the PSP. Its parameters
   are what lies on the stack: a structure of those twelve words, and
   behind it one of three words for each return address that an
   interrupt has left, `struct Saved` and `struct Frame` of
@@ -800,8 +802,8 @@ and the tests.
   a group of that name. With the name that `-nd` gives the group of the
   data, `-nd=R -g=R_GROUP`, the object file has two groups of one name
   and the linker makes one of them: code and data in one group, which
-  begins with the code. Not used yet: see `TODO.md`, the last item of
-  step 4.
+  begins with the code. That is how the part that stays is one segment
+  to the program, the PSP's.
 - A layout at the number 0, `(*(struct MainDat __near *)0)`, is not the
   main data. Read and written through it, it is; but an address in it
   is a number to the compiler, and of a near pointer that is a number
@@ -810,23 +812,31 @@ and the tests.
   the memory. `__based(__segname("_DATA"))` in its place makes every
   address of a field far, "Pointer truncated" wherever one is kept in a
   near pointer. `md` is an `extern` object for that reason, and its
-  place is the linker's to say. A `#pragma aux` can name it as another
-  object, `#pragma aux md "Psp"`: the linker takes the offset of that
-  in its own group.
-- The linker's command can say the order too: `order clname RCODE clname
-  DATA segment CONST segment CONST2 clname CCODE`, classes and the
-  segments within one, whatever the order of the object files. Its
-  help does not list the directive for DOS; it works.
-- The linker places segments by their class, in the order in which it
-  first meets each, and a group may have segments of other groups, or
-  of none, between its own: a group is where its first segment is. A
-  segment without contents counts for that. `R_GROUP` begins at the PSP
-  because `port/asm/VC.ASM` declares an empty segment, `RPSP`, first of
-  all, and says that it is of that group. The linker has no word of its
-  own for a group or for a class: both come from object files.
+  place is the linker's to say: `#pragma aux md "Psp"` names it as the
+  object that the program has at offset 0, the room of the PSP, and the
+  linker takes the offset of that in its own group.
+- The linker's command says the order of the segments: `order clname
+  RCODE clname DATA segment CONST segment CONST2 clname CCODE`, classes
+  and the segments within one, whatever the order of the object files.
+  Its help does not list the directive for DOS; it works. Without it
+  the linker places segments by their class, in the order in which it
+  first meets each, and every object file of C names its code segment
+  first. What a segment holds is in the order of the object files:
+  `resident.c` and `transit_t.c` are linked first for that.
+- A group may have segments of other groups, or of none, between its
+  own: a group is where its first segment is, and a segment without
+  contents counts for that. The linker has no word of its own for a
+  group or for a class: both come from object files, so from the
+  compiler's options.
+- A word that holds a segment holds that of a group, where the thing
+  named is of one, and the offset counts from there. So the test
+  `data` holds a word that names something against its offset in its
+  group, and `tools/mkexe.c` knows by the number of a segment which
+  part is named: 0 is the part that stays, and nothing of the part
+  that goes may name that.
 - An `__interrupt` function of the part that goes has DS on the
-  compiler's group when its first statement runs, and that group is the
-  assembly's: its segment, where `SecDat` is, a variable of
+  compiler's group when its first statement runs, that of the
+  constants: its segment, where `SecDat` is, a variable of
   `port/main_t.c`. `FatErr` of `port/main.c`
   reads `SecDat` there as a near word and puts DS on the main data by
   `DataSeg`, a `#pragma aux` of one instruction, `mov ds,ax`, with
@@ -939,9 +949,9 @@ and the tests.
   tool that shows the file as text leaves them out: the table of stars
   is five bytes between two quotes, two letters and 07h, 04h and 0Fh,
   and read as text it is two, with three bytes of the next table
-  seemingly taken along. Take the bytes of a table that goes to C from
-  the listing, `build/port/VC.LST`, or hold the C against the assembly
-  by a script before the table leaves it. The `port` test passed with
+  seemingly taken along. Take the bytes of a table from the listing of
+  the original, `build/shareware-layout/VC.LST`, or hold the C against
+  the assembly by a script. The `port` test passed with
   the three bytes wrong: no screen shows the stars of the blanker. What
   showed it was the setup file that a program started on the defaults
   saves, held against the original's; `start-setup` ends with that
@@ -1023,7 +1033,7 @@ with it is less obvious:
 - The structures of `port/vc.h` are the assembly's, but a field that the
   assembly declares with `0 DUP`, a name for a place, is not in them:
   `TreList` is where `TreSum2` is, two bytes before the end of `DIRTREE`.
-  Read the `STRUC` in `port/asm/VC.ASM` before taking an offset from a
+  Read the `STRUC` in `src/VC.ASM` before taking an offset from a
   C structure.
 - There is no C library. String literals and static variables are refused
   by `tools/mkexe.c`, but for the data of `port/resident.c`, which has

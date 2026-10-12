@@ -1,11 +1,11 @@
 /*
  * mkexe - turn the linker's VC.EXE into the one that is shipped.
  *
- * Volkov Commander is written as a .COM program: it expects to start at
+ * Volkov Commander was written as a .COM program: it expects to start at
  * offset 100h of the segment that holds its PSP, and it moves and reloads
- * most of itself at run time. With compiled code linked in it no longer
- * fits the 64K of a .COM file, and its code no longer sits in one segment.
- * This tool makes an .EXE that still suits it:
+ * most of itself at run time. Compiled, it no longer fits the 64K of a
+ * .COM file, and its code no longer sits in one segment. This tool makes
+ * an .EXE that still suits it:
  *
  *   - The program is loaded at PSP:100h, like a .COM file, and entered
  *     with CS on the PSP, by giving the header a code segment of -10h:
@@ -21,7 +21,9 @@
  *     room, then a paragraph for the header that DOS keeps in front of a
  *     block of memory, then the part that goes while a command runs. So
  *     that part is loaded where it runs, and the program has only to make
- *     a block of it.
+ *     a block of it. The linker's file begins with room for the PSP, 256
+ *     bytes of the code of the part that stays (Psp of port/resident.c),
+ *     which are taken off here: DOS has the PSP there.
  *   - DOS relocates nothing. A program that moves itself has to do that on
  *     its own, so the linker's relocation table is appended to the program,
  *     which applies it to every copy of itself that it loads (Reloc in
@@ -33,10 +35,22 @@
  *   - The numbers the program needs for this are written into words of
  *     the part that stays, which port/resident.c has for them: each is
  *     found by its name in the linker's map. So are the things that the
- *     numbers say: where the part that goes begins, TrnBeg; where the
- *     part that stays has nothing but zeros in the file, from Stays on;
- *     and its stack, DataSav, which is all of the segment R_BSS, the last
- *     of that part.
+ *     numbers say: where the part that stays has nothing but zeros in the
+ *     file, from Stays on; its stack, DataSav, which is all of the
+ *     segment R_BSS, the last of that part; and where the part that goes
+ *     begins. That is behind the first whole paragraph of TrnBeg, 32
+ *     bytes of nothing which port/transit_t.c has and the linker puts
+ *     behind the stack, on no paragraph of their own: the header of the
+ *     block is in that paragraph.
+ *
+ * What the linker's map has to show for that, which the build arranges by
+ * the compiler's options and the linker's command and nothing in the C
+ * language promises (see the README, "What rests on Open Watcom"): the
+ * code and the data of the part that stays are one group, R_GROUP, which
+ * begins at the PSP; the room of the PSP is the first thing of it; the
+ * stack is alone in the last segment of it; and no code of the part that
+ * goes is within a page of the stack. The build stops here if one of
+ * these does not hold.
  *
  * It also checks the object files of the compiled code, if they are named.
  * One of the part that goes may hold code, or data of the compiler's
@@ -46,7 +60,7 @@
  * compiler's making, a string literal for example, would be linked to
  * where the program does not look for it. The tables that the program
  * names by their offsets, boxes and dialogs with their texts, are
- * constants of the compiler's own group, which is the assembly's: a file
+ * constants of the compiler's own group, DGROUP: a file
  * of those has no code that could read them through DS (see
  * port/tables.h), and may have a variable for that reason, with a value,
  * so that it is in the file. One of the part that stays has that part's
@@ -69,8 +83,8 @@
  * And that no code of the part that goes lies within 4K of the stack,
  * which is the end of the part that stays: QEMU is many times slower at a
  * write to a page of the memory that has code which it has run, and a
- * push is a write. Constants stand between the two, the assembly's texts
- * and the tables of the C code.
+ * push is a write. Constants stand between the two, the texts and the
+ * tables of the C code.
  *
  * Usage: mkexe <linked.exe> <linked.map> <output.exe> [<compiled.obj>...]
  */
@@ -103,7 +117,9 @@ enum {
                                    which follow the others in the table */
 
 /* What the words say, by the names that the map has for it. */
-#define TRANSIT_AT  "TrnBeg"    /* the first of the part that goes */
+#define PSP_AT      "Psp"       /* the room of the PSP, the first of all */
+#define TRANSIT_AT  "TrnBeg"    /* the room of a block's header, behind
+                                   which the part that goes begins */
 #define DATA_AT     "Stays"     /* what the part that stays keeps */
 #define STACK_AT    "DataSav"   /* its stack, */
 #define STACK_IN    "R_BSS"     /* which is all of this segment, */
@@ -336,8 +352,8 @@ static unsigned long group_at(const char *name)
 
 /* Fail if the linker's map has a segment of compiled code that ends
    beyond CODE_END, counted from where its segment register points.
-   Returns where the first code behind `from` begins, the assembly's or
-   compiled, counted from the PSP. */
+   Returns where the first code behind `from` begins, counted from the
+   PSP. */
 static unsigned long check_map(unsigned long from)
 {
     const char *at = map;
@@ -353,7 +369,7 @@ static unsigned long check_map(unsigned long from)
             continue;
         if (size && segment * 16UL + offset >= from
                 && segment * 16UL + offset < first
-                && (!strcmp(class, "CODE") || !strcmp(class, "CCODE")))
+                && !strcmp(class, "CCODE"))
             first = segment * 16UL + offset;
         if (strcmp(class, "CCODE"))
             continue;
@@ -426,12 +442,14 @@ int main(int argc, char **argv)
             fail("the program has contents below 100h");
 
     /* The part that stays: its code, then its data, which begins with
-       what has contents in the file and ends with the stack. DS and SS
-       are on the PSP there, and its data is read by offsets from the
-       group of the data. */
+       what has contents in the file and ends with the stack. CS, DS and
+       SS are on the PSP there, and it is read by offsets from its
+       group. */
     if (group_at(DATA_GROUP) != 0)
-        fail("the data of the resident part is not in a group that "
-             "begins at the PSP");
+        fail("the resident part is not in a group that begins at the "
+             "PSP");
+    if (symbol(PSP_AT) != 0)
+        fail("the room of the PSP is not the first thing of the program");
     code = segment_at(NULL, "RCODE", &length);
     if (start < code || start >= code + length)
         fail("the program does not start in the code of the resident "
@@ -456,9 +474,12 @@ int main(int argc, char **argv)
 
     /* The part that goes begins on a paragraph, one paragraph behind the
        end of the part that stays: that one is for the header of its block
-       of memory. */
-    transit = symbol(TRANSIT_AT);
-    if (transit % 16 || transit / 16 != (resident + 15) / 16 + 1
+       of memory. The room for it is behind the stack, 32 bytes that
+       begin on no paragraph, and the first whole paragraph of them is
+       the one. */
+    transit = (symbol(TRANSIT_AT) + 15) / 16 * 16 + 16;
+    if (symbol(TRANSIT_AT) < resident
+            || transit / 16 != (resident + 15) / 16 + 1
             || transit + 2 > (unsigned long)image_size)
         fail("the transit part does not begin a paragraph behind the "
              "resident part");
@@ -475,8 +496,10 @@ int main(int argc, char **argv)
 
     /* A relocation is a word of the program that holds a segment, counted
        from the PSP. The part that moves is relocated at its new place,
-       and what its words name moves with it: the assembly's own segment
-       among it, which is the PSP's to the linker. */
+       and what its words name moves with it. So they cannot name the
+       part that stays, which is where it was: its segment is the PSP's,
+       0 here, and the program has that from SS (ResSeg of
+       port/misc.c). */
     for (i = 0; i < relocations; i++) {
         unsigned offset = get16(entry + i * 4);
         unsigned segment = get16(entry + i * 4 + 2);
@@ -485,6 +508,9 @@ int main(int argc, char **argv)
             fail("a relocation lies outside the program");
         if (address < (long)transit)
             continue;
+        if (get16(image + address) == 0)
+            fail("the transit part names the segment of the resident "
+                 "part");
         put16(image + table_at + moving * 4, offset);
         put16(image + table_at + moving * 4 + 2, segment);
         moving++;

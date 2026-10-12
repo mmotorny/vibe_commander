@@ -26,10 +26,9 @@ caller that uses them, and what a stub owes its callers is settled by
 reading them.
 
 The copy is built by the project's CMakeLists.txt, in build/notice, with
-the assembler's source and the compiler that build/ has fetched; build/
-has to exist. The first run compiles the assembler again, which takes a
-minute. Exits with status 0 if a scenario notices, 1 if none does, and 2
-if the changed port does not build.
+the compiler that build/ has fetched; build/ has to exist. Exits with
+status 0 if a scenario notices, 1 if none does, and 2 if the changed port
+does not build.
 """
 import argparse
 import subprocess
