@@ -9,6 +9,32 @@ Things that are known and not done. Standing instructions are in
   original's (see `harness/deviations.py`). The routine that works it out
   is still assembly. When it is translated, the number wants a check of
   its own: that it falls by one for every character typed, at least.
+  It has been wrong once without a test saying so, when a stub that it
+  calls handed back another CX. Held against the original by hand since,
+  over eight steps in text and in hex: 9,712 less in each.
+- Saving in the editor to a disk that cannot be written, the floppy A:
+  of the bench, goes beyond the stack. DOS's critical error brings up
+  its box from inside the call of DOS, 46 bytes deeper than a dialog:
+  with `T80_00` still assembly that left 4 bytes of the stack, under the
+  limit of the `port` test already, and with it in C none: its function
+  that writes the file has some 50 bytes more on the stack at the call
+  of DOS than the assembly had. No scenario has the step, and none can
+  as long as the stack is 256 bytes. What lies below the stack is the
+  end of the copy of the main data that is kept while a command runs,
+  the last bytes of the command line; it is written whole before a
+  command and read whole after, so nothing reads what the stack leaves
+  there. The same goes for any other call of DOS from C that meets a
+  critical error at the bottom of deep calls.
+- `T80_00` takes what the program knows of the main extension file from
+  the editor's text after saving it, and does so whether the file was
+  written or not: a save of VC.EXT that fails changes what the program
+  goes by until it is started again. Ported like that. Saving to the
+  console writes nothing and is no error; and after a save under another
+  name that fails, the new name is in the status line only once that is
+  drawn again for another reason. Ported like that too.
+- A disk that is full cannot be made on the bench, so what `T80_00` does
+  then, deleting what it has written, rests on reading; and so does
+  what it does when DOS refuses the attributes of a file just written.
 - The harness can type Russian on the Russian bench, and nothing beyond
   ASCII on the other: Alt with the numeric keypad types nothing there.
 - `tools/flagscan.py` follows flags until an instruction sets them all,
@@ -172,6 +198,32 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     of A:\ instead of a directory and so ran `fdauto.bat`; the files
     there are not in the order of the bench's. Noted at the top of
     `harness/scenarios.py`.
+
+- The editor: addresses in its text, a line on the screen, saving, 13
+  routines, 1079 bytes, 40 minutes in all, next to the viewer's batch:
+  - 5 minutes: a scenario that could not stay as written, found by the
+    `port` test before anything was translated. It showed D:\VC in a
+    panel, where the program's file has another name and size; and it
+    saved to the write-protected floppy, which left 4 bytes of the stack
+    in the port as it was. Two goldens derived again, 33 seconds each,
+    and the stack of every step read from the machine by a script of ten
+    lines around `scenarios._stack_left`: `ported.py` says how much a
+    scenario leaves, not after which step.
+  - 4 minutes: `T75_00` left CX as it came, where the original leaves
+    0, and its caller goes on with CL. The test failed on a status line
+    drawn once too often, 45 seconds; the caller was read again.
+  - 3 minutes: two tries at a full disk, 31 and 52 seconds, before it
+    showed that the floppy is write-protected. In `harness/scenarios.py`
+    now.
+  - 1 minute: an edit of `harness/scenarios.py` by a script cut off what
+    follows the scenarios; put back from the commit before.
+  - 1 minute waiting for a turn at the computer, in three runs.
+  - 3 minutes for the rebase, with the viewer's batch on `main` first:
+    six files in conflict, each where both batches had added to the end
+    of the same list. Git cut the two lists of batches and of scenarios
+    at lines they share, a closing bracket, so putting one side behind
+    the other left both open; mended by hand. The build and the test
+    after it took a minute and passed at once.
 
 ## Ideas put off
 

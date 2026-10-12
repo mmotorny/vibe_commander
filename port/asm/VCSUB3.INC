@@ -769,6 +769,7 @@ ChDsk1:	CALL	UpCase
 	POP	BX
 	RET
 ChgDisk	ENDP
+	FromC	ChgDisk, <SBB AX,AX>	; CY as a number
 
 	.CONST
 ChTr0_S	DB	' Choose Directory ',0

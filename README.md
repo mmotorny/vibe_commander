@@ -71,10 +71,14 @@ shows instead of files: the tree of directories, with the cursor on the
 current directory, and the Info, and those that read from the disk what a
 panel shows: the files of a directory with its extension file and the
 sizes of its directories, and for the Info the sizes of the disk, its
-label and the text of dirinfo, and those of the viewer that find the lines
+label and the text of dirinfo, those of the viewer that find the lines
 of a file, keep a part of it in the memory, write the screen and look for
-a text. Reading the tree is still assembly, and so is what the viewer does
-with its keys.
+a text, and those of the editor that say where in the memory a place in
+its text is and which column the cursor is in, that draw a line of the
+text, as text or in hex, and the status line, and that save the file.
+Reading the tree is still assembly, and so is what the viewer does with
+its keys, and what the editor does with a key and with the lines of its
+text.
 
 ## Layout
 

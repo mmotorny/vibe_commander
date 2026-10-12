@@ -36,9 +36,15 @@
 	EXTERN	V30_00_c:FAR, V31_00_c:FAR, V32_00_c:FAR, V40_00_c:FAR
 	EXTERN	V50_00_c:FAR, V51_00_c:FAR, V55_00_c:FAR, V60_00_c:FAR
 	EXTERN	V81_00_c:FAR, V82_00_c:FAR
+	EXTERN	T57_00_c:FAR, T57_01_c:FAR, T57_02_c:FAR, T60_00_c:FAR
+	EXTERN	T61_00_c:FAR, T62_00_c:FAR, T63_01_c:FAR, T70_00_c:FAR
+	EXTERN	T71_00_c:FAR, T72_00_c:FAR, T73_00_c:FAR, T73_10_c:FAR
+	EXTERN	T74_00_c:FAR, T75_00_c:FAR, T76_00_c:FAR, T80_00_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
+; Boxes and a text that C code hands to DialBox and Dialog.
+	PUBLIC	SavFi_P, SavEr_B, Prot_B, EdFl_S
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.

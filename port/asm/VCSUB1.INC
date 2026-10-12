@@ -406,6 +406,7 @@ Int10m	PROC	NEAR
 	POP	BP
 	RET
 Int10m	ENDP
+	FromC	Int10m
 
 ;------------- Convert coordinars to address -----------
 ;			BH,BL - coordinats
@@ -509,6 +510,7 @@ ResWn1:	PUSH	CX
 	POP	DS
 	RET
 ResWin	ENDP
+	FromC	ResWin
 
 ;----------------- Restore user screen -----------------
 ;			BH,BL - begin
@@ -1061,6 +1063,23 @@ DiBx22:	POP	DX
 	RET
 DialBox	ENDP
 
+; C code puts a box on the screen: DialBox for the box at CS:AX, which
+; puts where the box is, BX, DX and SI, into the three words at SS:DI.
+	PUBLIC	DialBox_a
+DialBox_a PROC	FAR
+	PUSH	BP
+	PUSH	DS
+	POP	ES
+	MOV	BP,AX
+	CALL	DialBox
+	MOV	BP,DI
+	MOV	[BP],BX
+	MOV	[BP+2],DX
+	MOV	[BP+4],SI
+	POP	BP
+	RET
+DialBox_a ENDP
+
 DiBx30	PROC	NEAR			; Convert variable
 	MOV	SI,CS:[BP]
 	MOV	CX,LenPath+13
@@ -1584,6 +1603,18 @@ Dial83:	POP	CX
 	POP	SI
 	RET
 Dialog	ENDP
+
+; C code has a dialog: Dialog for the box at CS:AX.
+	PUBLIC	Dialog_a
+Dialog_a PROC	FAR
+	PUSH	BP
+	PUSH	DS
+	POP	ES
+	MOV	BP,AX
+	CALL	Dialog
+	POP	BP
+	RET
+Dialog_a ENDP
 
 Dial85	PROC	NEAR
 	ADD	DI,SIZE BoxMn

@@ -129,6 +129,36 @@ out again (show.py --changes is how):
   - There is no mouse on the bench, and nothing sets the kind of a panel
     to anything but files, tree and Info: what the program does for a
     mouse or for a fourth kind of panel cannot be reached.
+  - No panel may show D:\\VC: the program is VC.COM there or VC.EXE, of
+    another size, and with it what the Info says is free on D:. A file
+    of that directory is opened by its path: Shift+F4 and
+    "d:\\vc\\vc.ext".
+  - In the editor F4 switches between text and hex, where two digits
+    are a byte and Tab goes to the characters and back; Shift+F2 saves
+    under another name, which the editor then goes by; Esc with changes
+    asks, Enter to save and "Right Enter" not to. Ctrl+y cuts the line
+    and Ctrl+u puts it back, as often as it is pressed, each time as a
+    line of its own; Del at the end of a line joins the next to it. So
+    "Ctrl+y Ctrl+u Ctrl+u Up Up End Del" makes a line twice as long, and
+    eight times that make 4096 characters of 16: more than the 3900
+    that the editor keeps of a line at a time. data.bin is one line of
+    1024 characters to it, with tabs; the lines of a:\\kernel.sys are
+    longer than 3900, with tabs too, so the cursor stops short of the
+    end of what the editor keeps.
+  - The dialog of attributes opens on Read only: Space ticks it. Saving
+    such a file in the editor asks first; "nul" as a name saves to a
+    device; a name in a directory that is not there is an error with a
+    box. An error beeps, and the BIOS of the machine scrolls the screen
+    up a line for the beep, because the program has the cursor hidden
+    below the last row: the editor's first row stays like that until it
+    is drawn again.
+  - The floppy A: is write-protected, and the hard disks have 32 MB
+    free: no disk can be filled. Writing to A: brings up the box of
+    DOS's critical error, from inside the call of DOS, and that is 46
+    bytes deeper in the stack than a dialog of the routine that called:
+    saving to A: in the editor left 4 bytes of the stack while that was
+    still assembly. No scenario can have it as long as the stack is 256
+    bytes.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -837,7 +867,87 @@ SCENARIOS = {
             "End",
             "Esc",
         )),
+
+    "editor-hex": Scenario(
+        "The editor on a file that is one line of all the characters "
+        "there are, as text and in hex",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of the file saved
+            "Down Down Down Down Down Down",      # onto data.bin
+            "F4",                         # 1024 characters, tabs among
+                                          # them: an arrow where it goes on
+            "End",                        # and one where it began
+            "Home F4",                    # in hex, a zero as a dot
+            '"4a"',                       # the two digits of a byte
+            'Tab "z"',                    # and a byte as a character
+            "Down Down End",
+            "F4",                         # text again, the cursor where
+                                          # it was
+            "Esc",                        # changed: asks
+            "Enter",                      # and saves
+        )),
+
+    "editor-long": Scenario(
+        "A line longer than the editor keeps of one at a time",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",                   # a new file
+            '"long.txt" Enter',
+            "Enter",
+            '"0123456789abcdef"',
+            # The line cut, put back twice and the two joined: twice as
+            # long, and that eight times. 4096 characters.
+            *("Ctrl+y Ctrl+u Ctrl+u Up Up End Del "
+              "Ctrl+y Ctrl+u Ctrl+u Up Up End Del",) * 4,
+            "End",                        # as far as the cursor goes, the
+                                          # 3900th column
+            "Esc",                        # changed: asks
+            "Right Enter",                # not saved
+        )),
+
+    "editor-save": Scenario(
+        "What the editor meets when it saves: a file that is read-only, a "
+        "device, a directory that is not there, and the main extension "
+        "file",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of the file saved
+            "Down Down Down Down",        # onto hello.txt
+            "Ctrl+a",
+            "Space",                      # read-only
+            "Enter",
+            "F4",
+            '"x"',
+            "F2",                         # asks whether to overwrite it
+            "Enter",                      # yes
+            "Shift+F2",
+            '"nul" Enter',                # saved to a device
+            '"y"',
+            "Shift+F2",
+            '"nodir\\x" Enter',           # no such directory: an error
+            "Enter",
+            "Esc",                        # changed: asks
+            "Right Enter",                # not saved
+            "Shift+F4",                   # the main extension file, in the
+            '"d:\\vc\\vc.ext" Enter',     # directory of the program
+            '"dat:" Tab "echo" Space "!.!" Enter',
+            "F2",                         # saved, and from now on what the
+            "Esc",                        # program goes by
+            "End Enter",                  # empty.dat: the command just
+            "Ctrl+o",                     # written for its kind
+            "Ctrl+o",
+        )),
 }
+
 
 
 def run(scenario, program, bench, signals, trace=False):

@@ -276,6 +276,29 @@ BATCHES = [
                     "only the editor is given a narrower one",
         },
     ),
+    Batch(
+        title="The editor: where in the memory its text is, what it shows "
+              "of it and how it saves it",
+        source="edit.c",
+        routines=("T57_00", "T60_00", "T62_00", "T63_00", "T70_00",
+                  "T71_00", "T72_00", "T73_00", "T73_10", "T74_00",
+                  "T75_00", "T76_00", "T80_00"),
+        functions=("T57_00_c", "T57_01_c", "T57_02_c", "T60_00_c",
+                   "T61_00_c", "T62_00_c", "T63_01_c", "T70_00_c",
+                   "T71_00_c", "T72_00_c", "T73_00_c", "T73_10_c",
+                   "T74_00_c", "T75_00_c", "T76_00_c", "T80_00_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x778C, 0x778F, 0x7791, 0x7794),
+                "T80_00, for a disk that is full, where it deletes what "
+                "it has written: the hard disks of the bench have 32 MB "
+                "free, and its floppy is write-protected"),
+            **dict.fromkeys(
+                (0x7824, 0x7827, 0x7829),
+                "T80_00, for a file that DOS has written and closed and "
+                "then refuses the attributes of"),
+        },
+    ),
 ]
 
 

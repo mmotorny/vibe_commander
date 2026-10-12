@@ -222,6 +222,23 @@ port.
   does DX where nothing found is on the screen, is handed to the C
   function like an argument. That is less than showing that nothing
   reads what was stored.
+- A caller may go on with a register as the routine happens to leave it,
+  not only with what it returns: CX is 0 after `T70_00` and `T75_00`,
+  because a `REP` ended there, and `T21_00` and `T00_53` compare with CL
+  as if they had cleared it. Read in every caller what becomes of each
+  register that the routine changes. With `T75_00` the test showed it
+  only by chance, in a status line drawn where the original leaves it:
+  what went wrong was the count of free bytes, which is not compared.
+- BP cannot carry an argument to an entry for C. `DialBox` and `Dialog`
+  take their box at CS:BP, so their entries take its offset in AX. C code
+  has the offset of an object of the assembly as
+  `(u16)(u32)(const void __far *)object`, which compiles to the offset
+  alone and costs no relocation. `PUBLIC` for such an object can stand in
+  `VC.ASM`, whichever file defines it.
+- The box of DOS's critical error, `FatErr`, comes up inside a call of
+  DOS and is 46 bytes deeper in the stack than a dialog of the routine
+  that called DOS. What a C function has on the stack when it calls
+  `Intr21` is on top of that: see `TODO.md` for the editor's saving.
 
 ### C for the port
 
@@ -261,7 +278,12 @@ with it is less obvious:
   untouched, and fails below a limit. Its run in step 3 has the figures
   of the new scenarios with the routines still assembly.
 - A static function is called, not expanded in place, also where only
-  one routine uses it.
+  one routine uses it. The call is near, two bytes, and the function
+  saves every register it uses but AX. So what is deep can be kept out
+  of the frame of the function that calls something deeper: `T80_00`
+  has only the place of its box, and calls `Dialog` with 22 bytes on the
+  stack where the assembly had 12; the registers for DOS, 14 bytes, are
+  in static functions that have returned by then.
 - The room a function takes for its variables is the `sub sp` at its
   start in the listing. `PutFls_c` takes 46 bytes, and 14 for registers,
   where the assembly pushed 16; no scenario is at its deepest there. A
