@@ -82,9 +82,12 @@ not in Claude's memory: memory does not travel between computers.
   compiler's intrinsics, and those before assembly, which is written
   inline in a C file and only where nothing else works. That a thing
   would be smaller or faster is no reason to go down that list.
-- The port is not done while code of it has never run. That goes for the
-  mouse as for the rest: the bench is to have one, and what the program
-  does with it is held against the original like everything else.
+- The mouse is tested like the keys: the bench is to have one, and what
+  the program does with it is held against the original in scenarios.
+  The port is not done while the mouse has not been shown to work. This
+  asks for no more coverage than is asked elsewhere: an instruction that
+  no scenario can reach is still listed as out of reach with its reason.
+  That the bench has no mouse is no longer such a reason.
 - DOS is a stage on the way: the aim is to carry the program to modern
   operating systems, where a few kilobytes of memory or of disk mean
   nothing. So the port may be larger than the original and use more
