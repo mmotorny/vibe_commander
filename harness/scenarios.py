@@ -343,6 +343,18 @@ out again (show.py --changes is how):
     the pointer: "Click@30,16*40". A click outside the window leaves,
     and so does the middle button anywhere; beside the text in the
     window a click does nothing. The scenario mouse-help has these.
+  - The box of Alt+F7 has a margin around its frame, a row above and
+    below and three columns beside, which is part of it: rows 2 to 22
+    and columns 3 to 76, with the list on rows 4 to 17. When a search
+    is over the list shows its end, so a
+    button held below it only takes the cursor to the last line, and
+    one held above it moves the list. A second click on a line is Go
+    to; a click beside the list does nothing, one outside the box
+    closes it, and so does the middle button. A click as short as
+    "Click@20,14*3" is over before the list has asked for the mouse,
+    and does nothing. The lines of the list are the directories, their
+    files, and an empty line between two directories: "*.txt" in
+    C:\\WORK is three lines. The scenario mouse-find has these.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
@@ -4126,6 +4138,39 @@ SCENARIOS = {
             "MiddleClick@70,40",
             "Move@40,40",                 # the pointer on the 41st row
             "Alt+F9",                     # which 25 lines have not
+        )),
+
+    "mouse-find": Scenario(
+        "The mouse in the list of the file search: a click on a line and "
+        "a second one, which goes to the file, a click below the last "
+        "line and on a list with none, a button held below the list and "
+        "above it, beside the list and outside the box, the right button "
+        "and the middle one",
+        steps=(
+            "Alt+F7",
+            '"*.zzz" Enter',              # no file
+            "Click@20,8",                 # a click on the empty list
+            "n",
+            '"*.txt" Enter',              # three lines
+            "Click@20,6",                 # the cursor onto the last
+            "Click@20,4",                 # and onto the first
+            "RightClick@20,12",           # below the last line: the last
+            "Click@20,3",                 # on the frame: nothing
+            "Click@3,10",                 # beside it in the box: nothing
+            "RightClick@1,1",             # the right one outside: nothing
+            "Click@1,10",                 # the left one there closes it
+            "Alt+F7",
+            '"a:\\*.*" Enter',            # 85 lines, the last 13 shown
+            "Click@20,8",                 # the cursor onto a line
+            "RightClick@30,10",           # and with the right button
+            "Click@20,14*3",              # let go before the list asks
+            "Click@20,11>20,21*8",        # held below the list: down
+            "Click@20,12>20,2*40",        # and above it: the list moves
+            "Click@20,7>20,19*40>20,3*4", # down and up without letting go
+            "Click@30,9 Click@30,9>75,9", # let go beside the line: nothing
+            "MiddleClick@30,12",          # the middle button closes it
+            "Alt+F7 Enter",               # the same search again
+            "Click@30,9 Click@30,9",      # a second click: Go to
         )),
 
 }

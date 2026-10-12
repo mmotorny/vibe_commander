@@ -224,11 +224,12 @@ Things that are known and not done. Standing instructions are in
   stop TmpBuf gets seven bytes of whatever follows `FnFl7_S` in the
   program. Nothing reads them; the C copies from the assembly, as long
   as that has them.
-- What `FndMove` does for the mouse has run in no scenario, 96
-  instructions: the middle button, a button held above the list or
-  below it, a click outside the box, a click and a second one on a line.
-  It is translated by reading, and so are the two places where
-  `FindFil` runs out of memory, for its list and for the file it reads.
+- What `FndMove` does for the mouse runs in `mouse-find`, with the
+  search over. While a search runs the mouse is taken too, by `FndBack`,
+  and no scenario has it: a button would be pressed at no moment that
+  the harness can name, as a key would. The two places where `FindFil`
+  runs out of memory, for its list and for the file it reads, are
+  translated by reading.
 - `FndBack`, which takes the keys while a search runs, means to go back
   for the next key when the menu, "Stop, Go to, Quit", has taken one:
   Left, Right, Space, Backspace, a letter that is no answer. It tests
@@ -577,10 +578,11 @@ Things that are known and not done. Standing instructions are in
 - The bench has a mouse now, and scenarios use it: `mouse-panel`,
   `mouse-bars` and `mouse-dialog`, with which 349 of the instructions
   that `harness/ported.py` listed as out of reach for the mouse came off
-  the lists, and `mouse-help`, with 104 more. The others are still
-  listed, with reasons that end in "the bench has no mouse", which is
-  no reason any more: each place wants a scenario, or the true reason
-  why none gets there. By the file of the port that has them:
+  the lists, and `mouse-help` and `mouse-find`, with 200 more. The
+  others are still listed, with reasons that end in "the bench has no
+  mouse", which is no reason any more: each place wants a scenario, or
+  the true reason why none gets there. By the file of the port that has
+  them:
   - `treebox.c`, 93: `ChTree`, a button held on a line of the tree,
     above the lines or below them, a second click on a line, a click
     outside the box.
@@ -590,7 +592,6 @@ Things that are known and not done. Standing instructions are in
     window, a button held above it or below it. `mouse-list` runs 36
     of its instructions: the click that opens the editor on dirinfo
     has the button still down when the editor asks.
-  - `find.c`, 96: `FndMove`, the list of the file search.
   - `dialog.c`, 2: `mouse-fields`, `mouse-line` and `mouse-filter` have
     the fields of a dialog. Left are the middle button, and a button
     moved off the button of a dialog that it went down on.
