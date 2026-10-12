@@ -164,8 +164,10 @@ static void F32_60(u16 color, u16 begin, u16 row, u16 keys, u16 size)
    size `size`, while a button of it is down. Returns in the high byte 0
    for nothing, 1 for a click on a line, whose number is in the low byte,
    1Ch for a second click on the same line, which chooses it, and FFh for
-   the right button, or the left one let go outside the box: that leaves
-   the list. The middle button does nothing. */
+   the middle button, or the left one let go outside the box: that leaves
+   the list. The right button is as the left one on a line, and does
+   nothing elsewhere. While the middle button alone is down the pointer
+   has the look of an x. */
 u16 F32_70(u16 begin, u16 size)
 {
     u32 pair;

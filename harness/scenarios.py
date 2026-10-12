@@ -321,6 +321,34 @@ out again (show.py --changes is how):
     there. More places may follow, and each may have its count:
     "Click@20,10*4>20,22*30>20,2". A list scrolls for a button that
     went down on one of its lines and is held above or below them.
+  - What the middle button is: on a key of the key bar the key with
+    Shift, on an item of the Files menu the item with Ctrl, and in a
+    dialog, the user menu, the history, the box of the drives and the
+    map of the memory the way out, wherever the pointer is:
+    mouse-middle.
+  - A button that is moved while it is down counts where it comes up.
+    Let go beside the key of the key bar, the button of a dialog or the
+    letter of a drive that it went down on, it is no key, no button
+    and no drive, and back on it, it is; let go outside a box that it
+    went down in, it is Esc, and the other way round nothing. In a
+    line that is typed into the cursor follows it, in the user menu
+    the cursor of the lines, and on the menu bar the menus, each name
+    opening its own and each item getting the cursor; let go on an
+    item it is that item. A second click that comes up beside its
+    line chooses nothing. The right button moved over the files of a
+    panel selects each, or takes each off, as it did with the first;
+    the program is not asked on the way between two places, so every
+    file wants a place of its own: "RightClick@3,5>3,6>3,7". The
+    scenarios mouse-drag-dialog, mouse-drag-menu and mouse-drag-lists.
+  - The program sees a button at the place it is moved to once more
+    than that place's count says, since the look that ends the count
+    of the place before finds the pointer there already: with "*1" at
+    the second place it sees it there once. "Click@70,0*5>25,0*1" is
+    how the menu bar is left with no menu, the button let go at the
+    look after the one that found it on a name. Left, Down and Enter
+    there open a menu that is none, from behind the table of the
+    menus, and F1 a page of the help by a byte that is not the same
+    in the original and in the port: do not press them.
   - "MiddleClick@40,12" is the middle button. The mouse driver takes a
     PS/2 mouse for one of two buttons and hands the third on only when
     it has been told, so the bench loads it with /3: that is in
@@ -4150,6 +4178,101 @@ SCENARIOS = {
             "Click@30,14 Click@30,14",    # twice on the program: released
             "Alt+F5",                     # gone
             "Click@30,1",                 # outside the box: it closes
+        )),
+
+    "mouse-middle": Scenario(
+        "The middle button of the mouse: on the key bar the key with "
+        "Shift, on an item of the Files menu the item with Ctrl, and "
+        "the way out of a dialog, the user menu, the history, the box of "
+        "the drives and the map of the memory",
+        steps=(
+            "Down Down Down",             # readme.txt
+            "MiddleClick@37,24",          # F5 of the key bar: Shift+F5
+            "MiddleClick@30,8",           # in a dialog, wherever: Esc
+            "F2",
+            "MiddleClick@35,8",           # on a line of the user menu
+            "Alt+F8",
+            "MiddleClick@35,12",          # in the history
+            "Alt+F1",
+            "MiddleClick@14,8",           # on a letter of a drive
+            "Alt+F5",
+            "MiddleClick@30,8",           # on a line of the map
+            "Click@10,0",                 # the Files menu
+            "MiddleClick@12,6",           # its Copy: Ctrl+F5
+            "MiddleClick@55,10",          # and on the dialog's button
+        )),
+
+    "mouse-drag-dialog": Scenario(
+        "A button of the mouse that is moved while it is down, in a "
+        "dialog, on the key bar and in the box of the drives: it counts "
+        "where it is let go",
+        steps=(
+            'F7 "abcdef"',
+            "Click@8,8>12,8",             # along the line: the cursor too
+            "Click@40,3>40,10",           # down outside the box and up in
+                                          # it: nothing
+            "Click@40,10>40,3",           # the other way: Esc
+            "Down Down Down",
+            'F6 "moved.txt" PgDn',        # a new name, and to the buttons
+            "Click@25,10>25,12",          # off the button that is chosen:
+                                          # it is not pressed
+            "Click@25,10>25,12>25,10",    # off it and on again: it is
+            "Click@37,24>37,20",          # off a key of the key bar: no key
+            "Click@37,24>45,24>37,24",    # to the next key and back: F5
+            "Esc",
+            "Alt+F1",
+            "Click@14,8>14,6",            # down on a letter, which gets the
+                                          # cursor, and up beside it: no
+                                          # drive is chosen
+            "Click@12,7>18,8",            # down beside the letters and up
+                                          # on one: that drive
+            "Alt+F1",
+            "Click@14,8>14,2",            # up outside the box: Esc
+        )),
+
+    "mouse-drag-menu": Scenario(
+        "A button of the mouse held and moved along the menu bar and "
+        "down a menu, and the bar that is left with no menu",
+        steps=(
+            "Click@70,0>25,0",            # down beside the names and onto
+                                          # one: its menu
+            "Click@25,0>40,0>10,0",       # along the bar: each in turn
+            "Click@10,0>12,3",            # down to an item: User menu
+            "Esc",
+            "Click@25,0>30,4>60,15",      # to an item and off the menu:
+                                          # none
+            "Click@70,0*5>25,0*1",        # let go as soon as it is on a
+                                          # name: the bar with no menu
+            "Right",                      # and the keys go by that: the
+                                          # menu behind none is the first
+            "Esc",
+        )),
+
+    "mouse-drag-lists": Scenario(
+        "A button of the mouse that is moved while it is down, over the "
+        "files of a panel, in the user menu and in the map of the memory",
+        steps=(
+            "RightClick@3,5>3,6>3,7>3,8",  # four files: selected
+            "RightClick@3,8>3,7>3,6",     # back over three: not any more
+            "F2",
+            "Click@35,8 Click@35,8>35,3",  # a second click that comes up
+                                          # beside its line: nothing
+            "Click@35,7>35,9",            # down the lines: the cursor too
+            "Click@35,8>35,3",            # up outside the box: it is gone
+            '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter',
+            "Alt+F5",
+            "Click@30,14>30,3*4",         # from a line to above the
+                                          # lines: the cursor goes up
+            "Click@30,8>30,19*6",         # and to below them: down
+            "RightClick@30,13>30,14>30,15",  # the right button over the
+                                          # program: selected
+            "Click@30,14 Click@30,14>30,10",  # a second click that comes
+                                          # up on another line: nothing
+                                          # is released
+            "Click@30,4>47,20",           # from beside the lines onto a
+                                          # button: Cancel
+            "Alt+F5",
+            "Click@30,4>30,1",            # up outside the box: it closes
         )),
 
     "mouse-help": Scenario(

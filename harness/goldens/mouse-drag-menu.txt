@@ -1,0 +1,285 @@
+Volkov Commander 4.05 in the scenario mouse-drag-menu: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 1: Click@70,0>25,0
+cursor 0 127 lines 6 7 mode 3
+|    Left    Files    Commands    Options    Right                               | 30x19 0Fx6 78x1 0Fx5 30x49
+|║    Name    │    N┌───────────────────────────────┐v Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex5 30x33 1Bx28
+|║..          │     │ Tree                  Alt-F10 │───────────────────────────╢| 1Bx1 30x12 1Bx6 30x1 0Fx1 0Ex1 0Fx29 30x1 03x2 1Bx26
+|║DOCS        │     │ Volume label          Ctrl-F4 │3,296 Bytes Memory         ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x2 1Ex3 1Bx23
+|║SRC         │     │ memory Info           Alt-F5  │###### Bytes Free          ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 06x2 1Ex4 1Bx22
+|║readme   txt│     │ Directory sizes       Alt-F6  │e in drive C: is WORK      ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx9 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│     │ Find file             Alt-F7  │2 total bytes on drive C:  ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x1 03x1 1Bx21 1Ex2 1Bx3
+|║notes    doc│     │ History               Alt-F8  │0 bytes free on drive C:   ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x1 03x1 1Bx20 1Ex2 1Bx4
+|║data     bin│     │ EGA lines             Alt-F9  │es use 3,072 bytes in      ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx5 1Ex5 1Bx16
+|║run      bat│     │ ───────────────────────────── │    C:\WORK                ║| 1Bx19 30x33 03x2 1Bx26
+|║empty    dat│     │ Swap panels           Ctrl-U  │───────────────────────────╢| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║            │     │-Compare directories   Ctrl-C  │fo' file in this directory ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
+|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
+|║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 2: Click@25,0>40,0>10,0
+cursor 0 127 lines 6 7 mode 3
+|    Left    Files    Commands    Options    Right                               | 30x10 78x1 0Fx8 30x61
+|║    Name ┌──────────────────────────┐ ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex5 30x28 1Bx42
+|║..       │ Help              F1     │ ║╟──────────────────────────────────────╢| 1Bx1 30x10 0Fx1 0Ex1 0Fx24 30x1 03x2 1Bx40
+|║DOCS     │ User menu         F2     │ ║║         653,296 Bytes Memory         ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx10 1Ex7 1Bx23
+|║SRC      │ View              F3     │ ║║          ####### Bytes Free          ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx11 1Ex7 1Bx22
+|║readme   │ Edit              F4     │ ║║      Volume in drive C: is WORK      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx23 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    │ Copy              F5     │ ║║  32,724,992 total bytes on drive C:  ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    │ Rename or move    F6     │ ║║  32,719,360 bytes free on drive C:   ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx3 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     │ Make directory    F7     │ ║║      6 files use 3,072 bytes in      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx7 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      │ Delete            F8     │ ║║               C:\WORK                ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║empty    │ ──────────────────────── │ ║╟──────────────────────────────────────╢| 1Bx10 30x28 03x2 1Bx40
+|║         │ file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 3Fx6 3Ex1 3Fx19 30x1 03x2 1Bx40
+|║         │ ──────────────────────── │ ║║  No `dirinfo' file in this directory ║| 1Bx10 30x28 03x2 1Bx40
+|║         │ select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 3Fx8 3Ex1 3Fx17 30x1 03x2 1Bx40
+|║         │ uNselect group    Gray - │ ║║                                      ║| 1Bx10 30x1 3Fx2 3Ex1 3Fx23 30x1 03x2 1Bx40
+|║         │ Invert group      Gray * │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║         │ reStore selection Ctrl-M │ ║║                                      ║| 1Bx10 30x1 3Fx3 3Ex1 3Fx22 30x1 03x2 1Bx40
+|║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
+|║         │ Quit              F10    │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
+|║         └──────────────────────────┘ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx12 03x28 1Bx40
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 3: Click@10,0>12,3
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx12 6Cx1 1Bx37 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│                                            rive C: is WORK      ║| 1Bx22 3Fx36 1Bx5 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│           ╔════════ User Menu ═════════╗   l bytes on drive C:  ║| 1Bx22 3Fx36 03x2 1Bx15 1Ex2 1Bx3
+|║notes    doc│           ║ F1  Archives...            ║   s free on drive C:   ║| 1Bx22 3Fx8 0Fx23 3Fx5 03x2 1Bx14 1Ex2 1Bx4
+|║data     bin│           ║ F2  Format floppy disk...  ║    3,072 bytes in      ║| 1Bx22 3Fx36 03x1 06x1 1Ex4 1Bx16
+|║run      bat│           ║ F4  Edit file              ║   \WORK                ║| 1Bx22 3Fx36 03x2 1Bx20
+|║empty    dat│           ╚════════════════════════════╝   ─────────────────────╢| 1Bx22 3Fx36 03x2 1Bx20
+|║            │                                                                 ║| 1Bx22 3Fx36 03x2 1Bx20
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx24 03x36 1Bx20
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 4: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx12 6Cx1 1Bx37 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 5: Click@25,0>30,4>60,15
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx60 6Cx1 1Bx19
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 6: Click@70,0*5>25,0*1
+cursor 0 127 lines 6 7 mode 3
+|    Left    Files    Commands    Options    Right                               | 30x25 47x1 30x54
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 7: Right
+cursor 0 127 lines 6 7 mode 3
+|    Left    Files    Commands    Options    Right                               | 30x2 0Fx8 30x15 47x1 30x54
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 8: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx1 6Cx1 1Bx54
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

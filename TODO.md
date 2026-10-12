@@ -328,9 +328,9 @@ Things that are known and not done. Standing instructions are in
   `mouse-menu`, which also has Alt by itself in an open menu and an item
   of the Files menu chosen with Ctrl and with Shift held down: with the
   keys pressed inside the machine, each is still down when the program
-  asks the BIOS for it. No step has the middle button on an item of the
-  Files menu yet, which is the item with Ctrl, nor a button that is
-  held and moved along the bar.
+  asks the BIOS for it. `mouse-middle` has the middle button on an item
+  of the Files menu, which is the item with Ctrl, and `mouse-drag-menu`
+  a button that is held and moved along the bar and down a menu.
 - With the mouse the menu bar can come to have no menu at all, the
   number 0, while it goes on as if it had one: a button pressed on the
   bar next to the names and moved onto one leaves 0 for a round, and
@@ -339,9 +339,18 @@ Things that are known and not done. Standing instructions are in
   bar between two looks at it after a menu was closed that way, has the
   keys work on menu 0, and a menu opened then is taken from 2,040 bytes
   behind the table. Ported like that as far as it can be: the C has the
-  tables in its own place, so what it reads there is something else. No
-  scenario does it: it takes a button that goes down in one place and is
-  moved to another.
+  tables in its own place, so what it reads there is something else.
+  `mouse-drag-menu` has the bar left like that, "Click@70,0*5>25,0*1",
+  and Right there, which goes to the first menu in the original and in
+  the port. It does not press F1: the page of the help is a byte that
+  the original takes from its data and the port from its code, the
+  word behind the table of the pages read as a place in that table.
+  Tried by hand, both showed the same box, "There was error reading
+  data from the help file", for a page that is none; another build of
+  the port may have another byte there. Enter, Down and Left there
+  were not tried, and F1 stays out of the scenario: they open a menu
+  from behind the table, or show a page by that byte, so the original
+  goes by stray memory there and the port cannot be held to it.
 - In an open menu the key of an item that is dark, Ctrl+a in the Files
   menu of a tree, is not dropped: the number of the item is looked for
   among the letters of the items, where it is not. And the table of
@@ -355,11 +364,12 @@ Things that are known and not done. Standing instructions are in
   letter more: that is held against the golden as it is, and the port
   fails there without anything translated. No scenario shows it now;
   the comparison would have to know the end of the banner by its place.
-- Of the dialogs, what they do for the mouse runs in `mouse-dialog`,
-  `mouse-fields`, `mouse-line` and `mouse-filter`, but for two
-  instructions that are listed as out of reach in `harness/ported.py`:
-  the middle button, or two buttons at once, which leave a dialog as Esc
-  does, and a button held on the button that is chosen and moved off it.
+- Of the dialogs, all that they do for the mouse runs: in
+  `mouse-dialog`, `mouse-fields`, `mouse-line` and `mouse-filter`, the
+  middle button, which leaves a dialog as Esc does, in `mouse-middle`,
+  and a button that is moved while it is down in `mouse-drag-dialog`.
+  Two buttons at once leave a dialog too, by the same instruction; no
+  step presses two.
 - A dialog trusts its tables. One without a field takes no key and does
   not end, a box without a line has 65536, and a line to type into of
   length 0 is shown as one of 65536. Ported like that; the program has
@@ -431,18 +441,18 @@ Things that are known and not done. Standing instructions are in
   of free memory where it begins, its blocks and its size. So nothing
   checks that what the program gives up while a command runs is listed
   as free, but the kind of the line.
-- Of the map, 78 instructions of 913 have run in no scenario and are
-  translated by reading: the mouse, 27; a map of more lines than its
-  window has, 13 on a screen of 25 lines, with the line that scrolls in,
-  22; a DOS before version 4 or with a version of two digits, 15; a
-  block of an unknown owner, 4; and a second program that stays in the
-  memory and is not released with the first, 10. The bench has one such
-  program, FDAPM of the floppy, which does not stay twice. Of the
-  mouse, `mouse-memory` has what a button does that goes down and comes
-  up in one place; left are the middle button, 13, and a button that is
-  moved while it is down, 14: from a line to above the lines or below
-  them, where the cursor goes on, and from beside the lines onto the
-  buttons.
+- Of the map, 51 instructions of 913 have run in no scenario and are
+  translated by reading: a map of more lines than its window has, 13 on
+  a screen of 25 lines, with the line that scrolls in, 22; a DOS before
+  version 4 or with a version of two digits, 15; a block of an unknown
+  owner, 4; and a second program that stays in the memory and is not
+  released with the first, 10. The bench has one such program, FDAPM of
+  the floppy, which does not stay twice. All that the map does for the
+  mouse runs: in `mouse-memory` what a button does that goes down and
+  comes up in one place, in `mouse-middle` the middle button, which
+  leaves the map, and in `mouse-drag-lists` a button that is moved
+  while it is down, from a line to above the lines or below them, where
+  the cursor goes on, and from beside the lines onto the buttons.
 - What the map does in the original and the port does after it:
   - A line with exactly eight vectors shows seven and three full stops,
     as one with more does: `MemItem` counts the vectors down in AL and
@@ -609,15 +619,15 @@ Things that are known and not done. Standing instructions are in
   - `menu.c`, none: `mouse-menu` has the rest of the menu bar.
   - `view.c`, `edit.c`, `find.c` and `treebox.c`, none: `mouse-view`,
     `mouse-edit`, `mouse-find` and `mouse-tree`.
-  - `dialog.c`, 2: `mouse-fields`, `mouse-line` and `mouse-filter` have
-    the fields of a dialog. Left are the middle button, and a button
-    moved off the button of a dialog that it went down on.
-  - `usermenu.c`, `cmdline.c` and `drive.c`, 2: `mouse-user-menu`,
+  - `dialog.c`, none: `mouse-fields`, `mouse-line` and `mouse-filter`
+    have the fields of a dialog.
+  - `usermenu.c`, `cmdline.c` and `drive.c`, none: `mouse-user-menu`,
     `mouse-history` and `mouse-drive` have the user menu, the history
-    and the box of the drives. Left is the middle button in the two
-    lists, which gives the pointer another look.
-  - `memory.c`, 27: `mouse-memory` has the map of the memory. Left are
-    the middle button, and a button moved while it is down.
+    and the box of the drives.
+  - `memory.c`, none: `mouse-memory` has the map of the memory.
+  - In all of these `mouse-middle` has the middle button, and
+    `mouse-drag-dialog`, `mouse-drag-menu` and `mouse-drag-lists` a
+    button that is moved while it is down.
   - `input.c`, none: `mouse-keys` has the right button on the key bar, a
     key of the bar that has no name, and the corners of the screen.
   - `keys.c`, none: `mouse-select` has the right button held below a
@@ -626,15 +636,7 @@ Things that are known and not done. Standing instructions are in
   with a count behind it, "Click@3,5*200"; one that goes down in one
   place and comes up in another has both, "Click@3,5>3,2"; the middle
   button is "MiddleClick@3,5"; and a row may be any of 50. See the top
-  of `harness/scenarios.py`. What such steps would still show, where the
-  instructions have run without them: the middle button on a key of
-  the key bar, which is the key with Shift, and on an item of the Files
-  menu, which is the item with Ctrl; a button let go beside the key of
-  the key bar or the letter of a drive that it went down on, which is
-  no key and no drive; a button held and moved along the menu bar, from
-  name to name and down a menu; a second click let go beside its line,
-  which chooses nothing; and the right button moved over the files of a
-  panel, which selects each.
+  of `harness/scenarios.py`.
 - `cmake --build build -j4` failed once in a new checkout, "The object is
   zero length" for one C file. Building without `-j` works.
 - A run of the harness that is killed outright leaves its QEMU running,
@@ -782,12 +784,13 @@ Things that are known and not done. Standing instructions are in
 
 - Of the user menu, the history and the box of the drives, these have
   run in no scenario and are listed as out of reach in
-  `harness/ported.py`: the middle button of the mouse in the two lists,
-  two instructions of `F32_70`; a box of the drives too wide for its
-  title, 15 letters or more; a drive that is not ready; and a list file
-  that DOS will not give attributes to or write. The rest of what they
-  do for the mouse runs in `mouse-user-menu`, `mouse-history` and
-  `mouse-drive`. A click on F1 or F10 of the key bar is the help or
+  `harness/ported.py`: a box of the drives too wide for its title, 15
+  letters or more; a drive that is not ready; and a list file that DOS
+  will not give attributes to or write. What they do for the mouse
+  runs, in `mouse-user-menu`, `mouse-history` and `mouse-drive`, with
+  the middle button, which leaves each of the three, in `mouse-middle`,
+  and a button that is moved while it is down in `mouse-drag-dialog`
+  and `mouse-drag-lists`. A click on F1 or F10 of the key bar is the help or
   leaves the user menu, where the key itself is a line's if the menu
   has one for it: `Input0` says which of the two a key was.
 - What the original does and the port does after it, found while the

@@ -569,13 +569,6 @@ BATCHES = [
                   "MnMn10", "MnMn40", "MnMn41", "MnMn50", "MnMn60"),
         functions=("Dialog_c",),
         unreached={
-            0x9D32: "Dialog, for the middle button of the mouse, or two "
-                    "buttons at once, which leave the dialog as Esc does: "
-                    "a step of the mouse presses the left button or the "
-                    "right one",
-            0xA181: "MnMn10, for a button of the mouse held on the button "
-                    "chosen and moved off it before it is let go: a step "
-                    "of the mouse presses and lets go in one place",
         },
     ),
     Batch(
@@ -593,12 +586,6 @@ BATCHES = [
                    "F68_00_c", "F82_01_c", "F74_00_c", "F73_00_c",
                    "F77_00_c"),
         unreached={
-            **dict.fromkeys(
-                (0x214C, 0x214E),
-                "F32_70, for the middle button of the mouse in the user "
-                "menu or the history, which gives the pointer another "
-                "look: a step of the mouse presses the left button or "
-                "the right one"),
             0x2201: "The box of the drives, for a DOS that cannot say "
                     "which letter a floppy drive goes by",
             0x2245: "The box of the drives, for more drives than fit a "
@@ -756,20 +743,6 @@ BATCHES = [
                  0x8255, 0x8257, 0x8259),
                 "F65_00, scrolling the lines by one: for a map of "
                 "more lines than its window has"),
-            **dict.fromkeys(
-                (0x82C7, 0x82C9, 0x82CC, 0x82CF, 0x82D2, 0x82D4, 0x82D6,
-                 0x82D7, 0x82D9, 0x82DC, 0x82DD, 0x82DF, 0x82E1),
-                "F65_00, for the middle button of the mouse, which "
-                "leaves the map: a step of the mouse presses the left "
-                "button or the right one"),
-            **dict.fromkeys(
-                (0x82FF, 0x8303, 0x8307, 0x8309, 0x830B, 0x830D, 0x830F,
-                 0x8312, 0x8314, 0x8316, 0x8318, 0x831A, 0x831C, 0x8336),
-                "F65_00, for a button of the mouse that goes down on a "
-                "line and is moved above the lines or below them, or "
-                "goes down beside the lines and is moved onto the "
-                "buttons: a step of the mouse presses and lets go in "
-                "one place"),
             **dict.fromkeys(
                 (0x84EA, 0x84EE, 0x84F0, 0x84F2, 0x84F5, 0x84F7, 0x84F9,
                  0x84FB, 0x8501, 0x8504),
