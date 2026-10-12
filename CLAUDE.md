@@ -608,9 +608,10 @@ them. The copy may be in another file than the text: `User_S` of
   round, and `Blank` while it waits; whatever makes it has to do so with
   DS on the main data and on the program's own stack, as C code does. And the
   driver reads `AutoTim` and `Clock` in the main data, which
-  `harness/driver.py` finds in the listing of the assembly,
-  `build/port/VC.LST`, and the stack, `DataSav` and `VcStack`, which it
-  finds in the linker's map next to it: when those four are no longer
+  `harness/driver.py` finds in the listing of the original,
+  `build/shareware-layout/VC.LST`, for the port too: its main data is
+  laid out as the original's. The port's stack, `DataSav` and
+  `VcStack`, it finds in the linker's map: when those two are no longer
   assembly, `harness/driver.py` has to be shown where they are.
 - What a routine reads in the assembly's code segment may be read by
   another file too, and then stays, `PUBLIC`, when the routine goes: the

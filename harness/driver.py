@@ -176,17 +176,19 @@ class Facts:
 
 
 def facts(program, stack=False):
-    """The Facts of `program`, a setups.Program, from the name of its
-    file and from the listing of its assembly. With `stack`, where its
-    stack is too: of the port, whose assembly is in several segments
-    with compiled code between them, by the linker's map, which the
-    build writes next to the listing."""
+    """The Facts of `program`, a setups.Program: its name, from that of
+    its file, and where AutoTim and Clock are in its main data, from the
+    listing of its assembly. The port has the listing of the original
+    for that: its main data is laid out as the original's. With `stack`,
+    where its stack is too: by the same listing, or for the port by the
+    linker's map, which the build writes next to it."""
     code = program.contents
     name = Path(program.filename).stem.upper().encode("ascii")
     if not program.listing or not Path(program.listing).exists():
         raise RuntimeError(
-            f"the driver needs the listing of {program.filename}, which "
-            "the build writes next to it")
+            f"the driver needs a listing for {program.filename}: its own, "
+            "which the build writes next to it, or for the port that of "
+            "the original, in build/shareware-layout")
     text = Path(program.listing).read_text(encoding="cp866")
 
     def symbol(pattern):
@@ -196,9 +198,8 @@ def facts(program, stack=False):
                   symbol(r"^ *AutoTim [ .]*([0-9A-F]+) +DWord"),
                   symbol(r"^ *Clock [ .]*([0-9A-F]+) +Byte"))
     if stack:
-        linked = Path(program.listing).with_suffix(".MAP")
-        if code[:2] == b"MZ" and linked.exists():
-            text = linked.read_text()
+        if program.linked:
+            text = Path(program.linked).read_text()
             bottom = symbol(r"^0000:([0-9a-f]{4})[*+]? +DataSav$")
             top = symbol(r"^0000:([0-9a-f]{4})[*+]? +VcStack$")
         else:

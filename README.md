@@ -604,7 +604,8 @@ host starts the machine and reads the file and the disks afterwards.
 The original and the port are driven alike, and neither is changed for it.
 What the driver has to know of a program, its name and where two of its
 variables are, it is told in the script, which takes that from the
-listing of the program's assembly. It knows the program's call of the
+listing of the original's assembly: the port keeps those variables
+where the original does. It knows the program's call of the
 idle interrupt from DOS's by where the call comes from: the memory of the
 program that DOS has as the current one, and that has that name. None of this is measured
 in time, and a busy computer makes a run slower, not different.

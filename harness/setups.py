@@ -89,13 +89,22 @@ class Program:
     # driver of the tests reads there where the program keeps what it
     # watches. Two programs are the same if their files are.
     listing: Path = field(default=None, compare=False)
+    # Of the port, the linker's map: where its stack is.
+    linked: Path = field(default=None, compare=False)
 
     @classmethod
     def load(cls, path):
         """The program in the file `path`, with the listing that the
-        build writes next to it."""
+        build writes next to it, or with the linker's map if it is the
+        port."""
         path = Path(path)
         contents = path.read_bytes()
+        if contents[:2] == b"MZ":
+            # The port has no assembly of its own to list: its main data
+            # is laid out as the original's, and what the driver watches
+            # there is where the original has it.
+            return cls(path.name.upper(), contents, LISTING,
+                       path.with_suffix(".MAP"))
         listing = path.with_suffix(".LST")
         if not listing.exists():
             # A copy of the original has the listing of the original.

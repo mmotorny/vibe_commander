@@ -10,7 +10,8 @@ and video mode, and leave the same files on its disks.
 The build is run as it is, and so is the original: a driver in the
 machine presses the keys and writes each screen out when the program has
 finished the step (see driver.py). The driver finds what it watches of a
-build in the listing that the build writes next to it.
+build in the listing that the build writes next to it, and of the port,
+whose main data is laid out as the original's, in the original's.
 
 Scenarios run side by side, each on a machine of its own, and are reported
 in their order.

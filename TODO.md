@@ -77,12 +77,11 @@ What names what:
   them any more.
 - The harness and the tools:
   - `harness/driver.py` reads where `AutoTim` and `Clock` are in the
-    main data from the assembler's listing, `build/port/VC.LST`, and
-    where the stack is, `DataSav` and `VcStack`, from the linker's map;
-    `harness/ported.py` takes the stack from the map too. The two
-    offsets are those of the original, which the listing of
-    `build/shareware-layout/` has, as long as the main data is laid out
-    as the original's; the stack wants two names in the map.
+    main data from the listing of the original, in
+    `build/shareware-layout/`, for the port too: its main data is laid
+    out as the original's. Where the stack is, `DataSav` and `VcStack`,
+    it takes from the linker's map, as `harness/ported.py` does; the
+    stack wants two names in the map when it is C.
   - `harness/datacheck.py` reads `VC.LST` and `VC.OBJ` of the port for
     what is still assembly, and does without them when they are gone.
   - `harness/coverage.py`, `harness/reach.py` and `harness/notice.py`
@@ -301,8 +300,7 @@ round the loop to a command that happens to read them.
   assemble: the last step, by one agent. No `VC.OBJ`, no listing of the
   port; the order of the segments and the two groups by the linker's
   command; the relocations of the second group in `tools/mkexe.c` and
-  `Reloc`; `harness/driver.py` with the original's listing for `AutoTim`
-  and `Clock`; `tools/routines.py`, `tools/flagscan.py` and what
+  `Reloc`; `tools/routines.py`, `tools/flagscan.py` and what
   `CLAUDE.md` and the README say of stubs and of the listing taken out.
   JWasm stays: it builds the original and the driver of the tests.
 
