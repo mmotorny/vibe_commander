@@ -62,10 +62,10 @@ void TrCr20(u16 lines);
 #pragma aux TreeCur "*_c" __far modify exact [ax]
 #pragma aux TrCr20  "*_c" __far parm [ax] modify exact [ax]
 
-/* What the assembly keeps of the tree, because its routines read it
-   there: the name of the tree file, which DelTr0 has too, and the boxes
-   that are shown while the disk is read and while the file is written,
-   which OncZoom takes by their offsets. */
+/* The tables of the tree, in port/treebox_t.c: the name of the tree
+   file, which DelTr0 has too, and the boxes that are shown while the
+   disk is read and while the file is written, which OncZoom takes by
+   their offsets. */
 extern const u8 __far Tree_F[];         /* "\TREEINFO.NCD" */
 extern const u8 __far Tree_P[];         /* "Scanning the directory..." */
 extern const u8 __far TrSav_P[];        /* "Saving the directory..." */

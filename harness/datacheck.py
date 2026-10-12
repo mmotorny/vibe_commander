@@ -369,8 +369,12 @@ class Port:
         for name, (address, kind, segment) in self.assembly.items():
             self.places[name].append(address)
             if kind == "data" and segment not in ("RDATA", "RGAP"):
-                end = min(there for there in ends[segment] if there > address)
-                self.objects.append(("assembly", name, address, end - address))
+                # A label with nothing of the assembly behind it is no
+                # object: TrnBeg, once the assembly's texts are gone.
+                behind = [there for there in ends[segment] if there > address]
+                if behind:
+                    self.objects.append(("assembly", name, address,
+                                         min(behind) - address))
 
         # The C code: an object of it is a symbol of a segment that is
         # no code, or one in the code that has an underscore in front, as

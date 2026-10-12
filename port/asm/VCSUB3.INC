@@ -2,16 +2,9 @@
 ;		Version :	09.09.1999
 ;-------------------------------------------------------
 
-; Of this file, and named by C code or by another file.
-	PUBLIC	Mask_S, Ext_F, Tree_F, Tree_P, TrSav_P, DrIn_F
-
 ;-------------- Read directory with save ---------------
 ;			    DS - WCBseg
 ;			AL = 0 - Without save
-	.CONST
-Mask_S	DB	'\*.*',0
-Ext_F	DB	'VC.EXT',0
-
 	.CODE
 ;			   ES - main data
 ;	Return :	CY=0 - what the panel shows has been read
@@ -46,32 +39,6 @@ ReDr70:	CMP	DS:ChgFlg,1		; Exit
 	RET
 ReDir	ENDP
 
-	.CONST
-Tree_F	DB	'\TREEINFO.NCD',0
-Scan1_S	DB	'Scanning the directory',0
-Scan2_S	DB	'structure on drive ^V:',0
-Scan3_S	DB	'0',0
-Scan4_S	DB	'Saving the',0
-Scan5_S	DB	'directory information...',0
-
-	.DATA
-Tree_P	DB	Box_C, 0, 0, 0
-	DB	4, 1
-	DW	OFFSET ErrBuf
-	DW	OFFSET MenuBuf
-	DB	0, 25
-	DW	OFFSET Tree_S
-	DW	OFFSET Scan1_S
-	DW	OFFSET Scan2_S
-	DW	OFFSET Scan3_S
-TrSav_P	DB	Box_C, 0, 0, 0
-	DB	3, 0
-	DW	OFFSET ErrBuf
-	DW	OFFSET Tree_S
-	DW	OFFSET Scan4_S
-	DW	OFFSET Scan5_S
-
-	.CODE
 ; Read the tree of the current disk, from its file or from the disk
 ;			   ES - main data
 ;	Return :	CY=1 - the drive is not ready any more
@@ -84,48 +51,13 @@ ReadTre	PROC	NEAR
 	RET
 ReadTre	ENDP
 
-	.CONST
-DrIn_F	DB	'DIRINFO',0
-
-	.CODE
-
 ;---------------------- Save setup ---------------------
 ; Saving the setup is C: SaveSet and MakeIni of port/setup.c, which only
-; C code calls. The name of the file stays here: the code that starts the
-; program reads the file too.
-	PUBLIC	Init_F
-	.CONST
-Init_F	DB	'VC.INI',0
+; C code calls. The name of the file is in port/system_t.c.
 
 ;-------------------- Fantom Diskette ------------------
 ;			AL - Disk ID
-	.CONST
-Fant0_S	DB	' Change drive ',0
-Fant1_S	DB	'Insert diskette for drive ^V:',0
-OkCan_S	DB	' Ok',0FFh,3,'Cancel',0
-
-	.DATA
-Fant_P	DB	Err_C, ErInv_C, ErInv_C, 0
-	DB	3, 1
-	DW	OFFSET ErrBuf1
-	DW	OFFSET TmpErr+1
-	DB	0, 25
-	DW	OFFSET Fant0_S
-	DW	OFFSET Fant1_S
-	DW	OFFSET OkCan_S
-Fant_B	DW	OFFSET Fant_P, 928h, 0
-	DB	2, 0FFh, 0FFh, 5
-	DB	4
-	DB	0, 0, 0, 0
-	DW	322h, OFFSET TmpErr, OFFSET OkCan_D
-	DB	0
-OkCan_D	DB	4, 0
-	DB	8, 5
-	DB	0
-
-	.CODE
 ; C: Fantom_c of port/system.c, which returns 1 if the user would not
-; change the disk. It has Dialog show the box here.
-	PUBLIC	Fant_B
+; change the disk. It has Dialog show the box of port/system_t.c.
 
 

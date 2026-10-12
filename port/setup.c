@@ -22,8 +22,9 @@
     ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
-/* AsmSeg returns the code segment of the assembly, where the name of the
-   file is: the code that starts the program reads it there too. */
+/* AsmSeg returns the code segment of the assembly, which the constants
+   of C are in too: the name of the file is one of port/system_t.c, and
+   the code that starts the program reads it there too. */
 u16 AsmSeg(void);
 extern const u8 __far Init_F[];
 #pragma aux AsmSeg "*_a" __far value [ax] modify exact [ax]

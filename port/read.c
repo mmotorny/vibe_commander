@@ -58,10 +58,10 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
 #pragma aux DiSi10  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux TstInfo "*_c" __far parm [ax] modify exact [ax]
 
-/* The names of files, in the assembly's code segment: Mask_S is \*.* and
-   Ext_F is VC.EXT. They are copied with MvzLine, which takes what follows
-   a text along, so they are the assembly's own, with what follows them
-   there, and not texts of this file. */
+/* The names of files: Mask_S is \*.* and Ext_F is VC.EXT. They are
+   copied with MvzLine, which takes what follows a text along, so they
+   are constants of port/system_t.c, written there with what follows
+   them in the original, and not texts of this file. */
 extern const u8 __far Mask_S[];
 extern const u8 __far Ext_F[];
 #pragma aux Mask_S "*"

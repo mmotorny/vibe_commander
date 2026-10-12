@@ -298,9 +298,9 @@ LAID_OUT(WCBdef, 0x1A62);
 extern struct MainDat __near md;
 
 /* Texts that the code of more than one file shows: the first two are
-   constants of port/main_t.c, the third is the assembly's. They are in
-   the group of the constants, so naming one costs a relocation. A file
-   of constants has them near, by port/tables.h. */
+   constants of port/main_t.c, the third is one of port/treebox_t.c.
+   They are in the group of the constants, so naming one costs a
+   relocation. A file of constants has them near, by port/tables.h. */
 extern const u8 __far Title_S[];        /* the program's name and version,
                                            behind two bytes of markup */
 extern const u8 __far Var_S[];          /* a line that is the text at

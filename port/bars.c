@@ -103,8 +103,8 @@ static const u8 CODE Key_S[34][6] = {
 };
 
 /* The menu bar: the names of its five menus, each behind four spaces, and
-   spaces to the end of the row. It is the assembly's, where the menu
-   reads it too. */
+   spaces to the end of the row. It is a constant of port/bars_t.c, which
+   the menu reads too. */
 extern const u8 __far PtMnu_S[];
 #pragma aux PtMnu_S "*"
 /* Its colour, as NgLine takes the colours of a line. The line switches to
@@ -115,7 +115,7 @@ static const u8 CODE PtMnu_B[] = { Menu_C };
    writes in, and return the address of the row below: `place` has the row
    in its high byte. The colour is read at CrntCol in the segment
    `segment`, which is that of the main data, MAIN_SEG, for every caller
-   but one (see the stub in port/asm/VCSUB2.INC). */
+   but one: Run_00 of port/usermenu.c. */
 u16 *ClsLine(u16 place, u16 segment)
 {
     u16 *screen = BasAdr(place & 0xFF00);

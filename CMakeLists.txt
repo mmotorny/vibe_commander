@@ -124,7 +124,7 @@ add_custom_target(shareware-relocations ALL DEPENDS ${layout_dir}/VC.OBJ)
 set(port_dir ${CMAKE_BINARY_DIR}/port)
 set(port_asm VC.ASM
     VCFUNC.INC VCMENU.INC VCF1.INC VCCOPY.INC VCVIEW.INC VCEDIT.INC
-    VCMEM.INC VCFIND.INC VCSUB1.INC VCSUB2.INC VCSUB3.INC)
+    VCMEM.INC VCFIND.INC VCSUB1.INC VCSUB3.INC)
 # Every C file in port/ is part of the program, in the order of their
 # names: a new one needs no mention here. The build looks again each time
 # it runs. One whose name ends in _t holds constants and no code: the

@@ -121,7 +121,9 @@ its file of the assembly is the first that is gone, with its texts, its
 box and its buttons constants of C.
 So is the tree of directories away from its panel: reading it from the
 disk, keeping it in its file there, and the box in which a directory is
-chosen from it. The file search is C as a whole: the command with its
+chosen from it; its title, the name of its file and the boxes shown
+while it is read and saved are constants of C, in `port/treebox_t.c`.
+The file search is C as a whole: the command with its
 dialog, the drives it searches and Go to, and the search itself, by name
 and by contents through a directory and those below it, with its list
 and the keys taken while it runs; its dialog, its buttons and their
@@ -168,8 +170,11 @@ that it may end in, opening a file, asking DOS for the current directory,
 and asking the user for the disk of a drive that shares the floppy drive
 with another. Saving the setup is C, and so is the jump from a key to its
 command, which was a table in the assembly. Of the three files of shared
-routines nothing is left but what passes the rest of the assembly on to
-the C, and texts.
+routines one is gone, and nothing is left of the others but what passes
+the rest of the assembly on to the C: the names of the menus in the
+menu bar are constants of C, in `port/bars_t.c`, and the names of the
+files that the program reads and the dialog that asks for a disk in
+`port/system_t.c`.
 The pull-down menus of the menu bar are C as well: the five menus with
 their ticks and the items that cannot be chosen as things are, and the
 keys and the mouse that the bar takes until an item is chosen. So are

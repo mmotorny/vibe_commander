@@ -18,7 +18,7 @@ object is what stands from one label to the next. "Code" is all that is
 no data: stubs, entries and what jumps between them. A file with nothing
 but code in its row has its data in C. `VC.ASM` had 14 texts of 696
 bytes: the fifteenth that was counted here was `TrnBeg`, a label where
-the first of them stood.
+the first of them stood. `VCSUB2.INC` was two texts and is gone.
 
 | File | texts | boxes | dialogs | buttons, colours | tables | code | goes with |
 |---|---|---|---|---|---|---|---|
@@ -32,9 +32,8 @@ the first of them stood.
 | `VCMEM.INC` | | | | | | 40 | `memory.c` |
 | `VCFIND.INC` | | | | | | 22 | `find.c` |
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
-| `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
-| `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 15 / 231 | 3 / 52 | 1 / 22 | 1 / 5 | 13 / 420 | 2,420 | |
+| `VCSUB3.INC` | | | | | | 109 | `treebox.c`, `system.c`, `read.c` |
+| all | | | | | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -91,9 +90,10 @@ What names what:
   `VC.ASM`; `Empty_S`, `Kov_S`,
   `YesNo_S`, `YesNo_D` of `port/keys_t.c`, which were of
   `VCFUNC.INC`; `OkCan_S`, `OkCan_D` of
-  `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`, which were of
+  `port/system_t.c`, which were of `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`, which were of
   `VCF1.INC`; `EdFl_S` of `port/view_t.c`, which was of `VCVIEW.INC`;
-  `Tree_S`, `PtMnu_S` of `VCSUB2.INC`. `VC.ASM` declares
+  `Tree_S` of `port/treebox_t.c` and `PtMnu_S` of `port/bars_t.c`,
+  which were of `VCSUB2.INC`. `VC.ASM` declares
   those `EXTERNDEF`, so that either side can name one wherever it is.
 - Code of the assembly names data in one place: the stub of the menu bar
   loads the offset of `PtMnu_S`.
@@ -182,7 +182,11 @@ where the title `ExFl_S` is one, 80 bytes, and `Chk1_S`, which is read
 as far as the end of `Chk2_S` behind it, is ten; `VCVIEW.INC`, where
 the names of the two extension files are such texts, 13 bytes each, and
 `Run2_S`, 80 bytes; `VCEDIT.INC`, which has none; the texts and boxes
-of `VC.ASM`, which have none either.
+of `VC.ASM`, which have none either; `VCSUB2.INC`, which is gone, and
+`VCSUB3.INC`, where four names of files are such texts: `Mask_S` and
+`Ext_F`, 69 and 68 bytes, which `MvzLine` copies as the 68 bytes of a
+path, the first from its second byte on, and `DrIn_F` and `Init_F`,
+the 13 bytes of a name.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for
@@ -507,7 +511,8 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
 - A name to search for that has a full stop gets four bytes behind it
   that follow `\*.*` in the assembly: a zero and "VC.", the start of
   the name of the main extension file. Nothing reads the three; the C
-  copies them from the assembly, `Mask_S`, as long as that has them.
+  copies them from `Mask_S`, a constant of `port/system_t.c`, which is
+  written with what follows it in the original.
 - `FindFil` calls itself, through `DirFunc`, once for every level of
   the directories it searches. The original took 18 bytes of its stack
   of 256 for a level, by reading; what the port takes of its 4,096 has
@@ -1430,19 +1435,18 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   that follow `VC.MNU`: both are copied from the assembly, `List_F` and
   `Menu_F`, as long as it has them. Nothing reads the six.
 
-- `VCSUB1.INC`, `VCSUB2.INC` and `VCSUB3.INC`, the shared routines, hold
-  no routine of the original any more but one, `CallPSP`. What is left
-  in them, and goes when what needs it is C:
+- `VCSUB1.INC` and `VCSUB3.INC`, the shared routines, hold no routine
+  of the original any more but one, `CallPSP`; `VCSUB2.INC` is gone.
+  What is left in them, and goes when what needs it is C:
   - Stubs, three of them: the routine's name, the call of the C
     function, and the registers and flags that the assembly which still
     calls it goes on with. `VCSUB1.INC` has one: `Dialog`, which the
     routine for DOS's critical error calls. The eight that the code
     which starts the program called, `ChkMode`, `ScrOffs`, `MvzLin0`,
     `MvzLine`, `AddFile`, `CutPath`, `PathLin` and `Cursor`, went when
-    that became C. `VCSUB2.INC` has
-    none: it is the names of the menus and the title of the tree.
-    `VCSUB3.INC` has two: `ReDir`, for the entry `ReDir_a` of the main
-    loop, and `ReadTre`, which the stub of `ReDir` calls. That of
+    that became C. `VCSUB3.INC` has two: `ReDir`, for the entry
+    `ReDir_a` of the main loop, and `ReadTre`, which the stub of `ReDir`
+    calls. That of
     `DiSi10`, whose address `DirSize` put into `FncAddr`, went when
     `FncAddr` came to hold a number. A stub that had lost its last caller went with this
     batch, 58 of them, behind the 38 that went with Enter, each with
@@ -1454,12 +1458,15 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     boxes and texts are, and `DialSub_a`, which calls what a dialog
     names for Enter. Neither calls an interrupt. `FncCall_a`, which
     called what `FncAddr` names, is a function of `port/dirfunc.c`.
-  - Texts and tables that the assembly reads, or C at its offset there:
-    the names of the menus, `PtMnu_S`; `Tree_S`; `Mask_S` and `Ext_F`;
-    the name of the tree's file and the two boxes shown while it is
-    read and saved; `DrIn_F`; `Init_F`, the name of the setup file,
-    which the code that starts the program reads too; and the dialog
-    that asks for a diskette, `Fant_B`, with its box and texts.
+  - No text or table: those are constants of `port/bars_t.c`,
+    `port/treebox_t.c` and `port/system_t.c`. Four names of files are
+    copied with what follows them, and are written there as long as what
+    is copied, with what the original has behind each: `Mask_S` and
+    `Ext_F`, 68 bytes by `MvzLine`, `DrIn_F` and `Init_F`, the 13 of a
+    name. While they were assembly the port had behind them what its
+    assembly still had, which was the original's as far as the name of
+    the tree's file and no further. Nothing is known to read those
+    bytes where they get to.
   - `CallPSP`, 6 bytes: a far call, by way of the stack, of a routine in
     the part of the program that stays in the memory. It is no routine
     to translate: C code makes such a call through a far pointer, as
