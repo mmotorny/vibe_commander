@@ -334,13 +334,6 @@ Things that are known and not done. Standing instructions are in
   its clock by the instructions executed (`-icount`), so that the guest's
   time no longer follows the host's. To be considered if timing shows up
   as failures.
-- The `port` test failed once without a cause being found: in
-  `stamps-russia`, after "Down Down Enter", the port's screen was taken
-  with the cursor moved and Enter not yet acted on. Four derivations of
-  goldens ran beside it, and the checkout was in the middle of a rebase,
-  with the harness as it was about to be committed. The next two runs
-  passed. If it is the signals, a W of the key before read after the
-  buffer was seen empty, it would show again under load.
 - `Machine.wait_for_prompt` takes a `>` before the cursor for the prompt
   of DOS. A command that leaves one there before it has finished would
   be taken for it; nothing runs after the program has ended in any

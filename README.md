@@ -343,7 +343,13 @@ starts from. One scenario, `clock`, switches the clock on again.
 The screen has to be read when the program has done all that a key makes
 it do, and not before. The variant of the port that the tests run says so
 itself (see [The port](#the-port)), and a scenario of twenty steps takes a
-second or two. The original cannot say, but it can be watched
+second or two. It says that it waits for a key, and with that where the
+keyboard buffer of the BIOS ended when it found nothing waiting there. The
+harness has seen every key of the step arrive in that buffer, so the step
+is finished when the program says that it waits with the buffer ending
+where it ends now, and not when it said so before it took the last key.
+
+The original cannot say, but it can be watched
 (`harness/watch.py`): the build of the source that is laid out like it is
 the same byte for byte, so its listing says where the original goes round
 while it waits for a key, and where it ends. QEMU's debugger stops the

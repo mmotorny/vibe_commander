@@ -2135,21 +2135,40 @@ def _watched(watched):
     return wait
 
 
+def _spelled(heard):
+    """Signals as they can be read: the letters, and in hexadecimal the
+    byte before W, S and T that says where the keyboard buffer ended."""
+    return "".join(signal if signal in "KWSTX" else f" {ord(signal):02X}"
+                   for signal in heard).strip()
+
+
 def _signalled(machine, where):
-    """Wait for the program to signal that it waits for a key, or that it
-    has ended, and return the screen and which of the two: whether it
-    waits. Leaves the machine paused if it does."""
-    heard = ""
+    """Wait for the program to signal that it waits for a key with every
+    key of the step taken, or that it has ended, and return the screen and
+    which of the two: whether it waits. Leaves the machine paused if it
+    does.
+
+    That the keyboard buffer is empty and the last word is W does not say
+    so: a key leaves the buffer before the program says K, and the W may
+    be that of the key before. The W says where the buffer ended when it
+    was given, with nothing waiting in it (see "Signals to the tests" in
+    port/asm/VC.ASM), and every key was seen to arrive there, so the W
+    that counts is one with the place where the buffer ends now. After 16
+    keys that is a place it has had before: the W must also have come
+    since the last key was pressed.
+    """
+    # What was signalled before the last key was pressed is old.
+    heard, old = machine.signals()
 
     def idle():
         nonlocal heard
-        if not machine.keys_taken():
+        head, tail = machine.keyboard()
+        if head != tail:
             return False
-        # Every key has been taken, and a key that is taken says K at once.
-        # So if the last word now is W, the program waits with nothing in
-        # hand.
-        heard += machine.signals()
-        return heard.endswith(("W", "X"))
+        heard += machine.signals()[0]
+        return heard.endswith("X") or (
+            len(heard) - old >= 2 and heard[-1] == "W"
+            and ord(heard[-2]) == tail % 256)
 
     try:
         machine.until(idle, STEP_TIME, "")
@@ -2158,7 +2177,8 @@ def _signalled(machine, where):
         shown = "\n".join(machine.screen().lines())
         raise MachineError(
             f"after {where}: the program did not come to wait for a key "
-            f"within {STEP_TIME} s; it signalled {heard!r} and shows\n"
+            f"within {STEP_TIME} s; it signalled {_spelled(heard)!r} and "
+            f"shows\n"
             f"{shown}") from None
     if heard.endswith("X"):
         # The program has ended; DOS then shows its prompt.

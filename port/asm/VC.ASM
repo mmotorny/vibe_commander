@@ -130,14 +130,24 @@ TakeLine MACRO	First, Scratch
 ;	T	it waits for a key, and will act by itself after a while
 ;	X	it ends
 ;
+; W, S and T say which keys the program has taken by then. The byte before
+; the letter is where the BIOS will put the next key in its keyboard
+; buffer, the low byte of KbTail, and they are signalled only while
+; nothing waits there. A key that the tests have seen arrive has moved
+; KbTail on, so a W with the place it has now is one that came after the
+; last key was taken, however slowly the tests look.
+;
 ; Without this the tests could only guess when the program has finished
 ; what a key started. The build that is shipped does none of it.
 ;
 ; The resident part must be as long in one build as in the other: the
-; memory it leaves free is shown on the screen. So what Signal assembles
-; is counted, and the local stack at the end of the resident part is that
-; much shorter (see LastRes). Only Signal may be used in the resident part.
+; memory it leaves free is shown on the screen. So what Signal and SigAsks
+; assemble is counted, and the local stack at the end of the resident part
+; is that much shorter (see LastRes). Only they may be used in the
+; resident part.
 SigPort	EQU	0E9h
+KbHead	EQU	41Ah			; In segment 0: where the BIOS takes
+KbTail	EQU	41Ch			; a key from its buffer, and puts one
 SigLen	=	0			; Bytes that Signal has assembled so far
 
 Signal	MACRO	Letter
@@ -146,6 +156,27 @@ IFDEF	HARNESS
 From:	PUSH	AX
 	MOV	AL,Letter
 	OUT	SigPort,AL
+	POP	AX
+SigLen	=	SigLen + ($ - From)
+ENDIF
+	ENDM
+
+; The resident part waits for a key, which it does inside the BIOS: signal
+; W unless a key is there already. Changes the flags.
+SigAsks	MACRO
+	LOCAL	From, Told
+IFDEF	HARNESS
+From:	PUSH	AX
+	PUSH	DS
+	XOR	AX,AX
+	MOV	DS,AX
+	MOV	AL,BYTE PTR DS:[KbTail]
+	CMP	AL,BYTE PTR DS:[KbHead]
+	JNE	Told
+	OUT	SigPort,AL
+	MOV	AL,'W'
+	OUT	SigPort,AL
+Told:	POP	DS
 	POP	AX
 SigLen	=	SigLen + ($ - From)
 ENDIF
@@ -171,26 +202,36 @@ ENDIF
 ENDIF
 	ENDM
 
-; The program has found no key and waits: signal W, S or T, unless that is
-; what was signalled last since SigNew. Expects DS to point at the main
-; data.
+; The program waits: signal W, S or T, unless a key is there for it to
+; take, or that is what was signalled last since SigNew, with KbTail as it
+; is. KbTail is read once, and before KbHead: a key that arrives meanwhile
+; is not missed, and only the program moves KbHead. Expects DS to point at
+; the main data.
 SigWait	MACRO
 	LOCAL	Which, Told
 IFDEF	HARNESS
 	PUSHF
 	PUSH	AX
-	MOV	AL,'T'
+	PUSH	DS
+	MOV	AH,'T'
 	CMP	DS:AutoTim.Lo,0FFFFh
 	JNE	Which
-	MOV	AL,'S'
+	MOV	AH,'S'
 	CMP	CS:SigKb,0
 	JNE	Which
-	MOV	AL,'W'
-Which:	CMP	AL,CS:SigSt
+	MOV	AH,'W'
+Which:	MOV	DS,CS:SigNul
+	MOV	AL,BYTE PTR DS:[KbTail]
+	CMP	AL,BYTE PTR DS:[KbHead]
+	JNE	Told
+	CMP	AX,CS:SigSt
 	JE	Told
-	MOV	CS:SigSt,AL
+	MOV	CS:SigSt,AX
 	OUT	SigPort,AL
-Told:	POP	AX
+	MOV	AL,AH
+	OUT	SigPort,AL
+Told:	POP	DS
+	POP	AX
 	POPF
 ENDIF
 	ENDM
@@ -831,7 +872,7 @@ NotFind	PROC	NEAR
 	PUSH	CS
 	CALL	OutStr0
 	POP	DS
-NotFn1:	Signal	'W'
+NotFn1:	SigAsks
 	MOV	AH,0
 	INT	16h
 	Signal	'K'
@@ -2980,7 +3021,9 @@ OkMn_D	DB	4, 0
 SecDat	DW	0
 RelDone	DB	0			; 1 when this copy has been relocated
 IFDEF	HARNESS
-SigSt	DB	0			; The last of W, S and T signalled
+SigSt	DW	0			; The last of W, S and T signalled,
+					; with KbTail in the low byte
+SigNul	DW	0			; Segment 0
 SigKb	DB	0			; The shift keys the key bar shows
 ENDIF
 

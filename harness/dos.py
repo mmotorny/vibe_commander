@@ -284,6 +284,7 @@ class Machine:
         self._command("qmp_capabilities")
         self._signals = self._connect(signals)
         self._heard = ""                                 # signals not yet used
+        self._stale = 0                 # how many are from before the last key
         self._debugger = None
         if state:
             self.until(lambda: self._command("query-status")["status"]
@@ -426,6 +427,10 @@ class Machine:
             tail = self._keyboard()[1]
 
             def send():
+                # What the guest has signalled so far says nothing about
+                # this key.
+                self._listen()
+                self._stale = len(self._heard)
                 if watch:
                     # Down and up in one: the program may act on the key
                     # and have the machine stopped before a second command.
@@ -469,9 +474,23 @@ class Machine:
         head, tail = self._keyboard()
         return head == tail
 
+    def keyboard(self):
+        """Where the BIOS takes a key from its keyboard buffer and where
+        it puts the next: the buffer is empty when they are the same."""
+        return self._keyboard()
+
     def signals(self):
         """What the guest has signalled since this was last asked, as text:
-        the bytes it wrote to the signal port."""
+        the bytes it wrote to the signal port. And how many of them it
+        had written before the last key was pressed, if one has been
+        pressed since this was last asked: otherwise 0."""
+        self._listen()
+        heard, stale = self._heard, self._stale
+        self._heard, self._stale = "", 0
+        return heard, stale
+
+    def _listen(self):
+        """Take what the guest has signalled by now."""
         self._signals.setblocking(False)
         try:
             while True:
@@ -481,8 +500,6 @@ class Machine:
                 self._heard += data.decode("latin-1")
         except BlockingIOError:
             pass
-        heard, self._heard = self._heard, ""
-        return heard
 
     def screen(self):
         """The text screen as it is now. Pause the machine first if the
