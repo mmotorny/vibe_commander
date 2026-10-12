@@ -284,9 +284,20 @@ Things that are known and not done. Standing instructions are in
   8C1D-8C46, and others from one time to the next. So `find.ran` was left
   as it was recorded the old way when the other goldens were derived
   again. The cure is in the scenario and the harness, not in timing: have
-  the scenario name a place in the search, and the watch press the key
-  when the original reaches it. Shift, Ctrl and Alt of such a key are
-  held for 20 ms of the host.
+  the scenario name a place in the search, and the watch put the key in
+  when the original reaches it. Tried for the original, and it works:
+  steps written "Enter Right@FndBk1 F1@FndBk1", the machine stopped at
+  `FndBk1` from the key before on, and the key written into the keyboard
+  buffer of the BIOS there, since a paused machine takes no keys. Home
+  after the Enter of two more steps wants the same. Three derivations
+  then had the same `find.ran`, and the screens of the golden. What is
+  missing is the same moment in the port. Its search asks for a key
+  through `Int16_a`, which the map has, but another entry begins with
+  the same bytes, and the port was not found at the distance the map
+  gives from its first bytes or from the next symbol; it was not found
+  out why. A label of its own in the build that signals, where the
+  search looks for a key, would be surer. Shift, Ctrl and Alt of such a
+  key are held for 20 ms of the host.
 - The machine's own clock runs with the host's while the machine runs,
   however much of the processor the machine gets. What the program does
   by its timer, following the cursor to a directory after 0.6 s or
