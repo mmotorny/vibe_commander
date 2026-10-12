@@ -76,8 +76,12 @@ not in Claude's memory: memory does not travel between computers.
   report it; whether to fix it is decided separately.
 - Translated code keeps the names that routines and data have in the
   assembly, until the whole program is C.
-- Size matters, but need not be chased: twice the original is fine, ten
-  times would be a red flag.
+- DOS is a stage on the way: the aim is to carry the program to modern
+  operating systems, where a few kilobytes of memory or of disk mean
+  nothing. So the port may be larger than the original and use more
+  memory, the part that stays in memory while a command runs included,
+  as long as it behaves the same. Spend no effort on making it small.
+  Ten times the original's size would still be a red flag.
 
 ## Translating a batch
 
