@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -72,7 +72,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║    Toggle inactive panel on/off    ^P                          ║      ║| 1Bx4 30x40 3Ex2 30x30 03x2 1Bx2
 |║emp   ║    Swap panels                     ^U                          ║   ───╢| 1Bx4 30x40 3Ex2 30x30 03x2 1Bx2
 |║      ║    Compare directories             ^C                          ║      ║| 1Bx4 30x40 3Ex2 30x30 03x2 1Bx2
-|║      ║    Toggle status panel             ^L                          ║   ry ║| 1Bx4 30x40 3Ex2 30x30 03x2 1Bx2
+|║      ║    Toggle status panel             ^L                          ║   ry ║| 1Bx4 30x36 47x1 30x3 3Ex2 30x30 03x2 1Bx2
 |║      ║    Toggle tree panel               ^Z                          ║      ║| 1Bx4 30x40 3Ex2 30x30 03x2 1Bx2
 |║      ║    Toggle function key bar on/off  ^B                          ║      ║| 1Bx4 30x40 3Ex2 30x30 03x2 1Bx2
 |║      ║    Reread directory/tree           ^R                          ║      ║| 1Bx4 30x40 3Ex2 30x30 03x2 1Bx2
@@ -100,7 +100,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║    Select group                    Gray +                      ║      ║| 1Bx4 30x40 3Ex6 30x26 03x2 1Bx2
 |║emp   ║    Unselect group                  Gray -                      ║   ───╢| 1Bx4 30x40 3Ex6 30x26 03x2 1Bx2
 |║      ║    Invert group                    Gray *  when command line   ║      ║| 1Bx4 30x40 3Ex6 30x26 03x2 1Bx2
-|║      ║                                            is empty            ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                                            is empty            ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║    Restore selection               ^M                          ║      ║| 1Bx4 30x40 3Ex2 30x30 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║ ──────────────────────── Command line ──────────────────────── ║      ║| 1Bx4 30x30 3Fx12 30x30 03x2 1Bx2
@@ -128,7 +128,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║   40 characters left               ^A   or  ^←                 ║      ║| 1Bx4 30x40 3Ex2 30x7 3Ex2 30x21 03x2 1Bx2
 |║emp   ║   40 characters right              ^F   or  ^→                 ║   ───╢| 1Bx4 30x40 3Ex2 30x7 3Ex2 30x21 03x2 1Bx2
 |║      ║   Line up                          ^E   or  ↑                  ║      ║| 1Bx4 30x40 3Ex2 30x7 3Ex1 30x22 03x2 1Bx2
-|║      ║   Line down                        ^X   or  ↓                  ║   ry ║| 1Bx4 30x40 3Ex2 30x7 3Ex1 30x22 03x2 1Bx2
+|║      ║   Line down                        ^X   or  ↓                  ║   ry ║| 1Bx4 30x36 47x1 30x3 3Ex2 30x7 3Ex1 30x22 03x2 1Bx2
 |║      ║   Page up                          ^R   or  PgUp               ║      ║| 1Bx4 30x40 3Ex2 30x7 3Ex4 30x19 03x2 1Bx2
 |║      ║   Page down                        ^C   or  PgDn               ║      ║| 1Bx4 30x40 3Ex2 30x7 3Ex4 30x19 03x2 1Bx2
 |║      ║   Start of file                    Home or  ^Home              ║      ║| 1Bx4 30x40 3Ex4 30x5 3Ex5 30x18 03x2 1Bx2
@@ -156,7 +156,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

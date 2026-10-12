@@ -207,9 +207,24 @@ out again (show.py --changes is how):
     program waits for one and has taken the one before. Keys written as
     one name, "Enter+Home", go into the keyboard buffer together, and
     that holds 15.
-  - There is no mouse on the bench, and nothing sets the kind of a panel
-    to anything but files, tree and Info: what the program does for a
-    mouse or for a fourth kind of panel cannot be reached.
+  - The bench has a mouse, with FreeDOS's driver for it. The pointer is
+    on every screen, a cell whose colours are exchanged: in the middle,
+    column 40 of row 12, until a step moves it, and it stays where a
+    step leaves it. "Click@3,5" moves it to column 3 of row 5 and
+    presses the left button, "RightClick@3,6" the right one, and
+    "Move@40,12" only moves it. The button stays down until the program
+    has asked 20 times where the mouse is, or "Click@1,24*4" 4 times:
+    what the program does while a button is held, it does that often.
+    The left button on a file puts the cursor there and the right one
+    selects it; on a name of the key bar it is that key; on the top
+    line it brings up the menu bar with the menu under the pointer
+    open; on an item of a menu it is the item, and beside a menu it
+    closes it; in a dialog it is on a button or in a field. The
+    scenarios mouse-panel, mouse-bars and mouse-dialog have each of
+    these once.
+  - Nothing sets the kind of a panel to anything but files, tree and
+    Info: what the program does for a fourth kind of panel cannot be
+    reached.
   - No panel may show D:\\VC: the program is VC.COM there or VC.EXE, of
     another size, and with it what the Info says is free on D:. A file
     of that directory is opened by its path: Shift+F4 and
@@ -3178,6 +3193,38 @@ SCENARIOS = {
             "Right Enter",                # go on: the same again
             "Enter",
         )),
+    "mouse-panel": Scenario(
+        "The mouse on a panel of files: the left button puts the cursor "
+        "on a file, the right one selects it",
+        steps=(
+            "Click@3,5",                  # the cursor onto readme.txt
+            "Click@3,8",                  # and onto data.bin
+            "RightClick@3,6",             # hello.txt selected
+            "RightClick@3,6",             # and not
+            "Move@40,12",                 # the pointer by itself
+        )),
+
+    "mouse-bars": Scenario(
+        "The mouse on the key bar, on the top line, which brings up the "
+        "menu bar, and on an item of a menu",
+        steps=(
+            "Click@1,24",                 # F1 of the key bar: the help
+            "Click@45,20",                # its button Cancel
+            "Click@10,0",                 # the top line: the Files menu
+            "Click@12,3",                 # its item User menu
+            "Click@60,12",                # beside the menu: it closes
+        )),
+
+    "mouse-dialog": Scenario(
+        "The mouse on the buttons of a dialog",
+        steps=(
+            "Click@3,5",
+            "Click@45,24",                # F6 of the key bar: Rename
+            "Click@55,10",                # its button Cancel
+            "Click@37,24",                # F5: Copy
+            "Click@40,10",                # the button in the middle
+        )),
+
 }
 
 

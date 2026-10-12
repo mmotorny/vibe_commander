@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -72,7 +72,7 @@ cursor 25 6 lines 6 7 mode 3
 |║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 |║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -100,7 +100,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 0 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -184,7 +184,7 @@ cursor 0 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -212,7 +212,7 @@ cursor 19 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -240,7 +240,7 @@ cursor 0 3 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -268,7 +268,7 @@ cursor 0 4 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -296,7 +296,7 @@ cursor 0 5 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -324,7 +324,7 @@ cursor 0 6 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -352,7 +352,7 @@ cursor 0 7 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -380,7 +380,7 @@ cursor 0 8 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔══════════════════════════════ User Menu Help ══════════════════════════════╗ | 30x80
@@ -408,7 +408,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -436,7 +436,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    ╚═══════════════╝        C:\WORK                ║| 1Bx28 3Fx23 03x2 1Bx27
 |║empty    dat│            │                        ────────────────────────────╢| 1Bx28 3Fx23 03x2 1Bx27
 |║vc       mnu│            │            ║║                                      ║| 1Bx30 03x23 1Bx27
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -464,7 +464,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -492,7 +492,7 @@ cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|                                                                                | 07x80
+|                                                                                | 07x40 70x1 07x39
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -520,7 +520,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -548,7 +548,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -576,7 +576,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -604,7 +604,7 @@ cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |C:\WORK>echo .. ! C: \WORK\                                                     | 07x80
-|.. ! C: \WORK\                                                                  | 07x80
+|.. ! C: \WORK\                                                                  | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>echo t                                                                  | 07x80
 |t                                                                               | 07x80
@@ -632,7 +632,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -660,7 +660,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -688,7 +688,7 @@ cursor 8 23 lines 6 7 mode 3
 |t                                                                               | 07x80
 |                                                                                | 07x80
 |C:\WORK>echo readme.txt ! C: \WORK\ readme                                      | 07x80
-|readme.txt ! C: \WORK\ readme                                                   | 07x80
+|readme.txt ! C: \WORK\ readme                                                   | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>echo t                                                                  | 07x80
 |t                                                                               | 07x80
@@ -716,7 +716,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -744,7 +744,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -772,7 +772,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -800,7 +800,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -828,7 +828,7 @@ cursor 8 23 lines 6 7 mode 3
 |t                                                                               | 07x80
 |                                                                                | 07x80
 |D:\VC\vc.lst                                                                    | 07x80
-|                                                                                | 07x80
+|                                                                                | 07x40 70x1 07x39
 |C:\WORK>ver                                                                     | 07x80
 |                                                                                | 07x80
 |FreeCom version 0.86 - WATCOMC - XMS_Swap [Dec 30 2024 22:10:51]                | 07x80
@@ -856,7 +856,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -884,7 +884,7 @@ cursor 25 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -912,7 +912,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -940,7 +940,7 @@ cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |FreeCom version 0.86 - WATCOMC - XMS_Swap [Dec 30 2024 22:10:51]                | 07x80
 |                                                                                | 07x80
-|D:\VC\vc.lst                                                                    | 07x80
+|D:\VC\vc.lst                                                                    | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>ver                                                                     | 07x80
 |                                                                                | 07x80
@@ -968,7 +968,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -996,7 +996,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1024,7 +1024,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1052,7 +1052,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    ╚═══════════════╝        C:\WORK                ║| 1Bx28 3Fx23 03x2 1Bx27
 |║empty    dat│            │                        ────────────────────────────╢| 1Bx28 3Fx23 03x2 1Bx27
 |║vc       mnu│            │            ║║                                      ║| 1Bx30 03x23 1Bx27
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1080,7 +1080,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1108,7 +1108,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1136,7 +1136,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│           ║ F4  Edit file              ║   \WORK                ║| 1Bx22 3Fx36 03x2 1Bx20
 |║empty    dat│           ╚════════════════════════════╝   ─────────────────────╢| 1Bx22 3Fx36 03x2 1Bx20
 |║vc       mnu│                                                                 ║| 1Bx22 3Fx36 03x2 1Bx20
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx24 03x36 1Bx20
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx24 03x16 74x1 03x19 1Bx20
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1164,7 +1164,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1192,7 +1192,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>type d:\vc\vc.lst                                                       | 07x80
 |DOCS\*.*                                                                        | 07x80
 |readme.txt                                                                      | 07x80
-|hello.txt                                                                       | 07x80
+|hello.txt                                                                       | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>echo notes.doc ! C: \WORK\ notes                                        | 07x80
 |notes.doc ! C: \WORK\ notes                                                     | 07x80
@@ -1220,7 +1220,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1248,7 +1248,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
 |║vc       mnu│            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1276,7 +1276,7 @@ cursor 0 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔═══════════════════════════ Extension File Help ════════════════════════════╗ | 30x80
@@ -1304,7 +1304,7 @@ cursor 18 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄| 13x80
 | ╔═══════════════════════════ Extension File Help ════════════════════════════╗ | 30x80
@@ -1332,7 +1332,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1360,7 +1360,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1388,7 +1388,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1416,7 +1416,7 @@ cursor 8 23 lines 6 7 mode 3
 |hello.txt                                                                       | 07x80
 |                                                                                | 07x80
 |C:\WORK>echo notes.doc ! C: \WORK\ notes                                        | 07x80
-|notes.doc ! C: \WORK\ notes                                                     | 07x80
+|notes.doc ! C: \WORK\ notes                                                     | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>echo t                                                                  | 07x80
 |t                                                                               | 07x80
@@ -1444,7 +1444,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1472,7 +1472,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
 |║vc       mnu│            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1500,7 +1500,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1528,7 +1528,7 @@ cursor 8 23 lines 6 7 mode 3
 |notes.doc ! C: \WORK\ notes                                                     | 07x80
 |                                                                                | 07x80
 |C:\WORK>echo t                                                                  | 07x80
-|t                                                                               | 07x80
+|t                                                                               | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>ne notes.doc                                                            | 07x80
 |Bad command or filename - "ne".                                                 | 07x80
@@ -1556,7 +1556,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1584,7 +1584,7 @@ cursor 8 23 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -1612,7 +1612,7 @@ cursor 8 23 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -1640,7 +1640,7 @@ cursor 8 23 lines 6 7 mode 3
 |Bad command or filename - "ne".                                                 | 07x80
 |                                                                                | 07x80
 |C:\WORK>echo readme.txt readme                                                  | 07x80
-|readme.txt readme                                                               | 07x80
+|readme.txt readme                                                               | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>echo ..\work\hello.txt ..\work\hello                                    | 07x80
 |..\work\hello.txt ..\work\hello                                                 | 07x80
@@ -1668,7 +1668,7 @@ cursor 8 23 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -1696,7 +1696,7 @@ cursor 8 23 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -1724,7 +1724,7 @@ cursor 8 23 lines 6 7 mode 3
 |..\work\hello.txt ..\work\hello                                                 | 07x80
 |                                                                                | 07x80
 |C:\WORK>echo  ! C: \WORK\                                                       | 07x80
-| ! C: \WORK\                                                                    | 07x80
+| ! C: \WORK\                                                                    | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>echo t                                                                  | 07x80
 |t                                                                               | 07x80
@@ -1752,7 +1752,7 @@ cursor 8 23 lines 6 7 mode 3
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║╟──────────────────────────────────────╢| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
-|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║                                      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
 |║                                      ║║                                      ║| 1Bx80
@@ -1780,7 +1780,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1808,7 +1808,7 @@ cursor 8 23 lines 6 7 mode 3
 |..\work\hello.txt ..\work\hello                                                 | 07x80
 |                                                                                | 07x80
 |C:\WORK>echo  ! C: \WORK\                                                       | 07x80
-| ! C: \WORK\                                                                    | 07x80
+| ! C: \WORK\                                                                    | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>echo t                                                                  | 07x80
 |t                                                                               | 07x80
@@ -1836,7 +1836,7 @@ cursor 0 127 lines 6 7 mode 3
 |..\work\hello.txt ..\work\he   ╚═══════════════╝                                | 07x28 3Fx23 0Fx2 07x27
 |                                                                                | 07x28 3Fx23 0Fx2 07x27
 |C:\WORK>echo  ! C: \WORK\                                                       | 07x30 0Fx23 07x27
-| ! C: \WORK\                                                                    | 07x80
+| ! C: \WORK\                                                                    | 07x40 70x1 07x39
 |                                                                                | 07x80
 |C:\WORK>echo t                                                                  | 07x80
 |t                                                                               | 07x80
@@ -1864,7 +1864,7 @@ cursor 8 23 lines 6 7 mode 3
 |t                                                                               | 07x80
 |                                                                                | 07x80
 |D:\VC\vc.lst                                                                    | 07x80
-|                                                                                | 07x80
+|                                                                                | 07x40 70x1 07x39
 |C:\WORK>ver                                                                     | 07x80
 |                                                                                | 07x80
 |FreeCom version 0.86 - WATCOMC - XMS_Swap [Dec 30 2024 22:10:51]                | 07x80
@@ -1892,7 +1892,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║vc       mnu│            │            ║║                                      ║| 1Bx80
-|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║vcview   ext│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

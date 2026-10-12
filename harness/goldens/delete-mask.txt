@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -72,7 +72,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│             ║    Delete   Cancel    ║    C:\WORK                ║| 1Bx24 70x7 30x8 70x16 03x2 1Bx23
 |║empty    dat│             ╚═══════════════════════╝   ────────────────────────╢| 1Bx24 70x31 03x2 1Bx23
 |║            │                                                                 ║| 1Bx24 70x31 03x2 1Bx23
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx26 03x31 1Bx23
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx26 03x14 74x1 03x16 1Bx23
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -100,7 +100,7 @@ cursor 8 23 lines 6 7 mode 3
 |║empty    dat│            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 8 8 lines 6 7 mode 3
 |║em   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 18 8 lines 6 7 mode 3
 |║em   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -183,8 +183,8 @@ cursor 0 127 lines 6 7 mode 3
 |║empty    dat│            │                             C:\WORK                ║| 1Bx27 4Fx25 1Bx28
 |║            │            │   ╔═════ Delete ════╗   ───────────────────────────╢| 1Bx27 4Fx25 03x2 1Bx26
 |║            │            │   ║ Can't find file ║                              ║| 1Bx27 4Fx25 03x2 1Bx26
-|║            │            │   ║    nosuch.txt   ║   fo' file in this directory ║| 1Bx27 4Fx25 03x2 1Bx26
-|║            │            │   ║        Ok       ║                              ║| 1Bx27 4Fx11 70x4 4Fx10 03x2 1Bx26
+|║            │            │   ║    nosuch.txt   ║   fo' file in this directory ║| 1Bx27 4Fx13 38x1 4Fx11 03x2 1Bx26
+|║            │            │   ║        Ok       ║                              ║| 1Bx27 4Fx11 70x2 07x1 70x1 4Fx10 03x2 1Bx26
 |║            │            │   ╚═══════ Ok ══════╝                              ║| 1Bx27 4Fx11 70x4 4Fx10 03x2 1Bx26
 |║            │            │                                                    ║| 1Bx27 4Fx25 03x2 1Bx26
 |║            │            │            ║║                                      ║| 1Bx29 03x25 1Bx26
@@ -212,7 +212,7 @@ cursor 8 23 lines 6 7 mode 3
 |║empty    dat│            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -240,7 +240,7 @@ cursor 8 8 lines 6 7 mode 3
 |║em   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -268,7 +268,7 @@ cursor 13 8 lines 6 7 mode 3
 |║em   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -296,7 +296,7 @@ cursor 0 127 lines 6 7 mode 3
 |║empty    dat│      ║               SRC\*.*?              ║   K                ║| 1Bx17 4Fx45 03x2 1Bx16
 |║            │      ║           Delete   Cancel           ║   ─────────────────╢| 1Bx17 4Fx14 70x8 4Fx23 03x2 1Bx16
 |║            │      ╚═════════════════════════════════════╝                    ║| 1Bx17 4Fx45 03x2 1Bx16
-|║            │                                                n this directory ║| 1Bx17 4Fx45 03x2 1Bx16
+|║            │                                                n this directory ║| 1Bx17 4Fx23 38x1 4Fx21 03x2 1Bx16
 |║            │            │            ║║                                      ║| 1Bx19 03x45 1Bx16
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -324,7 +324,7 @@ cursor 8 23 lines 6 7 mode 3
 |║empty    dat│            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -352,7 +352,7 @@ cursor 8 8 lines 6 7 mode 3
 |║em   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -380,7 +380,7 @@ cursor 11 8 lines 6 7 mode 3
 |║em   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -408,7 +408,7 @@ cursor 0 127 lines 6 7 mode 3
 |║empty    dat│      ║      in the current directory?      ║   K                ║| 1Bx17 4Fx45 03x2 1Bx16
 |║            │      ║           Delete   Cancel           ║   ─────────────────╢| 1Bx17 4Fx14 70x8 4Fx23 03x2 1Bx16
 |║            │      ╚═════════════════════════════════════╝                    ║| 1Bx17 4Fx45 03x2 1Bx16
-|║            │                                                n this directory ║| 1Bx17 4Fx45 03x2 1Bx16
+|║            │                                                n this directory ║| 1Bx17 4Fx23 38x1 4Fx21 03x2 1Bx16
 |║            │            │            ║║                                      ║| 1Bx19 03x45 1Bx16
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -436,7 +436,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -464,7 +464,7 @@ cursor 8 8 lines 6 7 mode 3
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -492,7 +492,7 @@ cursor 13 8 lines 6 7 mode 3
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -520,7 +520,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │      ║                B:*.*?               ║   K                ║| 1Bx17 4Fx45 03x2 1Bx16
 |║            │      ║           Delete   Cancel           ║   ─────────────────╢| 1Bx17 4Fx14 70x8 4Fx23 03x2 1Bx16
 |║            │      ╚═════════════════════════════════════╝                    ║| 1Bx17 4Fx45 03x2 1Bx16
-|║            │                                                n this directory ║| 1Bx17 4Fx45 03x2 1Bx16
+|║            │                                                n this directory ║| 1Bx17 4Fx23 38x1 4Fx21 03x2 1Bx16
 |║            │            │            ║║                                      ║| 1Bx19 03x45 1Bx16
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -548,7 +548,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │                                             WORK                ║| 1Bx21 4Fx38 1Bx21
 |║            │          ╔════════ Change drive ════════╗   ────────────────────╢| 1Bx21 4Fx38 03x2 1Bx19
 |║            │          ║ Insert diskette for drive B: ║                       ║| 1Bx21 4Fx38 03x2 1Bx19
-|║            │          ║          Ok   Cancel         ║   e in this directory ║| 1Bx21 4Fx13 70x4 4Fx21 03x2 1Bx19
+|║            │          ║          Ok   Cancel         ║   e in this directory ║| 1Bx21 4Fx13 70x4 4Fx2 38x1 4Fx18 03x2 1Bx19
 |║            │          ╚══════════════════════════════╝                       ║| 1Bx21 4Fx38 03x2 1Bx19
 |║            │                                                                 ║| 1Bx21 4Fx38 03x2 1Bx19
 |║            │            │            ║║                                      ║| 1Bx23 03x38 1Bx19
@@ -576,7 +576,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -604,7 +604,7 @@ cursor 8 8 lines 6 7 mode 3
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -632,7 +632,7 @@ cursor 16 8 lines 6 7 mode 3
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                            ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -660,7 +660,7 @@ cursor 0 127 lines 6 7 mode 3
 |║            │      ║              DOCS\*.*?              ║   K                ║| 1Bx17 4Fx45 03x2 1Bx16
 |║            │      ║           Delete   Cancel           ║   ─────────────────╢| 1Bx17 4Fx14 70x8 4Fx23 03x2 1Bx16
 |║            │      ╚═════════════════════════════════════╝                    ║| 1Bx17 4Fx45 03x2 1Bx16
-|║            │                                                n this directory ║| 1Bx17 4Fx45 03x2 1Bx16
+|║            │                                                n this directory ║| 1Bx17 4Fx23 38x1 4Fx21 03x2 1Bx16
 |║            │            │            ║║                                      ║| 1Bx19 03x45 1Bx16
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -687,8 +687,8 @@ cursor 0 127 lines 6 7 mode 3
 |║            │            │                             C:\WORK                ║| 1Bx27 4Fx26 1Bx27
 |║            │            │   ╔═════ Delete ═════╗   ──────────────────────────╢| 1Bx27 4Fx26 03x2 1Bx25
 |║            │            │   ║ Can't find files ║                             ║| 1Bx27 4Fx26 03x2 1Bx25
-|║            │            │   ║     DOCS\*.*     ║   o' file in this directory ║| 1Bx27 4Fx26 03x2 1Bx25
-|║            │            │   ║        Ok        ║                             ║| 1Bx27 4Fx11 70x4 4Fx11 03x2 1Bx25
+|║            │            │   ║     DOCS\*.*     ║   o' file in this directory ║| 1Bx27 4Fx13 38x1 4Fx12 03x2 1Bx25
+|║            │            │   ║        Ok        ║                             ║| 1Bx27 4Fx11 70x2 07x1 70x1 4Fx11 03x2 1Bx25
 |║            │            │   ╚═══════ Ok ═══════╝                             ║| 1Bx27 4Fx11 70x4 4Fx11 03x2 1Bx25
 |║            │            │                                                    ║| 1Bx27 4Fx26 03x2 1Bx25
 |║            │            │            ║║                                      ║| 1Bx29 03x26 1Bx25
@@ -716,7 +716,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

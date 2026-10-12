@@ -349,6 +349,13 @@ is a third of the time of a scenario with dialogs or more.
 `python3 harness/place.py` says where the stacks of the original and of
 the port end on each bench.
 
+Both machines have a mouse: the PS/2 mouse of QEMU's PC, and FreeDOS's
+driver for it, CuteMouse, which the boot floppy lacks and the harness adds.
+The program finds the driver and shows the pointer, a cell of the screen
+with its colours exchanged, in the middle of every screen until a
+scenario moves it. A step moves the mouse and presses its buttons by the
+cell it goes to: "Click@3,5", "RightClick@3,6", "Move@40,12".
+
 The Russian machine also has a Russian keyboard: the keyboard driver of
 FreeDOS with its Russian layout, which the boot floppy lacks and the
 harness adds. It types Latin letters until Alt and the right Shift select
@@ -381,11 +388,21 @@ keyboard would send, handed to the keyboard controller with the command
 it has for that, so the BIOS, and on the Russian machine the keyboard
 driver of DOS, make of them what they make of a keyboard's: the key in the
 BIOS's buffer, and Shift, Ctrl and Alt in its flags. Every request the
-program makes for a key is answered by the BIOS as always. The driver
-only watches two interrupts on their way to their owners: the one by
-which a program says that it is idle, which Volkov Commander calls every
-time it has gone round waiting for a key, and the BIOS's keyboard
-interrupt, for a program that waits inside the BIOS.
+program makes for a key is answered by the BIOS as always. The mouse is
+fed the same way: its packets, the buttons and how far it has moved, go
+to the controller's auxiliary port, the BIOS hands them to the mouse
+driver, and the mouse driver moves the pointer and answers the program.
+A mouse does not say where it is, so a step takes the pointer to the top
+left corner first and from there to its cell, in movements too small for
+the driver to speed them up.
+
+The driver only watches three interrupts on their way to their owners:
+the one by which a program says that it is idle, which Volkov Commander
+calls every time it has gone round waiting for a key; the BIOS's
+keyboard interrupt, for a program that waits inside the BIOS; and the
+mouse driver's, where the program asks which buttons are down. A button
+of the mouse comes up when the program has asked that so many times: a
+program that waits for it to come up is not idle, and asks nothing else.
 
 When the program is idle and the BIOS's buffer is empty, it has taken
 every key so far, and the driver hands over the next: so no key is ever

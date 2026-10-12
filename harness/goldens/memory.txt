@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -72,7 +72,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │  Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15

@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -72,7 +72,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -100,7 +100,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -184,7 +184,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║    Note:  All  these  settings (and some other ones, too) can  ║   ───╢| 1Bx1 30x11 3Fx5 30x59 03x2 1Bx2
 |║      ║           also be changed from the VCSETUP program.            ║      ║| 1Bx4 30x40 3Ex7 30x25 03x2 1Bx2
-|║      ║                                                                ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                                                                ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -212,7 +212,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -240,7 +240,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
@@ -268,7 +268,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
@@ -296,7 +296,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
@@ -324,7 +324,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
@@ -352,7 +352,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
@@ -380,7 +380,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
@@ -408,7 +408,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
@@ -436,7 +436,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  menu command.                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║                                                                ║   ───╢| 1Bx1 30x75 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                                                                ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                                                                ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -464,7 +464,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx1 30x12 1Bx18 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
@@ -492,7 +492,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║ │  eXtension            │            ║| 1Bx42 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx11
 |║empty    dat│            │            ║╟─│  tiMe                 │────────────╢| 1Bx1 30x12 1Bx29 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
 |║            │            │            ║║ │  Size                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|║            │            │            ║║ │  Unsorted             │s directory ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|║            │            │            ║║ │  Unsorted             │s directory ║| 1Bx40 6Cx1 1Bx1 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║            │            │            ║║ │ ───────────────────── │            ║| 1Bx42 30x25 03x2 1Bx11
 |║            │            │            ║║ │  Re-read      Ctrl-R  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║            │            │            ║║ │ -fiLter...    Ctrl-F  │            ║| 1Bx42 30x2 33x1 30x22 03x2 1Bx11
@@ -520,7 +520,7 @@ cursor 0 127 lines 6 7 mode 3
 |║r│  eXtension            │            ║║               C:\WORK                ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
 |║e│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx1 30x2 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -548,7 +548,7 @@ cursor 0 127 lines 6 7 mode 3
 |║r│  eXtension            │            ║║               C:\WORK                ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
 |║e│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx1 30x2 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -576,7 +576,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -604,7 +604,7 @@ cursor 0 127 lines 6 7 mode 3
 |║r│  eXtension            │            ║║               C:\WORK                ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
 |║e│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx1 30x2 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -632,7 +632,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -660,7 +660,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      │ Delete            F8     │ ║║               C:\WORK                ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
 |║empty    │ ──────────────────────── │ ║╟──────────────────────────────────────╢| 1Bx1 30x37 03x2 1Bx40
 |║         │ file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 3Fx6 3Ex1 3Fx19 30x1 03x2 1Bx40
-|║         │ ──────────────────────── │ ║║  No `dirinfo' file in this directory ║| 1Bx10 30x28 03x2 1Bx40
+|║         │ ──────────────────────── │ ║║  No `dirinfo' file in this directory ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │ select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 3Fx8 3Ex1 3Fx17 30x1 03x2 1Bx40
 |║         │ uNselect group    Gray - │ ║║                                      ║| 1Bx10 30x1 3Fx2 3Ex1 3Fx23 30x1 03x2 1Bx40
 |║         │ Invert group      Gray * │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
@@ -688,7 +688,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx1 30x75 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -716,7 +716,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -744,7 +744,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      │ Delete            F8     │ ║║               C:\WORK                ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
 |║empty    │ ──────────────────────── │ ║╟──────────────────────────────────────╢| 1Bx1 30x37 03x2 1Bx40
 |║         │ file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 3Fx6 3Ex1 3Fx19 30x1 03x2 1Bx40
-|║         │ ──────────────────────── │ ║║  No `dirinfo' file in this directory ║| 1Bx10 30x28 03x2 1Bx40
+|║         │ ──────────────────────── │ ║║  No `dirinfo' file in this directory ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │ select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 3Fx8 3Ex1 3Fx17 30x1 03x2 1Bx40
 |║         │ uNselect group    Gray - │ ║║                                      ║| 1Bx10 30x1 3Fx2 3Ex1 3Fx23 30x1 03x2 1Bx40
 |║         │ Invert group      Gray * │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
@@ -772,7 +772,7 @@ cursor 28 8 lines 6 7 mode 3
 |║run      bat│          ║  [x] Archive      6-16-2000  ║   WORK                ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
 |║empty    dat│          ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx1 30x12 1Bx8 70x38 03x2 1Bx19
 |║            │          ║  [ ] System       12:00:00p  ║                       ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
-|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x19 07x1 70x18 03x2 1Bx19
 |║            │          ║     [ Set ]   [ Cancel ]     ║                       ║| 1Bx21 70x38 03x2 1Bx19
 |║            │          ╚══════════════════════════════╝                       ║| 1Bx21 70x38 03x2 1Bx19
 |║            │                                                                 ║| 1Bx21 70x38 03x2 1Bx19
@@ -800,7 +800,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -828,7 +828,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║                                      ║| 1Bx80
 |║empty    dat│            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -856,7 +856,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
 |║empty    │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
 |║         │-file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
-|║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
+|║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │-select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │-uNselect group    Gray - │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │-Invert group      Gray * │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
@@ -884,7 +884,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 3Fx1 3Ex1 3Fx24 30x1 03x2 1Bx40
 |║empty    │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
 |║         │-file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
-|║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
+|║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │-select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │-uNselect group    Gray - │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │-Invert group      Gray * │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
@@ -912,7 +912,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      │ Delete            F8     │ ║║                                      ║| 1Bx10 30x1 0Fx1 0Ex1 0Fx24 30x1 03x2 1Bx40
 |║empty    │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
 |║         │-file Attributes   Ctrl-A │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
-|║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 1Bx40
+|║         │ ──────────────────────── │ ║║                                      ║| 1Bx10 30x28 03x2 6Cx1 1Bx39
 |║         │-select Group      Gray + │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │-uNselect group    Gray - │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
 |║         │-Invert group      Gray * │ ║║                                      ║| 1Bx10 30x1 33x1 30x26 03x2 1Bx40
@@ -940,7 +940,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
 |║empty    dat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
+|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
 |║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
 |║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
@@ -968,7 +968,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║ │  eXtension            │            ║| 1Bx42 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx11
 |║empty    dat│            │            ║║ │  tiMe                 │            ║| 1Bx42 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx11
 |║            │            │            ║║ │  Size                 │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
-|║            │            │            ║║ │  Unsorted             │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
+|║            │            │            ║║ │  Unsorted             │            ║| 1Bx40 6Cx1 1Bx1 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║            │            │            ║║ │ ───────────────────── │            ║| 1Bx42 30x25 03x2 1Bx11
 |║            │            │            ║║ │  Re-read      Ctrl-R  │            ║| 1Bx42 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11
 |║            │            │            ║║ │ -fiLter...    Ctrl-F  │            ║| 1Bx42 30x2 33x1 30x22 03x2 1Bx11
@@ -996,7 +996,7 @@ cursor 0 127 lines 6 7 mode 3
 |║r│  eXtension            │            ║║                                      ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
 |║e│  tiMe                 │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ │√ Unsorted             │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -1024,7 +1024,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│       21│ 6-16-00│12:00p║║                                      ║| 1Bx80
 |║empty    dat│        0│ 6-16-00│12:00p║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -1052,7 +1052,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
 |║empty    dat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
+|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
 |║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
 |║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
@@ -1080,7 +1080,7 @@ cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|                                                                                | 07x80
+|                                                                                | 07x40 70x1 07x39
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1108,7 +1108,7 @@ cursor 0 127 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|                                                                                | 07x80
+|                                                                                | 07x40 70x1 07x39
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1136,7 +1136,7 @@ cursor 0 127 lines 6 7 mode 3
 |                   │ ───────────────────────────── │                            | 07x19 30x33 0Fx2 07x26
 |                   │-Swap panels           Ctrl-U  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
 |                   │ Panels on/off         Ctrl-O  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
-|                   │-Compare directories   Ctrl-C  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
+|                   │-Compare directories   Ctrl-C  │                            | 07x19 30x1 33x1 30x19 47x1 30x11 0Fx2 07x26
 |                   │ ───────────────────────────── │                            | 07x19 30x33 0Fx2 07x26
 |                   │ Menu file edit                │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
 |                   └───────────────────────────────┘                            | 07x19 30x33 0Fx2 07x26
@@ -1164,7 +1164,7 @@ cursor 0 127 lines 6 7 mode 3
 |          │ Delete            F8     │                                          | 07x10 30x1 3Fx1 3Ex1 3Fx24 30x1 0Fx2 07x40
 |          │ ──────────────────────── │                                          | 07x10 30x28 0Fx2 07x40
 |          │-file Attributes   Ctrl-A │                                          | 07x10 30x1 33x1 30x26 0Fx2 07x40
-|          │ ──────────────────────── │                                          | 07x10 30x28 0Fx2 07x40
+|          │ ──────────────────────── │                                          | 07x10 30x28 0Fx2 70x1 07x39
 |          │-select Group      Gray + │                                          | 07x10 30x1 33x1 30x26 0Fx2 07x40
 |          │-uNselect group    Gray - │                                          | 07x10 30x1 33x1 30x26 0Fx2 07x40
 |          │-Invert group      Gray * │                                          | 07x10 30x1 33x1 30x26 0Fx2 07x40
@@ -1192,7 +1192,7 @@ cursor 8 8 lines 6 7 mode 3
 |      ║ to                                                               ║      | 07x3 70x74 0Fx2 07x1
 |      ║                                                                  ║      | 07x3 70x5 30x64 70x5 0Fx2 07x1
 |      ╟──────────────────────────────────────────────────────────────────╢      | 07x3 70x74 0Fx2 07x1
-|      ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║      | 07x3 70x74 0Fx2 07x1
+|      ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║      | 07x3 70x37 07x1 70x36 0Fx2 07x1
 |      ╚══════════════════════════════════════════════════════════════════╝      | 07x3 70x74 0Fx2 07x1
 |                                                                                | 07x3 70x74 0Fx2 07x1
 |                                                                                | 07x5 0Fx74 07x1
@@ -1220,7 +1220,7 @@ cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|                                                                                | 07x80
+|                                                                                | 07x40 70x1 07x39
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1248,7 +1248,7 @@ cursor 0 127 lines 6 7 mode 3
 |  │  eXtension            │                                                     | 07x2 30x1 3Fx3 3Ex1 3Fx19 30x1 0Fx2 07x51
 |  │  tiMe                 │                                                     | 07x2 30x1 3Fx4 3Ex1 3Fx18 30x1 0Fx2 07x51
 |  │  Size                 │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x51
-|  │  Unsorted             │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x51
+|  │  Unsorted             │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x11 70x1 07x39
 |  │ ───────────────────── │                                                     | 07x2 30x25 0Fx2 07x51
 |  │  Re-read      Ctrl-R  │                                                     | 07x2 30x1 3Fx2 3Ex1 3Fx20 30x1 0Fx2 07x51
 |  │ -fiLter...    Ctrl-F  │                                                     | 07x2 30x2 33x1 30x22 0Fx2 07x51
@@ -1276,7 +1276,7 @@ cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
-|                                                                                | 07x80
+|                                                                                | 07x40 70x1 07x39
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1304,7 +1304,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│       21│ 6-16-00│12:00p║║                                      ║| 1Bx80
 |║empty    dat│        0│ 6-16-00│12:00p║║                                      ║| 1Bx1 30x38 1Bx41
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║                                      ║| 1Bx80
+|║            │         │        │      ║║                                      ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -1332,7 +1332,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│       21│ 6-16-00│12:00p║║            │            │            ║| 1Bx80
 |║empty    dat│        0│ 6-16-00│12:00p║║            │            │            ║| 1Bx1 30x38 1Bx41
 |║            │         │        │      ║║            │            │            ║| 1Bx80
-|║            │         │        │      ║║            │            │            ║| 1Bx80
+|║            │         │        │      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx80
@@ -1360,7 +1360,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
 |║empty    dat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     │ Panels on/off         Ctrl-O  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx18 48x1 3Fx10 30x1 03x2 1Bx26
 |║            │     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
 |║            │     │ Menu file edit                │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     └───────────────────────────────┘ │            │            ║| 1Bx19 30x33 03x2 1Bx26
@@ -1388,7 +1388,7 @@ cursor 4 23 lines 6 7 mode 3
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
-|                                        ║            │            │            ║| 07x40 1Bx40
+|                                        ║            │            │            ║| 07x40 6Cx1 1Bx39
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
@@ -1416,7 +1416,7 @@ cursor 0 127 lines 6 7 mode 3
 |                   │ ───────────────────────────── │ │            │            ║| 07x19 30x33 03x2 1Bx26
 |                   │ Swap panels           Ctrl-U  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |                   │ Panels on/off         Ctrl-O  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|                   │-Compare directories   Ctrl-C  │ │            │            ║| 07x19 30x1 33x1 30x31 03x2 1Bx26
+|                   │-Compare directories   Ctrl-C  │ │            │            ║| 07x19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
 |                   │ ───────────────────────────── │ │            │            ║| 07x19 30x33 03x2 1Bx26
 |                   │ Menu file edit                │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |                   └───────────────────────────────┘ │            │            ║| 07x19 30x33 03x2 1Bx26
@@ -1444,7 +1444,7 @@ cursor 4 23 lines 6 7 mode 3
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
-|                                        ║            │            │            ║| 07x40 1Bx40
+|                                        ║            │            │            ║| 07x40 6Cx1 1Bx39
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40

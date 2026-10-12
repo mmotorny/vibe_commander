@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 25 6 lines 6 7 mode 3
 |║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 |║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -72,7 +72,7 @@ cursor 25 13 lines 6 7 mode 3
 |║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 |║            │    ║  │  [ ] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -100,7 +100,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│                                          C:\WORK                ║| 1Bx25 4Fx29 03x1 1Bx25
 |║empty    dat│              ╔════════ Edit ═══════╗   ─────────────────────────╢| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
 |║            │              ║ Can't find the file ║                            ║| 1Bx25 4Fx29 0Bx1 03x1 1Bx24
-|║            │              ║       long.txt      ║   ' file in this directory ║| 1Bx25 4Fx29 03x2 1Bx24
+|║            │              ║       long.txt      ║   ' file in this directory ║| 1Bx25 4Fx15 38x1 4Fx13 03x2 1Bx24
 |║            │              ║  New-file   Cancel  ║                            ║| 1Bx25 4Fx5 70x10 4Fx14 03x2 1Bx24
 |║            │              ╚═════════════════════╝                            ║| 1Bx25 4Fx29 03x2 1Bx24
 |║            │                                                                 ║| 1Bx25 4Fx29 03x2 1Bx24
@@ -184,7 +184,7 @@ cursor 0 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -212,7 +212,7 @@ cursor 16 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -240,7 +240,7 @@ cursor 32 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -268,7 +268,7 @@ cursor 78 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -296,7 +296,7 @@ cursor 78 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -324,7 +324,7 @@ cursor 78 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -352,7 +352,7 @@ cursor 78 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -380,7 +380,7 @@ cursor 0 127 lines 6 7 mode 3
 |                  ╚══════════════════════════════════════════╝                  | 1Bx15 4Fx50 03x2 1Bx13
 |                                                                                | 1Bx15 4Fx50 03x2 1Bx13
 |                                                                                | 1Bx17 03x50 1Bx13
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -408,7 +408,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

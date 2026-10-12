@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 25 6 lines 6 7 mode 3
 |║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 |║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -72,7 +72,7 @@ cursor 25 13 lines 6 7 mode 3
 |║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 |║            │    ║  │  [ ] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -100,7 +100,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 4 23 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────────────────────────────╢║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
-|║  No `dirinfo' file in this directory ║║            │            │            ║| 1Bx80
+|║  No `dirinfo' file in this directory ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -184,7 +184,7 @@ cursor 2 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -212,7 +212,7 @@ cursor 17 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║ ab cd ef gh ij                       ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -240,7 +240,7 @@ cursor 32 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║ ab cd ef gh ij kl mn op qr st        ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -268,7 +268,7 @@ cursor 36 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║ ←f gh ij kl mn op qr st uv wx yz 0   ║║            │            │            ║| 1Bx2 1Ex1 1Bx77
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -296,7 +296,7 @@ cursor 3 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║ ←ef gh ij kl mn op qr st uv wx yz 0  ║║            │            │            ║| 1Bx2 1Ex1 1Bx77
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -324,7 +324,7 @@ cursor 3 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║ ←cd ef gh ij kl mn op qr st uv wx y→ ║║            │            │            ║| 1Bx2 1Ex1 1Bx34 1Ex1 1Bx42
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -352,7 +352,7 @@ cursor 2 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║ ab cd ef gh ij kl mn op qr st uv wx→ ║║            │            │            ║| 1Bx37 1Ex1 1Bx42
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -380,7 +380,7 @@ cursor 2 21 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -408,7 +408,7 @@ cursor 2 20 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║                                      ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -436,7 +436,7 @@ cursor 2 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║ ab cd ef gh ij kl mn op qr st uv wx→ ║║            │            │            ║| 1Bx37 1Ex1 1Bx42
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -464,7 +464,7 @@ cursor 2 11 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────── Edit ────────────────╢║            │            │            ║| 1Bx17 1Ex6 1Bx57
 |║ ab cd ef gh ij kl mn op qr st uv wx→ ║║            │            │            ║| 1Bx37 1Ex1 1Bx42
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
@@ -492,7 +492,7 @@ cursor 4 23 lines 6 7 mode 3
 |║                 C:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────────────────────────────╢║            │            │            ║| 1Bx80
 |║ ab cd ef gh ij kl mn op qr st uv wx  ║║            │            │            ║| 1Bx80
-|║                                      ║║            │            │            ║| 1Bx80
+|║                                      ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80
 |║                                      ║║            │            │            ║| 1Bx80

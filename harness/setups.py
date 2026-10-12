@@ -13,9 +13,11 @@ Two setups share one clock and one source of files:
                   means its size cannot show up as free space on screen.
                   The clock in the corner of the screen is off, so that
                   no screen depends on how long it took to get there.
-                  DOS has loaded the driver of the tests (see driver.py),
-                  which takes the program through a scenario's steps from
-                  a script on a third disk, one without a file system.
+                  DOS has loaded a mouse driver, for the PS/2 mouse that
+                  the machine has, and the driver of the tests (see
+                  driver.py), which takes the program through a
+                  scenario's steps from a script on a third disk, one
+                  without a file system.
 """
 import io
 import shutil
@@ -126,15 +128,19 @@ def _floppy(workdir, commands, country=None, keyboard=None, bench=None):
                     *commands]
     floppy = boot_floppy(workdir / "a.img", workdir, deps.fetch(deps.FREEDOS),
                          EPOCH, commands, country)
+    # The keyboard driver and its layouts are two packages on the Lite USB
+    # image, which is a hard disk, and the mouse driver is a third.
+    packages = []
     if keyboard:
-        # The driver and its layouts are two packages on the Lite USB
-        # image, which is a hard disk.
+        packages += [("keyb", "BIN/KEYB.EXE"), ("keyb_lay", f"BIN/{layouts}")]
+    if bench:
+        packages += [MOUSE]
+    if packages:
         image = workdir / "lite.img"
         with zipfile.ZipFile(deps.fetch(deps.FREEDOS_LITE)) as archive:
             image.write_bytes(archive.read("FD14LITE.img"))
         lite = FatImage(image, workdir, EPOCH, partitioned=True)
-        for package, member in (("keyb", "BIN/KEYB.EXE"),
-                                ("keyb_lay", f"BIN/{layouts}")):
+        for package, member in packages:
             packed = io.BytesIO(lite.read(f"packages/base/{package}.zip"))
             with zipfile.ZipFile(packed) as archive:
                 floppy.write(f"FREEDOS/{member}", archive.read(member), EPOCH)
@@ -173,6 +179,11 @@ def codepage(country):
 # select its Cyrillic letters; Alt and the left Shift go back.
 KEYBOARDS = {"ru": ("RU", 866, "KEYBRD2.SYS")}
 
+# The mouse driver of the test bench: FreeDOS's CuteMouse, a package of
+# the Lite USB image, and its file there. The bench's machine has a PS/2
+# mouse, as every PC of QEMU's has.
+MOUSE = ("ctmouse", "BIN/CTMOUSE.EXE")
+
 # How many paragraphs of memory the driver of the tests keeps beyond its
 # own on the bench of each country, which decides where DOS loads the
 # program. They are chosen so that the original's stack ends where a page
@@ -183,14 +194,14 @@ KEYBOARDS = {"ru": ("RU", 866, "KEYBRD2.SYS")}
 # stacks end, and what to write here should that have to change: the
 # memory map of the scenarios shows the driver with what it keeps, so
 # their goldens change with it.
-PLACE = {"us": 114, "ru": 159}
+PLACE = {"us": 176, "ru": 159}
 
 # What DOS runs on the test bench once it has booted. It loads the driver
 # of the tests and then waits for a key: that is where the machine's state
 # is saved, and where every scenario begins, with the Enter that its
 # script has first.
-BENCH_COMMANDS = [Path(driver.FILENAME).stem, "PAUSE>NUL", "CLS", "C:",
-                  r"CD \WORK", r"D:\VC\VC"]
+BENCH_COMMANDS = ["CTMOUSE>NUL", Path(driver.FILENAME).stem, "PAUSE>NUL",
+                  "CLS", "C:", r"CD \WORK", r"D:\VC\VC"]
 
 
 class Bench:

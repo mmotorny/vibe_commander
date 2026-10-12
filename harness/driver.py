@@ -30,6 +30,24 @@ but no Latin letters.
 
 The BIOS's keyboard buffer holds 15 keys, and keys of one name all go
 into it at once.
+
+The mouse is written with the cell of the screen it goes to, column and
+row from 0: "Click@1,24" moves the pointer there, presses the left
+button and lets it go, "RightClick@40,12" the right one, and "Move@40,12"
+only moves. A button stays down until the program has asked the mouse
+driver 20 times where the mouse is, or as many times as the step says:
+"Click@1,24*4". Under a hand that would be thousands of times; what the
+program does with a button that is held, it does for as long as it is.
+
+The mouse's packets go to the keyboard controller's auxiliary port as
+the mouse would send them, and the BIOS and the mouse driver of DOS
+make of them where the pointer is and which buttons are down. A mouse
+says how far it has moved, not where it is, and the driver moves the
+pointer further for a fast mouse than for a slow one. So the pointer is
+first taken to the top left corner, by more than the screen is wide and
+high, and from there to the middle of its cell in steps of 4, which the
+driver takes as they are: 4 dots to the right for 4, 2 dots down for 4,
+where a cell is 8 dots each way.
 """
 import re
 import struct
@@ -47,7 +65,7 @@ PAD = 3
 
 # A script (see DRIVER.ASM).
 MAGIC = b"\xA5\x5A"
-KEYBOARD, MOUSE, STEP, HOLD, END = 1, 2, 3, 4, 0
+KEYBOARD, MOUSE, STEP, HOLD, ASKS, END = 1, 2, 3, 4, 5, 0
 NONE = 0xFFFF
 # The disk a script is on: its size is that of the disk the machine had
 # when its state was saved.
@@ -208,12 +226,54 @@ def _event(kind, codes):
     return bytes([kind, len(codes), *codes])
 
 
+# The buttons of the mouse, as its packets have them.
+BUTTONS = {"Move": None, "Click": 1, "RightClick": 2}
+# For how many times that the program asks where the mouse is a button
+# stays down, unless the step says.
+ASKED = 20
+STRIDE = 4                        # how far the mouse moves in one packet
+
+
+def _packet(right, up, buttons=0):
+    """What the mouse sends when it has moved so far with those buttons
+    down."""
+    return bytes([8 | buttons | (0x10 if right < 0 else 0)
+                  | (0x20 if up < 0 else 0), right & 255, up & 255])
+
+
+def _mouse(packets):
+    data = b"".join(packets)
+    return bytes([MOUSE]) + struct.pack("<H", len(data)) + data
+
+
+def _pointer(name):
+    """The events for a name of the mouse, "Click@column,row*asked"."""
+    what, _, place = name.partition("@")
+    place, _, asked = place.partition("*")
+    column, row = (int(number) for number in place.split(","))
+    if what not in BUTTONS or not (0 <= column < COLUMNS and 0 <= row < ROWS
+                                   and 0 < int(asked or ASKED) < 256):
+        raise ValueError(f"unknown step of the mouse {name!r}")
+    # To the corner, then to the middle of the cell: 8 dots a cell, and
+    # two units of the mouse to a dot downwards.
+    way = [_packet(-127, 127)] * 4 \
+        + [_packet(STRIDE, 0)] * (2 * column + 1) \
+        + [_packet(0, -STRIDE)] * (4 * row + 2)
+    button = BUTTONS[what]
+    if button is None:
+        return _mouse(way)
+    return (_mouse(way + [_packet(0, 0, button)])
+            + bytes([ASKS, int(asked or ASKED)]) + _mouse([_packet(0, 0)]))
+
+
 def events(step):
     """The events of the script for one step, without the one that ends
     it."""
     chords = []
     for name in step.split():
-        if name.startswith('"'):
+        if "@" in name and not name.startswith('"'):
+            chords.append(_pointer(name))
+        elif name.startswith('"'):
             text = name.strip('"')
             keys_of = (_russian if any(char.lower() in RUSSIAN
                                        for char in text) else _character)
@@ -222,6 +282,9 @@ def events(step):
             chords.append([_key(part) for part in name.split("+")])
     out = b""
     for chord in chords:
+        if isinstance(chord, bytes):
+            out += chord
+            continue
         held = [key for key in chord if key in MODIFIERS]
         keys = [key for key in chord if key not in MODIFIERS]
         for key in held:

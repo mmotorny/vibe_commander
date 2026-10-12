@@ -9,8 +9,9 @@
 ; BIOS's INT 9, and the keyboard driver of DOS where one is loaded, make
 ; of them what they make of a keyboard's: the keys in the BIOS's buffer and
 ; the shift flags. The mouse's packets go to the controller's auxiliary
-; port the same way (command D3h), for the mouse driver. Every call of
-; INT 16h and of INT 28h goes on to whoever had the interrupt before.
+; port the same way (command D3h), for the BIOS and the mouse driver that
+; DOS has loaded. Every call of INT 16h, of INT 28h and of INT 33h goes on
+; to whoever had the interrupt before.
 ;
 ; The program is idle when it calls INT 28h, as it does each time it has
 ; gone round waiting for a key (LeaveTm), or when it asks INT 16h to wait
@@ -36,9 +37,16 @@
 ; and from byte 18 the events:
 ;
 ;	01 n bytes	n bytes from the keyboard
-;	02 n bytes	n bytes from the mouse
+;	02 word bytes	as many bytes from the mouse as the word says: its
+;			packets of three, the buttons and how far it moved
 ;	03		the step ends
 ;	04 n		nothing for n more rounds of the program
+;	05 n		nothing until the program has asked the mouse
+;			driver n more times where the mouse is and which
+;			buttons are down (INT 33h, function 3): a program
+;			that waits for a button to come up asks that, and
+;			is not idle meanwhile. Behind an event 02 it counts
+;			from that event on
 ;	anything else	the script ends
 ;
 ; What the driver writes goes to a port that QEMU keeps in a file:
@@ -83,6 +91,7 @@ Pad	dw	0
 
 Old16	dd	0
 Old28	dd	0
+Old33	dd	0
 SPos	dw	0			; Where in the script the next byte is
 SSec	dw	0FFFFh			; Which sector of it SecBuf holds
 Ready	db	0			; The script's header has been read
@@ -91,6 +100,8 @@ Done	db	0			; The script has ended
 Idles	db	0			; Rounds the program has idled since
 					; anything was fed or seen to change
 Hold	db	0			; Rounds still to let pass (event 04)
+Asks	db	0			; Times the program still has to ask
+					; the mouse driver (event 05)
 Prog	db	0			; INT 28h came from the program
 Watch	db	0			; Looking for what blinks
 WTick	dw	0			; ... since this tick of the timer
@@ -346,6 +357,8 @@ Pump0:	mov	ax,40h
 	jmp	PumpX
 Pump1:	or	bl,bl
 	jnz	Pump2
+	cmp	cs:Asks,0
+	jne	PumpX
 	cmp	cs:Hold,0
 	je	Pump2
 	dec	cs:Hold
@@ -359,6 +372,8 @@ Pump2:	call	Peek
 	je	PumpE
 	cmp	al,4
 	je	PumpH
+	cmp	al,5
+	je	PumpA
 	mov	al,'E'			; The script has ended
 	out	OutPort,al
 	mov	cs:Done,1
@@ -366,15 +381,30 @@ Pump2:	call	Peek
 	out	64h,al
 Pump3:	hlt
 	jmp	Pump3
-PumpK:	mov	bh,0D2h
-	jmp	PumpF
-PumpM:	mov	bh,0D3h
-PumpF:	inc	cs:SPos
+PumpK:	inc	cs:SPos
 	call	Next
 	mov	cl,al
 	mov	ch,0
-	mov	ah,bh
+	mov	ah,0D2h
+	jmp	PumpF
+PumpM:	inc	cs:SPos
+	call	Next
+	mov	cl,al
+	call	Next
+	mov	ch,al
+	mov	ah,0D3h
 	call	Feed
+	mov	cs:Idles,0
+	call	Peek			; An event 05 behind this one counts
+	cmp	al,5			; from now: the program may not be
+	je	PumpA			; idle again before it is over
+	jmp	PumpN
+PumpF:	call	Feed
+	mov	cs:Idles,0
+	jmp	PumpN
+PumpA:	inc	cs:SPos
+	call	Next
+	mov	cs:Asks,al
 	mov	cs:Idles,0
 	jmp	PumpN
 PumpH:	inc	cs:SPos
@@ -384,6 +414,7 @@ PumpH:	inc	cs:SPos
 PumpN:	or	bl,bl			; The next event at once only for a
 	jz	PumpX			; program that will not come round
 	mov	cs:Hold,0
+	mov	cs:Asks,0
 	jmp	Pump0
 PumpE:	or	bl,bl
 	jnz	Pump4
@@ -513,6 +544,21 @@ I28P:	xor	al,al
 I28X:	pop	ax
 	jmp	cs:[Old28]
 
+; INT 33h, function 3: the program asks where the mouse is. When it has
+; asked as often as the script says, the next event is due at once: the
+; program may be waiting for nothing else.
+Int33:	cmp	ax,3
+	jne	I33X
+	cmp	cs:Asks,0
+	je	I33X
+	dec	cs:Asks
+	jnz	I33X
+	push	ax
+	xor	al,al
+	call	Pump
+	pop	ax
+I33X:	jmp	cs:[Old33]
+
 ; INT 16h: with AH 00h or 10h the caller waits for a key inside the BIOS,
 ; and comes round no more until there is one.
 Int16:	cmp	cs:Done,0
@@ -543,6 +589,17 @@ Init:	mov	PktSeg,cs
 	mov	dx,offset Int28
 	mov	ax,2528h
 	int	21h
+	mov	ax,3533h		; A mouse driver, if one is loaded
+	int	21h
+	mov	ax,es
+	or	ax,bx
+	jz	Init1
+	mov	word ptr Old33,bx
+	mov	word ptr Old33+2,es
+	mov	dx,offset Int33
+	mov	ax,2533h
+	int	21h
+Init1:
 	mov	dx,Last+Cells+15
 	shr	dx,4
 	add	dx,Pad

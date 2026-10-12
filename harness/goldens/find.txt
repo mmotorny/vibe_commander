@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 8 18 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -72,7 +72,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -100,7 +100,7 @@ cursor 8 18 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -122,20 +122,20 @@ cursor 0 127 lines 6 7 mode 3
 |║DO   ╔═══════════════════════════ Find File ════════════════════════════╗     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║SR   ║ A:\␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║re   ║    kernel.sys           46,485   A...    5-14-2021    3:32:52a   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║he   ║    fdauto.bat              102   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║he   ║    fdauto.bat              115   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║no   ║    fdconfig.sys            103   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║    FREEDOS             SUB-DIR   ....    4-02-2025    2:23:14p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║ ␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║ A:\FREEDOS␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    BIN                 SUB-DIR   ....    4-02-2025    2:22:58p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║    NLS                 SUB-DIR   ....    4-02-2025    2:23:14p   ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    NLS                 SUB-DIR   ....    4-02-2025    2:23:14p   ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║    CONFIGS             SUB-DIR   ....    4-02-2025    2:23:10p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    version.fdi              51   A...    4-02-2025    2:23:14p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ ␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ A:\FREEDOS\BIN␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    attrib.com            5,044   A...    6-30-2003   12:10:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║ 84 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 85 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
 |║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
@@ -156,14 +156,14 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║    fdbanner.com            475   A...   11-30-2021    5:44:12p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║    fasthelp.bat             64   A...    2-09-2022    4:00:48p   ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    setlang.bat           5,322   A...    2-18-2022    5:26:06p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║    welcome.bat             923   A...    4-19-2021   10:35:32a   ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    welcome.bat             923   A...    4-19-2021   10:35:32a   ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║    fdisk.exe            39,859   A...    1-20-2025    6:38:30p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    fdisk.ini             7,046   A...    8-15-2024    6:52:26p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    format.exe           42,424   A...    9-08-2024    3:16:20p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    command.com          87,772   A...    2-21-2025    2:06:48p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    country.sys          30,250   A...   11-03-2024    9:55:54a   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║ 84 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 85 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
 |║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
@@ -184,14 +184,14 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║    fdbanner.com            475   A...   11-30-2021    5:44:12p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║    fasthelp.bat             64   A...    2-09-2022    4:00:48p   ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    setlang.bat           5,322   A...    2-18-2022    5:26:06p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║    welcome.bat             923   A...    4-19-2021   10:35:32a   ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    welcome.bat             923   A...    4-19-2021   10:35:32a   ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║    fdisk.exe            39,859   A...    1-20-2025    6:38:30p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    fdisk.ini             7,046   A...    8-15-2024    6:52:26p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    format.exe           42,424   A...    9-08-2024    3:16:20p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    command.com          87,772   A...    2-21-2025    2:06:48p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    country.sys          30,250   A...   11-03-2024    9:55:54a   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║ 84 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 85 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
 |║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
@@ -212,14 +212,14 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║    autoexec.dbx          2,799   A...    4-02-2025    2:23:08p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║    autoexec.def          2,343   A...    4-02-2025    2:23:08p   ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    autoexec.vbx          2,331   A...    4-02-2025    2:23:10p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║    config.086              327   A...    4-02-2025    2:23:10p   ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    config.086              327   A...    4-02-2025    2:23:10p   ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║    config.186              327   A...    4-02-2025    2:23:10p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    config.286              601   A...    4-02-2025    2:23:10p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    config.dbx               49   A...    4-02-2025    2:23:10p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    config.def              954   A...    4-02-2025    2:23:10p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    config.vbx              866   A...    4-02-2025    2:23:10p   ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║ 84 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 85 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
 |║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
@@ -240,14 +240,14 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║    slicer.sv             6,501   A...    2-21-2022    9:21:40a   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║    slicer.tr             6,778   A...    1-11-2022    8:23:38p   ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    setup.en              7,948   A...    4-02-2025    2:23:12p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║    setup.de              8,784   A...    4-02-2025    2:23:10p   ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    setup.de              8,784   A...    4-02-2025    2:23:10p   ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║    setup.es              7,877   A...    4-02-2025    2:23:12p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    setup.fr              8,660   A...    4-02-2025    2:23:12p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    setup.sv              8,096   A...    4-02-2025    2:23:14p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    setup.tr              7,773   A...    4-02-2025    2:23:14p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ ␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║ 84 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 85 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
 |║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
@@ -262,20 +262,20 @@ cursor 0 127 lines 6 7 mode 3
 |║DO   ╔═══════════════════════════ Find File ════════════════════════════╗     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║SR   ║ A:\␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║re   ║    kernel.sys           46,485   A...    5-14-2021    3:32:52a   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║he   ║    fdauto.bat              102   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║he   ║    fdauto.bat              115   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║no   ║    fdconfig.sys            103   A...    6-16-2000   12:00:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║    FREEDOS             SUB-DIR   ....    4-02-2025    2:23:14p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║ ␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║ A:\FREEDOS␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    BIN                 SUB-DIR   ....    4-02-2025    2:22:58p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║    NLS                 SUB-DIR   ....    4-02-2025    2:23:14p   ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    NLS                 SUB-DIR   ....    4-02-2025    2:23:14p   ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║    CONFIGS             SUB-DIR   ....    4-02-2025    2:23:10p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    version.fdi              51   A...    4-02-2025    2:23:14p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ ␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ A:\FREEDOS\BIN␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    attrib.com            5,044   A...    6-30-2003   12:10:00p   ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║ 84 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║ 85 files found.␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╟──   ║              [ New search ]   [ Go to ]   [ Quit ]               ║     ║| 1Bx3 3Fx35 0Fx9 3Fx30 03x2 1Bx1
 |║..   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 3Fx74 03x2 1Bx1
 |╚══                                                                          ══╝| 1Bx3 3Fx74 03x2 1Bx1
@@ -296,7 +296,7 @@ cursor 8 18 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -324,7 +324,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -352,7 +352,7 @@ cursor 8 18 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -380,7 +380,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru    ║  DOS wildcard characters, described below.                     ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
 |║em    ║                                                                ║    ──╢| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
 |║      ║  To find files by Searching for Text type a partial  word  or  ║      ║| 1Bx3 3Fx1 30x23 3Fx18 30x31 07x1 0Bx1 03x1 1Bx1
-|║      ║  short phrase (or any fragment of text) in the Containing box  ║    y ║| 1Bx3 3Fx1 30x52 3Ex10 30x10 07x1 0Bx1 03x1 1Bx1
+|║      ║  short phrase (or any fragment of text) in the Containing box  ║    y ║| 1Bx3 3Fx1 30x36 47x1 30x15 3Ex10 30x10 07x1 0Bx1 03x1 1Bx1
 |║      ║  that you know to be contained in  the  misplaced  file. It's  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
 |║      ║  best to keep it short and avoid word breaks (word processors  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
 |║      ║  may insert a "soft return" between words). The  filespec  in  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
@@ -408,7 +408,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -436,7 +436,7 @@ cursor 8 18 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -464,7 +464,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru    ║  DOS wildcard characters, described below.                     ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
 |║em    ║                                                                ║    ──╢| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
 |║      ║  To find files by Searching for Text type a partial  word  or  ║      ║| 1Bx3 3Fx1 30x23 3Fx18 30x31 07x1 0Bx1 03x1 1Bx1
-|║      ║  short phrase (or any fragment of text) in the Containing box  ║    y ║| 1Bx3 3Fx1 30x52 3Ex10 30x10 07x1 0Bx1 03x1 1Bx1
+|║      ║  short phrase (or any fragment of text) in the Containing box  ║    y ║| 1Bx3 3Fx1 30x36 47x1 30x15 3Ex10 30x10 07x1 0Bx1 03x1 1Bx1
 |║      ║  that you know to be contained in  the  misplaced  file. It's  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
 |║      ║  best to keep it short and avoid word breaks (word processors  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
 |║      ║  may insert a "soft return" between words). The  filespec  in  ║      ║| 1Bx3 3Fx1 30x72 07x1 0Bx1 03x1 1Bx1
@@ -492,7 +492,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -520,7 +520,7 @@ cursor 8 18 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -548,7 +548,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -576,7 +576,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -604,7 +604,7 @@ cursor 8 18 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -632,7 +632,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -660,7 +660,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

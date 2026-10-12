@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║                                                                  ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
@@ -72,7 +72,7 @@ cursor 11 10 lines 6 7 mode 3
 |║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║ big                                                              ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
@@ -100,7 +100,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║bi   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx1 30x2 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -184,7 +184,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -212,7 +212,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║bi   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx1 30x2 70x74 03x2 1Bx1
-|║hu                                                                          y ║| 1Bx3 70x74 03x2 1Bx1
+|║hu                                                                          y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -240,7 +240,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║           huge           ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║big         │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx1 30x12 1Bx2 4Fx49 03x2 1Bx14
-|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                   huge                  ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -268,7 +268,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -296,7 +296,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║bi   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx1 30x2 70x74 03x2 1Bx1
-|║hu                                                                          y ║| 1Bx3 70x74 03x2 1Bx1
+|║hu                                                                          y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -324,7 +324,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║           huge           ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║big         │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx1 30x12 1Bx2 4Fx49 03x2 1Bx14
-|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                   huge                  ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -352,7 +352,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -380,7 +380,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║bi   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx1 30x2 70x74 03x2 1Bx1
-|║hu                                                                          y ║| 1Bx3 70x74 03x2 1Bx1
+|║hu                                                                          y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -408,7 +408,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║           huge           ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║big         │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx1 30x12 1Bx2 4Fx49 03x2 1Bx14
-|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                   huge                  ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -436,7 +436,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -464,7 +464,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║bi   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx1 30x2 70x74 03x2 1Bx1
-|║hu                                                                          y ║| 1Bx3 70x74 03x2 1Bx1
+|║hu                                                                          y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -492,7 +492,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║           huge           ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║big         │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx1 30x12 1Bx2 4Fx49 03x2 1Bx14
-|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                   huge                  ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -520,7 +520,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -548,7 +548,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║bi   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx1 30x2 70x74 03x2 1Bx1
-|║hu                                                                          y ║| 1Bx3 70x74 03x2 1Bx1
+|║hu                                                                          y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -576,7 +576,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║           huge           ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║big         │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx1 30x12 1Bx2 4Fx49 03x2 1Bx14
-|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                   huge                  ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -604,7 +604,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -632,7 +632,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx80
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx1 30x12 1Bx67
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx1 30x12 1Bx27 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -660,7 +660,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║bi   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║hu                                                                          y ║| 1Bx1 30x2 70x74 03x2 1Bx1
+|║hu                                                                          y ║| 1Bx1 30x2 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -688,7 +688,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx80
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx1 30x12 1Bx67
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx1 30x12 1Bx27 6Cx1 1Bx39
 |║huge2       │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -716,7 +716,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║bi   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║hu                                                                          y ║| 1Bx1 30x2 70x74 03x2 1Bx1
+|║hu                                                                          y ║| 1Bx1 30x2 70x37 07x1 70x36 03x2 1Bx1
 |║huge2       │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -744,7 +744,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║          huge2           ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║big         │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
-|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx1 30x12 1Bx2 4Fx49 03x2 1Bx14
+|║huge        │    ║        The following file exists        ║   this directory ║| 1Bx1 30x12 1Bx2 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║huge2       │    ║                  huge2                  ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -772,7 +772,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║big         │            │            ║║                                      ║| 1Bx80
-|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx1 30x12 1Bx67
+|║huge        │            │            ║║  No `dirinfo' file in this directory ║| 1Bx1 30x12 1Bx27 6Cx1 1Bx39
 |║huge2       │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

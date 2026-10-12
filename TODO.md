@@ -507,6 +507,39 @@ Things that are known and not done. Standing instructions are in
   a key over when the search comes to a named place, in the original and
   in the port alike: it would have to be told where that is in each, as
   it is told where `LeaveTm` is.
+- The bench has a mouse now, and three scenarios use it: `mouse-panel`,
+  `mouse-bars` and `mouse-dialog`. With them 349 of the instructions
+  that `harness/ported.py` listed as out of reach for the mouse run in
+  the original, and their C in the port, and are off the lists. Some 800
+  are still listed, with reasons that end in "the bench has no mouse",
+  which is no reason any more: each place wants a scenario, or the true
+  reason why none gets there. By the file of the port that has them:
+  - `treebox.c`, 93: `ChTree`, a button held on a line of the tree,
+    above the lines or below them, a second click on a line, a click
+    outside the box.
+  - `menu.c`, 19: what is left of the menu bar, a button held on the bar
+    or on a menu and let go, a menu open with no item under the cursor.
+  - `view.c`, 36: a button held in the viewer's window.
+  - `edit.c`, 74: `T00_71`, a click in the editor's window, a button
+    held above it or below it.
+  - `help.c`, 105: a button held in the text, above it or below it, a
+    click on a line of the index and one outside the window.
+  - `find.c`, 96: `FndMove`, the list of the file search.
+  - `dialog.c`, 127: what is left of `Dialog`, a click in a line that is
+    typed into (`InpStr`), on a line of a group (`Select`, `Slct20`), on
+    a box to tick (`FlipFl`).
+  - `usermenu.c`, `cmdline.c` and `drive.c`, 114: the rest of the user
+    menu with `F32_70`, the box of the drives, the history.
+  - `memory.c`, 136: `F65_00`, the map of the memory, either button on
+    its lines and buttons, held above or below, the middle button, a
+    second click.
+  - `input.c`, 5: the pointer in the corner of the screen that blanks
+    it, and what is left of a button held on the key bar.
+  A second click is two clicks in one step; a button held is a click
+  with a count behind it, "Click@3,5*200". There is no step yet for a
+  button that goes down in one place and comes up in another, nor for
+  the middle button: `harness/driver.py` has the packets, and the names
+  would be two lines there.
 - `cmake --build build -j4` failed once in a new checkout, "The object is
   zero length" for one C file. Building without `-j` works.
 - A run of the harness that is killed outright leaves its QEMU running,

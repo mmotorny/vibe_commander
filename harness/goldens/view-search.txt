@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 25 6 lines 6 7 mode 3
 |║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 |║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -72,7 +72,7 @@ cursor 25 13 lines 6 7 mode 3
 |║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
 |║            │    ║  │  [ ] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
 |║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
@@ -100,7 +100,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 34 8 lines 6 7 mode 3
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -184,7 +184,7 @@ cursor 0 127 lines 6 7 mode 3
 |«&êm☻î╔│♥░⍽ⁿÄ┘S╗x☻┐o☻⍽•t☼<→s♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë>Ω☺┤b═!Ä├&─▲4␀&èG☻ê─&ç•ú╪☺ë▲c☻î♠e☻[Ä┴| 1Bx80
 |Φé␀Φ╦␀│◙Φz␀│␀Φa␀│☺Φ\␀│♥ΦW␀│♀Φf␀δ◙[│♥δ3░•Φ¡␀ï>║☻1└è♣Gë┴ë├╕•♀═!≥«uσèY⍽èçö☻◘└t┌Φé␀─| 1Bx80
 |>c☻╕4↕&ë♣Xê╪<☻t◘<♥t♦■♫4↕[Y_^]▼•Z╧╖␀◙┐ö☻tWÇ├5ê▲¢☻╗ÿ☻δEá¥☻8├r☻ê├╖␀☺█ïƒ₧☻δ2S╗o☻Φ+␀δ| 1Bx80
-|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx80
+|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx40 6Cx1 1Bx39
 |◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻␀♥▼♥6♥:♥>♥C♥H♥Q♥Y♥a♥h♥k♥n♥⌂| 1Bx80
 |♥ñ♥╝♥╠♥∞♥☺♦,♦7♦J♦[♦p♦|♦ç♦ù♦⌐♦╕♦╠♦▄♦⌠♦•♣¶♣,♣reading from␀writing to␀Error %1 driv| 1Bx80
 |e %A: %2 area: %3␀Error %1 device %A: %3␀DOS␀FAT␀root␀data␀(I)gnore␀(R)etry␀(A)b| 1Bx80
@@ -212,7 +212,7 @@ cursor 0 127 lines 6 7 mode 3
 |␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
 |                                                                                | 1Bx80
 |The shell is about to be terminated, though, this is                            | 1Bx80
-|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx40 6Cx1 1Bx39
 |You must reboot the system or, if this shell runs in                            | 1Bx80
 |a multitasking environment, terminate this process/task manually.               | 1Bx80
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
@@ -240,7 +240,7 @@ cursor 0 127 lines 6 7 mode 3
 |You must reboot the system or, if this shell runs in                            | 1Bx80
 |a multitasking environment, terminate this process/task manually.               | 1Bx80
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
-|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx40 6Cx1 1Bx38 1Ex1
 |♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
 |♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
 |♥←☺☺☻☻♥♥♥♥☺☺♥☻Control-Break pressed.                                            | 1Bx80
@@ -268,7 +268,7 @@ cursor 0 127 lines 6 7 mode 3
 |␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
 |                                                                                | 1Bx80
 |The shell is about to be terminated, though, this is                            | 1Bx80
-|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx40 6Cx1 1Bx39
 |You must reboot the system or, if this shell runs in                            | 1Bx80
 |a multitasking environment, terminate this process/task manually.               | 1Bx80
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
@@ -296,7 +296,7 @@ cursor 0 127 lines 6 7 mode 3
 |forbidden (usually by enabling the "/P" option).                                | 1Bx80
 |You must reboot the system or, if this shell runs in                            | 1Bx80
 |a multitasking environment, terminate this process/task manually.               | 1Bx80
-|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx40 6Cx1 1Bx38 1Ex1
 |→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
 |♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
 |♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
@@ -324,7 +324,7 @@ cursor 0 127 lines 6 7 mode 3
 |The shell is about to be terminated, though, this is                            | 1Bx80
 |forbidden (usually by enabling the "/P" option).                                | 1Bx80
 |You must reboot the system or, if this shell runs in                            | 1Bx80
-|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx40 6Cx1 1Bx39
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
 |→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
 |                                                                                | 1Bx80
@@ -352,7 +352,7 @@ cursor 8 8 lines 6 7 mode 3
 |The   ╚══════════════════════════════════════════════════════════════════╝      | 1Bx3 70x74 03x2 1Bx1
 |for                                                                             | 1Bx3 70x74 03x2 1Bx1
 |You must reboot the system or, if this shell runs in                            | 1Bx5 03x74 1Bx1
-|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx40 6Cx1 1Bx39
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
 |→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
 |                                                                                | 1Bx80
@@ -380,7 +380,7 @@ cursor 17 8 lines 6 7 mode 3
 |The   ╚══════════════════════════════════════════════════════════════════╝      | 1Bx3 70x74 03x2 1Bx1
 |for                                                                             | 1Bx3 70x74 03x2 1Bx1
 |You must reboot the system or, if this shell runs in                            | 1Bx5 03x74 1Bx1
-|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx40 6Cx1 1Bx39
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
 |→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
 |                                                                                | 1Bx80
@@ -408,7 +408,7 @@ cursor 0 127 lines 6 7 mode 3
 |←                                                                               | 1Ex1 1Bx79
 |←                                                                               | 1Ex1 1Bx79
 |←the name of or changes the current directory and drive.◙◙CDD [drive:][path]◙CD→| 1Ex1 1Bx78 1Ex1
-|                                                                                | 1Bx80
+|                                                                                | 1Bx40 6Cx1 1Bx39
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
 |                                                                                | 1Bx80
@@ -436,7 +436,7 @@ cursor 0 127 lines 6 7 mode 3
 |␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
 |                                                                                | 1Bx80
 |The shell is about to be terminated, though, this is                            | 1Bx80
-|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx40 6Cx1 1Bx39
 |You must reboot the system or, if this shell runs in                            | 1Bx80
 |a multitasking environment, terminate this process/task manually.               | 1Bx80
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
@@ -464,7 +464,7 @@ cursor 8 8 lines 6 7 mode 3
 |␀%s   ╚══════════════════════════════════════════════════════════════════╝   n␀→| 1Bx3 70x74 03x2 1Ex1
 |                                                                                | 1Bx3 70x74 03x2 1Bx1
 |The shell is about to be terminated, though, this is                            | 1Bx5 03x74 1Bx1
-|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx40 6Cx1 1Bx39
 |You must reboot the system or, if this shell runs in                            | 1Bx80
 |a multitasking environment, terminate this process/task manually.               | 1Bx80
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
@@ -492,7 +492,7 @@ cursor 12 8 lines 6 7 mode 3
 |␀%s   ╚══════════════════════════════════════════════════════════════════╝   n␀→| 1Bx3 70x74 03x2 1Ex1
 |                                                                                | 1Bx3 70x74 03x2 1Bx1
 |The shell is about to be terminated, though, this is                            | 1Bx5 03x74 1Bx1
-|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx40 6Cx1 1Bx39
 |You must reboot the system or, if this shell runs in                            | 1Bx80
 |a multitasking environment, terminate this process/task manually.               | 1Bx80
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
@@ -520,7 +520,7 @@ cursor 0 127 lines 6 7 mode 3
 |␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
 |                                                                                | 1Bx80
 |The shell is about to be terminated, though, this is                            | 1Bx80
-|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx40 6Cx1 1Bx39
 |You must reboot the system or, if this shell runs in                            | 1Bx80
 |a multitasking environment, terminate this process/task manually.               | 1Bx80
 |␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
@@ -548,7 +548,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

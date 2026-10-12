@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 13 23 lines 6 7 mode 3
 |║            │            │            ║║             C:\WORK\DOCS             ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -72,7 +72,7 @@ cursor 13 23 lines 6 7 mode 3
 |║            │            │            ║║             C:\WORK\DOCS             ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -100,7 +100,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -184,7 +184,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -212,7 +212,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -240,7 +240,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -267,8 +267,8 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│             ║       HELLO.TXT       ║    C:\WORK                ║| 1Bx24 70x31 03x2 1Bx23
 |║empty    dat│                                            ─────────────────────╢| 1Bx22 4Fx36 1Bx22
 |║            │           ╔═══════════ Copy ═══════════╗                        ║| 1Bx22 4Fx36 03x2 1Bx20
-|║            │           ║ Can't create the directory ║   le in this directory ║| 1Bx22 4Fx36 03x2 1Bx20
-|║            │           ║         HELLO.TXT          ║                        ║| 1Bx22 4Fx36 03x2 1Bx20
+|║            │           ║ Can't create the directory ║   le in this directory ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
+|║            │           ║         HELLO.TXT          ║                        ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
 |║            │           ║             Ok             ║                        ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
 |║            │           ╚════════════ Ok ════════════╝                        ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
 |║            │                                                                 ║| 1Bx22 4Fx36 03x2 1Bx20
@@ -296,7 +296,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -324,7 +324,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -351,8 +351,8 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│             ║        NODIR\X        ║    C:\WORK                ║| 1Bx24 70x31 03x2 1Bx23
 |║empty    dat│                                            ─────────────────────╢| 1Bx22 4Fx36 1Bx22
 |║            │           ╔═══════════ Copy ═══════════╗                        ║| 1Bx22 4Fx36 03x2 1Bx20
-|║            │           ║ Can't create the directory ║   le in this directory ║| 1Bx22 4Fx36 03x2 1Bx20
-|║            │           ║          NODIR\X           ║                        ║| 1Bx22 4Fx36 03x2 1Bx20
+|║            │           ║ Can't create the directory ║   le in this directory ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
+|║            │           ║          NODIR\X           ║                        ║| 1Bx22 4Fx18 38x1 4Fx17 03x2 1Bx20
 |║            │           ║             Ok             ║                        ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
 |║            │           ╚════════════ Ok ════════════╝                        ║| 1Bx22 4Fx16 70x4 4Fx16 03x2 1Bx20
 |║            │                                                                 ║| 1Bx22 4Fx36 03x2 1Bx20
@@ -380,7 +380,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -408,7 +408,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -436,7 +436,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -464,7 +464,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -492,7 +492,7 @@ cursor 72 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -519,8 +519,8 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\SUBDIR.DIR ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 4Fx74 03x2 1Bx1
 |║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 4Fx74 0Bx2 1Bx1
-|║     ║                    Can't create the directory                    ║   y ║| 1Bx3 4Fx74 0Bx2 1Bx1
-|║     ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\SUBDIR.DIR ║     ║| 1Bx3 4Fx74 03x2 1Bx1
+|║     ║                    Can't create the directory                    ║   y ║| 1Bx3 4Fx37 38x1 4Fx36 0Bx2 1Bx1
+|║     ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\SUBDIR.DIR ║     ║| 1Bx3 4Fx37 38x1 4Fx36 03x2 1Bx1
 |║     ║                                Ok                                ║     ║| 1Bx3 4Fx35 70x4 4Fx35 03x2 1Bx1
 |║     ╚═══════════════════════════════ Ok ═══════════════════════════════╝     ║| 1Bx3 4Fx35 70x4 4Fx35 03x2 1Bx1
 |║                                                                              ║| 1Bx3 4Fx74 03x2 1Bx1
@@ -547,8 +547,8 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\readme.txt ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 4Fx74 03x2 1Bx1
 |║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 4Fx74 0Bx2 1Bx1
-|║     ║                       Can't open the file                        ║   y ║| 1Bx3 4Fx74 0Bx2 1Bx1
-|║     ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\readme.txt ║     ║| 1Bx3 4Fx74 0Bx2 1Bx1
+|║     ║                       Can't open the file                        ║   y ║| 1Bx3 4Fx37 38x1 4Fx36 0Bx2 1Bx1
+|║     ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\readme.txt ║     ║| 1Bx3 4Fx37 38x1 4Fx36 0Bx2 1Bx1
 |║     ║                            Ok   Cancel                           ║     ║| 1Bx3 4Fx31 70x4 4Fx39 03x2 1Bx1
 |║     ╚═══════════════════════════ Ok   Cancel ══════════════════════════╝     ║| 1Bx3 4Fx31 70x4 4Fx39 03x2 1Bx1
 |║                                                                              ║| 1Bx3 4Fx74 03x2 1Bx1
@@ -576,7 +576,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -604,7 +604,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -632,7 +632,7 @@ cursor 72 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -659,8 +659,8 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\SUBDIR.DIR ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 4Fx74 03x2 1Bx1
 |║     ╔══════════════════════════════ Move ══════════════════════════════╗     ║| 1Bx3 4Fx74 0Bx2 1Bx1
-|║     ║                    Can't create the directory                    ║   y ║| 1Bx3 4Fx74 0Bx2 1Bx1
-|║     ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\SUBDIR.DIR ║     ║| 1Bx3 4Fx74 03x2 1Bx1
+|║     ║                    Can't create the directory                    ║   y ║| 1Bx3 4Fx37 38x1 4Fx36 0Bx2 1Bx1
+|║     ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\SUBDIR.DIR ║     ║| 1Bx3 4Fx37 38x1 4Fx36 03x2 1Bx1
 |║     ║                                Ok                                ║     ║| 1Bx3 4Fx35 70x4 4Fx35 03x2 1Bx1
 |║     ╚═══════════════════════════════ Ok ═══════════════════════════════╝     ║| 1Bx3 4Fx35 70x4 4Fx35 03x2 1Bx1
 |║                                                                              ║| 1Bx3 4Fx74 03x2 1Bx1
@@ -687,8 +687,8 @@ cursor 0 127 lines 6 7 mode 3
 |║ru   ║ ....\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\.\SRC\DOCS\readme.txt ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ╚═════════════════                               ══════════════════╝   ──╢| 1Bx3 70x21 4Fx31 70x22 03x2 1Bx1
 |║                          ╔════════ Rename ═══════╗                           ║| 1Bx3 70x21 4Fx31 08x2 70x20 03x2 1Bx1
-|║            │             ║ Can't rename the file ║    file in this directory ║| 1Bx5 03x19 4Fx31 0Bx2 03x22 1Bx1
-|║            │             ║    DOCS\readme.txt    ║                           ║| 1Bx24 4Fx31 03x2 1Bx23
+|║            │             ║ Can't rename the file ║    file in this directory ║| 1Bx5 03x19 4Fx16 38x1 4Fx14 0Bx2 03x22 1Bx1
+|║            │             ║    DOCS\readme.txt    ║                           ║| 1Bx24 4Fx16 38x1 4Fx14 03x2 1Bx23
 |║            │             ║       Ok   Cancel     ║                           ║| 1Bx24 4Fx10 70x4 4Fx17 03x2 1Bx23
 |║            │             ╚══════ Ok   Cancel ════╝                           ║| 1Bx24 4Fx10 70x4 4Fx17 03x2 1Bx23
 |║            │                                                                 ║| 1Bx24 4Fx31 03x2 1Bx23
@@ -716,7 +716,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -744,7 +744,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -772,7 +772,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -800,7 +800,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -828,7 +828,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -856,7 +856,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -884,7 +884,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║  SRC\PAPERS\readme.txt   ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║            │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║          SRC\PAPERS\readme.txt          ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -912,7 +912,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -940,7 +940,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -968,7 +968,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│          ║    SRC\PAPERS\readme.txt    ║   \WORK                ║| 1Bx21 70x37 03x2 1Bx20
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║            │    ╔═════════════════ Rename ════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║          SRC\PAPERS\README.TXT          ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -996,7 +996,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1024,7 +1024,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1052,7 +1052,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│          ║    SRC\PAPERS\readme.txt    ║   \WORK                ║| 1Bx21 70x37 03x2 1Bx20
 |║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║            │    ╔═════════════════ Rename ════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║          SRC\PAPERS\README.TXT          ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1080,7 +1080,7 @@ cursor 8 23 lines 6 7 mode 3
 |║empty    dat│            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1108,7 +1108,7 @@ cursor 8 8 lines 6 7 mode 3
 |║em   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1136,7 +1136,7 @@ cursor 8 23 lines 6 7 mode 3
 |║empty    dat│            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1164,7 +1164,7 @@ cursor 8 8 lines 6 7 mode 3
 |║em   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1192,7 +1192,7 @@ cursor 0 127 lines 6 7 mode 3
 |║empty    dat│            ║ D:\SRC\PAPERS\readme.txt ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║            │                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║            │    ╔══════════════════ Move ═════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║         D:\SRC\PAPERS\readme.txt        ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1219,8 +1219,8 @@ cursor 0 127 lines 6 7 mode 3
 |║empty    dat│            ║    D:\SRC\readme.txt     ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║            │                                           ──────────────────────╢| 1Bx23 70x2 4Fx29 70x3 03x2 1Bx21
 |║            │              ╔════════ Move ═══════╗                            ║| 1Bx23 70x2 4Fx29 08x2 70x1 03x2 1Bx21
-|║            │              ║ Can't open the file ║      ile in this directory ║| 1Bx23 70x2 4Fx29 08x2 70x1 03x2 1Bx21
-|║            │              ║    SRC\readme.txt   ║                            ║| 1Bx25 4Fx29 0Bx2 03x3 1Bx21
+|║            │              ║ Can't open the file ║      ile in this directory ║| 1Bx23 70x2 4Fx15 38x1 4Fx13 08x2 70x1 03x2 1Bx21
+|║            │              ║    SRC\readme.txt   ║                            ║| 1Bx25 4Fx15 38x1 4Fx13 0Bx2 03x3 1Bx21
 |║            │              ║      Ok   Cancel    ║                            ║| 1Bx25 4Fx9 70x4 4Fx16 03x2 1Bx24
 |║            │              ╚═════ Ok   Cancel ═══╝                            ║| 1Bx25 4Fx9 70x4 4Fx16 03x2 1Bx24
 |║            │                                                                 ║| 1Bx25 4Fx29 03x2 1Bx24
@@ -1248,7 +1248,7 @@ cursor 8 23 lines 6 7 mode 3
 |║empty    dat│            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1276,7 +1276,7 @@ cursor 8 8 lines 6 7 mode 3
 |║em   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║               [ Move ]   [ F10-Tree ]   [ Cancel ]               ║   ──╢| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                            y ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                            y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1304,7 +1304,7 @@ cursor 0 127 lines 6 7 mode 3
 |║empty    dat│            ║ D:\SRC\PAPERS\readme.txt ║   :\WORK                ║| 1Bx23 70x34 03x2 1Bx21
 |║            │                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
 |║            │    ╔══════════════════ Move ═════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║         D:\SRC\PAPERS\readme.txt        ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1332,7 +1332,7 @@ cursor 8 23 lines 6 7 mode 3
 |║            │            │            ║║               C:\WORK                ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

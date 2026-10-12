@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                 C:\                  ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -72,7 +72,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
 |║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -100,7 +100,7 @@ cursor 0 127 lines 6 7 mode 3
 |║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
 |║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 0 127 lines 6 7 mode 3
 |║l│  eXtension            │            ║║              C:\STAMPS               ║| 1Bx2 30x1 3Fx3 3Ex1 3Fx19 30x1 03x2 1Bx51
 |║h│  tiMe                 │            ║╟──────────────────────────────────────╢| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
 |║ │  Size                 │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
-|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
+|║ │√ Unsorted             │            ║║  No `dirinfo' file in this directory ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx11 6Cx1 1Bx39
 |║ │ ───────────────────── │            ║║                                      ║| 1Bx2 30x25 03x2 1Bx51
 |║ │  Re-read      Ctrl-R  │            ║║                                      ║| 1Bx2 30x1 3Fx2 3Ex1 3Fx20 30x1 03x2 1Bx51
 |║ │  fiLter...    Ctrl-F  │            ║║                                      ║| 1Bx2 30x1 3Fx4 3Ex1 3Fx18 30x1 03x2 1Bx51
@@ -156,7 +156,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx80
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -184,7 +184,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx80
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -212,7 +212,7 @@ cursor 28 8 lines 6 7 mode 3
 |║last     dat│9999999   ║  [x] Archive      31.12.1999 ║   TAMPS               ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
 |║huge     dat│9999999   ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx21 70x38 03x2 1Bx19
 |║            │          ║  [ ] System       0:00:58    ║                       ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
-|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x19 07x1 70x18 03x2 1Bx19
 |║            │          ║     [ Set ]   [ Cancel ]     ║                       ║| 1Bx21 70x38 03x2 1Bx19
 |║            │          ╚══════════════════════════════╝                       ║| 1Bx21 70x38 03x2 1Bx19
 |║            │                                                                 ║| 1Bx21 70x38 03x2 1Bx19
@@ -240,7 +240,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx80
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -268,7 +268,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx80
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -296,7 +296,7 @@ cursor 28 8 lines 6 7 mode 3
 |║last     dat│9999999   ║  [x] Archive      3.02.2001  ║   TAMPS               ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
 |║huge     dat│9999999   ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx21 70x38 03x2 1Bx19
 |║            │          ║  [ ] System       9:05:06    ║                       ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
-|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x19 07x1 70x18 03x2 1Bx19
 |║            │          ║     [ Set ]   [ Cancel ]     ║                       ║| 1Bx21 70x38 03x2 1Bx19
 |║            │          ╚══════════════════════════════╝                       ║| 1Bx21 70x38 03x2 1Bx19
 |║            │                                                                 ║| 1Bx21 70x38 03x2 1Bx19
@@ -324,7 +324,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx80
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -352,7 +352,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx1 30x38 1Bx41
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -380,7 +380,7 @@ cursor 28 8 lines 6 7 mode 3
 |║last     dat│9999999   ║  [x] Archive      31.12.2107 ║   TAMPS               ║| 1Bx1 30x20 70x23 30x10 70x5 03x2 1Bx19
 |║huge     dat│9999999   ║  [ ] Hidden       Time       ║   ────────────────────╢| 1Bx21 70x38 03x2 1Bx19
 |║            │          ║  [ ] System       13:01:02   ║                       ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
-|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ╟──────────────────────────────╢   e in this directory ║| 1Bx21 70x19 07x1 70x18 03x2 1Bx19
 |║            │          ║     [ Set ]   [ Cancel ]     ║                       ║| 1Bx21 70x38 03x2 1Bx19
 |║            │          ╚══════════════════════════════╝                       ║| 1Bx21 70x38 03x2 1Bx19
 |║            │                                                                 ║| 1Bx21 70x38 03x2 1Bx19
@@ -408,7 +408,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx1 30x38 1Bx41
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -436,7 +436,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx1 1Ex38 1Bx41
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx1 3Ex38 1Bx41
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -464,7 +464,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx1 1Ex38 1Bx41
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx1 3Ex38 1Bx41
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -492,7 +492,7 @@ cursor 8 18 lines 6 7 mode 3
 |║la   ║                                                                  ║     ║| 1Bx1 1Ex2 3Fx74 03x2 1Bx1
 |║hu   ║                                                                  ║   ──╢| 1Bx1 3Ex2 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║                                                                  ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -520,7 +520,7 @@ cursor 0 127 lines 6 7 mode 3
 |║la   ║ C:\STAMPS␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀ ║     ║| 1Bx1 1Ex2 3Fx74 03x2 1Bx1
 |║hu   ║    SUB                 SUB-DIR   ....   16.06.2000   12:00:00    ║   ──╢| 1Bx1 3Ex2 3Fx74 03x2 1Bx1
 |║     ║    first.dat                 0   A...    1.01.1980    0:00:00    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║    night.dat                 9   A...   31.12.1999    0:00:58    ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║    night.dat                 9   A...   31.12.1999    0:00:58    ║   y ║| 1Bx3 3Fx37 48x1 3Fx36 03x2 1Bx1
 |║     ║    morning.dat           1 234   A...    3.02.2001    9:05:06    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    noon.dat          1 048 576   A...   10.10.2010   12:30:00    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║    evening.dat     999 999 999   A...   30.11.2099   23:59:58    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -548,7 +548,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│999999999│31.12.07│ 13:01║║              C:\STAMPS               ║| 1Bx1 1Ex38 1Bx41
 |║huge     dat│999999999│16.06.00│ 12:00║╟──────────────────────────────────────╢| 1Bx1 3Ex38 1Bx41
 |║            │         │        │      ║║                                      ║| 1Bx80
-|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │         │        │      ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80

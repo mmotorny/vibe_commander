@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -72,7 +72,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -100,7 +100,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -128,7 +128,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║       Save setup                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  VCSETUP program                                               ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Configuration                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║       Screen and Mouse                                         ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║       Screen and Mouse                                         ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Panel options                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Set Black and White / Color / Monochrome palette         ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Set default configuration                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -156,7 +156,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║       Advanced options...                                      ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║       Extension File Edit...                                   ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Viewers...                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║       Editors...                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║       Editors...                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Auto menus                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Path prompt                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Key bar                                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -184,7 +184,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║       Extension File Edit...                                   ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║       Viewers...                                               ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Editors...                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║       Auto menus                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║       Auto menus                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Path prompt                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Key bar                                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Full screen                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -212,7 +212,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -240,7 +240,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -268,7 +268,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                                    ▼                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║   ───╢| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
 |║      ║                                             ▲                  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -296,7 +296,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                                    ▼                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║   ───╢| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
 |║      ║                                             ▲                  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -324,7 +324,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                                    ▼                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║   ───╢| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
 |║      ║                                             ▲                  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -352,7 +352,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
+|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
@@ -380,7 +380,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║emp   ║   Line up        ^E  or  ↑    │    Line           ^Y           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
+|║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x2 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
 |║      ║   End of line    End          │    Quote next char  ^Q         ║      ║| 1Bx4 30x22 3Ex3 30x32 3Ex2 30x13 03x2 1Bx2
@@ -408,7 +408,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
+|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
@@ -436,7 +436,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
 |║emp   ║   End of line    End          │    Quote next char  ^Q         ║   ───╢| 1Bx4 30x22 3Ex3 30x32 3Ex2 30x13 03x2 1Bx2
 |║      ║   Start of file  ^Home        │    Quit             Esc or F10 ║      ║| 1Bx4 30x22 3Ex5 30x30 3Ex3 30x4 3Ex3 30x5 03x2 1Bx2
-|║      ║   End of file    ^End         │                                ║   ry ║| 1Bx4 30x22 3Ex4 30x46 03x2 1Bx2
+|║      ║   End of file    ^End         │                                ║   ry ║| 1Bx4 30x22 3Ex4 30x10 47x1 30x35 03x2 1Bx2
 |║      ║ ──────────────────────────────┴─────────────────────────────── ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║ Function keys                                                  ║      ║| 1Bx4 30x5 3Ex13 30x54 03x2 1Bx2
 |║      ║   Help          F1               ASCII / Hex        F4         ║      ║| 1Bx4 30x21 3Ex2 30x34 3Ex2 30x13 03x2 1Bx2
@@ -464,7 +464,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
+|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
@@ -492,7 +492,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
 |║emp   ║   End of line    End          │    Quote next char  ^Q         ║   ───╢| 1Bx4 30x22 3Ex3 30x32 3Ex2 30x13 03x2 1Bx2
 |║      ║   Start of file  ^Home        │    Quit             Esc or F10 ║      ║| 1Bx4 30x22 3Ex5 30x30 3Ex3 30x4 3Ex3 30x5 03x2 1Bx2
-|║      ║   End of file    ^End         │                                ║   ry ║| 1Bx4 30x22 3Ex4 30x46 03x2 1Bx2
+|║      ║   End of file    ^End         │                                ║   ry ║| 1Bx4 30x22 3Ex4 30x10 47x1 30x35 03x2 1Bx2
 |║      ║ ──────────────────────────────┴─────────────────────────────── ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║ Function keys                                                  ║      ║| 1Bx4 30x5 3Ex13 30x54 03x2 1Bx2
 |║      ║   Help          F1               ASCII / Hex        F4         ║      ║| 1Bx4 30x21 3Ex2 30x34 3Ex2 30x13 03x2 1Bx2
@@ -520,7 +520,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
+|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
@@ -548,7 +548,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                                    ▼                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║   ───╢| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
 |║      ║                                             ▲                  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -576,7 +576,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -604,7 +604,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  There are some new useful features:                           ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║      •  The  Commander  allows  you to select, copy, move and  ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║      •  The  Commander  allows  you to select, copy, move and  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║         delete directories as well as files.                   ║      ║| 1Bx4 30x20 3Ex11 30x41 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║      •  The Memory info  command  lists  the  memory-resident  ║      ║| 1Bx4 30x17 3Ex11 30x44 03x2 1Bx2
@@ -632,7 +632,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  made to the files on the  RAM disk.  As a result you'll lose  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  your changes as soon as you reboot or turn off your computer. ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  The  Commander  provides a solution to this problem. You can  ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  The  Commander  provides a solution to this problem. You can  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║  put a line  into  your  autoexec.bat  file  that  tells  the  ║      ║| 1Bx4 30x30 3Ex12 30x30 03x2 1Bx2
 |║      ║  Commander where to find these  files, as well as other files  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  it  needs  that  you haven't copied to the RAM disk. Put the  ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -660,7 +660,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║                                                                ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                                                                ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                                                                ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -688,7 +688,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  made to the files on the  RAM disk.  As a result you'll lose  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  your changes as soon as you reboot or turn off your computer. ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  The  Commander  provides a solution to this problem. You can  ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  The  Commander  provides a solution to this problem. You can  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║  put a line  into  your  autoexec.bat  file  that  tells  the  ║      ║| 1Bx4 30x30 3Ex12 30x30 03x2 1Bx2
 |║      ║  Commander where to find these  files, as well as other files  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  it  needs  that  you haven't copied to the RAM disk. Put the  ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -716,7 +716,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  There are some new useful features:                           ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║      •  The  Commander  allows  you to select, copy, move and  ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║      •  The  Commander  allows  you to select, copy, move and  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║         delete directories as well as files.                   ║      ║| 1Bx4 30x20 3Ex11 30x41 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║      •  The Memory info  command  lists  the  memory-resident  ║      ║| 1Bx4 30x17 3Ex11 30x44 03x2 1Bx2
@@ -744,7 +744,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -772,7 +772,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -800,7 +800,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -828,7 +828,7 @@ cursor 0 127 lines 6 7 mode 3
 |║ru    ║  The new directory will be  a  subdirectory  of  the  current  ║      ║| 1Bx3 70x1 30x72 08x1 0Bx1 03x1 1Bx1
 |║em    ║  directory unless you specify a full  path  name  or  another  ║    ──╢| 1Bx3 70x1 30x72 08x1 0Bx1 03x1 1Bx1
 |║      ║  drive letter.                                                 ║      ║| 1Bx4 30x72 0Bx2 03x1 1Bx1
-|║      ║                                                                ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                                                                ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║    Notes:                                                      ║      ║| 1Bx4 30x8 3Fx6 30x58 03x2 1Bx2
 |║      ║      •  Directory names  can  be up to 8 characters long, and  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║         can have an extension up to 3 characters long.         ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -856,7 +856,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -884,7 +884,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -912,7 +912,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -940,7 +940,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║                Left ─────┐          ┌─────── Right             ║      ║| 1Bx4 30x20 3Ex4 30x26 3Ex5 30x17 03x2 1Bx2
 |║emp   ║                          ▼          ▼                          ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║                    ╔══ Tree ══╗╔══ C:\ ══╗                     ║      ║| 1Bx4 30x27 0Fx6 30x39 03x2 1Bx2
-|║      ║                    ║          ║║         ║                     ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║                    ║          ║║         ║                     ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                    ║          ║║         ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                    ║          ║║         ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                    ║          ║║         ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -968,7 +968,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -996,7 +996,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1024,7 +1024,7 @@ cursor 8 48 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1052,7 +1052,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -1080,7 +1080,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run   ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║emp   ║       Volume label                                             ║   ───╢| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Memory info                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║       Directory sizes                                          ║   ry ║| 1Bx4 30x72 03x2 1Bx2
+|║      ║       Directory sizes                                          ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Find Files                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       History                                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       EGA Lines                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -1108,7 +1108,7 @@ cursor 8 48 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1136,7 +1136,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80

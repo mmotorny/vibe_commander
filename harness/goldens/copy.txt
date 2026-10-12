@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -72,7 +72,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -100,7 +100,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -128,7 +128,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -156,7 +156,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -184,7 +184,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -212,7 +212,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -240,7 +240,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -268,7 +268,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -295,8 +295,8 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║           CON            ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx23 70x2 4Fx29 70x3 03x2 1Bx21
 |║            │              ╔════════ Copy ═══════╗               │            ║| 1Bx23 70x2 4Fx29 08x2 70x1 03x2 1Bx21
-|║            │              ║ Can't open the file ║               │            ║| 1Bx23 70x2 4Fx29 08x2 70x1 03x2 1Bx21
-|║            │              ║         CON         ║               │            ║| 1Bx25 4Fx29 0Bx2 03x3 1Bx21
+|║            │              ║ Can't open the file ║               │            ║| 1Bx23 70x2 4Fx15 38x1 4Fx13 08x2 70x1 03x2 1Bx21
+|║            │              ║         CON         ║               │            ║| 1Bx25 4Fx15 38x1 4Fx13 0Bx2 03x3 1Bx21
 |║            │              ║      Ok   Cancel    ║               │            ║| 1Bx25 4Fx9 70x4 4Fx16 03x2 1Bx24
 |║            │              ╚═════ Ok   Cancel ═══╝               │            ║| 1Bx25 4Fx9 70x4 4Fx16 03x2 1Bx24
 |║            │                                                    │            ║| 1Bx25 4Fx29 03x2 1Bx24
@@ -324,7 +324,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -352,7 +352,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -380,7 +380,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -408,7 +408,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -436,7 +436,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                readme.bak               ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -464,7 +464,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -492,7 +492,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -520,7 +520,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                readme.bak               ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -548,7 +548,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -576,7 +576,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -604,7 +604,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                readme.bak               ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -632,7 +632,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -660,7 +660,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -688,7 +688,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                readme.bak               ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -716,7 +716,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -744,7 +744,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -771,8 +771,8 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.txt        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx19 4Fx41 1Bx20
 |║readme   bak│        ╔══════════════ Copy ═════════════╗         │            ║| 1Bx19 4Fx41 03x2 1Bx18
-|║            │        ║ You can't copy a file to itself ║         │            ║| 1Bx19 4Fx41 03x2 1Bx18
-|║            │        ║            readme.txt           ║         │            ║| 1Bx19 4Fx41 03x2 1Bx18
+|║            │        ║ You can't copy a file to itself ║         │            ║| 1Bx19 4Fx21 38x1 4Fx19 03x2 1Bx18
+|║            │        ║            readme.txt           ║         │            ║| 1Bx19 4Fx21 38x1 4Fx19 03x2 1Bx18
 |║            │        ║            Ok   Cancel          ║         │            ║| 1Bx19 4Fx15 70x4 4Fx22 03x2 1Bx18
 |║            │        ╚═══════════ Ok   Cancel ═════════╝         │            ║| 1Bx19 4Fx15 70x4 4Fx22 03x2 1Bx18
 |║            │                                                    │            ║| 1Bx19 4Fx41 03x2 1Bx18
@@ -800,7 +800,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -828,7 +828,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -855,8 +855,8 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║       C:readme.txt       ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx19 4Fx41 1Bx20
 |║readme   bak│        ╔══════════════ Copy ═════════════╗         │            ║| 1Bx19 4Fx41 03x2 1Bx18
-|║            │        ║ You can't copy a file to itself ║         │            ║| 1Bx19 4Fx41 03x2 1Bx18
-|║            │        ║            readme.txt           ║         │            ║| 1Bx19 4Fx41 03x2 1Bx18
+|║            │        ║ You can't copy a file to itself ║         │            ║| 1Bx19 4Fx21 38x1 4Fx19 03x2 1Bx18
+|║            │        ║            readme.txt           ║         │            ║| 1Bx19 4Fx21 38x1 4Fx19 03x2 1Bx18
 |║            │        ║            Ok   Cancel          ║         │            ║| 1Bx19 4Fx15 70x4 4Fx22 03x2 1Bx18
 |║            │        ╚═══════════ Ok   Cancel ═════════╝         │            ║| 1Bx19 4Fx15 70x4 4Fx22 03x2 1Bx18
 |║            │                                                    │            ║| 1Bx19 4Fx41 03x2 1Bx18
@@ -884,7 +884,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -912,7 +912,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -939,8 +939,8 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║     \WORK\readme.txt     ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx19 4Fx41 1Bx20
 |║readme   bak│        ╔══════════════ Copy ═════════════╗         │            ║| 1Bx19 4Fx41 03x2 1Bx18
-|║            │        ║ You can't copy a file to itself ║         │            ║| 1Bx19 4Fx41 03x2 1Bx18
-|║            │        ║            readme.txt           ║         │            ║| 1Bx19 4Fx41 03x2 1Bx18
+|║            │        ║ You can't copy a file to itself ║         │            ║| 1Bx19 4Fx21 38x1 4Fx19 03x2 1Bx18
+|║            │        ║            readme.txt           ║         │            ║| 1Bx19 4Fx21 38x1 4Fx19 03x2 1Bx18
 |║            │        ║            Ok   Cancel          ║         │            ║| 1Bx19 4Fx15 70x4 4Fx22 03x2 1Bx18
 |║            │        ╚═══════════ Ok   Cancel ═════════╝         │            ║| 1Bx19 4Fx15 70x4 4Fx22 03x2 1Bx18
 |║            │                                                    │            ║| 1Bx19 4Fx41 03x2 1Bx18
@@ -968,7 +968,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -996,7 +996,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1024,7 +1024,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║      ..\readme.txt       ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║              ..\readme.txt              ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1052,7 +1052,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1080,7 +1080,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1108,7 +1108,7 @@ cursor 28 8 lines 6 7 mode 3
 |║run      bat│          ║  [x] Archive      6-16-2000  ║          │            ║| 1Bx21 70x23 30x10 70x5 03x2 1Bx19
 |║empty    dat│          ║  [ ] Hidden       Time       ║          │            ║| 1Bx21 70x38 03x2 1Bx19
 |║readme   bak│          ║  [ ] System       12:00:00p  ║          │            ║| 1Bx1 30x12 1Bx8 70x23 30x10 70x5 03x2 1Bx19
-|║            │          ╟──────────────────────────────╢          │            ║| 1Bx21 70x38 03x2 1Bx19
+|║            │          ╟──────────────────────────────╢          │            ║| 1Bx21 70x19 07x1 70x18 03x2 1Bx19
 |║            │          ║     [ Set ]   [ Cancel ]     ║          │            ║| 1Bx21 70x38 03x2 1Bx19
 |║            │          ╚══════════════════════════════╝          │            ║| 1Bx21 70x38 03x2 1Bx19
 |║            │                                                    │            ║| 1Bx21 70x38 03x2 1Bx19
@@ -1136,7 +1136,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1164,7 +1164,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1192,7 +1192,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1220,7 +1220,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1248,7 +1248,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                readme.bak               ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1276,7 +1276,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx18 4Fx44 1Bx18
 |║readme   bak│       ╔═══════════════ Copy ═══════════════╗       │            ║| 1Bx18 4Fx44 03x2 1Bx16
-|║            │       ║             readme.bak             ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
+|║            │       ║             readme.bak             ║       │            ║| 1Bx18 4Fx22 38x1 4Fx21 03x2 1Bx16
 |║            │       ║        is a read-only file.        ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
 |║            │       ║ Do you still wish to overwrite it? ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
 |║            │       ║              Yes   No              ║       │            ║| 1Bx18 4Fx17 70x5 4Fx22 03x2 1Bx16
@@ -1304,7 +1304,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1332,7 +1332,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1360,7 +1360,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                readme.bak               ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1388,7 +1388,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx18 4Fx44 1Bx18
 |║readme   bak│       ╔═══════════════ Copy ═══════════════╗       │            ║| 1Bx18 4Fx44 03x2 1Bx16
-|║            │       ║             readme.bak             ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
+|║            │       ║             readme.bak             ║       │            ║| 1Bx18 4Fx22 38x1 4Fx21 03x2 1Bx16
 |║            │       ║        is a read-only file.        ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
 |║            │       ║ Do you still wish to overwrite it? ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
 |║            │       ║              Yes   No              ║       │            ║| 1Bx18 4Fx17 70x5 4Fx22 03x2 1Bx16
@@ -1416,7 +1416,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1444,7 +1444,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1472,7 +1472,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                readme.bak               ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1500,7 +1500,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx18 4Fx44 1Bx18
 |║readme   bak│       ╔═══════════════ Copy ═══════════════╗       │            ║| 1Bx18 4Fx44 03x2 1Bx16
-|║            │       ║             readme.bak             ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
+|║            │       ║             readme.bak             ║       │            ║| 1Bx18 4Fx22 38x1 4Fx21 03x2 1Bx16
 |║            │       ║        is a read-only file.        ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
 |║            │       ║ Do you still wish to overwrite it? ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
 |║            │       ║              Yes   No              ║       │            ║| 1Bx18 4Fx17 70x5 4Fx22 03x2 1Bx16
@@ -1528,7 +1528,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1556,7 +1556,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1584,7 +1584,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║                readme.bak               ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1612,7 +1612,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║        readme.bak        ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx18 4Fx44 1Bx18
 |║readme   bak│       ╔═══════════════ Copy ═══════════════╗       │            ║| 1Bx18 4Fx44 03x2 1Bx16
-|║            │       ║             readme.bak             ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
+|║            │       ║             readme.bak             ║       │            ║| 1Bx18 4Fx22 38x1 4Fx21 03x2 1Bx16
 |║            │       ║        is a read-only file.        ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
 |║            │       ║ Do you still wish to overwrite it? ║       │            ║| 1Bx18 4Fx44 03x2 1Bx16
 |║            │       ║              Yes   No              ║       │            ║| 1Bx18 4Fx17 70x5 4Fx22 03x2 1Bx16
@@ -1640,7 +1640,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1668,7 +1668,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1696,7 +1696,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║re   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1724,7 +1724,7 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║     DOCS\readme.txt      ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx15 4Fx49 1Bx16
 |║readme   bak│    ╔══════════════════ Copy ═════════════════╗     │            ║| 1Bx15 4Fx49 03x2 1Bx14
-|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║     │            ║| 1Bx15 4Fx25 38x1 4Fx23 03x2 1Bx14
 |║            │    ║             DOCS\readme.txt             ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║ Do you wish to write over the old file? ║     │            ║| 1Bx15 4Fx49 03x2 1Bx14
 |║            │    ║     Overwrite   All   aPpend   Skip     ║     │            ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
@@ -1752,7 +1752,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1780,7 +1780,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║ C:\                                                              ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║re   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
@@ -1808,7 +1808,7 @@ cursor 9 10 lines 6 7 mode 3
 |║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║ x                                                                ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║re   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
@@ -1836,7 +1836,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -1864,7 +1864,7 @@ cursor 8 8 lines 6 7 mode 3
 |║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║em   ║ C:\                                                              ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║re   ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
 |║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
@@ -1891,8 +1891,8 @@ cursor 0 127 lines 6 7 mode 3
 |║run      bat│            ║            x             ║            │            ║| 1Bx23 70x34 03x2 1Bx21
 |║empty    dat│                                                    │            ║| 1Bx23 70x2 4Fx29 70x3 03x2 1Bx21
 |║readme   bak│              ╔════════ Copy ═══════╗               │            ║| 1Bx23 70x2 4Fx29 08x2 70x1 03x2 1Bx21
-|║            │              ║ Can't open the file ║               │            ║| 1Bx23 70x2 4Fx29 08x2 70x1 03x2 1Bx21
-|║            │              ║         con         ║               │            ║| 1Bx25 4Fx29 0Bx2 03x3 1Bx21
+|║            │              ║ Can't open the file ║               │            ║| 1Bx23 70x2 4Fx15 38x1 4Fx13 08x2 70x1 03x2 1Bx21
+|║            │              ║         con         ║               │            ║| 1Bx25 4Fx15 38x1 4Fx13 0Bx2 03x3 1Bx21
 |║            │              ║      Ok   Cancel    ║               │            ║| 1Bx25 4Fx9 70x4 4Fx16 03x2 1Bx24
 |║            │              ╚═════ Ok   Cancel ═══╝               │            ║| 1Bx25 4Fx9 70x4 4Fx16 03x2 1Bx24
 |║            │                                                    │            ║| 1Bx25 4Fx29 03x2 1Bx24
@@ -1920,7 +1920,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║            │            │            ║| 1Bx80
 |║empty    dat│            │            ║║            │            │            ║| 1Bx80
 |║readme   bak│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80

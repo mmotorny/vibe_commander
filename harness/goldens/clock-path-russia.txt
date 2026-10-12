@@ -16,7 +16,7 @@ cursor 8 23 lines 6 7 mode 3
 |║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
 |║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -44,7 +44,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║                 C:\                  ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -72,7 +72,7 @@ cursor 10 23 lines 6 7 mode 3
 |║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
 |║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -100,7 +100,7 @@ cursor 17 8 lines 6 7 mode 3
 |║la   ║  [x] Hidden files       ║      ║║              C:\STAMPS               ║| 1Bx3 70x33 03x2 1Bx42
 |║hu   ║  [ ] Executable files   ║      ║╟──────────────────────────────────────╢| 1Bx3 70x33 03x2 1Bx42
 |║     ╟─────────────────────────╢      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
-|║     ║   [ Ok ]   [ Cancel ]   ║      ║║  No `dirinfo' file in this directory ║| 1Bx3 70x33 03x2 1Bx42
+|║     ║   [ Ok ]   [ Cancel ]   ║      ║║  No `dirinfo' file in this directory ║| 1Bx3 70x33 03x2 1Bx2 6Cx1 1Bx39
 |║     ╚═════════════════════════╝      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
 |║                                      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
 |║            │            │            ║║                                      ║| 1Bx5 03x33 1Bx42
@@ -128,7 +128,7 @@ cursor 29 8 lines 6 7 mode 3
 |║la   ║  [x] Hidden files       ║      ║║              C:\STAMPS               ║| 1Bx3 70x33 03x2 1Bx42
 |║hu   ║  [ ] Executable files   ║      ║╟──────────────────────────────────────╢| 1Bx3 70x33 03x2 1Bx42
 |║     ╟─────────────────────────╢      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
-|║     ║   [ Ok ]   [ Cancel ]   ║      ║║  No `dirinfo' file in this directory ║| 1Bx3 70x33 03x2 1Bx42
+|║     ║   [ Ok ]   [ Cancel ]   ║      ║║  No `dirinfo' file in this directory ║| 1Bx3 70x33 03x2 1Bx2 6Cx1 1Bx39
 |║     ╚═════════════════════════╝      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
 |║                                      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
 |║            │            │            ║║                                      ║| 1Bx5 03x33 1Bx42
@@ -156,7 +156,7 @@ cursor 10 10 lines 6 7 mode 3
 |║la   ║  [x] Hidden files       ║      ║║              C:\STAMPS               ║| 1Bx3 70x33 03x2 1Bx42
 |║hu   ║  [x] Executable files   ║      ║╟──────────────────────────────────────╢| 1Bx3 70x33 03x2 1Bx42
 |║     ╟─────────────────────────╢      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
-|║     ║   [ Ok ]   [ Cancel ]   ║      ║║  No `dirinfo' file in this directory ║| 1Bx3 70x33 03x2 1Bx42
+|║     ║   [ Ok ]   [ Cancel ]   ║      ║║  No `dirinfo' file in this directory ║| 1Bx3 70x33 03x2 1Bx2 6Cx1 1Bx39
 |║     ╚═════════════════════════╝      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
 |║                                      ║║                                      ║| 1Bx3 70x33 03x2 1Bx42
 |║            │            │            ║║                                      ║| 1Bx5 03x33 1Bx42
@@ -184,7 +184,7 @@ cursor 10 23 lines 6 7 mode 3
 |║            │            │            ║║     C:\STAMPS\????????.??? Progs     ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -212,7 +212,7 @@ cursor 10 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -240,7 +240,7 @@ cursor 4 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -268,7 +268,7 @@ cursor 10 23 lines 6 7 mode 3
 |║            │            │            ║║last     dat│            │            ║| 1Bx80
 |║            │            │            ║║huge     dat│            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -296,7 +296,7 @@ cursor 14 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -324,7 +324,7 @@ cursor 14 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -353,7 +353,7 @@ cursor 57 8 lines 6 7 mode 3
 |║            │            │            ║║     ║  [x] Hidden files       ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ║  [ ] Executable files   ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ╟─────────────────────────╢      ║| 1Bx43 70x33 03x2 1Bx2
-|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx43 70x33 03x2 1Bx2
+|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx40 6Cx1 1Bx2 70x33 03x2 1Bx2
 |║            │            │            ║║     ╚═════════════════════════╝      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║                                      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║            │            │            ║| 1Bx45 03x33 1Bx2
@@ -382,7 +382,7 @@ cursor 66 8 lines 6 7 mode 3
 |║            │            │            ║║     ║  [x] Hidden files       ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ║  [ ] Executable files   ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ╟─────────────────────────╢      ║| 1Bx43 70x33 03x2 1Bx2
-|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx43 70x33 03x2 1Bx2
+|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx40 6Cx1 1Bx2 70x33 03x2 1Bx2
 |║            │            │            ║║     ╚═════════════════════════╝      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║                                      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║            │            │            ║| 1Bx45 03x33 1Bx2
@@ -411,7 +411,7 @@ cursor 50 10 lines 6 7 mode 3
 |║            │            │            ║║     ║  [x] Hidden files       ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ║  [x] Executable files   ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ╟─────────────────────────╢      ║| 1Bx43 70x33 03x2 1Bx2
-|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx43 70x33 03x2 1Bx2
+|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx40 6Cx1 1Bx2 70x33 03x2 1Bx2
 |║            │            │            ║║     ╚═════════════════════════╝      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║                                      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║            │            │            ║| 1Bx45 03x33 1Bx2
@@ -440,7 +440,7 @@ cursor 14 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -469,7 +469,7 @@ cursor 57 8 lines 6 7 mode 3
 |║            │            │            ║║     ║  [x] Hidden files       ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ║  [x] Executable files   ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ╟─────────────────────────╢      ║| 1Bx43 70x33 03x2 1Bx2
-|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx43 70x33 03x2 1Bx2
+|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx40 6Cx1 1Bx2 70x33 03x2 1Bx2
 |║            │            │            ║║     ╚═════════════════════════╝      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║                                      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║            │            │            ║| 1Bx45 03x33 1Bx2
@@ -498,7 +498,7 @@ cursor 69 8 lines 6 7 mode 3
 |║            │            │            ║║     ║  [x] Hidden files       ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ║  [x] Executable files   ║      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║     ╟─────────────────────────╢      ║| 1Bx43 70x33 03x2 1Bx2
-|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx43 70x33 03x2 1Bx2
+|║            │            │            ║║     ║   [ Ok ]   [ Cancel ]   ║      ║| 1Bx40 6Cx1 1Bx2 70x33 03x2 1Bx2
 |║            │            │            ║║     ╚═════════════════════════╝      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║                                      ║| 1Bx43 70x33 03x2 1Bx2
 |║            │            │            ║║            │            │            ║| 1Bx45 03x33 1Bx2
@@ -527,7 +527,7 @@ cursor 14 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
@@ -556,7 +556,7 @@ cursor 15 6 lines 6 7 mode 3
 |║       ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
 |║       ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
 |║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( )  1 minute      │  ┌ Mouse options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
 |║       ║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
@@ -585,7 +585,7 @@ cursor 40 9 lines 6 7 mode 3
 |║       ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
 |║       ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
 |║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( )  1 minute      │  ┌ Mouse options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
 |║       ║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
@@ -614,7 +614,7 @@ cursor 40 9 lines 6 7 mode 3
 |║       ║  ┌ Screen blank delay ─┐  │  [x] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
 |║       ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
 |║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( )  1 minute      │  ┌ Mouse options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
 |║       ║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
@@ -643,7 +643,7 @@ cursor 14 23 lines 6 7 mode 3
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
 |║            │            │            ║║            │            │            ║| 1Bx80
