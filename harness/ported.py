@@ -512,7 +512,7 @@ BATCHES = [
         source="dirfunc.c",
         routines=("F38_10", "F38_40", "F38_60", "F38_70", "M30_50",
                   "M30_60", "DirFunc", "DelTree"),
-        functions=("F38_10_c", "M30_60_c", "DirFunc_c", "DelTr0_c"),
+        functions=("DirFunc_c", "DelTr0_c"),
         unreached={
             **dict.fromkeys(
                 (0x3B78, 0x3B7B, 0x3B7E, 0x3B80, 0x3B83, 0x3B86, 0x3B89,
@@ -691,7 +691,7 @@ BATCHES = [
         title="What Copy and Rename ask before anything is copied",
         source="copy.c",
         routines=("F36_00", "F35_50", "F35_60", "F35_70"),
-        functions=("F35_01_c", "F45_01_c", "F35_61_c"),
+        functions=("F35_01_c", "F45_01_c"),
     ),
     Batch(
         title="The map of the memory: its lines, the vectors that point "

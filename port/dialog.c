@@ -112,16 +112,20 @@
    port knows code by its bytes in the file and would not see a function
    run that begins with such a number.
 
-   DialSub calls the routine that a dialog has for Enter and F10: `key`
-   and `begin` are what Dialog has in AX and BX then, `field` and `box`
-   are the field of the cursor and the dialog, and `segment` is that of
-   whoever asked for the dialog. It returns AX as the routine leaves it,
-   and something that is not 0 in the high word if the routine set the
-   carry flag: to go on with the dialog. */
+   The routines that a dialog may name for Enter and F10, the SUB_ of
+   tables.h, get the answer as Dialog has it, the key. F38_10 returns the
+   answer to go by. M30_60 does too, and in the high word something that
+   is not 0 to go on with the dialog. F35_61 gets the place of the line
+   that the tree is for as well, and is not 0 to go on with the dialog;
+   the answer stays what it was. */
 u16 AsmSeg(void);
-u32 DialSub(u16 key, u16 begin, u16 field, u16 routine, u16 segment, u16 box);
+u16 F38_10(u16 answer);                                 /* dirfunc.c */
+u32 M30_60(u16 answer);
+u16 F35_61(u16 answer, u16 place);                      /* copy.c */
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux DialSub "*_a" __far parm [ax] [bx] [di] [si] [cx] [dx] value [dx ax] modify exact [ax bx cx dx si di es]
+#pragma aux F38_10  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux M30_60  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux F35_61  "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]
 
 /* C routines of other files that vc.h does not have. */
 u16 LnStr(const struct LineArgs STACK *args);           /* line.c */
@@ -992,11 +996,27 @@ Dial70:                                 /* Enter */
     if (field->mType == FIELD_BUTTONS)
         key = MD(field->mPoint);
 Dial71:
-    if (WORD(head->SubFunc) != 0) {
-        pair = DialSub(key, begin, cursor, WORD(head->SubFunc), segment, box);
+    /* The routine that the dialog names. The assembly calls it by its
+       address, and each hands back the answer in AX and the carry flag
+       to go on with the dialog, in its own way. */
+    switch (head->SubFunc) {
+    case SUB_F38_10:
+        key = F38_10(key);
+        break;
+    case SUB_M30_60:
+        pair = M30_60(key);
         key = LOW(pair);
         if (HIGH(pair) != 0)
             goto Dial31;
+        break;
+    case SUB_F35_60:
+        if (F35_61(key, begin + 0x200 + 0x305) != 0)
+            goto Dial31;
+        break;
+    case SUB_F35_61:
+        if (F35_61(key, begin + 0x305) != 0)
+            goto Dial31;
+        break;
     }
     if ((key & 0xFF) != 0)
         goto Dial82;

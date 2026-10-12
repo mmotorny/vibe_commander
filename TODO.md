@@ -25,15 +25,15 @@ the first of them stood. `VCSUB2.INC` was two texts and is gone.
 | `VC.ASM` | | | | | 2 / 160 | 219 | `main.c`, `start.c` |
 | `VCFUNC.INC` | | | | | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
 | `VCMENU.INC` | | | | | 8 / 174 | 495 | `commands.c`, `menu.c` |
-| `VCF1.INC` | | | | | | 217 | `dirfunc.c` |
-| `VCCOPY.INC` | | | | | 1 / 10 | 82 | `copy.c` |
+| `VCF1.INC` | | | | | | 192 | `dirfunc.c` |
+| `VCCOPY.INC` | | | | | 1 / 10 | 61 | `copy.c` |
 | `VCVIEW.INC` | | | | | | 180 | `view.c` |
 | `VCEDIT.INC` | | | | | | 26 | `edit.c` |
 | `VCMEM.INC` | | | | | | 40 | `memory.c` |
 | `VCFIND.INC` | | | | | | 22 | `find.c` |
-| `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
+| `VCSUB1.INC` | | | | | | 35 | `dialog.c` |
 | `VCSUB3.INC` | | | | | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | | | | | 13 / 420 | 2,420 | |
+| all | | | | | 13 / 420 | 2,359 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -69,11 +69,11 @@ The code is, by what it is there for:
   `Init11`, the eight entries made with `MainC`, `MainGo`, `Exit`.
 - Stubs of routines that other stubs call: `AdrNum`, `NumAdr`, `ChgAdr`
   and `F20_02` in `VCFUNC.INC`, `Dialog` in `VCSUB1.INC`, `ReDir` and
-  `ReadTre` in `VCSUB3.INC`, `DelTree` in `VCF1.INC`, and those that a
-  dialog names for Enter and F10: `F38_10`, `M30_60`, `F35_60`.
+  `ReadTre` in `VCSUB3.INC`, `DelTree` in `VCF1.INC`. Those that a
+  dialog names for Enter and F10 are gone: `Dialog` calls the functions.
 - Entries for C: `ReDir_a` in `VC.ASM`; `MemRun_a`, `ResSeg_a` and
-  `Release_a` in `VCMEM.INC`; `AsmSeg_a` and `DialSub_a` in
-  `VCSUB1.INC`, with `CallPSP`.
+  `Release_a` in `VCMEM.INC`; `AsmSeg_a` in `VCSUB1.INC`, with
+  `CallPSP`.
 
 What names what:
 
@@ -187,13 +187,13 @@ of `VC.ASM`, which have none either; `VCSUB2.INC`, which is gone, and
 path, the first from its second byte on, and `DrIn_F` and `Init_F`,
 the 13 bytes of a name.
 
-**2. The words that name a routine.** One agent, after 1, since it
-changes dialogs that are constants by then. A dialog names a routine for
+**2. The words that name a routine.** Done. A dialog names a routine for
 Enter and F10 in its header, `SubFunc`: `F38_10`, `M30_60`, `F35_60` and
-`F35_61`. They become a table of functions in `port/dialog.c`, and the
-word the place in it, as `FncAddr` did (see `Fnc_T` of
-`port/dirfunc.c`); `DialSub_a` and the stubs go, and the test `data` is
-told of each such word in `NAMED_OTHERWISE`, as a number.
+`F35_61`. The word is a number now, `SUB_` of `port/tables.h`, and
+`Dialog` calls the function from a `switch`, not through a table as
+`FncAddr` does: the three functions take and hand back different
+things. `DialSub_a` and the stubs are gone, and the test `data` has each
+such word in `NAMED_OTHERWISE`, as a number.
 
 **3. The commands and the main loop.** One agent, or one after another,
 never two at once: all of it is one web of jumps through `port/main.c`,
@@ -1465,10 +1465,10 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     `harness/ported.py`. `tools/routines.py` counts calls, not jumps:
     `Cursor` has fewer callers there than it has. The assembler says
     "Symbol not defined" for a stub that is taken out too early.
-  - Entries for C: `AsmSeg_a`, the assembly's code segment, where its
-    boxes and texts are, and `DialSub_a`, which calls what a dialog
-    names for Enter. Neither calls an interrupt. `FncCall_a`, which
-    called what `FncAddr` names, is a function of `port/dirfunc.c`.
+  - An entry for C: `AsmSeg_a`, the assembly's code segment, where its
+    boxes and texts are. `FncCall_a`, which called what `FncAddr`
+    names, is a function of `port/dirfunc.c`, and `DialSub_a`, which
+    called what a dialog names for Enter, is a `switch` in `Dialog`.
   - No text or table: those are constants of `port/bars_t.c`,
     `port/treebox_t.c` and `port/system_t.c`. Four names of files are
     copied with what follows them, and are written there as long as what

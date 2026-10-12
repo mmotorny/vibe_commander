@@ -124,11 +124,29 @@ struct BOXTX {
 #define BOX2(count) \
     struct { BOX_HEAD; struct BOXTX text[2]; const u8 *line[count]; }
 
+/* The routine that a dialog names, for Dialog to call when the dialog is
+   answered with Enter or F10. The assembly has the address of the
+   routine in the header; the C has one of these numbers there, and
+   Dialog of port/dialog.c calls the function that it stands for. The
+   word is still a word. */
+#define SUB_F38_10 1                    /* F38_10 of dirfunc.c: what is
+                                           deleted, the selected files or
+                                           the one under the cursor */
+#define SUB_M30_60 2                    /* M30_60 of dirfunc.c: whether
+                                           the date and the time that
+                                           were typed are one */
+#define SUB_F35_60 3                    /* F35_61 of copy.c, the tree to
+                                           choose a target from, for a
+                                           dialog whose line for it is
+                                           two rows further down, */
+#define SUB_F35_61 4                    /* and for one where it is not */
+
 /* The header of a dialog: BOXHD of the assembly. */
 struct BOXHD {
     const void *pDiBox;                 /* its box */
     u16 BoxBase;                        /* where the middle of its top is */
-    const void *SubFunc;                /* a routine for Enter and F10, or 0 */
+    u16 SubFunc;                        /* the routine for Enter and F10,
+                                           a SUB_ number, or 0 */
     u8  bKeyBar;                        /* the key bar to show */
     u8  bMenu;                          /* the item of the menu bar, or FFh */
     u8  bHelp;                          /* the page of the help, or 0 */

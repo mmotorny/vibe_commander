@@ -67,13 +67,6 @@ extern const u8 OkCan_D[];
 #pragma aux OkCan_S "*"
 #pragma aux OkCan_D "*"
 
-/* The routines that a dialog names for Enter and F10: the stubs of
-   F38_10 and M30_60 of port/dirfunc.c, in the assembly. */
-extern const u8 F38_10[];
-extern const u8 M30_60[];
-#pragma aux F38_10 "*"
-#pragma aux M30_60 "*"
-
 /* A box to tick, by the byte of TmpBuf that has its value: where that is
    while the dialog is up, and where it is taken from and left, which is
    the same place for the dialogs here. */
@@ -212,7 +205,7 @@ static const BOX1(4) DelSe_P = {
     { Del_S, DelSl_S, Var_S, DelCa_S }
 };
 const DIALOG(1) DelSe_B = {
-    { &DelSe_P, 0x528, F38_10, 1, 2, 23, 1 },
+    { &DelSe_P, 0x528, SUB_F38_10, 1, 2, 23, 1 },
     { { 4, 0, 0, 0, 0, 0x41F, MD_AT(TmpBuf[200]), DelCa_D } },
     0
 };
@@ -356,7 +349,7 @@ static const BOX1(9) StAt1_P = {
       &Attr6_S[5], 0, Attr7_S }
 };
 const DIALOG(7) StAt1_B = {
-    { &StAt1_P, 0x428, M30_60, 1, 2, 24, 0 },
+    { &StAt1_P, 0x428, SUB_M30_60, 1, 2, 24, 0 },
     {
         { 3, 6, 1, 0, 4, 0x407, TICK(0) },
         { 3, 0, 2, 1, 4, 0x507, TICK(1) },
@@ -379,7 +372,7 @@ static const BOX(9) StAt2_P = {
       Attr7_S }
 };
 const DIALOG(11) StAt2_B = {
-    { &StAt2_P, 0x428, M30_60, 1, 2, 24, 0 },
+    { &StAt2_P, 0x428, SUB_M30_60, 1, 2, 24, 0 },
     {
         { 3, 10, 1, 0, 4, 0x407, TICK(0) },
         { 3, 0, 2, 1, 5, 0x507, TICK(1) },

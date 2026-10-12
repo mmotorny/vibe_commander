@@ -101,26 +101,6 @@ AsmSeg_a PROC	FAR
 	RET
 AsmSeg_a ENDP
 
-; The routine that a dialog has for Enter and F10: the near routine at
-; SI, with AX, BX and DI as Dialog has them, in BP the dialog, which
-; comes in DX, and in DS what comes in CX, the DS of whoever asked for
-; the dialog. AX comes back as the routine leaves it, and DX is not 0 if
-; it set the carry flag.
-	PUBLIC	DialSub_a
-DialSub_a PROC	FAR
-	PUSH	BP
-	PUSH	DS
-	PUSH	DS
-	POP	ES
-	MOV	BP,DX
-	MOV	DS,CX
-	CALL	SI
-	SBB	DX,DX
-	POP	DS
-	POP	BP
-	RET
-DialSub_a ENDP
-
 
 
 ;------------------- Test drive letter -----------------

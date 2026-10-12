@@ -49,14 +49,6 @@ extern const u8 YesNo_D[];
 #pragma aux YesNo_S "*"
 #pragma aux YesNo_D "*"
 
-/* What Dialog calls when the dialogs of the commands are answered: the
-   stubs of F35_61 of port/copy.c, which shows the tree for F10 and its
-   button. F35_60 is for the dialog that has a line more. */
-extern const u8 F35_60[];
-extern const u8 F35_61[];
-#pragma aux F35_60 "*"
-#pragma aux F35_61 "*"
-
 /* Where in the main data the commands keep what the boxes show and the
    dialogs set: see port/copy.c. */
 #define CpVar1  MD_AT(TmpBuf[120])      /* Variable 1 */
@@ -108,7 +100,7 @@ static const BOX2(5) Copy1_P = {
     { Var_S, Var2_S, Empty_S, 0, CoMnu_S }
 };
 const DIALOG(2) Copy1_B = {
-    { &Copy1_P, 0x528, F35_61, 8, 2, 0, 8 },
+    { &Copy1_P, 0x528, SUB_F35_61, 8, 2, 0, 8 },
     { { 1, 1, 1, 0, 0, 0x305, CpInpt, NUMBER(0x200 + LenStr) },
       { 4, 0, 0, 1, 1, 0x516, CpMenu, Copy_D } },
     0
@@ -123,7 +115,7 @@ static const BOX2(7) Copy2_P = {
     { Var_S, Var2_S, Empty_S, CpTo1_S, Empty_S, 0, CoMnu_S }
 };
 const DIALOG(3) Copy2_B = {
-    { &Copy2_P, 0x528, F35_60, 8, 2, 0, 8 },
+    { &Copy2_P, 0x528, SUB_F35_60, 8, 2, 0, 8 },
     { { 1, 2, 1, 0, 0, 0x305, MD_AT(ViewFil), NUMBER(0x300 + LenStr) },
       { 1, 0, 2, 1, 1, 0x505, CpInpt, NUMBER(0x200 + LenStr) },
       { 4, 1, 0, 2, 2, 0x716, CpMenu, Copy_D } },

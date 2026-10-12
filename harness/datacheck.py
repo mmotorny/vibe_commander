@@ -105,6 +105,12 @@ NAMED_OTHERWISE = {
                       "Drive... goes on in a stub of its own, which hands "
                       "the box of the drives the panel and the menu as its "
                       "function takes them"),
+    **{(dialog, 4): ("is", number,
+                     "the routine that a dialog names for Enter and F10 is "
+                     "a number, SUB_ of port/tables.h, by which Dialog "
+                     "calls the function")
+       for dialog, number in (("DelSe_B", 1), ("StAt1_B", 2), ("StAt2_B", 2),
+                              ("Copy2_B", 3), ("Copy1_B", 4))},
     **{("MnuTab", row * 8 + 4): ("behind", "MenuLn1", _MENUS)
        for row in range(5)},
     **{("MnuTab", row * 8 + 6): ("behind", "MnuHlp1", _MENUS)

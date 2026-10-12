@@ -2,9 +2,6 @@
 ;		Version :	27.08.1999
 ;-------------------------------------------------------
 
-; Of this file, and named by C code or by another file.
-	PUBLIC	F35_60, F35_61
-
 CpVar1	EQU	BYTE PTR TmpBuf+120	; Variable 1
 CpVar2	EQU	BYTE PTR TmpBuf+140	; Variable 2
 
@@ -66,21 +63,6 @@ F55_00:	MOV	CL,0			; ^F5 - copy file
 F56_00:	MOV	CL,1			; ^F6 - rename or move file
 F56_01:	MOV	ES:OneFile,1
 	JMP	F35_01
-
-; What the dialogs of the commands have Dialog call when they are answered:
-; F35_61_c of port/copy.c, which shows the tree for F10 and its button.
-;			   AX - the answer
-;			BH,BL - where the box begins
-;	Return :	 CY=1 - go on with the dialog
-F35_60	PROC	NEAR			; Tree
-	ADD	BH,2
-F35_61:	ADD	BX,305h
-	PUSH	AX
-	CallC	F35_61_c
-	NEG	AX			; CY for 1
-	POP	AX
-	RET
-F35_60	ENDP
 
 ; The entries by which port/copy.c calls what is still assembly are next to
 ; their routines.

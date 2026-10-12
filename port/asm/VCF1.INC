@@ -3,8 +3,7 @@
 ;-------------------------------------------------------
 
 ; The texts, the boxes and the dialogs of this file are C, in
-; port/dirfunc_t.c. Two dialogs there name a routine of this file.
-	PUBLIC	F38_10, M30_60
+; port/dirfunc_t.c.
 
 	.CODE
 ; The commands of this file are C, in port/dirfunc.c. Each is jumped to,
@@ -32,15 +31,6 @@ F38_00:	MOV	AX,DS			; F8 - delete
 	CallC	F38_00_c
 	JMP	F1Next
 
-; Dialog calls this when the box for selected files is answered.
-;			   AL - the answer
-;	Return :	   AL - the answer to go by, CY=0
-F38_10	PROC	NEAR
-	CallC	F38_10_c
-	CLC
-	RET
-F38_10	ENDP
-
 F48_00:	CallC	F48_00_c		; Shift F8 - delete
 	JMP	F1Next
 
@@ -51,18 +41,6 @@ F58_00:	MOV	AX,DS			; ^F8 - delete one file
 M30_00:	MOV	AX,DS			; Attributes...
 	CallC	M30_00_c
 	JMP	F1Next
-
-; Dialog calls this when the dialog of attributes is answered.
-;			   AL - the answer
-;	Return :	   AL - the answer to go by
-;			 CY=1 - a date or a time was refused
-M30_60	PROC	NEAR			; Test date & time
-	PUSH	DX
-	CallC	M30_60_c		; DX: not 0 if one was refused
-	NEG	DX
-	POP	DX
-	RET
-M30_60	ENDP
 
 F54_00:	CallC	F54_00_c		; Change label
 	JMP	F1Next
