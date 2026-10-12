@@ -31,6 +31,21 @@ but no Latin letters.
 The BIOS's keyboard buffer holds 15 keys, and keys of one name all go
 into it at once.
 
+"Wait*18" lets time pass with nothing pressed: 18 ticks of the machine's
+timer, of which a second has 18.2, from when the program has taken what
+the step has before it. The program goes round meanwhile and does what it
+does by itself when time passes. What the step has behind the wait, or
+its end, comes the first time that the program goes round after the last
+of those ticks: later than one tick less than was asked for, and no later
+than the ticks asked for and one round of the program. The machine's time
+is counted in the instructions it executes, so that is the same
+instruction every time a program is taken through the scenario. The
+original and the port do not get to the wait at the same time, and each
+counts its ticks from where it is: their waits are of one length to
+within a tick, and both go on just behind a tick. A wait may have 65535
+ticks, an hour; a minute of them takes four seconds to run with the
+original and eight with the port.
+
 The mouse is written with the cell of the screen it goes to, column and
 row from 0: "Click@1,24" moves the pointer there, presses the left
 button and lets it go, "RightClick@40,12" the right one,
@@ -319,6 +334,14 @@ def _pointer(name):
     return out + _mouse([_packet(0, 0)])
 
 
+def _wait(name):
+    """The event for "Wait*ticks"."""
+    ticks = name.partition("*")[2]
+    if not ticks.isdigit() or not 0 < int(ticks) < 1 << 16:
+        raise ValueError(f"unknown wait {name!r}")
+    return bytes([HOLD]) + struct.pack("<H", int(ticks))
+
+
 def events(step):
     """The events of the script for one step, without the one that ends
     it."""
@@ -326,6 +349,8 @@ def events(step):
     for name in step.split():
         if "@" in name and not name.startswith('"'):
             chords.append(_pointer(name))
+        elif name.startswith("Wait*"):
+            chords.append(_wait(name))
         elif name.startswith('"'):
             text = name.strip('"')
             keys_of = (_russian if any(char.lower() in RUSSIAN

@@ -86,7 +86,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 3: Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24 Move@79,24
+== 3: Wait*30
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -96,7 +96,7 @@ cursor 0 127 lines 6 7 mode 3
 |║readme   txt│                                            rive C: is WORK      ║| 1Bx22 3Fx36 1Bx5 1Ex2 1Bx4 1Ex4 1Bx7
 |║hello    txt│           ╔════════ User Menu ═════════╗   l bytes on drive C:  ║| 1Bx22 3Fx36 03x2 1Bx15 1Ex2 1Bx3
 |║notes    doc│           ║ F1  Archives...            ║   s free on drive C:   ║| 1Bx22 3Fx36 03x2 1Bx14 1Ex2 1Bx4
-|║data     bin│           ║ F2  Format floppy disk...  ║    3,072 bytes in      ║| 1Bx22 3Fx8 0Fx23 3Fx5 03x1 06x1 1Ex4 1Bx16
+|║data     bin│           ║ F2  Format floppy disk...  ║    3,072 bytes in      ║| 1Bx22 3Fx8 0Fx5 78x1 0Fx17 3Fx5 03x1 06x1 1Ex4 1Bx16
 |║run      bat│           ║ F4  Edit file              ║   \WORK                ║| 1Bx22 3Fx36 03x2 1Bx20
 |║empty    dat│           ╚════════════════════════════╝   ─────────────────────╢| 1Bx22 3Fx36 03x2 1Bx20
 |║            │                                                                 ║| 1Bx22 3Fx36 03x2 1Bx20
@@ -112,7 +112,7 @@ cursor 0 127 lines 6 7 mode 3
 |║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
-|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x5 47x1
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 4: Click@35,8
 cursor 0 127 lines 6 7 mode 3

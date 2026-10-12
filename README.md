@@ -491,6 +491,11 @@ and Alt go down and come up one at a time, with a round of the program
 between. Where a scenario wants the program to find a key while it works,
 as `find` does of a search, the key is written as one name with the key
 that starts the work, "Enter+Home": the two go into the buffer together.
+A step may also let time pass with nothing pressed, "Wait*18" for 18
+ticks of the machine's timer, a second: the driver hands the program
+nothing more until the BIOS's count of ticks has gone up by so many, and
+the program does meanwhile what it does by itself, as after a minute
+without a key, when it blanks the screen.
 A step is finished when the program has gone round twice with no key left
 and nothing that it will do by itself after a while, which the driver
 reads in the program's own data: a time of day, which it believes for two

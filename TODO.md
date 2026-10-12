@@ -58,25 +58,8 @@ Things that are known and not done. Standing instructions are in
   through a sky of some hundreds of turns, and every screen of either
   was one that a model of the routine, written from the assembly, has
   after some turn. See what the batch lost time to, below.
-- Of `Blank`, 19 instructions of the original have run in no scenario
-  and are listed as out of reach: a star that flares up or goes out has
-  been out for 88 turns of the sky at the least, a turn takes a tick of
-  the timer, and a step ends when the program has gone round twice. The
-  one thing a script has to keep a step from ending there is the mouse
-  moved within the corner, which lets half a tick pass for 500 bytes,
-  and a script holds 64K. A step that has the driver let the program go
-  round so many times would reach them, and the minute after which the
-  blanker comes up by itself too, four instructions of `Input0`: the
-  driver has the events, 04 for rounds and 05 for times that the mouse
-  is asked, and `harness/driver.py` makes the second only behind a
-  click. "Move@79,0*255" could be the mouse moved and 255 times asked.
-  Six more of `LeaveTm` are for DESQview.
-- Of `Input0` in C, four instructions of the original have run in no
-  scenario and are listed as out of reach in `harness/ported.py`: where
-  the minute has come in which the screen is blanked, or midnight has
-  passed before it. The blanking by the mouse in the corner runs, in
-  `mouse-keys`, which shows it on a screen that a beep has moved up a
-  line, all of it put back as it should be, and in `blank`.
+- Of `LeaveTm`, six instructions of the original have run in no
+  scenario and are listed as out of reach: they are for DESQview.
 - `ClsLine` fills a row with the colour that DOS writes in, and reads
   that colour through DS, where every other routine of its kind goes by
   ES. One caller comes with DS on a panel: a command of a menu or of an
@@ -831,8 +814,7 @@ Things that are known and not done. Standing instructions are in
   two clicks, in one step or in two. The time a second click has is 0.4
   seconds or up to 1.4, by the hundredths of the first click (see
   `DoublMo` below). `mouse-user-menu`
-  has one that is late, after 64 times, `_A_WHILE` of
-  `harness/scenarios.py`, which is three seconds at the least.
+  has one that is late, after "Wait*30", 30 ticks of the timer.
 - The main loop hands the next command the registers as the assembly
   left them, BX, CX, DX, SI, DI and BP, but for two things. What
   `DoublMo` leaves in AX and CX after a click on an entry is not handed

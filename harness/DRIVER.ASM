@@ -56,7 +56,9 @@
 ;	02 word bytes	as many bytes from the mouse as the word says: its
 ;			packets of three, the buttons and how far it moved
 ;	03		the step ends
-;	04 n		nothing for n more rounds of the program
+;	04 word		nothing until the timer has ticked so many times
+;			more: the program goes round meanwhile, and does
+;			what it does by itself when time passes
 ;	05 n		nothing until the program has asked the mouse
 ;			driver n more times where the mouse is and which
 ;			buttons are down (INT 33h, function 3): a program
@@ -129,7 +131,10 @@ Ready	db	0			; The script's header has been read
 Done	db	0			; The script has ended
 Idles	db	0			; Rounds the program has idled since
 					; anything was fed or seen to change
-Hold	db	0			; Rounds still to let pass (event 04)
+Hold	db	0			; Ticks of the timer are let pass
+					; (event 04)
+HTick	dw	0			; ... since this tick
+HLen	dw	0			; ... so many of them
 Asks	db	0			; Times the program still has to ask
 					; the mouse driver (event 05)
 Prog	db	0			; INT 28h came from the program
@@ -416,8 +421,11 @@ Pump1:	or	bl,bl
 	jne	PumpX
 	cmp	cs:Hold,0
 	je	Pump2
-	dec	cs:Hold
-	jmp	PumpX
+	call	Ticks
+	sub	ax,cs:HTick
+	cmp	ax,cs:HLen
+	jb	PumpX
+	mov	cs:Hold,0
 Pump2:	call	Peek
 	cmp	al,1
 	je	PumpK
@@ -464,7 +472,13 @@ PumpA:	inc	cs:SPos
 	jmp	PumpN
 PumpH:	inc	cs:SPos
 	call	Next
-	mov	cs:Hold,al
+	mov	cl,al
+	call	Next
+	mov	ch,al
+	mov	cs:HLen,cx
+	call	Ticks
+	mov	cs:HTick,ax
+	mov	cs:Hold,1
 	mov	cs:Idles,0
 PumpN:	or	bl,bl			; The next event at once only for a
 	jz	PumpX			; program that will not come round

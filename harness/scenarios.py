@@ -299,8 +299,8 @@ out again (show.py --changes is how):
     goes by what the machine executes, and that is little between two
     clicks. The program allows 0.4 seconds, or up to 1.4, by the
     hundredths of the time of day at the first click. To have a click
-    come late, take the pointer across the screen and back 64 times
-    first: _A_WHILE below. The time of day is the same to the hundredth
+    come late, let time pass first, "Wait*30": 30 ticks of the timer,
+    1.6 seconds. The time of day is the same to the hundredth
     every time a scenario is run with the same program, but the port
     gets to a click some hundredths later than the original: nothing
     may depend on which side of a second a click is.
@@ -428,10 +428,19 @@ out again (show.py --changes is how):
     the timer has ticked, 18 times a second, and the machine's time is
     counted in instructions: one movement of the mouse within the
     corner, which is 500 bytes of a script, lets about half a tick
-    pass, and a script holds a megabyte at the most, which driver.py
-    says when one is longer. A star is out for 88 turns at the least
-    before it changes, and the blanker comes up by itself after a
-    minute: no scenario waits for either that way. See blank.
+    pass. See blank.
+  - "Wait*18" in a step lets 18 ticks of the machine's timer pass, a
+    second, with nothing pressed (see driver.py). The blanker comes up
+    by itself when no key has been pressed for as long as the
+    Configuration dialog says, five minutes as the program is
+    distributed: "F9 o Enter", "Tab Down Down Space Enter" make that a
+    minute, 1092 ticks. A star is out for 88 turns of the sky at the
+    least before it changes, so "Wait*1300 x" has the blanker come up,
+    every kind of star, and a key to end it, in one step: a step may
+    not end with the sky on the screen. That wait takes some four
+    seconds to run in the original and eight in the port: keep such
+    waits few. See blank-timed, which has the minute end after
+    midnight as well, the time set by DOS's command first.
   - The setup file is written to the program's directory whatever the
     panels show: with "del d:\\vc\\vc.ini" run as a command it is made
     anew, and with the directory renamed, F6 on it in a panel that shows
@@ -1099,12 +1108,6 @@ _CLOCK_EARLY_STEPS = (
     '"time" Space "9:59"',
     "Enter",
 )
-
-# The pointer of the mouse taken across the screen and back 64 times: three
-# seconds or more of the machine's time, which is counted in what the
-# machine executes. A click on the line that the click before was on comes
-# too late then to be the second click of two.
-_A_WHILE = " ".join(["Move@79,24"] * 64)
 
 SCENARIOS = {
     "start": Scenario(
@@ -4182,7 +4185,8 @@ SCENARIOS = {
         steps=(
             "F2",
             "Click@35,8",                 # a line: the cursor goes there
-            _A_WHILE,
+            "Wait*30",                    # 1.6 seconds: too long for the
+                                          # second click of two
             "Click@35,8",                 # again, late: nothing more
             "Click@40,6",                 # the frame of the box: nothing
             "RightClick@35,3",            # the right button outside it:
@@ -4589,6 +4593,20 @@ SCENARIOS = {
             # The sky for some twenty turns of it: stars come out.
             "Move@79,0 " + "Move@76,1 Move@79,0 " * 20 + "Click@77,0",
             "x",                          # the panels take keys again
+        )),
+
+    "blank-timed": Scenario(
+        "The screen blanker coming up by itself, a minute after the last "
+        "key, a minute that ends after midnight, with a sky that turns "
+        "until every kind of star has been",
+        steps=(
+            "F9 o Enter",                 # the Configuration dialog
+            "Tab Down Down Space Enter",  # Screen blank delay: 1 minute
+            '"time" Space "23:59:20" Enter',      # by DOS's command
+            "Wait*1300 x",                # 1092 ticks to the sky, on the
+                                          # next day, 208 turns of it, and
+                                          # a key, which is lost
+            "x",                          # this one is typed
         )),
 
     "start-setup": Scenario(

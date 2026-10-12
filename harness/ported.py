@@ -628,16 +628,6 @@ BATCHES = [
         routines=("Input", "Input0", "Rnd", "EdLin", "EdSub1", "EdSub2",
                   "CmpSym", "Search"),
         functions=(),
-        unreached={
-            **dict.fromkeys(
-                (0xB1E6, 0xB1EE, 0xB1F0, 0xB1F3),
-                "Input0, when the minute has come in which the screen is "
-                "blanked, or midnight has passed before it: a minute at "
-                "the least of the machine's time in which no key is "
-                "pressed, and the harness presses the next one as soon "
-                "as the program waits. The blanking itself runs, for the "
-                "mouse in the corner of the screen"),
-        },
     ),
     Batch(
         title="Copying, renaming and moving a file or a directory",
@@ -926,19 +916,6 @@ BATCHES = [
                 (0xB44A, 0xB44D, 0xB44F, 0xB452, 0xB454, 0xB457),
                 "LeaveTm, giving the time to the other programs of "
                 "DESQview: the bench does not run it"),
-            **dict.fromkeys(
-                (0xB547, 0xB549, 0xB54B, 0xB563, 0xB565, 0xB568, 0xB56B,
-                 0xB56D, 0xB56E, 0xB570, 0xB572, 0xB574, 0xB576, 0xB577,
-                 0xB579, 0xB57C, 0xB57E, 0xB581, 0xB583),
-                "Blank, for a star that flares up or goes out: it has "
-                "been out for 88 turns of the sky by then, at the least, "
-                "and the sky turns when the timer has ticked. A step "
-                "ends when the program has gone round twice; what keeps "
-                "it from ending, the mouse moved within the corner, "
-                "lets half a tick pass for 500 bytes of a script, which "
-                "holds 64K: some 60 turns. A step that lets the program "
-                "go round a number of times would reach them: the driver "
-                "has the event for it, and no step makes it"),
         },
     ),
     Batch(
