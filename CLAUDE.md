@@ -338,6 +338,31 @@ port.
   "Invalid Opcode" somewhere else. `PUBLIC` can stand anywhere, and at
   the top of the batch's own file, as in `VCF1.INC`, it does not meet
   the line another batch adds.
+- A box and a dialog are tables in the assembly's code segment, and
+  `DialBox`, `Dialog`, `MinMnu`, `MnMn10` and `MnMn40`, which are C, take
+  them as offsets there, from the assembly and from C alike. The C reads
+  them through far pointers made of the offset and of the assembly's
+  segment, which an entry hands it: `AsmSeg_a`, and `AT` in
+  `port/dialog.c`. Naming something of the assembly gives the segment
+  too, but as a number that is set when the program is loaded, and the
+  `port` test knows code by its bytes in the file: a function that had
+  such a number among its first instructions, before its first call or
+  jump, was reported as "not executed in the port".
+- Where the assembly has DS elsewhere than on the main data and the
+  routine reads there, the stub hands DS to the C as a number: the filter
+  of a panel is a dialog whose fields are in the panel's segment. C code
+  that calls such a function passes `MAIN_SEG` of `port/vc.h`, which
+  compiles to a copy of DS.
+- A routine that the assembly names in a table and C code has to call,
+  as `Dialog` calls what a dialog has for Enter and F10, gets an entry
+  that takes its address in a register and calls that: `DialSub_a`, next
+  to the stub of `Dialog`. It sets DS and BP as the routine expects them
+  and makes a number of the carry flag. Such a routine may call the stub
+  of the function that called it: `M30_60` and `F38_10` call `Dialog`
+  from inside a dialog.
+- With `modify exact [ax]` the compiled function saves the registers its
+  arguments come in as well, BX, CX, DX, SI and DI, and ES: the stub of
+  `InSt10` is the call and nothing else.
 
 ### C for the port
 

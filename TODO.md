@@ -128,6 +128,25 @@ Things that are known and not done. Standing instructions are in
   tried. The scenarios search three levels. DOS's critical error can come up with
   all of that on the stack: `FindFil` calls DOS for the files, and to
   open and read them.
+- Of the dialogs, what they do for the mouse has run in no scenario, 255
+  instructions: `Slct20` as a whole and parts of `Dialog`, `InpStr`,
+  `Select`, `FlipFl` and `MnMn10`. They are translated by reading, and
+  listed as out of reach in `harness/ported.py`.
+- A dialog trusts its tables. One without a field takes no key and does
+  not end, a box without a line has 65536, and a line to type into of
+  length 0 is shown as one of 65536. Ported like that; the program has
+  none of them.
+- A click of the mouse into a line that is typed into puts the cursor
+  where the mouse is, and no further than the text goes; `InpStr` looks
+  for the end of the text in as many bytes as the line has, so in a
+  line that is full it finds none and stops one short of the end. Ported
+  like that, by reading.
+- The routine that a dialog has for Enter and F10 got DX as `Dialog`
+  happened to have it, the size of the box or of its buttons, and two of
+  them, `M30_60` and `F38_10`, showed a box of their own with that as
+  the text for ^I. From the C they get the offset of the dialog there,
+  and those two, which are C as well, name no text. None of the lines of
+  their boxes has ^I, so nothing read it.
 - Deriving the golden of `find` stopped once in three times with "the
   screen did not settle", at the step that ends in the help over a
   search that runs. Not looked into: derive again.
@@ -492,6 +511,40 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     routines stay. It had also made an entry for `DelTr0`, which is C
     now: the entry went, and the tree's box calls the function. A build
     and a test of 146 seconds, which passed at once.
+
+- The dialogs, 15 routines, 2,190 bytes, 50 minutes in all, next to
+  three other batches. The translation passed the first time it was
+  tested.
+  - 8 minutes: an address that `harness/reach.py` listed, taken for
+    another instruction. `Dialog` has `ADD BL,40` three times; the
+    listing was searched for a label near the first of them, because
+    `grep` takes the listing for a binary file and found nothing by the
+    address: `grep -a`. The steps that reach the first did not reach the
+    one listed, so the record of what ran looked wrong, and a trace of
+    QEMU was kept and read to find that it was right. Three minutes of
+    that were waiting for a turn.
+  - 5 minutes waiting for a turn at the computer otherwise: 137 seconds
+    before a run of `harness/reach.py` with 30 steps, 63 before the
+    golden was derived, 100 before the `port` test with the routines
+    still assembly; and the first test of the C took 156 seconds where
+    it takes 78 by itself.
+  - 3 minutes: "not executed in the port" for three functions that
+    began by loading the segment of the assembly as `seg Title_S`, a
+    number that is set when the program is loaded. A test of 139
+    seconds, and an entry that hands the segment over instead. In
+    `CLAUDE.md` now.
+  - 15 minutes for getting onto `main`, three times, each time behind
+    what had arrived while the test before ran: the tree, deleting, and
+    a change to the harness. Behind the tree one file was in conflict,
+    `README.md`, and three things git did not show: the tree had made
+    entries for `Input`, which this batch had made too, and for
+    `InSt10`, which is C now and takes its arguments in another order,
+    and `struct Box` was in its C file and in `port/vc.h`. Behind
+    deleting eight files were in conflict, the lists of batches and of
+    scenarios cut at their closing brackets again and put right by a
+    script; its C file called `Dialog` by the entry that is gone, in
+    seven places, and had `struct Box` too. The third was clean. A build
+    and a test each time, 78, 142 and 75 seconds.
 
 ## Ideas put off
 

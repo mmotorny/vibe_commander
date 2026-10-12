@@ -487,19 +487,6 @@ FndAdr	ENDP
 
 ; Entries for the C code of the search to routines of other files (see
 ; FromC in VC.ASM, and port/find.c for what they take and return).
-	FromC	MnMn40
-
-; MnMn10 answers in AX, in CL and in the carry flag: CL comes back in DL,
-; and DH is not 0 for CY.
-	PUBLIC	MnMn10_a
-MnMn10_a PROC	FAR
-	PUSH	DS
-	POP	ES
-	CALL	MnMn10
-	SBB	DH,DH
-	MOV	DL,CL
-	RET
-MnMn10_a ENDP
 
 ; The BIOS for the keyboard: AX as INT 16h takes it and as it comes back,
 ; and DX is 1 if the zero flag was set, 0 if not.

@@ -482,6 +482,35 @@ u16 DirFunc(void);                                      /* dirfunc.c */
 u32 DelTr0(const u8 *path);
 #pragma aux DelTr0  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 
+/* Where a box is on the screen, as DialBox says it: what the assembly
+   has in BX, DX and SI then. */
+struct Box {
+    u16 begin;                          /* the row in the high byte */
+    u16 size;                           /* the rows in the high byte */
+    u16 saved;                          /* where what it covers is kept */
+};
+
+/* The boxes and the dialogs, which the assembly describes: `box`,
+   `include`, `table`, `control` and `colors` are offsets in its code
+   segment, and `segment` is where what a box shows and a dialog sets is,
+   MAIN_SEG for the main data. See each in dialog.c. */
+void DialBox(u16 place, u16 box, u16 include, u16 segment,
+             struct Box STACK *where);
+u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment);
+void InSt10(u16 place, u16 text, u16 length, u16 color);
+u32 MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys, u16 item);
+u32 MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table);
+u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table);
+#pragma aux DialBox "*_c" __far parm [bx] [ax] [dx] [cx] [di] modify exact [ax]
+#pragma aux Dialog  "*_c" __far parm [ax] [dx] [bx] [si] [cx] value [ax] modify exact [ax]
+#pragma aux InSt10  "*_c" __far parm [bx] [si] [cx] [ax] modify exact [ax]
+#pragma aux MinMnu  "*_c" __far parm [si] [bx] [dx] [di] [ax] [cx] value [dx ax] modify exact [ax dx]
+#pragma aux MnMn10  "*_c" __far parm [ax] [bx] [cx] [dx] [di] value [dx ax] modify exact [ax dx]
+#pragma aux MnMn40  "*_c" __far parm [ax] [bx] [cx] [dx] [di] value [ax] modify exact [ax]
+
+/* The segment of the main data, as a number. */
+#define MAIN_SEG ((u16)((u32)(void __far *)&md >> 16))
+
 /* The panel that a file entry belongs to. */
 #define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))
 

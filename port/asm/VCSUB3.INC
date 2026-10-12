@@ -425,10 +425,8 @@ ChTree	PROC	NEAR
 	RET
 ChTree	ENDP
 
-; C code waits for a key, and writes a text of the main data into a
-; field.
+; C code waits for a key.
 	FromC	Input
-	FromC	InSt10
 
 ; C code has a key looked at for the speed search: Search, which takes in
 ; CX what it has in BP, and hands back SI.

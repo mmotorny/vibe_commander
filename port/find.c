@@ -80,13 +80,6 @@ u8 __far *FndAdr(u16 number);
    a click that may be the first of two, 1 for the second of two on the
    line `line`, and 0 for a second one that was let go elsewhere.
 
-   MnMn10 has the menu at `place` take a key: `table` is where the
-   assembly describes it, an offset in its code segment. It returns the
-   key in the low word, the item in the next byte, and something that is
-   not 0 in the highest byte if the menu has dealt with the key. MnMn40
-   draws the menu with `item` chosen, in the two colours of `colors`, and
-   returns two bytes of the second of them.
-
    PgUp and PgDn move the cursor of a list a page, `rows` lines: they
    return the cursor in the low word and the first line shown in the high
    one. Int10m calls the BIOS for the screen, and returns CX as that
@@ -98,8 +91,6 @@ void ClrKbd(void);
 void TypMous(u16 pointer);
 u16 InWind(u16 where, u16 place, u16 size);
 u16 DoublMo(u16 place, u16 size, u16 line);
-u32 MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table);
-u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table);
 u32 PgUp(u16 cursor, u16 first, u16 rows);
 u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
@@ -111,8 +102,6 @@ void Help00(void);                                      /* help.c */
 #pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
 #pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux DoublMo "*_a" __far parm [bx] [dx] [si] value [ax] modify exact [ax cx es]
-#pragma aux MnMn10  "*_a" __far parm [ax] [bx] [cx] [dx] [di] value [dx ax] modify exact [ax cx dx si es]
-#pragma aux MnMn40  "*_a" __far parm [ax] [bx] [cx] [dx] [di] value [ax] modify exact [ax si es]
 #pragma aux PgUp    "*_a" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx si di]
 #pragma aux PgDn    "*_a" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx si di]
 #pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [cx] modify exact [ax bx cx dx es]

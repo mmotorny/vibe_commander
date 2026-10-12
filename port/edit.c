@@ -77,14 +77,6 @@ struct Where {
     u16 line;
 };
 
-/* Where a box is on the screen, as DialBox hands it back: in the order
-   in which its entry for C stores BX, DX and SI. */
-struct Box {
-    u16 begin;                          /* the row in the high byte */
-    u16 size;                           /* the rows in the high byte */
-    u16 saved;                          /* where what it covers is kept */
-};
-
 #pragma pack(pop)
 
 LAID_OUT(EdData, 138);
@@ -144,25 +136,16 @@ u16 T80_00(void);
 #pragma aux T80_00 "*_c" __far value [ax] modify exact [ax bx cx dx si di]
 
 /* Routines of the rest of the program that are still assembly, by their
-   entries for C. DialBox puts a box on the
-   screen with its middle at `place`: `box` is where the assembly
-   describes it, an offset in its code segment. Dialog does that and takes
-   the keys; the low byte of what it returns is 0 for Enter on the first
-   answer. `include` is the text that ^I stands for in a line of the box,
-   another such offset. ResWin puts back in the screen buffer what a box
+   entries for C. ResWin puts back in the screen buffer what a box
    covers, Window shows it. ChgDisk asks for the disk of a drive that
    shares the floppy drive with another, and is not 0 if the user would
    not change it. Int10m calls the BIOS for the screen, with the mouse
    pointer out of the way. CmpSym is not 0 for a character that stands
    between words: a space, a tab or one of +:.,><|\ */
-void DialBox(u16 place, u16 box, struct Box STACK *where);
-u16 Dialog(u16 box, u16 include);
 void ResWin(u16 begin, u16 size, u16 saved);
 u16 ChgDisk(const u8 *path);
 void Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
 u16 CmpSym(u16 symbol);
-#pragma aux DialBox "*_a" __far parm [bx] [ax] [di] modify exact [bx dx si es]
-#pragma aux Dialog  "*_a" __far parm [ax] [dx] value [ax] modify exact [ax es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
 #pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] modify exact [ax bx cx dx es]
@@ -1124,7 +1107,8 @@ u16 T80_00(void)
 
     T51_00();
     T50_00();
-    DialBox(0x528, OFFSET(SavFi_P), (struct Box STACK *)&box);
+    /* None of its lines has ^I: no include line. */
+    DialBox(0x528, OFFSET(SavFi_P), 0, MAIN_SEG, (struct Box STACK *)&box);
     Window(box.begin, box.size);
     if (ChgDisk(md.ViewFil))
         goto done;
@@ -1132,7 +1116,8 @@ u16 T80_00(void)
     if (HIGH(answer) == 0) {
         if (LOW(answer) & 1) {
             T80_Name();
-            if ((u8)Dialog(OFFSET(Prot_B), OFFSET(EdFl_S)) != 0)
+            if ((u8)Dialog(OFFSET(Prot_B), OFFSET(EdFl_S), 0, 0,
+                           MAIN_SEG) != 0)
                 goto done;
         }
         answer = T80_02(LOW(answer));
@@ -1150,7 +1135,7 @@ u16 T80_00(void)
         goto done;
 report:
     /* None of its lines has ^I: no include line. */
-    Dialog(OFFSET(SavEr_B), 0);
+    Dialog(OFFSET(SavEr_B), 0, 0, 0, MAIN_SEG);
 done:
     ResWin(box.begin, box.size, box.saved);
     Window(box.begin, box.size);

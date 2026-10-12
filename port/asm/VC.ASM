@@ -47,6 +47,7 @@
 	EXTERN	FindFil_c:FAR, FndMove_c:FAR, FndCurs_c:FAR, FndAdr_c:FAR
 	EXTERN	F38_10_c:FAR, F38_40_c:FAR, F38_70_c:FAR, M30_50_c:FAR
 	EXTERN	M30_60_c:FAR, DirFunc_c:FAR, DelTr0_c:FAR
+	EXTERN	DialBox_c:FAR, Dialog_c:FAR, InSt10_c:FAR, MinMnu_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F

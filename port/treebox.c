@@ -29,18 +29,6 @@ u16 ChTree(u16 column);
 #pragma aux ReadTre "*_c" __far value [ax] modify exact [ax]
 #pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
-#pragma pack(push, 1)
-
-/* Where a box is on the screen, as OncZoom hands it back: in the order in
-   which its entry for C stores BX, DX and SI. */
-struct Box {
-    u16 begin;                          /* the row in the high byte */
-    u16 size;                           /* the rows in the high byte */
-    u16 saved;                          /* where what it covers is kept */
-};
-
-#pragma pack(pop)
-
 /* Routines of the rest of the program that are still assembly, by their
    entries for C. HidCur puts the cursor below the screen, Cursor at a row
    and a column, the row in the high byte. SavWin keeps what the screen
@@ -61,9 +49,7 @@ struct Box {
 
    Input waits for a key, with the key bar `bar` on the screen, and shows
    the help for F1; the high byte of what it returns is FCh for a button
-   of the mouse. InSt10 writes the text at `text` in the main data to the
-   screen, in a field of `length` cells and in the colour whose number is
-   in the high byte of `color`. Search takes a key for the speed search,
+   of the mouse. Search takes a key for the speed search,
    whose text it keeps in MenuBuf, and looks for the next name that begins
    with the text: in a list from `begin` to `end` whose entries are `step`
    bytes apart, from the entry at `at` on, or from the one behind it for
@@ -87,7 +73,6 @@ void ClrKbd(void);
 u32 PgUp(u16 cursor, u16 first, u16 lines);
 u32 PgDn(u16 cursor, u16 first, u16 lines, u16 all);
 u16 Input(u16 bar);
-void InSt10(u16 place, u16 length, u16 text, u16 color);
 u16 Search(u16 at, u16 begin, u16 end, u16 step, u16 key);
 u16 ChkSum(u16 at, u16 length);
 void OncZoom(u16 place, u16 box, struct Box STACK *where);
@@ -105,7 +90,6 @@ void OncZoom(u16 place, u16 box, struct Box STACK *where);
 #pragma aux PgUp    "*_a" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx si di]
 #pragma aux PgDn    "*_a" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx si di]
 #pragma aux Input   "*_a" __far parm [ax] value [ax] modify exact [ax es]
-#pragma aux InSt10  "*_a" __far parm [bx] [cx] [si] [ax] modify exact [es]
 #pragma aux Search  "*_a" __far parm [si] [bx] [cx] [dx] [ax] value [ax] modify exact [ax cx si di es]
 #pragma aux ChkSum  "*_a" __far parm [si] [cx] value [ax] modify exact [ax es]
 #pragma aux OncZoom "*_a" __far parm [bx] [ax] [di] modify exact [bx dx si es]
@@ -600,7 +584,7 @@ ChTr19:                                 /* the path of the cursor */
 ChTr20:                                 /* the speed search, and a key */
     place = begin + (size & 0xFF00) - 0x400 + 19;
     if (md.WinMous == 0)
-        InSt10(place, 12, (u16)(md.MenuBuf + SPEED), ChTr_P[1] << 8);
+        InSt10(place, (u16)(md.MenuBuf + SPEED), 12, ChTr_P[1] << 8);
     Cursor(place + *(u16 *)(md.MenuBuf + SPEED - 2));
     cursor = NUMBER(md.TreAdr);
     first = NUMBER(md.TreFrst);

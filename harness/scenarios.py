@@ -267,6 +267,16 @@ out again (show.py --changes is how):
   - On the floppy, "Alt+F1 a", setting an attribute brings up the box
     of DOS's critical error, "Retry Abort", which Esc leaves.
   - Dates are typed as the country writes them: "31.8.99" in Russia.
+  - In a dialog End and PgDn go to the buttons and Home and PgUp to the
+    first field; Up and Down past the ends of a group go to the field
+    above or below, Left and Right to the one beside; Shift+Tab goes
+    back a field. Space on the line that is chosen of a group chooses
+    the next. A key that means nothing leaves the screen as it is, and
+    the cursor, which a golden records. F10 closes a dialog as Esc does,
+    but for the dialog of F5, where F10 and Alt+F10 show the tree to
+    choose from: Enter there types the path of the directory into the
+    line. "F9 r l" with the left panel active is the filter of the right
+    one, in the right half of the screen, three Tabs from its buttons.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -1424,6 +1434,49 @@ SCENARIOS = {
             "Tab Tab Tab Tab",
             '"31.8.99"',
             "Enter",
+        )),
+
+    "dialog-keys": Scenario(
+        "The keys of a dialog: from field to field by every key that "
+        "goes to one, round a group and a line of buttons, and F10",
+        steps=(
+            "F9 o Enter",                 # Configuration: on the colours
+            "x",                          # a key that means nothing there
+            "Space",                      # on the one chosen: the next
+            "Space",                      # round to the first
+            "Space",
+            "End",                        # the buttons
+            "Home",                       # the first field, its first line
+            "Down Down Down",             # past its last: the next group
+            "Up",                         # back, on the last line
+            "Right",                      # the box next to it
+            "x Space",                    # no key there either; ticked off
+            "Left",                       # the colours, the first line
+            "Down Down Home",
+            "PgDn",                       # the buttons
+            "Shift+Tab",                  # the field before them
+            "Alt+F10 Space",              # nothing; ticked
+            "End",                        # the buttons, the first of them
+            "Left",                       # round to the last
+            "Right",                      # and to the first
+            "End",                        # the last
+            "Home",                       # the first field
+            "Shift+Tab",                  # round to the buttons
+            "1",                          # a key that means nothing
+            "Tab",                        # round to the first field
+            "F10",                        # as Esc: nothing is changed
+            "Ctrl+l",                     # the right panel one of files
+            "F9 r l",                     # its filter, in the right half
+            "Tab Tab Tab",                # the buttons there
+            "Esc",
+            "Down Down Down F5",          # a copy: the tree is F10 here
+            "Left",                       # at the start of the field
+            '"ab" Left',                  # in it
+            "F10",                        # the tree, to choose from
+            "Down Enter",                 # a directory: its path typed
+            "Alt+F10",                    # the tree again
+            "Esc",                        # nothing chosen
+            "Esc",
         )),
 }
 

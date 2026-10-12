@@ -72,15 +72,8 @@ void Help00(void);
    another, and is not 0 if the user would not change it. SavWin keeps
    what the screen buffer has where a window is to be, ResWin puts it
    back; MinBox draws a box with a shadow there, growing if windows are to
-   zoom. Dialog shows the box that the assembly describes at `box`, an
-   offset in its code segment, and takes the keys. Int10m calls the BIOS
-   for the screen, with the mouse pointer out of the way, and returns CX
-   as the BIOS left it.
-
-   MinMnu has a line of buttons take keys until one is for the caller:
-   `control` and `colors` are where the assembly describes the buttons
-   and has the numbers of their colours, `item` is the button that the
-   cursor is on. It returns the key, and in the high word the button.
+   zoom. Int10m calls the BIOS for the screen, with the mouse pointer out
+   of the way, and returns CX as the BIOS left it.
 
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, or `place` as it was if there is no mouse.
@@ -99,9 +92,7 @@ u16 ChgDisk(const u8 *path);
 void SavWin(u16 begin, u16 size, u16 buffer);
 void ResWin(u16 begin, u16 size, u16 buffer);
 void MinBox(u16 begin, u16 size, u16 color);
-u16 Dialog(u16 box, u16 include);
 u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
-u32 MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys, u16 item);
 u32 GetMous(u16 place);
 void TypMous(u16 look);
 u16 InWind(u16 place, u16 begin, u16 size);
@@ -116,9 +107,7 @@ u32 PgDn(u16 cursor, u16 first, u16 lines, u16 all);
 #pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux Dialog  "*_a" __far parm [ax] [dx] value [ax] modify exact [ax es]
 #pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [cx] modify exact [ax bx cx dx es]
-#pragma aux MinMnu  "*_a" __far parm [si] [bx] [dx] [di] [ax] [cx] value [dx ax] modify exact [ax cx dx es]
 #pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
 #pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
 #pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
@@ -593,7 +582,7 @@ Help64:
         goto Help06;
 
 Help65:                                 /* it could not be read */
-    Dialog(OFFSET(HlpEr_B), 0);
+    Dialog(OFFSET(HlpEr_B), 0, 0, 0, MAIN_SEG);
 
 Help66:                                 /* Esc */
     ResWin(BEGIN, size, (u16)md.ErrBuf1);
@@ -637,7 +626,7 @@ static void HelpFil(void)
     goto Help67;
 
 Help01:
-    Dialog(OFFSET(HlpEr_B), 0);
+    Dialog(OFFSET(HlpEr_B), 0, 0, 0, MAIN_SEG);
 
 Help67:
     regs.ax = 0x3E00;

@@ -30,14 +30,6 @@
  */
 #include "vc.h"
 
-/* Where a box is on the screen, as OncZoom hands it back: in the order in
-   which its entry for C stores BX, DX and SI. */
-struct Box {
-    u16 begin;                          /* the row in the high byte */
-    u16 size;                           /* the rows in the high byte */
-    u16 saved;                          /* where what it covers is kept */
-};
-
 u16 F38_10(u16 answer);
 u16 F38_40(u16 attributes);
 u16 F38_70(void);
@@ -58,9 +50,10 @@ static u32 F38_60(void);
    `place`, zooming it only for the first box of a command: `box` is where
    the assembly describes it, an offset in its code segment, and `include`
    the text that ^I stands for in a line of the box, another such offset.
-   Dialog does that and takes the keys; the low byte of what it returns is
-   the number of the answer, 0 for the first, and more than any for Esc.
-   ResWin puts back in the screen buffer what a box covers, and Window,
+   Dialog, which is C, does that and takes the keys; the low byte of what
+   it returns is the number of the answer, 0 for the first, and more than
+   any for Esc: here always for a box that is not on the screen yet, with
+   what it sets in the main data. ResWin puts back in the screen buffer what a box covers, and Window,
    which is in vc.h, shows it. ChgDisk asks for the disk of a drive that
    shares the floppy drive with another, and is not 0 if the user would
    not change it.
@@ -69,13 +62,11 @@ static u32 F38_60(void);
    `carry` is not 0, and clear if it is. Fcb29 has DOS make an FCB of a
    name: function 29h with 2 in AL, not through Intr21. */
 void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
-u16 Dialog(u16 box, u16 include);
 void ResWin(u16 begin, u16 size, u16 saved);
 u16 ChgDisk(const u8 *path);
 u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
 u16 Fcb29(const u8 *name, u8 *fcb);
 #pragma aux OncZoom "*_a" __far parm [bx] [ax] [dx] [di] modify exact [bx dx si es]
-#pragma aux Dialog  "*_a" __far parm [ax] [dx] value [ax] modify exact [ax es]
 #pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
 #pragma aux Intr21f "*_a" __far parm [bx] [ax] value [ax] modify exact [ax bx cx dx si di es]
@@ -182,7 +173,7 @@ u16 F38_10(u16 answer)
     if ((u8)answer != 0)
         return answer;
     /* None of its lines has ^I: no include line. */
-    answer = Dialog(OFFSET(DelCo_B), 0);
+    answer = Dialog(OFFSET(DelCo_B), 0, 0, 0, MAIN_SEG);
     if ((u8)answer > 1)
         return answer;
     DEL_ALL = (u8)answer;
@@ -225,7 +216,8 @@ u16 F38_40(u16 attributes)
                    of a drive that is not ready, whatever DOS left. */
                 regs.ax &= 0xFF00;
                 if (regs.cx & 1) {
-                    answer = (u8)Dialog(OFFSET(RdOnl_B), OFFSET(Del_S));
+                    answer = (u8)Dialog(OFFSET(RdOnl_B), OFFSET(Del_S),
+                                        0, 0, MAIN_SEG);
                     if (answer == 1)
                         goto not_done;
                     if (answer > 1)
@@ -263,7 +255,8 @@ u16 F38_40(u16 attributes)
         }
         /* F38_51: it is not empty */
         if (DEL_ALL == 0) {
-            answer = (u8)Dialog(OFFSET(NoEmp_B), OFFSET(Del_S));
+            answer = (u8)Dialog(OFFSET(NoEmp_B), OFFSET(Del_S), 0, 0,
+                                MAIN_SEG);
             if (answer > 1)
                 goto not_done;
             if (answer == 1)
@@ -311,7 +304,7 @@ done:
 failed:
     /* F38_43 */
     if (error != ERR_NOT_READY
-        && (u8)Dialog(report, OFFSET(Del_S)) == 0) {
+        && (u8)Dialog(report, OFFSET(Del_S), 0, 0, MAIN_SEG) == 0) {
 not_done:
         answer = NOT_DONE;
         goto close;
@@ -519,7 +512,7 @@ failed:
         include = OFFSET(NoAtr_S);
         if (regs.ax <= ERR_NO_PATH)
             include = OFFSET(NoFnd_S);
-        if ((u8)Dialog(OFFSET(AtrEr_B), include) == 0) {
+        if ((u8)Dialog(OFFSET(AtrEr_B), include, 0, 0, MAIN_SEG) == 0) {
             answer = NOT_DONE;
             goto close;
         }
@@ -670,7 +663,7 @@ u32 M30_60(u16 answer)
 
 refused:
     /* None of its lines has ^I: no include line. */
-    return PAIR(1, Dialog(OFFSET(NoDat_B), 0));
+    return PAIR(1, Dialog(OFFSET(NoDat_B), 0, 0, 0, MAIN_SEG));
 }
 
 /* Call what FncAddr names for every file and directory of the directory
@@ -705,7 +698,7 @@ u16 DirFunc(void)
         if (count == 0) {
             if (md.FncAddr != DiSi10())
                 /* None of its lines has ^I: no include line. */
-                Dialog(OFFSET(PthEr_B), 0);
+                Dialog(OFFSET(PthEr_B), 0, 0, 0, MAIN_SEG);
             return 0;
         }
         if (*end++ == 0)
