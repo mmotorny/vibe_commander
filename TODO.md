@@ -6,12 +6,15 @@ Things that are known and not done. Standing instructions are in
 ## Known and not dealt with
 
 - The number of bytes that the editor has free is not compared with the
-  original's (see `harness/deviations.py`). The routine that works it out
-  is still assembly. When it is translated, the number wants a check of
+  original's (see `harness/deviations.py`). What works it out is C now,
+  in `T00_20` of `port/edit.c`, and the number still wants a check of
   its own: that it falls by one for every character typed, at least.
   It has been wrong once without a test saying so, when a stub that it
-  calls handed back another CX. Held against the original by hand since,
-  over eight steps in text and in hex: 9,712 less in each.
+  called handed back another CX. Held against the original by hand when
+  the editor's keys were translated, over some thirty steps of
+  `editor-keys`, `editor-hex-keys` and `editor-buffer`, in text and in
+  hex: 27,104 less in each, 331,648 for an empty text, with the port
+  at 90,560 bytes.
 - Saving in the editor to a disk that cannot be written, the floppy A:
   of the bench, with the box of DOS's critical error, is in no scenario:
   it went beyond the stack of 256 bytes that the port had when the
@@ -284,8 +287,44 @@ Things that are known and not done. Standing instructions are in
   it rests on reading.
 - Del at the end of what the editor keeps of a line longer than 3900
   characters joins the next line to those 3900 and drops the rest of the
-  line. That is in what the editor does with a key, which is assembly
-  still; `editor-long` and `editor-full` make their long lines that way.
+  line. Ported like that; `editor-long` and `editor-full` make their
+  long lines that way.
+- What the editor does with its keys, found while that was translated
+  and ported as it is; whether to mend any of it is not decided:
+  - Ctrl-Y on a line that the buffer holds a part of cuts the whole
+    line and keeps only the part, 3900 characters, to be put back;
+    Ctrl-K there cuts the rest off without keeping any of it. By
+    reading.
+  - Where Del joins two lines, and where Ctrl-K and Ctrl-Y look for the
+    end of a line, `T53_00` is given a number of the line that is
+    whatever the key before left in DI: the address of a cell of the
+    status line as a rule. If it were 0FFFFh nothing would be joined or
+    cut. The C hands it 0.
+  - A new file is asked about, "New-file, Cancel", only in a window as
+    high as the screen: not the menu file or an extension file, which
+    have their help below, and not dirinfo in the Info panel.
+  - PgUp and PgDn in a window of one row, and the clearing of a window
+    of no rows, would go round 65,536 times: the Info panel's dirinfo
+    with panels half the screen high might get there. Not tried.
+  - A click of the mouse on the space behind the two digits of a byte
+    puts the cursor on a third digit, which is taken for the second;
+    and a digit typed on the second digit of the byte behind the last
+    one is cleared again. By reading: the bench has no mouse.
+  - While a file is read, and before and after a search, the keyboard
+    is looked at for Esc, Ctrl-C and F10. While it is read that cannot
+    be seen: the viewer's code looks first, and takes the key.
+- Of the editor, 81 instructions have run in no scenario and are
+  translated by reading, listed in `harness/ported.py`: 74 for the
+  mouse; two for a file that DOS will not read; three where the window
+  would move up by fewer lines than it does, or begin above line 0;
+  and two for a cursor behind all that the buffer has of a line, which
+  only a click of the mouse leaves there.
+- `editor-big` has a file of 381,338 bytes that is too large for the
+  editor, of the original and of the port alike. One that fits, with a
+  size in the same 64K as the room, has no place in a scenario: the
+  port's room was 27,104 bytes less than the original's then and
+  shrinks with every batch. So of the two instructions that compare the low words,
+  the scenarios take the jump one way only.
 - `T54_00`, which goes to the line before, looks backwards for where a
   line begins and then goes forwards again with `T53_00` until it is back
   where it came from, without asking whether `T53_00` found a line. If
@@ -573,6 +612,39 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     at the top of `harness/scenarios.py`, where both had changed the same
     paragraph; a build and a test of 70 seconds each time. None of the
     other batches was on `main` yet.
+
+- The editor: opening a file, the screen and every key, code between
+  procedures, 3,900 bytes, next to seven other batches. The translation
+  passed the first time it was tested, but for two functions of earlier
+  batches that nothing called any more.
+  - 4 minutes: a file of 332,152 bytes for the editor, which fitted the
+    original and the port as it was, and was 504 bytes too large for
+    the port with the editor in C: the scenario failed on the first
+    run of the translation. It has a file now that is too large for
+    both. At the top of `harness/scenarios.py`.
+  - 3 minutes and a half: a full `port` test that failed on nothing but
+    `T60_00_c` and `T61_00_c`, listed for an earlier batch and called
+    by stubs that had gone. `harness/compare.py` on the batch's own
+    scenarios does not look at that.
+  - 3 minutes: the Info in both panels, where the second "Bytes Free"
+    of a row is compared. Two more layouts tried: with the right panel
+    off, the screen behind it shows the end of the banner, "ware" and
+    "are"; with files in the right panel it holds.
+  - 2 minutes: a search through 245K in the original, which did not
+    end within the 20 seconds that a step had then, while the goldens
+    were derived next to other runs; and A:\SETUP.BAT, which the
+    bench's floppy has not.
+  - 14 minutes: a step of five keys in `editor-full` with two beeps in
+    it and F4 before and after them, which the port passed twice and
+    then failed, in a full `port` test of nine minutes: the key bar
+    was missing. It is drawn only where the program waits and finds no
+    key, and the port need not wait within a step. Found by reading
+    `Input0` and `PutKey0`; at the top of `harness/scenarios.py` now.
+  - What saved time: `harness/reach.py` with steps and `--changes`
+    written to a file, 10 seconds for 30 steps, and the scenarios run
+    on the port before anything was translated, with
+    `harness/compare.py` and the build that signals: 30 seconds for
+    all of the editor's.
 
 - The help, 9 routines, 1,403 bytes, 36 minutes in all, next to three
   other batches. The translation passed the first time it was tested.

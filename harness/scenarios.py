@@ -197,6 +197,49 @@ out again (show.py --changes is how):
     is at the end of the text: Ctrl+Home, the top. A beep scrolls the
     screen, so the step also has to draw all of it again, which Ctrl+Home
     from the end of the text does.
+  - More keys of the editor: Ctrl+Left is the word before, Ctrl+w and
+    Ctrl+Backspace cut back to it, Ctrl+t cuts on to the next word, and
+    Ctrl+u puts back what was last cut, a piece into the line as often
+    as it is pressed, a line as a line. Ctrl+q makes the next key a
+    character, whatever it is, and shows a quotation mark in the status
+    line meanwhile. PgDn goes to the last line of the window first and
+    then by pages. F7 asks for a text and Shift+F7 looks for it again;
+    the cursor goes behind what is found, and in hex "4c 69" is two
+    bytes. "Enter+Esc" in the dialog of F7 has Esc waiting when the
+    search begins, which stops it.
+  - d:\\vc\\vcview.ext has 23 lines, and the editor shows ten lines of
+    help below an extension file or the menu file: a window of 13 rows,
+    and so a text of two pages without making one.
+  - F4 in a panel that shows the Info edits the file dirinfo there, in a
+    window of 36 columns and 11 rows without a status line. "Ctrl+l" and
+    then "F9 l i" leave the Info in the left panel, which stays the
+    active one, and files in the right. With the Info in both panels a
+    row has "Bytes Free" twice, and only the first is left out of the
+    comparison.
+  - The editor has room for 358,752 bytes of text, and the port for
+    some 328,000 by now, less with every batch: a file that a scenario edits
+    has to fit the port for long, and one that is to be too large is so
+    for both. The original compares the low words of size and room for
+    a file of 358,752 to 393,215 bytes only: four times COMMAND.COM and
+    a:\\freedos\\bin\\country.sys behind them are 381,338. The files
+    of C:\\STAMPS have no bytes behind their sizes: the editor opens
+    night.dat as an empty text, and has no room for noon.dat.
+  - The floppy of the bench has no SETUP.BAT.
+  - The original is slow while it is watched: a search through 87K of
+    text in the editor takes seconds, and one through 245K took more
+    than 20 seconds when the goldens were derived next to other runs.
+    Keep a search short.
+  - The key bar is drawn when the program waits for a key and finds
+    none, and only if it is another than the last one drawn: the bar of
+    another mode, or of Shift, Ctrl or Alt held down. The original is
+    given every key when it waits; the port gets the keys of a step as
+    fast as its keyboard buffer takes them, and may not wait in
+    between. So a step in which a beep scrolls the key bar away ends
+    with a key that changes the bar, F4 in the editor, or the bar is
+    there in the golden and now and then not in the port: in
+    `editor-full`, 'F4 Ctrl+End "4" Ctrl+Home F4' as one step failed
+    once in three runs, and "F4" as a step of its own before the rest
+    does not.
   - In the help Up, Down, PgUp, PgDn, Home and End move the cursor in
     the index and the text of a page; Left and Right go from button to
     button, Enter presses the one the cursor is on and a button's first
@@ -1656,8 +1699,237 @@ SCENARIOS = {
             "Down Ctrl+y Ctrl+End " + " ".join(["Ctrl+u"] * 12)
             + " Ctrl+Home",
             *("Ctrl+End " + " ".join(["Ctrl+u"] * 14) + " Ctrl+Home",) * 5,
+            '"ab"',                       # two characters more than there
+                                          # is room for: none is free
+            "F4",                         # in hex: a beep for the two
+            # A byte typed behind the last one has no room either: a
+            # beep, at the end of the text, which the port has elsewhere.
+            # The key bar is gone with it; F4 brings another.
+            'Ctrl+End "4" Ctrl+Home F4',
+            "Del Del",                    # the two taken out again
             "Esc",                        # changed: asks
             "Right Enter",                # not saved
+        )),
+
+    "editor-keys": Scenario(
+        "The keys of the editor in a text: by characters, words, lines "
+        "and pages, deleting and putting back, and those it has no use "
+        "for",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",                   # 23 lines, in a window of 13
+            '"d:\\vc\\vcview.ext" Enter',
+            '"alpha" Space "beta" Space "gamma"',
+            # A line of its own; back in it, a character deleted before
+            # the cursor and one under it.
+            "Enter Up End Left Left Left Backspace Del",
+            "Ctrl+Left Ctrl+Left Ctrl+w", # two words back; one cut
+            "Ctrl+w Left Backspace",      # nothing before the first line
+            "Ctrl+u End Ctrl+u Ctrl+k",   # the word put back, twice; at
+                                          # the end nothing to cut off
+            "Ctrl+Left Ctrl+k Home Ctrl+u",   # the end cut off, and put
+                                              # back at the start
+            "Ctrl+q",                     # the next key is a character:
+            "Ctrl+y",                     # that of Ctrl-Y
+            "Ctrl+q Up F5 Ctrl+b",        # and none of these is one
+            "End Right",                  # on to the next line,
+            "Left",                       # and back to the end of this
+            "Down Home Backspace",        # the next line joined to it
+            "Ctrl+End Right End Del",     # nothing behind the last line
+            "Ctrl+Home PgDn",             # to the last line of the window
+            "PgDn",                       # a page, as far as there is one
+            "PgDn",
+            "PgUp",                       # to the first line of the window
+            "Backspace",                  # joined to the line above it,
+                                          # which the window did not show
+            "PgUp",                       # a page, as far as there is one
+            "PgUp",
+            "Ctrl+y",                     # a line cut: one more comes up
+            "End Del",                    # and with two lines joined
+            "Shift+F2",                   # another name asked for,
+            "Esc",                        # and not given
+            "Esc",                        # changed: asks
+            "Right Right Enter",          # go on editing
+            "Esc",
+            "Right Enter",                # not saved
+        )),
+
+    "editor-hex-keys": Scenario(
+        "The keys of the editor in hex: from digit to digit and byte to "
+        "byte, bytes added behind the last and taken off again, pages",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Down Down Down Down",        # onto hello.txt, 15 bytes
+            "F4",
+            "F4",                         # in hex
+            "Right Right Right",          # the second digit of a byte
+            "Left",                       # its first
+            "Left",                       # the second of the one before
+            "Left Left Backspace",        # no further than the first byte
+            "Tab Right Right Left",       # by characters
+            "Backspace",
+            "Ctrl+End",                   # behind the last byte
+            '"z"',                        # a sixteenth: the next line
+            'Tab "4"',                    # the first digit of another,
+            '"1"',                        # and the second
+            "Backspace",                  # taken off again,
+            "Backspace",                  # and the one before: back in
+                                          # the first line
+            "Left",
+            "Home Up",
+            # Keys for a text.
+            "Ctrl+Left Ctrl+Right Del Ctrl+y Ctrl+k Ctrl+u Ctrl+t Ctrl+w",
+            "Ctrl+q Tab",                 # no digit, whatever comes first,
+            '"g" Enter',                  # and neither are these
+            "Tab Ctrl+q",                 # but characters:
+            "Enter",                      # the one of Enter, as it is,
+            "Enter",                      # with Ctrl-Q or without
+            "Esc",                        # changed: asks
+            "Right Enter",                # not saved
+            "Down Down",                  # data.bin: 64 lines of 16
+            "F4",
+            "F4",
+            "PgDn",                       # to the last line of the window
+            "PgDn",                       # a page
+            "PgDn",                       # as far as there is one: the
+            "PgDn",                       # line behind the last byte
+            "PgUp",
+            "PgUp",
+            "PgUp",
+            "PgUp",
+            "Ctrl+End",
+            "Up End",                     # the last byte of a line,
+            "Down",                       # and below it a line of none
+            "Esc",
+        )),
+
+    "editor-search": Scenario(
+        "The editor looks for a text, and in hex for bytes",
+        steps=(
+            "Down Down Down Down Down",   # onto notes.doc, three lines
+            "F4",
+            "Shift+F7",                   # nothing to look for yet
+            "F7",
+            "Esc",                        # and nothing given
+            "F7",
+            '"line" Enter',               # behind the first of three
+            "Shift+F7",
+            "Shift+F7",
+            "Shift+F7",                   # no fourth
+            "Esc",
+            "F4",                         # in hex
+            "Ctrl+Home",
+            "F7",
+            '"4c" Space "69" Enter',      # two bytes, among the digits
+            "Shift+F7",
+            "F7",
+            '"two" Enter',                # a text, among the characters
+            "Shift+F7",                   # not twice
+            "Esc",
+            "F7",
+            '"three" Enter+Esc',          # Esc is waiting when the search
+                                          # begins, and stops it
+            "Esc",
+        )),
+
+    "editor-buffer": Scenario(
+        "A line that the editor keeps a part of, and more typed and put "
+        "into that part than it holds",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",                   # a new file
+            '"buffer.txt" Enter',
+            "Enter",
+            '"0123456789abcdef"',
+            # The line cut, put back twice and the two joined: twice as
+            # long, and that eight times. 4096 characters, of which the
+            # editor keeps 3900, and has room for 4000.
+            *("Ctrl+y Ctrl+u Ctrl+u Up Up End Del "
+              "Ctrl+y Ctrl+u Ctrl+u Up Up End Del",) * 4,
+            'Ctrl+Home "ABCDEFGHIJKLMNOP"',
+            # Those sixteen cut and put back six times: 3996.
+            "Ctrl+w " + " ".join(["Ctrl+u"] * 6),
+            '"wxyz!"',                    # the fifth is one too many
+            # 3999, and no room for the two that end a line.
+            " ".join(["Ctrl+u"] * 6) + ' "ab" Enter',
+            " ".join(["Ctrl+u"] * 7),     # nor for sixteen, the seventh
+                                          # time
+            "End Del Right",              # the last character it keeps
+            "Home Del End",               # one less, and to the end
+            "Home Space End Ctrl+Left",   # a word of 3899 characters back
+            "Esc",                        # changed: asks
+            "Right Enter",                # not saved
+        )),
+
+    "editor-dirinfo": Scenario(
+        "The editor in the Info panel, on the file dirinfo: a window of "
+        "36 columns without a status line",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Ctrl+l",                     # files in the right panel, and
+            "F9 l i",                     # the Info in the left one
+            "F4",
+            '"ab" Space "cd" Space "ef" Space "gh" Space "ij" Space',
+            '"kl" Space "mn" Space "op" Space "qr" Space "st" Space',
+            '"uv" Space "wx" Space "yz" Space "0"',   # 40 characters
+            " ".join(["Ctrl+Left"] * 12), # back to the first word that is
+                                          # shown: one column more
+            "Ctrl+Left",                  # a word before that
+            "Ctrl+Left",                  # and the first
+            "End " + " ".join(["Enter"] * 12),    # eleven lines are shown
+            "F4 Up",                      # no hex in so narrow a window
+            "Ctrl+Home",
+            "F2",
+            "Esc",                        # the Info shows the text
+        )),
+
+    "editor-big": Scenario(
+        "The editor on a file of 87K, on one that it has no room for, and "
+        "on one that is shorter than its directory entry says",
+        steps=(
+            "F9 o n",                     # the mini status off: it would
+                                          # show the time of a file made
+            "Shift+F4",
+            '"a:\\freedos\\bin\\command.com" Enter',    # 87,772 bytes
+            "F7",
+            '"open" Space "watcom" Space "c" Enter',  # more than 32K in
+            "Shift+F7",                   # and once more, 50 bytes on
+            "Esc",
+            # Four times that file and country.sys behind them: 381,338
+            # bytes, within 64K of what the editor has room for.
+            "Shift+F5",
+            '"a:\\freedos\\bin\\command.com" Tab "b"',
+            "Enter",
+            *("Shift+F5",
+              '"a:\\freedos\\bin\\command.com" Tab "b"',
+              "Enter",
+              "p") * 3,
+            "Shift+F5",
+            '"a:\\freedos\\bin\\country.sys" Tab "b"',
+            "Enter",
+            "p",
+            "End",                        # onto it
+            "F4",                         # too large
+            "Enter",                      # view it, then
+            "Esc",
+            "F4",
+            "Esc",                        # or not
+            "Ctrl+PgUp",
+            "Down Enter",                 # C:\\STAMPS
+            "Down Down Down",             # night.dat says 9 bytes and
+            "F4",                         # has none
+            "Esc",
+            "Down Down",                  # noon.dat says 1 MB: too large
+            "F4",                         # by more than that
+            "Right Enter",                # Cancel
         )),
 
     "find": Scenario(

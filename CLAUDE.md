@@ -171,6 +171,36 @@ port.
   procedure, or by a later label of it for what stands from there on:
   such a stretch may hold the end of one file and the start of the
   next, as `M60_00` of `VCMENU.INC` runs on into `F37_00` of `VCF1.INC`.
+- Code between procedures may be entered by a jump and left by jumps, as
+  the editor is: the viewer's code jumps to `T00_00` and the editor jumps
+  back to `V00_10`, `V13_00` or `V13_01`. Its stub keeps the label, calls
+  the C function, and jumps by what that returns.
+- Where every jump inside such code ends up back at one place, the wait
+  for the next key, each label that is jumped to can be a function, with
+  the registers that the jump carries as its arguments: a jump is a call
+  and a return. `port/edit.c` has the editor's keys like that.
+- When the callers of a stub become C, the stub goes, and so does a
+  function that was only there for the stub: `T60_00_c` and `T61_00_c`
+  were listed in `harness/ported.py` and ran no more. The test says "not
+  executed in the port".
+- A text or a table of the assembly that C code reads is at its offset
+  in the segment that `AsmSeg_a` returns: `AT(AsmSeg(), OFFSET(text))`
+  costs no relocation, where naming the text as a far object does.
+- A table of colours for `NgLine` may be shorter than the four that the
+  routine can ask for: `EdtH_P` is one byte, and what followed it was the
+  editor's table of keys. With the table gone other bytes follow; the
+  lines written with it use the first colour only.
+- A table for `Case` whose entries are a character with any scan code,
+  or a key without a character, is two `switch` statements, one on the
+  character and one on the scan code; a key without a scan code is in
+  neither.
+- `LOOP` with CX 0 goes round 65,536 times: `do ... while (--count)` on
+  a `u16`. The editor counts the rows of its window like that.
+- A register may hold nothing that was meant for the routine called:
+  the editor calls `T53_00` with DI, the number of the line, as the last
+  key left it, where it deletes. `T53_00` goes by the number only where
+  it is 0FFFFh, so the C hands it 0; read what the routine does with
+  such a register before choosing.
 - A routine that answers in the carry flag and nothing else gets a stub
   that makes the flag of what the function returns: `FilePan` returns 1
   or 0, and `NEG AX` sets the carry for the 1. `POP` leaves flags alone.

@@ -1,0 +1,1182 @@
+Volkov Commander 4.05 in the scenario editor-big: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 1: F9 o n
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 2: Shift+F4
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Edit ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Edit the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 3: "a:\freedos\bin\command.com" Enter
+cursor 0 1 lines 6 7 mode 3
+|Edit: A:\FREEDOS\BIN\command.com         Line 1     Col 1############ Free      | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
+|♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
+|♥←☺☺☻☻♥♥♥♥☺☺♥☻Control-Break pressed.                                            | 1Bx80
+|Terminate batch file '%s' (Yes/No/All) ? ␀♂YyNnAaQq♥♪←☺☺☻☻♥♥♦♦♦☺☻Overwrite '%s'→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 4: F7
+cursor 8 8 lines 6 7 mode 3
+|Edit: A:\FREEDOS\BIN\command.com         Line 1     Col 1############ Free      | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞                                                                          êî→| 1Bx3 70x74 1Bx2 1Ex1
+|␀␀C   ╔══════════════════════════════ Edit ══════════════════════════════╗   .\→| 1Bx3 70x74 03x2 1Ex1
+|␀␀*   ║ Search for the string                                            ║   ␀␀→| 1Bx3 70x74 03x2 1Ex1
+|␀␀o   ║                                                                  ║   ␀,→| 1Bx3 70x5 30x64 70x5 03x2 1Ex1
+|␀%s   ╚══════════════════════════════════════════════════════════════════╝   n␀→| 1Bx3 70x74 03x2 1Ex1
+|                                                                                | 1Bx3 70x74 03x2 1Bx1
+|The shell is about to be terminated, though, this is                            | 1Bx5 03x74 1Bx1
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
+|♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
+|♥←☺☺☻☻♥♥♥♥☺☺♥☻Control-Break pressed.                                            | 1Bx80
+|Terminate batch file '%s' (Yes/No/All) ? ␀♂YyNnAaQq♥♪←☺☺☻☻♥♥♦♦♦☺☻Overwrite '%s'→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 5: "open" Space "watcom" Space "c" Enter
+cursor 78 5 lines 6 7 mode 3
+|Edit: A:\FREEDOS\BIN\command.com         Line 5     Col 482########## Free      | 30x80
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        ◙♂→| 1Ex1 1Bx78 1Ex1
+|←1÷╕␀        ⍽^÷ëVⁿëFΓëVΦà└u♥Θ▒␀╕␀␀Ä└&ï▲)•1╥╣♦␀╤π╤╥Γ·ë▲⌠☼ë▬÷☼í►☻úⁿ☼1└ú·☼ïFⁿú■☼ï→| 1Ex1 1Bx78 1Ex1
+|←î╧Ä▀║       ë╕☺=═!ï╪▼Zï≥ⁿ¼ä└u√ï╬+╩I┤@═!Ä▀║♪ë╣☻␀┤@═!3└║☼␀Φ‼;X┤L═!Open Watcom C/→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←HHHHHHHH♀♀♀♀♀♀ÿÿÿÿÿÿêêêêêêêêêêêêêêêêêêêê♀♀♀♀☺␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←ings.◙␀Out of memory error.◙␀☺☻♦◘► @ÇUnable to open file '%s'◙␀This file is no→| 1Ex1 1Bx78 1Ex1
+|←↨␀¶☼▼␀3☼‼␀F☼ ␀f☼←␀ü☼3␀┤☼♀␀└☼♫␀╬☼§␀π☼"␀♣►♪␀↕►♫␀ ►¶␀4►¶␀H►"␀j►"␀î►"␀«►¶␀┬►♦␀╞►♦␀→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←ree◙␀Directory of %s◙␀ Directory of %s◙␀%-15s␀%s◙␀%-13s␀%-8s %-3s ␀        <DI→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 6: Shift+F7
+cursor 78 5 lines 6 7 mode 3
+|Edit: A:\FREEDOS\BIN\command.com         Line 5     Col 533########## Free      | 30x80
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        ◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻→| 1Ex1 1Bx78 1Ex1
+|←·ë▲⌠☼ë▬÷☼í►☻úⁿ☼1└ú·☼ïFⁿú■☼ïv■1⍽╣♦␀╤µ╤╫Γ·ë6␀►ë>☻►╕␀␀Ä└&ë▲+•&ë▬-•í·☼ï▬ⁿ☼î├&ú7•&ë→| 1Ex1 1Bx78 1Ex1
+|←3└║☼␀Φ‼;X┤L═!Open Watcom C/C++16 Run-Time system. Copyright (c) Open Watcom Co→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|← file '%s'◙␀This file is no valid FreeCOM or of an incompatible version:◙%s◙␀␀→| 1Ex1 1Bx78 1Ex1
+|←►¶␀H►"␀j►"␀î►"␀«►¶␀┬►♦␀╞►♦␀╩►◄␀█►◙␀σ►G␀,◄)␀U◄[␀░◄;␀δ◄;␀&↕8␀^↕♀␀j↕↑␀é↕§␀ù↕•␀₧↕♫→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←-13s␀%-8s %-3s ␀        <DIR> ␀   %10s ␀%-14s␀PATH=%s◙␀No search path defined.→| 1Ex1 1Bx78 1Ex1
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|←                                                                               | 1Ex1 1Bx79
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 7: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 8: Shift+F5
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║                                                                  ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 9: "a:\freedos\bin\command.com" Tab "b"
+cursor 9 10 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 10: Enter
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,631,296 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║     7 files use 91,136 bytes in      ║| 1Bx46 1Ex1 1Bx11 1Ex6 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║b           │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 11: Shift+F5
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║b    ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 12: "a:\freedos\bin\command.com" Tab "b"
+cursor 9 10 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║b    ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 13: Enter
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │                                             Bytes Free          ║| 1Bx22 70x36 1Bx22
+|║readme   txt│           ╔═══════════ Copy ═══════════╗   rive C: is WORK      ║| 1Bx22 70x36 03x2 1Bx3 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│           ║      Copying the file      ║   l bytes on drive C:  ║| 1Bx22 70x36 03x2 1Bx15 1Ex2 1Bx3
+|║notes    doc│           ║ A:\FREEDOS\BIN\command.com ║   s free on drive C:   ║| 1Bx22 70x36 03x2 1Bx14 1Ex2 1Bx4
+|║data     bin│           ║             to             ║   91,136 bytes in      ║| 1Bx22 70x36 06x2 1Ex4 1Bx16
+|║run      bat│           ║             b              ║   \WORK                ║| 1Bx22 70x36 03x2 1Bx20
+|║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
+|║b           │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║                    b                    ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │                                                                 ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │            │            ║║                                      ║| 1Bx17 03x49 1Bx14
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 14: p
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,543,744 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║     7 files use 178,688 bytes in     ║| 1Bx46 1Ex1 1Bx11 1Ex7 1Bx15
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║b           │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 15: Shift+F5
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║b    ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 16: "a:\freedos\bin\command.com" Tab "b"
+cursor 9 10 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║b    ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 17: Enter
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │                                             Bytes Free          ║| 1Bx22 70x36 1Bx22
+|║readme   txt│           ╔═══════════ Copy ═══════════╗   rive C: is WORK      ║| 1Bx22 70x36 03x2 1Bx3 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│           ║      Copying the file      ║   l bytes on drive C:  ║| 1Bx22 70x36 03x2 1Bx15 1Ex2 1Bx3
+|║notes    doc│           ║ A:\FREEDOS\BIN\command.com ║   s free on drive C:   ║| 1Bx22 70x36 03x2 1Bx14 1Ex2 1Bx4
+|║data     bin│           ║             to             ║   178,688 bytes in     ║| 1Bx22 70x36 06x2 1Ex5 1Bx15
+|║run      bat│           ║             b              ║   \WORK                ║| 1Bx22 70x36 03x2 1Bx20
+|║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
+|║b           │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║                    b                    ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │                                                                 ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │            │            ║║                                      ║| 1Bx17 03x49 1Bx14
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 18: p
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,455,680 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║     7 files use 266,752 bytes in     ║| 1Bx46 1Ex1 1Bx11 1Ex7 1Bx15
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║b           │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 19: Shift+F5
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║b    ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 20: "a:\freedos\bin\command.com" Tab "b"
+cursor 9 10 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║b    ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 21: Enter
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │                                             Bytes Free          ║| 1Bx22 70x36 1Bx22
+|║readme   txt│           ╔═══════════ Copy ═══════════╗   rive C: is WORK      ║| 1Bx22 70x36 03x2 1Bx3 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│           ║      Copying the file      ║   l bytes on drive C:  ║| 1Bx22 70x36 03x2 1Bx15 1Ex2 1Bx3
+|║notes    doc│           ║ A:\FREEDOS\BIN\command.com ║   s free on drive C:   ║| 1Bx22 70x36 03x2 1Bx14 1Ex2 1Bx4
+|║data     bin│           ║             to             ║   266,752 bytes in     ║| 1Bx22 70x36 06x2 1Ex5 1Bx15
+|║run      bat│           ║             b              ║   \WORK                ║| 1Bx22 70x36 03x2 1Bx20
+|║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
+|║b           │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║                    b                    ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │                                                                 ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │            │            ║║                                      ║| 1Bx17 03x49 1Bx14
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 22: p
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,368,128 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║     7 files use 354,304 bytes in     ║| 1Bx46 1Ex1 1Bx11 1Ex7 1Bx15
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║b           │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 23: Shift+F5
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║b    ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 24: "a:\freedos\bin\country.sys" Tab "b"
+cursor 9 10 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\country.sys                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║em   ║ b                                                                ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║b    ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x74 03x2 1Bx1
+|║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 25: Enter
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │                                             Bytes Free          ║| 1Bx22 70x36 1Bx22
+|║readme   txt│           ╔═══════════ Copy ═══════════╗   rive C: is WORK      ║| 1Bx22 70x36 03x2 1Bx3 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│           ║      Copying the file      ║   l bytes on drive C:  ║| 1Bx22 70x36 03x2 1Bx15 1Ex2 1Bx3
+|║notes    doc│           ║ A:\FREEDOS\BIN\country.sys ║   s free on drive C:   ║| 1Bx22 70x36 03x2 1Bx14 1Ex2 1Bx4
+|║data     bin│           ║             to             ║   354,304 bytes in     ║| 1Bx22 70x36 06x2 1Ex5 1Bx15
+|║run      bat│           ║             b              ║   \WORK                ║| 1Bx22 70x36 03x2 1Bx20
+|║empty    dat│                                                  ───────────────╢| 1Bx15 4Fx49 1Bx16
+|║b           │    ╔══════════════════ Copy ═════════════════╗                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║        The following file exists        ║   this directory ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║                    b                    ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║ Do you wish to write over the old file? ║                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │    ║     Overwrite   All   aPpend   Skip     ║                  ║| 1Bx15 4Fx8 70x11 4Fx30 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │                                                                 ║| 1Bx15 4Fx49 03x2 1Bx14
+|║            │            │            ║║                                      ║| 1Bx17 03x49 1Bx14
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 26: p
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║     7 files use 384,512 bytes in     ║| 1Bx46 1Ex1 1Bx11 1Ex7 1Bx15
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║b           │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 27: End
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║     7 files use 384,512 bytes in     ║| 1Bx46 1Ex1 1Bx11 1Ex7 1Bx15
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║b           │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 28: F4
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │                           in drive C: is WORK      ║| 1Bx27 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │   ╔══════ Edit ══════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
+|║notes    doc│            │   ║ Reading the file ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
+|║data     bin│            │   ║        b         ║    use 384,512 bytes in     ║| 1Bx27 70x26 03x2 1Bx3 1Ex7 1Bx15
+|║run      bat│                                          C:\WORK                ║| 1Bx24 4Fx32 1Bx24
+|║empty    dat│             ╔═════════ Edit ═════════╗   ───────────────────────╢| 1Bx24 4Fx32 03x2 1Bx22
+|║b           │             ║       The file b       ║                          ║| 1Bx1 30x12 1Bx11 4Fx32 03x2 1Bx22
+|║            │             ║ is too large for Edit. ║   file in this directory ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │             ║     View   Cancel      ║                          ║| 1Bx24 4Fx8 70x6 4Fx18 03x2 1Bx22
+|║            │             ╚════════════════════════╝                          ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │                                                                 ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │            │            ║║                                      ║| 1Bx26 03x32 1Bx22
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 29: Enter
+cursor 0 127 lines 6 7 mode 3
+|View: b                                 Col 0            381,338 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ     | 1Bx80
+|␀␀#◙␀␀3↕␀␀O↕␀␀a↕␀␀|↕␀␀M↓␀␀▓↓␀␀Ω→␀␀⍽→␀␀╪←␀␀ü∟␀␀û∟␀␀▓∟␀␀┐∟␀␀╪∟␀␀Σ∟␀␀≡∟␀␀&▲␀␀♠▼␀␀─▼| 1Bx80
+|␀␀▀▼␀␀φ▼␀␀/ ␀␀B ␀␀↔0␀␀║0␀␀╬0␀␀▄0␀␀∩_␀␀Gr␀␀ou␀␀üu␀␀Åu␀␀òu␀␀\v␀␀ov␀␀}v␀␀◄ë␀␀¥ë␀␀éè| 1Bx80
+|␀␀eï␀␀␀␀␀␀␀␀␀␀␀␀␀␀╠δ²ÉÉÉÉ␀␀␀␀␀␀␀␀␀␀␀.⍽♠►␀°╩☻␀␀␀␀␀␀␀␀␀î╚Ä╪Ä╨╝☼•■♫;•u(í▼␀Ä└ë├┤P═!í| 1Bx80
+|←␀&ú◙␀í↔␀&ú♀␀í!␀&ú▬␀Φö•╕⍽L═!║d␀┤        ═!⌠δ²                                   | 1Bx80
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻êα| 1Bx80
+|$♥♦♦óh☻êα$♦óù☻êα$◘óò☻ÇΣ►ê&ö☻ë°♦☼ói☻│☻X╨Σs1Ä▌÷D♣Çt)╣◘␀â╞◙┐o☻┤ ⁿ¼8αs☻êα¬Γ÷╣◘␀êα²O≤| 1Bx80
+|«&êm☻î╔│♥░⍽ⁿÄ┘S╗x☻┐o☻⍽•t☼<→s♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë>Ω☺┤b═!Ä├&─▲4␀&èG☻ê─&ç•ú╪☺ë▲c☻î♠e☻[Ä┴| 1Bx80
+|Φé␀Φ╦␀│◙Φz␀│␀Φa␀│☺Φ\␀│♥ΦW␀│♀Φf␀δ◙[│♥δ3░•Φ¡␀ï>║☻1└è♣Gë┴ë├╕•♀═!≥«uσèY⍽èçö☻◘└t┌Φé␀─| 1Bx80
+|>c☻╕4↕&ë♣Xê╪<☻t◘<♥t♦■♫4↕[Y_^]▼•Z╧╖␀◙┐ö☻tWÇ├5ê▲¢☻╗ÿ☻δEá¥☻8├r☻ê├╖␀☺█ïƒ₧☻δ2S╗o☻Φ+␀δ| 1Bx80
+|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx80
+|◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻␀♥▼♥6♥:♥>♥C♥H♥Q♥Y♥a♥h♥k♥n♥⌂| 1Bx80
+|♥ñ♥╝♥╠♥∞♥☺♦,♦7♦J♦[♦p♦|♦ç♦ù♦⌐♦╕♦╠♦▄♦⌠♦•♣¶♣,♣reading from␀writing to␀Error %1 driv| 1Bx80
+|e %A: %2 area: %3␀Error %1 device %A: %3␀DOS␀FAT␀root␀data␀(I)gnore␀(R)etry␀(A)b| 1Bx80
+|ort␀(F)ail␀? ␀, ␀◘iIrRaAfF␀␀☺☺☻☻♥♥write-protection violation attempted␀unknown u| 1Bx80
+|nit for driver␀drive not ready␀unknown command given to driver␀data error (bad C| 1Bx80
+|RC)␀bad device driver request structure length␀seek error␀unknown media type␀sec| 1Bx80
+|tor not found␀printer out of paper␀write fault␀read fault␀general failure␀sharin| 1Bx80
+|g violation␀lock violation␀invalid disk change␀FCB unavailable␀sharing buffer ov| 1Bx80
+|erflow␀code page mismatch␀out of input␀insufficient disk space␀Unknown error cod| 1Bx80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 30: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║     7 files use 384,512 bytes in     ║| 1Bx46 1Ex1 1Bx11 1Ex7 1Bx15
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║b           │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 31: F4
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │                           in drive C: is WORK      ║| 1Bx27 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │   ╔══════ Edit ══════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
+|║notes    doc│            │   ║ Reading the file ║    bytes free on drive C:   ║| 1Bx27 70x26 03x2 1Bx19 1Ex2 1Bx4
+|║data     bin│            │   ║        b         ║    use 384,512 bytes in     ║| 1Bx27 70x26 03x2 1Bx3 1Ex7 1Bx15
+|║run      bat│                                          C:\WORK                ║| 1Bx24 4Fx32 1Bx24
+|║empty    dat│             ╔═════════ Edit ═════════╗   ───────────────────────╢| 1Bx24 4Fx32 03x2 1Bx22
+|║b           │             ║       The file b       ║                          ║| 1Bx1 30x12 1Bx11 4Fx32 03x2 1Bx22
+|║            │             ║ is too large for Edit. ║   file in this directory ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │             ║     View   Cancel      ║                          ║| 1Bx24 4Fx8 70x6 4Fx18 03x2 1Bx22
+|║            │             ╚════════════════════════╝                          ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │                                                                 ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │            │            ║║                                      ║| 1Bx26 03x32 1Bx22
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 32: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║     7 files use 384,512 bytes in     ║| 1Bx46 1Ex1 1Bx11 1Ex7 1Bx15
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║b           │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 33: Ctrl+PgUp
+cursor 4 23 lines 6 7 mode 3
+|╔════════════╤═══ C:\ ════╤════════════╗╔════════════════ Info ════════════════╗| 1Bx17 30x5 1Bx58
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║WORK        │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║STAMPS      │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║            │            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║            │            │            ║║        0 files use 0 bytes in        ║| 1Bx49 1Ex1 1Bx11 1Ex1 1Bx18
+|║            │            │            ║║                 C:\                  ║| 1Bx80
+|║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\>                                                                            | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 34: Down Enter
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═╤════════════╗╔════════════════ Info ════════════════╗| 1Bx14 30x11 1Bx55
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║SUB         │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 35: Down Down Down
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═╤════════════╗╔════════════════ Info ════════════════╗| 1Bx14 30x11 1Bx55
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│            │            ║║      Volume in drive C: is WORK      ║| 1Bx1 30x12 1Bx50 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 36: F4
+cursor 0 1 lines 6 7 mode 3
+|Edit: night.dat                          Line 1     Col 1############ Free      | 30x80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 37: Esc
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═╤════════════╗╔════════════════ Info ════════════════╗| 1Bx14 30x11 1Bx55
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│            │            ║║      Volume in drive C: is WORK      ║| 1Bx1 30x12 1Bx50 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 38: Down Down
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═╤════════════╗╔════════════════ Info ════════════════╗| 1Bx14 30x11 1Bx55
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 39: F4
+cursor 0 127 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═╤════════════╗╔════════════════ Info ════════════════╗| 1Bx14 30x11 1Bx55
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│            │                           in drive C: is WORK      ║| 1Bx27 70x26 1Bx10 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│            │   ╔══════ Edit ══════╗    total bytes on drive C:  ║| 1Bx27 70x26 03x2 1Bx20 1Ex2 1Bx3
+|║noon     dat│            │   ║ Reading the file ║    bytes free on drive C:   ║| 1Bx1 30x12 1Bx14 70x26 03x2 1Bx19 1Ex2 1Bx4
+|║evening  dat│            │   ║     noon.dat     ║   e 1,967,496,192 bytes in  ║| 1Bx27 70x26 03x2 1Ex13 1Bx12
+|║last     dat│                                          :\STAMPS               ║| 1Bx24 4Fx32 1Bx24
+|║huge     dat│             ╔═════════ Edit ═════════╗   ───────────────────────╢| 1Bx24 4Fx32 03x2 1Bx22
+|║            │             ║   The file noon.dat    ║                          ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │             ║ is too large for Edit. ║   file in this directory ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │             ║     View   Cancel      ║                          ║| 1Bx24 4Fx8 70x6 4Fx18 03x2 1Bx22
+|║            │             ╚════════════════════════╝                          ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │                                                                 ║| 1Bx24 4Fx32 03x2 1Bx22
+|║            │            │            ║║                                      ║| 1Bx26 03x32 1Bx22
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 40: Right Enter
+cursor 10 23 lines 6 7 mode 3
+|╔════════════╤ C:\STAMPS ═╤════════════╗╔════════════════ Info ════════════════╗| 1Bx14 30x11 1Bx55
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║SUB         │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║first    dat│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║night    dat│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║morning  dat│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║noon     dat│            │            ║║  32,337,920 bytes free on drive C:   ║| 1Bx1 30x12 1Bx30 1Ex10 1Bx21 1Ex2 1Bx4
+|║evening  dat│            │            ║║  7 files use 1,967,496,192 bytes in  ║| 1Bx43 1Ex1 1Bx11 1Ex13 1Bx12
+|║last     dat│            │            ║║              C:\STAMPS               ║| 1Bx80
+|║huge     dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\STAMPS>                                                                      | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\B  A   2025-02-21 14:06:48  381338 bytes  080b841b3e58a1f8
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

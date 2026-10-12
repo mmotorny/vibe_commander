@@ -334,10 +334,10 @@ BATCHES = [
         routines=("T57_00", "T60_00", "T62_00", "T63_00", "T70_00",
                   "T71_00", "T72_00", "T73_00", "T73_10", "T74_00",
                   "T75_00", "T76_00", "T80_00"),
-        functions=("T57_00_c", "T57_01_c", "T57_02_c", "T60_00_c",
-                   "T61_00_c", "T62_00_c", "T63_01_c", "T70_00_c",
-                   "T71_00_c", "T72_00_c", "T73_00_c", "T73_10_c",
-                   "T74_00_c", "T75_00_c", "T76_00_c", "T80_00_c"),
+        functions=("T57_00_c", "T57_01_c", "T57_02_c", "T62_00_c",
+                   "T63_01_c", "T70_00_c", "T71_00_c", "T72_00_c",
+                   "T73_00_c", "T73_10_c", "T74_00_c", "T75_00_c",
+                   "T76_00_c", "T80_00_c"),
         unreached={
             **dict.fromkeys(
                 (0x778C, 0x778F, 0x7791, 0x7794),
@@ -365,6 +365,52 @@ BATCHES = [
                 "their segment: the address it gets is one that T61_00 "
                 "has made, with an offset below 16, or at most a window "
                 "of lines further on"),
+        },
+    ),
+    Batch(
+        title="The editor: opening a file, the screen brought up to where "
+              "the cursor is, and what every key does",
+        source="edit.c",
+        routines=("T00_00",),
+        functions=("T00_00_c",),
+        unreached={
+            **dict.fromkeys(
+                (0x6215, 0x6216),
+                "T00_00, for a file that DOS will not read, or a key that "
+                "stops the reading: the key would have stopped the "
+                "viewer's code before, which looks for one when it has "
+                "opened the file"),
+            0x63B7: "T00_25, for a cursor that is below the window in a "
+                    "line whose number is less than the window has rows: "
+                    "the window then begins at line 0 and shows it",
+            **dict.fromkeys(
+                (0x6400, 0x6402),
+                "T00_28, for a window that moves up by fewer lines than "
+                "the cursor is below its first: it moves up only to the "
+                "line of the cursor"),
+            **dict.fromkeys(
+                (0x6610, 0x6613, 0x6618, 0x661C, 0x6620, 0x6625, 0x6627,
+                 0x6629, 0x662B, 0x662E, 0x662F, 0x6631, 0x6633, 0x6634,
+                 0x6636, 0x6639, 0x663C, 0x663E, 0x6643, 0x6648, 0x664A,
+                 0x664C, 0x664D, 0x6652, 0x6654, 0x6658, 0x665C, 0x6660,
+                 0x6662, 0x6664, 0x6665, 0x6667, 0x6669, 0x666C, 0x666F,
+                 0x6671, 0x6673, 0x6678, 0x667A, 0x667C, 0x667E, 0x6680,
+                 0x6682, 0x6684, 0x6685, 0x6687, 0x6689, 0x668A, 0x668C,
+                 0x668D, 0x668F, 0x6691, 0x6692, 0x6696, 0x6698, 0x6699,
+                 0x669B, 0x669D, 0x669F, 0x66A4, 0x66A6, 0x66A8, 0x66AA,
+                 0x66AC, 0x66AF, 0x66B1, 0x66B3, 0x66B6, 0x66BA, 0x66BC,
+                 0x66BE, 0x66C0, 0x66C2, 0x66C4),
+                "T00_71, for the mouse: a click in the window, and a "
+                "button held above it or below it. The bench has no "
+                "mouse"),
+            **dict.fromkeys(
+                (0x693D, 0x6940),
+                "T06_10, for a cursor behind all that the buffer has of "
+                "a line that it holds a part of: the buffer is filled "
+                "again whenever the line is drawn with fewer characters "
+                "behind the cursor than the window has columns there, "
+                "and it is drawn after every key; only a click of the "
+                "mouse leaves that out"),
         },
     ),
     Batch(

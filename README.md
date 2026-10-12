@@ -73,12 +73,12 @@ panel shows: the files of a directory with its extension file and the
 sizes of its directories, and for the Info the sizes of the disk, its
 label and the text of dirinfo, those of the viewer that find the lines
 of a file, keep a part of it in the memory, write the screen and look for
-a text, and those of the editor that say where in the memory a place in
-its text is and which column the cursor is in, that fill the buffer of
-the line the cursor is in and put it back into the text, that go from a
-line to the next, to the one before and to the next word, that draw a
-line of the text, as text or in hex, and the status line, and that save
-the file. The help is C as a whole: reading its file, showing the index
+a text. The editor is C as a whole: opening a file, the text in the
+memory with the buffer of the line that the cursor is in, the screen
+brought up to where the cursor is, as text or in hex, with its status
+line, what every key does, the search, and saving the file; only the
+viewer's code that opens the file for it is assembly. The help is C as a
+whole: reading its file, showing the index
 and the pages in their window, and taking the keys and the mouse there.
 So is the tree of directories away from its panel: reading it from the
 disk, keeping it in its file there, and the box in which a directory is
@@ -94,8 +94,8 @@ the key on: Copy and Rename with what they offer as the target, their
 dialogs, the tree to choose the target from, and the renaming of a
 directory of a tree panel, and those that make a directory, delete, set
 attributes and change the volume label. Going through the selected files
-of a panel is still assembly, and so is what the viewer and the editor
-do with their keys. At the panels the user menu is C, with what makes
+of a panel is still assembly, and so is what the viewer does with its
+keys. At the panels the user menu is C, with what makes
 the commands of a line of a menu or of an extension file and writes the
 list of the selected files for them, and so are the command line, with
 Esc and the names of the selected files and the paths of the panels put
