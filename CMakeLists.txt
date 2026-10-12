@@ -137,14 +137,16 @@ set_target_properties(mkexe PROPERTIES
     C_STANDARD 99
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
-# c_compile(<tree> <source> <object> <segment> <class> [<option>...])
-# compiles a file of src/<tree>/ into build/<tree>/<object>.obj, with a
-# listing next to it.
-function(c_compile tree source object text class)
+# c_compile(<tree> <model> <source> <object> <segment> <class>
+# [<option>...]) compiles a file of src/<tree>/ into
+# build/<tree>/<object>.obj, with a listing next to it.
+function(c_compile tree model source object text class)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/${tree})
     set(c_dir ${CMAKE_BINARY_DIR}/${tree})
     # -0     code for the 8086, like the original
-    # -ms    near code and data; the compiled code shares one segment
+    # -ms    the model that the tree is compiled in, which its caller
+    # -mm    names: near data in both, and a function near with -ms
+    #        unless it says otherwise, far with -mm unless it is static
     # -os    favour small code
     # -s     no checks for stack overflow, which need the C library
     # -zu    the stack is not in the data segment
@@ -160,7 +162,7 @@ function(c_compile tree source object text class)
     # how much stack it takes.
     add_custom_command(
         OUTPUT ${c_dir}/${object}.obj
-        COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -ms -os -s -zu -zl -zls
+        COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -m${model} -os -s -zu -zl -zls
                 -wx -we -nt=${text} -nc=${class} ${ARGN}
                 -fo=${c_dir}/${object}.obj
                 ${source_dir}/${source}
@@ -174,10 +176,11 @@ function(c_compile tree source object text class)
         VERBATIM)
 endfunction()
 
-# add_c_tree(<tree> <description> [<file of the second segment>...])
-# builds src/<tree>/ into build/<tree>/VC.EXE, with the linker's map
-# VC.MAP and the object files next to it, as the target <tree>.
-function(add_c_tree tree description)
+# add_c_tree(<tree> <description> <model> [<file of the second
+# segment>...]) builds src/<tree>/ into build/<tree>/VC.EXE, with the
+# linker's map VC.MAP and the object files next to it, as the target
+# <tree>.
+function(add_c_tree tree description model)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/${tree})
     set(c_dir ${CMAKE_BINARY_DIR}/${tree})
     # Every C file of the tree is part of the program, in the order of
@@ -198,11 +201,13 @@ function(add_c_tree tree description)
     # The compiled code is more than one segment holds, so it has two:
     # CTEXT, and CTEXT2 for the files that the caller names. Functions of
     # different files call each other far, so a file may be in either. The
-    # routines that the compiler calls near for arithmetic on 32 bits,
-    # __U4M and __U4D of arith.c, are in CTEXT only: a file that needs
-    # them stays there, or the linker says that it cannot reach them. A
-    # segment holds F000h bytes, not 64K: tools/mkexe.c says why, and stops
-    # the build when one is fuller. Name another file to the function then.
+    # routines that the compiler calls for arithmetic on 32 bits, __U4M
+    # and __U4D of arith.c, are in CTEXT. With the model s the compiler
+    # calls them near: a file that needs them stays in CTEXT then, or the
+    # linker says that it cannot reach them. With the model m it calls
+    # them far, from either segment. A segment holds F000h bytes, not 64K:
+    # tools/mkexe.c says why, and stops the build when one is fuller. Name
+    # another file to the function then.
     set(c_second ${ARGN})
     # The part of the program that stays in the memory while a command
     # runs has a code segment of its own, RTEXT, which is the first of the
@@ -233,16 +238,16 @@ function(add_c_tree tree description)
     foreach(source ${c_files})
         string(REGEX REPLACE "\\.c$" "" object ${source})
         if(source IN_LIST c_resident)
-            c_compile(${tree} ${source} ${object} RTEXT RCODE -dRESIDENT
+            c_compile(${tree} ${model} ${source} ${object} RTEXT RCODE -dRESIDENT
                       -nd=R -g=R_GROUP)
         elseif(source IN_LIST c_second)
-            c_compile(${tree} ${source} ${object} CTEXT2 CCODE)
+            c_compile(${tree} ${model} ${source} ${object} CTEXT2 CCODE)
         else()
-            c_compile(${tree} ${source} ${object} CTEXT CCODE)
+            c_compile(${tree} ${model} ${source} ${object} CTEXT CCODE)
         endif()
         list(APPEND c_compiled ${c_dir}/${object}.obj)
     endforeach()
-    c_compile(${tree} dos.c dos_r RTEXT RCODE -dRESIDENT -g=R_GROUP)
+    c_compile(${tree} ${model} dos.c dos_r RTEXT RCODE -dRESIDENT -g=R_GROUP)
     list(APPEND c_compiled ${c_dir}/dos_r.obj)
 
     # The program is linked of the compiled code alone, with a link map
@@ -285,13 +290,19 @@ function(add_c_tree tree description)
     add_custom_target(${tree} ALL DEPENDS ${c_dir}/VC.EXE)
 endfunction()
 
-# The trees, each with the files of its second code segment.
+# The trees, each with its model and the files of its second code segment.
+#
+# The C translation is compiled in the small model: its functions are far
+# where a #pragma aux of theirs says so, which every function has that
+# another file calls, with the registers that the assembly called it in.
+# The portable C is compiled in the medium model: a function is far by
+# the compiler's own rule, and needs no word of this compiler to say so.
 set(c_trees c portable_c)
-add_c_tree(c "the C translation"
+add_c_tree(c "the C translation" s
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c view.c
     window.c)
-add_c_tree(portable_c "the portable C"
+add_c_tree(portable_c "the portable C" m
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c view.c
     window.c)

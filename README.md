@@ -520,6 +520,26 @@ Three more instructions are the compiler's own, by its intrinsic
 functions in `src/c/dos.c`: `IN` for a port of the machine, `CLI`, and
 `STI` with `CLD`.
 
+## The portable C
+
+`src/portable_c/` began as a copy of the C translation, and it is the
+same program still: it passes the same scenarios against the same
+goldens, and `src/portable_c/DEVIATIONS.md` has no entry. What changes
+there first is how the program is written, toward C that any compiler
+takes, and what follows says where it has left the C translation so far.
+Everything above, of the layout of the file and of what rests on Open
+Watcom, holds for it but where this says otherwise.
+
+It is compiled in the medium model, the option `-mm`, where the C
+translation has the small one: a function that another file calls is far
+because the compiler makes it so, and a static one near, and no
+`#pragma aux` is needed to say which. The compiler then calls its two
+routines for arithmetic on 32 bits far as well, so those of
+`src/portable_c/arith.c` are far, and a file of either code segment may
+multiply and divide such numbers. In the part that stays in the memory
+one jump of the inline assembly is far for it: from the nine
+instructions of INT 2Eh to the function that goes on behind them.
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
@@ -540,7 +560,7 @@ nothing else, so all seven take three minutes and forty seconds.
 |---|---|
 | `asm-bytes` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
 | `c-data` | Every text, box, dialog and table of the translation that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
-| `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
+| `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, called near or far as each returns, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
 | `portable_c-data`, `portable_c-arith`, `portable_c-scenarios` | The same three checks of the portable C, `build/portable_c/`: what is said of the translation in the rows above and below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise |
 | `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 

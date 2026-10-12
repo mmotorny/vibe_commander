@@ -10,7 +10,9 @@ are run here, as the bytes that they are in the linked program, on a
 model of the 8086 that knows the instructions they are made of, with
 many pairs of numbers, and what comes back is held against what Python
 makes of the same numbers: the product in DX:AX, the quotient in DX:AX
-and the remainder in CX:BX.
+and the remainder in CX:BX. The compiler calls them near in the model
+that the C translation is compiled in, and far in that of the portable
+C: which it is, each routine says by how it returns.
 
 It also fails if a routine changes a register that it is to keep, BX and
 CX among them for __U4M, if it writes to the stack of its caller or
@@ -41,8 +43,15 @@ AX, CX, DX, BX, SP, BP, SI, DI = range(8)
 NAMES = "ax cx dx bx sp bp si di".split()
 
 
+CALLER = 0xCA11             # the segment that a far call comes from
+
+
 class Unknown(Exception):
     pass
+
+
+class CalledFar(Exception):
+    """A routine that was called near returns far."""
 
 
 class Fault(Exception):
@@ -57,6 +66,7 @@ class Machine:
         self.ip = 0
         self.cf = self.zf = self.sf = self.of = 0
         self.count = 0
+        self.far = False            # how the routine is called
 
     # --- memory: the stack segment only, which is all they may touch
     def rd16(self, at):
@@ -299,6 +309,13 @@ class Machine:
             self.r[op & 7] = self.word()
         elif op == 0xC3:
             self.ip = self.pop()
+        elif op == 0xCB:                    # retf: to where it was called
+            if not self.far:                # from, a segment that is none
+                raise CalledFar()
+            self.ip = self.pop()
+            if self.pop() != CALLER:
+                raise Fault("it returns to another segment than its "
+                            "caller's")
         elif op in (0xC6, 0xC7):
             wide = op & 1
             reg, rm = self.modrm()
@@ -355,14 +372,17 @@ class Machine:
                           f"{self.ip - 1:04X}h")
 
     def call(self, entry, ax, dx, bx, cx):
-        """Call the routine at `entry` near. Returns the registers, and
-        fails if it does not come back with the stack as it was."""
+        """Call the routine at `entry`, far if `self.far` and else near.
+        Returns the registers, and fails if it does not come back with
+        the stack as it was."""
         self.r = [random.getrandbits(16) for _ in range(8)]
         self.r[AX], self.r[DX], self.r[BX], self.r[CX] = ax, dx, bx, cx
         self.r[SP] = ENTERED
         kept = self.r[:]
         self.stack[:] = random.randbytes(STACK)
         above = bytes(self.stack[ENTERED:])
+        if self.far:
+            self.push(CALLER)
         self.push(0xFFFF)                   # where it returns to
         self.ip = entry
         self.cf, self.zf, self.sf, self.of = (random.getrandbits(1)
@@ -434,15 +454,28 @@ def main():
     longest = {"__U4M": 0, "__U4D": 0}
     keeps = {"__U4M": set(range(8)) - {AX, DX},
              "__U4D": set(range(8)) - {AX, BX, CX, DX}}
+    # How each is called: near, unless it returns far from that.
+    far = {}
+    for name in ("__U4M", "__U4D"):
+        machine.far = False
+        try:
+            machine.call(places[name] - base, 1, 0, 1, 0)
+        except CalledFar:
+            machine.far = True
+        except (Unknown, Fault) as problem:
+            sys.exit(f"{name}: {problem}, for 1 and 1")
+        far[name] = machine.far
+        print(f"{name}: called {'far' if machine.far else 'near'}")
     for a, b in numbers():
         for name in ("__U4M", "__U4D"):
             if name == "__U4D" and b == 0:
                 continue
             machine.count = 0
+            machine.far = far[name]
             try:
                 got, kept = machine.call(places[name] - base, a & 0xFFFF,
                                          a >> 16, b & 0xFFFF, b >> 16)
-            except (Unknown, Fault) as problem:
+            except (Unknown, Fault, CalledFar) as problem:
                 sys.exit(f"{name}: {problem}, for {a:08X}h and {b:08X}h")
             longest[name] = max(longest[name], machine.count)
             result = got[DX] << 16 | got[AX]
@@ -471,6 +504,7 @@ def main():
               + (f", {longest[name]} instructions at the most"
                  if name in longest else ""))
     # A division by nothing is the processor's divide error, in both.
+    machine.far = far["__U4D"]
     for a in (0, 1, 0x12345678):
         try:
             machine.call(places["__U4D"] - base, a & 0xFFFF, a >> 16, 0, 0)

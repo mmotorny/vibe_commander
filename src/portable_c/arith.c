@@ -3,18 +3,19 @@
  * compiler calls where it multiplies two of them or divides one by
  * another. The C library has these, and the program has no C library.
  *
- * The compiler calls them near, in the code segment of whoever does the
- * arithmetic, and by names of its own. So this file is compiled into the
- * first code segment, CTEXT, and a file that multiplies or divides such
- * numbers stays there with it: see c_second in CMakeLists.txt.
+ * The compiler calls them by names of its own and with registers of its
+ * own, which is what the two #pragma aux below say: they are no choice
+ * of the program's. It calls them far, as it calls every function of
+ * another file in the model that this tree is compiled in, so a file of
+ * either code segment may multiply and divide such numbers.
  *
  * Neither may do what it is there for. A word times a word as a number
  * of 32 bits would be a call of __U4M, and any division of a number of
  * 32 bits one of __U4D: the functions would call themselves. What they
  * are made of needs no helper: a word times a word as a word, a word
  * divided by a word, and numbers of 32 bits added, subtracted, compared
- * and shifted by a constant. Read the listing, build/c/arith.lst,
- * after a change: it must have no `call`.
+ * and shifted by a constant. Read the listing,
+ * build/portable_c/arith.lst, after a change: it must have no `call`.
  *
  * They are not the original's: it multiplies and divides where it needs
  * to, in registers. And no scenario would show one of them wrong for
@@ -41,8 +42,8 @@ typedef unsigned long long u64;
    them. */
 u32 U4M(u16 low, u16 high, u16 byLow, u16 byHigh);
 u64 U4D(u16 low, u16 high, u16 byLow, u16 byHigh);
-#pragma aux U4M "__U4M" __near parm [ax] [dx] [bx] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux U4D "__U4D" __near parm [ax] [dx] [bx] [cx] value [ax bx cx dx] modify exact [ax bx cx dx]
+#pragma aux U4M "__U4M" __far parm [ax] [dx] [bx] [cx] value [dx ax] modify exact [ax dx]
+#pragma aux U4D "__U4D" __far parm [ax] [dx] [bx] [cx] value [ax bx cx dx] modify exact [ax bx cx dx]
 
 /* What U4D returns, as the words of a number of 64 bits from the lowest
    up, each named after the register that it comes back in. */

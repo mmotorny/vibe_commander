@@ -1193,6 +1193,32 @@ with it is less obvious:
   with its segment: `(const u32 __far *)0x0040006CUL` is the BIOS's
   count of timer ticks, and costs no relocation.
 
+## Notes on the portable C
+
+What the work on `src/portable_c/` has written down for whoever goes on
+with it. Like the notes above they are notes, not rules; the rules are
+in "The portable C".
+
+- The two C trees are built by one function of `CMakeLists.txt`,
+  `add_c_tree`, which takes the tree's name, its model and the files of
+  its second code segment: the notes above say `port_c_second` and
+  `c_second` for that list, which is the end of each tree's call now.
+  The harness takes the tree where it had `src/c` written in:
+  `datacheck.py` and `reads.py` go by the name of the build's directory,
+  `notice.py` by the file it is given, `play.py` has `--tree`. The
+  tables of `datacheck.py` and `reads.py` are one for both trees: an
+  entry that only one tree wants will need them told apart.
+- The portable C is compiled in the medium model, `-mm`: a function is
+  far unless it is static, by the compiler's rule and with no
+  `#pragma aux`, and a pointer to a function is four bytes. A static
+  function is called near, as before. The compiler calls `__U4M` and
+  `__U4D` far then, with a relocation for each call from the second
+  segment; a `__near` in their `#pragma aux` is taken without a word and
+  the program links, and returns near to a far call. `_asm` takes the
+  name of a function for a far place: `jmp Exec2E` in `Int2E` of
+  `resident.c` is a far jump there, with a relocation of the part that
+  stays.
+
 ## Work by several agents
 
 Work that can be divided is done by several agents at a time, without
