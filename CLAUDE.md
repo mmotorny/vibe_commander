@@ -962,6 +962,11 @@ and the tests.
 `port/vc.h` says what the program asks of C code. What Open Watcom does
 with it is less obvious:
 
+- Where the program is right only because of what this compiler or its
+  linker does, and the language promises nothing, is one list in the
+  README, "What rests on Open Watcom", and every piece of inline
+  assembly is another there, "Inline assembly". A place that is added
+  to either gets its comment where it is done and its line in the list.
 - A byte register in the `parm` list of `#pragma aux` is ignored without a
   warning, and the argument goes on the stack. Pass bytes in 16-bit
   registers and mask them in C.

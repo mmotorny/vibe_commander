@@ -1289,7 +1289,8 @@ u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #pragma aux PgUp    "*_c" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx]
 #pragma aux PgDn    "*_c" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx]
 
-/* The segment of the main data, as a number. */
+/* The segment of the main data, as a number: this compiler makes a far
+   pointer of a near one with DS, and that is not read anywhere else. */
 #define MAIN_SEG ((u16)((u32)(void __far *)&md >> 16))
 
 /* The panel that a file entry belongs to. */

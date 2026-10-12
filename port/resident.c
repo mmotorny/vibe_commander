@@ -184,7 +184,8 @@ extern const u8 __far Vers_S[];
    goes, which is somewhere else after every command: tools/mkexe.c
    leaves it as it is, and what uses it adds where that part is: RunPar,
    or the PSP when the program begins and the part is where the file has
-   it. */
+   it. That the high word of a far pointer is that number is this
+   compiler's and its linker's doing, not the language's. */
 #define TRN_SEG(object) ((u16)((u32)(const void __far *)(object) >> 16))
 
 /* The PSP, which this segment begins with: where the program goes on
