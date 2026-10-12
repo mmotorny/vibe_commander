@@ -411,13 +411,12 @@ Things that are known and not done. Standing instructions are in
   of free memory where it begins, its blocks and its size. So nothing
   checks that what the program gives up while a command runs is listed
   as free, but the kind of the line.
-- Of the map, 51 instructions of 913 have run in no scenario and are
-  translated by reading: a map of more lines than its window has, 13 on
-  a screen of 25 lines, with the line that scrolls in, 22; a DOS before
-  version 4 or with a version of two digits, 15; a block of an unknown
-  owner, 4; and a second program that stays in the memory and is not
-  released with the first, 10. The bench has one such program, FDAPM of
-  the floppy, which does not stay twice. All that the map does for the
+- Of the map, 19 instructions of 913 have run in no scenario and are
+  translated by reading: a DOS before version 4 or with a version of
+  two digits, 15; and a block of an unknown owner, 4. A map of more
+  lines than its window has, and a second program that stays in the
+  memory, are in `stay`, which makes such programs in the editor, in
+  hex, and runs one nineteen times. All that the map does for the
   mouse runs: in `mouse-memory` what a button does that goes down and
   comes up in one place, in `mouse-middle` the middle button, which
   leaves the map, and in `mouse-drag-lists` a button that is moved
@@ -890,33 +889,16 @@ Things that are known and not done. Standing instructions are in
     runs, so DOS can jump to it with no stack of the program's: a stack
     set by inline assembly at that entry, or the address in the PSP
     made that of a handler written like one for an interrupt.
-  - `New21` and `New27`, 113 bytes, with `ExeProg`, `AddProg`, `FreeBlk`
-    and `ChkBlk`, 354 bytes: the program's hook on DOS, which notes
-    every program that is run and every one that stays in the memory,
-    with the vectors it has changed, and answers the question of
-    other programs for the program's data (AH=2Bh, CX='VC', DX='OM').
-    They run on the stack of whoever called DOS, know only CS, and
-    hand the call on to DOS with every register and the flags as they
-    came. `__interrupt` functions of Open Watcom save the registers
-    and give them to the C as a structure; they load DS with a segment
-    that the linker names, which here has to be the part that stays
-    and has to be relocated by `Reloc`. To go on in the old handler
-    they need `_chain_intr`, which is of the C library that the
-    program does not have: a few instructions of inline assembly that
-    put the registers back and jump far. `VCapi` returns with the
-    flags as it sets them, `RET 2`: an `__interrupt` function does
-    that by changing the flags in its structure. The table of
-    vectors is copied with interrupts off: `_disable()`.
-  - `Release`, 104 bytes, `GetStat` and `SetStat`, 68 bytes, `SetBrk`
-    and `SetBrk0`, 39 bytes, `NotFind` and `OutStr0`, 54 bytes: plain
-    routines that happen to be of the part that stays, called far from
-    the rest. `GetStat` and `SetStat` keep what they found in BP from
-    the one to the other: an argument in C. They go with the C of
-    that part, for which `RTEXT` is the room: `Exec` calls all but
-    `Release` while the rest of the program, the compiled code with it,
-    is not in the memory, and `Exit00`, which calls `Release`, may be
-    come to from there. The start-up no longer calls `OutStr` there:
-    `OutStr1` of `port/start.c` writes its texts by the BIOS itself.
+  - `New21` and `New27` with `ExeProg`, `AddProg`, `FreeBlk` and
+    `ChkBlk`, `CtrlC`, `Release`, `GetStat` and `SetStat` are C, in
+    `port/resident.c`, compiled into the part that stays. `Release`,
+    `GetStat` and `SetStat` have stubs for the assembly of that part,
+    `Exec`, the entry and `Exit02`, which go when those are C; the map
+    of the memory calls `Release` through `Release_a` and `CallPSP`
+    still.
+  - `SetBrk` and `SetBrk0`, 39 bytes, `NotFind` and `OutStr0`, 54 bytes:
+    plain routines of the part that stays, called far from the rest
+    through `CallPSP`. They go with `Exec`.
   - `FatErr`, 220 bytes: what DOS calls for a critical error. It is
     entered with nothing but CS known, takes its error in AX and DI
     and the device in BP:SI, shows a dialog, and returns the answer in
@@ -970,6 +952,45 @@ Things that are known and not done. Standing instructions are in
   had not. A step whose program does not come back, or comes back to a
   screen that it should not have left, is the sign; `start-screen` has
   its programs typed right.
+- What the program's watch on DOS does in the original, and in the
+  port after it (`port/resident.c`); whether to mend any of it is not
+  decided:
+  - The call by which another program asks for the program's data,
+    INT 21h with AH 2Bh, CX 'VC' and DX 'OM', returns with the flags as
+    the handler has them, not as the caller had them: the carry flag
+    clear, which is the answer, the other flags those of AL compared
+    with 1, and interrupts off, as they are when an interrupt begins.
+    They stay off in the caller until it lets them in again. In `stay`.
+  - When the list of programs that stay is full, 18 of them, the next
+    one ends instead of staying, and every interrupt is put back as it
+    was when that program was run, whoever has changed it since. In
+    `stay`.
+  - If DOS will not make the block of a program that stays longer by
+    the 82 paragraphs of its record, the program stays without one, and
+    the map of the memory does not know it for a program that can be
+    released. By reading: DOS has given the program all the memory
+    there is, so it can.
+  - A program is taken off the list when the block of its PSP is given
+    back to DOS, by whomever. Leaving the program releases "the last
+    of the list" as many times as the list is long, and relies on
+    that: a record that is not whole any more is released that many
+    times, which does nothing.
+  - The twelve bytes of a program's name are taken from where the name
+    begins in what DOS was asked to run, whatever follows the name
+    there.
+- The port's handler of INT 21h takes more of the stack of whoever
+  calls DOS than the original's: 30 bytes for the registers and the
+  second return address, and a few more for its own calls, at every
+  call of DOS while the program runs and while a command runs from it,
+  where the assembly took none for a call that it only passed on. A
+  program with a stack that is short by that much would fail under the
+  port and not under the original; none of the bench does.
+- `CtrlC`, the routine that the program has for Ctrl-C of DOS and for
+  Ctrl-Break of the BIOS, runs in no scenario: the BIOS of the bench
+  makes no interrupt of Ctrl and ScrollLock, which was tried with a key
+  added to `harness/driver.py` for it and taken out again. In the port
+  it is an interrupt function without a body, which saves the registers
+  and puts them back where the original has one instruction.
 - Ported as they are, in `port/main.c`:
   - When a panel cannot be read and another drive is chosen for it,
     the assembly notes the drive if none is noted as the one that

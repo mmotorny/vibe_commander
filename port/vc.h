@@ -378,7 +378,18 @@ u32 SaveSet(void);
 
 /* DOS, the BIOS, the mouse driver and the machine: the functions of
    dos.c, which has every software interrupt of the C code and what each
-   is for. Nothing else calls one. */
+   is for. Nothing else calls one.
+
+   The part of the program that stays in the memory while a command runs
+   (resident.c) cannot call them: they are of the part that goes, and
+   not in the memory then. So the build compiles dos.c a second time, into
+   that part, with RESIDENT defined as it is for resident.c: the names of
+   the second copy end otherwise, and resident.c calls those. */
+#ifdef RESIDENT
+#define DOS_NAME "*_r"
+#else
+#define DOS_NAME "*_c"
+#endif
 struct MouseAt {                        /* what the mouse driver says: */
     u16 buttons;                        /* the buttons held, the left one 1,
                                            the right one 2, the middle 4 */
@@ -400,22 +411,22 @@ void IntOff(void);
 void IntOn(void);
 void Int28(void);
 void DvPause(void);
-#pragma aux Int21d  "*_c" __far parm [bx] value [ax] modify exact [ax]
-#pragma aux Int21f  "*_c" __far parm [bx] [ax] value [ax] modify exact [ax]
-#pragma aux Int21e  "*_c" __far parm [bx] value [ax] modify exact [ax]
-#pragma aux Int10   "*_c" __far parm [bx] modify exact [ax]
-#pragma aux TopView "*_c" __far parm [es di] [cx] modify exact [ax]
-#pragma aux TopScr  "*_c" __far parm [es di] value [es di] modify exact [ax di es]
-#pragma aux Int16   "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux Int2F   "*_c" __far parm [ax] [bx] [cx] value [dx ax] modify exact [ax dx]
-#pragma aux Int33   "*_c" __far parm [ax] [bx] [cx] [dx] value [ax] modify exact [ax]
-#pragma aux MousAt  "*_c" __far parm [di] modify exact [ax]
-#pragma aux CaseMap "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux InPort  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux IntOff  "*_c" __far modify exact [ax]
-#pragma aux IntOn   "*_c" __far modify exact [ax]
-#pragma aux Int28   "*_c" __far modify exact [ax]
-#pragma aux DvPause "*_c" __far modify exact [ax]
+#pragma aux Int21d  DOS_NAME __far parm [bx] value [ax] modify exact [ax]
+#pragma aux Int21f  DOS_NAME __far parm [bx] [ax] value [ax] modify exact [ax]
+#pragma aux Int21e  DOS_NAME __far parm [bx] value [ax] modify exact [ax]
+#pragma aux Int10   DOS_NAME __far parm [bx] modify exact [ax]
+#pragma aux TopView DOS_NAME __far parm [es di] [cx] modify exact [ax]
+#pragma aux TopScr  DOS_NAME __far parm [es di] value [es di] modify exact [ax di es]
+#pragma aux Int16   DOS_NAME __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux Int2F   DOS_NAME __far parm [ax] [bx] [cx] value [dx ax] modify exact [ax dx]
+#pragma aux Int33   DOS_NAME __far parm [ax] [bx] [cx] [dx] value [ax] modify exact [ax]
+#pragma aux MousAt  DOS_NAME __far parm [di] modify exact [ax]
+#pragma aux CaseMap DOS_NAME __far parm [ax] value [ax] modify exact [ax]
+#pragma aux InPort  DOS_NAME __far parm [ax] value [ax] modify exact [ax]
+#pragma aux IntOff  DOS_NAME __far modify exact [ax]
+#pragma aux IntOn   DOS_NAME __far modify exact [ax]
+#pragma aux Int28   DOS_NAME __far modify exact [ax]
+#pragma aux DvPause DOS_NAME __far modify exact [ax]
 
 /* A line as the assembly hands it over: the registers that describe it,
    pushed in this order by CallLine in port/asm/VC.ASM. */

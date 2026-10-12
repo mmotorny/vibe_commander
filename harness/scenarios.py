@@ -2485,6 +2485,86 @@ SCENARIOS = {
             "Esc",
         )),
 
+    "stay": Scenario(
+        "Programs that stay in the memory, made in the editor, in hex: "
+        "one that stays by INT 27h and one by a call of DOS, each with an "
+        "interrupt of its own, and one that asks the program for its "
+        "data as its setup program does. They are listed in the map of "
+        "the memory, one is released there, the list is filled to its "
+        "18 and beyond, and the rest is released when the program is "
+        "left",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",
+            '"t.com"',
+            "Enter",
+            "Enter",                      # a new file
+            "F4",                         # in hex
+            '"b86025ba0001"',             # INT 60h to its PSP:100h, by DOS
+            '"cd21ba1001cd27"',           # and INT 27h with 110h bytes
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"u.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"b86125ba0001"',             # INT 61h likewise
+            '"cd21b80031ba"',             # and DOS's call 31h, with 11h
+            '"1100cd21"',                 # paragraphs
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"a.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"be000089f0b4"',             # for AL 0, 1 and 2: AH 2Bh,
+            '"2bb94356ba4d"',             # CX 'VC', DX 'OM', INT 21h;
+            '"4fcd2188e2b4"',             # then AH as a character, the
+            '"02cd21268a57"',             # number of the interface, 42,
+            '"14b402cd2146"',             # and the byte at ES:BX+20
+            '"83fe0372e0c3"',
+            "F2",
+            "Esc",
+            '"a" Enter',
+            "Ctrl+o",                     # *C*C*>: the drive of either
+            "Ctrl+o",                     # panel's path, and a colour
+            '"t" Enter',                  # stays
+            '"u" Enter',                  # stays too
+            '"a" Enter',                  # with two programs in the list
+            "Alt+F5",                     # both, with their interrupts
+            "End Up",                     # onto U.COM
+            "Enter",                      # released
+            "Alt+F5",
+            "Esc",
+            # T.COM nineteen times: with the one that is there, the list
+            # is full at the seventeenth, and two of them end instead.
+            '"for" Space "%a" Space "in" Space "(1" Space "2" Space "3" '
+            'Space "4" Space "5" Space "6" Space "7" Space "8" Space "9" '
+            'Space "0" Space "1" Space "2" Space "3" Space "4" Space "5" '
+            'Space "6" Space "7" Space "8" Space "9)" Space "do" Space "t" '
+            'Enter',
+            "Ctrl+o",
+            "Ctrl+o",
+            "Alt+F5",                     # more lines than the window has
+            "End",
+            "Home",
+            " ".join(["Down"] * 14),      # a line comes in at the bottom
+            " ".join(["Up"] * 14),        # and one at the top
+            "Esc",
+            # U.COM with the list full: it ends, twice.
+            '"for" Space "%a" Space "in" Space "(1" Space "2)" Space "do" '
+            'Space "u" Enter',
+            "Alt+F5",
+            "PgDn",
+            "Esc",
+            "F10",
+            "Enter",                      # eighteen programs released
+        )),
+
     "tree-deep": Scenario(
         "A tree thirteen directories deep, which is drawn narrower and has "
         "no room for the last of them, and longer than its panel",

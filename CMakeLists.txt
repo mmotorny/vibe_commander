@@ -125,6 +125,15 @@ set(port_c_second blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c
     keys.c main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c
     view.c window.c)
 list(TRANSFORM port_asm PREPEND ${CMAKE_SOURCE_DIR}/port/asm/)
+# The part of the program that stays in the memory while a command runs
+# has compiled code too, in a segment of its own, RTEXT, which
+# port/asm/VC.ASM places behind the PSP: the files named here. That part
+# cannot call the rest of the program, which is not in the memory then,
+# so dos.c, the one file that calls DOS and the BIOS, is compiled a second
+# time for it, into RTEXT as well: one source, two copies of its code.
+# RESIDENT is defined for both, and by it port/vc.h gives the functions of
+# the second copy names of their own.
+set(port_c_resident resident.c)
 
 # mkexe turns the linker's output into the program that is run.
 add_executable(mkexe tools/mkexe.c)
@@ -135,9 +144,9 @@ set_target_properties(mkexe PROPERTIES
 # The compiled code, which every build of the port shares.
 file(MAKE_DIRECTORY ${port_dir})
 set(port_compiled "")
-foreach(source ${port_c})
-    string(REGEX REPLACE "\\.c$" ".obj" object ${port_dir}/${source})
-    string(REGEX REPLACE "\\.c$" ".lst" listing ${port_dir}/${source})
+# port_compile(<source> <object> <segment> <class> [<option>...]) compiles
+# a file of port/ into <object>.obj, with a listing next to it.
+function(port_compile source object text class)
     # -0     code for the 8086, like the original
     # -ms    near code and data; the compiled code shares one segment
     # -os    favour small code
@@ -146,29 +155,41 @@ foreach(source ${port_c})
     # -zl    name no libraries to link: the program has none
     # -zls   no reference to the C library's start-up code either
     # -wx -we   all warnings, as errors
-    # -nt, -nc  the name and class of the code segment: CTEXT, or CTEXT2
-    #           for a file of port_c_second
+    # -nt, -nc  the name and class of the code segment: CTEXT, CTEXT2
+    #           for a file of port_c_second, RTEXT for the part that
+    #           stays
     #
     # What the compiler made of it is written next to the object, as a
     # listing: that is where to read which registers a function saves and
     # how much stack it takes.
-    set(text CTEXT)
-    if(source IN_LIST port_c_second)
-        set(text CTEXT2)
-    endif()
     add_custom_command(
-        OUTPUT ${object}
+        OUTPUT ${port_dir}/${object}.obj
         COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -ms -os -s -zu -zl -zls
-                -wx -we -nt=${text} -nc=CCODE -fo=${object}
+                -wx -we -nt=${text} -nc=${class} ${ARGN}
+                -fo=${port_dir}/${object}.obj
                 ${CMAKE_SOURCE_DIR}/port/${source}
-        COMMAND ${watcom} ${watcom_bin}/wdis -l=${listing} ${object}
-        BYPRODUCTS ${listing}
+        COMMAND ${watcom} ${watcom_bin}/wdis -l=${port_dir}/${object}.lst
+                ${port_dir}/${object}.obj
+        BYPRODUCTS ${port_dir}/${object}.lst
         DEPENDS ${CMAKE_SOURCE_DIR}/port/${source}
                 ${CMAKE_SOURCE_DIR}/port/vc.h
-        COMMENT "Compiling ${source}"
+        COMMENT "Compiling ${source} (${text})"
         VERBATIM)
-    list(APPEND port_compiled ${object})
+endfunction()
+
+foreach(source ${port_c})
+    string(REGEX REPLACE "\\.c$" "" object ${source})
+    if(source IN_LIST port_c_resident)
+        port_compile(${source} ${object} RTEXT RCODE -dRESIDENT)
+    elseif(source IN_LIST port_c_second)
+        port_compile(${source} ${object} CTEXT2 CCODE)
+    else()
+        port_compile(${source} ${object} CTEXT CCODE)
+    endif()
+    list(APPEND port_compiled ${port_dir}/${object}.obj)
 endforeach()
+port_compile(dos.c dos_r RTEXT RCODE -dRESIDENT)
+list(APPEND port_compiled ${port_dir}/dos_r.obj)
 
 # add_port(<target> <directory> [<jwasm option>...]) assembles port/asm and
 # links it with the compiled code into <directory>/VC.EXE, with a link map

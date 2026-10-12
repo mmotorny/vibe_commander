@@ -616,6 +616,53 @@ port.
   where the program is assembled.
 - A label of one segment less a label of another is no number to the
   assembler, also within one group: "Constant expected".
+- The compiled code of the part that stays is `port/resident.c`, a file
+  of `port_c_resident` in `CMakeLists.txt`: compiled into `RTEXT` with
+  `RESIDENT` defined. DS is the PSP's segment in all of it, not the main
+  data, and `md` means nothing there. Its data is laid out by the
+  assembly, in `RDATA`, made `PUBLIC` and declared in the C as `extern
+  ... __near` with a `#pragma aux` that keeps the name, as `md` is; a
+  place in the PSP is a near pointer made of its offset. Nothing of the
+  part that goes can be called from it, since that is not in the memory
+  while a command runs: `port/dos.c` is compiled a second time into
+  `RTEXT`, as `dos_r.obj`, and `port/vc.h` names the functions of that
+  copy with `_r` where the first has `_c`, by a macro in their `#pragma
+  aux`, which the compiler expands. `Int21e` there calls DOS with ES as
+  the structure has it, for a block of memory in ES.
+- The assembly of the part that stays calls a function of
+  `port/resident.c` near: `EXTERN GetStat_r:NEAR` in the list at the
+  top of `VC.ASM`, and `#pragma aux GetStat "*_r" __near` in the C.
+  Both are in the one group, so the call needs no relocation.
+- An `__interrupt` function of the compiler saves AX, CX, DX, BX, SP,
+  BP, SI, DI, DS, ES and two words more, clears the direction flag and
+  loads DS with its group, by a number that has to be relocated: the
+  group is the assembly's, so in `RTEXT` it is the PSP. Its parameters
+  are what lies on the stack: a structure of those twelve words, and
+  behind it one of three words for each return address that an
+  interrupt has left, `struct Saved` and `struct Frame` of
+  `port/resident.c`. Writing to them changes the registers that come
+  back and where the function returns.
+- A relocation in the part that stays is applied by the code that
+  starts the program, once it has the check sum of the file: `tools/
+  mkexe.c` puts those behind the others in the table and counts them in
+  `ResCnt`. One in the data of that part, or one that names a segment
+  of the part that goes, stops the build.
+- A function without the compiler's entry and exit is `__declspec(naked)`
+  with its instructions in `_asm { }`. A jump there to an `__interrupt`
+  function is a far one, with a relocation, whatever is written: such a
+  function is far, and `near ptr` is "Operator is expected".
+- The `port` test knows code that ran by its bytes in the file, and a
+  stretch with a relocated word in it does not count as run, but for a
+  far call or jump: an `__interrupt` function begins with one. List in
+  `functions` of `harness/ported.py` the naked entry in front of it,
+  `New21`, not the function.
+- `_disable` and `_enable` are known only where a `#pragma intrinsic`
+  names them, which is in `port/dos.c`: "No prototype found" elsewhere.
+  Call `IntOff` and `IntOn`.
+- The option `-nd` gives a file's own data a group of its own name,
+  which it reads through DS without loading a segment; the linker puts
+  that group where it likes, not at the PSP. Not used: the data of the
+  part that stays is the assembly's.
 - A command that is C whole and ends at `Func04` is a stub of two
   lines: `CallC` and the jump. See `F65_00`.
 - A label that gets a stub takes what the stub takes, and whatever
@@ -906,7 +953,8 @@ with it is less obvious:
   `ErrVct`, is a `u32` there and a far pointer by a cast, which costs
   nothing: `(const u8 __far *)md.ErrVct`.
 - DOS, the BIOS and the mouse driver are called in `port/dos.c` and
-  nowhere else, and that file alone has inline assembly: `Int21d` and
+  nowhere else, and that file alone has inline assembly, but for the
+  entries of the interrupts in `port/resident.c`: `Int21d` and
   `Int21f` for DOS, `Int10` and `TopView` for the screen, `Int16` for
   the keyboard, `Int2F`, `Int33` and `MousAt` for the mouse, and `Int28`
   and `DvPause`, by which the program says that it is idle, all

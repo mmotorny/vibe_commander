@@ -720,24 +720,6 @@ BATCHES = [
                 (0x8052, 0x8054, 0x8058, 0x805A, 0x805B, 0x805C),
                 "F65_00, for a DOS before version 4, where the first "
                 "command processor is named by guessing"),
-            **dict.fromkeys(
-                (0x8186, 0x8193, 0x8195, 0x8197, 0x8199),
-                "F65_00, for a map of more lines than its window has, "
-                "13 on a screen of 25 lines, where the cursor leaves "
-                "the window: the bench has eight at the most, with "
-                "the one program on it that stays in the memory"),
-            **dict.fromkeys(
-                (0x8237, 0x823A, 0x823C, 0x823E, 0x8240, 0x8242, 0x8243,
-                 0x8248, 0x824B, 0x824D, 0x824E, 0x824F, 0x8251, 0x8254,
-                 0x8255, 0x8257, 0x8259),
-                "F65_00, scrolling the lines by one: for a map of "
-                "more lines than its window has"),
-            **dict.fromkeys(
-                (0x84EA, 0x84EE, 0x84F0, 0x84F2, 0x84F5, 0x84F7, 0x84F9,
-                 0x84FB, 0x8501, 0x8504),
-                "F65_00, for a program that stays in the memory and "
-                "is not released while another is: the bench has one "
-                "such program, FDAPM, which does not stay twice"),
         },
     ),
     Batch(
@@ -957,6 +939,26 @@ BATCHES = [
                 "Init35, for a DOS before 5.0, which does not answer "
                 "for its true version, and for version 4.00: the bench "
                 "has FreeDOS, which is 7.10"),
+        },
+    ),
+    Batch(
+        title="The programs that stay in the memory: DOS's interrupts "
+              "taken to note them, their records, and one released",
+        source="resident.c",
+        # CtrlC is code between procedures: the routine for Ctrl-C and
+        # Ctrl-Break, and behind it New21 and New27, which the listing
+        # has as far procedures. The functions are New21 and New27, where
+        # the interrupts arrive, and what the assembly of the part that
+        # stays still calls.
+        routines=("CtrlC", "ExeProg", "AddProg", "FreeBlk", "ChkBlk",
+                  "Release", "GetStat", "SetStat"),
+        functions=("New21", "New27", "Release_r", "GetStat_r",
+                   "SetStat_r"),
+        unreached={
+            0x04AB: "CtrlC, where Ctrl-Break or DOS's Ctrl-C arrives: "
+                    "the BIOS of the bench makes no interrupt of Ctrl "
+                    "and ScrollLock, which was tried, and DOS does not "
+                    "look for Ctrl-C in the calls that the program makes",
         },
     ),
 ]

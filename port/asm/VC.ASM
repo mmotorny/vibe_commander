@@ -75,6 +75,11 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 	EXTERN	F65_00_c:FAR
 	EXTERN	MainLoop_c:FAR, Exit_c:FAR
 	EXTERN	Init00_c:FAR, Init11_c:FAR, IniData_c:FAR
+; The compiled code of the part that stays in the memory, port/resident.c:
+; the interrupt handlers, which the code that starts the program names,
+; and what the assembly of that part calls, near and in its own group.
+	EXTERN	New21:FAR, New27:FAR, CtrlC:FAR
+	EXTERN	GetStat_r:NEAR, SetStat_r:NEAR, Release_r:NEAR
 	EXTERN	F21_00_c:FAR, F21_10_c:FAR, F21_25_c:FAR, F21_30_c:FAR
 	EXTERN	F21_31_c:FAR, F22_00_c:FAR, F23_00_c:FAR, F24_00_c:FAR
 	EXTERN	F24_01_c:FAR, F24_02_c:FAR, F25_00_c:FAR, F26_00_c:FAR
@@ -96,7 +101,10 @@ DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST
 ; not ready, the routine for the critical errors of DOS, and in the part
 ; that stays in the memory the routine for Ctrl-Break and the copy of the
 ; first panel, all of which the C code of the main loop names.
-	PUBLIC	AltSr_T, NoRd_P, FatErr, CtrlC, WCB1sav
+	PUBLIC	AltSr_T, NoRd_P, FatErr, WCB1sav
+; What port/resident.c keeps of the interrupts and of the programs that
+; have stayed in the memory: its data is laid out here, in RDATA.
+	PUBLIC	IntTab, SavePtr, Vect21, Vect27, NameBuf
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.
@@ -180,14 +188,16 @@ Start:	JMP	Alloc0
 
 ;-------------- Layout of the linked program -----------
 ; This block is expected at 103h by tools/mkexe.c, which fills in the
-; first three words. Of the last three it reads the offsets that the
-; linker has put there, and writes them back in paragraphs.
+; first three words and the last. Of the three between it reads the
+; offsets that the linker has put there, and writes them back in
+; paragraphs.
 ImgEnd	DW	0			; End of the program, paragraphs from PSP
 RelTab	DW	0			; Relocation table, paragraphs from PSP
 RelCnt	DW	0			; Number of relocations
 TrnPrW	DW	OFFSET TrnBeg		; Transit part, paragraphs from PSP
 ResPrW	DW	OFFSET LastDat		; Size of the resident part
 DatPrW	DW	OFFSET IntTab		; Its data, paragraphs from PSP
+ResCnt	DW	0			; Number of relocations of that part
 RHEAD	ENDS
 
 ; Neither is known before the program is linked, since compiled code
@@ -844,381 +854,44 @@ SetBrk	PROC	NEAR
 	RETF
 SetBrk	ENDP
 
+;-------- Programs that stay in the memory, and DOS's memory --------
+; C: port/resident.c, which has the interrupt handlers New21 and New27,
+; CtrlC, what they keep of the programs that have stayed in the memory,
+; and these three, which the assembly of this part still calls. They are
+; near, in RTEXT, and take DS on this segment.
 GetStat	PROC	NEAR
-	MOV	CX,0FFFFh
-	MOV	AX,5802h
-	INT	21h
-	JC	GetSt1
-	MOV	CL,AL
-	MOV	AX,5800h
-	INT	21h
-	MOV	CH,AL
-	MOV	BX,1
-	MOV	AX,5803h
-	INT	21h
-	MOV	BX,80h
-	MOV	AX,5801h
-	INT	21h
-GetSt1:	MOV	BP,CX
+	PUSH	DS
+	PUSH	CS
+	POP	DS
+	CALL	GetStat_r
+	POP	DS
+	MOV	BP,AX
 	RET
 GetStat	ENDP
 
 SetStat	PROC	NEAR
 	PUSH	AX
 	PUSHF
-	CMP	BP,0FFFFh
-	JE	SetSt1
-	MOV	BX,BP
-	MOV	BL,BH
-	MOV	BH,0
-	MOV	AX,5801h
-	INT	21h
-	MOV	BX,BP
-	MOV	BH,0
-	MOV	AX,5803h
-	INT	21h
-SetSt1:	POPF
+	PUSH	DS
+	PUSH	CS
+	POP	DS
+	MOV	AX,BP
+	CALL	SetStat_r
+	POP	DS
+	POPF
 	POP	AX
 	RET
 SetStat	ENDP
 
-CtrlC:	IRET
-
-New21	PROC	FAR			; INT 21h
-	CMP	AH,4Bh
-	JE	Fnc4B
-	CMP	AH,31h
-	JE	Fnc31
-	CMP	AH,49h
-	JE	Fnc49
-	CMP	AH,2Bh
-	JE	VCapi
-Old21:	JMP	CS:Vect21
-Fnc4B:	CALL	ExeProg
-	JMP	Old21
-Fnc31:	CALL	AddProg
-	JNC	Old21
-	MOV	AH,4Ch
-	JMP	Old21
-Fnc49:	CALL	FreeBlk
-	JMP	Old21
-VCapi:	CMP	CX,'VC'
-	JNE	Old21
-	CMP	DX,'OM'
-	JNE	Old21
-	PUSH	CS
-	POP	ES
-	CMP	AL,1
-	MOV	BX,OFFSET WCB1sav
-	JB	VCapi1
-	MOV	BX,OFFSET WCB2sav
-	JE	VCapi1
-	MOV	BX,OFFSET ComnIni
-VCapi1:	MOV	AX,VcApiVr*100h
-	CLC
-	RET	2
-New21	ENDP
-
-New27	PROC	FAR			; INT 27h
-	ADD	DX,0Fh
-	SHR	DX,1
-	SHR	DX,1
-	SHR	DX,1
-	SHR	DX,1
-	CALL	AddProg
-	JNC	New27a
-	MOV	AH,0
-	JMP	Old21
-New27a:	SHL	DX,1
-	SHL	DX,1
-	SHL	DX,1
-	SHL	DX,1
-	JMP	CS:Vect27
-New27	ENDP
-
-;------------- Save vectors & program name -------------
-;			DS:DX - file name
-ExeProg	PROC	NEAR C
-	PUSH	ES
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	PUSH	AX
-	CLD
-	PUSH	CS
-	POP	ES
-	PUSH	DS			; Copy vectors & SAVE PTR
-	XOR	SI,SI
-	MOV	DS,SI
-	MOV	DI,OFFSET IntTab
-	MOV	CX,256*2
-	CLI
-	REP	MOVSW
-	MOV	SI,4A8h
-	MOVSW
-	MOVSW
-	STI
-	POP	DS
-	MOV	SI,DX			; Save file name
-ExPrg1:	MOV	CX,SI
-ExPrg2:	LODSB
-	CMP	AL,':'
-	JE	ExPrg1
-	CMP	AL,'\'
-	JE	ExPrg1
-	CMP	AL,0
-	JNE	ExPrg2
-	MOV	SI,CX
-	MOV	DI,OFFSET NameBuf
-	MOV	CX,12
-	REP	MOVSB
-	POP	AX
-	POP	CX
-	POP	DI
-	POP	SI
-	POP	ES
-	RET
-ExeProg	ENDP
-
-;------------- Add resident program to list ------------
-;			   DX - number of paragraphs
-AddProg	PROC	NEAR
-	PUSH	DS
-	PUSH	ES
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	STI
-	CMP	CS:Counter,MaxProg
-	JB	AdPrg1
-	MOV	AX,0E07h
-	INT	10h
-	PUSH	CS
-	POP	DS
-	MOV	SI,OFFSET IntTab
-	XOR	DI,DI
-	MOV	ES,DI
-	MOV	CX,2*256
-	CLD
-	CLI
-	REP	MOVSW
-	MOV	DI,4A8h
-	MOVSW
-	MOVSW
-	STI
-	STC
-	JMP	AdPrg6
-AdPrg1:	MOV	AH,62h			; Get current PSP
-	INT	21h
-	MOV	ES,BX
-	CALL	FreeBlk
-	MOV	BX,DX
-	ADD	BX,(2+12+1+5*256+4+2 +15) SHR 4
-	MOV	AH,4Ah
-	INT	21h
-	CMC
-	JNC	AdPrg6
-	MOV	AX,ES
-	MOV	CX,ES
-	ADD	CX,DX
-	MOV	ES,CX
-	PUSH	CS
-	POP	DS
-	CLD
-	CLI
-	XOR	DI,DI			; PSP -> PrgSeg
-	STOSW
-	MOV	SI,OFFSET NameBuf	; File name -> PrgSeg
-	MOV	CX,12
-	REP	MOVSB
-	PUSH	DX			; Changed vectors -> PrgSeg
-	PUSH	DI
-	INC	DI
-	XOR	BX,BX
-	XOR	DX,DX
-	MOV	DS,BX
-	MOV	SI,OFFSET IntTab
-AdPrg2:	LODS	CS:Wrd
-	MOV	CX,AX
-	LODS	CS:Wrd
-	CMP	CX,DS:[BX].Offs
-	JNE	AdPrg3
-	CMP	AX,DS:[BX].Segm
-	JE	AdPrg4
-AdPrg3:	CMP	DL,22h
-	JE	AdPrg4
-	PUSH	AX			; Save vector
-	MOV	AL,DL
-	STOSB
-	MOV	AX,CX
-	STOSW
-	POP	AX
-	STOSW
-	INC	DH
-AdPrg4:	ADD	BX,4
-	INC	DL
-	JNE	AdPrg2
-	POP	BX
-	MOV	ES:[BX],DH
-	PUSH	CS
-	POP	DS
-	POP	DX
-	MOVSW				; SAVE PTR -> PrgSeg
-	MOVSW
-	MOV	CX,DI			; check sum -> PrgSeg
-	XOR	SI,SI
-	XOR	BX,BX
-	MOV	AH,0
-AdPrg5:	LODS	ES:Byt
-	ADD	BX,AX
-	LOOP	AdPrg5
-	MOV	AX,BX
-	STOSW
-	MOV	BX,DS:Counter		; Save PrgSeg
-	SHL	BX,1
-	MOV	DS:PrgList[BX],ES
-	INC	DS:Counter
-	STI				; Add PrgSeg size
-	DEC	DI
-	MOV	CL,4
-	SHR	DI,CL
-	INC	DI
-	ADD	DX,DI
-AdPrg6:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	ES
-	POP	DS
-	RET
-AddProg	ENDP
-
-;------------------ Free memory block ------------------
-;			   ES - segment for diallocation
-FreeBlk	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	PUSH	AX
-	CLD
-	MOV	SI,OFFSET PrgList
-	MOV	DI,SI
-	MOV	CX,CS:Counter
-	JCXZ	FreBl3
-FreBl1:	MOV	DS,CS:[SI]
-	CALL	ChkBlk
-	LODS	CS:Wrd
-	JNE	FreBl2
-	PUSH	AX
-	MOV	AX,ES
-	CMP	AX,DS:[0]
-	POP	AX
-	JE	FreBl2
-	MOV	CS:[DI],AX
-	INC	DI
-	INC	DI
-FreBl2:	LOOP	FreBl1
-	SUB	SI,DI
-	SHR	SI,1
-	SUB	CS:Counter,SI
-FreBl3:	POP	AX
-	POP	CX
-	POP	DI
-	POP	SI
-	POP	DS
-	RET
-FreeBlk	ENDP
-
-;---------------------- Check sum ----------------------
-;			   DS - PrgSeg
-ChkBlk	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	MOV	AL,DS:[0Eh]
-	MOV	AH,5
-	MUL	AH
-	ADD	AX,WORD PTR (2+12+1+4)
-	MOV	CX,AX
-	XOR	SI,SI
-	XOR	DI,DI
-	MOV	AH,0
-ChkBl1:	LODSB
-	ADD	DI,AX
-	LOOP	ChkBl1
-	CMP	DI,DS:[SI]
-	POP	CX
-	POP	DI
-	POP	SI
-	RET
-ChkBlk	ENDP
-
-;------------------- Release programs ------------------
 ;			   DS - PrgSeg
 Release	PROC	NEAR
 	PUSH	DS
-	PUSH	ES
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	CALL	GetStat
-	CLD
-	CALL	ChkBlk			; Check sum
-	JNE	Relea5
-	XOR	AX,AX			; Restore vectors
-	MOV	ES,AX
-	MOV	SI,0Eh
-	LODSB
-	MOV	CX,AX
-	CLI
-	JCXZ	Relea2
-Relea1:	LODSB
-	MOV	DI,AX
-	SHL	DI,1
-	SHL	DI,1
-	MOVSW
-	MOVSW
-	LOOP	Relea1
-Relea2:	MOV	DI,4A8h			; Restore SAVE PTR
-	MOVSW
-	MOVSW
-	STI
-	MOV	SI,DS:[0]		; Release blocks
-	MOV	AH,52h
-	INT	21h
-	MOV	DS,ES:[BX-2]
-Relea3:	CMP	SI,DS:[1]
-	JNE	Relea4
 	MOV	AX,DS
-	INC	AX
-	MOV	ES,AX
-	MOV	AH,49h
-	INT	21h
-Relea4:	MOV	AX,DS
-	INC	AX
-	ADD	AX,DS:[3]
-	CMP	BYTE PTR DS:[0],'M'
-	MOV	DS,AX
-	JE	Relea3
-Relea5:	CALL	SetStat
+	PUSH	CS
+	POP	DS
+	CALL	Release_r
 	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	ES
 	POP	DS
 	RETF
 Release	ENDP
@@ -1284,6 +957,26 @@ AllocB:
 	INC	AX
 Alloc2:	INT	21h
 Alloc3:	MOV	DS:ChkFile,BX
+; The compiled code of the resident part names its segment, which is the
+; PSP's: the linker's relocations for that, behind those of the transit
+; part in the table. They are applied when the sum has been taken, which
+; has to be that of the file.
+	MOV	CX,DS:ResCnt
+	JCXZ	AllocE
+	MOV	AX,DS
+	ADD	AX,DS:RelTab
+	MOV	ES,AX
+	MOV	DI,DS:RelCnt
+	SHL	DI,1
+	SHL	DI,1
+	MOV	AX,DS
+AllocD:	MOV	BX,ES:[DI]
+	ADD	DS:[BX],AX
+	ADD	DI,4
+	LOOP	AllocD
+	PUSH	DS
+	POP	ES
+AllocE:
 	MOV	AH,30h			; Check DOS version
 	INT	21h
 	CMP	AL,3
@@ -1463,7 +1156,7 @@ ShadFl	EQU	38
 ; What it reads, writes and names of the assembly is made public here.
 	PUBLIC	SecDat
 	PUBLIC	Counter, Vect21, Vect22, Vect27, RelTab
-	PUBLIC	New21, New27, Exit01, SetBrk
+	PUBLIC	Exit01, SetBrk
 Init00:	CALL	Reloc
 	CLD
 	MOV	AX,SS

@@ -22,12 +22,17 @@
  *   - DOS relocates nothing. A program that moves itself has to do that on
  *     its own, so the linker's relocation table is appended to the program,
  *     which applies it to every copy of itself that it loads (Reloc in
- *     port/asm/VC.ASM).
+ *     port/asm/VC.ASM). The relocations of the part that stays come
+ *     behind the others in the table: that part does not move, but it
+ *     takes a check sum of the file as it was loaded, to know the file
+ *     again when it loads it after a command, and so applies its own
+ *     relocations itself too, once, when it has the sum.
  *   - The numbers the program needs for this are written into the block
  *     that port/asm/VC.ASM reserves at 103h.
  *
  * It also checks the object files of the compiled code, if they are named:
- * they may hold code only. The program keeps its data in a segment that it
+ * they may hold code only, of the part that goes or of the part that
+ * stays. The program keeps its data in a segment that it
  * allocates when it starts, and its constants in the code segment; static
  * data of the compiler's making, a string literal for example, would be
  * linked to where the program does not look for it.
@@ -67,7 +72,9 @@ enum {
                                    the top of its stack */
     DATA        = INFO + 10,    /* where the part that stays has its data,
                                    which the file has as nothing */
-    INFO_END    = INFO + 12,
+    STAYING     = INFO + 12,    /* number of relocations of that part,
+                                   which follow the others in the table */
+    INFO_END    = INFO + 14,
 
     /* Records of an object file (OMF). */
     LNAMES      = 0x96,         /* a list of names */
@@ -111,7 +118,8 @@ static unsigned char *read_file(const char *path, long *size)
 }
 
 /* Fail if the object file at `path` has anything in a segment that is not
-   code. The compiler names its code segments by class, here CCODE. */
+   code. The compiler names its code segments by class, here CCODE, and
+   RCODE for the part of the program that stays in the memory. */
 static void check_object(const char *path)
 {
     long size, at = 0;
@@ -142,7 +150,8 @@ static void check_object(const char *path)
             class = p[3];
             if (name >= (unsigned)count || class >= (unsigned)count)
                 fail("an object file is not as expected");
-            if ((length || attributes & 2) && strcmp(names[class], "CCODE")) {
+            if ((length || attributes & 2) && strcmp(names[class], "CCODE")
+                    && strcmp(names[class], "RCODE")) {
                 fprintf(stderr, "mkexe: %s has %u bytes of static data in "
                         "segment %s; compiled code may hold none, not even "
                         "a string literal\n", path, length, names[name]);
@@ -196,6 +205,7 @@ int main(int argc, char **argv)
     unsigned char *in, *image, header[HEADER_SIZE] = {0};
     long in_size, image_size, table_at, total, i;
     unsigned relocations, header_size, transit, resident, data;
+    unsigned moving = 0, staying = 0;
     const unsigned char *entry;
 
     if (argc < 4)
@@ -249,20 +259,44 @@ int main(int argc, char **argv)
         if (image[i])
             fail("the data of the resident part has contents");
 
-    /* Only the part of the program that moves is relocated, at its new
-       place; nothing below it may need relocating. */
+    /* A relocation is a word of the program that holds a segment, counted
+       from the PSP. The part that moves is relocated at its new place,
+       and what its words name moves with it: the assembly's own segment
+       among it, which is the PSP's to the linker. */
     for (i = 0; i < relocations; i++) {
         unsigned offset = get16(entry + i * 4);
         unsigned segment = get16(entry + i * 4 + 2);
         long address = segment * 16L + offset;
-        if (address < transit || address + 2 > image_size)
-            fail("a relocation lies outside the transit part");
-        put16(image + table_at + i * 4, offset);
-        put16(image + table_at + i * 4 + 2, segment);
+        if (address + 2 > image_size)
+            fail("a relocation lies outside the program");
+        if (address < transit)
+            continue;
+        put16(image + table_at + moving * 4, offset);
+        put16(image + table_at + moving * 4 + 2, segment);
+        moving++;
     }
+    /* The part that stays is relocated where it is, and its words can
+       only name that part itself: the other one is somewhere else after
+       every command. They are in its code, and the table has each by its
+       offset from the PSP. */
+    for (i = 0; i < relocations; i++) {
+        long address = get16(entry + i * 4 + 2) * 16L + get16(entry + i * 4);
+        if (address >= transit)
+            continue;
+        if (address + 2 > data)
+            fail("a relocation lies in the data of the resident part");
+        if (get16(image + address) >= transit / 16)
+            fail("the resident part names a segment of the transit part");
+        put16(image + table_at + (moving + staying) * 4, address);
+        put16(image + table_at + (moving + staying) * 4 + 2, 0);
+        staying++;
+    }
+    if (relocations * 4L > 0xFFFF)
+        fail("the relocation table is longer than 64K");
     put16(image + IMAGE_END, total / 16);
     put16(image + TABLE, table_at / 16);
-    put16(image + COUNT, relocations);
+    put16(image + COUNT, moving);
+    put16(image + STAYING, staying);
     put16(image + TRANSIT, transit / 16);
     put16(image + RESIDENT, (resident + 15) / 16);
     put16(image + DATA, (data + 15) / 16);

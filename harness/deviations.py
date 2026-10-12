@@ -137,12 +137,12 @@ IGNORED = [
     # Left out are the size of the program; of every line of free memory
     # where it begins, its blocks and its size, also of the one that lies
     # before the program, which a line by itself does not tell from the
-    # others; and where FDAPM begins, the program that the scenario
-    # memory-map has stay. A field is left out whole, with the room in
-    # front of the number, so that a number with fewer digits leaves out
-    # the same cells.
+    # others; and where a program begins that a scenario has stay: FDAPM
+    # in memory-map, T.COM and U.COM in stay. A field is left out whole,
+    # with the room in front of the number, so that a number with fewer
+    # digits leaves out the same cells.
     re.compile(r"║ . ([0-9A-F]{4}[ \d]{6}[ \d,]{10}) {3}free memory "),
-    re.compile(r"║ . ([0-9A-F]{4})[ \d]{6}[ \d,]{10} {3}FDAPM\.COM "),
+    re.compile(r"║ . ([0-9A-F]{4})[ \d]{6}[ \d,]{10} {3}(?:FDAPM|T|U)\.COM "),
     re.compile(r"║ . [0-9A-F]{4}[ \d]{6}([ \d,]{10}) {3}VC\.(?:COM|EXE) "),
 ]
 
