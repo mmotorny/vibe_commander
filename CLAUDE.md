@@ -49,8 +49,8 @@ not in Claude's memory: memory does not travel between computers.
 ## Committing and pushing
 
 - Show the result of a piece of work, then wait for confirmation before
-  committing it. A translated batch is the exception: see "A run of
-  batches".
+  committing it. Work that agents do in a run is the exception: see "Work by
+  several agents".
 - Commit and push together. A commit is never left unpushed.
 
 ## History
@@ -59,106 +59,128 @@ not in Claude's memory: memory does not travel between computers.
   step, described accurately. Get a commit right before it is pushed rather
   than fixing it afterwards.
 
-## The original source
+## The three trees
 
-- The files in `src/` are CP866 text with CRLF line endings. Edit them as
-  bytes; do not let an editor or tool re-encode them or change line endings.
-  The same goes for `port/asm/`, which starts as a copy of them.
-- The first commit holds the source exactly as its author published it, so
-  `git diff` against that commit shows every change made since.
+The source is three trees, and they are a story in that order.
 
-## The port
+- `src/asm/` is Volkov Commander 4.05 as its author published it, in
+  assembly, changed only as far as building it with free tools took. Its
+  files are CP866 text with CRLF line endings: edit them as bytes, and do
+  not let an editor or a tool re-encode them or change line endings. The
+  first commit holds them exactly as published, in `src/` itself, so
+  `git diff $(git rev-list --max-parents=0 HEAD):src HEAD:src/asm` shows
+  every change made since. The test `asm-bytes` builds this tree and holds
+  it against the binaries its author shipped.
+- `src/c/` is that program translated to C for DOS, the C translation: it
+  behaves as the original does, bugs included, and every scenario holds
+  it against the original. It is finished and frozen. It changes only to
+  mend a place where it is found not to behave as the original, and then
+  toward the original.
+- `src/portable_c/` is the portable C: the program on its way from DOS to
+  modern operating systems. It began as a copy of `src/c/`. This is where
+  work goes on.
 
-- The program is translated to C for DOS first, and compared with the
-  original there. Nothing for other operating systems, and no layer to hide
-  DOS behind, goes in until that translation is complete and verified.
-- Fidelity means the same behaviour, bugs included. Port a bug as it is and
-  report it; whether to fix it is decided separately.
-- Translated code keeps the names that routines and data have in the
-  assembly, until the whole program is C.
-- The port ends with no assembly file in it: its code and its data are
-  C. Where C can be written in more than one way, portable C comes before
-  C that is tied to this compiler or this machine, that before the
-  compiler's intrinsics, and those before assembly, which is written
-  inline in a C file and only where nothing else works. That a thing
-  would be smaller or faster is no reason to go down that list.
-- The mouse is tested like the keys: the bench is to have one, and what
-  the program does with it is held against the original in scenarios.
-  The port is not done while the mouse has not been shown to work. This
-  asks for no more coverage than is asked elsewhere: an instruction that
-  no scenario can reach is still listed as out of reach with its reason.
-  That the bench has no mouse is no longer such a reason.
-- DOS is a stage on the way: the aim is to carry the program to modern
-  operating systems, where a few kilobytes of memory or of disk mean
-  nothing. So the port may be larger than the original and use more
-  memory, the part that stays in memory while a command runs included,
-  as long as it behaves the same. Spend no effort on making it small.
-  Ten times the original's size would still be a red flag.
+In prose the first is the assembly or the original source, the second the
+C translation, the third the portable C. No tree is called "the port".
+The tests are named by the tree they judge: `asm-bytes`, `c-data`,
+`c-arith`, `c-scenarios`, and those of the portable C with `portable_c-`
+in front.
 
-## Translating a batch
+## The C translation
 
-Routines are translated in batches of ones that belong together. A batch
-is as large as what belongs together: a whole dialog or a whole command
-rather than a handful of leaves. `tools/routines.py` lists those that are
-still assembly, with their sizes, their callers and what they call. For
-each batch, in this order:
+These held while `src/c/` was made, and they say what it is.
 
-1. Run `tools/flagscan.py` on the routines: it follows the flags they
-   leave to whatever reads them, through calls and returns. Read every
-   caller that stays in assembly: which registers it passes and which it
-   uses afterwards. That and the flags are the contract the stubs must
-   keep.
-2. Write scenarios that reach the routines. `harness/reach.py` lists the
-   instructions of theirs that no scenario has run yet, by address in a
-   line for each routine and with `--list` as the listing has them, and
-   tries steps against that list; `harness/show.py` shows what keys do, with
-   `--changes` only the rows that a step changed; what is known about
-   driving the dialogs is at the top of `harness/scenarios.py`. Derive the
-   goldens with `harness/goldens.py`.
-3. List the routines in `harness/ported.py` and run the `port` test. It
-   names every instruction of theirs that no scenario executed in the
-   original. Add scenarios until none is left, or list an instruction as
-   out of reach with the reason.
-4. Translate. The C goes into `port/`, the routines leave `port/asm/`, and
-   those that assembly still calls leave a stub behind.
-5. The `port` test must pass. Nothing else decides whether a translation is
-   right. What it reports, the size, the stack and what ran, is in
-   `build/Testing/Temporary/LastTest.log` afterwards: read it there rather
-   than run the test again.
+- Fidelity means the same behaviour, bugs included. A bug of the original
+  was ported as it is and reported.
+- Its routines and data keep the names they have in the assembly.
+- It has no assembly file: its code and its data are C. Where C could be
+  written in more than one way, portable C came before C that is tied to
+  this compiler or this machine, that before the compiler's intrinsics,
+  and those before assembly, which is written inline in a C file and only
+  where nothing else works. That a thing would be smaller or faster was no
+  reason to go down that list. The README lists what rests on Open Watcom
+  and every piece of inline assembly.
+- The mouse is tested like the keys: the bench has one, and what the
+  program does with it is held against the original in scenarios. An
+  instruction that no scenario can reach is listed as out of reach with
+  its reason.
+- It is larger than the original and uses more memory, the part that
+  stays in memory while a command runs included. No effort went into
+  making it small.
 
-The test can only see what a scenario shows. `harness/notice.py` breaks
-a branch in a copy of the port and says whether any scenario notices, but
-it is not run for a batch: over three batches it took a sixth of the time
-and found no translation that was wrong. A batch is done when every
-instruction has run in the original and the `port` test passes.
+## The portable C
 
-When the `port` test fails where the change at hand cannot explain it,
+- The translation of the program is complete and verified, on the user's
+  word of 12 October 2026, so work for other operating systems may go in.
+  It goes into `src/portable_c/` and nowhere else.
+- What judges the portable C is what judged the C translation: the
+  scenarios, with goldens recorded from the original. Where the portable C
+  is to behave otherwise than the original, that is a deviation.
+- Every deviation is declared, in `src/portable_c/DEVIATIONS.md`: what
+  the original does, what the portable C does, why, and which scenarios
+  show it. A scenario that a deviation changes gets a golden of its own,
+  recorded from the portable C and read by whoever records it; such a
+  golden is kept apart from those of the original and says where it is
+  from, since it shows that nothing has changed, not that anything is
+  right.
+- A feature that only made sense on DOS is removed, not kept as a setting
+  that does nothing. The first is Memory allocation in the Configuration:
+  the portable C stays in memory whole while a command runs. A removal of
+  that kind is declared and made without asking. Any other deviation, a
+  fix of a bug of the original included, is asked first.
+- A bug of the original stays as it is until its fix has been decided.
+- DOS stays a target of the portable C for as long as DOS is where it is
+  judged: every step builds for DOS and passes its scenarios there before
+  it lands.
+- The order holds here as it did for the translation, and it is now the
+  point of the work: portable C first, then C tied to a compiler or a
+  machine, then intrinsics, then assembly inline in a C file. What the
+  README lists as resting on Open Watcom is to shrink, not grow.
+- What the program asks of the system it is on, it asks in one place; the
+  rest of it does not know which system that is. `dos.c` is that place
+  today.
+- Names may change here once a thing no longer is what its name in the
+  assembly says. The C translation keeps the old names, and a comment at
+  the new name says what it was.
+
+## How the translation was made
+
+The C translation was made a batch of routines at a time, each with
+scenarios that ran every instruction of it in the original, and the
+scenarios' test alone decided whether a batch was right. The history
+tells it commit by commit, and the three sections below are what the
+batches wrote down for each other: how the data went to C, what the
+assembly left behind in the C, and what Open Watcom does with it. They
+are notes, not rules, and they are kept because the portable C starts
+from the same code.
+
+When a scenarios' test fails where the change at hand cannot explain it,
 derive the goldens again before anything else. If `git diff` then shows
 them changed, it is the machine that differs, QEMU or DOS, and not the
-port.
+program.
 
 ### Moving the data of a file to C
 
 This is how the texts, boxes, dialogs, buttons and colours of the
-assembly went to C, a file at a time. It is done, and `port/asm/` is
+assembly went to C, a file at a time. It is done, and `src/c/asm/` is
 gone. What is here of the assembly, its
 `PUBLIC` and `EXTERN` lines and its stubs, is of then; what is here of
-the files of constants and of the test `data` holds for a constant that
+the files of constants and of the test `c-data` holds for a constant that
 is written or changed now. `VCHELP.INC` went first, into
-`port/help_t.c`: read that file and `port/tables.h` before anything
+`src/c/help_t.c`: read that file and `src/c/tables.h` before anything
 else.
 
 For one file, in this order:
 
 1. Build, and run `python3 harness/datacheck.py build/shareware-layout
-   build/port`. Under `assembly` it names every object of the file that
+   build/c`. Under `assembly` it names every object of the file that
    has a name of the original, with its length. That is the list of what
    moves, and each is as the original now. Keep the output, in `build/`:
    step 5 holds the new one against it. To read the assembly, make a
-   copy that an editor shows, `iconv -f cp866 port/asm/VCFIND.INC >
+   copy that an editor shows, `iconv -f cp866 src/c/asm/VCFIND.INC >
    build/VCFIND.txt`; change the file itself by a script that reads and
    writes bytes.
-2. Write the file of constants, `port/NAME_t.c`, under the name that
+2. Write the file of constants, `src/c/NAME_t.c`, under the name that
    `TODO.md` has for it. It includes `tables.h` and holds constants and
    nothing else, in the order of the assembly:
    - A text is `const u8 Name_S[] = "text";`, with the zero byte of
@@ -191,7 +213,7 @@ For one file, in this order:
      `OFFSET Name` is `Name`. A word that names something is a pointer,
      written as the name. A place in the main data is `MD_AT(TmpBuf)`,
      and `MD_AT(TmpErr[1])` for `TmpErr+1`; a number in a word that
-     names something elsewhere is `NUMBER(n)`. What `port/tables.h`
+     names something elsewhere is `NUMBER(n)`. What `src/c/tables.h`
      lacks, a place in a panel's segment say, is added there.
    - A constant that only this file names is `static`. One that code or
      another file names has `#pragma aux Name "*"`.
@@ -222,7 +244,7 @@ For one file, in this order:
    assembly and not arrived: hold the names against those of step 1.
    The two counts in its last lines add up to what they added up to
    before, in objects, and in bytes but for what was written longer.
-   Then `port` has to pass, two minutes.
+   Then `c-scenarios` has to pass, two minutes.
 6. A file with nothing left but comments goes: `git rm`, its `INCLUDE`
    in `VC.ASM`, its name in `port_asm` of `CMakeLists.txt`.
 
@@ -250,31 +272,31 @@ What names an object from elsewhere, and what to do:
   same name, as `Empty_S` and `Mask_S` are in several: leave it. The two
   do not meet at the linker, and the test holds both.
 
-What the test `data` goes by is the name: an object is held against the
+What the test `c-data` goes by is the name: an object is held against the
 label of the original that has its name, and a word that holds an
-address there against where the port has what that label names. What it
+address there against where the translation has what that label names. What it
 says when it fails, and what that means as a rule:
 
-- "Name+N: the port has XXh, the original YYh". Byte N of the object,
-  counted from 0, is another. With 00h in the port at the last byte, the
+- "Name+N: the translation has XXh, the original YYh". Byte N of the object,
+  counted from 0, is another. With 00h in the translation at the last byte, the
   string's zero is one that the assembly has not: give the array its
   length. With 00h behind a single byte, a structure is not packed. With
   everything from N on shifted, a byte is missing or one too many just
   before: an escape that ran on, a `BOX` that should be `BOX1`, a count
   of lines that is not the number of lines.
-- "the port has XXXXh, which is not where it has Y, ...: the original
+- "the translation has XXXXh, which is not where it has Y, ...: the original
   names Y there". The word names the wrong thing: two lines exchanged, a
   name of another box. A number where a name belongs shows like this
   too.
-- "the original names Y there, which the port has not by that name".
-  Nothing in the port is called Y: a name written otherwise in C, or Y
+- "the original names Y there, which the translation has not by that name".
+  Nothing in the translation is called Y: a name written otherwise in C, or Y
   left in neither place.
 - "the original has no data called X". A constant of C whose name the
   original has not: a name mistyped, as a rule.
 - "X is listed in datacheck.py, and the C code has no constant of that
   name". An entry of a table there that has outlived its constant.
 
-Where the port is meant to be otherwise, `harness/datacheck.py` has four
+Where the translation is meant to be otherwise, `harness/datacheck.py` has four
 tables, each entry with its reason. A file of the assembly that moves as
 it is needs no entry in any of them, and wanting one is a sign to look
 again:
@@ -283,13 +305,13 @@ again:
   or inside another object. It is there for the constants that code
   files had before the test was. A constant that moves keeps its name.
 - `OWN`, for a constant that the original has not as data, which is
-  then not compared. Right for a table that only the port has, as
+  then not compared. Right for a table that only the translation has, as
   `Fnc_T` is. The tables by which the stubs of the
   commands went on, `CmdNx_T`, `MnuNx_T` and `F35_T`, became `switch`
   statements and are no data.
   Wrong for anything that was in the published source: an entry here to
   quiet "no data called X" takes the object out of the test.
-- `NAMED_OTHERWISE`, for a word that names something the port has in
+- `NAMED_OTHERWISE`, for a word that names something the translation has in
   another way: a routine that has become a number in a table of
   functions. Texts, boxes and buttons are never named otherwise.
 - `DIFFERENT`, for an object that is meant to differ from the original.
@@ -297,7 +319,7 @@ again:
   ask, as "A run of batches" has it.
 
 A difference that the test reports is mended in the C. If the C is as
-the assembly of the port and the test still fails, the port's assembly
+the assembly of the translation and the test still fails, the translation's assembly
 had drifted from the original, which the test said before the move, in
 step 1: it does not start to fail by moving what was right.
 
@@ -329,7 +351,7 @@ What was met on the way:
   routine of a dialog, cannot become a pointer to a function: that is
   four bytes, and the layouts are the original's. It becomes the place
   of the function in a table of functions of one type, `static FncFn *
-  const CODE Fnc_T[]` in `port/dirfunc.c`, and what called through the
+  const CODE Fnc_T[]` in `src/c/dirfunc.c`, and what called through the
   word calls `Fnc_T[md.FncAddr](attributes)`. The type has the registers,
   `#pragma aux FncFn parm [ax] value [ax] modify exact [ax]`; a function
   that is far only by its own `#pragma aux` is cast to it, `(FncFn *)`,
@@ -339,9 +361,9 @@ What was met on the way:
   different things, as the commands do, are called from a `switch`
   instead. The routine that a dialog names for Enter and F10 went that
   second way: the word in its header is a number, `SUB_` of
-  `port/tables.h`, and `Dialog` has a `switch` that calls `F38_10`,
+  `src/c/tables.h`, and `Dialog` has a `switch` that calls `F38_10`,
   `M30_60` or `F35_61`, each of which takes and hands back something
-  else. The test `data` is told of each such word in `NAMED_OTHERWISE`,
+  else. The test `c-data` is told of each such word in `NAMED_OTHERWISE`,
   with "is" and the number.
 - The linker's map has the static objects too, `option static`, marked
   with an `s`, and that is how the test finds a constant that is
@@ -353,7 +375,7 @@ What was met on the way:
 What the agents found who moved the other files, each in ten to fifteen
 minutes by the steps above, and what those steps did not say:
 
-- `Var_S`, `Title_S` and `Tree_S` are declared far in `port/vc.h`, as
+- `Var_S`, `Title_S` and `Tree_S` are declared far in `src/c/vc.h`, as
   code reads them, and `tables.h` includes that. A box names its lines
   by near words, so `tables.h` has each of the three under a near name
   as well, `#define Var_S VarNear_S` with `#pragma aux VarNear_S
@@ -403,13 +425,13 @@ bytes as an object has, and the program reads more of some: `MvzLine`
 copies as many bytes as it is told whatever the text, 68 for a path;
 `MainFil` and `ReadOne` copy a name as 13; a title is copied as 80; a
 loop goes to a count. What lies behind the text in the original is then
-read too, and the port has to have it there: the object is written as
+read too, and the translation has to have it there: the object is written as
 long as what is read, with the original's bytes, and the test holds
 them. The copy may be in another file than the text: `User_S` of
-`port/keys_t.c` is copied as 80 bytes by Menu file edit, in
-`port/commands.c`, and was found last for that.
+`src/c/keys_t.c` is copied as 80 bytes by Menu file edit, in
+`src/c/commands.c`, and was found last for that.
 
-- `python3 harness/reads.py build/port` lists every place where a file
+- `python3 harness/reads.py build/c` lists every place where a file
   of code names a constant, with the bytes that are read of it there. A
   place that it knows by its form, a loop to a count, `MvzLine`,
   `MvsBw`, `MainFil`, a text read as far as its zero, a box handed on
@@ -417,7 +439,7 @@ them. The copy may be in another file than the text: `User_S` of
   the count and how it is known, by reading the code from where the
   constant is named to where the read stops, through the functions that
   it is handed to.
-- The test `data` fails for an object that is shorter than what is read
+- The test `c-data` fails for an object that is shorter than what is read
   of it, for a text that is read as far as a zero byte and has none,
   whether code reads it or a box names it, and for a place that is of
   no known form and not in `REVIEWED`: so a new read is looked at when
@@ -433,7 +455,7 @@ them. The copy may be in another file than the text: `User_S` of
   at an index that the program does not keep inside it. Of the second
   kind are the menu that is none, which `TODO.md` has, and the defaults
   of a panel, 88 bytes of which the original has 8: what lies behind
-  those is addresses of routines, or is not data of the port at all,
+  those is addresses of routines, or is not data of the translation at all,
   and no layout of the constants can make it the original's.
 
 ### What the assembly left in the C
@@ -452,7 +474,7 @@ and the tests.
   `FnFile` and `NearFl` with ES on the old list of files. So such
   functions take what they read as far pointers. A function that touches
   nothing of the main data, only far pointers and constants, needs no
-  DS. A panel is its segment as a number, and `PANEL` of `port/vc.h`
+  DS. A panel is its segment as a number, and `PANEL` of `src/c/vc.h`
   makes the pointer.
 - A routine that hands back two words returns them as a `u32` in
   `value [dx ax]`; one that hands back more gets room on the stack and a
@@ -469,9 +491,9 @@ and the tests.
 - Where every jump inside such code ends up back at one place, the
   wait for the next key, each label that is jumped to is a function, with
   the registers that the jump carries as its arguments: a jump is a call
-  and a return. `port/edit.c` has the editor's keys like that.
+  and a return. `src/c/edit.c` has the editor's keys like that.
 - A text or a table that is known by its offset is read at that
-  offset in the segment that `AsmSeg` of `port/misc.c` returns:
+  offset in the segment that `AsmSeg` of `src/c/misc.c` returns:
   `AT(AsmSeg(), OFFSET(text))` costs no relocation, where naming the
   text as a far object does, four bytes of the file each time.
 - A table of colours for `NgLine` may be shorter than the four that the
@@ -492,12 +514,12 @@ and the tests.
 - What the viewer keeps of a file, `ViewDat`, lies in `TmpBuf` from
   its byte 200 on, and what the editor keeps, `EdData`, lies over it:
   `EdBase` is `ViBase`, `EdSize` is `ViSize`, `EdTxHex` is `ViTxHex`.
-  `port/view.c` has the viewer's as a structure there. The text is in a
+  `src/c/view.c` has the viewer's as a structure there. The text is in a
   segment of its own, which the original has in DS and the C has as a
   number, like a panel; the table of its lines is at the top of the same
   segment.
 - A new scenario may reach what an earlier batch listed as out of
-  reach, and the `port` test then fails on the stale entry, "listed as
+  reach, and the `c-scenarios` test then fails on the stale entry, "listed as
   out of reach, but executed": take it out of that batch's list.
   `harness/reach.py` shows it beforehand, as a routine with nothing
   left.
@@ -523,16 +545,16 @@ and the tests.
   tests (`harness/DRIVER.ASM`) watches it from inside the machine: it
   takes a call of `INT 28h` for the program's when it comes from the
   memory of the program that DOS has as the current one, and that is
-  named as the file under test is. `LeaveTm` of `port/blank.c` makes that
-  call, through `Int28` of `port/dos.c`, every time `Input0` has gone
+  named as the file under test is. `LeaveTm` of `src/c/blank.c` makes that
+  call, through `Int28` of `src/c/dos.c`, every time `Input0` has gone
   round, and `Blank` while it waits; whatever makes it has to do so with
   DS on the main data and on the program's own stack, as C code does. And the
   driver reads `AutoTim` and `Clock` in the main data, which
   `harness/driver.py` finds in the listing of the original,
-  `build/shareware-layout/VC.LST`, for the port too: its main data is
-  laid out as the original's. The port's stack it finds in the linker's
+  `build/shareware-layout/VC.LST`, for the translation too: its main data is
+  laid out as the original's. The translation's stack it finds in the linker's
   map, `stack` of `harness/coverage.py`: it begins at `DataSav` of
-  `port/resident.c` and is all of the segment `R_BSS`.
+  `src/c/resident.c` and is all of the segment `R_BSS`.
 - A routine that jumps on by a table of keys, with `Case`, has the table
   as a `switch` in C. `Case` takes no key without a scan code, and an
   entry of the table without one takes the character with any.
@@ -548,10 +570,10 @@ and the tests.
   the current panel in DS, and it jumps back to one of several places of
   the loop, or on into another command. In C it is a function that
   returns where the program goes on, and the main loop calls it from a
-  `switch`: `Command` of `port/main.c`, with `CmdEnd`, `MnuEnd`, `F1Next`
+  `switch`: `Command` of `src/c/main.c`, with `CmdEnd`, `MnuEnd`, `F1Next`
   and `F35_90` there, which make of what a function returns what stood
   at the end of each family of commands in the original. "The commands"
-  in `port/vc.h` declares them, with the places that each family
+  in `src/c/vc.h` declares them, with the places that each family
   returns. Where the place that a command goes on at takes registers, a
   panel in DS and a byte in CL or CH for `M01_01`, `M03_00` and `M06_00`,
   the function returns them too, in the high word and the high byte of
@@ -560,7 +582,7 @@ and the tests.
   procedure: the menu comes in at `F17_01` and `F76_01`, the mouse at
   `F00_05`, `F01_05` and `F00_60`, with other registers than the key's
   entry has. Each is a function, and has a number of its own among the
-  commands, a `CMD_` of `port/vc.h`.
+  commands, a `CMD_` of `src/c/vc.h`.
 - A routine may be called with DS somewhere that only happens to do:
   `F16_00` asks `BegBX` where a panel begins with DS on the main data,
   and takes the row, which is that of either panel.
@@ -581,10 +603,10 @@ and the tests.
   and `M30_50` sets attributes, is called by `FncSel`, by `FncMas` and by
   `DirFunc`, with the attributes of a file, and answers 1, 0, or 100h to
   stop. `FncAddr` holds the number of the function, and `FncCall` of
-  `port/vc.h` calls it: see "Moving the data of a file to C".
+  `src/c/vc.h` calls it: see "Moving the data of a file to C".
 - A dialog may name a routine that `Dialog` calls when it is
   answered: `F38_10`, `M30_60` and `F35_61`. The word in its header is a
-  number, a `SUB_` of `port/tables.h`, and `Dialog` calls the function
+  number, a `SUB_` of `src/c/tables.h`, and `Dialog` calls the function
   from a `switch`.
 - A caller may go on with what a routine leaves in AX when it reports
   no error: `^R` in a tree takes AL after `DelTr0` for the kind of the
@@ -597,18 +619,18 @@ and the tests.
   leaves the flag undefined, so such a call goes through `Intr21f`,
   which sets the flag as the assembly had it: read back from the call
   to the instruction that set it. A call that the assembly makes with
-  `INT 21h` itself is `Int21d` of `port/dos.c` in C, which has the flag
-  clear when DOS is called: `Fcb29` of `port/dirfunc.c`.
+  `INT 21h` itself is `Int21d` of `src/c/dos.c` in C, which has the flag
+  clear when DOS is called: `Fcb29` of `src/c/dirfunc.c`.
 - A box and a dialog are constants of a file of constants, and
   `DialBox`, `Dialog`, `MinMnu`, `MnMn10` and `MnMn40` take them as
   offsets in the segment of the constants, as the original has them at
   offsets in its one segment. The C reads them through far pointers made
   of the offset and of that segment: `AsmSeg`, and `AT` in
-  `port/dialog.c`.
+  `src/c/dialog.c`.
 - Where the original has DS elsewhere than on the main data and the
   routine reads there, the function takes that segment as a number: the
   filter of a panel is a dialog whose fields are in the panel's segment.
-  C code that means the main data passes `MAIN_SEG` of `port/vc.h`,
+  C code that means the main data passes `MAIN_SEG` of `src/c/vc.h`,
   which compiles to a copy of DS.
 - C code may be entered again from what it calls: `C00_00` has `DirFunc`
   call it for everything in a directory. Nothing is needed for that, as
@@ -623,9 +645,9 @@ and the tests.
   each register that it reads.
 - Copy and Rename end where the commands that go through files do:
   at `FncSel`, `FncMas` or `FncExt`, or back in the loop. `F35_90` of
-  `port/main.c` goes on from what they return, with the title for
-  `FncMas` in the high word. The commands of `port/dirfunc.c` and the
-  file search return a `TO_` of `port/vc.h`, and `F1Next` goes on from
+  `src/c/main.c` goes on from what they return, with the title for
+  `FncMas` in the high word. The commands of `src/c/dirfunc.c` and the
+  file search return a `TO_` of `src/c/vc.h`, and `F1Next` goes on from
   that; `F67_00` returns the panel for `F24_02` in the high word.
 - A routine that reads through ES what its caller has at DS takes the
   wrong bytes where the two differ, and the C has to hand it the same
@@ -633,10 +655,10 @@ and the tests.
   file search calls it with DS on the list. Read what a routine takes
   its argument through, not only which register.
 - The header of a dialog has its bytes in the order of `struct BOXHD`
-  of `port/tables.h`, the key bar first: `DB 1, 0FFh, 32, 10h` of the
+  of `src/c/tables.h`, the key bar first: `DB 1, 0FFh, 32, 10h` of the
   original is key bar 1, no menu item, help page 32, flags.
 - DOS called with `INT 21h` itself, where the original did not go
-  through `Intr21`, is `Int21d` of `port/dos.c`, which takes `struct
+  through `Intr21`, is `Int21d` of `src/c/dos.c`, which takes `struct
   DosRegs` as `Intr21` does. `Int2F` is next to it.
 - A routine that hands back the cursor of a line and the carry flag
   returns both as a number of 32 bits: `EdLin` has the column in the low
@@ -657,12 +679,12 @@ and the tests.
   scenario had the two keys one behind the other. Where a register
   goes round, look at every place that the code comes back to, not at
   the one that most commands use. The cursor's keys put what the
-  original leaves into `struct Regs` of `port/vc.h` now.
+  original leaves into `struct Regs` of `src/c/vc.h` now.
 - The menu bar says which item was chosen and which table has its
-  command, and `F39_01` of `port/main.c` makes of that the registers as
+  command, and `F39_01` of `src/c/main.c` makes of that the registers as
   the original has them at its jump to the command, all but BP, which no
   command reads, and finds the command in the tables of
-  `port/commands_t.c`. Reading the commands for what they take was not
+  `src/c/commands_t.c`. Reading the commands for what they take was not
   enough while another batch had some in hand: Rename goes by BX and DX
   as they come, which showed only when its batch arrived.
 - The program is in three parts: the part that goes while a command
@@ -670,21 +692,21 @@ and the tests.
   program asks DOS for; and the part that stays in the memory while a
   command runs, where the stack is, with `Counter`, `PrgList`, `RunPar`
   and the interrupt handlers. The original reaches that part through SS;
-  C code gets its segment from `ResSeg` of `port/misc.c`, which is SS
+  C code gets its segment from `ResSeg` of `src/c/misc.c`, which is SS
   too, and the offset of an object there like that of any constant. What that part keeps is one
-  structure, `struct Stays` of `port/vc.h`, and a member has no name to
+  structure, `struct Stays` of `src/c/vc.h`, and a member has no name to
   the linker: `#define Counter STAYS(Counter)` at the top of a file
   makes `OFFSET(Counter)` the member's place.
 - The part that stays is the first five segments of the file, in the
   order that the linker's command has them in (`order` in
   `CMakeLists.txt`): `RTEXT`, its compiled code, which begins with the
-  room of the PSP, `Psp` of `port/resident.c`; and the four that the
+  room of the PSP, `Psp` of `src/c/resident.c`; and the four that the
   compiler makes for the data of that file, `RCONST`, `RCONST2`,
   `R_DATA` and `R_BSS`, the last of which is the stack. The five are
   one group, `R_GROUP`, which begins at the PSP: every offset in that
   part counts from there. The part that goes begins behind them, on a
   paragraph, behind the paragraph of its block's header: both are in
-  `TrnBeg` of `port/transit_t.c`, 32 bytes that the linker puts where
+  `TrnBeg` of `src/c/transit_t.c`, 32 bytes that the linker puts where
   the stack ends, and `tools/mkexe.c` works out where from them. It
   begins with the constants of the C code, `CONST2`, some 8,900 bytes
   of them: QEMU is many times slower at a write to a page that has code
@@ -693,18 +715,18 @@ and the tests.
   seconds where it takes 5.6. The constants are a group of their own,
   `DGROUP`, which begins where they do, not at the PSP: a word of a box
   that names a text is an offset in that group, and `AsmSeg` of
-  `port/misc.c` is its segment. Where the two parts begin and end is
-  not known before the program is linked: `TrnPrW` of `port/resident.c`
+  `src/c/misc.c` is its segment. Where the two parts begin and end is
+  not known before the program is linked: `TrnPrW` of `src/c/resident.c`
   is a word that `tools/mkexe.c` fills in.
-- The compiled code of the part that stays is `port/resident.c`, a file
+- The compiled code of the part that stays is `src/c/resident.c`, a file
   of `port_c_resident` in `CMakeLists.txt`: compiled into `RTEXT` with
   `RESIDENT` defined. DS is the PSP's segment in all of it, not the main
   data, and `md` means nothing there. Its data is its own, static data
   of C, which `tools/mkexe.c` lets that file have; a place in the PSP
   is a near pointer made of its offset. Nothing of the
   part that goes can be called from it, since that is not in the memory
-  while a command runs: `port/dos.c` is compiled a second time into
-  `RTEXT`, as `dos_r.obj`, and `port/vc.h` names the functions of that
+  while a command runs: `src/c/dos.c` is compiled a second time into
+  `RTEXT`, as `dos_r.obj`, and `src/c/vc.h` names the functions of that
   copy with `_r` where the first has `_c`, by a macro in their `#pragma
   aux`, which the compiler expands. `Int21e` there calls DOS with ES as
   the structure has it, for a block of memory in ES.
@@ -715,7 +737,7 @@ and the tests.
   are what lies on the stack: a structure of those twelve words, and
   behind it one of three words for each return address that an
   interrupt has left, `struct Saved` and `struct Frame` of
-  `port/resident.c`. Writing to them changes the registers that come
+  `src/c/resident.c`. Writing to them changes the registers that come
   back and where the function returns.
 - A relocation in the part that stays is applied by the code that
   starts the program, once it has the check sum of the file: `tools/
@@ -745,24 +767,24 @@ and the tests.
   function.
 - An interrupt function that goes on in another handler enters it with
   the flags of `on`, and those are made what the assembly had there:
-  `Left` of `port/resident.c`, with `Added`, `Taken` and `Doubled` for
+  `Left` of `src/c/resident.c`, with `Added`, `Taken` and `Doubled` for
   what `ADD`, `SUB` or `CMP`, and `SHL` leave of two numbers. A routine
   of that file that the assembly left with flags that go on to DOS
   returns them: `AddProg`.
-- The `port` test knows code that ran by its bytes in the file, and a
+- The `c-scenarios` test knows code that ran by its bytes in the file, and a
   stretch with a relocated word in it does not count as run, but for a
   far call or jump: an `__interrupt` function begins with one. List in
   `functions` of `harness/ported.py` the naked entry in front of it,
   `New21`, not the function.
 - The part that goes is called from the part that stays as a far
-  function: `TrnMain` of `port/main.c`, which `Stay` of
-  `port/resident.c` calls through a pointer. A word of that part that
+  function: `TrnMain` of `src/c/main.c`, which `Stay` of
+  `src/c/resident.c` calls through a pointer. A word of that part that
   holds a segment is set once, when the program is loaded, and the part
   that goes is somewhere else after every command. So a word of the
   part that stays which names a segment of the part that goes is left
   as the linker has it, in paragraphs from the PSP: `tools/mkexe.c`
   keeps it out of the table of relocations, and the code adds where
-  that part is, `RunPar`: `TRN_SEG` of `port/resident.c`, which is the
+  that part is, `RunPar`: `TRN_SEG` of `src/c/resident.c`, which is the
   high word of a far pointer to the thing. `tools/mkexe.c` knows such a
   word by its number, which is not 0, the segment of the part that
   stays.
@@ -772,7 +794,7 @@ and the tests.
   kept: `Stay` keeps the pointer in memory, `TrnAdr`, and has no
   variables, since then.
 - The program is entered at a C function, `Alloc0` of
-  `port/resident.c`: the linker is told `option start=Alloc0`, and
+  `src/c/resident.c`: the linker is told `option start=Alloc0`, and
   `tools/mkexe.c` takes the address from the linker's header. DOS enters
   it with DS on the PSP, which is what that file takes DS to be, and on
   the stack that the header names. The direction flag is as DOS leaves
@@ -782,7 +804,7 @@ and the tests.
   or a far function of another segment. A far call within `RTEXT` needs
   none, the linker makes `push cs` and a near call of it.
 - The numbers that `tools/mkexe.c` fills in are seven words of
-  `port/resident.c`, each of which it finds by its name in the linker's
+  `src/c/resident.c`, each of which it finds by its name in the linker's
   map, as it finds what they say: `TrnBeg`, `Stays`, `DataSav` and the
   segment `R_BSS`.
 - The data of the part that stays is in a group of its own, `R_GROUP`,
@@ -837,7 +859,7 @@ and the tests.
 - An `__interrupt` function of the part that goes has DS on the
   compiler's group when its first statement runs, that of the
   constants: its segment, where `SecDat` is, a variable of
-  `port/main_t.c`. `FatErr` of `port/main.c`
+  `src/c/main_t.c`. `FatErr` of `src/c/main.c`
   reads `SecDat` there as a near word and puts DS on the main data by
   `DataSeg`, a `#pragma aux` of one instruction, `mov ds,ax`, with
   nothing in its `modify` list: DS in a `parm` or a `modify` list is
@@ -845,7 +867,7 @@ and the tests.
   `md` and the functions of other files.
 - A function that does not return is `#pragma aux name aborts`; the
   compiler then ends the caller there.
-- A far function of `port/resident.c` that the part that goes
+- A far function of `src/c/resident.c` that the part that goes
   calls, through a pointer made of that part's segment and the
   function's offset, with DS anywhere, is `__far __loadds`: `SetBrk`, and
   `Release` for the map of the memory. Its first instructions load DS by
@@ -857,7 +879,7 @@ and the tests.
   stack. A parameter of a naked function that is only in
   its register wants `(void)name;`, or it is "not referenced".
 - `_disable` and `_enable` are known only where a `#pragma intrinsic`
-  names them, which is in `port/dos.c`: "No prototype found" elsewhere.
+  names them, which is in `src/c/dos.c`: "No prototype found" elsewhere.
   Call `IntOff` and `IntOn`.
 - A command may come to a place with DS on the main data where the
   place reads a panel: `M60_02` of the menus writes the prompt and tests
@@ -867,17 +889,17 @@ and the tests.
 - The BIOS called more than once with registers that go from one
   call to the next, as EGA lines calls it for the font and the mode,
   takes AX, BX, CX and DX from four words on the stack and puts them
-  back: `Int10` of `port/dos.c`, with `struct BiosRegs` of `port/vc.h`.
+  back: `Int10` of `src/c/dos.c`, with `struct BiosRegs` of `src/c/vc.h`.
   `Int10m` is another thing: it takes the mouse pointer off the screen
   around the call.
 - Code that is entered by jumps at several labels, falls from one
   into the next, and leaves by jumps, never by a return, as the main loop
   does, is one function that takes the number of the label and returns
-  where the program goes on: `Loop` of `port/main.c`, a `switch` whose
+  where the program goes on: `Loop` of `src/c/main.c`, a `switch` whose
   cases fall into one another, in a loop for what jumps back. What goes
   round in registers from one command to the next is `struct Regs` of
-  `port/vc.h`, which `Loop` and `Command` keep as the original has the
-  registers wherever a command reads one: the top of `port/main.c` says
+  `src/c/vc.h`, which `Loop` and `Command` keep as the original has the
+  registers wherever a command reads one: the top of `src/c/main.c` says
   which are read.
 - The shared routines answer in numbers where the original answers
   in flags: `GetMous`, `InWind`, `DoublMo`, `TstBrk`, `TstDrv`, `SetPth`,
@@ -891,7 +913,7 @@ and the tests.
   the page in BH after `ChkMode`, which changes only the high byte of
   what the structure has for BX.
 - The places by which a command says where the program goes on are
-  in `port/vc.h`, a family each: `NEXT_`, `MNU_`, `TO_` and `GO_`. A name
+  in `src/c/vc.h`, a family each: `NEXT_`, `MNU_`, `TO_` and `GO_`. A name
   there is seen by every C file, so it must not be that of a routine:
   `NEXT_M01_01` is a place, `M01_01` the function. The four families are
   the original's, by the file that a command is in; nothing but that
@@ -916,25 +938,25 @@ and the tests.
   that the original has there, from the listing of
   `build/shareware-layout/`, as for `DelTr0`.
 - The start of the program runs before there is main data:
-  `Init00` and `Init11` of `port/start.c` get the segment of the part
+  `Init00` and `Init11` of `src/c/start.c` get the segment of the part
   that stays in the memory as a number, and read and write through far
   pointers only. A function that touches nothing of `md` can be entered
   with DS anywhere, and so can what it calls if that reads none either:
   `ChkMode`, `Cursor`, `Int10`, `Int21d`, `CutPath`, `MvzLine`, `AddFile`,
   `AsmSeg`, `ResSeg` and `MemRun` do not, `CaseMap`, `PathLin`, `ScrOffs`
   and `HookVct` do. `Init11` returns the segment of the main data that it
-  has asked DOS for, `TrnMain` of `port/main.c` puts DS there, and the
+  has asked DOS for, `TrnMain` of `src/c/main.c` puts DS there, and the
   rest is a third function, `IniData`.
 - A routine of the part that stays is called from the part that
   goes through a pointer to a far function, made of that part's segment
   and the routine's offset, with a `#pragma aux` on the type of the
   function that says which registers it changes: `StaysFn` in
-  `port/start.c`, for `SetBrk`, and `ReleaseFn` in `port/memory.c`.
+  `src/c/start.c`, for `SetBrk`, and `ReleaseFn` in `src/c/memory.c`.
 - A routine may know a thing by its offset alone. `MainPth` took the
   text of `NcPath` where it was to write at the offset of `TempDir`,
   whatever the segment, and its first call writes into another segment,
   at an offset 12h short of that in the original and 0Bh short in the
-  port. The C has an argument for it. Where the assembly compares an
+  translation. The C has an argument for it. Where the assembly compares an
   address, look at every call for the segment it is made with.
 - A copy that runs on behind its table takes what follows the table in
   the assembly. The defaults of a panel are 88 bytes of which the
@@ -951,15 +973,15 @@ and the tests.
   and read as text it is two, with three bytes of the next table
   seemingly taken along. Take the bytes of a table from the listing of
   the original, `build/shareware-layout/VC.LST`, or hold the C against
-  the assembly by a script. The `port` test passed with
+  the assembly by a script. The `c-scenarios` test passed with
   the three bytes wrong: no screen shows the stars of the blanker. What
   showed it was the setup file that a program started on the defaults
   saves, held against the original's; `start-setup` ends with that
   file on its disk for this reason.
 
-### C for the port
+### C for the translation
 
-`port/vc.h` says what the program asks of C code. What Open Watcom does
+`src/c/vc.h` says what the program asks of C code. What Open Watcom does
 with it is less obvious:
 
 - Where the program is right only because of what this compiler or its
@@ -992,15 +1014,15 @@ with it is less obvious:
   through CS: the compiler takes the address of a row for a pointer into
   the main data, without a warning, and reads there. Give such a table
   one dimension and add the row's place to the index: `MnuHlp` of
-  `port/menu.c`. In the listing every access to a constant has `cs:`.
+  `src/c/menu.c`. In the listing every access to a constant has `cs:`.
 - Texts that follow one another in one array can be written as a macro
   of string literals, each ended by `\0`, with octal escapes for bytes
   that are no characters: `sizeof` of the macro, less one, is where the
   next one begins, and costs nothing in the program. See `MenuLn` there.
 - The option `-nd` makes the compiler load a segment for every access to
   the main data. Do not use it for a file of the part that goes.
-- The port's stack is 4,096 bytes where the original's is 256, so stack
-  use needs no care. The `port` test reports how much each scenario
+- The translation's stack is 4,096 bytes where the original's is 256, so stack
+  use needs no care. The `c-scenarios` test reports how much each scenario
   leaves and fails when less than half is left.
 - A static function is called, not expanded in place, also where only
   one routine uses it.
@@ -1035,15 +1057,15 @@ with it is less obvious:
   which do not.
 - Dividing a 16-bit number by another, or taking the remainder, needs no
   helper routine.
-- The structures of `port/vc.h` are the assembly's, but a field that the
+- The structures of `src/c/vc.h` are the assembly's, but a field that the
   assembly declares with `0 DUP`, a name for a place, is not in them:
   `TreList` is where `TreSum2` is, two bytes before the end of `DIRTREE`.
   Read the `STRUC` in `src/VC.ASM` before taking an offset from a
   C structure.
 - There is no C library. String literals and static variables are refused
-  by `tools/mkexe.c`, but for the data of `port/resident.c`, which has
+  by `tools/mkexe.c`, but for the data of `src/c/resident.c`, which has
   DS on it, and for a variable with a value in a file that has no code:
-  `SecDat` of `port/main_t.c`, the one. A text may be written as a
+  `SecDat` of `src/c/main_t.c`, the one. A text may be written as a
   string where it gives an array declared `CODE` its contents: `static const u8 CODE Name_S[] =
   "text";` is in the code segment, with its zero byte. Constants that
   are named by their offsets, boxes and dialogs with their texts, are in
@@ -1051,14 +1073,14 @@ with it is less obvious:
   C".
 - For 32-bit numbers the compiler calls helper routines, near, in its own
   code segment. `__U4M`, which multiplies, and `__U4D`, which divides
-  unsigned numbers, are functions of `port/arith.c`, written without
+  unsigned numbers, are functions of `src/c/arith.c`, written without
   what they are there for; of `__U4D` the scenarios run only a division
   by 16 bits. They are held against Python's arithmetic by the
-  test `arith`, `harness/arithcheck.py`, which runs their bytes on a
+  test `c-arith`, `harness/arithcheck.py`, which runs their bytes on a
   model of the processor, and with `--pairs 200000` as many numbers as
   they were written against: do that after a change there or to the
   compiler. A helper
-  that is missing shows as an undefined symbol when the port is linked:
+  that is missing shows as an undefined symbol when the translation is linked:
   signed division would be `__I4D`. Shifting a 32-bit number by a
   constant needs none. `/` and `%` of the same numbers are two calls:
   take the remainder by multiplying back where it is known to fit 16
@@ -1076,7 +1098,7 @@ with it is less obvious:
   that, comparing and subtracting in the loop needs no helper routine.
 - DX of a call of DOS that is no pointer, a drive or a date, is written
   into the offset of `name` in `struct DosRegs`, which leaves DS as it
-  was set: `*(u16 STACK *)&regs.name`, as `DX_OF` in `port/dirfunc.c`.
+  was set: `*(u16 STACK *)&regs.name`, as `DX_OF` in `src/c/dirfunc.c`.
 - `INC AX` and `CBW` on what DOS left in AL is
   `(u16)(signed char)(u8)(value + 1)`.
 - A text without its zero byte is an array of its length:
@@ -1091,7 +1113,7 @@ with it is less obvious:
   `parm [cx]` alone where the panel in AX is of no use to it.
 - A far call from one of the two code segments to the other costs a
   relocation, four bytes of the file, where one within a segment costs
-  none: `port/commands.c`, 2,479 bytes of code in CTEXT2 that calls the
+  none: `src/c/commands.c`, 2,479 bytes of code in CTEXT2 that calls the
   dialogs and the bars in CTEXT, made the program 2,848 bytes longer.
 - The scratchpad directory of a session is one for all the agents that
   run side by side: a file there may be another agent's by the same
@@ -1099,25 +1121,25 @@ with it is less obvious:
 - A far pointer whose segment is the constant 0 is compiled as a near
   one, without a warning: the table of interrupt vectors was read from
   the main data. Take the segment from a `volatile` variable, as
-  `F65_31` of `port/memory.c` does.
+  `F65_31` of `src/c/memory.c` does.
 - CTEXT has under a thousand bytes left below its limit. A new file
   goes into CTEXT2, by its name in `port_c_second`, unless it multiplies
   or divides numbers of 32 bits.
 - An address that the main data keeps as two words, offset and segment,
   `ErrVct`, is a `u32` there and a far pointer by a cast, which costs
   nothing: `(const u8 __far *)md.ErrVct`.
-- DOS, the BIOS and the mouse driver are called in `port/dos.c` and
+- DOS, the BIOS and the mouse driver are called in `src/c/dos.c` and
   nowhere else, and that file alone has inline assembly, but for the
-  entries of the interrupts and INT 2Eh in `port/resident.c` and one
-  instruction that loads DS in `port/main.c`: `Int21d` and
+  entries of the interrupts and INT 2Eh in `src/c/resident.c` and one
+  instruction that loads DS in `src/c/main.c`: `Int21d` and
   `Int21f` for DOS, `Int10` and `TopView` for the screen, `Int16` for
   the keyboard, `Int2F`, `Int33` and `MousAt` for the mouse, and `Int28`
   and `DvPause`, by which the program says that it is idle, all
-  declared in `port/vc.h`. Each is a line of C around a `#pragma aux`
+  declared in `src/c/vc.h`. Each is a line of C around a `#pragma aux`
   that holds the `INT` and as little else as will do: the registers are
   its `parm` and its `value`, and the compiler loads them. C code that
   needs a call of DOS fills a `struct DosRegs` and calls `Intr21` of
-  `port/system.c`, which looks for DOS's critical error, or `Int21d`,
+  `src/c/system.c`, which looks for DOS's critical error, or `Int21d`,
   where the original called DOS itself; an address that DOS answers
   with in ES:BX is in `es` and `bx` there afterwards. `Int21d` calls
   DOS with ES where DS is, on the main data; a call that takes a
@@ -1133,23 +1155,23 @@ with it is less obvious:
   and `IntOn` are there too: DOS's routine for capitals, a port, and the
   interrupt flag, for which the compiler has intrinsic functions. What
   is in the memory, the BIOS's data and the screen, is read and written
-  through far pointers in plain C: `Timer` of `port/system.c`, `Window`
-  of `port/window.c`. No entry of the assembly calls an interrupt for C
+  through far pointers in plain C: `Timer` of `src/c/system.c`, `Window`
+  of `src/c/window.c`. No entry of the assembly calls an interrupt for C
   code any more: a call of DOS that an entry made is a few lines around
-  `Int21d` in the C file that wants it, as `Dos52` of `port/memory.c`.
+  `Int21d` in the C file that wants it, as `Dos52` of `src/c/memory.c`.
 - Calls of an interrupt between which no compiled code may run are one
   piece of inline assembly: DESQview is asked for a stack of its own,
   for a pause and for the program's stack back, and the compiler may use
-  the stack between any two calls of C. `DvPause` of `port/dos.c`.
+  the stack between any two calls of C. `DvPause` of `src/c/dos.c`.
 - A number of 16 bits times another, as a number of 32, is a call of
   `__U4M`, which a file of the second segment cannot reach. Where one
   factor is below 256 the product can be had in halves of 16 bits:
-  `Below` of `port/blank.c`.
+  `Below` of `src/c/blank.c`.
 - A table for `Case` that has keys with their scan codes besides
   characters that count with any, as the main loop's had, is a `switch`
   on the key and then one on the character, if every character of the
   second kind stood behind the keys that have it too: Tab before ^I.
-  `Func12` of `port/main.c`.
+  `Func12` of `src/c/main.c`.
 - A number of 32 bits in a pair of registers has its halves by the
   registers, not by the order they are written in: `[dx cx]` has DX for
   the low word and CX for the high one, `[dx ax]` and `[bx ax]` have AX
@@ -1166,79 +1188,62 @@ with it is less obvious:
   `STI` with a `CLD` behind it.
 - A far routine that is no function of the program, DOS's for capitals,
   is called through a pointer to a function type that has a `#pragma
-  aux` of its own: `CaseMapFn` in `port/dos.c`.
+  aux` of its own: `CaseMapFn` in `src/c/dos.c`.
 - A far pointer to a fixed place of the machine's memory is a constant
   with its segment: `(const u32 __far *)0x0040006CUL` is the BIOS's
   count of timer ticks, and costs no relocation.
 
-## A run of batches
+## Work by several agents
 
-Batches are translated without waiting for the user between them, and
-several at a time.
+Work that can be divided is done by several agents at a time, without
+waiting for the user between its steps.
 
-- Each batch is the work of an agent of its own, started fresh, so that a
-  run does not fill one context. The session that runs them does not
-  translate: it starts each agent, checks what the agent left, which is
-  the commit, the push and `LastTest.log`, and keeps its report. An
-  improvement to the tools is handed to an agent in the same way.
+- Each piece is the work of an agent of its own, started fresh, so that a
+  run does not fill one context. The session that runs them does not do
+  the work: it starts each agent, checks what the agent left, which is
+  the commits, the push and `LastTest.log`, and keeps its report.
 - An agent is given no time limit for work that is going well. The
   session watches what its agents are doing, and turns one round that is
-  spending its time on something of little use.
-- An agent knows only what the repository tells it. What a batch learns
-  that the next one needs is written down before the batch is committed:
-  about the compiler and the stubs here, about driving the dialogs at the
-  top of `harness/scenarios.py`, about lost time in `TODO.md`.
-- Batches that run at the same time each have a checkout of their own, a
+  spending its time on something of little use. It also looks for what
+  an agent has left running.
+- An agent knows only what the repository tells it. What one learns that
+  the next needs is written down before its work is committed: in the
+  notes here, at the top of `harness/scenarios.py`, in `TODO.md`.
+- Agents that work at the same time each have a checkout of their own, a
   plain clone of the same origin with its own build, and a part of the
-  program that the others leave alone. The session names both: the part
-  is a file of the source, as a rule.
-- A batch is committed as soon as the `port` test passes, together with
-  the scenarios and goldens made for it. It gets onto `main` by
-  `git pull --rebase`, a build, the `port` test once more, now with the
-  other batches under it, and `git push`. If the push is refused, another
-  batch got there first: again from the pull. The agent settles a
-  conflict of its batch itself and keeps what both sides added.
+  program that the others leave alone. The session names both.
+- Work gets onto `main` one piece at a time, in a queue that the session
+  runs: an agent commits in its checkout when the tests pass and says
+  that it is ready; at its turn it does `git pull --rebase`, settles what
+  the others changed keeping what both sides added, builds, passes the
+  tests once more, and pushes. Nothing else lands meanwhile.
+- Two agents have made the same thing under one name with different
+  arguments, and git saw no conflict in it. After a rebase, look at
+  everything the others added that names what is yours.
 - Nothing in the harness takes turns: recordings of the original and
-  tests of the port run at the same time, in as many checkouts as there
-  are, and other machines only make them slower. The original and the
-  port are driven from inside their machine, by a driver that acts when
-  the program waits (`harness/DRIVER.ASM`), not by the clock. Where a
-  recording or a test
-  does come out different under load, that is a flaw to report, not
-  something to wait out.
-- A routine of the assembly that C code calls has one entry for C,
-  named after it with `_a`, that takes and hands back the registers as
-  the routine has them, and one declaration in `port/vc.h`. A batch that
-  wants its arguments otherwise wraps the entry in its own C file. Look
-  for an entry before making one, and again after a rebase: two batches
-  have made the same entry with different arguments, and git saw no
-  conflict in it.
-- The tools and the harness are improved during a run, between batches
-  and without waiting for confirmation, each improvement a commit of its
-  own. What decides is the total cost: an improvement is made when it
-  saves more time over the batches still to come than it takes to make.
-- The time it saves is time that a batch has actually lost, not time one
-  might lose. Note what a batch lost and to what, and go by those notes.
-  What does not pay yet stays in `TODO.md` with what it has cost so far.
-- The run ends when the number of batches the user asked for is done,
-  when the program is all C, or when something below stops it. Then
-  report: what was translated, the bugs found in the original, the
-  instructions listed as out of reach, the size and the stack; and what
-  was improved in the tools, with the time it took and the time it is
-  saving.
-- Stop and ask, with the batch at hand left uncommitted, before any of
-  these. An agent that meets one hands its batch back as it is, and the
+  tests run at the same time, in as many checkouts as there are, and
+  other machines only make them slower. Where a recording or a test does
+  come out different under load, that is a flaw to report, not something
+  to wait out.
+- The tools and the harness are improved as the work goes, without
+  waiting for confirmation, each improvement a commit of its own. What
+  decides is the total cost: an improvement is made when it saves more
+  time over the work still to come than it takes to make, counting time
+  that has actually been lost, not time one might lose.
+- Stop and ask, with the work at hand left unpushed, before any of
+  these. An agent that meets one hands its work back as it is, and the
   session asks the user:
-  - behaviour that differs from the original's, a fix of its bug
-    included;
+  - in the C translation, behaviour that differs from the original's;
+  - in the portable C, a deviation that is not the removal of something
+    that only made sense on DOS;
   - a change to what the comparison leaves out, other than a figure of
-    the kind that "Scenarios" has left out, or to a limit that the `port`
-    test holds the build to;
-  - a golden that comes out changed when it is derived again;
+    the kind that "Scenarios" has left out, or to a limit that a test
+    holds the build to;
+  - a golden of the original that comes out changed when it is derived
+    again;
   - anything new to download;
   - a change to these instructions, other than a note on what was
-    learned about the compiler or the stubs;
-  - a `port` test that still fails once the batch has been made smaller.
+    learned.
 
 ## Scenarios
 
@@ -1251,7 +1256,7 @@ several at a time.
 - A scenario that shows the time of day, with the clock switched on or in
   the time stamp of a file it has made, does so within the first minute of
   its machine. The machine's clock is counted in the instructions it
-  executes, and the port takes more of them than the original to get to
+  executes, and a C tree takes more of them than the original to get to
   the same step: up to a sixth more. The first screen is at about ten
   seconds past the minute, so such a scenario is done showing the time
   by about fifty seconds past in the original.
@@ -1263,9 +1268,9 @@ several at a time.
 - Russian text is typed on the Russian keyboard of the Russian bench. Its
   Cyrillic letters are selected in a step that types text into an input
   line, never at the panels: there Alt by itself brings up the menu.
-- The tests run the build of the port that is shipped; no build is made
-  for them. The original and the port are driven alike, by a program of
-  ours that stays resident in the machine, `harness/DRIVER.ASM`: it puts
+- The tests run the build of a C tree that is shipped; no build is made
+  for them. The original and the C trees are driven alike, by a program
+  of ours that stays resident in the machine, `harness/DRIVER.ASM`: it puts
   the keys of a step in through the keyboard controller, so that the BIOS
   makes of them what it makes of a keyboard's, and writes the screen out
   when the program idles with none left. It watches and feeds, and
