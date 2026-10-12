@@ -27,6 +27,15 @@ same distance from it. So an object is written in C as it is in the
 assembly, with the names of what it names, and the compiler and the
 linker see to the addresses.
 
+An object is compared as long as it is, and the program reads more of
+some than their own bytes: a name that it copies as 13 bytes whatever
+its length, a table of two colours of which a line may ask for the
+fourth. Such an object is written as long as what is read, with the
+original's bytes behind it, and then they are compared too. reads.py
+finds what the code reads of each constant, and an object that is
+shorter than that fails here; so does a text that a box or a dialog
+names and that has no zero byte within itself.
+
 Exits with status 0 if every object that was compared is as the original,
 and 1 otherwise, with the object and the offset of the first byte or word
 that differs.
@@ -40,6 +49,7 @@ from collections import defaultdict
 from pathlib import Path
 
 from bytecheck import REGIONS
+import reads
 
 COM_ORIGIN = 0x100          # where a .COM file is loaded, and the PSP ends
 EXE_HEADER = 0x20           # of the port's file: see tools/mkexe.c
@@ -366,6 +376,13 @@ class Port:
                     self.assembly[name] = (begin + value, kind, segment)
                     ends[segment].append(begin + value)
                     break
+        # What the assembly has in the part that stays in the memory is
+        # that part's variables and texts, and the word with the segment
+        # of the main data is a variable too: no constants of the code.
+        self.variables = {name for name, (_, kind, segment)
+                          in self.assembly.items()
+                          if kind == "data" and segment == "RHEAD"}
+        self.variables.add("SecDat")
         for name, (address, kind, segment) in self.assembly.items():
             self.places[name].append(address)
             if kind == "data" and segment not in ("RDATA", "RGAP"):
@@ -405,6 +422,13 @@ class Port:
     def bytes(self, address, length):
         at = address - COM_ORIGIN + EXE_HEADER
         return self.image[at:at + length]
+
+    def end_of(self, address):
+        """Where the object ends that has `address` in it, or None."""
+        for _, _, start, length in self.objects:
+            if start <= address < start + length:
+                return start + length
+        return None
 
 
 def compare(original, port, name, there, address, length):
@@ -450,6 +474,17 @@ def compare(original, port, name, there, address, length):
                     f"{instead}, "
                     f"{' or '.join(f'{w:04X}h' for w in wanted) or 'nowhere'}"
                     f": the original names {said} there")
+        # A text that is named so is read as far as a zero byte, and has
+        # to have that within itself: behind it the port has other bytes
+        # than the original.
+        if not how and original.segment_of[names[0]] == "CONST":
+            end = port.end_of(word)
+            if end is not None and 0 not in port.bytes(word, end - word):
+                return (f"{name}+{at}: names {said}, a text without a "
+                        f"zero byte of its own: what reads it goes on into "
+                        f"what follows it, which is not what follows it in "
+                        f"the original. Write it as far as the zero that "
+                        f"the original has behind it")
         at += 2
     return None
 
@@ -527,6 +562,9 @@ def main():
     for name in sorted(stale):
         failed.append(f"{name} is listed in {Path(__file__).name}, and the "
                       "C code has no constant of that name")
+    # An object is compared as long as it is. Where the code reads more
+    # of it, the object has to be that long: see reads.py.
+    failed += reads.check(port.objects, port.bytes, port.variables)
     for name, at in sorted(set(NAMED_OTHERWISE) - used):
         failed.append(f"{name}+{at} is listed in {Path(__file__).name}, "
                       "and the port has no object of that name")

@@ -101,7 +101,14 @@ const DIALOG(1) Quit_B = {
    MainFil copies any name, so it is written with what follows it in the
    assembly, the beginning of the title. */
 const u8 Menu_F[13] = "VC.MNU\000 User ";
-const u8 User_S[] = " User Menu ";
+/* Menu file edit copies the title as 80 bytes (M64_02 of
+   port/commands.c), so it is written with the 68 that follow it in the
+   original: the line of the box below, the texts of the box of the
+   drives, and the beginning of the history's title. */
+const u8 User_S[80] =
+    " User Menu \0"
+    "Could not find the menu file\0"
+    " Drive letter Choose leftright drive: H";
 static const u8 User1_S[] = "Could not find the menu file";
 static const BOX1(4) UsrEr_P = {
     { Err_C, ErInv_C, ErInv_C, 0 },
