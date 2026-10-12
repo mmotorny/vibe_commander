@@ -389,7 +389,10 @@ driver for it, CuteMouse, which the boot floppy lacks and the harness adds.
 The program finds the driver and shows the pointer, a cell of the screen
 with its colours exchanged, in the middle of every screen until a
 scenario moves it. A step moves the mouse and presses its buttons by the
-cell it goes to: "Click@3,5", "RightClick@3,6", "Move@40,12".
+cell it goes to: "Click@3,5", "RightClick@3,6", "Move@40,12"; a button
+held while the pointer moves is "Click@3,5>3,2". CuteMouse takes a PS/2
+mouse for one of two buttons until it is told of the third, which a
+scenario that wants "MiddleClick@3,5" does with a command of its own.
 
 The Russian machine also has a Russian keyboard: the keyboard driver of
 FreeDOS with its Russian layout, which the boot floppy lacks and the

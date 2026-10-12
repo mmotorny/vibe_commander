@@ -261,9 +261,9 @@ Things that are known and not done. Standing instructions are in
   screen when it is below the 25th row and 50 lines become 25, since a
   step of the mouse names a place among the first 25 rows, so it is
   translated by reading; one for a display that is neither EGA nor VGA;
-  and one for a kind of panel that nothing asks for. A step that can
-  put the pointer further down on a screen of 50 lines would reach the
-  first.
+  and one for a kind of panel that nothing asks for. A step can put
+  the pointer further down on a screen of 50 lines now, "Move@40,40",
+  so the first wants a scenario.
 - What the commands of the menus do in the original and the port does
   after them; whether to mend any of it is not decided:
   - The configuration and EGA lines end by writing the prompt and
@@ -607,10 +607,11 @@ Things that are known and not done. Standing instructions are in
   - `keys.c`, none: `mouse-select` has the right button held below a
     list and above it, which selects the files that come under it.
   A second click is two clicks in one step; a button held is a click
-  with a count behind it, "Click@3,5*200". There is no step yet for a
-  button that goes down in one place and comes up in another, nor for
-  the middle button: `harness/driver.py` has the packets, and the names
-  would be two lines there. What such steps would still show, where the
+  with a count behind it, "Click@3,5*200"; one that goes down in one
+  place and comes up in another has both, "Click@3,5>3,2"; the middle
+  button is "MiddleClick@3,5", once a step has told the mouse driver
+  that the mouse has three; and a row may be any of 50. See the top of
+  `harness/scenarios.py`. What such steps would still show, where the
   instructions have run without them: the middle button on a key of
   the key bar, which is the key with Shift, and on an item of the Files
   menu, which is the item with Ctrl; a button let go beside the key of

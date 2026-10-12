@@ -33,11 +33,24 @@ into it at once.
 
 The mouse is written with the cell of the screen it goes to, column and
 row from 0: "Click@1,24" moves the pointer there, presses the left
-button and lets it go, "RightClick@40,12" the right one, and "Move@40,12"
-only moves. A button stays down until the program has asked the mouse
-driver 20 times where the mouse is, or as many times as the step says:
-"Click@1,24*4". Under a hand that would be thousands of times; what the
-program does with a button that is held, it does for as long as it is.
+button and lets it go, "RightClick@40,12" the right one,
+"MiddleClick@40,12" the middle one, and "Move@40,12" only moves. A button
+stays down until the program has asked the mouse driver 20 times where
+the mouse is, or as many times as the step says: "Click@1,24*4". Under a
+hand that would be thousands of times; what the program does with a
+button that is held, it does for as long as it is.
+
+A button that is held while the pointer moves has the places it goes to
+one behind the other: "Click@3,5>3,2" presses the left button on column
+3 of row 5, moves the pointer to row 2 with the button down, and lets it
+go there. The button stays at each place for as long as a click would,
+or as that place says: "Click@3,5*4>3,2*100>3,9". The program is not
+asked on the way between two places: it finds the pointer at the next.
+
+A row may be any of the 50 that a screen can have, "Click@1,49" for the
+key bar of a screen of 50 lines; what is recorded of such a screen is its
+first 25 rows all the same. On a screen of 25 lines the mouse driver
+stops the pointer at the last row.
 
 The mouse's packets go to the keyboard controller's auxiliary port as
 the mouse would send them, and the BIOS and the mouse driver of DOS
@@ -47,7 +60,8 @@ pointer further for a fast mouse than for a slow one. So the pointer is
 first taken to the top left corner, by more than the screen is wide and
 high, and from there to the middle of its cell in steps of 4, which the
 driver takes as they are: 4 dots to the right for 4, 2 dots down for 4,
-where a cell is 8 dots each way.
+where a cell is 8 dots each way. From one place to the next with a button
+down the pointer goes the same way, by steps of 4, without the corner.
 """
 import re
 import struct
@@ -227,11 +241,14 @@ def _event(kind, codes):
 
 
 # The buttons of the mouse, as its packets have them.
-BUTTONS = {"Move": None, "Click": 1, "RightClick": 2}
+BUTTONS = {"Move": None, "Click": 1, "RightClick": 2, "MiddleClick": 4}
 # For how many times that the program asks where the mouse is a button
-# stays down, unless the step says.
+# stays down in one place, unless the step says.
 ASKED = 20
 STRIDE = 4                        # how far the mouse moves in one packet
+# The rows that a step may name: those of the screen with the most lines
+# that the program switches to.
+POINTER_ROWS = 50
 
 
 def _packet(right, up, buttons=0):
@@ -246,24 +263,50 @@ def _mouse(packets):
     return bytes([MOUSE]) + struct.pack("<H", len(data)) + data
 
 
+def _way(columns, rows, buttons):
+    """The packets of a mouse that moves the pointer so many cells to
+    the right and down, with those buttons down."""
+    return [_packet(STRIDE if columns > 0 else -STRIDE, 0, buttons)] \
+        * (2 * abs(columns)) \
+        + [_packet(0, -STRIDE if rows > 0 else STRIDE, buttons)] \
+        * (4 * abs(rows))
+
+
 def _pointer(name):
-    """The events for a name of the mouse, "Click@column,row*asked"."""
-    what, _, place = name.partition("@")
-    place, _, asked = place.partition("*")
-    column, row = (int(number) for number in place.split(","))
-    if what not in BUTTONS or not (0 <= column < COLUMNS and 0 <= row < ROWS
-                                   and 0 < int(asked or ASKED) < 256):
-        raise ValueError(f"unknown step of the mouse {name!r}")
+    """The events for a name of the mouse, "Click@column,row*asked", or
+    with more places, "Click@column,row*asked>column,row*asked"."""
+    what, _, places = name.partition("@")
+    try:
+        if what not in BUTTONS:
+            raise ValueError
+        stops = []
+        for place in places.split(">"):
+            place, _, asked = place.partition("*")
+            column, row = (int(number) for number in place.split(","))
+            asked = int(asked or ASKED)
+            if not (0 <= column < COLUMNS and 0 <= row < POINTER_ROWS
+                    and 0 < asked < 256):
+                raise ValueError
+            stops.append((column, row, asked))
+        button = BUTTONS[what]
+        if button is None and (len(stops) > 1 or "*" in places):
+            raise ValueError
+    except ValueError:
+        raise ValueError(f"unknown step of the mouse {name!r}") from None
     # To the corner, then to the middle of the cell: 8 dots a cell, and
     # two units of the mouse to a dot downwards.
+    column, row, asked = stops[0]
     way = [_packet(-127, 127)] * 4 \
         + [_packet(STRIDE, 0)] * (2 * column + 1) \
         + [_packet(0, -STRIDE)] * (4 * row + 2)
-    button = BUTTONS[what]
     if button is None:
         return _mouse(way)
-    return (_mouse(way + [_packet(0, 0, button)])
-            + bytes([ASKS, int(asked or ASKED)]) + _mouse([_packet(0, 0)]))
+    out = _mouse(way + [_packet(0, 0, button)]) + bytes([ASKS, asked])
+    for to_column, to_row, asked in stops[1:]:
+        out += _mouse(_way(to_column - column, to_row - row, button)) \
+            + bytes([ASKS, asked])
+        column, row = to_column, to_row
+    return out + _mouse([_packet(0, 0)])
 
 
 def events(step):

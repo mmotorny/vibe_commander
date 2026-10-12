@@ -259,9 +259,8 @@ out again (show.py --changes is how):
     the last file it goes to that; in the other panel it makes that the
     current one, an Info too, and in the lower part of an Info that is
     current it edits dirinfo. Two clicks on an entry in two steps that
-    follow each other are a double click, Enter there: mouse-list. The
-    pointer does not move while a button is down, and no step presses
-    two buttons or the middle one. In the box of a drive that is not
+    follow each other are a double click, Enter there: mouse-list. No
+    step presses two buttons at once. In the box of a drive that is not
     ready the right button is Enter and the left one beside the box
     gives up: not-ready.
   - More of the mouse. A box has a blank row above its frame and one
@@ -317,6 +316,21 @@ out again (show.py --changes is how):
     it is one of theirs or not; Tab is a key that gets to the map and
     means nothing there. The one program that can be released is the
     ninth line, FDAPM once it has been run.
+  - "Click@20,10>20,22" is a button held while the pointer moves: down
+    on column 20 of row 10, to row 22 with the button down, and up
+    there. More places may follow, and each may have its count:
+    "Click@20,10*4>20,22*30>20,2". A list scrolls for a button that
+    went down on one of its lines and is held above or below them.
+  - "MiddleClick@40,12" is the middle button. The mouse driver takes a
+    PS/2 mouse for one of two buttons and hands the third on only when
+    it has been told: '"a:\\freedos\\bin\\ctmouse" Space "/3" Enter' at
+    the command line, as a step before, which leaves the driver where
+    it is in the memory. The bench does not load it like that: three
+    characters more in a:\\fdauto.bat are in the goldens of find and
+    find-drives, which list the file with its size.
+  - The row of a step may be any of 50: on a screen of 50 lines,
+    Alt+F9, "Click@1,49" is F1 of the key bar. The mouse driver stops
+    the pointer at the last row that the screen has.
   - Nothing sets the kind of a panel to anything but files, tree and
     Info: what the program does for a fourth kind of panel cannot be
     reached.
