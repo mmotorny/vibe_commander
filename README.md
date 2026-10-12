@@ -333,7 +333,9 @@ Where a build is meant to differ from the original, `harness/deviations.py`
 says how, and the golden is derived with that difference in it, so that it
 holds exactly what a build should show. There are two such places. The
 banner names the edition, and the published source is of another edition
-than the binaries shipped in 2000. And the program names its own file when
+than the binaries shipped in 2000: that holds for as much of the name as
+shows, its beginning next to a panel on the right or its end next to one
+on the left. And the program names its own file when
 it cannot load it again after a command: the original is `VC.COM`, the port
 `VC.EXE`.
 

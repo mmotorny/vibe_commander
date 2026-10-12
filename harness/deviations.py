@@ -16,9 +16,14 @@ from dos import COLUMNS
 def expected(screen):
     """`screen` of the original as a build is expected to show it."""
     cells = bytearray(screen.cells)
-    for row, line in enumerate(screen.lines()):
-        for pattern, text in DEVIATIONS:
+    lines = screen.lines()
+    for row, line in enumerate(lines):
+        for pattern, text, below in DEVIATIONS:
             match = pattern.search(line)
+            if match and below:
+                # Known by the line below it as well.
+                under = lines[row + 1] if row + 1 < len(lines) else ""
+                match = below.search(under) and match
             if match:
                 # As much of it as shows: a panel may cover the rest.
                 start, end = match.span(1)
@@ -44,21 +49,35 @@ def compared(screen):
     return replace(screen, cells=bytes(cells))
 
 
+# What a build is to show otherwise than the original: the part of a line
+# that the pattern's group matches, the text that a build has there, and,
+# for a line that is known by the one below it as well, the pattern of
+# that one.
 DEVIATIONS = [
     # The banner that the program prints when it starts names its edition.
     # The published source is of the freeware edition; the binaries shipped
     # in 2000 are of another, with a name as long as nine letters. The
     # banner stays on the screen behind the panels.
     (re.compile(r"^The Volkov Commander, Version 4\.05 ([a-z]{1,9})"),
-     "freeware "),
+     "freeware ", None),
+    # The same banner behind a panel on the left with none on the right:
+    # the panel covers the 40 cells that the line is known by, and the
+    # last four letters of the edition show next to its frame, with a
+    # letter less in a build. It is the banner if nothing else is on the
+    # line, as far as where the clock would be, and the line below has
+    # behind a panel's frame the end of the second line that the program
+    # prints, the last two letters of its author's name, and nothing else.
+    (re.compile(r"^[╔║╟╚].{38}[╗║╢╝](ware) {30}"), "are ",
+     re.compile(r"^[╔║╟╚].{38}[╗║╢╝]ov {30}")),
     # The program names its own file when it cannot load it again after a
     # command. The original is VC.COM; the port is VC.EXE.
-    (re.compile(r"^Bad or missing D:\\VC\\VC\.(COM)"), "EXE"),
+    (re.compile(r"^Bad or missing D:\\VC\\VC\.(COM)"), "EXE", None),
     # And in the map of the memory, Alt+F5, which has a line for every
     # program with the name of its file. No scenario can show the map
     # without that line; the user has said that the deviation may stand
     # here too.
-    (re.compile(r"║ . [0-9A-F]{4}[ \d]{6}[ \d,]{10} {3}VC\.(COM) "), "EXE"),
+    (re.compile(r"║ . [0-9A-F]{4}[ \d]{6}[ \d,]{10} {3}VC\.(COM) "), "EXE",
+     None),
 ]
 
 # What stands in a golden for a character that is not compared.

@@ -357,13 +357,6 @@ Things that are known and not done. Standing instructions are in
   those keys has F1 for the Help item of the Files menu, which `Input`
   never hands on: it shows the help of the item under the cursor
   itself. Both ported as they are.
-- `harness/deviations.py` knows the banner that the program prints at
-  its start by its beginning. With a panel on the left and none on the
-  right, the first row shows the end of it behind the panel, "are", or
-  "ware" under the original, whose banner names an edition with a
-  letter more: that is held against the golden as it is, and the port
-  fails there without anything translated. No scenario shows it now;
-  the comparison would have to know the end of the banner by its place.
 - Of the dialogs, all that they do for the mouse runs: in
   `mouse-dialog`, `mouse-fields`, `mouse-line` and `mouse-filter`, the
   middle button, which leaves a dialog as Esc does, in `mouse-middle`,

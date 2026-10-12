@@ -747,9 +747,8 @@ out again (show.py --changes is how):
     cursor no further than that; the next PgDn goes to the last entry.
   - With the right panel off, Ctrl+p or Ctrl+F2, what DOS has shown is
     behind it, and at the start that is the end of the program's
-    banner, "ware" for the original and "are" for the port:
-    deviations.py knows the banner only where a line begins with it. Run
-    a command first, "ver": that scrolls the banner away.
+    banner, "ware" for the original and "are" for the port. deviations.py
+    knows the banner there too, by the line below it: see banner.
   - Ctrl+z puts the tree into the other panel and Ctrl+l the Info; each
     pressed again brings back what the panel showed before, which is
     the other of the two once both have been there, and never files:
@@ -783,14 +782,6 @@ out again (show.py --changes is how):
     asks for the file by name and offers the last target: after F6 it
     may offer the name under the cursor instead, as the registers
     happen to be.
-  - A panel on the left with none on the right shows, in the first row
-    of the right half, the end of the banner that the program printed
-    when it started: "are", and "ware" under the original, whose
-    banner names another edition. deviations.py knows the banner by
-    its beginning, so that row is held against the wrong letters, and
-    the port test fails before anything is translated. Switch the left
-    panel off instead, "Tab Ctrl+p": the beginning of the banner is
-    known.
   - An item of the Files menu chosen with Shift or Ctrl held down,
     "Shift+Enter" or "Ctrl+Enter" on Copy, is the command that F5 has
     with that key. The program asks for Shift and Ctrl after it has
@@ -1704,6 +1695,17 @@ SCENARIOS = {
             "Esc",                        # which cannot be read
             "c",
             "Enter",                      # so it shows C: instead
+        )),
+
+    "banner": Scenario(
+        "The banner that the program printed when it started, behind one "
+        "panel: its end next to a panel on the left, its beginning next "
+        "to one on the right. It names the edition, which is another in "
+        "the original than in the port (see deviations.py)",
+        steps=(
+            "Ctrl+p",                     # the right panel off
+            "Ctrl+p",
+            "Tab Ctrl+p",                 # and the left one
         )),
 
     "diskette-command": Scenario(
