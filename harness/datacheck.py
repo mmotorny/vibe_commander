@@ -216,6 +216,11 @@ def listed_symbols(path):
                 table = True
             if not table:
                 continue
+            # A name that the assembly declares and a C file defines has a
+            # line here too, with the segment that the declaration stands
+            # in and no place in it.
+            if line.rstrip().endswith("External"):
+                continue
             match = re.match(r"(\S+) [ .]*P Near +([0-9A-F]+) +(\w+) ", line)
             if match:
                 symbols[match[1]] = (match[3], int(match[2], 16), "code")
