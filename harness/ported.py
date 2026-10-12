@@ -352,6 +352,39 @@ BATCHES = [
                     "behind the end of the file too",
         },
     ),
+    Batch(
+        title="Find file: the search of a directory by name and by "
+              "contents, its list, and the keys taken while it runs",
+        source="find.c",
+        routines=("FindFil", "FnFl60", "FndBack", "FndStuf", "FndMove",
+                  "FndCurs", "FndLine", "FndAdr", "FndStat"),
+        functions=("FindFil_c", "FndMove_c", "FndCurs_c", "FndAdr_c"),
+        unreached={
+            0x8A7E: "FindFil, for more lines than the memory has room "
+                    "for, some 7,000: the disks of the bench have fewer "
+                    "files",
+            **dict.fromkeys(
+                (0x8BC8, 0x8BCA, 0x8BCC, 0x8BCE, 0x8BD0),
+                "FindFil, for less than 64 KB of memory to read a file "
+                "into: the bench has some 500 KB free"),
+            **dict.fromkeys(
+                (0x8D60, 0x8D61, 0x8D64, 0x8D67, 0x8D69, 0x8D6B, 0x8D6D,
+                 0x8D6F, 0x8D72, 0x8D75, 0x8D78, 0x8D7A, 0x8D7C, 0x8D7D,
+                 0x8D7F, 0x8D82, 0x8D83, 0x8D85, 0x8D87, 0x8D88, 0x8D8B,
+                 0x8D8C, 0x8D8D, 0x8D91, 0x8D95, 0x8D98, 0x8D99, 0x8D9A,
+                 0x8D9C, 0x8DA1, 0x8DA3, 0x8DA7, 0x8DAB, 0x8DAD, 0x8DAF,
+                 0x8DB1, 0x8DB3, 0x8DB4, 0x8DB7, 0x8DB9, 0x8DBB, 0x8DBD,
+                 0x8DBF, 0x8DC1, 0x8DC2, 0x8DC4, 0x8DC6, 0x8DC8, 0x8DCB,
+                 0x8DCD, 0x8DCF, 0x8DD0, 0x8DD4, 0x8DD7, 0x8DD8, 0x8DDA,
+                 0x8DDB, 0x8DDE, 0x8DDF, 0x8DE2, 0x8DE7, 0x8DEB, 0x8DED,
+                 0x8DEF, 0x8DF0, 0x8DF2, 0x8DF5, 0x8DF7, 0x8DF9, 0x8DFD,
+                 0x8DFF, 0x8E00, 0x8E01, 0x8E03, 0x8E05, 0x8E07, 0x8E09,
+                 0x8E0A, 0x8E0C, 0x8E0D, 0x8E0E, 0x8E10, 0x8E12, 0x8E14,
+                 0x8E17, 0x8E1A, 0x8E1C, 0x8E1F, 0x8E20, 0x8E21, 0x8E22,
+                 0x8E24, 0x8E26, 0x8E28, 0x8E2B, 0x8E2E),
+                "FndMove, for the mouse: the bench has none"),
+        },
+    ),
 ]
 
 

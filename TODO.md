@@ -98,6 +98,39 @@ Things that are known and not done. Standing instructions are in
   has none of these, and what a scenario makes of it by typing a letter
   into it has pages that are refused for their length.
 
+- Of the file search, the command itself is still assembly, the code
+  `F67_00` of `VCFIND.INC` between its data and its stubs: the dialog,
+  the drives of "*:", "N files found" and Go to. 44 of its 391
+  instructions have run in no scenario.
+- What `FndMove` does for the mouse has run in no scenario, 96
+  instructions: the middle button, a button held above the list or
+  below it, a click outside the box, a click and a second one on a line.
+  It is translated by reading, and so are the two places where
+  `FindFil` runs out of memory, for its list and for the file it reads.
+- `FndBack`, which takes the keys while a search runs, means to go back
+  for the next key when the menu, "Stop, Go to, Quit", has taken one:
+  Left, Right, Space, Backspace, a letter that is no answer. It tests
+  the carry flag for that behind `MnMn40`, which draws the menu and ends
+  in `Window`, and that leaves the carry clear. So it goes on to
+  `FndMove` with what `MnMn40` left in AX, the colour of the chosen
+  answer in both bytes, as if that were a key. `FndMove` knows no such
+  key and does nothing, unless the colour is 0Dh or 1Bh, which it would
+  take for Enter or Esc. On the bench the colour is 0Fh; the other
+  palettes have not been looked at. Ported like that.
+- A name to search for that has a full stop gets four bytes behind it
+  that follow `\*.*` in the assembly: a zero and "VC.", the start of
+  the name of the main extension file. Nothing reads the three; the C
+  copies them from the assembly, `Mask_S`, as long as that has them.
+- `FindFil` calls itself, through `DirFunc`, once for every level of
+  the directories it searches. The original took 18 bytes of its stack
+  of 256 for a level, by reading; what the port takes of its 4,096 has
+  not been measured, and how deep a tree either can search has not been
+  tried. The scenarios search three levels. DOS's critical error can come up with
+  all of that on the stack: `FindFil` calls DOS for the files, and to
+  open and read them.
+- Deriving the golden of `find` stopped once in three times with "the
+  screen did not settle", at the step that ends in the help over a
+  search that runs. Not looked into: derive again.
 - `wait_for_screen` takes a change of one cell for blinking. In `columns`
   the editor closes its box after F2 and clears the `*` in its first row
   some 10 ms later; a sample between the two has the harness wait 20
@@ -294,6 +327,39 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     same list; the list of batches was cut at its closing bracket again,
     and a script put the lines in between. Each time a build and a test,
     a minute and a half, which passed at once.
+
+- Find file, 9 routines, 1,536 bytes, 42 minutes in all, next to three
+  other batches. The translation passed the first time it was tested,
+  but for the stack and for a stub that nothing called.
+  - 8 minutes: finding out when a key reaches a search that runs, and
+    what a step can rest on: three runs of `harness/reach.py` with
+    steps, 17, 30 and 38 seconds, and reading `Input` and the harness
+    for where the milliseconds go. A search by contents of the floppy
+    stood still for longer than the original is waited for, so a step
+    was recorded in the middle of it. At the top of
+    `harness/scenarios.py` now.
+  - 6 minutes waiting for a turn at the computer: 95 seconds before the
+    third run of `harness/reach.py`, 50 and 40 before two derivations,
+    and some three minutes of a `port` test that took 4:43 where it
+    takes 1:16 by itself.
+  - 1 minute and a half: a derivation that stopped, "the screen did not
+    settle", at the step that ends in the help; the next one went
+    through.
+  - 1 minute: `FndAdr_c` not executed in the port. Its stub is called
+    by Go to alone, which no scenario had: three steps more, and the
+    golden derived again.
+  - The `port` test failed on the stack alone, none of 256 bytes left
+    in `stamps` and `find`, and passed on the stack of 4,096 bytes,
+    which was on `main` by then.
+  - 4 minutes for getting onto `main`, behind the larger stack, the
+    editor's second batch and the help: three files in conflict, the
+    lists of batches, of scenarios and of the C functions that the
+    assembler is told of, the first two cut at their closing brackets
+    again and put right by a script. Seven entries for C were there twice,
+    made by the help's batch as well and under the same names, without
+    a conflict; those of this batch went, and its C took the arguments
+    and the answers of the others. A build and a test, 76 seconds,
+    passed at once.
 
 ## Ideas put off
 

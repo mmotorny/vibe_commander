@@ -41,16 +41,7 @@ Find_B	DW	Find_P, 0, 0
 	DB	0, 0, 1, 1
 	DW	505h, SrchStr, 100h+LenStr
 	DB	0
-Find_T	DW	4800h, FnMv12
-	DW	5000h, FnMv13
-	DW	4700h, FnMv10
-	DW	4F00h, FnMv11
-	DW	4900h, FnMv14
-	DW	5100h, FnMv15
-	DW	000Dh, FnMv31
-	DW	001Bh, FnMv32
-	DW	4400h, FnMv32
-	DW	0
+	PUBLIC	Find5_D			; C code hands it to the menu
 Find5_D	DB	 8,  0
 	DB	 9, 11
 	DB	 8, 23
@@ -453,708 +444,84 @@ F67_33:	POP	DS
 F67_34:	JMP	FncEx1
 F67_35:	JMP	Func04
 
+; The search and its list are C: port/find.c.
+;			   AL - attributes of what is at TmpBuf
+;	Return :	   AX - 0 to go on, 100h to stop
 FindFil	PROC	NEAR			; Find files
-	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	TEST	AL,10h
-	JZ	FnFl10
-	PUSH	ES			; Output 'Sanning: PATH'
-	POP	DS
-	CALL	FndStat
-	MOV	DI,DX			; Find files
-	MOV	CX,LenPath+13
-	MOV	AL,0
-	REPNE	SCASB
-	DEC	DI
-	MOV	SI,DI
-	SUB	SI,DX
-	CMP	SI,LenFnf
-	JB	FnFl11
-FnFl10:	XOR	AX,AX
-	JMP	FnFl51
-FnFl11:	MOV	AL,DS:[DI-1]
-	CMP	AL,':'
-	JE	FnFl12
-	CMP	AL,'\'
-	JE	FnFl12
-	MOV	AL,'\'
-	STOSB
-FnFl12:	MOV	SI,OFFSET FindStr
-	CALL	CutPath
-	PUSH	DI
-	MOV	DI,OFFSET TmpErr+20
-	PUSH	DI
-	MOV	BX,OFFSET Mask_S+1
-FnFl13:	LODSB
-	CMP	AL,0
-	JE	FnFl15
-	CMP	AL,'.'
-	JNE	FnFl14
-	MOV	BX,OFFSET Mask_S+4
-FnFl14:	STOSB
-	JMP	FnFl13
-FnFl15:	PUSH	CS
-	POP	DS
-	MOV	SI,BX
-	MOV	CX,4
-	REP	MOVSB
-	PUSH	ES
-	POP	DS
-	POP	SI
-	MOV	DI,OFFSET TmpErr
-	CALL	Convert
-	MOV	SI,DI
-	POP	DI
-	CALL	UnConv
-	MOV	DS:FndDir,0
-	JMP	FnFl40
-FnFl20:	TEST	DS:FndDir,1		; First file in directory
-	JNZ	FnFl30
-	OR	DS:FndDir,1
-	MOV	AX,DS:FndNumb
-	OR	AX,AX
-	JE	FnFl22
-	INC	AX
-	INC	AX
-	CMP	AX,DS:FndSize
-	JB	FnFl21
-	JMP	FnFl43			; Out of memory ???
-FnFl21:	MOV	DI,OFFSET TmpErr
-	MOV	CX,LenFnf
-	MOV	AL,0
-	REP	STOSB
-	CALL	FndStuf
-FnFl22:	MOV	SI,OFFSET TmpBuf
-	MOV	DI,OFFSET TmpErr
-	MOV	CX,LenPath+13
-	PUSH	DI
-	REP	MOVSB
-	POP	DI
-	MOV	SI,DI
-	CALL	CutPath
-	MOV	AX,SI
-	SUB	AX,DI
-	CMP	AX,WORD PTR 3
-	JBE	FnFl23
-	DEC	SI
-FnFl23:	MOV	BYTE PTR DS:[SI],0
-	MOV	SI,DI
-	CALL	PathLin
-	MOV	CX,LenFnf
-	CALL	FilZero
-	CALL	FndStuf
-FnFl30:	MOV	DI,OFFSET TmpErr	; Find next file
-	MOV	CX,LenFnf
-	MOV	AL,' '
-	PUSH	DI
-	REP	STOSB
-	POP	DI
-	ADD	DI,3
-	PUSH	DI
-	MOV	SI,OFFSET DTA.FilName
-	MOV	AH,DS:DTA.FilAttr
-FnFl31:	LODSB
-	CMP	AL,0
-	JE	FnFl33
-	TEST	AH,10h
-	JNZ	FnFl32
-	CALL	LowCase
-FnFl32:	STOSB
-	JMP	FnFl31
-FnFl33:	POP	DI
-	ADD	DI,14
-	TEST	AH,10h
-	JZ	FnFl34
-	PUSH	CS
-	POP	DS
-	ADD	DI,6
-	MOV	SI,OFFSET SubDir+1
-	MOV	CX,7
-	REP	MOVSB
-	PUSH	ES
-	POP	DS
-	JMP	FnFl35
-FnFl34:	MOV	CX,DS:DTA.FilSize.Lo
-	MOV	BX,DS:DTA.FilSize.Hi
-	MOV	AL,3
-	CALL	Number
-	MOV	BYTE PTR DS:[DI],' '
-FnFl35:	ADD	DI,3
-	SHL	AH,1
-	SHL	AH,1
-	MOV	AL,'A'
-	CALL	FnFl60
-	SHL	AH,1
-	SHL	AH,1
-	MOV	AL,'S'
-	CALL	FnFl60
-	MOV	AL,'H'
-	CALL	FnFl60
-	MOV	AL,'R'
-	CALL	FnFl60
-	ADD	DI,3
-	MOV	AX,DS:DTA.FilDate
-	CALL	PutDate
-	CALL	BufDate
-	ADD	DI,3
-	MOV	AX,DS:DTA.FilTime
-	CALL	PutTime
-	CALL	BufTime
-	CALL	FndStuf
-	JC	FnFl43			; Out of memory ???
-	INC	DS:FndFls
-FnFl40:	CALL	FndBack
-	JNC	FnFl43
-	MOV	DX,OFFSET TmpBuf
-	CALL	ChgDisk
-	JC	FnFl43
-	MOV	AH,4Fh
-	TEST	DS:FndDir,2
-	JNZ	FnFl41
-	OR	DS:FndDir,2
-	MOV	CX,37h
-	MOV	AH,4Eh
-FnFl41:	CALL	SetDTA
-	CALL	Intr21
-	JNC	FnFl44
-	CMP	AX,WORD PTR 53h
-	JE	FnFl43
-	JMP	FnFl50
-FnFl42:	CMP	AX,WORD PTR 53h
-	JNE	FnFl40
-FnFl43:	MOV	AX,100h
-	JMP	FnFl51
-FnFl44:	CMP	DS:DTA.FilName[0],'.'
-	JE	FnFl40
-	CMP	DS:SrchStr[0],0		; Find by contents
-	JE	FnFl47
-	CALL	V81_00
-	MOV	DX,OFFSET TmpBuf
-	MOV	SI,DX
-	CALL	CutPath
-	MOV	DI,SI
-	MOV	SI,OFFSET DTA.FilName
-	MOV	CX,13
-	REP	MOVSB
-	CALL	FndStat
-	MOV	AL,40h
-	CALL	OpenFil
-	JC	FnFl42
-	MOV	BX,AX
-	MOV	AX,ES
-	ADD	AX,DS:FreMem2
-	SUB	AX,DS:ViewSeg
-	MOV	BP,8000h+80
-	TEST	AH,0F0h
-	JNZ	FnFl45
-	MOV	CL,4
-	SHL	AX,CL
-	CMP	AX,BP
-	JAE	FnFl45
-	MOV	BP,AX
-FnFl45:	CMP	BP,4000
-	JB	FnFl48			; Out of memory ???
-	MOV	AX,DS:FndNumb
-	INC	AX
-	CALL	FndAdr
-FnFl46:	CALL	FndBack
-	JNC	FnFl48
-	MOV	CX,BP
-	XOR	DX,DX
-	MOV	AH,3Fh
-	CALL	Intr21
-	JC	FnFl48
-	MOV	CX,AX
-	XOR	SI,SI
-	CALL	V82_00
-	JNC	FnFl49
-	CMP	CX,BP
-	JB	FnFl49
-	MOV	AX,4201h
-	MOV	CX,-1
-	MOV	DX,-80
-	CALL	Intr21
-	JMP	FnFl46
-FnFl47:	JMP	FnFl20
-FnFl48:	PUSH	ES
-	POP	DS
-	MOV	AH,3Eh
-	CALL	Intr21
-	JMP	FnFl43
-FnFl49:	PUSHF
-	PUSH	ES
-	POP	DS
-	MOV	AH,3Eh
-	CALL	Intr21
-	POPF
-	JNC	FnFl47
-	JMP	FnFl40
-FnFl50:	MOV	SI,OFFSET TmpBuf	; Exit
-	CALL	CutPath
-	MOV	BYTE PTR DS:[SI],0
-	CALL	DirFunc
-FnFl51:	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
+	CallC	FindFil_c
 	RET
 FindFil	ENDP
 
-FnFl60	PROC	NEAR
-	SHL	AH,1
-	JC	FnFl61
-	MOV	AL,'.'
-FnFl61:	STOSB
-	RET
-FnFl60	ENDP
-
-FndBack	PROC	NEAR			; Background movement
-	PUSH	DS
-	PUSH	BP
-	PUSH	BX
-	PUSH	ES
-	POP	DS
-FndBk1:	CALL	GetMous
-	MOV	AH,0FCh
-	JNZ	FndBk2
-	MOV	AH,1
-	INT	16h
-	STC
-	JZ	FndBk5
-	MOV	AH,0
-	INT	16h
-	OR	AX,AX
-	JE	FndBk5
-	CMP	AX,2E03h
-	JE	FndBk5
-	CMP	AX,011Bh
-	JE	FndBk5
-	CMP	AX,3B00h
-	JE	FndBk4
-FndBk2:	MOV	BX,DS:FndBg
-	MOV	DX,DS:FndSz
-	PUSH	DX
-	PUSH	BX
-	CMP	DS:WinMous,0
-	JNZ	FndBk3
-	ADD	BH,DH
-	SUB	BH,4
-	ADD	BL,21
-	MOV	DX,11Fh
-	MOV	BP,OFFSET FnFl_P
-	MOV	DI,OFFSET Find5_D
-	MOV	CH,0
-	MOV	CL,DS:FndMenu
-	CALL	MnMn10
-	MOV	DS:FndMenu,CL
-	JNC	FndBk3
-	MOV	AH,CS:[BP+0]
-	MOV	AL,CS:[BP+1]
-	CALL	MnMn40
-FndBk3:	POP	BX
-	POP	DX
-	JC	FndBk1
-	MOV	CL,1
-	CALL	FndMove
-	OR	AH,AH
-	JZ	FndBk1
-	OR	DS:FndMode,2
-	MOV	DS:FndMenu,AL
-	JMP	FndBk5
-FndBk4:	CALL	Help
-	JMP	FndBk1
-FndBk5:	MOV	DS:WinMous,0
-	MOV	DS:MousEnt,0
-	POP	BX
-	POP	BP
-	POP	DS
-	RET
-FndBack	ENDP
-
-FndStuf	PROC	NEAR			; Add line
-	PUSH	DX
-	PUSH	BX
-	PUSH	ES
-	POP	DS
-	MOV	AX,DS:FndNumb
-	CMP	DS:FndSize,AX
-	JB	FndSt4
-	INC	DS:FndNumb
-	MOV	DX,LenFnf
-	MUL	DX
-	MOV	DI,AX
-	AND	DI,0Fh
-	MOV	CL,4
-	SHR	AX,CL
-	SHL	DL,CL
-	OR	AH,DL
-	ADD	AX,DS:ViewSeg
-	MOV	ES,AX
-	MOV	SI,OFFSET TmpErr
-	MOV	CX,LenFnf
-	REP	MOVSB
-	PUSH	DS
-	POP	ES
-	MOV	BX,DS:FndBg
-	MOV	DX,DS:FndSz
-	TEST	DS:FndMode,1
-	JNZ	FndSt1
-	MOV	CL,0
-	MOV	AX,4F00h
-	CALL	FndMove
-	JMP	FndSt3
-FndSt1:	MOV	BP,DS:FndNumb
-	DEC	BP
-	MOV	DI,DS:FndFrst
-	MOV	AX,BP
-	SUB	AX,DI
-	ADD	AX,WORD PTR 8
-	OR	AH,AH
-	JNE	FndSt3
-	CMP	AL,DH
-	JAE	FndSt3
-	MOV	AH,CS:Find_P[0]
-	OR	BP,BP
-	JNE	FndSt2
-	MOV	AH,CS:Find_P[1]
-FndSt2:	CALL	FndCurs
-FndSt3:	CLC
-FndSt4:	POP	BX
-	POP	DX
-	RET
-FndStuf	ENDP
-
+;			   AX - key, or AH = 0FCh for the mouse
+;			   CL - for FndMode
+;			BH,BL - begin of the box
+;			DH,DL - its size
+;	Return :	   AX - 0, or AH = 1 and AL the answer
 FndMove	PROC	NEAR			; Move the cursor
-	MOV	BP,DS:FndCur
-	MOV	DI,DS:FndFrst
-	CMP	AH,0FCh
-	JE	FnMv00
-	MOV	SI,OFFSET Find_T
-	CALL	Case
-	JMP	FnMv30
-FnMv00:	PUSH	CX
-	CALL	GetMous			; Mouse support
-FnMv01:	CALL	ClrKbd
-	MOV	SI,CX
-	TEST	AL,4
-	JZ	FnMv03
-	MOV	AL,'x'
-	CALL	TypMous
-FnMv02:	CALL	GetMous
-	CALL	ClrKbd
-	TEST	AL,4
-	JNZ	FnMv02
-	PUSH	AX
-	MOV	AL,0
-	CALL	TypMous
-	POP	AX
-	TEST	AL,3
-	JNZ	FnMv03
-	POP	CX
-	JMP	FnMv32
-FnMv03:	PUSH	DX
-	PUSH	BX
-	ADD	BX,204h
-	SUB	DX,80Ah
-	CALL	InWind
-	POP	BX
-	POP	DX
-	JNC	FnMv08
-	CMP	DS:WinMous,0
-	JZ	FnMv05
-	MOV	BP,DS:FndCur
-	MOV	DI,DS:FndFrst
-	MOV	AL,BH
-	ADD	AL,2
-	CMP	CH,AL
-	JAE	FnMv04
-	POP	CX
-	JMP	FnMv12
-FnMv04:	MOV	AL,BH
-	ADD	AL,DH
-	SUB	AL,6
-	CMP	CH,AL
-	JB	FnMv06
-	POP	CX
-	JMP	FnMv13
-FnMv05:	TEST	AL,1
-	JZ	FnMv06
-	CALL	GetMous
-	JNZ	FnMv01
-	MOV	CX,SI
-	PUSH	DX
-	SUB	DX,102h
-	CALL	InWind
-	POP	DX
-	JNC	FnMv06
-	POP	CX
-	JMP	FnMv32
-FnMv06:	POP	CX
-FnMv07:	JMP	FnMv30
-FnMv08:	OR	DS:WinMous,1
-	MOV	BP,DS:FndNumb
-	OR	BP,BP
-	JE	FnMv06
-	PUSH	CX
-	SUB	CH,BH
-	SUB	CH,2
-	MOV	CL,CH
-	MOV	CH,0
-	MOV	DI,DS:FndFrst
-	ADD	CX,DI
-	DEC	BP
-	POP	SI
-	XCHG	BP,CX
-	CMP	BP,CX
-	JBE	FnMv09
-	MOV	BP,CX
-	POP	CX
-	JMP	FnMv20
-FnMv09:	PUSH	DX
-	PUSH	BX
-	MOV	AX,SI
-	MOV	SI,BP
-	MOV	BH,AH
-	ADD	BL,2
-	SUB	DL,10
-	MOV	DH,1
-	CALL	DoublMo
-	POP	BX
-	POP	DX
-	POP	CX
-	JC	FnMv20
-	JE	FnMv07
-	MOV	AL,0
-	CALL	TypMous
-	MOV	AX,101h
-	RET
-FnMv10:	XOR	BP,BP			; Home
-	JMP	FnMv20
-FnMv11:	MOV	BP,DS:FndNumb		; End
-FnMv12:	OR	BP,BP			; Up
-	JE	FnMv20
-	DEC	BP
-	JMP	FnMv20
-FnMv13:	INC	BP			; Down
-	CMP	BP,DS:FndNumb
-	JB	FnMv20
-	DEC	BP
-	JMP	FnMv20
-FnMv14:	MOV	AL,DH			; PgUp
-	SUB	AL,8
-	CBW
-	MOV	SI,BP
-	CALL	PgUp
-	MOV	BP,SI
-	JMP	FnMv20
-FnMv15:	MOV	SI,BP			; PgDn
-	MOV	BP,DS:FndNumb
-	MOV	AL,DH
-	SUB	AL,8
-	CBW
-	CALL	PgDn
-	MOV	BP,SI
-FnMv20:	MOV	AL,DS:FndMode		; Test parameters
-	PUSH	AX
-	OR	DS:FndMode,CL
-	CMP	BP,DI
-	JAE	FnMv21
-	MOV	DI,BP
-FnMv21:	MOV	AL,DH
-	SUB	AL,8
-	CBW
-	ADD	AX,DI
-	CMP	BP,AX
-	JB	FnMv22
-	SUB	AX,DI
-	MOV	DI,BP
-	SUB	DI,AX
-	INC	DI
-FnMv22:	POP	AX
-	MOV	CX,DI
-	XCHG	BP,DS:FndCur
-	XCHG	DI,DS:FndFrst
-	SUB	CX,DI
-	JNE	FnMv24
-	TEST	DS:FndMode,1
-	JZ	FnMv23
-	CMP	BP,DS:FndCur
-	JNE	FnMv24
-	TEST	AL,1
-	JZ	FnMv23
-	JMP	FnMv30
-FnMv23:	JMP	FnMv28
-FnMv24:	MOV	AH,CS:Find_P		; Reset cursor
-	CALL	FndCurs
-	JCXZ	FnMv23
-	PUSH	CX			; Output lines
-	PUSH	BX
-	MOV	CL,DH
-	SUB	CL,8
-	MOV	CH,0
-	ADD	BX,205h
-	MOV	AX,DS:FndFrst
-FnMv25:	CALL	FndLine
-	INC	AX
-	INC	BH
-	LOOP	FnMv25
-	POP	BX
-	POP	CX
-	PUSH	DX			; Output screen
-	PUSH	BX
-	ADD	BX,205h
-	SUB	DH,8
-	MOV	AL,DH
-	DEC	AX
-	MOV	AH,6
-	CMP	CX,1
-	JE	FnMv26
-	CMP	CX,-1
-	JNE	FnMv27
-	MOV	AX,700h
-FnMv26:	MOV	CX,BX
-	MOV	DL,63
-	DEC	DH
-	ADD	DX,CX
-	PUSH	AX
-	MOV	AH,CS:Find_P
-	CALL	Color
-	MOV	BH,AH
-	POP	AX
-	PUSH	AX
-	MOV	AL,1
-	CALL	Int10m
-	POP	AX
-	MOV	BX,CX
-	ADD	BH,AL
-	MOV	DH,1
-FnMv27:	MOV	DL,64
-	CALL	Window
-	POP	BX
-	POP	DX
-FnMv28:	CMP	DS:FndNumb,0		; Set cursor
-	JE	FnMv30
-	MOV	BP,DS:FndCur
-	MOV	DI,DS:FndFrst
-	MOV	AH,CS:Find_P[0]
-	TEST	DS:FndMode,1
-	JZ	FnMv29
-	MOV	AH,CS:Find_P[1]
-FnMv29:	CALL	FndCurs
-FnMv30:	XOR	AX,AX			; Exit
-	RET
-FnMv31:	MOV	AL,DS:FndMenu		; Enter
-	MOV	AH,1
-	RET
-FnMv32:	MOV	AX,1FFh			; Esc
+	CallC	FndMove_c
 	RET
 FndMove	ENDP
 
+;			   AH - colour
+;			   BP - line
+;			   DI - first line shown
+;			BH,BL - begin of the box
+;			DH,DL - its size
 FndCurs	PROC	NEAR			; Set/Reset cursor
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	MOV	CX,BP
-	SUB	CX,DI
-	ADD	BH,CL
-	ADD	BX,205h
-	PUSH	AX
-	MOV	AX,BP
-	CALL	FndLine
-	POP	AX
-	SUB	DL,12
-	MOV	CL,DL
-	MOV	CH,0
-	CALL	BasAdr
-	CALL	Color
-	MOV	AL,AH
-	CALL	MvsColr
-	MOV	DH,1
-	CALL	Window
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
+	PUSH	SI
+	MOV	SI,BP
+	CallC	FndCurs_c
+	POP	SI
 	RET
 FndCurs	ENDP
 
-FndLine	PROC	NEAR			; Output item
-	PUSH	DS
-	PUSH	DI
-	PUSH	CX
-	PUSH	AX
-	CALL	FndAdr
-	CALL	BasAdr
-	MOV	AH,CS:Find_P
-	CALL	Color
-	MOV	CX,LenFnf-1
-FndLn1:	LODSB
-	STOSW
-	LOOP	FndLn1
-	POP	AX
-	POP	CX
-	POP	DI
-	POP	DS
-	RET
-FndLine	ENDP
-
+;			   AX - line
+;	Return :	DS:SI - its address
 FndAdr	PROC	NEAR
 	PUSH	DX
-	PUSH	CX
-	MOV	DX,LenFnf
-	MUL	DX
-	MOV	SI,AX
-	AND	SI,0Fh
-	MOV	CL,4
-	SHR	AX,CL
-	SHL	DL,CL
-	OR	AH,DL
-	ADD	AX,ES:ViewSeg
-	MOV	DS,AX
-	POP	CX
+	CallC	FndAdr_c
+	MOV	DS,DX
 	POP	DX
 	RET
 FndAdr	ENDP
 
-FndStat	PROC	NEAR
-	MOV	SI,OFFSET TmpBuf
-	MOV	DI,OFFSET TmpErr
-	MOV	CX,LenPath+13
-	PUSH	SI
-	PUSH	DI
-	REP	MOVSB
-	POP	SI
-	MOV	AX,LenFnf-11
-	MOV	DL,AL
-	MOV	DH,1
-	CALL	ShrtLin
-	CALL	PathLin
-	MOV	BX,DS:FndBg
-	ADD	BH,DS:FndSz.Y
-	SUB	BH,5
-	ADD	BL,5+10
-	CALL	BasAdr
-	MOV	CL,DL
-	MOV	CH,0
-FnFl01:	LODSB
-	CMP	AL,0
-	JNE	FnFl02
-	DEC	SI
-	MOV	AL,' '
-FnFl02:	STOSB
-	INC	DI
-	LOOP	FnFl01
-	CALL	Window
-	POP	DX
+; Entries for the C code of the search to routines of other files (see
+; FromC in VC.ASM, and port/find.c for what they take and return).
+	FromC	MnMn40
+
+; MnMn10 answers in AX, in CL and in the carry flag: CL comes back in DL,
+; and DH is not 0 for CY.
+	PUBLIC	MnMn10_a
+MnMn10_a PROC	FAR
+	PUSH	DS
+	POP	ES
+	CALL	MnMn10
+	SBB	DH,DH
+	MOV	DL,CL
 	RET
-FndStat	ENDP
+MnMn10_a ENDP
+
+; DirFunc leaves no register as it was but ES.
+	PUBLIC	DirFunc_a
+DirFunc_a PROC	FAR
+	PUSH	BP
+	PUSH	DS
+	PUSH	DS
+	POP	ES
+	CALL	DirFunc
+	POP	DS
+	POP	BP
+	RET
+DirFunc_a ENDP
+
+; The BIOS for the keyboard: AX as INT 16h takes it and as it comes back,
+; and DX is 1 if the zero flag was set, 0 if not.
+	PUBLIC	Int16_a
+Int16_a	PROC	FAR
+	INT	16h
+	MOV	DX,0
+	JNZ	Int16A
+	INC	DX
+Int16A:	RET
+Int16_a	ENDP
 

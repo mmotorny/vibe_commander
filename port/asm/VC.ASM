@@ -43,6 +43,7 @@
 	EXTERN	T50_00_c:FAR, T51_00_c:FAR, T53_00_c:FAR, T53_10_c:FAR
 	EXTERN	T54_00_c:FAR, T55_00_c:FAR, T56_00_c:FAR, T64_00_c:FAR
 	EXTERN	Help00_c:FAR
+	EXTERN	FindFil_c:FAR, FndMove_c:FAR, FndCurs_c:FAR, FndAdr_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F

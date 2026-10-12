@@ -265,6 +265,26 @@ port.
   which returns at once because `HlpPage` is 0FFh then.
 - The files of `port/asm/` end with a byte 1Ah behind the last line. A
   script that takes one apart by lines keeps it.
+- A stub that only the code between procedures calls runs when a
+  scenario has that code call it: `FndAdr` is called from the assembly
+  by "Go to" of the file search alone, and the `port` test said "not
+  executed in the port: FndAdr_c" until a step did that.
+- A jump on a flag behind two calls may never be taken. `FndBack` has
+  `JC` behind `MnMn40` to go back for the next key, and `MnMn40` ends in
+  `Window`, which always leaves the carry clear. The C does what the
+  assembly did then, not what it meant: it goes on to `FndMove` with
+  what `MnMn40` left in AX, and the entry `FromC MnMn40` hands that back.
+- Two batches that run side by side may each make an entry for the same
+  routine, under the same name: the help and the file search both made
+  those of the mouse and of `PgUp` and `PgDn`. Git shows no conflict
+  where each put its entry in a file of its own, and the name is there
+  twice. After a rebase, look for the entries that have arrived, `FromC`
+  and `_a` in `port/asm/`, keep the one next to the routine, and go by
+  its registers and answers: those of `DoublMo` were the other way round.
+- The BIOS is called through an entry too: `Int16_a` in `VCFIND.INC`
+  for the keyboard, which makes a number of the zero flag. `DirFunc_a`
+  there saves BP, which `DirFunc` leaves changed and the compiled code
+  goes by.
 
 ### C for the port
 

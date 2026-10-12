@@ -481,11 +481,6 @@ PtPt10	PROC	NEAR
 	RET
 PtPt10	ENDP
 
-; The directory marker of the size column, for the file search.
-	.CONST
-SubDir	DB	'SUB-DIR'
-
-	.CODE
 ;---------------------- Output date --------------------
 ;			   AX - date
 ;	Return :	BX, DX, CX - day, month and year in the
