@@ -79,7 +79,7 @@ u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 #pragma aux Run_00 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 
 /* The dialog that asks whether to quit, and the name of the program for
-   it: in the assembly, where Dialog reads them. And where the part of the
+   it: constants of port/keys_t.c. And where the part of the
    program that stays in the memory keeps the main data and the two
    panels while a command runs. */
 extern const u8 __far Quit_B[];

@@ -88,12 +88,12 @@ void Help00(void);                                      /* help.c */
 #pragma aux TotSel  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 #pragma aux Help00  "*_c" __far modify exact [ax]
 
-/* What the assembly keeps of the menu, because its routines read it
-   there: the name of the menu file, which F34_40 and the editor have too,
-   with the title of the menu behind it, and the box that says that no
-   menu file was found. And two names that are copied with what follows
-   them in the assembly: that of the list file, and the mask that stands
-   behind the name of a directory in it. */
+/* What port/keys_t.c has of the menu: the name of the menu file, which
+   F34_40 and the editor have too, with the title of the menu behind it,
+   and the box that says that no menu file was found. And two names that
+   are copied with what follows them: that of the list file, which is
+   there too, and the mask that stands behind the name of a directory in
+   it. */
 extern const u8 __far Menu_F[];         /* "VC.MNU" */
 extern const u8 __far User_S[];         /* " User Menu " */
 extern const u8 __far UsrEr_B[];        /* "Could not find the menu file" */

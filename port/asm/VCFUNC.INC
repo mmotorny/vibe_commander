@@ -82,44 +82,6 @@ F06_00:	CmdC	F06_00_c		; Home
 F07_00:	CmdC	F07_00_c		; End
 F08_00:	CmdC	F08_00_c		; Ins
 
-; The dialog that asks for a mask and the box that says no file is like
-; it stay here: Dialog reads them in this segment, and the C code says
-; where they are.
-	PUBLIC	Sel_S, Unsl_S, Inv_S, Sel_B, ErSel_B
-	.CONST
-Sel_S	DB	'Select',0
-Unsl_S	DB	'Unselect',0
-Inv_S	DB	'Invert',0
-IncSp_S	DB	' ^I ',0
-Sel1_S	DB	'^I the files', 0
-ErSel_S	DB	'Could not find a match',0
-Kov_S	DB	'"^V"'
-Empty_S	DB	0
-
-	.DATA
-Sel_P	DB	Box_C, BoxCu_C, 0, 0
-	DB	3, 0
-	DW	WinBuf
-	DW	IncSp_S
-	DW	Sel1_S
-	DW	Empty_S
-Sel_B	BOXHD	< Sel_P, 528h, 0, 1, 2, 25, 0 >
-	BOXMN	< 1 ,0,0,0,0, 305h, SelMas, 20Ch >
-	DB	0
-ErSel_P	DB	Err_C, ErInv_C, ErInv_C, 0
-	DB	4, 1
-	DW	WinBuf
-	DW	SelMas
-	DB	4, 50
-	DW	IncSp_S
-	DW	ErSel_S
-	DW	Kov_S
-	DW	Ok_S
-ErSel_B	BOXHD	< ErSel_P, 528h, 0, 1, 0FFh, 0, 0 >
-	BOXMN	< 4, 0,0,0,0, 426h, TmpBuf, OkMn_D>
-	DB	0
-
-	.CODE
 F76_00:	CmdC	F76_00_c		; Grey *
 F76_01:	CmdC	F76_01_c		; the same, from the menu
 F09_00:	CmdC	F09_00_c		; Grey +
@@ -260,54 +222,9 @@ F80_00:	MOV	AX,DS			; ^I - insert files
 	JMP	Func05
 F80_10:	JMP	Func01
 
-	.CONST
-Name_S	DB	PrgName,0
-Quit1_S	DB	' The ^I ',0
-Quit2_S	DB	'Do you want to quit the ^I?',0
-YesNo_S	DB	'Yes',0FFh,3,'No',0
-
-	.DATA
-YesNo_D	DB	5, 0
-	DB	4, 6
-	DB	0
-Quit_P	DB	Box_C, BoxCu_C, BoxCu_C, 0
-	DB	3, 0
-	DW	OFFSET WinBuf
-	DW	OFFSET Quit1_S
-	DW	OFFSET Quit2_S
-	DW	OFFSET YesNo_S
-Quit_B	BOXHD	< Quit_P, 528h, 0, 1, 2, 26, 0 >
-	BOXMN	< 4, 0,0,0,0, 323h, TmpBuf, YesNo_D>
-	DB	0
-
-	.CODE
-; F10 is C: F30_00_c of port/enter.c, which has Dialog show this box.
-	PUBLIC	Quit_B, Name_S
+; F10 is C: F30_00_c of port/enter.c.
 F30_00:	CmdC	F30_00_c		; F10 - quit
 
-; Texts and a box that the C code of the user menu reads here, and the name
-; of the list file.
-	PUBLIC	Menu_F, User_S, UsrEr_B, List_F
-	.CONST
-Menu_F	DB	'VC.MNU',0
-User_S	DB	' User Menu ',0
-User1_S	DB	'Could not find the menu file',0
-
-	.DATA
-UsrEr_P	DB	Err_C, ErInv_C, ErInv_C, 0
-	DB	4, 1
-	DW	OFFSET ErrBuf
-	DW	OFFSET TmpBuf
-	DB	7, 64
-	DW	OFFSET User_S
-	DW	OFFSET User1_S
-	DW	OFFSET Var_S
-	DW	OFFSET Ok_S
-UsrEr_B	BOXHD	< UsrEr_P, 528h, 0, 1, 0FFh, 0, 2 >
-	BOXMN	< 4, 0,0,0,0, 426h, TmpBuf, OkMn_D>
-	DB	0
-
-	.CODE
 ; The user menu is C: F32_00_c of port/usermenu.c, which takes 1 for the
 ; main menu. It answers 1 if a line was chosen that has a command to run,
 ; and Run_00_c has put that into DosBuf then.
@@ -414,10 +331,6 @@ F77_00:	PUSH	DS			; Speed search
 	MOV	CH,0
 	JMP	Func12
 
-	.CONST
-List_F	DB	'vc.lst',0
-
-	.CODE
 ; The commands of a line of a menu or of an extension file are made by C,
 ; Run_00_c of port/usermenu.c, which only C code calls. Here the user menu
 ; goes on: with 1 in AX there is a command to run.

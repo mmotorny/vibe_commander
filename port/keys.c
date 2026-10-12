@@ -153,8 +153,8 @@ u16 StrLen(const u8 __far *text);                       /* string.c */
    PutMnu, ClsLine, PutPrm. */
 
 /* The dialog that asks for a mask, the box that says no file is like it,
-   and what ^I stands for in both: they are in the assembly's code
-   segment, where Dialog reads them. */
+   and what ^I stands for in both: constants of port/keys_t.c, which
+   Dialog takes by their offsets. */
 extern const u8 __far Sel_B[];
 extern const u8 __far ErSel_B[];
 extern const u8 __far Sel_S[];          /* "Select" */

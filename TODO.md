@@ -21,7 +21,7 @@ but code in its row has its data in C.
 | File | texts | boxes | dialogs | buttons, colours | tables | code | goes with |
 |---|---|---|---|---|---|---|---|
 | `VC.ASM` | 15 / 733 | 3 / 60 | 2 / 44 | 2 / 8 | 2 / 160 | 219 | `main.c`, `start.c` |
-| `VCFUNC.INC` | 16 / 186 | 4 / 68 | 4 / 88 | 1 / 5 | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
+| `VCFUNC.INC` | | | | | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
 | `VCMENU.INC` | 53 / 1,364 | 8 / 190 | 7 / 352 | 3 / 17 | 8 / 174 | 495 | `commands.c`, `menu.c` |
 | `VCF1.INC` | 48 / 959 | 25 / 502 | 22 / 660 | 4 / 24 | | 217 | `dirfunc.c` |
 | `VCCOPY.INC` | | | | | 1 / 10 | 82 | `copy.c` |
@@ -32,7 +32,7 @@ but code in its row has its data in C.
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 177 / 4,417 | 58 / 1,138 | 46 / 1,386 | 15 / 77 | 13 / 420 | 2,420 | |
+| all | 161 / 4,231 | 54 / 1,070 | 42 / 1,298 | 14 / 72 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -86,7 +86,8 @@ What names what:
   lines, a dialog its box, its buttons and the routine for Enter, a
   table its labels. Sixteen are named from more than one file: `Ok_S`,
   `OkMn_D`, `Var_S`, `Inc_S`, `Err_S` of `VC.ASM`; `Empty_S`, `Kov_S`,
-  `YesNo_S`, `YesNo_D` of `VCFUNC.INC`; `OkCan_S`, `OkCan_D` of
+  `YesNo_S`, `YesNo_D` of `port/keys_t.c`, which were of
+  `VCFUNC.INC`; `OkCan_S`, `OkCan_D` of
   `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `VCF1.INC`; `EdFl_S` of
   `VCVIEW.INC`; `Tree_S`, `PtMnu_S` of `VCSUB2.INC`. `VC.ASM` declares
   those `EXTERNDEF`, so that either side can name one wherever it is.
@@ -170,7 +171,9 @@ time, is the tables of `harness/datacheck.py` and the types of
 `port/tables.h`. Done: `VCMEM.INC`, and `VCFIND.INC`, whose two texts
 that are copied with what follows them are written as long as what is
 copied; `VCCOPY.INC`, where the titles `Copy0_S` and `Ren0_S` are such
-texts too, 20 bytes each.
+texts too, 20 bytes each; `VCFUNC.INC`, where the names of the menu file
+and of the list file are, 13 bytes each, and whose `AltSr_T` stays with
+the tables.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for
@@ -922,8 +925,10 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   "the drives of the bench are always ready". The top of
   `harness/scenarios.py` says how.
 - The keys of the panels, `VCFUNC.INC`, are C: what is left there is
-  the stubs, the table by which they jump on, `CmdNx_T`, boxes and
-  texts. Enter, `F21_00`, saves what the program needs to start over,
+  the stubs, the table by which they jump on, `CmdNx_T`, and the scan
+  codes of the speed search, `AltSr_T`, which the main loop reads there;
+  the boxes and texts are constants of `port/keys_t.c`. Enter,
+  `F21_00`, saves what the program needs to start over,
   gives the main data back to DOS and returns `NEXT_EXEC` or
   `NEXT_INIT11` (`F21_31` of `port/enter.c`), and the stub goes on to
   the part of the program that stays in the memory, at `Exec`, or to
