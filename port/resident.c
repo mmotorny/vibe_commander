@@ -174,7 +174,12 @@ extern const u8 __near Vers_S[];
 #define FLAG_SIGN      0x0080
 #define FLAG_TRAP      0x0100
 #define FLAG_INTERRUPT 0x0200
+#define FLAG_DIRECTION 0x0400
 #define FLAG_OVERFLOW  0x0800
+
+/* The six that an instruction leaves of what it has worked out. */
+#define FLAGS_RESULT (FLAG_CARRY | FLAG_PARITY | FLAG_AUX | FLAG_ZERO \
+                      | FLAG_SIGN | FLAG_OVERFLOW)
 
 /* A record of a program that has stayed in the memory, in a segment of
    its own behind what the program keeps: the program's PSP, its name,
@@ -206,6 +211,74 @@ static u16 GetStat(void);
 static void SetStat(u16 state);
 static void Stay(void);
 #pragma aux Stay aborts
+
+/*----------------------- The flags -----------------------
+   The assembly goes on in DOS, and in the program that started this
+   one, with the flags as its last instruction of arithmetic left them.
+   These say what that is, so that the C can leave the same. */
+
+/* What a result of 16 bits leaves of them: zero, sign, and parity, which
+   is of its low byte. */
+static u16 Result(u16 result)
+{
+    u8 bits = (u8)result;
+    u16 flags = 0;
+
+    bits ^= bits >> 4;
+    bits ^= bits >> 2;
+    bits ^= bits >> 1;
+    if (!(bits & 1))
+        flags |= FLAG_PARITY;
+    if (result == 0)
+        flags |= FLAG_ZERO;
+    if (result & 0x8000)
+        flags |= FLAG_SIGN;
+    return flags;
+}
+
+/* ADD: `a` and `b` added. */
+static u16 Added(u16 a, u16 b)
+{
+    u16 sum = a + b;
+    u16 flags = Result(sum);
+
+    if (sum < a)
+        flags |= FLAG_CARRY;
+    if ((a ^ b ^ sum) & 0x10)
+        flags |= FLAG_AUX;
+    if ((a ^ sum) & (b ^ sum) & 0x8000)
+        flags |= FLAG_OVERFLOW;
+    return flags;
+}
+
+/* SUB and CMP: `b` taken from `a`. */
+static u16 Taken(u16 a, u16 b)
+{
+    u16 rest = a - b;
+    u16 flags = Result(rest);
+
+    if (a < b)
+        flags |= FLAG_CARRY;
+    if ((a ^ b ^ rest) & 0x10)
+        flags |= FLAG_AUX;
+    if ((a ^ b) & (a ^ rest) & 0x8000)
+        flags |= FLAG_OVERFLOW;
+    return flags;
+}
+
+/* SHL by one: `value` doubled. The processor leaves the auxiliary flag
+   undefined; it is clear here. */
+static u16 Doubled(u16 value)
+{
+    u16 twice = value << 1;
+    u16 flags = Result(twice);
+
+    if (value & 0x8000)
+        flags |= FLAG_CARRY;
+    if ((value ^ twice) & 0x8000)
+        flags |= FLAG_OVERFLOW;
+    return flags;
+}
 
 /*---------------------- Check sum ----------------------
    Whether the record in the segment `record` is whole: 1 if its sum is
@@ -274,11 +347,20 @@ static void ExeProg(const u8 __far *name)
    A program is about to stay in the memory with as many paragraphs as
    `r` has in DX. Make its record behind them, with the interrupts that
    have changed since it was run, and add the record's paragraphs to DX.
-   Returns 1 if the program is to end instead: the list is full, the
-   bell sounds and the interrupts are put back as they were.
+   Returns the flags as the assembly leaves them, with interrupts let in
+   and the direction flag clear. The carry flag says that the program is
+   to end instead: the list is full, the bell sounds and the interrupts
+   are put back as they were, and the other flags are those of a
+   register cleared, XOR, of which the processor leaves the auxiliary
+   flag undefined: clear here. Or the paragraphs with the record's are
+   more than 16 bits hold. Without that the flags are those of the
+   addition that made them.
 
    Ported as it is: if DOS will not make the program's block longer for
-   the record, the program stays without one and is not listed. */
+   the record, the program stays without one and is not listed. The flags
+   are then those of the paragraphs asked for, as they were added up,
+   with the carry flag clear: DOS sets it and leaves the others, and the
+   assembly turns it over. */
 static u16 AddProg(struct Saved STACK *r)
 {
     volatile u16 table = 0;
@@ -288,7 +370,7 @@ static u16 AddProg(struct Saved STACK *r)
     u8 __far *record;
     u8 __far *to;
     const u8 __far *byte;
-    u16 psp, segment, i, changed, length, sum, more;
+    u16 psp, segment, i, changed, length, sum, more, flags;
 
     IntOn();
     if (Counter >= MaxProg) {
@@ -302,7 +384,7 @@ static u16 AddProg(struct Saved STACK *r)
             vector[i] = IntTab[i];
         *(u32 __far *)AT(table, SAVE_PTR) = SavePtr;
         IntOn();
-        return 1;
+        return FLAG_ZERO | FLAG_PARITY | FLAG_CARRY;
     }
     regs.ax = DOS_PSP;                  /* Get current PSP */
     Int21e(&regs);
@@ -312,7 +394,7 @@ static u16 AddProg(struct Saved STACK *r)
     regs.bx = r->dx + REC_PARAS;
     regs.es = psp;
     if (Int21e(&regs))
-        return 0;
+        return Added(r->dx, REC_PARAS) & ~FLAG_CARRY;
     segment = psp + r->dx;
     record = AT(segment, 0);
     IntOff();
@@ -342,8 +424,9 @@ static u16 AddProg(struct Saved STACK *r)
     Counter++;
     IntOn();
     more = ((length + 1) >> 4) + 1;     /* Add PrgSeg size */
+    flags = Added(r->dx, more);
     r->dx += more;
-    return r->dx < more;
+    return flags;
 }
 
 /*------------------- Release programs ------------------
@@ -431,19 +514,24 @@ static void SetStat(u16 state)
 }
 
 /*----------------------- The interrupts -----------------------
-   An interrupt that the program has taken comes to a function of four
-   instructions, New21 or New27, which is all the assembly there is to
-   it: room on the stack for one more return address, with the flags as
-   they came on top of it, and a jump to an interrupt function of the
-   compiler's. That function saves the registers and finds DS, and has
-   them as `r`, to read and to change; `on` is the room, and `back` what
-   the interrupt left on the stack, the place it came from. It ends as
-   every interrupt function does, by taking `on` off the stack and going
-   there, and that is how it goes on in the handler that had the
-   interrupt before: with the registers as they are in `r`, the flags of
-   `on`, and the stack as the interrupt left it. To go back where the
-   interrupt came from instead, it goes on in CtrlC, which does nothing
-   but return. */
+   An interrupt that the program has taken and deals with comes to four
+   instructions of assembly: room on the stack for one more return
+   address, with the flags as they are on top of it, and a jump to an
+   interrupt function of the compiler's. That function saves the
+   registers and finds DS, and has them as `r`, to read and to change;
+   `on` is the room, and `back` what the interrupt left on the stack, the
+   place it came from. It ends as every interrupt function does, by
+   taking `on` off the stack and going there, and that is how it goes on
+   in the handler that had the interrupt before: with the registers as
+   they are in `r`, the flags of `on`, and the stack as the interrupt
+   left it. To go back where the interrupt came from instead, it goes on
+   in CtrlC, which does nothing but return.
+
+   The flags of `on` are made what the assembly had when it jumped to
+   that handler: those of its last instruction of arithmetic, with
+   interrupts let in and the direction flag clear where it had done so.
+   Nothing that is known reads them there; they are the same all the
+   same. */
 
 /* Ctrl-C of DOS and Ctrl-Break of the BIOS, while the program has them:
    nothing. */
@@ -456,9 +544,46 @@ void __interrupt __far Int21(struct Saved r, struct Frame on,
                              struct Frame back);
 void __interrupt __far Int27(struct Saved r, struct Frame on);
 
+/* INT 21h arrives here, every call of DOS that any program makes while
+   this one is in the memory. Of nearly all of them the program wants
+   nothing, and for those it takes nothing either: no register changed
+   and not a byte of the caller's stack, which may be short. They go on
+   in the handler that had the interrupt before, with the flags of the
+   comparison that sent them there, as in the assembly. Only the four
+   that the program deals with go on to Int21: AH 4Bh, 31h, 49h, and
+   2Bh with 'VC' in CX and 'OM' in DX.
+
+   Why this is assembly, thirteen instructions in front of the four that
+   every entry has: what the compiler makes saves registers before it
+   compares, on the caller's stack, and cannot jump to another handler
+   with the stack as it found it; a function without that, naked, is
+   given no instruction for a statement of C at all; an ordinary one
+   with the call in AX, nothing to change and the jump as a call that
+   does not return makes itself room on the stack, changes AL to
+   compare, reads the old address through the caller's DS or through an
+   ES that it loads, and jumps with BP still pushed (tried, with this
+   compiler). And the flags that the handler before is entered with are
+   those of these comparisons, which C cannot promise of anything. The
+   old address is read through CS: the data of this part is of the
+   segment that its code is in. */
 __declspec(naked) void __far New21(void)
 {
     _asm {
+        cmp ah,4Bh
+        je deal
+        cmp ah,31h
+        je deal
+        cmp ah,49h
+        je deal
+        cmp ah,2Bh
+        jne old
+        cmp cx,5643h
+        jne old
+        cmp dx,4F4Dh
+        je deal
+    old:
+        jmp dword ptr cs:Vect21
+    deal:
         pushf
         push ax
         push ax
@@ -467,6 +592,8 @@ __declspec(naked) void __far New21(void)
 }
 #pragma aux New21 "*"
 
+/* INT 27h arrives here. The program deals with every one, and the
+   assembly took of the caller's stack for each as well. */
 __declspec(naked) void __far New27(void)
 {
     _asm {
@@ -485,26 +612,34 @@ static void Old(struct Frame STACK *on, u32 handler)
     on->cs = (u16)(handler >> 16);
 }
 
-/* The handlers below let interrupts in and clear the direction flag
-   before they go on in DOS, where the assembly did both: when it noted a
-   program, added one or looked through its list. */
-#define FLAG_DIRECTION 0x0400
-#define WORKED(on) \
-    ((on).flags = (on).flags & ~FLAG_DIRECTION | FLAG_INTERRUPT)
+/* Go on with what an instruction has left in the six flags, `result`,
+   and with the direction flag clear. */
+static void Left(struct Frame STACK *on, u16 result)
+{
+    on->flags = on->flags & ~(FLAGS_RESULT | FLAG_DIRECTION) | result;
+}
 
-/* INT 21h: DOS. A program run (AH 4Bh) is noted, one that stays in the
-   memory (31h) gets its record, or ends instead (4Ch) when the list is
-   full, and a block of memory given back (49h) takes the program that
-   it was off the list. And another program asks for this one's data,
-   the program's own call (AH 2Bh, CX 'VC', DX 'OM'): it gets in ES:BX
-   what is kept of the first panel for AL 0, of the second for 1 and of
-   the main data for anything else, and the number of this interface in
-   AH.
+/* INT 21h, the four calls that New21 does not pass on. A program run (AH
+   4Bh) is noted, one that stays in the memory (31h) gets its record, or
+   ends instead (4Ch) when the list is full, and a block of memory given
+   back (49h) takes the program that it was off the list. And another
+   program asks for this one's data, the program's own call (AH 2Bh, CX
+   'VC', DX 'OM'): it gets in ES:BX what is kept of the first panel for
+   AL 0, of the second for 1 and of the main data for anything else, and
+   the number of this interface in AH.
 
-   Ported as it is: that call returns with the flags as the handler has
-   them, not as its caller had them. The carry flag is clear, which is
-   the answer; interrupts are still off, as every interrupt begins; and
-   the other flags are those of AL compared with 1. */
+   The flags that DOS is entered with, as the assembly leaves them. For
+   a program run: those of the zero byte that ends its name, compared
+   with zero, and interrupts let in. For one that stays: those that
+   AddProg returns. For a block given back: those of the count of the
+   list less the programs taken off it, or, with the list empty, of the
+   comparison that found AH to be 49h, equal; interrupts are still off.
+
+   Ported as it is: the program's own call returns with the flags as the
+   handler has them, not as its caller had them. The carry flag is
+   clear, which is the answer; interrupts are still off, as every
+   interrupt begins; and the other flags are those of AL compared with
+   1. */
 void __interrupt __far Int21(struct Saved r, struct Frame on,
                              struct Frame back)
 {
@@ -512,15 +647,24 @@ void __interrupt __far Int21(struct Saved r, struct Frame on,
 
     if (function == 0x4B) {
         ExeProg(AT(r.ds, r.dx));
-        WORKED(on);
+        Left(&on, FLAG_ZERO | FLAG_PARITY);
+        on.flags |= FLAG_INTERRUPT;
     } else if (function == 0x31) {
-        if (AddProg(&r))
+        u16 flags = AddProg(&r);
+
+        if (flags & FLAG_CARRY)
             r.ax = 0x4C00 | r.ax & 0xFF;
-        WORKED(on);
+        Left(&on, flags);
+        on.flags |= FLAG_INTERRUPT;
     } else if (function == 0x49) {
+        u16 count = Counter;
+
         FreeBlk(r.es);
-        on.flags &= ~FLAG_DIRECTION;
-    } else if (function == 0x2B && r.cx == 0x5643 && r.dx == 0x4F4D) {
+        if (count)
+            Left(&on, Taken(count, count - Counter));
+        else
+            Left(&on, FLAG_ZERO | FLAG_PARITY);
+    } else {
         u8 which = (u8)r.ax;            /* VCapi */
         u8 less = which - 1;
         u8 bits = less;
@@ -559,18 +703,26 @@ void __interrupt __far Int21(struct Saved r, struct Frame on,
 
 /* INT 27h: a program stays in the memory, the old way, with the bytes
    up to DX of its segment. It gets its record, or ends instead, by
-   function 0 of DOS, when the list is full. */
+   function 0 of DOS, when the list is full. The handler before is
+   entered with interrupts let in and with the flags of the last shift
+   that makes bytes of the paragraphs again, DOS, where the program
+   ends, with those that AddProg returns. */
 void __interrupt __far Int27(struct Saved r, struct Frame on)
 {
+    u16 flags;
+
     r.dx = (u16)(r.dx + 0x0F) >> 4;
-    if (AddProg(&r)) {
+    flags = AddProg(&r);
+    if (flags & FLAG_CARRY) {
         r.ax &= 0x00FF;
         Old(&on, Vect21);
     } else {
+        flags = Doubled(r.dx << 3);
         r.dx <<= 4;
         Old(&on, Vect27);
     }
-    WORKED(on);
+    Left(&on, flags);
+    on.flags |= FLAG_INTERRUPT;
 }
 
 /*------------------- Execute commands ------------------*/

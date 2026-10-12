@@ -334,8 +334,8 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   comparison in every scenario (see `harness/deviations.py`). So nothing
   checks the number itself: that the port has less by what it is larger,
   at least. The same goes for what `mem` says in the scenario `command`,
-  416K free under the original and some 6K less under the port, whose
-  part that stays is 6,464 bytes longer, 3,840 of them its stack. With
+  416K free under the original and some 7K less under the port, whose
+  part that stays is 6,768 bytes longer, 3,840 of them its stack. With
   those numbers left out,
   no scenario shows any more that the program gives up its memory while
   a command runs: a check of its own would hold the port's figure
@@ -1252,30 +1252,43 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   - Where DOS does not allow another try, the box has Ok alone and the
     call fails; where it does, anything but Retry fails it, Esc too.
     The program never has DOS end it.
-- Five places where the port is not as the original, in the part that
-  stays in the memory (`port/resident.c`). No scenario shows any of
-  them; each is here with what it would take to make it as the
-  original, for the user to decide:
-  - The handler of INT 21h takes about 30 bytes of the stack of whoever
-    calls DOS, for the saved registers and the second return address,
-    and a few more for its calls: at every call of DOS while the
-    program runs and while a command runs from it. The assembly took
-    none for a call that it only passed on, and a dozen or two for
-    the four that it deals with. A program whose stack is short by that much
-    would fail under the port and not under the original; none of the
-    bench does. As the original: the test of AH and the jump to the
-    handler before have to stand in front of anything that saves a
-    register, in the naked entry `New21`, some ten instructions of
-    assembly in place of four (four `CMP AH` with their jumps, and a
-    far jump through the word that holds the old address, which then
-    has to be where CS reaches it). The four calls that the program
-    deals with would still take the 30 bytes: C needs them.
-  - DOS is entered from that handler with the flags that its caller
-    had, interrupts off, where the assembly left there the flags of
-    its own last comparison. DOS reads none of them. As the original:
-    no assembly, the flags worked out in C in each of the handler's
-    ways, as is done already for the program's own call, some twenty
-    lines.
+- Where the part that stays in the memory (`port/resident.c`) is not
+  as the original. No scenario shows any of these; each is here with
+  what it would take to make it as the original, for the user to
+  decide:
+  - The calls of DOS that the program deals with take more of the stack
+    of whoever calls than the assembly did: some 50 bytes for a program
+    run (AH 4Bh) where the assembly took 14, 60 for a block of memory
+    given back (49h) where it took 22, and 120 for a program that stays
+    (31h, and INT 27h) where it took 40, before what DOS takes for the
+    calls made from there; and some 150 of the stack of the program
+    that started this one, when DOS has ended it, where the assembly
+    took 32. The 30 bytes of an interrupt function's saved registers
+    and second return address are in each, the rest are the frames of
+    the C behind it. A call that the program only passes on takes none,
+    as in the original: the scenario `passed-on` shows that, and the
+    flags that DOS is entered with. As the original: these handlers
+    would have to be assembly again, or run on a stack of the
+    program's own, which is assembly too and not what the original
+    does.
+  - Where the processor leaves the auxiliary flag undefined, the port
+    has it clear in the flags that it enters DOS with: after the `XOR`
+    of a list that is full, and after the `SHL` of INT 27h. The
+    processor of the bench leaves it clear after `SHL` as well.
+  - No scenario shows the flags where the list of programs is full, or
+    where DOS will not make a program's block longer for its record.
+    The first was tried by hand, with nineteen programs from the second
+    copy of `passed-on`: a program that is ended for a full list, AH
+    31h made 4Ch, came to the watcher with zero, parity, carry and
+    interrupts let in, 0247h, under the original and under the port
+    alike. It is not kept. The watcher is on the first copy's list, so
+    that list is full a program sooner, and the first copy ends the
+    eighteenth, of which the second has a record all the same; whether
+    it still has it when the next one comes follows where the memory
+    was taken, which follows the size of the program, and so the
+    original's second copy was not full for INT 27h where the port's
+    was. A watcher that runs the second copy itself, as its parent,
+    would be on no list. The second rests on reading.
   - The texts that the part writes by itself, "Can't find the file",
     "There is not enough memory to run this command" and the others,
     go to page 0 of the screen. The assembly handed the BIOS for a
@@ -1306,6 +1319,24 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
     of assembly (`CLI`, SS, SP, `STI`) and a jump as behind INT 2Eh,
     and the check sum and `harness/driver.py`, which knows what the
     stack holds when loaded, would follow the new layout.
+- Where the size of the port becomes other behaviour, for the user to
+  weigh. A second copy of the port that runs a program which stays in
+  the memory may have no room to load itself again afterwards, and
+  ends with "Program too big to fit in memory", where the original
+  goes on. It follows from how large the port is in the memory and in
+  its file, and from nothing else: the translation does there what the
+  original does. A program that stays lies behind the COMMAND.COM that
+  ran it, a gap of 71K when that has ended. The part that is loaded
+  again is 111K in the port and 51K in the original: the original's
+  fits the gap, the port's goes behind the program that stays. And it
+  is loaded from the program's file, which wants its own length behind
+  that once more, 130K in the port and 64K in the original. With
+  another program staying in front of the copy, behind a gap of its
+  own, the watcher of `passed-on`, that is more than the bench has
+  left; without one in front the port has room, which was tried. The
+  scenario switches Memory allocation off in the copy, which keeps all
+  of it loaded. The port may use more memory than the original as long
+  as it behaves the same: this is a place where it does not.
 - How the data that the assembly still lays out could go to C, from
   having built the layout of the part that stays:
   - The data of the part that stays, `RDATA` and what `RHEAD` has, is
@@ -1328,6 +1359,15 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   - The block of numbers at 100h is then the first initialised member
     of that structure, and `tools/mkexe.c` finds it by its name in the
     linker's map, as it could find the end of the stack.
+  - `Vect21`, where INT 21h went before the program took it, is read
+    through CS by the entry of that interrupt, `New21` of
+    `port/resident.c`, which passes a call on before it has saved a
+    register: a word of the code's own segment is all that can be
+    reached there with no register and no stack. Today the code and
+    the data of the part that stays are one segment. If the code gets
+    a segment of its own, that word has to go with it, a word of
+    `RTEXT` that the start-up writes through a far pointer, as it
+    writes it now.
   - The main data is no storage of the program's but a block that DOS
     gives it: `md` needs no label, only a type at offset 0 of DS,
     `(*(struct MainDat __near *)0)`.

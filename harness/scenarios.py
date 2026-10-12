@@ -942,6 +942,22 @@ out again (show.py --changes is how):
     which wants 84; start-memory leaves 75. The port, which is larger,
     does not get as far as that and says the same, "Program too big to
     fit in memory". The copy ends and releases k.com.
+  - What a copy of the program hands on to DOS is seen by a program
+    that has taken INT 21h and stays, with a second copy started after
+    it: every call of DOS that the copy makes, and what it runs, comes
+    to that program by the copy, with the flags and the stack as the
+    copy leaves them. w.com of passed-on notes them and q.com asks it.
+    The machine is a 486, so such a program may shift by a number, ROL
+    BX,4; INT 29h writes the character in AL without a call of DOS.
+    Whatever stays from a second copy is on the first copy's list too,
+    which is full sooner if something stayed before the copy started.
+  - A program that stays lies behind the COMMAND.COM that ran it, and
+    that leaves a gap of 71K when it ends. With one program staying in
+    front of a second copy and one run from it, the port has no room to
+    load itself again after the command, 111K and the file of 130K
+    that they are loaded from, and says "Program too big to fit in
+    memory", where the original, of 51K and 64K, has. "F9 o m" in the
+    copy, Memory allocation off, keeps all of it loaded: passed-on.
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
 is off, started in C:\\WORK. A scenario that wants something else arranges
@@ -2673,6 +2689,133 @@ SCENARIOS = {
             "Esc",
             "F10",
             "Enter",                      # eighteen programs released
+        )),
+
+    "passed-on": Scenario(
+        "What the program takes of a call of DOS and what it hands on, "
+        "seen by a program that stays in the memory between two copies "
+        "of it, made in the editor, in hex: the flags that each call "
+        "comes on with from the second copy, and whether the stack of "
+        "whoever called has been written to below what the interrupt "
+        "pushed",
+        steps=(
+            "F9 o Enter",                 # Auto save setup, and two panels
+            "Tab Tab Tab Tab Down Space",  # of files: a second copy starts
+            "Enter",                      # so, without an Info that counts
+            "Ctrl+l",                     # the memory from where it is
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            # The watcher, w.com. It takes INT 21h and INT 27h and stays,
+            # with a table of 256 words behind it, cleared. Of every
+            # INT 21h it notes the word below the stack as the interrupt
+            # left it, before it pushes anything itself, and the flags it
+            # comes with, in the table by AH; of INT 27h the flags, for
+            # 27h. Then on to whoever had the interrupt, with everything
+            # as it came. AH E0h is a question and goes no further: AX is
+            # what was noted for the call in AL, BX the word below the
+            # last call.
+            "Shift+F4",
+            '"w.com"',
+            "Enter",
+            "Enter",                      # a new file
+            "F4",                         # in hex
+            '"bf9301b9000133c0f3ab"',     # the table, 193h, cleared
+            '"b82135cd21891e87018c068901"',   # where INT 21h goes, kept
+            '"b82735cd21891e8b018c068d01"',   # and INT 27h
+            '"ba4401b82125cd21"',         # INT 21h to 144h here
+            '"ba3901b82725cd21"',         # INT 27h to 139h
+            '"ba9303cd27"',               # and stay, table and all
+            '"9c2e8f06e1012eff2e8b01"',   # 139h: PUSHF, POP into the table,
+                                          # and a far jump
+            '"2e891e8f018bdc368b5ffe"',   # 144h: BX kept, and SS:[SP-2]
+            '"9c80fce07420"',             # PUSHF; AH E0h is the question
+            '"2e891e91018adcb700d1e3"',   # the word noted; BX twice AH
+            '"2e8f8793012effb793019d"',   # the flags into the table, and
+            '"2e8b1e8f012eff2e8701"',     # as they came; BX; a far jump
+            '"9d8ad8b700d1e3"',           # the answer: by AL
+            '"2e8b8793012e8b1e9101cf"',   # AX, BX, IRET
+            "F2",
+            "Esc",
+            # The questions, q.com. It prints the flags noted for the
+            # call that ran it, AH 4Bh, for a program that stayed, 31h,
+            # and for one that stayed the old way; then it makes four
+            # calls, each with interrupts off, 5A5Ah in the word below
+            # what the interrupt will push and the carry flag set, and
+            # prints the flags noted for each, and for the first three
+            # the word below the stack as well: for the version of DOS,
+            # AH 30h, for a date that is none, AH 2Bh with the year 0, for
+            # another, with 'VC' in CX and 0 in DX, which is half of the
+            # program's own call, and for a block of memory that is none
+            # given back, AH 49h with ES 0.
+            "Shift+F4",
+            '"q.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"33c08ec0"',                 # ES 0
+            '"b04be84100"',               # AL 4Bh, and print what is noted
+            '"b031e83c00"',               # 31h
+            '"b027e83700"',               # 27h
+            '"b430e82000e83a00"',         # AH 30h: call, flags, the word
+            '"b42b33c9e81600e83000"',     # 2Bh, CX 0
+            '"b42bb9435633d2e80900e82300"',   # 2Bh, CX 'VC', DX 0
+            '"b449e80100c3"',             # 49h: the flags only
+            '"fa8becc746f85a5a"',         # the call: CLI, 5A5Ah to [SP-8]
+            '"8bf8f9cd21fb"',             # AX kept in DI, STC, INT 21h, STI
+            '"8bc78ac4"',                 # which call it was, to AL
+            '"b4e0cd215393e802005bc3"',   # the question; AX printed, BX
+                                          # handed back
+            '"b90400c1c304"',             # four digits of BX, from the top
+            '"8ac3240f3c0a1c692f"',
+            '"cd29e2f0b020cd29c3"',       # by INT 29h, and a space
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"t.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"ba1001cd27"',               # stays by INT 27h, 110h bytes
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"u.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"b80031ba1100cd21"',         # stays by DOS's call 31h, with
+            "F2",                         # 11h paragraphs
+            "Esc",
+            '"w" Enter',                  # the watcher stays
+            '"d:\\vc\\vc" Enter',         # and a second copy starts: its
+                                          # calls of DOS, and those of what
+                                          # it runs, come to the watcher by
+                                          # the copy
+            '"q" Enter',
+            "Ctrl+o",                     # a program run; none has stayed,
+            "Ctrl+o",                     # 27h is the watcher's own; three
+                                          # calls passed on, the stack as it
+                                          # was; a block given back with the
+                                          # list empty
+            "F9 o m",                     # Memory allocation off: with two
+                                          # programs staying behind the
+                                          # shells that ran them, the port,
+                                          # which is larger, has no room to
+                                          # load itself again after a
+                                          # command
+            '"t" Enter',                  # stays, by the copy's INT 27h
+            '"u" Enter',                  # and by its INT 21h
+            '"q" Enter',
+            "Ctrl+o",                     # both noted, and a block given
+            "Ctrl+o",                     # back with two in the list
+            "F10",
+            "Enter",                      # the second copy left
+            '"q" Enter',                  # no copy before the watcher now:
+            "Ctrl+o",                     # the calls come as they are made,
+            "Ctrl+o",                     # with the flags of who calls
+            "F10",
+            "Enter",                      # the watcher released
         )),
 
     "tree-deep": Scenario(

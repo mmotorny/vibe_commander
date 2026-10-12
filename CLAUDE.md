@@ -856,6 +856,27 @@ What was met on the way:
   with its instructions in `_asm { }`. A jump there to an `__interrupt`
   function is a far one, with a relocation, whatever is written: such a
   function is far, and `near ptr` is "Operator is expected".
+- A statement of C in a `__declspec(naked)` function is compiled to
+  nothing, without a warning: such a function is its `_asm` and no more.
+  `_asm` takes labels and jumps to them, and `jmp dword ptr cs:Vect21`
+  is a far jump through a word of the part that stays, whose data is of
+  the segment that its code is in.
+- Nothing that the compiler makes passes an interrupt on with the stack
+  as it found it and no register changed. An ordinary function with the
+  call in AX, `modify exact []`, and the handler before called through a
+  pointer to a function type that is `aborts`, makes a frame, changes AL
+  to compare, reads the pointer through DS or an ES that it loads, and
+  jumps, `jmp dword ptr`, with BP still pushed. So INT 21h is told apart
+  in assembly, in `New21`: the calls that the program does not deal
+  with go on from there, before anything is pushed, with the flags of
+  the original's comparisons. Only the others reach the interrupt
+  function.
+- An interrupt function that goes on in another handler enters it with
+  the flags of `on`, and those are made what the assembly had there:
+  `Left` of `port/resident.c`, with `Added`, `Taken` and `Doubled` for
+  what `ADD`, `SUB` or `CMP`, and `SHL` leave of two numbers. A routine
+  of that file that the assembly left with flags that go on to DOS
+  returns them: `AddProg`.
 - The `port` test knows code that ran by its bytes in the file, and a
   stretch with a relocated word in it does not count as run, but for a
   far call or jump: an `__interrupt` function begins with one. List in

@@ -290,14 +290,22 @@ has to go on in the handler that had the interrupt before, with the
 stack as the interrupt left it, and C cannot change how deep the stack is
 that it returns on: so it writes that handler's address into the room,
 and returns there. The same four stand where DOS goes on when it has
-ended the program by itself. And nine instructions are the interrupt by
-which the COMMAND.COM in the memory runs a command, INT 2Eh: it comes
-back with no stack and no data segment, so both are set there, from the
-code segment, before any compiled instruction runs, and the program goes
-on in a function of its own on an empty stack. `port/main.c` has one
-instruction: where DOS calls the program for a critical error, DS is
-loaded with the segment of the main data, which is known only when the
-program runs.
+ended the program by itself. In front of the four of INT 21h stand
+thirteen more: every call of DOS that any program makes comes there
+while the program is in the memory, and those that it does not deal
+with, nearly all, are told from the others and passed on before
+anything is pushed, by six comparisons, their jumps, and a far jump to
+the handler before. So the program takes nothing of the stack of whoever
+calls DOS, which may be short, and DOS is entered with the flags of
+those comparisons, as in the original; compiled code saves registers
+before it compares and promises nothing of the flags. And nine
+instructions are the interrupt by which the COMMAND.COM in the memory
+runs a command, INT 2Eh: it comes back with no stack and no data
+segment, so both are set there, from the code segment, before any
+compiled instruction runs, and the program goes on in a function of its
+own on an empty stack. `port/main.c` has one instruction: where DOS
+calls the program for a critical error, DS is loaded with the segment
+of the main data, which is known only when the program runs.
 
 The halves are linked into one program, `VC.EXE`, which is not built the
 way a C program usually is. It still loads and starts like the `.COM` file
@@ -353,7 +361,7 @@ stack than the assembly it replaces, and a stack used beyond its bottom
 would overwrite data without a trace on the screen, so the port has 4,096
 bytes, of which the scenarios use some 200. The stack is the end of the
 part of the program that stays in memory while a command runs: that part
-is 19,168 bytes where it was 12,704, and a command has 6,464 bytes less
+is 19,472 bytes where it was 12,704, and a command has 6,768 bytes less
 than the original leaves it: 3,840 for the stack, and the rest because
 compiled code is longer than the assembly it replaces, and because the
 code that starts the program stays.
