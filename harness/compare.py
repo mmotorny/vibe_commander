@@ -50,7 +50,7 @@ def compare(names, program, signals, trace=False, together=None):
 
     failed = False
     runs = []
-    with setups.Benches() as benches, \
+    with setups.Benches(alone=not signals) as benches, \
             ThreadPoolExecutor(together or TOGETHER) as pool:
         # In the order of `names`, as each is done.
         for name, (run, took) in zip(names, pool.map(one, names)):

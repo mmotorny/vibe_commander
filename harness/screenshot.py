@@ -18,11 +18,12 @@ from pathlib import Path
 
 import deps
 import setups
+import turn
 
 
 def capture(out, scale):
     out.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as workdir:
+    with turn.taken(alone=True), tempfile.TemporaryDirectory() as workdir:
         with setups.fresh_install(Path(workdir)) as machine:
             machine.wait_for_boot()
             screen = machine.wait_for_screen()

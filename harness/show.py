@@ -122,7 +122,7 @@ def main():
     program = setups.Program.load(args.program) if args.program \
         else setups.original_vc()
     scenario = scenarios.Scenario("", tuple(args.step), args.country)
-    with setups.Benches() as benches:
+    with setups.Benches(alone=not args.signals) as benches:
         run = scenarios.run(scenario, program, benches[args.country],
                             args.signals)
     print_screens(scenario.steps, run.screens, setups.codepage(args.country),

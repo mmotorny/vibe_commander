@@ -308,6 +308,16 @@ slow, and needed only when a scenario is new or has changed.
 Nothing waits without a limit. A program that hangs or resets its machine
 fails its scenario within seconds, with the screen it got stuck on.
 
+A screen that stands still says that the program has finished only on a
+computer that is not busy. The project may be worked on in several
+checkouts on one computer at once, so a run takes a turn before it starts
+its machines (`harness/turn.py`): a run that waits for still screens, as
+every run of the original does, has its turn alone, and runs of the build
+that signals have theirs together, when no such run has one. A run that
+has to wait says so, and every turn leaves a line in
+`/tmp/vibe-commander/turn.log`: the tool, its checkout, how long it
+waited and how long it had the turn.
+
 ### What ran
 
 Which code ran is taken from QEMU's log of the code it translates, which

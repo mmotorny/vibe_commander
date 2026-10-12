@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import deps
+import turn
 from dos import FatImage, Machine, boot_floppy, timestamp
 
 # The PC's clock at power-on, and the date given to directories and to the
@@ -279,16 +280,30 @@ def _work_disk(path, workdir):
 class Benches:
     """A bench for each country that is asked for, booted when first used:
     benches[country]. To be used in a `with` statement, which removes them.
+
+    The statement also waits for a turn at the computer, which other
+    checkouts may be running their machines on, and has it until it ends
+    (see turn.py). `alone` says which kind: whether the machines are timed
+    by a still screen, as those of the original are, and so must have the
+    computer to themselves, or run a build that signals.
     """
 
+    def __init__(self, alone):
+        self._alone = alone
+
     def __enter__(self):
+        self._turn = turn.taken(self._alone)
+        self._turn.__enter__()
         self._directory = tempfile.TemporaryDirectory()
         self._benches = {}
         self._lock = threading.Lock()
         return self
 
     def __exit__(self, *exc):
-        self._directory.cleanup()
+        try:
+            self._directory.cleanup()
+        finally:
+            self._turn.__exit__(*exc)
 
     def __getitem__(self, country):
         with self._lock:                # scenarios may run side by side

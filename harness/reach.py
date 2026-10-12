@@ -86,7 +86,7 @@ def main():
     tried = None
     if args.steps:
         scenario = scenarios.Scenario("", tuple(args.steps), args.country)
-        with setups.Benches() as benches:
+        with setups.Benches(alone=True) as benches:
             run = scenarios.run(scenario, setups.original_vc(),
                                 benches[args.country], signals=False,
                                 trace=True)

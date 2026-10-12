@@ -288,7 +288,7 @@ def main():
     parser.add_argument("scenario", nargs="*",
                         help=", ".join(scenarios.SCENARIOS))
     args = parser.parse_args()
-    with setups.Benches() as benches:
+    with setups.Benches(alone=True) as benches:
         for name in args.scenario or scenarios.SCENARIOS:
             derive(name, benches)
 
