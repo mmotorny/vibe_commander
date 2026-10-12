@@ -284,6 +284,22 @@ out again (show.py --changes is how):
     asks for the file too, or copies the one under the cursor whatever
     is selected. Alt by itself in an open menu closes the menu and
     leaves the bar.
+  - In the user menu, the history and the map of the memory a click on
+    a line takes the cursor there, a click outside the box leaves, and
+    the right button outside the box does nothing; in the box of the
+    drives a click on a letter is that drive, and the right button
+    anywhere is Enter. A click on F1 or F10 of the key bar in the user
+    menu is the help or leaves, also where the menu has a line for the
+    key.
+  - A click on the line that the click before was on is the second
+    click of two, in the same step or in the next: the machine's clock
+    goes by what the machine executes, and that is little between two
+    clicks. The program allows 0.4 seconds, or up to 1.4, by the
+    hundredths of the time of day at the first click. To have a click
+    come late, take the pointer across the screen and back 64 times
+    first: _A_WHILE below. And the time of day itself is not the same
+    from run to run to the hundredth, so nothing may depend on which
+    side of a second a click is.
   - The pointer in the top right corner of the screen blanks it, and
     the stars that are shown then are not the same in the original and
     in the port: take it there and away in one step, "Move@79,0
@@ -907,6 +923,12 @@ _CLOCK_EARLY_STEPS = (
     '"time" Space "9:59"',
     "Enter",
 )
+
+# The pointer of the mouse taken across the screen and back 64 times: three
+# seconds or more of the machine's time, which is counted in what the
+# machine executes. A click on the line that the click before was on comes
+# too late then to be the second click of two.
+_A_WHILE = " ".join(["Move@79,24"] * 64)
 
 SCENARIOS = {
     "start": Scenario(
@@ -3928,6 +3950,67 @@ SCENARIOS = {
             "F9 f Down Down Down Down",
             "Shift+Enter",                # with Shift held
             "Esc",
+        )),
+
+    "mouse-user-menu": Scenario(
+        "The mouse in the user menu: a click on a line, a second one "
+        "that comes late and one that comes in time, the right button, "
+        "and clicks beside the lines and outside the box",
+        steps=(
+            "F2",
+            "Click@35,8",                 # a line: the cursor goes there
+            _A_WHILE,
+            "Click@35,8",                 # again, late: nothing more
+            "Click@40,6",                 # the frame of the box: nothing
+            "RightClick@35,3",            # the right button outside it:
+                                          # nothing either
+            "RightClick@35,9",            # and on a line: the cursor
+            "Click@1,24",                 # F1 of the key bar is the help,
+                                          # where the key is the first line
+            "Esc",
+            "Click@35,7 Click@35,7",      # twice on a line: its command,
+                                          # another menu
+            "Click@35,11",                # the last line there
+            "Click@35,11",                # and once more, at once: its
+                                          # command, the main menu
+            "Click@35,3",                 # outside the box: it is gone
+            "F2",
+            "Click@75,24",                # F10 of the key bar leaves, where
+                                          # the key would be a line's
+        )),
+
+    "mouse-history": Scenario(
+        "The mouse in the history of commands",
+        steps=(
+            '"ver" Enter',
+            '"echo" Space "one" Enter',
+            '"echo" Space "two" Enter',
+            "Alt+F8",
+            "Click@35,10",                # a line: the cursor goes there
+            "Click@35,9",                 # the frame: nothing
+            "RightClick@35,11",           # the right button on a line
+            "RightClick@35,3",            # and outside the box: nothing
+            "Click@35,12 Click@35,12",    # twice on a line: it is run
+            "Ctrl+o",                     # as this shows
+            "Ctrl+o",
+            "Alt+F8",
+            "Click@35,3",                 # outside the box: it is gone
+        )),
+
+    "mouse-drive": Scenario(
+        "The mouse in the box that asks for the drive of a panel",
+        steps=(
+            "Alt+F1",
+            "Click@12,7",                 # in the box, on no letter
+            "Click@18,8",                 # the letter of the cursor: it
+                                          # is chosen
+            "Alt+F1",
+            "Click@14,8",                 # another letter: A
+            "Alt+F1 Right",               # the cursor on C
+            "RightClick@30,15",           # the right button is Enter,
+                                          # wherever it is
+            "Alt+F1",
+            "Click@30,15",                # outside the box: Esc
         )),
 
 }

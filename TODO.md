@@ -591,8 +591,10 @@ Things that are known and not done. Standing instructions are in
   - `dialog.c`, 2: `mouse-fields`, `mouse-line` and `mouse-filter` have
     the fields of a dialog. Left are the middle button, and a button
     moved off the button of a dialog that it went down on.
-  - `usermenu.c`, `cmdline.c` and `drive.c`, 114: the rest of the user
-    menu with `F32_70`, the box of the drives, the history.
+  - `usermenu.c`, `cmdline.c` and `drive.c`, 2: `mouse-user-menu`,
+    `mouse-history` and `mouse-drive` have the user menu, the history
+    and the box of the drives. Left is the middle button in the two
+    lists, which gives the pointer another look.
   - `memory.c`, 136: `F65_00`, the map of the memory, either button on
     its lines and buttons, held above or below, the middle button, a
     second click.
@@ -749,13 +751,16 @@ Things that are known and not done. Standing instructions are in
   The 32 levels that a path of DOS can have fit the port's stack; they
   did not fit the original's 256 bytes.
 
-- What the user menu, the history and the box of the drives do for the
-  mouse has run in no scenario, 164 instructions: all of `F32_70`, which
-  the menu and the history share, and the box's own, a button held on a
-  letter and let go on it or elsewhere. They are translated by reading
-  and listed as out of reach in `harness/ported.py`, with a box of the
-  drives too wide for its title, 15 letters or more, a drive that is not
-  ready, and a list file that DOS will not give attributes to or write.
+- Of the user menu, the history and the box of the drives, these have
+  run in no scenario and are listed as out of reach in
+  `harness/ported.py`: the middle button of the mouse in the two lists,
+  two instructions of `F32_70`; a box of the drives too wide for its
+  title, 15 letters or more; a drive that is not ready; and a list file
+  that DOS will not give attributes to or write. The rest of what they
+  do for the mouse runs in `mouse-user-menu`, `mouse-history` and
+  `mouse-drive`. A click on F1 or F10 of the key bar is the help or
+  leaves the user menu, where the key itself is a line's if the menu
+  has one for it: `Input0` says which of the two a key was.
 - What the original does and the port does after it, found while the
   user menu was translated; whether to mend any of it is not decided:
   - A line of a menu that has no command, at the end of the file, is
@@ -824,8 +829,15 @@ Things that are known and not done. Standing instructions are in
   clock was changed over. It matters when `DoublMo` is translated and
   its instructions have to have run. The double click of `mouse-list`
   itself, two steps within those 0.4 seconds, came out the same in
-  every derivation and in the port; how much room it has was not
-  measured.
+  every derivation and in the port. It has room: the machine's clock is
+  counted in what the machine executes, and little of that is between
+  two clicks, in one step or in two. With the pointer taken across the
+  screen and back between them, the second click was still in time
+  after 4 times, and after 6 and 11 in one run each, and late after 8
+  and after 16: the time it has is 0.4 seconds or up to 1.4, by the
+  hundredths of the first click (see `DoublMo` below). `mouse-user-menu`
+  has one that is late, after 64 times, `_A_WHILE` of
+  `harness/scenarios.py`, which is three seconds at the least.
 - The main loop hands the next command the registers as the assembly
   left them, BX, CX, DX, SI, DI and BP, but for two things. What
   `DoublMo` leaves in AX and CX after a click on an entry is not handed

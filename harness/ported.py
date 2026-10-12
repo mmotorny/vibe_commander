@@ -680,37 +680,19 @@ BATCHES = [
                    "F77_00_c"),
         unreached={
             **dict.fromkeys(
-                            (0x214C, 0x214E, 0x216A, 0x2190, 0x2192, 0x2193, 0x2195,
-                             0x2197, 0x2199, 0x219A, 0x219C, 0x219D, 0x219E, 0x219F,
-                             0x21A3, 0x21A5, 0x21A8, 0x21AA, 0x21AD, 0x21AE, 0x21AF,
-                             0x21B0, 0x21B1, 0x21B3, 0x21B5, 0x21B6, 0x21B8, 0x21BA,
-                             0x21BD, 0x21BF),
-                "The user menu, for the mouse, with all of F32_70: the "
-                "bench has none"),
+                (0x214C, 0x214E),
+                "F32_70, for the middle button of the mouse in the user "
+                "menu or the history, which gives the pointer another "
+                "look: a step of the mouse presses the left button or "
+                "the right one"),
             0x2201: "The box of the drives, for a DOS that cannot say "
                     "which letter a floppy drive goes by",
             0x2245: "The box of the drives, for more drives than fit a "
                     "box as wide as its title: the bench has three",
             **dict.fromkeys(
-                (0x2351, 0x2353, 0x2356, 0x2358, 0x235A, 0x235D, 0x235F,
-                 0x2361, 0x2364, 0x2366, 0x2367, 0x2368, 0x236A, 0x236D,
-                 0x236F, 0x2371, 0x2373, 0x2375, 0x2377, 0x2379, 0x237C,
-                 0x237E, 0x2380, 0x2381, 0x2382, 0x2385, 0x2387, 0x2389,
-                 0x238A, 0x238B, 0x238D, 0x238F, 0x2390, 0x2391, 0x2392,
-                 0x2394, 0x2395, 0x2396, 0x2398, 0x239A, 0x239D, 0x239F,
-                 0x23A2, 0x23A4, 0x23A6, 0x23A7, 0x23A8, 0x23AA, 0x23B1,
-                 0x23B3, 0x23B5, 0x23B7, 0x23B9, 0x23BB, 0x23BD, 0x23BF,
-                 0x23C2, 0x23C5, 0x23C7, 0x23C9, 0x23CC, 0x23CE, 0x23CF,
-                 0x23D0, 0x23D2, 0x23D4, 0x23D6, 0x23D8, 0x23DA, 0x23DC,
-                 0x23DD, 0x23DE, 0x23E2, 0x23E5, 0x23E8, 0x23E9, 0x23EA),
-                "The box of the drives, for the mouse"),
-            **dict.fromkeys(
                 (0x2475, 0x2477, 0x247A),
                 "The box of the drives, for a drive that is not ready: "
                 "the bench has none"),
-            **dict.fromkeys(
-                (0x25D4, 0x25D7, 0x25DA, 0x25DC, 0x25DE, 0x25E0, 0x2618),
-                "The history, for the mouse"),
             0x2714: "F75_00, for the key that follows the cursor of the "
                     "tree arriving when the panel is no tree: Input "
                     "makes that key only for a tree",
