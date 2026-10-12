@@ -407,7 +407,9 @@ u16 __far *MovDz0(u16 __far *screen, const u8 __far *text);
 #pragma aux BasAdr  "*_c" __far parm [bx] value [di] modify exact [di]
 #pragma aux MvsColr "*_c" __far parm [es di] [cx] [ax] value [es di] modify exact [di es]
 #pragma aux MovDz0  "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
-u16 TstHex(u16 digit);                  /* digits.c */
+u16 __far *HexByt(u16 __far *screen, u16 byte);         /* digits.c */
+u16 TstHex(u16 digit);
+#pragma aux HexByt "*_c" __far parm [es di] [ax] value [es di] modify exact [di es]
 #pragma aux TstHex "*_c" __far parm [ax] value [ax] modify exact [ax]
 void Convert(const u8 __far *name, u8 *buffer);         /* mask.c */
 u16 TstMas(const u8 __far *name, const u8 *mask);
@@ -421,12 +423,14 @@ u8 __far *AddFile(u8 __far *end);                       /* string.c */
 u8 __far *MvzLine(u8 __far *to, const u8 __far *from, u16 length);
 u16 LowCase(u16 letter);
 const u8 __far *CutPath(const u8 __far *path);
+void PathLin(u8 __far *text);
 void LetLin(u8 __far *text);
 void ShrtLin(u8 __far *text, u16 limit);
 #pragma aux AddFile "*_c" __far parm [es di] value [es di] modify exact [di es]
 #pragma aux MvzLine "*_c" __far parm [es di] [dx si] [cx] value [es di] modify exact [di es]
 #pragma aux LowCase "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux CutPath "*_c" __far parm [es si] value [es si] modify exact [si es]
+#pragma aux PathLin "*_c" __far parm [es si] modify exact [ax]
 #pragma aux LetLin  "*_c" __far parm [es si] modify exact [ax]
 #pragma aux ShrtLin "*_c" __far parm [es si] [ax] modify exact [ax]
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */

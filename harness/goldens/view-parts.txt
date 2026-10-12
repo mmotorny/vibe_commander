@@ -1,0 +1,621 @@
+Volkov Commander 4.05 in the scenario view-parts: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 1: Shift+F3
+cursor 8 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 2: "a:\freedos\bin\command.com"
+cursor 34 8 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║re                                                                            ║| 1Bx3 70x74 1Bx3
+|║he   ╔══════════════════════════════ View ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
+|║no   ║ View the file:                                                   ║     ║| 1Bx3 70x74 03x2 1Bx1
+|║da   ║ a:\freedos\bin\command.com                                       ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
+|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 3: Enter
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ     | 1Bx80
+|␀␀#◙␀␀3↕␀␀O↕␀␀a↕␀␀|↕␀␀M↓␀␀▓↓␀␀Ω→␀␀⍽→␀␀╪←␀␀ü∟␀␀û∟␀␀▓∟␀␀┐∟␀␀╪∟␀␀Σ∟␀␀≡∟␀␀&▲␀␀♠▼␀␀─▼| 1Bx80
+|␀␀▀▼␀␀φ▼␀␀/ ␀␀B ␀␀↔0␀␀║0␀␀╬0␀␀▄0␀␀∩_␀␀Gr␀␀ou␀␀üu␀␀Åu␀␀òu␀␀\v␀␀ov␀␀}v␀␀◄ë␀␀¥ë␀␀éè| 1Bx80
+|␀␀eï␀␀␀␀␀␀␀␀␀␀␀␀␀␀╠δ²ÉÉÉÉ␀␀␀␀␀␀␀␀␀␀␀.⍽♠►␀°╩☻␀␀␀␀␀␀␀␀␀î╚Ä╪Ä╨╝☼•■♫;•u(í▼␀Ä└ë├┤P═!í| 1Bx80
+|←␀&ú◙␀í↔␀&ú♀␀í!␀&ú▬␀Φö•╕⍽L═!║d␀┤        ═!⌠δ²                                   | 1Bx80
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻êα| 1Bx80
+|$♥♦♦óh☻êα$♦óù☻êα$◘óò☻ÇΣ►ê&ö☻ë°♦☼ói☻│☻X╨Σs1Ä▌÷D♣Çt)╣◘␀â╞◙┐o☻┤ ⁿ¼8αs☻êα¬Γ÷╣◘␀êα²O≤| 1Bx80
+|«&êm☻î╔│♥░⍽ⁿÄ┘S╗x☻┐o☻⍽•t☼<→s♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë>Ω☺┤b═!Ä├&─▲4␀&èG☻ê─&ç•ú╪☺ë▲c☻î♠e☻[Ä┴| 1Bx80
+|Φé␀Φ╦␀│◙Φz␀│␀Φa␀│☺Φ\␀│♥ΦW␀│♀Φf␀δ◙[│♥δ3░•Φ¡␀ï>║☻1└è♣Gë┴ë├╕•♀═!≥«uσèY⍽èçö☻◘└t┌Φé␀─| 1Bx80
+|>c☻╕4↕&ë♣Xê╪<☻t◘<♥t♦■♫4↕[Y_^]▼•Z╧╖␀◙┐ö☻tWÇ├5ê▲¢☻╗ÿ☻δEá¥☻8├r☻ê├╖␀☺█ïƒ₧☻δ2S╗o☻Φ+␀δ| 1Bx80
+|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx80
+|◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻␀♥▼♥6♥:♥>♥C♥H♥Q♥Y♥a♥h♥k♥n♥⌂| 1Bx80
+|♥ñ♥╝♥╠♥∞♥☺♦,♦7♦J♦[♦p♦|♦ç♦ù♦⌐♦╕♦╠♦▄♦⌠♦•♣¶♣,♣reading from␀writing to␀Error %1 driv| 1Bx80
+|e %A: %2 area: %3␀Error %1 device %A: %3␀DOS␀FAT␀root␀data␀(I)gnore␀(R)etry␀(A)b| 1Bx80
+|ort␀(F)ail␀? ␀, ␀◘iIrRaAfF␀␀☺☺☻☻♥♥write-protection violation attempted␀unknown u| 1Bx80
+|nit for driver␀drive not ready␀unknown command given to driver␀data error (bad C| 1Bx80
+|RC)␀bad device driver request structure length␀seek error␀unknown media type␀sec| 1Bx80
+|tor not found␀printer out of paper␀write fault␀read fault␀general failure␀sharin| 1Bx80
+|g violation␀lock violation␀invalid disk change␀FCB unavailable␀sharing buffer ov| 1Bx80
+|erflow␀code page mismatch␀out of input␀insufficient disk space␀Unknown error cod| 1Bx80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 4: Down
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|␀␀#◙␀␀3↕␀␀O↕␀␀a↕␀␀|↕␀␀M↓␀␀▓↓␀␀Ω→␀␀⍽→␀␀╪←␀␀ü∟␀␀û∟␀␀▓∟␀␀┐∟␀␀╪∟␀␀Σ∟␀␀≡∟␀␀&▲␀␀♠▼␀␀─▼| 1Bx80
+|␀␀▀▼␀␀φ▼␀␀/ ␀␀B ␀␀↔0␀␀║0␀␀╬0␀␀▄0␀␀∩_␀␀Gr␀␀ou␀␀üu␀␀Åu␀␀òu␀␀\v␀␀ov␀␀}v␀␀◄ë␀␀¥ë␀␀éè| 1Bx80
+|␀␀eï␀␀␀␀␀␀␀␀␀␀␀␀␀␀╠δ²ÉÉÉÉ␀␀␀␀␀␀␀␀␀␀␀.⍽♠►␀°╩☻␀␀␀␀␀␀␀␀␀î╚Ä╪Ä╨╝☼•■♫;•u(í▼␀Ä└ë├┤P═!í| 1Bx80
+|←␀&ú◙␀í↔␀&ú♀␀í!␀&ú▬␀Φö•╕⍽L═!║d␀┤        ═!⌠δ²                                   | 1Bx80
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻êα| 1Bx80
+|$♥♦♦óh☻êα$♦óù☻êα$◘óò☻ÇΣ►ê&ö☻ë°♦☼ói☻│☻X╨Σs1Ä▌÷D♣Çt)╣◘␀â╞◙┐o☻┤ ⁿ¼8αs☻êα¬Γ÷╣◘␀êα²O≤| 1Bx80
+|«&êm☻î╔│♥░⍽ⁿÄ┘S╗x☻┐o☻⍽•t☼<→s♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë>Ω☺┤b═!Ä├&─▲4␀&èG☻ê─&ç•ú╪☺ë▲c☻î♠e☻[Ä┴| 1Bx80
+|Φé␀Φ╦␀│◙Φz␀│␀Φa␀│☺Φ\␀│♥ΦW␀│♀Φf␀δ◙[│♥δ3░•Φ¡␀ï>║☻1└è♣Gë┴ë├╕•♀═!≥«uσèY⍽èçö☻◘└t┌Φé␀─| 1Bx80
+|>c☻╕4↕&ë♣Xê╪<☻t◘<♥t♦■♫4↕[Y_^]▼•Z╧╖␀◙┐ö☻tWÇ├5ê▲¢☻╗ÿ☻δEá¥☻8├r☻ê├╖␀☺█ïƒ₧☻δ2S╗o☻Φ+␀δ| 1Bx80
+|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx80
+|◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻␀♥▼♥6♥:♥>♥C♥H♥Q♥Y♥a♥h♥k♥n♥⌂| 1Bx80
+|♥ñ♥╝♥╠♥∞♥☺♦,♦7♦J♦[♦p♦|♦ç♦ù♦⌐♦╕♦╠♦▄♦⌠♦•♣¶♣,♣reading from␀writing to␀Error %1 driv| 1Bx80
+|e %A: %2 area: %3␀Error %1 device %A: %3␀DOS␀FAT␀root␀data␀(I)gnore␀(R)etry␀(A)b| 1Bx80
+|ort␀(F)ail␀? ␀, ␀◘iIrRaAfF␀␀☺☺☻☻♥♥write-protection violation attempted␀unknown u| 1Bx80
+|nit for driver␀drive not ready␀unknown command given to driver␀data error (bad C| 1Bx80
+|RC)␀bad device driver request structure length␀seek error␀unknown media type␀sec| 1Bx80
+|tor not found␀printer out of paper␀write fault␀read fault␀general failure␀sharin| 1Bx80
+|g violation␀lock violation␀invalid disk change␀FCB unavailable␀sharing buffer ov| 1Bx80
+|erflow␀code page mismatch␀out of input␀insufficient disk space␀Unknown error cod| 1Bx80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 5: Up
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ     | 1Bx80
+|␀␀#◙␀␀3↕␀␀O↕␀␀a↕␀␀|↕␀␀M↓␀␀▓↓␀␀Ω→␀␀⍽→␀␀╪←␀␀ü∟␀␀û∟␀␀▓∟␀␀┐∟␀␀╪∟␀␀Σ∟␀␀≡∟␀␀&▲␀␀♠▼␀␀─▼| 1Bx80
+|␀␀▀▼␀␀φ▼␀␀/ ␀␀B ␀␀↔0␀␀║0␀␀╬0␀␀▄0␀␀∩_␀␀Gr␀␀ou␀␀üu␀␀Åu␀␀òu␀␀\v␀␀ov␀␀}v␀␀◄ë␀␀¥ë␀␀éè| 1Bx80
+|␀␀eï␀␀␀␀␀␀␀␀␀␀␀␀␀␀╠δ²ÉÉÉÉ␀␀␀␀␀␀␀␀␀␀␀.⍽♠►␀°╩☻␀␀␀␀␀␀␀␀␀î╚Ä╪Ä╨╝☼•■♫;•u(í▼␀Ä└ë├┤P═!í| 1Bx80
+|←␀&ú◙␀í↔␀&ú♀␀í!␀&ú▬␀Φö•╕⍽L═!║d␀┤        ═!⌠δ²                                   | 1Bx80
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻êα| 1Bx80
+|$♥♦♦óh☻êα$♦óù☻êα$◘óò☻ÇΣ►ê&ö☻ë°♦☼ói☻│☻X╨Σs1Ä▌÷D♣Çt)╣◘␀â╞◙┐o☻┤ ⁿ¼8αs☻êα¬Γ÷╣◘␀êα²O≤| 1Bx80
+|«&êm☻î╔│♥░⍽ⁿÄ┘S╗x☻┐o☻⍽•t☼<→s♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë>Ω☺┤b═!Ä├&─▲4␀&èG☻ê─&ç•ú╪☺ë▲c☻î♠e☻[Ä┴| 1Bx80
+|Φé␀Φ╦␀│◙Φz␀│␀Φa␀│☺Φ\␀│♥ΦW␀│♀Φf␀δ◙[│♥δ3░•Φ¡␀ï>║☻1└è♣Gë┴ë├╕•♀═!≥«uσèY⍽èçö☻◘└t┌Φé␀─| 1Bx80
+|>c☻╕4↕&ë♣Xê╪<☻t◘<♥t♦■♫4↕[Y_^]▼•Z╧╖␀◙┐ö☻tWÇ├5ê▲¢☻╗ÿ☻δEá¥☻8├r☻ê├╖␀☺█ïƒ₧☻δ2S╗o☻Φ+␀δ| 1Bx80
+|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx80
+|◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻␀♥▼♥6♥:♥>♥C♥H♥Q♥Y♥a♥h♥k♥n♥⌂| 1Bx80
+|♥ñ♥╝♥╠♥∞♥☺♦,♦7♦J♦[♦p♦|♦ç♦ù♦⌐♦╕♦╠♦▄♦⌠♦•♣¶♣,♣reading from␀writing to␀Error %1 driv| 1Bx80
+|e %A: %2 area: %3␀Error %1 device %A: %3␀DOS␀FAT␀root␀data␀(I)gnore␀(R)etry␀(A)b| 1Bx80
+|ort␀(F)ail␀? ␀, ␀◘iIrRaAfF␀␀☺☺☻☻♥♥write-protection violation attempted␀unknown u| 1Bx80
+|nit for driver␀drive not ready␀unknown command given to driver␀data error (bad C| 1Bx80
+|RC)␀bad device driver request structure length␀seek error␀unknown media type␀sec| 1Bx80
+|tor not found␀printer out of paper␀write fault␀read fault␀general failure␀sharin| 1Bx80
+|g violation␀lock violation␀invalid disk change␀FCB unavailable␀sharing buffer ov| 1Bx80
+|erflow␀code page mismatch␀out of input␀insufficient disk space␀Unknown error cod| 1Bx80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 6: PgDn
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       1% | 30x80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀═!║Å♣Ä┴╗☼•╕␀K═!r☻1└ⁿî╔Ä╤╝ •Ä┘úA•┤Hï▲)•═!rd| 1Bx80
+|ë├+▲9•Sú9•┤♂╛+•⍽▲%•[â°☺uFëσ☺^☻╦XMS copy error$Memory allocation error$          | 1Bx80
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•V| 1Bx80
+|WUî▬♦►ë&♠►┤♂╛⌠☼.⍽▲%•Ä♠ⁿ☼è&"␀ï▲≥☼î┌╣␀␀Ä┘î▬=•ë&?•Ä╤╝☼•RÜC•␀␀íA•☺^♦▼╞♠"␀I☺▲ⁿ☼ï♫♦►☺┘| 1Bx80
+|Ä╤ï&♠►]_^├Ç>&␀☻u♦╕☺␀├1└├SQRVUëσìv♀1╥╕␀♂╗␀␀Ä├&⍽▲%•]^ZY[├SQRVWUëσâ∞▲Ç>&␀␀t♥Θj☺╟♠Γ☺| 1Bx80
+|☻␀╞♠&␀☺Φ "ëF·à└t        1█HÄ└&ïG♥ëF■╟FΓ␀CìVΓ╕/␀Φ╪"Ç~ΓÇu╚╟FΓ►CìVΓ╕/␀Φ─"ïFΣëF÷ïF≥ë| 1Bx80
+|F°à└u♠â~Σ␀tñ╕␀␀Ä└ïFΣ&ú%•ïF≥&ú'•╕°•♣☼␀▒♦╙Φ♣␀␀+♠►☻@ú≥☼í►☻H1█Ä└&ïG♥║␀␀Ä┬&ú)•&ë┬♥V■▒| 1Bx80
+|♠╙ΩB1÷╕␀        ⍽^÷ëVⁿëFΓëVΦà└u♥Θ▒␀╕␀␀Ä└&ï▲)•1╥╣♦␀╤π╤╥Γ·ë▲⌠☼ë▬÷☼í►☻úⁿ☼1└ú·☼ïFⁿú■| 1Bx80
+|☼ïv■1⍽╣♦␀╤µ╤╫Γ·ë6␀►ë>☻►╕␀␀Ä└&ë▲+•&ë▬-•í·☼ï▬ⁿ☼î├&ú7•&ë▬9•ïFⁿ&ú/•ë╪&ë61•&ë>3•1╪úΓ☺| 1Bx80
+|╟♠Σ☺☺␀╞♠&␀☻â~■␀t#1└PP⍽vⁿ⍽v·PPWVΦt■â─►à└t♂ïF■ú$␀1└ú╬☺ë∞]_Θu■SQRVÇ>&␀☻t♥Θg■ï▬■☼1÷╕| 1Bx80
+|␀◙╗␀␀Ä├&⍽▲%•δΦSQRVë├í$␀à└t█║é␀Φ├!ë╞à└u♣╞•♣δ╩P1└PPPP⍽6■☼í$␀1╥╣♦␀╤α╤╥Γ·RPΦⁿ²â─►à└t| 1Bx80
+|•╞•␀ë≡δ₧ë≡Φ║"1└δòUëσâ∞¶ë┬ΦP►Ç╬LëV∞ìV∞╕!␀Φ♠!Së├à└t"♥W→u♣ïG♠[├;W"⌂♦à╥}♣╕ ♠[├╤Γï_♀☺| 1Bx80
+|╙ïG■[├Sï▲(␀à█t◙â⌂◙␀t♦ï▼δ≥ë╪[├SRï▬(␀â┬"ΦR#ï▲(␀ëG♀à└u◘ΦJ#1└Z[├╕☺␀Z[├Së├ïG☻à└t♥Φ=#ï| 1Bx80
+|G♦à└t♥ΦL#ïG♠à└t♥ΦB#ïG♫à└t♥Φ8#ïG►à└t♥Φ.#ïG◘à└t♥Φ$#ïG◙à└t♥Φ→#ïG♀à└t♥Φ╙#[├SRVë╞╗$␀1| 1Bx80
+|╥Φπ#╟D ☺␀^Z[├SRVí(␀à└t+ë├ïG♫à└t◘ë┬ïG♦Φ┌#í(␀Φt⍽ï6(␀ïD∟ú*␀ï♦ú(␀ë╪Φ├"â>(␀␀u└╕☻␀ΦB$δ| 1Bx80
+|╕S╕$␀Φ7%ë├à└u•ΦÇ"1└[├ΦÅ⍽í*␀ëG∟í(␀ë•ë▲(␀ë╪[├QVWUëσPë┴ë╓ë▀║☺␀Φ║%ë┴à└u♠╕☺␀Θt␀í(␀à└t| 1Bx80
+|♪ë├â⌂◙␀t♣Φa⍽δ∞í(␀à└u♫ΦÖ⍽à└u+ë╚ΦD"δ╤Φ▄■ï▲(␀ï•ëF■ïW∟ë╪Φ ⍽ï▲(␀ïF■ë•ï▲(␀ëW∟ï▲(␀ëO♦ë≡| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 7: PgUp
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ     | 1Bx80
+|␀␀#◙␀␀3↕␀␀O↕␀␀a↕␀␀|↕␀␀M↓␀␀▓↓␀␀Ω→␀␀⍽→␀␀╪←␀␀ü∟␀␀û∟␀␀▓∟␀␀┐∟␀␀╪∟␀␀Σ∟␀␀≡∟␀␀&▲␀␀♠▼␀␀─▼| 1Bx80
+|␀␀▀▼␀␀φ▼␀␀/ ␀␀B ␀␀↔0␀␀║0␀␀╬0␀␀▄0␀␀∩_␀␀Gr␀␀ou␀␀üu␀␀Åu␀␀òu␀␀\v␀␀ov␀␀}v␀␀◄ë␀␀¥ë␀␀éè| 1Bx80
+|␀␀eï␀␀␀␀␀␀␀␀␀␀␀␀␀␀╠δ²ÉÉÉÉ␀␀␀␀␀␀␀␀␀␀␀.⍽♠►␀°╩☻␀␀␀␀␀␀␀␀␀î╚Ä╪Ä╨╝☼•■♫;•u(í▼␀Ä└ë├┤P═!í| 1Bx80
+|←␀&ú◙␀í↔␀&ú♀␀í!␀&ú▬␀Φö•╕⍽L═!║d␀┤        ═!⌠δ²                                   | 1Bx80
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻êα| 1Bx80
+|$♥♦♦óh☻êα$♦óù☻êα$◘óò☻ÇΣ►ê&ö☻ë°♦☼ói☻│☻X╨Σs1Ä▌÷D♣Çt)╣◘␀â╞◙┐o☻┤ ⁿ¼8αs☻êα¬Γ÷╣◘␀êα²O≤| 1Bx80
+|«&êm☻î╔│♥░⍽ⁿÄ┘S╗x☻┐o☻⍽•t☼<→s♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë>Ω☺┤b═!Ä├&─▲4␀&èG☻ê─&ç•ú╪☺ë▲c☻î♠e☻[Ä┴| 1Bx80
+|Φé␀Φ╦␀│◙Φz␀│␀Φa␀│☺Φ\␀│♥ΦW␀│♀Φf␀δ◙[│♥δ3░•Φ¡␀ï>║☻1└è♣Gë┴ë├╕•♀═!≥«uσèY⍽èçö☻◘└t┌Φé␀─| 1Bx80
+|>c☻╕4↕&ë♣Xê╪<☻t◘<♥t♦■♫4↕[Y_^]▼•Z╧╖␀◙┐ö☻tWÇ├5ê▲¢☻╗ÿ☻δEá¥☻8├r☻ê├╖␀☺█ïƒ₧☻δ2S╗o☻Φ+␀δ| 1Bx80
+|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx80
+|◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻␀♥▼♥6♥:♥>♥C♥H♥Q♥Y♥a♥h♥k♥n♥⌂| 1Bx80
+|♥ñ♥╝♥╠♥∞♥☺♦,♦7♦J♦[♦p♦|♦ç♦ù♦⌐♦╕♦╠♦▄♦⌠♦•♣¶♣,♣reading from␀writing to␀Error %1 driv| 1Bx80
+|e %A: %2 area: %3␀Error %1 device %A: %3␀DOS␀FAT␀root␀data␀(I)gnore␀(R)etry␀(A)b| 1Bx80
+|ort␀(F)ail␀? ␀, ␀◘iIrRaAfF␀␀☺☺☻☻♥♥write-protection violation attempted␀unknown u| 1Bx80
+|nit for driver␀drive not ready␀unknown command given to driver␀data error (bad C| 1Bx80
+|RC)␀bad device driver request structure length␀seek error␀unknown media type␀sec| 1Bx80
+|tor not found␀printer out of paper␀write fault␀read fault␀general failure␀sharin| 1Bx80
+|g violation␀lock violation␀invalid disk change␀FCB unavailable␀sharing buffer ov| 1Bx80
+|erflow␀code page mismatch␀out of input␀insufficient disk space␀Unknown error cod| 1Bx80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 8: PgDn
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       1% | 30x80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀═!║Å♣Ä┴╗☼•╕␀K═!r☻1└ⁿî╔Ä╤╝ •Ä┘úA•┤Hï▲)•═!rd| 1Bx80
+|ë├+▲9•Sú9•┤♂╛+•⍽▲%•[â°☺uFëσ☺^☻╦XMS copy error$Memory allocation error$          | 1Bx80
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•V| 1Bx80
+|WUî▬♦►ë&♠►┤♂╛⌠☼.⍽▲%•Ä♠ⁿ☼è&"␀ï▲≥☼î┌╣␀␀Ä┘î▬=•ë&?•Ä╤╝☼•RÜC•␀␀íA•☺^♦▼╞♠"␀I☺▲ⁿ☼ï♫♦►☺┘| 1Bx80
+|Ä╤ï&♠►]_^├Ç>&␀☻u♦╕☺␀├1└├SQRVUëσìv♀1╥╕␀♂╗␀␀Ä├&⍽▲%•]^ZY[├SQRVWUëσâ∞▲Ç>&␀␀t♥Θj☺╟♠Γ☺| 1Bx80
+|☻␀╞♠&␀☺Φ "ëF·à└t        1█HÄ└&ïG♥ëF■╟FΓ␀CìVΓ╕/␀Φ╪"Ç~ΓÇu╚╟FΓ►CìVΓ╕/␀Φ─"ïFΣëF÷ïF≥ë| 1Bx80
+|F°à└u♠â~Σ␀tñ╕␀␀Ä└ïFΣ&ú%•ïF≥&ú'•╕°•♣☼␀▒♦╙Φ♣␀␀+♠►☻@ú≥☼í►☻H1█Ä└&ïG♥║␀␀Ä┬&ú)•&ë┬♥V■▒| 1Bx80
+|♠╙ΩB1÷╕␀        ⍽^÷ëVⁿëFΓëVΦà└u♥Θ▒␀╕␀␀Ä└&ï▲)•1╥╣♦␀╤π╤╥Γ·ë▲⌠☼ë▬÷☼í►☻úⁿ☼1└ú·☼ïFⁿú■| 1Bx80
+|☼ïv■1⍽╣♦␀╤µ╤╫Γ·ë6␀►ë>☻►╕␀␀Ä└&ë▲+•&ë▬-•í·☼ï▬ⁿ☼î├&ú7•&ë▬9•ïFⁿ&ú/•ë╪&ë61•&ë>3•1╪úΓ☺| 1Bx80
+|╟♠Σ☺☺␀╞♠&␀☻â~■␀t#1└PP⍽vⁿ⍽v·PPWVΦt■â─►à└t♂ïF■ú$␀1└ú╬☺ë∞]_Θu■SQRVÇ>&␀☻t♥Θg■ï▬■☼1÷╕| 1Bx80
+|␀◙╗␀␀Ä├&⍽▲%•δΦSQRVë├í$␀à└t█║é␀Φ├!ë╞à└u♣╞•♣δ╩P1└PPPP⍽6■☼í$␀1╥╣♦␀╤α╤╥Γ·RPΦⁿ²â─►à└t| 1Bx80
+|•╞•␀ë≡δ₧ë≡Φ║"1└δòUëσâ∞¶ë┬ΦP►Ç╬LëV∞ìV∞╕!␀Φ♠!Së├à└t"♥W→u♣ïG♠[├;W"⌂♦à╥}♣╕ ♠[├╤Γï_♀☺| 1Bx80
+|╙ïG■[├Sï▲(␀à█t◙â⌂◙␀t♦ï▼δ≥ë╪[├SRï▬(␀â┬"ΦR#ï▲(␀ëG♀à└u◘ΦJ#1└Z[├╕☺␀Z[├Së├ïG☻à└t♥Φ=#ï| 1Bx80
+|G♦à└t♥ΦL#ïG♠à└t♥ΦB#ïG♫à└t♥Φ8#ïG►à└t♥Φ.#ïG◘à└t♥Φ$#ïG◙à└t♥Φ→#ïG♀à└t♥Φ╙#[├SRVë╞╗$␀1| 1Bx80
+|╥Φπ#╟D ☺␀^Z[├SRVí(␀à└t+ë├ïG♫à└t◘ë┬ïG♦Φ┌#í(␀Φt⍽ï6(␀ïD∟ú*␀ï♦ú(␀ë╪Φ├"â>(␀␀u└╕☻␀ΦB$δ| 1Bx80
+|╕S╕$␀Φ7%ë├à└u•ΦÇ"1└[├ΦÅ⍽í*␀ëG∟í(␀ë•ë▲(␀ë╪[├QVWUëσPë┴ë╓ë▀║☺␀Φ║%ë┴à└u♠╕☺␀Θt␀í(␀à└t| 1Bx80
+|♪ë├â⌂◙␀t♣Φa⍽δ∞í(␀à└u♫ΦÖ⍽à└u+ë╚ΦD"δ╤Φ▄■ï▲(␀ï•ëF■ïW∟ë╪Φ ⍽ï▲(␀ïF■ë•ï▲(␀ëW∟ï▲(␀ëO♦ë≡| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 9: Home
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ     | 1Bx80
+|␀␀#◙␀␀3↕␀␀O↕␀␀a↕␀␀|↕␀␀M↓␀␀▓↓␀␀Ω→␀␀⍽→␀␀╪←␀␀ü∟␀␀û∟␀␀▓∟␀␀┐∟␀␀╪∟␀␀Σ∟␀␀≡∟␀␀&▲␀␀♠▼␀␀─▼| 1Bx80
+|␀␀▀▼␀␀φ▼␀␀/ ␀␀B ␀␀↔0␀␀║0␀␀╬0␀␀▄0␀␀∩_␀␀Gr␀␀ou␀␀üu␀␀Åu␀␀òu␀␀\v␀␀ov␀␀}v␀␀◄ë␀␀¥ë␀␀éè| 1Bx80
+|␀␀eï␀␀␀␀␀␀␀␀␀␀␀␀␀␀╠δ²ÉÉÉÉ␀␀␀␀␀␀␀␀␀␀␀.⍽♠►␀°╩☻␀␀␀␀␀␀␀␀␀î╚Ä╪Ä╨╝☼•■♫;•u(í▼␀Ä└ë├┤P═!í| 1Bx80
+|←␀&ú◙␀í↔␀&ú♀␀í!␀&ú▬␀Φö•╕⍽L═!║d␀┤        ═!⌠δ²                                   | 1Bx80
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻êα| 1Bx80
+|$♥♦♦óh☻êα$♦óù☻êα$◘óò☻ÇΣ►ê&ö☻ë°♦☼ói☻│☻X╨Σs1Ä▌÷D♣Çt)╣◘␀â╞◙┐o☻┤ ⁿ¼8αs☻êα¬Γ÷╣◘␀êα²O≤| 1Bx80
+|«&êm☻î╔│♥░⍽ⁿÄ┘S╗x☻┐o☻⍽•t☼<→s♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë>Ω☺┤b═!Ä├&─▲4␀&èG☻ê─&ç•ú╪☺ë▲c☻î♠e☻[Ä┴| 1Bx80
+|Φé␀Φ╦␀│◙Φz␀│␀Φa␀│☺Φ\␀│♥ΦW␀│♀Φf␀δ◙[│♥δ3░•Φ¡␀ï>║☻1└è♣Gë┴ë├╕•♀═!≥«uσèY⍽èçö☻◘└t┌Φé␀─| 1Bx80
+|>c☻╕4↕&ë♣Xê╪<☻t◘<♥t♦■♫4↕[Y_^]▼•Z╧╖␀◙┐ö☻tWÇ├5ê▲¢☻╗ÿ☻δEá¥☻8├r☻ê├╖␀☺█ïƒ₧☻δ2S╗o☻Φ+␀δ| 1Bx80
+|▲Cè•◘└t(<At∞<1r▬<:s↕Sÿë├èƒ6☻Φ╞⍽[δ•<%t█Φ☼␀Cè•◘└u≥├░◙Φ☻␀░♪┤☻ê┬═!├␀␀␀␀␀␀␀♪◘        | 1Bx80
+|◙♂12345678␀⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽⍽␀␀☺␀%4%6␀$Φ☻⌡☻␀♥▼♥6♥:♥>♥C♥H♥Q♥Y♥a♥h♥k♥n♥⌂| 1Bx80
+|♥ñ♥╝♥╠♥∞♥☺♦,♦7♦J♦[♦p♦|♦ç♦ù♦⌐♦╕♦╠♦▄♦⌠♦•♣¶♣,♣reading from␀writing to␀Error %1 driv| 1Bx80
+|e %A: %2 area: %3␀Error %1 device %A: %3␀DOS␀FAT␀root␀data␀(I)gnore␀(R)etry␀(A)b| 1Bx80
+|ort␀(F)ail␀? ␀, ␀◘iIrRaAfF␀␀☺☺☻☻♥♥write-protection violation attempted␀unknown u| 1Bx80
+|nit for driver␀drive not ready␀unknown command given to driver␀data error (bad C| 1Bx80
+|RC)␀bad device driver request structure length␀seek error␀unknown media type␀sec| 1Bx80
+|tor not found␀printer out of paper␀write fault␀read fault␀general failure␀sharin| 1Bx80
+|g violation␀lock violation␀invalid disk change␀FCB unavailable␀sharing buffer ov| 1Bx80
+|erflow␀code page mismatch␀out of input␀insufficient disk space␀Unknown error cod| 1Bx80
+|e␀∙╦╕⍽⍽╧␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 1Bx80
+|1Help   2Unwrap 3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 10: F2
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 11: PgDn
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes     100% | 30x80
+|╣‼␀┐;~≥»&ïE"⍽αà÷vkïF°à└vd9╞uJï₧≥■☺├╞G⍽␀Φe²=☺␀t  ╕t◙Φ♣■Θÿ␀Φo²ê┬■╩0÷╗J␀╕@␀Ä└&è•0Σ→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
+|♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
+|♥←☺☺☻☻♥♥♥♥☺☺♥☻Control-Break pressed.                                            | 1Bx80
+|Terminate batch file '%s' (Yes/No/All) ? ␀♂YyNnAaQq♥♪←☺☺☻☻♥♥♦♦♦☺☻Overwrite '%s'→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 12: PgUp
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 13: End
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes     100% | 30x80
+|b♂ë·ë≡Φ¡≡ë├ëF°ïF■Φgaë┬ëF·ïFⁿΦ\aëF÷☺┬BB☺╤à╔|‼9╙}¶ë╨)╪ë├ë≡Φ♣╜9╪w♣╕☺␀δOïF°9┬t↨ë├☺√→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
+|♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
+|♥←☺☺☻☻♥♥♥♥☺☺♥☻Control-Break pressed.                                            | 1Bx80
+|Terminate batch file '%s' (Yes/No/All) ? ␀♂YyNnAaQq♥♪←☺☺☻☻♥♥♦♦♦☺☻Overwrite '%s'→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 14: PgUp
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes      25% | 30x80
+|1└δ÷VWUëσâ∞FPRSQ▲•ì~∞╛[☻ÑÑÑ1└ëF≥ëF⌠ëF÷ëF°1÷ía☻ëF·1⍽â>∞►␀t<╕Φ♂Φƒ┌ë├ë╟à└u Φµ╫ë▲∞►→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|♥☺☺☻☻☻☻☻All files in '%s' will be deleted!◙Are you sure (Y/N)? ␀◘YyNn           | 1Bx80
+|♥←☺☺☻☻☺☺☻☻ [Yes=ENTER, No=ESC] ? ␀♀YyNnAaQq                                     | 1Bx80
+|♥←☺☺☻☻♥♥♥♥☺☺♥☻Control-Break pressed.                                            | 1Bx80
+|Terminate batch file '%s' (Yes/No/All) ? ␀♂YyNnAaQq♥♪←☺☺☻☻♥♥♦♦♦☺☻Overwrite '%s'→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 15: PgUp
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+|MZó☺x␀1␀☼␀ÿ☻⍽⍽♥☼␀►␀␀╓ê␀␀ ␀␀␀␀␀␀␀!◘␀␀6◘␀␀v◘␀␀⌠◘␀␀◄       ␀␀(     ␀␀T     ␀␀ÿ    →| 1Bx79 1Ex1
+|•Cannot terminate permanent FreeCOM instance                                    | 1Bx80
+|System halted ... reboot or power off now$░♥╧R♠▲UVWQSPî╔Ä┘P♦Aóo☻0└óp☻Ä┴╨∞►└óg☻ê→| 1Bx79 1Ex1
+|◙FreeCOM: XMSSwap-In: $╗î•δ♥╗¢•║│•┤     ═!ë┌┤   ═!╕⍽L═!Θ:°ï▬/•  ╥t≡┤◙⍽▲%•├.⍽.%•→| 1Bx79 1Ex1
+|√╣∞♪Ä┴╗b◄â├☼Çπ≡&ë▲▬☻&î▲►☻♥▄â├☼Çπ≡Ä╤ïπ&ë▲↑☻ï╙╤Ω╤Ω╤Ω╤Ω&Ç>¶☻␀u=ï♫☻␀î└+╚;╤r♂╗☺␀╕≈êî→| 1Bx79 1Ex1
+|␀␀COMPLETE␀on␀off␀,;=␀on␀off␀␀CHDIR␀CDD␀←[2J␀␀␀%30s♪␀*?␀=>>␀=>␀→␀+␀COPYCMD␀*␀.\→| 1Bx79 1Ex1
+|␀␀*.*␀%*.*s\%s%c%s␀.␀\.␀..␀\..␀ %.30s ␀%s%c%s␀◙␀%44c%s␀NG␀LFN␀\*.*␀ Mega␀[%s]␀␀→| 1Bx79 1Ex1
+|␀␀on␀off␀␀%-10s␀%s◙␀0123456789ABCDEF␀%04x:%04x␀␀PATH␀COM␀EXE␀BAT␀␀♪␀♪␀-+=:␀=:␀,→| 1Bx79 1Ex1
+|␀%s␀◘ ◘␀TEMP␀TMP␀TEMPDIR␀TMPDIR␀\TEMP␀\TMP␀.␀␀\COMMAND.COM␀.swp␀COM␀␀␀.␀off␀on␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|The shell is about to be terminated, though, this is                            | 1Bx80
+|forbidden (usually by enabling the "/P" option).                                | 1Bx80
+|You must reboot the system or, if this shell runs in                            | 1Bx80
+|a multitasking environment, terminate this process/task manually.               | 1Bx80
+|␀FreeCOM executable not found.◙You must specify the complete path to COMMAND.CO→| 1Bx79 1Ex1
+|→␀⍽␀§^␀␀↨␀↨␀↨␀.␀↓␀G␀&␀m␀#␀É␀"␀▓␀←␀═␀▼␀∞␀↔␀      ☺▬␀▼☺←␀:☺◄␀K☺◄␀\☺↑␀t☺↔␀æ☺¶␀Ñ☺!␀→| 1Bx79 1Ex1
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|                                                                                | 1Bx80
+|1Help   2Wrap   3Quit   4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 16: F4
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+| 00000000  4D 5A A2 01  78 00 31 00  0F 00 98 02  FF FF 03 0F  MZó☺x.1.☼.ÿ☻⍽⍽♥☼ | 1Bx80
+| 00000010  00 10 00 00  D6 88 00 00  20 00 00 00  00 00 00 00  .►..╓ê.. ....... | 1Bx80
+| 00000020  21 08 00 00  36 08 00 00  76 08 00 00  F4 08 00 00  !◘..6◘..v◘..⌠◘.. | 1Bx80
+| 00000030  11 09 00 00  28 09 00 00  54 09 00 00  98 09 00 00  ◄○..(○..T○..ÿ○.. | 1Bx80
+| 00000040  23 0A 00 00  33 12 00 00  4F 12 00 00  61 12 00 00  #◙..3↕..O↕..a↕.. | 1Bx80
+| 00000050  7C 12 00 00  4D 19 00 00  B2 19 00 00  EA 1A 00 00  |↕..M↓..▓↓..Ω→.. | 1Bx80
+| 00000060  FF 1A 00 00  D8 1B 00 00  81 1C 00 00  96 1C 00 00  ⍽→..╪←..ü∟..û∟.. | 1Bx80
+| 00000070  B2 1C 00 00  BF 1C 00 00  D8 1C 00 00  E4 1C 00 00  ▓∟..┐∟..╪∟..Σ∟.. | 1Bx80
+| 00000080  F0 1C 00 00  26 1E 00 00  06 1F 00 00  C4 1F 00 00  ≡∟..&▲..♠▼..─▼.. | 1Bx80
+| 00000090  DF 1F 00 00  ED 1F 00 00  2F 20 00 00  42 20 00 00  ▀▼..φ▼../ ..B .. | 1Bx80
+| 000000A0  1D 30 00 00  BA 30 00 00  CE 30 00 00  DC 30 00 00  ↔0..║0..╬0..▄0.. | 1Bx80
+| 000000B0  EF 5F 00 00  47 72 00 00  6F 75 00 00  81 75 00 00  ∩_..Gr..ou..üu.. | 1Bx80
+| 000000C0  8F 75 00 00  95 75 00 00  5C 76 00 00  6F 76 00 00  Åu..òu..\v..ov.. | 1Bx80
+| 000000D0  7D 76 00 00  11 89 00 00  9D 89 00 00  82 8A 00 00  }v..◄ë..¥ë..éè.. | 1Bx80
+| 000000E0  65 8B 00 00  00 00 00 00  00 00 00 00  00 00 00 00  eï.............. | 1Bx80
+| 000000F0  CC EB FD 90  90 90 90 00  00 00 00 00  00 00 00 00  ╠δ²ÉÉÉÉ......... | 1Bx80
+| 00000100  00 00 2E FF  06 10 00 F8  CA 02 00 00  00 00 00 00  ...⍽♠►.°╩☻...... | 1Bx80
+| 00000110  00 00 00 8C  C8 8E D8 8E  D0 BC 0F 07  FE 0E 3B 07  ...î╚Ä╪Ä╨╝☼•■♫;• | 1Bx80
+| 00000120  75 28 A1 1F  00 8E C0 89  C3 B4 50 CD  21 A1 1B 00  u(í▼.Ä└ë├┤P═!í←. | 1Bx80
+| 00000130  26 A3 0A 00  A1 1D 00 26  A3 0C 00 A1  21 00 26 A3  &ú◙.í↔.&ú♀.í!.&ú | 1Bx80
+| 00000140  16 00 E8 94  07 B8 FF 4C  CD 21 BA 64  00 B4 09 CD  ▬.Φö•╕⍽L═!║d.┤○═ | 1Bx80
+| 00000150  21 F4 EB FD  0D 0A 07 43  61 6E 6E 6F  74 20 74 65  !⌠δ²♪◙•Cannot te | 1Bx80
+| 00000160  72 6D 69 6E  61 74 65 20  70 65 72 6D  61 6E 65 6E  rminate permanen | 1Bx80
+|1Help   2       3Quit   4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 17: PgDn
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+| 00000150  21 F4 EB FD  0D 0A 07 43  61 6E 6E 6F  74 20 74 65  !⌠δ²♪◙•Cannot te | 1Bx80
+| 00000160  72 6D 69 6E  61 74 65 20  70 65 72 6D  61 6E 65 6E  rminate permanen | 1Bx80
+| 00000170  74 20 46 72  65 65 43 4F  4D 20 69 6E  73 74 61 6E  t FreeCOM instan | 1Bx80
+| 00000180  63 65 0D 0A  53 79 73 74  65 6D 20 68  61 6C 74 65  ce♪◙System halte | 1Bx80
+| 00000190  64 20 2E 2E  2E 20 72 65  62 6F 6F 74  20 6F 72 20  d ... reboot or  | 1Bx80
+| 000001A0  70 6F 77 65  72 20 6F 66  66 20 6E 6F  77 24 B0 03  power off now$░♥ | 1Bx80
+| 000001B0  CF 52 06 1E  55 56 57 51  53 50 8C C9  8E D9 50 04  ╧R♠▲UVWQSPî╔Ä┘P♦ | 1Bx80
+| 000001C0  41 A2 6F 02  30 C0 A2 70  02 8E C1 D0  EC 10 C0 A2  Aóo☻0└óp☻Ä┴╨∞►└ó | 1Bx80
+| 000001D0  67 02 88 E0  24 03 04 04  A2 68 02 88  E0 24 04 A2  g☻êα$♥♦♦óh☻êα$♦ó | 1Bx80
+| 000001E0  97 02 88 E0  24 08 A2 95  02 80 E4 10  88 26 94 02  ù☻êα$◘óò☻ÇΣ►ê&ö☻ | 1Bx80
+| 000001F0  89 F8 04 0F  A2 69 02 B3  02 58 D0 E4  73 31 8E DD  ë°♦☼ói☻│☻X╨Σs1Ä▌ | 1Bx80
+| 00000200  F6 44 05 80  74 29 B9 08  00 83 C6 0A  BF 6F 02 B4  ÷D♣Çt)╣◘.â╞◙┐o☻┤ | 1Bx80
+| 00000210  20 FC AC 38  E0 73 02 88  E0 AA E2 F6  B9 08 00 88   ⁿ¼8αs☻êα¬Γ÷╣◘.ê | 1Bx80
+| 00000220  E0 FD 4F F3  AE 26 88 6D  02 8C C9 B3  03 B0 FF FC  α²O≤«&êm☻î╔│♥░⍽ⁿ | 1Bx80
+| 00000230  8E D9 53 BB  78 02 BF 6F  02 FF 07 74  0F 3C 1A 73  Ä┘S╗x☻┐o☻⍽•t☼<→s | 1Bx80
+| 00000240  0B 98 04 02  01 D8 89 C7  FE 05 75 49  FF 0F 89 3E  ♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë> | 1Bx80
+| 00000250  EA 01 B4 62  CD 21 8E C3  26 C4 1E 34  00 26 8A 47  Ω☺┤b═!Ä├&─▲4.&èG | 1Bx80
+| 00000260  02 88 C4 26  87 07 A3 D8  01 89 1E 63  02 8C 06 65  ☻ê─&ç•ú╪☺ë▲c☻î♠e | 1Bx80
+| 00000270  02 5B 8E C1  E8 82 00 E8  CB 00 B3 0A  E8 7A 00 B3  ☻[Ä┴Φé.Φ╦.│◙Φz.│ | 1Bx80
+| 00000280  00 E8 61 00  B3 01 E8 5C  00 B3 03 E8  57 00 B3 0C  .Φa.│☺Φ\.│♥ΦW.│♀ | 1Bx80
+| 00000290  E8 66 00 EB  0A 5B B3 03  EB 33 B0 07  E8 AD 00 8B  Φf.δ◙[│♥δ3░•Φ¡.ï | 1Bx80
+| 000002A0  3E BA 02 31  C0 8A 05 47  89 C1 89 C3  B8 07 0C CD  >║☻1└è♣Gë┴ë├╕•♀═ | 1Bx80
+| 000002B0  21 F2 AE 75  E5 8A 59 FF  8A 87 94 02  08 C0 74 DA  !≥«uσèY⍽èçö☻◘└t┌ | 1Bx80
+|1Help   2       3Quit   4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 18: Up
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes       0% | 30x80
+| 00000140  16 00 E8 94  07 B8 FF 4C  CD 21 BA 64  00 B4 09 CD  ▬.Φö•╕⍽L═!║d.┤○═ | 1Bx80
+| 00000150  21 F4 EB FD  0D 0A 07 43  61 6E 6E 6F  74 20 74 65  !⌠δ²♪◙•Cannot te | 1Bx80
+| 00000160  72 6D 69 6E  61 74 65 20  70 65 72 6D  61 6E 65 6E  rminate permanen | 1Bx80
+| 00000170  74 20 46 72  65 65 43 4F  4D 20 69 6E  73 74 61 6E  t FreeCOM instan | 1Bx80
+| 00000180  63 65 0D 0A  53 79 73 74  65 6D 20 68  61 6C 74 65  ce♪◙System halte | 1Bx80
+| 00000190  64 20 2E 2E  2E 20 72 65  62 6F 6F 74  20 6F 72 20  d ... reboot or  | 1Bx80
+| 000001A0  70 6F 77 65  72 20 6F 66  66 20 6E 6F  77 24 B0 03  power off now$░♥ | 1Bx80
+| 000001B0  CF 52 06 1E  55 56 57 51  53 50 8C C9  8E D9 50 04  ╧R♠▲UVWQSPî╔Ä┘P♦ | 1Bx80
+| 000001C0  41 A2 6F 02  30 C0 A2 70  02 8E C1 D0  EC 10 C0 A2  Aóo☻0└óp☻Ä┴╨∞►└ó | 1Bx80
+| 000001D0  67 02 88 E0  24 03 04 04  A2 68 02 88  E0 24 04 A2  g☻êα$♥♦♦óh☻êα$♦ó | 1Bx80
+| 000001E0  97 02 88 E0  24 08 A2 95  02 80 E4 10  88 26 94 02  ù☻êα$◘óò☻ÇΣ►ê&ö☻ | 1Bx80
+| 000001F0  89 F8 04 0F  A2 69 02 B3  02 58 D0 E4  73 31 8E DD  ë°♦☼ói☻│☻X╨Σs1Ä▌ | 1Bx80
+| 00000200  F6 44 05 80  74 29 B9 08  00 83 C6 0A  BF 6F 02 B4  ÷D♣Çt)╣◘.â╞◙┐o☻┤ | 1Bx80
+| 00000210  20 FC AC 38  E0 73 02 88  E0 AA E2 F6  B9 08 00 88   ⁿ¼8αs☻êα¬Γ÷╣◘.ê | 1Bx80
+| 00000220  E0 FD 4F F3  AE 26 88 6D  02 8C C9 B3  03 B0 FF FC  α²O≤«&êm☻î╔│♥░⍽ⁿ | 1Bx80
+| 00000230  8E D9 53 BB  78 02 BF 6F  02 FF 07 74  0F 3C 1A 73  Ä┘S╗x☻┐o☻⍽•t☼<→s | 1Bx80
+| 00000240  0B 98 04 02  01 D8 89 C7  FE 05 75 49  FF 0F 89 3E  ♂ÿ♦☻☺╪ë╟■♣uI⍽☼ë> | 1Bx80
+| 00000250  EA 01 B4 62  CD 21 8E C3  26 C4 1E 34  00 26 8A 47  Ω☺┤b═!Ä├&─▲4.&èG | 1Bx80
+| 00000260  02 88 C4 26  87 07 A3 D8  01 89 1E 63  02 8C 06 65  ☻ê─&ç•ú╪☺ë▲c☻î♠e | 1Bx80
+| 00000270  02 5B 8E C1  E8 82 00 E8  CB 00 B3 0A  E8 7A 00 B3  ☻[Ä┴Φé.Φ╦.│◙Φz.│ | 1Bx80
+| 00000280  00 E8 61 00  B3 01 E8 5C  00 B3 03 E8  57 00 B3 0C  .Φa.│☺Φ\.│♥ΦW.│♀ | 1Bx80
+| 00000290  E8 66 00 EB  0A 5B B3 03  EB 33 B0 07  E8 AD 00 8B  Φf.δ◙[│♥δ3░•Φ¡.ï | 1Bx80
+| 000002A0  3E BA 02 31  C0 8A 05 47  89 C1 89 C3  B8 07 0C CD  >║☻1└è♣Gë┴ë├╕•♀═ | 1Bx80
+|1Help   2       3Quit   4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 19: End
+cursor 0 127 lines 6 7 mode 3
+|View: A:\FREEDOS\BIN\command.com        Col 0             87,772 Bytes     100% | 30x80
+| 00015570  6F 74 68 65  72 0A 6C 6F  63 61 74 69  6F 6E 20 6F  other◙location o | 1Bx80
+| 00015580  66 20 46 72  65 65 43 4F  4D 20 74 6F  20 74 72 79  f FreeCOM to try | 1Bx80
+| 00015590  20 74 6F 20  6C 6F 61 64  20 74 68 65  20 73 74 72   to load the str | 1Bx80
+| 000155A0  69 6E 67 73  20 66 72 6F  6D 2C 20 65  2E 67 2E 3A  ings from, e.g.: | 1Bx80
+| 000155B0  0A 43 3A 5C  43 4F 4D 4D  41 4E 44 2E  43 4F 4D 0A  ◙C:\COMMAND.COM◙ | 1Bx80
+| 000155C0  6F 72 20 6A  75 73 74 20  68 69 74 20  65 6E 74 65  or just hit ente | 1Bx80
+| 000155D0  72 20 74 6F  20 63 61 6E  63 65 6C 20  74 6F 20 6C  r to cancel to l | 1Bx80
+| 000155E0  6F 61 64 20  74 68 65 20  73 74 72 69  6E 67 73 2E  oad the strings. | 1Bx80
+| 000155F0  0A 00 54 65  72 6D 69 6E  61 74 69 6E  67 20 6E 6F  ◙.Terminating no | 1Bx80
+| 00015600  77 2E 0A 00  25 75 20 43  72 69 74 69  63 61 6C 20  w.◙.%u Critical  | 1Bx80
+| 00015610  45 72 72 6F  72 20 72 65  71 75 65 73  74 73 20 73  Error requests s | 1Bx80
+| 00015620  75 70 70 72  65 73 73 65  64 2E 0A 00  45 78 69 74  uppressed.◙.Exit | 1Bx80
+| 00015630  20 63 6F 64  65 20 28 45  52 52 4F 52  4C 45 56 45   code (ERRORLEVE | 1Bx80
+| 00015640  4C 29 3A 20  25 75 2C 20  72 65 61 73  6F 6E 3A 20  L): %u, reason:  | 1Bx80
+| 00015650  25 75 20 28  25 73 29 0A  00 44 4F 53  20 41 50 49  %u (%s)◙.DOS API | 1Bx80
+| 00015660  20 65 72 72  6F 72 00 74  65 72 6D 69  6E 61 74 65   error.terminate | 1Bx80
+| 00015670  64 20 6E 6F  72 6D 61 6C  6C 79 00 74  65 72 6D 69  d normally.termi | 1Bx80
+| 00015680  6E 61 74 65  64 20 62 79  20 5E 42 72  65 61 6B 00  nated by ^Break. | 1Bx80
+| 00015690  74 65 72 6D  69 6E 61 74  65 64 20 62  79 20 63 72  terminated by cr | 1Bx80
+| 000156A0  69 74 69 63  61 6C 20 65  72 72 6F 72  00 67 6F 6E  itical error.gon | 1Bx80
+| 000156B0  65 20 72 65  73 69 64 65  6E 74 00 45  58 45 20 66  e resident.EXE f | 1Bx80
+| 000156C0  69 6C 65 20  63 6F 72 72  75 70 74 00  2B 62 00 00  ile corrupt.+b.. | 1Bx80
+| 000156D0  00 00 03 00  46 52 45 45  43 4F 4D 20               ..♥.FREECOM      | 1Bx80
+|1Help   2       3Quit   4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 20: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          498,256 Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

@@ -199,6 +199,29 @@ port.
   so a name that is copied with it is the assembly's own, made `PUBLIC`,
   and not a constant of the C file: `Mask_S` and `Ext_F`. Once what
   follows them in the assembly is translated, those bytes are others.
+- A flag may come back through several returns. `V30_00` answered, for
+  a screen that is full, with the carry that `V32_00` left, and that was
+  the one of an `ADD` in `Color`, always clear. `tools/flagscan.py` names
+  the instruction that reads such a flag; follow it back to the one that
+  set it, in `src/`, before deciding what the stub makes.
+- A place that the assembly keeps in two registers and answers for in
+  the carry flag as well, as `NextLin` does with SI and BX, goes to C as
+  a structure: the stub pushes the registers, the function gets BX on
+  them and returns the flag in AX, and the stub pops them and makes the
+  carry with `NEG AX` before it pops AX.
+- What the viewer keeps of a file, `ViewDat`, lies in `TmpBuf` from its
+  byte 200 on, and what the editor keeps, `EdData`, lies over it: `EdBase`
+  is `ViBase`, `EdSize` is `ViSize`, `EdTxHex` is `ViTxHex`. `port/view.c`
+  has the viewer's as a structure there. The text is in a segment of its
+  own, which the assembly has in DS and C gets as a number, like a panel;
+  the table of its lines is at the top of the same segment.
+- An entry for C to a routine of a file that another batch has in hand
+  can stand next to the stub that needs it: `FromC T70_00` is in
+  `VCVIEW.INC`, the routine in `VCEDIT.INC`.
+- A register that a routine stores without having set it, as `V32_00`
+  does DX where nothing found is on the screen, is handed to the C
+  function like an argument. That is less than showing that nothing
+  reads what was stored.
 
 ### C for the port
 

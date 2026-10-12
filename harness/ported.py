@@ -252,6 +252,30 @@ BATCHES = [
                 "is shared by for a label: the bench has none"),
         },
     ),
+    Batch(
+        title="The viewer: the lines of a file, the part of it that is "
+              "in the memory, what the screen shows of it, and a text "
+              "looked for",
+        source="view.c",
+        routines=("NextLin", "PrevLin", "V20_00", "V25_00", "V30_00",
+                  "V31_00", "V32_00", "V40_00", "V50_00", "V51_00",
+                  "V55_00", "V60_00", "V81_00", "V82_00"),
+        functions=("NextLin_c", "PrevLin_c", "V20_00_c", "V25_00_c",
+                   "V30_00_c", "V31_00_c", "V32_00_c", "V40_00_c",
+                   "V50_00_c", "V51_00_c", "V55_00_c", "V60_00_c",
+                   "V81_00_c", "V82_00_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x5AC5, 0x5AD7, 0x5AD9, 0x5ADA),
+                "PrevLin, for a place that is not where a line begins, "
+                "or with another line of the table than its own: every "
+                "caller has both from V20_00, from PrevLin itself or "
+                "from the end of the table"),
+            0x5B88: "V25_00, for a viewer without a status line: it has "
+                    "one whenever its window is 80 columns wide, and "
+                    "only the editor is given a narrower one",
+        },
+    ),
 ]
 
 

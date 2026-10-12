@@ -6,12 +6,10 @@
  */
 #include "vc.h"
 
-u16 __far *HexByt(u16 __far *screen, u16 byte);
 const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number);
 
 /* How the assembly passes arguments to these, and what it expects back;
-   TstHex is in vc.h. */
-#pragma aux HexByt "*_c" __far parm [es di] [ax] value [es di] modify exact [di es]
+   HexByt and TstHex are in vc.h. */
 #pragma aux TxtNum "*_c" __far parm [es si] [bx] value [es si] modify exact [si es]
 
 /* Write the low byte of `byte` to the screen buffer as two hex digits,

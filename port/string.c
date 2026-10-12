@@ -14,18 +14,16 @@ void FilZero(u8 __far *text, u16 length);
 u16 StrLen(const u8 __far *text);
 const u8 __far *FndLet(const u8 __far *text);
 void NormStr(u8 __far *text);
-void PathLin(u8 __far *text);
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 
 /* How the assembly passes arguments to these, and what it expects back.
    The assembly has a text at DS:SI or ES:DI; DS cannot carry an argument
    here, so its stubs in port/asm/VCSUB1.INC move that elsewhere. AddFile,
-   MvzLine, LetLin and ShrtLin are in vc.h. */
+   MvzLine, PathLin, LetLin and ShrtLin are in vc.h. */
 #pragma aux FilZero "*_c" __far parm [es si] [cx] modify exact [ax]
 #pragma aux StrLen  "*_c" __far parm [es di] value [cx] modify exact [cx]
 #pragma aux FndLet  "*_c" __far parm [es si] value [es si] modify exact [si es]
 #pragma aux NormStr "*_c" __far parm [es si] modify exact [ax]
-#pragma aux PathLin "*_c" __far parm [es si] modify exact [ax]
 #pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
 /* End a path with a backslash, unless it has one: `end` is where the path

@@ -32,6 +32,10 @@
 	EXTERN	TrCr20_c:FAR, PutInf_c:FAR
 	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
 	EXTERN	GetVol_c:FAR, DirSize_c:FAR, TstInfo_c:FAR
+	EXTERN	NextLin_c:FAR, PrevLin_c:FAR, V20_00_c:FAR, V25_00_c:FAR
+	EXTERN	V30_00_c:FAR, V31_00_c:FAR, V32_00_c:FAR, V40_00_c:FAR
+	EXTERN	V50_00_c:FAR, V51_00_c:FAR, V55_00_c:FAR, V60_00_c:FAR
+	EXTERN	V81_00_c:FAR, V82_00_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F

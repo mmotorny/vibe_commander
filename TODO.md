@@ -52,6 +52,15 @@ Things that are known and not done. Standing instructions are in
   label; `RdInfo` takes 53h there for a drive that is not ready. A
   label of eleven characters that ends in S would do that, if DOS
   leaves 0 in AH. Ported like that; not tried.
+- Of the viewer, what looks at its keys is still assembly, the code of
+  `VCVIEW.INC` between its procedures, and with it `V80_00`, which only
+  calls `DialBox` for the search, and `F34_30` and `F34_40`, which read
+  the extension files of the viewer and the editor.
+- `PrevLin` has three instructions for a place that is not the start of
+  a line and one for a line of the table that is not its own. No caller
+  hands it either, so they ran in no scenario and are translated by
+  reading; so is `V25_00` without a status line, which the viewer always
+  has.
 - Of `__U4D` in `port/asm/VC.ASM`, which divides 32-bit numbers for the
   compiled code, no scenario runs the half for a divisor of more than 16
   bits: nothing divides by one yet. It was held against a model of its
@@ -145,6 +154,18 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     `CLAUDE.md` now.
   - 1 minute: `DrIn_F` went with `RdInfo` and the viewer uses it: found
     by the assembler.
+
+- The viewer, 14 routines, 1,730 bytes, about 25 minutes in all, next
+  to another batch in a checkout of its own:
+  - 2 minutes: waiting for a turn at the computer, in three runs: 20
+    seconds before a run of `harness/show.py`, 25 before the goldens
+    were derived and 60 before the first `port` test. The rebase, the
+    build and the test after it took a minute and met no conflict: the
+    other batch was not on `main` yet.
+  - 1 minute: a run of `harness/show.py` that pressed Enter on a file
+    of A:\ instead of a directory and so ran `fdauto.bat`; the files
+    there are not in the order of the bench's. Noted at the top of
+    `harness/scenarios.py`.
 
 ## Ideas put off
 

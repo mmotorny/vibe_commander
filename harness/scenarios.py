@@ -109,6 +109,19 @@ out again (show.py --changes is how):
     Ctrl+F4 shows the label in a dialog, which Esc leaves.
   - The dialog of Alt+F1 offers A, C and D: there is no drive B to be
     asked for, and no drive that is not ready.
+  - In the viewer F2 switches wrapping, F4 hex, F7 asks for a text and
+    Shift+F7 looks for it again; Right and Left move a line that is not
+    wrapped by a column, with Ctrl by forty. Home in a file that has
+    been paged down goes back to its start. A text typed for F7 in small
+    letters finds capitals. The viewer has 65504 bytes for a file, less
+    two for every line: A:\\FREEDOS\\BIN\\COMMAND.COM, 87772 bytes, is the
+    one file on the bench that does not fit, and is read a part at a
+    time. It has 25 line ends in all, so not wrapped a PgDn or a PgUp
+    leaves the part: that is three steps to the reading of the next part
+    and of the one before, where wrapped it is some twenty PgDn. The
+    file of all bytes, data.bin, has no line end at all.
+  - Enter on a file with the extension bat runs it: on A:\\ the second
+    file is fdauto.bat, which starts the bench again.
   - A step may press about 16 keys. The harness waits for each to reach
     the keyboard buffer, which holds 15, and fails when the program does
     not take them fast enough.
@@ -754,6 +767,64 @@ SCENARIOS = {
             "Home Down Down Down Enter",  # and its vc.ext with it
             "Ctrl+o",                     # what the command printed
             "Ctrl+o",
+        )),
+
+    "view": Scenario(
+        "The viewer: lines wrapped and not, a line longer than the screen "
+        "moved sideways, and a text found in it",
+        steps=(
+            "Down Down Down Down Down",   # onto notes.doc, of three lines
+            "F3",
+            "F2",                         # not wrapped: the same
+            "Down",                       # all of it is shown: no further
+            "Esc",
+            "Down",                       # the file of all bytes: they do
+            "F3",                         # not end a line anywhere
+            "F2",                         # not wrapped: one line, that goes
+            "Right",                      # on to the right; and to the left
+            "Ctrl+Right",                 # once it is moved, by one column
+            "Left",                       # or by forty
+            "Ctrl+Left",
+            "F7",
+            '"abc"',                      # a text, small letters for the
+            "Enter",                      # capitals there: moved into view
+            "F2",                         # wrapped: from where it was found
+            "Up",                         # a line at a time
+            "Down",
+            "F4",                         # in hex: found in the column of
+            "Up",                         # characters
+            "Down",
+            "PgUp",
+            "Shift+F7",                   # and found once more, where the
+            "Esc",                        # bytes repeat
+        )),
+
+    "view-parts": Scenario(
+        "A file larger than the memory the viewer has for it, read a part "
+        "at a time, forwards and backwards",
+        steps=(
+            "Shift+F3",                   # the shell that DOS started from
+            '"a:\\freedos\\bin\\command.com"',
+            "Enter",                      # the first 64K of its 87772 bytes
+            "Down",
+            "Up",
+            "PgDn",
+            "PgUp",
+            "PgDn",
+            "Home",
+            "F2",                         # not wrapped: the lines of that
+                                          # part fill no screen
+            "PgDn",                       # so the next part is read, which
+                                          # begins half a part further on
+            "PgUp",                       # and the one before it again
+            "End",                        # the end of the file: half a part
+            "PgUp",                       # the part before it, by half
+            "PgUp",                       # and the first
+            "F4",                         # in hex
+            "PgDn",
+            "Up",
+            "End",
+            "Esc",
         )),
 }
 
