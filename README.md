@@ -131,7 +131,8 @@ dialogs, the tree to choose the target from, and the renaming of a
 directory of a tree panel, and those that make a directory, delete, set
 attributes and change the volume label. The map of the memory is C as
 well: the blocks of DOS, whose they are and which vectors point into
-them, its window, and programs that have stayed in the memory released.
+them, its window, and programs that have stayed in the memory released;
+the buttons of the window are constants of C, in `port/memory_t.c`.
 Going through the selected files
 of a panel is C too. At the panels the user menu is C, with what makes
 the commands of a line of a menu or of an extension file and writes the

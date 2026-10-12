@@ -2,18 +2,12 @@
 ;		Version :	07.06.2000
 ;-------------------------------------------------------
 
-; The map of the memory is C: port/memory.c. What is left here are the
-; buttons of its window and their colours, which MinMnu reads in this
-; segment, the command, and what the C code asks of the part of the
-; program that stays in the memory. Counter, PrgList and Command are of
-; that part, in VC.ASM.
-	PUBLIC	Memo1_P, Memo_D, Counter, PrgList, Command
-
-	.DATA
-Memo1_P	DB	Conf_C, CnfRe_C, CnfRe_C
-Memo_D	DB	11,  0
-	DB	10, 14
-	DB	 0
+; The map of the memory is C: port/memory.c, with the buttons of its
+; window and their colours in port/memory_t.c. What is left here is the
+; command, and what the C code asks of the part of the program that
+; stays in the memory. Counter, PrgList and Command are of that part, in
+; VC.ASM.
+	PUBLIC	Counter, PrgList, Command
 
 	.CODE
 F65_00:	CallC	F65_00_c		; Alt F5 - memory info

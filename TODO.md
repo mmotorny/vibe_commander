@@ -27,12 +27,12 @@ but code in its row has its data in C.
 | `VCCOPY.INC` | 24 / 487 | 14 / 336 | 9 / 231 | 4 / 28 | 1 / 10 | 82 | `copy.c` |
 | `VCVIEW.INC` | 16 / 256 | 9 / 160 | 5 / 110 | | | 180 | `view.c` |
 | `VCEDIT.INC` | 14 / 688 | 6 / 106 | 5 / 110 | 4 / 18 | | 26 | `edit.c` |
-| `VCMEM.INC` | | | | 2 / 8 | | 40 | `memory.c` |
+| `VCMEM.INC` | | | | | | 40 | `memory.c` |
 | `VCFIND.INC` | | | | | | 22 | `find.c` |
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 201 / 4,904 | 72 / 1,474 | 55 / 1,617 | 21 / 113 | 13 / 420 | 2,420 | |
+| all | 201 / 4,904 | 72 / 1,474 | 55 / 1,617 | 19 / 105 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -167,9 +167,9 @@ No two agents have the same assembly file, and `VCSUB2.INC` and
 code, a file of another agent or the lists of `VC.ASM`: a name stays what
 it is when its object moves. What all of them may add to, a line at a
 time, is the tables of `harness/datacheck.py` and the types of
-`port/tables.h`. Done: `VCFIND.INC`, whose two texts that are copied
-with what follows them are written as long as what is copied.
-`VCMEM.INC` is the other small one to start with.
+`port/tables.h`. Done: `VCMEM.INC`, and `VCFIND.INC`, whose two texts
+that are copied with what follows them are written as long as what is
+copied.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for
