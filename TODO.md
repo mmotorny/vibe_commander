@@ -140,6 +140,13 @@ than it is would pass.
 
 ## Known and not dealt with
 
+- The setup program is not translated. `VCSETUP.COM` exists only as the
+  assembly of `src/asm/`, some 24 KB of it, which the test `asm-bytes`
+  builds and holds against the shipped binary; no C tree has it, and no
+  scenario runs it. It shares routines with the main program, so much of
+  what the translation of that learned applies. Future work, after the
+  portable C has taken its first steps.
+
 - The number of bytes that the editor has free is not compared with the
   original's (see `harness/deviations.py`). What works it out is C now,
   in `T00_20` of `src/c/edit.c`, and the number still wants a check of
