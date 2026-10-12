@@ -104,9 +104,10 @@ u16 ChTree(u16 column);                                 /* treebox.c */
 #pragma aux FilDir  "*_c" __far parm [di] [bx] [dx] value [di] modify exact [di]
 #pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
-/* Boxes and texts of the assembly, which OncZoom and Dialog take by their
-   offsets in its code segment: only those are used here, but for the
-   texts that the commands copy from there into what their dialogs show. */
+/* Boxes and texts, which OncZoom and Dialog take by their offsets in the
+   segment that the constants are in: those of port/copy_t.c, and some of
+   deleting. Only the offsets are used here, but for the texts that the
+   commands copy from there into what their dialogs show. */
 extern const u8 __far Copy0_S[];        /* " Copy " */
 extern const u8 __far Move0_S[];        /* " Move " */
 extern const u8 __far Ren0_S[];         /* " Rename " */
@@ -1427,7 +1428,7 @@ F35_57:
         words = OFFSET(RnMv_S);
         length = 15;
     }
-    /* The title and what follows it in the assembly, 20 bytes. */
+    /* The title and what follows it, 20 bytes: see port/copy_t.c. */
     for (i = 0; i < CpVar2 - CpVar1; i++)
         CpVar1[i] = *AT(AsmSeg(), title + i);
     for (i = 0; i < LenStr; i++)

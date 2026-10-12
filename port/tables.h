@@ -79,6 +79,21 @@
    length of a line that is typed into, say. */
 #define NUMBER(number) ((const void *)(number))
 
+/* Var_S, Title_S and Tree_S are declared far in vc.h, as code reads
+   them, and a box names its lines by near words: here each is the same
+   object under a near name, so a file of constants writes Var_S in a box
+   like any other line. The file that defines one writes no `#pragma aux`
+   for it: that would be expanded, and name the object VarNear_S. */
+extern const u8 VarNear_S[];
+extern const u8 TitleNear_S[];
+extern const u8 TreeNear_S[];
+#pragma aux VarNear_S "Var_S"
+#pragma aux TitleNear_S "Title_S"
+#pragma aux TreeNear_S "Tree_S"
+#define Var_S   VarNear_S
+#define Title_S TitleNear_S
+#define Tree_S  TreeNear_S
+
 #pragma pack(push, 1)
 
 /* A text that a box puts into its lines, where they have Var_S: where it

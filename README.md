@@ -129,7 +129,8 @@ through the files that a mask names. The commands of these are C from
 the key on: Copy and Rename with what they offer as the target, their
 dialogs, the tree to choose the target from, and the renaming of a
 directory of a tree panel, and those that make a directory, delete, set
-attributes and change the volume label. The map of the memory is C as
+attributes and change the volume label; the texts, boxes and dialogs of
+copying and renaming are constants of C, in `port/copy_t.c`. The map of the memory is C as
 well: the blocks of DOS, whose they are and which vectors point into
 them, its window, and programs that have stayed in the memory released;
 the buttons of the window are constants of C, in `port/memory_t.c`.

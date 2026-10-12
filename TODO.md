@@ -24,7 +24,7 @@ but code in its row has its data in C.
 | `VCFUNC.INC` | 16 / 186 | 4 / 68 | 4 / 88 | 1 / 5 | 2 / 76 | 980 | `keys.c`, `usermenu.c` |
 | `VCMENU.INC` | 53 / 1,364 | 8 / 190 | 7 / 352 | 3 / 17 | 8 / 174 | 495 | `commands.c`, `menu.c` |
 | `VCF1.INC` | 48 / 959 | 25 / 502 | 22 / 660 | 4 / 24 | | 217 | `dirfunc.c` |
-| `VCCOPY.INC` | 24 / 487 | 14 / 336 | 9 / 231 | 4 / 28 | 1 / 10 | 82 | `copy.c` |
+| `VCCOPY.INC` | | | | | 1 / 10 | 82 | `copy.c` |
 | `VCVIEW.INC` | 16 / 256 | 9 / 160 | 5 / 110 | | | 180 | `view.c` |
 | `VCEDIT.INC` | 14 / 688 | 6 / 106 | 5 / 110 | 4 / 18 | | 26 | `edit.c` |
 | `VCMEM.INC` | | | | | | 40 | `memory.c` |
@@ -32,7 +32,7 @@ but code in its row has its data in C.
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 201 / 4,904 | 72 / 1,474 | 55 / 1,617 | 19 / 105 | 13 / 420 | 2,420 | |
+| all | 177 / 4,417 | 58 / 1,138 | 46 / 1,386 | 15 / 77 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -169,7 +169,8 @@ it is when its object moves. What all of them may add to, a line at a
 time, is the tables of `harness/datacheck.py` and the types of
 `port/tables.h`. Done: `VCMEM.INC`, and `VCFIND.INC`, whose two texts
 that are copied with what follows them are written as long as what is
-copied.
+copied; `VCCOPY.INC`, where the titles `Copy0_S` and `Ren0_S` are such
+texts too, 20 bytes each.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for
@@ -635,9 +636,9 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   says 0 or 4096 and has no entries has its sum taken over 65536 bytes,
   all of the main data's segment. Ported like that; it takes a file made
   by hand.
-- `VCCOPY.INC` is C but for its boxes and texts, which `DialBox` and
-  `Dialog` read in the assembly, and the stubs: of the commands and of
-  what their dialogs call for the tree. `C00_00`, which `FncSel` and
+- `VCCOPY.INC` is C but for the stubs: of the commands and of what
+  their dialogs call for the tree. Its boxes and texts are constants of
+  `port/copy_t.c`. `C00_00`, which `FncSel` and
   `FncMas` call, has none any more: they call the function.
 - What the commands of Copy and Rename do in the original and the port
   does after them; whether to mend any of it is not decided:
