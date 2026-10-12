@@ -76,6 +76,15 @@ not in Claude's memory: memory does not travel between computers.
   report it; whether to fix it is decided separately.
 - Translated code keeps the names that routines and data have in the
   assembly, until the whole program is C.
+- The port ends with no assembly file in it: its code and its data are
+  C. Where C can be written in more than one way, portable C comes before
+  C that is tied to this compiler or this machine, that before the
+  compiler's intrinsics, and those before assembly, which is written
+  inline in a C file and only where nothing else works. That a thing
+  would be smaller or faster is no reason to go down that list.
+- The port is not done while code of it has never run. That goes for the
+  mouse as for the rest: the bench is to have one, and what the program
+  does with it is held against the original like everything else.
 - DOS is a stage on the way: the aim is to carry the program to modern
   operating systems, where a few kilobytes of memory or of disk mean
   nothing. So the port may be larger than the original and use more
