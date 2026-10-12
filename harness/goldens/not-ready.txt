@@ -256,11 +256,11 @@ cursor 0 127 lines 6 7 mode 3
 
 == 9: Enter
 cursor 0 127 lines 6 7 mode 3
-|View: B:\fdauto.bat                     Col 0                115 Bytes     100% | 30x80
+|View: B:\fdauto.bat                     Col 0                118 Bytes     100% | 30x80
 |@ECHO OFF                                                                       | 1Bx80
 |SET PATH=A:\FREEDOS\BIN                                                         | 1Bx80
 |ECHO BOOTED>COM1                                                                | 1Bx80
-|CTMOUSE>NUL                                                                     | 1Bx80
+|CTMOUSE /3>NUL                                                                  | 1Bx80
 |DRIVER                                                                          | 1Bx80
 |PAUSE>NUL                                                                       | 1Bx80
 |CLS                                                                             | 1Bx80
@@ -536,11 +536,11 @@ cursor 0 127 lines 6 7 mode 3
 
 == 19: Enter
 cursor 0 127 lines 6 7 mode 3
-|View: B:\fdauto.bat                     Col 0                115 Bytes     100% | 30x80
+|View: B:\fdauto.bat                     Col 0                118 Bytes     100% | 30x80
 |@ECHO OFF                                                                       | 1Bx80
 |SET PATH=A:\FREEDOS\BIN                                                         | 1Bx80
 |ECHO BOOTED>COM1                                                                | 1Bx80
-|CTMOUSE>NUL                                                                     | 1Bx80
+|CTMOUSE /3>NUL                                                                  | 1Bx80
 |DRIVER                                                                          | 1Bx80
 |PAUSE>NUL                                                                       | 1Bx80
 |CLS                                                                             | 1Bx80
@@ -816,11 +816,11 @@ cursor 0 127 lines 6 7 mode 3
 
 == 29: Enter
 cursor 0 127 lines 6 7 mode 3
-|View: B:\fdauto.bat                     Col 0                115 Bytes     100% | 30x80
+|View: B:\fdauto.bat                     Col 0                118 Bytes     100% | 30x80
 |@ECHO OFF                                                                       | 1Bx80
 |SET PATH=A:\FREEDOS\BIN                                                         | 1Bx80
 |ECHO BOOTED>COM1                                                                | 1Bx80
-|CTMOUSE>NUL                                                                     | 1Bx80
+|CTMOUSE /3>NUL                                                                  | 1Bx80
 |DRIVER                                                                          | 1Bx80
 |PAUSE>NUL                                                                       | 1Bx80
 |CLS                                                                             | 1Bx80
@@ -1068,11 +1068,11 @@ cursor 0 127 lines 6 7 mode 3
 
 == 38: Enter
 cursor 0 127 lines 6 7 mode 3
-|View: B:\fdauto.bat                     Col 0                115 Bytes     100% | 30x80
+|View: B:\fdauto.bat                     Col 0                118 Bytes     100% | 30x80
 |@ECHO OFF                                                                       | 1Bx80
 |SET PATH=A:\FREEDOS\BIN                                                         | 1Bx80
 |ECHO BOOTED>COM1                                                                | 1Bx80
-|CTMOUSE>NUL                                                                     | 1Bx80
+|CTMOUSE /3>NUL                                                                  | 1Bx80
 |DRIVER                                                                          | 1Bx80
 |PAUSE>NUL                                                                       | 1Bx80
 |CLS                                                                             | 1Bx80
@@ -1376,11 +1376,11 @@ cursor 0 127 lines 6 7 mode 3
 
 == 49: Enter
 cursor 0 127 lines 6 7 mode 3
-|View: A:\fdauto.bat                     Col 0                115 Bytes     100% | 30x80
+|View: A:\fdauto.bat                     Col 0                118 Bytes     100% | 30x80
 |@ECHO OFF                                                                       | 1Bx80
 |SET PATH=A:\FREEDOS\BIN                                                         | 1Bx80
 |ECHO BOOTED>COM1                                                                | 1Bx80
-|CTMOUSE>NUL                                                                     | 1Bx80
+|CTMOUSE /3>NUL                                                                  | 1Bx80
 |DRIVER                                                                          | 1Bx80
 |PAUSE>NUL                                                                       | 1Bx80
 |CLS                                                                             | 1Bx80

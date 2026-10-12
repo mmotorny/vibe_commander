@@ -609,9 +609,8 @@ Things that are known and not done. Standing instructions are in
   A second click is two clicks in one step; a button held is a click
   with a count behind it, "Click@3,5*200"; one that goes down in one
   place and comes up in another has both, "Click@3,5>3,2"; the middle
-  button is "MiddleClick@3,5", once a step has told the mouse driver
-  that the mouse has three; and a row may be any of 50. See the top of
-  `harness/scenarios.py`. What such steps would still show, where the
+  button is "MiddleClick@3,5"; and a row may be any of 50. See the top
+  of `harness/scenarios.py`. What such steps would still show, where the
   instructions have run without them: the middle button on a key of
   the key bar, which is the key with Shift, and on an item of the Files
   menu, which is the item with Ctrl; a button let go beside the key of

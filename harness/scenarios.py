@@ -323,11 +323,9 @@ out again (show.py --changes is how):
     went down on one of its lines and is held above or below them.
   - "MiddleClick@40,12" is the middle button. The mouse driver takes a
     PS/2 mouse for one of two buttons and hands the third on only when
-    it has been told: '"a:\\freedos\\bin\\ctmouse" Space "/3" Enter' at
-    the command line, as a step before, which leaves the driver where
-    it is in the memory. The bench does not load it like that: three
-    characters more in a:\\fdauto.bat are in the goldens of find and
-    find-drives, which list the file with its size.
+    it has been told, so the bench loads it with /3: that is in
+    a:\\fdauto.bat, which find and find-drives list with its size, and
+    drive-b and not-ready show in the viewer.
   - The row of a step may be any of 50: on a screen of 50 lines,
     Alt+F9, "Click@1,49" is F1 of the key bar. The mouse driver stops
     the pointer at the last row that the screen has.

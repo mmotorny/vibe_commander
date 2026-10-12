@@ -13,8 +13,9 @@ Two setups share one clock and one source of files:
                   means its size cannot show up as free space on screen.
                   The clock in the corner of the screen is off, so that
                   no screen depends on how long it took to get there.
-                  DOS has loaded a mouse driver, for the PS/2 mouse that
-                  the machine has, and the driver of the tests (see
+                  DOS has loaded a mouse driver, for the PS/2 mouse of
+                  three buttons that the machine has, and the driver of
+                  the tests (see
                   driver.py), which takes the program through a
                   scenario's steps from a script on a third disk, one
                   without a file system.
@@ -183,6 +184,10 @@ KEYBOARDS = {"ru": ("RU", 866, "KEYBRD2.SYS")}
 # the Lite USB image, and its file there. The bench's machine has a PS/2
 # mouse, as every PC of QEMU's has.
 MOUSE = ("ctmouse", "BIN/CTMOUSE.EXE")
+# The command that loads it. CuteMouse takes a PS/2 mouse for one of two
+# buttons unless it is told of the third, with /3; the mouse of the bench
+# has three.
+LOAD_MOUSE = "CTMOUSE /3>NUL"
 
 # How many paragraphs of memory the driver of the tests keeps beyond its
 # own on the bench of each country, which decides where DOS loads the
@@ -200,7 +205,7 @@ PLACE = {"us": 176, "ru": 159}
 # of the tests and then waits for a key: that is where the machine's state
 # is saved, and where every scenario begins, with the Enter that its
 # script has first.
-BENCH_COMMANDS = ["CTMOUSE>NUL", Path(driver.FILENAME).stem, "PAUSE>NUL",
+BENCH_COMMANDS = [LOAD_MOUSE, Path(driver.FILENAME).stem, "PAUSE>NUL",
                   "CLS", "C:", r"CD \WORK", r"D:\VC\VC"]
 
 

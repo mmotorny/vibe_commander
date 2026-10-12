@@ -32,7 +32,7 @@ ROOT = Path(__file__).resolve().parent.parent
 
 # What DOS runs once it has booted: the program, where the tests start it,
 # and then what switches the machine off.
-COMMANDS = ["CTMOUSE>NUL", "C:", r"CD \WORK", r"D:\VC\VC",
+COMMANDS = [setups.LOAD_MOUSE, "C:", r"CD \WORK", r"D:\VC\VC",
             r"A:\FREEDOS\BIN\FDAPM POWEROFF"]
 
 
