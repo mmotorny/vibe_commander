@@ -20,10 +20,11 @@
  * M30_50 sets attributes; the routines of the other commands are in
  * other files, and DirFunc serves them too.
  *
- * A command is entered by a jump, from the table of the keys or from a
- * menu, and jumps on when it is done: back to the panels, to FncSel, or
- * to where the panels are read again. Its function here returns which,
- * one of the TO_ of vc.h, and its stub in the assembly jumps there.
+ * A command is entered by a jump in the original, from the table of the
+ * keys or from a menu, and jumps on when it is done: back to the panels,
+ * to FncSel, or to where the panels are read again. Its function here
+ * returns which, one of the TO_ of vc.h, and the main loop goes on from
+ * that: F1Next of main.c.
  * FncMas and FncSel are here, and FncExt, where such a command ends: it
  * has the panels read again if TmpBuf has something at 91.
  *
@@ -45,8 +46,8 @@ u32 M30_60(u16 answer);
 static u32 F38_60(void);
 static u16 FncMs1(u16 include);
 
-/* How the assembly passes arguments to these, and what it expects back
-   (see the stubs in port/asm/VCF1.INC). DirFunc and DelTr0 are in vc.h. */
+/* The registers of these are those that their stubs had in the assembly,
+   when it called them. DirFunc and DelTr0 are in vc.h. */
 #pragma aux F38_10  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux F38_40  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux M30_50  "*_c" __far parm [ax] value [ax] modify exact [ax]
@@ -1415,8 +1416,8 @@ u16 FncMas(u16 include)
 
 /* Where a command ends that may have changed what is on the disk:
    FncExt. Returns 1 if the panels are to be read again, 0 if they are as
-   they were; the stub goes on to Init50 or to Func04 by that. FncEx1, of
-   vc.h, has them read again whatever. */
+   they were; the main loop goes on at Init50 or at Func04 by that.
+   FncEx1, of vc.h, has them read again whatever. */
 u16 FncEx1(void)
 {
     u16 panel = md.WCBcrn;

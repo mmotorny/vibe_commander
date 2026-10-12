@@ -1,7 +1,8 @@
 /*
- * The tables of the menus' commands: the boxes and the dialogs that
- * port/commands.c hands to DialBox and Dialog by their offsets, their
- * texts and their buttons, and the texts that it copies.
+ * The tables of the menus' commands: which command an item of a menu is;
+ * and the boxes and the dialogs that port/commands.c hands to DialBox and
+ * Dialog by their offsets, their texts and their buttons, and the texts
+ * that it copies.
  *
  * From VCMENU.INC, in the order that they have there. How a line is
  * marked up is said in port/line.c: \377 and a count stand for so many
@@ -13,8 +14,9 @@
  */
 #include "tables.h"
 
-/* What others name, port/commands.c here, has the name that it has in
-   the assembly. */
+/* What others name, port/commands.c and for Menu_T port/main.c, has the
+   name that it has in the assembly. */
+#pragma aux Menu_T "*"
 #pragma aux Filt_B "*"
 #pragma aux DiSiz_P "*"
 #pragma aux CmpDi_B "*"
@@ -43,6 +45,119 @@ static const u8 OkCn_D[5];
 static const u8 MnLoc_D[7];
 static const u8 SvSt_D[5];
 
+/* The commands of the menus. The menu bar, F39_00 of port/menu.c, says
+   which item was chosen and which of these tables has it: Menu_T names
+   them, one for each menu, Menu1_T for the Left and for the Right one,
+   and MenuS_T and MenuC_T, which are the first eight commands of the
+   Files menu with Shift and with Ctrl held down. An entry is the number
+   of a command, a CMD_ of vc.h, which F39_01 of port/main.c hands to
+   Command, and 0 for a line across the menu. The original has the
+   address of the command's label there. */
+static const u16 Menu1_T[15];
+static const u16 Menu2_T[17];
+static const u16 Menu3_T[13];
+static const u16 Menu4_T[16];
+static const u16 MenuS_T[8];
+static const u16 MenuC_T[8];
+
+const u16 * const Menu_T[6] = {
+    Menu1_T, Menu2_T, Menu3_T, Menu4_T, MenuS_T, MenuC_T
+};
+
+static const u16 Menu1_T[15] = {
+    CMD_M01_00,                         /* Brief */
+    CMD_M01_00,                         /* Full */
+    CMD_M03_00,                         /* Info */
+    CMD_M03_00,                         /* Tree */
+    CMD_M06_00,                         /* On/Off */
+    0,
+    CMD_M08_00,                         /* Name */
+    CMD_M08_00,                         /* Extension */
+    CMD_M08_00,                         /* Time */
+    CMD_M08_00,                         /* Size */
+    CMD_M08_00,                         /* Unsorted */
+    0,
+    CMD_F17_01,                         /* Re-read */
+    CMD_M16_01,                         /* Filter... */
+    CMD_F62_01                          /* Drive... */
+};
+
+static const u16 Menu2_T[17] = {
+    CMD_M21_00,                         /* Help */
+    CMD_F32_00,                         /* Menu */
+    CMD_F33_00,                         /* View */
+    CMD_F34_00,                         /* Edit */
+    CMD_F35_00,                         /* Copy */
+    CMD_F36_00,                         /* Rename or move */
+    CMD_F37_00,                         /* Make directory */
+    CMD_F38_00,                         /* Delete */
+    0,
+    CMD_M30_00,                         /* File attributes */
+    0,
+    CMD_F09_00,                         /* Gray + */
+    CMD_F10_00,                         /* Gray - */
+    CMD_F76_01,                         /* Gray * */
+    CMD_F78_00,                         /* ^M */
+    0,
+    CMD_F30_00                          /* Quit */
+};
+
+static const u16 Menu3_T[13] = {
+    CMD_M41_00,                         /* Tree */
+    CMD_F54_00,                         /* Volume label */
+    CMD_F65_00,                         /* Memory info */
+    CMD_M42_00,                         /* Directory sizes */
+    CMD_F67_00,                         /* Find file */
+    CMD_F68_00,                         /* History */
+    CMD_F69_00,                         /* EGA lines */
+    0,
+    CMD_F15_00,                         /* Swap panels */
+    CMD_F11_00,                         /* Panels on/off */
+    CMD_M49_00,                         /* Compare directories */
+    0,
+    CMD_M53_00                          /* Menu file edit */
+};
+
+static const u16 Menu4_T[16] = {
+    CMD_M60_00,                         /* Configuration... */
+    CMD_M61_00,                         /* Advanced options... */
+    CMD_M62_00,                         /* Extension file edit... */
+    CMD_M63_00,                         /* Viewer... */
+    CMD_M64_00,                         /* Editor... */
+    0,
+    CMD_M66_00,                         /* Auto menus */
+    CMD_M67_00,                         /* Path prompt */
+    CMD_F16_00,                         /* Key bar */
+    CMD_M69_00,                         /* Full screen */
+    CMD_M70_00,                         /* Auto directory sizes */
+    CMD_M71_00,                         /* Mini status */
+    CMD_M72_00,                         /* Clock */
+    CMD_M73_00,                         /* Memory location */
+    0,
+    CMD_M75_00                          /* Save setup */
+};
+
+static const u16 MenuS_T[8] = {
+    CMD_M21_00,                         /* Help */
+    CMD_F42_00,                         /* Menu */
+    CMD_F43_00,                         /* View... */
+    CMD_F44_00,                         /* Edit... */
+    CMD_F45_00,                         /* Copy... */
+    CMD_F46_00,                         /* Rename or move... */
+    CMD_F47_00,                         /* Make directory... */
+    CMD_F48_00                          /* Delete... */
+};
+
+static const u16 MenuC_T[8] = {
+    CMD_M21_00,                         /* Help */
+    CMD_F32_00,                         /* Menu */
+    CMD_F33_00,                         /* View... */
+    CMD_F34_00,                         /* Edit... */
+    CMD_F55_00,                         /* Copy... */
+    CMD_F56_00,                         /* Rename or move... */
+    CMD_F37_00,                         /* Make directory... */
+    CMD_F58_00                          /* Delete... */
+};
 /* The filter of a panel:
 
      Select files to display

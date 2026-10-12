@@ -124,6 +124,12 @@ REVIEWED = {
     ("keys.c", "Unsl_S"): (ZERO, "an include line"),
     ("keys.c", "Inv_S"): (ZERO, "an include line"),
     ("main.c", "AltSr_T"): (38, "compared up to ALT_KEYS"),
+    ("main.c", "Menu_T"): (OWN, "the word of one of its six tables, which "
+                                "F39_00 of menu.c numbers; and of that "
+                                "table, which this word names, the word of "
+                                "the item chosen, one of the menu's, and "
+                                "of the first eight of the Files menu for "
+                                "the two tables that are eight long"),
     ("main.c", "Err_S"): (7, "six bytes from the first on, for the box "
                              "of a critical error"),
     ("main.c", "OnDr_S"): (11, "copied as 11 bytes"),
@@ -136,6 +142,9 @@ REVIEWED = {
     ("memory.c", "Memo1_P"): (3, "the colours of buttons, three of them"),
     ("memory.c", "DosMe_S"): (ZERO, "four bytes, and from the fourth on "
                                     "as far as the zero"),
+    ("menu.c", "PtMnu_S"): (OWN, "F40_50 goes through the names of the "
+                                 "menus by their marks, five of them, as "
+                                 "PtMnu1 of bars.c does"),
     ("menu.c", "MenuLn"): (OWN, "the lines of a menu, by MnuTab; a menu "
                                 "that is none reads elsewhere, as the "
                                 "original does: see TODO.md"),

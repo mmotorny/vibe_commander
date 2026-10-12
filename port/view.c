@@ -1582,11 +1582,11 @@ none:
  * Shift-F3 and Shift-F4, which ask for a name.
  *
  * They are commands, as in keys.c and enter.c: functions that get the
- * panel which the assembly has in DS and return where the program goes
- * on. NEXT_VIEW, with 1 in the high word for the editor, is V00_00 above for
- * the file ViewFil, and NEXT_DIRINFO is V00_02 for the editor in the window of
- * an Info panel; their stub goes on from there to the editor, or back
- * here.
+ * panel which the original has in DS and return where the program goes
+ * on. NEXT_VIEW, with 1 in the high word for the editor, is V00_00 above
+ * for the file ViewFil, and NEXT_DIRINFO is V00_02 for the editor in the
+ * window of an Info panel; the main loop goes on from there to the
+ * editor, or back here: V00_03 of main.c.
  *
  * Where the setup has the viewer or the editor be another program, that
  * is looked for in VCVIEW.EXT or VCEDIT.EXT, of the current directory or

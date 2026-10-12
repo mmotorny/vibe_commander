@@ -7,21 +7,21 @@
  *
  * Translated from VCMENU.INC.
  *
- * These are commands, not routines: the stub of the menu bar jumps to one
- * by its tables, the main loop by its table of keys, and the keys of the
- * panels and the box of the drives go on in some of them. A command is a
- * function here that the stub at its label calls, with the panel that the
- * assembly has in DS and with CX as the menu or the key left it, and what
- * it returns says where the program goes on: see MNU_FUNC04 in vc.h, and
- * MnuEnd in main.c.
+ * These are commands, not routines: in the original the menu bar jumps
+ * to one by its tables, the main loop by its table of keys, and the keys
+ * of the panels and the box of the drives go on in some of them. A
+ * command is a function here that the main loop calls, Command of
+ * main.c, with the panel that the original has in DS and with CX as the
+ * menu or the key left it, and what it returns says where the program
+ * goes on: see MNU_FUNC04 in vc.h, and MnuEnd in main.c.
  *
- * A command of the Left or the Right menu gets that menu's panel, and
- * finds the current one on the stack, where the bar's stub has pushed it;
- * so do M01_01, M03_00, M06_00 and M06_10 from wherever they are entered.
- * The assembly takes it off before it jumps on, and once to have Tab
- * pressed for it. Here the stub takes it off, and the functions go by
- * WCBcrn instead: every way into a command has DS on the current panel,
- * and nothing changes WCBcrn before the place that popped it.
+ * A command of the Left or the Right menu gets that menu's panel. In the
+ * original it finds the current one on the stack, where the menu bar has
+ * pushed it, and so do M01_01, M03_00, M06_00 and M06_10 from wherever
+ * they are entered: the original takes it off before it jumps on, and
+ * once to have Tab pressed for it. The functions go by WCBcrn instead:
+ * every way into a command has DS on the current panel, and nothing
+ * changes WCBcrn before the place that popped it.
  */
 #include "vc.h"
 

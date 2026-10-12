@@ -560,6 +560,50 @@ struct Box {
  * at, which is how the original's files have them.
  */
 
+/* The commands, by number: what the main loop finds for a key or for
+   the mouse, and what the tables of the menus have for their items, with
+   0 for an item that is none (port/commands_t.c). Each has the name of
+   the label that the original has for it, which is how the test of the
+   data holds the menus' tables against the original's: it reads the
+   numbers here (harness/datacheck.py). Command of main.c has what each
+   is. */
+enum {
+    CMD_F73_00 = 1,                     /* the key goes to the command
+                                           line */
+    CMD_F77_00,                         /* the speed search */
+    CMD_F11_00,                         /* the panels off or on */
+    CMD_F39_00,                         /* the menu bar */
+    CMD_F20_00,                         /* the other panel */
+    CMD_F34_10,                         /* the editor on dirinfo */
+    CMD_F00_60,                         /* the cursor to an entry */
+    CMD_F00_05,                         /* a line up */
+    CMD_F01_05,                         /* a line down */
+    CMD_F21_10,                         /* Enter on the entry */
+    CMD_F21_31,                         /* run the command in DosBuf */
+    /* The other commands of the keys, in the order that the original's
+       table of the keys has them in: see Func12 of main.c. */
+    CMD_F00_00, CMD_F01_00, CMD_F02_00, CMD_F03_00, CMD_F04_00,
+    CMD_F05_00, CMD_F06_00, CMD_F07_00, CMD_F08_00, CMD_F09_00,
+    CMD_F10_00, CMD_F76_00, CMD_F21_00, CMD_F27_00, CMD_F74_00,
+    CMD_F78_00, CMD_F12_00, CMD_F13_00, CMD_F14_00, CMD_F15_00,
+    CMD_F16_00, CMD_F17_00, CMD_M16_00, CMD_M16_10, CMD_M30_00,
+    CMD_M49_00, CMD_F18_00, CMD_F79_00, CMD_F22_00, CMD_F23_00,
+    CMD_F24_00, CMD_F25_00, CMD_F26_00, CMD_F80_00, CMD_F81_00,
+    CMD_F82_00, CMD_F30_00, CMD_F32_00, CMD_F33_00, CMD_F34_00,
+    CMD_F35_00, CMD_F36_00, CMD_F37_00, CMD_F38_00, CMD_F40_00,
+    CMD_F42_00, CMD_F43_00, CMD_F44_00, CMD_F45_00, CMD_F46_00,
+    CMD_F47_00, CMD_F48_00, CMD_M75_00, CMD_F54_00, CMD_F55_00,
+    CMD_F56_00, CMD_F58_00, CMD_F61_00, CMD_F62_00, CMD_F63_00,
+    CMD_F64_00, CMD_F65_00, CMD_M42_00, CMD_F67_00, CMD_F68_00,
+    CMD_F69_00, CMD_M41_00, CMD_F75_00,
+    /* Those that only the menus have, or have at a label of their own. */
+    CMD_M01_00, CMD_M03_00, CMD_M06_00, CMD_M08_00, CMD_F17_01,
+    CMD_M16_01, CMD_F62_01, CMD_M21_00, CMD_F76_01, CMD_M53_00,
+    CMD_M60_00, CMD_M61_00, CMD_M62_00, CMD_M63_00, CMD_M64_00,
+    CMD_M66_00, CMD_M67_00, CMD_M69_00, CMD_M70_00, CMD_M71_00,
+    CMD_M72_00, CMD_M73_00
+};
+
 /* Where the program goes on after a command of the keys of the panels,
    of keys.c, enter.c and view.c, in the low byte of what it returns. The
    routines of a panel's menu take a panel, in the high word, and a byte,
@@ -917,8 +961,8 @@ u16 F32_00(u16 main);
 #pragma aux F32_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
 u16 F62_01(u16 panel, u16 item);
 #pragma aux F62_01 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
-u32 F39_00(u16 again, u16 panel, u16 bar);
-#pragma aux F39_00 "*_c" __far parm [ax] [dx] [si] value [dx ax] modify exact [ax dx es]
+u32 F39_00(u16 again, u16 panel);
+#pragma aux F39_00 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx es]
 
 /* Save the setup, the command line and the panels in the part of the
    program that stays in the memory, and give up the main data, for that

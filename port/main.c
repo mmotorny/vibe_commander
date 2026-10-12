@@ -30,9 +30,9 @@
  * goes back to the loop there or before leaves nothing in BX and DX that
  * Rename could tell; the cursor's keys go back behind it, at Func07.
  *
- * The menu bar and its tables of commands are still assembly, and so is
- * what ends the program or has a command run: for those MainLoop returns
- * to its stub, MainGo of port/asm/VC.ASM, which jumps on.
+ * What ends the program, starts it over or has a command run first is
+ * still assembly: for those MainLoop returns to its stub, MainGo of
+ * port/asm/VC.ASM, which jumps on.
  */
 #include "vc.h"
 
@@ -40,6 +40,7 @@
    of the loop pushes them so. */
 u16 MainLoop(u16 entry, struct Regs STACK *r);
 static u16 CmdEnd(u32 answer, struct Regs STACK *r);
+static u16 Command(u16 command, u16 panel, struct Regs STACK *r);
 u16 ErrRdy(u16 letter);
 void Exit(void);
 /* Quit, RestVct and HookVct are in vc.h. */
@@ -74,8 +75,6 @@ enum {
 /* Where the stub of the loop goes on when MainLoop returns: the places of
    Main_T in port/asm/VC.ASM. */
 enum {
-    ASM_F39_00,                         /* the menu bar, */
-    ASM_F40_00,                         /* and with its last item again */
     ASM_INIT11,                         /* start the program over */
     ASM_EXEC,                           /* have the part of the program
                                            that stays in the memory run
@@ -83,34 +82,8 @@ enum {
     ASM_EXIT                            /* leave the program */
 };
 
-/* The commands: what Loop returns and Command takes. */
+/* What Func21 returns besides a command. */
 enum {
-    TO_F73_00,                          /* the key goes to the command
-                                           line */
-    TO_F77_00,                          /* the speed search */
-    TO_F11_00,                          /* the panels off or on */
-    TO_F39_00,                          /* the menu bar */
-    TO_F20_00,                          /* the other panel */
-    TO_F34_10,                          /* the editor on dirinfo */
-    TO_F00_60,                          /* the cursor to an entry */
-    TO_F00_05,                          /* a line up */
-    TO_F01_05,                          /* a line down */
-    TO_F21_10,                          /* Enter on the entry */
-    TO_F21_31,                          /* run the command in DosBuf */
-    /* The other commands of the keys, in the order of Main_T: see
-       Func12. */
-    TO_F00_00, TO_F01_00, TO_F02_00, TO_F03_00, TO_F04_00, TO_F05_00,
-    TO_F06_00, TO_F07_00, TO_F08_00, TO_F09_00, TO_F10_00, TO_F76_00,
-    TO_F21_00, TO_F27_00, TO_F74_00, TO_F78_00, TO_F12_00, TO_F13_00,
-    TO_F14_00, TO_F15_00, TO_F16_00, TO_F17_00, TO_M16_00, TO_M16_10,
-    TO_M30_00, TO_M49_00, TO_F18_00, TO_F79_00, TO_F22_00, TO_F23_00,
-    TO_F24_00, TO_F25_00, TO_F26_00, TO_F80_00, TO_F81_00, TO_F82_00,
-    TO_F30_00, TO_F32_00, TO_F33_00, TO_F34_00, TO_F35_00, TO_F36_00,
-    TO_F37_00, TO_F38_00, TO_F40_00, TO_F42_00, TO_F43_00, TO_F44_00,
-    TO_F45_00, TO_F46_00, TO_F47_00, TO_F48_00, TO_M75_00, TO_F54_00,
-    TO_F55_00, TO_F56_00, TO_F58_00, TO_F61_00, TO_F62_00, TO_F63_00,
-    TO_F64_00, TO_F65_00, TO_M42_00, TO_F67_00, TO_F68_00, TO_F69_00,
-    TO_M41_00, TO_F75_00,
     AGAIN = 0x100                       /* not a place: go round, from the
                                            entry in the low byte */
 };
@@ -182,10 +155,12 @@ const u8 __far *FndLet(const u8 __far *text);
    port/main_t.c the box that says a drive is not ready, which DialBox
    takes by its offset. */
 extern const u8 __far AltSr_T[];
+extern const u8 __far Menu_T[];
 extern const u8 __far NoRd_P[];
 extern const u8 __far CtrlC[];
 extern const u8 __far WCB1sav[];
 #pragma aux AltSr_T "*"
+#pragma aux Menu_T "*"
 #pragma aux NoRd_P "*"
 #pragma aux CtrlC "*"
 #pragma aux WCB1sav "*"
@@ -491,8 +466,8 @@ Init70:
 
 /* What the mouse does at the panels, with a button down: `r->ax` is the
    buttons, `r->cx` where the mouse is, the row in the high byte, and
-   `r->ds` the current panel. Returns where the program goes on, or AGAIN
-   with the place of the loop.
+   `r->ds` the current panel. Returns the command that the mouse asks
+   for, a CMD_ of vc.h, or AGAIN with the place of the loop.
 
    A button in the top left corner switches the panels off and on when it
    comes up there; one on the top row is the menu bar's; one below the
@@ -535,10 +510,10 @@ static u16 Func21(struct Regs STACK *r)
         TypMous(0);
         if (look == 0)
             return AGAIN | FUNC07;
-        return TO_F11_00;
+        return CMD_F11_00;
     }
     if ((r->cx >> 8) == 0)              /* Func25: pull down menu */
-        return TO_F39_00;
+        return CMD_F39_00;
     r->bx = BegBX(r->ds);               /* Func26 */
     r->dx = SizDX();
     r->dx = r->dx & 0xFF | (u16)(u8)((r->dx >> 8) + (r->bx >> 8)) << 8;
@@ -554,7 +529,7 @@ static u16 Func21(struct Regs STACK *r)
             goto Func30;
     }
     r->ds = md.WCBcrn;                  /* Func28 */
-    return TO_F20_00;
+    return CMD_F20_00;
 
 Func30:
     wcb = PANEL(r->ds);
@@ -568,7 +543,7 @@ Func30:
     r->dx = SizDX() - 0x0C02;
     if (InWind(r->cx, r->bx, r->dx))
         return AGAIN | FUNC07;
-    return TO_F34_10;
+    return CMD_F34_10;
 
 Func40:                                 /* Move the cursor */
     md.WinMous |= 1;
@@ -591,7 +566,7 @@ Func40:                                 /* Move the cursor */
     r->cx = r->cx & 0xFF | (u16)(u8)(rows - (r->bx >> 8)) << 8;
     if (rows < r->bx >> 8) {            /* Func50: scroll up */
         r->si = r->di;
-        return TO_F00_05;
+        return CMD_F00_05;
     }
     rows = r->cx >> 8;
     kind = wcb->WinTyp | wcb->BrfFul;
@@ -603,7 +578,7 @@ Func40:                                 /* Move the cursor */
         r->si = r->di + r->ax;
         if (r->si > r->dx)
             r->si = r->dx;
-        return TO_F01_05;
+        return CMD_F01_05;
     }
     column = (u8)(column - (r->bx & 0xFF));     /* Set cursor position */
     r->cx = r->cx & 0xFF00 | column;
@@ -623,10 +598,10 @@ Func40:                                 /* Move the cursor */
     r->si = r->ax;
     if (r->si > r->dx) {
         r->si = r->dx;
-        return TO_F00_60;
+        return CMD_F00_60;
     }
     if (!(r->bp & 1))                   /* Func43 */
-        return TO_F00_60;
+        return CMD_F00_60;
 
     r->cx = *(u16 *)md.TmpBuf;          /* Func60: double click */
     r->bx = BegBX(r->ds) + 1;
@@ -644,16 +619,16 @@ Func40:                                 /* Move the cursor */
     }
     answer = DoublMo(r->bx, r->dx, r->si);      /* Func61 */
     if (answer == 2)
-        return TO_F00_60;
+        return CMD_F00_60;
     if (answer == 0)
         return AGAIN | FUNC04;
     r->ax &= 0xFF00;                    /* Func62 */
     TypMous(0);
-    return TO_F21_10;
+    return CMD_F21_10;
 }
 
-/* The command of a key, a place of Main_T: the command line for a key
-   that has none, and for one without a scan code.
+/* The command of a key, a CMD_ of vc.h: the command line for a key that
+   has none, and for one without a scan code.
 
    The assembly had a table of keys and commands, FncTab, which Case went
    through from its start: an entry was a key, or a character that counts
@@ -665,85 +640,85 @@ Func40:                                 /* Move the cursor */
 static u16 Func12(u16 key)
 {
     if (key >> 8 == 0)
-        return TO_F73_00;
+        return CMD_F73_00;
     switch (key) {
-    case 0x4800: return TO_F00_00;  /* Up */
-    case 0x5000: return TO_F01_00;  /* Down */
-    case 0x4B00: return TO_F02_00;  /* Left */
-    case 0x4D00: return TO_F03_00;  /* Right */
-    case 0x4900: return TO_F04_00;  /* PgUp */
-    case 0x5100: return TO_F05_00;  /* PgDn */
-    case 0x4700: return TO_F06_00;  /* Home */
-    case 0x4F00: return TO_F07_00;  /* End */
-    case 0x5200: return TO_F08_00;  /* Ins: select / unselect */
-    case 0x4E2B: return TO_F09_00;  /* Grey +: select group */
-    case 0x4A2D: return TO_F10_00;  /* Grey -: unselect group */
-    case 0x372A: return TO_F76_00;  /* Grey *: invert group */
-    case 0x0F09: return TO_F20_00;  /* Tab: change active panel */
-    case 0x1C0D: return TO_F21_00;  /* Enter: run / change directory */
-    case 0x011B: return TO_F74_00;  /* Esc: clear command line / on/off */
-    case 0x5E00: return TO_F13_00;  /* ^F1: on/off left panel */
-    case 0x5F00: return TO_F14_00;  /* ^F2: on/off right panel */
-    case 0x2308: return TO_M16_10;  /* ^H: hidden files */
-    case 0x8400: return TO_F22_00;  /* ^PgUp: CD .. */
-    case 0x7600: return TO_F23_00;  /* ^PgDn: change directory */
-    case 0x4400: return TO_F30_00;  /* F10: quit */
-    case 0x3C00: return TO_F32_00;  /* F2: user menu */
-    case 0x3D00: return TO_F33_00;  /* F3: view */
-    case 0x3E00: return TO_F34_00;  /* F4: edit */
-    case 0x3F00: return TO_F35_00;  /* F5: copy */
-    case 0x4000: return TO_F36_00;  /* F6: rename / move */
-    case 0x4100: return TO_F37_00;  /* F7: make directory */
-    case 0x4200: return TO_F38_00;  /* F8: delete */
-    case 0x4300: return TO_F39_00;  /* F9: pull down menu */
-    case 0x5D00: return TO_F40_00;  /* Shift F10: pull down menu */
-    case 0x5500: return TO_F42_00;  /* Shift F2: main menu... */
-    case 0x5600: return TO_F43_00;  /* Shift F3: view... */
-    case 0x5700: return TO_F44_00;  /* Shift F4: edit... */
-    case 0x5800: return TO_F45_00;  /* Shift F5: copy... */
-    case 0x5900: return TO_F46_00;  /* Shift F6: rename/move... */
-    case 0x5A00: return TO_F47_00;  /* Shift F7: make directory... */
-    case 0x5B00: return TO_F48_00;  /* Shift F8: delete... */
-    case 0x5C00: return TO_M75_00;  /* Shift F9: save setup */
-    case 0x6100: return TO_F54_00;  /* ^F4: change label */
-    case 0x6200: return TO_F55_00;  /* ^F5: copy file */
-    case 0x6300: return TO_F56_00;  /* ^F6: rename/move file */
-    case 0x6500: return TO_F58_00;  /* ^F8: delete file */
-    case 0x6800: return TO_F61_00;  /* Alt F1: change left drive */
-    case 0x6900: return TO_F62_00;  /* Alt F2: change right drive */
-    case 0x6A00: return TO_F63_00;  /* Alt F3: internal viewer */
-    case 0x6B00: return TO_F64_00;  /* Alt F4: internal editor */
-    case 0x6C00: return TO_F65_00;  /* Alt F5: memory info */
-    case 0x6D00: return TO_M42_00;  /* Alt F6: directory sizes */
-    case 0x6E00: return TO_F67_00;  /* Alt F7: file find */
-    case 0x6F00: return TO_F68_00;  /* Alt F8: history */
-    case 0x7000: return TO_F69_00;  /* Alt F9: EGA lines */
-    case 0x7100: return TO_M41_00;  /* Alt F10: Tree */
-    case 0xFD00: return TO_F39_00;  /* Alt: pull down menu */
-    case 0xFE00: return TO_F75_00;  /* the time in AutoTim has come:
+    case 0x4800: return CMD_F00_00;  /* Up */
+    case 0x5000: return CMD_F01_00;  /* Down */
+    case 0x4B00: return CMD_F02_00;  /* Left */
+    case 0x4D00: return CMD_F03_00;  /* Right */
+    case 0x4900: return CMD_F04_00;  /* PgUp */
+    case 0x5100: return CMD_F05_00;  /* PgDn */
+    case 0x4700: return CMD_F06_00;  /* Home */
+    case 0x4F00: return CMD_F07_00;  /* End */
+    case 0x5200: return CMD_F08_00;  /* Ins: select / unselect */
+    case 0x4E2B: return CMD_F09_00;  /* Grey +: select group */
+    case 0x4A2D: return CMD_F10_00;  /* Grey -: unselect group */
+    case 0x372A: return CMD_F76_00;  /* Grey *: invert group */
+    case 0x0F09: return CMD_F20_00;  /* Tab: change active panel */
+    case 0x1C0D: return CMD_F21_00;  /* Enter: run / change directory */
+    case 0x011B: return CMD_F74_00;  /* Esc: clear command line / on/off */
+    case 0x5E00: return CMD_F13_00;  /* ^F1: on/off left panel */
+    case 0x5F00: return CMD_F14_00;  /* ^F2: on/off right panel */
+    case 0x2308: return CMD_M16_10;  /* ^H: hidden files */
+    case 0x8400: return CMD_F22_00;  /* ^PgUp: CD .. */
+    case 0x7600: return CMD_F23_00;  /* ^PgDn: change directory */
+    case 0x4400: return CMD_F30_00;  /* F10: quit */
+    case 0x3C00: return CMD_F32_00;  /* F2: user menu */
+    case 0x3D00: return CMD_F33_00;  /* F3: view */
+    case 0x3E00: return CMD_F34_00;  /* F4: edit */
+    case 0x3F00: return CMD_F35_00;  /* F5: copy */
+    case 0x4000: return CMD_F36_00;  /* F6: rename / move */
+    case 0x4100: return CMD_F37_00;  /* F7: make directory */
+    case 0x4200: return CMD_F38_00;  /* F8: delete */
+    case 0x4300: return CMD_F39_00;  /* F9: pull down menu */
+    case 0x5D00: return CMD_F40_00;  /* Shift F10: pull down menu */
+    case 0x5500: return CMD_F42_00;  /* Shift F2: main menu... */
+    case 0x5600: return CMD_F43_00;  /* Shift F3: view... */
+    case 0x5700: return CMD_F44_00;  /* Shift F4: edit... */
+    case 0x5800: return CMD_F45_00;  /* Shift F5: copy... */
+    case 0x5900: return CMD_F46_00;  /* Shift F6: rename/move... */
+    case 0x5A00: return CMD_F47_00;  /* Shift F7: make directory... */
+    case 0x5B00: return CMD_F48_00;  /* Shift F8: delete... */
+    case 0x5C00: return CMD_M75_00;  /* Shift F9: save setup */
+    case 0x6100: return CMD_F54_00;  /* ^F4: change label */
+    case 0x6200: return CMD_F55_00;  /* ^F5: copy file */
+    case 0x6300: return CMD_F56_00;  /* ^F6: rename/move file */
+    case 0x6500: return CMD_F58_00;  /* ^F8: delete file */
+    case 0x6800: return CMD_F61_00;  /* Alt F1: change left drive */
+    case 0x6900: return CMD_F62_00;  /* Alt F2: change right drive */
+    case 0x6A00: return CMD_F63_00;  /* Alt F3: internal viewer */
+    case 0x6B00: return CMD_F64_00;  /* Alt F4: internal editor */
+    case 0x6C00: return CMD_F65_00;  /* Alt F5: memory info */
+    case 0x6D00: return CMD_M42_00;  /* Alt F6: directory sizes */
+    case 0x6E00: return CMD_F67_00;  /* Alt F7: file find */
+    case 0x6F00: return CMD_F68_00;  /* Alt F8: history */
+    case 0x7000: return CMD_F69_00;  /* Alt F9: EGA lines */
+    case 0x7100: return CMD_M41_00;  /* Alt F10: Tree */
+    case 0xFD00: return CMD_F39_00;  /* Alt: pull down menu */
+    case 0xFE00: return CMD_F75_00;  /* the time in AutoTim has come:
                                            auto CD / quick view */
     }
     switch (key & 0xFF) {
-    case 0x0A: return TO_F27_00;  /* ^Enter: history command */
-    case 0x0D: return TO_F78_00;  /* ^M: restore marks */
-    case 0x0F: return TO_F11_00;  /* ^O: on/off panels */
-    case 0x10: return TO_F12_00;  /* ^P: on/off unactive panel */
-    case 0x15: return TO_F15_00;  /* ^U: swap panels */
-    case 0x02: return TO_F16_00;  /* ^B: on/off key bar */
-    case 0x12: return TO_F17_00;  /* ^R: re-read */
-    case 0x06: return TO_M16_00;  /* ^F: filter */
-    case 0x01: return TO_M30_00;  /* ^A: attributes */
-    case 0x03: return TO_M49_00;  /* ^C: compare directories */
-    case 0x0C: return TO_F18_00;  /* ^L: info */
-    case 0x1A: return TO_F79_00;  /* ^Z: tree */
-    case 0x1C: return TO_F24_00;  /* ^\: CD \ */
-    case 0x05: return TO_F25_00;  /* ^E: previous history command */
-    case 0x18: return TO_F26_00;  /* ^X: next history command */
-    case 0x09: return TO_F80_00;  /* ^I: insert files */
-    case 0x1B: return TO_F81_00;  /* ^[: insert left path */
-    case 0x1D: return TO_F82_00;  /* ^]: insert right path */
+    case 0x0A: return CMD_F27_00;  /* ^Enter: history command */
+    case 0x0D: return CMD_F78_00;  /* ^M: restore marks */
+    case 0x0F: return CMD_F11_00;  /* ^O: on/off panels */
+    case 0x10: return CMD_F12_00;  /* ^P: on/off unactive panel */
+    case 0x15: return CMD_F15_00;  /* ^U: swap panels */
+    case 0x02: return CMD_F16_00;  /* ^B: on/off key bar */
+    case 0x12: return CMD_F17_00;  /* ^R: re-read */
+    case 0x06: return CMD_M16_00;  /* ^F: filter */
+    case 0x01: return CMD_M30_00;  /* ^A: attributes */
+    case 0x03: return CMD_M49_00;  /* ^C: compare directories */
+    case 0x0C: return CMD_F18_00;  /* ^L: info */
+    case 0x1A: return CMD_F79_00;  /* ^Z: tree */
+    case 0x1C: return CMD_F24_00;  /* ^\: CD \ */
+    case 0x05: return CMD_F25_00;  /* ^E: previous history command */
+    case 0x18: return CMD_F26_00;  /* ^X: next history command */
+    case 0x09: return CMD_F80_00;  /* ^I: insert files */
+    case 0x1B: return CMD_F81_00;  /* ^[: insert left path */
+    case 0x1D: return CMD_F82_00;  /* ^]: insert right path */
     }
-    return TO_F73_00;
+    return CMD_F73_00;
 }
 
 /* The main loop as far as a command: see the top of this file. `entry`
@@ -762,7 +737,7 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
         switch (entry) {
         case INIT40:
             if (Init40())
-                return TO_F21_31;
+                return CMD_F21_31;
             PutMnu(0);                  /* Init49 */
             PutKey(0xFF);
             /* fall through */
@@ -900,7 +875,7 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
                     r->di = OFFSET(AltSr_T) + i;
                     r->cx = ALT_KEYS - i;
                     if (same)
-                        return TO_F77_00;
+                        return CMD_F77_00;
                 }
             }
             /* fall through */
@@ -908,7 +883,7 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
             if (r->ax >> 8 == KEY_MOUSE)
                 goto Func20;
             if (md.Quote != 0)
-                return TO_F73_00;
+                return CMD_F73_00;
             return Func12(r->ax);
         }
 
@@ -1081,34 +1056,71 @@ static u16 F62_02(u16 panel, u16 item, struct Regs STACK *r)
     return MnuEnd(M06_10(panel, item), r);
 }
 
+/* The menu bar, F9, and with `again` Shift-F10, which goes back to the
+   item chosen last: an item is chosen there or the bar is left, and the
+   command of the item is done. The original jumps to it by the tables of
+   the menus, of port/commands_t.c, which have the commands by their
+   numbers here: one for each menu, and two more for the first eight
+   items of the Files menu with Shift and with Ctrl held down.
+
+   The command gets the registers as the original has them at that jump:
+   in AX the item and the table, in BX twice the place of the item in its
+   table, in CX the item and the menu, in DX 1 and what the bar left in
+   DL, in SI the table, in DI the panel of the Left menu, or of the Right
+   one if that is the menu. Rename goes by BX and DX, the editors of the
+   menu file and the extension files by CX, and a key that an item hands
+   on to the command line is what AX holds. A command of the Left or the
+   Right menu is for the panel of that menu. */
+static u16 F39_01(u16 again, struct Regs STACK *r)
+{
+    u32 chosen = F39_00(again, r->ds);
+    u16 menu = (u8)chosen;
+    u16 item = (u8)(chosen >> 8);
+    u16 table = (u16)(chosen >> 24);
+    u16 code = AsmSeg();
+    u16 panel = r->ds;
+
+    r->cx = (u16)chosen;
+    if (table == 0)
+        return FUNC04;
+    r->ax = item << 8 | table;
+    r->bx = (item - 1) & 0xFF00 | (item - 1) << 1 & 0xFF;
+    r->dx = 0x100 | (u8)(chosen >> 16);
+    r->di = menu == 5 ? md.WCB2seg : md.WCB1seg;
+    if (table == 1)
+        panel = r->di;
+    r->si = *(const u16 __far *)AT(code, OFFSET(Menu_T) + (table - 1) * 2);
+    return Command(*(const u16 __far *)AT(code, r->si + r->bx), panel, r);
+}
+
 /* Do a command: call its function, with what it reads of the registers,
    and go on by what that returns. Returns the place of the loop where the
    program goes on, with the registers as that place and the next command
    get them, or LEAVE with what the stub of the loop is to go on in.
 
-   In the original every command is entered with the current panel in
-   DS, and so `r->ds` is that panel. */
-static u16 Command(u16 command, struct Regs STACK *r)
+   `panel` is the panel that the command is for, which the original has
+   in DS when it jumps to the command: the current panel, `r->ds`, but for
+   a command of the Left or the Right menu. */
+static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
 {
-    u16 panel = r->ds;
     u32 pair;
     u16 answer;
 
     switch (command) {
-    case TO_F39_00: return LEAVE | ASM_F39_00;
-    case TO_F40_00: return LEAVE | ASM_F40_00;
+    case CMD_F39_00: return F39_01(0, r);
+    case CMD_F40_00: return F39_01(1, r);
 
     /* The command line, cmdline.c. */
-    case TO_F73_00:
+    case CMD_F73_00:
         F73_00(r->ax);
         return FUNC05;
-    case TO_F74_00:                     /* Esc: the panels off or on, if
+    case CMD_F74_00:                     /* Esc: the panels off or on, if
                                            the command line was empty */
         answer = F74_00();
         if (answer == 0)
             return FUNC05;
         return CmdEnd(F11_00(panel), r);
-    case TO_F77_00:
+    case CMD_F77_00:
         /* The speed search ends with a key that is not its own, and the
            command of that key gets the registers as the search leaves
            them. */
@@ -1119,123 +1131,148 @@ static u16 Command(u16 command, struct Regs STACK *r)
         r->si = (u16)md.WinBuf;
         r->cx = md.KeyBar;
         return FUNC12;
-    case TO_F80_00: return F80_00(panel) ? FUNC01 : FUNC05;
-    case TO_F81_00:
+    case CMD_F80_00: return F80_00(panel) ? FUNC01 : FUNC05;
+    case CMD_F81_00:
         F82_01(md.WCB1seg, r->ax);
         return FUNC04;
-    case TO_F82_00:
+    case CMD_F82_00:
         F82_01(md.WCB2seg, r->ax);
         return FUNC04;
-    case TO_F68_00:                     /* the history: a command to run? */
+    case CMD_F68_00:                     /* the history: a command to run? */
         if (F68_00() == 0)
             return FUNC04;
         return CmdEnd(F21_25(), r);
 
     /* The keys of the panels, keys.c. The mouse has its buttons in BP. */
-    case TO_F00_60:
+    case CMD_F00_60:
         return CmdEnd(F00_60(panel, r->si, r->di, r->bp, r), r);
-    case TO_F00_05:
+    case CMD_F00_05:
         return CmdEnd(F00_05(panel, r->si, r->di, r->bp, r), r);
-    case TO_F01_05:
+    case CMD_F01_05:
         return CmdEnd(F01_05(panel, r->si, r->di, r->dx, r->bp, r), r);
-    case TO_F00_00: return CmdEnd(F00_00(panel, r), r);
-    case TO_F01_00: return CmdEnd(F01_00(panel, r), r);
-    case TO_F02_00: return CmdEnd(F02_00(panel, r), r);
-    case TO_F03_00: return CmdEnd(F03_00(panel, r), r);
-    case TO_F04_00: return CmdEnd(F04_00(panel, r), r);
-    case TO_F05_00: return CmdEnd(F05_00(panel, r), r);
-    case TO_F06_00: return CmdEnd(F06_00(panel, r), r);
-    case TO_F07_00: return CmdEnd(F07_00(panel, r), r);
-    case TO_F08_00: return CmdEnd(F08_00(panel, r), r);
-    case TO_F09_00: return CmdEnd(F09_00(panel), r);
-    case TO_F10_00: return CmdEnd(F10_00(panel), r);
-    case TO_F76_00: return CmdEnd(F76_00(panel), r);
-    case TO_F78_00: return CmdEnd(F78_00(panel), r);
-    case TO_F11_00: return CmdEnd(F11_00(panel), r);
-    case TO_F12_00: return CmdEnd(F12_00(panel), r);
-    case TO_F13_00: return CmdEnd(F13_00(), r);
-    case TO_F14_00: return CmdEnd(F14_00(), r);
-    case TO_F15_00: return CmdEnd(F15_00(panel), r);
-    case TO_F16_00: return CmdEnd(F16_00(), r);
-    case TO_F17_00: return CmdEnd(F17_01(panel), r);
-    case TO_F18_00: return CmdEnd(F18_00(panel), r);
-    case TO_F79_00: return CmdEnd(F79_00(panel), r);
-    case TO_F20_00: return CmdEnd(F20_00(panel), r);
+    case CMD_F00_00: return CmdEnd(F00_00(panel, r), r);
+    case CMD_F01_00: return CmdEnd(F01_00(panel, r), r);
+    case CMD_F02_00: return CmdEnd(F02_00(panel, r), r);
+    case CMD_F03_00: return CmdEnd(F03_00(panel, r), r);
+    case CMD_F04_00: return CmdEnd(F04_00(panel, r), r);
+    case CMD_F05_00: return CmdEnd(F05_00(panel, r), r);
+    case CMD_F06_00: return CmdEnd(F06_00(panel, r), r);
+    case CMD_F07_00: return CmdEnd(F07_00(panel, r), r);
+    case CMD_F08_00: return CmdEnd(F08_00(panel, r), r);
+    case CMD_F09_00: return CmdEnd(F09_00(panel), r);
+    case CMD_F10_00: return CmdEnd(F10_00(panel), r);
+    case CMD_F76_00: return CmdEnd(F76_00(panel), r);
+    case CMD_F76_01: return CmdEnd(F76_01(panel), r);
+    case CMD_F78_00: return CmdEnd(F78_00(panel), r);
+    case CMD_F11_00: return CmdEnd(F11_00(panel), r);
+    case CMD_F12_00: return CmdEnd(F12_00(panel), r);
+    case CMD_F13_00: return CmdEnd(F13_00(), r);
+    case CMD_F14_00: return CmdEnd(F14_00(), r);
+    case CMD_F15_00: return CmdEnd(F15_00(panel), r);
+    case CMD_F16_00: return CmdEnd(F16_00(), r);
+    case CMD_F17_00:
+    case CMD_F17_01: return CmdEnd(F17_01(panel), r);
+    case CMD_F18_00: return CmdEnd(F18_00(panel), r);
+    case CMD_F79_00: return CmdEnd(F79_00(panel), r);
+    case CMD_F20_00: return CmdEnd(F20_00(panel), r);
 
     /* Enter, the directory changed and the history, enter.c. */
-    case TO_F21_00: return CmdEnd(F21_00(panel), r);
-    case TO_F21_10: return CmdEnd(F21_10(panel), r);
-    case TO_F21_31: return CmdEnd(F21_31(), r);
-    case TO_F22_00: return CmdEnd(F22_00(panel), r);
-    case TO_F23_00: return CmdEnd(F23_00(panel), r);
-    case TO_F24_00: return CmdEnd(F24_00(panel), r);
-    case TO_F25_00: return CmdEnd(F25_00(), r);
-    case TO_F26_00: return CmdEnd(F26_00(), r);
-    case TO_F27_00: return CmdEnd(F27_00(panel), r);
-    case TO_F30_00: return CmdEnd(F30_00(panel), r);
-    case TO_F75_00: return CmdEnd(F75_00(panel), r);
+    case CMD_F21_00: return CmdEnd(F21_00(panel), r);
+    case CMD_F21_10: return CmdEnd(F21_10(panel), r);
+    case CMD_F21_31: return CmdEnd(F21_31(), r);
+    case CMD_F22_00: return CmdEnd(F22_00(panel), r);
+    case CMD_F23_00: return CmdEnd(F23_00(panel), r);
+    case CMD_F24_00: return CmdEnd(F24_00(panel), r);
+    case CMD_F25_00: return CmdEnd(F25_00(), r);
+    case CMD_F26_00: return CmdEnd(F26_00(), r);
+    case CMD_F27_00: return CmdEnd(F27_00(panel), r);
+    case CMD_F30_00: return CmdEnd(F30_00(panel), r);
+    case CMD_F75_00: return CmdEnd(F75_00(panel), r);
 
     /* The user menu, usermenu.c: a line with a command to run? */
-    case TO_F32_00:
-    case TO_F42_00:
-        if (F32_00(command == TO_F42_00) == 0)
+    case CMD_F32_00:
+    case CMD_F42_00:
+        if (F32_00(command == CMD_F42_00) == 0)
             return FUNC04;              /* Run_0A */
         return CmdEnd(F21_30(), r);
 
     /* The viewer and the editor, view.c. */
-    case TO_F33_00: return CmdEnd(F33_00(panel), r);
-    case TO_F34_00: return CmdEnd(F34_00(panel), r);
-    case TO_F34_10: return CmdEnd(F34_10(panel), r);
-    case TO_F43_00: return CmdEnd(F43_00(), r);
-    case TO_F44_00: return CmdEnd(F44_00(), r);
-    case TO_F63_00: return CmdEnd(F63_00(panel), r);
-    case TO_F64_00: return CmdEnd(F64_00(panel), r);
+    case CMD_F33_00: return CmdEnd(F33_00(panel), r);
+    case CMD_F34_00: return CmdEnd(F34_00(panel), r);
+    case CMD_F34_10: return CmdEnd(F34_10(panel), r);
+    case CMD_F43_00: return CmdEnd(F43_00(), r);
+    case CMD_F44_00: return CmdEnd(F44_00(), r);
+    case CMD_F63_00: return CmdEnd(F63_00(panel), r);
+    case CMD_F64_00: return CmdEnd(F64_00(panel), r);
 
     /* Copy and Rename, copy.c: with BX and DX as they come. */
-    case TO_F35_00: return F35_90(F35_01(panel, 0, r->bx, r->dx));
-    case TO_F36_00: return F35_90(F35_01(panel, 1, r->bx, r->dx));
-    case TO_F45_00: return F35_90(F45_01(panel, 0, r->bx, r->dx));
-    case TO_F46_00: return F35_90(F45_01(panel, 1, r->bx, r->dx));
-    case TO_F55_00:
-    case TO_F56_00:                     /* F56_01: of the one file */
+    case CMD_F35_00: return F35_90(F35_01(panel, 0, r->bx, r->dx));
+    case CMD_F36_00: return F35_90(F35_01(panel, 1, r->bx, r->dx));
+    case CMD_F45_00: return F35_90(F45_01(panel, 0, r->bx, r->dx));
+    case CMD_F46_00: return F35_90(F45_01(panel, 1, r->bx, r->dx));
+    case CMD_F55_00:
+    case CMD_F56_00:                     /* F56_01: of the one file */
         md.OneFile = 1;
-        return F35_90(F35_01(panel, command == TO_F56_00, r->bx, r->dx));
+        return F35_90(F35_01(panel, command == CMD_F56_00, r->bx, r->dx));
 
     /* Directories, deleting, attributes and the label, dirfunc.c. */
-    case TO_F37_00: return F1Next(F37_00(panel));
-    case TO_F38_00: return F1Next(F38_00(panel));
-    case TO_F47_00: return F1Next(F47_00());
-    case TO_F48_00: return F1Next(F48_00());
-    case TO_F54_00: return F1Next(F54_00());
-    case TO_F58_00: return F1Next(F58_00(panel));
-    case TO_M30_00: return F1Next(M30_00(panel));
+    case CMD_F37_00: return F1Next(F37_00(panel));
+    case CMD_F38_00: return F1Next(F38_00(panel));
+    case CMD_F47_00: return F1Next(F47_00());
+    case CMD_F48_00: return F1Next(F48_00());
+    case CMD_F54_00: return F1Next(F54_00());
+    case CMD_F58_00: return F1Next(F58_00(panel));
+    case CMD_M30_00: return F1Next(M30_00(panel));
 
-    /* The box of the drives, drive.c. */
-    case TO_F61_00: return F62_02(md.WCB1seg, 1, r);
-    case TO_F62_00: return F62_02(md.WCB2seg, 5, r);
+    /* The box of the drives, drive.c: by the keys, and from the menu of
+       a panel. */
+    case CMD_F61_00: return F62_02(md.WCB1seg, 1, r);
+    case CMD_F62_00: return F62_02(md.WCB2seg, 5, r);
+    case CMD_F62_01: return F62_02(panel, r->cx & 0xFF, r);
 
     /* The map of the memory, memory.c. */
-    case TO_F65_00:
+    case CMD_F65_00:
         F65_00();
         return FUNC04;
 
     /* The file search, find.c: Go to has the current directory be
        another, and the panel that it hands back show it. */
-    case TO_F67_00:
+    case CMD_F67_00:
         pair = F67_00();
         if ((u16)pair == TO_F24_02)
             return CmdEnd(F24_02((u16)(pair >> 16)), r);    /* F67_01 */
         return F1Next((u16)pair);
 
-    /* The commands of the menus that have keys, commands.c. EGA lines
-       hands the BIOS what CX holds. */
-    case TO_M16_00: return MnuEnd(M16_00(panel), r);
-    case TO_M16_10: return MnuEnd(M16_10(panel), r);
-    case TO_M41_00: return MnuEnd(M41_00(), r);
-    case TO_M42_00: return MnuEnd(M42_00(panel), r);
-    case TO_M49_00: return MnuEnd(M49_00(panel), r);
-    case TO_F69_00: return MnuEnd(F69_00(r->cx), r);
-    default:                            /* TO_M75_00 */
+    /* The commands of the menus, commands.c. Those of a panel's menu
+       take the item, and so do the editors of the menu file and the
+       extension files, to mark their menu; EGA lines hands the BIOS what
+       CX holds, which by its key is what the loop left there. */
+    case CMD_M01_00: return MnuEnd(M01_00(panel, r->cx), r);
+    case CMD_M03_00: return MnuEnd(M03_00(panel, r->cx), r);
+    case CMD_M06_00: return MnuEnd(M06_00(panel, r->cx), r);
+    case CMD_M08_00: return MnuEnd(M08_00(panel, r->cx), r);
+    case CMD_M16_00: return MnuEnd(M16_00(panel), r);
+    case CMD_M16_01: return MnuEnd(M16_01(panel), r);
+    case CMD_M16_10: return MnuEnd(M16_10(panel), r);
+    case CMD_M21_00: return MnuEnd(M21_00(), r);
+    case CMD_M41_00: return MnuEnd(M41_00(), r);
+    case CMD_M42_00: return MnuEnd(M42_00(panel), r);
+    case CMD_M49_00: return MnuEnd(M49_00(panel), r);
+    case CMD_F69_00: return MnuEnd(F69_00(r->cx), r);
+    case CMD_M53_00: return MnuEnd(M53_00(r->cx), r);
+    case CMD_M60_00: return MnuEnd(M60_00(), r);
+    case CMD_M61_00: return MnuEnd(M61_00(), r);
+    case CMD_M62_00: return MnuEnd(M62_00(r->cx), r);
+    case CMD_M63_00: return MnuEnd(M63_00(r->cx), r);
+    case CMD_M64_00: return MnuEnd(M64_00(r->cx), r);
+    case CMD_M66_00: return MnuEnd(M66_00(panel), r);
+    case CMD_M67_00: return MnuEnd(M67_00(panel), r);
+    case CMD_M69_00: return MnuEnd(M69_00(panel), r);
+    case CMD_M70_00: return MnuEnd(M70_00(panel), r);
+    case CMD_M71_00: return MnuEnd(M71_00(panel), r);
+    case CMD_M72_00: return MnuEnd(M72_00(panel), r);
+    case CMD_M73_00: return MnuEnd(M73_00(panel), r);
+    default:                            /* CMD_M75_00 */
         return MnuEnd(M75_00(panel), r);
     }
 }
@@ -1250,7 +1287,7 @@ u16 MainLoop(u16 entry, struct Regs STACK *r)
 
     for (;;) {
         command = Loop(entry, r);
-        entry = Command(command, r);
+        entry = Command(command, r->ds, r);
         if (entry & LEAVE)
             return entry & 0xFF;
     }

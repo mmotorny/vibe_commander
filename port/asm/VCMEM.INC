@@ -3,16 +3,12 @@
 ;-------------------------------------------------------
 
 ; The map of the memory is C: port/memory.c, with the buttons of its
-; window and their colours in port/memory_t.c. What is left here is the
-; command, and what the C code asks of the part of the program that
-; stays in the memory. Counter, PrgList and Command are of that part, in
-; VC.ASM.
+; window and their colours in port/memory_t.c. What is left here is what
+; the C code asks of the part of the program that stays in the memory.
+; Counter, PrgList and Command are of that part, in VC.ASM.
 	PUBLIC	Counter, PrgList, Command
 
 	.CODE
-F65_00:	CallC	F65_00_c		; Alt F5 - memory info
-	JMP	Func04
-
 ; The segment of the part of the program that goes while a command runs,
 ; in AX, and that of the part that stays.
 	PUBLIC	MemRun_a, ResSeg_a, Release_a

@@ -7,8 +7,9 @@
  * The commands, at the end of this file, ask where to: they put the name
  * of the target into ToFile, as it was typed, and say in CopyMov what is
  * wanted. They then have C00_00 called for every file that is selected or
- * that fits a mask, by FncSel and FncMas, which are still assembly, with
- * its name in CpSrc; for a directory C00_00 has DirFunc call it again
+ * that fits a mask, by FncSel and FncMas of dirfunc.c, where the main
+ * loop goes on by what they return (F35_90 of main.c), with its name in
+ * CpSrc; for a directory C00_00 has DirFunc call it again
  * for everything in the directory, with the name behind that of the
  * directory. What it keeps from one file to the next, and from one call
  * of DOS to the next, is in TmpBuf.

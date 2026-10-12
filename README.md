@@ -186,6 +186,14 @@ compared, the configuration and the advanced options, the menu file and
 the extension files opened in the editor, the switches of the Options
 menu, and the setup saved; their texts, boxes and dialogs are constants
 of C, in `port/commands_t.c`.
+The main loop calls the commands. In the original a command is no
+routine: the loop jumps to it by a table of the keys and the menu bar by
+tables of the menus, and it jumps back into the loop at one of several
+places, or on into another command. Each is a function now, which
+returns where the program goes on, and the loop calls it from a `switch`
+(`Command` of `port/main.c`); the tables of the menus hold the commands
+by their numbers. What a command finds in the registers, as the command
+before left them, is kept where one reads it.
 
 ## Layout
 

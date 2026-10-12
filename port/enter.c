@@ -10,15 +10,14 @@
  * file of its directory has for files of its kind.
  *
  * A command is run by the part of the program that stays in the memory,
- * which is still assembly: F21_31 saves there what the program needs to
- * start over afterwards, the setup, the command and what the panels show,
- * gives the main data back to DOS, and returns NEXT_EXEC, or NEXT_INIT11 if
- * there is nothing to run after all. The stub jumps on from that (CmdExe and
- * CmdIni in port/asm/VCFUNC.INC): the program does not come back here,
- * it starts over.
+ * resident.c: F21_31 saves there what the program needs to start over
+ * afterwards, the setup, the command and what the panels show, gives the
+ * main data back to DOS, and returns NEXT_EXEC, or NEXT_INIT11 if there
+ * is nothing to run after all. The main loop leaves for that: the
+ * program does not come back here, it starts over.
  *
  * These are commands, as in keys.c: functions that get the panel which
- * the assembly has in DS and return where the program goes on.
+ * the original has in DS and return where the program goes on.
  */
 #include "vc.h"
 

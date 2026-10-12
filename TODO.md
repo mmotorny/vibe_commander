@@ -13,27 +13,21 @@ How one file is done is in `CLAUDE.md`, "Moving the data of a file to C";
 
 ### What is left
 
-Objects and bytes as they are linked, after the help's file had gone. An
-object is what stands from one label to the next. "Code" is all that is
-no data: stubs, entries and what jumps between them. A file with nothing
-but code in its row has its data in C. `VC.ASM` had 14 texts of 696
-bytes: the fifteenth that was counted here was `TrnBeg`, a label where
-the first of them stood. `VCSUB2.INC` was two texts and is gone.
+Objects and bytes as they are linked, once the main loop calls every
+command. An object is what stands from one label to the next. "Code" is
+all that is no data: stubs, entries and what jumps between them. The
+texts, boxes, dialogs, buttons and colours are all C, and so are the
+tables of the commands. Seven files went with the stubs of the commands:
+`VCFUNC.INC`, `VCMENU.INC`, `VCF1.INC`, `VCCOPY.INC`, `VCVIEW.INC`,
+`VCEDIT.INC` and `VCFIND.INC`.
 
-| File | texts | boxes | dialogs | buttons, colours | tables | code | goes with |
-|---|---|---|---|---|---|---|---|
-| `VC.ASM` | | | | | 2 / 12 | 219 | `main.c`, `start.c` |
-| `VCFUNC.INC` | | | | | 2 / 76 | 905 | `keys.c`, `usermenu.c` |
-| `VCMENU.INC` | | | | | 8 / 174 | 495 | `commands.c`, `menu.c` |
-| `VCF1.INC` | | | | | | 160 | `dirfunc.c` |
-| `VCCOPY.INC` | | | | | 1 / 10 | 61 | `copy.c` |
-| `VCVIEW.INC` | | | | | | 180 | `view.c` |
-| `VCEDIT.INC` | | | | | | 26 | `edit.c` |
-| `VCMEM.INC` | | | | | | 40 | `memory.c` |
-| `VCFIND.INC` | | | | | | 22 | `find.c` |
-| `VCSUB1.INC` | | | | | | 9 | `dialog.c` |
-| `VCSUB3.INC` | | | | | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | | | | | 13 / 272 | 2,226 | |
+| File | tables | code | goes with |
+|---|---|---|---|
+| `VC.ASM` | 2 / 8 | 143 | `main.c`, `start.c` |
+| `VCMEM.INC` | | 30 | `memory.c` |
+| `VCSUB1.INC` | | 9 | `dialog.c` |
+| `VCSUB3.INC` | | 109 | `treebox.c`, `read.c` |
+| all | 2 / 8 | 291 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -46,33 +40,21 @@ Besides these, all in `VC.ASM`:
   the panels and of the setup and the stack of 4,096, and the 16 of
   `RGAP`.
 - The layout: the `STRUC` of the main data, 62,603 bytes that the
-  program asks DOS for, that of a panel, and a dozen small ones; in the
-  files those of the viewer, the editor and the file search, of which C
-  has its own; and the `EQU` of the colours and the lengths.
-- The macros `CallC`, `MainC`, `CmdC`, `MnuC` and `PanC`; `FromC`,
-  `CallLine` and `TakeLine` have no use left.
+  program asks DOS for, that of a panel, and a dozen small ones, and
+  the `EQU` of the colours and the lengths.
+- The macros `CallC` and `MainC`.
 
-The tables are `Main_T`, the five places that the stub of the main loop
+The tables are `Main_T`, the three places that the stub of the main loop
 goes on at when the loop returns, and `SecDat`, the word with the segment
-of the main data, in `VC.ASM`;
-`CmdNx_T` and `AltSr_T` in `VCFUNC.INC`; the seven tables of the menus'
-commands and `MnuNx_T` in `VCMENU.INC`; `F35_T` in `VCCOPY.INC`.
+of the main data.
 
 The code is, by what it is there for:
 
-- The stubs of the commands, about 150 labels: a command is a label that
-  the main loop or a menu jumps to by a table, with the registers of its
-  family (`CmdC` with `CmdEnd` and `CmdNx_T` in `VCFUNC.INC`, `MnuC` and
-  `PanC` with `MnuEnd` and `MnuNx_T` in `VCMENU.INC`, `F1Next` in
-  `VCF1.INC`, `F35_T` in `VCCOPY.INC`), calls the C function and jumps on
-  to where that says, which may be another command.
 - The glue of the main loop in `VC.ASM`: the stubs of `Init00` and
-  `Init11`, the eight entries made with `MainC`, `MainGo`, `Exit`.
-- Stubs of routines that other stubs call: `ReDir` and `ReadTre` in
-  `VCSUB3.INC`. Those that nothing called any more are gone, `AdrNum`,
-  `NumAdr`, `ChgAdr`, `F20_02`, `Dialog`, `DirFunc` and `DelTree`, and so
-  are those that a dialog names for Enter and F10: `Dialog` calls the
-  functions.
+  `Init11`, `Init40`, which enters the loop, `MainGo`, and where the loop
+  returns to: `CmdIni`, `CmdExe` and `Exit`.
+- Stubs of routines that only an entry calls: `ReDir` and `ReadTre` in
+  `VCSUB3.INC`.
 - Entries for C: `ReDir_a` in `VC.ASM`; `MemRun_a`, `ResSeg_a` and
   `Release_a` in `VCMEM.INC`; `AsmSeg_a` in `VCSUB1.INC`, with
   `CallPSP`.
@@ -85,19 +67,14 @@ What names what:
   through the far pointer. The assembly has the name `PUBLIC`, in the
   file that defines it.
 - An object names another by a word that holds its address: a box its
-  lines, a dialog its box, its buttons and the routine for Enter, a
-  table its labels. Sixteen are named from more than one file: `Ok_S`,
-  `OkMn_D`, `Var_S`, `Inc_S`, `Err_S` of `port/main_t.c`, which were of
-  `VC.ASM`; `Empty_S`, `Kov_S`,
-  `YesNo_S`, `YesNo_D` of `port/keys_t.c`, which were of
-  `VCFUNC.INC`; `OkCan_S`, `OkCan_D` of
-  `port/system_t.c`, which were of `VCSUB3.INC`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`, which were of
-  `VCF1.INC`; `EdFl_S` of `port/view_t.c`, which was of `VCVIEW.INC`;
-  `Tree_S` of `port/treebox_t.c` and `PtMnu_S` of `port/bars_t.c`,
-  which were of `VCSUB2.INC`. `VC.ASM` declares
-  those `EXTERNDEF`, so that either side can name one wherever it is.
-- Code of the assembly names data in one place: the stub of the menu bar
-  loads the offset of `PtMnu_S`.
+  lines, a dialog its box and its buttons, the table of the menus'
+  tables each of them. Sixteen are named from more than one file: `Ok_S`,
+  `OkMn_D`, `Var_S`, `Inc_S`, `Err_S` of `port/main_t.c`; `Empty_S`,
+  `Kov_S`, `YesNo_S`, `YesNo_D` of `port/keys_t.c`; `OkCan_S`, `OkCan_D`
+  of `port/system_t.c`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`;
+  `EdFl_S` of `port/view_t.c`; `Tree_S` of `port/treebox_t.c` and
+  `PtMnu_S` of `port/bars_t.c`. Nothing of the assembly names any of
+  them any more.
 - The harness and the tools:
   - `harness/driver.py` reads where `AutoTim` and `Clock` are in the
     main data from the assembler's listing, `build/port/VC.LST`, and
@@ -145,8 +122,16 @@ What it does not hold, each listed in the tool with the reason:
   for what only the shipped binary has.
 - Data that became code: the tables of keys are `switch` statements, and
   the scenarios answer for them.
-- Tables of the assembly that the original has not: `Main_T`, `CmdNx_T`,
-  `MnuNx_T`, `F35_T`.
+- The table of the assembly that the original has not, `Main_T`. The
+  tables by which the stubs of the commands went on are gone with them,
+  `CmdNx_T`, `MnuNx_T` and `F35_T`: they are `switch` statements of
+  `port/main.c`, as the tables of keys are.
+
+The tables of the menus' commands it holds in a way of their own. The
+original has the address of a command for every item; the port has the
+number of the command, a `CMD_` of `port/vc.h` that is named after the
+original's label, and the test reads those numbers there: an item that
+has another command than the original's fails it.
 
 What is read behind the end of an object is held too, as far as the
 code says how much that is: a name copied as 13 bytes, a path as 68, a
@@ -228,7 +213,7 @@ such word in `NAMED_OTHERWISE`, as a number.
 
 **3. The commands and the main loop.** Next. One agent, or one after
 another, never two at once: all of it is one web of jumps through
-`port/main.c`, `port/menu.c` and the `.CODE` of every file. What is
+`port/main.c`, `port/menu.c` and the `.CODE` of every file. What was
 there is 192 labels and 2,359 bytes of code: the stubs of the commands
 in four families, each with an end that goes on by a table (`CmdC`
 with `CmdEnd` and `CmdNx_T`, `MnuC` and `PanC` with `MnuEnd` and
@@ -236,28 +221,28 @@ with `CmdEnd` and `CmdNx_T`, `MnuC` and `PanC` with `MnuEnd` and
 tables of the menus' commands, and the glue of the loop. Three pieces,
 each a commit that the tests pass, in this order:
 
-- The loop calls the commands. Done, for the keys and the mouse:
-  `MainLoop` of `port/main.c` returned the place of `Main_T` that the
-  assembly was to jump to, and calls the command instead, from a
-  `switch` in `Command`, with what the command's stub handed the
-  function of `struct Regs`, and makes of what the function returns
-  what the end of its family made of it, in `CmdEnd`, `MnuEnd`,
-  `F1Next` and `F35_90` there: a place of the loop, or another command,
-  as `M01_01`, `M06_10`, `F21_25`, `F21_30`, `F24_01`, `V00_01` and
-  `F62_01` are gone on to. The commands are declared in one place,
-  `port/vc.h`. The stubs are all there still: the menu bar jumps to
-  them by its tables, and they jump back into the loop. `Main_T` has
-  the five places left that the loop returns for: the menu bar, twice,
-  and what ends the program or has a command run.
-- The menu bar. Its stub jumps to a command by the tables of the menus,
-  with the registers as the bar leaves them. In C the tables are tables
-  of places, numbers of the same `enum`, which the `switch` takes. The
-  test `data` should hold them: where the original's table names a
-  routine, the port's has the place of that name, which the tool can
-  read in the `enum` of `port/main.c`. Drive... of a panel's menu went
-  to a stub with the wrong registers for two batches and no scenario
-  chose it: a table of the menus is data that no screen shows until
-  every item has been chosen.
+- The loop calls the commands. Done: `MainLoop` of `port/main.c`
+  returned the place of `Main_T` that the assembly was to jump to, and
+  calls the command instead, from a `switch` in `Command`, with what
+  the command's stub handed the function of `struct Regs`, and makes of
+  what the function returns what the end of its family made of it, in
+  `CmdEnd`, `MnuEnd`, `F1Next` and `F35_90` there: a place of the loop,
+  or another command, as `M01_01`, `M06_10`, `F21_25`, `F21_30`,
+  `F24_01`, `V00_01` and `F62_01` are gone on to. The commands are
+  declared in one place, `port/vc.h`.
+- The menu bar. Done: its stub jumped to a command by the tables of the
+  menus, with the registers as the bar leaves them. `F39_01` of
+  `port/main.c` makes the registers and finds the command, and the
+  tables are tables of numbers in `port/commands_t.c`, a `CMD_` of
+  `port/vc.h` for every item, which the `switch` takes. The test `data`
+  holds them: where the original's table names a routine, the port's
+  has the number of that name, which the tool reads in the `enum`.
+  Drive... of a panel's menu went to a stub with the wrong registers
+  for two batches and no scenario chose it: a table of the menus is
+  data that no screen shows until every item has been chosen, and 34 of
+  the 67 items were chosen in no scenario until `menu-items` and
+  `menu-held`. With the stubs of the commands went `CmdNx_T`,
+  `MnuNx_T`, `F35_T`, `F1Next` and seven files of the assembly.
 - The glue and the entries. `Stay` of `port/resident.c` calls the
   loop, which wants DS on the main data, the one instruction that
   `FatErr` has too; `MainC` and `MainGo` go. The stubs that only stubs

@@ -41,51 +41,24 @@ CONST2	ENDS
 DGROUP	GROUP	RHEAD, RTEXT, RDATA, RGAP, CONST, CONST2
 
 ;------------------- Routines written in C -------------
-; They are compiled into a code segment of their own, which follows this
-; one, and are called through the routines of the same names here. C code
-; expects DS to point at the main data segment and may change ES.
-	EXTERN	F76_00_c:FAR, F76_01_c:FAR, F09_00_c:FAR
-	EXTERN	F10_00_c:FAR, F78_00_c:FAR, F11_00_c:FAR, F12_00_c:FAR
-	EXTERN	F13_00_c:FAR, F14_00_c:FAR, F15_00_c:FAR, F16_00_c:FAR
-	EXTERN	F17_01_c:FAR, F79_00_c:FAR, F18_00_c:FAR, F20_00_c:FAR
-	EXTERN	F39_00_c:FAR
-	EXTERN	M01_00_c:FAR, M01_01_c:FAR, M03_00_c:FAR, M06_00_c:FAR
-	EXTERN	M06_10_c:FAR, M08_00_c:FAR, M16_00_c:FAR, M16_01_c:FAR
-	EXTERN	M16_10_c:FAR, M21_00_c:FAR, M41_00_c:FAR, M42_00_c:FAR
-	EXTERN	F69_00_c:FAR, M49_00_c:FAR, M60_00_c:FAR, M61_00_c:FAR
-	EXTERN	M53_00_c:FAR, M62_00_c:FAR, M63_00_c:FAR, M64_00_c:FAR
-	EXTERN	M66_00_c:FAR, M67_00_c:FAR, M69_00_c:FAR, M70_00_c:FAR
-	EXTERN	M71_00_c:FAR, M72_00_c:FAR, M73_00_c:FAR, M75_00_c:FAR
-	EXTERN	ReadTre_c:FAR
-	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
-	EXTERN	V00_02_c:FAR, V00_10_c:FAR, V13_00_c:FAR, V13_01_c:FAR
-	EXTERN	T00_00_c:FAR
-	EXTERN	F32_00_c:FAR, F62_01_c:FAR, F68_00_c:FAR
-	EXTERN	F82_01_c:FAR, F74_00_c:FAR, F73_00_c:FAR, F77_00_c:FAR
-	EXTERN	F80_00_c:FAR
-	EXTERN	F67_00_c:FAR
-	EXTERN	F37_00_c:FAR, F47_00_c:FAR, F38_00_c:FAR, F48_00_c:FAR
-	EXTERN	F58_00_c:FAR, M30_00_c:FAR, F54_00_c:FAR, FncMas_c:FAR
-	EXTERN	F35_01_c:FAR, F45_01_c:FAR
-	EXTERN	F65_00_c:FAR
+; They are compiled into code segments of their own, which follow this
+; one. C code expects DS to point at the main data segment and may change
+; ES. What is called from here is the main loop, which calls everything
+; else, the start of the program, and what a panel is read by.
 	EXTERN	MainLoop_c:FAR, Exit_c:FAR
 	EXTERN	Init00_c:FAR, Init11_c:FAR, IniData_c:FAR
+	EXTERN	ReadTre_c:FAR
+	EXTERN	ReDir_c:FAR, ReDr45_c:FAR, ReDr50_c:FAR, RdInfo_c:FAR
 ; The compiled code of the part that stays in the memory, port/resident.c:
 ; the interrupt handlers, which the code that starts the program names,
 ; and what the assembly of that part calls, near and in its own group.
 	EXTERN	New21:FAR, New27:FAR, CtrlC:FAR, SetBrk:FAR, Exit01:FAR
 	EXTERN	Release_r:NEAR
-	EXTERN	F21_00_c:FAR, F21_10_c:FAR, F21_25_c:FAR, F21_30_c:FAR
-	EXTERN	F21_31_c:FAR, F22_00_c:FAR, F23_00_c:FAR, F24_00_c:FAR
-	EXTERN	F24_01_c:FAR, F24_02_c:FAR, F25_00_c:FAR, F26_00_c:FAR
-	EXTERN	F27_00_c:FAR, F30_00_c:FAR, F75_00_c:FAR
-	EXTERN	F43_00_c:FAR, F44_00_c:FAR, F63_00_c:FAR, F64_00_c:FAR
-	EXTERN	F33_00_c:FAR, F34_00_c:FAR, F34_10_c:FAR
-	EXTERN	FncSel_c:FAR, FncExt_c:FAR, FncEx1_c:FAR
 
-; In the part that stays in the memory, the copy of the first panel,
-; which the C code of the main loop names.
-	PUBLIC	WCB1sav
+; In the part that stays in the memory, what is kept while a command
+; runs: the copies of the two panels, of which the C code of the main
+; loop names the first, and of the main data, for F21_30_c to fill.
+	PUBLIC	WCB1sav, WCB2sav, ComnIni
 ; What port/resident.c keeps of the interrupts and of the programs that
 ; have stayed in the memory: its data is laid out here, in RDATA.
 	PUBLIC	IntTab, SavePtr, Vect21, Vect22, Vect27, NameBuf, TrnAdr
@@ -104,53 +77,6 @@ CallC	MACRO	Name
 	POP	DS
 	CALL	FAR PTR Name
 	POP	DS
-	ENDM
-
-; An entry by which C code calls the near routine Name: Name_a, called far
-; with DS on the main data. The assembly keeps ES there, so the entry puts
-; it there too. Registers go in and come back as the routine has them. C
-; code cannot see flags: a routine that answers in one names instructions
-; for After that put the answer into a register.
-FromC	MACRO	Name, After
-	PUBLIC	Name&_a
-Name&_a	PROC	FAR
-	PUSH	DS
-	POP	ES
-	CALL	Name
-	After
-	RET
-Name&_a	ENDP
-	ENDM
-
-; Hand a line of text to the C function Name: the registers that describe
-; it are pushed, First of them last, and the function gets BX on them and
-; DS on the main data (see struct LineArgs in port/line.c). TakeLine pops
-; them again, as the function has left them, and with them DS. Scratch is
-; a register to pop into what is of no use.
-CallLine MACRO	Name, First
-	PUSH	CS
-	PUSH	DX
-	PUSH	CS
-	PUSH	BP
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	First
-	MOV	BX,SP
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR Name
-	ENDM
-
-TakeLine MACRO	First, Scratch
-	POP	First
-	POP	DI
-	POP	SI
-	POP	DS
-	POP	BP
-	POP	Scratch
-	POP	DX
-	POP	Scratch
 	ENDM
 
 ; Enter the main loop, which is C, at the place Entry: see MainGo. The
@@ -588,16 +514,8 @@ RGAP	SEGMENT
 RGAP	ENDS
 
 ;-------------------------- Data -----------------------
-	.CONST
-; Texts, buttons and the title of a tree that the boxes of more than one
-; file name. One that is defined in the assembly is made public by this,
-; for a box that is C to name; one that has gone to C is taken from there,
-; for a box that is still here.
-	EXTERNDEF Ok_S:BYTE, OkMn_D:BYTE, Var_S:BYTE, Inc_S:BYTE, Err_S:BYTE
-	EXTERNDEF Empty_S:BYTE, Kov_S:BYTE, YesNo_S:BYTE, YesNo_D:BYTE
-	EXTERNDEF OkCan_S:BYTE, OkCan_D:BYTE, Var2_S:BYTE, NoFnd_S:BYTE
-	EXTERNDEF EdFl_S:BYTE, Tree_S:BYTE, PtMnu_S:BYTE
-
+; The texts, the boxes, the dialogs and the tables of the program are C:
+; the files of constants, port/*_t.c.
 	.DATA
 Back_C	EQU	0
 Cursr_C	EQU	1
@@ -683,29 +601,14 @@ IniOk:	MOV	DS,AX
 	POP	ES
 
 ;----------------------- Set cursor --------------------
-; From here on the loop is C: MainLoop_c of port/main.c, which is entered
-; at one of several places and returns where the program goes on. See
-; MainGo below.
+; From here on the program is C: MainLoop_c of port/main.c, the main
+; loop, which calls every command. The code above falls into it. The
+; function gets the number of the place where the loop is entered, 0 for
+; its start, and room on the stack for the registers that go round it
+; (struct Regs of port/vc.h): MainC, at the top of this file, pushes them.
+; It returns when the program goes on outside it, with the place in AX, a
+; number of Main_T.
 Init40:	MainC	0
-
-
-;-------------------------------------------------------
-; The main loop is C: MainLoop_c of port/main.c, which calls the commands
-; of the keys and of the mouse too. It is no routine: the code above
-; falls into it, and the commands of the menus, which are stubs here
-; still, jump back into it at the labels here. So each label hands the
-; function the number of the place, and all the registers as a structure
-; on the stack (struct Regs there). The function returns when the program
-; goes on outside it, with the place in AX, a number of Main_T, and has
-; made of the registers what that place gets, with the current panel for
-; DS. MainC, at the top of this file, pushes the registers.
-Init50:	MainC	1			; Draw the panels, reading them
-Func01:	MainC	2			; Draw the panel in DS
-Func02:	MainC	3			; The screen buffer to the screen
-Func04:	MainC	4			; The menu bar
-Func05:	MainC	5			; The setup saved if it has changed
-Func07:	MainC	6			; The next key
-Func12:	MainC	7			; The command of the key in AX
 
 MainGo:	MOV	BX,SP
 	PUSH	ES
@@ -729,12 +632,10 @@ MainGo:	MOV	BX,SP
 	POP	DS
 	RET				; To the place of Main_T
 
-; Where the program goes on when the loop returns: the menu bar, whose
-; tables of commands are here still, and what starts the program over,
-; has a command run first, or leaves. Every other command the loop calls
-; itself: Command of port/main.c, which has these as ASM_.
+; Where the program goes on when the loop returns: it starts over, has a
+; command run first, or leaves. port/main.c has these as ASM_.
 	.DATA
-Main_T	DW	F39_00, F40_00, CmdIni, CmdExe, Exit
+Main_T	DW	CmdIni, CmdExe, Exit
 
 	.CODE
 ; An entry for the C code of the loop (see port/main.c for what it takes
@@ -753,14 +654,29 @@ ReDir_a	PROC	FAR
 	RET
 ReDir_a	ENDP
 
-	INCLUDE	VCFUNC.INC
-	INCLUDE	VCMENU.INC
-	INCLUDE	VCF1.INC
-	INCLUDE	VCCOPY.INC
-	INCLUDE	VCVIEW.INC
-	INCLUDE	VCEDIT.INC
 	INCLUDE	VCMEM.INC
-	INCLUDE	VCFIND.INC
+
+;------------------- Start over, or run -----------------
+; Enter does not come back when it runs something: F21_30_c of
+; port/enter.c has saved what the program needs in the part that stays in
+; the memory, and given the main data back to DOS. That part runs the
+; commands: Exec there, which gets in ES the block of the memory that the
+; rest of the program is in, to give it back to DOS as well. With nothing
+; to run the program starts over at once.
+CmdExe:	PUSH	SS
+	POP	DS
+	MOV	AX,CS
+	ADD	AX,TrnPar
+	MOV	ES,AX
+	MOV	AX,OFFSET Exec
+	PUSH	DS
+	PUSH	AX
+	RETF
+CmdIni:	PUSH	SS
+	PUSH	SS
+	POP	DS
+	POP	ES
+	JMP	Init11
 
 ;------------------------ Exit -------------------------
 ; C: Exit_c of port/main.c puts the screen back. The part of the program

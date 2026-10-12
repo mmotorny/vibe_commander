@@ -4,8 +4,9 @@
  * the dialog that asks whether to quit, of port/enter.c; and what
  * port/usermenu.c has of the user menu, the names of the menu file and of
  * the list file, the title of the menu and the box that says no menu file
- * was found. The texts that many boxes name are here too: an empty line,
- * a name in quotes, and the buttons Yes and No.
+ * was found; and the keys that begin the speed search, which the main
+ * loop looks for. The texts that many boxes name are here too: an empty
+ * line, a name in quotes, and the buttons Yes and No.
  *
  * From VCFUNC.INC.
  */
@@ -27,6 +28,7 @@
 #pragma aux Menu_F "*"
 #pragma aux User_S "*"
 #pragma aux UsrEr_B "*"
+#pragma aux AltSr_T "*"
 #pragma aux List_F "*"
 
 /* Of another file: the text of the button Ok, and the button. The line
@@ -121,6 +123,16 @@ const DIALOG(1) UsrEr_B = {
     { &UsrEr_P, 0x528, 0, 1, 0xFF, 0, 2 },
     { { 4, 0, 0, 0, 0, 0x426, MD_AT(TmpBuf), OkMn_D } },
     0
+};
+
+/* The scan codes of Alt with a digit or a letter, which begin the speed
+   search: the main loop looks for a key here. The search itself, in
+   port/cmdline.c, has them too. */
+const u8 AltSr_T[38] = {
+    0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83,
+    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
+    0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26,
+    0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32
 };
 
 /* The name of the list file, which is copied 13 bytes long too. What

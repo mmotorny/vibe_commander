@@ -85,6 +85,14 @@ OWN = {
               "table of one",
 }
 
+# The tables of the menus' commands. Where the original has the address
+# of a command there, the port has the number of the command: the CMD_ of
+# port/vc.h that has the name of the original's label. So an item that
+# names another command than the original's fails the test, though no
+# screen shows a table of the menus until its item is chosen.
+COMMAND_TABLES = {"Menu1_T", "Menu2_T", "Menu3_T", "Menu4_T", "MenuS_T",
+                  "MenuC_T"}
+
 # Objects of the port that have the name of one of the original and are
 # meant to be otherwise: name -> why. Each is still compared, and has to
 # differ: an entry that no longer applies fails the test.
@@ -101,10 +109,6 @@ DIFFERENT = {
 _MENUS = ("the C has the lines of the menus in one array and the pages of "
           "their help in another, and a menu by its place in them")
 NAMED_OTHERWISE = {
-    ("Menu1_T", 28): ("at", "M17_00",
-                      "Drive... goes on in a stub of its own, which hands "
-                      "the box of the drives the panel and the menu as its "
-                      "function takes them"),
     **{(dialog, 4): ("is", number,
                      "the routine that a dialog names for Enter and F10 is "
                      "a number, SUB_ of port/tables.h, by which Dialog "
@@ -120,6 +124,30 @@ NAMED_OTHERWISE = {
 
 class Problem(Exception):
     pass
+
+
+def commands():
+    """The numbers of the commands: the names that port/vc.h has with CMD_
+    in an enumeration, as the compiler counts them."""
+    header = Path(__file__).resolve().parent.parent / "port" / "vc.h"
+    text = re.sub(r"/\*.*?\*/", "", header.read_text(), flags=re.S)
+    numbers = {}
+    for body in re.findall(r"\benum\s*{(.*?)}", text, flags=re.S):
+        if "CMD_" not in body:
+            continue
+        number = 0
+        for entry in body.split(","):
+            match = re.fullmatch(r"\s*(\w+)\s*(?:=\s*(\w+))?\s*", entry)
+            if not match:
+                raise Problem(f"an entry of the commands in {header.name} "
+                              f"is not understood: {entry.strip()}")
+            if match[2]:
+                number = int(match[2], 0)
+            numbers[match[1].removeprefix("CMD_")] = number
+            number += 1
+    if not numbers:
+        raise Problem(f"{header.name} has no numbers of commands")
+    return numbers
 
 
 class ObjectFile:
@@ -467,6 +495,11 @@ def compare(original, port, name, there, address, length):
         elif how == "is":
             wanted = [label]
             instead = "the number that it is to have"
+        elif name in COMMAND_TABLES:
+            numbers = commands()
+            wanted = [numbers[candidate] for candidate in names
+                      if candidate in numbers]
+            instead = f"the number of the command {said} in port/vc.h"
         else:
             wanted = [place + behind & 0xFFFF for candidate in names
                       for place in port.places.get(candidate, [])]
