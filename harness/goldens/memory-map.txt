@@ -42,8 +42,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -70,8 +70,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -98,8 +98,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -126,8 +126,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -154,8 +154,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -182,8 +182,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -210,8 +210,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -238,8 +238,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -266,8 +266,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -294,8 +294,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -322,8 +322,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -350,8 +350,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -406,8 +406,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -434,8 +434,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -490,8 +490,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 23 27              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -574,8 +574,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        22 2E                    ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     3##########   VC.EXE         1B 21 23 24 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     3##########   VC.EXE         1B 21 23 24 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -742,8 +742,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ • ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -770,8 +770,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ • ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -798,8 +798,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ • ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -826,8 +826,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ √ ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx5 0Ex64 3Fx5 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -854,8 +854,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ • ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -882,8 +882,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ √ ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx5 0Ex64 3Fx5 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -910,8 +910,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ • ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx5 0Fx64 3Fx5 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -966,8 +966,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -1050,8 +1050,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ • ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -1078,8 +1078,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM                              ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║ √ ####     1       960   FDAPM.COM      16 28 2A 2F              ║     ║| 1Bx3 3Fx5 3Ex64 3Fx5 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
@@ -1134,8 +1134,8 @@ cursor 0 127 lines 6 7 mode 3
 |║no   ║   06CC     1    42,192   system                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║da   ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║ru   ║   1121     2    73,008   COMMAND        2E                       ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║em   ║   22BF     2     5,760   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║   2429     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
+|║em   ║   22BF     2     8,784   DRIVER.COM     16 28                    ║   ──╢| 1Bx3 3Fx74 03x2 1Bx1
+|║     ║   24E6     2##########   VC.EXE         1B 21 22 23 27           ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1

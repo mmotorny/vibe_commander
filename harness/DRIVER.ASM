@@ -45,9 +45,10 @@
 ;	'S' 4005 bytes	the screen at the end of a step: 2000 cells, the
 ;			cursor's column and row, the two lines of its
 ;			shape, the video mode
-;	'K' word bytes	with it, when the program waits in LeaveTm: the
-;			length of its stack and what the stack holds, from
-;			the bottom up
+;	'K' word word bytes
+;			with it, when the program waits in LeaveTm: the
+;			length of its stack, its segment, and what the
+;			stack holds, from the bottom up
 ;	'B' 4005 bytes	with the clock on: the screen as it was seen to
 ;			change within 20 ticks of the timer after 'S'
 ;	'E'		the script has ended; the machine is then reset
@@ -65,10 +66,16 @@ Cells	EQU	4000			; Bytes of an 80 x 25 text screen
 Events	EQU	16			; Where the events begin in a script
 Rounds	EQU	2			; Idle rounds that end a step
 Blink	EQU	20			; Ticks to look for what blinks: 1.1 s
+FileLen	EQU	2048			; Bytes of the driver's file
 
 	.code
 	org	100h
-Start:	jmp	Init
+Start:	jmp	near ptr Init
+
+; How many paragraphs of memory the driver keeps beyond its own, so that
+; what DOS loads after it lies where the tests want it (see PLACE in
+; harness/setups.py). The host sets this in the file, at its fourth byte.
+Pad	dw	0
 
 Old16	dd	0
 Old28	dd	0
@@ -222,6 +229,10 @@ PutStk	proc	near
 	mov	al,cl
 	out	dx,al
 	mov	al,ch
+	out	dx,al
+	mov	ax,ss
+	out	dx,al
+	mov	al,ah
 	out	dx,al
 	mov	si,cs:HStack
 	push	ss
@@ -520,6 +531,11 @@ Init:	mov	PktSeg,cs
 	int	21h
 	mov	dx,offset Last+Cells+15
 	shr	dx,4
+	add	dx,Pad
 	mov	ax,3100h
 	int	21h
+
+; The file is as long whatever is changed in the driver: its length shows
+; on the screen where a scenario lists the directory it is in.
+	db	(Start + FileLen - $) dup (0)
 	end	Start

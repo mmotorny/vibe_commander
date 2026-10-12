@@ -1691,7 +1691,7 @@ cursor 4 23 lines 6 7 mode 3
 |║fdconfig sys│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
 |║FREEDOS     │            │            ║║   Volume in drive A: is FD14-BOOT    ║| 1Bx60 1Ex2 1Bx4 1Ex9 1Bx5
 |║            │            │            ║║  1,457,664 total bytes on drive A:   ║| 1Bx43 1Ex9 1Bx22 1Ex2 1Bx4
-|║            │            │            ║║    847,360 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
+|║            │            │            ║║    846,848 bytes free on drive A:    ║| 1Bx45 1Ex7 1Bx21 1Ex2 1Bx5
 |║            │            │            ║║     3 files use 47,616 bytes in      ║| 1Bx46 1Ex1 1Bx11 1Ex6 1Bx16
 |║            │            │            ║║                 A:\                  ║| 1Bx80
 |║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
@@ -1915,7 +1915,7 @@ cursor 4 23 lines 6 7 mode 3
 |║          ####### Bytes Free          ║║fdconfig sys│            │            ║| 1Bx11 1Ex7 1Bx62
 |║   Volume in drive A: is FD14-BOOT    ║║FREEDOS     │            │            ║| 1Bx20 1Ex2 1Bx4 1Ex9 1Bx45
 |║  1,457,664 total bytes on drive A:   ║║            │            │            ║| 1Bx3 1Ex9 1Bx22 1Ex2 1Bx44
-|║    847,360 bytes free on drive A:    ║║            │            │            ║| 1Bx5 1Ex7 1Bx21 1Ex2 1Bx45
+|║    846,848 bytes free on drive A:    ║║            │            │            ║| 1Bx5 1Ex7 1Bx21 1Ex2 1Bx45
 |║     3 files use 47,616 bytes in      ║║            │            │            ║| 1Bx6 1Ex1 1Bx11 1Ex6 1Bx56
 |║                 A:\                  ║║            │            │            ║| 1Bx80
 |╟──────────────────────────────────────╢║            │            │            ║| 1Bx80

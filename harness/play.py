@@ -40,7 +40,7 @@ def machine(workdir, program, country):
     with `program` on drive D:."""
     bench = setups.Bench(workdir / "bench", country)
     floppy = setups._floppy(workdir, COMMANDS, setups.COUNTRIES[country],
-                            setups.KEYBOARDS.get(country), bench=True).path
+                            setups.KEYBOARDS.get(country), bench=country).path
     disks = [workdir / "c.img", workdir / "d.img"]
     shutil.copyfile(bench._work, disks[0])
     shutil.copyfile(bench._program_disk(program), disks[1])

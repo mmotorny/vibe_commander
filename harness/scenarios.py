@@ -613,8 +613,9 @@ class Run:
     executed: dict = field(default_factory=dict)
     # The fewest bytes of its stack that the program had never used, of
     # all the steps that ended with it waiting for a key; None if its stack
-    # was not looked at.
+    # was not looked at. And the segment its stack was in.
     stack_left: int = None
+    stack_segment: int = None
 
 
 # From C:\WORK into C:\STAMPS, whose files have sizes and time stamps of
@@ -3231,6 +3232,9 @@ def run(scenario, program, bench, trace=False, blinking=False,
                 if step.stack is not None]
         if left:
             result.stack_left = min(left)
+            result.stack_segment = next(
+                step.stack_segment for step in done
+                if step.stack is not None)
     return result
 
 

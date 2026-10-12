@@ -71,6 +71,12 @@ STAMPS_FILES = [
 ]
 
 
+# The listing of the build of the published source that is laid out as
+# the original is, and is the same byte for byte: it says where the
+# original has its routines and its variables.
+LISTING = deps.ROOT / "build" / "shareware-layout" / "VC.LST"
+
+
 @dataclass(frozen=True)
 class Program:
     """A build of Volkov Commander, and the file name it is run under."""
@@ -86,9 +92,12 @@ class Program:
         """The program in the file `path`, with the listing that the
         build writes next to it."""
         path = Path(path)
+        contents = path.read_bytes()
         listing = path.with_suffix(".LST")
-        return cls(path.name.upper(), path.read_bytes(),
-                   listing if listing.exists() else None)
+        if not listing.exists():
+            # A copy of the original has the listing of the original.
+            listing = LISTING if contents == original_vc().contents else None
+        return cls(path.name.upper(), contents, listing)
 
 
 def distribution():
@@ -99,22 +108,17 @@ def distribution():
                 for member in archive.infolist()}
 
 
-# The listing of the build of the published source that is laid out as
-# the original is, and is the same byte for byte: it says where the
-# original has its routines and its variables.
-LISTING = deps.ROOT / "build" / "shareware-layout" / "VC.LST"
-
-
 def original_vc():
     """The original VC.COM."""
     return Program("VC.COM", distribution()["VC.COM"][0], LISTING)
 
 
-def _floppy(workdir, commands, country=None, keyboard=None, bench=False):
+def _floppy(workdir, commands, country=None, keyboard=None, bench=None):
     """A boot floppy that runs `commands`, for a country of COUNTRIES and
-    with a keyboard of KEYBOARDS, if they are given. With `bench` it has
-    what the test bench has besides: the driver of the tests, next to the
-    programs of DOS, for the commands to load."""
+    with a keyboard of KEYBOARDS, if they are given. With `bench`, the
+    name of a country, it has what the test bench of that country has
+    besides: the driver of the tests, next to the programs of DOS, for
+    the commands to load."""
     if keyboard:
         layout, codepage, layouts = keyboard
         directory = r"A:\FREEDOS\BIN"
@@ -136,11 +140,8 @@ def _floppy(workdir, commands, country=None, keyboard=None, bench=False):
                 floppy.write(f"FREEDOS/{member}", archive.read(member), EPOCH)
         image.unlink()
     if bench:
-        if not driver.PROGRAM.exists():
-            raise RuntimeError(f"{driver.PROGRAM} is not there: build the "
-                               "project first")
         floppy.write(f"FREEDOS/BIN/{driver.FILENAME}",
-                     driver.PROGRAM.read_bytes(), EPOCH)
+                     driver.program(PLACE[bench]), EPOCH)
     return floppy
 
 
@@ -172,6 +173,18 @@ def codepage(country):
 # select its Cyrillic letters; Alt and the left Shift go back.
 KEYBOARDS = {"ru": ("RU", 866, "KEYBRD2.SYS")}
 
+# How many paragraphs of memory the driver of the tests keeps beyond its
+# own on the bench of each country, which decides where DOS loads the
+# program. They are chosen so that the original's stack ends where a page
+# of the machine's memory ends, 4,096 bytes: QEMU is slow to write to a
+# page that has code in it which it has run, and behind its stack the
+# program has its code. The port's stack ends 249 bytes short of a page
+# like that, and few of them are code that runs. place.py says where the
+# stacks end, and what to write here should that have to change: the
+# memory map of the scenarios shows the driver with what it keeps, so
+# their goldens change with it.
+PLACE = {"us": 188, "ru": 233}
+
 # What DOS runs on the test bench once it has booted. It loads the driver
 # of the tests and then waits for a key: that is where the machine's state
 # is saved, and where every scenario begins, with the Enter that its
@@ -202,7 +215,7 @@ class Bench:
         self._workdir.mkdir(parents=True, exist_ok=True)
         self._floppy = _floppy(self._workdir, BENCH_COMMANDS,
                                COUNTRIES[country], KEYBOARDS.get(country),
-                               bench=True).path
+                               bench=country).path
         self._work = self._workdir / "c.img"
         _work_disk(self._work, self._workdir)
         self._programs = {}             # Program -> its disk image

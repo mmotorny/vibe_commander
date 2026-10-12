@@ -340,6 +340,15 @@ its file size from appearing on screen as free space. A scenario that wants
 the program set up differently does that itself, through the menus. When a
 build is tested, up to four scenarios run side by side.
 
+Where DOS loads the program is chosen: the driver of the tests keeps some
+memory more than it needs, so that the original's stack ends where a page
+of the machine's memory ends. QEMU has to look at every write to a page
+with code in it that it has run, and the program has its code right
+behind its stack: a push is many times slower there than elsewhere, which
+is a third of the time of a scenario with dialogs or more.
+`python3 harness/place.py` says where the stacks of the original and of
+the port end on each bench.
+
 The Russian machine also has a Russian keyboard: the keyboard driver of
 FreeDOS with its Russian layout, which the boot floppy lacks and the
 harness adds. It types Latin letters until Alt and the right Shift select

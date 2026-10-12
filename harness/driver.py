@@ -42,6 +42,8 @@ from dos import COLUMNS, ROWS, MachineError, Screen
 PROGRAM = Path(__file__).resolve().parent.parent / "build" / "DRIVER.COM"
 # The file it is on the floppy that DOS boots from.
 FILENAME = "DRIVER.COM"
+# Where its file has the number of paragraphs it keeps beyond its own.
+PAD = 3
 
 # A script (see DRIVER.ASM).
 MAGIC = b"\xA5\x5A"
@@ -150,10 +152,21 @@ def facts(program, stack=False):
     if stack:
         bottom = symbol(r"^DataSav [ .]*Byte\[\d+\] +([0-9A-F]+)h")
         top = symbol(r"^VcStack [ .]*L Near +([0-9A-F]+)h")
-        at = bottom - COM_ORIGIN + EXE_HEADER
+        at = bottom - COM_ORIGIN + (EXE_HEADER if code[:2] == b"MZ" else 0)
         found = replace(found, stack=bottom, stack_size=top - bottom,
                         stack_loaded=code[at:at + top - bottom])
     return found
+
+
+def program(pad=0):
+    """The driver's file, for a driver that keeps `pad` paragraphs of
+    memory beyond its own."""
+    if not PROGRAM.exists():
+        raise RuntimeError(f"{PROGRAM} is not there: build the project "
+                           "first")
+    code = bytearray(PROGRAM.read_bytes())
+    struct.pack_into("<H", code, PAD, pad)
+    return bytes(code)
 
 
 def _key(name):
@@ -256,6 +269,7 @@ class Step:
     screen: Screen
     stack: bytes = None           # what the program's stack held, if the
                                   # program waited where that is looked at
+    stack_segment: int = None     # and the segment it is in
 
 
 def _screen(data):
@@ -300,11 +314,12 @@ def read(data):
                 steps.append(Step(screen))
             states.append(screen)
             at += 1 + SCREEN
-        elif kind == b"K" and at + 3 <= len(data) and at + 3 + \
+        elif kind == b"K" and at + 5 <= len(data) and at + 5 + \
                 int.from_bytes(data[at + 1:at + 3], "little") <= len(data):
-            size = int.from_bytes(data[at + 1:at + 3], "little")
-            steps[-1].stack = data[at + 3:at + 3 + size]
-            at += 3 + size
+            size, segment = struct.unpack_from("<HH", data, at + 1)
+            steps[-1].stack = data[at + 5:at + 5 + size]
+            steps[-1].stack_segment = segment
+            at += 5 + size
         elif kind == b"R":
             at += 1
         elif kind == b"E":
