@@ -69,6 +69,12 @@
 	EXTERN	F65_00_c:FAR
 	EXTERN	MainLoop_c:FAR, Exit_c:FAR, Quit_c:FAR, RestVct_c:FAR
 	EXTERN	HookVct_c:FAR
+	EXTERN	Timer_c:FAR, TstBrk_c:FAR, ChkMode_c:FAR, Cursor_c:FAR
+	EXTERN	Cursor1_c:FAR, HidCur_c:FAR, IniMous_c:FAR, SavMous_c:FAR
+	EXTERN	CurMous_c:FAR, GetMous_c:FAR, InWind_c:FAR, ScrOffs_c:FAR
+	EXTERN	ResWin_c:FAR, Window_c:FAR, IsCrLf_c:FAR, UpCase_c:FAR
+	EXTERN	SetDTA_c:FAR, Intr21f_c:FAR, InvVar_c:FAR, ChkSum_c:FAR
+	EXTERN	SetPth_c:FAR, Fantom_c:FAR, ChgDisk_c:FAR, OpenFil_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
@@ -2218,14 +2224,13 @@ Main_T	DW	MainKy, F73_00, F77_00, F11_00, F39_00, F20_00, F34_10
 
 	.CODE
 ; Entries for the C code of the loop to routines of other files (see
-; FromC above, and port/main.c for what they take and return). Those
-; of SaveSet and of the BIOS for the screen, Int10_a, are in VCMENU.INC.
+; FromC above, and port/main.c for what they take and return). That of
+; SaveSet is in VCMENU.INC.
 	FromC	MakeIni
-	FromC	SavScr
 
 ; Read what a panel shows: ReDir, with the panel in DX and in AL whether
 ; to keep the cursor and the marks. AX is not 0 if it set the carry flag.
-	PUBLIC	ReDir_a, Dos35_a
+	PUBLIC	ReDir_a
 ReDir_a	PROC	FAR
 	PUSH	DS
 	PUSH	DS
@@ -2236,19 +2241,6 @@ ReDir_a	PROC	FAR
 	POP	DS
 	RET
 ReDir_a	ENDP
-
-; DOS for where an interrupt goes: AL - which. It comes back in DX and AX.
-Dos35_a	PROC	FAR
-	PUSH	ES
-	PUSH	BX
-	MOV	AH,35h
-	INT	21h
-	MOV	DX,ES
-	MOV	AX,BX
-	POP	BX
-	POP	ES
-	RET
-Dos35_a	ENDP
 
 	INCLUDE	VCFUNC.INC
 	INCLUDE	VCMENU.INC

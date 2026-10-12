@@ -83,9 +83,12 @@ enum {
     ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
-/* Routines that are still assembly, by their entries for C. HidCur puts
-   the cursor below the screen, Cursor at a row and a column, the row in
-   the high byte, and Cursor1 on the command line. ClrKbd empties the
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   HidCur puts the cursor below the screen, Cursor at a row and a column,
+   the row in the high byte, and Cursor1 on the command line. ClrKbd empties the
    keyboard buffer if the setup has it so. ResWin puts back what a box
    covered, ResUser what DOS has shown, for a window given like Window's,
    and SavScr takes the screen into the screen buffer.
@@ -99,10 +102,9 @@ enum {
 
    TstDrv is 1 if there is a drive of the letter. SelDrv is the call of
    DOS that makes a drive the current one, 0 for A:, and Int21d any call
-   of DOS that the assembly made without Intr21; Dos35 asks DOS where an
-   interrupt goes, and DosTime for the time of day, the hours and minutes
-   in the low word. Int10, which calls the BIOS for the screen, is in
-   vc.h.
+   of DOS that the assembly made without Intr21; DosTime asks DOS for the
+   time of day, the hours and minutes in the low word. Int10 calls the
+   BIOS for the screen.
 
    MakeIni writes into MenuBuf what the setup file holds, and SaveSet, of
    vc.h, writes that file. ReDir reads what a panel shows, keeping the
@@ -111,42 +113,12 @@ enum {
    AsmSeg returns the code segment of the assembly and ResSeg the segment
    of the part of the program that stays in the memory while a command
    runs, where the stack is. */
-void HidCur(void);
-void Cursor(u16 place);
-void Cursor1(void);
-void ClrKbd(void);
-void ResWin(u16 begin, u16 size, u16 saved);
-void ResUser(u16 begin, u16 size);
-void SavScr(void);
-u32 GetMous(u16 place);
-void TypMous(u16 look);
-u16 InWind(u16 place, u16 begin, u16 size);
-u16 DoublMo(u16 begin, u16 size, u16 line);
-u16 TstDrv(u16 letter);
 void SelDrv(u16 drive);
-u16 Int21d(struct DosRegs STACK *regs);
-u32 Dos35(u16 number);
-u32 DosTime(void);
 void MakeIni(void);
 u16 ReDir(u16 panel, u16 keep);
 u16 AsmSeg(void);
 u16 ResSeg(void);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux Cursor  "*_a" __far parm [ax] modify exact [es]
-#pragma aux Cursor1 "*_a" __far modify exact [es]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResUser "*_a" __far parm [bx] [dx] modify exact [es]
-#pragma aux SavScr  "*_a" __far modify exact [es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux DoublMo "*_a" __far parm [bx] [dx] [si] value [ax] modify exact [ax cx es]
-#pragma aux TstDrv  "*_a" __far parm [ax] value [ax] modify exact [ax es]
 #pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
-#pragma aux Int21d  "*_a" __far parm [bx] value [ax] modify exact [ax bx cx dx si di es]
-#pragma aux Dos35   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux DosTime "*_a" __far value [dx ax] modify exact [ax cx dx]
 #pragma aux MakeIni "*_a" __far modify exact [cx si es]
 #pragma aux ReDir   "*_a" __far parm [dx] [ax] value [ax] modify exact [ax es]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
@@ -942,6 +914,22 @@ static void SetVect(u16 number, const u8 __far *to)
     regs.si = 0;
     regs.di = 0;
     Int21d((struct DosRegs STACK *)&regs);
+}
+
+/* Where an interrupt goes, as DOS says: the offset in the low word. The
+   low byte of `call` is the number of the interrupt. */
+static u32 Dos35(u16 call)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x3500 | call & 0xFF;
+    regs.bx = 0;
+    regs.cx = 0;
+    regs.name = (const u8 __far *)&md;
+    regs.si = 0;
+    regs.di = 0;
+    Int21d((struct DosRegs STACK *)&regs);
+    return (u32)regs.es << 16 | regs.bx;
 }
 
 /* Give Ctrl-Break back to whoever had it. */

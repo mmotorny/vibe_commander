@@ -217,30 +217,7 @@ MnuV00:	MOV	AX,CX			; Edit ViewFil, with the menu that
 ; Entries for the C code of these commands to routines of files that are
 ; being translated elsewhere (see FromC in VC.ASM, and port/commands.c for
 ; what they take and return).
-	FromC	ScrOffs
 	FromC	SaveSet, <SBB DX,DX>	; CY as a number, next to AX
-
-; The BIOS for the screen, called as the original calls it here, with the
-; mouse pointer left as it is. AX, BX, CX and DX come from four words at
-; SS:BX and are put back there as the BIOS leaves them.
-	PUBLIC	Int10_a
-Int10_a	PROC	FAR
-	PUSH	BP
-	MOV	BP,BX
-	MOV	AX,[BP]
-	MOV	BX,[BP+2]
-	MOV	CX,[BP+4]
-	MOV	DX,[BP+6]
-	PUSH	BP
-	INT	10h
-	POP	BP
-	MOV	[BP],AX
-	MOV	[BP+2],BX
-	MOV	[BP+4],CX
-	MOV	[BP+6],DX
-	POP	BP
-	RET
-Int10_a	ENDP
 
 ; The boxes and the dialogs of the commands, and their texts, stay here:
 ; DialBox and Dialog read them in this segment, and the C code says where

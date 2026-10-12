@@ -57,17 +57,4 @@ Help	PROC	NEAR
 	POP	AX
 	RET
 Help	ENDP
-
-; C code asks where the cursor is on the screen: AH,AL - y, x.
-	PUBLIC	GetCur_a
-GetCur_a PROC	FAR
-	PUSH	BP
-	MOV	AH,0Fh
-	INT	10h
-	MOV	AH,3
-	INT	10h
-	MOV	AX,DX
-	POP	BP
-	RET
-GetCur_a ENDP
 

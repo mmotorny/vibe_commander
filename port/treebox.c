@@ -29,12 +29,14 @@ u16 ChTree(u16 column);
 #pragma aux ReadTre "*_c" __far value [ax] modify exact [ax]
 #pragma aux ChTree  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. HidCur puts the cursor below the screen, Cursor at a row
-   and a column, the row in the high byte. SavWin keeps what the screen
-   buffer has where a window is to be, ResWin puts it back; MinBox draws a
-   box with a shadow there, growing if windows are to zoom. Int10m calls
-   the BIOS for the screen, with the mouse pointer out of the way.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
+
+   HidCur puts the cursor below the screen, Cursor at a row and a column,
+   the row in the high byte. SavWin keeps what the screen buffer has where
+   a window is to be, ResWin puts it back; MinBox draws a box with a shadow
+   there, growing if windows are to zoom. Int10m calls the BIOS for the
+   screen, with the mouse pointer out of the way.
 
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, or `place` as it was if there is no mouse.
@@ -51,36 +53,6 @@ u16 ChTree(u16 column);
    puts the box on the screen that the assembly describes at `box`, an
    offset in its code segment, with its middle at `place`; only the first
    box since ZoomOne was cleared grows. */
-void HidCur(void);
-void Cursor(u16 place);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-void MinBox(u16 begin, u16 size, u16 color);
-u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
-u32 GetMous(u16 place);
-void TypMous(u16 look);
-u16 InWind(u16 place, u16 begin, u16 size);
-u16 DoublMo(u16 begin, u16 size, u16 line);
-void ClrKbd(void);
-u32 PgUp(u16 cursor, u16 first, u16 lines);
-u32 PgDn(u16 cursor, u16 first, u16 lines, u16 all);
-u16 ChkSum(u16 at, u16 length);
-void OncZoom(u16 place, u16 box, struct Box STACK *where);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux Cursor  "*_a" __far parm [ax] modify exact [es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [cx] modify exact [ax bx cx dx es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux DoublMo "*_a" __far parm [bx] [dx] [si] value [ax] modify exact [ax cx es]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux PgUp    "*_a" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx si di]
-#pragma aux PgDn    "*_a" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx si di]
-#pragma aux ChkSum  "*_a" __far parm [si] [cx] value [ax] modify exact [ax es]
-#pragma aux OncZoom "*_a" __far parm [bx] [ax] [di] modify exact [bx dx si es]
 
 /* C routines of other files that vc.h does not have. */
 void FilZero(u8 __far *text, u16 length);               /* string.c */
@@ -221,12 +193,12 @@ RdTr02:                                 /* the file */
         if (md.TreeBuf[i] != TreBeg[i])
             goto RdTr10;
     count = TREE->TreeLen;
-    if (ChkSum((u16)md.TreeBuf, 7) != TREE->TreSum1)
+    if (ChkSum(md.TreeBuf, 7) != TREE->TreSum1)
         goto RdTr10;
     count <<= 4;
     if ((u16)(done - 11) != count)
         goto RdTr10;
-    if (ChkSum(TRELIST, count) != *(u16 *)(u16)(TRELIST + count))
+    if (ChkSum((const u8 *)TRELIST, count) != *(u16 *)(u16)(TRELIST + count))
         goto RdTr10;
     goto RdTr40;
 
@@ -249,7 +221,7 @@ RdTr11:                                 /* one more: with five, a box that
     if (count >= 5) {
         if (count == 5) {
             *(u16 *)md.MenuBuf = (u16)(signed char)md.DosPth[0];
-            OncZoom(0x728, OFFSET(Tree_P), (struct Box STACK *)&box);
+            OncZoom(0x728, OFFSET(Tree_P), 0, (struct Box STACK *)&box);
         }
         Number(md.MenuBuf, 0, count, NUM_SEPARATED);
         line.value = box.begin + 0x400 & 0xFF00 | 0x28;
@@ -374,13 +346,13 @@ RdTr26:
         goto RdTr40;
 
     /* The file. */
-    OncZoom(0x728, OFFSET(TrSav_P), (struct Box STACK *)&box);
+    OncZoom(0x728, OFFSET(TrSav_P), 0, (struct Box STACK *)&box);
     for (i = 0; i < 5; i++)
         md.TreeBuf[i] = TreBeg[i];
     count = TREE->TreeLen;
-    TREE->TreSum1 = ChkSum((u16)md.TreeBuf, 7);
+    TREE->TreSum1 = ChkSum(md.TreeBuf, 7);
     count <<= 4;
-    *(u16 *)(u16)(TRELIST + count) = ChkSum(TRELIST, count);
+    *(u16 *)(u16)(TRELIST + count) = ChkSum((const u8 *)TRELIST, count);
     size = count + 11;
     regs.ax = 0x4300;                   /* with the attributes it has */
     regs.bx = size;

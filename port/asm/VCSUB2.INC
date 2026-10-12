@@ -3,7 +3,6 @@
 ;-------------------------------------------------------
 
 	PUBLIC	PtMnu_S
-	PUBLIC	Timer_a, DosTime_a, InpKey_a
 
 ;------------------ Begin of main windows --------------
 ;			   DS - WCBseg
@@ -360,30 +359,6 @@ Input	ENDP
 ; entries take and return).
 	FromC	LeaveTm
 	FromC	Blank
-
-; The BIOS's count of timer ticks, as a number of 32 bits in DX and AX.
-Timer_a	PROC	FAR
-	CALL	Timer
-	MOV	AX,DX
-	MOV	DX,CX
-	RET
-Timer_a	ENDP
-
-; The time of day: the hours and the minutes in AX, the seconds and their
-; hundredths in DX.
-DosTime_a PROC	FAR
-	MOV	AH,2Ch
-	INT	21h
-	MOV	AX,CX
-	RET
-DosTime_a ENDP
-
-; Take the key that waits.
-InpKey_a PROC	FAR
-	MOV	AH,0
-	INT	16h
-	RET
-InpKey_a ENDP
 
 LeaveTm	PROC	NEAR
 	INT	28h

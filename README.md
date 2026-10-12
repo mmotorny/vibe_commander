@@ -125,7 +125,15 @@ the screen, the tap on Alt and the keys that the mouse clicks on the key
 bar, and so are what a key does to a line that is typed into, the speed
 search, the key bar, the menu bar, the command line with its prompt, and
 finding what an extension file says for a file. The screen blanker is
-still assembly, and so is drawing the frame of a box.
+still assembly. What all of these rest on is C too: putting a window of
+the program's copy of the screen on the display, keeping what a box
+covers and putting it back, the frame of a box with its shadow and the
+box growing, the cursor, the mouse with its pointer and the second click,
+the keys that wait, the bell, capitals, every call of DOS with the error
+that it may end in, opening a file, asking DOS for the current directory,
+and asking the user for the disk of a drive that shares the floppy drive
+with another. Saving the setup and the jump by a table of keys are still
+assembly.
 The pull-down menus of the menu bar are C as well: the five menus with
 their ticks and the items that cannot be chosen as things are, and the
 keys and the mouse that the bar takes until an item is chosen. So are
@@ -227,6 +235,19 @@ routine that is still assembly, the assembly gets an entry for it that C
 can call. The assembly also holds the two routines that the compiler calls
 to multiply and to divide numbers of 32 bits, which a C library would
 bring: the program has none.
+
+DOS, the BIOS and the mouse driver are called by software interrupts,
+which C cannot express. The C code calls them in one file, `port/dos.c`,
+and nowhere else: eight small functions, each a line of C around the one
+instruction, which is inline assembly there, with the registers as its
+arguments. Four more are there for a port of the machine and its
+interrupt flag, for which the compiler has functions of its own, and for
+DOS's routine that makes capitals. Everything else is plain C that calls
+these, and reads the BIOS's data and the memory of the display through
+pointers. That file is where the program will meet another operating
+system; until the translation is done it hides nothing of DOS. The
+entries by which C code calls DOS in `VCCOPY.INC`, `VCF1.INC` and
+`VCMEM.INC` have yet to move there.
 
 The halves are linked into one program, `VC.EXE`, which is not built the
 way a C program usually is. It still loads and starts like the `.COM` file

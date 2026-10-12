@@ -662,6 +662,17 @@ out again (show.py --changes is how):
     "work\\docs". Do not have the Info in both panels for it: a row
     then has "Bytes Free" twice, and the second number is compared.
   - Drive... of a panel's menu, "F9 l d", is the box of Alt+F1.
+  - A key written with the one before it, "Right+Right", is lost where
+    the program empties the keyboard buffer after a key, as the editor
+    does while "Clear keyboard buffer" is on: the cursor goes one
+    column. Behind the Enter that starts a copy, "Enter+a", a key that
+    stops nothing is left where it is by the copy, which looks for Esc,
+    Ctrl+c and F10 before every piece, and is typed into the command
+    line afterwards; "Enter+F10" stops the copy before it has read
+    anything, and no target is left.
+  - "Click@40,15" in the Configuration, "F9 o c", ticks Left-handed
+    mouse: from then on the right button puts the cursor on a file and
+    the left one selects.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -3542,6 +3553,51 @@ SCENARIOS = {
             "Click@40,10",                # the button in the middle
         )),
 
+    "keys-waiting": Scenario(
+        "A key that waits behind another: taken from the keyboard and "
+        "lost where the buffer is cleared, left there by a copy that it "
+        "does not stop, and F10, which stops one",
+        steps=(
+            "Down Down Down",             # onto a file
+            "F4",                         # the editor clears the buffer
+            "Right+Right",                # after a key: one column, not two
+            "Esc",
+            "F5",
+            '"zz"',
+            "Enter+a",                    # no key that stops a copy: it
+                                          # stays, for the command line
+            "Backspace",
+            "F5",
+            '"zy"',
+            "Enter+F10",                  # stops it: no zy
+        )),
+
+    "drive-b": Scenario(
+        "The disk of a drive that shares the floppy drive with another, "
+        "put in when the program asks for it: B:, and A: again",
+        steps=(
+            "Shift+F3",
+            '"b:fdauto.bat"',
+            "Enter",                      # "Insert diskette for drive B:"
+            "Enter",                      # Ok: the file of that disk
+            "Esc",
+            "Shift+F3",
+            '"a:fdauto.bat"',
+            "Enter",                      # and for drive A:
+            "Enter",
+            "Esc",
+        )),
+
+    "mouse-left-hand": Scenario(
+        "The mouse for a left hand: the two buttons the other way round",
+        steps=(
+            "F9 o c",                     # the Configuration
+            "Click@40,15",                # Left-handed mouse, ticked
+            "Enter",
+            "RightClick@3,5",             # the cursor onto readme.txt
+            "Click@3,6",                  # hello.txt selected
+            "Click@3,8",                  # and data.bin
+        )),
 }
 
 

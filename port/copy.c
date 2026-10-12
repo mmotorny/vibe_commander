@@ -61,24 +61,19 @@ u16 F35_61(u16 answer, u16 place);
 #pragma aux F45_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
 #pragma aux F35_61 "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]
 
-/* Routines that are still assembly, by their entries for C. OncZoom puts
-   a box on the screen with its middle at `place`, growing only if it is
-   the first of a command: `box` is where the assembly describes it and
-   `include` the text that ^I stands for in its lines, both offsets in the
-   assembly's code segment; where the box is comes back as a struct Box of
-   vc.h. ResWin puts back what a box covers. ChgDisk asks for the disk of
-   a drive that shares the floppy drive with another, and is not 0 to
-   stop. Intr21f is Intr21 with the carry flag set before DOS is called if
-   `carry` is not 0, and clear if it is: for a call that leaves the flag
-   as it finds it. */
-void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
-void ResWin(u16 begin, u16 size, u16 saved);
-u16 ChgDisk(const u8 *path);
-u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
-#pragma aux OncZoom "*_a" __far parm [bx] [ax] [dx] [di] modify exact [bx dx si es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
-#pragma aux Intr21f "*_a" __far parm [bx] [ax] value [ax] modify exact [ax bx cx dx si di es]
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   OncZoom puts a box on the screen with its middle at `place`, growing
+   only if it is the first of a command: `box` is where the assembly
+   describes it and `include` the text that ^I stands for in its lines,
+   both offsets in the assembly's code segment; where the box is comes back
+   as a struct Box of vc.h. ResWin puts back what a box covers. ChgDisk
+   asks for the disk of a drive that shares the floppy drive with another,
+   and is not 0 to stop. Intr21f is Intr21 with the carry flag set before
+   DOS is called if `carry` is not 0, and clear if it is: for a call that
+   leaves the flag as it finds it. */
 /* AsmSeg returns the code segment of the assembly, where its texts are
    (see port/dialog.c). SelDrv makes a drive the current one, 0 for A:,
    by the call of DOS that the assembly makes without Intr21. */

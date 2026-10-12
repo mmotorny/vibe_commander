@@ -14,11 +14,11 @@
 #define Menu_C  7                       /* the menu bar */
 #define MnCur_C 8                       /* the menu that is open */
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. Int16 calls the BIOS for the keyboard, with `ax` as INT
-   16h takes it, and returns AX as it comes back. */
-u32 Int16(u16 ax);
-#pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
+
+   Int16 calls the BIOS for the keyboard, with `ax` as INT 16h takes it,
+   and returns AX as it comes back. */
 
 /* Which names the key bar shows: for each of the bars that the program
    has, and for none of Shift, Ctrl and Alt held, Shift, Ctrl and Alt, a

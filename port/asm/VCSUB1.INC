@@ -3,61 +3,29 @@
 ;-------------------------------------------------------
 
 ;----------------------- Timer -------------------------
+; C: Timer_c of port/system.c, which returns the count in DX and AX.
 Timer	PROC	NEAR
-	PUSH	DS
-	XOR	CX,CX
-	MOV	DS,CX
-	CLI
-	MOV     DX,DS:[46Ch].Lo
-	MOV     CX,DS:[46Ch].Hi
-	STI
-	POP	DS
+	PUSH	AX
+	CALL	FAR PTR Timer_c
+	MOV	CX,DX
+	MOV	DX,AX
+	POP	AX
 	RET
 Timer	ENDP
 
 ;----------------- Clear keyboard buffer ---------------
-ClrKbd	PROC	NEAR
-	PUSH	AX
-	CMP	ES:ClrBuf,0
-	JZ	ClrKb3
-	JMP	ClrKb2
-ClrKb1:	MOV	AH,0
-	INT	16h
-ClrKb2:	MOV	AH,1
-	INT	16h
-	JNZ	ClrKb1
-ClrKb3:	POP	AX
-	RET
-ClrKbd	ENDP
-	FromC	ClrKbd
+; C: ClrKbd_c of port/system.c, which only C code calls.
 
 ;---------------------- Break test ---------------------
 ;	Return :	CY=1 - break
+; C: TstBrk_c of port/system.c, which returns 1 for a break.
 TstBrk	PROC	NEAR
-	PUSH	BX
 	PUSH	AX
-	MOV	BL,1
-TstBr1:	MOV	AH,1
-	INT	16h
-	JZ	TstBr3
-	OR	AX,AX
-	JE	TstBr2
-	CMP	AX,2E03h
-	JE	TstBr2
-	CMP	AX,011Bh
-	JE	TstBr2
-	CMP	AX,4400h
-	JNE	TstBr3
-TstBr2:	MOV	AH,0
-	INT	16h
-	MOV	BL,0
-	JMP	TstBr1
-TstBr3:	CMP	BL,1
+	CALL	FAR PTR TstBrk_c
+	NEG	AX			; CY for 1
 	POP	AX
-	POP	BX
 	RET
 TstBrk	ENDP
-	FromC	TstBrk, <SBB AX,AX>	; CY as a number
 
 ;----------------------- Go to CASE --------------------
 ;			CS:SI - address of case table
@@ -86,240 +54,100 @@ Case	ENDP
 
 ;------------------ Check video mode -------------------
 ;			   ZR - ok
+; C: ChkMode_c of port/window.c. It returns 1 for ok, and puts AX and BH
+; as the BIOS leaves them into the two words on the stack, struct
+; VideoMode of port/vc.h: the code that starts the program goes on with
+; the mode in AL, the columns in AH and the page in BH.
 ChkMode	PROC	NEAR
-	MOV	AH,0Fh
-	INT	10h
-	CMP	AH,80
-	JNE	ChkMd1
-	AND	AL,7Fh
-	CMP	AL,2
-	JE	ChkMd1
-	CMP	AL,3
-	JE	ChkMd1
-	CMP	AL,7
-ChkMd1:	RET
+	PUSH	BX
+	PUSH	AX
+	MOV	BX,SP
+	CALL	FAR PTR ChkMode_c
+	CMP	AX,1			; ZR for 1
+	POP	AX
+	POP	BX
+	RET
 ChkMode	ENDP
 
 ;----------------------- Set cursor --------------------
 ;			AL,AH - x, y
+; C: Cursor_c of port/window.c.
 Cursor	PROC	NEAR
-	PUSH	DX
-	PUSH	BX
 	PUSH	AX
-	MOV	DX,AX
-	MOV	AH,0Fh
-	INT	10h
-	MOV	AH,2
-	INT	10h
+	CALL	FAR PTR Cursor_c
 	POP	AX
-	POP	BX
-	POP	DX
 	RET
 Cursor	ENDP
-	FromC	Cursor
 
 ;------------------ Set cursor on prompt ---------------
+; C: Cursor1_c of port/window.c.
 Cursor1	PROC	NEAR
 	PUSH	AX
-	MOV	AL,ES:DosCol
-	SUB	AL,ES:OutCol
-	ADD	AL,ES:BegCol
-	MOV	AH,ES:DosLin
-	CALL	Cursor
+	CallC	Cursor1_c
 	POP	AX
 	RET
 Cursor1	ENDP
-	FromC	Cursor1
 
 ;-------------- Get cursor size & set it ---------------
 ;	Return :	CX - cursor size
-ChgCur	PROC	NEAR
-	PUSH	BP
-	PUSH	DX
-	PUSH	BX
-	MOV	BH,0
-	MOV	AH,3
-	INT	10h
-	PUSH	CX
-	MOV	CX,0607h
-	CMP	ES:ScrMod,7
-	JNE	ChCur1
-	MOV	CX,0B0Ch
-ChCur1:	CMP	ES:ColTyp,2
-	JNE	ChCur2
-	MOV	CH,0
-ChCur2:	MOV	AH,1
-	INT	10h
-	POP	CX
-	POP	BX
-	POP	DX
-	POP	BP
-	RET
-ChgCur	ENDP
-	FromC	ChgCur, <MOV AX,CX>	; The shape it had, in AX
+; C: ChgCur_c of port/window.c, which only C code calls.
 
 ;------------------- Make hidden cursor ----------------
+; C: HidCur_c of port/window.c.
 HidCur	PROC	NEAR
 	PUSH	AX
-	MOV	AX,7F00h
-	CALL	Cursor
+	CALL	FAR PTR HidCur_c
 	POP	AX
 	RET
 HidCur	ENDP
-	FromC	HidCur
 
 ;----------------------- Beep sound --------------------
-Beep	PROC	NEAR
-	CMP	ES:ErrSnd,0
-	JE	Beep1
-	PUSH	BP
-	PUSH	AX
-	MOV	AX,0E07h
-	INT	10h
-	POP	AX
-	POP	BP
-Beep1:	RET
-Beep	ENDP
-	FromC	Beep
+; C: Beep_c of port/system.c, which only C code calls.
 
 ;---------------------- Init mouse ---------------------
+; C: IniMous_c of port/mouse.c. It leaves all registers but AX, where the
+; routine left AX, BX, CX and DX as the mouse driver did.
 IniMous	PROC	NEAR
-	MOV	AX,21h
-	INT	33h
-	CMP	AX,WORD PTR 21h
-	JNE	IniMo1
-	XOR	AX,AX
-	INT	33h
-IniMo1:	CMP	AX,WORD PTR 0FFFFh
-	CMC
-	MOV	AL,0
-	ADC	AL,AL
-	MOV	ES:Mouse,AL
-	OR	AL,AL
-	JNE	IniMo2
-	MOV	AX,0FFFFh
-	MOV	ES:MouseX,AX
-	MOV	ES:MouseY,AX
-	RET
-IniMo2:	MOV	AL,0
-	CALL	TypMous
-	MOV	DL,ES:Lines
-	CMP	DL,25
-	JE	IniMo3
-	MOV	DH,0
-	MOV	CL,3
-	SHL	DX,CL
-	DEC	DX
-	XOR	CX,CX
-	MOV	AX,8
-	INT	33h
-IniMo3:	MOV	CX,ES:MouseX
-	MOV	DX,ES:MouseY
-	MOV	AX,CX
-	AND	AX,DX
-	INC	AX
-	JE	IniMo4
-	MOV	AX,4
-	INT	33h
-IniMo4:	MOV	AL,1
-	CALL	CurMous
+	CallC	IniMous_c
 	RET
 IniMous	ENDP
-	FromC	IniMous
 
 ;--------------- Set type of mouse sursor --------------
 ;			   AL - cursor
-TypMous	PROC	NEAR
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	CX,0FFFFh
-	MOV	DX,7700h
-	CMP	AL,0
-	JE	TypMo1
-	MOV	CL,0
-	MOV	DL,AL
-TypMo1:	XOR	BX,BX
-	MOV	AX,0Ah
-	INT	33h
-	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	RET
-TypMous	ENDP
-	FromC	TypMous
+; C: TypMous_c of port/mouse.c, which only C code calls.
 
 ;------------------ Save mouse cursor ------------------
+; C: SavMous_c of port/mouse.c.
 SavMous	PROC	NEAR
-	CMP	ES:Mouse,0
-	JE	SavMo1
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	MOV	AX,3
-	INT	33h
-	MOV	ES:MouseX,CX
-	MOV	ES:MouseY,DX
+	CallC	SavMous_c
 	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-SavMo1:	RET
+	RET
 SavMous	ENDP
-	FromC	SavMous
 
 ;------------------- Set mouse cursor ------------------
 ;			   AL - set/reset
+; C: CurMous_c of port/mouse.c.
 CurMous	PROC	NEAR
-	CMP	ES:Mouse,0
-	JE	CurMo1
 	PUSH	AX
-	CMP	AL,1
-	MOV	AX,1
-	ADC	AL,0
-	INT	33h
+	CallC	CurMous_c
 	POP	AX
-CurMo1:	RET
+	RET
 CurMous	ENDP
-	FromC	CurMous
 
 ;------------------- Get mouse cursor ------------------
 ;	Return :	CH,CL - mouse cursor
 ;			   AX - mouse buttons
+; C: GetMous_c of port/mouse.c, which takes CX and returns the buttons in
+; AX and the place in DX.
 GetMous	PROC	NEAR
 	PUSH	DX
-	PUSH	BX
-	XOR	AX,AX
-	CMP	ES:Mouse,0
-	STC
-	JZ	GetMo1
-	MOV	AX,3
-	INT	33h
-	MOV	AX,CX
-	MOV	CL,3
-	SHR	AX,CL
-	SHR	DX,CL
-	MOV	CL,AL
-	MOV	CH,DL
-	MOV	AX,BX
-	CMP	ES:LftMous,0
-	JE	GetMo1
-	MOV	BH,BL
-	SHR	BL,1
-	SHL	BH,1
-	AND	BX,201h
-	AND	AL,4
-	OR	AL,BL
-	OR	AL,BH
-GetMo1:	AND	AX,WORD PTR 7
-	POP	BX
+	CallC	GetMous_c
+	MOV	CX,DX
 	POP	DX
+	OR	AX,AX			; ZR for no button, and no carry
 	RET
 GetMous	ENDP
-	FromC	GetMous, <MOV DX,CX>	; Where the mouse is, with AX
 
 ;----------------- Mouse double click ------------------
 ;			BH,BL - base of selected point
@@ -327,113 +155,24 @@ GetMous	ENDP
 ;			   SI - cursor
 ;	Return :	   CY - continue
 ;			   NZ - action
-DoublMo	PROC	NEAR
-	PUSH	DX
-	CMP	ES:MousEnt,0
-	JNE	DblMo3
-	MOV	ES:MousEnt,1
-	MOV	AH,2Ch
-	INT	21h
-	CMP	ES:MousTim.Hi,0FFFFh
-	JE	DblMo1
-	CMP	SI,ES:MousPos
-	JE	DblMo4
-DblMo1:	ADD	DL,MoDelay
-	CMP	DL,100
-	JB	DblMo2
-	INC	DH
-	CMP	DH,60
-	JB	DblMo2
-	INC	CL
-	CMP	CL,60
-	JB	DblMo2
-	INC	CH
-DblMo2:	MOV	ES:MousTim.Lo,DX
-	MOV	ES:MousTim.Hi,CX
-	MOV	ES:MousPos,SI
-DblMo3:	POP	DX
-	STC
-	RET
-DblMo4:	CMP	CX,ES:MousTim.Hi
-	JA	DblMo1
-	JB	DblMo5
-	CMP	DX,ES:MousTim.Lo
-	JA	DblMo1
-DblMo5:	POP	DX
-	MOV	CH,0
-DblMo6:	PUSH	CX
-	CALL	GetMous
-	CALL	InWind
-	POP	CX
-	PUSH	AX
-	MOV	AL,0
-	JC	DblMo7
-	MOV	AL,'û'
-DblMo7:	CMP	AL,CH
-	JE	DblMo8
-	MOV	CH,AL
-	CALL	TypMous
-DblMo8:	POP	AX
-	TEST	AL,7
-	JNZ	DblMo6
-	OR	CH,CH
-	RET
-DoublMo	ENDP
-
-; C code asks about a double click: DoublMo, and in AX 2 for CY, to go on,
-; 1 for NZ, to act, and 0 for neither.
-	PUBLIC	DoublMo_a
-DoublMo_a PROC	FAR
-	PUSH	DS
-	POP	ES
-	CALL	DoublMo
-	MOV	AX,2
-	JC	DblMoA
-	MOV	AX,1
-	JNE	DblMoA
-	DEC	AX
-DblMoA:	RET
-DoublMo_a ENDP
+; C: DoublMo_c of port/mouse.c, which only C code calls.
 
 ;--------------- Check cursor in window ----------------
 ;			CH,CL - cursor
 ;			BH,BL - begin of window
 ;			DH,DL - size of window
 ;	Return :	CY=0  - cursor inside the window
+; C: InWind_c of port/mouse.c, which returns 1 for a place outside.
 InWind	PROC	NEAR
-	PUSH	DX
-	PUSH	CX
-	SUB	CH,BH
-	JB	InWin1
-	SUB	CL,BL
-	JB	InWin1
-	DEC	DH
-	CMP	DH,CH
-	JB	InWin1
-	DEC	DL
-	CMP	DL,CL
-InWin1:	POP	CX
-	POP	DX
+	PUSH	AX
+	CALL	FAR PTR InWind_c
+	NEG	AX			; CY for 1
+	POP	AX
 	RET
 InWind	ENDP
-	FromC	InWind, <SBB AX,AX>	; CY as a number
 
 ;------------------ INT 10h with mouse -----------------
-Int10m	PROC	NEAR
-	PUSH	BP
-	PUSH	AX
-	MOV	AL,0
-	CALL	CurMous
-	POP	AX
-	INT	10h
-	PUSH	AX
-	MOV	AL,1
-	CALL	CurMous
-	POP	AX
-	POP	BP
-	RET
-Int10m	ENDP
-	FromC	Int10m
+; C: Int10m_c of port/window.c, which only C code calls.
 
 ;------------- Convert coordinars to address -----------
 ;			BH,BL - coordinats
@@ -444,549 +183,61 @@ BasAdr	PROC	NEAR
 BasAdr	ENDP
 
 ;-------------------- Screen Offset --------------------
+; C: ScrOffs_c of port/window.c, which notes the offset in the main data,
+; where the callers have DS, and returns it in DI. AX and BH stay, where
+; the routine left what the BIOS says of the mode there.
 ScrOffs	PROC	NEAR
-	PUSH	DS
-	XOR	DI,DI
-	MOV	AH,0Fh
-	INT	10h
-	OR	BH,BH
-	JE	ScrOf1
-	MOV	DS,DI
-	MOV	DI,DS:[44Eh]
-ScrOf1:	POP	DS
-	MOV	DS:Screen.Offs,DI
+	PUSH	AX
+	CALL	FAR PTR ScrOffs_c
+	POP	AX
 	RET
 ScrOffs	ENDP
 
 ;--------------- Shift windows in EGA lines ------------
-SftEGA	PROC	NEAR
-	PUSH	AX
-	MOV	AL,ES:Lines
-	SUB	AL,25
-	JBE	SfEGA1
-	SHR	AL,1
-	ADD	BH,AL
-SfEGA1:	POP	AX
-	RET
-SftEGA	ENDP
-	FromC	SftEGA
+; C: SftEGA_c of port/window.c, which only C code calls.
 
 ;---------------------- Save window --------------------
 ;			BH,BL - begin
 ;			DH,DL - size
 ;			   SI - address of buffer
-SavWin	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	CLD
-	CALL	BasAdr
-	XCHG	SI,DI
-	MOV	CL,DH
-	MOV	CH,0
-	MOV	DH,0
-	PUSH	ES
-	POP	DS
-SavWn1:	PUSH	CX
-	PUSH	SI
-	MOV	CX,DX
-	REP	MOVSW
-	POP	SI
-	POP	CX
-	ADD	SI,2*80
-	LOOP	SavWn1
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
-	RET
-SavWin	ENDP
-	FromC	SavWin
+; C: SavWin_c of port/window.c, which only C code calls.
 
 ;--------------------- Restore window ------------------
 ;			BH,BL - begin
 ;			DH,DL - size
 ;			   SI - address of buffer
+; C: ResWin_c of port/window.c.
 ResWin	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	CLD
-	CALL	BasAdr
-	MOV	CL,DH
-	MOV	CH,0
-	MOV	DH,0
-	PUSH	ES
-	POP	DS
-ResWn1:	PUSH	CX
-	PUSH	DI
-	MOV	CX,DX
-	REP	MOVSW
-	POP	DI
-	POP	CX
-	ADD	DI,2*80
-	LOOP	ResWn1
-	MOV	DS:Quote,0
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
+	PUSH	AX
+	CallC	ResWin_c
+	POP	AX
 	RET
 ResWin	ENDP
-	FromC	ResWin
 
 ;----------------- Restore user screen -----------------
 ;			BH,BL - begin
 ;			DH,DL - size
-ResUser	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	CLD
-	PUSH	ES
-	POP	DS
-	CALL	BasAdr
-	LEA	SI,[DI-ScrBuf+UserScr]
-	MOV	CL,DH
-	MOV	CH,0
-	MOV	DH,0
-ResUs1:	PUSH	SI
-	PUSH	DI
-	PUSH	CX
-	MOV	CX,DX
-	REP	MOVSW
-	POP	CX
-	POP	DI
-	POP	SI
-	ADD	SI,2*80
-	ADD	DI,2*80
-	LOOP	ResUs1
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
-	RET
-ResUser	ENDP
+; C: ResUser_c of port/window.c, which only C code calls.
 
 ;--------------------- Output window -------------------
 ;			BH,BL - begin
 ;			DH,DL - size
+; C: Window_c of port/window.c.
 Window	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	PUSH	ES
-	MOV	AL,0
-	CALL	CurMous
-	PUSH	ES
-	POP	DS
-	MOV	ES,DS:Screen.Segm
-	CALL	BasAdr
-	MOV	SI,DI
-	SUB	DI,OFFSET ScrBuf
-	ADD	DI,DS:Screen.Offs
-	MOV	AL,DS:Snow
-	CMP	DH,1
-	JE	Wind1
-	MOV	BH,0
-	ADD	BX,BX
-	SUB	SI,BX
-	SUB	DI,BX
-	PUSH	DI
-	PUSH	DX
-	CALL	MovScr
+	CallC	Window_c
 	POP	AX
-	MOV	AL,80
-	MUL	AH
-	MOV	CX,AX
-	POP	DI
-	JMP	Wind6
-Wind1:	MOV	CL,DL
-	MOV	CH,0
-	PUSH	DI
-	PUSH	CX
-	MOV	AH,AL
-	MOV	DX,03DAh
-Wind2:	OR	AH,AH
-	JNZ	Wind5
-Wind3:	IN	AL,DX
-	TEST	AL,1
-	JNZ	Wind3
-	CLI
-Wind4:	IN	AL,DX
-	TEST	AL,1
-	JZ	Wind4
-Wind5:	MOVSW
-	STI
-	LOOP	Wind2
-	POP	CX
-	POP	DI
-Wind6:	POP	ES
-	CMP	ES:TopView,0
-	JZ	Wind7
-	MOV	AH,0FFh
-	INT	10h
-Wind7:	MOV	AL,1
-	CALL	CurMous
-	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
 	RET
 Window	ENDP
-	FromC	Window
 
 ;------------------------ Save screen ------------------
-SavScr	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	DS,ES:Screen.Segm
-	MOV	SI,ES:Screen.Offs
-	MOV	DI,OFFSET ScrBuf
-	MOV	DH,ES:Lines
-	MOV	AL,ES:Snow
-	CALL	MovScr
-	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
-	RET
-SavScr	ENDP
+; C: SavScr_c of port/window.c, with MovScr, which moves the cells. Only C
+; code calls it.
 
-;-------------------- Move screen bytes ----------------
-;			   DH - number of lines
-;			   AL - snow
-;			DS:SI => ES:DI
-MovScr	PROC	NEAR
-	CLD
-	MOV	BL,AL
-	MOV	DL,7			; Const1 ???
-MovSc1:	CMP	DH,DL
-	JAE	MovSc2
-	MOV	DL,DH
-MovSc2:	MOV	AX,80
-	MUL	DL
-	PUSH	AX
-	OR	BL,BL
-	JNZ	MovSc6
-	PUSH	DX
-	MOV	DX,03DAh
-MovSc3:	IN	AL,DX
-	TEST	AL,1
-	JNZ	MovSc3
-MovSc4:	STI
-	MOV	CX,10			; Const2 ???
-	CLI
-MovSc5:	IN	AL,DX
-	TEST	AL,1
-	JZ	MovSc4
-	LOOP	MovSc5
-	POP	DX
-MovSc6:	POP	CX
-	REP	MOVSW
-	STI
-	SUB	DH,DL
-	JNE	MovSc1
-	RET
-MovScr	ENDP
-
-;---------------------- Zooming box --------------------
-;			BH,BL - begin
-;			DH,DL - size
-;			   AH - color
-Diskret	EQU	5
-MinBox	PROC	NEAR
-	PUSH	DI
-	PUSH	CX
-	PUSH	AX
-	MOV	AL,0
-	MOV	ES:Quote,AL
-	CMP	AL,ES:ZoomWin
-	JZ	MinBx2
-	PUSH	AX
-	MOV	AH,ShadFl
-	CALL	ColAddr
-	POP	AX
-	XCHG	AL,ES:[DI]
-	PUSH	DI
-	PUSH	AX
-	XOR	DI,DI
-	CALL	MinBx3
-	MOV	CX,Diskret-1
-MinBx1:	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	MOV	AL,DL
-	MOV	AH,BL
-	MOV	CH,11
-	CALL	MinBx5
-	MOV	DL,AL
-	MOV	BL,AH
-	MOV	AL,DH
-	MOV	AH,BH
-	MOV	CH,5
-	CALL	MinBx5
-	MOV	DH,AL
-	MOV	BH,AH
-	POP	AX
-	CALL	ShadBox
-	CALL	MinBx3
-	CALL	Window
-	POP	BX
-	POP	CX
-	POP	DX
-	LOOP	MinBx1
-	CALL	MinBx3
-	POP	AX
-	POP	DI
-	MOV	ES:[DI],AL
-MinBx2:	CALL	ShadBox
-	POP	AX
-	POP	CX
-	POP	DI
-	RET
-MinBox	ENDP
-	FromC	MinBox
-
-MinBx3	PROC	NEAR
-	PUSH	DX
-	PUSH	CX
-	PUSH	AX
-MinBx4:	STI
-	CALL	Timer
-	CMP	DX,DI
-	JE	MinBx4
-	MOV	DI,DX
-	POP	AX
-	POP	CX
-	POP	DX
-	RET
-MinBx3	ENDP
-
-MinBx5	PROC	NEAR
-	PUSH	AX
-	SUB	AL,CH
-	SHR	AL,1
-	MUL	CL
-	MOV	CH,Diskret-1
-	DIV	CH
-	MOV	CH,AL
-	POP	AX
-	ADD	AH,CH
-	SUB	AL,CH
-	SUB	AL,CH
-	RET
-MinBx5	ENDP
-
-;-------------------- Box with shadow ------------------
-;			BH,BL - begin
-;			DH,DL - size
-;			   AH - color
-ShadBox	PROC	NEAR
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	PUSH	AX
-	CALL	BasAdr
-	MOV	CL,DH
-	MOV	CH,0
-	MOV	SI,CX
-	SUB	DL,10
-	MOV	DH,0
-	MOV	CL,3
-	MOV	BX,'  '
-	MOV	AL,' '
-	CALL	BoxLine
-	MOV	BX,'É»'
-	MOV	AL,'Í'
-	CALL	ShadLin
-	SUB	SI,5
-	JBE	ShdBx2
-	MOV	BX,'ºº'
-	MOV	AL,' '
-ShdBx1:	CALL	ShadLin
-	DEC	SI
-	JNE	ShdBx1
-ShdBx2:	MOV	BX,'È¼'
-	MOV	AL,'Í'
-	CALL	ShadLin
-	MOV	BX,'  '
-	MOV	AL,' '
-	CALL	ShadLin
-	ADD	DI,2*2
-	MOV	CX,DX
-	ADD	CL,8
-ShdBx3:	CALL	Shadow
-	LOOP	ShdBx3
-	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	RET
-ShadBox	ENDP
-
-;-------------------------- Box ------------------------
-;			ES:DI - screen buffer
-;			   AH - color
-;		    ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ»
-;		    º                 º   ¿
-;		    º                 º   Ã SI
-;		    º                 º   Ù
-;		    ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼
-;		 ÀÂÙ ÀÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÙ ÀÂÙ
-;		  CX         DX         CX
-BoxDubl	PROC	NEAR
-	PUSH	SI
-	PUSH	BX
-	PUSH	AX
-	MOV	AL,'Í'
-	MOV	BX,'É»'
-	CALL	BoxLine
-	MOV	AL,' '
-	MOV	BX,'ºº'
-BoxDb1:	CALL	BoxLine
-	DEC	SI
-	JNE	BoxDb1
-	MOV	AL,'Í'
-	MOV	BX,'È¼'
-	CALL	BoxLine
-	POP	AX
-	POP	BX
-	POP	SI
-	RET
-BoxDubl	ENDP
-	FromC	BoxDubl
-
-;-------------------- One line of box ------------------
-;			ES:DI - screen buffer
-;			   AH - color
-;		³   ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¶   ³
-;		 ÀÂÙ|ÀÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÙ|ÀÂÙ
-;		 CX BH         DX(AL)      BL CX
-ShadLin	PROC	NEAR
-	PUSH	DI
-	CALL	BoxLn0
-	CALL	Shadow
-	CALL	Shadow
-	POP	DI
-	ADD	DI,2*80
-	RET
-ShadLin	ENDP
-
-BoxLine	PROC	NEAR
-	PUSH	DI
-	CALL	BoxLn0
-	POP	DI
-	ADD	DI,2*80
-	RET
-BoxLine	ENDP
-	FromC	BoxLine
-
-BoxLn0	PROC	NEAR
-	PUSH	CX
-	PUSH	AX
-	PUSH	CX
-	PUSH	AX
-	JCXZ	BoxLn1
-	MOV	AL,' '
-	REP	STOSW
-BoxLn1:	MOV	AL,BH
-	STOSW
-	POP	AX
-	MOV	CX,DX
-	REP	STOSW
-	MOV	AL,BL
-	STOSW
-	POP	CX
-	JCXZ	BoxLn2
-	MOV	AL,' '
-	REP	STOSW
-BoxLn2:	POP	AX
-	POP	CX
-	RET
-BoxLn0	ENDP
-
-StdLine	PROC	NEAR
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
-	CALL	BasAdr
-	SUB	DL,10
-	MOV	DH,0
-	MOV	CX,3
-	MOV	BX,SI
-	CALL	BoxLine
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	INC	BH
-	RET
-StdLine	ENDP
-	FromC	StdLine
-
-;------------------- Zoom box only once ----------------
-OncZoom	PROC	NEAR
-	PUSH	AX
-	MOV	AL,ES:ZoomWin
-	CMP	ES:ZoomOne,0
-	JZ	OncZo1
-	MOV	ES:ZoomWin,0
-OncZo1:	CALL	DialBox
-	CALL	Window
-	MOV	ES:ZoomWin,AL
-	MOV	ES:ZoomOne,1
-	POP	AX
-	RET
-OncZoom	ENDP
-
-; C code puts a box on the screen, zoomed once: OncZoom for the box at
-; CS:AX, which puts where the box is, BX, DX and SI, into the three words
-; at SS:DI.
-	PUBLIC	OncZoom_a
-OncZoom_a PROC	FAR
-	PUSH	BP
-	PUSH	DS
-	POP	ES
-	MOV	BP,AX
-	CALL	OncZoom
-	MOV	BP,DI
-	MOV	[BP],BX
-	MOV	[BP+2],DX
-	MOV	[BP+4],SI
-	POP	BP
-	RET
-OncZoom_a ENDP
+;------------------------ Boxes ------------------------
+; The frame of a box, its shadow and its growing are C: MinBox, ShadBox,
+; BoxDubl, BoxLine, StdLine and OncZoom of port/box.c, with the routines
+; that were their own. Only C code calls them.
 
 ;---------------------- Put window ---------------------
 ;			BH,BL - begin-center
@@ -1120,16 +371,6 @@ AsmSeg_a PROC	FAR
 	MOV	AX,CS
 	RET
 AsmSeg_a ENDP
-
-; The cursor in the shape CX, as the BIOS takes it.
-	PUBLIC	CurShp_a
-CurShp_a PROC	FAR
-	PUSH	BP
-	MOV	AH,1
-	INT	10h
-	POP	BP
-	RET
-CurShp_a ENDP
 
 ; The routine that a dialog has for Enter and F10: the near routine at
 ; SI, with AX, BX and DI as Dialog has them, in BP the dialog, which
@@ -1315,20 +556,18 @@ FilZero	ENDP
 ;--------------------- Check CrLf ----------------------
 ;			   AX - word
 ;	Return :	   ZR - yes
-IsCrLf0	PROC	NEAR
-	DEC	SI
-	DEC	SI
-IsCrLf0	ENDP
-
+; C: IsCrLf_c of port/misc.c, which returns 1 for yes. IsCrLfS takes the
+; word from DS:SI first.
 IsCrLfS	PROC	NEAR
 	LODSW
 IsCrLfS	ENDP
 
 IsCrLf	PROC	NEAR
-	CMP	AX,0D0Ah
-	JE	IsCrL1
-	CMP	AX,0A0Dh
-IsCrL1:	RET
+	PUSH	AX
+	CALL	FAR PTR IsCrLf_c
+	CMP	AX,1			; ZR for 1
+	POP	AX
+	RET
 IsCrLf	ENDP
 
 ;-------------------- String length --------------------
@@ -1343,16 +582,11 @@ StrLen	ENDP
 ;--------------------- Upper letter --------------------
 ;			   AL - letter
 ;	Return :	   AL - letter
+; C: UpCase_c of port/system.c, which leaves AH as it is.
 UpCase	PROC	NEAR
-	CMP	AL,'a'
-	JB	UpCas1
-	CMP	AL,'z'
-	JA	UpCas1
-	SUB	AL,20h
-UpCas1:	CALL	ES:Country.CaseMap
+	CallC	UpCase_c
 	RET
 UpCase	ENDP
-	FromC	UpCase
 
 ;--------------------- Lower letter --------------------
 ;			   AL - letter
@@ -1557,143 +791,63 @@ TstMas	PROC	NEAR
 TstMas	ENDP
 
 ;------------------------ Set DTA ----------------------
+; C: SetDTA_c of port/system.c.
 SetDTA	PROC	NEAR
-	PUSH	DS
-	PUSH	DX
 	PUSH	AX
-	PUSH	ES
-	POP	DS
-	MOV	DX,OFFSET DTA
-	MOV	AH,1Ah
-	INT	21h
+	CallC	SetDTA_c
 	POP	AX
-	POP	DX
-	POP	DS
 	RET
 SetDTA	ENDP
-	FromC	SetDTA
 
 ;------------------- Test drive letter -----------------
 ;			   AL - drive letter
 ;	Return :	   ZR - yes
 ;			   NZ - no
-TstDrv	PROC	NEAR
-	PUSH	DX
-	PUSH	AX
-	SUB	AL,'A'
-	MOV	DL,AL
-	MOV	AH,19h
-	INT	21h
-	PUSH	AX
-	MOV	AH,0Eh
-	INT	21h
-	MOV	AH,19h
-	INT	21h
-	CMP	AL,DL
-	POP	DX
-	PUSHF
-	MOV	AH,0Eh
-	INT	21h
-	POPF
-	POP	AX
-	POP	DX
-	RET
-TstDrv	ENDP
-
-; C code asks whether there is a drive of the letter AL: 1 in AX for ZR.
-	PUBLIC	TstDrv_a
-TstDrv_a PROC	FAR
-	CALL	TstDrv
-	MOV	AX,0			; This leaves the flags
-	JNE	TstDrA
-	INC	AX
-TstDrA:	RET
-TstDrv_a ENDP
+; C: TstDrv_c of port/system.c, which only C code calls.
 
 ;--------------- Int 21h with fatal error --------------
+; C: Intr21f_c of port/system.c. The registers go there on the stack, as
+; struct DosRegs of port/vc.h has them, with the carry flag as a number in
+; AX: a call of DOS that leaves the flag as it finds it comes back with
+; what the caller had. AX, BX, CX and DX come back as DOS leaves them, and
+; AX is not 0 afterwards if the carry flag is to be set. DOS is called
+; with ES on the main data, which is found as the routine found it: no
+; caller has DS there for sure. ES comes back as DOS leaves it.
 Intr21	PROC	NEAR
-	PUSH	DS
-	MOV	DS,CS:SecDat
-	MOV	BYTE PTR DS:[ErrDat],0
-	POP	DS
-	INT	21h
-	PUSHF
-	PUSH	DS
-	MOV	DS,CS:SecDat
-	CMP	BYTE PTR DS:[ErrDat],0
-	POP	DS
-	JNE	I21_02
-	POPF
-	JNC	I21_01
-	PUSH	DS
 	PUSH	ES
-	PUSH	BP
-	PUSH	SI
 	PUSH	DI
+	PUSH	SI
+	PUSH	DS
 	PUSH	DX
 	PUSH	CX
 	PUSH	BX
-	XOR	BX,BX
-	MOV	AH,59h
-	INT	21h
+	PUSH	AX
+	SBB	AX,AX			; The carry flag as it comes
+	MOV	BX,SP
+	MOV	DS,CS:SecDat
+	CALL	FAR PTR Intr21f_c
+	NEG	AX			; CY for an error
+	POP	AX
 	POP	BX
 	POP	CX
 	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	ES
 	POP	DS
-	STC
-I21_01:	RET
-I21_02:	POPF
-	MOV	AX,53h
-	STC
+	POP	SI
+	POP	DI
+	POP	ES
 	RET
 Intr21	ENDP
 
-; C code calls DOS: Intr21 with the registers that struct DosRegs of
-; port/vc.h holds, at SS:BX. AX, BX, CX and DX are put back there as they
-; return, and AX is not 0 afterwards if the carry flag was set.
-	PUBLIC	Intr21_a
-; Intr21f_a is the same with the carry flag set first if AX is not 0, and
-; clear if it is. A call of DOS that leaves the flag as it finds it, as
-; those for an FCB do, comes back with what the caller had, and Intr21
-; takes that for an error of DOS: F38_70 goes by it. Nothing from here to
-; the INT of Intr21 changes the flag.
-	PUBLIC	Intr21f_a
-Intr21f_a LABEL	FAR
-	NEG	AX
-Intr21_a PROC	FAR
-	PUSH	BP
-	PUSH	DS
-	PUSH	DS
-	POP	ES
-	MOV	BP,BX
-	MOV	AX,[BP]
-	MOV	BX,[BP+2]
-	MOV	CX,[BP+4]
-	MOV	SI,[BP+10]
-	MOV	DI,[BP+12]
-	LDS	DX,[BP+6]
-	CALL	Intr21
-	MOV	[BP],AX
-	MOV	[BP+2],BX
-	MOV	[BP+4],CX
-	MOV	[BP+6],DX
-	SBB	AX,AX
-	POP	DS
-	POP	BP
-	RET
-Intr21_a ENDP
-
 ;------------------- Invert variable -------------------
 ;			ES:BX - address of variable
+; C: InvVar_c of port/misc.c, which returns what the variable is then.
+; AH stays.
 InvVar	PROC	NEAR
-	CMP	BYTE PTR ES:[BX],1
-	MOV	AL,0
-	ADC	AL,0
-	MOV	ES:[BX],AL
+	PUSH	CX
+	MOV	CH,AH
+	CALL	FAR PTR InvVar_c
+	MOV	AH,CH
+	POP	CX
 	RET
 InvVar	ENDP
 
@@ -1701,21 +855,10 @@ InvVar	ENDP
 ;			DS:SI - address
 ;			   CX - length
 ;	Return :	   AX - check sum
+; C: ChkSum_c of port/misc.c, which adds up in the caller's DS: the main
+; data.
 ChkSum	PROC	NEAR
-	PUSH	SI
-	PUSH	CX
-	PUSH	BX
-	XOR	BX,BX
-	MOV	AH,0
-ChkSm1:	LODSB
-	ADD	BX,AX
-	LOOP	ChkSm1
-	LODSW
-	CMP	AX,BX
-	MOV	AX,BX
-	POP	BX
-	POP	CX
-	POP	SI
+	CALL	FAR PTR ChkSum_c
 	RET
 ChkSum	ENDP
 
@@ -1730,67 +873,6 @@ CallPSP	PROC	NEAR
 	RETF
 CallPSP	ENDP
 
-;----------------------- Page Up -----------------------
-PgUp	PROC	NEAR
-	OR	DI,DI
-	JNE	PgUp1
-	XOR	SI,SI
-	JMP	PgUp3
-PgUp1:	DEC	AX
-	SUB	DI,AX
-	JAE	PgUp2
-	XOR	DI,DI
-PgUp2:	ADD	AX,DI
-	CMP	SI,AX
-	JBE	PgUp3
-	MOV	SI,AX
-PgUp3:	RET
-PgUp	ENDP
-
-;---------------------- Page Down ----------------------
-PgDn	PROC	NEAR
-	PUSH	SI
-	MOV	SI,BP
-	SUB	BP,AX
-	JAE	PgDn1
-	XOR	BP,BP
-PgDn1:	DEC	AX
-	CMP	DI,BP
-	JB	PgDn2
-	POP	AX
-	OR	SI,SI
-	JE	PgDn5
-	DEC	SI
-	JMP	PgDn5
-PgDn2:	POP	SI
-	ADD	DI,AX
-	JC	PgDn3
-	CMP	DI,BP
-	JBE	PgDn4
-PgDn3:	MOV	DI,BP
-PgDn4:	CMP	SI,DI
-	JAE	PgDn5
-	MOV	SI,DI
-PgDn5:	RET
-PgDn	ENDP
-
-; C code turns a page: PgUp and PgDn, which hand back SI in AX and DI in
-; DX. PgDn takes in BX what it has in BP.
-	PUBLIC	PgUp_a, PgDn_a
-PgUp_a	PROC	FAR
-	CALL	PgUp
-	MOV	AX,SI
-	MOV	DX,DI
-	RET
-PgUp_a	ENDP
-
-PgDn_a	PROC	FAR
-	PUSH	BP
-	MOV	BP,BX
-	CALL	PgDn
-	MOV	AX,SI
-	MOV	DX,DI
-	POP	BP
-	RET
-PgDn_a	ENDP
+;------------------ Page Up, Page Down -----------------
+; C: PgUp_c and PgDn_c of port/misc.c, which only C code calls.
 

@@ -35,12 +35,15 @@ u16 Run_00(u16 text, u16 view);
 #pragma aux F32_70 "*_c" __far parm [bx] [dx] value [ax] modify exact [ax]
 #pragma aux Run_00 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. HidCur puts the cursor below the screen and Cursor1 at
-   its place in the command line. SavWin keeps what the screen
-   buffer has where a window is to be, ResWin puts it back; MinBox draws a
-   box with a shadow there. SftEGA moves a place down on a screen of more
-   than 25 lines, by half of what it has more.
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   HidCur puts the cursor below the screen and Cursor1 at its place in the
+   command line. SavWin keeps what the screen buffer has where a window is
+   to be, ResWin puts it back; MinBox draws a box with a shadow there.
+   SftEGA moves a place down on a screen of more than 25 lines, by half of
+   what it has more.
 
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, or `place` as it was if there is no mouse.
@@ -60,32 +63,8 @@ u16 Run_00(u16 text, u16 view);
    place in the high word, and the low one is not 0 if there is none.
 
    PutMnu, Input0, FndItem, DosCom and ClsLine are C, of vc.h. */
-void HidCur(void);
-void Cursor1(void);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-void MinBox(u16 begin, u16 size, u16 color);
-u16 SftEGA(u16 place);
-u32 GetMous(u16 place);
-void TypMous(u16 look);
-u16 InWind(u16 place, u16 begin, u16 size);
-u16 DoublMo(u16 begin, u16 size, u16 line);
-void ClrKbd(void);
-u16 ChgDisk(u16 path);
 u32 F34_30(u16 text);
 u32 F34_40(u16 text, u16 view);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux Cursor1 "*_a" __far modify exact [es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux SftEGA  "*_a" __far parm [bx] value [bx] modify exact [bx es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux DoublMo "*_a" __far parm [bx] [dx] [si] value [ax] modify exact [ax cx es]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
 #pragma aux F34_30  "*_a" __far parm [si] value [dx ax] modify exact [ax dx si es]
 #pragma aux F34_40  "*_a" __far parm [si] [cx] value [dx ax] modify exact [ax bx cx dx si di es]
 
@@ -265,7 +244,7 @@ static u16 FileLst(void)
     regs.si = 0;
     regs.di = 0;
     regs.name = LIST_NAME;
-    if (ChgDisk((u16)LIST_NAME))
+    if (ChgDisk(LIST_NAME))
         goto FiLs18;
     regs.cx = 0x20;                     /* delete the one that is there */
     regs.ax = 0x4301;
@@ -563,7 +542,7 @@ u16 F32_00(u16 main)
         md.TmpBuf[i] = Menu_F[i];
     F42_10();
     include = (u16)md.TmpBuf;
-    if (ChgDisk((u16)md.TmpBuf))
+    if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);
     if (!HIGH(opened))
@@ -580,7 +559,7 @@ F32_01:                                 /* the main menu */
     MainFil(md.TmpBuf, Menu_F);
 F32_02:
     include = (u16)md.TmpBuf;
-    if (ChgDisk((u16)md.TmpBuf))
+    if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);
     if (!HIGH(opened))

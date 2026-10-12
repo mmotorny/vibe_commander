@@ -71,8 +71,9 @@ void F65_00(void);
 /* How the assembly calls it (see the stub in port/asm/VCMEM.INC). */
 #pragma aux F65_00 "*_c" __far modify exact [ax bx cx dx si di]
 
-/* Routines that are still assembly, by their entries for C: see
-   port/dialog.c and port/find.c for those that others call too.
+/* Routines that are still assembly, by their entries for C. The routines
+   of the screen, the mouse and the keyboard that this file calls are C,
+   of vc.h.
 
    What is asked of DOS for the map, without Intr21 as in the original:
    Dos5802 says whether the upper memory is linked into the chain of
@@ -86,18 +87,6 @@ void F65_00(void);
    a command runs, and ResSeg that of the part that stays, where Counter,
    PrgList and Command are. Release releases a program that has stayed in
    the memory: `program` is what PrgList has of it. */
-void HidCur(void);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-void MinBox(u16 begin, u16 size, u16 color);
-u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
-u32 GetMous(u16 place);
-void ClrKbd(void);
-void TypMous(u16 look);
-u16 InWind(u16 place, u16 begin, u16 size);
-u16 DoublMo(u16 begin, u16 size, u16 line);
-u32 PgUp(u16 cursor, u16 first, u16 rows);
-u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 u16 Dos5802(void);
 void Dos5803(u16 link);
 u16 Dos52(void);
@@ -106,18 +95,6 @@ void Dos2523(u16 routine);
 u16 MemRun(void);
 u16 ResSeg(void);
 void Release(u16 program);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [cx] modify exact [ax bx cx dx es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux DoublMo "*_a" __far parm [bx] [dx] [si] value [ax] modify exact [ax cx es]
-#pragma aux PgUp    "*_a" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx si di]
-#pragma aux PgDn    "*_a" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx si di]
 #pragma aux Dos5802 "*_a" __far value [ax] modify exact [ax]
 #pragma aux Dos5803 "*_a" __far parm [bx] modify exact [ax]
 #pragma aux Dos52   "*_a" __far value [ax] modify exact [ax bx]
@@ -655,9 +632,9 @@ F65_40:                                 /* Test parameters */
             if (moved == 1 || moved == 0xFFFF) {
                 if (moved == 0xFFFF)
                     key = 0x700;
-                place = Int10m(key & 0xFF00 | 1,
-                               Color(Memo_P[0]) << 8 | place & 0xFF, place,
-                               ((u16)(u8)(rows - 1) << 8 | 63) + place);
+                place = (u16)(Int10m(
+                    key & 0xFF00 | 1, Color(Memo_P[0]) << 8 | place & 0xFF,
+                    place, ((u16)(u8)(rows - 1) << 8 | 63) + place) >> 16);
                 place += (key & 0xFF) << 8;
                 n = 0x100;
             }

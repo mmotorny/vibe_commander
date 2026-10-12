@@ -233,8 +233,8 @@ Things that are known and not done. Standing instructions are in
   which the stub of the menu bar jumps to the commands, the stubs of the
   commands, 28 of them with `M17_00`, which hands Drive... to the box of
   the drives, the boxes, dialogs and texts, which `DialBox` and `Dialog`
-  read in the assembly, and three entries for the C: `Int10_a`,
-  `ScrOffs_a` and `SaveSet_a`. The stubs go when the loop that jumps to
+  read in the assembly, and one entry for the C, `SaveSet_a`. The stubs
+  go when the loop that jumps to
   them is C, and with it `CmdM01`, `CmdM03` and `CmdM06` of
   `VCFUNC.INC`, by which the keys of the panels go on in three of the
   commands: `port/keys.c` can call the functions then.
@@ -803,9 +803,9 @@ Things that are known and not done. Standing instructions are in
     that take that segment as far pointers and touch nothing of `md`.
     From `Init11` on it is the main data. It asks much of the BIOS and
     of DOS: the video mode set, the cursor's shape, the country, the
-    font's rows, DESQview, for which `Int10_a` of `VCMENU.INC` and
-    `Int21d_a` do, and the address of a virtual screen (INT 10h,
-    AH=FEh), which answers in ES:DI and has no entry yet. It
+    font's rows, DESQview, for which `Int10` and `Int21d` of
+    `port/dos.c` do, and the address of a virtual screen (INT 10h,
+    AH=FEh), which answers in ES:DI and has no function there yet. It
     calls the routine of DOS that makes capitals through the far
     pointer of the country information, with a character in AL: a far
     function pointer with a `#pragma aux`. It writes two vectors into
@@ -932,6 +932,105 @@ Things that are known and not done. Standing instructions are in
   follow `vc.lst` in the assembly, and the menu's name at TmpBuf the six
   that follow `VC.MNU`: both are copied from the assembly, `List_F` and
   `Menu_F`, as long as it has them. Nothing reads the six.
+
+- Of the shared routines of `VCSUB1.INC` two are still assembly. `Case`,
+  37 bytes, jumps by a table of keys to a label of whoever called it, and
+  takes that caller's return address off the stack: one caller is left,
+  `MainKy` in `VC.ASM`, where the main loop, which is C, has the key
+  looked up in the table of the commands, whose labels are stubs. It
+  goes when that table is a `switch`.
+  `CallPSP`, 6 bytes, calls a routine in the part of the program that
+  stays in the memory, far, by way of the stack; `OutStr1` and
+  `Release_a` call it. Of `VCSUB3.INC` four are still assembly, 232
+  bytes, the next batch there with `LeaveTm` and `Blank` of
+  `VCSUB2.INC`: `SaveSet`, `MakeIni` and `MkIni1`, which save the setup,
+  and `DiSi10`, which `DirFunc` calls for the sizes of directories, by
+  its address. `SaveSet` has run in no scenario: the bench has the setup
+  saved before the scenarios begin.
+- When `LeaveTm` becomes C its `INT 28h` goes into `port/dos.c`, with
+  the calls of `INT 2Fh` and `INT 15h` behind it. The driver of the
+  tests takes a call of `INT 28h` for the program's when it comes from
+  the memory of the program that DOS has as the current one and that
+  program is named `VC`, so the call may stand anywhere in the port and
+  `harness/driver.py` needs no change for it. What the call needs is DS
+  on the main data, where the driver reads `AutoTim` and `Clock`, and
+  the program's own stack: any C function has both.
+- Entries by which C code calls DOS are still in the assembly, each a
+  call of `INT 21h` that the original made without `Intr21`: `SelDrv_a`
+  in `VCCOPY.INC`, `Fcb29_a` in `VCF1.INC`, and `Dos5802_a`, `Dos5803_a`,
+  `Dos52_a`, `Dos4452_a` and `Dos2523_a` in `VCMEM.INC`. They belong in
+  `port/dos.c`, or go through `Int21d` there: `struct DosRegs` has ES
+  as DOS leaves it, for `Dos52_a`, and DS with DX, for `Dos2523_a`. The
+  two that the main loop and the commands of the menus had made, for
+  the BIOS and for where an interrupt goes, went that way: `Int10` and
+  `Int21d`.
+- Of the mouse's routines, which are C, ten instructions of the
+  original have run in no scenario and are translated by reading: six of
+  `IniMous`, for a mouse driver that does not know the call 21h and for
+  no mouse at all, which every machine of the bench has now, and four of
+  `DoublMo`, where a first click falls into the last 40 hundredths of a
+  minute. The rest ran when the bench got its mouse, and the C did what
+  the original does in every scenario of the mouse the first time it
+  was tried. Three more instructions of `DoublMo`, at 9506h, where the
+  hundredths of the first click are 60 or more, ran or did not from one
+  derivation of the goldens to the next when the main loop was
+  translated, by the time of day of the click. They are counted as run:
+  if a derivation comes out without them, the `port` test will say "not
+  executed" of them, and that is the clock, not the port.
+- Of the screen's routines 26 instructions are out of reach on the
+  bench and translated by reading: a monochrome display in mode 7, two
+  of `ChkMode` and `ChgCur`; a screen on another page than the first,
+  two of `ScrOffs`; a display that shows snow, where `Window` and
+  `MovScr` wait for it not to draw, 20; and TopView or DESQview, two of
+  `Window`. Which of these the machine is, the program finds out when it
+  starts, and no menu says otherwise.
+- What these routines do in the original and the port does after them;
+  whether to mend any of it is not decided:
+  - `Window` tells TopView or DESQview which cells of their buffer have
+    changed with ES on the main data, where the call takes the segment
+    of the buffer. By reading: the bench runs neither.
+  - `Window` copies whole rows when a window has more than one, whatever
+    its columns are, and of a window of one row and no columns 65536
+    cells. `SavWin`, `ResWin` and `ResUser` take a window of no rows for
+    one of 65536.
+  - `DoublMo` adds the 40 hundredths that a second click may take to the
+    time of the first byte by byte, and where the hundredths go beyond
+    99 it carries a second and leaves them there: the click is in time
+    until the next second ends, up to a second and 39 hundredths. The
+    same goes for the seconds of a minute and the minutes of an hour,
+    which are left at 60. And a click is the second one whenever the
+    clock is not beyond the time noted: after midnight the next click on
+    the line of the last one of the day before is a second click, however
+    late. By reading.
+  - `TstBrk` looks at the next key only. A key that does not stop what
+    is going on stays where it is, and Esc typed behind it is not seen
+    until that key has been taken, which is when the work is done. In
+    `keys-waiting`.
+  - A box that is smaller than the one it grows from, fewer than five
+    rows or eleven columns, is drawn while it grows with a length worked
+    out in a byte that has gone below 0: `MinBx5`. The program has no
+    such box.
+  - `ShadBox` takes ten columns off the width of a box in a byte, and
+    writes the shadow below it over that many cells and eight, counted
+    in a byte too: a box of two columns would have a shadow of 65536
+    cells. The program has no such box.
+- What the C of these routines hands the BIOS where the assembly had
+  whatever a register held, none of which the BIOS reads: `Beep` writes
+  the character 7 with page 0 and colour 0 where BX was as it came;
+  `ChgCur` and `CurShp` set the shape of the cursor with AL 0, where
+  some BIOSes of the time wanted the video mode there and the assembly
+  had what the call before left; the mouse driver gets BX 0 with the
+  calls that take none. DOS gets the registers of `struct DosRegs` and
+  ES on the main data, whatever the caller of `Intr21` in the assembly
+  has in ES: the one call that reads ES, which runs a program for
+  Alt+F3, has it there. And `Fantom` shows its dialog with 0 for the
+  include line and for the place of a box that is on the screen
+  already, where the assembly had registers as they came: its box has
+  no line that includes one, and is not on the screen.
+- `OpenFil` asks DOS a second time, without what the mode says of
+  sharing, where DOS says that another program has the file open. Three
+  instructions, listed as out of reach: DOS says so only where files
+  are shared, and nothing else has a file open on the bench.
 
 ## Ways of testing that were tried, for the user to decide on
 
@@ -1704,6 +1803,39 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     nothing was lost to the mouse at the panels; a fourth was written
     for what they leave, and derived five times because one record of
     what ran differed (see above).
+- The shared routines of `VCSUB1.INC` and four of `VCSUB3.INC`, 49 of
+  them, 1,822 bytes, with the file for DOS and the BIOS, some 45 minutes
+  to a translation that passed, next to three other batches and one
+  change to the harness. No golden was derived twice, and the full
+  `port` test passed both times it ran, 173 and 233 seconds.
+  - 2 minutes: the halves of a number of 32 bits in `[dx cx]`, which are
+    the other way round than in `[dx ax]`: the cursor came back to the
+    wrong place after the help, in the third scenario compared. In
+    `CLAUDE.md` now.
+  - 5 minutes: the first comparison of all scenarios, 4 minutes 26 with
+    the other checkouts at work, where the `port` test takes three.
+  - Most of the time went into reading: the 125 places of the assembly
+    that call these routines, for the registers they go on with. Three
+    mattered: the start of the program takes AL, AH and BH from
+    `ChkMode` and DI from `ScrOffs`, and Enter with Shift keeps a flag
+    in AH across `InvVar`.
+  - What saved time: `harness/compare.py` on three scenarios, four
+    seconds, before all of them; and keeping the functions' names and
+    registers as their entries had them, so that the sixteen C files
+    that call them lost their declarations to a script and changed in a
+    dozen places.
+  - 15 minutes to get onto `main`, behind the mouse of the bench, the
+    commands of the menus and the main loop: eight files in conflict,
+    each where both sides had added. What git did not show: `main.c`
+    and `commands.c` declared 19 of these routines by their entries;
+    seven stubs had lost their last caller to the main loop; the two
+    batches had made entries for the BIOS and for a vector of DOS,
+    which went into `port/dos.c`, the first by making `Int10` take the
+    structure that their code already filled; and the new scenario of
+    the left-handed mouse ran 55 instructions that the dialogs had
+    listed as out of reach, which the first `port` test said, 132
+    seconds. The second passed, 348 seconds next to other runs. The
+    mouse's routines, read and never run before, needed no change.
 
 ## Ideas put off
 

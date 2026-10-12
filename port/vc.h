@@ -313,57 +313,27 @@ extern const u8 __far Tree_S[];         /* the title of the tree */
 #define CurSl_C 3                       /* selected, under the cursor */
 #define Title_C 4                       /* the titles of the columns */
 
+/* The registers of a call of DOS. DS goes with DX: a pointer to what DOS
+   takes there, a name or a buffer, sets both. ES does not go to DOS,
+   which is called with it on the main data: it is what DOS leaves there,
+   for the calls that answer with an address in ES:BX. */
+struct DosRegs {
+    u16 ax, bx, cx;
+    const u8 __far *name;               /* DX, and DS behind it */
+    u16 si, di;
+    u16 es;                             /* as DOS leaves it */
+};
+
+/* The registers of a call of the BIOS for the screen. */
+struct BiosRegs {
+    u16 ax, bx, cx, dx;
+};
+
 /* Routines that are still assembly, for C code to call. Each has an entry
    in the assembly, the routine's name with _a, which is called far and
    calls the routine (see FromC in port/asm/VC.ASM). They take and return
    what the routine's registers hold, so a value in a high byte stays
    there; flags do not come back. */
-u16 UpCase(u16 letter);                 /* AL: a letter -> AL: its capital */
-#pragma aux UpCase "*_a" __far parm [ax] value [ax] modify exact [ax es]
-/* Put on the screen what the screen buffer has in a window: where it
-   begins, the row in the high byte, and its rows and columns likewise. */
-void Window(u16 begin, u16 size);
-#pragma aux Window "*_a" __far parm [bx] [dx] modify exact [es]
-/* Write a line of a box to the screen buffer: `margin` spaces, the
-   character in the high byte of `ends`, `width` times the cell `cell`,
-   the character in the low byte of `ends`, and the spaces again, all in
-   the colour of `cell`. Returns the address of the line below. */
-u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width);
-#pragma aux BoxLine "*_a" __far parm [di] [ax] [bx] [cx] [dx] value [di] modify exact [di es]
-/* Write a box with a double frame and `rows` empty lines in it, in the
-   colour in the high byte of `color`. Returns the address of the line
-   below it. */
-u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width);
-#pragma aux BoxDubl "*_a" __far parm [di] [ax] [si] [cx] [dx] value [di] modify exact [di es]
-void Beep(void);                        /* if errors are to sound */
-#pragma aux Beep "*_a" __far modify exact [es]
-void SetDTA(void);                      /* have DOS put what it finds at DTA */
-#pragma aux SetDTA "*_a" __far modify exact [es]
-/* Ask for the disk of a drive that shares a floppy drive with another, if
-   that is in it: 1 for A:. Not 0 if the user would not change it. */
-u16 Fantom(u16 drive);
-#pragma aux Fantom "*_a" __far parm [ax] value [ax] modify exact [ax es]
-
-/* The registers of a call of DOS, as the entry of Intr21 takes them off
-   the stack. DS goes with DX: a pointer to what DOS takes there, a name
-   or a buffer, sets both. */
-struct DosRegs {
-    u16 ax, bx, cx;
-    const u8 __far *name;               /* DX, and DS behind it */
-    u16 si, di;
-};
-
-/* Call DOS, with ES on the main data. AX, BX, CX and DX come back in
-   `regs`, DX where the offset of `name` was. Not 0 if DOS set the carry
-   flag: AX is its error then, or 53h for a drive that is not ready. */
-u16 Intr21(struct DosRegs STACK *regs);
-#pragma aux Intr21 "*_a" __far parm [bx] value [ax] modify exact [ax bx cx dx si di es]
-/* Open a file, `mode` as DOS takes it in AL; where others have the file
-   open and the mode asks to share it, without sharing. Returns the handle
-   in the low word, or the error there and something that is not 0 in the
-   high one. */
-u32 OpenFil(const u8 __far *name, u16 mode);
-#pragma aux OpenFil "*_a" __far parm [dx bx] [ax] value [dx ax] modify exact [ax dx es]
 /* Where the routine is that DirSize has DirFunc call for every file, and a
    call of what FncAddr names, for a file with these attributes at TmpBuf:
    the high byte of what it returns is not 0 to stop. */
@@ -371,19 +341,6 @@ u16 DiSi10(void);
 u16 FncCall(u16 attributes);
 #pragma aux DiSi10  "*_o" __far value [ax] modify exact [ax]
 #pragma aux FncCall "*_a" __far parm [ax] value [ax] modify exact [ax es]
-/* Asks DOS for the current drive and directory, into DosPth, with PathEr
-   set if that fails: not 0 then. */
-u16 SetPth(void);
-#pragma aux SetPth  "*_a" __far value [ax] modify exact [ax es]
-/* The mouse: SavMous notes where its pointer is, CurMous shows the
-   pointer, or hides it for 0, and IniMous looks for a mouse and sets it
-   up as when the program starts. */
-void SavMous(void);
-void CurMous(u16 show);
-void IniMous(void);
-#pragma aux SavMous "*_a" __far modify exact [es]
-#pragma aux CurMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux IniMous "*_a" __far modify exact [ax bx cx dx es]
 /* RestVct gives the vectors of the critical error and of Ctrl-Break back
    to whoever had them, and HookVct takes them again: it returns where
    its routine for Ctrl-Break is, in the part of the program that stays
@@ -400,25 +357,45 @@ u16 ErrRdy(u16 letter);
 #pragma aux HookVct "*_c" __far value [ax] modify exact [ax]
 #pragma aux Quit    "*_c" __far modify exact [ax]
 #pragma aux ErrRdy  "*_c" __far parm [ax] value [ax] modify exact [ax]
-/* Checks the keyboard for Esc, Ctrl-C and F10, and takes them from it:
-   not 0 if one was pressed. */
-u16 TstBrk(void);
-#pragma aux TstBrk  "*_a" __far value [ax] modify exact [ax es]
-
-/* The registers of a call of the BIOS for the screen, as the entry Int10
-   takes them off the stack and puts them back: it calls the BIOS as the
-   assembly does where it does not take the mouse pointer off the screen
-   first. SaveSet writes the setup to its file: something that is not 0
-   in the high word if it could not, with what DOS answered in the low
-   one, or 53h there for a drive that is not ready. Both entries are in
+/* SaveSet writes the setup to its file: something that is not 0 in the
+   high word if it could not, with what DOS answered in the low one, or
+   53h there for a drive that is not ready. Its entry is in
    port/asm/VCMENU.INC. */
-struct BiosRegs {
-    u16 ax, bx, cx, dx;
-};
-void Int10(struct BiosRegs STACK *regs);
 u32 SaveSet(void);
-#pragma aux Int10   "*_a" __far parm [bx] modify exact [ax bx cx dx si di es]
 #pragma aux SaveSet "*_a" __far value [dx ax] modify exact [ax dx es]
+
+/* DOS, the BIOS, the mouse driver and the machine: the functions of
+   dos.c, which has every software interrupt of the C code and what each
+   is for. Nothing else calls one. */
+struct MouseAt {                        /* what the mouse driver says: */
+    u16 buttons;                        /* the buttons held, the left one 1,
+                                           the right one 2, the middle 4 */
+    u16 x, y;                           /* where the pointer is, in dots */
+};
+u16 Int21d(struct DosRegs STACK *regs);
+u16 Int21f(struct DosRegs STACK *regs, u16 carry);
+void Int10(struct BiosRegs STACK *regs);
+void TopView(u16 __far *cells, u16 count);
+u32 Int16(u16 ax);
+u32 Int2F(u16 ax, u16 bx, u16 cx);
+u16 Int33(u16 ax, u16 bx, u16 cx, u16 dx);
+void MousAt(struct MouseAt STACK *state);
+u16 CaseMap(u16 letter);
+u16 InPort(u16 port);
+void IntOff(void);
+void IntOn(void);
+#pragma aux Int21d  "*_c" __far parm [bx] value [ax] modify exact [ax]
+#pragma aux Int21f  "*_c" __far parm [bx] [ax] value [ax] modify exact [ax]
+#pragma aux Int10   "*_c" __far parm [bx] modify exact [ax]
+#pragma aux TopView "*_c" __far parm [es di] [cx] modify exact [ax]
+#pragma aux Int16   "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+#pragma aux Int2F   "*_c" __far parm [ax] [bx] [cx] value [dx ax] modify exact [ax dx]
+#pragma aux Int33   "*_c" __far parm [ax] [bx] [cx] [dx] value [ax] modify exact [ax]
+#pragma aux MousAt  "*_c" __far parm [di] modify exact [ax]
+#pragma aux CaseMap "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux InPort  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux IntOff  "*_c" __far modify exact [ax]
+#pragma aux IntOn   "*_c" __far modify exact [ax]
 
 /* A line as the assembly hands it over: the registers that describe it,
    pushed in this order by CallLine in port/asm/VC.ASM. */
@@ -611,6 +588,127 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
 #pragma aux EdSub1  "*_c" __far parm [di] [ax] value [ax] modify exact [ax]
 #pragma aux CmpSym  "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux Search  "*_c" __far parm [di] [si] [bx] [cx] [dx] [ax] value [si] modify exact [ax si]
+
+/* What the program asks of DOS and the BIOS at every turn: see each in
+   system.c. Intr21 and Intr21f call DOS with the registers of `regs` and
+   put AX, BX, CX and DX back there, DX where the offset of `name` was;
+   they are not 0 if DOS set the carry flag: AX is its error then, or 53h
+   for a drive that is not ready. Intr21f has the carry flag set when DOS
+   is called, if `carry` is not 0. OpenFil opens a file, `mode` as DOS
+   takes it in AL, and returns the handle in the low word, or the error
+   there and 1 in the high one. SetPth asks DOS for the current drive and
+   directory, into DosPth, and is not 0 if that fails. Fantom asks for
+   the disk of a drive that shares a floppy drive with another, 1 for A:,
+   and ChgDisk for that of the drive that a path of the main data names:
+   not 0 if the user would not put it in. */
+u32 Timer(void);
+void ClrKbd(void);
+u16 TstBrk(void);
+void Beep(void);
+u16 UpCase(u16 letter);
+void SetDTA(void);
+u16 TstDrv(u16 letter);
+u16 Intr21(struct DosRegs STACK *regs);
+u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
+u32 DosTime(void);
+u32 OpenFil(const u8 __far *name, u16 mode);
+u16 SetPth(void);
+u16 Fantom(u16 drive);
+u16 ChgDisk(const u8 *path);
+#pragma aux Timer   "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux ClrKbd  "*_c" __far modify exact [ax]
+#pragma aux TstBrk  "*_c" __far value [ax] modify exact [ax]
+#pragma aux Beep    "*_c" __far modify exact [ax]
+#pragma aux UpCase  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux SetDTA  "*_c" __far modify exact [ax]
+#pragma aux TstDrv  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux Intr21  "*_c" __far parm [bx] value [ax] modify exact [ax]
+#pragma aux Intr21f "*_c" __far parm [bx] [ax] value [ax] modify exact [ax]
+#pragma aux DosTime "*_c" __far value [dx ax] modify exact [ax dx]
+#pragma aux OpenFil "*_c" __far parm [dx bx] [ax] value [dx ax] modify exact [ax dx]
+#pragma aux SetPth  "*_c" __far value [ax] modify exact [ax]
+#pragma aux Fantom  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux ChgDisk "*_c" __far parm [dx] value [ax] modify exact [ax]
+/* The mouse: see each in mouse.c. GetMous returns the buttons in the low
+   word and the place in the high one, InWind is not 0 for a place
+   outside a window, and DoublMo is 2 to go on, 1 for a second click and 0
+   for one that was let go elsewhere. */
+void IniMous(void);
+void TypMous(u16 pointer);
+void SavMous(void);
+void CurMous(u16 show);
+u32 GetMous(u16 place);
+u16 DoublMo(u16 begin, u16 size, u16 cursor);
+u16 InWind(u16 where, u16 begin, u16 size);
+#pragma aux IniMous "*_c" __far modify exact [ax]
+#pragma aux TypMous "*_c" __far parm [ax] modify exact [ax]
+#pragma aux SavMous "*_c" __far modify exact [ax]
+#pragma aux CurMous "*_c" __far parm [ax] modify exact [ax]
+#pragma aux GetMous "*_c" __far parm [cx] value [dx ax] modify exact [ax dx]
+#pragma aux DoublMo "*_c" __far parm [bx] [dx] [si] value [ax] modify exact [ax]
+#pragma aux InWind  "*_c" __far parm [cx] [bx] [dx] value [ax] modify exact [ax]
+/* The screen, its cursor, and windows of the screen buffer: see each in
+   window.c. A place has the row in its high byte, and a size the rows.
+   `buffer` is an address in the main data. */
+struct VideoMode {                      /* for ChkMode: as the BIOS says, */
+    u16 ax;                             /* the mode, and above it the
+                                           columns */
+    u16 bx;                             /* the page, in the high byte */
+};
+u16 ChkMode(struct VideoMode STACK *mode);
+void Cursor(u16 place);
+void Cursor1(void);
+u16 ChgCur(void);
+void CurShp(u16 shape);
+u16 GetCur(void);
+void HidCur(void);
+u32 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
+u16 ScrOffs(void);
+u16 SftEGA(u16 place);
+void SavWin(u16 begin, u16 size, u16 buffer);
+void ResWin(u16 begin, u16 size, u16 buffer);
+void ResUser(u16 begin, u16 size);
+void Window(u16 begin, u16 size);
+void SavScr(void);
+#pragma aux ChkMode "*_c" __far parm [bx] value [ax] modify exact [ax]
+#pragma aux Cursor  "*_c" __far parm [ax] modify exact [ax]
+#pragma aux Cursor1 "*_c" __far modify exact [ax]
+#pragma aux ChgCur  "*_c" __far value [ax] modify exact [ax]
+#pragma aux CurShp  "*_c" __far parm [cx] modify exact [ax]
+#pragma aux GetCur  "*_c" __far value [ax] modify exact [ax]
+#pragma aux HidCur  "*_c" __far modify exact [ax]
+#pragma aux Int10m  "*_c" __far parm [ax] [bx] [cx] [dx] value [dx cx] modify exact [cx dx]
+#pragma aux ScrOffs "*_c" __far value [di] modify exact [ax di]
+#pragma aux SftEGA  "*_c" __far parm [bx] value [bx] modify exact [bx]
+#pragma aux SavWin  "*_c" __far parm [bx] [dx] [si] modify exact [ax]
+#pragma aux ResWin  "*_c" __far parm [bx] [dx] [si] modify exact [ax]
+#pragma aux ResUser "*_c" __far parm [bx] [dx] modify exact [ax]
+#pragma aux Window  "*_c" __far parm [bx] [dx] modify exact [ax]
+#pragma aux SavScr  "*_c" __far modify exact [ax]
+/* The frame of a box: see each in box.c. OncZoom takes a box of the
+   assembly as DialBox does, in the main data. */
+u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width);
+u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width);
+void MinBox(u16 begin, u16 size, u16 color);
+u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
+void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
+#pragma aux BoxLine "*_c" __far parm [di] [ax] [bx] [cx] [dx] value [di] modify exact [di]
+#pragma aux BoxDubl "*_c" __far parm [di] [ax] [si] [cx] [dx] value [di] modify exact [di]
+#pragma aux MinBox  "*_c" __far parm [bx] [dx] [ax] modify exact [ax]
+#pragma aux StdLine "*_c" __far parm [bx] [ax] [si] [dx] value [bx] modify exact [bx]
+#pragma aux OncZoom "*_c" __far parm [bx] [ax] [dx] [di] modify exact [ax]
+/* Small ones: see each in misc.c. PgUp and PgDn return the cursor in the
+   low word and the first line shown in the high one. */
+u16 IsCrLf(u16 word);
+u16 InvVar(u8 __far *variable);
+u16 ChkSum(const u8 *data, u16 length);
+u32 PgUp(u16 cursor, u16 first, u16 rows);
+u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
+#pragma aux IsCrLf  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux InvVar  "*_c" __far parm [es bx] value [ax] modify exact [ax]
+#pragma aux ChkSum  "*_c" __far parm [si] [cx] value [ax] modify exact [ax]
+#pragma aux PgUp    "*_c" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx]
+#pragma aux PgDn    "*_c" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx]
 
 /* The segment of the main data, as a number. */
 #define MAIN_SEG ((u16)((u32)(void __far *)&md >> 16))

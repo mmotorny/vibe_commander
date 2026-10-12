@@ -129,27 +129,22 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
 #pragma aux Help00  "*_c" __far modify exact [ax]
 #pragma aux MainFil "*_c" __far parm [es di] [dx si] value [es di] modify exact [di es]
 
-/* Routines that are still assembly, by their entries for C. HidCur puts
-   the cursor below the screen. ResUser writes what DOS has shown, which
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   HidCur puts the cursor below the screen. ResUser writes what DOS has shown, which
    the panels cover, to the screen buffer, for a window given like
    Window's, and ResWin what a box covers, from where it was kept. SelDrv
    is the call of DOS that makes a drive the current one, 0 for A:, which
    the assembly makes without Intr21. AsmSeg returns the code segment of
    the assembly. ScrOffs asks the BIOS where in the memory of the screen
-   the page begins that is shown. Int10, which calls the BIOS for the
-   screen, and SaveSet, which writes the setup to its file, are in vc.h. */
-void HidCur(void);
-void ResUser(u16 begin, u16 size);
-void ResWin(u16 begin, u16 size, u16 buffer);
+   the page begins that is shown. Int10 calls the BIOS for the screen,
+   and SaveSet writes the setup to its file. */
 void SelDrv(u16 drive);
 u16 AsmSeg(void);
-void ScrOffs(void);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux ResUser "*_a" __far parm [bx] [dx] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux SelDrv  "*_a" __far parm [dx] modify exact [ax]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux ScrOffs "*_a" __far modify exact [ax bx di es]
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what

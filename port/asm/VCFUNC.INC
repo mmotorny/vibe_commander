@@ -195,12 +195,6 @@ F20_02	PROC	NEAR
 	RET
 F20_02	ENDP
 
-; Entries for the C code of these commands to routines of other files
-; (see FromC in VC.ASM, and port/keys.c for what they take).
-; Those of SavMous and CurMous are next to the routines, in VCSUB1.INC.
-	FromC	ResUser
-	FromC	InvVar
-
 F21_00:	CMP	ES:DosBuf,0		; Enter
 	JNE	F21_01
 	CMP	DS:Visible,0

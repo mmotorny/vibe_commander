@@ -114,14 +114,17 @@ LAID_OUT(BOXMN, 11);
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. HidCur puts the cursor below the screen, Cursor at a row
-   and a column, the row in the high byte. ChgCur gives the cursor the
-   shape it has in the program and returns the one it had, which CurShp
-   gives back. ClrKbd empties the keyboard buffer if the setup has it so.
-   SavWin keeps what the screen buffer has where a window is to be, ResWin
-   puts it back; MinBox draws a box with a shadow there, growing if
-   windows are to zoom, in the colour in the high byte of `color`.
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   HidCur puts the cursor below the screen, Cursor at a row and a column,
+   the row in the high byte. ChgCur gives the cursor the shape it has in
+   the program and returns the one it had, which CurShp gives back. ClrKbd
+   empties the keyboard buffer if the setup has it so. SavWin keeps what
+   the screen buffer has where a window is to be, ResWin puts it back;
+   MinBox draws a box with a shadow there, growing if windows are to zoom,
+   in the colour in the high byte of `color`.
 
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, or `place` as it was if there is no mouse.
@@ -140,30 +143,8 @@ LAID_OUT(BOXMN, 11);
    whoever asked for the dialog. It returns AX as the routine leaves it,
    and something that is not 0 in the high word if the routine set the
    carry flag: to go on with the dialog. */
-void HidCur(void);
-void Cursor(u16 place);
-u16 ChgCur(void);
-void CurShp(u16 shape);
-void ClrKbd(void);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-void MinBox(u16 begin, u16 size, u16 color);
-u32 GetMous(u16 place);
-void TypMous(u16 look);
-u16 InWind(u16 place, u16 begin, u16 size);
 u16 AsmSeg(void);
 u32 DialSub(u16 key, u16 begin, u16 field, u16 routine, u16 segment, u16 box);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux Cursor  "*_a" __far parm [ax] modify exact [es]
-#pragma aux ChgCur  "*_a" __far value [ax] modify exact [ax cx es]
-#pragma aux CurShp  "*_a" __far parm [cx] modify exact [ax]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
 #pragma aux DialSub "*_a" __far parm [ax] [bx] [di] [si] [cx] [dx] value [dx ax] modify exact [ax bx cx dx si di es]
 

@@ -682,14 +682,16 @@ BATCHES = [
         functions=("DialBox_c", "Dialog_c", "InSt10_c", "MinMnu_c"),
         unreached={
             **dict.fromkeys(
-                            (0x9CE9, 0x9D1F, 0x9D21, 0x9D24, 0x9D26, 0x9D2C, 0x9D2E,
-                             0x9D30, 0x9D32, 0x9D34, 0x9D35, 0x9D37, 0x9D39, 0x9D3B,
-                             0x9D3D, 0x9D3F, 0x9D41, 0x9D42, 0x9D44, 0x9D47, 0x9D57,
-                             0x9D6C, 0x9D6D, 0x9D6E, 0x9D70, 0x9D74, 0x9D76, 0x9D78,
-                             0x9D7A, 0x9D7D, 0x9D81, 0x9D84, 0x9D88, 0x9D8A, 0x9D8D,
-                             0x9D91, 0x9D94, 0x9D98, 0x9D9B, 0x9D9C, 0x9DA1, 0x9DA3,
-                             0x9DA6, 0x9DAA, 0x9DAC, 0x9DAF, 0x9DB1, 0x9DB5, 0x9DB7,
-                             0x9DB9, 0x9DBC),
+                (0x9CE9, 0x9D2C, 0x9D2E, 0x9D30, 0x9D32,
+                 0x9D34, 0x9D35, 0x9D37, 0x9D39, 0x9D3B,
+                 0x9D3D, 0x9D3F, 0x9D41, 0x9D42, 0x9D44,
+                 0x9D47, 0x9D57, 0x9D6C, 0x9D6D, 0x9D6E,
+                 0x9D70, 0x9D74, 0x9D76, 0x9D78, 0x9D7A,
+                 0x9D7D, 0x9D81, 0x9D84, 0x9D88, 0x9D8A,
+                 0x9D8D, 0x9D91, 0x9D94, 0x9D98, 0x9D9B,
+                 0x9D9C, 0x9DA1, 0x9DA3, 0x9DA6, 0x9DAA,
+                 0x9DAC, 0x9DAF, 0x9DB1, 0x9DB5, 0x9DB7,
+                 0x9DB9, 0x9DBC),
                 "Dialog, for the mouse: a button held, a click on a "
                 "field, on a button or outside the box. The bench has no "
                 "mouse"),
@@ -700,24 +702,9 @@ BATCHES = [
                 "InpStr, for the mouse: a click in the line that is typed "
                 "into"),
             **dict.fromkeys(
-                (0x9FDC, 0x9FDE, 0x9FE1, 0x9FE3, 0x9FE5,
-                 0x9FE7, 0x9FEA, 0x9FEC, 0x9FEE, 0x9FEF,
-                 0x9FF0, 0x9FF3, 0x9FF5, 0x9FF8, 0x9FFA,
-                 0x9FFB, 0x9FFC, 0x9FFE, 0xA000, 0xA002,
-                 0xA004, 0xA006, 0xA008),
+                (0x9FFE, 0xA000, 0xA002, 0xA004, 0xA006,
+                 0xA008),
                 "Select, for the mouse: a click on a line of the group"),
-            **dict.fromkeys(
-                (0xA05F, 0xA060, 0xA062, 0xA065, 0xA069,
-                 0xA06B, 0xA070, 0xA072, 0xA073, 0xA074,
-                 0xA076, 0xA078, 0xA079),
-                "Slct20, which measures a field for a click of the mouse"),
-            **dict.fromkeys(
-                (0xA092, 0xA094, 0xA097, 0xA099, 0xA09B,
-                 0xA09D, 0xA0A0, 0xA0A2, 0xA0A4, 0xA0A5,
-                 0xA0A8, 0xA0AA, 0xA0AC, 0xA0AF, 0xA0B1,
-                 0xA0B2, 0xA0D2, 0xA0D3, 0xA0D6, 0xA0D8,
-                 0xA0D9),
-                "FlipFl, for the mouse: a click on the box to tick"),
             **dict.fromkeys(
                             (0xA181,),
                 "MnMn10, for the mouse: a click on a button and a button "
@@ -1000,6 +987,106 @@ BATCHES = [
                     "a drive that is not ready: a step of the bench "
                     "presses the left button or the right one",
         },
+    ),
+    Batch(
+        title="DOS and the BIOS at every turn: the timer, the keys that "
+              "wait, the bell, capitals, DOS with its errors, a file "
+              "opened, the current directory, the disk of a drive",
+        source="system.c",
+        routines=("Timer", "ClrKbd", "TstBrk", "Beep", "UpCase", "SetDTA",
+                  "TstDrv", "Intr21", "SetPth", "Fantom", "ChgDisk",
+                  "OpenFil"),
+        # ClrKbd, Beep and TstDrv have no caller left in the assembly.
+        functions=("Timer_c", "TstBrk_c", "UpCase_c", "SetDTA_c",
+                   "Intr21f_c", "SetPth_c", "Fantom_c", "ChgDisk_c",
+                   "OpenFil_c"),
+        unreached={
+            **dict.fromkeys(
+                (0xCC11, 0xCC13, 0xCC15),
+                "OpenFil, for a file that DOS will not open because "
+                "another program has it open: DOS says so only where "
+                "files are shared, and on the bench nothing else has a "
+                "file open"),
+        },
+    ),
+    Batch(
+        title="The mouse: finding it, its pointer, where it is, and a "
+              "second click",
+        source="mouse.c",
+        routines=("IniMous", "TypMous", "SavMous", "CurMous", "GetMous",
+                  "DoublMo", "InWind"),
+        # TypMous and DoublMo have no caller left in the assembly.
+        functions=("IniMous_c", "SavMous_c", "CurMous_c", "GetMous_c",
+                   "InWind_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x93F3, 0x93F5),
+                "IniMous, for a mouse driver that does not know the "
+                "call which resets it without the mouse, 21h, and is "
+                "asked by call 0 instead: the driver of the bench, "
+                "CuteMouse, knows it"),
+            **dict.fromkeys(
+                (0x9407, 0x940A, 0x940E, 0x9412),
+                "IniMous, where there is no mouse: every machine of "
+                "the bench has one"),
+            **dict.fromkeys(
+                (0x950D, 0x950F, 0x9512, 0x9514),
+                "DoublMo, for a first click in the last 40 hundredths "
+                "of a minute, where the time by which a second one "
+                "counts is in the next minute, or the next hour: the "
+                "machine's clock is counted in instructions, and the "
+                "clicks of the scenarios do not fall there"),
+        },
+    ),
+    Batch(
+        title="The screen: its mode and its cursor, windows of the screen "
+              "buffer kept, put back and put on the screen",
+        source="window.c",
+        routines=("ChkMode", "Cursor", "Cursor1", "ChgCur", "HidCur",
+                  "Int10m", "ScrOffs", "SftEGA", "SavWin", "ResWin",
+                  "ResUser", "Window", "SavScr", "MovScr"),
+        # ResUser and SavScr have no caller left in the assembly.
+        functions=("ChkMode_c", "Cursor_c", "Cursor1_c", "HidCur_c",
+                   "ScrOffs_c", "ResWin_c", "Window_c"),
+        unreached={
+            **dict.fromkeys(
+                (0x9376, 0x93B8),
+                "ChkMode and ChgCur, for a screen in mode 7, that of a "
+                "monochrome display: the bench has a VGA, in mode 3 when "
+                "the program starts and when a command has ended"),
+            **dict.fromkeys(
+                (0x95A4, 0x95A6),
+                "ScrOffs, for a screen that shows another page than its "
+                "first: DOS has the bench's on page 0"),
+            **dict.fromkeys(
+                (0x968D, 0x968E, 0x9690, 0x9692, 0x9693, 0x9694, 0x9696,
+                 0x96F5, 0x96F6, 0x96F9, 0x96FA, 0x96FC, 0x96FE, 0x96FF,
+                 0x9702, 0x9703, 0x9704, 0x9706, 0x9708, 0x970A),
+                "Window and MovScr, waiting to write where a display "
+                "shows snow: a CGA, which the program finds out for "
+                "itself as it starts. The bench has a VGA, and Snow is "
+                "in no menu"),
+            **dict.fromkeys(
+                (0x96A7, 0x96A9),
+                "Window, telling TopView or DESQview what has changed: "
+                "the bench runs neither"),
+        },
+    ),
+    Batch(
+        title="The frame of a box, its shadow, and the box growing",
+        source="box.c",
+        routines=("MinBox", "MinBx3", "MinBx5", "ShadBox", "BoxDubl",
+                  "ShadLin", "BoxLine", "BoxLn0", "StdLine", "OncZoom"),
+        functions=(),
+    ),
+    Batch(
+        title="Small routines: the end of a line, a switch turned over, a "
+              "sum of bytes, a page up and down in a list",
+        source="misc.c",
+        # IsCrLf0, which stepped back two bytes for IsCrLf, has no caller
+        # left: what called it is C and does that itself.
+        routines=("IsCrLf0", "IsCrLf", "InvVar", "ChkSum", "PgUp", "PgDn"),
+        functions=("IsCrLf_c", "InvVar_c", "ChkSum_c"),
     ),
 ]
 

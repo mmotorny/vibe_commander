@@ -37,14 +37,16 @@
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. Int16 calls the BIOS for the keyboard, with `ax` as INT
-   16h takes it: it returns AX as it comes back, and 1 in the high word if
-   the zero flag was set, which says for function 1 that no key waits.
-   InpKey takes the key that waits. DosTime asks DOS for the time: the
-   hours and the minutes in the two bytes of the low word, the seconds and
-   their hundredths in those of the high one. Timer returns the BIOS's
-   count of timer ticks.
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   Int16 calls the BIOS for the keyboard, with `ax` as INT 16h takes it: it
+   returns AX as it comes back, and 1 in the high word if the zero flag was
+   set, which says for function 1 that no key waits. Function 0 takes the
+   key that waits. DosTime asks DOS for the time: the hours and the minutes
+   in the two bytes of the low word, the seconds and their hundredths in
+   those of the high one. Timer returns the BIOS's count of timer ticks.
 
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, the row in the high byte, or `place` as it was
@@ -55,22 +57,8 @@
    Blank blanks the screen until a key is pressed or the mouse moved, and
    LeaveTm tells DOS and what runs beside it that the program is idle.
  */
-u32 Int16(u16 ax);
-u16 InpKey(void);
-u32 DosTime(void);
-u32 Timer(void);
-u32 GetMous(u16 place);
-void TypMous(u16 look);
-u16 InWind(u16 place, u16 begin, u16 size);
 void Blank(void);
 void LeaveTm(void);
-#pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux InpKey  "*_a" __far value [ax] modify exact [ax]
-#pragma aux DosTime "*_a" __far value [dx ax] modify exact [ax cx dx]
-#pragma aux Timer   "*_a" __far value [dx ax] modify exact [ax cx dx]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux Blank   "*_a" __far modify exact [es]
 #pragma aux LeaveTm "*_a" __far modify exact [ax es]
 
@@ -123,7 +111,7 @@ u32 Input0(u16 bar)
 
     bar &= 0xFF;
     if (HIGH(Int16(0x100)) == 0) {
-        key = InpKey();
+        key = (u16)Int16(0);
         goto Inpt41;
     }
 Inpt02:
@@ -215,7 +203,7 @@ Inpt12:
     }
     Rnd();                              /* Inpt31 */
     if (HIGH(Int16(0x100)) == 0) {
-        key = InpKey();
+        key = (u16)Int16(0);
         goto Inpt40;
     }
     key = KEY_MOUSE | LOW(GetMous(0));  /* Inpt33 */

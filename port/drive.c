@@ -15,12 +15,13 @@ u16 F62_01(u16 panel, u16 item);
 /* How the assembly calls it (see the stub in port/asm/VCFUNC.INC). */
 #pragma aux F62_01 "*_c" __far parm [ax] [dx] value [ax] modify exact [ax]
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. HidCur puts the cursor below the screen.
-   SavWin keeps what the screen buffer has where a window is to be, ResWin
-   puts it back; MinBox draws a box with a shadow there. SftEGA moves a
-   place down on a screen of more than 25 lines, by half of what it has
-   more.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
+
+   HidCur puts the cursor below the screen. SavWin keeps what the screen
+   buffer has where a window is to be, ResWin puts it back; MinBox draws a
+   box with a shadow there. SftEGA moves a place down on a screen of more
+   than 25 lines, by half of what it has more.
 
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, or `place` as it was if there is no mouse.
@@ -33,26 +34,6 @@ u16 F62_01(u16 panel, u16 item);
    another, is C, of vc.h. Int21d calls DOS as Intr21 does, with the
    registers of `regs` and their answer there, but not through Intr21,
    where the assembly called DOS itself. */
-void HidCur(void);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-void MinBox(u16 begin, u16 size, u16 color);
-u16 SftEGA(u16 place);
-u32 GetMous(u16 place);
-void TypMous(u16 look);
-u16 InWind(u16 place, u16 begin, u16 size);
-u16 TstDrv(u16 letter);
-u16 Int21d(struct DosRegs STACK *regs);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux SftEGA  "*_a" __far parm [bx] value [bx] modify exact [bx es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux TstDrv  "*_a" __far parm [ax] value [ax] modify exact [ax es]
-#pragma aux Int21d  "*_a" __far parm [bx] value [ax] modify exact [ax bx cx dx si di es]
 
 /* A C routine of another file that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,

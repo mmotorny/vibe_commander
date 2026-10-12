@@ -230,10 +230,11 @@ port.
   be done again.
 - A routine that answers in the carry flag gets an entry for C that
   makes a number of it: `FromC Fantom, <SBB AX,AX>`. `Intr21`, which
-  calls DOS, has an entry that takes the registers from a structure on
-  the stack, `struct DosRegs` of `port/vc.h`, DS among them, and puts
-  back what DOS returns; `OpenFil` has one that takes the name as a far
-  pointer. Such an entry puts ES on the main data, as `FromC` does.
+  calls DOS, had an entry that took the registers from a structure on
+  the stack, `struct DosRegs` of `port/vc.h`, DS among them, and put
+  back what DOS returns, as the function that it is now does; `OpenFil`
+  has one that takes the name as a far pointer. Such an entry puts ES on
+  the main data, as `FromC` does.
 - `MvzLine` copies what follows a text along with it, 68 bytes in all,
   so a name that is copied with it is the assembly's own, made `PUBLIC`,
   and not a constant of the C file: `Mask_S` and `Ext_F`. Once what
@@ -300,8 +301,8 @@ port.
   `VC.ASM`, whichever file defines it.
 - A routine that answers in the zero flag gets an entry for C that is
   written out, where `FromC` has room for one instruction: `MOV AX,0`,
-  which leaves the flags, and `JNE` past an `INC AX`. `Int16_a` in
-  `VCFIND.INC` does it with DX. A stub makes the zero flag for its callers
+  which leaves the flags, and `JNE` past an `INC AX`. `Int16_a` did it
+  with DX, while it was there. A stub makes the zero flag for its callers
   of a function that returns 1 or 0 with `CMP AX,1`: `CmpSym`.
 - Nothing in the program tells the tests where it is. The driver of the
   tests (`harness/DRIVER.ASM`) watches it from inside the machine: it
@@ -322,7 +323,7 @@ port.
   routine in all of `port/asm/` first.
 - An entry that hands back a number of 32 bits is written out, with the
   high word in DX and the low one in AX, whatever the routine has them
-  in: `Timer_a`, `DosTime_a`.
+  in, as `Timer_a` and `DosTime_a` were.
 - Registers that follow from what a function returns are made by the
   stub: `T55_00` returns where the cursor gets to in the line, and its
   stub makes SI of that, DI of where the cursor was, and the zero flag
@@ -416,8 +417,9 @@ port.
   twice. After a rebase, look for the entries that have arrived, `FromC`
   and `_a` in `port/asm/`, keep the one next to the routine, and go by
   its registers and answers: those of `DoublMo` were the other way round.
-- The BIOS is called through an entry too: `Int16_a` in `VCFIND.INC`
-  for the keyboard, which makes a number of the zero flag.
+- The BIOS was called through an entry too, `Int16_a` for the keyboard,
+  which made a number of the zero flag. It is `Int16` of `port/dos.c`
+  now: see "C for the port".
 - The program has code in its data: `DirFunc` and what follows it,
   `FncSel` and `FncExt`, stand behind a `.DATA` with no `.CODE` after
   it. `harness/coverage.py` knows the procedures there; code between
@@ -527,9 +529,8 @@ port.
   `port/asm/VC.ASM`, the key bar first: `DB 1, 0FFh, 32, 10h` is key
   bar 1, no menu item, help page 32, flags.
 - DOS called with `INT 21h` itself, where the original did not go
-  through `Intr21`, has an entry that takes `struct DosRegs` as
-  `Intr21_a` does: `Int21d_a` in `VCFIND.INC`. `Int2F_a` is next to it,
-  and `StdLine_a` next to its routine.
+  through `Intr21`, is `Int21d` of `port/dos.c`, which takes `struct
+  DosRegs` as `Intr21` does. `Int2F` is next to it.
 - When the last caller of a stub becomes C, the stub goes, with its
   line in the `EXTERN` list, and the function is static if only its own
   file calls it: `FndMove`, `FndCurs` and `F38_70`. Take such a function
@@ -615,11 +616,12 @@ port.
   `PUSH ES`, `POP DS`. The C takes the segment as a number, MAIN_SEG for
   those, and reads there what the assembly read.
 - The BIOS called more than once with registers that go from one call
-  to the next, as EGA lines calls it for the font and the mode, has an
-  entry that takes AX, BX, CX and DX from four words on the stack and
-  puts them back: `Int10_a` in `VCMENU.INC`, with `struct BiosRegs` of
-  `port/commands.c`. `Int10m_a` is another thing: it takes the mouse
-  pointer off the screen around the call.
+  to the next, as EGA lines calls it for the font and the mode, takes
+  AX, BX, CX and DX from four words on the stack and puts them back:
+  `Int10` of `port/dos.c`, with `struct BiosRegs` of `port/vc.h`, which
+  was an entry, `Int10_a`, while the commands of the menus were
+  translated. `Int10m` is another thing: it takes the mouse pointer off
+  the screen around the call.
 - Code that is entered by jumps at several labels, falls from one into
   the next, and leaves by jumps, never by a return, as the main loop
   does, is one function that takes the number of the label and returns
@@ -639,6 +641,42 @@ port.
 - A routine that only C code calls any more leaves nothing in the
   assembly but what it read there: `ErrRdy` left its box, `NoRd_P`,
   made `PUBLIC`, and the table of its keys went.
+- The shared routines of `VCSUB1.INC` are C, and their entries for C
+  are gone: `port/vc.h` declares the functions, under the names the
+  entries had and with the same registers. A C file that still declares
+  one with `"*_a"` does not link, "undefined symbol", and the cure is to
+  take the declaration out. So are `SetPth`, `Fantom`, `ChgDisk` and
+  `OpenFil` of `VCSUB3.INC`. `GetMous`, `InWind`, `DoublMo`, `TstBrk`,
+  `TstDrv` and these four answer as their entries did, in numbers, 1
+  where an entry had 0FFFFh for a flag; `Int10m` returns DX
+  in the low word and CX in the high one; `OncZoom` always takes the
+  include line; `InvVar` takes a far pointer, since the assembly hands
+  it a byte of a panel too.
+- A routine that found the main data by `CS:SecDat`, as `Intr21` did,
+  has a stub that loads DS from there: its callers have DS anywhere.
+  The stub of `Intr21` pushes the registers in the order of
+  `struct DosRegs`, hands the carry flag it was called with to the C as
+  a number, `SBB AX,AX` behind the pushes, which leave the flags, and
+  pops what DOS returned, ES among it: the structure has a word for
+  ES as DOS leaves it, the last, and the stub pushes ES first.
+- Registers that a routine leaves as the BIOS left them, and that a
+  caller goes on with, come back in a structure on the stack: the code
+  that starts the program takes the mode in AL, the columns in AH and
+  the page in BH after `ChkMode`. The stub pushes BX as well, and the C
+  changes its high byte only.
+- A function that needs nothing of the main data, as those that only
+  call the BIOS, is called from its stub by `CALL FAR PTR` with DS as it
+  is. `ScrOffs` and `ChkSum` read through the caller's DS, which is the
+  main data wherever they are called, and are called so too.
+- A stub of a routine that answers in two flags makes them with a jump:
+  see `DoublMo`, which is CY for 2, NZ for 1 and ZR for 0.
+- When two batches land one behind the other, the stubs of the second
+  may have lost their callers to the first: after the rebase onto the
+  main loop, `ClrKbd`, `Beep`, `TypMous`, `DoublMo`, `TstDrv`, `ResUser`
+  and `SavScr` had none left in the assembly. Count the callers of
+  every stub of the batch again then, in all of `port/asm/`, and take
+  out the stub, its line in the `EXTERN` list and the function's name
+  in `functions` of `harness/ported.py`.
 
 ### C for the port
 
@@ -759,12 +797,56 @@ with it is less obvious:
   one, without a warning: the table of interrupt vectors was read from
   the main data. Take the segment from a `volatile` variable, as
   `F65_31` of `port/memory.c` does.
-- CTEXT has some 280 bytes left below its limit. A new file goes into
-  CTEXT2, by its name in `port_c_second`, unless it multiplies or
-  divides numbers of 32 bits.
+- CTEXT has under a thousand bytes left below its limit. A new file
+  goes into CTEXT2, by its name in `port_c_second`, unless it multiplies
+  or divides numbers of 32 bits.
 - An address that the main data keeps as two words, offset and segment,
   `ErrVct`, is a `u32` there and a far pointer by a cast, which costs
   nothing: `(const u8 __far *)md.ErrVct`.
+- DOS, the BIOS and the mouse driver are called in `port/dos.c` and
+  nowhere else, and that file alone has inline assembly: `Int21d` and
+  `Int21f` for DOS, `Int10` and `TopView` for the screen, `Int16` for
+  the keyboard, `Int2F`, and `Int33` and `MousAt` for the mouse, all
+  declared in `port/vc.h`. Each is a line of C around a `#pragma aux`
+  that holds the `INT` and as little else as will do: the registers are
+  its `parm` and its `value`, and the compiler loads them. C code that
+  needs a call of DOS fills a `struct DosRegs` and calls `Intr21` of
+  `port/system.c`, which looks for DOS's critical error, or `Int21d`,
+  where the original called DOS itself; an address that DOS answers
+  with in ES:BX is in `es` and `bx` there afterwards. A call of the
+  BIOS for the screen fills a `struct BiosRegs` for `Int10`, and the
+  registers stay in it from one call to the next, as they did in the
+  assembly. A call that these do
+  not cover gets a function there, with a comment that says what it is
+  for and which services go through it; nothing is added that hides
+  DOS, as long as the translation goes on. `CaseMap`, `InPort`, `IntOff`
+  and `IntOn` are there too: DOS's routine for capitals, a port, and the
+  interrupt flag, for which the compiler has intrinsic functions. What
+  is in the memory, the BIOS's data and the screen, is read and written
+  through far pointers in plain C: `Timer` of `port/system.c`, `Window`
+  of `port/window.c`. The entries of `VCCOPY.INC`, `VCF1.INC` and
+  `VCMEM.INC` that call DOS for C code are still there, and go the same
+  way.
+- A number of 32 bits in a pair of registers has its halves by the
+  registers, not by the order they are written in: `[dx cx]` has DX for
+  the low word and CX for the high one, `[dx ax]` and `[bx ax]` have AX
+  for the low one. Read the listing.
+- Inline assembly is a `#pragma aux` with the instructions in quotes
+  and `parm`, `value` and `modify exact` behind them, for a function
+  declared `static`: it is put in place where it is called. `bp` in its
+  `modify` list is accepted and not saved: where the BIOS may lose BP,
+  the instructions push and pop it. Flags come out by `pushf` and a
+  `pop` into the register of the value, as in `Int16`; a structure on
+  the stack is written by `mov ss:[di],bx`, as in `MousAt` and `Int10`.
+- `inp`, `_disable` and `_enable` are the compiler's own once a
+  `#pragma intrinsic` names them, without a header: `IN`, `CLI`, and
+  `STI` with a `CLD` behind it.
+- A far routine that is no function of the program, DOS's for capitals,
+  is called through a pointer to a function type that has a `#pragma
+  aux` of its own: `CaseMapFn` in `port/dos.c`.
+- A far pointer to a fixed place of the machine's memory is a constant
+  with its segment: `(const u32 __far *)0x0040006CUL` is the BIOS's
+  count of timer ticks, and costs no relocation.
 
 ## A run of batches
 

@@ -70,35 +70,28 @@ static u16 FncMs1(u16 include);
 #pragma aux F54_00  "*_c" __far value [ax] modify exact [ax]
 #pragma aux FncMas  "*_c" __far parm [ax] value [ax] modify exact [ax]
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. OncZoom puts a box on the screen with its middle at
-   `place`, zooming it only for the first box of a command: `box` is where
-   the assembly describes it, an offset in its code segment, and `include`
-   the text that ^I stands for in a line of the box, another such offset.
-   Dialog, which is C, does that and takes the keys; the low byte of what
-   it returns is the number of the answer, 0 for the first, and more than
-   any for Esc: here always for a box that is not on the screen yet, with
-   what it sets in the main data. ResWin puts back in the screen buffer what a box covers, and Window,
-   which is in vc.h, shows it. ChgDisk asks for the disk of a drive that
-   shares the floppy drive with another, and is not 0 if the user would
-   not change it.
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   OncZoom puts a box on the screen with its middle at `place`, zooming it
+   only for the first box of a command: `box` is where the assembly
+   describes it, an offset in its code segment, and `include` the text that
+   ^I stands for in a line of the box, another such offset. Dialog, which
+   is C, does that and takes the keys; the low byte of what it returns is
+   the number of the answer, 0 for the first, and more than any for Esc:
+   here always for a box that is not on the screen yet, with what it sets
+   in the main data. ResWin puts back in the screen buffer what a box
+   covers, and Window, which is in vc.h, shows it. ChgDisk asks for the
+   disk of a drive that shares the floppy drive with another, and is not 0
+   if the user would not change it.
 
    Intr21f is Intr21 with the carry flag set before DOS is called if
    `carry` is not 0, and clear if it is. Fcb29 has DOS make an FCB of a
    name: function 29h with `flags` in AL, not through Intr21. HidCur puts
    the cursor below the screen. */
-void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
-void ResWin(u16 begin, u16 size, u16 saved);
-u16 ChgDisk(const u8 *path);
-u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
 u16 Fcb29(const u8 *name, u8 *fcb, u16 flags);
-void HidCur(void);
-#pragma aux OncZoom "*_a" __far parm [bx] [ax] [dx] [di] modify exact [bx dx si es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
-#pragma aux Intr21f "*_a" __far parm [bx] [ax] value [ax] modify exact [ax bx cx dx si di es]
 #pragma aux Fcb29   "*_a" __far parm [si] [di] [ax] value [ax] modify exact [ax si es]
-#pragma aux HidCur  "*_a" __far modify exact [es]
 
 /* C routines of other files that vc.h does not have. */
 const u8 __far *FndLet(const u8 __far *text);           /* string.c */

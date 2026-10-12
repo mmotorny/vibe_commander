@@ -81,10 +81,6 @@ ReadTre	PROC	NEAR
 	RET
 ReadTre	ENDP
 
-; C code adds up bytes of the main data. The entries of TstBrk and of
-; OncZoom, which it calls too, are next to those routines.
-	FromC	ChkSum
-
 ;	Put the cursor of the tree on the current directory
 ;			   ES - main data
 TreeCur	PROC	NEAR
@@ -176,42 +172,14 @@ NearFl	ENDP
 
 ;----------------------- Set Path ----------------------
 ;	Return :	CY=1 - Error
+; C: SetPth_c of port/system.c, which returns 1 for an error.
 SetPth	PROC	NEAR
-	PUSH	DS
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
 	PUSH	AX
-	PUSH	ES
-	POP	DS
-	MOV	DS:PathEr,1
-	MOV	AH,19h
-	INT	21h
-	MOV	DL,AL
-	MOV	DI,OFFSET DosPth
-	ADD	AL,'A'
-	STOSB
-	MOV	AX,'\:'
-	STOSW
-	MOV	SI,DI
-	MOV	AL,0
-	STOSB
-	INC	DX
-	MOV	AL,DL
-	CALL	Fantom
-	JC	SetPt1
-	MOV	AH,47h
-	CALL	Intr21
-	JC	SetPt1
-	MOV	DS:PathEr,0
-SetPt1:	POP	AX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	DS
+	CallC	SetPth_c
+	NEG	AX			; CY for 1
+	POP	AX
 	RET
 SetPth	ENDP
-	FromC	SetPth, <SBB AX,AX>	; CY as a number
 
 ;---------------------- Save setup ---------------------
 	.CONST
@@ -342,77 +310,27 @@ OkCan_D	DB	4, 0
 	DB	0
 
 	.CODE
+; C: Fantom_c of port/system.c, which returns 1 if the user would not
+; change the disk. It has Dialog show the box here.
+	PUBLIC	Fant_B
 Fantom	PROC	NEAR
-	PUSH	DS
-	PUSH	BP
-	PUSH	SI
-	PUSH	DI
-	PUSH	DX
-	PUSH	CX
-	PUSH	BX
 	PUSH	AX
-	PUSH	ES
-	POP	DS
-	MOV	BL,AL
-	MOV	AX,440Eh
-	INT	21h
-	JC	Fantm1
-	CMP	AL,0
-	JE	Fantm1
-	CMP	AL,BL
-	JE	Fantm1
-	MOV	BH,AL
-	MOV	AX,440Fh
-	INT	21h
-	JC	Fantm1
-	CMP	AL,BH
-	JE	Fantm1
-	XCHG	BL,BH
-	MOV	AX,440Fh
-	INT	21h
-	JC	Fantm1
-	XCHG	BL,BH
-	MOV	AL,BL
-	CBW
-	ADD	AL,'A'-1
-	MOV	WORD PTR DS:[TmpErr+1],AX
-	MOV	CL,DS:HlpPage
-	MOV	BP,OFFSET Fant_B
-	CALL	Dialog
-	MOV	DS:HlpPage,CL
-	STC
-	JNE	Fantm2
-	MOV	AX,440Fh
-	INT	21h
-Fantm1:	CLC
-Fantm2:	POP	AX
-	POP	BX
-	POP	CX
-	POP	DX
-	POP	DI
-	POP	SI
-	POP	BP
-	POP	DS
+	CallC	Fantom_c
+	NEG	AX			; CY for 1
+	POP	AX
 	RET
 Fantom	ENDP
-	FromC	Fantom, <SBB AX,AX>	; CY as a number
 
+; The disk of the drive that the path at ES:DX names
+;	Return :	CY=1 - the user would not change it
+; C: ChgDisk_c of port/system.c, which returns 1 for that.
 ChgDisk	PROC	NEAR
-	PUSH	BX
 	PUSH	AX
-	MOV	BX,DX
-	MOV	AX,ES:[BX]
-	CMP	AH,':'
-	JE	ChDsk1
-	MOV	AL,ES:[DosPth]
-ChDsk1:	CALL	UpCase
-	SUB	AL,'A'-1
-	CALL	Fantom
+	CallC	ChgDisk_c
+	NEG	AX			; CY for 1
 	POP	AX
-	POP	BX
 	RET
 ChgDisk	ENDP
-	FromC	ChgDisk, <SBB AX,AX>	; CY as a number
 
 ; Have a directory chosen from the tree, in a box
 ;			   AL - the column the box begins in
@@ -500,34 +418,21 @@ GetVol	PROC	NEAR
 	RET
 GetVol	ENDP
 
+; Open a file
+;			DS:DX - its name
+;			   AL - the mode, as DOS takes it
+;	Return :	   AX - the handle, or with CY the error
+; C: OpenFil_c of port/system.c, which takes the name as a far pointer in
+; DX:BX and returns 1 in DX for an error.
 OpenFil	PROC	NEAR
+	PUSH	DX
 	PUSH	BX
-	MOV	AH,3Dh
-	MOV	BX,AX
-	CALL	Intr21
-	JNC	OpnFl1
-	CMP	AX,WORD PTR 20h
-	STC
-	JNE	OpnFl1
-	MOV	AX,BX
-	AND	AL,0Fh
-	CALL	Intr21
-OpnFl1:	POP	BX
+	MOV	BX,DX
+	MOV	DX,DS
+	CallC	OpenFil_c
+	NEG	DX			; CY for 1
+	POP	BX
+	POP	DX
 	RET
 OpenFil	ENDP
-
-; C code opens a file: AX as OpenFil has it, DX:BX - the name. DX is not 0
-; afterwards if the carry flag was set.
-	PUBLIC	OpenFil_a
-OpenFil_a PROC	FAR
-	PUSH	DS
-	PUSH	DS
-	POP	ES
-	MOV	DS,DX
-	MOV	DX,BX
-	CALL	OpenFil
-	POP	DS
-	SBB	DX,DX
-	RET
-OpenFil_a ENDP
 

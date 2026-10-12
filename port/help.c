@@ -65,15 +65,17 @@ void Help00(void);
    takes Help_c for Help_C, the number of a colour. */
 #pragma aux Help00 "*_c" __far modify exact [ax]
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. HidCur puts the cursor below the screen, Cursor at a row
-   and a column, the row in the high byte, and GetCur says where it is.
-   ChgDisk asks for the disk of a drive that shares the floppy drive with
-   another, and is not 0 if the user would not change it. SavWin keeps
-   what the screen buffer has where a window is to be, ResWin puts it
-   back; MinBox draws a box with a shadow there, growing if windows are to
-   zoom. Int10m calls the BIOS for the screen, with the mouse pointer out
-   of the way, and returns CX as the BIOS left it.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
+
+   HidCur puts the cursor below the screen, Cursor at a row and a column,
+   the row in the high byte, and GetCur says where it is. ChgDisk asks for
+   the disk of a drive that shares the floppy drive with another, and is
+   not 0 if the user would not change it. SavWin keeps what the screen
+   buffer has where a window is to be, ResWin puts it back; MinBox draws a
+   box with a shadow there, growing if windows are to zoom. Int10m calls
+   the BIOS for the screen, with the mouse pointer out of the way, and
+   returns CX as the BIOS left it in the high word.
 
    GetMous returns the buttons of the mouse that are down, and in the high
    word where the mouse is, or `place` as it was if there is no mouse.
@@ -85,36 +87,6 @@ void Help00(void);
 
    PgUp and PgDn turn a list by a page of `lines`: they return the line of
    the cursor, and in the high word the first line shown. */
-void HidCur(void);
-void Cursor(u16 place);
-u16 GetCur(void);
-u16 ChgDisk(const u8 *path);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-void MinBox(u16 begin, u16 size, u16 color);
-u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
-u32 GetMous(u16 place);
-void TypMous(u16 look);
-u16 InWind(u16 place, u16 begin, u16 size);
-u16 DoublMo(u16 begin, u16 size, u16 line);
-void ClrKbd(void);
-u32 PgUp(u16 cursor, u16 first, u16 lines);
-u32 PgDn(u16 cursor, u16 first, u16 lines, u16 all);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux Cursor  "*_a" __far parm [ax] modify exact [es]
-#pragma aux GetCur  "*_a" __far value [ax] modify exact [ax bx cx dx]
-#pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [cx] modify exact [ax bx cx dx es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux DoublMo "*_a" __far parm [bx] [dx] [si] value [ax] modify exact [ax cx es]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux PgUp    "*_a" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx si di]
-#pragma aux PgDn    "*_a" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx si di]
 
 /* C routines of other files that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
@@ -395,9 +367,10 @@ Help10:                                 /* the cursor within the window */
             count = SHOWN();
             if (moved == 1 || moved == 0xFFFF) {
                 key = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
-                place = Int10m(key & 0xFF00 | 1,
-                               Color(Help_C) << 8 | place & 0xFF, place,
-                               ((count - 1 & 0xFF) << 8 | WIDTH - 1) + place);
+                place = (u16)(Int10m(
+                    key & 0xFF00 | 1, Color(Help_C) << 8 | place & 0xFF,
+                    place, ((count - 1 & 0xFF) << 8 | WIDTH - 1) + place)
+                    >> 16);
                 place += key << 8;
                 count = 1;
             }

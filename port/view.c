@@ -127,27 +127,19 @@ u32 V82_00(u16 segment, u16 at, u16 count);
 #pragma aux V81_00  "*_c" __far modify exact [ax]
 #pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. ClrKbd empties the keyboard buffer if the setup has it
-   so; the bars and the key that is waited for are C, in vc.h. GetMous
-   returns the buttons
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   ClrKbd empties the keyboard buffer if the setup has it so; the bars and
+   the key that is waited for are C, in vc.h. GetMous returns the buttons
    of the mouse that are down, and in the high word where the mouse is, or
    `place` as it was if there is no mouse. InWind is not 0 if a place is
    outside a window. ChgDisk asks for the disk of a drive that shares the
-   floppy drive with another, and is not 0 if the user would not change
-   it. ResWin puts back what a box covers. AsmSeg returns the code segment
-   of the assembly, where its boxes and texts are. */
-void ClrKbd(void);
-u32 GetMous(u16 place);
-u16 InWind(u16 place, u16 begin, u16 size);
-u16 ChgDisk(const u8 *path);
-void ResWin(u16 begin, u16 size, u16 saved);
+   floppy drive with another, and is not 0 if the user would not change it.
+   ResWin puts back what a box covers. AsmSeg returns the code segment of
+   the assembly, where its boxes and texts are. */
 u16 AsmSeg(void);
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
 
 /* C routines of other files that vc.h does not have: a panel's frame,

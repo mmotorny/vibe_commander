@@ -29,14 +29,17 @@ u32 F77_00(u16 key, u16 panel);
 #pragma aux F68_00 "*_c" __far value [ax] modify exact [ax]
 #pragma aux F77_00 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. HidCur puts the cursor below the screen, Cursor at a row
-   and a column, the row in the high byte, and Cursor1 at its place in the
-   command line. PutMnu draws the menu bar, if that is always shown, with
-   an item of it marked, and PutKey the key bar. SavWin keeps what the
-   screen buffer has where a window is to be, ResWin puts it back; MinBox
-   draws a box with a shadow there. SftEGA moves a place down on a screen
-   of more than 25 lines, by half of what it has more.
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   HidCur puts the cursor below the screen, Cursor at a row and a column,
+   the row in the high byte, and Cursor1 at its place in the command line.
+   PutMnu draws the menu bar, if that is always shown, with an item of it
+   marked, and PutKey the key bar. SavWin keeps what the screen buffer has
+   where a window is to be, ResWin puts it back; MinBox draws a box with a
+   shadow there. SftEGA moves a place down on a screen of more than 25
+   lines, by half of what it has more.
 
    GetMous returns the buttons of the mouse that are down. Input waits for
    a key, with the key bar `bar` on the screen, and shows the help for F1;
@@ -53,23 +56,7 @@ u32 F77_00(u16 key, u16 panel);
    has F00_50 move the cursor to what Search found.
 
    PutMnu, PutKey, Input, EdLin and DosCom are C, of vc.h. */
-void HidCur(void);
-void Cursor(u16 place);
-void Cursor1(void);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-void MinBox(u16 begin, u16 size, u16 color);
-u16 SftEGA(u16 place);
-u32 GetMous(u16 place);
 void F77_10(u16 key, u16 panel);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux Cursor  "*_a" __far parm [ax] modify exact [es]
-#pragma aux Cursor1 "*_a" __far modify exact [es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux SftEGA  "*_a" __far parm [bx] value [bx] modify exact [bx es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
 #pragma aux F77_10  "*_a" __far parm [ax] [cx] modify exact [ax cx si di es]
 
 /* C routines of other files that vc.h does not have. */

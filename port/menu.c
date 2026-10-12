@@ -52,37 +52,25 @@
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. HidCur puts the cursor below the screen. ClrKbd empties
-   the keyboard buffer if the setup has it so. SavWin keeps what the screen
-   buffer has where a window is to be, ResWin puts it back. GetMous
-   returns the buttons of the mouse that are down, and in the high word
-   where the mouse is, or `place` as it was if there is no mouse. InWind
-   is not 0 if a place is outside a window. AsmSeg returns the code
-   segment of the assembly. Int16 calls the BIOS for the keyboard, with
-   AX as it takes it.
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   HidCur puts the cursor below the screen. ClrKbd empties the keyboard
+   buffer if the setup has it so. SavWin keeps what the screen buffer has
+   where a window is to be, ResWin puts it back. GetMous returns the
+   buttons of the mouse that are down, and in the high word where the mouse
+   is, or `place` as it was if there is no mouse. InWind is not 0 if a
+   place is outside a window. AsmSeg returns the code segment of the
+   assembly. Int16 calls the BIOS for the keyboard, with AX as it takes it.
 
    Of the C routines in vc.h, PutKey shows a key bar, if there is one;
    PtMnu1 writes the menu bar with an item marked, 0 for none, whether or
    not the bar is always visible; and Input waits for a key, with a key
    bar, and returns it, the scan code in the high byte: F1 it answers
    with the help of the page HlpPage itself. */
-void HidCur(void);
-void ClrKbd(void);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-u32 GetMous(u16 place);
-u16 InWind(u16 place, u16 begin, u16 size);
 u16 AsmSeg(void);
-u32 Int16(u16 ax);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
-#pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
 
 /* A C routine of another file that vc.h does not have. */
 u16 *Shadow(u16 *cell);                                 /* screen.c */

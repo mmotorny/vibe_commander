@@ -369,6 +369,5 @@ C00_00	PROC	NEAR
 C00_00	ENDP
 
 ; The entries by which port/copy.c calls what is still assembly are next to
-; their routines, or with the stubs of the batch that made them: OncZoom_a and
-; TstBrk_a in VCSUB3.INC.
+; their routines.
 

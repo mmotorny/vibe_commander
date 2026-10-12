@@ -146,19 +146,16 @@ u16 T80_00(void);
 #pragma aux T76_00 "*_c" __far parm [bx] [dx] [si] [ax] modify exact [ax]
 #pragma aux T80_00 "*_c" __far value [ax] modify exact [ax bx cx dx si di]
 
-/* Routines of the rest of the program that are still assembly, by their
-   entries for C. ResWin puts back in the screen buffer what a box
-   covers, Window shows it. ChgDisk asks for the disk of a drive that
-   shares the floppy drive with another, and is not 0 if the user would
-   not change it. Int10m calls the BIOS for the screen, with the mouse
-   pointer out of the way. */
-void ResWin(u16 begin, u16 size, u16 saved);
-u16 ChgDisk(const u8 *path);
-void Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
-#pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] modify exact [ax bx cx dx es]
-/* HidCur hides the cursor and Cursor puts it at a row, in the high byte,
+/* Routines of the rest of the program that this file calls. Those that
+   are declared below are still assembly, and are called by their entries
+   for C; the others are C, of vc.h.
+
+   ResWin puts back in the screen buffer what a box covers, Window shows
+   it. ChgDisk asks for the disk of a drive that shares the floppy drive
+   with another, and is not 0 if the user would not change it. Int10m calls
+   the BIOS for the screen, with the mouse pointer out of the way.
+
+   HidCur hides the cursor and Cursor puts it at a row, in the high byte,
    and a column; ChgCur gives it the editor's shape and returns the one it
    had, which CurShp gives it back. ClrKbd empties the keyboard buffer, if
    the setup has it so. GetMous returns the buttons of the mouse that are down
@@ -166,21 +163,7 @@ void Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
    there is no mouse. InWind is not 0 if that is outside a window. AsmSeg
    is the code segment of the assembly. Input, EdSub1 and CmpSym are C,
    of vc.h. */
-void HidCur(void);
-void Cursor(u16 place);
-u16 ChgCur(void);
-void CurShp(u16 shape);
-void ClrKbd(void);
-u32 GetMous(u16 place);
-u16 InWind(u16 place, u16 begin, u16 size);
 u16 AsmSeg(void);
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux Cursor  "*_a" __far parm [ax] modify exact [es]
-#pragma aux ChgCur  "*_a" __far value [ax] modify exact [ax cx es]
-#pragma aux CurShp  "*_a" __far parm [cx] modify exact [ax]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
 #pragma aux AsmSeg  "*_a" __far value [ax] modify exact [ax]
 
 /* C routines of other files that vc.h does not have. */

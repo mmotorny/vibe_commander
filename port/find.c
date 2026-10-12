@@ -71,20 +71,21 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
 #pragma aux FindFil "*_c" __far parm [ax] value [ax] modify exact [ax]
 #pragma aux F67_00  "*_c" __far value [dx ax] modify exact [ax dx]
 
-/* Routines that are still assembly, by their entries for C.
+/* Routines of the rest of the program that this file calls: all are C,
+   of vc.h.
 
-   GetMous returns the buttons of the mouse in the low word and where it
-   is in the high one, the row in its high byte; without a mouse that is
+   GetMous returns the buttons of the mouse in the low word and where it is
+   in the high one, the row in its high byte; without a mouse that is
    `place` as it came. ClrKbd empties the keyboard buffer, if the setup
    says so, and TypMous sets the character that the mouse pointer is.
-   InWind is not 0 if a place is outside a window. DoublMo returns 2 for
-   a click that may be the first of two, 1 for the second of two on the
-   line `line`, and 0 for a second one that was let go elsewhere.
+   InWind is not 0 if a place is outside a window. DoublMo returns 2 for a
+   click that may be the first of two, 1 for the second of two on the line
+   `line`, and 0 for a second one that was let go elsewhere.
 
    PgUp and PgDn move the cursor of a list a page, `rows` lines: they
    return the cursor in the low word and the first line shown in the high
    one. Int10m calls the BIOS for the screen, and returns CX as that
-   leaves it. Int16 calls the BIOS for the keyboard: the high word of
+   leaves it in the high word. Int16 calls the BIOS for the keyboard: the high word of
    what it returns is 1 if the zero flag was set. Help00 is the help,
    which is C, as is DirFunc, of vc.h.
 
@@ -100,41 +101,7 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
    that is not ready is not looked for, and an error is not asked about.
    Int2F calls the multiplex interrupt, and returns AX in the low word
    and BX in the high one. */
-u32 GetMous(u16 place);
-void ClrKbd(void);
-void TypMous(u16 pointer);
-u16 InWind(u16 where, u16 place, u16 size);
-u16 DoublMo(u16 place, u16 size, u16 line);
-u32 PgUp(u16 cursor, u16 first, u16 rows);
-u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
-u16 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
-u32 Int16(u16 ax);
-u16 ChgDisk(const u8 *path);
-void HidCur(void);
-void SavWin(u16 begin, u16 size, u16 buffer);
-void ResWin(u16 begin, u16 size, u16 buffer);
-void MinBox(u16 begin, u16 size, u16 color);
-u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
-u16 Int21d(struct DosRegs STACK *regs);
-u32 Int2F(u16 ax, u16 bx, u16 cx);
 void Help00(void);                                      /* help.c */
-#pragma aux GetMous "*_a" __far parm [cx] value [dx ax] modify exact [ax cx dx es]
-#pragma aux ClrKbd  "*_a" __far modify exact [es]
-#pragma aux TypMous "*_a" __far parm [ax] modify exact [es]
-#pragma aux InWind  "*_a" __far parm [cx] [bx] [dx] value [ax] modify exact [ax es]
-#pragma aux DoublMo "*_a" __far parm [bx] [dx] [si] value [ax] modify exact [ax cx es]
-#pragma aux PgUp    "*_a" __far parm [si] [di] [ax] value [dx ax] modify exact [ax dx si di]
-#pragma aux PgDn    "*_a" __far parm [si] [di] [ax] [bx] value [dx ax] modify exact [ax dx si di]
-#pragma aux Int10m  "*_a" __far parm [ax] [bx] [cx] [dx] value [cx] modify exact [ax bx cx dx es]
-#pragma aux Int16   "*_a" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux ChgDisk "*_a" __far parm [dx] value [ax] modify exact [ax es]
-#pragma aux HidCur  "*_a" __far modify exact [es]
-#pragma aux SavWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux ResWin  "*_a" __far parm [bx] [dx] [si] modify exact [es]
-#pragma aux MinBox  "*_a" __far parm [bx] [dx] [ax] modify exact [es]
-#pragma aux StdLine "*_a" __far parm [bx] [ax] [si] [dx] value [bx] modify exact [bx es]
-#pragma aux Int21d  "*_a" __far parm [bx] value [ax] modify exact [ax bx cx dx si di es]
-#pragma aux Int2F   "*_a" __far parm [ax] [bx] [cx] value [dx ax] modify exact [ax bx dx]
 #pragma aux Help00  "*_c" __far modify exact [ax]
 
 /* C routines of other files that vc.h does not have. */
@@ -473,9 +440,9 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
             scroll = 0x600 | (rows - 1) & 0xFF;
             if (moved != 1)
                 scroll = 0x700;
-            at = Int10m(scroll & 0xFF00 | 1,
-                        Color(Conf_C) << 8 | at & 0xFF, at,
-                        (((rows - 1) & 0xFF) << 8 | 63) + at);
+            at = (u16)(Int10m(scroll & 0xFF00 | 1,
+                              Color(Conf_C) << 8 | at & 0xFF, at,
+                              (((rows - 1) & 0xFF) << 8 | 63) + at) >> 16);
             at += (scroll & 0xFF) << 8;
             rows = 1;
         }
