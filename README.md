@@ -78,8 +78,10 @@ its text is and which column the cursor is in, that fill the buffer of
 the line the cursor is in and put it back into the text, that go from a
 line to the next, to the one before and to the next word, that draw a
 line of the text, as text or in hex, and the status line, and that save
-the file. Reading the tree is still assembly, and so is what the viewer
-and the editor do with their keys.
+the file. The help is C as a whole: reading its file, showing the index
+and the pages in their window, and taking the keys and the mouse there.
+Reading the tree is still assembly, and so is what the viewer and the
+editor do with their keys.
 
 ## Layout
 

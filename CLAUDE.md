@@ -243,6 +243,28 @@ port.
   used it calls the function: `T50_00_a`, `T51_00_a` and `T53_10_a` went
   like that. A function that had the entry's convention, a result in SI
   say, then has another: read every place that calls it.
+- The assembler does not tell capitals from small letters. `Help_c` is
+  `Help_C` to it, the number of a colour, and it says "Symbol
+  redefinition": the C function of `Help` is `Help00`.
+- A routine that jumps on by a table of keys, with `Case`, has the table
+  as a `switch` in C. `Case` takes no key without a scan code, and an
+  entry of the table without one takes the character with any.
+- What a routine of the assembly reads at an offset in its code segment
+  stays in the assembly and is made `PUBLIC`: the box that `Dialog`
+  shows, the buttons and the colours that `MinMnu` takes. Texts and
+  colours that only C code hands on, as a far pointer to `NgLine`, go to
+  the C file.
+- An entry for C can hand back a second register in DX, `FromC GetMous,
+  <MOV DX,CX>`, and make a number of two flags: that of `DoublMo` loads
+  AX with `MOV`, which leaves the flags, between its jumps. `MinMnu`
+  takes its colours at CS:BP and has an entry that takes them in DI;
+  `PgDn` has one that takes in BX what it has in BP.
+- `Input` calls `Help` for F1, so every routine that takes keys can have
+  the help on the stack above it, and the help takes its own keys with
+  `MinMnu`, which calls `Input`: F1 in the help enters `Help` again,
+  which returns at once because `HlpPage` is 0FFh then.
+- The files of `port/asm/` end with a byte 1Ah behind the last line. A
+  script that takes one apart by lines keeps it.
 
 ### C for the port
 

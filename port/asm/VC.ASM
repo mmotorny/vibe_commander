@@ -42,11 +42,14 @@
 	EXTERN	T74_00_c:FAR, T75_00_c:FAR, T76_00_c:FAR, T80_00_c:FAR
 	EXTERN	T50_00_c:FAR, T51_00_c:FAR, T53_00_c:FAR, T53_10_c:FAR
 	EXTERN	T54_00_c:FAR, T55_00_c:FAR, T56_00_c:FAR, T64_00_c:FAR
+	EXTERN	Help00_c:FAR
 
 ; Texts here that C code shows too.
 	PUBLIC	Title_S, Var_S, Tree_S, Mask_S, Ext_F
 ; Boxes and a text that C code hands to DialBox and Dialog.
 	PUBLIC	SavFi_P, SavEr_B, Prot_B, EdFl_S
+; A text, a box, and buttons with their colours, of the help.
+	PUBLIC	Help_S, HlpEr_B, HlMn1_D, HlMn2_D, HlpMn_P
 
 ; Call a routine written in C from where ES points at the main data
 ; segment and DS may not.

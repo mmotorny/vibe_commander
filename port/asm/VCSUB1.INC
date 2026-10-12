@@ -29,6 +29,7 @@ ClrKb2:	MOV	AH,1
 ClrKb3:	POP	AX
 	RET
 ClrKbd	ENDP
+	FromC	ClrKbd
 
 ;---------------------- Break test ---------------------
 ;	Return :	CY=1 - break
@@ -114,6 +115,7 @@ Cursor	PROC	NEAR
 	POP	DX
 	RET
 Cursor	ENDP
+	FromC	Cursor
 
 ;------------------ Set cursor on prompt ---------------
 Cursor1	PROC	NEAR
@@ -161,6 +163,7 @@ HidCur	PROC	NEAR
 	POP	AX
 	RET
 HidCur	ENDP
+	FromC	HidCur
 
 ;----------------------- Beep sound --------------------
 Beep	PROC	NEAR
@@ -242,6 +245,7 @@ TypMo1:	XOR	BX,BX
 	POP	DX
 	RET
 TypMous	ENDP
+	FromC	TypMous
 
 ;------------------ Save mouse cursor ------------------
 SavMous	PROC	NEAR
@@ -309,6 +313,7 @@ GetMo1:	AND	AX,WORD PTR 7
 	POP	DX
 	RET
 GetMous	ENDP
+	FromC	GetMous, <MOV DX,CX>	; Where the mouse is, with AX
 
 ;----------------- Mouse double click ------------------
 ;			BH,BL - base of selected point
@@ -369,6 +374,21 @@ DblMo8:	POP	AX
 	RET
 DoublMo	ENDP
 
+; C code asks about a double click: DoublMo, and in AX 2 for CY, to go on,
+; 1 for NZ, to act, and 0 for neither.
+	PUBLIC	DoublMo_a
+DoublMo_a PROC	FAR
+	PUSH	DS
+	POP	ES
+	CALL	DoublMo
+	MOV	AX,2
+	JC	DblMoA
+	MOV	AX,1
+	JNE	DblMoA
+	DEC	AX
+DblMoA:	RET
+DoublMo_a ENDP
+
 ;--------------- Check cursor in window ----------------
 ;			CH,CL - cursor
 ;			BH,BL - begin of window
@@ -390,6 +410,7 @@ InWin1:	POP	CX
 	POP	DX
 	RET
 InWind	ENDP
+	FromC	InWind, <SBB AX,AX>	; CY as a number
 
 ;------------------ INT 10h with mouse -----------------
 Int10m	PROC	NEAR
@@ -476,6 +497,7 @@ SavWn1:	PUSH	CX
 	POP	DS
 	RET
 SavWin	ENDP
+	FromC	SavWin
 
 ;--------------------- Restore window ------------------
 ;			BH,BL - begin
@@ -742,6 +764,7 @@ MinBx2:	CALL	ShadBox
 	POP	DI
 	RET
 MinBox	ENDP
+	FromC	MinBox
 
 MinBx3	PROC	NEAR
 	PUSH	DX
@@ -1984,6 +2007,20 @@ MnMn02:	POP	DI
 	RET
 MinMnu	ENDP
 
+; C code has a line of buttons: MinMnu with the colour table at CS:DI.
+; The case that it returns in CL comes back in DX, with CH.
+	PUBLIC	MinMnu_a
+MinMnu_a PROC	FAR
+	PUSH	BP
+	PUSH	DS
+	POP	ES
+	MOV	BP,DI
+	CALL	MinMnu
+	MOV	DX,CX
+	POP	BP
+	RET
+MinMnu_a ENDP
+
 MnMn10	PROC	NEAR
 	CMP	AH,0FCh
 	JE	MnMn11
@@ -2747,4 +2784,24 @@ PgDn4:	CMP	SI,DI
 	MOV	SI,DI
 PgDn5:	RET
 PgDn	ENDP
+
+; C code turns a page: PgUp and PgDn, which hand back SI in AX and DI in
+; DX. PgDn takes in BX what it has in BP.
+	PUBLIC	PgUp_a, PgDn_a
+PgUp_a	PROC	FAR
+	CALL	PgUp
+	MOV	AX,SI
+	MOV	DX,DI
+	RET
+PgUp_a	ENDP
+
+PgDn_a	PROC	FAR
+	PUSH	BP
+	MOV	BP,BX
+	CALL	PgDn
+	MOV	AX,SI
+	MOV	DX,DI
+	POP	BP
+	RET
+PgDn_a	ENDP
 

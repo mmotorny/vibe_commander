@@ -185,6 +185,22 @@ out again (show.py --changes is how):
     is at the end of the text: Ctrl+Home, the top. A beep scrolls the
     screen, so the step also has to draw all of it again, which Ctrl+Home
     from the end of the text does.
+  - In the help Up, Down, PgUp, PgDn, Home and End move the cursor in
+    the index and the text of a page; Left and Right go from button to
+    button, Enter presses the one the cursor is on and a button's first
+    letter presses it: Help and Cancel under the index, Next, Previous,
+    Index and Cancel under a page. Esc and F10 leave. The index has 62
+    lines, of which a screen of 25 lines shows 13; its fourth page has
+    eight lines, fewer than the window, its fifth twenty. F1 in a dialog
+    or a menu shows the page of that: F7, F9. F5 on ".." opens no
+    dialog, and Esc at the panels switches them off.
+  - The help file, d:\\vc\\vc.hlp, has no line end in it: to the editor
+    it is one line, End goes to its 3900th character, in the text of
+    the second page, and a letter typed there puts every page behind it
+    a byte further on than the index says. The index is read as before
+    then, and a page behind the second is an error with a box. Ctrl+y
+    there leaves a file with nothing in it, an error at once; "del" at
+    the command line leaves none, and F1 does nothing.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -360,6 +376,85 @@ SCENARIOS = {
             "PgDn",
             "Enter",                      # the next page
             "Esc",
+        )),
+
+    "help-keys": Scenario(
+        "The help by all its keys: the index and pages scrolled by lines "
+        "and by pages, from page to page and back to the index, for a "
+        "dialog and a menu, and on a screen of 50 lines",
+        steps=(
+            "F1",                         # the index
+            "F1",                         # in the help: nothing
+            '"5"',                        # a key that means nothing
+            "End",                        # the last pages of 62
+            "PgUp",                       # the cursor in the last line
+            "Down",                       # scrolled by a line
+            "Home",
+            "Home",                       # where it is already
+            "Down Down Down Enter",       # a page of eight lines
+            "Down",                       # nothing more to show
+            "Up",
+            "Enter",                      # Next: a page of twenty lines
+            "Down",                       # scrolled by a line
+            "Up",                         # and back
+            "PgDn",
+            "PgUp",
+            "End",
+            "Home",
+            "Right Enter",                # Previous
+            '"i"',                        # the index, by its letter: the
+                                          # cursor on that page
+            "Home Enter",                 # the first page
+            "Right Enter",                # Previous: the last one
+            "Enter",                      # and the one before it
+            "Left Enter",                 # Next
+            "Enter",                      # Next: the first one again
+            "Right Right Enter",          # the index, by its button
+            "Right Enter",                # Cancel
+            "F7",
+            "F1",                         # the page of a dialog
+            '"c"',                        # Cancel, by its letter
+            "Esc",
+            "F9",
+            "F1",                         # the page of the menus
+            "Esc",
+            "Esc",
+            "Alt+F9",                     # 50 lines
+            "F1",                         # an index of 38 lines
+            "End",
+            "F10",                        # leaves it too
+            "Alt+F9",
+        )),
+
+    "help-broken": Scenario(
+        "A help file that cannot be read: a page that is not where the "
+        "index says, a file that is empty and one that is not there",
+        steps=(
+            "Shift+F4",                   # the help file in the editor:
+            '"d:\\vc\\vc.hlp"',           # one line of 68836 characters
+            "Enter",
+            "End",                        # the 3900th of them, in the text
+            '"x"',                        # of the second page: every page
+            "F2",                         # behind it is a byte further on
+            "Esc",
+            "F1",                         # the index is as it was
+            "End Enter",                  # its last page is not: an error
+            "Enter",                      # which ends the help
+            "F7",
+            "F1",                         # nor is the page of a dialog
+            "Enter",
+            "Esc",
+            "Shift+F4",
+            '"d:\\vc\\vc.hlp"',
+            "Enter",
+            "Ctrl+y",                     # the one line cut: nothing left
+            "F2",
+            "Esc",
+            "F1",                         # an error
+            "Enter",
+            '"del" Space "d:\\vc\\vc.hlp"',
+            "Enter",
+            "F1",                         # no file: nothing
         )),
 
     "configuration": Scenario(

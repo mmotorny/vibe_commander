@@ -85,6 +85,19 @@ Things that are known and not done. Standing instructions are in
   bits: nothing divides by one yet. It was held against a model of its
   steps, not run.
 
+- Of the help, what it does for the mouse has run in no scenario, 105
+  instructions of `Help`: a button held above the text or below it, a
+  click and a second one on a line of the index, the middle button, a
+  click outside the window. The bench has no mouse. It is translated by
+  reading, and listed as out of reach in `harness/ported.py`.
+- The help trusts its file. `DeCode` takes a length of 0 for 65536, so an
+  entry whose text has no length would have the whole main data changed,
+  byte by byte; an index without lines has Enter take the place of a page
+  from its text; and a line whose end is missing is looked for
+  through 65535 bytes. Ported like that. The file of the distribution
+  has none of these, and what a scenario makes of it by typing a letter
+  into it has pages that are refused for their length.
+
 - `wait_for_screen` takes a change of one cell for blinking. In `columns`
   the editor closes its box after F2 and clears the `*` in its first row
   some 10 ms later; a sample between the two has the harness wait 20
@@ -251,6 +264,36 @@ tools pays (see "A run of batches" in `CLAUDE.md`).
     at the top of `harness/scenarios.py`, where both had changed the same
     paragraph; a build and a test of 70 seconds each time. None of the
     other batches was on `main` yet.
+
+- The help, 9 routines, 1,403 bytes, 36 minutes in all, next to three
+  other batches. The translation passed the first time it was tested.
+  - 5 minutes: planning the C and its stub around the 256 bytes of the
+    stack, read from the callers and the routines below, before the
+    stack was made larger. The test then failed on nothing but the
+    stack, 6 bytes left with F1 in a dialog, and passed unchanged on
+    the stack of 4,096 bytes; half a minute went on waiting for that
+    to reach `main`.
+  - 4 minutes and a half waiting for a turn at the computer before
+    the rebases, in six runs: 57 and 26 seconds before two runs of `harness/reach.py`
+    with steps, 97 before the goldens were derived, 46 and 19 before
+    two `port` tests, and 25 before a derivation that then stopped at
+    once, the scenarios not yet in the file: an edit had been refused
+    and the refusal not read.
+  - 1 minute: the C function named `Help_c`, which the assembler takes
+    for `Help_C`. In `CLAUDE.md` now.
+  - 1 minute: the byte 1Ah at the end of the files of `port/asm/`,
+    which a script that split them by lines did not expect. In
+    `CLAUDE.md` now.
+  - 11 minutes for four rebases, the push refused once. The last was
+    clean, and its test waited four minutes for a turn, behind a run
+    that recorded the original. The second, on the larger stack, had
+    one file in conflict, the notes at the top of `harness/scenarios.py`,
+    where both sides had changed the end of the list. The third, on the
+    editor's second batch, which reached `main` while the commit was
+    being written, had six, each where both had added to the end of the
+    same list; the list of batches was cut at its closing bracket again,
+    and a script put the lines in between. Each time a build and a test,
+    a minute and a half, which passed at once.
 
 ## Ideas put off
 
