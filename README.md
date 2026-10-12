@@ -120,7 +120,8 @@ disk, keeping it in its file there, and the box in which a directory is
 chosen from it. The file search is C as a whole: the command with its
 dialog, the drives it searches and Go to, and the search itself, by name
 and by contents through a directory and those below it, with its list
-and the keys taken while it runs. Deleting a file or a directory with
+and the keys taken while it runs; its dialog, its buttons and their
+colours are constants of C, in `port/find_t.c`. Deleting a file or a directory with
 what is in it, copying, renaming and moving one, and setting attributes,
 a date and a time, are C, and so is what goes through the files of a
 directory for these, the sizes of directories and the file search, and

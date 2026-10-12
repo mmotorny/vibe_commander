@@ -15,7 +15,8 @@ How one file is done is in `CLAUDE.md`, "Moving the data of a file to C";
 
 Objects and bytes as they are linked, after the help's file had gone. An
 object is what stands from one label to the next. "Code" is all that is
-no data: stubs, entries and what jumps between them.
+no data: stubs, entries and what jumps between them. A file with nothing
+but code in its row has its data in C.
 
 | File | texts | boxes | dialogs | buttons, colours | tables | code | goes with |
 |---|---|---|---|---|---|---|---|
@@ -27,11 +28,11 @@ no data: stubs, entries and what jumps between them.
 | `VCVIEW.INC` | 16 / 256 | 9 / 160 | 5 / 110 | | | 180 | `view.c` |
 | `VCEDIT.INC` | 14 / 688 | 6 / 106 | 5 / 110 | 4 / 18 | | 26 | `edit.c` |
 | `VCMEM.INC` | | | | 2 / 8 | | 40 | `memory.c` |
-| `VCFIND.INC` | 2 / 15 | | 1 / 33 | 4 / 21 | | 22 | `find.c` |
+| `VCFIND.INC` | | | | | | 22 | `find.c` |
 | `VCSUB1.INC` | | | | | | 50 | `dialog.c` |
 | `VCSUB2.INC` | 2 / 49 | | | | | | `bars.c`, `panel.c` |
 | `VCSUB3.INC` | 13 / 182 | 3 / 52 | 1 / 22 | 1 / 5 | | 109 | `treebox.c`, `system.c`, `read.c` |
-| all | 203 / 4,919 | 72 / 1,474 | 56 / 1,650 | 25 / 134 | 13 / 420 | 2,420 | |
+| all | 201 / 4,904 | 72 / 1,474 | 55 / 1,617 | 21 / 113 | 13 / 420 | 2,420 | |
 
 Besides these, all in `VC.ASM`:
 
@@ -166,9 +167,9 @@ No two agents have the same assembly file, and `VCSUB2.INC` and
 code, a file of another agent or the lists of `VC.ASM`: a name stays what
 it is when its object moves. What all of them may add to, a line at a
 time, is the tables of `harness/datacheck.py` and the types of
-`port/tables.h`. `VCFIND.INC` and `VCMEM.INC` are the small ones to
-start with; `VCFIND.INC` has the two texts that are copied with what
-follows them.
+`port/tables.h`. Done: `VCFIND.INC`, whose two texts that are copied
+with what follows them are written as long as what is copied.
+`VCMEM.INC` is the other small one to start with.
 
 **2. The words that name a routine.** One agent, after 1, since it
 changes dialogs that are constants by then. A dialog names a routine for
@@ -467,11 +468,13 @@ its texts and boxes; the loop of `port/main.c`; `port/resident.c` with
   also copies 69 bytes of the line into the path of the panel, which
   has 68; the last goes into the place of the cursor, which is set
   next.
-- "N files found." is put together from two texts of the assembly,
-  each copied with the 15 bytes that begin with it: behind the full
-  stop TmpBuf gets seven bytes of whatever follows `FnFl7_S` in the
-  program. Nothing reads them; the C copies from the assembly, as long
-  as that has them.
+- "N files found." is put together from two texts, each copied with
+  the 15 bytes that begin with it: behind the full stop TmpBuf gets
+  seven bytes of what follows `FnFl7_S` in the program, the title of
+  an error's box without its zero byte. Nothing reads them. The two
+  are constants of `port/find_t.c`, each 15 bytes long with what the
+  original has there, so the copy no longer goes by what happens to
+  stand behind them.
 - What `FndMove` does for the mouse runs in `mouse-find`, with the
   search over. While a search runs the mouse is taken too, by `FndBack`,
   and no scenario has it: a button would be pressed at no moment that
