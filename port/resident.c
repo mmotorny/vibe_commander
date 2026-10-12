@@ -150,16 +150,23 @@ u32 CODE Vect21;
 #pragma aux Vect21 "*"
 
 /* Where the part that goes is entered, when the program starts and when
-   it has run a command: Trans_T of port/main_t.c is a constant of that
-   part which holds the far address of the function, TrnMain of
-   port/main.c. Only its offset is of use here: its segment is RunPar,
-   as long as the group of the constants begins at the PSP, as this
-   part does. And a text of that part, which is where the file has it
+   it has run a command: TrnMain of port/main.c, which vc.h declares as
+   the function that it is, and which is named here as an object, for
+   its address. And a text of that part, which is where the file has it
    when the program begins. */
-extern const u8 __far Trans_T[];
+extern const u8 __far TrnMain_s[];
 extern const u8 __near Vers_S[];
-#pragma aux Trans_T "*"
+#pragma aux TrnMain_s "TrnMain_c"
 #pragma aux Vers_S "*"
+
+/* The segment of something of the part that goes, as the linker has it:
+   in paragraphs from the PSP. Every other word of the program that
+   holds a segment has the place of the program added when that is
+   loaded. This one is of the part that stays and names the part that
+   goes, which is somewhere else after every command: tools/mkexe.c
+   leaves it as it is, and what uses it adds where that part is,
+   RunPar. */
+#define TRN_SEG(object) ((u16)((u32)(const void __far *)(object) >> 16))
 
 /* The PSP, which this segment begins with: where the program goes on
    when DOS has ended it, and the segment of its environment. */
@@ -1211,8 +1218,9 @@ static void Exec(void)
 }
 
 /*--------------------- The outermost loop ---------------------
-   The part that goes is called far, at the address that it has in
-   Trans_T, with something that is not 0 when the program has just been
+   The part that goes is called far, at TrnMain, in the segment that
+   the linker has for that and RunPar make, with something that is not 0
+   when the program has just been
    loaded, and comes back when it has something for this part to do: a
    number in AX, the low word. With no memory for the main data it has
    in DX, the high word, the paragraphs that DOS had, as Init11 of
@@ -1250,7 +1258,8 @@ static void Go(u32 back)
 static void Stay11(void)
 {
     for (;;) {
-        TrnAdr = *(Transit * __far *)AT(RunPar, OFFSET(Trans_T));
+        TrnAdr = (Transit *)AT(RunPar + TRN_SEG(TrnMain_s),
+                               OFFSET(TrnMain_s));
         Go(TrnAdr(0));
     }
 }
@@ -1260,7 +1269,7 @@ static void Stay11(void)
    setup first: Init00 of the original. */
 static void Stay(void)
 {
-    TrnAdr = *(Transit * __far *)AT(RunPar, OFFSET(Trans_T));
+    TrnAdr = (Transit *)AT(RunPar + TRN_SEG(TrnMain_s), OFFSET(TrnMain_s));
     Go(TrnAdr(1));
     Stay11();
 }

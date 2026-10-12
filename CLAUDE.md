@@ -285,7 +285,7 @@ again:
   files had before the test was. A constant that moves keeps its name.
 - `OWN`, for a constant that the original has not as data, which is
   then not compared. Right for a table that only the port has, as
-  `Trans_T` and `Fnc_T` are. The tables by which the stubs of the
+  `Fnc_T` is. The tables by which the stubs of the
   commands went on, `CmdNx_T`, `MnuNx_T` and `F35_T`, became `switch`
   statements and are no data.
   Wrong for anything that was in the published source: an entry here to
@@ -754,15 +754,16 @@ and the tests.
   `New21`, not the function.
 - The part that goes is called from the part that stays as a far
   function: `TrnMain` of `port/main.c`, which `Stay` of
-  `port/resident.c` calls through a pointer. That part cannot name the
-  function, since a word of it that holds a segment is set once, when
-  the program is loaded, and the part that goes is somewhere else after
-  every command: `tools/mkexe.c` stops the build for such a word. So it
-  reads the far address in a constant of the part that goes, `Trans_T`
-  of `port/main_t.c`, at that constant's offset in the segment `RunPar`,
-  which is where the constant is as long as the group of the constants
-  begins at the PSP: the words of that part are set every time it is
-  loaded, by `Reloc`.
+  `port/resident.c` calls through a pointer. A word of that part that
+  holds a segment is set once, when the program is loaded, and the part
+  that goes is somewhere else after every command. So a word of the
+  part that stays which names a segment of the part that goes is left
+  as the linker has it, in paragraphs from the PSP: `tools/mkexe.c`
+  keeps it out of the table of relocations, and the code adds where
+  that part is, `RunPar`: `TRN_SEG` of `port/resident.c`, which is the
+  high word of a far pointer to the thing. `tools/mkexe.c` knows such a
+  word by its number, which is not 0, the segment of the part that
+  stays.
   `TrnMain` puts DS on the main data when there is some, and back before
   it returns. While that part came back through the assembly, it did so
   with every register changed, BP too, which the compiler takes to be

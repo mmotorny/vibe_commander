@@ -53,6 +53,7 @@ extern const u8 __far Ext_F[];
 extern const u8 __far SecDat[];
 extern const u8 __far Vect21[];
 extern const u8 __far RelTab[];
+extern const u8 __far TrnPrW[];
 extern const u8 __far New21[];
 extern const u8 __far Exit01[];
 extern const u8 __far New27[];
@@ -62,6 +63,7 @@ extern const u8 __far SetBrk[];
 #pragma aux SecDat "*"
 #pragma aux Vect21 "*"
 #pragma aux RelTab "*"
+#pragma aux TrnPrW "*"
 #pragma aux New21 "*"
 #pragma aux Exit01 "*"
 #pragma aux New27 "*"
@@ -568,7 +570,8 @@ u32 Init11(u16 stays, u16 block)
     if (regs.ax != 8)
         most = 0;
     regs.ax = 0x4A00 | regs.ax & 0xFF;  /* Init12 */
-    regs.bx = WORD_AT(stays, OFFSET(RelTab)) - (block - code);
+    regs.bx = WORD_AT(stays, OFFSET(RelTab))
+        - WORD_AT(stays, OFFSET(TrnPrW));
     regs.es = block;
     Int21e((struct DosRegs STACK *)&regs);
     regs.ax = 0x4800 | regs.ax & 0xFF;  /* a block of the memory: of all

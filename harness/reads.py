@@ -178,8 +178,6 @@ REVIEWED = {
                                       "zero"),
     **{("resident.c", text): (ZERO, "OutStr0 writes it as far as its zero")
        for text in ("NoRun_S", "FnFil_S", "BadFl_S", "Retr_S", "Aloc_S")},
-    ("resident.c", "Trans_T"): (4, "the far address that it is, which "
-                                   "Stay calls"),
     ("start.c", "NcEnv"): (OWN, "compared at its size"),
     ("start.c", "TempEnv"): (OWN, "compared at its size"),
     ("start.c", "Comsp"): (OWN, "compared at its size"),

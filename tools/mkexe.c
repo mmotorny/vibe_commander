@@ -489,18 +489,25 @@ int main(int argc, char **argv)
         put16(image + table_at + moving * 4 + 2, segment);
         moving++;
     }
-    /* The part that stays is relocated where it is, and its words can
-       only name that part itself: the other one is somewhere else after
-       every command. They are in its code, and the table has each by its
-       offset from the PSP. */
+    /* The part that stays is relocated where it is, once, and the table
+       has each word of it by its offset from the PSP: they are in its
+       code. That holds for a word that names that part itself, whose
+       segment is the PSP's, 0 here. One that names a segment of the part
+       that goes is left as the linker has it, in paragraphs from the PSP,
+       and is not in the table: that part is somewhere else after every
+       command, and the code adds where (TRN_SEG of port/resident.c). */
     for (i = 0; i < relocations; i++) {
         long address = get16(entry + i * 4 + 2) * 16L + get16(entry + i * 4);
         if (address >= (long)transit)
             continue;
         if (address + 2 > (long)kept)
             fail("a relocation lies in the data of the resident part");
-        if (get16(image + address) >= transit / 16)
-            fail("the resident part names a segment of the transit part");
+        if (get16(image + address) != 0) {
+            if (get16(image + address) < resident / 16)
+                fail("the resident part names a segment within itself "
+                     "that is not the PSP's");
+            continue;
+        }
         put16(image + table_at + (moving + staying) * 4, address);
         put16(image + table_at + (moving + staying) * 4 + 2, 0);
         staying++;

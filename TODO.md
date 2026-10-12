@@ -60,11 +60,10 @@ What names what:
   of `port/system_t.c`; `Var2_S`, `NoFnd_S` of `port/dirfunc_t.c`;
   `EdFl_S` of `port/view_t.c`; `Tree_S` of `port/treebox_t.c` and
   `PtMnu_S` of `port/bars_t.c`.
-- The part of the program that stays in the memory finds the rest by
-  one constant, `Trans_T` of `port/main_t.c`, which holds the far
-  address of `TrnMain` of `port/main.c`: it reads that at the
-  constant's offset in the segment `RunPar`, which holds as long as the
-  group of the constants begins at the PSP (see the last step, below).
+- The part of the program that stays in the memory finds the rest at
+  one function, `TrnMain` of `port/main.c`: by its offset, and by its
+  segment as the linker has it, to which it adds `RunPar` (`TRN_SEG` of
+  `port/resident.c`).
   The rest finds that part by `ResSeg` of `port/misc.c`, which is SS,
   and what it names there by `STAYS` of `port/vc.h` or by a far name;
   and the constants by `AsmSeg` of `port/misc.c`, the segment of one of
@@ -124,8 +123,7 @@ What it does not hold, each listed in the tool with the reason:
   for what only the shipped binary has.
 - Data that became code: the tables of keys are `switch` statements, and
   the scenarios answer for them.
-- `Trans_T`, the far address at which the part that stays calls the
-  rest, which the original has not. The tables by which the stubs of
+- The tables by which the stubs of
   the commands went on are gone with them, `Main_T`, `CmdNx_T`,
   `MnuNx_T` and `F35_T`: they are `switch` statements of `port/main.c`,
   as the tables of keys are.
@@ -251,10 +249,10 @@ each a commit that the tests pass, in this order:
   which starts the program, puts DS on the main data, by the one
   instruction that `FatErr` has too, runs the loop, and puts DS back
   before it returns what that part is to do; `MainC`, `MainGo` and the
-  three labels of that part that the rest jumped back to are gone. That
-  part cannot name a function of the rest, whose segments are set anew
-  after every command, and `tools/mkexe.c` stops the build for it: so
-  `Stay` reads the far address in a constant of the rest, `Trans_T`.
+  three labels of that part that the rest jumped back to are gone. The
+  segments of the rest are set anew after every command, so `Stay` has
+  that of `TrnMain` as the linker has it and adds `RunPar`, and
+  `tools/mkexe.c` leaves such a word alone.
   `ReDir` is one function of `port/read.c`. `ResSeg` returns the
   segment of a far pointer to a variable of its own, which compiles to
   `mov ax,ss`; `AsmSeg` the segment of a far pointer to a constant,
@@ -404,23 +402,12 @@ the original, which Rename reads (see "Known and not dealt with", and
     are of the other group. Three things took it to begin there.
     `Init11` of `port/start.c` works out how long the block of the part
     that goes is from `block - code`, which is `TrnPrW` only then: it
-    reads `TrnPrW`. `port/resident.c` reads `Vers_S` through DS, and
-    enters the part that goes by a constant of that part: `Stay` and
-    `Stay11` read the far address of `TrnMain` of `port/main.c` in
-    `Trans_T` of `port/main_t.c`, as `*(Transit * __far *)AT(RunPar,
-    OFFSET(Trans_T))`, the offset of the constant in `DGROUP` taken in
-    the segment `RunPar`. That is where the constant is only while
-    `DGROUP` begins at the PSP; what it holds, the address of the
-    function, is set by `Reloc` and holds wherever the group begins.
-    So for `Vers_S` and for `Trans_T` that code wants the segment of
-    each as the linker has it, in paragraphs from the PSP, which is the
-    high word of a far pointer to the thing, added to the PSP for the
-    text and to `RunPar` for the constant; and `tools/mkexe.c` leaves
-    such a number as it is, where it stops the build for a segment of
-    the part that goes named in the part that stays. It tells the two
-    apart by the number: the part that stays is one group and its
-    segment is 0. With that rule `Stay` could as well take the segment
-    of `TrnMain` itself and add `RunPar`, and `Trans_T` would go. The
+    reads `TrnPrW`, which is done. `port/resident.c` reads `Vers_S`
+    through DS: it wants the segment of the text as the linker has it,
+    in paragraphs from the PSP, added to the PSP, as it has that of
+    `TrnMain`, which it adds to `RunPar`: `tools/mkexe.c` leaves such a
+    number as it is, and tells it from the segment of the part that
+    stays by the number, which is 0 for that. The
     block of the part that goes is `RunPar` and `TrnPrW` to `TrnMain`,
     by `MemRun` of `port/misc.c`, which holds either way; so do
     `AsmSeg`, a segment that `Reloc` sets, and `ResSeg`, which is SS.
