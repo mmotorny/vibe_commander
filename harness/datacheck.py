@@ -66,6 +66,8 @@ ELSEWHERE = {
 # Constants of the C code that the original has not as data, or not in one
 # piece: name -> why. They are not compared.
 OWN = {
+    "Fnc_T": "the functions that FncAddr names by a number: the original "
+             "has the address of a routine in that word, and no table",
     "Panel_T": "Brief_T and Full_T of the original, as two rows of four",
     "PowersOfTen": "what Number divides by: the original has them in its "
                    "instructions",

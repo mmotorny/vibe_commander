@@ -139,8 +139,7 @@ u32 V82_00(u16 segment, u16 at, u16 count);
    Find6_D, the menu of one that is over, of FnFl_P, the colours of that
    menu, and of Find_B, the dialog that asks what to look for. FnFl6_S
    is " files" and FnFl7_S " found.": each is copied with what follows it
-   in the assembly, 15 bytes. FindFil_stub is the stub of FindFil, whose
-   offset FncAddr gets. */
+   in the assembly, 15 bytes. */
 extern const u8 __far Mask_S[];
 extern const u8 __far Find5_D[];
 extern const u8 __far Find6_D[];
@@ -148,7 +147,6 @@ extern const u8 __far FnFl_P[];
 extern const u8 __far Find_B[];
 extern const u8 __far FnFl6_S[];
 extern const u8 __far FnFl7_S[];
-extern const u8 __far FindFil_stub[];
 #pragma aux Mask_S "*"
 #pragma aux Find5_D "*"
 #pragma aux Find6_D "*"
@@ -156,7 +154,6 @@ extern const u8 __far FindFil_stub[];
 #pragma aux Find_B "*"
 #pragma aux FnFl6_S "*"
 #pragma aux FnFl7_S "*"
-#pragma aux FindFil_stub "FindFil"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 #define SEGMENT(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))
@@ -966,7 +963,7 @@ again:
             *end++ = *rest++;
         *end = 0;
         *NEAR(CutPath(md.TmpBuf)) = 0;
-        md.FncAddr = OFFSET(FindFil_stub);
+        md.FncAddr = FNC_FINDFIL;
         answer = FindFil(ATTR_DIRECTORY);
         if ((answer >> 8) != 0 || first != ALL_DRIVES || FND->FndDrv > 'Z')
             break;

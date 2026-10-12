@@ -11,11 +11,10 @@
 	PUBLIC	DelFl_P, DelDr_P, DelCo_B, RdOnl_B, NoEmp_B, DelEr_B, CntDi_B
 	PUBLIC	StAtr_P, AtrEr_B, NoDat_B, PthEr_B, Del_S, DelFs_S
 	PUBLIC	NoAtr_S
-; Those that its commands hand to Dialog, a text that F48_00 copies, and
-; the stubs whose offsets they put into FncAddr.
+; Those that its commands hand to Dialog, and a text that F48_00 copies.
 	PUBLIC	MkDi1_B, MkDi2_B, CrDir_S, MkDir_S, DelDi_B, Subdi_S, DelFi_B
 	PUBLIC	DelSe_B, DlMas_B, DlWrn_B, DlWr4_S, StAt1_B, StAt2_B, Attr8_S
-	PUBLIC	Label_B, DelVo_B, ErVol_B, NoFnc_B, F38_40, M30_50
+	PUBLIC	Label_B, DelVo_B, ErVol_B, NoFnc_B
 
 	.CONST
 MkDir_S	DB	" Make directory ",0
@@ -307,13 +306,6 @@ F38_10	PROC	NEAR
 	RET
 F38_10	ENDP
 
-;			   AL - attributes of what is at TmpBuf
-;	Return :	   AX - 1 deleted, 0 not, 100h to stop
-F38_40	PROC	NEAR			; Delete file or directory
-	CallC	F38_40_c
-	RET
-F38_40	ENDP
-
 F48_00:	CallC	F48_00_c		; Shift F8 - delete
 	JMP	F1Next
 
@@ -471,13 +463,6 @@ AttrTim	EQU	WORD PTR TmpBuf[98]
 M30_00:	MOV	AX,DS			; Attributes...
 	CallC	M30_00_c
 	JMP	F1Next
-
-;			   AL - attributes of what is at TmpBuf
-;	Return :	   AX - 1 set, 0 not, 100h to stop
-M30_50	PROC	NEAR			; Set attributes
-	CallC	M30_50_c
-	RET
-M30_50	ENDP
 
 ; Dialog calls this when the dialog of attributes is answered.
 ;			   AL - the answer

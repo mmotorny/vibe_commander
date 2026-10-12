@@ -61,14 +61,4 @@ F67_00:	CallC	F67_00_c		; Alt F7 - file find
 	JMP	F1Next
 F67_01:	MOV	DS,DX
 	JMP	F24_02
-
-; The search and its list are C: port/find.c. The command puts the offset
-; of this into FncAddr, for DirFunc to call.
-;			   AL - attributes of what is at TmpBuf
-;	Return :	   AX - 0 to go on, 100h to stop
-	PUBLIC	FindFil
-FindFil	PROC	NEAR			; Find files
-	CallC	FindFil_c
-	RET
-FindFil	ENDP
 

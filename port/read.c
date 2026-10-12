@@ -555,7 +555,7 @@ void DirSize(u16 panel)
     u8 __far *to;
     u16 file, i;
 
-    md.FncAddr = (u16)(u32)(const void __far *)DiSi10_s;
+    md.FncAddr = FNC_DISI10;
     to = MvzLine(md.TmpBuf, wcb->WinPath, LenPath);
     if (to[-1] != '\\')
         *(u16 __far *)to = '\\';

@@ -301,9 +301,8 @@ Cont_D	DB	 7, 0
 ; VCF1.INC, which has made the others of its own public.
 	PUBLIC	Copy0_S, Move0_S, Ren0_S, RenFi_P, CopFi_P, MovFi_P, CopDi_P
 	PUBLIC	MovDi_P, OvrCo_B, Cont_B, OpnEr_B, Itslf_B, RenEr_B
-; What the commands in C copy texts from and hand to Dialog, and the
-; routine that they put into FncAddr.
-	PUBLIC	RnMv_S, CopTo_S, CopFi_S, Copy1_B, Copy2_B, Renam_B, C00_00
+; What the commands in C copy texts from and hand to Dialog.
+	PUBLIC	RnMv_S, CopTo_S, CopFi_S, Copy1_B, Copy2_B, Renam_B
 
 	.CODE
 ; What Copy and Rename ask before anything is copied is C: F35_01_c and
@@ -350,17 +349,6 @@ F35_61:	ADD	BX,305h
 	POP	AX
 	RET
 F35_60	ENDP
-
-;	Copy, rename or move a file or a directory
-;			AL - its attributes
-;	Return :	AL - 1 if it was done
-;			AH - 1 to stop
-C00_00	PROC	NEAR
-	PUSH	ES
-	POP	DS
-	CALL	FAR PTR C00_00_c
-	RET
-C00_00	ENDP
 
 ; The entries by which port/copy.c calls what is still assembly are next to
 ; their routines.

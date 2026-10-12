@@ -332,20 +332,22 @@ struct BiosRegs {
     u16 ax, bx, cx, dx;
 };
 
-/* Routines that are still assembly, for C code to call. Each has an entry
-   in the assembly, the routine's name with _a, which is called far and
-   calls the routine (see FromC in port/asm/VC.ASM). They take and return
-   what the routine's registers hold, so a value in a high byte stays
-   there; flags do not come back. */
-/* A call of what FncAddr names, for a file with these attributes at
-   TmpBuf: the high byte of what it returns is not 0 to stop. FncAddr has
-   the address of a routine of the assembly, which is the stub of a C
-   function: DiSi10_s is that of DiSi10 of read.c, which DirSize has
-   DirFunc call for every file. */
+/* What goes through files, DirFunc, FncSel and FncMas, calls a routine
+   for each of them: the one that FncAddr names. The assembly has the
+   address of the routine there. The C has its number, one of these, in
+   Fnc_T of dirfunc.c, a table of the functions: the word is still a
+   word, and the main data is laid out as it was. FncCall calls the
+   function, for a file with these attributes at TmpBuf: the high byte of
+   what it returns is not 0 to stop. */
+enum {
+    FNC_C00_00,                         /* copy, rename or move: copy.c */
+    FNC_DISI10,                         /* add up the sizes: read.c */
+    FNC_FINDFIL,                        /* the file search: find.c */
+    FNC_F38_40,                         /* delete: dirfunc.c */
+    FNC_M30_50                          /* set attributes: dirfunc.c */
+};
 u16 FncCall(u16 attributes);
-extern const u8 __far DiSi10_s[];
-#pragma aux FncCall "*_a" __far parm [ax] value [ax] modify exact [ax es]
-#pragma aux DiSi10_s "DiSi10"
+#pragma aux FncCall "*_c" __far parm [ax] value [ax] modify exact [ax]
 /* RestVct gives the vectors of the critical error and of Ctrl-Break back
    to whoever had them, and HookVct takes them again: it returns where
    its routine for Ctrl-Break is, in the part of the program that stays

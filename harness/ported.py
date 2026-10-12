@@ -487,7 +487,7 @@ BATCHES = [
         source="find.c",
         routines=("FindFil", "FnFl60", "FndBack", "FndStuf", "FndMove",
                   "FndCurs", "FndLine", "FndAdr", "FndStat"),
-        functions=("FindFil_c",),
+        functions=(),
         unreached={
             0x8A7E: "FindFil, for more lines than the memory has room "
                     "for, some 7,000: the disks of the bench have fewer "
@@ -512,8 +512,7 @@ BATCHES = [
         source="dirfunc.c",
         routines=("F38_10", "F38_40", "F38_60", "F38_70", "M30_50",
                   "M30_60", "DirFunc", "DelTree"),
-        functions=("F38_10_c", "F38_40_c", "M30_50_c", "M30_60_c",
-                   "DirFunc_c", "DelTr0_c"),
+        functions=("F38_10_c", "M30_60_c", "DirFunc_c", "DelTr0_c"),
         unreached={
             **dict.fromkeys(
                 (0x3B78, 0x3B7B, 0x3B7E, 0x3B80, 0x3B83, 0x3B86, 0x3B89,
@@ -634,7 +633,7 @@ BATCHES = [
         source="copy.c",
         routines=("F35_40", "C00_00", "C00_30", "C40_00", "C40_05",
                   "C40_10", "C50_00", "SetDate", "PerCent"),
-        functions=("C00_00_c",),
+        functions=(),
         unreached={
             **dict.fromkeys(
                 (0x432B, 0x435A, 0x435D, 0x4BAB, 0x4BAE, 0x4CC7, 0x4CCA,
@@ -904,7 +903,7 @@ BATCHES = [
         title="The size of a file added to that of its directory",
         source="read.c",
         routines=("DiSi10",),
-        functions=("DiSi10_c",),
+        functions=(),
     ),
     Batch(
         title="The command of a key: the last table of keys that Case "

@@ -206,12 +206,24 @@ extern const u8 __far NoFnc_B[];        /* "Can't find file" */
 #pragma aux ErVol_B "*"
 #pragma aux NoFnc_B "*"
 
-/* The stubs of F38_40 and of M30_50 in the assembly: FncAddr gets the
-   offset of one, for FncSel, FncMas and DirFunc to call. */
-extern const u8 __far F38_40_stub[];
-extern const u8 __far M30_50_stub[];
-#pragma aux F38_40_stub "F38_40"
-#pragma aux M30_50_stub "M30_50"
+/* What FncAddr can name, by the numbers of vc.h: a routine that is called
+   with the attributes of a file in AL and answers in AX. The original
+   has the address of the routine in FncAddr and calls that; here the
+   routines are a table of functions, all of one kind, and FncAddr has the
+   place in it. Those of other files: C00_00 of copy.c, DiSi10 of read.c
+   and FindFil of find.c. */
+u16 C00_00(u16 attributes);
+u16 DiSi10(u16 attributes);
+u16 FindFil(u16 attributes);
+#pragma aux C00_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux DiSi10  "*_c" __far parm [ax] value [ax] modify exact [ax]
+#pragma aux FindFil "*_c" __far parm [ax] value [ax] modify exact [ax]
+typedef u16 __far FncFn(u16 attributes);
+#pragma aux FncFn parm [ax] value [ax] modify exact [ax]
+static FncFn * const CODE Fnc_T[] = {
+    (FncFn *)C00_00, (FncFn *)DiSi10, (FncFn *)FindFil, (FncFn *)F38_40,
+    (FncFn *)M30_50
+};
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
@@ -782,6 +794,12 @@ refused:
     return PAIR(1, Dialog(OFFSET(NoDat_B), 0, 0, 0, MAIN_SEG));
 }
 
+/* Call what FncAddr names, for a file with these attributes at TmpBuf. */
+u16 FncCall(u16 attributes)
+{
+    return Fnc_T[md.FncAddr](attributes);
+}
+
 /* Call what FncAddr names for every file and directory of the directory
    at TmpBuf, but "." and "..", with its name behind the path there.
    Returns 1 if every call answered with something in the low byte, 0 if
@@ -812,7 +830,7 @@ u16 DirFunc(void)
     end = md.TmpBuf;
     for (count = LenPath; ; count--) {
         if (count == 0) {
-            if (md.FncAddr != OFFSET(DiSi10_s))
+            if (md.FncAddr != FNC_DISI10)
                 /* None of its lines has ^I: no include line. */
                 Dialog(OFFSET(PthEr_B), 0, 0, 0, MAIN_SEG);
             return 0;
@@ -1075,7 +1093,7 @@ u16 F38_00(u16 panel)
     DEL_ALL = 0;
     FNC_CHANGE = 0;
     DEL_TREE = 0;
-    md.FncAddr = OFFSET(F38_40_stub);
+    md.FncAddr = FNC_F38_40;
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
         return F48_00();
     if (wcb->WinTyp == 1) {
@@ -1173,7 +1191,7 @@ delete:
     DEL_ALL = 0;
     FNC_CHANGE = 0;
     DEL_TREE = 0;
-    md.FncAddr = OFFSET(F38_40_stub);
+    md.FncAddr = FNC_F38_40;
     answer = F38_70();
     if (answer >> 8)
         return TO_FNCEXT;
@@ -1273,7 +1291,7 @@ u16 M30_00(u16 panel)
     ATTR_KEEP = (u8)~M30_82(md.TmpBuf + 10);
 set:
     /* M30_07 */
-    md.FncAddr = OFFSET(M30_50_stub);
+    md.FncAddr = FNC_M30_50;
     return TO_FNCSEL;
 }
 

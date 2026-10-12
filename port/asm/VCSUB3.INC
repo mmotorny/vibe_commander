@@ -128,28 +128,4 @@ OkCan_D	DB	4, 0
 ; change the disk. It has Dialog show the box here.
 	PUBLIC	Fant_B
 
-; For DirSize and DirFunc in C: a call of what FncAddr names, with the
-; attributes of a file in AL. Not every such routine leaves DS as it was.
-	PUBLIC	FncCall_a
-FncCall_a PROC	FAR
-	PUSH	BP
-	PUSH	DS
-	PUSH	DS
-	POP	ES
-	CALL	ES:FncAddr
-	POP	DS
-	POP	BP
-	RET
-FncCall_a ENDP
-
-; What DirSize puts into FncAddr, for DirFunc to call with every file
-;			   AL - its attributes
-;	Return :	   AX - see DiSi10 in port/read.c
-; C: DiSi10_c of port/read.c. Only FncCall_a calls this.
-	PUBLIC	DiSi10
-DiSi10	PROC	NEAR
-	CallC	DiSi10_c
-	RET
-DiSi10	ENDP
-
 

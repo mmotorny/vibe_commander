@@ -106,9 +106,7 @@ u16 ChTree(u16 column);                                 /* treebox.c */
 
 /* Boxes and texts of the assembly, which OncZoom and Dialog take by their
    offsets in its code segment: only those are used here, but for the
-   texts that the commands copy from there into what their dialogs show.
-   C00_00_s is the routine by which the assembly calls C00_00, for
-   FncAddr. */
+   texts that the commands copy from there into what their dialogs show. */
 extern const u8 __far Copy0_S[];        /* " Copy " */
 extern const u8 __far Move0_S[];        /* " Move " */
 extern const u8 __far Ren0_S[];         /* " Rename " */
@@ -118,7 +116,6 @@ extern const u8 __far CopFi_S[];        /* "Copying the file" */
 extern const u8 __far Copy1_B[];        /* the dialog of F5 and F6 */
 extern const u8 __far Copy2_B[];        /* and that of Shift-F5 and -F6 */
 extern const u8 __far Renam_B[];        /* "Rename ... to" */
-extern const u8 __far C00_00_s[];
 extern const u8 __far RenFi_P[];        /* "Renaming or moving the file" */
 extern const u8 __far CopFi_P[];        /* "Copying the file" */
 extern const u8 __far MovFi_P[];        /* "Moving the file" */
@@ -144,7 +141,6 @@ extern const u8 __far CntDi_B[];        /* "Can't delete the subdirectory" */
 #pragma aux Copy1_B "*"
 #pragma aux Copy2_B "*"
 #pragma aux Renam_B "*"
-#pragma aux C00_00_s "C00_00"
 #pragma aux RenFi_P "*"
 #pragma aux CopFi_P "*"
 #pragma aux MovFi_P "*"
@@ -1381,7 +1377,7 @@ static void F35_70(void)
     CpTree2 = 0;
     CpAll = 0;
     FncChg = 0;
-    md.FncAddr = OFFSET(C00_00_s);
+    md.FncAddr = FNC_C00_00;
 }
 
 /* Set default target path, in CpInpt: the directory of the other panel,
