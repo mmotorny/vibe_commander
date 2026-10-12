@@ -323,8 +323,9 @@ several at a time.
   session asks the user:
   - behaviour that differs from the original's, a fix of its bug
     included;
-  - a change to what the comparison leaves out, or to a limit that the
-    `port` test holds the build to;
+  - a change to what the comparison leaves out, other than a figure of
+    the kind that "Scenarios" has left out, or to a limit that the `port`
+    test holds the build to;
   - a golden that comes out changed when it is derived again;
   - anything new to download;
   - a change to these instructions, other than a note on what was
@@ -342,6 +343,10 @@ several at a time.
 - A scenario that shows the time of day, with the clock switched on or in
   the time stamp of a file it has made, does so within the first minute of
   its machine: a golden is recorded more slowly than a build is tested.
+- A figure on the screen that follows the time of day or the size of the
+  program, such as the clock or a count of free memory, is left out of
+  the comparison, in `harness/deviations.py`. The exception is a scenario
+  that is made to test that figure.
 - The countries tested are the United States and Russia.
 - Russian text is typed on the Russian keyboard of the Russian bench. Its
   Cyrillic letters are selected in a step that types text into an input
