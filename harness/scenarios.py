@@ -1460,6 +1460,7 @@ them then; switched off and on again it takes none. On that bench
 28.1 in the translation, and `delete`, of 63, 25.8 and 28.6: the
 translation has taken up to a sixth longer.
 """
+import re
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
@@ -1476,6 +1477,16 @@ from dos import MachineError
 # it is there for a program that hangs, and a machine that many tests
 # share must not look like one.
 STEP_TIME = 300
+# A step that has the driver wait, Wait*ticks, has as many seconds more
+# for each second of the machine's that it waits. The program goes round
+# idling for all of that time, and a second of the machine then takes
+# the host as long as it is loaded: while the program of 32 bits idles,
+# with its extender and the driver's reads above the megabyte at every
+# round, the 71 seconds of blank-timed took 60 seconds on a host by
+# itself, 150 beside one other run, and more than the 300 of STEP_TIME
+# in a suite on a host with a load of 25, three times running.
+WAIT_TIME = 10
+TICKS = 1193180 / 65536           # of the machine's timer, in a second
 
 
 @dataclass(frozen=True)
@@ -7247,7 +7258,8 @@ def run(scenario, program, bench, trace=False, blinking=False,
     much of its stack the program never used is recorded (see
     driver.stack_left). `limit` is for how many seconds the driver may
     write nothing before the program counts as stuck: STEP_TIME for a
-    test, and less where steps are tried out (see show.py).
+    test, and less where steps are tried out (see show.py). A scenario
+    that has the driver wait has more, by its longest wait: WAIT_TIME.
 
     `until`, if it is given, is asked of every screen as the driver
     writes it, with its number, 0 for the start, and the screen: when it
@@ -7271,6 +7283,9 @@ def run(scenario, program, bench, trace=False, blinking=False,
     else:
         known = driver.facts(program, stack)
     script = driver.script(scenario.steps, known, blinking)
+    waits = [int(ticks) for step in scenario.steps
+             for ticks in re.findall(r"\bWait\*(\d+)", step)]
+    limit = round(limit + WAIT_TIME * max(waits, default=0) / TICKS)
     with dos.workdir() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None
