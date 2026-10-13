@@ -17,7 +17,7 @@ copy.c        to-number 94, to-pointer 34
 copy_t.c      clean
 dialog.c      to-number 18, to-pointer 45
 digits.c      clean
-dirfunc.c     to-number 97, to-pointer 33
+dirfunc.c     to-number 95, to-pointer 33
 dirfunc_t.c   clean
 dos.c         to-number 54, to-pointer 14, asm-pragma 7, registers 1, intrinsic 1
 drive.c       to-number 3, to-pointer 1

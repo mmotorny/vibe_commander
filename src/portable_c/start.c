@@ -259,29 +259,18 @@ static u8 __far *MnPth0(u8 __far *to, const u8 __far *env,
 static u16 ReadOne(const u8 __far *path, u8 __far *end,
                    const u8 __far *name, u8 __far *buffer, u16 count)
 {
-    struct DosRegs regs;
-    u16 i, failed, length;
+    struct Answer opened, read;
+    u16 i;
 
     for (i = 0; i < 13; i++)
         end[i] = name[i];
-    regs.ax = 0x3D20;                   /* open, to read; others may read */
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.name = path;
-    regs.si = 0;
-    regs.di = 0;
-    if (Int21d((struct DosRegs STACK *)&regs))
+    opened = FileOpenBare(path, 0x20);  /* to read; others may read */
+    if (opened.failed)
         return FAILED;                  /* RdOne1 */
-    regs.bx = regs.ax;
-    regs.cx = count;
-    regs.name = buffer;
-    regs.ax = 0x3F00 | regs.ax & 0xFF;
-    failed = Int21d((struct DosRegs STACK *)&regs);
-    length = regs.ax;
-    regs.ax = 0x3E00 | regs.ax & 0xFF;
-    if (Int21d((struct DosRegs STACK *)&regs) || failed)
+    read = FileReadBare(opened.value, buffer, count);
+    if (FileCloseBare(opened.value).failed || read.failed)
         return FAILED;
-    return length;
+    return read.value;
 }
 
 /* The program has been started. Read its setup file and its main

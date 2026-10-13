@@ -66,10 +66,6 @@ extern const u8 __far Inv_S[];          /* "Invert" */
 #define MOUSE_PASSED  2
 #define MOUSE_SELECTS 4
 
-/* The byte of the BIOS that says which keys are held down: its highest
-   bit is the Ins key. */
-#define KEYS_DOWN ((u8 __far *)0x00000418UL)
-
 #define DOS_CHDIR 0x3B00                /* DOS: make a directory current */
 #define ERR_PATH  3                     /* its error: there is no such */
 
@@ -487,7 +483,7 @@ struct Onward F08_00(u16 panel, struct Regs STACK *r)
         return To(NEXT_FUNC07);
     if (md.InsDwn != 0
         && address + sizeof(struct FILENT) < wcb->EndBuf)
-        *KEYS_DOWN &= 0x7F;
+        KeyForgetIns();
     file = ENTRY(wcb, address);
     if (file->NameF[0] != '.')
         file->AttrF ^= ATTR_SELECTED;
