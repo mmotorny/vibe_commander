@@ -1085,6 +1085,23 @@ of it.
   they came, which is what the original leaves there where its setup
   has TSR manager off and it has no interrupt to give back; and CX and
   SI as they came (see 7). The flags are the original's.
+- What the program of 32 bits leaves of the interrupts then is
+  otherwise, by its extender, and is declared on the user's word of 13
+  October 2026 for what follows from running under an extender and
+  shows on no screen (see 1). The original never gives Ctrl-Break, INT
+  1Bh, back when DOS ends it, and INT 22h, which DOS sets from the PSP,
+  names the routine in which the original goes on then: both go into
+  the ended program, memory that is free from then on, and the program
+  of 16 bits leaves both so. The extender of the program of 32 bits
+  sees the call that ends the program and, as it takes itself out, has
+  Ctrl-Break go where it went when the program was started. And INT
+  22h names the few instructions of real mode that `dos32.c` keeps in
+  its 512 bytes below the megabyte, in which DOS goes on then, since
+  nothing of a program of 32 bits can run there: memory that DOS has
+  freed like the ended program, where the interrupt stays until DOS
+  sets it anew for the next program that it runs. The registers are
+  those above, left by those instructions; what DOS is handed there in
+  the registers that its call does not read is in 6.
 - The setup that is made without a good file, and for Set default
   configuration, has zeros in the 64 bytes behind the path of each
   panel. A setup file that the setup saves of it differs from the
