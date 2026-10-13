@@ -325,9 +325,9 @@ function(add_portable_c)
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
     # But dos32.c, which is the functions of dos.c for a program of 32
-    # bits and no part of this one: nothing builds it yet but the toy
-    # that holds it against dos.c, harness/trial32/build.sh.
-    list(REMOVE_ITEM c_files dos32.c)
+    # bits and no part of this one: add_portable_c32, further down,
+    # compiles it.
+    list(REMOVE_ITEM c_files ${portable_c_32_alone})
     # The compiled code is more than one segment holds, so it has two:
     # CTEXT, and CTEXT2 for the files that the caller names. Functions of
     # different files call each other far, so a file may be in either. A
@@ -390,11 +390,108 @@ function(add_portable_c)
     add_custom_target(${tree} ALL DEPENDS ${c_dir}/VC.EXE)
 endfunction()
 
+# add_portable_c32(<target> <directory> <option>...) compiles the files of
+# src/portable_c/ once more, for a flat program of 32 bits that the
+# extender DOS/32A is to start: step 1 of the portable C's road (TODO.md,
+# "The portable C in 32 bits: the plan"). The objects go into <directory>,
+# with their listings, as the target <target>. No program is linked of
+# them yet and no test reads them: they are made so that every build
+# holds the source to both compilers, and a line that only the one for 16
+# bits takes stops the build here.
+#
+# The options are the caller's where the two programs of the plan differ,
+# the one that is shipped and the one for finding a fault: each is a call
+# of this function with a target and a directory of its own.
+function(add_portable_c32 target directory)
+    set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
+    file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
+         ${source_dir}/*.c)
+    # What is not ready for 32 bits, each with the piece of the plan that
+    # takes it off. The list may only get shorter. A file on it is
+    # compiled all the same, and the build stops when the compiler takes
+    # it: tools/refused.cmake, which leaves what the compiler said next to
+    # the objects, as <file>.refused.
+    #   resident.c   "Pointer truncated", twice of one line: what an
+    #                interrupt function is entered with is far to this
+    #                compiler too, and Exit05 hands the address of the
+    #                registers and of the flags to a function that takes
+    #                plain pointers. It goes into dos.c with the entry
+    #                of the program, its end and Quick execute: S3
+    set(c_waiting resident.c)
+    # A file that is named and is not there has left its name behind.
+    foreach(source ${portable_c_16_alone} ${portable_c_32_alone} ${c_waiting})
+        if(NOT source IN_LIST c_files)
+            message(FATAL_ERROR
+                "src/portable_c/${source} is named in CMakeLists.txt and is "
+                "not there: take its name out")
+        endif()
+    endforeach()
+    list(REMOVE_ITEM c_files ${portable_c_16_alone})
+    # -3r    code for the 386, with arguments in registers
+    # -mf    the flat model: one segment of code and one of data, and a
+    #        pointer is an offset of 32 bits
+    # -s -zl -zls -wx -we   as in c_compile above: no check of the stack,
+    #        no library, and every warning an error
+    # -i=    the compiler's own headers, for one of them: vc.h has
+    #        offsetof of <stddef.h> where the compiler is not the one for
+    #        16 bits, as any other compiler has it
+    # -fr    no file of the errors beside what the compiler writes out:
+    #        it would be build/<file>.err, which is where the compiler
+    #        for 16 bits leaves its own of the same file
+    set(compile ${watcom} ${watcom_bin}/wcc386 -q -3r -mf -s -zl -zls
+        -wx -we ${ARGN} -i=${open_watcom_SOURCE_DIR}/h -fr)
+    file(MAKE_DIRECTORY ${directory})
+    set(made "")
+    foreach(source ${c_files})
+        string(REGEX REPLACE "\\.c$" "" object ${source})
+        set(read ${source_dir}/${source} ${source_dir}/vc.h
+            ${source_dir}/tables.h ${source_dir}/sys.h)
+        if(source IN_LIST c_waiting)
+            list(JOIN compile "|" command)
+            add_custom_command(
+                OUTPUT ${directory}/${object}.refused
+                COMMAND ${CMAKE_COMMAND} -D command=${command}
+                        -D source=${source_dir}/${source}
+                        -D object=${directory}/${object}.obj
+                        -D said=${directory}/${object}.refused
+                        -P ${CMAKE_SOURCE_DIR}/tools/refused.cmake
+                DEPENDS ${read} ${CMAKE_SOURCE_DIR}/tools/refused.cmake
+                COMMENT "Trying portable_c/${source} for 32 bits"
+                VERBATIM)
+            list(APPEND made ${directory}/${object}.refused)
+        else()
+            add_custom_command(
+                OUTPUT ${directory}/${object}.obj
+                COMMAND ${compile} -fo=${directory}/${object}.obj
+                        ${source_dir}/${source}
+                COMMAND ${watcom} ${watcom_bin}/wdis
+                        -l=${directory}/${object}.lst
+                        ${directory}/${object}.obj
+                BYPRODUCTS ${directory}/${object}.lst
+                DEPENDS ${read}
+                COMMENT "Compiling portable_c/${source} for 32 bits"
+                VERBATIM)
+            list(APPEND made ${directory}/${object}.obj)
+        endif()
+    endforeach()
+    add_custom_target(${target} ALL DEPENDS ${made})
+endfunction()
+
 # The trees, each with the files of its second code segment.
 #
 # The C translation is compiled in the small model: its functions are far
 # where a #pragma aux of theirs says so, which every function has that
 # another file calls, with the registers that the assembly called it in.
+#
+# The portable C is compiled twice, for 16 bits and for 32, and three of
+# its files are of one of the two alone. Each goes with its build.
+#   arith.c   the two routines that the compiler for 16 bits calls to
+#             multiply and to divide numbers of 32 bits; the one for 32
+#             bits calls nothing for that
+#   dos.c     the system's functions, sys.h, for DOS in 16 bits
+#   dos32.c   the same functions for a flat program under the extender
+set(portable_c_16_alone arith.c dos.c)
+set(portable_c_32_alone dos32.c)
 set(c_trees c portable_c)
 add_c_tree(c "the C translation" s
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
@@ -404,6 +501,9 @@ add_portable_c(
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c menu.c misc.c mouse.c setup.c start.c stcolor.c sthelp.c
     stmain.c stopts.c system.c view.c window.c)
+# For 32 bits: -os, small code, and no debugging information, as the
+# program that is shipped is to be compiled.
+add_portable_c32(portable_c32 ${CMAKE_BINARY_DIR}/portable_c32 -os)
 
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS

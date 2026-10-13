@@ -224,7 +224,7 @@ portable C](#the-portable-c)).
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
 | `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
-| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README |
+| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README; `refused.cmake` is the build's, for a file that is listed as not compiling for 32 bits yet |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/` |
 | `docs/` | Pictures for this README |
@@ -269,6 +269,19 @@ into `build/portable_c/`: `VC.EXE`, the linker's map and the listings.
 The linker writes its `VC.EXE`; `tools/mkexe.c`, which lays out the C
 translation's, has no hand in it (see [The portable
 C](#the-portable-c)).
+
+Its files are compiled a second time, by Open Watcom's compiler for 32
+bits, `wcc386`, into `build/portable_c32/`, each with its listing. That
+is the portable C on its way to a 32-bit program for DOS (`TODO.md`,
+"The portable C in 32 bits: the plan"): no program is linked of those
+objects yet and no test reads them, and they are made so that every
+build holds the source to both compilers. Three files are of one of the
+two builds alone, `arith.c` and `dos.c` of the one for 16 bits and
+`dos32.c` of the one for 32. A file that is not ready for 32 bits is
+named in a list of `CMakeLists.txt`, with what it waits for. The build
+tries it all the same, writes what the compiler said next to the
+objects, `resident.refused` for `resident.c`, the one such file, and
+stops when the compiler takes a file that is on the list.
 
 ### Changes to the source
 

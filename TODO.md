@@ -2330,9 +2330,11 @@ build is gone, and would do harm mixed into step 1:
 
 - `wcc386 -3r -mf -os -s -zl -zls -wx -we`: the flat model, small code
   as today, no check of the stack and no library. `vc.h` includes
-  `stddef.h` for `offsetof` where `__I86__` is not set; with
-  `__WATCOMC__` it can write it out as the 16-bit build does, and the
-  build needs no directory of headers.
+  `stddef.h` for `offsetof` where `__I86__` is not set, and the build
+  names the compiler's directory of headers for that one, `-i=`. The
+  plan had `vc.h` write it out for `__WATCOMC__` as the 16-bit build
+  does, so that no directory is named; B1 tried that, and it compiles,
+  and left it: see "B1, the objects" below.
 - `wlink format os2 le`, `option stub=` with `binw/dos32a.exe` of the
   pinned download, `option start=`, and an `order` line: the code;
   then the constants and the tables, which share the code's last page
@@ -2513,7 +2515,7 @@ and H1 are started at once by the session.
 | S3, the entry, the end, Quick execute | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
 | D1, `dos32.c`: what goes straight through. Done: see "Piece D1" below | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
 | D2, `dos32.c`: the rest | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
-| B1, the objects | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt` | 50 lines | P1 | The build | Little |
+| B1, the objects. Done: see below | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt`, `tools/refused.cmake` | 50 lines | P1 | The build | Little |
 | B2, the program | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
 | H1, the reader. Done: see "Piece H1, the reader" below | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
 | H2, the driver | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
@@ -2898,6 +2900,133 @@ typed, `F34_30` of `view.c` the text of a command.
 Not looked at, being P4's: what is added to a place outside a word,
 `MD_PLACE(md.InfBuf) + md.InfoLen` of `info.c` and `md.HstAdr - 1` of
 `enter.c`, where an int of 32 bits does not wrap round.
+
+### B1, the objects: done, and what a later piece should know
+
+Every build compiles `src/portable_c/*.c` a second time, with `wcc386`,
+into `build/portable_c32/`: an object and its listing for each file,
+61 of them, as the target `portable_c32`, which is of the default
+build. Nothing is linked of them and no test reads them. What they are
+for is that the build stops at a line which the compiler for 32 bits
+does not take, with every warning an error, as it stops for the one for
+16 bits. `add_portable_c32` of `CMakeLists.txt` does it, some 100 lines
+with what they say of themselves, where the plan had 50.
+
+    wcc386 -q -3r -mf -s -zl -zls -wx -we -os -i=<Open Watcom>/h -fr
+
+What a piece sees of it:
+
+- `Compiling portable_c/NAME.c for 32 bits`, and under it the
+  compiler's error, when a change does not compile there. The 16-bit
+  program may have been built by then and pass every test: the piece
+  does not land all the same. It is mended in the common source, for
+  both, as "What a piece goes by" has it.
+- `build/portable_c32/NAME.lst` is what `wcc386` made of a file, beside
+  `build/portable_c/NAME.lst`: what a word of `vc.h` comes to in its
+  second body is read there.
+- A new file of the tree is compiled for both without a word in the
+  build, as before.
+
+The files that are not of both builds are three lists, and each name on
+one has to be a file that is there, or the build does not configure:
+
+| List | Files | What the build does | Comes off |
+|---|---|---|---|
+| `portable_c_16_alone` | `arith.c`, `dos.c` | Compiles them for 16 bits alone. They are not tried for 32 | Z1, with the files |
+| `portable_c_32_alone` | `dos32.c` | Compiles it for 32 bits alone. It was D1's line in `add_portable_c` | Z1, when it becomes `dos.c` |
+| `c_waiting`, in `add_portable_c32` | `resident.c` | Tries it for 32 bits at every build, `Trying portable_c/resident.c for 32 bits`, by `tools/refused.cmake`: what the compiler said is left as `build/portable_c32/resident.refused`, and no object. When the compiler takes the file, the build stops and says to take it off the list | S3 |
+
+The piece was set out with `arith.c`, `dos.c` and `resident.c` on one
+list of what cannot compile yet, each to be tried. They are two kinds.
+`resident.c` is to be a file of the 32-bit program and is not ready;
+trying it is what tells S3 that it is. `arith.c` and `dos.c` are never
+to be of it: that they do not compile there, for registers of 16 bits
+in their `#pragma aux`, is nothing that the work rests on, and a build
+that stopped on the day one of them compiled would stop for nothing.
+
+`resident.c` is refused for one line, twice: `Exit05` hands the address
+of the registers and of the flags that it was entered with to `Exit02`,
+and what an interrupt function is entered with is far to `wcc386` as
+well, where `STACK` is nothing: W112, "Pointer truncated". The list
+does not hold a file to its reason: one that comes to be refused for
+something else stays refused, and nothing says so. Read
+`resident.refused` when the file is touched.
+
+What was decided:
+
+- The compiler's directory of headers is named, `-i=`, for `stddef.h`.
+  The plan had `vc.h` write `offsetof` out for `__WATCOMC__`, so that
+  the build names none. That was tried: one word of `vc.h`, and all 61
+  compile without the option. It was left, because of the order that
+  the portable C goes by: `offsetof` of the header is C, and what
+  `vc.h` writes out in its place is Open Watcom's, there for a build
+  that has no header. The 32-bit build would be held to Open Watcom's
+  way by it, and after Z1 there would still be a line for
+  `__WATCOMC__` where otherwise the whole `#ifdef` goes. `stddef.h` is
+  a header that needs no library. And the directory is needed for more
+  than `offsetof` as soon as P3 lands, right behind this piece: its
+  `NUMBER_OF` has `size_t` of the same header in its body for 32 bits,
+  which `vc.h` has from that include where `__I86__` is not set. So
+  the option is not one to take out again by writing `offsetof` out.
+- `-fr`: `wcc386` writes no file of its errors. It would be
+  `build/NAME.err`, the name under which `wcc` leaves its own of the
+  same file, and both run at once.
+- Listings are written, by `wdis`, as for 16 bits. All 61 cost 0.14 s
+  of the processor.
+- The directory and the target have the name that the plan has for the
+  tree of the harness, `portable_c32`.
+
+Release and debug. The plan has two programs from B2 on, and B1 makes
+the objects of the first. `add_portable_c32(target directory
+option...)` is a call for each: what the two have in common is in the
+function, and what differs is the caller's, the target, the directory
+and the options behind them. Today's one call is
+
+    add_portable_c32(portable_c32 ${CMAKE_BINARY_DIR}/portable_c32 -os)
+
+and B2's second would be
+
+    add_portable_c32(portable_c32-debug
+        ${CMAKE_BINARY_DIR}/portable_c32/debug -od -d2 -dCHECKED)
+
+with the link written once, in the function, of the objects of its
+directory. Not tried: the second call was not made, since nothing reads
+`CHECKED` yet and unoptimised objects that nothing links are held to
+nothing more than the first are.
+
+For B2:
+
+- The function ends with `made`, the objects and the `.refused` files
+  together, as what the target depends on. A link wants the objects
+  alone; a file that is still waiting then is in neither program.
+- The options of a file are one variable, `compile`, the same for
+  every file. Where a file wants its own, as the tables may for "What
+  could go wrong", 14, the 16-bit build's `c_compile` shows the shape:
+  the options behind the common ones, by the file's name.
+- `wdis -s` puts the lines of the source into a listing where the
+  object has them, `-d1` or more: the debug program's listings.
+- `.err` files: see `-fr` above. A linker's file of errors was not
+  looked at.
+
+What the build costs. A build from nothing, `cmake --build build
+--target clean` and then the build, with and without the target
+`portable_c32`, turn about, three times each, on a computer that other
+agents were testing on (load 31 to 40):
+
+| | Without | With | More |
+|---|---|---|---|
+| The processor's time, `-j8` | 9.3, 9.7, 9.4 s | 10.8, 11.2, 11.1 s | 1.6 s, a sixth |
+| The processor's time, one job | 10.1, 10.4, 10.4 s | 12.1, 12.0, 12.2 s | 1.8 s, a sixth |
+| Elapsed, one job, under that load | 76, 94, 87 s | 106, 105, 99 s | a fifth |
+
+Elapsed with `-j8` was not to be had that way: the three without took
+19 to 21 s and the three with 13 to 16, which would be the build going
+through the targets one behind the other when they are named to it;
+that was not looked into. Before the change and with the computer less
+taken (load 6 to 9) a build from nothing was 5 s with `-j8` and 16 to
+20 s with one job; a sixth more of that is one second and three. A
+file changed is two compilers run where it was one, some 20 ms of the
+processor more.
 
 ### What could go wrong
 
