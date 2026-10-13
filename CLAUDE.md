@@ -1730,15 +1730,29 @@ What a call hands back, and where the traps are:
   what was read out of `regs` three calls later is a variable of the
   caller's now, and the call in between does not touch it: CX from
   4300h to 4301h is `attributes`, BX is the handle.
-- AL of a service that takes nothing there was whatever the call
-  before left, `0x3E00 | regs.ax & 0xFF`, and DS of one that takes no
-  address was the main data's or the segment of a buffer. The functions
-  pass 0 and the main data. The one such byte that anything reads is
-  AL of 4Eh, which DOS's APPEND goes by where it is installed: the
-  original has there what was left in three places, `0x4E00 | drive`
-  and `0x4E5C` in `read.c` and `regs.ax |= 2` in `treebox.c`, and 0 in
-  the others. The same holds for what the BIOS is not asked in: AL of
-  the calls 1 to 3 and 0Fh, BL of those that take a page.
+- A register that the service does not take was whatever the code
+  before left there: AL of most calls, `0x3E00 | regs.ax & 0xFF`, the
+  half of BX that a call does not read, CX and DX behind a call that
+  set them, DS where no address goes. The functions hand over what is
+  asked and nothing else, 0 in AL and the main data in DS. That is the
+  program doing otherwise than the original, though no screen shows
+  it, and it is declared: `src/portable_c/DEVIATIONS.md` has one entry
+  for all of it, "DOS and the BIOS are handed nothing that they are not
+  asked", with a table of the places. Every leftover that a file drops
+  as it goes over gets a row there, in the same commit: the routine,
+  the call, what the original has in the register and what the
+  portable C has. Find them by step 2: a register that is written, or
+  left as a call answered, and that the next call does not take.
+- Before a leftover is dropped, be sure that the service does not read
+  it, from what is written of DOS and of the BIOS, not from the bench
+  passing. Three are known to be read by something, and the entry says
+  what the functions do about each: AL of 4Eh, which DOS's APPEND goes
+  by, in `read.c` twice and in `treebox.c`; AL of the BIOS's call 1,
+  where some BIOSes want the video mode, in `IniData` and in `Blank`;
+  and CX and DL of 1130h, which a BIOS that does not know the call
+  leaves as they came, in `F69_00` and in `IniData`. One that you are
+  not sure of is not dropped: hand the work back with it, as "Work by
+  several agents" has it for a deviation, and the session asks.
 - What the BIOS is asked in comes by name. The page that is shown goes
   from `ScreenState` to the calls that take one, where the assembly
   kept BH from the call before. `ScreenType` takes the page and the

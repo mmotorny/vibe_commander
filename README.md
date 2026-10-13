@@ -540,8 +540,10 @@ Where it behaves otherwise than the original, that is declared in
 the memory whole](#staying-in-the-memory-whole) while a command runs,
 and so is one program, which the linker writes, where the C translation
 is two parts laid out by a tool. The others are [what the program did
-for the PC and for the programs around it](#what-else-has-gone), which
-no scenario shows. In every scenario that a deviation does not change
+for the PC and for the programs around it](#what-else-has-gone), and
+what a register happened to hold where DOS or the BIOS is called, which
+[the functions of the system](#the-system-in-one-place) do not hand
+over; no scenario shows either. In every scenario that a deviation does not change
 the portable C is held against the original's golden, as the C
 translation is.
 
@@ -626,20 +628,21 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 184,626 bytes |
-| as a multiple of the original's 65,090 bytes | 2.84 |
-| below 3 times the original's, where the scenarios' test fails | 10,644 bytes |
-| more than the C translation's 133,056 bytes | 51,570 bytes |
+| `VC.EXE` | 186,448 bytes |
+| as a multiple of the original's 65,090 bytes | 2.86 |
+| below 3 times the original's, where the scenarios' test fails | 8,822 bytes |
+| more than the C translation's 133,056 bytes | 53,392 bytes |
 | The relocations in its header, which DOS applies | 977 |
-| What it keeps of the memory while a command runs: the program and its panels | 194,480 bytes |
-| What DOS has for a command then, on the bench of the tests | 231,056 bytes |
-| The code segment `CTEXT` ends at | DFE9h, 4,119 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | B3A3h, 15,453 bytes below the limit, F000h |
+| What it keeps of the memory while a command runs: the program and its panels | 196,288 bytes |
+| What DOS has for a command then, on the bench of the tests | 229,248 bytes |
+| The code segment `CTEXT` ends at | DFD7h, 4,137 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | BAD1h, 13,615 bytes below the limit, F000h |
 | Inline assembly | 70 instructions in 11 pieces: 37 in 7 of `dos.c`, 33 in 4 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 770, 481, 94 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 769, 62, 447, 94 |
+| Calls that still hand registers to an interrupt, which are to go through `sys.h`, as `tools/calls.py` counts them | 272, in 22 files |
 
 <!-- The end of the figures. -->
 
@@ -860,6 +863,12 @@ name, where they were in what a register happened to hold:
 - What a call leaves. Every answer has what DOS left in AX, also where
   nothing failed, since some callers go on with that; what else a call
   answers in is a member with a name.
+
+What the functions do not take is what a register happened to hold
+where the call does not read it, the low byte of AX at most calls of
+DOS: the original hands DOS and the BIOS whatever the code before left
+there, and the portable C hands them 0. No screen shows that, and
+`src/portable_c/DEVIATIONS.md` declares it, with every place.
 
 Not in the header is what only DOS has: where an interrupt goes, which
 the program takes for DOS's critical error, for Ctrl-Break and for its

@@ -378,3 +378,82 @@ out of reach in `harness/ported.py`. In that scenario the portable C
 does not test, shows the same screens and leaves the same setup file,
 with the byte as it found it. Every scenario is held against the golden
 that it was held against before.
+
+### 6. DOS and the BIOS are handed nothing that they are not asked
+
+**What the original does.** It calls DOS and the BIOS with the registers
+that a call takes set for it, and every other register as the code
+before happens to have left it: what the call before answered, a
+counter, an address. The low byte of AX is often like that, since the
+high byte alone says which service is meant, and so are the half of BX
+that a call does not take, CX and DX of a call that takes neither, and
+DS where no address goes with the call. The C translation hands over
+the same where it kept the registers from one call to the next in one
+structure, `0x3E00 | regs.ax & 0xFF`, and where it did not, it already
+hands over something else: a register that it never sets is what the
+stack holds, and `TODO.md` says where.
+
+**What the portable C does.** It asks through the functions of `sys.h`,
+and a function is handed what is asked and nothing else. So a call gets
+the registers that it takes from the function's arguments; AL is 0
+where the service takes nothing there, and so is the half of BX that it
+does not take; DS is on the main data where no address is handed over;
+and a register that the service takes nothing in is 0 or what the stack
+holds, as `dos.c` has it. The calls, their order and every register
+that a call takes are the original's.
+
+The places so far, each with what the original hands over there in a
+register that the call does not take. The files that have not gone over
+to `sys.h` still hand over what the C translation does, and their places
+are added here as they go.
+
+| Routine | Call | The original | The portable C |
+|---|---|---|---|
+| `OpenFil`, `system.c` | DOS 3Dh, a file opened, both times | BX: the service and the mode, as in AX | BX as it comes |
+| `SetPth`, `system.c` | DOS 47h, the current directory | AL: the drive, 1 for A: | AL 0 |
+| `Fantom`, `system.c` | DOS 440Fh, the drive that a unit goes by, three times | BH: the other of the two drives | BH 0 |
+| `ChkMode`, `window.c` | BIOS 0Fh, the mode | BX as the caller has it | BX 0 |
+| `Cursor`, `window.c` | BIOS 0Fh and 02h, the cursor placed | 0Fh: AL the column, DX the place. 02h: AL the mode, as 0Fh left it | AL 0 for both, DX 0 for 0Fh |
+| `ChgCur`, `window.c` | BIOS 01h, the shape of the cursor | DX: where the cursor is, as 03h left it | DX 0 |
+| `GetCur`, `window.c` | BIOS 03h, where the cursor is | AL: the mode, as 0Fh left it | AL 0 |
+| `Scroll`, `window.c`, for its seven callers | BIOS 06h and 07h, a window scrolled | BL: the column of a place that the caller has | BL 0 |
+| `M30_50`, `dirfunc.c` | DOS 5700h, the date and the time of a file, and 3Eh, the file closed | CX and DX: the attributes and the address of the name for the first, the time just set and the address of the name for the second | CX and DX 0 |
+| `DelTr0`, `dirfunc.c` | DOS 3Eh, a file closed | CX 1 and DX the address of the byte, of the call that wrote it | CX and DX 0 |
+| `FncMs1`, `dirfunc.c` | DOS 4Fh, the next file | CX 37h and DS:DX on the mask, of the call for the first file | CX and DX 0 |
+| `ReadOne`, `start.c` | DOS 3Dh, 3Fh and 3Eh, a file read | 3Dh: BX, CX, SI and DI 0. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still | 3Dh: those four as they come. AL 0 for the other two, and for 3Eh CX as it comes and DX 0 |
+| `IniData`, `start.c` | DOS 38h, the country, and DOS's routine for capitals, 128 times | 38h: BX and CX as the BIOS left them at the call before, the page and the shape of the cursor. The routine: AH as 38h left it | BX and CX as they come; AH 0 |
+
+What is known to read such a register, and where the portable C will
+hand it something else when the file goes over:
+
+- AL of DOS 4Eh, the first file of a search. DOS's APPEND, where it is
+  installed, goes by it. `FindFirst` hands over 0, as the original does
+  at most places; at three it has a leftover there, the number of the
+  drive and 5Ch in `read.c` and 2 in `treebox.c`.
+- AL of BIOS 01h, the shape of the cursor. Some BIOSes of the time are
+  said to want the video mode there. `CursorShape` hands over 0, as the
+  original does where an input line sets the shape, by `ChgCur` and
+  `CurShp`; in `IniData` of `start.c` and in `Blank` the original has
+  the mode there, left from the call that asked for it.
+- CX and DL of BIOS 1130h, the font of an EGA, which a BIOS that does
+  not know the call hands back as they came. `ScreenFont` puts 16 and 0
+  there, so such a BIOS is taken to have a font of 16 lines and to say
+  nothing of the rows. The original has 16 in CL where `F69_00` of
+  `commands.c` asks for the height and 0 in DL where it and `IniData`
+  ask for the rows, and leftovers in the other of the two each time,
+  which it does not read then.
+
+Nothing else that the functions leave out is known to be read by a DOS
+or a BIOS.
+
+**Why.** A function of `sys.h` says what is asked, and what a register
+happened to hold is not asked: it cannot be an argument without a name,
+and a name for it would be the name of a register. What the original
+goes on with behind a call is another matter and is kept: what DOS
+leaves in AX where nothing failed, a register that a call did not set,
+the carry flag before a call, and the page that the BIOS is handed,
+which the functions answer with or take by name.
+
+**Which scenarios show it.** None. FreeDOS and the bench's BIOS read none
+of these registers, APPEND is not installed there, and every scenario
+passes against the golden that it had.
