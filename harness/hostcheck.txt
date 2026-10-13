@@ -46,7 +46,7 @@ misc.c        to-number 1
 mouse.c       clean
 panel.c       to-number 2, to-pointer 7
 place.c       to-number 7, to-pointer 5
-read.c        to-number 7, to-pointer 17
+read.c        to-number 3, to-pointer 16
 resident.c    to-number 28, to-pointer 30, function 6, interrupt 7, loadds 3, naked 4, asm 4, registers 1, aborts 3
 screen.c      clean
 setup.c       to-number 1, to-pointer 2

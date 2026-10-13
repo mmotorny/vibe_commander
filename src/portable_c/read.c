@@ -23,8 +23,7 @@
  * of what the program does ever gets, by way of the capital letters of
  * a mask, which DOS makes on the stack of whoever asks, in 62 bytes: so
  * that is called with nothing of what reading the directory needed left
- * on the stack. For the same reason GetVol shares the registers of
- * RdInfo.
+ * on the stack.
  */
 #include "vc.h"
 
@@ -46,7 +45,6 @@ u16 ReadTre(void);                                      /* treebox.c */
 void DirSize(u16 panel);
 u16 DiSi10(u16 attributes);
 void TstInfo(u16 panel);
-static struct Label GetVol0(u8 *volume, struct DosRegs STACK *regs);
 
 /* ReDir and GetVol are in vc.h. */
 
@@ -62,8 +60,8 @@ static const u8 CODE DrIn_F[] = "DIRINFO";
 #define SIZE_FILENT sizeof(struct FILENT)
 #define MinView 8000                    /* Minimum view buffer size */
 
-/* Errors of DOS, and the one that Intr21 makes of a drive that is not
-   ready. */
+/* Errors of DOS, and the one that a call makes of a drive that is not
+   ready, where it is asked with the program's errors. */
 #define ERR_NO_FILE   0x02
 #define ERR_NO_PATH   0x03
 #define ERR_NO_DRIVE  0x0F
@@ -110,7 +108,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
     u16 limit, file, number, retries;
     u16 oldCursor, oldFirst;
     u16 drive, attributes, found, answer;
-    struct Answer opened;
+    struct Answer opened, asked;
 
     /* Expand: the panel behind this one as far up as it goes, but no
        further than 64K from here. */
@@ -202,14 +200,12 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
         if (Fantom(drive))
             goto unread;
         SetDTA();
-        regs.ax = 0x4E00 | drive;
-        regs.cx = 0x37;
-        regs.name = md.TmpBuf;
-        if (!Intr21((struct DosRegs STACK *)&regs))
+        asked = FindFirst(md.TmpBuf, 0x37);
+        if (!asked.failed)
             break;
-        if (regs.ax == ERR_NO_MORE)
+        if (asked.value == ERR_NO_MORE)
             goto read;
-        if (regs.ax != ERR_NO_PATH)
+        if (asked.value != ERR_NO_PATH)
             goto unread;
         /* ReDr22: the directory is not there. */
         keep = 0;
@@ -225,12 +221,10 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
             drive = (u8)(wcb->WinPath[0] - ('A' - 1));
             if (Fantom(drive))
                 goto unread;
-            regs.ax = 0x4700 | drive;
-            regs.name = (const u8 __far *)wcb + drive;  /* DL, and DS */
-            regs.si = (u16)(u32)(wcb->WinPath + 3);
-            if (!Intr21((struct DosRegs STACK *)&regs))
+            asked = DirCurrent(drive, wcb->WinPath + 3);
+            if (!asked.failed)
                 break;
-            if (regs.ax != ERR_NO_DRIVE)
+            if (asked.value != ERR_NO_DRIVE)
                 goto unread;
             wcb->WinPath[0] = md.DosPth[0];
             wcb->WinPath[3] = 0;
@@ -266,9 +260,9 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
                 to[i] = (&md.DTA.FilAttr)[i];
             file += SIZE_FILENT;
         }
-        regs.ax = 0x4F00;
-        if (Intr21((struct DosRegs STACK *)&regs)) {
-            if (regs.ax != ERR_NO_MORE)
+        asked = FindNext();
+        if (asked.failed) {
+            if (asked.value != ERR_NO_MORE)
                 goto ended;
             break;
         }
@@ -297,6 +291,12 @@ ended:
         opened = OpenFil(md.TmpBuf, 0x40);
         answer = opened.value;
         if (opened.failed == 0) {
+            /* These two calls still hand DOS a structure of registers.
+               Where reading has failed and the file is closed all the
+               same, what follows goes by AL as closing left it, and a
+               DOS that leaves AX alone when it has closed a file has
+               there what it was handed: the low byte of what reading
+               answered, its error. FileClose of sys.h hands over 0. */
             regs.bx = answer;
             regs.name = wcb->ExtBuf;
             regs.cx = LenExt - 1;
@@ -417,10 +417,10 @@ static void ReDr50(u16 panel, struct OldList STACK *old)
 static void RdInfo(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
-    struct DosRegs regs;
-    u16 drive, failed, handle, length;
+    struct Space space;
+    u16 drive, handle;
     struct Label label;
-    struct Answer opened;
+    struct Answer opened, read;
 
     if (wcb->WinTyp != 2)
         return;
@@ -432,33 +432,26 @@ static void RdInfo(u16 panel)
     drive = (u8)(md.DosPth[0] - ('A' - 1));
     if (Fantom(drive))
         return;
-    regs.ax = 0x3600 | drive;
-    regs.name = (const u8 __far *)(u32)drive;   /* DL */
-    if (Intr21((struct DosRegs STACK *)&regs))
+    space = DriveSpace(drive, 0);
+    if (space.failed)
         return;
-    if (regs.ax == 0xFFFF)
+    if (space.value == 0xFFFF)
         return;
-    md.Total = (u16)(u32)regs.name;             /* DX */
-    md.FreeDsk = regs.bx;
-    md.ClstSiz = regs.ax * regs.cx;
+    md.Total = space.total;
+    md.FreeDsk = space.free;
+    md.ClstSiz = space.value * space.sector;
     opened = OpenFil(DrIn_F, 0x40);
     handle = opened.value;
     if (opened.failed != 0) {
         if (handle != ERR_NO_FILE)
             return;
     } else {
-        regs.bx = handle;
-        regs.name = md.InfBuf;
-        regs.cx = sizeof md.InfBuf;
-        regs.ax = 0x3F00 | (handle & 0xFF);
-        failed = Intr21((struct DosRegs STACK *)&regs);
-        length = regs.ax;
-        regs.ax = 0x3E00 | (length & 0xFF);
-        if (Intr21((struct DosRegs STACK *)&regs) || failed)
+        read = FileRead(handle, md.InfBuf, sizeof md.InfBuf);
+        if (FileClose(handle).failed || read.failed)
             return;
-        md.InfoLen = length;
+        md.InfoLen = read.value;
     }
-    label = GetVol0(md.Volume, (struct DosRegs STACK *)&regs);
+    label = GetVol(md.Volume);
     if (label.local != 0 && label.answer == ERR_NOT_READY)
         return;
     wcb->ChgFlg = 0;
@@ -487,6 +480,17 @@ u16 ReDir(u16 panel, u16 keep)
     return wcb->ChgFlg;                 /* ReDr70 */
 }
 
+/* What GetVol returns: what DOS answered, and whether the drive is a
+   local one. */
+static struct Label Labelled(u16 answer, u16 local)
+{
+    struct Label label;
+
+    label.answer = answer;
+    label.local = local;
+    return label;
+}
+
 /* Get the label of the current drive, as a text of at most 11 characters
    at `volume` in the main data: for a drive of a network the name it is
    shared by, which follows the name of the server in what DOS makes of a
@@ -502,37 +506,16 @@ u16 ReDir(u16 panel, u16 keep)
    characters, a space unless the label is that long. */
 struct Label GetVol(u8 *volume)
 {
-    struct DosRegs regs;
-
-    return GetVol0(volume, (struct DosRegs STACK *)&regs);
-}
-
-/* What GetVol returns: what DOS answered, and whether the drive is a
-   local one. */
-static struct Label Labelled(u16 answer, u16 local)
-{
-    struct Label label;
-
-    label.answer = answer;
-    label.local = local;
-    return label;
-}
-
-/* The same, with room for the registers of DOS that the caller has. */
-static struct Label GetVol0(u8 *volume, struct DosRegs STACK *regs)
-{
+    struct Answer asked;
     u8 *scan, *end;
     u16 i;
     u8 c;
 
     volume[0] = 0;
     *(u16 *)md.TmpErr = 'A';
-    regs->ax = 0x6000;
-    regs->name = md.TmpErr;
-    regs->si = (u16)md.TmpErr;
-    regs->di = (u16)(md.TmpErr + 100);
-    if (Intr21(regs))
-        return Labelled(regs->ax, 1);
+    asked = FileTrueName(md.TmpErr, md.TmpErr + 100);
+    if (asked.failed)
+        return Labelled(asked.value, 1);
     scan = md.TmpErr + 100;
     if (*(u16 *)scan == 0x5C5C) {               /* \\server\name\... */
         scan += 2;
@@ -549,12 +532,10 @@ static struct Label GetVol0(u8 *volume, struct DosRegs STACK *regs)
         return Labelled(0, 0);
     }
     SetDTA();
-    regs->ax = 0x4E5C;
-    regs->cx = 8;
-    regs->name = Mask_S;
-    if (Intr21(regs)) {
+    asked = FindFirst(Mask_S, 8);
+    if (asked.failed) {
         *volume = 0;
-        return Labelled(regs->ax, 1);
+        return Labelled(asked.value, 1);
     }
     Convert(md.DTA.FilName, volume);
     end = volume;
@@ -564,7 +545,7 @@ static struct Label GetVol0(u8 *volume, struct DosRegs STACK *regs)
             end = volume + i + 1;
     }
     *end = 0;
-    return Labelled((regs->ax & 0xFF00) | c, 1);
+    return Labelled((asked.value & 0xFF00) | c, 1);
 }
 
 /* Work out the sizes of the directories in a panel's list, of all files
