@@ -2591,6 +2591,29 @@ in "The portable C".
     takes it for the same tree, and `harness/show.py --program` shows
     the two side by side. The editor's F4 is a view of the memory at
     `ViewSeg` in hex.
+  - Which functions of the batches ran is asked of that program while
+    its record holds, of what ran in the scenarios that pass; a
+    scenario that is off the record is not counted, being ended at its
+    first screen that differs. A function that the program has under
+    another name may be static in its file, as the entry of the
+    critical error is, `DeviceEntry` of `dos32.c` for `FatErr`:
+    `RENAMED` of `harness/ported.py`, which finds a static name in the
+    linker's map (`TODO.md`, "W, the switch").
+  - What that program does otherwise than the original, declared or
+    not, is in one list with what the user decided of each: `TODO.md`,
+    "The program of 32 bits: what differs from the original, for the
+    user". A difference of it that a piece meets goes there, and to
+    the user, before it is declared.
+  - What a program asks of DOS, call for call, with the segments that
+    DOS gets in real mode, `harness/trial32/calls.asm` writes to a
+    file: it takes INT 21h and runs the program under the program's
+    name, so the driver drives it. That is how the registers and the
+    calls of entry 6 of `DEVIATIONS.md` were seen for the program of
+    32 bits. Under the extender, DS of real mode holds what AX holds
+    at a call that takes no address, and is not on the program's data
+    at any.
+  - `harness/notice.py --build portable_c32` tries a change on the
+    program of 32 bits, through the scenarios of its record.
 
 ### Moving a file to the system's functions
 

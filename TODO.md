@@ -3246,13 +3246,17 @@ checkout's `build/tmp` by itself; no `TMPDIR` is wanted.
 - `--record` only adds. The plan had it write the record. With a
   scenario of the record failing it writes nothing and says which.
 - What ran of the C is not asked while a scenario fails, as the plan
-  has it; that every function of a batch is linked, or is gone or
-  renamed as the tables say, is held from the first day. `FatErr`,
+  has it (asked since W while the record holds, of the scenarios that
+  pass: "W, the switch" below); that every function of a batch is
+  linked, or is gone or renamed as the tables say, is held from the
+  first day. `FatErr`,
   `Exit01` and `Exit05` are gone from this tree and `Alloc0` is
   `Start`, as S3 and D2 wrote for this piece. The entry of the critical
   error in `dos32.c`, `DeviceEntry`, is static, and the map as
   `coverage.link_map` reads it has no static name: when what ran is
   asked, nothing holds that it ran but the scenarios that show the box.
+  (Held since W: the map has static names, `le.Map.named`, and
+  `FatErr` is renamed to it for this tree.)
 - `check_place`, which the plan did not have: from QEMU's log, the test
   holds in every scenario that the program's code ran with its first
   object at `le.BENCH`, where the driver reads. H2 had that as a thing
@@ -3394,7 +3398,9 @@ What would mend it, by reading and not tried:
 - The checks of the words of the addresses in the debug program,
   `CHECKED`, which B2 left to whoever first has a wild read to find.
 - `harness/place.py` and `harness/notice.py` know the two trees of 16
-  bits and no other.
+  bits and no other. (`notice.py` builds the program of 32 bits since
+  W, `--build portable_c32`; `place.py` is of programs of 16 bits by
+  what it is for.)
 
 For the convergence: a piece runs the test, takes a family from "What
 fails", mends it under both builds, runs `--record`, and commits the
@@ -3655,7 +3661,7 @@ and H1 are started at once by the session.
 | R1, `resident.c` renamed | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
 | C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
-| W, the switch | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
+| W, the switch. Half done: see "W, the switch" below, which has what waits and for what | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
 | Z1, the 16-bit build goes | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
 | Z2, the words go | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
 
@@ -6751,6 +6757,124 @@ the user asks.
   flat program yet (H2), nor of its copies.
 - `ended` passes since E, which landed beside this piece, with the
   16-bit program's patch: "E, the end by another's hand" above.
+
+### W, the switch: what does not wait is done, and what waits
+
+W is the piece that ends the step: the tests of the portable C judge
+the program of 32 bits, and the 16-bit one has another name beside it.
+Its row asks that every scenario pass first, and one does not,
+`command`, which is the user's and open (9 of what is open). So the
+switch itself waits. This is what the row asks, what of it was done
+already or is done now, and exactly what is left. Made on 13 October
+2026, from `1eb233c`.
+
+**What the row asks, and where each thing stands.**
+
+| The row | Stands |
+|---|---|
+| The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it | Waits: for `command`, and see "The switch" below. What those tests hold is held of the program of 32 bits today, under the names `portable_c32-`: the next table |
+| Entry 1 of `DEVIATIONS.md` | Done. C2 wrote "The program of 32 bits" there, with the rows of `second-copy` and `start-memory`; E the row of `ended`; W two points more, on the user's word: what the program wants of the machine, and what the extender is in it |
+| What the others say of `ended` | Entry 1's row, done by E and C2. Entry 8, what is left of the machine when DOS ends the program: the other agent's, with the mend of 2 of the list |
+| The patches of `second-copy`, `start-memory`, `ended` | Done: the first two are C2's, of this build's own; `ended` is one patch for both programs, and W had its reason say what is so of each |
+| The README | "The program of 32 bits", "The extender" and the rows of the tests were written by the pieces as they went. W wrote what was left for it: how such a program is driven, "When a step is finished", how its code is known, "What ran", and where its stack is, "The machines". What turns round with the names waits with the switch |
+| Entry 6, which D2 and E left for W | Done, on the user's word: "The program of 32 bits" there, the registers and the calls, seen first with `harness/trial32/calls.asm` |
+
+**What the tests of the 16-bit program hold, and whether those of the
+program of 32 bits hold it.**
+
+| What | The 16-bit program | The program of 32 bits |
+|---|---|---|
+| Every scenario as the original's golden, with what is declared | `portable_c-scenarios`: all | `portable_c32-scenarios`: the record, 153 of the 154 that it is taken through. `command` is off it; `editor-big` is not run, by entry 13 |
+| Every instruction of a batch ran in the original | The same check, of the goldens | The same, by the same run |
+| Every C function of a batch ran | Held | Held since W. It was asked only "once every scenario passes", which `command` kept from ever being so. It is asked now while the record holds, of what ran in the scenarios that pass. A run of them all was kept and asked first: each of the 169 functions that the batches name for this program ran in the 153, and none of them shares its place in the map with another function, which `wcc386 -os` may do to two that have the same instructions |
+| The entry of the critical error ran, `FatErr` | Held: a function of a batch | Held since W, as `DeviceEntry` of `dos32.c`. It was listed as gone, for being static; the linker's map has static names, and a function that a tree has under another name may be static now (`RENAMED`, `check_translation`). It ran in five scenarios, `not-ready`, `device`, `tree-choose`, `find-drives` and `attributes-directory`, and without those the check fails, which was tried |
+| `Exit01`, `Exit05`, where DOS goes on when it has ended the program | Held: functions of a batch | Not as functions: they are 28 bytes of real mode in a block below the megabyte, `Ended_T`, of which QEMU's log of the program's code has nothing. That they ran is held by the registers that `ended` shows |
+| Half of the stack left in every scenario | Held: 4,096 bytes | Held, of 16,384: 14,790 left at the least, in `attributes-directory`, where the critical error is 512 bytes deeper |
+| The layout that the machine of the tests asks | Code below F000h in its segment, none within 4K of the stack, the stack last | The first is not asked of a flat program. The other two in their flat form, and what the words of the addresses rest on: `harness/layoutcheck.py`, asked by the scenarios' test before it runs anything and by `portable_c32-layout` |
+| Where the driver reads | In the segment that DS is on | `check_place`: the program and every copy of it ran where the driver was told, by QEMU's log |
+| The tables against the original's | `portable_c-data`, with `harness/reads.py` | `portable_c32-data`, the same tables and the same reads, field by field where an object has pointers |
+| The comparison itself | A cell changed or an entry of a disk gone is reported | The same, by the same run |
+| What is declared fits the harness | `check_declared` | The same, and that what is said for the build alone names a scenario that the portable C is taken through |
+| The source as another compiler reads it, and its arithmetic | `portable_c-host`, `portable_c-int16` | They are of the source, not of a build, and read `dos32.c` with the rest. Nothing to take over |
+| `__U4M` and `__U4D` | `portable_c-arith` | The program has neither: `wcc386` multiplies and divides by itself. The test goes with `arith.c`, in Z1 |
+| The length of the file | Held to none | Held to none |
+| The debug program | There is none of 16 bits | `portable_c32-debug-layout` alone. No machine runs it, since it takes more instructions and a scenario that shows the time of day may fail in it alone |
+
+So nothing that the 16-bit program's tests hold goes unheld of the
+program of 32 bits today but what `command` shows, and what waits in
+the list of what differs.
+
+**What W did**, each a commit:
+
+- The list, "The program of 32 bits: what differs from the original,
+  for the user", behind this section, and what the user decided of it.
+- `harness/ported.py`: which functions ran, and `DeviceEntry`, as the
+  table has them. Tried without a machine, on what a run of all the
+  scenarios had kept: the check passes, fails with the five scenarios
+  of the critical error left out, and says of the two trees of 16 bits
+  what it said.
+- `harness/notice.py` built nothing any more, for either tree: the
+  build has made a tool of `tools/stub.c` since B2, and the copy that
+  the script builds had no such file. Mended. And `--build
+  portable_c32` has it build and run the program of 32 bits, through
+  the scenarios of its record: when the 16-bit build goes, that is the
+  only program that a change to the tree can be tried on.
+- The README, as the first table has it.
+- The reason in `harness/goldens/portable_c/ended.patch`.
+- `harness/trial32/calls.asm`, and with what it showed the two parts of
+  `DEVIATIONS.md`.
+
+**Not done, and why not.**
+
+- `harness/place.py` says where the stack of a program of 16 bits ends
+  in its page of the memory, for the driver's choice of where DOS loads
+  the program. The stack of a flat program is where the linker put it
+  above the megabyte, whatever DOS does, and the rule that it answers
+  to is `layoutcheck.py`'s. It stays a tool of the 16-bit trees and of
+  the original, and needs nothing.
+- `harness/trial32/both.py`, the toy that holds `dos32.c` against
+  `dos.c` function for function, is run by hand and passes, 28 screens.
+  It could be a test of the build for as long as there are two files
+  to hold against one another, which is until Z1. Not made one: it
+  builds with a script of its own and runs two machines, and what it
+  guards, a change to `dos32.c` that makes the two answer otherwise,
+  has not been lost to yet.
+- `CHECKED`, the checks of the debug program, which B2 left to whoever
+  first has a wild read to find, and C1 argued for. Not W's.
+
+**The switch, which waits.** A piece of its own when it can be made.
+
+| | |
+|---|---|
+| Waits for | `command` on the record, by whichever way the user decides 1 of the list; the mend of 2, which changes what a patch or an entry says; and best the user's word on 8 of what is open, whether the 16-bit build may go, since that decides whether the switch is worth making at all: see below |
+| The build | The targets and directories of `CMakeLists.txt` change names: `portable_c` is the program of 32 bits, with `debug/` in it, and the program of 16 bits a name of its own, `portable_c16` say. The names of the tests follow the directories |
+| The harness's names | `deviations.SOURCE` turns round, the 16-bit build being the one of another tree's source. `TREES`: the tree's entry is then what is declared of the program of 32 bits, with `editor-big` not run, and the 16-bit build is that with something taken away, which `Declared.also()` cannot say: it only adds. Either a common entry that both add to, or a way to take away. `GONE` and `RENAMED` of `ported.py` turn round in the same way, the entries of `dos.c` being the 16-bit build's. `RECORDS` loses the tree and `harness/pass32.txt` goes, once the record is every scenario. `goldens.TREES`, and the patches: those of `harness/goldens/portable_c32/` become the tree's, and the tree's of `second-copy` and `start-memory` go to a directory of the 16-bit build's name. `tools/figures.py`, `harness/notice.py`, `harness/place.py`, `harness/datacheck.py` and `harness/reads.py` by the names that they have for a build's directory |
+| The documents | The README is written of the program of 16 bits throughout, "that everything else here is said of": "The figures", "Staying in the memory whole", "The system in one place", "What rests on Open Watcom", "Inline assembly". `DEVIATIONS.md` says "the program of 32 bits" for the one that is other, in entries 1, 6 and 13. Both turn round, and that is the larger part of the work |
+| Size | Not the "small" of the table of pieces: half a day to a day, most of it the documents and the way for a build to be declared to do less than its tree |
+| Right when | Both builds pass everything from one source, under the new names; every golden derived again leaves `harness/goldens/` clean; the 16-bit `VC.EXE` is the same bytes |
+
+What W thinks of it, for the session and the user: the switch gives the
+16-bit build a name and a place in every table, to be deleted by the
+next piece. If the user releases the 16-bit build when asked, the two
+are better one piece: the program of 32 bits takes the names and the
+16-bit build goes in the same change, with no name invented for it, no
+`also()` that takes away, and the documents turned round once. The
+switch as the plan has it is worth its work only if the two builds are
+to stand side by side for a while behind it.
+
+**For the piece behind this one.**
+
+- A tree with a record is asked which functions ran as soon as its
+  record holds. A build that starts a record from nothing fails that
+  for every function that its passing scenarios do not reach: such a
+  build wants the condition in `main()` of `ported.py` put back as it
+  was for its first days, one that waits for every scenario.
+- `harness/trial32/calls.asm` says what DOS is asked, call for call. A
+  change to `dos32.c`, or to the extender's settings, that is to leave
+  the calls as they are can be held by it: the two lists of this piece
+  were made by the line at its top and compared by AX.
+- A patch that two builds are held to says in its reason what is so of
+  each: `ended` did not, and nothing fails for a reason.
 
 ## The program of 32 bits: what differs from the original, for the user
 
