@@ -342,6 +342,7 @@ static u16 C00_01(void)
     const u8 *end;
     u8 *name, *part, *to;
     struct Answer opened;
+    struct Device device;
     u16 count, i, kind, info;
     u8 c;
 
@@ -376,15 +377,15 @@ static u16 C00_01(void)
     if (kind == 0) {
         if (ChgDisk(CpDest))
             return 0;
-        regs.name = CpDest;
         opened = OpenFil(CpDest, 0x40);
         if (opened.failed == 0) {
-            regs.ax = 0x4400;
-            regs.bx = opened.value;
-            CALL(regs);
-            info = DX_OF(regs);
-            regs.ax = 0x3E00;
-            CALL(regs);
+            device = FileDevice(opened.value);
+            info = device.kind;
+            /* The assembly goes on with DX as it is, which DOS has not
+               set if it would not say: the address of the name. */
+            if (device.failed)
+                info = (u16)CpDest;
+            FileClose(opened.value);
             if (info & 0x80) {
                 CpDev2 = 1;
                 kind = 3;
@@ -622,6 +623,7 @@ static u16 C20_00(u16 fits)
     struct DosRegs regs;
     u32 left, free;
     struct Answer opened;
+    struct Device device;
     u16 result, error, report, answer, info, attributes;
     u16 segment, offset, count, got, i;
     u16 *screen;
@@ -650,16 +652,19 @@ static u16 C20_00(u16 fits)
     }
     if (ChgDisk(CpSrc))
         goto stop;
-    regs.name = CpSrc;
     opened = OpenFil(CpSrc, 0x40);
     error = opened.value;
     if (opened.failed)
         goto unopened;
     CpHndl1 = opened.value;
-    regs.bx = opened.value;
-    regs.ax = 0x4400;
-    CALL(regs);
-    info = DX_OF(regs);
+    device = FileDevice(CpHndl1);
+    info = device.kind;
+    /* The assembly goes on with DX as it is, which DOS has not set if it
+       would not say what the handle is: the address of the name, here
+       and for the target. */
+    if (device.failed)
+        info = (u16)CpSrc;
+    regs.bx = CpHndl1;
     if ((info & 0x81) == 0x81)
         goto no_source;
     CpDev1 = (u8)(info & 0x80);
@@ -728,9 +733,7 @@ read:
     } while (left != 0);
     goto target;
 ended:
-    regs.bx = CpHndl1;
-    regs.ax = 0x3E00;
-    CALL(regs);
+    FileClose(CpHndl1);
     CpHndl1 = 0;
     if (CpDev1 != 0) {
         CpSize = CpRead;
@@ -791,20 +794,18 @@ open:
     }
     FncChg = 1;
 create:
-    regs.cx = 0x20;
-    regs.ax = 0x3C00;
-    if (CALL(regs)) {
-        error = regs.ax;
+    opened = FileCreate(CpDest, 0x20);
+    error = opened.value;
+    if (opened.failed)
         goto no_target;
-    }
-    opened.value = regs.ax;
 opened:
     CpHndl2 = opened.value;
     FncChg = 1;
-    regs.bx = opened.value;
-    regs.ax = 0x4400;
-    CALL(regs);
-    if ((DX_OF(regs) & 0x82) != 0x82)
+    device = FileDevice(CpHndl2);
+    info = device.kind;
+    if (device.failed)
+        info = (u16)CpDest;
+    if ((info & 0x82) != 0x82)
         goto write;
     error = 0;
     goto no_target;
@@ -914,8 +915,7 @@ write:
 
     regs.bx = CpHndl2;
     SetDate((struct DosRegs STACK *)&regs);
-    regs.ax = 0x3E00;
-    if (CALL(regs))
+    if (FileClose(CpHndl2).failed)
         goto stop;
     if (CpDev2 == 0) {
         regs.name = CpDest;
@@ -992,8 +992,7 @@ full:
     regs.ax = 0x4202;
     CALL(regs);
     info = regs.ax | DX_OF(regs);
-    regs.ax = 0x3E00;
-    if (CALL(regs))
+    if (FileClose(CpHndl2).failed)
         goto forget;
     regs.name = CpDest;
     if (info == 0) {
@@ -1065,19 +1064,14 @@ terminate:
     result = STOP;
     md.BlocEr = 1;
     if (CpHndl2 != 0 && !ChgDisk(CpDest)) {
-        regs.bx = CpHndl2;
-        regs.ax = 0x3E00;
-        CALL(regs);
+        FileClose(CpHndl2);
         regs.name = CpDest;
         regs.ax = 0x4100;
         CALL(regs);
     }
 close_source:
-    if (CpHndl1 != 0) {
-        regs.bx = CpHndl1;
-        regs.ax = 0x3E00;
-        CALL(regs);
-    }
+    if (CpHndl1 != 0)
+        FileClose(CpHndl1);
     md.BlocEr = 0;
     goto close;
 
