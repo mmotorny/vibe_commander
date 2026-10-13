@@ -1015,16 +1015,13 @@ static struct Answer Failed(u16 error)
    DOS says is an error, and that is returned. */
 static struct Answer T80_01(void)
 {
-    struct DosRegs regs;
+    struct FileAttr asked = FileAttributes(md.ViewFil);
 
-    regs.ax = 0x4300;
-    regs.name = md.ViewFil;
-    if (Intr21((struct DosRegs STACK *)&regs)) {
-        if (regs.ax != ERR_NO_FILE)
-            return Failed(regs.ax);
-        regs.cx = 0;
-    }
-    return Done(regs.cx & 0x3F | 0x20);
+    if (asked.failed && asked.value != ERR_NO_FILE)
+        return Failed(asked.value);
+    /* A file that is not there has none: 0, which FileAttributes answers
+       with where it failed. */
+    return Done(asked.attributes & 0x3F | 0x20);
 }
 
 /* The name of the file, as the box about a read-only file shows it. */
@@ -1049,84 +1046,76 @@ static void T80_Name(void)
    disk that is full. The file is closed whatever happened, and gets its
    attributes back; that DOS denies access for that is no error.
 
-   The registers go from one call of DOS to the next as it leaves them,
-   but for AL where DOS does not read it. */
+   The file is made with the attributes less Read-only: those that it
+   has just been given, or its own, which have none then. */
 static struct Answer T80_02(u16 attributes)
 {
-    struct DosRegs regs;
+    struct Answer answer;
+    struct Device device;
     u32 left;
-    u16 segment, error, failed;
+    u16 handle, segment, count, error, failed;
 
-    regs.name = md.ViewFil;
-    regs.cx = attributes;
     if (attributes & 1) {
-        regs.cx = attributes & 0xFFFE;
-        regs.ax = 0x4301;
-        if (Intr21((struct DosRegs STACK *)&regs))
-            return Failed(regs.ax);
+        answer = FileSetAttributes(md.ViewFil, attributes & 0xFFFE);
+        if (answer.failed)
+            return Failed(answer.value);
         ed.EdWrite = 1;
     }
-    regs.ax = 0x3C00;
-    if (Intr21((struct DosRegs STACK *)&regs))
-        return Failed(regs.ax);
+    answer = FileCreate(md.ViewFil, attributes & 0xFFFE);
+    if (answer.failed)
+        return Failed(answer.value);
     ed.EdWrite = 1;
-    regs.bx = regs.ax;
-    regs.ax = 0x4400;
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    error = regs.ax;
+    handle = answer.value;
+    device = FileDevice(handle);
+    failed = device.failed;
+    error = device.value;
     if (!failed) {
-        if ((u16)(u32)regs.name & 0x80) {
-            if ((u16)(u32)regs.name & 2)
+        if (device.kind & 0x80) {
+            if (device.kind & 2)
                 goto close;
             attributes = 0xFFFF;
         }
         left = ed.EdLen;
         segment = md.ViewSeg;
         do {
-            regs.cx = 0xFF00;
-            if (HIGH(left) == 0 && LOW(left) < regs.cx)
-                regs.cx = LOW(left);
-            regs.name = AT(segment, 0);
-            regs.ax = 0x4000;
-            failed = Intr21((struct DosRegs STACK *)&regs);
-            error = regs.ax;
+            count = 0xFF00;
+            if (HIGH(left) == 0 && LOW(left) < count)
+                count = LOW(left);
+            answer = FileWrite(handle, AT(segment, 0), count);
+            failed = answer.failed;
+            error = answer.value;
             if (failed)
                 goto close;
-            if (regs.ax != regs.cx) {
-                failed = regs.ax < regs.cx;
+            if (answer.value != count) {
+                failed = answer.value < count;
                 error = ERR_DISK_FULL;
                 goto close;
             }
             segment += 0xFF0;
-            left -= regs.cx;
+            left -= count;
         } while (left != 0);
     }
 close:
-    regs.ax = 0x3E00;
-    if (Intr21((struct DosRegs STACK *)&regs))
-        return Failed(regs.ax);
+    answer = FileClose(handle);
+    if (answer.failed)
+        return Failed(answer.value);
     if (failed)
         return Failed(error);
     if (attributes == 0xFFFF)
         return Done(0);
-    regs.cx = attributes;
-    regs.name = md.ViewFil;
-    regs.ax = 0x4301;
-    if (Intr21((struct DosRegs STACK *)&regs)
-        && regs.ax != ERR_NO_ACCESS)
-        return Failed(regs.ax);
+    answer = FileSetAttributes(md.ViewFil, attributes);
+    if (answer.failed && answer.value != ERR_NO_ACCESS)
+        return Failed(answer.value);
     return Done(0);
 }
 
 /* Delete the file. Returns 0, or the error. */
 static struct Answer T80_03(void)
 {
-    struct DosRegs regs;
+    struct Answer deleted = FileDelete(md.ViewFil);
 
-    regs.ax = 0x4100;
-    regs.name = md.ViewFil;
-    if (Intr21((struct DosRegs STACK *)&regs))
-        return Failed(regs.ax);
+    if (deleted.failed)
+        return Failed(deleted.value);
     return Done(0);
 }
 
@@ -1142,7 +1131,6 @@ static struct Answer T80_03(void)
    Nothing is done if the file was not written. */
 static void T80_14(void)
 {
-    struct DosRegs regs;
     const u8 *name = md.ViewFil;
     const u8 *file;
     const u8 __far *text;
@@ -1158,10 +1146,7 @@ static void T80_14(void)
     md.TmpBuf[0] = (u8)letter;
     md.TmpBuf[1] = ':';
     md.TmpBuf[2] = '\\';
-    regs.ax = 0x4700;
-    regs.name = AT(MAIN_DATA(), (u8)(letter - ('A' - 1)));
-    regs.si = (u16)(md.TmpBuf + 3);
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (DirCurrent(letter - ('A' - 1), md.TmpBuf + 3).failed)
         return;
     to = md.TmpBuf + 2;
     if (*name != '\\') {
@@ -2567,7 +2552,7 @@ static struct EditEnd Ends(u16 how, u16 written)
    and the extension files have ten lines of help below theirs. */
 struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
 {
-    struct DosRegs regs;
+    struct Answer read;
     struct LineArgs line;
     const u8 __far *name;
     u8 __far *end;
@@ -2619,22 +2604,19 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
                           MAIN_SEG) != 0)
             goto closed;
     } else {
-        regs.bx = handle;               /* T00_06 */
-        left = ed.EdLen;
+        left = ed.EdLen;                /* T00_06 */
         segment = md.ViewSeg;
         for (;;) {
             count = PIECE;              /* T00_07 */
             if (HIGH(left) == 0 && LOW(left) < count)
                 count = LOW(left);
-            regs.cx = count;            /* T00_08 */
-            regs.name = AT(segment, 0);
-            regs.ax = 0x3F00;
-            if (Intr21((struct DosRegs STACK *)&regs))
+            read = FileRead(handle, AT(segment, 0), count);     /* T00_08 */
+            if (read.failed)
                 goto closed;            /* T00_09 */
             if (TstBrk())
                 goto closed;
-            if (regs.ax != count) {
-                left -= regs.ax;        /* T00_11 */
+            if (read.value != count) {
+                left -= read.value;     /* T00_11 */
                 ed.EdLen -= left;
                 break;
             }
@@ -2643,8 +2625,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
             if (left == 0)
                 break;
         }
-        regs.ax = 0x3E00;               /* T00_12 */
-        Intr21((struct DosRegs STACK *)&regs);
+        FileClose(handle);              /* T00_12 */
     }
     ResWin(begin, size, (u16)md.WinBuf);        /* T00_13 */
     Window(begin, size);

@@ -248,7 +248,6 @@ file. Whoever moves a file takes it out of the table:
 | 1 | `copy.c` 60 | 60 |
 | 2 | `start.c` 31, `resident.c` 34, of which 11 stay | 65 |
 | 3 | `dirfunc.c` 15, `read.c` 10, `usermenu.c` 10, `treebox.c` 8, `drive.c` 5, `setup.c` 4 | 52 |
-| 4 | `view.c` 16, `find.c` 14, `edit.c` 11, `help.c` 3 | 44 |
 | 5 | `blank.c` 15, `main.c` 9, `enter.c` 7, `commands.c` 7, `keys.c` 3, `bars.c` 1, `menu.c` 1 | 43 |
 
 Then, when no file is left that calls them: `Intr21` and `Intr21f` of

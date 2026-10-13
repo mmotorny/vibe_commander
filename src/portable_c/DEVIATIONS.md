@@ -433,6 +433,8 @@ are added here as they go.
 | `FindFil`, `find.c` | DOS 3Eh, a file that was searched closed | CX and DX as the calls before left them, the address of `TmpBuf` in DX in the C translation | CX and DX 0 |
 | `F67_00`, `find.c` | DOS 4409h and 4408h, a drive asked whether it is of a network and whether its disk can be taken out | CX: the drive, 0 for A:. DX: the address of the path for 4409h, and for 4408h what 4409h left there | CX as it comes, DX 0 |
 | `F67_00`, `find.c` | DOS 0Eh and 19h behind Go to, a drive made the current one and the current one asked for | DS: the segment of the list for 0Eh and of the panel for 19h, of the list for both in the C translation. DL of 19h: the drive still | DS on the main data. DL 0 for 19h |
+| `T80_02`, `edit.c` | DOS 4400h, what the handle of the file is that was made, and 3Eh, the file closed | 4400h: CX the attributes and DS:DX on the name of the file. 3Eh: CX the attributes, the count of the last write in the C translation, and DX as the call before left it; DS on the piece last written in the C translation | 4400h: CX as it comes, DX 0. 3Eh: CX and DX 0, DS on the main data |
+| `T00_00`, `edit.c` | DOS 3Eh, the file closed that was read | CX: the count of the last read. DS: the segment of the piece last read | CX 0, DS on the main data |
 
 What is known to read such a register, and where the portable C will
 hand it something else when the file goes over:
