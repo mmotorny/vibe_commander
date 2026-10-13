@@ -217,7 +217,9 @@ struct MainDat {
     u8  TopView;                        /* TopView output: of the
                                            original. Not set or read
                                            here */
-    u8  DesqVie;                        /* Running under DESQVIEW */
+    u8  DesqVie;                        /* Running under DESQVIEW: of
+                                           the original. Not set or read
+                                           here */
     u8  WinLeav;                        /* Leave time under Windows */
     u8  CrntCol;                        /* Color which DOS currently uses */
     u8  Quote;                          /* Quote next character */
@@ -535,7 +537,6 @@ u16 InPort(u16 port);
 void IntOff(void);
 void IntOn(void);
 void Int28(void);
-void DvPause(void);
 
 /* The registers as an interrupt function of the compiler saves them on
    the stack and puts them back: its first parameter. */

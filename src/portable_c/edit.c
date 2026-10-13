@@ -2512,8 +2512,8 @@ static void T00_19(void)
                 bar = 7;
         }
         key = Input(bar);
-        if (md.DesqVie == 0)
-            ClrKbd();
+        ClrKbd();                       /* not under DESQview, in the
+                                           original */
         HidCur();                       /* T00_82 */
         if (key >> 8 == 0xFC)
             continue;

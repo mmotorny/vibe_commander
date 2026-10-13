@@ -95,7 +95,7 @@ left open:
   of `passed-on` takes as an interrupt of its own and that of
   `handed-on` cannot get behind: where the program hands that on is a
   variable, not a word that its code names.
-- The file is 184,956 bytes, 2.84 times the original's, where the
+- The file is 184,876 bytes, 2.84 times the original's, where the
   scenarios' test fails at 3: some 10 KB are left. The main data's
   zeros are 62.6 KB of it. They are in the file because the main data
   has to be at offset 0 of a segment, the linker starts a segment on a
@@ -328,7 +328,9 @@ than it is would pass.
   was one that a model of the routine, written from the assembly, has
   after some turn. See what the batch lost time to, below.
 - Of `LeaveTm`, six instructions of the original have run in no
-  scenario and are listed as out of reach: they are for DESQview.
+  scenario and are listed as out of reach: they are for DESQview. The
+  portable C has nothing for DESQview any more
+  (`src/portable_c/DEVIATIONS.md`, 3).
 - `ClsLine` fills a row with the colour that DOS writes in, and reads
   that colour through DS, where every other routine of its kind goes by
   ES. One caller comes with DS on a panel: a command of a menu or of an

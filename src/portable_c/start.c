@@ -621,7 +621,7 @@ static void CurNl(struct BiosRegs STACK *regs)
    itself again after a command. Then the display: an EGA or VGA and its rows,
    whether writing to it has to wait for the beam, and where its memory
    is; the original also asks whether TopView or DESQview shows a buffer
-   in its place, and draws into that. Whether DESQview runs; the
+   in its place, and draws into that, and whether DESQview runs. The
    version of DOS; and the colour in which DOS writes, found by having
    it write a space.
 
@@ -795,13 +795,6 @@ void IniData(void)
                                            of the display, at the page
                                            that is shown */
     *((u16 *)&md.Screen + 1) = segment;
-    regs.ax = 0x2B01;                   /* Check DESQview: a date that
-                                           DOS refuses */
-    regs.bx = segment;
-    regs.cx = 0x4445;                   /* 'DE' */
-    regs.name = (const u8 __far *)&md + 0x5351;     /* 'SQ' */
-    Int21d((struct DosRegs STACK *)&regs);
-    md.DesqVie = (u8)(regs.ax + 1);
     regs.ax = 0x3306;                   /* VerDOS: the version that DOS
                                            has, whatever it says to a
                                            program that asks otherwise */

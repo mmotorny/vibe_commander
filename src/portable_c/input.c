@@ -217,7 +217,8 @@ Inpt12:
     flags = Int16(0x200).key & 0xFF;
     was = KbdFlgs;
     KbdFlgs = flags;
-    if (md.DesqVie == 0 && md.AltBar != 0) {
+    if (md.AltBar != 0) {               /* and not under DESQview, in
+                                           the original */
         /* A tap on Alt: Alt is all that has changed since the round
            before, and that was less than three ticks ago. The assembly
            tests the time in 16 bits, twice the high word of the

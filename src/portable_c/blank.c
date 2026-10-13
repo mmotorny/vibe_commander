@@ -48,8 +48,6 @@ void LeaveTm(void)
     Int28();
     if (md.WinLeav == 0 && (Int2F(0x1680, 0, 0).ax & 0xFF) == 0x80)
         md.WinLeav = 1;
-    if (md.DesqVie != 0)
-        DvPause();
 }
 
 /* A random number below `limit`, which is 255 at the most: the high word

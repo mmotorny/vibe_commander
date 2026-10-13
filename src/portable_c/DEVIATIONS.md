@@ -139,9 +139,9 @@ it.
   later.
 
 What it costs in memory. While a command runs the portable C keeps
-194,800 bytes, the program and its panels, where the original keeps
+194,720 bytes, the program and its panels, where the original keeps
 12,704 and the C translation 19,728. On the bench of the tests DOS has
-230,736 bytes for a command run from the portable C, 412,848 for one run
+230,816 bytes for a command run from the portable C, 412,848 for one run
 from the original as it is distributed, and 405,824 for one run from the
 C translation. That is enough for every command of the scenarios but
 those of a second copy of the program: the bench has 500,128 bytes from
@@ -230,3 +230,47 @@ instructions that go by another address ran in no scenario, four that
 `harness/ported.py` lists as out of reach, in `Init34` and in `Window`.
 Every scenario is held against the golden that it was held against
 before.
+
+### 3. The program does not know of DESQview
+
+**What the original does.** When it starts, and again after every
+command, it asks whether it runs under DESQview, a program that shared a
+PC among programs of DOS, each in a window: it has DOS set a date that
+there is none of (INT 21h, AX 2B01h, with 'DE' in CX and 'SQ' in DX),
+which DOS refuses with FFh in AL and DESQview answers for itself. Under
+DESQview it does three things otherwise:
+
+- Every time it goes round waiting for a key, also while the screen is
+  blanked, it gives the rest of its turn to the other programs of
+  DESQview: three calls of INT 15h, which take it onto a stack of
+  DESQview's (AX 101Ah), pause it (1000h) and put it back on its own
+  (1025h).
+- Alt pressed and let go by itself does not bring up the menu bar,
+  whatever the Configuration has for "Alt alone selects menu": Alt is
+  the key by which DESQview's own menu is called.
+- The editor does not empty the keyboard of the keys that wait after
+  each key that it has taken, whatever the Configuration has for "Clear
+  keyboard buffer".
+
+**What the portable C does.** It does not ask, and does what the original
+does without DESQview, also under it: it makes none of those calls, Alt
+alone brings up the menu bar if the Configuration says so, and the editor
+empties the keyboard if the Configuration says so. `DvPause` of `dos.c`
+is gone, with the inline assembly that it was, `DesqviewPause`, six
+instructions, and the call of DOS in `IniData` of `start.c`. The byte of
+the main data that said whether DESQview runs, `DesqVie`, keeps its place
+and is neither set nor read.
+
+**Why.** It only made sense on DOS, and there only next to that one
+program. A system that shares the machine among programs by itself is
+not told by each of them that it may go on, and takes no key from them
+on the way; what the program has to say of being idle it says in one
+place, which is the call of INT 28h today and stays.
+
+**Which scenarios show it.** None. The bench does not run DESQview: DOS
+refuses the date, and of the original the six instructions that pause
+ran in no scenario and are listed as out of reach in
+`harness/ported.py`, in `LeaveTm`; the two tests of the byte, in `Input0`
+and in the editor, always went the way that the portable C now goes
+without testing. Every scenario is held against the golden that it was
+held against before.
