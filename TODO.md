@@ -1555,6 +1555,397 @@ have what the file is today.
 - Whether the line A20, which DOS/32A leaves on, troubles anything
   that a command runs.
 
+## An implementation of the layer for tests: future work
+
+The road of the portable C (`CLAUDE.md`, "The portable C") has a
+platform abstraction layer designed at its step 3, the implementation
+for DOS moved under it at step 4, and at step 5 a second implementation
+that builds and is not meant to run, a stub. An implementation of the
+layer made for tests would be a third: one that does run, on this
+computer, built by clang, with the common code of the program above it,
+and that answers the program where a system would. It is future work,
+on the user's word of 13 October 2026, with everything that it would
+give written down here. It is not started, and is not to be started
+without the user. The stub of step 5 stays a stub: making the
+implementation for tests in its place was proposed, and not taken.
+
+What is here was found on that day by reading the tree as it was at
+7fc7a51 and by counting, with nothing of the program run. Of every
+figure it is said whether it was counted, and by what, or is an
+estimate:
+
+- "IR" is counted in what clang wrote. clang 23 was given every file of
+  `src/portable_c/` for 32 bits, `clang -m32 -ffreestanding -std=gnu99
+  -O0 -S -emit-llvm`, with `__interrupt`, `__loadds` and
+  `__declspec(x)` defined away, and `dialog.c` and the files of tables
+  in a copy with the `LAID_OUT` lines taken out. It took 54 of the 55
+  files, all but `resident.c` with its `_asm`, and nothing counted so
+  is of that file. In what it wrote a script counted the functions, of
+  each its instructions, which is what a share of the program is a
+  share of below, its conditional branches, `br i1`, the cases of its
+  `switch` statements, and the functions that it calls by name; two
+  calls go through a pointer and were not followed. That clang reads a
+  file says nothing of whether it would run: a panel is a segment's
+  number there still.
+- "Regex" is a pattern counted in the source without its comments, or
+  in the listing of the original.
+- "Read" is sorted by reading, one thing at a time.
+- "The test's" is what the scenarios' test printed when it last ran
+  before that day.
+
+### What it would give
+
+1. **The sanitizers under the steps of the scenarios that there are.**
+   clang's address sanitizer stops a program at a read or a write
+   outside the object that a pointer is of, on every path that a step
+   takes and whatever the form of the read. The project has had to find
+   such reads by other means: `harness/reads.py` knows a read behind
+   the end of a constant by its form, or by an entry of `REVIEWED`
+   made by reading, and `CLAUDE.md` tells what it was made for, five
+   constants with a zero byte too many, `CrLf_S` among them, and
+   `User_S`, copied as 80 bytes from another file and found last. In a
+   flat memory, step 2 of the road, what lies behind an object is no
+   longer what the original has there, so the sanitizer's list is the
+   list of the places where the program goes by the layout of the
+   memory. The sanitizer of undefined behaviour stops at a shift by
+   too much, at a sum with a sign that does not fit, and at a number
+   read or written at an address that is not even, which
+   `harness/hostcheck.py` says at its top that it cannot see;
+   arithmetic that counts on an int of 16 bits it does not find, and 8
+   below is for that. The memory sanitizer stops at a value that is
+   used and was
+   never set: `SetStat` and the entry handed DOS a `name` that nothing
+   had set, DS and DX as the stack had them (`CLAUDE.md`, "Moving a
+   file to the system's functions"), and the audit with clang's
+   warnings named two variables, both set. The first two sanitizers
+   are there for a program of 32 bits and the third for one of 64 only:
+   that is what is known of clang, and was not tried.
+2. **The suite in seconds, on every build and in a CI.** An estimate:
+   nothing was run. What it rests on was measured, in "Ways of testing
+   that were tried": 77% of a scenario's time is the machine running
+   while the harness waits, most of it the program waiting for the
+   timer while a box grows. A clock that the implementation moves on
+   when the program says that it is idle takes that time away, and no
+   machine is started. The two tests of the scenarios take a little
+   under two minutes each today.
+3. **Mutation testing that can be paid for, which measures what
+   coverage does not.** That a branch ran does not mean that a screen
+   shows what it is for. `harness/notice.py` asks that of one change at
+   a time, with a build of a copy of the tree and a run of the
+   scenarios for each, minutes; it found three branches that no
+   scenario noticed in one batch of nine routines ("What batches have
+   lost time to"), and the table of the blanker's stars was three bytes
+   wrong with every scenario passing. One change to each conditional
+   branch of the program is some 3,300 runs: at seconds a run that is
+   an afternoon, an estimate, and at minutes it is not done. What
+   comes of it is the list of the branches that the goldens do not
+   watch.
+4. **The first measurement of the C's own branches.** What is measured
+   today is the instructions of the original that ran, 22,603 of the
+   22,981 that the 50 batches translate, 98.4% (the test's), and of the
+   C only that each function of a batch was entered
+   (`check_translation` of `harness/ported.py`). What is not measured,
+   of the original or of the C, is which way a jump went, and it cannot
+   be had from what is recorded: QEMU logs a block once, when it
+   translates it. The C has 3,297 conditional branches and 420 cases of
+   `switch` statements in its 521 functions outside `dos.c`, and
+   `dos.c` has 5 conditional branches in its 102 (IR); the listing of
+   the original has some 3,000 conditional jumps and loops (regex,
+   3,008, and a line that the pattern does not take is not counted).
+   The source has 2,406 `if`, 153 `while`, 439 `for`, and 215 `&&` and
+   132 `||` (regex, the files of code). clang's coverage by the source
+   says of every branch how often it went each way, `llvm-cov show
+   --show-branches=count`. Nobody knows the figure today, and none was
+   guessed. MC/DC is not worth its cost: the conditions came from
+   single conditional jumps, and few are of more than one part. What
+   to report is three lists that are never added up: the branches that
+   a scenario of the bench runs, where the original is the judge; those
+   that only a test on this computer runs, where reading is; and those
+   listed with a reason, as `unreached` is today. Only the first is
+   fidelity.
+5. **The paths that the bench cannot produce.** `harness/ported.py`
+   lists 378 instructions of the original as out of reach, with 94
+   reasons (counted there; the batches of the setup program had none
+   yet). Sorted by the kind of the reason (read):
+
+   | Why no scenario gets there | Instructions | With an implementation for tests |
+   |---|---|---|
+   | DOS refuses a call that it grants on the bench: a file that it will not delete, attributes that it will not set, a directory that it will not go to | 79 | reached: the test says the answer |
+   | Another machine: a CGA with snow, a network, a CD-ROM, no mouse, DESQview or TopView, no EGA | 60 | reached: the test says the answer |
+   | A disk that is full, a write that comes up short, the next disk | 43 | reached: the test says the answer |
+   | Memory that runs out, or more than there is room for | 42 | reached in part: where the program asks for memory and is refused |
+   | Another version of DOS | 30 | reached: the test says the answer |
+   | A drive that is not ready, the critical error | 19 | reached, if the layer has the critical error as a call back into the program: see below |
+   | The time of day at the end of a minute, an hour, a day | 14 | reached: the clock is the implementation's |
+   | A country that neither bench has | 11 | reached, also by calling the routine with the country's record |
+   | Code that nothing calls, or input that no step makes: markup that no text has, a file with a line end in every two bytes, a path of 68 characters | 80 | some 50 by calling the routine itself or with a file made for it (an estimate); the rest nothing reaches |
+
+   So 298 of the 378 are of the kinds that such an implementation
+   reaches. Some 50 of the 378 are of code that the portable C has not,
+   or not in that form: the 19 of the map of the memory, and most of
+   the 30 of the program's entry, which are for the block of the part
+   that goes (read, and not held against `GONE`). And the 378 are 1.6%
+   of the instructions: this is the last of the coverage, not a change
+   of its kind. What runs there has no golden behind it, see the
+   limits; "rests on reading" becomes "rests on reading, runs without
+   a fault, and is held from then on".
+6. **Unit and property tests of what reaches nothing of the system.**
+   The 521 functions outside `dos.c`, by what each reaches of
+   `sys.h`'s 84 functions, itself or through what it calls (IR; the
+   share is of the instructions clang wrote):
+
+   | Reaches | Functions | Share | Conditional branches |
+   |---|---|---|---|
+   | Nothing of the system | 189 | 22.0% | 644 |
+   | The screen only | 33 | 2.7% | 90 |
+   | The screen, the time, memory or the rest, and neither keys nor files | 40 | 7.8% | 241 |
+   | Files, and no keys | 22 | 3.3% | 109 |
+   | Keys or the mouse, and no files | 103 | 18.8% | 560 |
+   | Keys and files | 134 | 45.4% | 1,653 |
+
+   "Ways of testing that were tried" has 27% for the first row, of the
+   C translation and by another way. The program draws into its own
+   copy of the screen, `ScrBuf`, so much of what draws is in the first
+   row, and a test reads the cells there with no implementation of
+   anything. Those functions need the layer for nothing but to be
+   built on this computer. The candidates, each wholly or mostly in
+   the first row:
+
+   - `format.c`, all of it: `Number`, `PutSize`, `PutDate`, `PutTime`,
+     `BufDate`. Handed a country's record, they run 10 of the 11
+     instructions of a country that neither bench has; the eleventh is
+     of `M30_60`, the dialog of the attributes.
+   - `files.c`: `Sort`, `CmpPar`, `NearFl`, `FnFile`, `TstExe`, the
+     order and the filter of a panel; and `mask.c`.
+   - `extfile.c`, all of it: `FindExt` and `Item`, the lines of an
+     extension file.
+   - `tree.c`, all of it: `PutTree`, `TreeCur`; and `place.c`:
+     `CorPar`, `AdrNum`.
+   - `view.c`: `PrevLin`, `NextLin`, `V20_00`, `V32_00`, the table of
+     lines and a text looked for. `edit.c`: `T53_00`, `T54_00`,
+     `T72_00`, `T50_00`, the buffer.
+   - `string.c`, `digits.c`, and the markup of `line.c`.
+
+   Not among them: `copy.c`, of whose instructions two thirds are in
+   functions that call the system themselves, 2,549 of 3,896, so what
+   it decides it decides between two answers of DOS; and
+   `usermenu.c`, of which nothing is in the first row. Those want the
+   implementation, told what to answer.
+7. **Fuzzing.** First of the files that the program reads, each into
+   room of a fixed length: the setup file `VC.INI`, the extension files
+   `VC.EXT`, `VCVIEW.EXT` and `VCEDIT.EXT`, the menu file `VC.MNU`, the
+   tree's `TREEINFO.NCD`, `DIRINFO` and the help file; then of what a
+   directory lists and of sequences of keys. `unreached` has such
+   input as what no step makes: more directories than the tree has
+   room for, a list too long to keep, a setup file made elsewhere. It
+   looks for a fault, with the sanitizers on, and not for fidelity:
+   what the implementation shows there is held against nothing. Much
+   of what it finds will be the original's own, as `ClsLine` reading a
+   colour in a panel's list of files is, and each such is a bug of the
+   original that stays until its fix is decided: a list for the user,
+   not a list of things to mend.
+8. **The build of this computer held against the build for DOS on the
+   same steps.** `harness/hostcheck.py` says at its top what it cannot
+   see since it only reads, above all arithmetic that counts on an int
+   of 16 bits, and "The portable C: what another compiler says of it"
+   has it. With the answers recorded from a scenario, see below, the
+   build of this computer has to show the screens that the build for
+   DOS showed: where it does not, it has found such a place.
+9. **What it would have caught, of the bugs that this project had.**
+   By reading how each was found:
+
+   | The bug | What would have caught it |
+   |---|---|
+   | BX and DX going round the main loop from one command to the next: Rename behind Down offered a name that the original does not, and no scenario had the two keys one behind the other | Nothing on this computer. Sequences of keys made at random, on the bench, against the original: the first of the two things that need no layer, below |
+   | Texts read behind their end: `CrLf_S` with a zero byte too many, `User_S` copied as 80 bytes | The address sanitizer, in the first scenario that reads them |
+   | The table of the blanker's stars, three bytes wrong where no screen shows | Not this: `c-data` holds it now. Mutation testing would have said that no screen watches the blanker |
+   | A `name` that was never set, so DOS was handed what the stack held, in `SetStat` and at the entry | The memory sanitizer, in a build of 64 bits |
+   | CX as `T75_00` leaves it: the editor's count of free bytes wrong, a figure that is not compared | A property test of the editor's buffer: the count falls by one for every character typed, which "Known and not dealt with" asks for |
+
+### What it has to be
+
+The rule of "Scenarios" in `CLAUDE.md` is that a test puts no stand-in
+where something is that the project does not own, and that what a test
+knows of DOS, the BIOS and the machine it gets from the real ones. The
+layer is the project's. What a function of it promises is a statement
+about a system all the same: that `FileWrite` answers with fewer bytes
+on a disk that is full is so of DOS, whoever wrote the header. So an
+implementation for tests is within the rule only as this:
+
+- It knows nothing of its own of what a system does.
+- It answers what a test tells it to, the test's premise in so many
+  words, "the third write answers 5 of 512": scripted. It has a queue
+  of answers and no more.
+- Or it answers what the real system was recorded answering on the
+  bench, call for call: replay. Such a record is derived, as a golden
+  is, and never edited, and is taken only from a run whose screens were
+  the original's golden's.
+- Where a premise of a scripted test can be made to happen on the
+  bench, a small program asks the real DOS and holds the premise
+  against it, as the toys of `harness/trial32/` asked DOS/32A.
+
+An implementation that models DOS, a file system in the memory that
+behaves "as FreeDOS does", is what the rule forbids, behind our own
+interface as much as in front of it. It holds what we believe of DOS:
+the order of a directory, which error, what is left in AX. The code is
+then made to pass on it, and the bench disagrees, or is not asked. The
+one use that such a thing may have is under a fuzzer, where it only has
+to agree with itself and nothing that it shows is compared with
+anything.
+
+A wording for the rule was proposed. It is **not adopted**: the rule is
+the user's, and this is here as what was proposed, no more:
+
+> The layer is the project's, and an implementation of it made for
+> tests is a part of the program replaced. It answers what a test tells
+> it, or what the real system was recorded answering on the bench, and
+> knows nothing of its own of what a system does. What runs on it shows
+> what the program does with those answers; that a system gives them,
+> and that the program does as the original, only the bench shows.
+
+### Its limits
+
+- The goldens stay the only witness of what the original does. Nothing
+  here records the original, and nothing here says what DOS does.
+- The bench stays the gate: a step lands when it has passed its
+  scenarios on DOS, as now. What runs on this computer is what is run
+  while working, and where the bench cannot go. The implementation for
+  DOS is tested on the bench alone, whatever else there is.
+- What a unit test expects comes from reading the assembly. It holds a
+  behaviour in place and says where a failure is; it certifies no
+  fidelity. An expected screen written by hand would be a golden
+  edited by hand under another name: a test of a routine holds cells
+  and numbers that the routine is said to make, not screens.
+- A scripted failure shows what the program does with an answer. That
+  a system gives that answer, and that the original does the same with
+  it, it does not show: for the 298 instructions of the table there is
+  still no golden.
+- A recorded trace is valid only while the program asks the same
+  things in the same order. This is the session's reservation, and it
+  is right; what there is to add makes it sharper, not weaker. Replay
+  serves work that leaves the questions alone: pointers for segments,
+  numbers widened, a routine written anew above the layer, what is
+  drawn into the program's own buffer. Any change to what the program
+  asks of the system, one call more or two in another order, ends the
+  trace of every scenario that passes there, and those are recorded
+  again on the bench, from a run that has passed against the
+  original's golden. The same holds, for all of them at once, of a
+  change to the layer itself, so no trace is worth recording before
+  the design of step 3 has settled. Two things keep this from being a
+  trap. A replay that meets another question than was recorded fails,
+  it does not pass on a wrong answer, so a stale trace is noticed and
+  says that the bench is wanted. And a trace is a golden of the tree's
+  own, in the sense of `CLAUDE.md`: it shows that nothing has changed
+  since it was recorded, and what made it right was the bench.
+- The sanitizers and the coverage are of the build of this computer,
+  another compiler's of the same source, in a memory laid out
+  otherwise. A fault that only the layout of DOS makes they do not
+  see, and one that they see may be the original's.
+
+### What it asks of the layer's design
+
+The design of step 3 is made before any of this is built, and is not to
+close the door on it. What of today's `sys.h` helps (read):
+
+- 84 functions, each one thing asked, with no register in them.
+- A failure is a value that comes back, `struct Answer`, so an
+  implementation can be told to give it.
+- The screen is cells put and got, `ScreenPut` and `ScreenGet`, and the
+  keys are `KeyWaiting` and `KeyRead`: a test reads the one and fills
+  the other.
+- The timer and the time of day, memory, the version, the country,
+  the display and the mouse are all asked there, so a test can have
+  each be otherwise.
+- `Idle` is a call of its own. It is where `harness/DRIVER.ASM` knows
+  that a step is over, and where an implementation for tests would.
+- `dos.c` decides next to nothing: 5 conditional branches of the 3,302
+  counted (IR). An implementation without decisions needs no coverage,
+  and the bench is enough to judge it.
+
+And what hurts:
+
+- A decision of the program's under the seam: `AskEs` of `dos.c` makes
+  the error 53h of a call that the user gave up, asks DOS for its
+  extended error, and reads `md.ErrDat`. Every other implementation
+  would have to do the same again.
+- What a system enters of the program is outside the header: `FatErr`
+  of `main.c` is an `__interrupt` function that `SetVector` hooks, and
+  `resident.c` has the entries. With the critical error not a call
+  back that the layer names, the build of this computer does not link,
+  and the 19 instructions of a drive that is not ready stay out of
+  reach.
+- What DOS happens to do, in what the functions take and answer: some
+  25 of the 84 have such a thing (read, and approximate). `value` as
+  DOS left AX where nothing failed, `flagged`, what `FileSeek` answers
+  when it fails, the five functions with Bare in their names, the page
+  and the colour of `ScreenType`, `FcbParse` and `FcbDelete`,
+  `ScreenMemory` and `ScreenPageStart`, `ProgramPrefix`, memory by the
+  segment. Each is one thing more that every implementation and every
+  trace has to do as DOS does. Taking one out is a deviation, to be
+  asked.
+- What the system keeps between two calls and no call names: the
+  current drive and directory, the record of a search, `FindRecord`,
+  how often the pointer was hidden.
+- Nothing that a test can call to start the program: it is entered in
+  `resident.c`, as DOS enters it, and `ProgramEnd` does not return.
+
+So, of the design:
+
+- Low and narrow, as `sys.h` is. A layer that knows more, a file system
+  or a console, takes logic under it, where only the bench sees it and
+  every implementation writes it again; and replay rests on a trace of
+  small questions being all that the program knew.
+- An implementation that decides nothing; what the program decides
+  about an answer is above the layer.
+- The layer reads nothing of the program's data, and the program
+  nothing of the machine's.
+- What a system enters of the program, the critical error and
+  Ctrl-Break, as call backs that the layer names and the program hands
+  it.
+- Every answer said in full by its function, and nothing "as DOS left
+  it" that a caller goes on with unsaid.
+- The shapes of DOS that the screens show, a name of eight and three,
+  the bits of the attributes, a date and a time packed, the number of
+  an error, as the layer's own, written in its header: another system
+  answers in them.
+- Numbers of a width that is said, so that what is recorded of a
+  program of 32 bits can be answered to one of 64.
+- No waiting but through the layer: time is what the layer says it
+  is.
+- Memory asked of the layer in blocks that are pointers, so that on
+  this computer each is a block of its own and the sanitizer sees one
+  panel run into the next.
+- One call that says whether the program has anything left that it
+  will do by itself, where the driver reads `AutoTim` and `Clock` at
+  their addresses today.
+- All that is kept, by the program and by the layer, set anew by one
+  call; and the program started by a function that a test can call,
+  and ended so that the test goes on.
+- One implementation to a program, chosen when it is linked, `_dos.c`,
+  `_posix.c` and one for tests beside them, as the road has it. What
+  tells that one to fail is its own header, and no part of the layer.
+
+### Open, for the user
+
+- Whether a build of the program for DOS that writes out what it asks
+  and what it is answered may exist, to derive traces from, where
+  "Scenarios" has that no build is made for the tests. It would judge
+  nothing: the build that is shipped is the one that is held against
+  the goldens.
+- Whether the rule gets the wording above, or another, before any of
+  this is built.
+- Two things need no layer and could be done now. Neither is started:
+  - Sequences of keys made at random, on the bench, against the
+    original and a tree, with one that differs kept as a scenario. It
+    is the one thing here that looks for a mistake of the translation
+    where nobody thought to write a scenario. One to two days, an
+    estimate.
+  - A first figure of the C's own code: which of its blocks never
+    ran, from the log of QEMU that the scenarios' test reads already,
+    where it looks today only at where each function begins. Half a
+    day, an estimate. It says which blocks ran, not which way a branch
+    went.
+
 ## The last of the assembly
 
 Done: the C translation has no assembly file, and its build runs no
