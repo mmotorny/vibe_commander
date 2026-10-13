@@ -146,6 +146,13 @@ set_target_properties(mkexe PROPERTIES
     C_STANDARD 99
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
+# stub switches off the banner of the extender in the program of 32 bits
+# that the linker wrote: see add_portable_c32, further down.
+add_executable(stub tools/stub.c)
+set_target_properties(stub PROPERTIES
+    C_STANDARD 99
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
+
 # c_compile(<tree> <model> <source> <object> <segment> <class>
 # [<option>...]) compiles a file of src/<tree>/ into
 # build/<tree>/<object>.obj, with a listing next to it.
@@ -390,14 +397,13 @@ function(add_portable_c)
     add_custom_target(${tree} ALL DEPENDS ${c_dir}/VC.EXE)
 endfunction()
 
-# add_portable_c32(<target> <directory> <option>...) compiles the files of
-# src/portable_c/ once more, for a flat program of 32 bits that the
-# extender DOS/32A is to start: step 1 of the portable C's road (TODO.md,
-# "The portable C in 32 bits: the plan"). The objects go into <directory>,
-# with their listings, as the target <target>. No program is linked of
-# them yet and no test reads them: they are made so that every build
-# holds the source to both compilers, and a line that only the one for 16
-# bits takes stops the build here.
+# add_portable_c32(<target> <directory> <option>...) builds src/portable_c/
+# a second time, as a flat program of 32 bits that the extender DOS/32A
+# starts: step 1 of the portable C's road (TODO.md, "The portable C in 32
+# bits: the plan"). It is <directory>/VC.EXE, with the linker's map VC.MAP
+# and the objects and their listings next to it, as the target <target>.
+# Every build makes it, so the source is held to both compilers: a line
+# that only the one for 16 bits takes stops the build here.
 #
 # The options are the caller's where the two programs of the plan differ,
 # the one that is shipped and the one for finding a fault: each is a call
@@ -415,6 +421,10 @@ function(add_portable_c32 target directory)
         endif()
     endforeach()
     list(REMOVE_ITEM c_files ${portable_c_16_alone})
+    # The files in the order of their names, and dos32.c behind them all,
+    # whatever its name: the linker's command, below, says why.
+    list(REMOVE_ITEM c_files ${portable_c_32_alone})
+    list(APPEND c_files ${portable_c_32_alone})
     # -3r    code for the 386, with arguments in registers
     # -mf    the flat model: one segment of code and one of data, and a
     #        pointer is an offset of 32 bits
@@ -429,25 +439,96 @@ function(add_portable_c32 target directory)
     set(compile ${watcom} ${watcom_bin}/wcc386 -q -3r -mf -s -zl -zls
         -wx -we ${ARGN} -i=${open_watcom_SOURCE_DIR}/h -fr)
     file(MAKE_DIRECTORY ${directory})
-    set(made "")
+    set(c_compiled "")
     foreach(source ${c_files})
         string(REGEX REPLACE "\\.c$" "" object ${source})
-        set(read ${source_dir}/${source} ${source_dir}/vc.h
-            ${source_dir}/tables.h ${source_dir}/sys.h)
+        # The listing has the lines of the source between the
+        # instructions where the object says which they are, which it
+        # does when it is compiled for a debugger (-d1 or more).
+        set(lines "")
+        if("-d2" IN_LIST ARGN)
+            set(lines -s=${source_dir}/${source})
+        endif()
         add_custom_command(
             OUTPUT ${directory}/${object}.obj
             COMMAND ${compile} -fo=${directory}/${object}.obj
                     ${source_dir}/${source}
-            COMMAND ${watcom} ${watcom_bin}/wdis
+            COMMAND ${watcom} ${watcom_bin}/wdis ${lines}
                     -l=${directory}/${object}.lst
                     ${directory}/${object}.obj
             BYPRODUCTS ${directory}/${object}.lst
-            DEPENDS ${read}
-            COMMENT "Compiling portable_c/${source} for 32 bits"
+            DEPENDS ${source_dir}/${source} ${source_dir}/vc.h
+                    ${source_dir}/tables.h ${source_dir}/sys.h
+            COMMENT "Compiling portable_c/${source} for 32 bits (${target})"
             VERBATIM)
-        list(APPEND made ${directory}/${object}.obj)
+        list(APPEND c_compiled ${directory}/${object}.obj)
     endforeach()
-    add_custom_target(${target} ALL DEPENDS ${made})
+
+    # The program is linked of those objects alone, as a linear
+    # executable, which is the kind of file that the extender loads
+    # (format os2 le), with the extender in front of it as its stub:
+    # binw/dos32a.exe of the Open Watcom fetched above, DOS/32A. The stub
+    # is in no file of this repository; its licence is, LICENSE.DOS32A.
+    # The linker's file of systems for Linux knows no `dos32a`, so the
+    # format and the stub are said here. The extender enters the program
+    # at Start of dos32.c, on the stack that the header of the file
+    # names, which is the segment of the class STACK, of stack.c.
+    #
+    # The order of the segments is said here, by their classes, and the
+    # program rests on it: a segment and an offset are still numbers of
+    # 16 bits in it, counted from 64K below the main data (see "The words
+    # of the addresses" in vc.h).
+    #
+    #   CODE    the code, an object of the file by itself
+    #   STACK   the stack, the first thing of the data
+    #   DATA    the constants of the code and the tables, CONST2, and
+    #           behind them what has a value, _DATA, which is little
+    #           more than the tables that the program writes to
+    #   MAIN    the main data, md of main.c, in the file as zeros
+    #   BSS     what has no value, which the file does not hold
+    #
+    # - A table is known by its offset from 32K below Title_S of
+    #   main_t.c: every table has to lie within 32K of that, those that
+    #   are written to among them, so _DATA stands with the constants;
+    #   and Title_S no more than 32K in front of the main data.
+    # - What has no value follows the main data at once: IniSave of
+    #   setup.c is known to the main loop by how far it is behind md, in
+    #   16 bits, and the main data leaves 2.9K of those. And dos32.c is
+    #   linked last, since a segment holds what the objects have of it in
+    #   their order: the memory that it hands out to the program, 640K
+    #   without a value, is then behind everything else that has none,
+    #   and still within the megabyte that a segment can name.
+    # - So the stack cannot stand behind the main data. Between the
+    #   tables and the main data its 16K leave Title_S further than 32K
+    #   from md. Behind what has no value, it would have all of that in
+    #   the file as zeros in front of it. It is first.
+    # - The machine of the tests is many times slower at a write to a
+    #   page of the memory that has code which it has run, and the
+    #   extender packs the data right behind the code, in the same page
+    #   of 4K. What shares that page is the low end of the stack, which
+    #   a program writes to that has used three quarters of its stack,
+    #   and the scenarios' test fails one that uses half. The constants
+    #   stand between the stack and everything else that is written.
+    #
+    # The extender writes two lines of its name when it starts, onto what
+    # would be the program's first screen: tools/stub.c switches that off
+    # in the file, by one bit of the stub's settings.
+    list(JOIN c_compiled "," compiled)
+    set(extender ${open_watcom_SOURCE_DIR}/binw/dos32a.exe)
+    add_custom_command(
+        OUTPUT ${directory}/VC.EXE ${directory}/VC.MAP
+        COMMAND ${watcom} ${watcom_bin}/wlink option quiet format os2 le
+                name ${directory}/VC.EXE
+                order clname CODE clname STACK clname DATA clname MAIN
+                      clname BSS
+                file ${compiled}
+                option map=${directory}/VC.MAP,start=Start_,static
+                option stub=${extender}
+        COMMAND stub ${directory}/VC.EXE
+        DEPENDS stub ${c_compiled} ${extender}
+        COMMENT "Linking the portable C for 32 bits (${target})"
+        VERBATIM)
+    add_custom_target(${target} ALL DEPENDS ${directory}/VC.EXE)
 endfunction()
 
 # The trees, each with the files of its second code segment.
@@ -474,9 +555,21 @@ add_portable_c(
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c menu.c misc.c mouse.c setup.c start.c stcolor.c sthelp.c
     stmain.c stopts.c system.c view.c window.c)
-# For 32 bits: -os, small code, and no debugging information, as the
-# program that is shipped is to be compiled.
+# For 32 bits, two programs of every build:
+#   portable_c32/VC.EXE         the program: -os, small code, and nothing
+#                               for a debugger, as the one for 16 bits is
+#                               compiled. It is what a test judges.
+#   portable_c32/debug/VC.EXE   the same source for finding a fault, run
+#                               by hand: -od, as it is written, with
+#                               nothing moved or left out; -d2, so that
+#                               its listings have the lines of the source;
+#                               and CHECKED defined, for the words of the
+#                               addresses to look at what they are handed.
+#                               Nothing reads CHECKED yet: see TODO.md,
+#                               the piece B2 of the plan for the 32 bits.
 add_portable_c32(portable_c32 ${CMAKE_BINARY_DIR}/portable_c32 -os)
+add_portable_c32(portable_c32-debug ${CMAKE_BINARY_DIR}/portable_c32/debug
+    -od -d2 -dCHECKED)
 
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS

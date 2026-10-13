@@ -227,7 +227,7 @@ portable C](#the-portable-c)).
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
 | `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
-| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README |
+| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README; `stub.c` switches the banner of [the extender](#the-extender) off in the 32-bit program of the portable C |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/` |
 | `docs/` | Pictures for this README |
@@ -274,13 +274,15 @@ translation's, has no hand in it (see [The portable
 C](#the-portable-c)).
 
 Its files are compiled a second time, by Open Watcom's compiler for 32
-bits, `wcc386`, into `build/portable_c32/`, each with its listing. That
-is the portable C on its way to a 32-bit program for DOS (`TODO.md`,
-"The portable C in 32 bits: the plan"): no program is linked of those
-objects yet and no test reads them, and they are made so that every
-build holds the source to both compilers. Three files are of one of the
-two builds alone, `arith.c` and `dos.c` of the one for 16 bits and
-`dos32.c` of the one for 32.
+bits, `wcc386`, and linked into a second program,
+`build/portable_c32/VC.EXE`, with the linker's map and the listings
+next to it: the portable C as a 32-bit program for DOS, which it is on
+its way to being. And a third time, for the same program compiled for
+finding a fault, `build/portable_c32/debug/VC.EXE`. So every build holds
+the source to both compilers. Three files are of one of the two builds
+alone, `arith.c` and `dos.c` of the one for 16 bits and `dos32.c` of the
+one for 32. [The program of 32 bits](#the-program-of-32-bits) says what
+the two programs are and how far they get.
 
 ### Changes to the source
 
@@ -1075,6 +1077,80 @@ word under a name of its own. `TODO.md` has the plan, "The setup
 program in the portable C", with what each piece brings and what is
 declared for it.
 
+### The program of 32 bits
+
+The portable C is on its way from a program of 16 bits to one of 32,
+still for DOS: the first step of the road that takes it off DOS.
+`TODO.md` has the plan, "The portable C in 32 bits: the plan", with
+what each piece of it has done. The same source is built both ways by
+every build, and until the 32-bit program passes the scenarios, the one
+of 16 bits, `build/portable_c/VC.EXE`, is the portable C that the tests
+judge and that everything else here is said of.
+
+`cmake --build build` makes two programs of 32 bits beside it:
+
+| Program | What it is |
+|---|---|
+| `build/portable_c32/VC.EXE` | The program: compiled for the 386 in the flat model, for small code as the one of 16 bits is (`-os`), with nothing for a debugger. It is the one that is to be shipped, and the one that the tests will judge |
+| `build/portable_c32/debug/VC.EXE` | The same source for finding a fault, to be run by hand: compiled as it is written, with nothing moved or left out (`-od`), with the lines of the source between the instructions of its listings (`-d2`), and with `CHECKED` defined, by which the words that make a pointer of a segment and an offset are to look at what they are handed. Nothing reads `CHECKED` yet. No test runs this program, since unoptimised code takes more instructions and the machine's clock is counted in those; it is built so that it does not rot |
+
+Each is a linear executable that Open Watcom's linker writes, with its
+map, `VC.MAP`, and a listing of every file next to it, and with [the
+extender](#the-extender) in front of it. The files are those of the
+16-bit program but for three: `dos32.c` has the functions of `sys.h`
+for a program of 32 bits under the extender, where `dos.c` has them for
+DOS in 16 bits, and the program is entered there, at `Start`;
+`arith.c`, the two routines that the compiler for 16 bits calls for
+arithmetic on 32, is not needed.
+
+In this step a segment and an offset are still numbers of 16 bits in
+the program, as they are on DOS: it keeps the memory of the 16-bit
+program inside its own, a megabyte counted from 64K below the main
+data, in which a panel is in the segment that its number says and a
+table is known by its offset among the tables. The words of
+`src/portable_c/vc.h` that make pointers of such numbers have a second
+body for it ("The words of the addresses" there), and they take for
+granted where the linker has put the tables, the main data and what
+follows it. So the linker's command says the order of the segments,
+`add_portable_c32` of `CMakeLists.txt`, with the reason for each
+thing's place: the code, then the stack, the constants with the tables,
+the main data, and last what has no value, which is not in the file.
+Pointers in place of the numbers are the step behind this one.
+
+It does not run yet. `dos32.c` has 74 of the 98 functions of `sys.h`,
+and those by which the program takes its memory are among the 24 that
+are still to be made: started on the bench of the tests, the program
+writes its banner, says "Program too big to fit in memory" and leaves.
+It is started there as any program is:
+
+```sh
+mkdir -p build/tmp
+TMPDIR=$PWD/build/tmp python3 harness/show.py --program build/portable_c32/VC.EXE
+```
+
+### The extender
+
+A program of 32 bits does not run on DOS by itself: an extender puts
+the processor into protected mode, loads the program above the first
+megabyte, and hands what the program asks of DOS and the BIOS down to
+them. The 32-bit program of the portable C is started by DOS/32A:
+
+**This product uses DOS/32 Advanced DOS Extender technology.**
+
+The extender is the first 27,536 bytes of the program's file, its
+stub, which the linker copies there from `binw/dos32a.exe` of the Open
+Watcom that the build fetches. It is in no file of this repository;
+its licence is, [`LICENSE.DOS32A`](#licence). One bit of it is changed:
+as it comes, DOS/32A writes two lines of its name and its copyright
+when it starts, onto what is the program's first screen, and
+`tools/stub.c` clears the bit of its settings that makes it, in the
+file that the linker wrote. That tool says where the bit is and how it
+was found. Open Watcom has other extenders too. CauseWay, which is
+free as well, does not run on the machine of the tests, for a fault of
+QEMU's (`TODO.md`, "The portable C in 32 bits: what a trial on the
+bench showed"); DOS/4GW and PMODE/W are not free, and are neither
+linked nor run here.
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
@@ -1553,7 +1629,13 @@ CMake fetches these into the build directory, as pinned in
 
 Both are open source under the Sybase Open Watcom Public License, which is
 about the tools' own code. None of that code ends up in the programs built
-here: the translation is linked without Open Watcom's libraries.
+here: the C trees are linked without Open Watcom's libraries.
+
+One file of the Open Watcom download does end up in a program, and is
+not Open Watcom's code: `binw/dos32a.exe`, the DOS extender DOS/32A,
+which the linker puts in front of the 32-bit program of the portable C
+(see [The extender](#the-extender)). It has a licence of its own, which
+that download has as `binw/license.d32`.
 
 ## Licence
 
@@ -1564,6 +1646,17 @@ covers everything written for it, including changes made to the files in
 Volkov Commander is Copyright 1991-2000 Vsevolod V. Volkov and was released
 by its author under the 2-clause BSD licence in `src/asm/LICENSE.TXT`, which
 continues to apply to his code.
+
+DOS/32A, the DOS/32 Advanced DOS Extender, is Copyright 1996-2006 Narech K.
+and is distributed under the licence in `LICENSE.DOS32A`: the text of
+`binw/license.d32` of the Open Watcom snapshot that the build fetches,
+copied as it is. It covers the extender's stub, which the build links into
+the 32-bit program of the portable C, `build/portable_c32/VC.EXE` and
+`build/portable_c32/debug/VC.EXE`. The stub comes with that download and
+is not part of this repository; the licence's text is kept here because a
+program that is built here and passed on has to have it with it, and its
+third condition is why this README says what [The extender](#the-extender)
+says.
 
 The shareware distribution of Volkov Commander is proprietary and is not
 part of this repository. The picture at the top shows it running.
