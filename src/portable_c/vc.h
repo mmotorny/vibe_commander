@@ -1249,12 +1249,6 @@ struct VideoMode {                      /* for ChkMode: as the BIOS says, */
                                            columns */
     u16 bx;                             /* the page, in the high byte */
 };
-struct Corners {                        /* for Int10m: of a window that the
-                                           BIOS scrolls, as it leaves them, */
-    u16 lower;                          /* the lower right one, DX there, */
-    u16 upper;                          /* and the upper left one, CX: the
-                                           row in the high byte of each */
-};
 u16 ChkMode(struct VideoMode STACK *mode);
 void Cursor(u16 place);
 void Cursor1(void);
@@ -1262,7 +1256,7 @@ u16 ChgCur(void);
 void CurShp(u16 shape);
 u16 GetCur(void);
 void HidCur(void);
-struct Corners Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
+void Scroll(u16 down, u16 color, u16 upper, u16 lower);
 u16 ScrOffs(void);
 u16 SftEGA(u16 place);
 void SavWin(u16 begin, u16 size, u16 buffer);

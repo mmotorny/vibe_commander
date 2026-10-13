@@ -82,24 +82,21 @@ void HidCur(void)
     Cursor(0x7F00);
 }
 
-/* Have the BIOS scroll a window with the mouse pointer hidden, which it
-   would move along with the rest. The arguments are the registers of
-   the BIOS's call still, for the callers' sake: the high byte of `ax`
-   is 6 to scroll up and 7 to scroll down, and its low byte the lines;
-   the high byte of `bx` is the colour of the lines that come in; `cx`
-   is the upper left corner of the window and `dx` the lower right one.
-   Returns the corners: the assembly goes on with CX and DX as the BIOS
-   leaves them, which is as they went. */
-struct Corners Int10m(u16 ax, u16 bx, u16 cx, u16 dx)
-{
-    struct Corners corners;
+/* Move what a window of the screen shows a line up, or down if `down` is
+   not 0, with the mouse pointer hidden, which would move along with the
+   rest: `upper` is the upper left corner of the window and `lower` the
+   lower right one, and the line that comes in is empty, of the colour
+   `color`.
 
+   Int10m of the original, which is the BIOS called for the screen with
+   any registers, and called for nothing but this. The assembly goes on
+   with CX and DX as the BIOS leaves them, the corners, which is as they
+   went: a caller goes on with its own. */
+void Scroll(u16 down, u16 color, u16 upper, u16 lower)
+{
     CurMous(0);
-    ScreenScroll(ax >> 8 == 7, ax, bx >> 8, cx, dx);
+    ScreenScroll(down, 1, color, upper, lower);
     CurMous(1);
-    corners.lower = dx;
-    corners.upper = cx;
-    return corners;
 }
 
 /* Note where the cells of the screen are: in the memory of the display

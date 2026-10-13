@@ -659,9 +659,8 @@ F65_40:                                 /* Test parameters */
             if (moved == 1 || moved == 0xFFFF) {
                 if (moved == 0xFFFF)
                     key = 0x700;
-                place = Int10m(
-                    key & 0xFF00 | 1, Color(Memo_P[0]) << 8 | place & 0xFF,
-                    place, ((u16)(u8)(rows - 1) << 8 | 63) + place).upper;
+                Scroll(key >> 8 == 7, Color(Memo_P[0]), place,
+                       ((u16)(u8)(rows - 1) << 8 | 63) + place);
                 place += (key & 0xFF) << 8;
                 n = 0x100;
             }

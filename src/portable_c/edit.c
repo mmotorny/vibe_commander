@@ -166,8 +166,9 @@ u16 T80_00(void);
 
    ResWin puts back in the screen buffer what a box covers, Window shows
    it. ChgDisk asks for the disk of a drive that shares the floppy drive
-   with another, and is not 0 if the user would not change it. Int10m calls
-   the BIOS for the screen, with the mouse pointer out of the way.
+   with another, and is not 0 if the user would not change it. Scroll
+   moves a window of the screen by a line, with the mouse pointer out of
+   the way.
 
    HidCur hides the cursor and Cursor puts it at a row, in the high byte,
    and a column; ChgCur gives it the editor's shape and returns the one it
@@ -814,8 +815,7 @@ void T71_00(u16 function, u16 place, u16 step)
         from = (u16 *)((u8 *)from + step);
         to = (u16 *)((u8 *)to + step);
     } while (--count);
-    Int10m(function & 0xFF00 | 1,
-           Color(Back_C) << 8 | place & 0xFF,
+    Scroll(function >> 8 == 7, Color(Back_C),
            ed.EdBase + ((function & 0xFF) << 8),
            *(u16 *)&ed.EdSizeX + ed.EdBase - 0x101);
 }

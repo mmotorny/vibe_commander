@@ -79,8 +79,8 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
    `line`, and 0 for a second one that was let go elsewhere.
 
    PgUp and PgDn move the cursor of a list a page, `rows` lines: they
-   return the cursor and the first line shown. Int10m calls the BIOS for
-   the screen, and returns the corners of the window as that leaves them.
+   return the cursor and the first line shown. Scroll moves a window of
+   the screen by a line.
    Int16 calls the BIOS for the keyboard: `none` of what it returns is 1
    if the zero flag was set. Help00 is the help,
    which is C, as is DirFunc, of vc.h.
@@ -415,9 +415,8 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
             scroll = 0x600 | (rows - 1) & 0xFF;
             if (moved != 1)
                 scroll = 0x700;
-            at = Int10m(scroll & 0xFF00 | 1,
-                        Color(Conf_C) << 8 | at & 0xFF, at,
-                        (((rows - 1) & 0xFF) << 8 | 63) + at).upper;
+            Scroll(scroll >> 8 == 7, Color(Conf_C), at,
+                   (((rows - 1) & 0xFF) << 8 | 63) + at);
             at += (scroll & 0xFF) << 8;
             rows = 1;
         }

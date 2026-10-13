@@ -72,9 +72,9 @@ void Help00(void);
    the disk of a drive that shares the floppy drive with another, and is
    not 0 if the user would not change it. SavWin keeps what the screen
    buffer has where a window is to be, ResWin puts it back; MinBox draws a
-   box with a shadow there, growing if windows are to zoom. Int10m calls
-   the BIOS for the screen, with the mouse pointer out of the way, and
-   returns the corners of the window as the BIOS left them.
+   box with a shadow there, growing if windows are to zoom. Scroll moves
+   a window of the screen by a line, with the mouse pointer out of the
+   way.
 
    GetMous returns the buttons of the mouse that are down and where the
    mouse is, or `place` as it was if there is no mouse.
@@ -361,9 +361,8 @@ Help10:                                 /* the cursor within the window */
             count = SHOWN();
             if (moved == 1 || moved == 0xFFFF) {
                 key = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
-                place = Int10m(
-                    key & 0xFF00 | 1, Color(Help_C) << 8 | place & 0xFF,
-                    place, ((count - 1 & 0xFF) << 8 | WIDTH - 1) + place).upper;
+                Scroll(key >> 8 == 7, Color(Help_C), place,
+                       ((count - 1 & 0xFF) << 8 | WIDTH - 1) + place);
                 place += key << 8;
                 count = 1;
             }

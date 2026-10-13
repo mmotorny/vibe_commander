@@ -33,8 +33,8 @@ u16 ChTree(u16 column);
    HidCur puts the cursor below the screen, Cursor at a row and a column,
    the row in the high byte. SavWin keeps what the screen buffer has where
    a window is to be, ResWin puts it back; MinBox draws a box with a shadow
-   there, growing if windows are to zoom. Int10m calls the BIOS for the
-   screen, with the mouse pointer out of the way.
+   there, growing if windows are to zoom. Scroll moves a window of the
+   screen by a line, with the mouse pointer out of the way.
 
    GetMous returns the buttons of the mouse that are down and where the
    mouse is, or `place` as it was if there is no mouse.
@@ -524,8 +524,8 @@ ChTr12:                                 /* the cursor within the lines */
         }
         was -= moved;                   /* the line that had the cursor has
                                            moved too */
-        Int10m(scroll & 0xFF00 | 1, Color(ChTr_P[0]) << 8 | place & 0xFF,
-               place, n + place - 0x101);
+        Scroll(scroll >> 8 == 7, Color(ChTr_P[0]), place,
+               n + place - 0x101);
         ChTr50(begin, (u16)(signed char)scroll << 4);
     }
     ChTr50(begin, was - shown);         /* the line that had the cursor */
