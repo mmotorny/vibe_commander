@@ -129,7 +129,7 @@ STACK_LEFT = coverage.STACK_LEFT
 class Batch:
     """Routines translated together."""
     title: str
-    source: str                   # the C file of the tree
+    source: str                   # the C file, as src/c names it: FILES
     # The assembly procedures it replaces, and stretches of code between
     # procedures, each by its first label, or by a later one for what
     # stands from there on (see coverage.Listing).
@@ -1243,7 +1243,7 @@ SETUP_BATCHES = [
             0x109C:
                 "what the setup program has Ctrl-C and Ctrl-Break go to, "
                 "a routine that only returns: the one program has its "
-                "own, CtrlC of resident.c",
+                "own, NothingEntry of dos32.c",
         },
     ),
     Batch(
@@ -1388,6 +1388,20 @@ RENAMED = {
 }
 
 
+# The C files of the batches that a tree has under another name: tree ->
+# the file as src/c names it, which is what a batch says -> the tree's
+# name for it, and why. It is for what is printed: a batch's functions
+# are found in the link map, whatever their file.
+FILES = {
+    "portable_c": {
+        "resident.c": ("exec.c", "nothing of the portable C stays in the "
+                       "memory apart from the rest: the file is the "
+                       "running of the commands, with what the program "
+                       "does first and when it leaves"),
+    },
+}
+
+
 def check_original(listing, ran, batches):
     """Report on the assembly that `batches` say has been replaced;
     return success.
@@ -1511,8 +1525,11 @@ def check_translation(link_map, executed, tree, place, batches):
             if start not in executed:
                 passed = False
                 print(f"  not executed in the translation: {name}")
+        source = batch.source
+        for file, (now, _) in FILES.get(tree, {}).items():
+            source = re.sub(rf"\b{re.escape(file)}", now, source)
         print(f"{batch.title}: {len(batch.functions)} C functions of "
-              f"{batch.source} checked")
+              f"{source} checked")
     return passed
 
 

@@ -204,7 +204,7 @@ OWN_OF = {
                    "them as code, its Exit01 and Exit02",
         "NoStart_S": "what dos32.c says where the extender has no memory "
                      "below the megabyte for it: the words of the "
-                     "original's Aloc_S, which the tree has in resident.c "
+                     "original's Aloc_S, which the tree has in exec.c "
                      "and which is held there, in a copy that ends as DOS "
                      "takes a text and not as the original's does",
     },
@@ -241,9 +241,8 @@ GONE = {
     "portable_c": {
         "TrnBeg": _ONE_PROGRAM + "it has no part of its own that it makes "
                   "a block of memory of",
-        "Stays": _ONE_PROGRAM + "what the watch on DOS keeps is variables "
-                 "of resident.c, and it keeps no copies of the setup and "
-                 "the panels",
+        "Stays": _ONE_PROGRAM + "it keeps no watch on DOS, and no copies "
+                 "of the setup and the panels",
         **dict.fromkeys(
             ("ImgEnd", "RelTab", "RelCnt", "TrnPrW", "ResPrW", "DatPrW",
              "ResCnt"),

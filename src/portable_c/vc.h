@@ -392,7 +392,7 @@ extern struct MainDat md;
 /* The stack, of stack.c: LenStk bytes in a segment of their own. */
 extern u8 Stack[];
 
-/* What the program knows of DOS around it, resident.c. Of its routines
+/* What the program knows of DOS around it, exec.c. Of its routines
    there, Alloc3 is what the program does first: it looks at the version
    of DOS and keeps no more of the memory than it is.
    TakeEnd has the system put back what SetBrk has changed if DOS ends

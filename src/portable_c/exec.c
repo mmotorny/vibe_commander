@@ -2,17 +2,19 @@
  * The program and DOS around it: what it does first, the commands of
  * DOS that it runs, and what it does when it leaves.
  *
- * In the original, and in the C translation after it, this is the part
- * of the program that stays in the memory while a command runs, which
- * the file has its name from: one segment with the PSP, a stack and
- * copies of the setup and the panels, which gives the rest of the
- * program up for the command and loads it again afterwards. The portable
- * C stays in the memory whole (see DEVIATIONS.md), and this is a file
- * of it like any other: md is the main data, its variables are
- * variables, and what it wants of DOS it asks through sys.h. Nothing of
- * it stays anywhere, and nothing that DOS enters is here: where the
- * program begins and where DOS goes on when it has ended the program
- * are the system's, in dos32.c.
+ * This file was resident.c, and is that in the C translation. In the
+ * original, and in the C translation after it, it is the part of the
+ * program that stays in the memory while a command runs, which that
+ * name said: one segment with the PSP, a stack and copies of the setup
+ * and the panels, which gives the rest of the program up for the
+ * command and loads it again afterwards. The portable C stays in the
+ * memory whole (see DEVIATIONS.md), so nothing of it is resident, and
+ * the file is named for the largest thing that it has, Exec, the
+ * running of the commands. It is a file of the program like any other:
+ * md is the main data, its variables are variables, and what it wants
+ * of DOS it asks through sys.h. Nothing that DOS enters is here: where
+ * the program begins and where DOS goes on when it has ended the
+ * program are the system's, in dos32.c.
  *
  * Two things are here. The first is what the program does before
  * anything else, Alloc3: it looks at the version of DOS and keeps no more

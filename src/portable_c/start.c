@@ -193,7 +193,7 @@ static u8 *MvzTxt(u8 *to, const u8 *from)
 
 /* Write a text on the screen as a teletype would, on the page `page`:
    its first character whatever it is, and on up to its zero byte. This
-   is OutStr of resident.c, which the assembly called there. */
+   is OutStr of exec.c, which the assembly called there. */
 static void OutStr1(const u8 *text, u16 page)
 {
     do
@@ -399,7 +399,7 @@ static void Memory(u16 segment, u16 size)
    many paragraphs there were, and whether that is too few for the least
    that the program needs: the assembly has them in BX where it says
    that there is no memory, and the BIOS takes a page of the screen
-   there (see AlocEr of resident.c).
+   there (see AlocEr of exec.c).
 
    The original asks for its main data here too, which is the start of
    the same block: FreMem2 is the paragraphs of that block there, and

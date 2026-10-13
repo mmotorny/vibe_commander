@@ -53,8 +53,9 @@ bytes of the file, so the memory differs from the file in each of them,
 by where the object named begins: code with an address in it is not in
 the memory as it is in the file. A relocation whose four bytes lie
 across the end of a page is in the file twice, once for each page; it
-is one here. Code that takes the segment of something, as two routines
-of resident.c do, has a selector there, with a relocation of two bytes:
+is one here. Code that takes the segment of something, which the
+portable C has none of, has a selector there, with a relocation of two
+bytes:
 what the extender puts there is its own to say, and those bytes are as
 the file has them here, and listed.
 

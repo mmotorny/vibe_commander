@@ -593,5 +593,5 @@ void StSetup(void)
                                            the program takes the two
                                            interrupts again when it goes
                                            on */
-    md.LoadFl = md.LoadRes;             /* Exec10 of resident.c */
+    md.LoadFl = md.LoadRes;             /* Exec10 of exec.c */
 }

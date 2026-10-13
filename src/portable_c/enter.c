@@ -9,7 +9,7 @@
  * can run by its name, any other file by the command that the extension
  * file of its directory has for files of its kind.
  *
- * A command is run by Exec of resident.c: F21_31 makes the program ready
+ * A command is run by Exec of exec.c: F21_31 makes the program ready
  * for that, the interrupts given back, the panels cut down to what is
  * kept of them while a command runs and the screen as DOS left it, and
  * returns NEXT_EXEC, or NEXT_INIT11 if there is nothing to run after
@@ -124,7 +124,7 @@ void F21_40(u16 panel)
    The vectors go back to their owners, the panels are cut down to what
    is kept of them, and the screen is as DOS left it but for the prompt.
    With no command the program only starts over, NEXT_INIT11; else the
-   commands are run, NEXT_EXEC: Exec of resident.c, which the loop's end
+   commands are run, NEXT_EXEC: Exec of exec.c, which the loop's end
    in main.c calls.
 
    The original asks DOS for the current drive here and leaves a command

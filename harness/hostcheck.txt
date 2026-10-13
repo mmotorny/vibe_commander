@@ -23,6 +23,7 @@ drive.c       clean
 edit.c        clean
 edit_t.c      clean
 enter.c       clean
+exec.c        aborts 1
 extfile.c     clean
 files.c       clean
 find.c        clean
@@ -44,7 +45,6 @@ mouse.c       clean
 panel.c       clean
 place.c       clean
 read.c        clean
-resident.c    aborts 1
 screen.c      clean
 setup.c       clean
 stack.c       data_seg 2

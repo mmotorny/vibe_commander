@@ -10,7 +10,7 @@
 #include "tables.h"
 
 /* What is not static here, others name: the code of main.c, start.c,
-   resident.c and of those that show the title, and the boxes of other
+   exec.c and of those that show the title, and the boxes of other
    files. */
 
 /* What the program calls itself: Vibe Commander 0.1, since it no longer

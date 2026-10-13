@@ -1533,7 +1533,7 @@ void HookVct(void)
 }
 
 /* Leave the program: the screen as DOS had it, with the cursor on the
-   line above the command line. Exit00 of resident.c ends the program.
+   line above the command line. Exit00 of exec.c ends the program.
 
    Ported as it is: of the two interrupts that the program has taken,
    only Ctrl-Break is given back here. DOS itself puts the critical error

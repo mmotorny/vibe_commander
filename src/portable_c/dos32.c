@@ -1935,7 +1935,7 @@ static u32 Base(u16 selector, u32 none)
 
 /* What the program says where it cannot start for want of memory below
    the megabyte: what the original says where it has too little memory
-   to run, Aloc_S of resident.c, which is the nearest case that it
+   to run, Aloc_S of exec.c, which is the nearest case that it
    knows. It is a copy of this file's own, since this file reads nothing
    of the program's, ended as DOS takes a text. */
 static const u8 NoStart_S[] = "Program too big to fit in memory\r\n$";

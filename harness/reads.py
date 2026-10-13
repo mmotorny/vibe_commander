@@ -98,6 +98,12 @@ SETUP_PLACES = (("bars.c", "StKeyB_T"), ("bars.c", "StKeyC_T"),
 # program.
 SYSTEM_FILE = {False: "dos.c", True: "dos32.c"}
 
+# A file of code that a tree has under another name than the C
+# translation, which is the name that REVIEWED and GONE have it by: tree
+# -> the tree's name -> that name. An entry of the two tables is one for
+# both trees so, and what is printed of a place names the tree's file.
+FILES = {"portable_c": {"exec.c": "resident.c"}}
+
 # Places that are not known by their form: (file, name) -> (what is read,
 # how that is known). A number is a count of bytes from the start of the
 # object. It holds for every place in the file that names the constant
@@ -396,6 +402,7 @@ def places(source, objects, variables=()):
     for path in sorted(source.glob("*.c")):
         if path.name.endswith("_t.c"):
             continue
+        listed_as = FILES.get(source.name, {}).get(path.name, path.name)
         text = re.sub(r"/\*.*?\*/",
                       lambda match: re.sub(r"[^\n]", " ", match[0]),
                       path.read_text(), flags=re.S)
@@ -406,7 +413,8 @@ def places(source, objects, variables=()):
             for match in pattern.finditer(line):
                 name = match[1]
                 # A function may have the name of a constant of another
-                # file: Command of main.c, and that of resident.c.
+                # file: Command of main.c, and that of resident.c, which
+                # the portable C has as exec.c.
                 if line[match.end():].lstrip().startswith("("):
                     continue
                 if re.match(rf"\s*(extern|static|const)\b[^=;(]*\b{name}\b"
@@ -435,9 +443,9 @@ def places(source, objects, variables=()):
                 module, length = (own or other or by_name[name])[0]
                 read = _form(statement, name, sizes | {name: length})
                 how = "by its form"
-                if read is None or (path.name, name) in REVIEWED and \
+                if read is None or (listed_as, name) in REVIEWED and \
                         read in (None, TABLE, ZERO):
-                    read, how = REVIEWED.get((path.name, name),
+                    read, how = REVIEWED.get((listed_as, name),
                                              (read, how))
                 found.append((path.name, number + 1, name, module, length,
                               read, how))
@@ -463,6 +471,7 @@ GONE = {
              ("memory.c", "DosMe_S"), ("memory.c", "Command")),
             "of the map of the memory, Alt+F5: the portable C has no "
             "such map, and no file memory.c"),
+        # Of resident.c, which is exec.c in this tree: see FILES.
         ("resident.c", "BadFl_S"): "said that the program's file is bad "
                                    "or missing, when the program wanted "
                                    "to load itself again after a command: "
@@ -480,11 +489,12 @@ def check(source, objects, contents, variables=(), flat=False):
     wrong = []
     used = set()
     gone = GONE.get(Path(source).name, {})
+    files = FILES.get(Path(source).name, {})
     where = {(module, name): address
              for module, name, address, _ in objects}
     for file, line, name, module, length, read, how in places(
             source, objects, variables):
-        used.add((file, name))
+        used.add((files.get(file, file), name))
         if read is None:
             wrong.append(f"{file}:{line}: how much of {name} is read here "
                          f"is not known: see REVIEWED in "
