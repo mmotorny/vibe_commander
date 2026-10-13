@@ -140,7 +140,14 @@ These held while `src/c/` was made, and they say what it is.
      A variable is widened wherever wrapping round at 16 bits would be
      unexpected behaviour, and stays 16 bits only where the program
      counts on the wrapping. A number that is only ever true or false
-     becomes a boolean.
+     becomes a boolean. On the user's word of 13 October 2026 it is
+     done in two parts. Now: the pointers, the booleans, and a record
+     of every number's width with the reason for it. After the layer
+     is designed: the widening itself, to the types that the layer
+     names. And the memory for the panels and the texts comes from the
+     extender from this step on, as much as the machine has, where
+     step 1 had 640 KB of the program's own: what a user then sees
+     otherwise, an editor that opens whatever fits, is declared.
   3. The abstraction layer is designed: what the program asks of the
      system it is on, and how. The user approves the design before
      anything is built on it. `sys.h` is what there is until then, a
@@ -237,7 +244,8 @@ These held while `src/c/` was made, and they say what it is.
   README lists as resting on Open Watcom is to shrink, not grow.
 - What the program asks of the system it is on, it asks in one place; the
   rest of it does not know which system that is. Today that place is
-  `sys.h`, with `dos.c` behind it.
+  `sys.h`, with `dos32.c` behind it, the one file of the system's
+  functions since the 16-bit build went.
 - Names may change here once a thing no longer is what its name in the
   assembly says. The C translation keeps the old names, and a comment at
   the new name says what it was.
