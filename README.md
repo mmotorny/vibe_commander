@@ -634,14 +634,14 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,450 bytes |
+| `VC.EXE` | 197,460 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 64,394 bytes |
+| more than the C translation's 133,056 bytes | 64,404 bytes |
 | The relocations in its header, which DOS applies | 1,034 |
-| What it keeps of the memory while a command runs: the program and its panels | 207,072 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,464 bytes |
+| What it keeps of the memory while a command runs: the program and its panels | 207,088 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,448 bytes |
 | The code segment `CTEXT` ends at | D410h, 7,152 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C534h, 10,956 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C53Bh, 10,949 bytes below the limit, F000h |
 | Inline assembly | 57 instructions in 10 pieces: 37 in 7 of `dos.c`, 20 in 3 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
@@ -939,9 +939,9 @@ program's menus have not. It exists only as assembly,
 `src/asm/VCSETUP.ASM` with two files of routines that are for the most
 part copies of the main program's. In the portable C it is becoming a
 part of the one program, entry 8 of `src/portable_c/DEVIATIONS.md`: an
-item of the Options menu, " seTup...", behind which the setup program
-is on the screen as the original's is when it is run from the
-program's command line, over what DOS had shown. It is translated as it
+item of the Options menu, " More setup...", its last, behind which the
+setup program is on the screen as the original's is when it is run from
+the program's command line, over what DOS had shown. It is translated as it
 is: it reads the setup file and edits that, and the program takes what
 was saved when the setup is left, as the original's running copy is
 handed it by a call of DOS.

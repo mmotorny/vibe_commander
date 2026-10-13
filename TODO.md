@@ -26,11 +26,11 @@ setup program's assembly against the main program's are kept, in
 Seven things were the user's to decide. They are decided, and stand
 first.
 
-### Decided, on the user's word of 12 October 2026
+### Decided, on the user's word of 12 and 13 October 2026
 
 | | What | Decided |
 |---|---|---|
-| 1 | The item of the Options menu | ` seTup...` behind ` Editors...`, chosen by T, since S is Save setup; F1 on it shows the index of the help, which has no page for it. Every item below it moves a place: see "What could go wrong" |
+| 1 | The item of the Options menu | ` More setup...`, the last, behind ` Save setup` and a line across the menu of its own, chosen by M, which is free since Memory allocation went; F1 on it shows the index of the help, which has no page for it. No item moves for it, and the box is two rows taller. This is the user's word of 13 October 2026: on the 12th it was ` seTup...` behind ` Editors...`, chosen by T, and was made so first, with every item below it a place further down |
 | 2 | What is on the screen behind setup | What DOS has shown, with the panels off, as when the original was run from the program's command line. So whole screens are held against the original's goldens |
 | 3 | What setup edits | The setup file, as the original: it reads `VC.INI` when it is entered and shows that, and the program takes what was saved when setup is left |
 | 4 | The three settings of what the portable C has no more, Memory allocation, TSR manager and Screen output | Shown, doing nothing, while the dialogs are translated and held against the original's goldens, and taken out by piece E2. "A feature that only made sense on DOS is removed, not kept as a setting that does nothing" waits for that piece here: taken out from the start, the Configuration and Screen and Mouse would never be held against the original |
@@ -397,7 +397,7 @@ change, each as it is now, and what came out otherwise than planned.
    of them are derived again in a minute and a half.
 5. `deviations.py`: the line of the command is in `DEVIATIONS`, as
    spaces in a build; `Declared` has `in_place_of`, by which the
-   portable C is taken through `"F9 o t"` where the original has the
+   portable C is taken through `"F9 o m"` where the original has the
    command, `SETUP_ITEM` and `SETUP_COMMAND` there, in every scenario;
    and `no_setup`, by which the C translation is taken through no
    scenario of the setup program, whichever there are. That is
@@ -799,7 +799,7 @@ last.
 | Setup is no program of its own: no banner, no word on the version of DOS or on the memory, no command line, nothing run from DOS without the main program, no "Error reading data from the help file." | No scenario: the banner is sent nowhere when a golden is derived |
 | What DOS has shown has no line of a command that started setup, behind setup and afterwards: the row is empty, and the screen moves as the original's. And the history has no such command | Every scenario of setup, on the rows that `harness/deviations.py` has as spaces; the history in none |
 | The program takes what was saved whatever its setup has for TSR manager, where the original's running copy is asked only with that on. And with E1 the program's own call of DOS is gone | `asked`, `handed-on`, `ended` |
-| The Options menu has a line more | `clock`, `clock-russia`, `menu`, which have goldens of the portable C's own already and got them recorded again |
+| The Options menu has two lines more, at its bottom | `clock`, `clock-russia`, `menu`, which have goldens of the portable C's own already and got them recorded again |
 | With E2: no Memory allocation and no TSR manager in S2, no Screen output in S3 | The scenarios of piece A that show the two dialogs |
 | The program's box for a critical error of DOS while setup is open, where the original's setup program leaves the error to DOS's own words. And setup's calls for files are asked with the program's errors, where the original's setup program calls DOS itself: a drive that is not ready has the program's box, a call given up there is the error 53h, and DOS is asked what was wrong behind a call that failed | No scenario |
 | The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. **This waits for the user's word**: it was met while 0b was made, and is not among the seven things decided | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
@@ -1087,13 +1087,20 @@ and "Do you wish to save the current setup?" (no page either).
   keys, is held by the screens alone, and `ColPage`, which picture an
   item has, is held by the test only if it is written as the table
   that the assembly has.
-- **The item of the menu.** Done. A line put in above others moves
-  them, and an item is known by its number in code as well as in
+- **The item of the menu.** Done, twice. A line put in above others
+  moves them, and an item is known by its number in code as well as in
   tables: the ticks of the Options menu, `F39_58` of `menu.c`, the keys
   of an open menu, `KeyTab`, with Ctrl-B, the commands, `Menu4_T`, the
-  pages of the help, `MnuHlp`. Shift-F9 and the size of the menu are
-  the original's again, with a line less and a line more. Nothing else
-  knew an item of that menu by its number.
+  pages of the help, `MnuHlp`. Nothing else knew an item of that menu
+  by its number. All of that was moved for the item behind the editors
+  and moved back when the item went to the bottom of the menu, where a
+  line moves nothing: there it is two entries at the end of `Menu4_T`,
+  of `MnuHlp` and of the lines, and two rows in `MnuTab`. Its keys,
+  "F9 o m", are those of a step that is left out for the portable C,
+  Memory allocation switched: `Declared.steps` of
+  `harness/deviations.py` leaves a step of the original out before it
+  puts another in its place, and `goldens.changes` reads a golden by
+  the same rule.
 - **What a box of setup means to the main program's `Dialog`**: a menu
   bar to draw and a box to move down, unless `Dialog` is told. And the
   routine that a dialog names for Enter, `F04_10`, is a number there, a

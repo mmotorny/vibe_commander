@@ -40,11 +40,12 @@ static const u8 SvSt_D[5];
    than the original's (see DEVIATIONS.md): the Commands menu, Menu3_T,
    Memory info, behind the volume label, and the Options menu, Menu4_T,
    Memory allocation, behind the clock. And the Options menu has one
-   that the original has not, the setup, behind the editors. */
+   that the original has not, the setup, the last, behind Save setup and
+   a line across the menu. */
 static const u16 Menu1_T[15];
 static const u16 Menu2_T[17];
 static const u16 Menu3_T[12];
-static const u16 Menu4_T[16];
+static const u16 Menu4_T[17];
 static const u16 MenuS_T[8];
 static const u16 MenuC_T[8];
 
@@ -105,13 +106,12 @@ static const u16 Menu3_T[12] = {
     CMD_M53_00                          /* Menu file edit */
 };
 
-static const u16 Menu4_T[16] = {
+static const u16 Menu4_T[17] = {
     CMD_M60_00,                         /* Configuration... */
     CMD_M61_00,                         /* Advanced options... */
     CMD_M62_00,                         /* Extension file edit... */
     CMD_M63_00,                         /* Viewer... */
     CMD_M64_00,                         /* Editor... */
-    CMD_SETUP,                          /* Setup... */
     0,
     CMD_M66_00,                         /* Auto menus */
     CMD_M67_00,                         /* Path prompt */
@@ -121,7 +121,9 @@ static const u16 Menu4_T[16] = {
     CMD_M71_00,                         /* Mini status */
     CMD_M72_00,                         /* Clock */
     0,
-    CMD_M75_00                          /* Save setup */
+    CMD_M75_00,                         /* Save setup */
+    0,
+    CMD_SETUP                           /* More setup... */
 };
 
 static const u16 MenuS_T[8] = {

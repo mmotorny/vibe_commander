@@ -181,46 +181,49 @@ _NO_OPTION = ("the portable C stays in the memory whole while a command "
               "runs, and its Options menu has no Memory allocation: ")
 _NO_MAP = ("the portable C has no map of the memory, Alt+F5, Memory info "
            "of the Commands menu: ")
-_SETUP = ("the portable C has the setup program in itself, an item of its "
-          "Options menu behind the editors, seTup...: ")
+_SETUP = ("the portable C has the setup program in itself, the last item "
+          "of its Options menu, More setup..., behind Save setup and a "
+          "line across the menu: ")
 DECLARED = {
     "portable_c": {
         "Menu3_T": (_NO_MAP + "the command of that item is left out, "
                     "F65_00", ((4, 2, b""),)),
-        "Menu4_T": (_SETUP + "the command of that item is put in, the "
-                    "number that CMD_SETUP of vc.h is, 100, the last of "
-                    "the commands; " + _NO_OPTION + "the command of that "
-                    "item is left out, M73_00",
-                    ((10, 0, b"\x64\x00"), (26, 2, b""))),
+        "Menu4_T": (_NO_OPTION + "the command of that item is left out, "
+                    "M73_00; " + _SETUP + "nothing for the line, and the "
+                    "command of that item, the number that CMD_SETUP of "
+                    "vc.h is, 100, the last of the commands, are put in "
+                    "at the end",
+                    ((26, 2, b""), (32, 0, b"\x00\x00\x64\x00"))),
         "MenuLn": (_NO_MAP + "the line of that item is left out; "
-                   + _SETUP + "the line of that item is put in; "
-                   + _NO_OPTION + "the line of that item is left out",
-                   ((369, 17, b""), (612, 0, b" seTup...\0"),
-                    (706, 19, b""))),
+                   + _NO_OPTION + "the line of that item is left out; "
+                   + _SETUP + "the line across and the line of that item "
+                   "are put in at the end",
+                   ((369, 17, b""), (706, 19, b""),
+                    (748, 0, b"\0 More setup...\0"))),
         "MnuHlp": (_NO_MAP + "the page of the help for that item is left "
-                   "out, 30; " + _SETUP + "the item has no page of the "
-                   "help, 0, which is put in; " + _NO_OPTION + "the page "
-                   "of the help for that item is left out, 52",
-                   ((37, 1, b""), (54, 0, b"\0"), (62, 1, b""))),
+                   "out, 30; " + _NO_OPTION + "the page of the help for "
+                   "that item is left out, 52; " + _SETUP + "the line "
+                   "across has no page of the help and neither has the "
+                   "item, 0 and 0, which are put in at the end",
+                   ((37, 1, b""), (62, 1, b""), (65, 0, b"\0\0"))),
         "MnuTab": (_NO_MAP + "the Commands menu is a row shorter, 0Fh "
                    "rows with its frame and its shadow, and the lines of "
                    "the Options menu and the pages of its help begin 17 "
-                   "bytes and a byte further up, at 1FCh and 2Fh. The "
-                   "Options menu has as many rows as the original's, "
-                   "with a line more and a line less",
-                   ((19, 1, b"\x0F"),
+                   "bytes and a byte further up, at 1FCh and 2Fh; "
+                   + _NO_OPTION + "the Options menu is a row shorter "
+                   "for that; " + _SETUP + "and two rows taller for "
+                   "these, 14h rows in all",
+                   ((19, 1, b"\x0F"), (27, 1, b"\x14"),
                     (28, 2, b"\xFC\x01"), (30, 2, b"\x2F\x00"))),
         "KeyTab": (_NO_MAP + "Alt+F5 chooses no item of the Commands "
                    "menu, and the seven keys of that menu below it choose "
-                   "an item further up, 3 to 6 and 8 to 10; " + _SETUP
-                   + "the key bar, which Ctrl-B chooses in the menu, is "
-                   "its item 10 and not 9. Save setup, which Shift-F9 "
-                   "chooses there, is the item 16 of both, below a line "
-                   "more and a line less",
+                   "an item further up, 3 to 6 and 8 to 10; " + _NO_OPTION
+                   + "Save setup, which Shift-F9 chooses in the menu, is "
+                   "its item 15 and not 16",
                    ((80, 4, b""), (87, 1, b"\x03"), (91, 1, b"\x04"),
                     (95, 1, b"\x05"), (99, 1, b"\x06"), (103, 1, b"\x08"),
                     (107, 1, b"\x09"), (111, 1, b"\x0A"),
-                    (115, 1, b"\x0A"))),
+                    (119, 1, b"\x0F"))),
         "Key_S": (_NO_MAP + "the name of the key in the key bar, "
                   '"Memory", the 30th, is left out', ((180, 6, b""),)),
         "KeyC_T": (_NO_MAP + "Alt with F5 has no name in the two key "

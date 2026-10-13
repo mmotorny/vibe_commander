@@ -418,9 +418,14 @@ def changes(name, tree):
     ours = read(name, tree)
     theirs = read(name)
     # A step that the tree is taken through in place of another stands
-    # for that one.
-    instead = deviations.declared(tree).in_place_of
-    stands_for = [instead.get(step, (step,))[0] for step in theirs.steps]
+    # for that one. A step that is left out for the tree stands for
+    # none, also where the keys of one put in are the same: a step of
+    # the original is left out before another is put in its place
+    # (deviations.Declared.steps).
+    declared = deviations.declared(tree)
+    stands_for = [None if step in declared.left_out
+                  else declared.in_place_of.get(step, (step,))[0]
+                  for step in theirs.steps]
     report = []
     at = 0
     for number, step in enumerate(ours.steps):

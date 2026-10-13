@@ -102,10 +102,13 @@ DEVIATIONS = [
 # program, with what it prints sent nowhere. It prints a banner through
 # DOS when it starts, which would move what DOS has shown up by four
 # lines; a C tree has no such banner. And the keys by which the same is
-# chosen in a tree that has the setup program in itself: seTup... of the
-# Options menu.
+# chosen in a tree that has the setup program in itself: More setup...,
+# the last item of the Options menu. They are the keys by which the
+# original switches Memory allocation, a step that is left out for such
+# a tree (left_out of TREES): a step of the original is left out before
+# another is put in its place, so the two do not meet.
 SETUP_COMMAND = '"d:\\vc\\vcsetup>nul" Enter'
-SETUP_ITEM = "F9 o t"
+SETUP_ITEM = "F9 o m"
 
 # What stands in a golden for a character that is not compared.
 BLANK = "#"
@@ -250,7 +253,9 @@ class Declared:
     # original and then shows alike: the screen behind the tree's step is
     # held against the one behind the original's, and so is every screen
     # after it. Such a step changes no scenario by itself, and is no
-    # reason for a golden of the tree's own.
+    # reason for a golden of the tree's own. The tree's step may be the
+    # keys of a step that is left out for it, which then mean another
+    # thing there: steps() leaves out first and puts in afterwards.
     in_place_of: dict = field(default_factory=dict)
     # Why the tree is taken through no scenario of the setup program
     # (scenarios.Scenario.setup), whichever there are, or None if it is
@@ -287,9 +292,10 @@ _NO_MAP = ("it shows the map of the memory, Alt+F5, and the programs "
            "that stay in the memory listed and released there: the "
            "portable C has no such map and keeps no such list")
 _NO_LINE = ", without Memory info"
-_OPTIONS = ("the Options menu, with the setup behind the editors and "
-            "without Memory allocation: as many lines as the original's, "
-            "with seven of them a row further down")
+_OPTIONS = ("the Options menu, without Memory allocation and with More "
+            "setup at its bottom, behind Save setup and a line across "
+            "the menu: a row taller than the original's, with Save setup "
+            "a row further up")
 _FDAPM = '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter'
 _NO_SETUP_YET = ("the portable C has no setup yet: what the scenario "
                  "shows of it is still to be translated")
@@ -330,8 +336,8 @@ TREES = {
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "
-                      "menu of the portable C has no line that M chooses, "
-                      "and stays open",
+                      "menu of the portable C has no such line, and M "
+                      "chooses another there, More setup",
         },
         left_out_of={
             "menu-items": {
@@ -364,10 +370,8 @@ TREES = {
                      "last command",
             "clock": _OPTIONS,
             "clock-russia": _OPTIONS,
-            "menu": _OPTIONS + ", so that the help of its seventh line "
-                    "is the index of the help, for the setup, where the "
-                    "original has the page of Auto menus; and the "
-                    "Commands menu, a line shorter" + _NO_LINE,
+            "menu": _OPTIONS + "; and the Commands menu, a line shorter"
+                    + _NO_LINE,
             "menu-items": "Memory info is not chosen from the Commands "
                           "menu",
             "mouse-menu": "the Commands menu, a line shorter" + _NO_LINE,
@@ -399,7 +403,7 @@ TREES = {
             SETUP_COMMAND: (SETUP_ITEM,
                             "the setup is no program of its own in the "
                             "portable C, and no command starts it: it is "
-                            "an item of the Options menu, seTup..."),
+                            "an item of the Options menu, More setup..."),
         },
     ),
 }

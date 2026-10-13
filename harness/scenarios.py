@@ -1017,7 +1017,7 @@ is the first, and the form of the others:
     VCSETUP.COM of its distribution next to it in D:\\VC, and no other
     machine has that file (setups.beside). A tree that has the setup in
     itself is taken through the keys of its menu's item in place of
-    _SETUP, "F9 o t" for the portable C: deviations.TREES says so once,
+    _SETUP, "F9 o m" for the portable C: deviations.TREES says so once,
     in `in_place_of`, for every scenario. Every other step is the same,
     and every screen is held against the original's golden, the one
     behind that step too.

@@ -80,10 +80,9 @@ copy of anything, never loads itself again and has no switch for any of
 it.
 
 - The Options menu has no line Memory allocation: Save setup, below
-  it, stands a row further up for that, and the letter M chooses nothing
-  there. The menu has sixteen lines all the same, as the original's,
-  since it has a line that the original has not, the setup, further up:
-  see 8. Shift with Enter is Enter.
+  it, stands a row further up for that. The letter M chooses another
+  thing there, the setup, for which the menu has two lines at its
+  bottom that the original has not: see 8. Shift with Enter is Enter.
 - The program takes no check sum of its file and does not know a second
   copy of itself: it never says "Bad or missing", and goes on if its
   file is deleted while a command runs.
@@ -165,16 +164,15 @@ portable C's own:
 | Scenario | What changes in it |
 |---|---|
 | `lost` | The program's file is deleted by a command. The original asks for it, twice, and ends; the portable C is back at its panels, and the keys that answered the original are keys at the panels: a space into the command line, Enter, which runs it, and Esc, which switches the panels off |
-| `clock`, `clock-russia` | The Options menu where it shows: without Memory allocation. And by 8: with the setup above, so as long as the original's, the lines from Auto menus to the clock a row further down than there |
-| `menu` | The same, and Up from Save setup goes to the clock. By 8: five times Down from the top is the setup, where the original has Auto menus, and F1 there is the index of the help. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
+| `clock`, `clock-russia` | The Options menu where it shows: without Memory allocation, so with Save setup a row further up. And by 8: with two rows more at its bottom, a line across the menu and More setup, so a row taller than the original's |
+| `menu` | The same. By 8: Up from the top of the menu, and PgDn, go to More setup, the last item, where the original has Save setup, and Up from there goes to Save setup, where the original goes on from that to Memory allocation. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
 | `quick` | The step that switches Memory allocation off before the last command is left out; every screen is as the original's after the same step |
 | `second-copy` | The second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work |
 | `start-memory` | The second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with its Info, not the first copy's |
 | `ended` | The program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. And by 7: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. The portable C has where INT 21h went before, the entry of the first copy: an address in the program, which changes with every step of the work and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
 
 A step that switches Memory allocation, "F9 o m", is left out of every
-scenario for the portable C: there it would open the Options menu and
-leave it open.
+scenario for the portable C: there it would enter the setup (see 8).
 
 **Not run for the portable C:**
 
@@ -183,13 +181,11 @@ leave it open.
 | `memory` | It switches Memory allocation off, for the Info panel to show the other number, and shows the menu without the mark |
 | `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." What the program hands on is held by `handed-on` instead, which sees the same with one copy, by a program that puts itself behind it. The C translation passes that against the original's golden; the portable C, which hands on more, has a golden of its own there: see 7 |
 
-**In the data.** The test `portable_c-data` holds three tables of the
-menus against the original's with this difference declared for each, in
-`DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages
-of their help, and the commands of the Options menu. Two more were
-declared for it until the setup was put into that menu (see 8), and are
-the original's again with a line less and a line more: the size of the
-Options menu, and the item that Shift-F9 chooses in it.
+**In the data.** The test `portable_c-data` holds five tables of the menus
+against the original's with this difference declared for each, in
+`DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages of
+their help, the size of the Options menu, its commands, and the item that
+Shift-F9 chooses in it.
 
 ### 2. No buffer of TopView or DESQview in place of the screen
 
@@ -755,11 +751,12 @@ in the setup file when it is saved.
 **What the portable C does.** It is one program, and the setup is a part
 of it.
 
-- The Options menu has a line that the original has not, " seTup...",
-  behind " Editors...", which the letter T chooses. The lines from Auto
-  menus to the clock stand a row further down for it, with their ticks,
-  and Ctrl-B, the key bar, is the tenth item and not the ninth. The item
-  has no page of the help: F1 on it shows the index.
+- The Options menu has a line that the original has not, " More
+  setup...", which the letter M chooses. It is the last, behind " Save
+  setup" and a line across the menu of its own, so every item above it
+  is on the row and has the number that it has without it, and the box
+  is two rows taller. The item has no page of the help: F1 on it shows
+  the index.
 - Choosing it does what running a command does, without a command: the
   lists of the panels are cut down to 256 files, the screen is what DOS
   had shown, the row of the command line is emptied, where the original
@@ -813,7 +810,11 @@ first: what is behind it on the screen is what DOS had shown, as when
 the original is run from the program's command line, and it edits the
 setup file, not the setup of the running program. Its start and its end
 are those of a program of its own, and what they did that the one
-program has done already is not done twice. The critical error is the
+program has done already is not done twice. Where the item is and what
+it is called is the user's decision of 13 October 2026: it was put in
+the day before as " seTup..." behind " Editors...", chosen by T, which
+moved the seven switches below it a row down, and reads better at the
+bottom of the menu, where it moves nothing. The critical error is the
 program's, and the files are asked for as the rest of the program asks,
 on the user's word of the same day. And the 64 bytes behind a path are
 zeros because half of them cannot be anything else: 17 of each 64 are of
@@ -824,8 +825,10 @@ layout, which mean nothing in a file.
 **Which scenarios show it.** Every scenario of the setup program is held
 against the golden that the original's setup program left, with two
 things otherwise, which `harness/deviations.py` has. The portable C is
-taken through the item of its menu, "F9 o t", where the original is
-taken through the command, "d:\vc\vcsetup>nul" and Enter. And the row
+taken through the item of its menu, "F9 o m", where the original is
+taken through the command, "d:\vc\vcsetup>nul" and Enter: the keys that
+switch Memory allocation in the original, a step that is left out for
+the portable C (see 1), and left out before this one is put in. And the row
 that has the command in the original, behind the setup and afterwards
 for as long as it is on the screen, is empty in the portable C: the
 golden is derived with spaces there. The scenarios `setup-menu`,
@@ -858,8 +861,9 @@ and `menu`: their rows there say what differs.
 menus against the original's with this difference declared for each, in
 `DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages
 of their help, the commands of the Options menu, where the item is the
-number of a command that the original has not, and the keys that choose
-an item in an open menu, where Ctrl-B chooses the tenth. The constants
+number of a command that the original has not, and the size of the
+Options menu, each with what the two lines add behind what the original
+has. The constants
 of the setup are held against those of the original's setup program,
 `VCSETUP.COM`, each by its name with `St` in front; the table of a
 panel's defaults is the 24 bytes that the published source has.

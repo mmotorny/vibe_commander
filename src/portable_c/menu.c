@@ -82,16 +82,15 @@ extern const u8 __far PtMnu_S[];
    of a line chooses it. Two menus have a line less than the original's
    (see DEVIATIONS.md): the Commands menu "memory Info" with Alt-F5
    behind the volume label, and the Options menu " Memory allocation"
-   behind the clock. So each has a page of the help less in MnuHlp, the
-   Commands menu a row less in MnuTab, and in KeyTab Alt+F5 chooses
-   nothing and the keys of the Commands menu below it choose an item
-   further up. And the Options menu has a line that the original has
-   not, " seTup..." behind the editors, the setup program, which is a
-   program of its own there: with it the menu has as many rows as the
-   original's, the items from the editors down to the clock are a row
-   further down than there, with their ticks and with Ctrl-B, the key
-   bar, in KeyTab, and the item has no page of the help: F1 on it shows
-   the index. */
+   behind the clock. So each has a page of the help less in MnuHlp and a
+   row less in MnuTab, and in KeyTab Alt+F5 chooses nothing, the keys of
+   the Commands menu below it choose an item further up, and so does
+   Shift-F9, Save setup. And the Options menu has a line that the
+   original has not, " More setup..." at its bottom, behind Save setup
+   and a line across the menu of its own: the setup program, which is a
+   program of its own there. Every item above it is where it would be
+   without it, the menu is two rows taller for it in MnuTab, and the
+   item has no page of the help: F1 on it shows the index. */
 #define LEFT_S \
     " Brief\0" \
     " Full\0" \
@@ -145,7 +144,6 @@ extern const u8 __far PtMnu_S[];
     " eXtension file edit...\0" \
     " Viewers...\0" \
     " Editors...\0" \
-    " seTup...\0" \
     "\0" \
     " Auto menus\0" \
     " Path prompt\0" \
@@ -155,7 +153,9 @@ extern const u8 __far PtMnu_S[];
     " miNi status\0" \
     " cLock\0" \
     "\0" \
-    " Save setup\377\011Shift-F9\0"
+    " Save setup\377\011Shift-F9\0" \
+    "\0" \
+    " More setup...\0"
 static const u8 CODE MenuLn[sizeof(LEFT_S FILES_S COMMANDS_S OPTIONS_S) - 1] =
     LEFT_S FILES_S COMMANDS_S OPTIONS_S;
 
@@ -174,7 +174,7 @@ static const u8 CODE MnuHlp[] = {
      7,  8,  8,  9, 10, 11,  0, 12, 12, 12, 12, 12,  0, 13, 14, 15,
     16,  0, 17, 18, 19, 20, 21, 22, 23,  0, 24,  0, 25, 25, 25, 25,  0, 26,
     27, 28, 29, 31, 32, 33, 34,  0, 35, 36, 37,  0, 38,
-    39, 40, 41, 42, 43, 44,  0,  0, 45, 46, 47, 48, 49, 50, 51,  0, 53,
+    39, 40, 41, 42, 43, 44,  0, 45, 46, 47, 48, 49, 50, 51,  0, 53,  0,  0,
 };
 #define MnuHlp1 0                       /* where in it each kind begins */
 #define MnuHlp2 16
@@ -194,7 +194,7 @@ static const struct MnuTab CODE MnuTab[] = {
     { 0x102, 0x121B, MenuLn1, MnuHlp1 },        /* Left */
     { 0x10A, 0x141E, MenuLn2, MnuHlp2 },        /* Files */
     { 0x113, 0x0F23, MenuLn3, MnuHlp3 },        /* Commands */
-    { 0x11F, 0x1322, MenuLn4, MnuHlp4 },        /* Options */
+    { 0x11F, 0x1422, MenuLn4, MnuHlp4 },        /* Options */
     { 0x12A, 0x121B, MenuLn1, MnuHlp1 },        /* Right */
 };
 
@@ -217,7 +217,7 @@ static const struct KeyTab CODE KeyTab[] = {
     { 0x7100, 0x0103 }, { 0x6100, 0x0203 }, { 0x6D00, 0x0303 },
     { 0x6E00, 0x0403 }, { 0x6F00, 0x0503 }, { 0x7000, 0x0603 },
     { 0x1615, 0x0803 }, { 0x180F, 0x0903 }, { 0x2E03, 0x0A03 },
-    { 0x3002, 0x0A04 }, { 0x5C00, 0x1004 }, { 0x5F00, 0x0505 },
+    { 0x3002, 0x0904 }, { 0x5C00, 0x0F04 }, { 0x5F00, 0x0505 },
     { 0x1312, 0x0D05 }, { 0x2106, 0x0E05 }, { 0x6900, 0x0F05 },
 };
 #define KEYS (sizeof KeyTab / sizeof KeyTab[0])
@@ -397,11 +397,8 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
     u16 *mark;
     u16 order;
 
-    if (menu == 4) {                    /* Options: from Auto menus on,
-                                           each a row further down than
-                                           in the original, which has no
-                                           setup above them */
-        u8 *tick = (u8 *)(top + 641);
+    if (menu == 4) {                    /* Options */
+        u8 *tick = (u8 *)(top + 561);
 
 #define F40_20(option) \
         if (md.option != 0) \
