@@ -13,11 +13,11 @@ box.c         clean
 cmdline.c     to-number 6
 commands.c    clean
 commands_t.c  clean
-copy.c        to-number 9, to-pointer 4
+copy.c        clean
 copy_t.c      clean
 dialog.c      to-number 18, to-pointer 15
 digits.c      clean
-dirfunc.c     to-number 1
+dirfunc.c     clean
 dirfunc_t.c   clean
 dos.c         to-number 25, to-pointer 14, asm-pragma 7, registers 1, intrinsic 1
 dos32.c       to-number 9, to-pointer 6, asm-pragma 9, intrinsic 1

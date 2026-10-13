@@ -369,7 +369,7 @@ static u16 C00_01(void)
             /* The assembly goes on with DX as it is, which DOS has not
                set if it would not say: the address of the name. */
             if (device.failed)
-                info = (u16)CpDest;
+                info = MD_PLACE(CpDest);
             FileClose(opened.value);
             if (info & 0x80) {
                 CpDev2 = 1;
@@ -397,13 +397,13 @@ known:
         return 1;
 mask:
     Convert(name, md.TmpErr);
-    part = (u8 *)CpBgNam;
+    part = MD_POINTER(CpBgNam);
     do
         c = *part++;
     while (c != 0 && c != '\\');
     part--;
     *part = 0;
-    Convert((const u8 *)CpBgNam, md.TmpErr + 20);
+    Convert(MD_POINTER(CpBgNam), md.TmpErr + 20);
     *part = c;
     for (i = 0; i < 11; i++)
         if (md.TmpErr[i] == '?')
@@ -415,7 +415,7 @@ mask:
 directory:
     to[-1] = '\\';
 source:
-    from = (const u8 *)CpBgNam;
+    from = MD_POINTER(CpBgNam);
     count = from - CpSrc;
 rest:
     if (count < LenName)
@@ -644,7 +644,7 @@ static u16 C20_00(u16 fits)
        would not say what the handle is: the address of the name, here
        and for the target. */
     if (device.failed)
-        info = (u16)CpSrc;
+        info = MD_PLACE(CpSrc);
     if ((info & 0x81) == 0x81)
         goto no_source;
     CpDev1 = (u8)(info & 0x80);
@@ -667,7 +667,7 @@ static u16 C20_00(u16 fits)
            to, as FileTime has them; for a device they are what comparing
            the two names left and the address of the name. */
         stamp.time = count;
-        stamp.date = (u16)CpSrc;
+        stamp.date = MD_PLACE(CpSrc);
     }
     CpDate = stamp.date;
     CpTime = stamp.time;
@@ -777,7 +777,7 @@ opened:
     device = FileDevice(CpHndl2);
     info = device.kind;
     if (device.failed)
-        info = (u16)CpDest;
+        info = MD_PLACE(CpDest);
     if ((info & 0x82) != 0x82)
         goto write;
     error = 0;
@@ -830,7 +830,7 @@ append:
         /* CX and DX as they are, again: the attributes that were last
            kept or set, and the address of the name. */
         stamp.time = attributes;
-        stamp.date = (u16)CpDest;
+        stamp.date = MD_PLACE(CpDest);
     }
     CpDate = stamp.date;
     CpTime = stamp.time;
@@ -1366,7 +1366,7 @@ struct Copied F45_01(u16 panel, u16 command, u16 directories, u16 files)
         CpSrc[i] = md.ViewFil[i];
     if (md.ViewFil[0] == 0 || md.ToFile[0] == 0)
         return Go(GO_PANELS);
-    CpBgNam = (u16)NEAR(CutPath(CpSrc));
+    CpBgNam = MD_PLACE(NEAR(CutPath(CpSrc)));
     F35_70();
     return Masked(F35_40());
 }
@@ -1388,7 +1388,7 @@ static void F36_04(void)
 
     for (i = 0; i < LenPath; i++)
         CpSrc[i] = md.CrnPath[i];
-    CpBgNam = (u16)NEAR(CutPath(CpSrc));
+    CpBgNam = MD_PLACE(NEAR(CutPath(CpSrc)));
     F35_70();
     md.ZoomOne = 0;
     if ((u8)C00_00(ATTR_DIRECTORY) == 0 || CopyMov == 0)
@@ -1486,13 +1486,13 @@ F35_06:
         return Go(GO_DONE);
     }
     F35_70();
-    CpBgNam = (u16)CpSrc;
+    CpBgNam = MD_PLACE(CpSrc);
     return Go(GO_SELECTED);
 
 F36_03:
     /* A new name for the directory, which stays where it is. */
     for (i = 0; i < 13; i++)
-        CpDest[i] = *(const u8 *)(md.TreAdr + i);
+        CpDest[i] = *MD_POINTER(md.TreAdr + i);
     if ((u8)Ask(OFFSET(Renam_B), 0) != 0)
         return Go(GO_KEYS);
     typed = CpDest;
@@ -1567,6 +1567,6 @@ u16 F35_61(u16 answer, u16 place)
         ;
     *(u16 *)(line - 3) = i;             /* the cursor behind the path */
     line[-1] = 1;                       /* and what is typed added to it */
-    InSt10(place, (u16)line, LenStr, BoxCu_C << 8);
+    InSt10(place, MD_PLACE(line), LenStr, BoxCu_C << 8);
     return 1;
 }
