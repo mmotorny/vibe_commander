@@ -84,6 +84,16 @@ What the driver reads of it, it reads at addresses of the machine's
 memory, which are worked out here: from the file and the linker's map,
 which le.py reads, and from where the extender has the first object of a
 program on the bench, le.BENCH. See flat_facts.
+
+A scenario may start the program from the program's own command line,
+and that copy idles and is watched as the first is. A program of 16 bits
+is read in the segments that its idle call comes with, so a copy is read
+where it is. A flat one is at another address, which nothing at an idle
+call says: the script has the addresses of COPIES copies, each started
+by the one before, and the driver tells which of them idles by how many
+programs of that name lie in DOS's memory in front of the one that DOS
+has as the current one (Copy in DRIVER.ASM). A copy beyond those is not
+watched, and the driver says so: read() raises for it.
 """
 import re
 import struct
@@ -105,6 +115,10 @@ PAD = 3
 MAGIC = b"\xA5\x5A"
 KEYBOARD, MOUSE, STEP, HOLD, ASKS, ABOVE, END = 1, 2, 3, 4, 5, 6, 0
 NONE = 0xFFFF
+# How many copies of a flat program, each started by the one before, a
+# script says the places of: as many as the driver has room for (Copies
+# in DRIVER.ASM).
+COPIES = 3
 # The disk a script is on: its size is that of the disk the machine had
 # when its state was saved, and the longest that a script may be. The
 # driver would read one of 32 MB.
@@ -185,6 +199,11 @@ class Facts:
     # machine's memory, 0 for none, and the driver reads them with the
     # BIOS's block move. The stack has no segment then.
     flat: bool = False
+    # Of a flat program: the same three places, AutoTim, Clock and the
+    # stack, of each copy of it that is started while those before it
+    # are in the memory, the second copy first. What a copy's stack
+    # holds when it has been loaded is what the first one's does.
+    copies: tuple = ()
 
 
 def facts(program, stack=False):
@@ -263,8 +282,10 @@ def flat_facts(name, program, linked, auto_time, clock, stack=False,
     `base` is where the extender puts the first object. On the bench that
     is le.BENCH, the same in every run that was looked at, and promised
     by nothing: a run with QEMU's log of the code says where the program
-    was, as harness/drivercheck.py --trace asks it."""
-    def address(where):
+    was, as harness/drivercheck.py --trace asks it. The copies that the
+    Facts have besides are where le.Linear.copies has them, by the same
+    token."""
+    def address(where, base):
         if where is None:
             return 0
         symbol, offset = where
@@ -275,16 +296,20 @@ def flat_facts(name, program, linked, auto_time, clock, stack=False,
         first, at = linked.public[symbol]
         return base + program.place(first, at + offset)
 
-    found = Facts(name, address(auto_time), address(clock), flat=True)
+    bottom = top = 0
     if stack:
         bottom, top = coverage.flat_stack(program, linked)
-        found = replace(found, stack=base + bottom, stack_size=top - bottom,
-                        stack_loaded=program.image()[bottom:top])
-        if found.stack_size >= 1 << 16:
+        if top - bottom >= 1 << 16:
             raise RuntimeError(
-                f"the stack is {found.stack_size} bytes: the driver of the "
+                f"the stack is {top - bottom} bytes: the driver of the "
                 "tests writes out one of less than 64K")
-    return found
+    first, *others = (
+        (address(auto_time, base), address(clock, base),
+         base + bottom if stack else 0)
+        for base in program.copies(COPIES, base))
+    return Facts(name, first[0], first[1], first[2], top - bottom,
+                 program.image()[bottom:top], flat=True,
+                 copies=tuple(others))
 
 
 def setup_facts(program):
@@ -496,9 +521,15 @@ def script(steps, known, blinking=False):
         # addresses, in an event of their own.
         out += struct.pack("<HHHH", NONE, NONE, 0, known.stack_size)
         out += known.name
-        out += bytes([ABOVE]) + struct.pack(
-            "<III", known.auto_time, known.clock if blinking else 0,
-            known.stack if known.stack_size else 0)
+        places = ((known.auto_time, known.clock, known.stack),
+                  *known.copies)
+        if len(places) > COPIES:
+            raise ValueError(f"the places of {len(places)} copies of the "
+                             f"program: the driver has room for {COPIES}")
+        out += bytes([ABOVE, len(places)])
+        for auto_time, clock, stack in places:
+            out += struct.pack("<III", auto_time, clock if blinking else 0,
+                               stack if known.stack_size else 0)
     else:
         out += struct.pack("<HHHH", known.auto_time,
                            known.clock if blinking else NONE,
@@ -579,6 +610,13 @@ def read(data):
                 "the BIOS refused the driver of the tests a read of the "
                 "program's memory above the megabyte (INT 15h, function "
                 "87h): what it did then is worth nothing")
+        elif kind == b"C":
+            raise MachineError(
+                "a copy of the program idled that the driver of the tests "
+                f"had no place for: a script has the places of {COPIES}, "
+                "the first and those that were started one from the "
+                "command line of the other. What the driver did then is "
+                "worth nothing")
         elif kind == b"E":
             ended = True
         else:

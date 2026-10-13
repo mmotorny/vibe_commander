@@ -65,11 +65,14 @@
 ;			that waits for a button to come up asks that, and
 ;			is not idle meanwhile. Behind an event 02 it counts
 ;			from that event on
-;	06 3 dwords	the program is a flat one of 32 bits: where its
+;	06 n dwords	the program is a flat one of 32 bits: where its
 ;			AutoTim, its Clock and its stack are, as addresses
 ;			of the machine's memory, each in place of its word
-;			of the header, or 0 for going by that. See "A flat
-;			program" below. It comes before the first key
+;			of the header, or 0 for going by that: three dwords
+;			for each of n copies of the program, the first,
+;			the one that the first runs, and so on, n being no
+;			more than Copies. See "A flat program" below. It
+;			comes before the first key
 ;	anything else	the script ends
 ;
 ; What the driver writes goes to a port that QEMU keeps in a file:
@@ -86,6 +89,8 @@
 ;			change within 20 ticks of the timer after 'S'
 ;	'F'		the BIOS refused to read the memory of a flat
 ;			program: what the driver did then is worth nothing
+;	'C'		a copy of a flat program idled that the script has
+;			no places for: the same
 ;	'E'		the script has ended; the machine is then reset
 ;
 ; While no disk holds a script the driver has nothing to go by, and stops
@@ -115,6 +120,9 @@ Events	EQU	18			; Where the events begin in a script
 Rounds	EQU	2			; Idle rounds that end a step
 Blink	EQU	20			; Ticks to look for what blinks: 1.1 s
 Soon	EQU	37			; Ticks for which AutoTim is believed
+Copies	EQU	3			; Copies of a flat program, each run
+					; by the one before, that a script
+					; may have the places of
 FileLen	EQU	2048			; Bytes of the driver's file
 SecBuf	EQU	100h + FileLen		; Behind it in memory: a sector of
 Last	EQU	SecBuf + 512		; the script, and Cells bytes of screen
@@ -683,6 +691,22 @@ I16X:	jmp	cs:[Old16]
 ; (event 06), and the driver reads them there with the BIOS's block move,
 ; INT 15h function 87h. The idle call and the keys are as for any program.
 ;
+; A scenario may start the program a second time, from the command line
+; of the first, and that copy is elsewhere above the megabyte, with a main
+; data and a stack of its own. Nothing in the registers of an idle call
+; says where; the script does, for as many copies as it has, the first,
+; the one that the first runs, and so on. Which of them is idling the
+; driver reads in DOS's memory, which is a line of blocks, each with a
+; paragraph in front that says whose it is and, of a program's own block,
+; the program's name: a program that runs another stays below it, so a
+; copy is the second if one program of the script's name lies in front
+; of it, the third if two do. The line is gone along from the driver's
+; own block, which every program lies behind. DOS is not asked who ran
+; whom, since it cannot say: at 16h of its PSP the shell that the bench
+; has, FreeCOM, names itself, also when a program has run it for one
+; command. A program of 16 bits needs none of this: its idle call comes
+; with DS and SS on its own.
+;
 ; The driver changes its own code for a flat program, and this is why. A
 ; program of 16 bits is to be driven by the instructions that it was
 ; driven by before there was any of this: the machine's time is counted in
@@ -694,18 +718,23 @@ I16X:	jmp	cs:[Old16]
 ; scenario, each time one is added. So nothing above asks. The event
 ; writes a jump over the instruction at each of the three places, once,
 ; before the first key, to what does the same from above the megabyte: at
-; I28Q to I28F, at Pump6 to Pump8, at PutStk to PutStF. A script without
+; I28Q to I28F, always, since that is where the copy is told; at Pump6 to
+; Pump8 and at PutStk to PutStF, if the script has a place. A script without
 ; the event goes through the driver as it was, instruction for
 ; instruction, but for the two that tell the event from the others, to
 ; which it comes at its end, behind its last screen. Whoever changes the
 ; driver for a flat program keeps to that: what is new goes here, behind
 ; a jump, and not into the way of the original.
 
-; The event, from its second byte: where the three are, 0 for one that is
-; not above the megabyte.
-LAuto	dd	0
-LClock	dd	0
-LStack	dd	0
+; The event, from its third byte: where the three are, 0 for one that is
+; not above the megabyte, of each copy that the script has. A set of
+; them is known by where it begins here.
+LSets	dd	3 * Copies dup (0)
+LAuto	EQU	0			; Where each is in a set
+LClock	EQU	4
+LStack	EQU	8
+LCount	db	0			; How many sets the script has
+LSet	dw	offset LSets		; That of the copy that idled last
 
 LFrom	dd	0			; Where PutStF is in the stack
 Got	dd	0			; What RdGot has read
@@ -724,27 +753,31 @@ Divert	proc	near
 	ret
 Divert	endp
 
-; Event 06, in Pump.
+; Event 06, in Pump. What it says of the first copy decides which of the
+; three is read above the megabyte at all: the script has of every copy
+; what it has of the first.
 PumpL:	inc	cs:SPos
 	push	bx
 	push	dx
-	mov	bx,offset LAuto
-	mov	cx,12
+	call	Next
+	mov	cs:LCount,al
+	mov	cl,12
+	mul	cl
+	mov	cx,ax
+	mov	bx,offset LSets
 PumpL1:	call	Next
 	mov	cs:[bx],al
 	inc	bx
 	loop	PumpL1
-	cmp	cs:LAuto,0
-	je	PumpL2
 	mov	bx,offset I28Q
 	mov	dx,offset I28F
 	call	Divert
-PumpL2:	cmp	cs:LClock,0
+	cmp	cs:LSets+LClock,0
 	je	PumpL3
 	mov	bx,offset Pump6
 	mov	dx,offset Pump8
 	call	Divert
-PumpL3:	cmp	cs:LStack,0
+PumpL3:	cmp	cs:LSets+LStack,0
 	je	PumpL4
 	mov	bx,offset PutStk
 	mov	dx,offset PutStF
@@ -809,10 +842,74 @@ RdGot	proc	near
 	ret
 RdGot	endp
 
+; Which copy of the program is idling: LSet is put on its places. Returns
+; CY, with C written, for a copy that the script has none for. The
+; program that DOS has as the current one is the one that idles (see
+; Int28), and DOS may be asked for its PSP at any time; the blocks of the
+; memory are read as they lie, and DOS is not asked for them. No memory
+; has 1024 blocks.
+Copy	proc	near
+	pusha
+	push	ds
+	push	es
+	mov	ah,62h
+	int	21h
+	push	cs
+	pop	ds
+	cld
+	xor	dx,dx			; Programs of that name in front of it
+	mov	ax,cs
+	dec	ax			; The paragraph in front of a block
+	mov	cx,1024
+Copy1:	mov	es,ax
+	inc	ax			; The block
+	cmp	ax,bx
+	jae	Copy4			; The program itself: no further
+	cmp	es:[1],ax		; Its own, so a program's with its PSP?
+	jne	Copy3
+	push	ax
+	push	cx
+	mov	si,offset HName		; Of that name, from the ninth byte on?
+	mov	di,8
+	mov	cx,8
+Copy2:	lodsb
+	scasb
+	jne	Copy5
+	or	al,al
+	loopnz	Copy2
+	inc	dx
+Copy5:	pop	cx
+	pop	ax
+Copy3:	cmp	byte ptr es:[0],'M'	; Another block behind it?
+	jne	Copy4
+	add	ax,es:[3]		; As long as this one says
+	loop	Copy1
+Copy4:	cmp	dl,LCount
+	jae	Copy6
+	mov	al,12
+	mul	dl
+	add	ax,offset LSets
+	mov	LSet,ax
+	clc
+	jmp	Copy7
+Copy6:	mov	al,'C'
+	out	OutPort,al
+	stc
+Copy7:	pop	es
+	pop	ds
+	popa
+	ret
+Copy	endp
+
 ; INT 28h, from I28Q: has the program something to do by itself after a
-; while? As there, with AutoTim as it was read.
+; while? As there, with AutoTim as it was read, of the copy that idles:
+; what Pump goes on to read is that copy's too.
 I28F:	push	bx
-	mov	bx,offset LAuto
+	call	Copy
+	jc	I28B
+	mov	bx,cs:LSet
+	cmp	dword ptr cs:[bx+LAuto],0
+	je	I28B
 	call	RdGot
 	jc	I28B
 	cmp	word ptr cs:Got,0FFFFh
@@ -837,7 +934,8 @@ I28K:	mov	ax,word ptr cs:Got	; Another: it is believed from now
 	jmp	I28H
 
 ; Pump, from Pump6: is the clock on?
-Pump8:	mov	bx,offset LClock
+Pump8:	mov	bx,cs:LSet
+	add	bx,LClock
 	call	RdGot
 	jc	Pump7
 	cmp	byte ptr cs:Got,0
@@ -862,9 +960,10 @@ PutStF:	pushf
 	xor	al,al			; No segment
 	out	dx,al
 	out	dx,al
-	mov	ax,word ptr LStack
+	mov	bx,LSet
+	mov	ax,[bx+LStack]
 	mov	word ptr LFrom,ax
-	mov	ax,word ptr LStack+2
+	mov	ax,[bx+LStack+2]
 	mov	word ptr LFrom+2,ax
 	mov	bp,HStLen		; Bytes still to write
 PutSF1:	mov	cx,Cells

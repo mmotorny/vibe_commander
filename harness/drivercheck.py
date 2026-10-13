@@ -53,9 +53,32 @@ A fourth toy is of the tree itself:
             holds that the way is whole and not that the two are read
             right: auto.c holds that.
 
+And a fifth is the program started from its own command line, as six
+scenarios start it:
+
+  copies.c  auto.c with a key that runs a copy of the toy through the
+            shell, as a command. Each copy is elsewhere above the
+            megabyte, with an AutoTim, a Clock and a stack of its own,
+            and writes of itself where the two are and its stack
+            pointer. Three copies deep and back. Held: each copy says
+            that it is where le.Linear.copies has it, which is where the
+            driver was told to read; the step of t ends when the copy
+            that idles has done its thing, in each of the three, and
+            again in each when the one that it ran has ended; with the
+            clock of the second copy on, its cell blinks while that copy
+            idles and nothing does while the third idles; the stack that
+            is written out at a step holds addresses of the code of the
+            copy that idles and of no other, and that copy's stack
+            pointer is inside it. It is run a second time with the
+            driver told that every copy is where the first is, which is
+            what the driver went by before it knew of copies: the step
+            of t in the second copy has then to end early. And a third
+            time four copies deep, one more than the script has places
+            for: the driver has to say so, and driver.read to raise.
+
 It needs the project built, for the compiler, the assembler and the
-driver, and takes half a minute. It ends with what it found wrong, or
-with nothing wrong.
+driver, and takes a minute. It ends with what it found wrong, or with
+nothing wrong.
 
     drivercheck.py --trace          also run auto.c with QEMU's log of
                                     the code that ran, and say where the
@@ -296,6 +319,106 @@ def auto(bench, toy):
              "told nothing: the toy shows nothing")
 
 
+# copies.c: the rows of the screen that a copy has, and where its clock
+# blinks, the last cell of its first row.
+COPY_ROWS = 6
+
+
+def copies(bench):
+    """copies.c: see the top."""
+    toy = Toy("copies")
+    known = toy.facts()
+    bases = toy.flat.copies(driver.COPIES)
+    places = [(known.auto_time, known.clock, known.stack), *known.copies]
+    # Each step, and the copy that idles when it has ended.
+    steps = [("a", 1), ("t", 1), ("r", 2), ("t", 2), ("c", 2), ("r", 3),
+             ("t", 3), ("q", 2), ("t", 2), ("o", 2), ("q", 1), ("t", 1)]
+    blinks = {5: 2, 8: 2, 9: 2}         # the steps that end with a clock on
+    print("copies.c, told that its copies are at "
+          + ", ".join(f"{base:08X}" for base in bases))
+    done = drive(bench, toy, [step for step, _ in steps], known,
+                 blinking=True)
+    if len(done) != len(steps) + 1:
+        return
+    code = toy.flat.objects[0].size
+    for at, (step, copy) in enumerate([("", 1)] + steps):
+        auto_time, clock, stack = places[copy - 1]
+        first = done[at].screen.lines()[COPY_ROWS * (copy - 1)]
+        said = re.match(rf"copy {copy} AutoTim at ([0-9A-F]{{8}}) Clock at "
+                        r"([0-9A-F]{8}) ESP ([0-9A-F]{8})", first)
+        if not hold(said and (int(said[1], 16), int(said[2], 16))
+                    == (auto_time, clock),
+                    f"copies.c, behind step {at}: copy {copy} says of "
+                    f"itself {first.rstrip()!r}, and the driver was told "
+                    f"{auto_time:08X} and {clock:08X}"):
+            continue
+        if step in ("r", ""):
+            print(f"  copy {copy} says: AutoTim at {said[1]} Clock at "
+                  f"{said[2]}")
+        lines = "\n".join(new_lines(done, at)) if at else ""
+        if step == "t":
+            key = re.search(r"key 1474 at ([0-9A-F]{8})", lines)
+            did = re.search(r"done by itself at ([0-9A-F]{8})", lines)
+            if hold(key and did, f"copies.c: step {at}, t in copy {copy}, "
+                                 "ended before the copy had done its thing"):
+                hold(int(did[1], 16) - int(key[1], 16) >= 9,
+                     f"copies.c: step {at}: copy {copy} did its thing less "
+                     "than nine ticks behind the key")
+        blinking = [cell[:2] for cell in done[at].screen.blinking]
+        wanted = [(79, COPY_ROWS * (blinks[at] - 1))] if at in blinks else []
+        hold(blinking == wanted,
+             f"copies.c: behind step {at}, {step} with copy {copy} idling, "
+             f"the driver has {blinking} as blinking, and what blinks is "
+             f"{wanted}")
+        # The stack that was written out is that of the copy that idles.
+        held = done[at].stack
+        if not hold(held is not None and len(held) == known.stack_size,
+                    f"copies.c: no stack of {known.stack_size} bytes was "
+                    f"written out behind step {at}"):
+            continue
+        words = struct.unpack(f"<{len(held) // 4}I", held)
+        own = [word for word in words if 0 <= word - bases[copy - 1] < code]
+        others = [word for word in words
+                  if any(0 <= word - base < code for base in bases
+                         if base != bases[copy - 1])]
+        left = driver.stack_left(held, known)
+        hold(own and not others and 0 < left < known.stack_size
+             and stack + left <= int(said[3], 16) <= stack + len(held),
+             f"copies.c: the stack written out behind step {at} is not "
+             f"that of copy {copy}: {len(own)} words of it are addresses "
+             f"in that copy's code and {len(others)} in another's, {left} "
+             f"bytes of it were never used, and the copy's stack pointer "
+             f"was {said[3]} with its stack at {stack:08X}")
+    print(f"  {len(steps)} steps, three copies deep and back: t ended with "
+          "the copy's own thing done in each, the clock of the second "
+          f"blinked at steps {sorted(blinks)} and nothing else did, and "
+          "each stack was that of the copy that idled")
+
+    print("copies.c again, with the driver told that every copy is where "
+          "the first is")
+    blind = replace(known, copies=(places[0],) * len(known.copies))
+    done = drive(bench, toy, ["r", "t"], blind)
+    if len(done) == 3:
+        lines = "\n".join(new_lines(done, 2))
+        print("  the step of t in the second copy ended with: "
+              + " / ".join(new_lines(done, 2)))
+        hold("key 1474" in lines and "done by itself" not in lines,
+             "copies.c: the step of t in the second copy did not end early "
+             "with the driver reading the first copy: the toy shows "
+             "nothing")
+
+    print(f"copies.c again, {driver.COPIES + 1} copies deep")
+    try:
+        drive(bench, toy, ["r"] * driver.COPIES, known)
+    except MachineError as error:
+        print(f"  {error}")
+        hold("no place for" in str(error), f"copies.c: {error}")
+    else:
+        hold(False, f"copies.c: copy {driver.COPIES + 1} idled, which the "
+                    "script has no places for, and the driver did not say "
+                    "so")
+
+
 def keys(bench):
     toy = Toy("keys")
     known = toy.facts()
@@ -458,6 +581,7 @@ def main():
         auto(bench, auto_in_md())
         toy = keys(bench)
         wait(bench)
+        copies(bench)
         system(bench)
         if args.below and toy:
             below(bench, toy)

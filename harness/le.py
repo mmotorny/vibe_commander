@@ -33,6 +33,17 @@ everything here is counted from where the first object begins, a
 *place*, and the address of that is given by whoever knows it, as
 coverage.py finds where a program is from a trace of what ran.
 
+A program that this one runs, with this one still in the memory. If it
+has DOS/32A for its extender too, that one takes no memory of its own:
+it asks the first for it, and its first object is the next block of the
+same memory, behind the last object of this program as an object is
+behind the one before. So a copy of the program that is started from a
+command of the program is at behind(), a copy that that one starts is
+behind it by as much again, and copies() has them. Seen on the bench as
+the rest was, with the program in every scenario that starts it twice
+and with a toy three deep (harness/drivercheck.py), and promised by as
+little.
+
 The relocations. A flat program is linked for no address: every place
 where code or a table names something by its address has a relocation
 in the file, which says where the four bytes are, in which object the
@@ -223,6 +234,22 @@ class Linear:
         if not 0 <= offset <= found.size:
             raise ValueError(f"object {number} has no offset {offset:X}h")
         return found.place + offset
+
+    def behind(self, base=BENCH):
+        """Where the extender puts the first object of a program that is
+        started while this one is in the memory with its first object at
+        `base`: see the top."""
+        ends = base + self.place(len(self.objects), self.objects[-1].size)
+        return -(-ends // IN_FRONT) * IN_FRONT + IN_FRONT
+
+    def copies(self, count, base=BENCH):
+        """Where the first object of each of `count` copies of this
+        program is, each started while those before it are in the
+        memory: `base` for the first."""
+        found = [base]
+        while len(found) < count:
+            found.append(self.behind(found[-1]))
+        return tuple(found)
 
     def in_file(self, number, offset=0):
         """Where an offset of an object is in the file, or None for what

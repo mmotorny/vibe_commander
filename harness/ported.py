@@ -134,7 +134,7 @@ import compare
 import coverage
 import deps
 import deviations
-from driver import COM_ORIGIN
+from driver import COM_ORIGIN, COPIES
 import goldens
 import layoutcheck
 import le
@@ -1718,42 +1718,46 @@ def check_place(program, outcomes):
     (coverage.executed).
 
     A scenario that starts the program a second time, from the command
-    line of the first, has it in two places, and passes this: the first
-    is where it is taken to be. The driver knows the one place, and
-    reads the variables and the stack of the first copy while the second
-    is the program that DOS has as the current one, which is said here
-    of each such scenario."""
-    if not le.linear(program.contents):
+    line of the first, has it in two places. The driver is told where a
+    copy is too, by the rule that le.py has for it, as many of them as
+    driver.COPIES, and reads of the copy that idles what is that
+    copy's: a copy that ran has to have been at one of those places, as
+    the first has."""
+    flat = le.linear(program.contents)
+    if not flat:
         return True
+    places = flat.copies(COPIES)
     ran = {outcome.name: outcome.run.executed.at for outcome in outcomes
            if outcome.run is not None}
     elsewhere = {name: at for name, at in ran.items()
-                 if at and le.BENCH not in at}
+                 if at and (places[0] not in at or set(at) - set(places))}
     never = [name for name, at in ran.items() if not at]
-    # A second copy of the program, which a scenario starts from the
-    # first one's command line, is loaded behind the first.
-    second = {name: at for name, at in ran.items()
-              if le.BENCH in at and len(at) > 1}
+    # A copy of the program, which a scenario starts from the command
+    # line of the one before, is loaded behind it.
+    copies = {name: at for name, at in ran.items()
+              if len(at) > 1 and name not in elsewhere}
     for name, at in elsewhere.items():
         print(f"  in {name} the program ran at "
               + ", ".join(f"{address:08X}h" for address in at)
-              + f", and the driver of the tests took it to be at "
-              f"{le.BENCH:08X}h: see BENCH of harness/le.py, and "
+              + ", and the driver of the tests took it and its copies to "
+              "be at " + ", ".join(f"{address:08X}h" for address in places)
+              + ": see BENCH and behind() of harness/le.py, and "
               "harness/drivercheck.py --trace")
     print(textwrap.fill(
         f"The place: in {len(ran) - len(elsewhere) - len(never)} of the "
         f"{len(ran)} scenarios that the machine got through, the "
-        f"program's code ran with its first object at {le.BENCH:08X}h, "
+        f"program's code ran with its first object at {places[0]:08X}h, "
         "where the driver of the tests reads it"
         + (f"; in {len(never)} none of it was seen to run: "
            f"{', '.join(never)}" if never else "")
-        + (f". In {len(second)} a copy of it ran elsewhere as well, "
-           "which the driver watches by what it reads of the first: "
+        + (f". In {len(copies)} a copy of it ran as well, started from "
+           "the command line of the first, where the driver reads that "
+           "copy: "
            + ", ".join(
                f"{name} at "
                + " and ".join(f"{address:08X}h" for address in at
-                              if address != le.BENCH)
-               for name, at in second.items()) if second else ""),
+                              if address != places[0])
+               for name, at in copies.items()) if copies else ""),
         width=78, subsequent_indent="  ", break_on_hyphens=False))
     return not elsewhere
 

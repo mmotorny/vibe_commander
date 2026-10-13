@@ -16,7 +16,8 @@ which holds the system's functions of the 32-bit program,
 
 And the driver of the tests reads above the megabyte itself since,
 where the trial had `DRIVERX.ASM` do it: `harness/drivercheck.py` holds
-it to `auto.c`, `keys.c`, `wait.c` and `sys.c`, and its top says how.
+it to `auto.c`, `keys.c`, `wait.c`, `copies.c` and `sys.c`, and its top
+says how.
 `run.py` still tells the driver nothing of where a toy keeps anything,
 so what is said below of `auto.c` and "the driver as it is" is what
 `run.py` shows today as well.
@@ -92,6 +93,7 @@ the finding: see `csover.c`.
 | `sys.c`, `both.py` | The functions of the portable C's `sys.h`, each asked and what it answers written out: one toy built both ways, with the program's `dos.c` for 16 bits and with its `dos32.c` for 32, which have to write the same. `both.py` builds both, runs them on the bench and says where they differ; see its top, and the top of `sys.c` |
 | `depth.c` | How much of the program's own stack the extender writes below the stack pointer during a call of DOS, of the BIOS, of the mouse and of real mode, and for the timer's interrupts |
 | `ended.asm` | Real mode: DOS ends a program by another's hand, as the scenario `ended` has it, and what is left then of a program of 32 bits and of its extender. Its top says how it is run and what it writes |
+| `copies.c` | A copy of the toy run from the toy through the shell, and one from that: each with an `AutoTim`, a `Clock` and a stack of its own, elsewhere above the megabyte. `harness/drivercheck.py` holds the driver to it; by hand, steps of `t c o r q`, as its top has them |
 | `rmbench.asm` | Real mode: what the bench has for an extender, XMS, DPMI, EMS and memory |
 | `rmstart.asm` | Real mode: when DOS enters a program, to hold `start.c` against |
 | `rmcalls.asm` | Real mode: what a call costs, to hold `realcalls.c` against |
