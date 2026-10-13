@@ -27,17 +27,12 @@ void F20_02(u16 panel);
    neither byte. */
 #define GO(where)                    ((u32)(where))
 
-/* What a routine leaves in BX and DX, for the keys of the cursor: they go
-   back to the loop where it does not load the two again, and Rename may
-   read them (see main.c). */
-#define LEFT(bx, dx) ((u32)(dx) << 16 | (u16)(bx))
 #define GO_PANEL(where, panel, byte) \
     ((u32)(panel) << 16 | (u16)((u16)(u8)(byte) << 8 | (where)))
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
 u16 NumAdr(u16 panel, u16 number);                      /* place.c */
-u32 ChgAdr(u16 panel, u16 cursor, u16 first);
 void PutPath(u16 panel);                                /* panel.c */
 void PutFls(u16 panel);
 void SetCur(u16 panel, u16 set);
@@ -103,6 +98,18 @@ static void PtFs00(u16 panel)
         PutInf(panel);
 }
 
+/* What a routine leaves in BX and DX, for the keys of the cursor: they go
+   back to the loop where it does not load the two again, and Rename may
+   read them (see main.c). */
+static struct Left Leaves(u16 bx, u16 dx)
+{
+    struct Left left;
+
+    left.bx = bx;
+    left.dx = dx;
+    return left;
+}
+
 /* Move the cursor of a panel of files or of the tree to the entry at the
    address `cursor`, with the entry at `first` the first one shown, if
    that leaves the cursor among those shown, and put on the screen what
@@ -118,13 +125,12 @@ static void PtFs00(u16 panel)
    those two; where the panel is and its size if all of it was; else the
    place and the size of the line written last, which is one that the
    BIOS has scrolled in, or the status line. DX is never 0. */
-u32 F00_50(u16 panel, u16 cursor, u16 first)
+struct Left F00_50(u16 panel, u16 cursor, u16 first)
 {
     struct WCBdef __far *wcb = PANEL(panel);
-    u32 was = ChgAdr(panel, cursor, first);
-    u16 was_cursor = (u16)was;
-    u16 was_first = (u16)(was >> 16);
-    u32 now, left;
+    struct Shown was = ChgAdr(panel, cursor, first);
+    struct Shown now;
+    struct Left left;
     struct Corners window;
     u16 step, moved, how, begin, corner, bottom;
 
@@ -137,10 +143,10 @@ u32 F00_50(u16 panel, u16 cursor, u16 first)
         step = sizeof(struct DIRENT);
         first = md.TreFrst;
         cursor = md.TreAdr;
-        if (was_cursor != cursor)
+        if (was.cursor != cursor)
             md.FlagCD = 1;
     }
-    moved = was_first - first;
+    moved = was.first - first;
     how = 0;
     if (moved != 0) {
         if (moved == step)
@@ -149,18 +155,18 @@ u32 F00_50(u16 panel, u16 cursor, u16 first)
             how = 6;                    /* and up */
         else {
             PtFs00(panel);
-            left = LEFT(BegBX(panel), SizDX());
-            Window((u16)left, (u16)(left >> 16));
+            left = Leaves(BegBX(panel), SizDX());
+            Window(left.bx, left.dx);
             return left;
         }
-    } else if (was_cursor == cursor)
-        return LEFT(first, cursor);
-    left = LEFT(first, cursor);
+    } else if (was.cursor == cursor)
+        return Leaves(first, cursor);
+    left = Leaves(first, cursor);
 
     /* The cursor goes from where it was, on the screen as it is. */
-    now = ChgAdr(panel, was_cursor, was_first);
+    now = ChgAdr(panel, was.cursor, was.first);
     SetCur(panel, 0);
-    ChgAdr(panel, (u16)now, (u16)(now >> 16));
+    ChgAdr(panel, now.cursor, now.first);
     PtFs00(panel);
     if (moved != 0) {
         /* The entries, without the frame and the titles: the tree has no
@@ -182,7 +188,7 @@ u32 F00_50(u16 panel, u16 cursor, u16 first)
         if (how != 7)
             corner = window.lower & 0xFF00 | corner & 0xFF;
         Window(corner, 0x126);
-        left = LEFT(corner, 0x126);
+        left = Leaves(corner, 0x126);
     }
     SetCur(panel, 1);
     if ((wcb->WinTyp | md.MiniSta) == 0)
@@ -190,7 +196,7 @@ u32 F00_50(u16 panel, u16 cursor, u16 first)
     /* The status line. */
     begin = BegBX(panel) + (SizDX() & 0xFF00) - 0x200 + 1;
     Window(begin, 0x126);
-    return LEFT(begin, 0x126);
+    return Leaves(begin, 0x126);
 }
 
 /* Show a file selected or not, and the status line, which counts what is
@@ -211,10 +217,11 @@ static void F08_10(u16 panel, struct Regs STACK *r)
    one shown: with BX and DX as F00_50 leaves them. */
 static void F00_70(u16 panel, u16 cursor, u16 first, struct Regs STACK *r)
 {
-    u32 left = F00_50(panel, NumAdr(panel, cursor), NumAdr(panel, first));
+    struct Left left = F00_50(panel, NumAdr(panel, cursor),
+                              NumAdr(panel, first));
 
-    r->bx = (u16)left;
-    r->dx = (u16)(left >> 16);
+    r->bx = left.bx;
+    r->dx = left.dx;
 }
 
 /* The same for Up and Down, and for the mouse, whose buttons are in

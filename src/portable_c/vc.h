@@ -627,6 +627,11 @@ u16 InvWCB(u16 panel);
 u16 FilePan(u16 panel);
 void AdrNum(u16 panel, struct Place STACK *place);
 void CorPar(u16 panel);
+struct Shown {                          /* what a panel shows, as addresses: */
+    u16 cursor;                         /* the entry that the cursor is on, */
+    u16 first;                          /* and the first one shown */
+};
+struct Shown ChgAdr(u16 panel, u16 cursor, u16 first);
 u8 *PtPt10(u16 panel);                                  /* panel.c */
 /* The tree in a panel, tree.c: its colours are four numbers in the code,
    which come as a far pointer. */
@@ -799,8 +804,13 @@ struct Regs {
    the panel of the menu. The keys of the cursor leave BX and DX in `r`
    as the original has them when it goes back to the loop: F00_50, which
    moves the cursor and which the speed search calls too, returns what it
-   leaves in the two, BX in the low word. */
-u32 F00_50(u16 panel, u16 cursor, u16 first);
+   leaves in the two. */
+struct Left {
+    u16 bx;                             /* BX, and */
+    u16 dx;                             /* DX: see F00_50 for what each
+                                           holds */
+};
+struct Left F00_50(u16 panel, u16 cursor, u16 first);
 u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons,
            struct Regs STACK *r);
 u32 F00_00(u16 panel, struct Regs STACK *r);

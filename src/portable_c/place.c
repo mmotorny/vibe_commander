@@ -18,10 +18,9 @@
 #include "vc.h"
 
 u16 NumAdr(u16 panel, u16 number);
-u32 ChgAdr(u16 panel, u16 cursor, u16 first);
 
 /* struct Place, BegBX, SizDX, LnsAX, InvWCB, FilePan, AdrNum and CorPar
-   are in vc.h. */
+   are in vc.h, and so is ChgAdr, with struct Shown. */
 
 /* The rows a panel takes: half the screen and three, one more on a screen
    of more than 25 lines; or, with the panels full screen, all lines but
@@ -127,25 +126,24 @@ u16 NumAdr(u16 panel, u16 number)
 }
 
 /* Give a panel another cursor and another first line, as addresses, and
-   return those it had: the first line in the high word, the cursor in the
-   low one. */
-u32 ChgAdr(u16 panel, u16 cursor, u16 first)
+   return those it had. */
+struct Shown ChgAdr(u16 panel, u16 cursor, u16 first)
 {
     struct WCBdef __far *wcb = PANEL(panel);
-    u16 was_cursor, was_first;
+    struct Shown was;
 
     if (wcb->WinTyp == 0) {
-        was_cursor = wcb->CurAdr;
-        was_first = wcb->First;
+        was.cursor = wcb->CurAdr;
+        was.first = wcb->First;
         wcb->CurAdr = cursor;
         wcb->First = first;
     } else {
-        was_cursor = md.TreAdr;
-        was_first = md.TreFrst;
+        was.cursor = md.TreAdr;
+        was.first = md.TreFrst;
         md.TreAdr = cursor;
         md.TreFrst = first;
     }
-    return (u32)was_first << 16 | was_cursor;
+    return was;
 }
 
 /* Set right the first line that a panel of files or of the tree shows,
