@@ -3028,6 +3028,34 @@ taken (load 6 to 9) a build from nothing was 5 s with `-j8` and 16 to
 file changed is two compilers run where it was one, some 20 ms of the
 processor more.
 
+`harness/trial32/whole.py`, and what of it the build has taken over.
+It copied the tree, compiled every file itself, without `-wx -we`, to
+see which compile, and put a file of functions that do nothing in
+place of `dos.c`. Whether the tree compiles for 32 bits is the build's
+to say now, at every build and with warnings as errors, and the
+script's own compiling of 61 files said the same less strictly. And
+since D1 the tree has `dos32.c`: the script compiled that too, and the
+linker took `dos32.c`'s 84 functions and wrote 84 warnings for the
+script's own. So the script was changed, in a commit of its own, and
+its linking kept:
+
+- It has the build make the target `portable_c32` and links those
+  objects, `dos32.obj` among them.
+- It compiles itself only what the build does not make: each file that
+  has a `.refused` and no object in `build/portable_c32/`, with its
+  warnings, which is `resident.c`; and `Vector`, `SetVector`, `IntOn`
+  and `__GETDS` as functions that do nothing, which are of `dos.c` and
+  no part of `sys.h`, until S2 and S3 change them.
+- It prints 290,892 bytes: 129,904 of code, 92,720 of everything else,
+  5,073 relocations. As it stood, with D1 landed, it printed 290,900,
+  130,141 and 5,074: the difference is its own 84 functions, which the
+  linker kept the code of. P1 had 286,640 with every function of
+  `sys.h` doing nothing.
+
+It is still the one thing that links the tree for 32 bits, and what an
+S piece runs to see that it does; B2 takes that over, and the script
+can go then.
+
 ### What could go wrong
 
 1. An offset that has wrapped round, added to a pointer. Nothing finds

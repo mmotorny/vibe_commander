@@ -4,30 +4,33 @@ long it is: nothing that it makes runs.
 
     python3 harness/trial32/whole.py
 
-It copies src/portable_c/ to build/trial32/whole/, and changes there
-what Open Watcom's 32-bit compiler refuses of the tree as it stands:
+The project's build compiles the tree for 32 bits, into
+build/portable_c32/, and links no program of it yet. This links one, of
+those objects and of what the build does not make:
 
-  - arith.c is left out, the two helpers of the 16-bit compiler;
-  - dos.c is left out, and in its place every function of sys.h is
-    written as one that does nothing, with the three that vc.h declares
-    of DOS alone, and `__GETDS`, which an interrupt function of the
-    compiler's asks for.
+  - a file that the build lists as not ready for 32 bits, and tries: it
+    leaves <file>.refused there and no object. Such a file is compiled
+    here with its warnings, which the build takes for errors;
+  - what the tree has of DOS outside sys.h, and so outside dos32.c: the
+    three functions that vc.h declares, and `__GETDS`, which an
+    interrupt function of the compiler's asks for. Each is written here
+    as a function that does nothing.
 
-Every other file compiles as it is, with warnings, which the build
-takes for errors, in resident.c alone. Then it links them as
-build.sh links a toy, with DOS/32A for the stub, and prints what the
-file has: its length, its objects, and its relocations. The project
-has to be built once, for the compiler.
+It has the build make the objects first, links them as build.sh links a
+toy, with DOS/32A for the stub, and prints what the file has: its
+length, its objects, and its relocations. The project has to be
+configured, and its tools fetched.
 
-What it shows of the tree as it was on 13 October 2026 is in TODO.md,
+What it showed of the tree as it was on 13 October 2026 is in TODO.md,
 "The portable C in 32 bits: the plan", and again there with the words
-of the addresses of vc.h in their second bodies, which the compiler
-reads here. That the file links says nothing of whether the program
-would run: a place of the main data is still cast to 16 bits in many
-files, and DOS is not there.
+of the addresses of vc.h in their second bodies. Then it compiled the
+tree itself, and had every function of sys.h do nothing; since there
+is dos32.c, what it links is that. That the file links says nothing of
+whether the program would run: a place of the main data is still cast
+to 16 bits in many files, and thirteen functions of dos32.c are not
+made.
 """
 import re
-import shutil
 import struct
 import subprocess
 import sys
@@ -38,32 +41,17 @@ ROOT = Path(__file__).resolve().parent.parent.parent
 SOURCE = ROOT / "src" / "portable_c"
 WATCOM = ROOT / "build" / "_deps" / "open_watcom-src"
 BIN = WATCOM / "binl64"
+BUILT = ROOT / "build" / "portable_c32"
 OUT = ROOT / "build" / "trial32" / "whole"
 
-
-def stub():
-    """A file with every function of sys.h, each doing nothing."""
-    text = re.sub(r"/\*.*?\*/", "", (SOURCE / "sys.h").read_text(), flags=re.S)
-    lines = ['#include "vc.h"',
-             "static void Clear(void *at, u32 size)",
-             "{ u8 *to = at; while (size--) *to++ = 0; }"]
-    for found in re.finditer(r"^((struct \w+|u16|u32|void)\s+\**\w+"
-                             r"\([^;{]*\));", text, re.M):
-        function = " ".join(found.group(1).split())
-        answer = found.group(2)
-        if answer == "void":
-            lines.append(f"{function} {{ }}")
-        elif answer.startswith("struct"):
-            lines.append(f"{function} {{ {answer} none; "
-                         "Clear(&none, sizeof none); return none; }")
-        else:
-            lines.append(f"{function} {{ return 0; }}")
-    lines += ["u32 Vector(u16 number) { return number; }",
-              "void SetVector(u16 number, u32 to) { }",
-              "void IntOn(void) { }",
-              "void GetDs(void) { }",
-              '#pragma aux GetDs "__GETDS"']
-    return "\n".join(lines) + "\n"
+# What the tree calls of DOS that is no function of sys.h.
+OUTSIDE = """#include "vc.h"
+u32 Vector(u16 number) { return number; }
+void SetVector(u16 number, u32 to) { }
+void IntOn(void) { }
+void GetDs(void) { }
+#pragma aux GetDs "__GETDS"
+"""
 
 
 def facts(file):
@@ -92,29 +80,43 @@ def facts(file):
 
 
 def main():
-    if OUT.exists():
-        shutil.rmtree(OUT)
-    OUT.mkdir(parents=True)
-    for path in sorted(SOURCE.glob("*.[ch]")):
-        if path.name not in ("arith.c", "dos.c"):
-            shutil.copy(path, OUT / path.name)
-    (OUT / "nosystem.c").write_text(stub())
+    made = subprocess.run(["cmake", "--build", ROOT / "build",
+                           "--target", "portable_c32"],
+                          capture_output=True, text=True)
+    if made.returncode:
+        sys.exit(made.stdout + made.stderr)
+    OUT.mkdir(parents=True, exist_ok=True)
+    for old in OUT.iterdir():
+        old.unlink()
+    (OUT / "outside.c").write_text(OUTSIDE)
+    # A file that the build has refused has no object there. One that
+    # has both was refused once, and is ready since.
+    waiting = [SOURCE / f"{refused.stem}.c"
+               for refused in sorted(BUILT.glob("*.refused"))
+               if not refused.with_suffix(".obj").exists()]
     environment = {"WATCOM": str(WATCOM), "PATH": "/usr/bin:/bin"}
-    objects = []
-    for path in sorted(OUT.glob("*.c")):
+    objects = sorted(BUILT.glob("*.obj"))
+    for path in waiting + [OUT / "outside.c"]:
+        object_file = OUT / f"{path.stem}.obj"
         made = subprocess.run(
             [BIN / "wcc386", "-q", "-3r", "-mf", "-os", "-s", "-zl", "-zls",
-             f"-i={WATCOM / 'h'}", f"-fo={path.with_suffix('.obj')}", path],
+             f"-i={SOURCE}", f"-i={WATCOM / 'h'}", "-fr",
+             f"-fo={object_file}", path],
             cwd=OUT, env=environment, capture_output=True, text=True)
         if made.returncode:
             sys.exit(f"{path.name}:\n{made.stdout}")
         if "Warning" in made.stdout + made.stderr:
             print(f"{path.name}: "
                   f"{(made.stdout + made.stderr).count('Warning')} warnings")
-        objects += ["file", path.with_suffix(".obj")]
+        objects.append(object_file)
+    print(f"{len(objects)} objects, {len(waiting) + 1} of them made here")
+    # In the order of the files' names, as the program of 16 bits is
+    # linked: a segment holds what the objects have of it in their order.
+    objects.sort(key=lambda path: path.name)
     subprocess.run(
         [BIN / "wlink", "option", "quiet", "format", "os2", "le",
-         "name", OUT / "VC.EXE", *objects,
+         "name", OUT / "VC.EXE",
+         *(word for path in objects for word in ("file", path)),
          "option", "start=Alloc0_",
          "option", f"stub={WATCOM / 'binw' / 'dos32a.exe'}",
          "option", f"map={OUT / 'VC.MAP'},static",
