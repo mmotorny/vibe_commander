@@ -37,11 +37,14 @@ comparison must report each.
 
 The portable C is declared to behave otherwise than the original in some
 things (src/portable_c/DEVIATIONS.md, and deviations.TREES for the
-scenarios). A scenario that it is declared to change is held against a
-golden of the tree's own, recorded from it; such a golden is no measure,
-so this says how many scenarios were held against the original and names
-the others, and fails for a golden of the tree's own that is as the
-original's, or that nothing declares. A scenario that only shows what
+scenarios). A scenario that it is declared to show otherwise is held
+against the original's golden with that difference made to it: the
+steps that are left out for the tree, and the scenario's patch, a file
+of the rows that are expected otherwise (see goldens.py). This says how
+many scenarios were held against the original's golden as it is and
+names the others, and fails for a patch that does not fit its golden,
+before anything is run, and for one whose header names no entry of
+DEVIATIONS.md that names the scenario. A scenario that only shows what
 the tree has no more is not run, and a function that the tree has no
 more is listed in GONE, with what took it away.
 
@@ -65,6 +68,7 @@ map.
 Exits with status 0 if all of this holds and 1 otherwise.
 """
 import argparse
+import re
 import sys
 import textwrap
 from dataclasses import dataclass, field, replace
@@ -72,6 +76,7 @@ from pathlib import Path
 
 import compare
 import coverage
+import deps
 import deviations
 from driver import COM_ORIGIN
 import goldens
@@ -1525,12 +1530,13 @@ def check_layout(program):
 def check_declared(tree, names):
     """Report on what the tree `tree` is declared to do otherwise than
     the original, of which `names` are the scenarios it was taken
-    through; return success. A golden of its own has to be other than
-    the original's, where both are of the same steps, and to be declared."""
+    through; return success. A patch has to be of a scenario that the
+    tree is taken through, and its header to name entries of the tree's
+    DEVIATIONS.md that name the scenario; that it fits its golden was
+    seen before anything was run (compare.compare)."""
     declared = deviations.declared(tree)
-    not_run = scenarios.not_run(tree)
     passed = True
-    for name in sorted(set(declared.changed) | set(declared.not_run)):
+    for name in sorted(declared.not_run):
         if name not in scenarios.SCENARIOS:
             passed = False
             print(f"  declared for {tree}, and no scenario: {name}")
@@ -1541,25 +1547,11 @@ def check_declared(tree, names):
             passed = False
             print(f"  {tree} is declared to be taken through {instead} in "
                   f"place of a step that no scenario has: {step}")
-    for name, why in declared.changed.items():
-        if name in not_run or name not in scenarios.SCENARIOS:
-            continue
-        ours, theirs = goldens.read(name, tree), goldens.read(name)
-        if ours.steps == theirs.steps and not goldens.changes(name, tree):
-            passed = False
-            print(f"  {name} has a golden of {tree}'s own that is as the "
-                  "original's: it is declared to change, and does not")
-    for name in names:
-        left = set(scenarios.SCENARIOS[name].steps) & set(declared.left_out)
-        if left and name not in declared.changed:
-            passed = False
-            print(f"  {name} has a step that is left out for {tree}, "
-                  f"{sorted(left)[0]}, and is not declared to change")
     for name, gone in declared.left_out_of.items():
-        if name not in names or name not in declared.changed:
+        if name not in names:
             passed = False
             print(f"  steps are left out of {name} for {tree}, which is "
-                  "not run for it, or is not declared to change")
+                  "not run for it")
             continue
         steps = [step for step in scenarios.SCENARIOS[name].steps
                  if step not in declared.left_out]
@@ -1569,22 +1561,49 @@ def check_declared(tree, names):
                 print(f"  left out of {name} for {tree}, and the scenario "
                       f"has no such steps one behind the other: "
                       f"{', '.join(some)}")
+    patched = {}
+    entries = deviation_entries(tree)
     directory = goldens.DIRECTORY / tree
     for file in sorted(directory.glob("*")) if directory.is_dir() else []:
-        if file.suffix != ".txt" or file.stem not in declared.changed:
+        name = file.stem
+        if file.suffix == ".txt" and name in declared.changed:
+            continue              # still a golden of the tree's own
+        if file.suffix != ".patch" or name not in names:
             passed = False
-            print(f"  {file.relative_to(goldens.DIRECTORY.parent)} is the "
-                  f"golden of nothing that is declared for {tree}")
-    held = [name for name in names if name not in declared.changed]
+            print(f"  {goldens.shown(file)} is the patch of no scenario "
+                  f"that {tree} is taken through")
+            continue
+        patch = goldens.read(name, tree).patch
+        patched[name] = patch.count()
+        for number in patch.deviations:
+            if f"`{name}`" not in entries.get(number, ""):
+                passed = False
+                print(f"  {goldens.shown(file)} says that it is of "
+                      f"deviation {number}, and src/{tree}/DEVIATIONS.md "
+                      + ("does not name the scenario there, as "
+                         f"`{name}`" if number in entries else
+                         "has no such entry"))
+    shorter = [name for name in names if name not in declared.changed
+               and len(declared.kept(scenarios.SCENARIOS[name].steps, name))
+               < len(scenarios.SCENARIOS[name].steps)]
+    held = [name for name in names if name not in patched
+            and name not in shorter and name not in declared.changed]
     print(f"The goldens: {len(held)} scenarios were held against the "
-          "original's")
-    if declared.changed:
-        print(textwrap.fill(
-            f"against {tree}'s own, which only show that nothing has "
-            "changed since they were recorded: "
-            + ", ".join(name for name in names if name in declared.changed),
-            width=78, initial_indent="  ", subsequent_indent="    ",
-            break_on_hyphens=False))
+          "original's as it is")
+    for what, some in (
+            (f"against {tree}'s own, which only show that nothing has "
+             "changed since they were recorded, and are still to become "
+             "patches", [name for name in names if name in declared.changed]),
+            ("against the original's without the steps that are left out "
+             f"for {tree}", shorter),
+            ("against the original's with a patch, the lines that the "
+             "patch says are expected otherwise in brackets",
+             [f"{name} ({count})" for name, count in patched.items()])):
+        if some:
+            print(textwrap.fill(
+                f"{what}: {', '.join(some)}", width=78,
+                initial_indent="  ", subsequent_indent="    ",
+                break_on_hyphens=False))
     for name, why in declared.not_run.items():
         print(textwrap.fill(f"not run for {tree}: {name}, {why}", width=78,
                             initial_indent="  ", subsequent_indent="    ",
@@ -1603,6 +1622,18 @@ def check_declared(tree, names):
             width=78, initial_indent="  ", subsequent_indent="    ",
             break_on_hyphens=False))
     return passed
+
+
+def deviation_entries(tree):
+    """The entries of the tree's DEVIATIONS.md, number -> text: each
+    from its heading, "### 7. ...", to the next."""
+    file = deps.ROOT / "src" / tree / "DEVIATIONS.md"
+    if not file.exists():
+        return {}
+    parts = re.split(r"^### (\d+)\. ", file.read_text(encoding="utf-8"),
+                     flags=re.MULTILINE)
+    return {int(number): text
+            for number, text in zip(parts[1::2], parts[2::2])}
 
 
 def check_comparison(name, run, program):

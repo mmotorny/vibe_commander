@@ -10,8 +10,10 @@ and video mode, and leave the same files on its disks.
 A build of the portable C, build/portable_c/VC.EXE, is held against the
 original in the same way but where that tree is declared to behave
 otherwise (see deviations.TREES): a scenario that it is declared to
-change is held against the tree's own golden of it, and one that only
-shows what the tree has no more is not run.
+show otherwise is held against the original's golden with that
+difference made to it, by the scenario's patch (see goldens.py), and one
+that only shows what the tree has no more is not run. A patch that does
+not fit the golden it is of fails the comparison before anything is run.
 
 The build is run as it is, and so is the original: a driver in the
 machine presses the keys and writes each screen out when the program has
@@ -48,7 +50,20 @@ def compare(names, program, trace=False, together=None, stack=False):
     `together` scenarios run side by side, each on a machine of its own;
     TOGETHER if it is not given. `trace` and `stack` are as for
     scenarios.run(). Returns whether any departed, and the runs.
+
+    What each scenario is held against is read before any is run: a
+    patch that cannot be made to its golden wants a person, and nothing
+    that a run would say is worth waiting for until one has looked.
     """
+    expected, misfits = {}, []
+    for name in names:
+        try:
+            expected[name] = goldens.read(name, program.tree)
+        except goldens.Misfit as misfit:
+            misfits.append(str(misfit))
+    if misfits:
+        sys.exit("\n\n".join(misfits))
+
     def one(name):
         scenario = scenarios.of(name, program.tree)
         began = time.monotonic()
@@ -63,13 +78,13 @@ def compare(names, program, trace=False, together=None, stack=False):
         # In the order of `names`, as each is done.
         for name, (run, took) in zip(names, pool.map(one, names)):
             runs.append(run)
-            golden = goldens.read(name, program.tree)
+            golden = expected[name]
             report = goldens.differences(golden, run, {program.filename})
             screens = len(run.screens)
-            # A golden of the tree's own is no measure of it: the line
-            # says which of the two a scenario was held against.
-            measure = f"its own golden, recorded from {golden.tree}" \
-                if golden.tree else "the original"
+            # The line says what a scenario was held against: the
+            # original's golden, or that without the steps that are
+            # left out for the tree and with the scenario's patch.
+            measure = goldens.measure(golden)
             if report:
                 failed = True
                 print(f"{name}: differs from {measure}")

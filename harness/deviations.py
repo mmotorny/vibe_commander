@@ -9,7 +9,19 @@ original at all, and are declared here too: see IGNORED.
 
 That much holds for both C trees. The portable C is declared to behave
 otherwise than the original in more, in src/portable_c/DEVIATIONS.md; what
-the harness goes by of that is at the end of this file: see TREES.
+the harness goes by of that is at the end of this file: see TREES. What
+such a tree is expected to show in a scenario is still the original's
+golden, with the declared difference made to it when the golden is read
+for that tree, and nothing else:
+
+  - steps that the tree is not taken through are left out, with their
+    screens: `left_out` and `left_out_of` of TREES;
+  - a difference that is on many screens is a rule, of the form that
+    DEVIATIONS has, for that tree alone: `rules` of TREES;
+  - and what one scenario shows otherwise is a patch, a file of the rows
+    that differ in harness/goldens/TREE/, written by whoever declared
+    the deviation: the top of goldens.py says how it is written, read
+    and made.
 """
 import re
 from dataclasses import dataclass, field, replace
@@ -17,12 +29,16 @@ from dataclasses import dataclass, field, replace
 from dos import COLUMNS
 
 
-def expected(screen):
-    """`screen` of the original as a build is expected to show it."""
+def expected(screen, rules=None):
+    """`screen` of the original as a build is expected to show it: by
+    the rules of DEVIATIONS, which hold for every build and are made to
+    a golden when it is derived. With `rules`, by those instead: the
+    rules of one tree (Declared.rules), which are made to the golden's
+    screens when it is read for that tree."""
     cells = bytearray(screen.cells)
     lines = screen.lines()
     for row, line in enumerate(lines):
-        for pattern, text, below in DEVIATIONS:
+        for pattern, text, below in DEVIATIONS if rules is None else rules:
             match = pattern.search(line)
             if match and below:
                 # Known by the line below it as well.
@@ -218,12 +234,21 @@ IGNORED = [
 # src/portable_c/DEVIATIONS.md, with the scenarios that show it, and those
 # scenarios are named here again, for the harness to go by.
 #
-# A scenario that a deviation changes cannot be held against what the
-# original did. It gets a golden of the tree's own, recorded from the tree
-# (goldens.py record) and read by whoever recorded it, in a directory of
-# that tree's name next to the original's goldens. Such a golden shows that
-# nothing has changed since it was recorded, not that anything is right.
-# Every other scenario is held against the original's golden, as it is.
+# A scenario that a deviation changes is still held against what the
+# original did, with the declared difference made to it when the golden is
+# read for the tree (goldens.read): the steps that are left out here go,
+# with their screens; the rules of the tree are made to every screen; and
+# the rows that one scenario shows otherwise are its patch, a file of
+# harness/goldens/TREE/ that says of each such row what the original has
+# and what the tree is expected to have, with the deviation it is of and
+# why. The patches are not listed here: a scenario has one if the file is
+# there, and the top of goldens.py says how one is written. Every other
+# scenario is held against the original's golden as it is.
+#
+# Until now such a scenario had a golden of the tree's own, a whole file
+# recorded from the tree, which showed that nothing had changed since and
+# not that anything was right. Those that are still held so are in
+# `changed`, and go from there one by one.
 
 
 @dataclass(frozen=True)
@@ -244,8 +269,33 @@ class Declared:
     # switches the panels off in another. The steps are left out wherever
     # the scenario has them one behind the other.
     left_out_of: dict = field(default_factory=dict)
-    # Scenarios that the tree is held in against a golden of its own:
-    # scenario -> what changes in it.
+    # What the tree shows otherwise on whatever screen has it: rules of
+    # the form that DEVIATIONS has, (pattern, text, pattern of the line
+    # below or None), which are made to every screen of every golden
+    # when it is read for this tree, and to no other tree's. For a
+    # difference that is on many screens, where a patch for each
+    # scenario would say the same thing over and over. A rule is made
+    # before a scenario's patch, so the rows of a patch are the golden's
+    # as the rules leave them.
+    #
+    # A rule says "expect this in their place" of the cells that its
+    # group matches. It could say "these cells are not compared" as well
+    # (TODO.md, "Leaving a part of the screen out of the comparison"),
+    # which nothing does today: written as a rule with None for its
+    # text, (pattern, None, below). Such cells would be blanked as those
+    # of IGNORED are, on the golden's screen and on the build's, and not
+    # by expected(), which sees the golden alone: compared() would take
+    # the tree, which goldens.differences has, and go through the rules
+    # of the tree that have None, matching each on the golden's screen
+    # and blanking the cells it finds there on both. That is the form
+    # that TODO.md asks for, a cell left out only where the golden has
+    # what the part shows when nothing covers it.
+    rules: tuple = ()
+    # Scenarios that the tree is still held in against a golden of its
+    # own, a whole file recorded from the tree, as every such scenario
+    # was before a deviation was held by a patch: scenario -> what
+    # changes in it. Each goes from here when it has become a patch, or
+    # needs none, and the field with the last of them.
     changed: dict = field(default_factory=dict)
     # Steps that the tree is taken through in place of others, one for
     # one, in every scenario: the step of the original -> (the step of
@@ -253,24 +303,30 @@ class Declared:
     # original and then shows alike: the screen behind the tree's step is
     # held against the one behind the original's, and so is every screen
     # after it. Such a step changes no scenario by itself, and is no
-    # reason for a golden of the tree's own. The tree's step may be the
-    # keys of a step that is left out for it, which then mean another
-    # thing there: steps() leaves out first and puts in afterwards.
+    # reason for a patch. The tree's step may be the keys of a step that
+    # is left out for it, which then mean another thing there: steps()
+    # leaves out first and puts in afterwards.
     in_place_of: dict = field(default_factory=dict)
     # Why the tree is taken through no scenario of the setup program
     # (scenarios.Scenario.setup), whichever there are, or None if it is
     # taken through them: for a tree that has no setup program.
     no_setup: str = None
 
+    def kept(self, steps, name=None):
+        """Which of `steps`, those of the scenario `name`, the tree is
+        taken through: their places in `steps`, counted from 0."""
+        places = [at for at, step in enumerate(steps)
+                  if step not in self.left_out]
+        for gone in self.left_out_of.get(name, {}):
+            for at in reversed(found([steps[at] for at in places], gone)):
+                del places[at:at + len(gone)]
+        return places
+
     def steps(self, steps, name=None):
         """The steps of `steps`, those of the scenario `name`, that the
-        tree is taken through."""
-        steps = [step for step in steps if step not in self.left_out]
-        for gone in self.left_out_of.get(name, {}):
-            for at in reversed(found(steps, gone)):
-                del steps[at:at + len(gone)]
-        return tuple(self.in_place_of.get(step, (step,))[0]
-                     for step in steps)
+        tree is taken through, each as the tree is taken through it."""
+        return tuple(self.in_place_of.get(steps[at], (steps[at],))[0]
+                     for at in self.kept(steps, name))
 
 
 def found(steps, some):
