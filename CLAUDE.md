@@ -140,14 +140,22 @@ These held while `src/c/` was made, and they say what it is.
      A variable is widened wherever wrapping round at 16 bits would be
      unexpected behaviour, and stays 16 bits only where the program
      counts on the wrapping. A number that is only ever true or false
-     becomes a boolean. On the user's word of 13 October 2026 it is
-     done in two parts. Now: the pointers, the booleans, and a record
-     of every number's width with the reason for it. After the layer
-     is designed: the widening itself, to the types that the layer
-     names. And the memory for the panels and the texts comes from the
-     extender from this step on, as much as the machine has, where
-     step 1 had 640 KB of the program's own: what a user then sees
-     otherwise, an editor that opens whatever fits, is declared.
+     becomes a boolean. On the user's word of 13 October 2026 the
+     memory for the panels and the texts comes from the extender from
+     this step on, as much as the machine has, where step 1 had 640 KB
+     of the program's own: what a user then sees otherwise, an editor
+     that opens whatever fits, is declared. The widening is of this
+     step and does not wait for the layer: the pointers first, then
+     the booleans and the widths together, with the reason written
+     down for every number that stays 16 bits, and a named type for
+     what crosses to the system, a size of a file or a count of bytes
+     read, so that the layer can say later how wide that is. A limit
+     of the original that goes when a number is widened is a
+     deviation, and each is asked as the work comes to it. For an hour
+     of that day the widening was put behind the layer's design: the
+     reasons did not hold, since most of what is widened never crosses
+     to the system, and the memory from the extender makes the limits
+     of 16 bits reachable on DOS.
   3. The abstraction layer is designed: what the program asks of the
      system it is on, and how. The user approves the design before
      anything is built on it. `sys.h` is what there is until then, a
