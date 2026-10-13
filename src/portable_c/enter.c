@@ -26,10 +26,9 @@
    F21_30, which other files call too. */
 
 /* What is called of the rest of the program is of vc.h: HidCur and
-   Cursor1 for the cursor, Int10, the BIOS for the screen, Int21d, DOS as
-   it is where the assembly did not go through Intr21, and Fantom,
-   SetDTA, Intr21, SetPth, UpCase, RestVct, SavMous, CurMous, Quit and
-   Window. */
+   Cursor1 for the cursor, and Fantom, SetDTA, SetPth, UpCase, RestVct,
+   SavMous, CurMous, Quit and Window. What is asked of the system is
+   asked by the functions of sys.h. */
 
 /* C routines of other files that vc.h does not have. TstExe is 1 for a
    name that DOS can run: com, exe or bat. TrCr10 finds the current
@@ -53,12 +52,8 @@ extern const u8 __far Name_S[];
 /* Where the original has what it keeps of the main data while a command
    runs, ComnIni: 25E5h. The assembly has that in BX when it has the BIOS
    write the end of a line, where the BIOS takes the page of the screen
-   and a colour. */
+   and a colour: the high byte and the low one. */
 #define COMNINI_WAS 0x25E5
-
-#define DOS_FIND_FIRST 0x4E00           /* DOS: the first file of a name */
-#define DOS_CHDIR      0x3B00           /* make a directory current */
-#define DOS_DRIVE      0x1900           /* which drive is current */
 
 static const u8 CODE CDir_S[] = "\\";
 
@@ -139,8 +134,6 @@ static void F21_40(u16 panel)
    DOS; what it reads from then on is the copy. */
 struct Onward F21_31(void)
 {
-    struct DosRegs regs;
-    struct BiosRegs bios;
     u16 drive;
 
     RestVct();
@@ -158,20 +151,10 @@ struct Onward F21_31(void)
         md.LoadFl = md.LoadRes;
         return To(NEXT_INIT11);
     }
-    bios.ax = 0x0E0D;
-    bios.bx = COMNINI_WAS;
-    bios.cx = bios.dx = 0;
-    Int10((struct BiosRegs STACK *)&bios);
-    if (!(md.LoadFl & 0x80)) {
-        bios.ax = 0x0E0A;
-        bios.bx = COMNINI_WAS;
-        Int10((struct BiosRegs STACK *)&bios);
-    }
-    regs.ax = DOS_DRIVE;
-    regs.bx = regs.cx = regs.si = regs.di = 0;
-    regs.name = (const u8 *)&md;
-    Int21d((struct DosRegs STACK *)&regs);
-    drive = regs.ax & 0xFF;
+    ScreenType('\r', COMNINI_WAS >> 8, COMNINI_WAS & 0xFF);
+    if (!(md.LoadFl & 0x80))
+        ScreenType('\n', COMNINI_WAS >> 8, COMNINI_WAS & 0xFF);
+    drive = DriveCurrent();
     if (drive != md.DosChg[0])
         drive = (u8)(drive + 'A');
     else
@@ -264,7 +247,6 @@ struct Onward F21_10(u16 panel)
     struct WCBdef __far *wcb = PANEL(panel);
     const struct FILENT __far *file;
     const u8 __far *from;
-    struct DosRegs regs;
     struct Edited edited;
     u16 address, command, cursor, i;
     u8 c;
@@ -275,20 +257,14 @@ struct Onward F21_10(u16 panel)
         HidCur();
         if (Fantom((u8)(md.DosPth[0] - ('A' - 1))))
             return To(NEXT_FUNC04);
-        regs.bx = regs.si = regs.di = 0;
-        regs.name = md.CrnPath + 2;
         if (md.CrnPath[3] != 0) {
             SetDTA();
-            regs.ax = DOS_FIND_FIRST;
-            regs.cx = 0x37;
-            if (Intr21((struct DosRegs STACK *)&regs))
+            if (FindFirst(md.CrnPath + 2, 0x37).failed)
                 return To(NEXT_FUNC04);
             if (!(md.DTA.FilAttr & ATTR_DIRECTORY))
                 return To(NEXT_FUNC04);
-            regs.name = md.CrnPath + 2;
         }
-        regs.ax = DOS_CHDIR;
-        if (Intr21((struct DosRegs STACK *)&regs))
+        if (DirChange(md.CrnPath + 2).failed)
             return To(NEXT_FUNC04);
         F24_02(panel);
         return To(NEXT_INIT50);
@@ -378,17 +354,13 @@ static struct Onward F23_02(u16 panel, u16 address)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file = ENTRY(wcb, address);
-    struct DosRegs regs;
     u8 __far *name;
     u16 i;
 
     HidCur();
     if (Fantom((u8)(wcb->WinPath[0] - ('A' - 1))))
         return To(NEXT_FUNC04);
-    regs.ax = DOS_CHDIR;
-    regs.bx = regs.cx = regs.si = regs.di = 0;
-    regs.name = file->NameF;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (DirChange(file->NameF).failed)
         return To(NEXT_FUNC04);
     if (file->NameF[0] == '.') {
         wcb->CurAdr = DSKBUF;
@@ -445,12 +417,7 @@ struct Onward F23_00(u16 panel)
    that was chosen, at TmpBuf. */
 static struct Onward ChDir(u16 panel, const u8 __far *path)
 {
-    struct DosRegs regs;
-
-    regs.ax = DOS_CHDIR;
-    regs.bx = regs.cx = regs.si = regs.di = 0;
-    regs.name = path;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (DirChange(path).failed)
         return To(NEXT_FUNC04);
     PANEL(panel)->EndBuf = DSKBUF;
     F24_02(panel);
