@@ -23,6 +23,17 @@ function of the compiler does, is known for what it is.
 The portable C's file is an .EXE as the linker writes it, which DOS
 relocates by the table in its header: the same holds of it, with that
 table. Which of the two a file is, its header says: see origin().
+
+Two programs of the original run in one machine where a scenario is of
+the setup program: VC.COM, and VCSETUP.COM started from its command line.
+The two files have routines of the same bytes, in the same order, 68 of
+them. So a block that ran in the one program is found in the file of the
+other as well, once, and such blocks agree on a place in the memory for
+the other program where it never was: the original taken through dialogs
+and the help, with the setup program never started, had 1,003 bytes of
+VCSETUP.COM count as run. A program is therefore placed only by blocks
+that the file of no other program has too: see `others` of executed().
+What ran at the place so found counts whatever else has the same bytes.
 """
 import bisect
 import re
@@ -147,10 +158,13 @@ def _loaded(contents, words, base):
     return bytes(there)
 
 
-def executed(trace_path, contents, linked=None):
+def executed(trace_path, contents, linked=None, others=()):
     """Offset -> length in `contents` (a program file) of what was
     executed. `linked` is the linker's map of the translation, for where its
-    relocation table is."""
+    relocation table is. `others` are the files of the other programs
+    that ran in the same machine and have code of the same bytes as this
+    one, as the two programs of the original have: a block that one of
+    them has too says nothing of where this program is."""
     logged = list(blocks(trace_path))
     votes = Counter()
     # Instructions that follow one another in memory vote as one block
@@ -165,6 +179,8 @@ def executed(trace_path, contents, linked=None):
     for block in logged + runs:
         code = b"".join(code for _, code in block)
         if len(code) < MIN_BLOCK:
+            continue
+        if any(code in other for other in others):
             continue
         offset = contents.find(code)
         if offset >= 0 and contents.find(code, offset + 1) < 0:
