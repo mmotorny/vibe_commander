@@ -4810,6 +4810,56 @@ the block's own drive kept; files deleted by a mask, twice, with the
 flag, and by an extended block; the country as its 34 bytes; and
 seven letters made capitals. The same in both, for both countries.
 
+**A program run, and Quick execute: done.** 89 of the 98 are made, 9
+do nothing. New are `ProgramRun`, `ProgramRunBare` and `ShellRun`. The
+block below the megabyte is 512 bytes.
+
+`ProgramRun` and `ProgramRunBare` are 4B00h in real mode, the first
+with the program's errors, with everything that DOS reads in the
+block: the name; the tail, 128 bytes of it whatever its count, since
+DOS copies 128 into the PSP of the program; the two file control
+blocks, 16 bytes each, the bytes of the main data at 5Ch and at 6Ch
+as `Run` of `dos.c` has them; and the 14 bytes that name those.
+
+| What | 16 bits | 32 bits | Why |
+|---|---|---|---|
+| The environment in DOS's block | 0: DOS copies this program's | The segment of this program's environment: DOS copies that | The word of the PSP at 2Ch, through which DOS finds the environment to copy, is a selector of the extender's. Tried with 0: a second copy that the toy ran by itself had an environment without `COMSPEC`. Run through the shell it had one all the same, since FreeCOM gives what it runs its own; that is why the trial's `command.c`, which named none, showed nothing |
+| INT 22h of real mode | DOS has it name where it was called from, and puts it back from the PSP when the program ends | Read before the call and put back behind it, DPMI 0200h and 0201h | The extender ends first, and writes "DOS/32A warning (9003): real mode interrupt vector has been modified: INT 22h" onto the last screen. Tried without: it does; with it the last screen is as in 16 bits |
+| CX, SI and DI at the call | As they come | 0, as D1 has every register that a call does not read | |
+
+`ShellRun` is the trial's way: 26 bytes of real mode in the block,
+which keep the stack in four bytes behind their own segment, call INT
+2Eh, put the stack back with the machine kept from interrupting, and
+return far, called by DPMI 0301h with DS:SI on the command, which is
+in the block too. INT 22h is put back behind it as behind a program,
+since a shell that serves the interrupt runs programs. On the bench it
+comes back and runs nothing, as in 16 bits: FreeCOM does not serve the
+interrupt. That the stack comes back right behind a shell which does,
+is from reading here as it is in `dos.c`.
+
+What was not looked at: whether a shell that serves INT 2Eh leaves
+INT 23h and 24h of real mode as it found them. DOS puts both back from
+the PSP of a program that ends, so a program run by 4Bh leaves them;
+a shell that takes them for a command of its own interrupt and does
+not give them back would leave the extender's routines out of DOS's
+reach, and the extender with a warning at the end. No bench of the
+project can show it.
+
+The toy has three pages more, 17 for 16 steps: the shell found in the
+environment and run bare for a command that leaves a file, which is
+read; a file that is not there run both ways; the toy's own file run
+with something behind its name, by itself and then by the shell as a
+command, each of which is a second copy that writes a page of its own
+with its tail, its shell by its environment, the path of its file and
+whether it has memory, waits for a key that the driver gives it, and
+ends; and a command handed to the shell. The same in both, for both
+countries, and no warning on the last screen.
+
+For W: entry 6 of `DEVIATIONS.md` has what DOS is handed in the
+registers that it does not read, call by call, for the program of 16
+bits. In 32 bits each of those is 0, at every call, and the
+environment is named at 4Bh: the entry wants a sentence for that.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")

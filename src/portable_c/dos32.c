@@ -52,7 +52,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 86 of the 98, eleven of them in real mode; the 12 that are not made
+ * 89 of the 98, fourteen of them in real mode; the 9 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -214,9 +214,17 @@ static void MouseState(u32 eax, struct MouseAt *state);
      LOW_NAME     a name or a path, 128 bytes
      LOW_RECORD   the record of a search, 43 bytes
      LOW_SECOND   128 bytes that DOS writes a path to
+                  or the command tail of a program that is run, or a
+                  command for the shell
      LOW_FCB      a file control block, 44 bytes with what an extended
                   one has in front
-     LOW_COUNTRY  what DOS tells of the country, 34 bytes */
+     LOW_COUNTRY  what DOS tells of the country, 34 bytes
+     LOW_RUN      what DOS is told of a program that it is to run, 14
+                  bytes, and the two file control blocks that this
+                  names, 16 bytes each
+     LOW_SHELL    instructions of real mode around the shell's
+                  interrupt, and the four bytes in which they keep the
+                  stack */
 static u16 LowSeg = 0;
 
 #define LOW_NAME    0
@@ -224,7 +232,12 @@ static u16 LowSeg = 0;
 #define LOW_SECOND  192
 #define LOW_FCB     320
 #define LOW_COUNTRY 368
-#define LOW_SIZE    416
+#define LOW_RUN     416
+#define LOW_FCB1    432
+#define LOW_FCB2    448
+#define LOW_SHELL   464
+#define LOW_KEPT    496
+#define LOW_SIZE    512
 #define LOW(place) ((u8 *)(((u32)LowSeg << 4) + (place)))
 
 #define DPMI_SEGMENT_BASE 0x0006        /* where the segment of the
@@ -232,6 +245,9 @@ static u16 LowSeg = 0;
                                            DX */
 #define DPMI_LOW_BLOCK 0x0100           /* a block of DOS's memory: BX
                                            paragraphs; AX its segment */
+#define DPMI_REAL_VECTOR 0x0200         /* where the interrupt in BL goes
+                                           in real mode: CX:DX */
+#define DPMI_SET_REAL_VECTOR 0x0201     /* and that set */
 #define DPMI_REAL_INT  0x0300           /* an interrupt in real mode: BL
                                            which, CX words of the stack to
                                            take along, ES:EDI the
@@ -1149,23 +1165,6 @@ void Idle(void)
     DosIdle();
 }
 
-/* The end of the program. The extender takes the call for its own end
-   too, and leaves the machine as it found it. */
-void ProgramEnd(u16 code)
-{
-    struct DosRegs regs;
-
-    Set(&regs, 0x4C00 | code & 0xFF, 0, 0, 0);
-    Tell(&regs);
-}
-
-/* The extender does not start on a DOS before 3, so there is none to
-   leave another way: nothing, and the program goes on to say what it
-   says of a DOS that is too old for it. */
-void ProgramEndOld(void)
-{
-}
-
 /* What the program was started with is in its PSP, which is DOS's and
    below the megabyte: the tail from 81h on, and at 2Ch what names the
    environment. Start has found both. The environment is DOS's own
@@ -1186,6 +1185,155 @@ const u8 FAR *ProgramTail(void)
 const u8 FAR *ProgramEnvironment(void)
 {
     return Environment;
+}
+
+/* Other programs: AX 4B00h in real mode, since what DOS is told of the
+   program is addresses of real mode, with the name at DS:DX and at ES:BX
+   the block that says what the program is run with; the shell's own
+   interrupt, INT 2Eh; and AH 4Ch.
+
+   All that DOS reads is in the block below the megabyte. The name. The
+   tail, of which DOS copies 128 bytes into the PSP of the program
+   whatever its count, so 128 go down. The two file control blocks,
+   which DOS copies there too, 16 bytes each: the bytes of the main data
+   at 5Ch and at 6Ch, as in dos.c, where Run says why. And the 14 bytes
+   that name them, with the environment.
+
+   dos.c names no environment, and DOS then gives the program a copy of
+   this one's, which it finds through this program's PSP. Here the PSP
+   has a selector of the extender's where DOS looks for the segment
+   (see Start), so the environment is named, by its segment: the program
+   gets a copy of it all the same. */
+
+#define INT_GOES_ON 0x22                /* where DOS goes on when a
+                                           program has ended */
+#define TAIL_SIZE 128
+
+/* Where INT 22h goes in real mode, and that set. DOS has it name where
+   it was called from when it runs a program, and leaves it so; in 16
+   bits it puts it back from the PSP when this program ends. The
+   extender ends first, and says of every interrupt of real mode that is
+   not as it found it that it "has been modified", onto the last screen:
+   so it is put back behind every program that is run. Only the extender
+   is asked. */
+static u32 GoesOn(void)
+{
+    struct DosRegs regs;
+
+    Extender(&regs, DPMI_REAL_VECTOR, INT_GOES_ON, 0, 0, 0);
+    return (u32)(u16)regs.ecx << 16 | (u16)regs.edx;
+}
+
+static void SetGoesOn(u32 to)
+{
+    struct DosRegs regs;
+
+    Extender(&regs, DPMI_SET_REAL_VECTOR, INT_GOES_ON, to >> 16, (u16)to, 0);
+}
+
+static void Run(struct DosRegs *regs, const u8 *name, const u8 *tail)
+{
+    u16 *block = (u16 *)LOW(LOW_RUN);
+
+    NameLow(name);
+    Bytes(LOW(LOW_SECOND), tail, TAIL_SIZE);
+    Bytes(LOW(LOW_FCB1), (const u8 *)&md + 0x5C, FCB_UNOPENED);
+    Bytes(LOW(LOW_FCB2), (const u8 *)&md + 0x6C, FCB_UNOPENED);
+    block[0] = (u16)((u32)Environment >> 4);
+    block[1] = LOW_SECOND;
+    block[2] = LowSeg;
+    block[3] = LOW_FCB1;
+    block[4] = LowSeg;
+    block[5] = LOW_FCB2;
+    block[6] = LowSeg;
+    SetLow(regs, 0x4B00, LOW_RUN, 0, LOW_NAME);
+}
+
+struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail)
+{
+    struct DosRegs regs;
+    struct Answer ran;
+    u32 goes = GoesOn();
+
+    Run(&regs, name, tail);
+    ran = Ask(&regs, 0);
+    SetGoesOn(goes);
+    return ran;
+}
+
+struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
+{
+    struct DosRegs regs;
+    struct Answer ran;
+    u32 goes = GoesOn();
+
+    Run(&regs, name, tail);
+    ran = Tell(&regs);
+    SetGoesOn(goes);
+    return ran;
+}
+
+/* The shell's own interrupt for a command, INT 2Eh of COMMAND.COM, with
+   the command at DS:SI. It is of real mode, and comes back there with
+   nothing as it was but where it comes back to: no stack and no
+   register. So it cannot be called as an interrupt of real mode is, by
+   the extender's service, which goes on with the stack: it is called
+   from a stretch of instructions of real mode in the block below the
+   megabyte, which keep where the stack is in four bytes there, behind
+   their own segment, and put it back behind the interrupt, with the
+   machine kept from interrupting meanwhile, and return far; and that
+   stretch is called by the extender's service for a routine. Int2E of
+   dos.c is the same in the program's own code. The command goes into
+   the block too: its count, its characters and the carriage return.
+
+   INT 22h is put back behind it as behind a program that DOS runs,
+   since the shell runs programs. */
+#define KEPT_LOW  (LOW_KEPT & 0xFF)
+#define KEPT_HIGH (LOW_KEPT >> 8)
+
+static const u8 Shell_T[] = {
+    0x2E, 0x89, 0x26, KEPT_LOW, KEPT_HIGH,      /* mov cs:[LOW_KEPT],sp */
+    0x2E, 0x8C, 0x16, KEPT_LOW + 2, KEPT_HIGH,  /* mov cs:[LOW_KEPT+2],ss */
+    0xCD, 0x2E,                                 /* int 2Eh */
+    0xFA,                                       /* cli */
+    0x2E, 0x8E, 0x16, KEPT_LOW + 2, KEPT_HIGH,  /* mov ss,cs:[LOW_KEPT+2] */
+    0x2E, 0x8B, 0x26, KEPT_LOW, KEPT_HIGH,      /* mov sp,cs:[LOW_KEPT] */
+    0xFB,                                       /* sti */
+    0xFC,                                       /* cld */
+    0xCB                                        /* retf */
+};
+
+void ShellRun(const u8 FAR *command)
+{
+    struct DosRegs regs;
+    u32 goes = GoesOn();
+    u16 count = command[0] + 2;
+
+    if (count > TAIL_SIZE)
+        count = TAIL_SIZE;
+    Bytes(LOW(LOW_SECOND), command, count);
+    Bytes(LOW(LOW_SHELL), Shell_T, sizeof Shell_T);
+    SetLow(&regs, 0, 0, 0, 0);
+    regs.esi = LOW_SECOND;
+    Real(&regs, 0, (u32)LowSeg << 16 | LOW_SHELL);
+    SetGoesOn(goes);
+}
+
+/* The end of the program. The extender takes the call for its own end
+   too, and leaves the machine as it found it. */
+void ProgramEnd(u16 code)
+{
+    struct DosRegs regs;
+
+    Set(&regs, 0x4C00 | code & 0xFF, 0, 0, 0);
+    Tell(&regs);
+}
+
+/* The extender does not start on a DOS before 3, so there is none to
+   leave another way: nothing, and the program goes on to say what it
+   says of a DOS that is too old for it. */
+void ProgramEndOld(void)
+{
 }
 
 /* The console. */
@@ -1444,67 +1592,15 @@ void IntOn(void)
 }
 
 /*
- * The 12 functions of sys.h that are not made here yet. Each does
- * nothing, and answers as a system does that failed or does not know
- * the question; none of them calls DOS, since a call that the extender
- * does not translate has DOS write wherever the registers happen to
- * point in real mode. What each needs is in TODO.md, "The portable C in
- * 32 bits: the plan", with the piece D2:
- *
- *   - through the block below the megabyte and a call in real mode, as
- *     the search of a directory is made above, with more room in the
- *     block: ProgramRun and ProgramRunBare; and ShellRun, by a stretch
- *     of code of real mode there;
- *   - what DOS and the BIOS enter of the program, the critical error,
- *     Ctrl-Break and Ctrl-C, which are taken through the extender here
- *     and arrive at routines of protected mode: the seven that note,
- *     take and give them, at the end of this part; and behind those the
- *     two for the system ending the program, ProgramEndedTake and
- *     ProgramEndedGive.
- *
- * ProgramRun and ProgramRunBare take the name and the tail, and what
- * else DOS is told of a program that it runs is theirs to make, in the
- * block below the megabyte: see Run of dos.c for what that is, the two
- * file control blocks above all, which are bytes of the main data.
+ * The 9 functions of sys.h that are not made here yet. Each does
+ * nothing. They are what DOS and the BIOS enter of the program, the
+ * critical error, Ctrl-Break and Ctrl-C, which are taken through the
+ * extender here and arrive at routines of protected mode: the seven that
+ * note, take and give them; and behind those the two for the system
+ * ending the program, ProgramEndedTake and ProgramEndedGive. What each
+ * needs is in TODO.md, "The portable C in 32 bits: the plan", with the
+ * piece D2.
  */
-
-static struct Answer NotMade(u16 error)
-{
-    struct Answer answer;
-
-    answer.value = error;
-    answer.failed = 1;
-    return answer;
-}
-
-struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail)
-{
-    (void)name;
-    (void)tail;
-    return NotMade(ERR_NO_FUNCTION);
-}
-
-struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
-{
-    return ProgramRun(name, tail);
-}
-
-/* The shell's own interrupt for a command, INT 2Eh of COMMAND.COM: the
-   command is not handed over, and nothing is run, which is what the
-   program finds of a shell that does not serve the interrupt. It is of
-   real mode and comes back there with every register lost, the stack
-   among them, so it cannot be called as the others are: the trial had
-   a stretch of 28 bytes of real mode in the block below the megabyte,
-   `int 2Eh` with the stack kept in front of it and put back behind it
-   and a far return, called by the extender's service for a routine of
-   real mode, DPMI 0301h, with DS:SI on the command, which has to be in
-   that block too: its count, its text and the carriage return, 127
-   bytes at the most. That came back (TODO.md, "DOS's services under
-   DOS/32A"). */
-void ShellRun(const u8 FAR *command)
-{
-    (void)command;
-}
 
 /* The critical error, Ctrl-Break and Ctrl-C: none is noted, taken or
    given back, so each goes where the extender has it go, and the

@@ -846,6 +846,143 @@ static void Keyboard(void)
 }
 
 
+TEXT(Comspec_S, "COMSPEC=");
+TEXT(Ran_S, "RAN.TXT");
+TEXT(Echo_S, "/C ECHO ran>RAN.TXT");
+TEXT(Run_S, "/C ");
+TEXT(Two_S, " 2");
+TEXT(Three_S, " 3");
+TEXT(Ver_S, "VER");
+TEXT(No_S, "");
+
+/* The text of the environment that begins with `name`, behind that; or
+   an empty one. */
+static const u8 FAR *Variable(const u8 FAR *name)
+{
+    const u8 FAR *text = ProgramEnvironment();
+    u16 at;
+
+    while (*text != 0) {
+        for (at = 0; name[at] != 0 && text[at] == name[at]; at++)
+            ;
+        if (name[at] == 0)
+            return text + at;
+        while (*text++ != 0)
+            ;
+    }
+    return text;
+}
+
+/* The path of the toy's own file, which DOS has behind the end of the
+   environment. */
+static const u8 FAR *Self(void)
+{
+    const u8 FAR *text = ProgramEnvironment();
+
+    while (text[0] != 0 || text[1] != 0)
+        text++;
+    return text + 4;
+}
+
+/* A command tail made of three texts, in the small buffer from 128 on:
+   a count, the characters, a carriage return. */
+static u8 *Tail(const u8 FAR *first, const u8 FAR *second,
+                const u8 FAR *third)
+{
+    u8 *tail = SMALL + 128;
+    u16 count = 0;
+
+    while (*first != 0)
+        tail[++count] = *first++;
+    while (*second != 0)
+        tail[++count] = *second++;
+    while (*third != 0)
+        tail[++count] = *third++;
+    tail[0] = (u8)count;
+    tail[count + 1] = '\r';
+    return tail;
+}
+
+/* Other programs. The shell is run for a command that leaves a file,
+   bare, as the program runs its commands, and a file that is not there
+   is run both ways. Tails and commands are in the main data, as the
+   program's are. */
+static void Others(void)
+{
+    const u8 FAR *shell = Variable(Comspec_S);
+    struct Answer asked;
+    u16 at;
+
+    SAY("the shell is "); Quoted(shell, 40);
+    Line();
+    ANSWER("ProgramRunBare of it, for a command:",
+           ProgramRunBare(shell, Tail(Echo_S, No_S, No_S)));
+    for (at = 0; at < 16; at++)
+        SMALL[at] = 0;
+    asked = FileOpen(Ran_S, 0);
+    FileRead(asked.value, SMALL, 16);
+    FileClose(asked.value);
+    SAY("the command wrote "); Quoted(SMALL, 16);
+    ANSWER("FileDelete of that:", FileDelete(Ran_S));
+    Line();
+    ANSWER("ProgramRun of a file that is not there:",
+           ProgramRun(None_S, Tail(No_S, No_S, No_S)));
+    ANSWER("ProgramRunBare:",
+           ProgramRunBare(None_S, Tail(No_S, No_S, No_S)));
+    Line();
+}
+
+/* The toy's own file run with something behind its name, by itself and
+   then by the shell, as a command: each time the second copy writes a
+   page of its own, waits for a key as the first does, and ends, and the
+   first writes what it was answered when both have. Run by itself, the
+   copy has the environment that DOS made for it of this one's; run by
+   the shell, it has what the shell gave it. Then a command is handed to
+   the shell that started the toy, which the shell of the bench does not
+   run: it comes back, and that it does is what is written. */
+static void Copies(void)
+{
+    struct Answer first, second;
+
+    first = ProgramRun(Self(), Tail(Two_S, No_S, No_S));
+    second = ProgramRun(Variable(Comspec_S), Tail(Run_S, Self(), Three_S));
+    Clear();
+    ANSWER("ProgramRun of a second copy:", first);
+    ANSWER("and of the shell for one:", second);
+    Line();
+    ShellRun(Tail(Ver_S, No_S, No_S));
+    SAY("ShellRun came back");
+    Line();
+}
+
+/* What a second copy of the toy does, which is one that was started
+   with something behind its name: it writes that, what its environment
+   and the end of it say, and whether it has memory, waits for a key and
+   ends with 5. */
+static void Second(void)
+{
+    const u8 FAR *tail = ProgramTail();
+    struct Block block;
+    u16 at;
+
+    Clear();
+    SAY("a second copy, ProgramTail '");
+    for (at = 0; at < 20 && tail[at] != '\r'; at++)
+        Cell(tail[at] < ' ' ? '.' : tail[at]);
+    Cell('\'');
+    Line();
+    SAY("its shell is "); Quoted(Variable(Comspec_S), 40);
+    SAY("and its own file "); Quoted(Self(), 40);
+    Line();
+    block = MemTake(0xFFFF);
+    SAY("MemTake FFFF: "); H4(block.value); H4(block.failed);
+    SAY("at least 128 KB and no more than 640 ");
+    H2(block.largest >= 0x2000 && block.largest <= 0xA000);
+    Line();
+    Page(0);
+    ProgramEnd(5);
+}
+
 /* What the toy has the system tell it when DOS has ended it: nothing.
    Nobody ends the toy. */
 static void Told(void)
@@ -1105,18 +1242,6 @@ static void Later(void)
     ProgramEndedGive();
     SAY("ProgramEnded taken, given back");
     Line();
-    /* A command handed to the shell that started the toy, which the
-       shell of the bench does not run: it comes back, and that it does
-       is what is written. The command is in the main data, as the
-       program's are. */
-    SMALL[0] = 3;
-    SMALL[1] = 'V';
-    SMALL[2] = 'E';
-    SMALL[3] = 'R';
-    SMALL[4] = '\r';
-    ShellRun(SMALL);
-    SAY("ShellRun came back");
-    Line();
 }
 
 /* The pages, a step of the script behind each.
@@ -1129,6 +1254,8 @@ static void Later(void)
 void Main(void)
 {
     Owned = MemOwn().failed;
+    if (*ProgramTail() != '\r')
+        Second();
     Clear();
     System();
     Page(0);
@@ -1151,6 +1278,10 @@ void Main(void)
     Memory();
     Page(0);
     Older();
+    Page(0);
+    Others();
+    Page(0);
+    Copies();
     Page(0);
     Later();
     Page(0);
