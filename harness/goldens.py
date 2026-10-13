@@ -884,11 +884,14 @@ def differences(golden, run, programs):
     made = golden.patch.made if golden.patch else {}
     for number, step in enumerate(steps):
         # Both are blanked, the golden's screen as well: one derived before
-        # a figure was left out of the comparison still holds it.
+        # a figure was left out of the comparison still holds it. The
+        # golden's is without what any tree leaves out, as it was
+        # derived, and the build's without what its own tree does.
         place = golden.places[number] if golden.places else number
         found = screen_differences(
             deviations.compared(golden.screens[number]),
-            deviations.compared(run.screens[number]), made.get(place))
+            deviations.compared(run.screens[number], golden.tree),
+            made.get(place))
         if found:
             report += [f"--- after step {number}: {step}"
                        + _in_golden(golden, number)] + found
@@ -1062,7 +1065,7 @@ def from_run(name, program, benches):
         # blanked, and a cell that the original blinks as the golden
         # has it.
         want = golden.screens[number]
-        got = deviations.compared(run.screens[number])
+        got = deviations.compared(run.screens[number], tree)
         got = replace(got, cells=settled(deviations.compared(want), got))
         stated = PatchedScreen()
         for row in range(ROWS):

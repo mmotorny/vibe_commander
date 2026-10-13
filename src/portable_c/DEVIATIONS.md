@@ -122,8 +122,9 @@ it.
   comes when there is less than two panels and that. With less memory
   than the program itself, DOS does not load it, and says so in its own
   words.
-- The Info panel says how much memory a command has: all that is behind
-  the panels.
+- The Info panel, which said how much memory a command has while the
+  portable C had the line, all that is behind the panels, says nothing
+  of the memory since: see 11.
 - The map of the memory, which listed what stays as the program's, is
   gone from the portable C since: see 7.
 - The program's own call, which handed out the main data and the
@@ -196,7 +197,7 @@ says that every screen is as the original's, by the steps left out alone:
 | `menu` | The same. By 8: Up from the top of the menu, and PgDn, go to More setup, the last item, where the original has Save setup, and Up from there goes to Save setup, where the original goes on from that to Memory allocation. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
 | `quick` | The step that switches Memory allocation off before the last command is left out; every screen is as the original's after the same step |
 | `second-copy` | The second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work |
-| `start-memory` | The second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with its Info, not the first copy's |
+| `start-memory` | The second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with the mini status that the first copy's have not |
 | `setup-config` | The Configuration of the setup where it shows: without Memory allocation, and by 7 without TSR manager. In the right half of its box, Quick execute commands is a row further up, the frame of Execute options ends below it, the Keyboard options are two rows further up, and the last two rows are empty. The two steps that untick Memory allocation and TSR manager are left out; Quick execute commands is ticked where the cursor is when it comes down from the left half, by Space where the original goes down a line first. Left from Clear keyboard buffer is Error sound, the box of its row, where the original has Show logical drive B: there. And the setup file that is saved has the two bytes as it had them, 1 and 1, where the original's has 0 and 0, with another sum for that: three bytes of the file |
 | `setup-config-mouse` | The Configuration so. The click on Quick execute commands is a row further up and those on Alt alone selects menu two rows, and the mouse pointer with them. Every box is ticked as in the original, and the setup file that is saved is the original's |
 | `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The Configuration so, where each shows it; under the help of `setup-help-screens` nothing of its right half shows. In the Configuration the steps are the original's, since none goes into its right half. All but `setup-missing-saved` show Screen and Mouse too, which is otherwise by 5 |
@@ -1127,7 +1128,12 @@ more for it than the original's.
 - The title of the Info panel is the name with the version alone, "Vibe
   Commander 0.1", in the middle of the row, 18 cells where the
   original's title is 34: the panel has 38 columns, which is no room for
-  what the program is based on.
+  what the program is based on. That is a line of its own in the row
+  below the title, "based on Volkov Commander 4.05", 30 cells in the
+  middle of the row, where the original has the line across the panel;
+  the line across is a row further down. The panel has no row more for
+  it: its two lines on the memory are gone from below the title, by 11,
+  which has the top of the panel row for row.
 - The name without a version is "Vibe Commander". The box of F10 has
   "The Vibe Commander" in its title and asks "Do you want to quit the
   Vibe Commander?", and is two cells narrower for the two letters, a
@@ -1157,8 +1163,9 @@ behind the panels or beside them, the Info panel is on, or the help is
 at the list of its pages: a thousand screens, in some seventy
 scenarios. Those are held against the original's goldens by rules of the
 comparison, `rules` of `TREES` in `harness/deviations.py`, one for each
-of the banner's two lines, one for the title of the Info panel and one
-for that of the help's window. A rule says the text
+of the banner's two lines, one for the top of the Info panel, which is
+of this entry and of 11 together and is described there, and one for
+the title of the help's window. A rule says the text
 as the original shows it and as the portable C does, cell for cell, and
 is made to a screen of the golden wherever at least twelve characters of
 the original's text show in their places: each cell that the golden has
@@ -1177,7 +1184,6 @@ What the rules cannot say is in the patches of these scenarios:
 | `start-screen` | The same box. And the second line that asks for Enter, on a screen of 40 columns, with the cursor two cells further left behind it; and on a screen of graphics, where the test sees the dots of the one line as cells: other dots, for another name |
 | `setup-colors-own` | The sample of the colours that the setup shows at the right of the screen is grey on black on twelve screens, as what DOS has shown is, and covers the end of the banner's second line with four spaces. The rule takes a space in that colour for the screen behind the banner, and expects the line's letters in three of the four cells; the patch says that they are the sample's spaces |
 | `mouse-list`, `mouse-help` | The mouse's pointer is on a cell of the banner, its first, and on a cell of the help's title. It turns the colours of its cell round, and a rule leaves a cell in another colour as the original has it: the patch says the portable C's character there, in the pointer's colours |
-| `menu` | The Right menu covers the title of the Info panel but for its last ten cells, too few for the rule to know the title by: the patch has the end of the shorter title there, and spaces |
 | `banner` | A panel on the left with none on the right covers the banner but for the ends of its lines, three letters and two, too few again: the patch has the ends of the longer lines there |
 
 **In the data.** The test `portable_c-data` holds four texts against the
@@ -1185,6 +1191,107 @@ original's with this difference declared for each, in `DECLARED` of
 `harness/datacheck.py`: the title, `Title_S`, which is the help's and the
 banner's; the name without a version, `Name_S`; the second line of the
 banner, `Copyr_S`, with what is put behind it; and the lines that ask
-for Enter, `CrLf_S`. The title of the Info panel, `NameVer_S`, is a text
-that the original has not, and is listed as the tree's own, in `OWN_OF`
-there. The word behind the original's title, `Suff_S`, is gone.
+for Enter, `CrLf_S`. The title of the Info panel, `NameVer_S`, and the
+line below it, `BasedOn_S`, are texts that the original has not, and are
+listed as the tree's own, in `OWN_OF` there. The word behind the
+original's title, `Suff_S`, is gone.
+
+### 11. The Info panel says nothing of the memory
+
+**What the original does.** The Info panel has its title in its second
+row, a line across the panel under it, and from the fourth row on what
+it knows, each line in the middle of its row, the figures in yellow. The
+first two are of the memory:
+
+- "653,296 Bytes Memory" on the bench of the tests: where DOS says that
+  the memory ends which it has for programs, a word of the program's
+  PSP, as bytes.
+- "485,344 Bytes Free" there: how much of that a command gets, which
+  follows how the program is set up to give itself up for a command, and
+  how large the part of it is that stays (see 1).
+
+Below them, in the sixth row, is the label of the drive, then the size
+of the disk and what is free on it, the files of the other panel, a
+second line across, and the text of `dirinfo`.
+
+**What the portable C does.** It has neither line, and what it is based
+on in the row that this leaves (see 10). The top of the panel, row for
+row:
+
+| Row of the panel | The original | The portable C |
+|---|---|---|
+| 2 | "The Volkov Commander, Version 4.05" | "Vibe Commander 0.1" |
+| 3 | the line across | "based on Volkov Commander 4.05" |
+| 4 | "653,296 Bytes Memory" | the line across |
+| 5 | "485,344 Bytes Free" | empty |
+| 6 | "Volume in drive C: is WORK" | the same |
+
+Nothing from the sixth row down moves, the second line across is where
+it was, and the panel is as tall as it was. The program does not work
+the two figures out: it does not read where the memory ends, and the
+word of the main data that held it, `Memorys`, keeps its place and is
+neither set nor read. How much memory a command has is no longer to be
+seen from the program; the README has it for the bench of the tests,
+under "The figures".
+
+**Why.** The user's decision, on 13 October 2026: the two lines "mean
+nothing off DOS". How much of 640K there is and how much of it the next
+command will find is what a user of DOS had to know before running
+anything, and what no other system has a program count. So it is the
+removal of something that only made sense on DOS, like those before it.
+What stands in the rows that it leaves is of 10, which was decided with
+it: what the program is based on, on a line of its own between the
+title and the line under it, and no row added.
+
+**Which scenarios show it.** Every scenario that has the Info panel on:
+some 390 screens of 27 scenarios as they stand, on some fifty of which a
+menu or a box covers a part of these rows. They are held against the
+original's goldens by one
+rule of the comparison, of `rules` of `TREES` in `harness/deviations.py`,
+which is of 10 as well: the four rows from the title to the count of
+free memory, with the frame on either side, 40 cells each, as the
+original shows them and as the portable C does, each cell with its
+colour. As the other rules of 10, it is made to a screen of the golden
+wherever at least twelve characters of the original's rows show in their
+places, letters and figures, not the frame and the line, which the foot
+of any panel has too; each cell that the golden has as the original's
+rows have it is expected as the portable C's rows have it, and every
+other cell, which is what covers the panel, as the golden has it. Three
+things it knows that the rules of a single text need not:
+
+- The colours of the cells one by one: the two figures are yellow in
+  rows of cyan, and nothing is yellow in the portable C's four rows.
+- The shadow of a box: a menu or a box over the panel throws its shadow
+  on the cells beside it and below it, which then have the row's
+  character in what the shadow makes of the row's colour. The portable
+  C has its own character there, in what the shadow makes of its
+  colour: sixteen screens, most of them of `menu`.
+- The rows gone off the top of the screen. An error beeps, the BIOS
+  moves the screen up a row for the beep, and the panel stands a row
+  or two further up, without its title: nine screens, all of `move`.
+  And a row of the panel that is left twice then makes two places for
+  the rule that lie over each other; it takes the one where more of the
+  panel shows.
+
+The count of free memory is a figure that the comparison leaves out for
+the C translation, since it follows the size of the program
+(`IGNORED_OF` of `harness/deviations.py`), and the original's goldens
+have `#` for its digits. The rule has the row so, and expects an empty
+row in its place, every cell of it: nothing of these rows is left out of
+the comparison for the portable C, and the figure is no longer left out
+for it anywhere.
+
+What the rule cannot say is in the patch of one scenario:
+
+| Scenario | What changes in it |
+|---|---|
+| `move` | An error has moved the screen up a row, and what the program puts back where its boxes were leaves the row of the count of free memory on two rows or three, one under the other, whole or beside what is left of a box: twelve screens. The rule knows the panel once on a screen, and not one row of it by itself. Each of those rows is empty in the portable C, with what the box left where it was |
+
+`memory`, which is about the count of free memory, is not run for the
+portable C: see 1.
+
+**In the data.** The three texts of the two lines, `PtIn1_S`, `PtIn2_S`
+and `PtIn3_S` of `info.c`, are gone. The test `portable_c-data` holds
+the texts that the tree has against the original's, and has nothing to
+say of one that the tree has not. `BasedOn_S` is listed there as the
+tree's own: see 10.

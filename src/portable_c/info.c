@@ -1,8 +1,14 @@
 /*
- * The Info panel: the memory, the disk, the files of the other panel, and
- * what the directory says about itself in its file dirinfo.
+ * The Info panel: the disk, the files of the other panel, and what the
+ * directory says about itself in its file dirinfo.
  *
- * Translated from VCSUB3.INC.
+ * Translated from VCSUB3.INC. The original has two lines on the memory
+ * in front of these, how much the machine has and how much of it a
+ * command gets, which mean nothing off DOS and are gone from here
+ * (DEVIATIONS.md, 11): PtIn20 of the assembly, with the texts PtIn1_S,
+ * PtIn2_S and PtIn3_S. What the program is based on stands where the
+ * line under the title was, that line a row further down, and the row
+ * below it is empty: Panel of panel.c writes all three.
  *
  * What is shown has been read before, when the directory was: the sizes
  * of the disk in clusters, its label, and the first bytes of dirinfo, in
@@ -12,9 +18,6 @@
 
 /* PutInf is in vc.h. */
 
-static const u8 CODE PtIn1_S[] = "^r^V^r Bytes ^I";
-static const u8 CODE PtIn2_S[] = "Memory";
-static const u8 CODE PtIn3_S[] = "Free";
 static const u8 CODE PtIn4_S[] = "Volume in drive ^r^W:^r ^I^r^V";
 static const u8 CODE PtInA_S[] = "is ";
 static const u8 CODE PtInB_S[] = "has no label";
@@ -32,12 +35,13 @@ static const u8 CODE PtIn_P[] = {Back_C, Title_C};
 /* Write the Info into its panel: nothing, if the panel is of another
    kind. Each line has its middle in the middle of the panel.
 
-   From the fourth row of the panel: the memory there is and how much of
-   it is free with the program loaded; the label of the current drive; the
-   size of the disk and what is free on it. If the other panel shows files and is not switched
-   off: how many files it has, without the directories, and what they
-   take on the disk, every file counted in whole clusters; and its path
-   with its mask, as it stands over that panel, in at most 37 characters.
+   From the sixth row of the panel, which is where the original has
+   them, below its two lines on the memory: the label of the current
+   drive; the size of the disk and what is free on it. If the other panel
+   shows files and is not switched off: how many files it has, without
+   the directories, and what they take on the disk, every file counted in
+   whole clusters; and its path with its mask, as it stands over that
+   panel, in at most 37 characters.
 
    Four rows below the line of the files, if dirinfo could not be read,
    a line that says so. If it could, its text from one row higher and one
@@ -64,7 +68,7 @@ void PutInf(u16 panel)
 
     if (PANEL(panel)->WinTyp != 2)
         return;
-    place = BegBX(panel) + 0x314;
+    place = BegBX(panel) + 0x514;
     line.colors = PtIn_P;
 
 /* PtIn23 in the assembly: a line, and on to the next row. */
@@ -75,22 +79,6 @@ void PutInf(u16 panel)
         CntLine((struct LineArgs STACK *)&line); \
         place += 0x100; \
     } while (0)
-
-    /* PtIn20: a number of paragraphs as bytes. */
-    i = md.Memorys;
-    Number(md.TmpErr + 1, i >> 12, i << 4, NUM_SEPARATED);
-    line.include = PtIn2_S;
-    PUT(PtIn1_S);
-    /* The memory that a command has: all that the program has for its
-       panels and the viewer but the panels, and the paragraph of the
-       header that DOS puts where a block begins. The original gives
-       its main data back for a command too, and shows the block that
-       held all three; and another number, FreMem1, where it is set up
-       to give most of itself up. */
-    i = MAIN_SEG + md.FreMem2 - md.MemSeg - 2 * PANEL_PARAS - 1;
-    Number(md.TmpErr + 1, i >> 12, i << 4, NUM_SEPARATED);
-    line.include = PtIn3_S;
-    PUT(PtIn1_S);
 
     md.TmpErr[101] = md.DosPth[0];
     md.TmpErr[102] = 0;

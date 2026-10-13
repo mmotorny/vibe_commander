@@ -49,7 +49,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 71 of the 86, six of them in real mode; the 15 that are not made
+ * 71 of the 85, six of them in real mode; the 14 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -1022,7 +1022,7 @@ u32 Ticks(void)
 }
 
 /*
- * The 15 functions of sys.h that are not made here yet. Each does
+ * The 14 functions of sys.h that are not made here yet. Each does
  * nothing, and answers as a system does that failed or does not know
  * the question; none of them calls DOS, since a call that the extender
  * does not translate has DOS write wherever the registers happen to
@@ -1036,7 +1036,7 @@ u32 Ticks(void)
  *   - other in 32 bits: MemTake, MemGive and MemResize, which hand out
  *     memory of the program's own; MemSetSearch and MemSetUpper;
  *   - out of the PSP, which is below the megabyte, once the start of
- *     the program knows where that is: MemEnd, ProgramTail and
+ *     the program knows where that is: ProgramTail and
  *     ProgramEnvironment.
  *
  * ProgramRun and ProgramRunBare take the name and the tail, and what
@@ -1135,16 +1135,11 @@ struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
     return ProgramRun(name, tail);
 }
 
-/* No memory, a tail of no characters, and an environment of no texts
-   with no path of the program's file behind it: as many zero bytes as
-   the program reads there, the path being read as LenPath bytes. */
+/* A tail of no characters, and an environment of no texts with no
+   path of the program's file behind it: as many zero bytes as the
+   program reads there, the path being read as LenPath bytes. */
 static const u8 NoTail[] = "\r";
 static const u8 NoEnvironment[1 + 2 + LenPath] = { 0 };
-
-u16 MemEnd(void)
-{
-    return 0;
-}
 
 const u8 FAR *ProgramTail(void)
 {

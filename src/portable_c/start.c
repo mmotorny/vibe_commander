@@ -603,7 +603,6 @@ void IniData(void)
             md.LowTab[c - 128] = (u8)(0x80 + i);
     }
     md.LoadFl &= 0x7F;
-    md.Memorys = MemEnd();
     IniSave[0] = 0;                     /* no setup is known to have been
                                            saved */
     md.DosBuf[0] = 0;

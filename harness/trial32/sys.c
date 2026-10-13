@@ -906,13 +906,9 @@ static void Later(void)
     MemSetUpper(0);
     SAY("MemSetSearch, MemSetUpper");
     Line();
-    /* What the PSP says: where the memory ends, of which only that it
-       is plausible is written; the tail that the toy was started with,
-       as far as its carriage return; and the first text of its
+    /* What the PSP says: the tail that the toy was started with, as
+       far as its carriage return; and the first text of its
        environment. */
-    at = MemEnd();
-    SAY("MemEnd: at least 256 KB and no more than 640 ");
-    H2(at >= 0x4000 && at <= 0xA000);
     tail = ProgramTail();
     SAY("ProgramTail '");
     for (at = 0; at < 20 && tail[at] != '\r'; at++)

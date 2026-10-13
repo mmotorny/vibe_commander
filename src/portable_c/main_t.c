@@ -22,12 +22,16 @@
    bytes in front that are six spaces and put it in the middle of the
    window's 62 columns, and without them the first line of the banner.
    The panel of the Info is 38 columns, which is no room for that: its
-   title is the name and the version alone, NameVer_S, a text that the
-   original has not. */
+   title is the name and the version alone, NameVer_S, and what the
+   program is based on is a line of its own below the title, BasedOn_S,
+   where the original has two lines on the memory further down that are
+   gone from here (DEVIATIONS.md, 11): two texts that the original has
+   not. */
 #define NAME_VERSION "Vibe Commander 0.1"
 #define BASED_ON "based on Volkov Commander 4.05"
 const u8 Title_S[] = "\377\006" NAME_VERSION ", " BASED_ON;
 const u8 NameVer_S[] = NAME_VERSION;
+const u8 BasedOn_S[] = BASED_ON;
 const u8 Vers_S[] = "\r\nThis program requires DOS 3.20 or later.\r\n";
 
 /* The critical error of DOS. The title, of which the box of every error

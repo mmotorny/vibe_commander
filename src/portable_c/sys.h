@@ -277,10 +277,6 @@ struct Block MemTake(u16 paragraphs);
 struct Answer MemGive(u16 block);
 struct Block MemResize(u16 block, u16 paragraphs);
 
-/* Where the memory ends that the system has for programs: the segment
-   behind its last byte, which is how many paragraphs of it there are. */
-u16 MemEnd(void);
-
 /* Where the system looks for a block that it is asked for: `how` is as
    DOS has it, 0 for the lowest block that fits, which is how DOS looks
    when it has started. And whether the upper memory, beyond the 640 KB

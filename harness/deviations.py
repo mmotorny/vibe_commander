@@ -5,7 +5,8 @@ the original with these differences made to it (see goldens.py), so that it
 holds exactly what a build is expected to show.
 
 Figures that follow the size of the program are not held against the
-original at all, and are declared here too: see IGNORED.
+original at all, and are declared here too: see IGNORED, and IGNORED_OF
+for those that only one tree shows.
 
 That much holds for both C trees. The portable C is declared to behave
 otherwise than the original in more, in src/portable_c/DEVIATIONS.md; what
@@ -244,15 +245,20 @@ def expected(screen, rules=None):
     return replace(screen, cells=bytes(cells))
 
 
-def compared(screen):
-    """`screen` with what is not compared blanked out. When a build is held
-    against a golden, both screens are made like this, that of the golden
-    too: it may have been derived before a figure was left out. A golden
-    that is derived now holds its screens like this already, and blanking
-    what is blanked changes nothing."""
+def compared(screen, tree=None):
+    """`screen` with what is not compared blanked out: with `tree`, a
+    screen of a build of that tree, without what every build leaves out
+    (IGNORED) and what the builds of that tree do (IGNORED_OF); without
+    one, a screen of a golden, without what any tree leaves out. When a
+    build is held against a golden, both screens are made like this, that
+    of the golden too: it may have been derived before a figure was left
+    out. A golden that is derived now holds its screens like this
+    already, and blanking what is blanked changes nothing."""
+    patterns = IGNORED + [pattern for some, its in IGNORED_OF.items()
+                          if tree in (None, some) for pattern in its]
     cells = bytearray(screen.cells)
     for row, line in enumerate(screen.lines()):
-        for pattern in IGNORED:
+        for pattern in patterns:
             match = pattern.search(line)
             if match:
                 for column in range(*match.span(1)):
@@ -323,7 +329,8 @@ BLANK = "#"
 # What a build shows that is not compared with the original: the part of a
 # line that the pattern's group matches. Its colours are compared. Every
 # pattern is tried on the line as the screen has it, so two of them can
-# each take a number of the same line.
+# each take a number of the same line. These hold for the builds of every
+# tree; what only those of one tree leave out is in IGNORED_OF, below.
 IGNORED = [
     # The editor says in its first line how many bytes it has free for the
     # text. That is what the program leaves of the memory, and the
@@ -332,25 +339,6 @@ IGNORED = [
     # build that is tested; the number says too little about the program to
     # be worth that. The field is the number and the room in front of it.
     re.compile(r"^Edit: .* Col \d+( [\d, ]+) Free"),
-    # The Info panel says how much memory is free. As the program is
-    # configured that is what a command gets: all but the part of the
-    # program that stays while one runs. That part holds the program's
-    # stack, and it is to be translated: it does not stay as long in the
-    # translation as in the original. With Memory allocation switched off
-    # the number is what is left with all of the program loaded, and follows
-    # the size of the build like the editor's. Either way it is left out,
-    # in every scenario. The field is the number only, as much of it as a
-    # box in front leaves to see, with the comma or the space that a
-    # country has between its thousands: the line is centred, so a number
-    # of another length would move the words too, and that is noticed.
-    re.compile(r"(\d+(?:[, ]\d{3})*) Bytes Free"),
-    # The same line where a box covers its words and the end of the
-    # number, as the tree of Alt+F10 does: there is nothing to know the
-    # line by but its place. It is the one line of the Info that begins
-    # ten cells into the panel, a number of seven cells and two words in
-    # 38; the total above it begins nine cells in. The box has three cells
-    # of room in front of its frame.
-    re.compile(r"^║ {10}(\d(?:[\d, ]*\d)?) {3}║"),
     # MEM of DOS, run as a command, says how much memory is in use and how
     # much is free while it runs: the first includes the part of the
     # program that stays, the second is what that part leaves. The fields
@@ -397,6 +385,39 @@ IGNORED = [
     # INT 27h on every build.
     re.compile(r"^2222 1111 [0-9A-F]{4} ([0-9A-F]{4}) 0000 [0-9A-F]{4} +$"),
 ]
+
+# What only the builds of one tree show and is not compared with the
+# original: tree -> patterns, as those of IGNORED. A golden has none of
+# these figures, whichever tree it is read for.
+IGNORED_OF = {
+    "c": [
+        # The Info panel says how much memory is free. As the program is
+        # configured that is what a command gets: all but the part of
+        # the program that stays while one runs, which is larger in the
+        # translation than in the original. With Memory allocation
+        # switched off the number is what is left with all of the program
+        # loaded, and follows the size of the build like the editor's.
+        # Either way it is left out, in every scenario. The field is the
+        # number only, as much of it as a box in front leaves to see,
+        # with the comma or the space that a country has between its
+        # thousands: the line is centred, so a number of another length
+        # would move the words too, and that is noticed.
+        #
+        # This is of the C translation alone. The portable C has no such
+        # line (src/portable_c/DEVIATIONS.md, 11): where the golden has
+        # it, the rule of that tree for the top of the Info panel
+        # expects an empty row, cell for cell, and nothing of that row
+        # is left out.
+        re.compile(r"(\d+(?:[, ]\d{3})*) Bytes Free"),
+        # The same line where a box covers its words and the end of the
+        # number, as the tree of Alt+F10 does: there is nothing to know
+        # the line by but its place. It is the one line of the Info that
+        # begins ten cells into the panel, a number of seven cells and
+        # two words in 38; the total above it begins nine cells in. The
+        # box has three cells of room in front of its frame.
+        re.compile(r"^║ {10}(\d(?:[\d, ]*\d)?) {3}║"),
+    ],
+}
 
 # Deviations that show on no screen, and so change no golden. They are
 # listed here all the same, so that this is the whole list.
@@ -665,11 +686,13 @@ TREES = {
                     "a look at the map of the memory, for what has stayed",
             },
         },
-        # The program's name (DEVIATIONS.md, 10). The original has its
-        # title or its banner on a thousand screens of the scenarios,
-        # behind the panels or beside them, in the Info and in the help,
-        # and a menu, a box or a panel covers a part of it on many: each
-        # text is a Part, known by twelve of its characters that show.
+        # The program's name (DEVIATIONS.md, 10), and with it the top
+        # of the Info panel, which has no lines on the memory (11). The
+        # original has its title or its banner on a thousand screens of
+        # the scenarios, behind the panels or beside them, in the Info
+        # and in the help, and a menu, a box or a panel covers a part
+        # of it on many: each is a Part, known by twelve of its
+        # characters that show.
         rules=(
             # The banner, which the program prints when it starts and
             # which stays on the screen behind the panels, grey on black
@@ -691,13 +714,35 @@ TREES = {
             # the ends of the two lines show, three letters and two,
             # which is nothing to know them by: one screen, of the
             # scenario banner, which has the two rows in its patch.
-            # The title of the Info panel, in the middle of its second
-            # row, in the panel on the left or on the right: the name and
+            # The top of the Info panel, in the panel on the left or on
+            # the right, its second row to its fifth with the frame on
+            # either side (DEVIATIONS.md, 10 and 11). The original has
+            # its title there, the line under it, and two lines on the
+            # memory: what the machine has, which is the bench's and the
+            # same on every screen, and what is free, a figure that is
+            # left out of the comparison and that the golden has in
+            # BLANK, seven cells of it. The portable C has its name with
             # the version, 18 cells in the middle where the original's
-            # title has 34.
-            Part("the title of the Info panel",
-                 was=(_TITLE,), now=(_NAME.center(len(_TITLE)),),
-                 colour=0x1B, columns=(3, 43)),
+            # title has 34; what it is based on, in the row where the
+            # line was; the line, a row further down; and an empty row.
+            # The two figures are yellow in the original, and nothing is
+            # in the tree's four rows. A menu over the panel throws its
+            # shadow on these rows, and the part is known there too. It
+            # is known by its letters and figures, not by its frame or
+            # its line, which the foot of any panel has.
+            Part("the top of the Info panel",
+                 was=("║  " + _TITLE + "  ║",
+                      "╟" + "─" * 38 + "╢",
+                      "║" + "653,296 Bytes Memory".center(38) + "║",
+                      "║" + (BLANK * 7 + " Bytes Free").center(38) + "║"),
+                 now=("║" + _NAME.center(38) + "║",
+                      "║" + _BASED.center(38) + "║",
+                      "╟" + "─" * 38 + "╢",
+                      "║" + " " * 38 + "║"),
+                 colour=("1Bx40", "1Bx40", "1Bx10 1Ex7 1Bx23",
+                         "1Bx11 1Ex7 1Bx22"),
+                 now_colour=0x1B, columns=(0, 40), frame="║╟─╢",
+                 shaded=True),
             # The title of the help's window, over the list of its
             # pages, in the middle of the 62 columns of the window's
             # text: the name, the version and what it is based on, 50

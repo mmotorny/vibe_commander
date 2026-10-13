@@ -112,7 +112,12 @@ out again (show.py --changes is how):
     size of the program, so the translation shows another number than the
     original. The scenario memory does it. deviations.py has the Info's
     free memory left out of the comparison, there and in every other
-    scenario. Every disk of the bench
+    scenario, for the C translation. The Info of the portable C has no
+    lines on the memory and another top for that (DEVIATIONS.md, 10 and
+    11), which a rule of that tree expects wherever a golden shows the
+    original's, also under a menu or a box: a new scenario with the
+    Info needs nothing for it, unless the test says that a row differs
+    there, which then wants a patch. Every disk of the bench
     has a volume label, and the program does not get one off: Ctrl+F4,
     Ctrl+y, Enter and Enter again ask whether to delete it and leave it
     where it is.

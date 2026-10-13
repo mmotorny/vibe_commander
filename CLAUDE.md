@@ -1436,7 +1436,8 @@ in "The portable C".
     leave them. The program's name is said by four (`DEVIATIONS.md`,
     10), each a `Part` of `harness/deviations.py`, the kind of rule
     for a text that is of another length in the tree, or stands
-    elsewhere on its row, and that a menu, a box or a panel may cover
+    elsewhere on its row, or for rows that the tree has other rows in,
+    and that a menu, a box or a panel may cover
     in part: it says the text as the original shows it and as the tree
     does, and on a screen where enough of the original's shows, each
     cell that the golden has as the original's text has it, character
@@ -1458,8 +1459,9 @@ in "The portable C".
       was tried: the pointer turns grey on black into black on grey,
       which is a box, and the rule wrote the banner into the box of
       F10. The shadow of a box, which makes `(colour & 8Fh) ^ 8` of a
-      colour as the program is distributed, it does not know either;
-      no screen has the banner or a title in one.
+      colour as the program is distributed, a rule knows only where it
+      is told to, `shaded`, which the rule for the top of the Info
+      panel is: see below. No screen has the banner in one.
     - On a row that a rule changes, the line with `-` of a patch is
       what the rule made, not what the original shows: read it so. Of
       the two patches that there were on such rows, `second-copy` and
@@ -1480,6 +1482,51 @@ in "The portable C".
       what counts now is how much of the original's object it is held
       against, `held` of `harness/datacheck.py`. A text that only one
       tree has is in `OWN_OF` there.
+    - The top of the Info panel is one `Part` of four rows of 40 cells
+      (`DEVIATIONS.md`, 10 and 11): the title, the line and the two
+      lines on the memory in the original; the name, what it is based
+      on, the line and an empty row in the portable C. A part of rows
+      took what a text did not. Colours cell by cell, since the two
+      figures are yellow: `colour` and `now_colour` are a number or,
+      for each row, its runs as a golden writes them. The frame and
+      the line across left out of what the part is known by, `frame`:
+      the foot of any panel has such a line between such ends, and
+      forty cells of it are more than twelve. And the shadow.
+    - `shaded` has a part known in the shadow of a box as well: a cell
+      that has the part's character in what the shadow makes of the
+      part's colour is expected with the tree's character in what the
+      shadow makes of the tree's colour, and counts among the twelve.
+      It was needed: the Right menu over the Info leaves ten cells of
+      the title and five letters of the two lines below, four of them
+      in the menu's shadow. It is not what teaching the pointer's
+      colours was: the shadow makes cyan on black of the panel's
+      colour, and nothing that the program draws over a panel as it is
+      distributed has that. It is switched on for that one rule.
+    - A part may stand with its first rows above the screen: an error
+      beeps, the BIOS moves the screen up a row for the beep, and the
+      panel is a row further up without its title (`move`). And no
+      place of a part lies over another: what the program puts back
+      after such a beep leaves a row of the panel twice, the part was
+      known at two places that overlapped, and each wrote into the
+      other, so that the row which the rule made was one that neither
+      program shows. The place where more of the part shows is taken;
+      the rows that are left twice are `move`'s patch.
+    - A figure that the comparison leaves out is in a part as the
+      golden has it, `#######`, since a golden is blanked when it is
+      derived and a rule is made to the golden as it is read. What
+      the machine has of memory, 653,296, is in the rule as a text: a
+      bench with another figure fails every screen of the Info, which
+      is the notice to change the rule.
+    - `compared` takes the tree: a build's screen is blanked of what
+      every tree leaves out, `IGNORED`, and of what its own tree does,
+      `IGNORED_OF`, and a golden's of all of it. The count of free
+      memory in the Info is of the C translation alone there, so a
+      portable C that showed such a figure again would fail.
+    - When a rule changes, a patch on a row that it now changes says
+      "does not fit" before anything is run: make it again with the
+      tool, which says whether it states what it stated. `mouse-menu`
+      was the one here, and `menu` lost the row that the rule now
+      knows.
 - The portable C is one program, and the notes above on the part that
   stays in the memory, on `tools/mkexe.c` and on string literals and
   static variables are of the C translation alone. In the portable C DS
@@ -2341,7 +2388,7 @@ is called both ways the bare function says so in its name.
 | 5801h, 5803h | bare | `MemSetSearch(how)`, `MemSetUpper(on)` |
 | 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is `dos.c`'s to make |
 | 4Ch | bare | `ProgramEnd(code)` |
-| 51h | bare | `ProgramPrefix()`, the segment of the PSP: of `vc.h` and not of `sys.h`, for the entry of the program. What is read in the PSP is `MemEnd()`, `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
+| 51h | bare | `ProgramPrefix()`, the segment of the PSP: of `vc.h` and not of `sys.h`, for the entry of the program. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
 | 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
 | 56h | asked | `FileRename(from, to)` |
 | 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |

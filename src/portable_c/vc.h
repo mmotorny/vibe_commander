@@ -320,7 +320,12 @@ struct MainDat {
     u16 FreMem2;                        /* How many paragraphs it is from
                                            the main data to the end of
                                            that block */
-    u16 Memorys;
+    u16 Memorys;                        /* The memory that the machine
+                                           has, in paragraphs, for the
+                                           Info: of the original. Here a
+                                           word that nothing sets or
+                                           reads, which keeps the place
+                                           of what is behind it */
     u16 HstAdr;
     u16 TreAdr;
     u16 TreFrst;
@@ -440,6 +445,7 @@ extern const u8 TEXT_FAR Title_S[];     /* the program's name and version
                                            and what it is based on, behind
                                            two bytes of markup */
 extern const u8 TEXT_FAR NameVer_S[];   /* its name and version alone */
+extern const u8 TEXT_FAR BasedOn_S[];   /* and what it is based on */
 extern const u8 TEXT_FAR Var_S[];       /* a line that is the text at
                                            TmpErr+1 */
 extern const u8 TEXT_FAR Tree_S[];      /* the title of the tree */

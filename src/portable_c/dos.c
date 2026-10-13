@@ -202,8 +202,6 @@ static u16 Mouse(u16 ax, u16 bx, u16 cx, u16 dx)
    DOS goes on; vc.h declares both for it. */
 u16 PspSeg;
 
-#define PSP_MEMORY  0x02                /* the segment where the memory
-                                           that DOS has ends */
 #define PSP_ENVIRON 0x2C                /* the segment of the environment */
 #define PSP_TAIL    0x81                /* the command tail, behind its
                                            count */
@@ -695,12 +693,6 @@ struct Block MemResize(u16 block, u16 paragraphs)
     regs.bx = paragraphs;
     regs.es = block;
     return Paragraphs(REGS(regs));
-}
-
-/* The memory ends where the PSP says: DOS is not asked. */
-u16 MemEnd(void)
-{
-    return PSP_WORD(PSP_MEMORY);
 }
 
 /* How DOS looks for memory, AX 5801h, and whether the upper memory is in

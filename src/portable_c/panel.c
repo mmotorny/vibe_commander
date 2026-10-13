@@ -84,8 +84,8 @@ static const u8 CODE FilDi_S[24] = {
 /* Draw the frame of a panel, empty: around a panel of files with the
    titles of its columns and the lines between them, and with the line
    over the mini status if that is on; around the Info with the program's
-   name and the two lines that divide it; around the tree, or a panel of
-   yet another kind, with the line over its last row.
+   name, what it is based on and the two lines that divide it; around the
+   tree, or a panel of yet another kind, with the line over its last row.
 
    Nothing here has a line to include, and the assembly names none. */
 void Panel(u16 panel)
@@ -101,14 +101,24 @@ void Panel(u16 panel)
     if (wcb->WinTyp == 1 || wcb->WinTyp == 3) {
         BoxLine(screen, color | LINE, LEFT_RIGHT, 0, 38);
     } else if (wcb->WinTyp == 2) {
+        /* The name, and below it what the program is based on, each in
+           the middle of its row; the line under them, which the
+           original has a row further up, under its one line of a title;
+           and the line over the text of dirinfo, where it was. The row
+           below the first line stays empty, and the label of the drive
+           is in the next: the original has its two lines on the memory
+           in these two rows (DEVIATIONS.md, 11). */
         place += 0x114;
         line.value = place;
         line.line = NameVer_S;
         line.colors = Panel_P;
         CntLine((struct LineArgs STACK *)&line);
-        screen = BoxLine(BasAdr(place) + (80 - 20), color | LINE, LEFT_RIGHT,
-                         0, 38);
-        BoxLine(screen + 7 * 80, color | LINE, LEFT_RIGHT, 0, 38);
+        line.value = place + 0x100;
+        line.line = BasedOn_S;
+        CntLine((struct LineArgs STACK *)&line);
+        screen = BoxLine(BasAdr(place) + (2 * 80 - 20), color | LINE,
+                         LEFT_RIGHT, 0, 38);
+        BoxLine(screen + 6 * 80, color | LINE, LEFT_RIGHT, 0, 38);
     }
     if (wcb->WinTyp != 0)
         return;

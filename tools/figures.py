@@ -32,13 +32,19 @@ test's to count, and its table is in TODO.md. What is worked out:
     made whole paragraphs, which is what the block of the panels is cut
     down to for a command (struct WCBdef of vc.h).
   - What DOS has for a command on the bench of the tests: BENCH less
-    that. BENCH is not worked out but seen, once: `python3
-    harness/show.py --program build/portable_c/VC.EXE --last Ctrl+l`
-    prints the first screen with the Info panel switched on, which says
-    how much is free, COMMAND.COM not being loaded yet; that is 72,496
-    more than a command gets. See it
-    again if the bench changes, or what the program keeps besides its
-    file and its panels.
+    that. BENCH is not worked out but was seen, once, while the Info
+    panel of the portable C still said how much memory is free: with
+    COMMAND.COM not loaded yet, which is 72,496 more than a command
+    gets, and what the program kept then added to that. The portable C
+    has no such line any more (src/portable_c/DEVIATIONS.md, 11). The
+    original has, and its figure is of the same bench: `python3
+    harness/show.py --last Ctrl+l` prints its first screen with the
+    Info panel switched on, 485,344 Bytes Free, which is 59,808 more
+    than BENCH: the 72,496, less the 12,704 that the original keeps
+    while a command runs, and a paragraph. If the bench changes, see
+    that again, and BENCH is as much more or less as it is; if the
+    program comes to keep something besides its file and its panels,
+    that is to be added above.
 """
 import argparse
 import math

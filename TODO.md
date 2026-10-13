@@ -1988,8 +1988,8 @@ DOS and is not behind it yet.
   one thing more by its offset, with `TakeEnd` and `Exit00`: the place
   where DOS goes on. The rest of what was read there in three files is
   `dos.c`'s since the piece S1 of the plan for the 32 bits, behind
-  functions of `sys.h` that say what is wanted: `ProgramTail`,
-  `ProgramEnvironment` and `MemEnd`.
+  functions of `sys.h` that say what is wanted: `ProgramTail` and
+  `ProgramEnvironment`.
 - Quick execute, `Int2E` and `Exec2E` of `resident.c`: COMMAND.COM's
   own interrupt, called in assembly, with the stack set by hand behind
   it. It stays whole and where it is until it is decided (above).
@@ -2232,9 +2232,10 @@ of registers differs, and a call through real mode has no likeness in
 behaviour and is carried over a function at a time.
 
 The 84 functions that `sys.h` had when this was written, by what the
-trial found of DOS/32A. It has 86 since S1: `ProgramPrefix` has left
-it, and `ProgramTail`, `ProgramEnvironment` and `MemEnd` have come,
-which read the PSP below the megabyte and ask DOS nothing.
+trial found of DOS/32A. It has 85 now: with S1 `ProgramPrefix` left
+it, and `ProgramTail`, `ProgramEnvironment` and `MemEnd` came, which
+read the PSP below the megabyte and ask DOS nothing; and `MemEnd` has
+gone again, with the Info panel's two lines on the memory.
 
 | Kind | Functions | Which |
 |---|---|---|
@@ -2248,7 +2249,7 @@ What is 16 bits in kind and changes shape for both builds, under the
 | What | Today | After | Piece |
 |---|---|---|---|
 | `ProgramRun(name, block)` | `struct EPBs`: three far pointers of real mode, which `resident.c`, `start.c` and `view.c` make with `MAIN_SEG` | `ProgramRun(name, tail)`; the block is `dos.c`'s to make, with the two file control blocks where the original has them | S1, done |
-| `ProgramPrefix()` and `PspSeg` | The PSP's segment, read at 0Ah, 2Ch, 02h and 81h in three files, 10 places | The command tail and the environment as pointers that `sys.h` answers with; the end of the memory as a number, if the Info still shows it then | S1, done for 2Ch, 02h and 81h: `ProgramEnvironment`, `MemEnd`, which the Info does show, and `ProgramTail`. 0Ah, and the two themselves, are S3's: see "S1, the PSP and a program run" |
+| `ProgramPrefix()` and `PspSeg` | The PSP's segment, read at 0Ah, 2Ch, 02h and 81h in three files, 10 places | The command tail and the environment as pointers that `sys.h` answers with; the end of the memory as a number, if the Info still shows it then | S1, done for 2Ch and 81h: `ProgramEnvironment` and `ProgramTail`. 02h, the end of the memory, was `MemEnd` with S1 and is read no more: the Info does not show it (`DEVIATIONS.md`, 11). 0Ah, and the two themselves, are S3's: see "S1, the PSP and a program run" |
 | `Vector`, `SetVector` of `vc.h`; `FatErr` of `main.c`, `CtrlC` of `resident.c` | The program takes INT 24h, 1Bh and 23h itself, with interrupt functions | Functions of `sys.h` that take and give back the critical error and Ctrl-Break, in the order of today's calls; the entries in `dos.c`, which call `FtErr1` of `main.c` as a plain function | S2 |
 | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` of `resident.c` | The entry of the program, what DOS does when it ends it, COMMAND.COM's interrupt with the stack set by hand | In `dos.c`. `Main` is called by the entry; leaving is `ProgramEnd` with what has to be done first; Quick execute is a function that comes back, the stack kept and put back around the interrupt | S3 |
 | The memory by segment and paragraph | `MemTake`, `MemGive`, `MemResize` | As they are, through step 1 | Step 2 |
@@ -3670,19 +3671,24 @@ For B1, B2 and the harness:
 ### S1, the PSP and a program run: done, and what a later piece should know
 
 What was 16 bits in kind in the header for a program run and for the
-PSP is gone from it, and `dos.c` has it. `sys.h` has 86 functions,
-where it had 84:
+PSP is gone from it, and `dos.c` has it. `sys.h` had 86 functions
+with this piece, where it had 84. It has 85 since 13 October 2026:
+`MemEnd()`, which the piece made for the word of the PSP at 02h, the
+segment where the memory ends, went with the Info panel's two lines on
+the memory, the one thing that asked it (`DEVIATIONS.md`, 11): out of
+`sys.h`, `dos.c`, `dos32.c` and the toy, with the line of `IniData`
+that called it, `md.Memorys = MemEnd()`. The functions that are left:
 
 | Function | What it is | In `dos.c` | In `dos32.c` |
 |---|---|---|---|
 | `ProgramRun(name, tail)`, `ProgramRunBare(name, tail)` | A program run, with its command tail as DOS has one: a count, the characters, a carriage return. They took DOS's block of three far addresses, which three files made with `MAIN_SEG` | `Run` fills in the block, `EPB` of the main data, and names it to DOS at ES:BX | Not made: they fail with the error 1, as before. D2's |
 | `ProgramTail()` | What this program was told behind its name, as far as a carriage return | The PSP at 81h | Not made: a carriage return. D2's |
 | `ProgramEnvironment()` | The environment, and behind its end the path of the program's own file | Offset 0 of the segment that the PSP has at 2Ch | Not made: 71 zero bytes. D2's |
-| `MemEnd()` | The segment where the memory ends: the Info still shows it, as bytes | The word of the PSP at 02h | Not made: 0. D2's |
 | `ProgramPrefix()` | The segment of the PSP, as DOS says | In the last part, with what is of DOS alone, and declared in `vc.h` | None |
 
 The places, each as it was and as it is. That is the six of the block
-and six of the PSP that the row of the piece had:
+and six of the PSP that the row of the piece had, but for the one of
+`MemEnd`, in `IniData`, which is gone:
 
 | File | Was | Is |
 |---|---|---|
@@ -3691,7 +3697,6 @@ and six of the PSP that the row of the piece had:
 | `view.c`, `Aexec0` | `md.EPB.CmdLine = ...` on `md.TmpBuf + 100`, and `ProgramRun(md.TmpBuf, &md.EPB)` | `ProgramRun(md.TmpBuf, md.TmpBuf + 100)` |
 | `resident.c`, `Exec02` | `DOS_AT(PSP_ENV, md.ComSpec)` | `ProgramEnvironment() + md.ComSpec` |
 | `start.c`, `Init00` and `IniData` | `DOS_AT(PSP_WORD(PSP_ENVIRON), 0)`, twice | `ProgramEnvironment()` |
-| `start.c`, `IniData` | `md.Memorys = PSP_WORD(PSP_MEMORY)` | `md.Memorys = MemEnd()` |
 | `main.c`, `Init40` | `FndLet(DOS_AT(PspSeg, 0x81))` | `FndLet(ProgramTail())` |
 
 What decided: the whole suite, nine tests of nine, with `VC.EXE` 62
@@ -3730,8 +3735,8 @@ What is otherwise than the plan had it:
   `Alloc0` sets, and `vc.h` declares it and `ProgramPrefix` with what
   is of DOS alone, beside `Vector`, `SetVector` and `IntOn`. When S3
   has those routines in `dos.c`, both are static there.
-- `info.c` had no place: it shows `Memorys` of the main data, which
-  `IniData` sets.
+- `info.c` had no place: it showed `Memorys` of the main data, which
+  `IniData` set, and shows nothing of the memory since.
 - `struct EPBs` stays in `vc.h`: the main data has it, and its layout
   is held.
 - Two tools of the trial went by the header as it was and were mended:
@@ -3753,7 +3758,7 @@ For S2 and S3:
 - A function that is added to `sys.h`, or that leaves it, is in six
   places besides `dos.c`: `dos32.c`, made or as one that does nothing,
   with the counts at its top and in front of its second part, 71 made
-  and 15 not; the README's table of the groups, and its 86; the table
+  and 14 not; the README's table of the groups, and its 85; the table
   of `CLAUDE.md`, "Moving a file to the system's functions"; `NAMED` of
   `harness/reads.py`, if it takes a name; `OUTSIDE` of `whole.py`, if
   it is of DOS alone and no function of `sys.h`; and the toy's last
@@ -4627,62 +4632,49 @@ changes what blinks. Lines for the disks, which were tried in the same
 way, two patches have since: `setup-config` and `setup-screen`, for the
 setup file that each saves.
 
-## The program's name in the portable C: done but for the Info panel
+## The program's name in the portable C: done
 
 Decided by the user on 13 October 2026 (`CLAUDE.md`, "The portable C";
-`src/portable_c/DEVIATIONS.md`, 10). Done: the title, the banner, the
-name without a version in the box of F10, and the line that asks for
-Enter. `main_t.c` has the two texts as macros, `NAME_VERSION` and
-`BASED_ON`, and of them `Title_S`, the help's title and the banner's
-first line, and `NameVer_S`, the Info's title.
+`src/portable_c/DEVIATIONS.md`, 10 and 11). Done: the title, the banner,
+the name without a version in the box of F10, the line that asks for
+Enter, and the top of the Info panel. `main_t.c` has the two texts as
+macros, `NAME_VERSION` and `BASED_ON`, and of them `Title_S`, the help's
+title and the banner's first line, `NameVer_S`, the Info's title, and
+`BasedOn_S`, the line below it.
+
+The Info panel. Its two lines on the memory are gone, as something that
+only made sense on DOS (`DEVIATIONS.md`, 11), and its top is: the title;
+"based on Volkov Commander 4.05", centred; the line across; an empty
+row; and the label of the drive on the row where it was. `Panel` of
+`panel.c` writes the first three and `PutInf` of `info.c` begins at the
+label. The word of the main data that held where the memory ends,
+`Memorys`, keeps its place and is neither set nor read.
 
 How it is held. Four rules of `TREES["portable_c"]`, each a `Part`: the
-text as the original shows it and as the portable C does, made to a
-screen of the golden wherever twelve letters of the original's show in
-their places, cell for cell, with what covers the text left as the
-golden has it. The notes of `CLAUDE.md` have what making them met. The
-test says how many screens each rule expects otherwise. Thirteen
-scenarios have rows in a patch for it: the box of F10, which is two
-cells narrower and uncovers what no rule can know, in eight; the line
-that asks for Enter, in one of those; and five where a rule is wrong of
-a cell or does not know the text, which `DEVIATIONS.md` lists.
+part as the original shows it and as the portable C does, made to a
+screen of the golden wherever twelve characters of the original's show
+in their places, cell for cell, with what covers the part left as the
+golden has it. Three are of one text each, the banner's two lines and
+the help's title. The fourth is the top of the Info panel, four rows of
+40 cells with their colours, known in the shadow of a box and with its
+first rows off the top of the screen. The notes of `CLAUDE.md` have what
+making them met. The test says how many screens each rule expects
+otherwise. Thirteen scenarios have rows in a patch for it: the box of
+F10, which is two cells narrower and uncovers what no rule can know, in
+eight; the line that asks for Enter, in one of those; four where a rule
+is wrong of a cell or does not know the text; and `move`, where a row
+of the Info is left twice on a screen that a beep has moved up.
+`DEVIATIONS.md` lists them.
 
-Still to do, the Info panel, which the user decided with the rest:
-
-- Its two lines on the memory go, "... Bytes Memory" and "... Bytes
-  Free": they mean nothing off DOS. That is the removal of something
-  that only made sense on DOS, declared like the others.
-- "based on Volkov Commander 4.05" comes, centred, on a line of its own
-  between the title and the line under the title. So the top of the
-  panel is: the title; that line; the line across; an empty row; and
-  "Volume in drive ..." on the row where it is today. Nothing below
-  moves, and no row is added.
-- In the program: `Panel` of `panel.c` writes the title and the two
-  lines across, and `PutInf` of `info.c` the rest, the two lines on the
-  memory first, `PtIn1_S` with `PtIn2_S` and `PtIn3_S`. `BASED_ON` of
-  `main_t.c` is the text.
-- In the harness: the four rows change as rows, on every screen that
-  has the Info, some hundreds, in the twenty scenarios that switch it
-  on (`grep -n "Ctrl+l" harness/scenarios.py`), some with a menu or a
-  box over them. A `Part` can be several rows and stand at column 0 or
-  40, which is what it wants. What a `Part` cannot do yet and this
-  needs: cells of more than one colour, since the numbers of the two
-  lines are yellow in a row of cyan; and a row that is not one text,
-  since the count of the memory is of the machine and the count of
-  what is free is `#` in the golden, as many as it has digits and
-  commas, in a line that is centred. A menu over the Info throws its
-  shadow on the rows below its first, which a `Part` does not know:
-  see the note in `CLAUDE.md` before teaching it colours.
-- What the two lines were used for besides: `IGNORED` of
-  `harness/deviations.py` leaves the count of free memory out of the
-  comparison, by two patterns, for every build. With the lines gone
-  from the portable C no screen of that tree needs them: they are to
-  hold for the C translation alone then, and `IGNORED` is one list for
-  both today. Entry 1 of `DEVIATIONS.md` says "The Info panel says how
-  much memory a command has", and the README, under "The figures", that
-  what DOS has for a command "was seen once on the Info panel": both
-  are to say what is so then. The scenario `memory`, which is about the
-  figure, is not run for the portable C already.
+What is left out of the comparison. The count of free memory in the
+Info is left out for the C translation alone now, `IGNORED_OF` of
+`harness/deviations.py`: the portable C shows no such figure, and the
+rule expects every cell of the row empty. `IGNORED`, which holds for
+every tree, still has three patterns of the map of the memory, which
+the portable C has not, and one of a line that only the portable C
+prints, of `ended`: each is of one tree as well, and could move to
+`IGNORED_OF` in the same way. That was not done with this, since it
+changes what the comparison leaves out and was not asked.
 
 ## The bench with a list of files on the right: done, and what was put off
 

@@ -573,7 +573,8 @@ named its version. Its banner is "Vibe Commander 0.1, based on Volkov
 Commander 4.05" over "Copyright (C) 1991-2000 Vsevolod V. Volkov, (C)
 2026 Maksym Motorny", two lines as the original's is; the first of them
 is the title over its help; the title of its Info panel, which has no
-room for all of that, is "Vibe Commander 0.1"; and the box that asks
+room for all of that, is "Vibe Commander 0.1", with "based on Volkov
+Commander 4.05" on a line of its own below it; and the box that asks
 before the program is left calls it the Vibe Commander. That is entry
 10 of `DEVIATIONS.md`. Its files keep their names, `VC.EXE` and
 `VC.INI` and the rest, and the help file is the distribution's.
@@ -662,19 +663,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,152 bytes |
+| `VC.EXE` | 197,026 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 64,096 bytes |
-| The relocations in its header, which DOS applies | 1,030 |
-| What it keeps of the memory while a command runs: the program and its panels | 206,784 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,752 bytes |
-| The code segment `CTEXT` ends at | D359h, 7,335 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C57Bh, 10,885 bytes below the limit, F000h |
+| more than the C translation's 133,056 bytes | 63,970 bytes |
+| The relocations in its header, which DOS applies | 1,031 |
+| What it keeps of the memory while a command runs: the program and its panels | 206,672 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,864 bytes |
+| The code segment `CTEXT` ends at | D2D2h, 7,470 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C55Fh, 10,913 bytes below the limit, F000h |
 | Inline assembly | 49 instructions in 9 pieces: 37 in 7 of `dos.c`, 12 in 2 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 756, 101, 263, 95 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 756, 101, 264, 92 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -682,7 +683,9 @@ the number. No test holds the table.
 What the program keeps while a command runs is worked out, of the
 length of its file and of two panels; what DOS has for a command is
 that taken from what the bench of the tests has, which was seen once
-on the Info panel: the top of `tools/figures.py` says how. The three
+on the Info panel, while that of the portable C said how much memory
+is free: the top of `tools/figures.py` says how, and how it is seen
+again by the original's. The three
 words in the last line are counted by the test `portable_c-host`,
 which prints them in its summary, each place where the word stands in
 the code; what else that test counts of what only Open Watcom reads,
@@ -861,7 +864,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 86 functions
+In the portable C that place is `src/portable_c/sys.h`: 85 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
 has the file clean. `dos.c` is those functions for DOS on a PC, and the
@@ -876,7 +879,7 @@ file beside it.
 | Files by a file control block: a mask deleted at one call, a label | 2 |
 | Directories: what is in one, made, removed, the current one | 8 |
 | Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
-| Memory: a block taken, given back, made another size, where the system looks for one, and where the memory ends | 6 |
+| Memory: a block taken, given back, made another size, and where the system looks for one | 5 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
 | Other programs: one run, with what it is told behind its name, and this one ended; what this one was told when it was started, and its environment | 5 |
 | The console: a character and a text where the cursor is | 2 |
@@ -960,6 +963,7 @@ steps that went there, against the original's golden without them:
 | | What | What it was for |
 |---|---|---|
 | 7 | The map of the memory, Alt+F5, Memory info of the Commands menu: `memory.c` and `memory_t.c`. And the watch on DOS that it rested on, in `resident.c`: the entry of INT 27h, `New27` with `Int27`; in the entry of INT 21h the three calls by which a program is run, stays in the memory or gives a block back; the list of the programs that have stayed and their records, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk`, `Release`; `GetStat`; and the programs released when the program is left | Listing what DOS has given to whom, and getting a program out of the memory again that was run from here and has stayed, which DOS had no way to do |
+| 11 | The two lines on the memory in the Info panel, "Bytes Memory" and "Bytes Free": the part of `PutInf` of `info.c` that wrote them, with their three texts; and for the first, `MemEnd` of `sys.h` and `dos.c`, which read in the PSP where the memory ends, with its call in `IniData` of `start.c` | Saying how much memory DOS has for programs and how much of it the next command gets. The panel is no row shorter for it: what the program is based on stands below its title, the line under the title a row further down, and the row below that is empty |
 
 What was left of the watch then was what was not for the map: the
 program still took INT 21h, for its own call, by which a setup program
@@ -1122,7 +1126,9 @@ has less, by more with every routine translated, and the numbers are not
 worth an expectation that follows the size of the build. Both screens
 have `#` in their place when a build is held against a golden, so a
 golden that was derived with a number still in it need not be derived
-again.
+again. The Info's number is left out for the C translation alone: the
+portable C has no such line, and the row that the original has it in is
+expected empty there, every cell of it.
 
 What the portable C is declared to do otherwise than the original is
 another matter, since the original cannot be made to show it. The
@@ -1143,7 +1149,11 @@ cell that the golden has as that text has it is expected as the
 portable C's text has it, and every other cell, which is what covers
 the text, as the golden has it. So a rule leaves no cell out of the
 comparison, and a screen on which it is wrong of a cell fails and gets
-a patch. A patch says of each such row what the
+a patch. The rule for the top of the Info panel is four rows of the
+panel with their colours, since the portable C has other rows there,
+without the original's two lines on the memory: it knows its cells in
+the shadow of a menu too, and the panel with its first rows gone off
+the top of the screen. A patch says of each such row what the
 original's golden has and what the portable C is expected to show, one
 above the other, by the screen's line in the golden and the number of
 the row:

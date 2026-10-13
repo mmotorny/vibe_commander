@@ -148,6 +148,10 @@ OWN_OF = {
                      "the banner, Title_S, which the portable C has too, "
                      "with what it is based on, and that is longer than "
                      "the panel is wide",
+        "BasedOn_S": "the line below that title, what the portable C is "
+                     "based on, where the original has the line across "
+                     "the panel and below it two lines on the memory, "
+                     "which the portable C has not",
     },
 }
 
