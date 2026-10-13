@@ -19,7 +19,7 @@ dialog.c      to-number 18, to-pointer 45
 digits.c      clean
 dirfunc.c     to-number 97, to-pointer 33
 dirfunc_t.c   clean
-dos.c         to-number 2, to-pointer 1, asm-pragma 7, registers 1, intrinsic 1
+dos.c         to-number 54, to-pointer 14, asm-pragma 7, registers 1, intrinsic 1
 drive.c       to-number 3, to-pointer 1
 edit.c        to-number 58, to-pointer 36
 edit_t.c      clean
@@ -53,6 +53,7 @@ setup.c       to-number 1, to-pointer 2
 stack.c       data_seg 2
 start.c       to-number 9, to-pointer 16
 string.c      clean
+sys.h         clean
 system.c      to-number 3
 system_t.c    clean
 tables.h      layout 2

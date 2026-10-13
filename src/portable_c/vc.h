@@ -83,9 +83,12 @@ HOLDS(u32_has_32_bits, sizeof(u32) == 4);
 #ifdef __I86__
 #define CODE  __based(__segname("_CODE"))   /* a constant, in the code segment */
 #define STACK __based(__segname("_STACK"))  /* a pointer to a local variable */
+#define FAR   __far                         /* a pointer of sys.h, which
+                                               reaches every segment */
 #else
 #define CODE
 #define STACK
+#define FAR
 #define __far
 #endif
 
@@ -453,11 +456,18 @@ extern const u8 TEXT_FAR Tree_S[];      /* the title of the tree */
 #define CurSl_C 3                       /* selected, under the cursor */
 #define Title_C 4                       /* the titles of the columns */
 
-/* The registers of a call of DOS. DS goes with DX: a pointer to what DOS
-   takes there, a name or a buffer, sets both. ES goes to DOS only by
-   Int21e of dos.c: otherwise DOS is called with it on the main data,
-   and it is what DOS leaves there, for the calls that answer with an
-   address in ES:BX. */
+/* What the program asks of the system that it runs on, sys.h: the
+   functions of dos.c by which it has files, directories, drives, memory,
+   the time, the keyboard, the screen, the mouse and the timer, and what
+   they answer with, struct Answer first. A pointer of that file reaches
+   any segment of the program: FAR, at the top of this one. */
+#include "sys.h"
+
+/* The registers of a call of DOS, for the files that have not gone over
+   to sys.h yet. DS goes with DX: a pointer to what DOS takes there, a
+   name or a buffer, sets both. ES goes to DOS only by Int21e of dos.c:
+   otherwise DOS is called with it on the main data, and it is what DOS
+   leaves there, for the calls that answer with an address in ES:BX. */
 struct DosRegs {
     u16 ax, bx, cx;
     const u8 __far *name;               /* DX, and DS behind it */
@@ -465,16 +475,7 @@ struct DosRegs {
     u16 es;                             /* as DOS leaves it */
 };
 
-/* What DOS answered to a call that may fail, where the assembly has AX
-   and the carry flag. */
-struct Answer {
-    u16 value;                          /* what was asked for, a handle or
-                                           a number of bytes, or the error:
-                                           AX as DOS left it */
-    u16 failed;                         /* not 0 if that is the error */
-};
-
-/* The registers of a call of the BIOS for the screen. */
+/* The registers of a call of the BIOS for the screen, for those files. */
 struct BiosRegs {
     u16 ax, bx, cx, dx;
 };
@@ -566,27 +567,11 @@ void Again(void);
 #define CmnIni  OFFSET_IN(struct MainDat, LoadRes)
 #define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
 
-/* DOS, the BIOS, the mouse driver and the machine: the functions of
-   dos.c, which has every software interrupt of the C code and what each
-   is for. Nothing else calls one.
-
-   The original keeps a part of itself in the memory while a command
-   runs, which calls DOS too and cannot call what is not there then:
-   the C translation compiles dos.c twice for that. Here it is compiled
-   once. */
-struct MouseAt {                        /* what the mouse driver says: */
-    u16 buttons;                        /* the buttons held, the left one 1,
-                                           the right one 2, the middle 4 */
-    u16 x, y;                           /* where the pointer is, in dots */
-};
-struct Keys {                           /* what the BIOS says of the keyboard: */
-    u16 key;                            /* AX as it leaves it: a key, the
-                                           scan code in the high byte, or
-                                           the keys among Shift, Ctrl and
-                                           Alt that are held */
-    u16 none;                           /* 1 if it leaves the zero flag
-                                           set: no key waits */
-};
+/* DOS, the BIOS and the mouse driver as the C translation calls them, a
+   structure of registers handed to an interrupt: for the files that have
+   not gone over to sys.h yet, and for what is of DOS alone, the map of
+   the memory and the watch on DOS. See each in dos.c. Int16 answers as
+   KeyWaiting of sys.h does. */
 struct MuxRegs {                        /* what the multiplex interrupt */
     u16 ax, bx;                         /* answers in: these registers */
 };
@@ -598,10 +583,15 @@ struct Keys Int16(u16 ax);
 struct MuxRegs Int2F(u16 ax, u16 bx, u16 cx);
 u16 Int33(u16 ax, u16 bx, u16 cx, u16 dx);
 void MousAt(struct MouseAt STACK *state);
-u16 CaseMap(u16 letter);
+void Int28(void);
+/* What is of DOS on a PC alone, and no part of sys.h: where an interrupt
+   goes, as an address with the offset in the low word, and one made to
+   go somewhere; and the machine kept from interrupting the program. See
+   each in dos.c. */
+u32 Vector(u16 number);
+void SetVector(u16 number, u32 to);
 void IntOff(void);
 void IntOn(void);
-void Int28(void);
 
 /* The registers as an interrupt function of the compiler saves them on
    the stack and puts them back: its first parameter. */
@@ -1203,25 +1193,21 @@ u16 EdSub1(const u8 *line, u16 cursor);
 u16 CmpSym(u16 symbol);
 u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
 
-/* What the program asks of DOS and the BIOS at every turn: see each in
-   system.c. Intr21 and Intr21f call DOS with the registers of `regs` and
-   put AX, BX, CX and DX back there, DX where the offset of `name` was;
-   they are not 0 if DOS set the carry flag: AX is its error then, or 53h
-   for a drive that is not ready. Intr21f has the carry flag set when DOS
-   is called, if `carry` is not 0. OpenFil opens a file, `mode` as DOS
-   takes it in AL, and answers with the handle, or with the error.
-   SetPth asks DOS for the current drive and
-   directory, into DosPth, and is not 0 if that fails. Fantom asks for
-   the disk of a drive that shares a floppy drive with another, 1 for A:,
-   and ChgDisk for that of the drive that a path of the main data names:
-   not 0 if the user would not put it in. SelDrv makes a drive the
-   current one, 0 for A:. */
-struct Time {                           /* the time of day, as DOS has it: */
-    u16 clock;                          /* the hour in the high byte and
-                                           the minute in the low one */
-    u16 seconds;                        /* the second in the high byte and
-                                           the hundredth in the low one */
-};
+/* What the program makes of the system at every turn: see each in
+   system.c. OpenFil opens a file, `mode` as DOS takes it in AL, and
+   answers with the handle, or with the error. SetPth asks for the
+   current drive and directory, into DosPth, and is not 0 if that fails.
+   Fantom asks for the disk of a drive that shares a floppy drive with
+   another, 1 for A:, and ChgDisk for that of the drive that a path of
+   the main data names: not 0 if the user would not put it in.
+
+   And what the files have of it that have not gone over to sys.h yet.
+   Intr21 and Intr21f call DOS with the registers of `regs` and put AX,
+   BX, CX and DX back there, DX where the offset of `name` was; they are
+   not 0 if DOS set the carry flag: AX is its error then, or 53h for a
+   drive that is not ready. Intr21f has the carry flag set when DOS is
+   called, if `carry` is not 0. DosTime is TimeOfDay of sys.h, and
+   SelDrv is DriveSelect. */
 u32 Timer(void);
 void ClrKbd(void);
 u16 TstBrk(void);

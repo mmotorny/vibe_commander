@@ -677,16 +677,17 @@ void IniData(void)
     Int10((struct BiosRegs STACK *)&bios);
 
     /* Initialize data segment. */
-    regs.ax = 0x3800;                   /* Country */
-    regs.bx = bios.bx;
+    CountryInfo(&md.Country);           /* Country */
+    regs.bx = bios.bx;                  /* the registers of the calls of
+                                           DOS further down, as the
+                                           assembly has them from here */
     regs.cx = bios.cx;
     regs.name = (const u8 *)&md.Country;
     regs.si = 0;
     regs.di = 0;
-    Int21d((struct DosRegs STACK *)&regs);
     for (i = 0; i < 128; i++) {         /* Lower case table */
         md.LowTab[i] = (u8)(0x80 + i);
-        md.TmpBuf[i] = (u8)CaseMap(regs.ax & 0xFF00 | 0x80 + i);
+        md.TmpBuf[i] = (u8)CaseMap(0x80 + i);
     }
     for (i = 0; i < 128; i++) {         /* Init22 */
         c = md.TmpBuf[i];

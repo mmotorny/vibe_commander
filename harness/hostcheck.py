@@ -24,7 +24,8 @@ What is counted, a place at a time, each of a kind (KINDS below):
     else is hidden.
 
 The words of Open Watcom that say what segment a thing is in, `__far`,
-CODE and STACK, are no errors: vc.h takes them for nothing where the
+CODE and STACK, and FAR, which is `__far` for the pointers of sys.h, are
+no errors: vc.h takes them for nothing where the
 memory has no segments, as a build for such a machine will. The summary
 says how many there are.
 
@@ -148,7 +149,9 @@ SAYS = [
 CASTS = ["to-number", "to-pointer", "function"]
 
 # The words that vc.h takes for nothing on a machine without segments.
-SEGMENT_WORDS = ["__far", "STACK", "CODE"]
+# FAR is its own, for the pointers of sys.h, and is __far where there
+# are segments.
+SEGMENT_WORDS = ["__far", "FAR", "STACK", "CODE"]
 
 
 def bare(text, strings):
