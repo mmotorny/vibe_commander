@@ -467,6 +467,8 @@ are added here as they go.
 | `C20_00`, `copy.c` | DOS 3Fh, the last byte read of a file that is appended to; 36h, the room of a drive; and 40h, what still fits of a piece written | 3Fh: AL the low byte of the place just gone to. 36h: BX the handle and CX the size of the piece, DH the second character of the target's name, DS on the memory that the file is read into. 40h: AL the low byte of the count, as in CL | 3Fh and 40h: AL 0. 36h: BX, CX and DH 0, DS on the main data |
 | `C00_01`, `C10_00`, `C20_00` and `C30_00`, `copy.c` | DOS 4300h, the attributes of a file or a directory, at seven of the eight places | CX as the code before left it: what was left of comparing two names or of a piece, or the attributes that the call before answered with | CX 0 |
 | `C20_00`, `copy.c` | DOS 5700h, the date and the time of a file: of a source that is a device, and of a target that is appended to | CX and DX: what was left of comparing the two names, or the attributes just kept or set, and the address of the name | CX and DX 0 |
+| `C10_00` and `C20_00`, `copy.c` | DOS 41h, a file deleted, at nine places | AL as the call or the dialog before left it; CX the attributes of the file, as they were asked for or the 20h just set, or what else the code before left | AL and CX 0 |
+| `C10_00` and `C30_00`, `copy.c` | DOS 56h, a file or a directory renamed, at three places | CX what was left of comparing the two names, or at the second try of `C10_00` the attributes of the target, with AL as 41h left it | CX as it comes; AL 0 |
 
 What is known to read such a register, and where the portable C will
 hand it something else when the file goes over:

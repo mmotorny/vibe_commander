@@ -13,7 +13,7 @@ box.c         to-number 1
 cmdline.c     to-number 8, to-pointer 3
 commands.c    to-number 29, to-pointer 22
 commands_t.c  clean
-copy.c        to-number 83, to-pointer 30
+copy.c        to-number 81, to-pointer 30
 copy_t.c      clean
 dialog.c      to-number 18, to-pointer 45
 digits.c      clean

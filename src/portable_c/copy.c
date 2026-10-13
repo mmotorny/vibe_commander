@@ -488,7 +488,6 @@ static void C10_13(void)
 static u16 C10_00(u16 STACK *fits)
 {
     struct Box box;
-    struct DosRegs regs;
     struct FileAttr attr;
     struct Answer asked;
     u16 result, answer, error, report;
@@ -503,14 +502,12 @@ static u16 C10_00(u16 STACK *fits)
         goto close;
     if (ChgDisk(CpDest))
         goto stop;
-    regs.name = CpSrc;
-    regs.di = (u16)CpDest;
-    regs.ax = 0x5600;
-    if (!CALL(regs))
+    asked = FileRename(CpSrc, CpDest);
+    if (!asked.failed)
         goto renamed;
-    if (regs.ax == ERR_NOT_READY)
+    if (asked.value == ERR_NOT_READY)
         goto stop;
-    if (regs.ax != ERR_NO_ACCESS) {
+    if (asked.value != ERR_NO_ACCESS) {
         CopyMov = 2;
         goto copy;
     }
@@ -531,10 +528,9 @@ static u16 C10_00(u16 STACK *fits)
             goto nothing;
         CpAll = (u8)answer;
     }
-    regs.name = CpDest;
-    regs.ax = 0x4100;
-    if (CALL(regs)) {
-        error = regs.ax;
+    asked = FileDelete(CpDest);
+    if (asked.failed) {
+        error = asked.value;
         if (error != ERR_NO_ACCESS)
             goto undeleted;
         C50_00();
@@ -546,17 +542,16 @@ static u16 C10_00(u16 STACK *fits)
             goto undeleted;
         }
         FncChg = 1;
-        regs.ax = 0x4100;
-        if (CALL(regs)) {
-            error = regs.ax;
+        asked = FileDelete(CpDest);
+        if (asked.failed) {
+            error = asked.value;
             goto undeleted;
         }
     }
-    regs.name = CpSrc;
-    regs.ax = 0x5600;
-    if (!CALL(regs))
+    asked = FileRename(CpSrc, CpDest);
+    if (!asked.failed)
         goto renamed;
-    error = regs.ax;
+    error = asked.value;
 failed:
     /* None of the lines of this box has ^I: no include line. */
     report = OFFSET(RenEr_B);
@@ -778,10 +773,9 @@ open:
         }
         FncChg = 1;
     }
-    regs.name = CpDest;
-    regs.ax = 0x4100;
-    if (CALL(regs)) {
-        error = regs.ax;
+    asked = FileDelete(CpDest);
+    if (asked.failed) {
+        error = asked.value;
         goto undeleted;
     }
     FncChg = 1;
@@ -904,11 +898,10 @@ write:
         goto done;
     if (ChgDisk(CpSrc))
         goto stop;
-    regs.name = CpSrc;
-    regs.ax = 0x4100;
-    if (!CALL(regs))
+    asked = FileDelete(CpSrc);
+    if (!asked.failed)
         goto done;
-    error = regs.ax;
+    error = asked.value;
     if (error == ERR_NO_ACCESS) {
         answer = (u8)Ask(OFFSET(RdOnl_B), F35_40());
         if (answer == 1)
@@ -918,10 +911,10 @@ write:
         asked = FileSetAttributes(CpSrc, 0x20);
         error = asked.value;
         if (!asked.failed) {
-            regs.ax = 0x4100;
-            if (!CALL(regs))
+            asked = FileDelete(CpSrc);
+            if (!asked.failed)
                 goto done;
-            error = regs.ax;
+            error = asked.value;
         }
     }
     if (error == ERR_NOT_READY)
@@ -968,9 +961,7 @@ full:
     if (FileClose(CpHndl2).failed)
         goto forget;
     if (info == 0) {
-        regs.name = CpDest;
-        regs.ax = 0x4100;
-        if (CALL(regs))
+        if (FileDelete(CpDest).failed)
             goto terminate;
     } else {
         asked = FileSetAttributes(CpDest, CpAttr);
@@ -978,13 +969,10 @@ full:
             goto forget;
     }
     if ((u8)Ask(OFFSET(Cont_B), F35_40()) != 1) {
-        regs.name = CpDest;
-        regs.ax = 0x4100;
-        if (CALL(regs) && regs.ax == ERR_NO_ACCESS
-            && !FileSetAttributes(CpDest, 0x20).failed) {
-            regs.ax = 0x4100;
-            CALL(regs);
-        }
+        asked = FileDelete(CpDest);
+        if (asked.failed && asked.value == ERR_NO_ACCESS
+            && !FileSetAttributes(CpDest, 0x20).failed)
+            FileDelete(CpDest);
         goto forget;
     }
     /* On another disk: the directories of the target are made there, one
@@ -1034,9 +1022,7 @@ terminate:
     md.BlocEr = 1;
     if (CpHndl2 != 0 && !ChgDisk(CpDest)) {
         FileClose(CpHndl2);
-        regs.name = CpDest;
-        regs.ax = 0x4100;
-        CALL(regs);
+        FileDelete(CpDest);
     }
 close_source:
     if (CpHndl1 != 0)
@@ -1101,11 +1087,9 @@ static u16 C30_00(u16 across, u16 fits)
         goto make;
     if (ChgDisk(CpDest))
         goto stop;
-    regs.name = CpSrc;
-    regs.di = (u16)CpDest;
-    regs.ax = 0x5600;
-    if (CALL(regs)) {
-        if (regs.ax == ERR_NOT_READY)
+    asked = FileRename(CpSrc, CpDest);
+    if (asked.failed) {
+        if (asked.value == ERR_NOT_READY)
             goto stop;
         goto make;
     }
