@@ -2681,6 +2681,7 @@ and H1 are started at once by the session.
 | H2, the driver. Done: see "Piece H2, the driver" above | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
 | H3, the scenarios' test | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
 | H4, the test of the data | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |
+| R1, `resident.c` renamed | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
 | C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
 | W, the switch | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
@@ -2693,6 +2694,7 @@ The order:
     P1 landed    P2a P2b P3 P4  B1   S1 > S2 > S3     H2
     S3 landed    D2 > B2                              H3 H4
     then         M1 > C1 .. Cn > W > (the user) > Z1 > Z2
+    M1 landed    R1, beside the convergence
 
 The longest way through is S1, S2, S3, D2, B2, M1 and the convergence:
 six pieces one behind the other before the first run. D2 shortens it
@@ -4162,11 +4164,14 @@ original has in the registers that the interrupt does not take.
 `quick` passes as it did, and the stack figures did not move: `quick`
 3,760. It hands the shell a command three times, the second time
 behind the command that changes the drive first, so both ways through
-`Exec02` are run. On the bench the shell runs nothing by this
-interrupt, so the scenario shows that the program comes back and goes
-on, with the stack whole, and not that a command runs. The toy hands
-the shell `VER` on its last page and writes that it came back, in both
-builds.
+`Exec02` are run. No bench of the project can show a command run by
+INT 2Eh, before this piece or after it: the shell there is FreeCOM,
+which runs nothing by that interrupt and says nothing. So the scenario
+shows that the program comes back and goes on, with the stack whole,
+and not that a command runs; that the stack comes back right behind a
+shell which does run one is from reading, as it was of the stack set
+anew. The toy hands the shell `VER` on its last page and writes that
+it came back, in both builds.
 
 With this nothing but `dos.c` and `arith.c` has an interrupt function,
 `__loadds`, `_asm`, a naked function or a register in a `#pragma aux`:
@@ -4272,8 +4277,8 @@ tables of the harness know the file by it, for both trees:
 `source="resident.c"` of three batches in `harness/ported.py`,
 `REVIEWED` and its like in `harness/reads.py`, and a text of
 `harness/datacheck.py`. What it is now would be `commands.c`, which is
-taken, or `shell.c`; a rename is one commit of `git mv` and those
-three, and is nobody's piece yet.
+taken, or `shell.c`. It keeps its name for now, by the session's word:
+the rename is the piece R1 of the table, for after the first run.
 
 For D2, what `Start` of `dos32.c` has to do before it can call `Main`.
 `Main` asks at once, in this order, and each has to answer:
