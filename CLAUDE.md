@@ -134,7 +134,9 @@ These held while `src/c/` was made, and they say what it is.
      deleted before the user has said so. The user said so on 13
      October 2026, with the last two differences of the program of 32
      bits declared: the tests then judge that program as the portable
-     C, and the 16-bit build goes with the switch, in one piece.
+     C, and the 16-bit build goes with the switch, in one piece. That
+     is done, the same day: the portable C is the program of 32 bits
+     and has no other build, and steps 0 and 1 are behind it.
   2. It uses what 32 bits give: one flat memory, with pointers where
      there were segments and offsets, and numbers and values of 32 bits.
      A variable is widened wherever wrapping round at 16 bits would be
