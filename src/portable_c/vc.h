@@ -34,9 +34,29 @@
 #ifndef VC_H
 #define VC_H
 
+/* Numbers of 8, 16 and 32 bits, whatever the compiler. A long has 32
+   bits for the 8086, where an int has 16: Open Watcom says with __I86__
+   that it compiles for that. Elsewhere a long may have 64, and an int
+   has 32. No header of a compiler names the types here: the build for
+   DOS has none. */
 typedef unsigned char  u8;
 typedef unsigned short u16;
+#ifdef __I86__
 typedef unsigned long  u32;
+#else
+typedef unsigned int   u32;
+#endif
+
+/* Fails to compile when something that the code counts on is not so:
+   the name says what. It is the tag of a structure and no typedef, as
+   LAID_OUT below is: a typedef more can change the order of two
+   variables in the program that Open Watcom makes, which a tag does
+   not (see "Notes on the portable C" in CLAUDE.md). */
+#define HOLDS(name, truth) struct name { char holds[(truth) ? 1 : -1]; }
+
+HOLDS(u8_has_8_bits, sizeof(u8) == 1 && (u8)-1 == 0xFF);
+HOLDS(u16_has_16_bits, sizeof(u16) == 2);
+HOLDS(u32_has_32_bits, sizeof(u32) == 4);
 
 #define CODE  __based(__segname("_CODE"))   /* a constant, in the code segment */
 #define STACK __based(__segname("_STACK"))  /* a pointer to a local variable */

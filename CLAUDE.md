@@ -1563,6 +1563,19 @@ in "The portable C".
   - The builds were each tested as a copy while the next was made, by
     the note above, two or three at a time: the scenarios' test took
     five to six minutes each that way.
+- A name that is declared in `vc.h` can change the program where
+  nothing uses it. What has no value the compiler lays out in an order
+  of its own, and of `SavePtr` and `Vect27` in `resident.c` that order
+  went by how many names were declared in front of them: three to six
+  typedefs more in `vc.h`, or as many prototypes, and the two changed
+  places; one, two, seven or eight, and they did not. The tag of a
+  structure does not count, nor a macro. So a change that is to leave
+  the program as it was byte for byte, and declares something in a
+  header, may not: hold the listings against those of the build
+  before, `build/portable_c/*.lst`, and if `resident.lst` alone
+  differs, in the order of two variables of `_BSS` and nothing else,
+  it is this, and the program is as right as it was. `HOLDS` of `vc.h`
+  is a tag for that reason.
 
 ## Work by several agents
 
