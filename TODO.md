@@ -2508,7 +2508,7 @@ and H1 are started at once by the session.
 | P1, the words in one place. Done: see below | `vc.h` gets the macros of the addresses once, with two bodies: `AT`, `WORD_AT`, `OFFSET`, `PANEL`, `MAIN_SEG`, `NEAR`, `MD_PLACE`, `MD_POINTER`, `TRELIST`; the files lose their own. The classes P, M, V, G and R whole | `vc.h`, `tables.h` for `LAID_OUT`, and the tops of 23 files | 46 definitions out of 23 files, 17 lines by hand | Nothing; lands first and alone, D1 and H1 start beside it | The 16-bit `VC.EXE` is the same bytes; the host check falls to some 310; `whole.py` still links | A file's own `OFFSET` meant something else: `dos.c`'s does, and keeps its own under another name. And nothing runs the second bodies before M1: a mistake in them is found there |
 | P2a, places of the main data: the lists, the tree, the command line. Done: see below | N in `treebox.c`, `tree.c`, `enter.c`, `usermenu.c`, `cmdline.c`, `place.c`, `info.c`, `extfile.c`, `drive.c`, `input.c`, `panel.c`, `files.c`, `read.c` | Those files | 97 places, 59 by hand | P1; beside P2b, P3, P4, S | The same bytes; those files clean in the host check | A number that is no place of the main data: `(u16)(u32)file` is the offset in a panel |
 | P2b, the same: the viewer, the editor, a copy, the menus. Done: see below | N in `view.c`, `edit.c`, `copy.c`, `menu.c`, `help.c`, `find.c`, `stcolor.c`, `sthelp.c`, `window.c`, `bars.c`, `dirfunc.c` | Those files, but the lines that S1 has in `view.c` | 66 places | P1; beside the others | The same | `EditBuf`, `CpSrc`: names that are places of the main data by a macro |
-| P3, the tables read as what they are | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
+| P3, the tables read as what they are. Done: see below | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
 | P4, arithmetic | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
 | S1, the PSP and a program run | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
 | S2, what DOS enters | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
@@ -3046,8 +3046,11 @@ its linking kept:
   warnings, which is `resident.c`; and `Vector`, `SetVector`, `IntOn`
   and `__GETDS` as functions that do nothing, which are of `dos.c` and
   no part of `sys.h`, until S2 and S3 change them.
-- It prints 290,892 bytes: 129,904 of code, 92,720 of everything else,
-  5,073 relocations. As it stood, with D1 landed, it printed 290,900,
+- It prints 292,152 bytes at the head that P3 landed with: 130,977 of
+  code, 92,720 of everything else, 5,248 relocations. The figure moves
+  with every piece, and is what the script prints, not what stands
+  here. When the script was changed it printed 290,892, 129,904 and
+  5,073, where as it stood, with D1 landed, it printed 290,900,
   130,141 and 5,074: the difference is its own 84 functions, which the
   linker kept the code of. P1 had 286,640 with every function of
   `sys.h` doing nothing.
@@ -3055,6 +3058,105 @@ its linking kept:
 It is still the one thing that links the tree for 32 bits, and what an
 S piece runs to see that it does; B2 takes that over, and the script
 can go then.
+
+### P3, the tables read as what they are: done, and what a later piece should know
+
+A word of a table that names something, which `tables.h` has as a
+pointer, is read as a pointer wherever code reads one, and asked what
+it names through two words that `vc.h` has beside `OFFSET`, each with
+its two bodies:
+
+| Word | Takes | Gives | The first body | The second body |
+|---|---|---|---|---|
+| `NAMED(names)` | A word of a table that names something: a line of a box, the box of a dialog, the buttons of a field, a table of `Menu_T`, a half of a picture of `StPagTab` | What it names as a number, its offset in the tables' segment: what `OFFSET` gives of a table that the code names itself, and what `DialBox`, `MinMnu`, `MnMn40` and `AT` take | The word: `(u16)(names)` | `OFFSET(names)`: the word is a pointer |
+| `NUMBER_OF(names)` | A word of that kind that holds a number, written with `NUMBER` of `tables.h` | The number | The word | The pointer's low 16 bits, by way of `size_t` |
+
+So a pointer is still handed on as an offset, which is what step 1
+keeps: `AT(code, NAMED(word))` is the pointer to what a word names,
+in both builds, and in 32 bits it is the word itself by way of its
+offset and back. Step 2, when `Dialog` and `DialBox` take pointers,
+writes the word where that stands, and `NAMED` goes with `OFFSET`.
+
+What was read so, 24 places in three files:
+
+| File | Places | What |
+|---|---|---|
+| `dialog.c` | 11 of `NAMED`, 9 of `NUMBER_OF` | `DialBox` reads a line twice, once for the width and once to write it. `Dialog` reads `pDiBox` three times, for `DialBox`, for the colours and for `MinMnu`, and `mCtrl` of buttons six times; `mCtrl` of a line that is typed into, of a group and of a box to tick is a number, nine times. Its own `WORD`, which was the cast for both kinds, is gone, and `WORD_AT` with it |
+| `main.c` | 1 of `NAMED` | `F39_01` reads the word of `Menu_T` that names the table of a menu's commands. `Menu_T` is declared there as what it is, an array of pointers, and stepped over by `sizeof *Menu_T`. The commands in such a table are numbers of 16 bits in both builds, and that line stays |
+| `stcolor.c` | 3 of `NAMED` | `struct Picture` has two pointers where it had two words, as the nameless structure of `StPagTab` in `stcolor_t.c` has, and the three places that read one ask `NAMED` |
+
+`DialBox` no longer goes by the numbers 4, 5, 6, 8 and 12 for where a
+box has what. `tables.h` has `struct BOXTOP`, what every box begins
+with, the `BOX_HEAD` of the three macros under a tag, held to 8 bytes
+by `LAID_OUT`; the texts that a box puts in are `struct BOXTX` behind
+it, and the lines stand behind those: `const u8 * const __far *line`,
+a far pointer to a word that names a text, stepped by `line++`, which
+is 2 bytes on DOS and 4 in 32 bits. A line across the box is the
+pointer 0 and is looked for in the word itself, `*line != 0`, before
+`NAMED` is asked: `NAMED` of a word that names nothing is a number
+like any other in 32 bits. `Dialog` walks its fields by `sizeof(struct
+BOXHD)` and `sizeof(struct BOXMN)` as it did, which is right in both.
+
+The 17 of N in `dialog.c` went with it: `MD` and `MDW` are made of
+`MD_POINTER`, `InSt10` makes its pointer with it, and the two calls of
+`InSt10` hand on `MD_PLACE(text)`.
+
+The plan had 40 places of T for this piece, by the sorting of the
+three files. Of those, 16 were the `WORD` of `dialog.c`, which the
+host check counted to the last; six more read such a word with nothing
+counting them, two in `DialBox`, one in `main.c` and three in
+`stcolor.c`; and the mouse's loop of `Dialog` has three reads where it
+had one. The rest take a table by its offset, `AT(code, box)`,
+`FIELD(item)`, and are right as they stand. Nothing else in the tree
+reads such a word: the files of tables have pointers in boxes,
+dialogs, `Menu_T` and `StPagTab` and nowhere else, and `menu.c` and
+`box.c` read none.
+
+What decided: the scenarios, all of which pass. `main.c` and
+`stcolor.c` compile to the bytes they had, by their listings. Of
+`dialog.c`, `DialBox` is 6 bytes longer, for walking a far pointer
+where it added to an offset, and `Dialog` 11, where the mouse's loop
+over the fields read `mCtrl` once before it knew the kind of the field
+and now reads it by the kind; the other fifteen routines are the same
+bytes. `VC.EXE` is 20 bytes longer. `LAID_OUT` and the test of the
+data hold the tables as they did, and no file of tables was changed.
+The host check has `dialog.c` clean and counts 105 places where it
+counted 138, P2a and P2b having landed in front of this.
+
+The second bodies are read by the compilers and no more, as P1's:
+the build compiles them for 32 bits, with warnings as errors, since
+B1; `whole.py` links the tree with them, and `wcc386` makes of a line of
+a box a read of four bytes, a step of four and the offset of what it
+found. They were tried once on this computer as P1 tried its own, in
+a file that is not kept: gcc for 64 bits, a main data with 64K in
+front and a megabyte behind, a box of two texts and three lines, one
+of them a line across, and a dialog of two fields, at every place in
+a paragraph, in front of the main data and behind it; walked as
+`DialBox` and `Dialog` walk, each word gave what was put there.
+
+What a later piece should know:
+
+- H4: which fields are pointers is as the plan has it, five shapes.
+  `struct BOXTOP` is no shape of its own and no object has it. A line
+  across a box is a pointer without a relocation whose four bytes are
+  0, and a `NUMBER` is one whose high word is 0: the program cuts it
+  to 16 bits and never looks at the rest. `struct Picture` of
+  `stcolor.c` is `StPagTab`'s declaration a second time, and nothing
+  holds the two to one another but that they read the same in both
+  builds today.
+- M1 and the convergence: `NAMED` takes for granted what `OFFSET`
+  does, that what a word names lies within 32K of `Title_S`: a text,
+  a box, buttons, a table of commands, a picture, all of files of
+  tables. A box or a dialog that shows a wrong line where its other
+  lines are right has a text outside that.
+- On DOS a pointer in a table is near, and code that reads through
+  one as it stands reads the main data, with no warning: `NAMED`
+  first. Nothing holds the code to that but the scenarios.
+- A name for the type of such a word was thought of and left: a
+  typedef more in a header can change the order of two variables
+  (`CLAUDE.md`, "Notes on the portable C"), and the pointers of
+  `tables.h` say what each names by their own types, `const u8 *` for
+  a text, `const void *` for a box or for buttons or a number.
 
 ### What could go wrong
 

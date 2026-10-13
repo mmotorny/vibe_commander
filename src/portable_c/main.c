@@ -110,9 +110,11 @@ const u8 __far *FndLet(const u8 __far *text);
 /* What this reads or names of other files: the scan codes of Alt with a
    digit or a letter, which begin the speed search; of main_t.c the box
    that says a drive is not ready, which DialBox takes by its offset;
-   and of setup.c the setup as it was last saved or found. */
+   and of setup.c the setup as it was last saved or found. Menu_T, of
+   commands_t.c, is a word for each table of a menu's commands that
+   names it, a pointer there: see NAMED of vc.h. */
 extern const u8 __far AltSr_T[];
-extern const u8 __far Menu_T[];
+extern const u16 * const __far Menu_T[];
 extern const u8 __far NoRd_P[];
 extern u8 IniSave[];
 
@@ -1079,7 +1081,8 @@ static u16 F39_01(u16 again, struct Regs STACK *r)
     r->di = menu == 5 ? md.WCB2seg : md.WCB1seg;
     if (table == 1)
         panel = r->di;
-    r->si = *(const u16 __far *)AT(code, OFFSET(Menu_T) + (table - 1) * 2);
+    r->si = NAMED(*(const u16 * const __far *)
+                  AT(code, OFFSET(Menu_T) + (table - 1) * sizeof *Menu_T));
     return Command(*(const u16 __far *)AT(code, r->si + r->bx), panel, r);
 }
 

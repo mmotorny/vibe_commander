@@ -1426,6 +1426,17 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    with no relocation. */
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
+/* What a word of a table names, as the same number: a box has such a
+   word for each of its lines and a dialog for its box and its buttons,
+   and tables.h has it as a pointer. In a file of tables a pointer is
+   the offset in their segment, so the word is the number already. The
+   pointer that it is here is a near one, which code would follow into
+   the main data: it is read for this number and never read through.
+   And the number in a word that holds one where it could name
+   something, NUMBER of tables.h. */
+#define NAMED(names) ((u16)(names))
+#define NUMBER_OF(names) ((u16)(names))
+
 /* A far pointer that is known to point into the main data, as a near
    one: what MvzLine, AddFile and CutPath return. */
 #define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
@@ -1496,6 +1507,18 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    static object. */
 #define OFFSET(object) \
     ((u16)((const u8 *)(object) - AT(TABLES_BY(Title_S), 0)))
+
+/* What a word of a table names, as the same number: the word is a
+   pointer to it, and OFFSET makes the number, for the routines that
+   take a table as one. It takes for granted what OFFSET does, and that
+   the word names something: one that names nothing, a line across a
+   box, is the pointer 0, of which this makes a number like any other.
+   That is asked of the word itself, before this. And the number in a
+   word that holds one where it could name something, NUMBER of
+   tables.h: the pointer's low 16 bits, by way of a number that is as
+   long as a pointer, size_t of the header that OFFSET_IN includes. */
+#define NAMED(names) OFFSET(names)
+#define NUMBER_OF(names) ((u16)(size_t)(names))
 
 /* A pointer into the main data is a pointer. It takes nothing for
    granted, and does not look whether the pointer is into the main

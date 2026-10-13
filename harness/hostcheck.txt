@@ -15,7 +15,7 @@ commands.c    clean
 commands_t.c  clean
 copy.c        clean
 copy_t.c      clean
-dialog.c      to-number 16
+dialog.c      clean
 digits.c      clean
 dirfunc.c     clean
 dirfunc_t.c   clean

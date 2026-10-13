@@ -5,7 +5,11 @@
  * Translated from VCSUB1.INC.
  *
  * A box and a dialog are described where the assembly has them, in its
- * code segment, and are named by their offsets there.
+ * code segment, and are named by their offsets there. What one of them
+ * names in turn, a box its lines, a dialog its box and its buttons, it
+ * has a word for that tables.h has as a pointer: NAMED of vc.h makes of
+ * such a word the offset of what it names, and NUMBER_OF the number in
+ * a word of that kind that holds one.
  *
  * A box is four numbers of colours, the number of its lines and of the
  * texts that are put into them, the place in the main data where what it
@@ -32,10 +36,6 @@
  */
 #include "tables.h"
 
-/* A word of a box or a dialog that names something, as the offset that
-   it is: tables.h has such a word as a pointer. */
-#define WORD(names) ((u16)(names))
-
 /* The kinds of a field. A line to type into has its text at mPoint in
    the segment of whoever asks for the dialog, its length in the low byte
    of mCtrl and INPUT_ flags in the high one. A group has, at mPoint in
@@ -44,7 +44,8 @@
    its value at mCtrl in the caller's segment, and while the dialog is up
    at mPoint in the main data. Buttons have the one chosen at mPoint in
    the main data, and at mCtrl in the assembly their widths and columns,
-   two bytes each, up to a width of 0. */
+   two bytes each, up to a width of 0. So mCtrl names something for
+   buttons alone, and is a number for the other three. */
 #define FIELD_INPUT   1
 #define FIELD_SELECT  2
 #define FIELD_FLIP    3
@@ -86,8 +87,7 @@
 #define LEFT_RIGHT  0xC7B6              /* where one meets the frame, on the
                                            left and on the right */
 
-/* The word at an offset in a segment, and a field of a dialog. */
-#define WORD_AT(segment, offset) (*(u16 __far *)AT(segment, offset))
+/* A field of a dialog, by its offset. */
 #define FIELD(offset) ((const struct BOXMN __far *)AT(code, offset))
 
 /* A byte and a word of the main data, by their offsets. */
@@ -132,9 +132,9 @@ void NormStr(u8 __far *text);                           /* string.c */
 
 /* Copy a text that a box puts into its lines to where the lines have it,
    and write it as the box asks: `entry` is its four bytes in the box. */
-static void DiBx30(const u8 __far *entry, u8 *to, u16 segment)
+static void DiBx30(const struct BOXTX __far *entry, u8 *to, u16 segment)
 {
-    const u8 __far *from = AT(segment, *(const u16 __far *)entry);
+    const u8 __far *from = AT(segment, entry->from);
     u8 *text = to;
     u16 count = LenPath + 13;
     u16 mode;
@@ -142,7 +142,7 @@ static void DiBx30(const u8 __far *entry, u8 *to, u16 segment)
     do
         *text++ = *from++;
     while (--count);
-    mode = entry[2];
+    mode = entry->how;
     if (mode & 4)
         NormStr(to);
     if (mode & 2) {
@@ -150,7 +150,7 @@ static void DiBx30(const u8 __far *entry, u8 *to, u16 segment)
         if (mode & 1)
             LetLin(to);
     }
-    ShrtLin(to, (u16)(signed char)entry[3]);
+    ShrtLin(to, (u16)(signed char)entry->length);
 }
 
 /* Put the box at `box` into the screen buffer, with the middle of its
@@ -158,69 +158,74 @@ static void DiBx30(const u8 __far *entry, u8 *to, u16 segment)
    than 25 lines. `include` is the text that ^I stands for in its lines,
    an offset in the assembly too, and `segment` where the texts are that
    it puts in. `where` gets where the box is and where what it covers is
-   kept. A box without a line has 65536. */
+   kept. A box without a line has 65536.
+
+   The lines of the box are words that name their texts, one behind the
+   other behind the texts that it puts in: `line` is at one of them. */
 void DialBox(u16 place, u16 box, u16 include, u16 segment,
              struct Box STACK *where)
 {
     u16 code = AsmSeg();
-    const u8 __far *head = AT(code, box);
+    const struct BOXTOP __far *head
+        = (const struct BOXTOP __far *)AT(code, box);
+    const struct BOXTX __far *put = (const struct BOXTX __far *)(head + 1);
+    const u8 * const __far *lines;
+    const u8 * const __far *line;
     struct LineArgs args;
-    u16 texts, lines, line, count, text, width, length, size, begin, row;
+    u16 texts, count, width, length, size, begin, row;
     u16 *screen;
 
     HidCur();
     if (md.Lines > 25)                  /* SftEGA */
         place += (u16)((u8)(md.Lines - 25) >> 1) << 8;
-    texts = head[5] & 3;
+    texts = head->texts & 3;
     if (texts != 0) {
-        DiBx30(head + 8, md.TmpErr + 1, segment);
+        DiBx30(put, md.TmpErr + 1, segment);
         if (texts != 1)
-            DiBx30(head + 12, md.TmpErr + 101, segment);
+            DiBx30(put + 1, md.TmpErr + 101, segment);
     }
 
     /* As wide as its longest line. */
-    lines = box + 8 + (texts << 2);
+    lines = (const u8 * const __far *)(put + texts);
     args.value = 0;
     args.screen = 0;
-    args.colors = head;
+    args.colors = head->colors;
     args.include = AT(code, include);
     width = 0;
     line = lines;
-    count = head[4];
+    count = head->lines;
     do {
-        text = WORD_AT(code, line);
-        line += 2;
-        if (text != 0) {
-            args.line = AT(code, text);
+        if (*line != 0) {
+            args.line = AT(code, NAMED(*line));
             length = LnStr((struct LineArgs STACK *)&args);
             if (length > width)
                 width = length;
         }
+        line++;
     } while (--count);
-    size = ((u16)head[4] << 8 | width & 0xFF) + 0x40C;
+    size = ((u16)head->lines << 8 | width & 0xFF) + 0x40C;
     begin = ADD_LOW(place, -((((size & 0xFF) - 1) & 0xFF) >> 1));
     where->begin = begin;
     where->size = size;
-    where->saved = WORD_AT(code, box + 6);
+    where->saved = head->saved;
     SavWin(begin, size, where->saved);
-    MinBox(begin, size, Color(head[0]) << 8);
+    MinBox(begin, size, Color(head->colors[0]) << 8);
 
     row = place;
     line = lines;
-    count = head[4];
+    count = head->lines;
     do {
         row += 0x100;
-        text = WORD_AT(code, line);
-        if (text != 0) {
+        if (*line != 0) {
             args.value = row;
-            args.line = AT(code, text);
+            args.line = AT(code, NAMED(*line));
             CntLine((struct LineArgs STACK *)&args);
         } else {
             screen = BasAdr(row) - ((((size & 0xFF) - 1) & 0xFFFE) >> 1);
-            BoxLine(screen, Color(head[0]) << 8 | LINE, LEFT_RIGHT, 3,
-                    (size & 0xFF) - 10 & 0xFF);
+            BoxLine(screen, Color(head->colors[0]) << 8 | LINE, LEFT_RIGHT,
+                    3, (size & 0xFF) - 10 & 0xFF);
         }
-        line += 2;
+        line++;
     } while (--count);
 }
 
@@ -843,13 +848,13 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     if (head->bFlags & BOX_ERROR)
         begin += (u16)md.SftErr << 8;
     if (!(head->bFlags & BOX_THERE)) {
-        DialBox(begin, WORD(head->pDiBox), include, segment,
+        DialBox(begin, NAMED(head->pDiBox), include, segment,
                 (struct Box STACK *)&where);
         begin = where.begin;
         size = where.size;
         saved = where.saved;
     }
-    colors = AT(code, WORD(head->pDiBox));
+    colors = AT(code, NAMED(head->pDiBox));
 
     /* The fields as they are when the dialog opens. */
     for (item = first; ; item += sizeof(struct BOXMN)) {
@@ -858,7 +863,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
         place = begin + field->mBase;
         screen = BasAdr(place);
         if (type == FIELD_INPUT) {
-            control = WORD(field->mCtrl);
+            control = NUMBER_OF(field->mCtrl);
             text = INPUT(control);
             text[0] = 0;
             text[1] = 0;
@@ -873,14 +878,14 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
         } else if (type == FIELD_SELECT) {
             *((u8 *)screen + MD(field->mPoint) * (2 * 80)) = BULLET;
         } else if (type == FIELD_FLIP) {
-            value = *AT(segment, WORD(field->mCtrl));
+            value = *AT(segment, NUMBER_OF(field->mCtrl));
             MD(field->mPoint) = (u8)value;
             if (value != 0)
                 *(u8 *)screen = 'x';
         } else if (type == FIELD_BUTTONS) {
             screen = BasAdr(Dial18(place, begin & 0xFF));
             MD(field->mPoint) = 0;
-            MnMn41(colors[2], 0, WORD(field->mCtrl), screen, code);
+            MnMn41(colors[2], 0, NAMED(field->mCtrl), screen, code);
         } else
             break;
     }
@@ -898,15 +903,15 @@ Dial31:                                 /* the field of the cursor has the keys 
     type = field->mType;
     place = begin + field->mBase;
     if (type == FIELD_INPUT) {
-        control = WORD(field->mCtrl);
+        control = NUMBER_OF(field->mCtrl);
         text = INPUT(control);
         typed = InpStr(place, text + 3, *(u16 *)text, control & 0xFF,
                        colors[1], head->bKeyBar);
         *(u16 *)text = typed.cursor;
         key = typed.key;
     } else if (type == FIELD_SELECT) {
-        chosen = Select(place, head->bKeyBar, WORD(field->mCtrl) & 0xFF,
-                        MDW(field->mPoint));
+        chosen = Select(place, head->bKeyBar,
+                        NUMBER_OF(field->mCtrl) & 0xFF, MDW(field->mPoint));
         MDW(field->mPoint) = chosen.lines;
         key = chosen.key;
     } else if (type == FIELD_FLIP) {
@@ -914,8 +919,8 @@ Dial31:                                 /* the field of the cursor has the keys 
         MD(field->mPoint) = (u8)ticked.value;
         key = ticked.key;
     } else if (type == FIELD_BUTTONS) {
-        menu = MinMnu(WORD(field->mCtrl), Dial18(place, begin & 0xFF),
-                      MnMn60(WORD(field->mCtrl), code), WORD(head->pDiBox),
+        menu = MinMnu(NAMED(field->mCtrl), Dial18(place, begin & 0xFF),
+                      MnMn60(NAMED(field->mCtrl), code), NAMED(head->pDiBox),
                       head->bKeyBar | 0x80, MD(field->mPoint));
         MD(field->mPoint) = (u8)menu.chosen;
         key = menu.key;
@@ -987,7 +992,7 @@ Dial31:                                 /* the field of the cursor has the keys 
     if (field->mType == FIELD_SELECT && (link & LINK_SET)) {
         value = 0;
         if (link & LINK_LAST)
-            value = WORD(field->mCtrl) - 1;
+            value = NUMBER_OF(field->mCtrl) - 1;
         MD(field->mPoint + 1) = (u8)value;
     }
     goto Dial31;
@@ -1014,16 +1019,16 @@ Dial40:                                 /* the mouse */
                 if (type == 0)
                     break;
                 place = begin + field->mBase;
-                window = WORD(field->mCtrl);
                 if (type == FIELD_INPUT) {
-                    window = 0x100 | window & 0xFF;
+                    window = 0x100 | NUMBER_OF(field->mCtrl) & 0xFF;
                 } else if (type <= FIELD_FLIP) {
-                    window = (window & 0xFF) << 8 | Slct20(place);
+                    window = (NUMBER_OF(field->mCtrl) & 0xFF) << 8
+                             | Slct20(place);
                     if (type != FIELD_SELECT)
                         window = 0x100 | window & 0xFF;
                 } else {
                     place = Dial18(place, begin & 0xFF);
-                    window = MnMn60(window, code);
+                    window = MnMn60(NAMED(field->mCtrl), code);
                 }
                 if (!InWind(mouse, place, window))
                     goto Dial49;
@@ -1049,8 +1054,8 @@ Dial49:
     if (field->mType == FIELD_BUTTONS)
         MnMn40((u16)colors[0] << 8 | colors[2],
                Dial18(begin + field->mBase, begin & 0xFF),
-               MD(field->mPoint), MnMn60(WORD(field->mCtrl), code),
-               WORD(field->mCtrl));
+               MD(field->mPoint), MnMn60(NAMED(field->mCtrl), code),
+               NAMED(field->mCtrl));
     cursor = item;
     goto Dial31;
 
@@ -1097,7 +1102,7 @@ Dial71:
         if (type == 0)
             break;
         if (type == FIELD_INPUT) {
-            control = WORD(field->mCtrl);
+            control = NUMBER_OF(field->mCtrl);
             text = INPUT(control) + 3;
             if (control & INPUT_NORMAL)
                 NormStr(text);
@@ -1106,7 +1111,7 @@ Dial71:
                 *to++ = *text++;
             *to = 0;
         } else if (type == FIELD_FLIP)
-            *AT(segment, WORD(field->mCtrl)) = MD(field->mPoint);
+            *AT(segment, NUMBER_OF(field->mCtrl)) = MD(field->mPoint);
     }
     goto Dial82;
 

@@ -2134,8 +2134,8 @@ in "The portable C".
     when a file has a warning: run a trial of it from `build/`.
   - A name that `vc.h` takes is taken in every file: `dos.c` had an
     `OFFSET` of its own, which is `OFFSET_OF` there now, and `view.c`
-    and `usermenu.c` each have a `WORD_AT` that is not `dialog.c`'s,
-    which is why that word is in no header.
+    and `usermenu.c` each have a `WORD_AT` that is not the one that
+    `dialog.c` had, which is why that word is in no header.
   - The host check does not count a pointer that is made of a number
     which gcc can work out. `MD_PLACE` of the address of a field is
     such a number in its second body, so `(struct DIRENT *)TRELIST`
@@ -2160,6 +2160,32 @@ in "The portable C".
     right one.
   - A cast with a step in it, `*(const u8 *)entry--`, is the same
     bytes with the step as a statement of its own behind it.
+- A word of a table that names something, a line of a box, the box
+  and the buttons of a dialog, is a pointer in `tables.h`, as long as
+  a pointer is, and code never reads through it: it asks `NAMED` of
+  `vc.h` what the word names, as an offset in the tables' segment, and
+  `NUMBER_OF` where the word holds a number. `TODO.md`, "P3, the
+  tables read as what they are", has the two. What reading the tables
+  so met:
+  - Whether the bytes of the 16-bit program stay is a matter of how
+    the read is written. A structure laid over what was read by its
+    offsets, `head->lines` where `head[4]` stood, is the same bytes. A
+    far pointer that is stepped where an offset was added to is not:
+    `DialBox` is 6 bytes longer. And a far pointer to a table kept in
+    a variable of its own was 10 bytes more in `F39_01` of `main.c`
+    and moved every local variable of the function, where the same
+    read in one expression, `NAMED(*(type __far *)AT(code,
+    OFFSET(table) + index * sizeof *table))`, is the bytes that the
+    function had.
+  - A word may be a name or a number by the kind of the thing that it
+    is a part of, as `mCtrl` of a dialog's field is, and code may read
+    it before it has looked at the kind: the mouse's loop of `Dialog`
+    did. Such a read is made once for each kind, behind the test.
+  - The objects of two builds differ in every file, by what the
+    compiler writes into them besides the code. The listings do not:
+    `build/portable_c/*.lst` against a copy of the build before says
+    which files changed, and within one, the bytes of each routine,
+    without their addresses, say which routines.
 
 ### Moving a file to the system's functions
 

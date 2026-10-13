@@ -43,10 +43,12 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);
 
 /* The tables, of stcolor_t.c, in the segment that AsmSeg returns: see
-   there. A picture of StPagTab is two offsets in that segment. */
+   there. A picture of StPagTab is two words that name what it is made
+   of, which the table has as pointers: NAMED of vc.h makes of each the
+   offset in that segment. */
 struct Picture {
-    u16 page;                           /* 25 rows of 58 characters */
-    u16 colors;                         /* and which item colours which */
+    const u8 *page;                     /* 25 rows of 58 characters */
+    const u8 *colors;                   /* and which item colours which */
 };
 extern const u8 __far StColor_S[];      /* " Color Setup " */
 extern const u8 __far StMode_S[];       /* "Mode: " */
@@ -365,7 +367,7 @@ static void StF07_53(void)
 static void StCol30(u16 color)
 {
     const u8 __far *colors = AT(AsmSeg(),
-        StPagTab[StColPage[sd.ColCur] - 1].colors);
+        NAMED(StPagTab[StColPage[sd.ColCur] - 1].colors));
     u16 *row = md.ScrBuf;
     u16 __far *screen;
     u16 rows, count, item, paint, changed;
@@ -503,8 +505,8 @@ static void StCol00(void)
     }
     md.ColTyp = (u8)list.palette;
     picture = &StPagTab[StColPage[sd.ColCur] - 1];
-    page = AT(AsmSeg(), picture->page);
-    colors = AT(AsmSeg(), picture->colors);
+    page = AT(AsmSeg(), NAMED(picture->page));
+    colors = AT(AsmSeg(), NAMED(picture->colors));
     row = md.ScrBuf;
     for (rows = 25; rows != 0; rows--) {
         screen = row;

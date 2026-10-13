@@ -20,6 +20,15 @@
  * what it uses as `extern const u8 __far`, and so reads it in the right
  * one, and AsmSeg of misc.c is that segment.
  *
+ * A word that names something is a pointer here, and as long as one: a
+ * word on DOS, which is the original's layout, and four bytes in a
+ * program of 32 bits, with whatever stands behind it that much further
+ * on. So the routines that read a table read such a word as the pointer
+ * that it is, by the structures below, step over it by its size, and
+ * never read through it as it stands: on DOS it is a near pointer, which
+ * code would follow into the main data. They ask NAMED of vc.h what it
+ * names, and NUMBER_OF there where it holds a number.
+ *
  * A constant that only its own file names is static, and one that code
  * or another file names is not. Either has the name that it has in the
  * assembly, and the compiler's name for it will do for the linker.
@@ -79,7 +88,8 @@
 #define WCB_AT(field) OFFSET_IN(struct WCBdef, field)
 
 /* A word that names something, where it holds a number instead: the
-   length of a line that is typed into, say. */
+   length of a line that is typed into, say. NUMBER_OF of vc.h reads
+   it. */
 #define NUMBER(number) ((const void *)(number))
 
 #pragma pack(push, 1)
@@ -99,8 +109,14 @@ struct BOXTX {
    many texts it puts into them, where in the main data what it covers is
    kept, those texts, and its lines: the first is the title, in the frame,
    and 0 is a line across the box. BOX(n) is a box of n lines, BOX1(n) and
-   BOX2(n) one that puts in a text or two. */
+   BOX2(n) one that puts in a text or two. A line is a word that names
+   its text.
+
+   BOXTOP is what every box begins with, for the routine that is handed
+   one and does not know how many texts and lines it has, DialBox: the
+   texts stand behind it, and the lines behind those. */
 #define BOX_HEAD u8 colors[4]; u8 lines; u8 texts; u16 saved
+struct BOXTOP { BOX_HEAD; };
 #define BOX(count) \
     struct { BOX_HEAD; const u8 *line[count]; }
 #define BOX1(count) \
@@ -131,7 +147,7 @@ struct BOXTX {
 
 /* The header of a dialog: BOXHD of the assembly. */
 struct BOXHD {
-    const void *pDiBox;                 /* its box */
+    const void *pDiBox;                 /* its box: a word that names it */
     u16 BoxBase;                        /* where the middle of its top is */
     u16 SubFunc;                        /* the routine for Enter and F10,
                                            a SUB_ number, or 0 */
@@ -151,7 +167,8 @@ struct BOXMN {
     u8  mRight;
     u16 mBase;                          /* where it is in the box */
     u16 mPoint;                         /* what it sets */
-    const void *mCtrl;                  /* buttons, or a NUMBER */
+    const void *mCtrl;                  /* a word that names its buttons,
+                                           or a NUMBER */
 };
 
 /* A dialog of n fields: the header, the fields and a byte 0. */
@@ -165,6 +182,7 @@ struct BOXMN {
    pointer, and is longer elsewhere by what a pointer is longer, with
    nothing else in it moved: 12 and 13 bytes in a program of 32 bits. */
 LAID_OUT(BOXTX, 4);
+LAID_OUT(BOXTOP, 8);
 LAID_OUT(BOXHD, 8 + sizeof(const void *));
 LAID_OUT(BOXMN, 9 + sizeof(const void *));
 
