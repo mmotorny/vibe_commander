@@ -1154,9 +1154,12 @@ with it is less obvious:
   one, without a warning: the table of interrupt vectors was read from
   the main data. Take the segment from a `volatile` variable, as
   `F65_31` of `src/c/memory.c` does.
-- CTEXT has under a thousand bytes left below its limit. A new file
-  goes into CTEXT2, by its name in `port_c_second`, unless it multiplies
-  or divides numbers of 32 bits.
+- CTEXT of the C translation ends at D32Eh, 7,378 bytes below its
+  limit, and CTEXT2 at B740h, 14,528 below it: the linker's map,
+  `build/c/VC.MAP`, has where each begins and how long it is. This note
+  had CTEXT with under a thousand bytes left, and a new file going into
+  CTEXT2 for that, by its name in `port_c_second`, unless it multiplied
+  or divided numbers of 32 bits.
 - An address that the main data keeps as two words, offset and segment,
   `ErrVct`, is a `u32` there and a far pointer by a cast, which costs
   nothing: `(const u8 __far *)md.ErrVct`.
