@@ -406,17 +406,8 @@ function(add_portable_c32 target directory)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
-    # What is not ready for 32 bits, each with the piece of the plan that
-    # takes it off. The list may only get shorter, and nothing is on it:
-    # resident.c was, for the interrupt function in which DOS goes on
-    # when it has ended the program, and came off when that went into
-    # dos.c with the piece S3. A file on it is compiled all the same, and
-    # the build stops when the compiler takes it: tools/refused.cmake,
-    # which leaves what the compiler said next to the objects, as
-    # <file>.refused.
-    set(c_waiting "")
     # A file that is named and is not there has left its name behind.
-    foreach(source ${portable_c_16_alone} ${portable_c_32_alone} ${c_waiting})
+    foreach(source ${portable_c_16_alone} ${portable_c_32_alone})
         if(NOT source IN_LIST c_files)
             message(FATAL_ERROR
                 "src/portable_c/${source} is named in CMakeLists.txt and is "
@@ -443,33 +434,18 @@ function(add_portable_c32 target directory)
         string(REGEX REPLACE "\\.c$" "" object ${source})
         set(read ${source_dir}/${source} ${source_dir}/vc.h
             ${source_dir}/tables.h ${source_dir}/sys.h)
-        if(source IN_LIST c_waiting)
-            list(JOIN compile "|" command)
-            add_custom_command(
-                OUTPUT ${directory}/${object}.refused
-                COMMAND ${CMAKE_COMMAND} -D command=${command}
-                        -D source=${source_dir}/${source}
-                        -D object=${directory}/${object}.obj
-                        -D said=${directory}/${object}.refused
-                        -P ${CMAKE_SOURCE_DIR}/tools/refused.cmake
-                DEPENDS ${read} ${CMAKE_SOURCE_DIR}/tools/refused.cmake
-                COMMENT "Trying portable_c/${source} for 32 bits"
-                VERBATIM)
-            list(APPEND made ${directory}/${object}.refused)
-        else()
-            add_custom_command(
-                OUTPUT ${directory}/${object}.obj
-                COMMAND ${compile} -fo=${directory}/${object}.obj
-                        ${source_dir}/${source}
-                COMMAND ${watcom} ${watcom_bin}/wdis
-                        -l=${directory}/${object}.lst
-                        ${directory}/${object}.obj
-                BYPRODUCTS ${directory}/${object}.lst
-                DEPENDS ${read}
-                COMMENT "Compiling portable_c/${source} for 32 bits"
-                VERBATIM)
-            list(APPEND made ${directory}/${object}.obj)
-        endif()
+        add_custom_command(
+            OUTPUT ${directory}/${object}.obj
+            COMMAND ${compile} -fo=${directory}/${object}.obj
+                    ${source_dir}/${source}
+            COMMAND ${watcom} ${watcom_bin}/wdis
+                    -l=${directory}/${object}.lst
+                    ${directory}/${object}.obj
+            BYPRODUCTS ${directory}/${object}.lst
+            DEPENDS ${read}
+            COMMENT "Compiling portable_c/${source} for 32 bits"
+            VERBATIM)
+        list(APPEND made ${directory}/${object}.obj)
     endforeach()
     add_custom_target(${target} ALL DEPENDS ${made})
 endfunction()
