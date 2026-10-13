@@ -224,7 +224,7 @@ portable C](#the-portable-c)).
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
 | `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
-| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces |
+| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against what it did itself, recorded in `harness/goldens/portable_c/` |
 | `docs/` | Pictures for this README |
@@ -584,16 +584,17 @@ goes on after a command and what the mouse asks for.
 
 The lines that say something of registers still, and why:
 
-| What | Where | How many |
-|---|---|---|
-| Inline assembly: the instruction and the registers it takes and leaves | `src/portable_c/dos.c` | 7 |
-| The compiler's own routines for arithmetic on 32 bits, which it calls with registers of its choosing | `__U4M`, `__U4D` of `arith.c` | 2 |
-| DOS's routine for capitals, which is no function of the program: called through a pointer, with the letter in AL | `CaseMapFn` of `dos.c` | 1 |
-| The command for COMMAND.COM's INT 2Eh, in SI as the interrupt takes it, for a function that is inline assembly | `Int2E` of `resident.c` | 1 |
+| What | Where |
+|---|---|
+| Inline assembly: the instruction and the registers it takes and leaves | every piece of `src/portable_c/dos.c` |
+| The compiler's own routines for arithmetic on 32 bits, which it calls with registers of its choosing | `__U4M`, `__U4D` of `arith.c` |
+| DOS's routine for capitals, which is no function of the program: called through a pointer, with the letter in AL | `CaseMapFn` of `dos.c` |
+| The command for COMMAND.COM's INT 2Eh, in SI as the interrupt takes it, for a function that is inline assembly | `Int2E` of `resident.c` |
 
-Eight more lines say that a function does not return, `aborts`, which
-makes 19 lines of `#pragma aux` in the portable C where the C
-translation has 863. None of them gives anything a name but the two of
+The other lines of `#pragma aux` say that a function does not return,
+`aborts`; [the figures](#the-figures) have how many lines there are in
+the portable C, where the C translation has 863. None of them gives
+anything a name but the two of
 `arith.c`, whose names are the compiler's to choose. In the C
 translation a constant that another file names has a `#pragma aux`
 wherever it is defined or declared, which takes off the underscore that
@@ -607,6 +608,49 @@ while the tree was still two parts, 80 lines in all, the names of what
 the part that stays in the memory defined, of a second copy of `dos.c`
 and of the main data, and the registers where one part called the
 other, went with the two parts.
+
+### The figures
+
+What can be measured of the portable C, or counted in its source, and
+changes with every step of the work, is written here and nowhere else:
+how long its file is, how much of the memory it keeps, how near its
+code is to the limits that the tests hold it to, and how much of it
+only Open Watcom takes. `python3 tools/figures.py --write` puts the
+table here, of the build in `build/` and of `src/portable_c/`, and is
+run when a piece of work lands; `python3 tools/figures.py --check` says
+whether the table is that of the build. The rest of this README,
+`TODO.md` and `src/portable_c/DEVIATIONS.md` say these things without
+the number. No test holds the table.
+
+<!-- The figures: written by `python3 tools/figures.py --write`, not by hand. -->
+
+| What | Figure |
+|---|---|
+| `VC.EXE` | 184,626 bytes |
+| as a multiple of the original's 65,090 bytes | 2.84 |
+| below 3 times the original's, where the scenarios' test fails | 10,644 bytes |
+| more than the C translation's 133,056 bytes | 51,570 bytes |
+| The relocations in its header, which DOS applies | 977 |
+| What it keeps of the memory while a command runs: the program and its panels | 194,480 bytes |
+| What DOS has for a command then, on the bench of the tests | 231,056 bytes |
+| The code segment `CTEXT` ends at | DFE9h, 4,119 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | B3A3h, 15,453 bytes below the limit, F000h |
+| Inline assembly | 70 instructions in 11 pieces: 37 in 7 of `dos.c`, 33 in 4 of `resident.c` |
+| Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
+| Intrinsic functions | 2: `_disable`, `_enable` |
+| Pairs of `#pragma pack` | 7 |
+| `__far`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 770, 481, 94 |
+
+<!-- The end of the figures. -->
+
+What the program keeps while a command runs is worked out, of the
+length of its file and of two panels; what DOS has for a command is
+that taken from what the bench of the tests has, which was seen once
+on the Info panel: the top of `tools/figures.py` says how. The three
+words in the last line are counted by the test `portable_c-host`,
+which prints them in its summary, each place where the word stands in
+the code; what else that test counts of what only Open Watcom reads,
+by kinds, is in its own table, in `TODO.md`.
 
 ### Staying in the memory whole
 
@@ -680,12 +724,13 @@ local variable, and a constant of a code file is still `CODE`, in the
 code segment: with 12 KB less of main data all four could be one, which
 `TODO.md` has, with what stands in its way and what it waits on.
 
-`VC.EXE` of the portable C is 184,626 bytes, 51,570 more than the C
-translation's: the main data is in the file, the header has the
-relocations that DOS applies, 977 of them, and the part that stayed in
-the memory, with its copies and its second `dos.c`, is gone. While a
-command runs it keeps 194,480 bytes of the memory, the program and its
-panels, where the C translation keeps 19,728 and the original 12,704.
+`VC.EXE` of the portable C is longer than the C translation's: the
+main data is in the file, the header has the relocations that DOS
+applies, and the part that stayed in the memory, with its copies and
+its second `dos.c`, is gone. While a command runs it keeps the program
+and its panels in the memory, where the C translation keeps 19,728
+bytes and the original 12,704. [The figures](#the-figures) have how
+long and how much.
 
 How far the source is from what another compiler takes is counted, by
 the test `portable_c-host` (see [Testing](#testing)): gcc reads every
@@ -699,15 +744,15 @@ and `CODE` for nothing where the compiler is not Open Watcom's for the
 8086, as a build for a machine without segments will.
 
 What rests on Open Watcom, for the portable C. Of what the code is
-written in, the first table above: `__far` in 770 places, `STACK` in
-481, `CODE` in 94, which that test counts in its summary; `#pragma aux`
-in 19 lines; `#pragma pack(1)` in 7
-pairs; the five `__interrupt` functions; two `__loadds` functions,
-`Alloc0`, where DOS enters the program, and `Exec2E`, where it goes on
-behind INT 2Eh; the four `__declspec(naked)` functions; two of the
-three intrinsic functions, `_disable` and `_enable`; the two routines
-for arithmetic; and, new,
-`#pragma data_seg` in two places, for the main data and for the stack.
+written in, the first table above: `__far`, `STACK` and `CODE`,
+`#pragma aux` and `#pragma pack(1)`, each as often as [the
+figures](#the-figures) say; the `__interrupt` functions; two `__loadds`
+functions, `Alloc0`, where DOS enters the program, and `Exec2E`, where
+it goes on behind INT 2Eh; the `__declspec(naked)` functions; two of
+the three intrinsic functions, `_disable` and `_enable`; the two
+routines for arithmetic; and, new, `#pragma data_seg`, for the main
+data and for the stack. The test `portable_c-host` counts these by
+their kinds, and `TODO.md` has its table.
 Of what cannot be seen in the code, the seventeen places of the second
 table, seven are left, most in another form, and two are new, 3 and 7
 here:
@@ -728,16 +773,17 @@ Gone are 2, 4 to 7, 9, 10, 12, 15 and 17 of that table, and with 15 the
 rule that a file of code may have no variable and no string: nothing
 checks the object files of the portable C, and nothing has to.
 
-Inline assembly, for the portable C: 70 instructions in 11 pieces.
-Seven of the nine of `dos.c` are as in the table above, 37 instructions;
-`VideoBuffer` and `DesqviewPause` are [gone](#what-else-has-gone).
-`DataSeg` of `main.c` is gone. `New21`, `New27` and `Exit01` of
-`resident.c` are as they were, 17, 4 and 4. `Int2E` is 8, where it was
-9: `INT 2Eh`, `CLI`, `MOV AX` with the segment of the stack,
-`MOV SS,AX`, `MOV SP`, `STI`, `CLD` and the jump; it no longer loads DS,
-which the function that it jumps to does for itself. Of the three
-instructions that are the compiler's own, by its intrinsic functions,
-`IN` is gone too: the program reads no port.
+Inline assembly, for the portable C, is as much as [the
+figures](#the-figures) say. Of the nine pieces of `dos.c` in the table
+above, `VideoBuffer` and `DesqviewPause` are
+[gone](#what-else-has-gone), and the others are as they were. `DataSeg`
+of `main.c` is gone. `New21`, `New27` and `Exit01` of `resident.c` are
+as they were. `Int2E` is an instruction shorter: `INT 2Eh`, `CLI`,
+`MOV AX` with the segment of the stack, `MOV SS,AX`, `MOV SP`, `STI`,
+`CLD` and the jump; it no longer loads DS, which the function that it
+jumps to does for itself. Of the three instructions that are the
+compiler's own, by its intrinsic functions, `IN` is gone too: the
+program reads no port.
 
 ### What else has gone
 

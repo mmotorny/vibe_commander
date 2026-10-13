@@ -101,8 +101,9 @@ left open:
 - The memory model. The program's data is three segments, each reached
   in its own way: the compiler's group with the main data, which DS is
   on; the tables, `__far` through `AsmSeg`; and the stack, for which a
-  pointer to a local variable is `STACK`, in 481 places. A constant of a
-  code file is `CODE`, in the code segment, in 96. With one group that
+  pointer to a local variable is `STACK`. A constant of a code file is
+  `CODE`, in the code segment. The README has how many places have each,
+  under "The figures". With one group that
   DS and SS are both on, all of that is plain C. It is not in hand: it
   waits on the decision whether 16-bit DOS stays a target, since in a
   flat build of 32 bits these qualifiers fall away by themselves. What
@@ -157,9 +158,10 @@ left open:
     program gives INT 24h back for such a program, which is a
     deviation to ask for.
   - Then the qualifiers go from the rest: `STACK` can be defined as
-    nothing first, in all files but those two, and taken out of its 481
+    nothing first, in all files but those two, and taken out of its
     places when no other work has them in hand.
-- Memory, on DOS. The program keeps 195 KB while a command runs. On the
+- Memory, on DOS. The program keeps all of itself and its panels while
+  a command runs (the README has how much, under "The figures"). On the
   bench a second copy of it starts and has no memory to run a command,
   and behind a program that has stayed in the memory it does not start:
   `second-copy`, `start-memory` and `ended` have goldens of the portable
@@ -180,9 +182,10 @@ left open:
   of `passed-on` takes as an interrupt of its own and that of
   `handed-on` cannot get behind: where the program hands that on is a
   variable, not a word that its code names.
-- The file is 184,626 bytes, 2.84 times the original's, where the
-  scenarios' test fails at 3: some 10 KB are left. The main data's
-  zeros are 62.6 KB of it. They are in the file because the main data
+- The file is close to three times the original's, where the
+  scenarios' test fails: the README has how much is left, under "The
+  figures". The main data's zeros are 62.6 KB of it, in the file
+  because the main data
   has to be at offset 0 of a segment, the linker starts a segment on a
   paragraph only where the file starts, and nothing of C gives a
   segment an alignment. Tried: the linker's `segaddr`, which starts a

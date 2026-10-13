@@ -106,8 +106,8 @@ it.
   less is free than the viewer needs at the least, 8,000 bytes: the main
   data and the panels are there already. When the program starts, it
   comes when there is less than two panels and that. With less memory
-  than the program itself, 181K, DOS does not load it, and says so in
-  its own words.
+  than the program itself, DOS does not load it, and says so in its own
+  words.
 - The Info panel says how much memory a command has: all that is behind
   the panels.
 - The map of the memory lists as the program's what stays, the program
@@ -132,22 +132,25 @@ it.
   shows the switch and writes the byte.
 - The original's help file, which the portable C reads, still has its
   page on Memory allocation; no item of the menu leads there.
-- It is an `.EXE` file of 185K, with the main data in it, which DOS
-  loads and relocates. A DOS before 3 is left through the INT 20h of the
+- It is an `.EXE` file, with the main data in it, which DOS loads and
+  relocates. A DOS before 3 is left through the INT 20h of the
   PSP, as the original leaves it, by a call instead of a return; the
   call by which the program asks DOS for its PSP is one of DOS 2 and
   later.
 
-What it costs in memory. While a command runs the portable C keeps
-194,480 bytes, the program and its panels, where the original keeps
-12,704 and the C translation 19,728. On the bench of the tests DOS has
-231,056 bytes for a command run from the portable C, 412,848 for one run
-from the original as it is distributed, and 405,824 for one run from the
-C translation. That is enough for every command of the scenarios but
-those of a second copy of the program: the bench has 500,128 bytes from
-where the program is loaded, two copies with the COMMAND.COM that runs
-the second take 463K of it, and the COMMAND.COM that a command of the
-second copy wants is 73K more. So a second copy starts there and shows its panels, and has no
+What it costs in memory. While a command runs the portable C keeps the
+program and its panels, where the original keeps 12,704 bytes and the C
+translation 19,728; and on the bench of the tests DOS has that much less
+for a command than the 412,848 bytes that it has for one run from the
+original as it is distributed, or the 405,824 for one run from the C
+translation. How much the portable C keeps, and what DOS has for a
+command then, changes with every step of the work: the README has both
+as they stand, under "The figures". It is enough for every command of
+the scenarios but those of a second copy of the program: the bench has
+500,128 bytes from where the program is loaded, two copies with the
+COMMAND.COM that runs the second take most of it, and what is left is
+less than the 73K of the COMMAND.COM that a command of the second copy
+wants. So a second copy starts there and shows its panels, and has no
 memory to run anything; and behind a program that has stayed in the
 memory, with the gap that COMMAND.COM leaves in front of it, a second
 copy does not start at all.

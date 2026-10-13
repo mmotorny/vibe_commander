@@ -395,6 +395,19 @@ def recorded():
     return table, with_gcc
 
 
+def segment_words(source):
+    """How often each of SEGMENT_WORDS stands in the tree `source`, in
+    the code, where it is not being defined. tools/figures.py writes
+    these into the README's table."""
+    words = Counter()
+    for path in sorted(source.glob("*.[ch]")):
+        code = bare(path.read_text(encoding="latin-1"), True)
+        for word in SEGMENT_WORDS:
+            words[word] += (len(re.findall(rf"\b{word}\b", code))
+                            - len(re.findall(rf"#define {word}\b", code)))
+    return words
+
+
 def summary(table, source, said):
     """What is printed of a run."""
     clean = sum(1 for kinds in table.values() if not kinds)
@@ -410,12 +423,7 @@ def summary(table, source, said):
             lines.append(f"{name:<12}{number:>7}{files:>7}  {what}")
     dirty = len(table) - clean
     lines.append(f"{'all':<12}{total:>7}{dirty:>7}")
-    words = Counter()
-    for path in sorted(source.glob("*.[ch]")):
-        code = bare(path.read_text(encoding="latin-1"), True)
-        for word in SEGMENT_WORDS:
-            words[word] += (len(re.findall(rf"\b{word}\b", code))
-                            - len(re.findall(rf"#define {word}\b", code)))
+    words = segment_words(source)
     lines += ["", "Taken for nothing where the memory has no segments: "
               + ", ".join(f"{word} in {words[word]} places"
                           for word in SEGMENT_WORDS)]

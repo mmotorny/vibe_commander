@@ -1548,18 +1548,10 @@ in "The portable C".
   - A thing that is half of a command which shows is not of this kind,
     however little of it shows: the command stays whole until it is
     decided.
-  - The figures that follow the size of the file are set again with
-    every removal: the size, how much more that is than the C
-    translation's, the relocations and what the program keeps while a
-    command runs in the README, the size in `TODO.md`, and what the
-    program keeps and what DOS has for a command in `DEVIATIONS.md`.
-    What it keeps is the file less its header, and 256 bytes of PSP,
-    made whole paragraphs, and 13,536 bytes more for the panels and the
-    headers of the blocks; what DOS has for a command on the bench is
-    425,536 less that. The second can be seen: `python3 harness/show.py
-    --program build/portable_c/VC.EXE --last Tab` prints the Info panel
-    with its number, 72,496 more than that, COMMAND.COM not being
-    loaded yet.
+  - The figures that follow the size of the file were set again by
+    hand with every one of these, in three documents, and were a
+    conflict in every commit at the rebase. They are in one place now:
+    see the note on the figures below.
   - The builds were each tested as a copy while the next was made, by
     the note above, two or three at a time: the scenarios' test took
     five to six minutes each that way.
@@ -1606,6 +1598,26 @@ in "The portable C".
     makes.
   - What gcc cannot say, since it only reads, is in `TODO.md`: above
     all arithmetic that counts on an int of 16 bits.
+- The figures of the portable C that change with every step, the
+  length of its file and what follows from that, what it keeps of the
+  memory, where its code segments end, and the counts of what only
+  Open Watcom takes, are in one place: the table of the README under
+  "The figures", which `python3 tools/figures.py --write` writes of the
+  build and the source, between two marks. Run it when a piece of work
+  lands, after the build and the rebase, and commit the README with the
+  work; `--check` says whether the table is the build's. Write no such
+  figure anywhere else, in the README, `TODO.md`, `DEVIATIONS.md` or
+  these notes: say the thing without the number, or point to the
+  table. A figure that is history, what a step cost when it was made,
+  stays where it tells that, and a commit message keeps its own. A new
+  figure is a row of the table, added in the script. Three things the
+  script does not measure but takes: what the bench has for the
+  program, its panels and a command together, 425,536 bytes, seen once
+  on the Info panel as its top says; that the block of the panels is
+  two panels of 256 files for a command; and the counts of `__far`,
+  `STACK` and `CODE`, which are the host check's, by its function.
+  What else that test counts is in its own table in `TODO.md`, which
+  its `--record` flow goes with, and is not copied.
 
 ## Work by several agents
 
