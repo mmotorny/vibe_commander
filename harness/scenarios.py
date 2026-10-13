@@ -952,6 +952,15 @@ out again (show.py --changes is how):
     BX,4; INT 29h writes the character in AL without a call of DOS.
     Whatever stays from a second copy is on the first copy's list too,
     which is full sooner if something stayed before the copy started.
+  - The same is seen without a second copy by a program that puts itself
+    behind the program, where the program has put DOS: it asks where
+    INT 21h goes, which is to the program's entry, looks from there for
+    the far jump through a word of the code segment by which a call is
+    handed on, 2Eh FFh 2Eh and the address of the word, and writes its
+    own entry into that word, keeping DOS's. w.com of handed-on. The
+    program gives INT 21h back to what that word holds when it leaves,
+    so such a scenario does not leave it: the watcher would be gone and
+    the interrupt left on its memory.
   - A program that stays lies behind the COMMAND.COM that ran it, and
     that leaves a gap of 71K when it ends. With one program staying in
     front of a second copy and one run from it, the translation has no room
@@ -2926,6 +2935,120 @@ SCENARIOS = {
             "Ctrl+o",                     # with the flags of who calls
             "F10",
             "Enter",                      # the watcher released
+        )),
+
+    "handed-on": Scenario(
+        "What the program takes of a call of DOS and what it hands on, "
+        "as in passed-on, but seen without a second copy of it: by a "
+        "program that stays in the memory and puts itself behind the "
+        "program, where the calls that the program has dealt with or "
+        "passed on arrive on their way to DOS",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            # The watcher, w.com. It asks where INT 21h goes, which is to
+            # the program, and looks there for the jump by which the
+            # program hands a call on, a far jump through a word of its
+            # code segment: 2Eh, FFh, 2Eh and the address of the word. It
+            # keeps what the word holds, DOS's own entry, puts its own
+            # entry there, and stays, with a table of 256 words behind
+            # it, cleared. So every call of DOS comes to the program
+            # first and from there to the watcher. Of each it notes the
+            # word below the stack as the interrupt left it, before it
+            # pushes anything itself, and the flags it comes with, in
+            # the table by AH. Then on to DOS, with everything as it
+            # came. AH E0h is a question and goes no further: AX is what
+            # was noted for the call in AL, BX the word below the last
+            # call.
+            "Shift+F4",
+            '"w.com"',
+            "Enter",
+            "Enter",                      # a new file
+            "F4",                         # in hex
+            '"bf8c01b9000133c0f3ab"',     # the table, 18Ch, cleared
+            '"b82135cd21"',               # where INT 21h goes: ES:BX
+            '"26813f2eff750726807f022e7403"',     # 2Eh FFh 2Eh there?
+            '"43ebef"',                   # no: a byte further
+            '"268b5f03"',                 # BX the address of the word
+            '"fa268b07a38401268b4702a38601"',     # what it holds, kept
+            '"26c7074101268c4f02fb"',     # and the entry here, 141h, put
+            '"ba8c03cd27"',               # stay, table and all
+            '"2e891e88018bdc368b5ffe"',   # 141h: BX kept, and SS:[SP-2]
+            '"9c80fce07420"',             # PUSHF; AH E0h is the question
+            '"2e891e8a018adcb700d1e3"',   # the word noted; BX twice AH
+            '"2e8f878c012effb78c019d"',   # the flags into the table, and
+            '"2e8b1e88012eff2e8401"',     # as they came; BX; a far jump
+            '"9d8ad8b700d1e3"',           # the answer: by AL
+            '"2e8b878c012e8b1e8a01cf"',   # AX, BX, IRET
+            "F2",
+            "Esc",
+            # The questions, q.com, as in passed-on: the flags noted for
+            # a program run, AH 4Bh, for one that stayed, 31h, and for
+            # 27h, which this watcher does not see; then four calls,
+            # each with interrupts off, 5A5Ah in the word below what the
+            # interrupt will push and the carry flag set, and for each
+            # the flags noted, and for the first three the word below
+            # the stack: the version of DOS, AH 30h, a date that is
+            # none, AH 2Bh with the year 0, another, with 'VC' in CX and
+            # 0 in DX, which is half of the program's own call, and a
+            # block of memory that is none given back, AH 49h with ES 0.
+            "Shift+F4",
+            '"q.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"33c08ec0"',                 # ES 0
+            '"b04be84100"',               # AL 4Bh, and print what is noted
+            '"b031e83c00"',               # 31h
+            '"b027e83700"',               # 27h
+            '"b430e82000e83a00"',         # AH 30h: call, flags, the word
+            '"b42b33c9e81600e83000"',     # 2Bh, CX 0
+            '"b42bb9435633d2e80900e82300"',   # 2Bh, CX 'VC', DX 0
+            '"b449e80100c3"',             # 49h: the flags only
+            '"fa8becc746f85a5a"',         # the call: CLI, 5A5Ah to [SP-8]
+            '"8bf8f9cd21fb"',             # AX kept in DI, STC, INT 21h, STI
+            '"8bc78ac4"',                 # which call it was, to AL
+            '"b4e0cd215393e802005bc3"',   # the question; AX printed, BX
+                                          # handed back
+            '"b90400c1c304"',             # four digits of BX, from the top
+            '"8ac3240f3c0a1c692f"',
+            '"cd29e2f0b020cd29c3"',       # by INT 29h, and a space
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"t.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"ba1001cd27"',               # stays by INT 27h, 110h bytes
+            "F2",
+            "Esc",
+            "Shift+F4",
+            '"u.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"b80031ba1100cd21"',         # stays by DOS's call 31h, with
+            "F2",                         # 11h paragraphs
+            "Esc",
+            '"q" Enter',                  # no watcher yet: nothing noted,
+            "Ctrl+o",                     # and nobody answers the
+            "Ctrl+o",                     # question
+            '"w" Enter',                  # the watcher stays, behind the
+                                          # program
+            '"q" Enter',
+            "Ctrl+o",                     # a program run; none has stayed;
+            "Ctrl+o",                     # three calls passed on, the
+                                          # stack as it was; a block given
+                                          # back with the watcher in the
+                                          # list
+            '"t" Enter',                  # stays, by the program's INT 27h
+            '"u" Enter',                  # and by its INT 21h
+            '"q" Enter',
+            "Ctrl+o",                     # one noted that stayed, and a
+            "Ctrl+o",                     # block given back with three in
+                                          # the list
         )),
 
     "ended": Scenario(
