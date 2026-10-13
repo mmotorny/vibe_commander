@@ -118,7 +118,7 @@ void PutInf(u16 panel)
         count = 0;
         cluster = md.ClstSiz;
         for (file = ENTRY(PANEL(other), DSKBUF);
-             (u16)(u32)file < WCB_OF(file)->EndBuf; file++) {
+             OFFSET_IN_SEG(other, file) < PANEL(other)->EndBuf; file++) {
             if (file->AttrF & ATTR_DIRECTORY)
                 continue;
             count++;

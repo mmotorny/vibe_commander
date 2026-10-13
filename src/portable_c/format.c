@@ -206,16 +206,19 @@ static u16 *PutPair(u16 *screen, u16 pair, u16 color)
 }
 
 /* Put a file's size on the screen, in 9 cells. A directory shows a marker
-   instead, unless its panel has had the sizes of directories worked out.
-   A size of 10 digits shows as nine nines. */
-static u16 *PutSize(const struct FILENT __far *file, u16 *screen, u16 color)
+   instead, unless its panel, `wcb`, has had the sizes of directories
+   worked out. The assembly has the panel in DS, where the file is; here
+   it is handed on, since a pointer to a file says which panel it is in
+   only where it has a segment. A size of 10 digits shows as nine nines. */
+static u16 *PutSize(const struct WCBdef __far *wcb,
+                    const struct FILENT __far *file, u16 *screen, u16 color)
 {
     u16 i, marker;
 
     color &= 0xFF00;
     if (file->AttrF & ATTR_DIRECTORY) {
         marker = file->NameF[0] != '.';
-        if (!marker || WCB_OF(file)->SizDir == 0) {
+        if (!marker || wcb->SizDir == 0) {
             for (i = 0; i < 9; i++)
                 *screen++ = color | DirMarker[marker][i];
             return screen;
@@ -267,12 +270,14 @@ static u16 *PutTim0(const struct FILENT __far *file, u16 *screen, u16 color)
 #define PutGap(screen, color) \
     (((u8 *)(screen))[1] = (u8)((color) >> 8), (screen) + 1)
 
-/* Put a file's size, date and time on the screen, each after a cell that
-   separates the columns: 26 cells. Returns the address behind them. */
-u16 *SzDtTm(const struct FILENT __far *file, u16 *screen, u16 color)
+/* Put the size, date and time of a file of the panel `wcb` on the screen,
+   each after a cell that separates the columns: 26 cells. Returns the
+   address behind them. */
+u16 *SzDtTm(const struct WCBdef __far *wcb, const struct FILENT __far *file,
+            u16 *screen, u16 color)
 {
     screen = PutGap(screen, color);
-    screen = PutSize(file, screen, color);
+    screen = PutSize(wcb, file, screen, color);
     screen = PutGap(screen, color);
     screen = PutDat0(file, screen, color);
     screen = PutGap(screen, color);

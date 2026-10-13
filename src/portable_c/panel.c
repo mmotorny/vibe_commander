@@ -301,7 +301,7 @@ void PutFls(u16 panel)
 
         place += 0x100;
         if (wcb->BrfFul != 0) {
-            SzDtTm(file, screen, color);
+            SzDtTm(wcb, file, screen, color);
         } else if ((u8)(place >> 8) >= bottom) {
             place -= (lines & 0xFF) << 8;
             place = ADD_LOW(place, 13);
@@ -334,7 +334,7 @@ void PutFls(u16 panel)
     if (count == 0) {
         file = ENTRY(wcb, wcb->CurAdr);
         MovDz0(screen, file->NameF);
-        SzDtTm(file, screen + 12, color);
+        SzDtTm(wcb, file, screen + 12, color);
         return;
     }
 

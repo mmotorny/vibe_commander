@@ -699,7 +699,8 @@ void PathLin(u8 __far *text);
 void LetLin(u8 __far *text);
 void ShrtLin(u8 __far *text, u16 limit);
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */
-u16 *SzDtTm(const struct FILENT __far *file, u16 *screen, u16 color);
+u16 *SzDtTm(const struct WCBdef __far *wcb, const struct FILENT __far *file,
+            u16 *screen, u16 color);
 void SetMask(u16 panel);                                /* files.c */
 void Sort(u16 panel);
 u16 FnFile(u16 panel, const u8 __far *name);
@@ -1524,9 +1525,6 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    by it. */
 #define DOS_AT(segment, offset) \
     ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-
-/* The panel that a file entry belongs to. */
-#define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))
 
 /* Where in a panel's segment its list of files begins, DskBuf, and where
    in the main data the list of the tree's directories, TreeBuf.TreList.

@@ -2112,6 +2112,11 @@ in "The portable C".
     the offset and in a macro between. One thing was not: the
     difference of two far pointers written out where `(u16)(u32)` took
     the offset, which is why `OFFSET_IN_SEG` is a word.
+  - What a far pointer says beyond its address is lost where the
+    memory is flat, and no second body gets it back: `WCB_OF` took the
+    panel from the segment of a pointer to one of its files. Such a
+    thing is handed on as an argument, which is other code in 16 bits
+    too, and the scenarios judge it, not the bytes.
   - A second body is read by nothing but the compilers until the
     program runs in 32 bits. To try one, a file of a few lines that
     includes `vc.h`, has gcc take it for this computer, defines `md`

@@ -634,19 +634,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 196,998 bytes |
+| `VC.EXE` | 197,030 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 63,942 bytes |
+| more than the C translation's 133,056 bytes | 63,974 bytes |
 | The relocations in its header, which DOS applies | 1,029 |
-| What it keeps of the memory while a command runs: the program and its panels | 206,640 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,896 bytes |
-| The code segment `CTEXT` ends at | D322h, 7,390 bytes below the limit, F000h |
+| What it keeps of the memory while a command runs: the program and its panels | 206,672 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,864 bytes |
+| The code segment `CTEXT` ends at | D342h, 7,358 bytes below the limit, F000h |
 | The code segment `CTEXT2` ends at | C534h, 10,956 bytes below the limit, F000h |
 | Inline assembly | 49 instructions in 9 pieces: 37 in 7 of `dos.c`, 12 in 2 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 751, 62, 262, 96 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 753, 62, 262, 96 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->

@@ -28,10 +28,10 @@ extfile.c     to-number 2, to-pointer 1
 files.c       to-number 1
 find.c        to-number 3
 find_t.c      clean
-format.c      to-number 1
+format.c      clean
 help.c        to-number 4
 help_t.c      clean
-info.c        to-number 6
+info.c        to-number 4
 input.c       to-number 2
 keys.c        clean
 keys_t.c      clean

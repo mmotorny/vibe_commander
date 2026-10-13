@@ -2121,7 +2121,7 @@ That is 737 places that change by a definition (286 of T, 148 of P,
 macro makes), 207 by hand, on some 190 lines (147 of N on 138 lines,
 14 of R on 7, the 40 of T, 2 of P, 3 of V, 1 of G), and the 96 of DOS.
 After P1 the host check was to count some 310 of the 1,040, since gcc
-reads the second bodies, which cast nothing. It counts 252: "P1, the
+reads the second bodies, which cast nothing. It counts 249: "P1, the
 words in one place: done" below says why it is fewer. When P2, P3
 and S3 have landed it counts those of `dos.c` and no others. So its
 record says how far the preparation is, file by file, and a file that
@@ -2569,7 +2569,10 @@ files did, and a body for a flat memory, with what that body takes for
 granted written at it. The files have lost their own: 41 definitions
 out of 23 files, 20 of `OFFSET`, 13 of `AT`, 4 of `NEAR`, 2 of
 `MAIN_DATA` and 2 of `SEGMENT`, and 30 lines of code were changed by
-hand. `build/portable_c/VC.EXE` is the same bytes as before it.
+hand. `build/portable_c/VC.EXE` was the same bytes with all of that.
+The one thing that could not leave them alone is a commit of its own,
+the panel that was found in the segment of a pointer: see `WCB_OF`
+below.
 
 Nothing runs the second bodies. They compile: every file but `arith.c`
 and `dos.c` under `wcc386 -3r -mf -os -s -zl -zls -wx -we`, with
@@ -2632,21 +2635,36 @@ What is otherwise than the plan had it:
   entry for `misc.c` and `Title_S` wants the file to name the constant,
   and the C translation has the same entry.
 
-The host check counts 252 places where it counted 1,040. The plan
-thought 310 with the two of `WCB_OF` left, and the 58 between are 24 of
-P3 and 34 of DOS that the check sees no more, with one more and one
-fewer by the way:
+The host check counts 249 places where it counted 1,040. The plan
+thought some 310, which is 308 by its own counts, and the 59 between
+are 24 of P3 and 34 of DOS that the check sees no more, two of N that
+went with the lines they stood on, less one that the plan's sorting
+had in a class that went:
 
 | Class | Was | Is | What went, and what is left |
 |---|---|---|---|
 | T | 326 | 16 | All that goes through `OFFSET` and `AT`. Left are the 16 of `WORD` in `dialog.c`. The plan had 40 for P3, and thought them all left: what they are besides those 16 goes through `AT`, `FIELD` and `WORD_AT` and went from the count with the rest, 25 places of `dialog.c`, 8 of `main.c` and 3 of `stcolor.c`. Those of them that read a pointer out of a table as a word are as much P3's as they were, with nothing counting them |
-| N | 210 | 171 | The 38 of `TRELIST`, which leave `place.c` clean, and the one of `bars.c`, whose line was changed for its segment |
-| P | 150 | 2 | `PANEL`. The two of `WCB_OF` are left: see below |
+| N | 210 | 170 | The 38 of `TRELIST`, which leave `place.c` clean; the one of `bars.c`, whose line was changed for its segment; and the one of `info.c` that is no place of the main data but the offset of a file in its panel, on the line of `WCB_OF` |
+| P | 150 | 0 | `PANEL`, and the two of `WCB_OF`: see below |
 | R | 108 | 0 | |
 | M | 105 | 0 | |
 | V | 39 | 0 | One of them was the environment, in `resident.c`, and is among D now |
 | G | 6 | 0 | |
 | D | 96 | 63 | 30 of `dos.c`, which names `MAIN_SEG` and is read with the constant: it has 39. And 4 outside it for the same reason, the block that a program is run with, `(u32)MAIN_SEG << 16 | ...` in `resident.c`, `view.c` and twice in `start.c`: the two of `start.c` are counted nowhere now, and are S1's all the same |
+
+`WCB_OF(file)` was the panel that a file's entry is in: the segment of
+the pointer to the entry, with the offset 0. A pointer has no segment
+in a flat memory, and a panel is as long as its list of files, so the
+address says nothing of where the panel begins: the panel has to be
+handed on, as the plan said. It had two places. `PutSize` of `format.c`
+asked whether the sizes of directories had been worked out, and now
+takes the panel from `SzDtTm`, which takes it from its two callers in
+`panel.c`, both of which have it. And the Info panel's loop over the
+other panel's files has `PANEL(other)`, with `OFFSET_IN_SEG(other,
+file)` for where it is in the list. That is other code, one more word
+on the stack of a call and a segment loaded from the number: `VC.EXE`
+is 32 bytes longer, and what decided was the scenarios, all of which
+pass.
 
 So a file that is clean in the record is one that makes no pointer of a
 number outside the words. It is not thereby right in 32 bits: gcc has
@@ -2671,7 +2689,7 @@ the same bytes, and was taken back where it is another piece's.
 | P2 | The same, to something that is no byte | `((struct DIRENT *)md.TreAdr)->DirLevel`, `*(u16 *)starts = line.at` | `((struct DIRENT *)MD_POINTER(md.TreAdr))->DirLevel`, `*(u16 *)MD_POINTER(starts) = line.at` |
 | P2 | What a routine returns far, kept as a place | `(u16)(u32)MvzLine(md.MenuBuf, tried + 2, 13)`, `(u16)NEAR(CutPath(CpSrc))` | `MD_PLACE(NEAR(MvzLine(md.MenuBuf, tried + 2, 13)))`, `MD_PLACE(NEAR(CutPath(CpSrc)))` |
 | P2 | A place worked out | `(u16)md.TmpBuf - 2`, `*(u16 *)(u16)(TRELIST + count)` | `MD_PLACE(md.TmpBuf) - 2`, `*(u16 *)MD_POINTER(TRELIST + count)`: the sum is made in the number, inside the word, where it wraps round as on DOS |
-| P2 | A pointer into a panel taken for its offset: no place of the main data | `(u16)(u32)file` | `OFFSET_IN_SEG(panel, file)`, with the segment that the pointer was made with. The difference of two far pointers, written out, is other bytes |
+| P2 | A pointer into a panel taken for its offset: no place of the main data | `(u16)(u32)file` | `OFFSET_IN_SEG(panel, file)`, with the segment that the pointer was made with: `PutInf` of `info.c` has it. The difference of two far pointers, written out, is other bytes |
 | P1 | A far pointer kept as a near one | `to = (u8 *)(u16)(u32)AddFile(to - 1)` | `to = NEAR(AddFile(to - 1))` |
 | P1 | A segment and an offset with a shift | `(const u8 __far *)((u32)segment << 16 \| at)` | `AT(segment, at)` |
 | P1 | The segment of the main data, worked out | `SEGMENT(&md)`, `MAIN_DATA()` | `MAIN_SEG` |
