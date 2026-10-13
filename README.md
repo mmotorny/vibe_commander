@@ -1360,7 +1360,8 @@ which scenarios are not run for it at all is in
 `harness/deviations.py`, under `TREES`, as
 `src/portable_c/DEVIATIONS.md` declares it; a patch names the entries
 of that file which it is of, and the test fails for an entry that does
-not name the scenario.
+not name the scenario, and for a scenario that is not run and that no
+entry names.
 
 Two more deviations show on no screen, and are listed in the same file.
 When the original tries again to load itself after a command, it stores a

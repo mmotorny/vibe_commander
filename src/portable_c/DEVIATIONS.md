@@ -44,7 +44,8 @@ where its rows come from and not what makes them right: its author reads
 every row against the entry here, fills in the header and commits it, and
 the tests then hold the program to the patch, not to another run. A patch
 names the entries here that it is of, and each of those entries has to name
-the scenario: the test `portable_c-scenarios` fails otherwise.
+the scenario: the test `portable_c-scenarios` fails otherwise. It fails too
+for a scenario that is not run and that no entry here names.
 
 ## The deviations
 

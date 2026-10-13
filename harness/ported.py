@@ -1866,16 +1866,37 @@ def check_record(program, names, outcomes, write=False):
 def check_declared(tree, names):
     """Report on what the tree `tree` is declared to do otherwise than
     the original, of which `names` are the scenarios it was taken
-    through; return success. A patch has to be of a scenario that the
-    tree is taken through, and its header to name entries of the tree's
-    DEVIATIONS.md that name the scenario; that it fits its golden was
-    seen before anything was run (compare.compare)."""
+    through; return success. A scenario that is not run for the tree has
+    to be one, and an entry of the tree's DEVIATIONS.md has to name it;
+    and where the tree is another build of a tree's source, a scenario
+    that is not run for the build by an entry of its own has to be one
+    that the tree of its source is taken through. A patch has to be of
+    a scenario that the tree is taken through, and its header to name
+    entries of the tree's DEVIATIONS.md that name the scenario; that it
+    fits its golden was seen before anything was run
+    (compare.compare)."""
     declared = deviations.declared(tree)
+    of_source = deviations.declared(deviations.source(tree))
+    document = f"src/{deviations.source(tree)}/DEVIATIONS.md"
+    entries = deviation_entries(tree)
     passed = True
-    for name in sorted(declared.not_run):
+    for name, why in sorted(declared.not_run.items()):
         if name not in scenarios.SCENARIOS:
             passed = False
             print(f"  declared for {tree}, and no scenario: {name}")
+        elif not any(f"`{name}`" in entry for entry in entries.values()):
+            passed = False
+            print(f"  not run for {tree}, and no entry of {document} names "
+                  f"the scenario, as `{name}`: what is not run is "
+                  "declared there, or is run")
+        elif why != of_source.not_run.get(name, why):
+            # Declared.also() has put the build's reason in the place of
+            # the one that the tree of its source has.
+            passed = False
+            print(f"  not run for {tree} by an entry of its own, and "
+                  f"{deviations.source(tree)} is not taken through {name} "
+                  f"either: the entry of {tree} says nothing more, and is "
+                  "to go from deviations.py")
     every = {step for scenario in scenarios.SCENARIOS.values()
              for step in scenario.steps}
     for step, (instead, _) in declared.in_place_of.items():
@@ -1919,7 +1940,6 @@ def check_declared(tree, names):
                       f"steps in place of some that {name} has not one "
                       f"behind the other: {', '.join(some)}")
     patched = {}
-    entries = deviation_entries(tree)
     for file in goldens.patches(tree):
         name = file.stem
         if file.suffix != ".patch" or name not in names:
@@ -1933,8 +1953,7 @@ def check_declared(tree, names):
             if f"`{name}`" not in entries.get(number, ""):
                 passed = False
                 print(f"  {goldens.shown(file)} says that it is of "
-                      f"deviation {number}, and "
-                      f"src/{deviations.source(tree)}/DEVIATIONS.md "
+                      f"deviation {number}, and {document} "
                       + ("does not name the scenario there, as "
                          f"`{name}`" if number in entries else
                          "has no such entry"))

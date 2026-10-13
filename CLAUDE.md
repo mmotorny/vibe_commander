@@ -1388,7 +1388,8 @@ in "The portable C".
   harness, in three tables that each fail the test for an entry that
   no longer applies:
   - `TREES` of `harness/deviations.py`: the scenarios that are not run
-    for the tree; a step that is left out of every scenario for it,
+    for the tree, each of which an entry of `DEVIATIONS.md` has to name,
+    as `` `NAME` ``; a step that is left out of every scenario for it,
     where the keys choose something that is gone, or steps of one
     scenario; a step that the tree is taken through in place of
     another, in every scenario or in one; and a rule for what is
