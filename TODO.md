@@ -2578,6 +2578,11 @@ without waiting.
 
 To be asked when the work reaches them, and not before.
 
+What differs in the program of 32 bits from the original, declared or
+not, is in one list for the user, with the ways for each: "The program
+of 32 bits: what differs from the original, for the user", behind this
+plan. 9 below is its first row.
+
 | | What | When, and what is thought of it |
 |---|---|---|
 | 3 | What deviation 1 says, the program staying in the memory whole, once the program is above the megabyte and a second copy has the memory to run again. That moves toward the original. `second-copy`, `start-memory` and `ended` have patches that say a second copy has none | **Decided, on 13 October 2026** (`CLAUDE.md`, "The portable C"): where the program of 32 bits does again what the original does, it is held to the original's golden, and the deviation says only what still differs. Done by C2 for `second-copy` and `start-memory`, each with a patch of the 32-bit build's own; `ended` passes since E, with the 16-bit program's patch |
@@ -6746,6 +6751,111 @@ the user asks.
   flat program yet (H2), nor of its copies.
 - `ended` passes since E, which landed beside this piece, with the
   16-bit program's patch: "E, the end by another's hand" above.
+
+## The program of 32 bits: what differs from the original, for the user
+
+Collected by the piece W on 13 October 2026, at `1eb233c`, from what the
+pieces of the plan above wrote down as otherwise in the program of 32
+bits or left "for W": H3, D1, D2, C1, C2, "E, the end by another's
+hand", the trial on the bench, and "The editor's room: untested in the
+program of 32 bits". Each thing was held against
+`src/portable_c/DEVIATIONS.md` for whether it is declared, and one was
+found while the list was made, 2.
+
+The user's word of that day is that a deviation of the program of 32
+bits from the original is decided by the user, one at a time, and that
+nothing gives leave to remove or break a feature of the original
+without asking. So this list declares nothing, and no line of
+`DEVIATIONS.md` was written for it. It is what there is to decide.
+
+What the portable C does otherwise than the original in both of its
+builds is not here: `DEVIATIONS.md` has that. A row is here where the
+program of 32 bits does otherwise than the original and the entries, as
+they say it of both builds, do not cover it, or cover it only since a
+piece of today wrote it in. "16 bits" is `build/portable_c/VC.EXE`, "32
+bits" `build/portable_c32/VC.EXE`. Of the ways in the last column the
+first is the one that W would take.
+
+**What a user can meet.**
+
+| | What | The original | 16 bits | 32 bits | A scenario shows it | Declared | The ways |
+|---|---|---|---|---|---|---|---|
+| 1 | The memory above the megabyte while a command runs | Takes none of it: a command has all, 15,232K by the BIOS on the bench, and 14,978K free with an XMS driver | The same | The extender has all of it, and INT 15h: a command is told 0 by 88h and refused at E801h and E820h, and with an XMS driver 0K are free. A program with DOS/32A gets memory all the same, a second copy among them; one with another extender, a cache or a RAM disk would find none, which is from reading and was not tried | `command`, in what `mem` prints: 128K more of extended and of total memory. It fails, and is off the record | No. Entry 1 says that it is not declared; 9 of what is open in the plan | (a) The extender held to what the program and one copy of it need, 2 MB, by four bytes of its settings in `tools/stub.c`: seen by C2 on a copy of the file, a command then has 12,930K by XMS and 13,184K by 88h. It costs: the program then runs at the top of the memory, so `le.BENCH` and `behind()` of the harness are found anew and the six scenarios with a second copy run again; a third copy has no room and the extender says so in its own words; and `command` still shows other figures, E801h and E820h being refused, which wants a patch of this build's own. Half a day. (b) Declared as it is, with a patch of `command` for the two rows. Small. (c) Left open until the 16-bit build is to go, `command` failing meanwhile, which is how it stands |
+| 2 | A program that stays in the memory and takes interrupts, run from the program, when the program is then left. Found by W: see below | Keeps a list of such programs and releases each when it is left: its memory is free and its interrupts are back. Seen: FDAPM, run from it as `fdapm apmdos`, is gone afterwards | By entry 7 nothing is released: the program is in the memory afterwards and goes on working, as when it was run from DOS's command line. Seen: `fdapm stats` finds it | The program stays in the memory, but the extender, as it leaves, puts every interrupt of real mode back to where it went when the program was started, and writes a line for each onto the screen that is left: four of "DOS/32A warning (9003): real mode interrupt vector has been modified: INT 16h", 28h, 2Ah and 2Fh. The resident program is cut off from its interrupts and keeps its memory: `fdapm stats` says that none is resident | None: no scenario leaves the program behind such a one | No. Entry 7 says "as it is when it was run from DOS's own command line", which is not so of this build | (a) One bit of the extender's settings cleared in `tools/stub.c`, bit 4 of the byte 14h behind `ID32`: seen once on a copy of the file, the extender then writes nothing and leaves the interrupts alone, and FDAPM answers afterwards as in 16 bits. It is then to be held anew what E and D2 rest on of the extender putting interrupts back: `ended` and the table of `harness/trial32/ended.asm`, where INT 1Bh would no longer be given back, which is what the original does (8 below); INT 22h behind a program run; the three interrupts at `ProgramEnd`; `both.py`; the whole suite. A scenario for it would be new, with a golden of the original in which the program is released, and a patch by 7. Half a day. (b) Declared as it is, a sentence in 7. (c) The lines alone silenced, bit 0 or bit 3 of the same byte, seen: no line, and the program cut off all the same. That hides it and mends nothing |
+| 3 | A second copy of the program, started from the first with a command to run | Runs the command. In `start-memory` the command stays in the memory with nearly all of DOS's, and the copy cannot get its data back: "Program too big to fit in memory", and it ends | Has no memory for the command and says so; in `start-memory` it is still there afterwards | Runs the command, as the original. In `start-memory` it needs none of DOS's memory to come back, says nothing and is still there | `second-copy`, which is the original's but for the name; `start-memory`, by a patch of this build's own | Yes: entry 1, "The program of 32 bits", on the user's word of 13 October 2026 that it is held to the original where it does again what the original does | Nothing to decide. What `start-memory` still shows otherwise follows from the memory being the program's own (5) |
+| 4 | `ended`: the program that the second copy leaves in the memory before DOS ends the copy | Runs it, and releases it when DOS ends the copy | Has no memory to run it | Runs it; it stays in the memory, 448 bytes, by entry 7 | No screen: the program that started the copy clears it. Seen by `mem /c` typed behind the steps | Yes: the row of `ended` in entry 1 | Nothing to decide |
+| 5 | The room of the editor, which is also what a copy reads into | 345,840 bytes on the bench: a file of 381,338 is refused with a box | 291,360 | 641,824, of the 640 KB of the program's own: it opens that file | `editor-big`, which is not run for this build. `editor-full` and `copy-big` pass and no longer get to their point: the editor is never full, and the file is read in one part | Yes: entry 13, on the user's word, which names the two scenarios too | Decided. What is still open is what goes untested, and each way is asked first: (a) `editor-big` run for this build with its five steps at the file left out, which was tried and passes, and tests again all but the box for a file that fits; small. (b) A scenario of its own with a file that no build has room for; a new golden. (c) `editor-full` and `copy-big` made longer; two goldens derived anew, every tree taken through more steps. W would take (a) now and leave (b) and (c) until step 2 of the road, when the memory is the extender's and every one of these numbers is another |
+| 6 | The program cannot start | Too little memory: "Program too big to fit in memory", and it ends with 1. A DOS before 3 it leaves without a word, and one before 3.20 with a line of its own. It runs on any PC | The same | Without the 512 bytes below the megabyte that the system's functions keep: the same words, by DOS, and it ends with 8. Without a 386, without the memory above the megabyte that it wants, some 900 KB, the extender does not start it and says so in words of its own: "DOS/32A fatal (4003): not enough extended memory to load application exec" was seen, of a copy. On a DOS before 3 the extender does not start either, by a comment of `dos32.c`; no bench has one | None | In part: entry 1 has the words, the 512 bytes and the extender's words for too little memory. That it wants a 386, and the 8, are said nowhere | (a) A sentence in entry 1 for the 386, a DOS before 3 and the 8; the words stay. Nothing can be mended where the program does not run yet, and the road names the extender. (b) Other words for the case of the 512 bytes, which D2 left as the user's: `NoStart_S` of `dos32.c` is the one place |
+
+**What only DOS, the machine or another program sees.** No screen of
+the program shows any of these, and no scenario does.
+
+| | What | The original | 16 bits | 32 bits | Declared | The ways |
+|---|---|---|---|---|---|---|
+| 7 | What the extender is in the machine while the program runs, a command of it included | Nothing: a program of real mode, a part of which stays in the memory while a command runs | A program of real mode, all of it in the memory while a command runs, by entry 1 | The extender's part of real mode, 51,696 bytes below the megabyte, and 512 bytes more that the system's functions keep there; INT 21h of real mode goes to the extender, and INT 15h (1); the timer's counter 0 is set anew when it starts, to mode 3 where the BIOS has mode 2; the line A20 is left on; the program runs at privilege level 0; and the program's idle call, INT 28h, comes from the extender, on a stack of its own, with DS and ES 0 | In part: entry 1 has the 52 KB and the 512 bytes | (a) A sentence in entry 1: it is what an extender is, and the road names this one. Nothing to mend |
+| 8 | When DOS ends the program by another program's hand | Releases what it has on its list, tells DOS to look for Ctrl-C as before, and leaves registers for the program that started it. Ctrl-Break, INT 1Bh, is never given back and goes into memory that is free from then on; INT 22h goes into the ended program | DOS told and the registers left, as entries 7 and 8 have them; INT 1Bh and 22h as the original | DOS told and the registers left as in 16 bits, by the routine of real mode that the user decided for (E). But INT 1Bh is given back, by the extender, before DOS sees the call; INT 22h goes into the block below the megabyte, which DOS has freed, as the ended program is in 16 bits; and at the routine's call 3301h DH, DS and the registers that the call does not read are as they came from the program that started this one, which is what the original hands DOS there, where 16 bits has DH 0 and DS on the main data | No: the row of `ended` in entry 1 and entry 8 say what is the same | (a) A sentence in entry 8: the program of 32 bits leaves the machine with less astray than the original does, and making INT 1Bh point into free memory would be breaking the machine on purpose. If 2 is mended by its way (a), this is to be seen again, and may be the original's |
+| 9 | The registers that a call of DOS or the BIOS does not read: entry 6 | As the code before left them | By entry 6: 0 in AL and in the half of BX that is not taken; DS on the main data; elsewhere 0 or what the stack holds, "as it comes" in the rows of its table | 0 in every register that a call does not take, at every call. DS and ES of real mode are the extender's, 0 at the idle call where the trial looked, or on the block below the megabyte at the thirteen functions that are made in real mode. The carry flag is clear at the two calls that the original makes with it set, 36h and 13h, and counted as set afterwards, which is the same for a DOS that leaves it. At 4Bh the environment is named, where the original and 16 bits name none and DOS copies the program's own: the same environment, since the word of the PSP through which DOS would find it is a selector of the extender's; and CX, SI and DI are 0 | No: entry 6 is of the program of 16 bits, and D2 and E left its sentence for 32 bits to W | (a) A paragraph in entry 6, with no table: it is the entry's own rule, DOS handed nothing that it is not asked, kept more strictly. Nothing to mend |
+| 10 | Which calls DOS is asked, and in which order | | The original's, call for call: entry 6 says so | Fewer, and one more. Not asked: 51h, where the PSP is, the first call of 16 bits; 4Ah for the program's own block; 48h, 49h and 4Ah for the memory of the panels, the viewer and the editor, at the start and around every command, which are the program's own 640 KB; 35h and 25h for the critical error, Ctrl-Break and Ctrl-C, which are taken and given back through the extender, so that `ErrVct` and `BrkVct` of the main data are never written. More: 48h for the 512 bytes, when the program starts. And through the extender, where DOS does not see it: INT 22h read before a program is run and put back behind it, and the three interrupts given back when the program ends | In part: entry 1 has the 640 KB and the 512 bytes; the calls are said nowhere | (a) A paragraph in entry 6, which says of both builds that "the calls, their order and every register that a call takes are the original's": not so of this one. To mend it would be to take the memory from DOS, below the megabyte, which the session's choice 2 of the plan gave up and step 2 of the road changes again |
+| 11 | What DOS left in AX where a call did not fail, on a DOS that changes AX there | As DOS left it | As DOS left it | As DOS left it at the calls that are made in real mode for that reason, the search, the current directory, the attributes set. At the other calls that the extender translates, 39h, 3Ah, 3Bh, 41h, 4300h, 56h, it may be the AX that the call was made with: FreeDOS leaves AX alone there, so the bench cannot tell | No | Nothing to decide today: not known to differ on any DOS. Written here so that it is not lost |
+| 12 | Memory that the program reads before it has written it | What the last program left in DOS's block | The same | Zeros, in the 640 KB of its own | No | Nothing to decide: no place is known where it shows, and every scenario that passes went by it |
+
+**Not a difference of the program.** A wait costs more of the host's
+time while the program of 32 bits idles, `blank-timed` above all: that
+is the bench's, another piece has it, and no screen differs for it. The
+stack is 16,384 bytes where 16 bits has 4,096, and a critical error
+goes 512 bytes deeper on it: the test holds half of it free as for
+every tree, and H3 saw 14,790 bytes left at the least. Hosts that the
+bench has not, EMM386 and a DOS box of Windows, where the extender goes
+into protected mode another way, were tried by no piece.
+
+**How 2 was found, and seen.** D2 has the extender's warning for an
+interrupt of real mode that is not as it was when the program ends, and
+put INT 22h and the program's own three back for it. A program that
+stays in the memory and takes interrupts leaves others changed, and the
+bench has one, FDAPM, which the scenarios of the map of the memory ran
+for the original. The same three steps for each program, `python3
+harness/show.py --last --program FILE '"a:\freedos\bin\fdapm" Space
+"apmdos" Enter' 'F10 Enter' '"a:\freedos\bin\fdapm" Space "stats"
+Enter'`, and what DOS's screen has behind them:
+
+| Program | Behind `fdapm apmdos`, when the program has been left | `fdapm stats` |
+|---|---|---|
+| The original | Nothing | "No FDAPM / POWER driver resident yet." |
+| 16 bits | Nothing | "Found resident FDAPM / POWER driver version 1.0", and what it has saved |
+| 32 bits | Four lines of the extender's warning, for INT 16h, 28h, 2Ah and 2Fh | "No FDAPM / POWER driver resident yet." |
+| 32 bits, bit 0 of the settings' byte 15h cleared | The four lines | The same |
+| 32 bits, bit 0 or bit 3 of the byte 14h cleared | Nothing | The same |
+| 32 bits, bit 1, 2 or 5 of the byte 14h cleared | The four lines | The same |
+| 32 bits, bit 4 of the byte 14h cleared | An empty line of DOS's prompt, which was not looked into | "Found resident FDAPM / POWER driver version 1.0", as in 16 bits |
+
+The byte 14h of the block of settings is 3Fh as the stub comes, and
+`tools/stub.c` knows only the banner's bit of the byte behind it. Each
+of its six bits was cleared in a copy of the program, in a directory
+named as the tree is, and the copy run once; nothing was kept, and
+nothing but those three steps was run with any of them. So the original
+and the program of 32 bits leave the resident program cut off, the
+first by releasing it and the second with its memory still taken and
+four lines on the screen, and the program of 16 bits leaves it at
+work, which is what entry 7 declares.
+
+**Whose these are.**
+
+- The user's, and not decided: 1, which is 9 of what is open in the
+  plan; 2, which is new; the sentences of 6, 7, 8, 9 and 10, each of
+  which says of the program of 32 bits something that no entry says
+  today; and of 5 the three ways to test again what goes untested.
+- Covered by a decision that is written down: 3 and 4, by the user's
+  word on a second copy (`CLAUDE.md`, "The portable C", and entry 1); 5
+  itself, by entry 13; the routine of 8, by the user's word on a
+  program ended by another's hand; that the extender is DOS/32A and
+  that the file is held to no length, by the road.
+- Nothing to decide: 11 and 12.
+
+What W writes when these are decided: for each way (a) that is a
+sentence, the sentence, in the entry named; for 1 and 2 by their ways
+(a), a piece each, with the cost that the row has. Entry 6 has no word
+of the program of 32 bits until 9 and 10 are decided, and entry 7 none
+of 2.
 
 ## The portable C in 32 bits: what a trial on the bench showed
 
