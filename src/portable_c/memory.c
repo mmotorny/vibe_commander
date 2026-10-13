@@ -570,7 +570,7 @@ void F65_00(void)
     u16 buttons, mouse, pressed, last;
     u16 programs, program, release;
     u16 *screen;
-    u32 pair;
+    struct Buttons menu;
     struct Paged paged;
     struct Mouse pointer;
 
@@ -686,12 +686,12 @@ F65_48:                                 /* Input */
     md.WinMous = 0;
     md.MousEnt = 0;
 F65_49:
-    pair = MinMnu(OFFSET(Memo_D),
+    menu = MinMnu(OFFSET(Memo_D),
                   (u16)(u8)((begin >> 8) + (size >> 8) - 4) << 8
                   | (u8)(begin + 25),
                   0x118, OFFSET(Memo1_P), 1, MemMenu);
-    MemMenu = (u8)HIGH(pair);
-    key = LOW(pair);
+    MemMenu = (u8)menu.chosen;
+    key = menu.key;
     cursor = MemCur;
     first = MemFrst;
     if (key >> 8 == KEY_MOUSE)

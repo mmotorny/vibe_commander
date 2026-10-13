@@ -20,15 +20,21 @@
 /* A line ends with a carriage return and a line feed, in either order. */
 #define IS_CRLF(pair) ((pair) == 0x0D0A || (pair) == 0x0A0D)
 
-/* Where FndItem stopped, the offset in the low word, and 1 in the high
-   one if that is the end of the file. */
-#define ITEM(end, file) ((u32)(end) << 16 | (u16)(u32)(file))
+/* Where FndItem stopped, and whether that is the end of the file. */
+static struct Entry Found(u16 end, const u8 __far *file)
+{
+    struct Entry entry;
+
+    entry.at = (u16)(u32)file;
+    entry.end = end;
+    return entry;
+}
 
 /* Go to the entry at `file` or the next one behind it; with `rest`, to
    the next one behind the line that `file` is in. At the end of the file
    the place returned is that of the byte 1Ah if an entry was looked for
    there, and one behind it if a line was being skipped. */
-static u32 Item(const u8 __far *file, u16 rest)
+static struct Entry Item(const u8 __far *file, u16 rest)
 {
     u16 pair, c;
 
@@ -37,7 +43,7 @@ static u32 Item(const u8 __far *file, u16 rest)
             pair = *(const u16 __far *)file;
             c = pair & 0xFF;
             if (c != ' ' && c != '\t' && c != '\'' && !IS_CRLF(pair))
-                return ITEM(c == EOF_CHAR, file);
+                return Found(c == EOF_CHAR, file);
         }
         rest = 0;
         for (;;) {                      /* FndIt1: to the end of the line */
@@ -48,13 +54,13 @@ static u32 Item(const u8 __far *file, u16 rest)
             }
             file++;
             if ((pair & 0xFF) == EOF_CHAR)
-                return ITEM(1, file);
+                return Found(1, file);
         }
     }
 }
 
 /* The entry at `file`, or the first one behind it: see Item. */
-u32 FndItem(const u8 __far *file)
+struct Entry FndItem(const u8 __far *file)
 {
     return Item(file, 0);
 }
@@ -68,7 +74,7 @@ u16 FindExt(const u8 __far *name)
     const u8 *file;
     const u8 *wanted;
     u16 count, pair;
-    u32 item;
+    struct Entry item;
     u8 c;
 
     do
@@ -86,9 +92,9 @@ u16 FindExt(const u8 __far *name)
     }
     item = FndItem(md.MenuBuf);
     for (;;) {
-        if ((u16)(item >> 16) != 0)
+        if (item.end != 0)
             return 0;
-        file = (const u8 *)(u16)item;
+        file = (const u8 *)item.at;
         wanted = md.TmpErr;             /* FnEx05 */
         count = 3;
         for (;;) {

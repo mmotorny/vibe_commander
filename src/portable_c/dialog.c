@@ -438,17 +438,20 @@ MnMn16:
 }
 
 /* MnMn10, for a menu that is not MinMnu's: see MnMn11. `item` is what
-   that has in `*state`. Returns the key in the low word, the button
-   chosen in the next byte, and something that is not 0 in the highest
-   byte if the buttons have dealt with the key. `size` is not read: the
-   assembly did not read it either. */
-u32 MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table)
+   that has in `*state`. Returns the key, the button chosen, and whether
+   the buttons have dealt with the key. `size` is not read: the assembly
+   did not read it either. */
+struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table)
 {
+    struct Taken taken;
     u32 pair;
 
     (void)size;
     pair = MnMn11(key, place, (u16 STACK *)&item, table, AsmSeg());
-    return LOW(pair) | (u32)(HIGH(pair) << 8 | item & 0xFF) << 16;
+    taken.key = LOW(pair);
+    taken.button = (u8)item;
+    taken.taken = (u8)HIGH(pair);
+    return taken;
 }
 
 /* A line of buttons: have the buttons at `control`, which take `size` at
@@ -456,10 +459,12 @@ u32 MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table)
    assembly has three numbers of colours: of the line, of the button
    chosen while it takes keys, and of the button chosen when it is left.
    `keys` is the key bar, with 80h for a field of a dialog, and `item` the
-   button chosen. Returns the key, and in the high word the button chosen,
-   with `keys` in its high byte, or 0 there for the letter of a button. */
-u32 MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys, u16 item)
+   button chosen. Returns the key, and the button chosen, with `keys` in
+   the high byte of that, or 0 there for the letter of a button. */
+struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
+                      u16 item)
 {
+    struct Buttons buttons;
     u16 code = AsmSeg();
     const u8 __far *color = AT(code, colors);
     u16 state = (keys & 0xFF) << 8 | item & 0xFF;
@@ -479,7 +484,9 @@ u32 MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys, u16 item)
                    control);
         break;
     }
-    return key | (u32)state << 16;
+    buttons.key = key;
+    buttons.chosen = state;
+    return buttons;
 }
 
 /* A line to type into: `text`, in the main data, of `length` characters
@@ -558,7 +565,7 @@ static u32 InpStr(u16 place, u8 *text, u16 cursor, u16 length, u16 color,
                 text[0] = 0;
         }
 InSt04:
-        cursor = (u16)EdLin(key, text, cursor, length);
+        cursor = EdLin(key, text, cursor, length).cursor;
     }
 InSt08:
     return key | (u32)cursor << 16;
@@ -752,6 +759,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     u16 *screen;
     struct Box where;
     u32 pair;
+    struct Buttons menu;
     struct Mouse pointer;
     u16 first = box + sizeof(struct BOXHD);
     u16 size = include;
@@ -843,10 +851,11 @@ Dial31:                                 /* the field of the cursor has the keys 
         pair = FlipFl(place, head->bKeyBar, MD(field->mPoint));
         MD(field->mPoint) = (u8)HIGH(pair);
     } else if (type == FIELD_BUTTONS) {
-        pair = MinMnu(WORD(field->mCtrl), Dial18(place, begin & 0xFF),
+        menu = MinMnu(WORD(field->mCtrl), Dial18(place, begin & 0xFF),
                       MnMn60(WORD(field->mCtrl), code), WORD(head->pDiBox),
                       head->bKeyBar | 0x80, MD(field->mPoint));
-        MD(field->mPoint) = (u8)HIGH(pair);
+        MD(field->mPoint) = (u8)menu.chosen;
+        pair = menu.key;
     } else
         pair = (begin & 0xFF) << 8 | type;
     key = LOW(pair);

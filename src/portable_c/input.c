@@ -80,11 +80,21 @@ u16 Rnd(void)
     return second;
 }
 
+/* What Input0 returns: a key, and whether it was clicked on the key
+   bar. */
+static struct Key Pressed(u16 key, u16 clicked)
+{
+    struct Key pressed;
+
+    pressed.key = key;
+    pressed.clicked = clicked;
+    return pressed;
+}
+
 /* Wait for a key with the key bar `bar` on the screen, of which only the
-   low byte counts, and return it. The high word is not 0 if the key was
-   clicked on the key bar with the mouse: the assembly has the carry flag
-   for that. */
-u32 Input0(u16 bar)
+   low byte counts, and return it, and whether the key was clicked on the
+   key bar with the mouse: the assembly has the carry flag for that. */
+struct Key Input0(u16 bar)
 {
     u16 ClkBuf[CLOCK_CELLS];            /* what the clock covers */
     u16 KbdFlgs;                        /* Shift, Ctrl, Alt and the locks */
@@ -256,7 +266,7 @@ Inpt40:
 Inpt41:
     *(u16 *)&md.AutoTim = 0xFFFF;
     if ((key & 0xFF00) != KEY_MOUSE || md.KeyBar == 0)
-        return key;
+        return Pressed(key, 0);
     /* A button of the mouse is down: on the key bar it is held for a
        key, the left one as the key is, the middle one with Shift and the
        right one with Alt. The bar shows what the keys are then, the
@@ -267,7 +277,7 @@ Inpt41:
     mouse = seen.place;
     key = KEY_MOUSE | buttons;
     if ((u8)((mouse >> 8) + 1) != md.Lines)
-        return key;
+        return Pressed(key, 0);
     column = mouse & 0xF8;              /* where the key begins: BL */
     held = 0;                           /* the buttons one round before:
                                            DH */
@@ -306,7 +316,7 @@ Inpt41:
                 key = KEY_F1;
             else
                 goto Inpt02;
-            return 0x10000UL | (u16)(key + (column >> 3 << 8));
+            return Pressed(key + (column >> 3 << 8), 1);
         }
         PutKey0(bar, i);                /* Inpt54 */
         held = buttons;
@@ -318,7 +328,7 @@ Inpt41:
             if ((*BasAdr((mouse & 0xFF00)
                          | column + 1 + (column >= 72 ? 1 : 0))
                  & 0xFF) == ' ')
-                return KEY_MOUSE | buttons;
+                return Pressed(KEY_MOUSE | buttons, 0);
             tracking = 1;
         }
     }
@@ -331,7 +341,7 @@ u16 Input(u16 bar)
     u16 key;
 
     for (;;) {
-        key = (u16)Input0(bar);
+        key = Input0(bar).key;
         if (key != KEY_F1)
             return key;
         Help00();
@@ -383,18 +393,35 @@ static u16 EdSub2(const u8 *line, u16 cursor)
     return cursor;
 }
 
+/* What EdLin returns: the cursor at a column, with the line or the
+   cursor changed, or neither. */
+static struct Edited Changed(u16 column)
+{
+    struct Edited edited;
+
+    edited.cursor = column;
+    edited.changed = 1;
+    return edited;
+}
+
+static struct Edited Unchanged(u16 column)
+{
+    struct Edited edited;
+
+    edited.cursor = column;
+    edited.changed = 0;
+    return edited;
+}
+
 /* Have a line that is typed into take a key: `text` is the line, in the
    main data, with room for `length` characters and a zero byte, and
    `cursor` the column of the cursor in it. Returns the column of the
-   cursor then, and 1 in the high word if the line or the cursor has
-   changed.
+   cursor then, and whether the line or the cursor has changed.
 
    Ctrl-Q has the next key typed as it is, whatever it does otherwise;
    Quote remembers that from one call to the next. */
-u32 EdLin(u16 key, u8 *text, u16 cursor, u16 length)
+struct Edited EdLin(u16 key, u8 *text, u16 cursor, u16 length)
 {
-#define CHANGED(column)   (0x10000UL | (u16)(column))
-#define UNCHANGED(column) ((u32)(u16)(column))
     u16 low = key & 0xFF;
     u16 from, count;
     u8 *to;
@@ -402,7 +429,7 @@ u32 EdLin(u16 key, u8 *text, u16 cursor, u16 length)
     if (md.Quote != 0) {                /* E00_03 */
         md.Quote = 0;
         if (low == 0)
-            return UNCHANGED(cursor);
+            return Unchanged(cursor);
         goto E00_01;
     }
     /* A key without a scan code is a character, and none of these. */
@@ -434,18 +461,18 @@ u32 EdLin(u16 key, u8 *text, u16 cursor, u16 length)
             case 0x14: goto E12_00;     /* Ctrl-T */
             case 0x11:                  /* Ctrl-Q */
                 md.Quote = 1;
-                return UNCHANGED(cursor);
+                return Unchanged(cursor);
             }
         }
         if (low < ' ')
-            return UNCHANGED(cursor);
+            return Unchanged(cursor);
     } else if (low == 0) {
-        return UNCHANGED(cursor);
+        return Unchanged(cursor);
     }
 E00_01:                                 /* a character */
     if (cursor >= length) {
         Beep();
-        return UNCHANGED(cursor);
+        return Unchanged(cursor);
     }
     to = text + length;
     for (count = length - cursor; count != 0; count--) {
@@ -454,43 +481,43 @@ E00_01:                                 /* a character */
     }
     text[length] = 0;
     text[cursor] = (u8)low;
-    return CHANGED(cursor + 1);
+    return Changed(cursor + 1);
 
 E01_00:                                 /* Left, Ctrl-S */
     if (cursor == 0)
-        return UNCHANGED(cursor);
-    return CHANGED(cursor - 1);
+        return Unchanged(cursor);
+    return Changed(cursor - 1);
 E02_00:                                 /* Right, Ctrl-D */
     if (text[cursor] == 0)
-        return UNCHANGED(cursor);
-    return CHANGED(cursor + 1);
+        return Unchanged(cursor);
+    return Changed(cursor + 1);
 E03_00:                                 /* Ctrl-Left, Ctrl-A */
-    return CHANGED(EdSub1(text, cursor));
+    return Changed(EdSub1(text, cursor));
 E04_00:                                 /* Ctrl-Right, Ctrl-F */
-    return CHANGED(EdSub2(text, cursor));
+    return Changed(EdSub2(text, cursor));
 E05_00:                                 /* Home */
-    return CHANGED(0);
+    return Changed(0);
 E06_00:                                 /* End: where the text ends, looked
                                            for in the line and one more */
     cursor = 0;
     for (count = length + 1; count != 0; count--)
         if (text[cursor++] == 0)
             break;
-    return CHANGED(cursor - 1);
+    return Changed(cursor - 1);
 E07_00:                                 /* Backspace */
     if (cursor == 0)
-        return UNCHANGED(cursor);
+        return Unchanged(cursor);
     cursor--;
 E08_00:                                 /* Del, Ctrl-G */
     if (text[cursor] == 0)
-        return UNCHANGED(cursor);
+        return Unchanged(cursor);
     from = cursor + 1;
     goto E00_05;
 E09_00:                                 /* Ctrl-Y: all of the line */
     cursor = 0;
 E10_00:                                 /* Ctrl-K: the rest of it */
     text[cursor] = 0;
-    return CHANGED(cursor);
+    return Changed(cursor);
 E11_00:                                 /* Ctrl-Backspace, Ctrl-W: back to
                                            where the word begins */
     from = cursor;
@@ -503,9 +530,7 @@ E00_05:                                 /* take out what is between */
     do
         *to++ = text[from];
     while (text[from++] != 0);
-    return CHANGED(cursor);
-#undef CHANGED
-#undef UNCHANGED
+    return Changed(cursor);
 }
 
 /* The speed search: look for the next name that begins with what has
@@ -535,7 +560,7 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key)
     for (i = 0; i < 15; i++)
         tried[i] = typed[i];
     if ((key & 0xFF) != 0x0A)
-        *(u16 *)tried = (u16)EdLin(key, tried + 2, *(u16 *)tried, 12);
+        *(u16 *)tried = EdLin(key, tried + 2, *(u16 *)tried, 12).cursor;
     length = (u16)(u32)MvzLine(md.MenuBuf, tried + 2, 13)
              - (u16)(u8 *)md.MenuBuf;
     PathLin(md.MenuBuf);

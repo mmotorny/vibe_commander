@@ -482,7 +482,7 @@ static u16 FndStuf(void)
    of Enter or of Esc: 0Dh or 1Bh. */
 static u16 FndBack(void)
 {
-    u32 answer;
+    struct Taken taken;
     struct Mouse pointer;
     u16 key, mode, place, size, menu, item, go;
 
@@ -513,12 +513,12 @@ static u16 FndBack(void)
         size = FND->FndSz;
         if (md.WinMous == 0) {
             menu = MOVED(place, (size >> 8) - 4, 21);
-            answer = MnMn10(key, menu, FND->FndMenu, 0x11F, OFFSET(Find5_D));
-            key = (u16)answer;
-            item = (u16)(answer >> 16) & 0xFF;
+            taken = MnMn10(key, menu, FND->FndMenu, 0x11F, OFFSET(Find5_D));
+            key = taken.key;
+            item = taken.button;
             mode = item;
             FND->FndMenu = (u8)item;
-            if (answer >> 24)
+            if (taken.taken)
                 key = MnMn40(Conf_C << 8 | CnfRe_C, menu, item, 0x11F,
                              OFFSET(Find5_D));
         }
@@ -796,7 +796,7 @@ u32 F67_00(void)
     u16 size = (u16)(u8)(md.Lines - 3) << 8 | 76;
     u16 color, row, count, answer, first, drive, cell, i, number, panel;
     u16 key, mode, room;
-    u32 pair;
+    struct Buttons chosen;
     struct MuxRegs mux;
     struct Mouse pointer;
 
@@ -996,12 +996,12 @@ found:
         } else {
             md.WinMous = 0;
             md.MousEnt = 0;
-            pair = MinMnu(OFFSET(Find6_D),
+            chosen = MinMnu(OFFSET(Find6_D),
                           MOVED(place, (size >> 8) - 4, 18), 0x125,
                           OFFSET(FnFl_P), KEY_MOUSE << 8 | FIND_BAR,
                           FND->FndMenu);
-            key = LOW(pair);
-            mode = HIGH(pair);
+            key = chosen.key;
+            mode = chosen.chosen;
             FND->FndMenu = (u8)mode;
         }
         answer = FndMove(key, mode & 0xFF00 | MODE_CURSOR, place, size);

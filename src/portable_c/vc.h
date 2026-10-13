@@ -969,8 +969,22 @@ void DialBox(u16 place, u16 box, u16 include, u16 segment,
              struct Box STACK *where);
 u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment);
 void InSt10(u16 place, u16 text, u16 length, u16 color);
-u32 MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys, u16 item);
-u32 MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table);
+struct Buttons {                        /* what MinMnu returns: */
+    u16 key;                            /* the key that is for the caller */
+    u16 chosen;                         /* the button chosen, in the low
+                                           byte; above it the key bar as it
+                                           came, or 0 for the letter of a
+                                           button */
+};
+struct Taken {                          /* what MnMn10 returns: */
+    u16 key;                            /* the key */
+    u8  button;                         /* the button chosen */
+    u8  taken;                          /* not 0 if the buttons have dealt
+                                           with the key */
+};
+struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
+                      u16 item);
+struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table);
 u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table);
 /* The key bar and the menu bar, the command line and its prompt: see
    each in bars.c. `segment` is where ClsLine reads the colour, MAIN_SEG. */
@@ -982,23 +996,39 @@ void PtMnu1(u16 item);
 void PutPrm(u16 panel);
 void DosCom(void);
 /* The entries of an extension file or a menu file: FndItem returns where
-   the next one is, the offset in the low word, and 1 in the high one at
-   the end of the file; FindExt where in the main data the command for a
-   file's extension is, or 0. See extfile.c. */
-u32 FndItem(const u8 __far *file);
+   the next one is, and whether that is the end of the file; FindExt
+   where in the main data the command for a file's extension is, or 0.
+   See extfile.c. */
+struct Entry {
+    u16 at;                             /* where it is: the offset in the
+                                           segment of the file */
+    u16 end;                            /* 1 if the file ends there */
+};
+struct Entry FndItem(const u8 __far *file);
 u16 FindExt(const u8 __far *name);
 /* Waiting for a key, and a line that is typed into: see each in input.c.
    Input and Input0 return the key, the scan code in the high byte, where
-   FCh says that the mouse did something; Input0 has 1 in the high word
-   for a key clicked on the key bar. EdLin returns the column of the
-   cursor, and 1 in the high word if anything changed. CmpSym is 1 for a
+   FCh says that the mouse did something; Input0 says besides whether
+   the key was clicked on the key bar. EdLin returns the column of the
+   cursor, and whether anything changed. CmpSym is 1 for a
    character that words end at. Search is the speed search among names
    in the segment `segment`. Rnd is the next of the program's random
    numbers. */
+struct Key {
+    u16 key;                            /* the key, the scan code in the
+                                           high byte */
+    u16 clicked;                        /* not 0 if the mouse clicked it
+                                           on the key bar */
+};
+struct Edited {
+    u16 cursor;                         /* the column of the cursor */
+    u16 changed;                        /* 1 if the line or the cursor has
+                                           changed */
+};
 u16 Input(u16 bar);
-u32 Input0(u16 bar);
+struct Key Input0(u16 bar);
 u16 Rnd(void);
-u32 EdLin(u16 key, u8 *text, u16 cursor, u16 length);
+struct Edited EdLin(u16 key, u8 *text, u16 cursor, u16 length);
 u16 EdSub1(const u8 *line, u16 cursor);
 u16 CmpSym(u16 symbol);
 u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);

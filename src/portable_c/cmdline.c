@@ -34,8 +34,7 @@
 
    EdLin has a key act on a line that is typed into, `length` characters
    at `buffer` in the main data with the cursor in `column`: it returns
-   the column, and in the high word something that is not 0 if the line
-   or the column has changed. A key without a scan code is a character,
+   the column, and whether the line or the column has changed. A key without a scan code is a character,
    whatever it is. DosCom draws the command line.
 
    PutMnu, PutKey, Input, EdLin, Search and DosCom are C, of vc.h. */
@@ -85,10 +84,10 @@ static const u8 CODE Ascii_T[38] = "1234567890-=qwertyuiopasdfghjklzxcvbnm";
    changed it. */
 void F73_00(u16 key)
 {
-    u32 pair = EdLin(key, md.DosBuf, md.DosCol, LenCmd - 1);
+    struct Edited edited = EdLin(key, md.DosBuf, md.DosCol, LenCmd - 1);
 
-    if (HIGH(pair)) {
-        md.DosCol = (u8)pair;
+    if (edited.changed) {
+        md.DosCol = (u8)edited.cursor;
         DosCom();
     }
 }
@@ -151,11 +150,11 @@ F80_05:                                 /* is there room for it */
         goto F80_10;
     column = md.DosCol;
     for (i = 0; (c = file->NameF[i]) != 0; i++)
-        column = LOW(EdLin(c, md.DosBuf, column, LenCmd - 1));
+        column = EdLin(c, md.DosBuf, column, LenCmd - 1).cursor;
     if (file->AttrF & ATTR_DIRECTORY)
         for (i = 0; (c = Mask_S[i]) != 0; i++)
-            column = LOW(EdLin(c, md.DosBuf, column, LenCmd - 1));
-    column = LOW(EdLin(' ', md.DosBuf, column, LenCmd - 1));
+            column = EdLin(c, md.DosBuf, column, LenCmd - 1).cursor;
+    column = EdLin(' ', md.DosBuf, column, LenCmd - 1).cursor;
     md.DosCol = (u8)column;
     if (any == 0)
         goto F80_10;
@@ -177,7 +176,7 @@ F80_10:
    of the cursor. */
 static u16 F68_25(const u8 __far *text, u16 column, u16 scan, u16 end)
 {
-    u32 pair;
+    struct Edited edited;
     u16 c;
 
     for (;;) {
@@ -185,14 +184,14 @@ static u16 F68_25(const u8 __far *text, u16 column, u16 scan, u16 end)
         if (c == 0)
             goto F68_90;
         text++;
-        pair = EdLin(scan | c, md.DosBuf, column, LenCmd - 1);
-        column = LOW(pair);
-        if (!HIGH(pair))
+        edited = EdLin(scan | c, md.DosBuf, column, LenCmd - 1);
+        column = edited.cursor;
+        if (!edited.changed)
             goto F68_27;
     }
 F68_90:
     if ((end & 0xFF) != 0 && (end & 0xFF) != text[-1])
-        column = LOW(EdLin(end, md.DosBuf, column, LenCmd - 1));
+        column = EdLin(end, md.DosBuf, column, LenCmd - 1).cursor;
 F68_27:
     md.DosCol = (u8)column;
     DosCom();

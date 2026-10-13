@@ -66,9 +66,9 @@ u16 Run_00(u16 text, u16 view);
    word, and the low one not 0 if there is none. */
 static u32 MenuItem(u16 text)
 {
-    u32 item = FndItem((const u8 *)text);
+    struct Entry item = FndItem((const u8 *)text);
 
-    return (u32)(u16)item << 16 | (u16)(item >> 16);
+    return (u32)item.at << 16 | item.end;
 }
 
 /* C routines of other files that vc.h does not have. */
@@ -510,6 +510,7 @@ u16 F32_00(u16 main)
 {
     struct DosRegs regs;
     u32 pair;
+    struct Key pressed;
     struct Answer opened;
     const u8 *text;                     /* SI */
     u16 *screen;                        /* DI */
@@ -731,9 +732,9 @@ F32_31:
     if (GetMous(0).buttons)
         goto F32_45;
     md.MousEnt = 0;
-    pair = Input0(1);
-    answer = LOW(pair);
-    if (HIGH(pair))
+    pressed = Input0(1);
+    answer = pressed.key;
+    if (pressed.clicked)
         goto F32_33;
     if (answer >> 8 == 0xFC)
         goto F32_45;

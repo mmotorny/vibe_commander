@@ -290,7 +290,7 @@ static void Help05(void)
     u16 was, shown;                     /* and where the screen is */
     u16 *screen;
     u16 color, place, moved, count, key, buttons, mouse, held, third;
-    u32 pair;
+    struct Buttons menu;
     struct Paged paged;
     struct Mouse pointer;
 
@@ -385,10 +385,10 @@ Help25:                                 /* a key */
         place = OFFSET(HlMn1_D);
     else
         place = OFFSET(HlMn2_D);
-    pair = MinMnu(place, BEGIN + (size & 0xFF00) - 0x400 + 12, 0x130,
+    menu = MinMnu(place, BEGIN + (size & 0xFF00) - 0x400 + 12, 0x130,
                   OFFSET(HlpMn_P), 2, item);
-    key = LOW(pair);
-    item = HIGH(pair);
+    key = menu.key;
+    item = menu.chosen;
     if (key >> 8 == 0xFC)
         goto Help30;
     if (key >> 8 == 0)                  /* Case takes none without a scan code */

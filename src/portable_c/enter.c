@@ -284,7 +284,7 @@ u32 F21_10(u16 panel)
     const struct FILENT __far *file;
     const u8 __far *from;
     struct DosRegs regs;
-    u32 pair;
+    struct Edited edited;
     u16 address, command, cursor, i;
     u8 c;
 
@@ -338,9 +338,9 @@ u32 F21_10(u16 panel)
     cursor = 0;
     md.DosBuf[0] = 0;
     for (i = 0; (c = file->NameF[i]) != 0; i++) {
-        pair = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
-        cursor = (u16)pair;
-        if (pair >> 16 == 0)
+        edited = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
+        cursor = edited.cursor;
+        if (edited.changed == 0)
             break;
     }
     md.DosCol = (u8)cursor;
@@ -490,20 +490,20 @@ u32 F24_00(u16 panel)
 static u32 F27_07(const u8 *text, u16 cursor)
 {
     const u8 *from = text;
-    u32 pair;
+    struct Edited edited;
     u8 c;
 
     for (;;) {
         c = *from;
         if (c == 0) {
             if (text == md.TmpBuf)
-                cursor = (u16)EdLin(' ', md.DosBuf, cursor, LenCmd - 1);
+                cursor = EdLin(' ', md.DosBuf, cursor, LenCmd - 1).cursor;
             break;
         }
         from++;
-        pair = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
-        cursor = (u16)pair;
-        if (pair >> 16 == 0)
+        edited = EdLin(c, md.DosBuf, cursor, LenCmd - 1);
+        cursor = edited.cursor;
+        if (edited.changed == 0)
             break;
     }
     md.DosCol = (u8)cursor;
