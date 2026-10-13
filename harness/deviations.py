@@ -244,11 +244,6 @@ IGNORED = [
 # why. The patches are not listed here: a scenario has one if the file is
 # there, and the top of goldens.py says how one is written. Every other
 # scenario is held against the original's golden as it is.
-#
-# Until now such a scenario had a golden of the tree's own, a whole file
-# recorded from the tree, which showed that nothing had changed since and
-# not that anything was right. Those that are still held so are in
-# `changed`, and go from there one by one.
 
 
 @dataclass(frozen=True)
@@ -291,12 +286,6 @@ class Declared:
     # that TODO.md asks for, a cell left out only where the golden has
     # what the part shows when nothing covers it.
     rules: tuple = ()
-    # Scenarios that the tree is still held in against a golden of its
-    # own, a whole file recorded from the tree, as every such scenario
-    # was before a deviation was held by a patch: scenario -> what
-    # changes in it. Each goes from here when it has become a patch, or
-    # needs none, and the field with the last of them.
-    changed: dict = field(default_factory=dict)
     # Steps that the tree is taken through in place of others, one for
     # one, in every scenario: the step of the original -> (the step of
     # the tree, why). For what the tree gets to by other keys than the
@@ -342,16 +331,9 @@ def found(steps, some):
     return places
 
 
-_NO_ROOM = ("the second copy has no memory to run a command: each copy "
-            "keeps all of itself")
 _NO_MAP = ("it shows the map of the memory, Alt+F5, and the programs "
            "that stay in the memory listed and released there: the "
            "portable C has no such map and keeps no such list")
-_NO_LINE = ", without Memory info"
-_OPTIONS = ("the Options menu, without Memory allocation and with More "
-            "setup at its bottom, behind Save setup and a line across "
-            "the menu: a row taller than the original's, with Save setup "
-            "a row further up")
 _FDAPM = '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter'
 _NO_SETUP_YET = ("the portable C has no setup yet: what the scenario "
                  "shows of it is still to be translated")
@@ -418,46 +400,6 @@ TREES = {
                 ("Alt+F5", "Esc"):
                     "a look at the map of the memory, for what has stayed",
             },
-        },
-        changed={
-            "lost": "the program does not load itself again after a "
-                    "command, and so does not miss its file",
-            "quick": "Memory allocation is not switched off before the "
-                     "last command",
-            "clock": _OPTIONS,
-            "clock-russia": _OPTIONS,
-            "menu": _OPTIONS + "; and the Commands menu, a line shorter"
-                    + _NO_LINE,
-            "menu-items": "Memory info is not chosen from the Commands "
-                          "menu",
-            "mouse-menu": "the Commands menu, a line shorter" + _NO_LINE,
-            "mouse-drag-menu": "the Commands menu, a line shorter"
-                               + _NO_LINE,
-            "tree-choose": "the key bar with Alt held has no name for "
-                           "F5, where the original has Memory",
-            "handed-on": "the program hands on a program run, one that "
-                         "stays and a block given back like any other "
-                         "call of DOS, with the flags of the comparison "
-                         "that told them from its own call: it keeps no "
-                         "watch on the programs that stay in the memory",
-            "second-copy": _NO_ROOM,
-            "start-memory": _NO_ROOM + ", so the command that was to "
-                            "leave it without memory for its data does "
-                            "not run, and the copy is still there",
-            "ended": _NO_ROOM + ", so no program has stayed from it when "
-                     "DOS ends it; the registers that it leaves are "
-                     "those of a program that keeps no list of such "
-                     "programs and has taken INT 21h alone; and the map "
-                     "of the memory is not looked at",
-            "mouse-middle": "the middle button is not pressed in the map "
-                            "of the memory",
-            "mouse-drag-lists": "no program stays in the memory, and no "
-                                "button is moved in the map of the "
-                                "memory",
-            "setup-lines": "the top left corner of what DOS had shown is "
-                           "as DOS left it, where the original's setup "
-                           "program has put a space, the 81st cell of "
-                           "its key bar on a screen of 50 lines",
         },
         in_place_of={
             SETUP_COMMAND: (SETUP_ITEM,

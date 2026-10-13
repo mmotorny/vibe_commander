@@ -1,0 +1,24 @@
+The portable C in the scenario second-copy: what it is expected to show
+otherwise than the original. A patch of harness/goldens/second-copy.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 1 of src/portable_c/DEVIATIONS.md
+Why: the second copy has no memory to run a command: each copy keeps all of
+itself
+
+== 7: Ctrl+o
+rows 15-21
+-|C:\WORK>d:\vc\vc ver○/r                                                         | 07x80
+-|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+-|                                                                                | 07x80
+-|FreeCom version 0.86 - WATCOMC - XMS_Swap [Dec 30 2024 22:10:51]                | 07x80
+-|DOS version 7.10                                                                | 07x80
+-|FreeDOS kernel 2043 (build 2043 OEM:0xfd) [compiled May 13 2021]                | 07x80
++|                                                                                | 07x80
++|                                                                                | 07x80
++|                                                                                | 07x80
++|C:\WORK>d:\vc\vc ver○/r                                                         | 07x80
++|The Volkov Commander, Version 4.05 freeware                                     | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
++|There is not enough memory to run this command                                  | 07x80

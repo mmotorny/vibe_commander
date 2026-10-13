@@ -1,0 +1,38 @@
+The portable C in the scenario clock: what it is expected to show otherwise
+than the original. A patch of harness/goldens/clock.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 1, 8 of src/portable_c/DEVIATIONS.md
+Why: the Options menu, without Memory allocation and with More setup at its
+bottom, behind Save setup and a line across the menu: a row taller than the
+original's, with Save setup a row further up
+
+== 1: F9 o
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 5: F9 o
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15

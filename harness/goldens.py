@@ -52,11 +52,6 @@ golden is read for the tree (read), and written nowhere:
   3. the screens of the steps that the tree is not taken through, left
      out (`left_out` and `left_out_of` of deviations.TREES).
 
-(Sixteen scenarios are still held as they were until now, against a
-golden of the tree's own: a whole file of harness/goldens/TREE/, recorded
-from the tree. They are in `changed` of deviations.TREES, and each goes
-from there when it has become a patch.)
-
 A patch is a file of harness/goldens/TREE/, NAME.patch for the scenario
 NAME. It says which rows of the original's golden the tree is expected to
 show otherwise, and what it is expected to show there. It is written by
@@ -210,10 +205,6 @@ class Golden:
     places: list = None
     original_steps: list = None
     patch: "Patch" = None
-    # Whether it is a golden of the tree's own, recorded from the tree:
-    # what there was before patches, and still is for some scenarios
-    # (`changed` of deviations.TREES).
-    own: bool = False
 
 
 @dataclass
@@ -390,12 +381,6 @@ def read(name, tree=None, patched=True):
     if tree is None:
         return golden
     declared = deviations.declared(tree)
-    if patched is True and name in declared.changed:
-        # Still held against a golden of the tree's own, a whole file
-        # recorded from the tree, until it has become a patch.
-        golden = read_original(name, DIRECTORY / tree / f"{name}.txt")
-        golden.tree, golden.own = tree, True
-        return golden
     golden.tree = tree
     if declared.rules:
         golden.screens = [deviations.expected(screen, declared.rules)
@@ -416,10 +401,9 @@ def read(name, tree=None, patched=True):
     return golden
 
 
-def read_original(name, file=None):
-    """The golden of the scenario `name` as its file has it, or as the
-    file `file` has it."""
-    file = file or path(name)
+def read_original(name):
+    """The golden of the scenario `name` as its file has it."""
+    file = path(name)
     if not file.exists():
         raise FileNotFoundError(
             f"{file} is not there: derive it, goldens.py derive {name}")
@@ -898,8 +882,6 @@ def differences(golden, run, programs):
 def measure(golden):
     """What a golden as it was read is called in a line of a report: the
     original, with what was made to it for the tree it was read for."""
-    if golden.own:
-        return f"its own golden, recorded from {golden.tree}"
     gone = len(scenarios.SCENARIOS[golden.scenario].steps) + 1 \
         - len(golden.screens) if golden.places else 0
     return ("the original"
@@ -1205,8 +1187,7 @@ def changes(name, tree, patch=None):
         number = theirs.places.index(at)
         found = screen_differences(theirs.screens[number],
                                    ours.screens[number],
-                                   build="its own" if ours.own
-                                   else "the patch")
+                                   build="the patch")
         if found:
             report += [f"--- after step {at}: {step}"
                        + (f"   (step {number} of {tree}"
@@ -1225,7 +1206,7 @@ def otherwise(tree):
     left out of for it."""
     declared = deviations.declared(tree)
     return [name for name in scenarios.names(tree)
-            if patch_path(name, tree).exists() or name in declared.changed
+            if patch_path(name, tree).exists()
             or len(declared.kept(scenarios.SCENARIOS[name].steps, name))
             < len(scenarios.SCENARIOS[name].steps)]
 
@@ -1268,11 +1249,7 @@ def main():
     try:
         if args.command == "changes":
             for name in args.scenario or otherwise(args.tree):
-                own = deviations.declared(args.tree).changed.get(name)
-                if own:
-                    print(f"{name}: a golden of {args.tree}'s own, still "
-                          f"to become a patch: {own}")
-                elif not patch_path(name, args.tree).exists():
+                if not patch_path(name, args.tree).exists():
                     print(f"{name}: no patch")
                 else:
                     patch = read(name, args.tree).patch

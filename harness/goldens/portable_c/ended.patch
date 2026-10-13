@@ -1,0 +1,19 @@
+The portable C in the scenario ended: what it is expected to show otherwise
+than the original. A patch of harness/goldens/ended.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 1, 7 of src/portable_c/DEVIATIONS.md
+Why: the second copy has no memory to run a command: each copy keeps all of
+itself, so no program has stayed from it when DOS ends it; the registers that
+it leaves are those of a program that keeps no list of such programs and has
+taken INT 21h alone; and the map of the memory is not looked at
+
+== 40: Ctrl+o
+row 0
+-|0000 1111 0000 0000 0000 0202                                                   | 07x80
++|2222 1111 ######### 0000 0202                                                   | 07x80
+
+== 43: Ctrl+o
+row 0
+-|0000 0002 0000 0000 0000 0202                                                   | 07x80
++|2222 1111 ######### 0000 0202                                                   | 07x80

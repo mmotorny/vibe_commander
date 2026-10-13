@@ -1566,8 +1566,6 @@ def check_declared(tree, names):
     directory = goldens.DIRECTORY / tree
     for file in sorted(directory.glob("*")) if directory.is_dir() else []:
         name = file.stem
-        if file.suffix == ".txt" and name in declared.changed:
-            continue              # still a golden of the tree's own
         if file.suffix != ".patch" or name not in names:
             passed = False
             print(f"  {goldens.shown(file)} is the patch of no scenario "
@@ -1583,17 +1581,14 @@ def check_declared(tree, names):
                       + ("does not name the scenario there, as "
                          f"`{name}`" if number in entries else
                          "has no such entry"))
-    shorter = [name for name in names if name not in declared.changed
-               and len(declared.kept(scenarios.SCENARIOS[name].steps, name))
+    shorter = [name for name in names
+               if len(declared.kept(scenarios.SCENARIOS[name].steps, name))
                < len(scenarios.SCENARIOS[name].steps)]
-    held = [name for name in names if name not in patched
-            and name not in shorter and name not in declared.changed]
+    held = [name for name in names
+            if name not in patched and name not in shorter]
     print(f"The goldens: {len(held)} scenarios were held against the "
           "original's as it is")
     for what, some in (
-            (f"against {tree}'s own, which only show that nothing has "
-             "changed since they were recorded, and are still to become "
-             "patches", [name for name in names if name in declared.changed]),
             ("against the original's without the steps that are left out "
              f"for {tree}", shorter),
             ("against the original's with a patch, the lines that the "

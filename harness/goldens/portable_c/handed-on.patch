@@ -1,0 +1,21 @@
+The portable C in the scenario handed-on: what it is expected to show
+otherwise than the original. A patch of harness/goldens/handed-on.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 7 of src/portable_c/DEVIATIONS.md
+Why: the program hands on a program run, one that stays and a block given back
+like any other call of DOS, with the flags of the comparison that told them
+from its own call: it keeps no watch on the programs that stay in the memory
+
+== 69: Ctrl+o
+row 22
+-|0246 0000 0000 0016 5A5A 0097 5A5A 0093 5A5A 0002                               | 07x80
++|0002 0000 0000 0016 5A5A 0097 5A5A 0093 5A5A 0016                               | 07x80
+
+== 74: Ctrl+o
+row 16
+-|0246 0000 0000 0016 5A5A 0097 5A5A 0093 5A5A 0002                               | 07x80
++|0002 0000 0000 0016 5A5A 0097 5A5A 0093 5A5A 0016                               | 07x80
+row 22
+-|0246 0202 0000 0016 5A5A 0097 5A5A 0093 5A5A 0006                               | 07x80
++|0002 0016 0000 0016 5A5A 0097 5A5A 0093 5A5A 0016                               | 07x80

@@ -1,0 +1,55 @@
+The portable C in the scenario start-memory: what it is expected to show
+otherwise than the original. A patch of harness/goldens/start-memory.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 1 of src/portable_c/DEVIATIONS.md
+Why: the second copy has no memory to run a command: each copy keeps all of
+itself, so the command that was to leave it without memory for its data does
+not run, and the copy is still there
+
+== 11: "d:\vc\vc" Space "k" Enter
+rows 3-4
+-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
++|║DOCS        │            │            ║║         652,960 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
++|║SRC         │            │            ║║          ###### Bytes Free           ║| 1Bx51 1Ex6 1Bx23
+rows 20-22
+-|║            │            │            ║║                                      ║| 1Bx80
+-|║            │            │            ║║                                      ║| 1Bx80
+-|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+
+== 12: Ctrl+o
+row 21
+-|Program too big to fit in memory                                                | 07x80
++|There is not enough memory to run this command                                  | 07x80
+
+== 13: Ctrl+o
+rows 3-4
+-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
++|║DOCS        │            │            ║║         652,960 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
++|║SRC         │            │            ║║          ###### Bytes Free           ║| 1Bx51 1Ex6 1Bx23
+rows 20-22
+-|║            │            │            ║║                                      ║| 1Bx80
+-|║            │            │            ║║                                      ║| 1Bx80
+-|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+
+== 14: Ctrl+PgUp
+rows 3-4
+-|║STAMPS      │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+-|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
++|║STAMPS      │            │            ║║         652,960 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
++|║            │            │            ║║          ###### Bytes Free           ║| 1Bx51 1Ex6 1Bx23
+rows 20-22
+-|║            │            │            ║║                                      ║| 1Bx80
+-|║            │            │            ║║                                      ║| 1Bx80
+-|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║WORK         ►SUB-DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
++|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80

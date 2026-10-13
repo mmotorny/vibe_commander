@@ -1,0 +1,274 @@
+The portable C in the scenario menu: what it is expected to show otherwise
+than the original. A patch of harness/goldens/menu.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 1, 7, 8 of src/portable_c/DEVIATIONS.md
+Why: the Options menu, without Memory allocation and with More setup at its
+bottom, behind Save setup and a line across the menu: a row taller than the
+original's, with Save setup a row further up; and the Commands menu, a line
+shorter, without Memory info
+
+== 8: Down
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 9: Up
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 10: Up
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 11: End Down
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 12: PgDn
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 13: PgUp Home
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 14: Down Down Down Down Down
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 16: Esc
+rows 15-20
+-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
+-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
+-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
++|║            │            │    │  More setup...               │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
++|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
++|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
+
+== 33: Right
+rows 4-16
+-|║SRC         │     │ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
+-|║readme   txt│     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
+-|║hello    txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║notes    doc│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║data     bin│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║run      bat│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+-|║empty    dat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
+-|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+-|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
+-|║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
++|║SRC         │     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
++|║readme   txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║hello    txt│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║notes    doc│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║data     bin│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
++|║run      bat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║empty    dat│     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
++|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x21 47x1 30x11 03x2 1Bx26
++|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
++|║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
++|║            │            │            ║║                                      ║| 1Bx80
+
+== 37: Tab F9 c
+rows 4-16
+-|║SRC         │►SUB-│ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
+-|║readme   txt│     │ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║hello    txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║notes    doc│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║data     bin│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║run      bat│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+-|║empty    dat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
+-|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+-|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
+-|║            │         │        │      ║║                                      ║| 1Bx21 03x33 1Bx26
++|║SRC         │►SUB-│ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║readme   txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║hello    txt│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║notes    doc│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║data     bin│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
++|║run      bat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║empty    dat│     │ Panels on/off         Ctrl-O  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
++|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x21 47x1 30x11 03x2 1Bx26
++|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
++|║            │         │        │      ║║                                      ║| 1Bx21 03x33 1Bx26
++|║            │         │        │      ║║                                      ║| 1Bx80
+
+== 40: c
+rows 4-16
+-|                   │ memory Info           Alt-F5  │                            | 07x19 30x1 3Fx8 3Ex1 3Fx22 30x1 0Fx2 07x26
+-|                   │-Directory sizes       Alt-F6  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
+-|                   │ Find file             Alt-F7  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
+-|                   │ History               Alt-F8  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
+-|                   │ EGA lines             Alt-F9  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
+-|                   │ ───────────────────────────── │                            | 07x19 30x33 0Fx2 07x26
+-|                   │-Swap panels           Ctrl-U  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
+-|                   │ Panels on/off         Ctrl-O  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
+-|                   │-Compare directories   Ctrl-C  │                            | 07x19 30x1 33x1 30x19 47x1 30x11 0Fx2 07x26
+-|                   │ ───────────────────────────── │                            | 07x19 30x33 0Fx2 07x26
+-|                   │ Menu file edit                │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
+-|                   └───────────────────────────────┘                            | 07x19 30x33 0Fx2 07x26
+-|                                                                                | 07x21 0Fx33 07x26
++|                   │-Directory sizes       Alt-F6  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
++|                   │ Find file             Alt-F7  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
++|                   │ History               Alt-F8  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
++|                   │ EGA lines             Alt-F9  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
++|                   │ ───────────────────────────── │                            | 07x19 30x33 0Fx2 07x26
++|                   │-Swap panels           Ctrl-U  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
++|                   │ Panels on/off         Ctrl-O  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
++|                   │-Compare directories   Ctrl-C  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
++|                   │ ───────────────────────────── │                            | 07x19 30x21 47x1 30x11 0Fx2 07x26
++|                   │ Menu file edit                │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
++|                   └───────────────────────────────┘                            | 07x19 30x33 0Fx2 07x26
++|                                                                                | 07x21 0Fx33 07x26
++|                                                                                | 07x80
+
+== 48: F9 c
+rows 4-16
+-|║SRC         │►SUB-│ memory Info           Alt-F5  │d│            │            ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
+-|║readme   txt│     │ Directory sizes       Alt-F6  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║hello    txt│     │ Find file             Alt-F7  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║notes    doc│     │ History               Alt-F8  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║data     bin│     │ EGA lines             Alt-F9  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║run      bat│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+-|║empty    dat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │ Panels on/off         Ctrl-O  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx18 48x1 3Fx10 30x1 03x2 1Bx26
+-|║            │     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+-|║            │     │ Menu file edit                │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     └───────────────────────────────┘ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+-|║            │         │        │      ║║            │            │            ║| 1Bx21 03x33 1Bx26
++|║SRC         │►SUB-│ Directory sizes       Alt-F6  │d│            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║readme   txt│     │ Find file             Alt-F7  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║hello    txt│     │ History               Alt-F8  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║notes    doc│     │ EGA lines             Alt-F9  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║data     bin│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
++|║run      bat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║empty    dat│     │ Panels on/off         Ctrl-O  │ │            │            ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x21 47x1 30x11 03x2 1Bx26
++|║            │     │ Menu file edit                │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     └───────────────────────────────┘ │            │            ║| 1Bx19 30x33 03x2 1Bx26
++|║            │         │        │      ║║            │            │            ║| 1Bx21 03x33 1Bx26
++|║            │         │        │      ║║            │            │            ║| 1Bx80
+
+== 50: F9 c
+rows 4-16
+-|                   │ memory Info           Alt-F5  │d│            │            ║| 07x19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
+-|                   │ Directory sizes       Alt-F6  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|                   │ Find file             Alt-F7  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|                   │ History               Alt-F8  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|                   │ EGA lines             Alt-F9  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|                   │ ───────────────────────────── │ │            │            ║| 07x19 30x33 03x2 1Bx26
+-|                   │ Swap panels           Ctrl-U  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|                   │ Panels on/off         Ctrl-O  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|                   │-Compare directories   Ctrl-C  │ │            │            ║| 07x19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
+-|                   │ ───────────────────────────── │ │            │            ║| 07x19 30x33 03x2 1Bx26
+-|                   │ Menu file edit                │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|                   └───────────────────────────────┘ │            │            ║| 07x19 30x33 03x2 1Bx26
+-|                                        ║            │            │            ║| 07x21 0Fx19 03x14 1Bx26
++|                   │ Directory sizes       Alt-F6  │d│            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|                   │ Find file             Alt-F7  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|                   │ History               Alt-F8  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|                   │ EGA lines             Alt-F9  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|                   │ ───────────────────────────── │ │            │            ║| 07x19 30x33 03x2 1Bx26
++|                   │ Swap panels           Ctrl-U  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|                   │ Panels on/off         Ctrl-O  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|                   │-Compare directories   Ctrl-C  │ │            │            ║| 07x19 30x1 33x1 30x31 03x2 1Bx26
++|                   │ ───────────────────────────── │ │            │            ║| 07x19 30x21 47x1 30x11 03x2 1Bx26
++|                   │ Menu file edit                │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|                   └───────────────────────────────┘ │            │            ║| 07x19 30x33 03x2 1Bx26
++|                                        ║            │            │            ║| 07x21 0Fx19 03x14 1Bx26
++|                                        ║            │            │            ║| 07x40 1Bx40

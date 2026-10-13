@@ -1,0 +1,17 @@
+The portable C in the scenario tree-choose: what it is expected to show
+otherwise than the original. A patch of harness/goldens/tree-choose.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 7 of src/portable_c/DEVIATIONS.md
+Why: the key bar with Alt held has no name for F5, where the original has
+Memory
+
+== 13: Alt+F10
+row 23
+-|1Left   2Right  3View.. 4Edit.. 5Memory 6DirSiz 7Find   8Histry 9EGA Ln 10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|1Left   2Right  3View.. 4Edit.. 5       6DirSiz 7Find   8Histry 9EGA Ln 10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 20: Alt+F10
+row 23
+-|1Left   2Right  3View.. 4Edit.. 5Memory 6DirSiz 7Find   8Histry 9EGA Ln 10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
++|1Left   2Right  3View.. 4Edit.. 5       6DirSiz 7Find   8Histry 9EGA Ln 10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6

@@ -1,0 +1,18 @@
+The portable C in the scenario setup-lines: what it is expected to show
+otherwise than the original. A patch of harness/goldens/setup-lines.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 9 of src/portable_c/DEVIATIONS.md
+Why: the top left corner of what DOS had shown is as DOS left it, where the
+original's setup program has put a space, the 81st cell of its key bar on a
+screen of 50 lines
+
+== 8: F6 Esc
+row 0
+-| opyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+
+== 9: F10
+row 0
+-| opyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
