@@ -204,6 +204,41 @@ these, where it is of the program of 16 bits alone and the program of
   functions keep there; with less memory above the megabyte than the
   program wants, the extender does not start it, and says so in words
   of its own.
+- What it wants of the machine, where it cannot start. Of the program
+  of 32 bits alone, and declared on the user's word of 13 October 2026.
+  It is compiled for the 386 and started by an extender that needs
+  one, and it wants memory above the megabyte for all of itself, its
+  640 KB among it, some 900 KB; the original runs on any PC that DOS
+  runs on, and wants no memory there. Without that memory the extender
+  does not start it and says so in its own words, not in the
+  program's: "DOS/32A fatal (4003): not enough extended memory to load
+  application exec" is what a second copy was told on the bench when
+  the first had been left a megabyte for the two of them. What a
+  machine without a 386 is told is the extender's as well, and was not
+  seen: the bench has no such machine. And where the program itself
+  says "Program too big to fit in memory", for want of the 512 bytes,
+  the words are the original's, written through DOS from a copy that
+  `dos32.c` has of them, and the program ends with 8, DOS's number for
+  too little memory; the original and the program of 16 bits end with
+  1 behind those words. No scenario shows any of this.
+- What the extender is in the machine while the program runs, a
+  command of the program's included. Of the program of 32 bits alone,
+  and declared on the user's word of 13 October 2026. Its part of real
+  mode lies below the megabyte in the program's own block, 51,696 bytes
+  on the bench, with the 512 bytes of the system's functions in a block
+  of DOS's behind it. INT 21h of real mode goes to the extender for as
+  long as the program is in the memory, so a call of DOS that another
+  program makes then passes the extender on its way; so does INT 15h,
+  of which `TODO.md` has more, 9 of what is open in the plan. When it
+  starts, the extender sets the counter of the machine's timer anew, in
+  its mode 3 where the BIOS has it in mode 2, and it keeps the line A20
+  on. The program runs in protected mode at the highest privilege, with
+  no memory protected from it, as nothing is on DOS. And the call by
+  which the program says that it is idle, INT 28h, comes to whoever has
+  taken that interrupt from the extender's part of real mode, on a
+  stack of the extender's, 512 bytes, with DS and ES 0, where the
+  original's comes from the program on the program's stack with DS on
+  the main data. No screen shows any of this, and no scenario.
 - The file. That of 32 bits is the extender, a program of DOS, with the
   program behind it as a linear executable, which the extender loads
   and relocates.
@@ -224,7 +259,13 @@ features that only made sense on DOS." And on 13 October 2026: where the
 program of 32 bits does again what the original does and the program of
 16 bits could not, a second copy that has the memory to run a command,
 it is held to the original's golden, and this entry says only what still
-differs.
+differs. And the same day, of the program of 32 bits alone: what follows
+from its running under an extender and shows on no screen is declared
+as it is, what it wants of the machine and what the extender is in the
+machine while it runs among it. The user's word, "declare all five", on
+a list of what differs in that program (`TODO.md`, "The program of 32
+bits: what differs from the original, for the user", 6 to 10 there; the
+others of the five are in 6 and in 8).
 
 **Which scenarios show it.** Each of these is held against the original's
 golden with what its row says made to it: by its patch, or, where the row
@@ -522,7 +563,9 @@ where the service takes nothing there, and so is the half of BX that it
 does not take; DS is on the main data where no address is handed over;
 and a register that the service takes nothing in is 0 or what the stack
 holds, as `dos.c` has it. The calls, their order and every register
-that a call takes are the original's.
+that a call takes are the original's. That is the program of 16 bits;
+"The program of 32 bits", below, says what is otherwise for that one,
+in the registers and in which calls are made.
 
 The places, file by file and in each file as its routines stand, each
 with what the original hands over there in a register that the call
@@ -672,6 +715,68 @@ by the read's own answer, whatever closing leaves in AX. On a DOS that
 does change AX when it closes a file the original goes by what that DOS
 leaves, and does not mark the panel unless that happens to be 53h; the
 portable C marks it there too.
+
+**The program of 32 bits.** What is said above is of the program of 16
+bits, whose functions of `sys.h` are `dos.c`. The program of 32 bits
+has `dos32.c` for them, and DOS and the BIOS are of real mode, where
+its extender takes each call. Two things are otherwise for it, of that
+program alone, and both are declared on the user's word of 13 October
+2026. Both were seen on the bench, by a program of real mode that takes
+INT 21h, runs the program and writes down every call as DOS gets it,
+`harness/trial32/calls.asm`, with each of the two programs taken
+through its start, a command and its end.
+
+What DOS is handed in a register that a call does not take:
+
+- AX, BX, CX, DX, SI and DI hold what the call takes and 0 wherever it
+  takes nothing, at every call: `Set` of `dos32.c`. Nothing is "as it
+  comes" there, as it is in rows of the table above, and nothing is
+  what the stack holds. At the calls of the BIOS and of the mouse
+  driver those registers are what the program of 16 bits hands over.
+- DS and ES are not on the main data, which is above the megabyte:
+  they are what the extender has in them when it goes over to real
+  mode. At a call that takes no address, DS held the number that is in
+  AX and ES 0, at every such call that was seen: 1900h in both for the
+  current drive, 3301h, 2C00h, 4C00h. At a call that the extender
+  translates, a name or a buffer handed over, DS was on the extender's
+  own buffer below the megabyte, to which it copies the name, and ES
+  as the extender left it. At the thirteen functions that `dos32.c`
+  makes in real mode, both are on the program's 512 bytes below the
+  megabyte, where the name or the buffer then is.
+- The carry flag is clear at the two calls that the original makes
+  with it set and that DOS leaves it at, 36h and 13h: the extender does
+  not carry the program's flag down. `dos32.c` counts it as set
+  afterwards, so the program goes on as the original does behind a DOS
+  that leaves the flag; a DOS that looked at it would see it clear.
+- At 4B00h, a program run, DOS's block names the program's environment
+  by its segment, where the original and the program of 16 bits name
+  none and DOS copies the program's own: it is the same environment,
+  named because the word of the PSP through which DOS would find it is
+  a selector of the extender's. CX, SI and DI are 0 there.
+- When DOS has ended the program by another program's hand and is told
+  of Ctrl-C by the routine of real mode that the program has left for
+  that (see 8), the registers that 3301h does not take are as the
+  program that started this one left them, which is what the original
+  hands DOS there.
+
+Which calls DOS is asked. "The calls, their order and every register
+that a call takes are the original's" is so of the program of 16 bits.
+Of the program of 32 bits it is so of every call but these, which it
+does not make, and one that it makes besides:
+
+| When | The program of 16 bits, as the original | The program of 32 bits |
+|---|---|---|
+| It starts | 51h, where the PSP is, the first call; 4Ah, its own block made as long as the program is | Neither: the extender is asked where the PSP is, and the block is the extender's, which has asked DOS both for itself before the program is entered. One call more, before the first of the program's: 48h for 20h paragraphs, the 512 bytes below the megabyte |
+| It starts, and comes back from a command | 2523h, Ctrl-C taken; 48h twice, how much memory there is and all of it taken; 3524h and 351Bh, who has the critical error and Ctrl-Break; 2524h and 251Bh, both taken. Behind a command 49h first, the memory given back | None of them. The memory of the panels, the viewer and the editor is the program's own 640 KB, handed out by `dos32.c` as DOS hands out its memory, and the three interrupts are taken through the extender, which DOS does not see: so `ErrVct` and `BrkVct` of the main data, where the program of 16 bits keeps who had the two, are never written |
+| It runs a command | 2524h and 251Bh, the two given back; 4Ah, the block of the panels made shorter | Neither, for the same two reasons. The extender is asked where INT 22h of real mode goes before 4B00h and has it put back behind it, since DOS changes it for the program that is run and the extender would write a warning of that when the program ends |
+| It is left | 251Bh, Ctrl-Break given back | Not that: the extender gives back the three that the program took through it |
+
+Every other call is made by both, in the same order, with the
+registers that it takes: the version, how DOS looks for memory, the
+files, the directories and the searches, the country, the drives, the
+time, a program run and the end. What the extender asks DOS for itself,
+while it loads the program and when it leaves, is not the program's
+and is not listed.
 
 **Why.** A function of `sys.h` says what is asked, and what a register
 happened to hold is not asked: it cannot be an argument without a name,
