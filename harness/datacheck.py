@@ -819,6 +819,27 @@ def known(original, translation, candidate):
     return []
 
 
+def origins(length, otherwise=()):
+    """For each of the `length` bytes of an object of the translation,
+    where the original has it, counted from the start of its object, or
+    the byte that is declared to be there instead: `otherwise` as
+    DECLARED has it."""
+    origin, behind = [], 0
+    for where, count, instead in sorted(otherwise):
+        origin += list(range(behind, where)) + [bytes([b]) for b in instead]
+        behind = where + count
+    return (origin + list(range(behind, behind + length)))[:length]
+
+
+def held(length, otherwise=()):
+    """How many bytes of the original's object an object of the
+    translation of `length` bytes is held against, from its start to the
+    last of them: its own length, unless it is declared to have more or
+    fewer than the original, `otherwise` as DECLARED has it."""
+    return max((o for o in origins(length, otherwise)
+                if isinstance(o, int)), default=0) + 1
+
+
 def compare(original, translation, name, there, address, length,
             otherwise=()):
     """Hold `length` bytes of the translation at `address` against the
@@ -828,14 +849,8 @@ def compare(original, translation, name, there, address, length,
     has it: it is held against the original's with that done to it.
     `original` is the program of the original that has the object."""
     ours = translation.bytes(address, length)
-    # For each byte of the object, where the original has it, counted
-    # from `there`, or the byte that is declared to be there instead.
-    origin, behind = [], 0
-    for where, count, instead in sorted(otherwise):
-        origin += list(range(behind, where)) + [bytes([b]) for b in instead]
-        behind = where + count
-    origin = (origin + list(range(behind, behind + length)))[:length]
-    last = max((o for o in origin if isinstance(o, int)), default=0)
+    origin = origins(length, otherwise)
+    last = held(length, otherwise) - 1
     theirs = original.image[there - COM_ORIGIN:there - COM_ORIGIN + last + 1]
     if len(theirs) < last + 1:
         return f"{name} goes on beyond the end of the original"
@@ -1000,13 +1015,13 @@ def main():
             continue
         program, label, behind = found
         there = program.labels[label] + behind
-        if program.reserved(there, length):
+        why, otherwise = declared.get(name, (None, ()))
+        if program.reserved(there, held(length, otherwise)):
             if not args.quiet:
                 print(f"  {module:12} {name:11} {length:4}  not compared: "
                       "in the room reserved for what only the shipped "
                       "binary has")
             continue
-        why, otherwise = declared.get(name, (None, ()))
         difference = compare(program, translation, name, there, address,
                              length, otherwise)
         used |= {key for key in (*NAMED_OTHERWISE, *COUNTED,
@@ -1038,7 +1053,9 @@ def main():
                     + (f"+{behind}" if behind else "")
             elif label != name or behind:
                 note += f"  {label}" + (f"+{behind}" if behind else "")
-            if why:
+            # A second object of the name, a file's own copy of a text,
+            # may end before the first place that is declared.
+            if why and origins(length, otherwise) != list(range(length)):
                 note += f"  but for what is declared: {why}"
             print(f"  {module:12} {name:11} {length:4}  {there:04X}h{note}")
     for name in sorted(stale):
