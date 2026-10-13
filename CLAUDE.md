@@ -113,6 +113,33 @@ These held while `src/c/` was made, and they say what it is.
 - The translation of the program is complete and verified, on the user's
   word of 12 October 2026, so work for other operating systems may go in.
   It goes into `src/portable_c/` and nowhere else.
+- The road, on the user's word of 12 October 2026, in this order:
+  1. The portable C becomes a 32-bit program for DOS, built by Open
+     Watcom's 32-bit compiler with a DOS extender, and judged on the same
+     bench by the same scenarios. When it passes them all, its 16-bit
+     build goes: `src/c/` is the 16-bit program.
+  2. It uses what 32 bits give: one flat memory, with pointers where
+     there were segments and offsets, and numbers and values of 32 bits.
+     A variable is widened wherever wrapping round at 16 bits would be
+     unexpected behaviour, and stays 16 bits only where the program
+     counts on the wrapping. A number that is only ever true or false
+     becomes a boolean.
+  3. The abstraction layer is designed: what the program asks of the
+     system it is on, and how. The user approves the design before
+     anything is built on it. `sys.h` is what there is until then, a
+     seam that keeps the registers in one file, and not that design.
+  4. The implementation for DOS moves under the layer.
+  5. A second implementation is made that builds and is not meant to
+     run: a stub.
+  6. The stub is built with clang on Linux, for 64 bits, and whatever of
+     the x86 or of DOS is still in the common code goes behind the
+     layer, as Chromium has it: files `_dos.c` and `_posix.c` beside
+     common headers, and macros that each platform defines in its own
+     way.
+- Clang is where this is going, for the platforms it reaches and for its
+  sanitizers and static checks. Open Watcom builds the program for DOS
+  for as long as DOS is where it is judged. No other toolchain is taken
+  on.
 - What judges the portable C is what judged the C translation: the
   scenarios, with goldens recorded from the original. Where the portable C
   is to behave otherwise than the original, that is a deviation.
@@ -126,8 +153,13 @@ These held while `src/c/` was made, and they say what it is.
 - A feature that only made sense on DOS is removed, not kept as a setting
   that does nothing. The first is Memory allocation in the Options menu:
   the portable C stays in memory whole while a command runs. A removal of
-  that kind is declared and made without asking. Any other deviation, a
-  fix of a bug of the original included, is asked first.
+  that kind is declared and made without asking. Whether a feature is of
+  that kind is judged by what it gives the user, not by how DOS did it:
+  Quick execute runs commands through an interrupt that only DOS has,
+  and what it gives, commands run by the shell the program was started
+  from, is not DOS's alone. Where that is in doubt, it is asked. Any
+  other deviation, a fix of a bug of the original included, is asked
+  first.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
@@ -137,8 +169,8 @@ These held while `src/c/` was made, and they say what it is.
   machine, then intrinsics, then assembly inline in a C file. What the
   README lists as resting on Open Watcom is to shrink, not grow.
 - What the program asks of the system it is on, it asks in one place; the
-  rest of it does not know which system that is. `dos.c` is that place
-  today.
+  rest of it does not know which system that is. Today that place is
+  `sys.h`, with `dos.c` behind it.
 - Names may change here once a thing no longer is what its name in the
   assembly says. The C translation keeps the old names, and a comment at
   the new name says what it was.
