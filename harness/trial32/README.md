@@ -94,6 +94,7 @@ the finding: see `csover.c`.
 | `depth.c` | How much of the program's own stack the extender writes below the stack pointer during a call of DOS, of the BIOS, of the mouse and of real mode, and for the timer's interrupts |
 | `ended.asm` | Real mode: DOS ends a program by another's hand, as the scenario `ended` has it, and what is left then of a program of 32 bits and of its extender. Its top says how it is run and what it writes |
 | `copies.c` | A copy of the toy run from the toy through the shell, and one from that: each with an `AutoTim`, a `Clock` and a stack of its own, elsewhere above the megabyte. `harness/drivercheck.py` holds the driver to it; by hand, steps of `t c o r q`, as its top has them |
+| `above.asm` | Real mode: what a program that is run as a command is told of the memory above the megabyte, by INT 15h, the clock's memory, XMS and DPMI. Its top says how it is run |
 | `rmbench.asm` | Real mode: what the bench has for an extender, XMS, DPMI, EMS and memory |
 | `rmstart.asm` | Real mode: when DOS enters a program, to hold `start.c` against |
 | `rmcalls.asm` | Real mode: what a call costs, to hold `realcalls.c` against |

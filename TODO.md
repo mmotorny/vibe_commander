@@ -2385,9 +2385,10 @@ To be asked when the work reaches them, and not before.
 
 | | What | When, and what is thought of it |
 |---|---|---|
-| 3 | What deviation 1 says, the program staying in the memory whole, once the program is above the megabyte and a second copy has the memory to run again. That moves toward the original. `second-copy`, `start-memory` and `ended` have patches that say a second copy has none | At W, with the three scenarios as the 32-bit build shows them. Thought: declared as it is found, where the difference is of memory alone, and the three patches made anew and read |
+| 3 | What deviation 1 says, the program staying in the memory whole, once the program is above the megabyte and a second copy has the memory to run again. That moves toward the original. `second-copy`, `start-memory` and `ended` have patches that say a second copy has none | **Decided, on 13 October 2026** (`CLAUDE.md`, "The portable C"): where the program of 32 bits does again what the original does, it is held to the original's golden, and the deviation says only what still differs. Done by C2 for `second-copy` and `start-memory`, each with a patch of the 32-bit build's own; `ended` passes since E, with the 16-bit program's patch |
 | 4 | What the 32-bit program can do when DOS ends it by another program's hand. The 16-bit program has its say first, through its PSP, and leaves registers for the program that started it: `ended` prints them. Under an extender DOS would seem to go back to that program through the extender's own part of real mode, with nothing of the program run. That is from reading and was not tried | The piece that meets it, D2 or M1, tries it first and reports, and the user is asked with what was seen. Thought: declared, and `ended` not run for the portable C; `TakeEnd`, `Exit01` and `Exit05` go with the 16-bit build. **Tried by D2**: nothing of the program runs, but the extender takes itself out and leaves every interrupt of real mode as it found it; what is not put back is that DOS looks for Ctrl-C at every call, and whoever ended the program sees DOS's registers. "Piece D2" below has the table and the ways that there seem to be. **Decided on 13 October 2026**, the second of those ways: the program of 32 bits is told as the 16-bit one is, by a small routine of real mode that the system's functions keep for it (`CLAUDE.md`, "The portable C"). **Done**: "E, the end by another's hand" below; `ended` passes for both programs with the one patch |
 | 8 | That the 16-bit build may go, which the road keeps for the user | Before Z1, when both builds pass every scenario from one source |
+| 9 | Whether the program of 32 bits may take all of the memory above the megabyte while a command runs. Its extender does, as it comes: a command is told by the BIOS that there is none, and with an XMS driver none is free, where a command of the original or of the 16-bit program has all of it. A program with the same extender gets memory all the same, a second copy among them. `command` shows it in what `mem` prints, by 128K | Found by C2, which has the figures, and what the extender's setting for it does: "C2" below. Thought: the extender held to what the program and a copy of it need, by the build, which moves the program in the memory and wants the harness told; or declared as it is. The user's word of 13 October 2026: it stays open, to be decided before the 16-bit build goes, and `command` stays failing and off the record until then |
 
 ### The strategy
 
@@ -3121,7 +3122,7 @@ place: see below.
 | 2 | The editor, where a line ends: the cursor is on line 1 at the column behind what was typed, where the original is on a line further down at column 1. Each has typed a line and Enter into a file of the program's own | `user-menu-run`, `user-menu`, `comspec`, `view-commands`, `editor-save` | After step 6, `"a:" Tab "all" Enter`, row 0: `Edit: vc.mnu  *  Line 1  Col 7` for `Line 2  Col 1`. The others at steps 47, 45, 29 and 23, in `vc.mnu`, `vcview.ext` and `D:\VC\vc.ext` | `comspec` alone, and it shows what the four without one show |
 | 3 | The editor, the cursor in a line: perhaps 2 again, since the step begins with Enter | `editor-keys` | After step 7, `Enter Up End Left Left Left Backspace Del`, rows 0 to 13: the status has `Col 157` for `Col 13`, and the cursor is at column 74 of row 1 for column 12 | No |
 | 4 | The editor opened where the original does not open it | `editor-big` | After step 28, `F4`, row 0: `Edit: b  Line 1  Col 1` and the editor's screen, where the original shows the panels | No |
-| 5 | What the machine's memory is said to be while a command runs from the program | `command` | After step 7, `Ctrl+o`, rows 15 and 17: `mem` of DOS says 15,360K of extended memory, in all and free, for 15,232K, and 16,384K of memory in all for 16,256K, 128K more of each. What the extender makes of the memory: not looked into. If it is a figure that follows what the program is and not what it does, `harness/deviations.py` leaves such out, which is asked first | No |
+| 5 | What the machine's memory is said to be while a command runs from the program. Looked into by C2: the extender has all of the memory above the megabyte then, which is the user's, 9 of what is open | `command` | After step 7, `Ctrl+o`, rows 15 and 17: `mem` of DOS says 15,360K of extended memory, in all and free, for 15,232K, and 16,384K of memory in all for 16,256K, 128K more of each. What the extender makes of the memory: not looked into. If it is a figure that follows what the program is and not what it does, `harness/deviations.py` leaves such out, which is asked first | No |
 | 6 | A second copy of the program: the patches of the 16-bit build say that it has no memory to run, and here it has. 3 of what is open for the user | `second-copy`, `start-memory` | After step 6, `Ctrl+o`, row 15: `C:\WORK>d:\vc\vc ver` and what follows it, where the patch expects an empty row. `start-memory` after step 12, `Ctrl+o`, row 18: an empty row where the original has `C:\WORK>d:\vc\vc k` | Both |
 | 7 | The program ended by another's hand. 4 of what is open for the user, which D2 tried and wrote down. **Mended by E**, below: `ended` passes and is on the record | `ended` | After step 40, `Ctrl+o`, row 0: of the six words that the scenario prints of the registers left for the program that started this one, `2222 1111 EEF6 436D FF75 0202` for the patch's `2222 1111 EE4F #### 0000 0202` | Yes |
 
@@ -3133,7 +3134,8 @@ Since C1 the nine of 1, 2 and 3 pass, by one mend, and are on the
 record; 4 is no fault of the program's, and is declared and not run
 for this program, on the user's word: "C1, the editor" below.
 
-**A second copy, which the driver does not know.** In six scenarios
+**A second copy, which the driver does not know.** It knows since C2,
+and otherwise than is thought out here: see "C2" below. In six scenarios
 the program is started a second time from the command line of the
 first, and QEMU's log has its code at 00100010h and at 001DA1A0h:
 `second-copy`, `comspec`, `ended`, `start-setup`, `start-screen`,
@@ -6314,6 +6316,231 @@ already has (`short_step` of `harness/ported.py`).
 For whoever takes Quick execute out: `LOW_SHELL` and `LOW_KEPT` are 48
 bytes of the block in front of `LOW_ENDED`; the places behind them can
 move down, since `Ended_T` is written by their names.
+
+### C2, a second copy in the driver, and `command`: done but for what is the user's
+
+Two things. The driver of the tests reads of a copy of the 32-bit
+program what is that copy's, and `second-copy` and `start-memory` are on
+the record for it, each with a patch of this build's own. And `command`
+is not on the record and nothing of it is left out: what `mem` shows
+there is a state of the machine that the extender makes, which is the
+user's to decide on, 9 of what is open.
+
+**The driver and a copy of the program.**
+
+| | |
+|---|---|
+| `le.Linear.behind(base)`, `copies(count, base)` | Where the extender puts the first object of a program that is started while this one is in the memory, and of each of so many copies, one started by the other: behind the last object as an object is behind the one before, the end rounded up to 16 and 16 more. The top of `le.py` says why: a program of DOS/32A that another one runs takes no memory of its own |
+| `driver.COPIES`, `Facts.copies` | A script says the places of 3 copies: `flat_facts` works out `AutoTim`, `Clock` and the stack of the second and the third as it does the first's |
+| Event 06 | A count, and for each copy the three addresses |
+| `DRIVER.ASM`, `Copy` | Which copy idles: it counts the programs of the script's name that lie in DOS's memory in front of the one that DOS has as the current one, along the line of DOS's blocks from the driver's own, and puts `LSet` on that copy's places. `I28F` asks it at every idle call of the program; `Pump8` and `PutStF` read at `LSet` |
+| What the driver writes | New, `C`: a copy idled that the script has no places for, a fourth. `driver.read` raises for it, as for `F` |
+| `check_place` of `ported.py` | Holds every place that a copy ran at, by QEMU's log, to one of `copies(COPIES)`, and names the scenarios with a copy and where it was |
+| `harness/trial32/copies.c`, and `copies` of `drivercheck.py` | The toy: `auto.c` with a key that runs a copy of the toy through the shell. The check: three copies deep and back, twelve steps; again with the driver told that every copy is where the first is, which is the driver as it was; again four deep |
+
+Where H3's reading and the code differ:
+
+- Not "the PSP of the first call that was the program's". That takes a
+  program which is started again elsewhere for a second copy.
+- Not by who ran whom either, which DOS would seem to keep, at 16h of
+  a PSP. FreeCOM names itself there, also when a program has run it
+  for one command: a program of real mode that printed that line of
+  PSPs from under a second copy wrote `62A4 5110 CHAIN` and `5110 5110
+  COMMAND`, and the line ends there. Written first, and it took every
+  copy for the first.
+- A list of the PSPs in the order in which each first idled was
+  written next and passed everything here. It takes a copy for the one
+  before it if that one has never idled, as when a copy is started
+  with a copy for its command. The count along DOS's blocks does not
+  go by what has idled, and asks DOS nothing but the current PSP,
+  which the driver asks at every idle call already (AH 62h, which DOS
+  answers on the caller's stack at any time): the list of lists, AH
+  52h, is not asked, since an idle call of the program comes from
+  inside the critical error too. It takes it that a program lies
+  behind the one that ran it, as DOS loads them on the bench, and that
+  the driver lies in front of both.
+- `I28Q` is diverted for every flat program, where it was for one
+  with an `AutoTim`: that is where the copy is told. The other two as
+  before, by what the script has of the first copy.
+- 115 lines of `DRIVER.ASM`, 50 of `driver.py`, 25 of `le.py`, 125 of
+  the check and the toy's 95.
+
+What decided:
+
+- The original's instructions. The driver's file is the old one byte
+  for byte from 100h to 577h, everything in front of "A flat program",
+  but for three bytes: the two of how far `jmp Init` goes, at 101h,
+  and one of how far `je PumpL` goes, at 334h, which a script without
+  the event comes to once, behind its last screen. `Init` is the same
+  88 bytes, further on. Compared as bytes, which says more than
+  `ndisasm` of both. The file is 2,048 bytes, 1,845 of them used where
+  1,693 were, and what the driver keeps of the memory is the same.
+- Every golden of the original derived again, `python3
+  harness/goldens.py derive --together 8`: 167 scenarios, and `git
+  status` of `harness/goldens/` clean. Twice, once for the driver with
+  the list and once for the driver as it is.
+- The whole suite, before and after: the tests of the two trees of 16
+  bits printed the same to the line, 283 and 431 lines, but for the
+  seconds.
+- `python3 harness/drivercheck.py --trace --below`: what it held of
+  the four toys before, to the address and the tick, and
+
+  | Toy | What the driver did |
+  |---|---|
+  | `copies.c`, told that its copies are at 00100010, 00104940 and 00109270 | Each copy says of itself where its two variables are, and that is what the driver was told: `AutoTim` at 001008DC, 0010520C and 00109B3C. The step of `t` ended with "done by itself" in each copy, and again in the second and the first when the copy that each ran had ended. With the second copy's clock on, its cell was blinking at the three steps that ended with that copy idling, and nothing was at the two that ended in the third. The stack written out at each step held addresses of the code of the copy that idled and of no other, with that copy's stack pointer inside what was used |
+  | The same, told that every copy is where the first is | The step of `t` in the second copy ended at once, before the copy had done its thing: the driver as it was |
+  | The same, four deep | `C`, and `driver.read` raised |
+  | `--below` | Of the extender's stack of real mode, 512 bytes, 72 were used with the two variables read at every round, where 66 were, and 84 with a stack written out, as before |
+
+- `check_place`, in the scenarios' test of the 32-bit program: "In 6 a
+  copy of it ran as well, started from the command line of the first,
+  where the driver reads that copy", each at 001DA1A0h as the program
+  was linked then, and at whatever `copies` works out since: the place
+  moves with every change of the program's length.
+
+- The time of a step is not the driver's doing. `blank-timed`, whose
+  step of 1,300 ticks is the longest that this program idles, was run
+  on the program of 32 bits with the driver as it was and as it is, at
+  the same time, twice: 128 and 120 seconds, then 79 and 68. But under
+  a host as loaded as it was that hour, three agents' suites at once
+  and a load of 25 to 30, the same step took more than its 300 seconds
+  in three runs of `--record` one behind the other, which wrote nothing
+  for it, and the scenario 306 seconds in a suite, where the 16-bit
+  program took 80: what H3 has on a machine's second while this
+  program idles. A flaw of the bench under load. What it cost is
+  mended, by a commit of its own: a scenario has ten seconds more for
+  each second of its longest wait before the program counts as stuck,
+  `WAIT_TIME` of `harness/scenarios.py`, 1,014 seconds for this one.
+  That is a stopgap: the piece that finds out why this program's waits
+  cost the host so much looks at it, and may take it out again.
+  Why a second of the machine costs the host so much while this
+  program idles was not looked into: the extender's way to real mode
+  and back and the BIOS's block move at every round, by the look of
+  it.
+
+What is not held: a copy that lies in front of the one that ran it in
+DOS's memory, which the bench does not make; a program of the script's
+name that has stayed in the memory, which would count for a copy; and
+the place of a copy if the extender is ever told to take less than all
+of the memory above the megabyte, see below.
+
+**The scenarios that start a second copy**, each run by itself on the
+program of 32 bits with the driver as it is now. Its code ran at
+00100010h and 001DA1A0h in each, as it was linked then.
+
+| Scenario | Against the original's golden as the rules leave it, with no patch | Now |
+|---|---|---|
+| `second-copy` | Every screen cell for cell but one: behind step 8, F10, rows 5 to 11, the box that names the program, which is 10 of `DEVIATIONS.md` and the second half of the 16-bit program's patch, row for row. The copy runs `ver` and shows what it printed, as the original's does. The disks are the original's | On the record, with `harness/goldens/portable_c32/second-copy.patch`, those seven rows, of 10 alone |
+| `start-memory` | The same but for steps 11 to 14. The copy runs `k`, as the original's does, and `k` stays in the memory with all but 75 KB of DOS's. The original's copy cannot get its data back, says "Program too big to fit in memory" and ends. This one needs none of DOS's memory to come back, says nothing and is still there: behind step 12 the command line shows `C:\WORK>d:\vc\vc k` and the two lines of the banner a row further down, rows 19 to 21, with no fourth line; behind steps 11, 13 and 14 the panels are the copy's, with the mini status, rows 20 to 22, which are the rows that the 16-bit program's patch has there. The disks are the original's | On the record, with a patch of its own, those four screens, of 1, which says so for the program of 32 bits now |
+| `ended` | Two rows, the one that the scenario prints of the registers behind steps 40 and 43: `2222 1111 EEF6 436D FF75 0202` both times, where the original has `0000 1111 0000 0000 0000 0202` and `0000 0002 0000 0000 0000 0202`, and the 16-bit program's patch `2222 1111 EE4F #### 0000 0202`. Every other screen, and the disks, as the original's. That is what H3 saw: the driver's blindness had no part in it | Not this piece's. On the record since E, which has the program of 32 bits told when DOS ends it: those rows are the 16-bit program's patch's now |
+| `comspec` | Before C1's mend of the editor, against the 16-bit program's patch: first otherwise behind step 45, Enter in the editor, `Line 1` for `Line 2`, and everything behind followed from that; nothing of the second copy showed. With that mend it passes | On the record since C1 |
+| `start-setup`, `start-screen` | Pass, as before | On the record already |
+
+`unpatched` of `deviations.TREES` is new and nothing uses it: a build
+of another tree's source says there that it wants no patch for a
+scenario for which that tree has one. Neither scenario came out as the
+original's cell for cell, so each has a file of its own instead, with
+the rows that still differ; the top of `goldens.py` has both ways.
+
+**`command`: what `mem` says of the memory above the megabyte.** Not on
+the record, and nothing left out.
+
+What the figure is. FreeDOS's `mem` (its source is in its package of
+the pinned image, `SOURCE/MEM/SOURCES.ZIP`, `check_xms` of `mem.c`)
+takes for the extended memory in all the sum of what INT 15h with
+E820h lists as memory from the megabyte on; if that is nothing, what
+E801h says; then function 88h; then, if that is 0 too, the two bytes of
+the clock's memory at 17h. What is used of it is that less what an XMS
+driver has free, and "Total memory" is that and 1,024K.
+
+What a command is told, by `harness/trial32/above.asm`, run as a
+command of each program (`harness/trial32/run.py --extra
+VC/ABOVE.COM=build/trial32/above.com PROGRAM '"d:\vc\above" Enter'
+Ctrl+o`):
+
+| | From the program of 16 bits | From the program of 32 bits |
+|---|---|---|
+| INT 15h, 88h | 3B80h, 15,232K | 0 |
+| INT 15h, E801h | 3B80h | Refused, with the carry |
+| INT 15h, E820h | Six stretches, one of them memory from 00100000h, 00EE0000h long | Refused |
+| The clock's memory, 17h and 30h | 3C00h, 15,360K | The same |
+| A20 | On | On |
+| XMS, DPMI | Neither | Neither |
+
+So the extender has INT 15h while a command runs and says that there
+is no memory above the megabyte, since it has taken all of it; `mem`
+falls through to the clock's memory, which has 128K more than the BIOS
+says, the BIOS keeping that much at the top for itself. The 128K is
+the least of it. The figures of that screen that follow the same
+thing: the extended memory in all and used, and the total in all; the
+total that is used follows it too and is left out already for
+following the program's size.
+
+That is not a figure of the kind that "Scenarios" leaves out: it is
+what the machine is while a command of the program runs, and a user
+meets it. With an XMS driver loaded (`run.py --himem`, FreeDOS's
+HimemX of the pinned image), `mem` as a command says:
+
+| | Extended, in all | Used | Free | Conventional, free |
+|---|---|---|---|---|
+| From the program of 16 bits | 15,232K | 254K | 14,978K | 348K |
+| From the program of 32 bits | 15,232K | 15,232K | 0K | 431K |
+| From the program of 32 bits with its extender told to take 2 MB | 15,232K | 2,302K | 12,930K | 499K |
+
+A command run from the program of 32 bits finds no memory above the
+megabyte, by XMS or by the BIOS: a program with another extender, a
+cache, a RAM disk. A program with DOS/32A does, since that asks the
+first one for memory, as a second copy does. And the command has 68K
+less of DOS's memory, the second row against the third: FreeCOM, which
+moves itself out to XMS while a command runs where it can, would seem
+not to be able to.
+
+What would change it, tried on copies of the file and not made: the
+stub's settings (`tools/stub.c`) have at 10h behind `ID32` four bytes,
+FFh each, which are the most memory above the megabyte that the
+extender takes, in bytes. With 00200000h there: the rows above with an
+XMS driver; without one, 88h says 13,184K to a command, E801h and
+E820h are still refused, and `mem` has 13,184K and 14,208K. But:
+
+- The extender then takes the top of the memory and not the bottom:
+  with 1 MB the program ran at 00EE0010h, with E1000h at 00EFF010h.
+  `le.BENCH` is another then, by the setting.
+- A second copy lives in what the first took, not in what is left:
+  with 1 MB, which holds the program's 893,307 bytes once, `d:\vc\vc ver`
+  ends with "DOS/32A fatal (4003): not enough extended memory to load
+  application exec". So the setting is how much the program and what
+  it runs of its own kind have between them, and `second-copy`,
+  `start-memory`, `comspec`, `ended`, `start-setup` and `start-screen`
+  want twice the program, with the copy where `behind()` has it or
+  wherever the extender then puts it, which was not looked at.
+- `mem` on the bench still shows other figures than the golden, since
+  E820h is refused: those would then follow the size of the program,
+  which is the kind that is left out.
+
+For the user, 9 of what is open: whether the program of 32 bits may
+take all of the memory above the megabyte while a command runs, or is
+held to what it needs, and to how much. The user's word of 13 October
+2026: it stays open, and is theirs to decide before the 16-bit build
+goes; `command` stays failing, for the 128K, and off the record until
+then.
+
+And of the second copy, the same day: this work lands as it is, and no
+more goes into scenarios with more than one copy of the program unless
+the user asks.
+
+**For the pieces behind this one.**
+
+- A flat program's copy is watched; a scenario may wait on `AutoTim`
+  in one, switch its clock on, and count on its stack being looked
+  at. Four deep is refused.
+- If the extender is told how much memory to take, `le.BENCH` and
+  `behind()` are to be found again, by `drivercheck.py --trace` and
+  the place line of the scenarios' test, which fails for a copy that
+  is elsewhere.
+- For W: the README's "When a step is finished" says nothing of a
+  flat program yet (H2), nor of its copies.
+- `ended` passes since E, which landed beside this piece, with the
+  16-bit program's patch: "E, the end by another's hand" above.
 
 ## The portable C in 32 bits: what a trial on the bench showed
 

@@ -2515,8 +2515,19 @@ in "The portable C".
     it takes 3: Python's threads take turns at such work, so four
     scenarios side by side waited on one another.
   - A second copy of the program, started from the command line of
-    the first, is loaded behind it, at 001DA1A0h on the bench. The
-    driver of the tests knows the first copy's place alone.
+    the first, is loaded behind it, where `copies` of `harness/le.py`
+    works it out from the program's length: the place moves with every
+    change of the program, and is written nowhere. The driver of the
+    tests is told the places of three copies and tells which of them
+    idles by the programs of that name in DOS's memory in front of it
+    (`TODO.md`, "C2"): not by who ran whom, since FreeCOM names itself
+    as the one that ran it, at 16h of its PSP, also when a program has
+    run it for one command.
+  - The extender takes all of the memory above the megabyte while the
+    program runs, and a command of the program is told that there is
+    none: the scenario `command` fails for that and is off the record,
+    and whether it stays so is the user's (`TODO.md`, the plan, 9 of
+    what is open).
   - A number of 16 bits that stands for one below 0, FF60h for 160
     back, and is added to a pointer goes that far on in a flat
     memory, and nothing at the place says so: `T71_00` of `edit.c`,

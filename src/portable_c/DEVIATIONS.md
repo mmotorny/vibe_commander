@@ -192,10 +192,9 @@ these, where it is of the program of 16 bits alone and the program of
   while a command runs; below it stays the extender, some 52 KB. So
   the count of what the program costs in memory, above, is the 16-bit
   program's: a command run from the program of 32 bits has of DOS's
-  memory all but the extender's part. Of the memory above the megabyte
-  it has none, the extender having taken all of that: this is not
-  declared here, and is the user's to decide (`TODO.md`, the plan, 9 of
-  what is open); the scenario `command` shows it and fails for it.
+  memory all but the extender's part. What it has of the memory above
+  the megabyte is not declared here: `TODO.md`, the plan, 9 of what is
+  open for the user.
 - The block of the panels. The program of 32 bits has it of 640 KB that
   are its own, above the megabyte, which it hands out to itself as DOS
   hands out its memory; it makes the block shorter for a command and
