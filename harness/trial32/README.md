@@ -81,3 +81,17 @@ the finding: see `csover.c`.
 
 The three of real mode are run under the program's name: `run.py --name
 VC.COM build/trial32/rmbench.com`.
+
+## Three scripts of the plan
+
+When the step was planned, on 13 October 2026 (`TODO.md`, "The portable
+C in 32 bits: the plan"), the tree itself was asked three things, by
+scripts that read and compile it and run nothing. They are here for the
+pieces of that plan to start from, and what each printed that day is in
+the plan.
+
+| File | What it asks |
+|---|---|
+| `casts.py` | Of the places where a pointer is kept in a number or made of one, which `harness/hostcheck.py` counts: what is each, a place of the main data, a table by its offset, a panel by its segment? It prints the classes of the plan with their files, and the places of one. It needs gcc, as the host check does |
+| `int16.py` | Where can the program tell an int of 32 bits from one of 16: where is arithmetic on numbers of 16 bits compared, divided, shifted right or made wider before it is put back into 16? It needs clang, which reads each file for a machine of 32 bits. Its top says what it cannot see |
+| `whole.py` | Does the tree compile and link as a flat program, and how long is that? It copies the tree to `build/trial32/whole/`, changes the two lines that `wcc386` refuses, puts functions that do nothing in place of `dos.c`, and prints the file's length, its objects and its relocations. Nothing that it makes runs |

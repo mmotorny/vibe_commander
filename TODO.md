@@ -1993,6 +1993,520 @@ last 35 calls, with the functions of the old way that went behind
 them, gave back 738 bytes. The README's figures say where the file
 stands.
 
+## The portable C in 32 bits: the plan
+
+Step 1 of the road (`CLAUDE.md`, "The portable C"): the portable C
+becomes a 32-bit program for DOS, built by Open Watcom's `wcc386` with
+DOS/32A, and judged on the same bench by the same scenarios; and what
+of step 2 has to be settled with it. This is the plan, made on 13
+October 2026 at `c0b3cad`, before any of it was begun, by reading the
+tree and by trials that compile and link and run nothing. What the
+bench does with such a program is in the section behind this one, "what
+a trial on the bench showed", and is not said again. Three scripts of
+this plan's trials are kept with the toys, in `harness/trial32/`:
+`casts.py`, `int16.py` and `whole.py`. A count below says which of
+them counted it.
+
+### In short
+
+- The same source is built twice, by `wcc` and by `wcc386`, from the
+  first piece to the last. Nothing is cut over.
+- In step 1 a segment stays a number and an offset stays a number. The
+  32-bit program has the 16-bit program's memory inside its flat one: a
+  megabyte counted in paragraphs from 64K below the main data, in which
+  the main data, the tables, the panels and the viewer's text are where
+  their numbers say. Pointers in their place are step 2, made under the
+  32-bit build alone, with the bench judging every piece of it.
+- So of the 1,040 places where a pointer is kept in a number or made of
+  one, 737 need no change where they stand: they go through a dozen
+  macros, which get a second body. Some 190 lines are changed by hand,
+  and 96 places are of DOS and go into `dos.c`.
+- All of that is done under the 16-bit build first, and most of it
+  leaves `VC.EXE` byte for byte as it was, which is a check that takes
+  a second.
+- `dos.c` stays the 16-bit one and `dos32.c` is written beside it,
+  behind the same `sys.h`, and judged by toys on the bench before the
+  program can run: 71 of the 84 functions go straight through the
+  extender, 7 go through real mode, 6 change.
+- The 32-bit build is first run when all of that has landed, and is
+  then held to a record of the scenarios that it passes, which may only
+  grow.
+- 20 pieces can be named, and the convergence behind the first run is
+  guessed at three to six more. The first is P1; D1 and H1 start beside
+  it.
+- Nothing is past return before the last piece, which deletes the
+  16-bit build and is the user's to release.
+
+### Taken by the session, on 13 October 2026
+
+Ways of doing step 1 that the road in `CLAUDE.md` leaves open. They
+are not the user's word: the session that runs the work took them, the
+step being one that follows the setup program without waiting for the
+user. The numbers are those that the two lists have between them.
+
+| | What | Taken |
+|---|---|---|
+| 1 | Whether step 1 keeps segments and offsets as numbers, or has pointers first, under the 16-bit build: see "The strategy" | Numbers in step 1, in a megabyte of the program's own inside the flat memory. They become pointers in step 2, under the 32-bit build alone. It is scaffolding of some 40 lines of `vc.h` and 30 of `dos32.c`, which step 2 takes down again |
+| 2 | Where the panels and the viewer's text are in step 1. With 1 they have to lie within that megabyte, so they cannot be DOS's memory below the megabyte, nor a block that the extender gives wherever it likes | A stretch of the program's own, 640 KB, that the three functions of `sys.h` for memory hand out as they hand out DOS's today. A command then finds all of DOS's memory free but the extender's 52 KB |
+| 5 | Quick execute commands, which is the user's to decide and not decided (`TODO.md`, "The portable C: one program"). Under the extender COMMAND.COM's interrupt is called in real mode and comes back; the shell of the bench does not serve it either way (`quick`) | It stays whole through step 1, some 40 lines of `dos32.c`. Should the user decide that it goes, the hardest part of S3 and D2 goes with it |
+| 6 | Release and debug, which the user asked for at this step | Two programs of every build: `VC.EXE`, compiled `-os` without debugging information, which is shipped and which every test judges; and `debug/VC.EXE`, compiled `-od -d2` with checks in the macros of the addresses, built always and run by hand. See "The build" |
+| 7 | Where DOS/32A's licence text is kept, which the road has in the repository and the trial left open as to where | `LICENSE.DOS32A` beside `LICENSE`, the text of `binw/license.d32` as it is, and the sentence that the road has the README say, under a heading of its own |
+
+Not taken here, since `CLAUDE.md` has them: the extender is DOS/32A,
+its stub is linked from the pinned download and never committed, the
+file is held to no length, and this step follows the setup program
+without waiting.
+
+### Open, for the user
+
+To be asked when the work reaches them, and not before.
+
+| | What | When, and what is thought of it |
+|---|---|---|
+| 3 | What deviation 1 says, the program staying in the memory whole, once the program is above the megabyte and a second copy has the memory to run again. That moves toward the original. `second-copy`, `start-memory` and `ended` have patches that say a second copy has none | At W, with the three scenarios as the 32-bit build shows them. Thought: declared as it is found, where the difference is of memory alone, and the three patches made anew and read |
+| 4 | What the 32-bit program can do when DOS ends it by another program's hand. The 16-bit program has its say first, through its PSP, and leaves registers for the program that started it: `ended` prints them. Under an extender DOS would seem to go back to that program through the extender's own part of real mode, with nothing of the program run. That is from reading and was not tried | The piece that meets it, D2 or M1, tries it first and reports, and the user is asked with what was seen. Thought: declared, and `ended` not run for the portable C; `TakeEnd`, `Exit01` and `Exit05` go with the 16-bit build |
+| 8 | That the 16-bit build may go, which the road keeps for the user | Before Z1, when both builds pass every scenario from one source |
+
+### The strategy
+
+| Way | For | Against |
+|---|---|---|
+| A cut-over: the source changed until `wcc386` builds a program that runs, with the 16-bit build let go on the way | The least written twice | Against the rule: every step builds for DOS and passes its scenarios before it lands. And nothing would judge the tree between the first piece and the last |
+| Pointers first: step 2 under the 16-bit build, a panel a far pointer, a place of the main data a pointer, then the switch | The switch itself is small | A far pointer in the main data is four bytes where a word is, and the main data's layout is held: by the setup file, by the driver of the tests, by the 284 words of the tables that say `MD_AT`. A table handed on as a far pointer costs a relocation of four bytes in the file at each of 231 places. And each of those pieces is judged by a build that is about to go, in a memory where a pointer has a segment that C knows nothing of |
+| Two programs of one source, with the numbers kept. Taken | Every piece before the first run is the 16-bit program unchanged, and most can show it by the bytes of the file. The 32-bit program is the same program, so what its first run fails is what 16 bits hid and not a new mistake of translating. Step 2 is then made where pointers are plain, and the bench judges each piece of it | What gives the numbers a meaning in 32 bits is written for step 1 and taken out in step 2. A place where the 16-bit program counted on an offset wrapping round at 64K is not found by reading: see "What could go wrong" |
+
+What only the 16-bit build needs, and where it stands so that it is
+nothing in 32 bits and goes with that build:
+
+| What | How much | Where it is | In 32 bits |
+|---|---|---|---|
+| `__far`, `FAR`, `STACK`, `CODE` | 790, 62, 262 and 96 places (`harness/hostcheck.py`) | Words in the source | Nothing already: `vc.h` defines them away where `__I86__` is not set. The words go by a script in the last piece |
+| The macros of the addresses | 7 names that files define for themselves, 46 definitions in 23 files, and 4 of `vc.h` | After P1: one block of `vc.h` with two bodies, under `#ifdef __I86__` | The second body. The first goes with the build, the second in step 2 |
+| The three groups of the data, the two code segments, `#pragma data_seg` | `CMakeLists.txt`; 4 pragmas in `main.c` and `stack.c` | The build; the pragmas under `__I86__` after S3 | One flat segment of each kind, by the linker's order |
+| `arith.c`, the compiler's two helpers | 1 file | Not built for 32 bits | `wcc386` multiplies and divides without them |
+| Interrupt functions, `__loadds`, naked functions, `_asm`, registers in `#pragma aux` | 5, 3, 2, 2, 4 and 7 places | In `resident.c`, `main.c`, `vc.h`, `dos.c` today; in `dos.c` alone after S3 | `dos32.c` has its own, as inline assembly of 32 bits |
+| `LAID_OUT(BOXHD, 10)` and `LAID_OUT(BOXMN, 11)` | 2 lines of `tables.h` | Under `__I86__` after P1 | 12 and 13 bytes: see "The tables" |
+| `dos.c` | 1,148 lines | A file that only the 16-bit build has | `dos32.c` |
+
+### A pointer in a number, by what it is
+
+`harness/hostcheck.py` counts 1,035 places where a pointer is cast to a
+number of 16 or 32 bits or made of one, and 5 where it is a function's
+address; `harness/trial32/casts.py` asks gcc the same way and sorts
+them by the macros that each is made through and by the words of its
+line. It is a sorting by rule, and a few lines are in the wrong class.
+
+| | Class | Places | Files | What it is | In step 1 | The work, and whether under 16 bits first |
+|---|---|---|---|---|---|---|
+| T | A table by its offset | 326 | 22 | `OFFSET(Conf_B)`, 231 times, and `AT(code, offset)`, which makes the pointer again: a box, a dialog or a text of the files of tables, handed to `Dialog`, `DialBox`, `Ask` and their like as its offset in the tables' segment | Stays an offset: from the paragraph 32K below `Title_S`, which is the tables' segment as `AsmSeg` answers it. The tables are 25 KB in a flat program, with the constants of the code beside them | None where they stand: the two macros get a second body. Yes, P1. But the 40 places of `dialog.c`, `main.c` and `stcolor.c` that read a pointer out of a table as a word are P3 |
+| N | A place of the main data as a number | 210 | 28 | A near pointer, which on DOS is its offset in the main data: `(u16)md.WinBuf`, `(u8 *)md.BatAdr`, `md.HstAdr`, the tree's `TRELIST` | Stays a number: the offset in `md`. `MD_PLACE(pointer)` and `MD_POINTER(place)`, which are the two casts on DOS and take away or add `&md` elsewhere | 147 written out on 138 lines, each wrapped in one of the two words; 63 made by `TRELIST`, `MD`, `MDW`, `WAS` and `FIND`, whose definitions change. Yes: P2a, P2b, P3 and S3, by file |
+| P | A panel by its segment | 150 | 22 | `PANEL(panel)`, 148 times, and `WCB_OF(file)` twice | Stays a number of paragraphs. `PANEL` adds it to where the megabyte begins | None, but the two of `WCB_OF`, which finds the panel in the segment of a far pointer and has to be handed it. Yes, P1 |
+| R | A far pointer kept as a near one | 108 | 9 | What `MvzLine`, `AddFile`, `CutPath` return, known to be in the main data: `NEAR(pointer)`, 94 places, and 14 written out on 7 lines | The same pointer | The macro's second body is a cast; the 7 lines get the macro. Yes, P1 |
+| M | The main data's segment as a number | 105 | 22 | `MAIN_SEG`, handed where a routine takes a panel's segment or the caller's: `Dialog` 48 times, `DialBox`, `ClsLine`, `Ask` | The number 1000h: the megabyte is counted from 64K below the main data so that it is a constant | None. Yes, P1 |
+| D | Of DOS | 96 | 5 | A far pointer taken apart for DOS's registers or made of what DOS answers, 69 in `dos.c`; and 27 outside it, in `resident.c`, `start.c`, `main.c` and `view.c`: the PSP read by its offsets, an interrupt's address, the block that a program is run with | Not in the common code at all | S1 to S3 move the 27 outside `dos.c` into it or behind new functions of `sys.h`. `dos.c` keeps its own until it goes. Yes |
+| V | The viewer's, the editor's and a copy's memory by segment | 39 | 7 | `TEXT(segment)`, `AT(address.segment, address.offset)` | Stays a segment and an offset | None: three that are written out with a shift get `AT`. Yes, P1 |
+| G | A segment handed on, the main data's or a panel's | 6 | 2 | `AT(segment, field->mPoint)` in `dialog.c` | The same | None: one written out in `bars.c` gets `AT`. Yes, P1 |
+
+That is 737 places that change by a definition (286 of T, 148 of P,
+105 of M, 36 of V, 5 of G, the 94 of `NEAR` and the 63 of N that a
+macro makes), 207 by hand, on some 190 lines (147 of N on 138 lines,
+14 of R on 7, the 40 of T, 2 of P, 3 of V, 1 of G), and the 96 of DOS.
+After P1 the host check counts some 310 of the 1,040, since gcc reads
+the second bodies, which cast nothing; when P2, P3 and S3 have landed
+it counts those of `dos.c` and no others. So its record says how far
+the preparation is, file by file, and a file that has gained a place
+has a cast outside the words.
+
+What the host check does not see is said under "Arithmetic" and under
+"What could go wrong".
+
+### The memory
+
+The megabyte: a segment `s` and an offset `o` are the address
+`(u8 *)&md - 10000h + 16 * s + o`. Tried with both compilers:
+`wcc386` takes such second bodies with warnings as errors, `MAIN_SEG`
+being the constant 1000h, and gcc for 64 bits says nothing of them.
+Whatever is named by a segment has to lie between the main data and
+983 KB behind it, which the linker's order sees to. The bodies as
+they were tried, for P1 to start from:
+
+    #define ARENA ((u8 *)&md - 0x10000L)
+    #define MAIN_SEG 0x1000
+    #define AT(segment, offset) \
+        (ARENA + ((u32)(u16)(segment) << 4) + (u16)(offset))
+    #define SEG_OF(pointer) \
+        ((u16)(((const u8 *)(pointer) - ARENA) >> 4))
+    #define PANEL(panel) ((struct WCBdef *)AT(panel, 0))
+    #define TABLES() SEG_OF(Title_S - 0x8000)      /* AsmSeg */
+    #define OFFSET(object) \
+        ((u16)((const u8 *)(object) - AT(TABLES(), 0)))
+    #define MD_PLACE(pointer) \
+        ((u16)((const u8 *)(pointer) - (const u8 *)&md))
+    #define MD_POINTER(place) ((u8 *)&md + (u16)(place))
+    #define NEAR(pointer) ((u8 *)(pointer))
+
+| What | Today | In the 32-bit program of step 1 | In step 2 |
+|---|---|---|---|
+| The main data, 62,603 bytes | `md`, at offset 0 of the group that DS is on, in the file as zeros | `md`, a variable, anywhere; its layout as it is. `MAIN_SEG` is 1000h | The same variable. Its layout is free once three things no longer go by it: the driver, which takes the two addresses from the map by name then; the tables, which name a field by its address; and the words of it that held places and segments, which are pointers outside the part that the setup file is an image of |
+| A place in it | A near pointer, or that as a word | A pointer, or its offset in `md` as a word | A pointer |
+| The tables, 20,850 bytes | A group of their own, reached far through `AsmSeg` | Constants like any others, 25,131 bytes with the constants of the code; known by offsets from 32K below `Title_S`. The test of the layout holds them all to lie within 32K of it | Named by pointers: `Dialog(&Conf_B, ...)` |
+| The stack, 4,096 bytes | A group of its own; a pointer to a local variable is `STACK` | Data of the program, 16 KB, in the file as zeros so that the tests know what it holds when loaded; the header of the file names it | The same |
+| The panels and the viewer's text | One block of DOS's, all that there is, cut up in paragraphs: `Init11`, `GiveMem`, `TakeMem` of `start.c` | The same code and the same paragraphs, in 640 KB of the program's own that `dos32.c` has behind the main data, without a value and so not in the file. `MemTake`, `MemGive` and `MemResize` answer for it as DOS answers, the largest block with a refusal | Blocks that the extender gives, DPMI 0501h, as pointers; the three functions answer in addresses |
+| A panel's segment in the main data: `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg`, `ViewSeg`, `MemSeg`, `FreMem2` | Words | Words: paragraphs of the megabyte | Pointers, in variables outside the laid-out part |
+| The same in the setup file | None: the file is three letters, of each panel what a `WCBdef` has before `CurAdr`, of the main data what it has before `LoadRes`, and a sum; no word of those is a segment or a place | The same file | The same file |
+| The copy of the screen, the boxes' and the help's buffers | Arrays of the main data, named by their offsets in 82 words of the tables | The same | Named by address |
+| The screen itself, the BIOS's data | Far pointers of `dos.c`, B800:0 and 40:6C | Flat addresses of `dos32.c`, B8000h and 46Ch | The same |
+| The PSP and the environment | Read by their offsets through `PspSeg`, in `resident.c`, `start.c` and `main.c` | Below the megabyte and outside the program's own: `sys.h` hands out the command tail and the environment, S1 | The same |
+
+What keeps its layout through step 1, and who holds it:
+
+- The main data: `LAID_OUT(MainDat, 0xF48B)`, for both compilers. The
+  setup file is an image of its start; the driver reads `AutoTim` and
+  `Clock` at the main data's address, which the harness takes from the
+  linker's map, plus the offsets of the original's listing; the tables
+  name places in it by `MD_AT`.
+- A panel, `LAID_OUT(WCBdef, 0x1A62)`: the setup file has its start.
+- The tables, but for the words that name something.
+
+**The tables.** A box's lines, a dialog's box and its buttons, the
+table of the menus' tables, `Menu_T`, and the pictures of the setup's
+colours, `StPagTab`, are written in C as pointers already. On DOS such
+a pointer is a word, the offset in the tables' group, which is what the
+original has there. `wcc386` makes it four bytes with a relocation:
+`harness/trial32/whole.py` compiles all 16 files of tables once the two
+lines of `LAID_OUT` say 12 and 13. The objects of `find_t.c`, read
+byte by byte, are laid out as they are written, one behind the other
+with nothing between: 90 bytes where the 16-bit build has 84, for the
+three pointers of its dialog. A word that holds a number where it
+could hold an address, `NUMBER(LenStr)`, is four bytes without a
+relocation.
+
+So in 32 bits a word that names something is a pointer, and the test
+of the data compares an object field by field instead of byte by byte:
+
+- It knows from the declaration which fields are pointers. There are
+  five shapes: `BOX(n)`, `BOX1(n)`, `BOX2(n)`, `DIALOG(n)`, and an
+  array of pointers; everything else is bytes.
+- A pointer with a relocation is held against the original's word as
+  today, by the name of what it points at and the distance from it. The
+  relocations are in the file, where the reader of LE files finds them.
+- A pointer without one is a number: its low word is the original's
+  word and its high word is 0.
+- A field that holds an offset in the main data is compared as a
+  number, as today. Written so that it may also be a relocation that
+  names `md` and that offset, it serves step 2 unchanged.
+- Every other byte is compared as today.
+
+The routines that read a table have to read a pointer as a pointer:
+`DialBox` steps through a box's lines two bytes at a time and `Dialog`
+takes `head->pDiBox` for a word. That is P3, under the 16-bit build,
+where a near pointer read out of a far table is still the word.
+
+### The system's functions
+
+Two files behind one `sys.h`: `dos.c`, which stays what it is and goes
+with the 16-bit build, and `dos32.c`. One file with two bodies would
+share little: all seven pieces of inline assembly differ, the structure
+of registers differs, and a call through real mode has no likeness in
+16 bits. What they share is the order in which DOS is asked, which is
+behaviour and is carried over a function at a time.
+
+The 84 functions of `sys.h`, by what the trial found of DOS/32A:
+
+| Kind | Functions | Which |
+|---|---|---|
+| Straight through: no address, or one that the extender translates, with the program's pointer as it is | 71 | The files but `FileTrueName`, 16; the directories, 8; the drives, 8; `TimeOfDay`, the two versions, `BreakCheck`, `SetBreakCheck`, `Idle`; `ProgramEnd`; the console, 2; the keyboard, 4; the screen, 17, of which four read and write the display's memory and the BIOS's data at flat addresses; the mouse, 8; `Ticks` |
+| Through one block below the megabyte and a call in real mode, DPMI 0300h, or 0301h for a routine | 7 | `FcbParse` (29h), `FcbDelete` (13h), `CountryInfo` (38h), `CaseMap`, which calls the routine that 38h names, `FileTrueName` (60h), `ProgramRun` and `ProgramRunBare` (4Bh) |
+| Other in 32 bits | 6 | `MemTake`, `MemGive`, `MemResize`: the program's own 640 KB. `MemSetSearch`, `MemSetUpper`: passed to DOS as they are. `ProgramPrefix`: goes, S1 |
+
+What is 16 bits in kind and changes shape for both builds, under the
+16-bit build first:
+
+| What | Today | After | Piece |
+|---|---|---|---|
+| `ProgramRun(name, block)` | `struct EPBs`: three far pointers of real mode, which `resident.c`, `start.c` and `view.c` make with `MAIN_SEG` | `ProgramRun(name, tail)`; the block is `dos.c`'s to make, with the two file control blocks where the original has them | S1 |
+| `ProgramPrefix()` and `PspSeg` | The PSP's segment, read at 0Ah, 2Ch, 02h and 81h in three files, 10 places | The command tail and the environment as pointers that `sys.h` answers with; the end of the memory as a number, if the Info still shows it then | S1 |
+| `Vector`, `SetVector` of `vc.h`; `FatErr` of `main.c`, `CtrlC` of `resident.c` | The program takes INT 24h, 1Bh and 23h itself, with interrupt functions | Functions of `sys.h` that take and give back the critical error and Ctrl-Break, in the order of today's calls; the entries in `dos.c`, which call `FtErr1` of `main.c` as a plain function | S2 |
+| `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` of `resident.c` | The entry of the program, what DOS does when it ends it, COMMAND.COM's interrupt with the stack set by hand | In `dos.c`. `Main` is called by the entry; leaving is `ProgramEnd` with what has to be done first; Quick execute is a function that comes back, the stack kept and put back around the interrupt | S3 |
+| The memory by segment and paragraph | `MemTake`, `MemGive`, `MemResize` | As they are, through step 1 | Step 2 |
+
+In `dos32.c`, by the trial: the entry puts ES on the data and clears
+the direction flag; one block below the megabyte is asked for when the
+program starts, DPMI 0100h, for the seven functions above; the three
+interrupts are taken with DPMI 0205h, and the handler of the critical
+error goes over to the program's own stack before it calls `FtErr1`;
+INT 22h is put back after a program has run; the vectors are given
+back before the program ends, or the extender writes a warning onto
+the last screen.
+
+`dos32.c` is judged before the program can run: a toy that asks every
+function of `sys.h` and prints what it is answered, built twice, with
+`wcc` and `dos.c` and with `wcc386` and `dos32.c`, and run on the bench
+by `harness/trial32/run.py`. The two have to print the same.
+
+### Arithmetic
+
+On DOS two numbers of 16 bits are added, taken from one another,
+multiplied and shifted as numbers of 16 bits without a sign. Where an
+int has 32 bits they are made ints first, and the result has a sign
+and does not wrap. Put back into 16 bits it is the same; looked at as
+it is, it is not: `a - b < c`, `(a + b) >> 1`, `a + b < a`, a product
+kept in 32 bits, `a == -1`. The types being `u8`, `u16` and `u32`
+everywhere, with no `int` in the tree but in two casts, and 244 places
+that say `(u16)(` already, most of the code is the same in both.
+
+`harness/trial32/int16.py` finds the rest: clang reads a file for a
+machine whose int has 32 bits, and the script walks every expression
+with its type. Held against nineteen lines written for it, it found
+the nineteen. Of the 47 files of code it counts, in 34 of them:
+
+| Kind | Places | What |
+|---|---|---|
+| compare | 17 | `if (item > sd.ColNum - 1)`, `if (cursor - first >= place.lines)` |
+| divide | 3 | |
+| shift | 9 | `key = item - table >> 1`, `Below` of `blank.c` |
+| widen | 21 | The result becomes a number of 32 bits |
+| address | 2 | The result is made a pointer; the host check has these too |
+| index | 73 | `text[i - 1]`, `screen + (width - 2)`: the same in both builds unless the number leaves 16 bits, since one below 0 steps back in both |
+
+So some 50 places to read and 73 to look over, which is one piece, P4.
+Where a place can differ, `(u16)(a - b) < c` says what DOS does, in
+both builds, and compiles on DOS to the code that it had. P4 makes the
+script a test with a record, as the host check is.
+
+The compiler's own warnings do not do it. Asked of the same files for
+the same machine, clang's `-Wsign-compare` names no place, since both
+sides of such a comparison are ints by then; and `-Wconversion` names
+244, those where a result is put back into fewer bits, which are the
+places that are the same in both builds. Its
+`-fsanitize=implicit-conversion` wants a program that clang builds and
+that runs, which is step 6 of the road.
+
+What neither finds:
+
+- A number of 16 bits that has wrapped round already and is then added
+  to a pointer: FFFEh for two back. On DOS the pointer wraps round with
+  it. In a flat memory it lands 64K further on. Where the number goes
+  through `AT` or `MD_POINTER` first, the megabyte does what DOS does;
+  where it is added to a pointer, it does not.
+- A far pointer stepped past the end of its segment, which begins
+  again at 0 on DOS.
+- What is read behind an object, or at an index that the program does
+  not keep inside it: the bytes that follow are others, as they are in
+  the portable C of 16 bits against the original already.
+
+Of step 2, what waits until the 32-bit build passes and the 16-bit
+build is gone, and would do harm mixed into step 1:
+
+- A variable made wider. It changes what happens where the number
+  wraps, which is the point of it, and the 16-bit build cannot follow.
+- A pointer where a number is, in the main data or in what a routine
+  takes. See the strategy.
+- A boolean. Harmless and no use here: it changes the bytes of the
+  16-bit file, and the check that most pieces of step 1 go by is that
+  they do not.
+- The words `__far`, `STACK`, `CODE` and `FAR` taken out: the 16-bit
+  build needs them to its last day.
+
+### The build
+
+- `wcc386 -3r -mf -os -s -zl -zls -wx -we`: the flat model, small code
+  as today, no check of the stack and no library. `vc.h` includes
+  `stddef.h` for `offsetof` where `__I86__` is not set; with
+  `__WATCOMC__` it can write it out as the 16-bit build does, and the
+  build needs no directory of headers.
+- `wlink format os2 le`, `option stub=` with `binw/dos32a.exe` of the
+  pinned download, `option start=`, and an `order` line: the code;
+  then the constants and the tables, which share the code's last page
+  of 4K and of which 274 bytes are ever written; then the main data,
+  what has a value and the stack; and
+  last what has no value, the 640 KB above all, so that it is not in
+  the file.
+- The banner bit of the stub is cleared in the file that the linker
+  wrote, by a tool of ten lines of C, `tools/stub.c`: the build runs no
+  Python.
+- Tried, `harness/trial32/whole.py`: 61 of the 63 files compile as they
+  stand, all but `arith.c` and `dos.c`, with the two lines of
+  `LAID_OUT` changed and warnings in `resident.c` alone, for its
+  interrupt functions. Linked with a file of functions that do nothing
+  in place of `dos.c`, the program is 277,132 bytes where the 16-bit
+  one is 196,998: 121,807 of code against 104,521, the main data and
+  the stack as zeros, and 4,440 relocations in 33,320 bytes of the
+  file.
+
+Release and debug, both built by every build, of the same source:
+
+| | Release, `VC.EXE` | Debug, `debug/VC.EXE` |
+|---|---|---|
+| Compiled | `-os`, no debugging information | `-od -d2`, with `CHECKED` defined |
+| What it is for | It is the program: shipped, and judged by every test | Finding where a scenario goes wrong. Its listings have the lines of the source. With `CHECKED` the macros of the addresses stop the program with a message when a place is outside the main data or a segment is outside what the program has, where the release build would read or write whatever is there: the bench has no paging, and a wild write is caught by nothing |
+| The tests | All of them | None. It is built so that it does not rot, and `harness/show.py --program` runs it by hand. Unoptimised code takes more instructions, and a scenario that shows the time of day may not hold it |
+
+The limits:
+
+| Limit | For the 32-bit program |
+|---|---|
+| A code segment ends below F000h | Goes: one flat segment of code, and the near call that QEMU gets wrong is one that wraps round 64K |
+| No code within 4K of the stack | In its new form: nothing that is written lies in a page that holds code. The constants stand between |
+| Half of the stack stays untouched in every scenario | Stays, with the stack 16 KB and read by the driver above the megabyte |
+| The length of the file | None, as for the 16-bit one |
+| New: everything named by a segment lies within the megabyte | Held by the test of the layout, from the map |
+| New: the tables lie within 32K of `Title_S` | The same |
+
+### The harness
+
+The trial's seven changes, set against the pieces of the program:
+
+| | What | Piece | Has to be there before |
+|---|---|---|---|
+| 1 | The build | B1, B2 | B1: any later piece is held to compiling for both. B2: the first run |
+| 2 | A reader of LE files and of the flat map | H1 | Everything below |
+| 3 | `driver.py`: the facts of a flat program as linear addresses, and the script's second header | H2 | The first run that is to be judged. Before it `harness/trial32/run.py` runs the program and prints its screens, with every step that waits on `AutoTim` ended early |
+| 4 | `DRIVER.ASM`: the block move for `AutoTim`, `Clock` and the stack; then every golden derived again, which must change none | H2 | The same |
+| 5 | `coverage.py` and `ported.py` on the reader, with the stub left out; the record of the scenarios that pass | H3 | The 32-bit build can be held to anything. What ran of the C is asked only once every scenario passes |
+| 6 | The scenarios' test: the stack, the limits above | H3 | The switch |
+| 7 | `datacheck.py`, with `tools/figures.py`; `reads.py` goes by the text of the C and stays | H4 | The switch: until then the 16-bit build holds the tables, which are the same source |
+
+The record: `harness/pass32.txt`, the names of the scenarios that the
+32-bit build passes, written by `ported.py --record`. The test
+`portable_c32-scenarios` fails when one of them fails, and when one
+passes that is not in it, so that the record is what is so; a piece
+commits it with the change that made it grow.
+
+### The pieces
+
+P and S change the program under the 16-bit build; D, B and H make the
+32-bit side; M and C bring the two together; W and Z end it. P1, D1
+and H1 are started at once by the session.
+
+| Piece | What it does | Owns | Size | Needs; beside | Right when | Could go wrong |
+|---|---|---|---|---|---|---|
+| P1, the words in one place | `vc.h` gets the macros of the addresses once, with two bodies: `AT`, `WORD_AT`, `OFFSET`, `PANEL`, `MAIN_SEG`, `NEAR`, `MD_PLACE`, `MD_POINTER`, `TRELIST`; the files lose their own. The classes P, M, V, G and R whole | `vc.h`, `tables.h` for `LAID_OUT`, and the tops of 23 files | 46 definitions out of 23 files, 17 lines by hand | Nothing; lands first and alone, D1 and H1 start beside it | The 16-bit `VC.EXE` is the same bytes; the host check falls to some 310; `whole.py` still links | A file's own `OFFSET` meant something else: `dos.c`'s does, and keeps its own under another name. And nothing runs the second bodies before M1: a mistake in them is found there |
+| P2a, places of the main data: the lists, the tree, the command line | N in `treebox.c`, `tree.c`, `enter.c`, `usermenu.c`, `cmdline.c`, `place.c`, `info.c`, `extfile.c`, `drive.c`, `input.c`, `panel.c`, `files.c`, `read.c` | Those files | 97 places, 59 by hand | P1; beside P2b, P3, P4, S | The same bytes; those files clean in the host check | A number that is no place of the main data: `(u16)(u32)file` is the offset in a panel |
+| P2b, the same: the viewer, the editor, a copy, the menus | N in `view.c`, `edit.c`, `copy.c`, `menu.c`, `help.c`, `find.c`, `stcolor.c`, `sthelp.c`, `window.c`, `bars.c`, `dirfunc.c` | Those files, but the lines that S1 has in `view.c` | 66 places | P1; beside the others | The same | `EditBuf`, `CpSrc`: names that are places of the main data by a macro |
+| P3, the tables read as what they are | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
+| P4, arithmetic | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
+| S1, the PSP and a program run | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
+| S2, what DOS enters | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
+| S3, the entry, the end, Quick execute | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
+| D1, `dos32.c`: what goes straight through | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
+| D2, `dos32.c`: the rest | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
+| B1, the objects | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt` | 50 lines | P1 | The build | Little |
+| B2, the program | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
+| H1, the reader | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
+| H2, the driver | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
+| H3, the scenarios' test | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
+| H4, the test of the data | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |
+| M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
+| C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
+| W, the switch | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
+| Z1, the 16-bit build goes | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
+| Z2, the words go | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
+
+The order:
+
+    at once      P1                  D1          H1
+    P1 landed    P2a P2b P3 P4  B1   S1 > S2 > S3     H2
+    S3 landed    D2 > B2                              H3 H4
+    then         M1 > C1 .. Cn > W > (the user) > Z1 > Z2
+
+The longest way through is S1, S2, S3, D2, B2, M1 and the convergence:
+six pieces one behind the other before the first run. D2 shortens it
+by having its toys ready when S3 lands.
+
+No return: none before Z1. Up to and with W every commit builds both
+programs and passes the scenarios with the 16-bit one, and W is a
+change of names. Just before Z1 the tree is one source from which two
+programs are built that pass every scenario, the 32-bit one judged by
+default. What the user is asked then: that the 16-bit build may go;
+and, if not asked before, 3 and 4 of what is open, since the
+patches of W rest on them.
+
+What a piece goes by:
+
+- A piece of P or S lands when the 16-bit scenarios pass, as every
+  piece does. Where the table says "the same bytes", the agent also
+  holds `build/portable_c/VC.EXE` against the one of the commit that
+  it started from, with `cmp`: the build is the same file twice from
+  the same source, which was seen. A file that differs where it was
+  not to says where the change did more than it meant; `wdis` on the
+  two objects shows the place.
+- The host check's record and, after P4, that of `int16.py` are
+  committed with the change that moves them.
+- From B1 on, a piece that does not compile for 32 bits does not land.
+  From M1 on, one that takes a scenario out of the record does not.
+  The scenarios take 195 to 200 seconds for a tree by itself
+  (`LastTest.log`), so both builds are seven minutes.
+- What a piece learns that the next needs goes into `CLAUDE.md`,
+  "Notes on the portable C", before it is committed, as always.
+- A fix that the 32-bit program needs is made in the common source,
+  under both builds. Where the two have to differ it is in `dos.c`
+  against `dos32.c`, or in the two bodies of `vc.h`, and nowhere else:
+  no `#ifdef` in a file of code.
+
+### What could go wrong
+
+1. An offset that has wrapped round, added to a pointer. Nothing finds
+   it by reading. On the bench it is a read or a write 64K off, which
+   nothing catches: garbage on a screen, or a program that stops. The
+   debug build's checks catch what goes through the macros. The pieces
+   of the convergence will meet these; how many there are is what is
+   least known here.
+2. A far pointer stepped past its segment's end, and what lies behind
+   an object: the same.
+3. The critical error inside the extender. The trial saw the handler
+   called and its answer taken. It did not try Retry, the phantom
+   drive, or a box drawn from inside, which waits for keys, calls the
+   BIOS and the mouse and makes the idle call, each through the
+   extender again, on a stack of the extender's whose length is not
+   known. D2 tries it with a toy before anything rests on it.
+4. The time of day. A call of the system costs 175 to 280 instructions
+   more, and an idle round 1,400 more for the block moves, where a
+   round of the toy was 1,500. "Scenarios" has a C tree take up to a
+   sixth more than the original to a step, and a scenario that shows
+   the time done by fifty seconds past. If the 32-bit program takes
+   more, the driver can read the two variables less often; if that
+   does not do, the rule is the user's.
+5. The goldens when the driver changes: H2.
+6. COMMAND.COM's interrupt: one try in the trial, which came back and
+   ran nothing, as the 16-bit program finds it on the bench. It cannot
+   be seen to run a command there in either build.
+7. Memory that the program reads before it has written it: zeros in
+   the 640 KB where DOS's block has what the last program left.
+8. The stubs of QEMU. CauseWay does not run in it for one fault of its
+   emulation; flat code and DOS/32A have met none so far, through the
+   toys.
+9. The eight stacks of 512 bytes that DOS/32A has for real mode: the
+   driver's work in an idle call used 82 bytes of one. A critical
+   error has calls three deep.
+10. The functions of `dos32.c` that no scenario reaches, when what ran
+    of the C is asked: each is listed with its reason, as elsewhere.
+11. Two pieces of P touching one file: they own lines of different
+    files by the table, and P4 single lines of all; it rebases last.
+12. The megabyte forms addresses that are in no object, 64K in front
+    of the main data, which the language does not promise and both
+    compilers here take. It is gone, with step 2, before clang builds
+    the program.
+
+### The estimate
+
+20 pieces that can be named, and three to six of the convergence.
+
+| Kind | Pieces | What it is like |
+|---|---|---|
+| Mechanical, under the 16-bit build, the file's bytes the same | P1, P2a, P2b | A file moved to the functions of `sys.h`: the 348 calls went over in 25 commits between 20:41 and 22:33 on 12 October, by agents side by side |
+| Under the 16-bit build, the code changed and the behaviour kept | P3, P4, S1, S2, S3 | `resident.c` moved to `sys.h`, the last and the hardest of those 25; S one behind the other |
+| New code against the bench, with toys | D1, D2 | The trial itself |
+| The build and the harness | B1, B2, H1 to H4 | Piece 0a of the setup program, which was 800 lines where 200 were thought. The trial's own sizes add up to three days of one person |
+| The first run and the convergence | M1, C1 to Cn | Not known: the plan has not run the program at all. It is the kind of work that "What batches have lost time to" is the record of |
+| The end | W, Z1, Z2 | Small |
+
+The setup program was eight pieces, whose commits are from 23:02 on
+the 12th to 03:44 on the 13th. This is two and a half to three times
+as many, with one chain of six, so not less than a day of agents side
+by side before the first run; and what follows the first run is the
+part that the plan cannot count.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")
