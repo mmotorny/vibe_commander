@@ -398,6 +398,10 @@ TREES = {
             "mouse-drag-lists": "no program stays in the memory, and no "
                                 "button is moved in the map of the "
                                 "memory",
+            "setup-lines": "the top left corner of what DOS had shown is "
+                           "as DOS left it, where the original's setup "
+                           "program has put a space, the 81st cell of "
+                           "its key bar on a screen of 50 lines",
         },
         in_place_of={
             SETUP_COMMAND: (SETUP_ITEM,

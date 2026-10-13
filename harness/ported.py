@@ -1147,11 +1147,6 @@ SETUP_BATCHES = [
                 "without the mouse, 21h, and is asked by call 0 instead: "
                 "the driver of the bench, CuteMouse, knows it"),
             **dict.fromkeys(
-                (0x104C, 0x104F, 0x1051),
-                "Exit5, a setup file that could not be written: no "
-                "scenario has one yet. The piece of the plan that has "
-                "the setup file not writable takes this out (TODO.md)"),
-            **dict.fromkeys(
                 (0x1BFD, 0x1CC0, 0x1D8E, 0x1DB1),
                 "Dialog, the buttons of a box that begins in the right "
                 "half of the screen: every box of the setup program "

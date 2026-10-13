@@ -1147,8 +1147,8 @@ with the original:
     panels, or with the panels off, what DOS has shown is on the screen,
     which no scenario may look at afterwards. Left-handed mouse saved
     exchanges the buttons from the next step on, in the setup program
-    too. And no scenario of these shows the clock: Clock is ticked and
-    not, within one step.
+    too. And no scenario of the option dialogs shows the clock: Clock
+    is ticked and not, within one step. setup-clock shows it.
   - A setup file with a value that no dialog sets is made in the main
     program's editor before the setup program is started, as
     start-setup does it: "Shift+F4" and "d:\\vc\\vc.ini", F4, and 28
@@ -1202,8 +1202,9 @@ with the original:
     81 cells (TODO.md, "The bugs of the original that stay"). The
     banner of the main program is then no longer known as the banner,
     and its "shareware" would be in the golden where a build says
-    "freeware": setup-colors-lines ends in the list for that. Whoever
-    shows that corner has deviations.py to look at first.
+    "freeware": setup-colors-lines ends in the list for that, and
+    setup-lines, which shows the corner, first has the banner's first
+    line gone from the screen: see below.
   - The help, F1, is a window with the title of a page, 13 of its lines
     on a screen of 25 lines, and Ok: Up and Down move the text by a
     line, PgUp and PgDn by a page less a line, Home and End go to its
@@ -1316,6 +1317,57 @@ with the original:
     leaves anywhere. A click as short as "*1" is over before the menu
     looks. On 50 lines the box is rows 17 to 29, its lines 19 to 27.
     See setup-mouse.
+  - A setup file that the setup program cannot write: made read-only
+    by a command of the main program beforehand, "attrib" as menu-files
+    has it. The setup program says "There was an error while saving the
+    setup file" through DOS when it has put the screen back, and the
+    program takes the setup all the same. _SETUP sends that line
+    nowhere, with the banner; a tree writes it on the screen, where the
+    cursor is, and what DOS has shown is a row further up for it. With
+    panels of the full height nothing of that shows, and the two agree:
+    so no scenario looks at what DOS has shown, Ctrl+o, after a save
+    that failed, or starts the setup program again there. See
+    setup-save-fails.
+  - To show the top left corner of what DOS had shown on 50 lines,
+    which the original's setup program blanks: the panels off, Ctrl+o,
+    since a panel covers the corner, and no key bar, Ctrl+b, since a
+    command then moves what DOS has shown up by one row, where it is
+    two with the bar: '"c:" Enter' prints nothing, and leaves the
+    banner's second line in the first row, which deviations.py does not
+    take for anything. On 50 lines the prompt stays on its row, 24, and
+    the menu of the setup program would cover a part of the command
+    there, rows 17 to 30 with its shadow: '"dir" Enter' takes the
+    prompt to row 42, below the menu and clear of the last row, where
+    leaving would move the screen and the corner off it. The setup
+    program reads the key bar from the setup file, which has it on.
+    The corner is blank from the first time that the screen is put
+    back from what was kept: on the way out of the colours, and when
+    the setup program is left. A tree shows it as DOS left it, and has
+    a golden of its own for the scenario. See setup-lines.
+  - The clock, with `setup_clock=True`: "12:00p" in columns 74 to 79
+    of the first row, over the menu, the dialogs, the help and the
+    list of colours, which clears the row from column 58 on and has it
+    all the same. The picture of a colour has none but its own, which
+    is of the picture. Clock unticked and Ok takes it off the screen at
+    once. The whole of setup-clock is over some 14 seconds past the
+    minute in the original.
+  - Left-handed mouse, a click on its box in Screen and Mouse,
+    "Click@45,14", holds in the setup program from Ok on: the buttons
+    are exchanged at the menu, in the dialogs and in the help. See
+    setup-left-handed.
+  - F1 from the screens behind the menu. A dialog has its page, also
+    with the cursor in a line that is typed into, which is as it was
+    when the help is closed; the list of colours and the picture of a
+    colour have one page; the box that asks about the default colours
+    has none, and F1 is nothing there. Country info and "save the
+    current setup?" have pages that the setup program has not read
+    (see above): "Help contents is not available", with a beep, which
+    moves the screen up a row. Closing that box puts back only what
+    the box covered, and closing the dialog under it what that
+    covered, as it was before the beep: the rows above and below a
+    dialog stay a row up. The line of the command is whole on row 22
+    then, and on row 23 again where a tall dialog has been closed. See
+    setup-help-screens.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -6895,6 +6947,138 @@ SCENARIOS = {
                                           # nothing for the right button,
             "Click@30,9>60,10",           # and the left one let go there
                                           # leaves, wherever it went down
+        ),
+        setup=True),
+
+    "setup-save-fails": Scenario(
+        "The setup saved by the setup program where its file cannot be "
+        "written, being read-only: the file stays as it is, and the "
+        "program goes by what was not saved all the same",
+        steps=(
+            '"a:\\freedos\\bin\\attrib" Space "+r" Space "d:\\vc\\vc.ini" '
+            'Enter',                      # the setup file read-only
+            _SETUP,
+            "F8",
+            "Enter",                      # everything as without a file
+            "F10",                        # save the current setup?
+            "Enter",                      # Save: the panels, and nothing
+                                          # says that it failed
+            "F9 o Enter",                 # Auto save setup is ticked: the
+            "Esc",                        # program has the setup
+        ),
+        setup=True),
+
+    "setup-lines": Scenario(
+        "The setup program on a screen of 50 lines, over what DOS has "
+        "shown with the panels off, and what it leaves in the top left "
+        "corner of that: a space where the original has written its key "
+        "bar a cell too far, which shows from where the screen is first "
+        "put back, on the way out of the colours",
+        steps=(
+            "Ctrl+b",                     # no key bar: a command moves
+            "Ctrl+o",                     # what DOS has shown by one row
+            '"c:" Enter',                 # the first row is the second
+                                          # line of the banner
+            "Alt+F9",                     # 50 lines
+            '"dir" Enter',                # the prompt is below where the
+                                          # menu will be, on row 42
+            _SETUP,                       # the menu, from row 18 on
+            "Click@30,21",                # a line of it
+            "F6 Esc",                     # the colours and back: the corner
+            "F10",                        # left: it stays
+        ),
+        setup=True),
+
+    "setup-clock": Scenario(
+        "The clock switched on in the Configuration of the setup program, "
+        "which shows it at once: over the menu, a dialog, the help and "
+        "the list of colours, not in the picture of a colour, which has "
+        "one of its own; and switched off again, which takes it away",
+        steps=(
+            _SETUP,
+            "F2",                         # Configuration
+            "Down Down Down Down Down Space",     # Clock
+            "Enter",                      # Ok: the clock, in the corner
+            "F3",                         # Screen and Mouse under it
+            "Esc",
+            "F1",                         # the help
+            "Esc",
+            "F6",                         # the list of colours
+            "Enter",                      # a picture: its own clock only
+            "Esc",                        # the list again, with the clock
+            "Esc",
+            "F2",
+            "Down Down Down Down Down Space",     # no Clock
+            "Enter",                      # Ok: it is gone
+            "F10",                        # nothing has changed: left
+        ),
+        setup=True, setup_clock=True),
+
+    "setup-left-handed": Scenario(
+        "Left-handed mouse ticked in the setup program, which exchanges "
+        "the buttons there at once: at the menu, in a dialog and in the "
+        "help; and saved, which exchanges them in the program",
+        steps=(
+            _SETUP,
+            "F3",                         # Screen and Mouse
+            "Click@45,14",                # Left-handed mouse
+            "Enter",                      # Ok
+            "Click@5,5",                  # the left button beside the
+                                          # menu: nothing now
+            "RightClick@30,9",            # a line
+            "F2",                         # Configuration
+            "Click@30,10",                # the left button is Enter there
+            "F1",                         # the help
+            "Click@2,2",                  # beside its window: nothing
+            "RightClick@2,2",             # and the right one closes it
+            "RightClick@5,5",             # and leaves the menu: save the
+                                          # current setup?
+            "Click@40,8",                 # Enter: Save
+            "RightClick@3,5",             # the program has it: the cursor
+            "Click@3,6",                  # on a file, and a file selected
+        ),
+        setup=True),
+
+    "setup-help-screens": Scenario(
+        "The help of the setup program from the screens behind its menu: "
+        "the page of a dialog over it, also from a line that is typed "
+        "into; one page for the list of colours and the picture of a "
+        "colour, and nothing in the box that asks about the default "
+        "colours; and no page for Country info and for the question "
+        "whether to save, which the help says in a box, with a beep",
+        steps=(
+            _SETUP,
+            "F2",                         # Configuration,
+            "F1",                         # and its page
+            "Esc",
+            "Esc",
+            "F3",                         # Screen and Mouse,
+            "Tab Tab Tab Tab",            # in its line of characters
+            "F1",
+            "Esc",                        # the cursor is in the line
+            "Esc",
+            "F6",                         # the list of colours
+            "F1",                         # the page of the palettes
+            "Esc",
+            "F8",                         # set default colors?
+            "F1",                         # that box has no page: nothing
+            "Esc",
+            "Enter",                      # the picture of a colour
+            "F1",                         # the same page
+            "Esc",
+            "Esc",
+            "Esc",
+            "F9",                         # Country info
+            "F1",                         # Help contents is not available:
+                                          # a beep, and the screen a row up
+            "Enter",
+            "Esc",
+            "F8",
+            "Enter",                      # everything as without a file
+            "F10",                        # save the current setup?
+            "F1",                         # no page either
+            "Enter",
+            "Esc",                        # left, and not saved
         ),
         setup=True),
 

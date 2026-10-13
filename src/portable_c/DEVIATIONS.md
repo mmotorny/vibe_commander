@@ -897,9 +897,14 @@ account that we are going to merge vc and vcsetup code". The setup uses
 the main program's routines, and a second copy of one is not kept for a
 bug of it.
 
-**Which scenarios show it.** None so far: the scenarios of the setup
-are on a screen of 25 lines, where the cell lands in a row of the
-buffer that is not on the screen. One that has the setup on a screen of
-50 lines, which is still to come (`TODO.md`), shows it in the top left
-corner of what DOS had shown, and is held against a golden of the
-portable C's own for that.
+**Which scenarios show it.** `setup-lines`, which has the setup on a
+screen of 50 lines over what DOS has shown, with the panels off: the
+first row there is the second line of the program's banner, and its
+first cell, the C of Copyright, is a space in the original from the
+way out of the colours on, and when the setup has been left. The
+scenario is held against a golden of the portable C's own, which
+differs from the original's in that one cell, on its last two screens.
+The other scenarios of the setup that are on 50 lines end before the
+screen is put back from what was kept, or have the panels over the
+corner when it is; all the rest are on a screen of 25 lines, where the
+cell lands in a row of the buffer that is not on the screen.
