@@ -16,19 +16,19 @@ the top of the script says how. This is what the kinds are waiting
 for, with the counts of when it was written; the test prints them as
 they stand.
 
-1,132 places in 39 of the 59 files, the two headers among them. Twenty
+1,084 places in 39 of the 59 files, the two headers among them. Twenty
 files are clean: the thirteen of tables, and `blank.c`, `digits.c`,
 `line.c`, `mask.c`, `mouse.c`, `screen.c` and `string.c`. The first
-count was 1,391, with two files of tables clean: the others named
-places in the main data by `MD_AT`, 259 times, which is written as
-`offsetof` is now, `OFFSET_IN` of `vc.h`.
+count was 1,391, with two files of tables clean. The 307 that went
+were the offset of a field worked out from a pointer at 0, `MD_AT` of
+`tables.h` above all, which no pointer was meant by: they are written
+as `offsetof` is now, `OFFSET_IN` of `vc.h`.
 
 | Kind | Places | Files | What it is | What it waits for |
 |---|---|---|---|---|
-| `to-number` | 639 | 34 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets, but for the 46 that are the offset of a field: see below |
+| `to-number` | 593 | 34 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets: see below |
 | `to-pointer` | 436 | 30 | A number of 16 or 32 bits made a pointer | The same. Where the address is the machine's, the screen in `window.c` and DOS's routine for capitals in `dos.c`, the system interface |
 | `layout` | 2 | 1 | `BOXHD` and `BOXMN` of `tables.h`, the header and a field of a dialog, are not as long as on DOS: each holds a pointer, which is a word there | Tables that are not held to the original's bytes where a pointer is no word: `LAID_OUT` for DOS alone, when the routines that read them take pointers |
-| `inconstant` | 2 | 2 | A length that gcc cannot work out when it compiles: `IniSave` of `setup.c`, and what `start.c` holds `Palets` to | The offset of a field, below |
 | `function` | 9 | 3 | The address of a function kept as that of data, for a vector of an interrupt, and once the other way, the call into the PSP | The system interface |
 | `interrupt` | 9 | 3 | `__interrupt`, where a function is declared or defined: `CtrlC`, `Int21`, `Int27` and `Exit05` of `resident.c`, `FatErr` of `main.c` | The system interface: what DOS enters is of DOS, and goes to a file that only the build for DOS has |
 | `loadds` | 3 | 1 | `__loadds`: `Alloc0` and `Exec2E` of `resident.c` | The same |
@@ -39,17 +39,15 @@ places in the main data by `MD_AT`, 259 times, which is written as
 | `data_seg` | 4 | 2 | The segment of the main data, in `main.c`, and of the stack, `stack.c` | A program that does not take the main data to be at offset 0 of its segment, which the tables and `MAIN_SEG` do; and a stack that the system gives |
 | `aborts` | 8 | 3 | A `#pragma aux` that says a function does not return | Nothing: another compiler passes over the line. Four are in `vc.h`, which is not clean for them and for the `__interrupt` of `CtrlC`. A word of `vc.h` could say it to every compiler in its own way |
 
+The script knows three kinds more, which have no place now:
+`inconstant`, a length that gcc cannot work out when it compiles, which
+two of those offsets were; `undeclared`, a function that nothing
+declares or defines; and `other`, what gcc says that the script does
+not know.
+
 Most of the two casts are a few macros, and
 `python3 harness/hostcheck.py --macros` counts them as they stand:
 
-- The offset of a field, worked out from a pointer at 0: `WCBini` 24
-  and `CmnIni` 12 of `vc.h`, `INI_CMN` 5 and `INI_WCB` 4 of `main.c`,
-  and one line of `start.c`, which with `IniSave` of `setup.c` is the
-  kind `inconstant` too. No pointer is meant by these, and they need
-  no other program: `OFFSET_IN` of `vc.h` in their place, which
-  `MD_AT` and `WCB_AT` of `tables.h` are. `start.c` has `WCBini` and
-  `CmnIni` a second time, word for word, and Open Watcom refuses two
-  definitions that differ: that copy has to go first.
 - `OFFSET`, 208, which 17 files define each for itself: a box, a dialog
   or a text of the tables handed on as its offset in their segment, to
   `Dialog`, `DialBox`, `Ask`, `OncZoom` and what else takes one. And
@@ -63,7 +61,7 @@ Most of the two casts are a few macros, and
   kept as a near one. With `__far` nothing the macro has nothing to do.
 - `TRELIST`, 38: where the list of the tree begins in the main data, as
   a number.
-- 145 and 58 are written out where they are, in no macro: a place of
+- 144 and 58 are written out where they are, in no macro: a place of
   the main data kept as a word, `(u16)md.WinBuf`, `md.HstAdr`,
   `md.BatAdr`; DX of a call of DOS that is no pointer, written into
   `name` of `struct DosRegs`; a far pointer made of a segment and an

@@ -699,7 +699,7 @@ and `CODE` for nothing where the compiler is not Open Watcom's for the
 8086, as a build for a machine without segments will.
 
 What rests on Open Watcom, for the portable C. Of what the code is
-written in, the first table above: `__far` in 773 places, `STACK` in
+written in, the first table above: `__far` in 770 places, `STACK` in
 481, `CODE` in 94, which that test counts in its summary; `#pragma aux`
 in 19 lines; `#pragma pack(1)` in 7
 pairs; the five `__interrupt` functions; two `__loadds` functions,

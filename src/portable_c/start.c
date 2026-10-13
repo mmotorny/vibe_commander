@@ -53,13 +53,6 @@ extern u8 IniSave[];
 /* How many paragraphs the viewer takes at the least. */
 #define VIEW_PARAS  (((MinView - 1) >> 4) + 1)
 
-/* What the setup file holds: three letters V, of each panel what a
-   WCBdef has before CurAdr, of the main data what it has before LoadRes,
-   and the sum of all these bytes. */
-#define WCBini  ((u16)(u32)&((struct WCBdef __far *)0)->CurAdr)
-#define CmnIni  ((u16)&((struct MainDat *)0)->LoadRes)
-#define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
-
 /* Where Init00 has the setup file as it read it, or the defaults of the
    two panels in its place, until Init11 makes the panels of that: in
    MenuBuf, which nothing else uses in between. */
@@ -151,7 +144,7 @@ static const u8 CODE Palets[] = {
 
 /* The table goes as far as the bytes that are reserved. */
 typedef char Palets_size[sizeof Palets
-                         == (u16)&((struct MainDat *)0)->ResIni ? 1 : -1];
+                         == OFFSET_IN(struct MainDat, ResIni) ? 1 : -1];
 
 /* The panel that the program has without a setup file, as far as its
    mask, which is empty: files in brief, shown, hidden ones too, no

@@ -152,9 +152,9 @@ struct MainDat md;
    loop last found it, IniSave of setup.c; the original keeps that where
    it has the copy of the first panel while a command runs. */
 #define INI_WCB(number, field) \
-    (3 + (number) * WCBini + (u16)(u32)&((struct WCBdef __far *)0)->field)
+    (3 + (number) * WCBini + OFFSET_IN(struct WCBdef, field))
 #define INI_CMN(field) \
-    (3 + 2 * WCBini + (u16)&((struct MainDat *)0)->field)
+    (3 + 2 * WCBini + OFFSET_IN(struct MainDat, field))
 
 #define DOS_SET_VECTOR 0x2500           /* DOS: an interrupt to DS:DX */
 #define DOS_PATH       0x4700           /* the current directory of a

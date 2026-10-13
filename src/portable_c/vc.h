@@ -562,8 +562,8 @@ void Again(void);
 /* What the setup file holds: three letters V, of each panel what a
    WCBdef has before CurAdr, of the main data what it has before LoadRes,
    and the sum of all these bytes. */
-#define WCBini  ((u16)(u32)&((struct WCBdef __far *)0)->CurAdr)
-#define CmnIni  ((u16)&((struct MainDat *)0)->LoadRes)
+#define WCBini  OFFSET_IN(struct WCBdef, CurAdr)
+#define CmnIni  OFFSET_IN(struct MainDat, LoadRes)
 #define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
 
 /* DOS, the BIOS, the mouse driver and the machine: the functions of

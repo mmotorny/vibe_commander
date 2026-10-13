@@ -36,7 +36,7 @@ input.c       to-number 2, to-pointer 1
 keys.c        to-number 11, to-pointer 28
 keys_t.c      clean
 line.c        clean
-main.c        to-number 56, to-pointer 23, function 2, interrupt 1, data_seg 2, aborts 1
+main.c        to-number 30, to-pointer 23, function 2, interrupt 1, data_seg 2, aborts 1
 main_t.c      clean
 mask.c        clean
 memory.c      to-number 11, to-pointer 27, function 1
@@ -49,9 +49,9 @@ place.c       to-number 7, to-pointer 5
 read.c        to-number 7, to-pointer 17
 resident.c    to-number 28, to-pointer 30, function 6, interrupt 7, loadds 3, naked 4, asm 4, registers 1, aborts 3
 screen.c      clean
-setup.c       to-number 5, to-pointer 2, inconstant 1
+setup.c       to-number 1, to-pointer 2
 stack.c       data_seg 2
-start.c       to-number 25, to-pointer 16, inconstant 1
+start.c       to-number 9, to-pointer 16
 string.c      clean
 system.c      to-number 3
 system_t.c    clean
