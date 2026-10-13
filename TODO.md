@@ -2359,15 +2359,18 @@ build is gone, and would do harm mixed into step 1:
   does, so that no directory is named; B1 tried that, and it compiles,
   and left it: see "B1, the objects" below.
 - `wlink format os2 le`, `option stub=` with `binw/dos32a.exe` of the
-  pinned download, `option start=`, and an `order` line: the code;
-  then the constants and the tables, which share the code's last page
-  of 4K and of which 274 bytes are ever written; then the main data,
-  what has a value and the stack; and
+  pinned download, `option start=`, and an `order` line. The plan had
+  the order as: the code; then the constants and the tables, which
+  share the code's last page of 4K and of which 274 bytes are ever
+  written; then the main data, what has a value and the stack; and
   last what has no value, the 640 KB above all, so that it is not in
-  the file.
+  the file. The code needs another, and B2 linked that: the code; the
+  stack; the constants and the tables, with what has a value behind
+  them; the main data; what has no value. See "B2, the program"
+  below, which has why.
 - The banner bit of the stub is cleared in the file that the linker
   wrote, by a tool of ten lines of C, `tools/stub.c`: the build runs no
-  Python.
+  Python. It is 40 lines, with what it refuses.
 - Tried, `harness/trial32/whole.py`: 61 of the 63 files compile as they
   stand, all but `arith.c` and `dos.c`, with the two lines of
   `LAID_OUT` changed and warnings in `resident.c` alone, for its
@@ -2390,11 +2393,12 @@ The limits:
 | Limit | For the 32-bit program |
 |---|---|
 | A code segment ends below F000h | Goes: one flat segment of code, and the near call that QEMU gets wrong is one that wraps round 64K |
-| No code within 4K of the stack | In its new form: nothing that is written lies in a page that holds code. The constants stand between |
+| No code within 4K of the stack | In its new form: nothing that is written lies in a page that holds code. The constants stand between. As B2 linked it, the stack is in front of the constants and its low end shares the code's last page: what the test of the layout holds is that nothing which a scenario writes lies in such a page, the upper half of the stack being all of it that a scenario may use |
 | Half of the stack stays untouched in every scenario | Stays, with the stack 16 KB and read by the driver above the megabyte |
 | The length of the file | None, as for the 16-bit one |
-| New: everything named by a segment lies within the megabyte | Held by the test of the layout, from the map |
+| New: everything named by a segment lies within the megabyte | Held by the test of the layout, from the map: `portable_c32-layout`, `harness/layoutcheck.py` |
 | New: the tables lie within 32K of `Title_S` | The same |
+| New, with S3: `IniSave` ends within 64K of where the main data begins | The same |
 
 ### The harness
 
@@ -2677,7 +2681,7 @@ and H1 are started at once by the session.
 | D1, `dos32.c`: what goes straight through. Done: see "Piece D1" below | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
 | D2, `dos32.c`: the rest | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
 | B1, the objects. Done: see below | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt`, `tools/refused.cmake` | 50 lines | P1 | The build | Little |
-| B2, the program | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
+| B2, the program. Done: see "B2, the program" below | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
 | H1, the reader. Done: see "Piece H1, the reader" below | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
 | H2, the driver. Done: see "Piece H2, the driver" above | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
 | H3, the scenarios' test | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
@@ -3225,6 +3229,288 @@ It is still the one thing that links the tree for 32 bits, and what an
 S piece runs to see that it does; B2 takes that over, and the script
 can go then.
 
+### B2, the program: done, and what a later piece should know
+
+Every build links the portable C for 32 bits, twice:
+`build/portable_c32/VC.EXE`, the program, and
+`build/portable_c32/debug/VC.EXE`, the same source for finding a fault,
+each with its map `VC.MAP` and its objects and listings next to it. The
+bench starts both. `add_portable_c32` of `CMakeLists.txt` does it, 125
+lines with what they say of themselves, 75 of them new, where the plan
+had 100.
+
+    wlink option quiet format os2 le name VC.EXE
+          order clname CODE clname STACK clname DATA clname MAIN clname BSS
+          file <the objects, dos32.obj last>
+          option map=VC.MAP,start=Start_,static
+          option stub=<Open Watcom>/binw/dos32a.exe
+    stub VC.EXE
+
+What there is:
+
+| | |
+|---|---|
+| The targets | `portable_c32` and `portable_c32-debug`, both of the default build. The second call is as B1 had it, `-od -d2 -dCHECKED`, and its directory lies inside the first's |
+| `tools/stub.c` | Clears the bit of the banner in the file that the linker wrote, bit 3 of the byte 15h behind `ID32`, and says at its top how the bit was found. It stops, and the build with it, for a file whose stub has the letters not once in its first 512 bytes, or has another number than 090Ch at 18h of the block, which is taken for the extender's version: the bit is known for that one |
+| The stack | `LenStk` of `vc.h` has a second number where `__I86__` is not set, 4000h. So `stack.c` is 16K in the program of 32 bits, with a value and in the file |
+| `harness/layoutcheck.py` | The tests `portable_c32-layout` and `portable_c32-debug-layout`: the file and the map against the layout that the program rests on. Below |
+| `LICENSE.DOS32A` | `binw/license.d32` of the pinned download, the same bytes. The README says where it is from and what it covers, under "Licence", and has the sentence that the licence asks for under a heading of its own, "The extender", behind "The program of 32 bits", which says what the two programs are |
+| `tools/figures.py` | Nine rows of the program of 32 bits behind those of the 16-bit one, which say what they said |
+| `harness/trial32/ran.py` | The functions of a flat program in the order in which each first ran on the bench, by QEMU's log: where the program stops. Below |
+| Gone | `harness/trial32/whole.py`, which linked the tree by hand; `tools/refused.cmake` and the list `c_waiting`, which were empty |
+
+**The order of the segments, which is not the plan's.** The plan had
+the code, the constants and the tables, the main data, what has a
+value, the stack, and what has no value. Three things that the pieces
+before this one wrote down do not let it be so:
+
+- The tables that the program writes to are of `_DATA`, and have to be
+  within 32K of `Title_S` ("What could go wrong", 14). `_DATA` is 282
+  bytes, five texts of `stopts_t.c` and two variables of `dos32.c`,
+  and is
+  of the class `DATA` as the constants are: the class is linked whole,
+  `CONST2` and behind it `_DATA`, in front of the main data.
+- `IniSave` of `setup.c` has to end within 64K of where `md` begins
+  (S3), and has no value, so what has no value has to follow the main
+  data at once: the main data leaves 2,932 bytes of the 64K, and
+  `IniSave` ends 2,347 short of them. Nothing can stand between `MAIN`
+  and `BSS`, the stack least of all.
+- What has no value has to be last, or it is in the file.
+
+So the stack is in front of the main data. Between the tables and the
+main data it does link: `Title_S` is then 32,744 bytes in front of
+`md`, 24 short of the 32,768 that `TABLES_BY` allows, and the next
+text that is added behind `Title_S` breaks it. So it is first of the
+data, in front of the constants: `Title_S` is 16,360 bytes in front of
+`md`, and the tables reach from 8,596 in front of `Title_S` to 16,352
+behind it, of 32,768 each way.
+
+What that costs is the rule of the page. The extender packs the data
+behind the code, in the same page of 4K, and what shares that page now
+is the low end of the stack, 816 bytes of it as the file is linked
+today and never more than 4,095. A program writes there when it has
+used three quarters of its stack, and the scenarios' test fails a
+scenario that uses half. So the rule is held in this form: nothing
+that a scenario writes lies in a page that holds code, the upper half
+of the stack being what a scenario may write of it. The plan's limits
+have the line. Should the half become another fraction, `pages` of
+`harness/layoutcheck.py` has it once.
+
+`dos32.obj` is linked last, whatever its name. A segment holds what
+the objects have of it in their order, and what `dos32.c` has without
+a value, the 640 KB above all, is then behind `IniSave` and everything
+else of `_BSS`. The check was run with 640 KB linked so: it passes,
+and the file is no longer for it. Linked in the order of the names,
+`dos32` in front of `setup`, `IniSave` ends 718,548 bytes behind `md`.
+
+What else was found of the linker and the compiler, which
+`CLAUDE.md`, "Notes on the portable C", has as notes: `md` is in the
+file, as zeros, though it has no value; `option stack=` makes a
+segment of the class `STACK` longer; the name of the file is in the
+file; the compiler gives functions that do nothing one address.
+
+**Otherwise than the plan had it.**
+
+- The order, above.
+- The stack's length is the source's, `LenStk`, and not `option
+  stack=16k` of the linker, which also works: it makes the segment of
+  `stack.c` 16K whatever the source says. Then `stack.c` would say
+  4,096 bytes of a stack that has four times as many.
+- `tools/stub.c` is C, as the plan has it, and 40 lines for 10: it
+  refuses a stub that it does not know. The trial's `quiet.py` stays
+  for the toys, which `build.sh` builds.
+- The debug program is linked without the linker's `debug` directive:
+  what `-d2` puts into the objects is for the listings, which have the
+  lines of the source between the instructions (`wdis -s=`), and is
+  not in the file. No debugger runs on the bench. Its code is 220,278
+  bytes for 130,211.
+- The layout has a test of its own, which starts no machine, and is
+  not a part of the scenarios' test: H3 can call it or leave it.
+- `LICENSE.DOS32A` has nothing at its top. It is the file of the
+  download byte for byte, and the README says where it is from.
+
+**`CHECKED`, and what is missing.** The debug program is compiled with
+`-dCHECKED`, and nothing reads it: `vc.h` has no word of it, so the two
+programs differ in how they are compiled and in nothing else. What the
+plan means by it has to be written, and was not, since nothing could
+have run it:
+
+- A third body of the words of the addresses, under `CHECKED` where
+  `__I86__` is not set: `AT`, `PANEL`, `MD_POINTER`, `MD_PLACE`,
+  `OFFSET`, `OFFSET_IN_SEG`, `SEG_OF` and `NEAR`, each of which says in
+  its comment what it takes for granted. That is what a check holds: a
+  segment that is the main data's, the tables' or one that the memory
+  handed out, a place within the main data, a table within reach.
+- A function that they call, which knows how far the program's memory
+  goes, so `dos32.c`'s to answer or to be asked, and that stops the
+  program with a message that says the file and the line: the console
+  and `ProgramEnd` of `sys.h`, with the screen as it is.
+- `OFFSET` stands in no value of a static object today and `MD_PLACE`
+  is a constant to gcc in places (P2a): a body that calls a function
+  is neither, which the host check does not see, since it reads the
+  bodies without `CHECKED`.
+
+It is a piece for whoever first has a wild read to find, M1 or the
+convergence.
+
+**The check of the layout.** `python3 harness/layoutcheck.py --stub
+<dos32a.exe> VC.EXE VC.MAP` prints where things are and fails for what
+is wrong; its top says which word of `vc.h` goes by each thing.
+
+| What is held | Seen to fail for |
+|---|---|
+| Every object of a file of tables, a module of the map whose name ends in `_t`, lies in the 64K that begin at the paragraph which 32K below `Title_S` is in, as `OFFSET` counts | 30,000 bytes of constants linked behind `commands_t.obj`: 79 of the 509 objects outside, the first `PtMnu_S` |
+| 32K below `Title_S` is not in front of 64K below `md`, nor a megabyte behind that | 20,000 bytes of constants behind `main_t.obj` |
+| `IniSave` lies behind `md` and ends within FFFFh of where that begins | The plan's order, 79,572; the trial's, 88,728; 640 KB linked in front of `setup.obj` |
+| The program ends no more than F0000h behind `md`, 983,040 bytes | 960 KB without a value linked last |
+| The stack is the segment that ends where the header has the stack's top, `coverage.flat_stack`, of the class `STACK`, as long as the linker's summary says, and in the file as zeros | |
+| The file has of the data all that lies in front of the first segment of the class `BSS`, and nothing of another class lies behind that | The trial's order and no order at all, which have the stack last: 593 bytes of zeros in the file today, and 640 KB with the memory |
+| No segment that is written begins in a page of the memory that has code, by `le.BENCH`: all of the data but `CONST`, `CONST2` and the lower half of the stack | The trial's order and the main data behind the code |
+| Two objects, the code whole in the file, each as long as the map's segments in it; the entry at `Start_`, and as the linker's summary has it | |
+| Every relocation an address, in what the file holds, with the offset of what it names there; none a selector | |
+| The stub is `dos32a.exe` behind its header but for the banner's bit, which is clear | A link without `tools/stub.c`; CauseWay's stub, which `tools/stub.c` refuses too |
+
+The rows with nothing in the second column were not seen to fail: no
+link was found that breaks them alone. The stack's are held by what
+H2's toys showed of `coverage.flat_stack`. That a table is known by
+`OFFSET` only if it is of a file of tables was looked at once, by the
+names that the tree hands to `OFFSET`, 174 of them, against the
+modules of the map: every one is of a `_t` file. The test does not
+look at that.
+
+What it cannot hold: that the 640 KB begin on a paragraph of the
+megabyte, which is `dos32.c`'s to see to when it has them; and
+anything of the debug program beyond its layout.
+
+**On the bench: where the program stops.** Started as the harness
+starts any program, `TMPDIR=$PWD/build/tmp python3 harness/show.py
+--program build/portable_c32/VC.EXE`, with the driver told what
+`driver.facts` makes of the file (`drivercheck.py --facts`: `AutoTim`
+at 0012AB89h, `Clock` at 0012A18Bh, the stack 16,384 bytes at
+0011FCD0h), the first screen is, with the cursor at column 8 of row 3:
+
+    Vibe Commander 0.1, based on Volkov Commander 4.05
+    Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny
+    Program too big to fit in memory
+    C:\WORK>
+
+Nothing of the extender is on it: no banner in front, and no warning
+behind, the program having taken no vector. The debug program shows
+the same. By QEMU's log (`run.py --trace`, `ran.py`), 154 blocks of
+the program's code ran, 27 of them with an address that the extender
+had put in, and every one is what the reader has at `le.BENCH`: the
+code is at 00100010h, the data at 0011FCD0h, and `md` at 0012A094h. No
+fault, and nothing of the second bodies of the words went wrong as far
+as it got, which is `AsmSeg` and little more.
+
+The way there, in the order in which each function first ran, from the
+debug program, which gives every function a place of its own; the
+functions of `sys.h` that are not made are marked:
+
+    Start, Main,
+    Alloc3: SystemVersion, MemOwn, SetStat: MemSetSearch*, MemSetUpper*
+    Init00: ProgramEnvironment*, AsmSeg, MnPth0, CutPath,
+            ReadOne: FileOpenBare,
+            DriveCurrent, DirCurrentBare, ChkMode: ScreenState,
+            MvzTxt, ConsoleText,
+            SetBrk: BreakCheck, SetBreakCheck, CtrlCTake*,
+            TakeEnd: ProgramEndedTake*
+    Init11: MemTake*
+    AlocEr: OutStr0, OutStr, ScreenType
+    Exit00: ProgramEndedGive*, Exit02, ProgramEnd
+
+- The first function of `sys.h` that it calls and that is not made is
+  `MemSetSearch`, in `SetStat`, and `MemSetUpper` behind it: both do
+  nothing, and nothing shows.
+- The first that changes what happens is `ProgramEnvironment`, in
+  `Init00`: it answers an environment of no texts with no path behind
+  it, so the program does not know where its own file is. `ReadOne`
+  asks DOS to open the setup file and the extension file by their
+  names without that path, which is in the directory that DOS is in,
+  and gets neither: `FileReadBare` never ran. The program is on its
+  defaults, and the bench's setup, which has the clock off, is not in
+  it.
+- `CtrlCTake` and `ProgramEndedTake` take nothing.
+- It stops at `MemTake(0xFFFF)`, in `Init11`: the function answers
+  that it failed, with no paragraphs as the largest block. `Init11`
+  holds that against what the viewer and two panels need, answers
+  failed, and `Round` goes to `AlocEr`, which writes the line and
+  leaves by `Exit00`, with DOS's prompt behind it. That is the 16-bit
+  program's own way out for a machine with too little memory.
+
+So the program does what it is written to do with those answers, as
+far as `Init11`, and M1 begins where D2 has `MemTake`, the PSP and the
+rest: the next thing that the program asks is `Memory` of `start.c`,
+which cuts the block up by segments, and `IniData` behind it.
+
+Not seen, since the program never idles: the stack as the driver
+writes it out, and a step that waits on `AutoTim`. H2's list of what
+waits for the first run stands as it is. Its toy of the system's
+functions has the tree's `stack.c` and so the 16K: `python3
+harness/drivercheck.py` finds 16,384 bytes of stack for `sys.c`, at
+001041ACh, 15,874 of them never used, where H2 wrote down 4,096 and
+3,598, and says "Nothing wrong"; `python3 harness/trial32/both.py`
+passes as before.
+
+For D2:
+
+**The 640 KB, first of all.** In this layout it has to be a plain
+variable of `dos32.c` without a value, no `#pragma data_seg` and no
+`= { 0 }`: it is then of `_BSS`, and since `dos32.obj` is linked last,
+the last thing of the program, behind `IniSave` and not in the file.
+And its start has to be rounded up to a paragraph counted from `&md`
+itself, an address that is `&md` and a multiple of 16, since that is
+what a segment of the megabyte names: the linker puts the variable on
+no such address by itself.
+
+- Keep the 640 KB a variable of `dos32.c` without a value, so that it
+  is of `_BSS`: it is then last in the program and not in the file,
+  and the check holds both. One in a segment of its own, by a `#pragma
+  data_seg`, wants its class in the linker's `order`, behind `BSS`, and
+  the check wants to know that class for what has no value (`held` of
+  `layoutcheck.py` takes `BSS` alone for that).
+- It ends within the megabyte with room to spare: the program ends
+  63,197 bytes behind `md` today, of 983,040, so 640 KB behind that
+  leave 264,483.
+- Where it begins is the linker's to say, and not on a paragraph of
+  the megabyte by itself: a paragraph is an address that is `&md` and
+  a multiple of 16, whatever `&md` is. `md` is at 0012A094h on the
+  bench.
+- `Start` is where the linker's command has the program begin,
+  `Start_`; the test fails if the entry is anything else.
+- The stack is 16K, `LenStk`, and `Stack` of `stack.c` is where it is,
+  should the critical error want to go over to it.
+
+For H3:
+
+- The tree is `build/portable_c32/VC.EXE` with `VC.MAP` beside it,
+  which has the static symbols. `scenarios.run` and `show.py
+  --program` take it as it is. The debug program is in a directory
+  inside that one: a pattern over `build/portable_c32/` that goes into
+  directories finds both.
+- `layoutcheck.Check(contents, map).all(stub)` answers whether the
+  layout holds, with `problems`, `found` and `room`, if the scenarios'
+  test is to say it too. The two limits of the 16-bit program that
+  `check_layout` holds are in the plan's table with what each becomes.
+- In the program that is shipped several functions are one address:
+  the compiler gives a function no instructions of its own where the
+  function behind it in the file has the same, one that does nothing
+  or that is the same call. Nineteen names of `dos32.c` are three
+  places today, of 5, 5 and 9. A function is then seen to have run
+  when another of the same place did. The debug program has no such.
+- A piece of a function may stand in front of its label, behind the
+  function before, with no name in the map: what `ran.py` says of it.
+
+For H4: a table that is written to is of `_DATA`, behind `CONST2`, in
+the same object as the constants; the modules of the map whose names
+end in `_t` are the files of tables, 509 symbols.
+
+For M1: the report above. `harness/trial32/ran.py` with the debug
+program says where a run stops; `python3 harness/le.py` with a file
+and its map says where everything is on the bench. A fault of the
+processor does not show on a screen: `run.py --qemu "-d int -D FILE"`
+has QEMU log it, as the trial did for CauseWay.
+
 ### P3, the tables read as what they are: done, and what a later piece should know
 
 A word of a table that names something, which `tables.h` has as a
@@ -3513,7 +3799,9 @@ What the pieces behind this one should know:
     the constants, and the test of the layout, of H3 or B2, has to
     hold every object of a file of tables, the written ones among
     them, to lie within 32K of `Title_S`, and `Title_S` no more than
-    32K in front of the main data.
+    32K in front of the main data. B2 did both: what has a value is
+    one class with the constants in the linker's order, and
+    `portable_c32-layout` holds the two.
 
 ### The estimate
 

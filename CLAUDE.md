@@ -2327,6 +2327,47 @@ in "The portable C".
     which files changed, and within one, the bytes of each routine,
     without their addresses, say which routines.
 
+- The program of 32 bits is linked by the build since the piece B2
+  (`TODO.md`, "B2, the program"), `build/portable_c32/VC.EXE` and
+  `debug/VC.EXE` there, and the test `portable_c32-layout` holds where
+  the linker has put things. What linking it met:
+  - The order of the segments is the linker's command's, by classes,
+    and a class is linked whole: the constants and what has a value
+    are both `DATA`, `CONST2` and `_DATA`, and nothing can be put
+    between them. The stack and the main data have classes of their
+    own by the two `#pragma data_seg`, `STACK` and `MAIN`.
+  - What has no value is not in the file only where nothing with a
+    value stands behind it, and of the class `BSS`. The main data has
+    none and is in the file all the same, as zeros, also with nothing
+    but that class behind it: the segment that its `#pragma data_seg`
+    names is one with a value to the linker.
+  - Within a segment the objects are in the order in which the linker
+    is given them, so which file's variables stand behind which is the
+    order of the link's files: `dos32.obj` is last for that.
+  - `option stack=` makes a segment of the class `STACK` as long as it
+    says, also one that the source has shorter. The build does not
+    say it: `LenStk` is the stack's length.
+  - The name of the file is in the file: two links of the same
+    objects under two names differ in one byte. Under one name they
+    are the same bytes, so the program of 32 bits can be held against
+    itself as the one of 16 is.
+  - `wcc386 -os` gives a function no instructions of its own where
+    the function behind it in the file has the same: one that does
+    nothing, or that is the same call. The map has several names at
+    one place then, nineteen of `dos32.c` at three. With `-od` each has
+    its own.
+  - It puts pieces of a function in front of its label, behind the
+    function before: an address of QEMU's log is not always of the
+    function whose name precedes it in the map. The listing says.
+  - `wdis -s=FILE` puts the lines of the source into a listing of an
+    object that was compiled with `-d2`; without the linker's `debug`
+    directive nothing of that is in the program.
+  - A check that is to fail for a wrong link is tried with wrong
+    links, by hand, from `build/`: the objects of
+    `build/portable_c32/` with another `order`, or with a toy object
+    of constants or of memory without a value among them. The table
+    in the plan has which link broke what.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through
