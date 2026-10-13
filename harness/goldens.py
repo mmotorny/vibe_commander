@@ -25,6 +25,13 @@ golden, so a golden need not be derived again when more is left out.
     goldens.py derive [SCENARIO...]     derive goldens from the original;
                                         all of them if none is named
 
+Scenarios are derived side by side, each on a machine of its own, as a
+build is taken through them (see compare.py): the machine's time is
+counted in what it executes, and a golden is the same however busy the
+host is. All of them take a minute and a half on four processors. After
+a change to the harness, `git status` of harness/goldens/ is clean when
+they have been derived again, if the change has left the judging alone.
+
 A C tree that is declared to behave otherwise than the original, the
 portable C, cannot be held against the original in the scenarios that
 show it (see deviations.TREES, and src/portable_c/DEVIATIONS.md). Each of
@@ -49,7 +56,9 @@ printable ASCII are written as the characters they show as in the code
 page of the scenario's country.
 """
 import argparse
+import os
 import re
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -60,6 +69,10 @@ import setups
 from dos import COLUMNS, CP437_CONTROLS, ROWS, Screen
 
 DIRECTORY = Path(__file__).resolve().parent / "goldens"
+
+# How many scenarios are derived side by side: each has a machine of its
+# own, which keeps one processor busy while the program works.
+TOGETHER = min(4, os.cpu_count() or 1)
 
 # What a tree is called in the first line of a golden of its own.
 TREES = {"portable_c": "The portable C"}
@@ -435,14 +448,23 @@ def main():
     parser.add_argument("--tree", choices=sorted(TREES),
                         help="for record and changes: the tree whose "
                              "goldens are meant")
+    parser.add_argument("--together", type=int, metavar="N",
+                        default=TOGETHER,
+                        help="for derive: so many scenarios side by side "
+                             f"(default: {TOGETHER} here)")
     args = parser.parse_args()
     if args.command == "derive":
         if args.tree:
             parser.error("derive is of the original: record is of a tree")
         names = args.scenario or list(scenarios.SCENARIOS)
-        with setups.Benches() as benches:
-            for name in names:
-                derive(name, benches)
+        for name in names:
+            if name not in scenarios.SCENARIOS:
+                parser.error(f"no scenario {name}")
+        with setups.Benches() as benches, \
+                ThreadPoolExecutor(args.together) as pool:
+            # Each says that it is done when it is; a failure ends the
+            # tool when those before it are done.
+            list(pool.map(lambda name: derive(name, benches), names))
         return
     if not args.tree:
         parser.error(f"{args.command} wants --tree")
