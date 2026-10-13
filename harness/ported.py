@@ -1122,6 +1122,129 @@ BATCHES = [
 #         },
 #     ),
 SETUP_BATCHES = [
+    Batch(
+        title="The setup program: entered and left, its setup file, its "
+              "menu, the setup that the program has without a file, and "
+              "what its key bars and its dialogs do otherwise",
+        source="stmain.c",
+        # Init15 is the start of the setup program from where it reads
+        # the setup file, with the box for a file that is missing or
+        # wrong and the menu behind it, as far as Main40. Dialog is the
+        # setup program's copy of the main program's, which differs from
+        # it: its fields run in the scenarios of the options.
+        routines=("Init15", "Main40", "F08_00..F09_00", "Exit", "Default",
+                  "PutKey0", "Dialog"),
+        functions=("StSetup", "StUser"),
+        unreached={
+            **dict.fromkeys(
+                (0x039B, 0x039D),
+                "the mouse set up when the setup is entered, for a mouse "
+                "driver that does not know the call which resets it "
+                "without the mouse, 21h, and is asked by call 0 instead: "
+                "the driver of the bench, CuteMouse, knows it"),
+            **dict.fromkeys(
+                (0x05A0, 0x05A3, 0x05A6, 0x05A8, 0x05AA, 0x05AD),
+                "Main30, the mouse at the menu: its routine, Main50, is "
+                "still to come, and a button does nothing there in the "
+                "portable C until then, so no scenario presses one. The "
+                "piece of the plan that brings Main50 takes this out "
+                "(TODO.md)"),
+            **dict.fromkeys(
+                (0x101E, 0x1021, 0x1023),
+                "Exit, where the setup is saved and its file is not "
+                "there: without a file the setup program has the setup "
+                "that it makes itself, which the keys of its menu "
+                "cannot change, and what has not changed is not saved. "
+                "It takes a dialog of the options, which are still to "
+                "come"),
+            **dict.fromkeys(
+                (0x104C, 0x104F, 0x1051),
+                "Exit5, a setup file that could not be written: no "
+                "scenario has one yet. The piece of the plan that has "
+                "the setup file not writable takes this out (TODO.md)"),
+            **dict.fromkeys(
+                (0x1BFD, 0x1CC0, 0x1D8E, 0x1DB1),
+                "Dialog, the buttons of a box that begins in the right "
+                "half of the screen: every box of the setup program "
+                "begins in the left"),
+            **dict.fromkeys(
+                (0x1ECE, 0x1ED0, 0x1ED2),
+                "Dialog, F10 and Alt-F10 as answers: no dialog of the "
+                "setup program has the flag for them"),
+        },
+        not_carried={
+            **dict.fromkeys(
+                (0x01BE, 0x01BF, 0x01C0, 0x01C3, 0x01C4),
+                "the help file read when the setup program starts, "
+                "RdHelp: of the help of the setup, sthelp.c, which is "
+                "still to come and says when its pages are read"),
+            **dict.fromkeys(
+                (0x0228, 0x022B, 0x022D, 0x0231, 0x0233, 0x0236, 0x0238,
+                 0x0239, 0x023C, 0x023E, 0x0242, 0x0246, 0x0249, 0x024B,
+                 0x024D, 0x0250, 0x0252),
+                "Ctrl-C not looked for at every call of DOS, and Ctrl-C "
+                "and Ctrl-Break taken, when the setup program starts: "
+                "the one program has both so since it started"),
+            **dict.fromkeys(
+                (0x0253, 0x0256, 0x0259, 0x025B, 0x025E, 0x0261, 0x0264,
+                 0x0265, 0x0266, 0x0268, 0x026A, 0x026C, 0x026D, 0x0271,
+                 0x0272, 0x0274, 0x0275, 0x0276, 0x0278, 0x027A, 0x027B,
+                 0x027D, 0x027F, 0x0281, 0x0283, 0x0285, 0x0289, 0x028B),
+                "the country and the table of the small letters, asked "
+                "for when the setup program starts: the one program has "
+                "them, of IniData"),
+            **dict.fromkeys(
+                (0x029C, 0x029E, 0x02A0, 0x02A2, 0x02A5),
+                "the mode and the page of the screen, asked for when the "
+                "setup program starts: the one program has them, of "
+                "IniData"),
+            **dict.fromkeys(
+                (0x02B1, 0x02B4, 0x02B6, 0x02B9, 0x02BC, 0x02BE, 0x02C1,
+                 0x02C6, 0x02C8, 0x02CC, 0x02CE),
+                "the shape of the cursor corrected when the setup "
+                "program starts: the one program has corrected it, in "
+                "IniData, and the setup notes the shape as it is"),
+            **dict.fromkeys(
+                (0x02D5, 0x02DA, 0x02DC, 0x02DE, 0x02E0, 0x02E1, 0x02E2,
+                 0x02E4, 0x02E6, 0x02E8, 0x02EA, 0x02EC, 0x02ED, 0x02EE,
+                 0x02F0, 0x02F2, 0x02F4, 0x02F6, 0x02FB, 0x02FD, 0x02FF,
+                 0x0303, 0x0305, 0x0306, 0x0307, 0x0309, 0x030C, 0x030E,
+                 0x030F, 0x0310, 0x0312, 0x0314, 0x0315, 0x0317, 0x0319,
+                 0x031B, 0x031D, 0x0320, 0x0321, 0x0323, 0x0325, 0x0327,
+                 0x0329, 0x032B, 0x032D, 0x0331, 0x0332, 0x0336, 0x0339,
+                 0x033E, 0x0340, 0x0343, 0x0347, 0x0348, 0x034A, 0x034C,
+                 0x034E, 0x0350, 0x0351, 0x0353, 0x0355, 0x0357, 0x035C,
+                 0x035F, 0x0363, 0x0365, 0x0369, 0x036C, 0x036F, 0x0372,
+                 0x0374, 0x0375, 0x0378),
+                "what the setup program finds out about the display when "
+                "it starts: an EGA and its lines and where the cells of "
+                "the screen are, which the one program has, of IniData; "
+                "and a buffer of TopView, DESQview, and a display that "
+                "shows snow, which the portable C does not know of "
+                "(src/portable_c/DEVIATIONS.md)"),
+            **dict.fromkeys(
+                (0x0FB0, 0x0FB1, 0x0FB5, 0x0FB8, 0x0FBA, 0x0FEA, 0x0FEE,
+                 0x0FF1),
+                "Ctrl-Break given back and Ctrl-C looked for as before, "
+                "when the setup program ends: the one program goes on, "
+                "and keeps both as it has them"),
+            **dict.fromkeys(
+                (0x1053, 0x1056, 0x1059, 0x105C, 0x105E, 0x1061, 0x1063,
+                 0x1065),
+                "the call of DOS by which the setup program asks a main "
+                "program that is running where its setup is: the one "
+                "program knows, and does what follows the call with its "
+                "own setup"),
+            **dict.fromkeys(
+                (0x1097, 0x109A),
+                "the setup program ended, by DOS's call: the one program "
+                "goes on"),
+            0x109C:
+                "what the setup program has Ctrl-C and Ctrl-Break go to, "
+                "a routine that only returns: the one program has its "
+                "own, CtrlC of resident.c",
+        },
+    ),
 ]
 
 

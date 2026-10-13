@@ -79,10 +79,11 @@ its two panels. It has no part that stays and none that goes, keeps no
 copy of anything, never loads itself again and has no switch for any of
 it.
 
-- The Options menu has no line Memory allocation. It has fifteen lines
-  where the original has sixteen: Save setup stands a row further up, and
-  the box is a row shorter. The letter M chooses nothing there. Shift
-  with Enter is Enter.
+- The Options menu has no line Memory allocation: Save setup, below
+  it, stands a row further up for that, and the letter M chooses nothing
+  there. The menu has sixteen lines all the same, as the original's,
+  since it has a line that the original has not, the setup, further up:
+  see 8. Shift with Enter is Enter.
 - The program takes no check sum of its file and does not know a second
   copy of itself: it never says "Bad or missing", and goes on if its
   file is deleted while a command runs.
@@ -121,8 +122,9 @@ it.
 - The byte of the setup file that held the switch is kept as it is found
   and written back as it was; the program does not go by it. A setup file
   of the original is one of the portable C and the other way round. The
-  original's setup program, `VCSETUP`, which is not translated, still
-  shows the switch and writes the byte.
+  original's setup program, `VCSETUP`, still shows the switch and writes
+  the byte, and so will the setup of the portable C, which is that
+  program (see 8), until the setting is taken out there.
 - The original's help file, which the portable C reads, still has its
   page on Memory allocation; no item of the menu leads there.
 - It is an `.EXE` file, with the main data in it, which DOS loads and
@@ -163,8 +165,8 @@ portable C's own:
 | Scenario | What changes in it |
 |---|---|
 | `lost` | The program's file is deleted by a command. The original asks for it, twice, and ends; the portable C is back at its panels, and the keys that answered the original are keys at the panels: a space into the command line, Enter, which runs it, and Esc, which switches the panels off |
-| `clock`, `clock-russia` | The Options menu where it shows: a line shorter, without Memory allocation |
-| `menu` | The same, and Up from Save setup goes to the clock. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
+| `clock`, `clock-russia` | The Options menu where it shows: without Memory allocation. And by 8: with the setup above, so as long as the original's, the lines from Auto menus to the clock a row further down than there |
+| `menu` | The same, and Up from Save setup goes to the clock. By 8: five times Down from the top is the setup, where the original has Auto menus, and F1 there is the index of the help. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
 | `quick` | The step that switches Memory allocation off before the last command is left out; every screen is as the original's after the same step |
 | `second-copy` | The second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work |
 | `start-memory` | The second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with its Info, not the first copy's |
@@ -181,11 +183,13 @@ leave it open.
 | `memory` | It switches Memory allocation off, for the Info panel to show the other number, and shows the menu without the mark |
 | `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." What the program hands on is held by `handed-on` instead, which sees the same with one copy, by a program that puts itself behind it. The C translation passes that against the original's golden; the portable C, which hands on more, has a golden of its own there: see 7 |
 
-**In the data.** The test `portable_c-data` holds five tables of the menus
-against the original's with this difference declared for each, in
-`DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages of
-their help, the size of the Options menu, its commands, and the item that
-Shift-F9 chooses in it.
+**In the data.** The test `portable_c-data` holds three tables of the
+menus against the original's with this difference declared for each, in
+`DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages
+of their help, and the commands of the Options menu. Two more were
+declared for it until the setup was put into that menu (see 8), and are
+the original's again with a line less and a line more: the size of the
+Options menu, and the item that Shift-F9 chooses in it.
 
 ### 2. No buffer of TopView or DESQview in place of the screen
 
@@ -345,8 +349,9 @@ whether to wait, `Snow`, keeps its place and is neither set nor read.
 Snow mode is a byte of the setup that is kept as it is found and written
 back as it was, 2 in a setup made of the defaults: a setup file of the
 original is one of the portable C and the other way round, and the
-original's setup program, which is not translated, still shows the
-choice and writes the byte.
+original's setup program still shows the choice and writes the byte, as
+the setup of the portable C will, which is that program (see 8), until
+the setting is taken out there.
 
 One thing is left of it, because more than the snow may rest on it: when
 a window has been put on the screen, or the screen has been read, the
@@ -460,6 +465,10 @@ it went.
 | `IniData`, `start.c` | DOS 19h, the current drive; BIOS 12h and 1130h, an EGA and its font | 19h: BX and CX as the calls before left them. 12h: AL the drive, as DOS answered; CX and DX as left. 1130h: BL and CX as 12h answered, the memory of the EGA and its switches (see below); DH as left |  | BX and CX as they come at 19h. AL, CX and DX 0 at 12h. BL and DH 0 and CX 16 at 1130h |
 | `IniData`, `start.c` | DOS 3306h and 30h, the version | 30h: BX what 3306h left in AX. CX and DX of both as the calls before left them |  | BX and CX as they come, DX 0 |
 | `IniData` with `CurNl`, `start.c` | The colour that DOS writes in: BIOS 0Fh and 03h, the page and the cursor, twice; 0Eh, a carriage return or a line feed typed, three times; 08h, the cell at the cursor, twice; DOS 06h, a space written; BIOS 09h, the cell written back | 0Eh: BL what DOS left when it was asked for its version, the low byte of AX from 3306h or BL from 30h; the BIOS takes a colour there only where the screen is graphics. 06h: AL the character at the cursor, as 08h answered; DH the row of the cursor; BX and CX as the BIOS left them. AL of 0Fh, 03h and 08h as the call before left it. CX and DX of the BIOS's calls the shape of the cursor and where it is, as 03h answered, with the space in DL from 06h on |  | BL 0 at 0Eh. AL and DH 0 at 06h, BX and CX as they come. AL 0 at 0Fh, 03h and 08h, and 0 in whichever of BL, CX and DX a call of the BIOS does not take |
+| `StDefault`, `stmain.c` | DOS 19h, the current drive, for the panels that the setup makes without a setup file | AL as the code before left it: what DOS answered about the setup file, or 0, the answer of the box that asks |  | AL 0 |
+| `StInit15`, `stmain.c` | DOS 3Dh, 3Fh and 3Eh, the setup file read | 3Dh: BX, CX, SI and DI as the help file read and the name copied left them. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  | BX, CX, SI and DI as they come at 3Dh. AL 0 at 3Fh and 3Eh; CX and DX 0 at 3Eh |
+| `StExit`, `stmain.c` | BIOS 01h, the cursor in its shape again; DOS 4300h, 3Ch, 40h and 3Eh, the setup file written; 09h, the line that says it could not be | 01h: DX the rows of the screen and 80, of the screen put back. 4300h: BX the sum of the file. 3Ch: AL as 4300h left it, or 0 for a file that is not there; BX the sum still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still. 09h: AL, BX and CX as the calls before left them |  | DX 0 at 01h. AL 0 at 3Ch, 40h, 3Eh and 09h; BX as it comes at 4300h and 3Ch; CX and DX 0 at 3Eh; BX and CX as they come at 09h |
+| `StSetup`, `stmain.c` | BIOS 0Fh and 03h, the page and the cursor, where the setup notes the row and the shape of the cursor | 0Fh: AL and BX as making the table of the small letters left them. 03h: AL the mode, as 0Fh left it; BL, CX and DX as the code before left them |  | AL 0 at both; BX 0 at 0Fh, and BL, CX and DX 0 at 03h |
 | `OpenFil`, `system.c` | DOS 3Dh, a file opened, both times | BX the service and the mode, as in AX |  | BX as it comes |
 | `SetPth`, `system.c` | DOS 47h, the current directory | AL the drive, 1 for A: |  | AL 0 |
 | `Fantom`, `system.c` | DOS 440Fh, the drive that a unit goes by, three times | BH the other of the two drives |  | BH 0 |
@@ -620,8 +629,9 @@ watch.
   is found and written back as it was, 1 in a setup made of the
   defaults; the program does not go by it. A setup file of the original
   is one of the portable C and the other way round. The original's
-  setup program, which is not translated, still shows TSR manager and
-  writes the byte.
+  setup program still shows TSR manager and writes the byte, and so will
+  the setup of the portable C, which is that program (see 8), until the
+  setting is taken out there.
 - The original's help file, which the portable C reads, still has its
   pages on the map; no key and no item of a menu leads there.
 
@@ -685,3 +695,192 @@ that choose an item in an open menu, which have Alt+F5 no more and the
 items of the Commands menu below Memory info a place further up; and of
 the key bar the names of the keys, without "Memory", and the two rows
 that had it for F5 with Alt.
+
+### 8. The setup program is a part of the program
+
+**What the original does.** It is two programs. `VCSETUP.COM` is the
+setup program, of 24 KB, with a copy of every routine that it shares
+with the main program: boxes, dialogs, the key bar, the mouse. A user
+runs it from DOS, or from the command line of the main program like any
+command: the main program writes the prompt and the command into the
+row of its command line, notes the command in its history, gives the
+screen back as DOS had it, and has COMMAND.COM run it. When the setup
+program starts,
+
+- it looks at the version of DOS, "This program requires DOS 3.20 or
+  later.", and at the memory, "Program too big to fit in memory", sets
+  the screen to text of 80 columns if it is not, and writes a banner
+  through DOS: its name with "Setup", the version, the copyright;
+- it finds its directory, from `VC=` of the environment or else from the
+  path of its own file, and reads its seven pages of the help file there,
+  "Error reading data from the help file." if it cannot;
+- it reads the setup file, `VC.INI`, of that directory, calling DOS
+  itself: with a drive that is not ready, DOS's own question comes up,
+  whether to try again, since the setup program takes no critical error;
+- it has DOS not look for Ctrl-C at every call, takes Ctrl-C and
+  Ctrl-Break, asks for the country, and finds out about the screen, as
+  the main program does when it starts.
+
+What it edits is what it read from the file, or, without a good file,
+the setup that it makes itself. The setup of a main program that is
+running is not looked at. When it is left with Save it writes the file
+and then asks a running main program for the address of its setup, by a
+call of DOS that the main program answers (INT 21h with AX 2B02h, CX
+'VC', DX 'OM'): the answer comes only from a main program whose setup
+has TSR manager on, as it has when the program is distributed. Into that
+setup it copies the 330 bytes that it has saved, but for four that the
+running program keeps as it has them: which panel is the current one,
+whether the other is switched off, TSR manager, and Memory allocation,
+which the running program takes when the command has ended. Then it
+ends, and the main program goes on as after any command: it looks at
+the screen anew, reads its panels again, and has no setup that it knows
+to be saved.
+
+The setup that the setup program makes without a good file, and for
+Set default configuration, has two panels as well as the colours and
+the options. It copies the 88 bytes that the file has of a panel from a
+table of 24, so the other 64 are what stands behind that table in the
+program: the box that says the setup file is missing, with the addresses
+that it names, and the start of a dialog that only the binary has which
+was shipped, not the published source. They land behind the zero byte
+that ends the path of each panel, where no program reads them, and are
+in the setup file when it is saved.
+
+**What the portable C does.** It is one program, and the setup is a part
+of it.
+
+- The Options menu has a line that the original has not, " seTup...",
+  behind " Editors...", which the letter T chooses. The lines from Auto
+  menus to the clock stand a row further down for it, with their ticks,
+  and Ctrl-B, the key bar, is the tenth item and not the ninth. The item
+  has no page of the help: F1 on it shows the index.
+- Choosing it does what running a command does, without a command: the
+  lists of the panels are cut down to 256 files, the screen is what DOS
+  had shown, the row of the command line is emptied, where the original
+  has its prompt and the command of the setup program there, and the
+  cursor goes on to the next row, which moves the screen up if that row
+  was the last. Nothing is noted in the history. The program keeps the
+  two interrupts that it has taken.
+- Then the setup is on the screen as the original's setup program is.
+  There is no word on the version of DOS or on the memory, no mode set
+  and no banner: the program has started already. The directory is the
+  one that the program has, which it makes by its own rule: in capitals,
+  and with a backslash behind whatever `VC=` names, where the setup
+  program adds none behind a colon. The help file is not read when the
+  setup is entered.
+- The setup file is asked for as the rest of the program asks for its
+  files, with the program's errors (see `sys.h`): a drive that is not
+  ready has the program's box, a call that was given up there is the
+  error 53h, and DOS is asked what was wrong behind a call that failed.
+  The box is the main program's, with its own key bar, also while the
+  setup is open.
+- What is edited is what was read from the file, as in the original, in
+  the place of the program's own setup, which is set aside meanwhile:
+  the routines that both programs have go by what is edited, so the
+  colours, the key bar and the clock of the setup are those that are
+  edited, as in the original.
+- Left with Save, the file is written, and the program keeps what was
+  edited, but for the four bytes that the original's running program
+  keeps: it takes the setup whatever that has for TSR manager, and no
+  call of DOS is made for it. Left without, the program has its setup
+  back as it was. Either way it goes on as after a command: the screen
+  is looked at anew, which moves it up as after a command, the panels
+  are read again, and what stood in the command line is gone.
+- The setup that is made without a good file, and for Set default
+  configuration, has zeros in the 64 bytes behind the path of each
+  panel. A setup file that the setup saves of it differs from the
+  original's in those bytes, twice 64 of the file's 511.
+- While the setup program is being translated (`TODO.md`, "The setup
+  program in the portable C: the plan"), what its menu leads to is not
+  all there: an item whose screen is still to come waits for a key and
+  goes back to the menu, the mouse does nothing at the menu, and F1 is
+  no key.
+
+**Why.** The user's decision, on 12 October 2026: the setup program is
+ported into the portable C "so that there is one program", reached by an
+item of its Options menu and judged by scenarios whose goldens are
+recorded from the original setup program. It is translated as it is
+first: what is behind it on the screen is what DOS had shown, as when
+the original is run from the program's command line, and it edits the
+setup file, not the setup of the running program. Its start and its end
+are those of a program of its own, and what they did that the one
+program has done already is not done twice. The critical error is the
+program's, and the files are asked for as the rest of the program asks,
+on the user's word of the same day. And the 64 bytes behind a path are
+zeros because half of them cannot be anything else: 17 of each 64 are of
+a dialog that the published source has not, which the project does not
+reproduce, and the other 47 are a box with addresses of the original's
+layout, which mean nothing in a file.
+
+**Which scenarios show it.** Every scenario of the setup program is held
+against the golden that the original's setup program left, with two
+things otherwise, which `harness/deviations.py` has. The portable C is
+taken through the item of its menu, "F9 o t", where the original is
+taken through the command, "d:\vc\vcsetup>nul" and Enter. And the row
+that has the command in the original, behind the setup and afterwards
+for as long as it is on the screen, is empty in the portable C: the
+golden is derived with spaces there. The scenarios `setup-menu`,
+`setup-defaults`, `setup-missing`, `setup-damaged` and `setup-cancel`
+pass so; `setup` is not run until the screens that it shows are there.
+
+No scenario shows the 64 bytes. `setup-defaults` saves a setup that was
+made by Set default configuration, starts the program anew with it and
+ends with the setup file as that program saves it, where the bytes
+behind a path are zeros in the original too: the file that the setup
+program itself has written is not on the disk when the scenario ends.
+No scenario has a drive that is not ready while the setup is open, a
+`VC=` in the environment, or a look at the history.
+
+The Options menu shows in three scenarios that have a golden of the
+portable C's own for the first deviation already, `clock`, `clock-russia`
+and `menu`: their rows there say what differs.
+
+**In the data.** The test `portable_c-data` holds four tables of the
+menus against the original's with this difference declared for each, in
+`DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages
+of their help, the commands of the Options menu, where the item is the
+number of a command that the original has not, and the keys that choose
+an item in an open menu, where Ctrl-B chooses the tenth. The constants
+of the setup are held against those of the original's setup program,
+`VCSETUP.COM`, each by its name with `St` in front; the table of a
+panel's defaults is the 24 bytes that the published source has.
+
+### 9. The key bar of the setup is 80 cells, not 81
+
+**What the original does.** Its setup program has a copy of the routine
+that draws the key bar, `PutKey0`, which differs from the main program's
+in one place. Both write, for each of the ten keys, its number, the six
+cells of its name, and a space before the next number. The main
+program's looks whether the key was the tenth before it writes that
+space; the setup program's writes the space first and looks then. So
+the setup program's bar has a space behind the name of its tenth key
+too, an 81st cell in a row of 80, in the colour of the bar's numbers.
+
+The bar is drawn into the last row of the screen buffer, and that row
+alone is put on the screen, so the cell does not show there. It is the
+first cell of what stands behind the row: of the next row of the
+buffer, on a screen of fewer lines than 50, which no key bar is put on
+the screen from; and on a screen of 50 lines of what stands behind the
+buffer, which is the setup program's copy of what DOS had on the
+screen. That copy is put back on the screen when the setup program is
+left, and where one of its screens is: the top left cell of what DOS
+had shown is a space then, in the colour of the key bar's numbers.
+
+**What the portable C does.** It has one routine for both, the main
+program's, which writes 80 cells: `PutKey0` of `bars.c`. While the setup
+is open it draws the setup's key bars, which are tables that it reads
+then, and nothing else is otherwise. What DOS had shown is put back as
+it was.
+
+**Why.** The user's decision, on 13 October 2026: the cell is a bug of
+the original's setup program, and is fixed, not kept, "taking into
+account that we are going to merge vc and vcsetup code". The setup uses
+the main program's routines, and a second copy of one is not kept for a
+bug of it.
+
+**Which scenarios show it.** None so far: the scenarios of the setup
+are on a screen of 25 lines, where the cell lands in a row of the
+buffer that is not on the screen. One that has the setup on a screen of
+50 lines, which is still to come (`TODO.md`), shows it in the top left
+corner of what DOS had shown, and is held against a golden of the
+portable C's own for that.

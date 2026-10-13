@@ -1032,10 +1032,14 @@ is the first, and the form of the others:
     The line is known when all of it shows: a box that covered a part
     of that row would leave the rest in the golden. The menu and the
     dialogs of the setup program do not reach it, and the picture of a
-    colour covers the row whole. And no scenario looks at what DOS has
-    shown after the setup program has been left, Ctrl+o, or at the
-    history, Alt+F8 and Ctrl+e: the original has the command there, and
-    a line more on the screen, and a tree has neither.
+    colour covers the row whole. The line stays among what DOS has
+    shown when the setup program has been left, and moves up with it: a
+    tree has an empty row there, and moves the screen alike. So what
+    DOS has shown may be looked at afterwards, Ctrl+o, and the setup
+    program may be started again, as long as every such line shows
+    whole: see below for where it gets to. No scenario looks at the
+    history, Alt+F8 and Ctrl+e, where the original has the command and
+    a tree has not.
   - Driven. The driver of the tests feeds the setup program and writes
     its screens out as it does for the main program, unchanged: the
     setup program says that it is idle in the same way, and asks the
@@ -1252,6 +1256,46 @@ with the original:
     all the setup program looks for its pages in memory that it has put
     nothing into, and found none there when this was written, started
     after a command or after an earlier setup program alike.
+  - Every time the setup program has been left, what DOS has shown is
+    two rows further up, as after any command: the line of the command
+    that started it is on row 21 then, and that of the time before on
+    row 19 when it is started a third time. The menu has the rows 6 to
+    17 with its shadow, and the box of a setup file that is missing 9
+    to 15: a line of a command that gets behind one of them is covered
+    in part, and then it is in the golden as the original has it,
+    where a tree has nothing (see above). Three starts in a row are
+    clear of the menu; where more is on the screen, the lines of other
+    commands or a fourth start, have DOS empty the screen first, "cls"
+    and Enter at the command line. And where the program is left and
+    started anew, F10, Enter and "d:\\vc\\vc" at DOS's prompt, a panel
+    that is switched on covers half of every row: "cls" before that
+    too. See setup-damaged and setup-defaults.
+  - An item of the menu and Esc in one step, "F2 Esc", leave the menu
+    on the screen as it was, with the cursor on that item: the screen
+    of the item is not looked at. setup-menu has every item so.
+  - Without a setup file the setup program says so, and goes on with
+    the setup that it makes itself: "del", a space, "d:\\vc\\vc.ini"
+    and Enter at the command line of the main program take the file
+    away, and the main program does not write it again as long as its
+    Auto save setup is off, which it is on the bench. What is left as
+    the setup program made it is not offered for saving. A file that
+    is none is made of the file in the editor, Shift+F4 and its path:
+    Del and a letter leave it as long as it was, with another first
+    byte, and the same three bytes further on leave it with a sum that
+    is wrong; one key to a step there. A copy of another file over it
+    has another length.
+  - The setup that the setup program makes itself, for Set default
+    configuration, F8 and Enter, and without a setup file, has bytes
+    behind the paths of its two panels that only the original has: 64
+    behind each, what stands behind a table in VCSETUP.COM (see
+    src/portable_c/DEVIATIONS.md). They are in the setup file when
+    that setup is saved, so a scenario does not end with such a file
+    on the disk: a tree's is another. In setup-defaults the program
+    is left and started anew, reads that file, and saves its own
+    setup by itself, with Auto save setup on as that setup has it,
+    once something of it changes: Ctrl+F1. The bytes behind a path are
+    zeros then, in the original too. A setup that was read from a file
+    and saved again has no such bytes.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -6610,6 +6654,159 @@ SCENARIOS = {
             "PgUp",                       # and a page
             "Esc",
             "F10",
+        ),
+        setup=True),
+
+    "setup-menu": Scenario(
+        "The menu of the setup program by its keys: the cursor up and "
+        "down, round at the ends, and to the ends; a key that means "
+        "nothing; an item by its key and by Enter on it; every item "
+        "entered and left at once; and the setup left with nothing "
+        "changed, by Esc, by its last item and by F10, which ask nothing",
+        steps=(
+            _SETUP,                       # the cursor on the first item
+            "Down",
+            "Down",
+            "Up",
+            "End",                        # the last item, Exit
+            "Down",                       # round to the first
+            "Up",                         # and back to the last
+            "Home",
+            "PgDn",
+            "PgUp",
+            "x",                          # no key of the menu
+            "F8",                         # reset all options?
+            "Right Enter",                # No: the cursor is on that item
+            "Enter",                      # the item under the cursor
+            "Esc",
+            # An item and Esc in one step: its screen is not looked at
+            # here, only that the menu is back afterwards, with the
+            # cursor on that item.
+            "F2 Esc",                     # Configuration
+            "F3 Esc",                     # Screen and Mouse
+            "F4 Esc",                     # Panel options
+            "F5 Esc",                     # Set Black & White palette
+            "F6 Esc",                     # Set Color palette
+            "F7 Esc",                     # Set Laptop palette
+            "F9 Esc",                     # Country info
+            "Esc",                        # leaves: nothing has changed
+            _SETUP,
+            "End",
+            "Enter",                      # Exit, by its item
+            _SETUP,
+            "F10",                        # and by its key
+        ),
+        setup=True),
+
+    "setup-defaults": Scenario(
+        "Set default configuration in the setup program, and the setup "
+        "saved when it is left: the program goes by what was saved at "
+        "once, but for which panel is the current one, and a program "
+        "that is started anew has the two panels as the setup program "
+        "made them and saves its setup by itself",
+        steps=(
+            _SETUP,
+            "F8",                         # reset all options?
+            "Enter",                      # Yes
+            "F10",                        # save the current setup?
+            "Enter",                      # Save: the panels, as they were
+            "F9 o Enter",                 # Auto save setup is ticked now,
+            "Esc",
+            "F9 o o",                     # and Alternative editor,
+            "Esc",
+            "Alt+F1",                     # and the drive B: is offered
+            "Esc",
+            "F10",
+            "Enter",                      # the program left: DOS
+            # The line of the command that started the setup program is
+            # taken off the screen, where the panel of the program that
+            # is started next would cover half of it.
+            '"cls" Enter',
+            '"d:\\vc\\vc" Enter',         # the left panel off, the right
+                                          # one the current one
+            "Ctrl+F1",                    # the left one: the root, and the
+                                          # setup is saved by itself
+        ),
+        setup=True),
+
+    "setup-missing": Scenario(
+        "The setup program without a setup file: it says so and goes on "
+        "with the setup that the program has without one, which is not "
+        "offered for saving when it is left as it is; and it is left "
+        "from that box by Exit, by Esc and by F10",
+        steps=(
+            '"del" Space "d:\\vc\\vc.ini" Enter',
+            _SETUP,                       # the setup file ... not found.
+            "Enter",                      # Ok: the menu
+            "F8",
+            "Enter",                      # the same setup once more
+            "F10",                        # leaves, and asks nothing
+            _SETUP,                       # there is still no file
+            "Right Enter",                # Exit
+            _SETUP,
+            "Esc",
+            _SETUP,
+            "F10",
+        ),
+        setup=True),
+
+    "setup-damaged": Scenario(
+        "The setup program with a setup file that is none: one that "
+        "does not begin as a setup file does, one whose sum is wrong, "
+        "and one of another length",
+        steps=(
+            "Shift+F4",
+            '"d:\\vc\\vc.ini" Enter',     # the file in the editor
+            "Del",                        # its first letter V
+            "x",                          # is another: as long as it was
+            "F2",
+            "Esc",
+            _SETUP,                       # contains data that is not correct.
+            "Esc",
+            "Shift+F4",
+            "Enter",
+            "Del",
+            '"V"',                        # it begins as a setup file again,
+            "Right",
+            "Right",
+            "Del",                        # and its fourth byte is another:
+            "x",                          # the sum is wrong
+            "F2",
+            "Esc",
+            _SETUP,
+            "Right Enter",                # Exit
+            # The lines of the two commands would be behind the menu of
+            # the third: see "The scenarios of the setup program" above.
+            '"cls" Enter',
+            '"copy" Space "hello.txt" Space "d:\\vc\\vc.ini" Enter',
+            _SETUP,                       # a file of 13 bytes
+            "Enter",                      # Ok: the menu
+            "F10",
+        ),
+        setup=True),
+
+    "setup-cancel": Scenario(
+        "The setup program left with something changed and not saved, "
+        "by Cancel and by Esc: the program is left too, the setup file "
+        "is as it was, and so is the setup of the program",
+        steps=(
+            _SETUP,
+            "F8",
+            "Enter",                      # everything as without a file
+            "F8",
+            "Alt+F10",                    # no key of the box
+            "Esc",
+            "F10",                        # save the current setup?
+            "Right Enter",                # Cancel: the panels
+            "F9 o Enter",                 # Auto save setup is not ticked
+            "Esc",
+            _SETUP,
+            "F8",
+            "Enter",
+            "Esc",                        # save the current setup?
+            "Esc",                        # no: the panels
+            "F9 o o",                     # nor is Alternative editor
+            "Esc",
         ),
         setup=True),
 

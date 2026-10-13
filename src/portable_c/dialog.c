@@ -25,6 +25,10 @@
  * second line. The three bytes are the column of the cursor and a byte
  * that is 0 until a key has been typed there: the first one typed
  * replaces the text.
+ *
+ * The setup program has these routines too, word for word but for
+ * Dialog, and a dialog of the setup is asked while the setup is open,
+ * StOpen of vc.h: Dialog says what it does otherwise then.
  */
 #include "tables.h"
 
@@ -48,6 +52,9 @@
 
 #define INPUT_SECOND 0x100              /* the second of two lines */
 #define INPUT_NORMAL 0x200              /* taken with NormStr at the end */
+/* In a dialog of the setup the high byte is the number of the line, and
+   says where its text is kept: see INPUT. It is 0 in both of the
+   setup's. */
 
 #define LINK_FIELD 0x3F                 /* the number of the field */
 #define LINK_LAST  0x40                 /* a group: on its last line, */
@@ -62,9 +69,12 @@
 
 #define LenCmd 124                      /* Length of command line */
 
-/* Where a line that is typed into is kept: its three bytes. */
+/* Where a line that is typed into is kept: its three bytes. In a dialog
+   of the setup that is in TmpErr, 64 bytes for each line. */
 #define INPUT(control) \
-    (md.DosBuf + LenCmd + 10 + ((control) & INPUT_SECOND ? 100 : 0))
+    (StOpen != 0 \
+     ? md.TmpErr + ((control) >> 8) * 64 \
+     : md.DosBuf + LenCmd + 10 + ((control) & INPUT_SECOND ? 100 : 0))
 
 #define KEY_MOUSE 0xFC                  /* the high byte of a "key" that
                                            says the mouse did something */
@@ -777,7 +787,22 @@ static u16 Dial85(u16 field, u16 code)
    Returns in the low byte 0 for that answer, the number of another
    button, 1 for F10 and Alt-F10 where they are answers, with 1 and 0 in
    the high byte, and FFh for Esc. A dialog without a field takes no key
-   and does not end. */
+   and does not end.
+
+   While the setup is open, StOpen of vc.h, two things are as the setup
+   program's Dialog has them, which is a copy of this routine: no menu
+   bar is drawn, whatever the dialog names for one, and a line that is
+   typed into is kept in TmpErr (see INPUT), where the routine that the
+   Panel options name reads it.
+
+   The setup program's copy differs in four things more, which nothing
+   of the setup can show, and here the main program's hold for both. It
+   has no flag BOX_ERROR, by which a box is lower by SftErr: that is 0
+   while the setup is open. It puts a box where the dialog says also if
+   the box is said to be on the screen already, takes no line with
+   NormStr, and has 0 and 1 in the high byte where F10 and Alt-F10 are
+   answers, the other way round: no dialog of the setup has such a box,
+   such a line or those answers. */
 u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
 {
     u16 code = AsmSeg();
@@ -803,6 +828,8 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     md.Quote = 0;
     shape = ChgCur();
     key = head->bMenu;
+    if (StOpen != 0)
+        key = 0xFF;                     /* the setup has no menu bar */
     if (!(head->bFlags & BOX_THERE)) {
         begin = head->BoxBase;
         /* Of a panel: in the half of the screen that the panel has. */

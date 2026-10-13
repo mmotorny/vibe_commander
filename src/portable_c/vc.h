@@ -544,6 +544,100 @@ void Again(void);
 #define CmnIni  OFFSET_IN(struct MainDat, LoadRes)
 #define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
 
+/*
+ * The setup program.
+ *
+ * The original has it as a program of its own, VCSETUP, with a copy of
+ * the routines that it shares with the main program. Here it is a part
+ * of the one program: the files whose names begin with st, and StSetup
+ * of stmain.c, which the Options menu calls and which returns when the
+ * setup has been left (see DEVIATIONS.md). A routine and an object of
+ * the setup program have St in front of the name that they have in its
+ * assembly, src/asm/VCSETUP.ASM with VCSTSUB.INC and VCSTHLP.INC, since
+ * many of those names are the main program's too; a routine that both
+ * programs have word for word is the main program's, and is not
+ * written twice.
+ *
+ * The main data is what the setup program has in its one segment while
+ * the setup is open: the setup that is edited is the first CmnIni bytes
+ * of it, as it is the main program's, and the routines that both
+ * programs have read the colours, the key bar and the clock there. What
+ * the setup program has besides is struct StData below, and what it has
+ * under another name or of another size is said there too.
+ */
+
+/* Not 0 while the setup is open. Three routines that both programs have
+   go by it: PutKey0 of bars.c, which has the setup's key bars then,
+   Dialog of dialog.c, which draws no menu bar and keeps a typed line
+   elsewhere, and Input of input.c, where F1 is the help of the setup.
+   Everything else that the setup program's copy of a routine has
+   otherwise is the main program's here: each of the three says what. */
+extern u8 StOpen;
+
+/* What the setup program has of its own, while it is open: in MenuBuf,
+   where the main program makes the setup file too, and reads it when it
+   starts. A file of the setup has it as `sd`, by a line of its own:
+   #define sd (*(struct StData *)md.MenuBuf).
+
+   The first of it is the setup file as it is read and written. The
+   original has that as its data from IniData on: the three letters V,
+   the two panels, WCB1 and WCB2, the setup that is edited, and the sum.
+   Here the setup that is edited is the start of the main data, as it is
+   the main program's, and is copied into the file when that is written.
+
+   Of the buffers of the setup program, ScrBuf, WinBuf, TmpBuf and
+   TmpErr are the main data's; BoxBuf, which the main program has not, is
+   ErrBuf, which is as long; NcPath is the main data's, the directory of
+   the program, and has the name of the setup file behind it only where
+   stmain.c says so; and UserScr, what DOS had on the screen, is the
+   main data's with one row less than the 50 that the setup program
+   keeps: StUser of stmain.c has the rows. */
+struct StData {
+    u8  File[INI_LEN + 1];              /* the setup file, and a byte more,
+                                           which is read to know a file
+                                           that is too long */
+    u8  IniStat;                        /* 0 - not found, 1 - Ok, 2 - bad */
+    u8  MnItem;                         /* Item of main menu */
+    u16 CurType;                        /* Shape of cursor */
+    u8  SrcIni[CmnIni];                 /* Source VC.INI */
+    u8  BackC;                          /* of the palettes, stcolor.c */
+    u8  HistC;
+    u8  HstCuC;
+    u16 ColCur;
+    u16 ColFrst;
+    u16 ColNum;
+    /* Not of the original: the setup of the program as it was when the
+       setup was entered, which the original's main program keeps in its
+       own memory meanwhile; and the 50th row of what DOS had on the
+       screen. */
+    u8  Aside[CmnIni];
+    u16 Row50[80];
+};
+HOLDS(the_setups_data_fits_MenuBuf, sizeof(struct StData) <= LenMenu);
+
+/* The setup: entered from the Options menu, and left. It is no command
+   that says where the program goes on: that is always where it goes on
+   when a command of DOS has ended, which main.c says. See stmain.c. */
+void StSetup(void);
+/* What DOS had on the screen when the setup was entered, which the setup
+   keeps: StUser puts `rows` rows of it into the screen buffer, from the
+   row `first` on. See stmain.c. */
+void StUser(u16 first, u16 rows);
+/* What the items of the setup's menu do, each of which returns when its
+   screen has been left: the Configuration, Screen and Mouse, the Panel
+   options and the Country info, of stopts.c; the three palettes, of
+   stcolor.c; and the help of the setup, for F1, of sthelp.c. Until its
+   file is there, each is a routine of stmain.c that does nothing: see
+   "What is still to come" there. */
+void StF02_00(void);
+void StF03_00(void);
+void StF04_00(void);
+void StF05_00(void);
+void StF06_00(void);
+void StF07_00(void);
+void StF09_00(void);
+void StHelp(void);
+
 /* What is of DOS on a PC alone, and no part of sys.h: where an interrupt
    goes, as an address with the offset in the low word, and one made to
    go somewhere, by DOS or, for PutVector, in the machine's table itself;
@@ -700,7 +794,12 @@ enum {
     CMD_M16_01, CMD_F62_01, CMD_M21_00, CMD_F76_01, CMD_M53_00,
     CMD_M60_00, CMD_M61_00, CMD_M62_00, CMD_M63_00, CMD_M64_00,
     CMD_M66_00, CMD_M67_00, CMD_M69_00, CMD_M70_00, CMD_M71_00,
-    CMD_M72_00
+    CMD_M72_00,
+    /* The one that the original has not: the setup program, which is a
+       program of its own there and an item of the Options menu here
+       (see DEVIATIONS.md). It is the last, so that no other has another
+       number for it: the test of the data is told the number. */
+    CMD_SETUP
 };
 
 /* Where the program goes on after a command of the keys of the panels,
@@ -854,8 +953,10 @@ struct Onward F20_00(u16 panel);
 
 /* Enter, the directory changed and the history, enter.c. F21_10 is Enter
    on the entry under the cursor, F21_25 a command of the command line
-   run, F21_31 the program started over to run what DosBuf holds; F24_01
-   goes to the directory whose path is at `path` in the main data.
+   run, F21_31 the program started over to run what DosBuf holds, and
+   F21_40 the list of a panel cut down to what is kept of it while a
+   command runs, which is no command; F24_01 goes to the directory whose
+   path is at `path` in the main data.
    F24_02 has the panels show the directory that DOS is in when they
    are drawn next, `panel` being the current one: it is no command, and
    what calls it goes on at Init50, which draws them. */
@@ -863,6 +964,7 @@ struct Onward F21_00(u16 panel);
 struct Onward F21_10(u16 panel);
 struct Onward F21_25(void);
 struct Onward F21_31(void);
+void F21_40(u16 panel);
 struct Onward F22_00(u16 panel);
 struct Onward F23_00(u16 panel);
 struct Onward F24_00(u16 panel);

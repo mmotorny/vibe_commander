@@ -39,19 +39,19 @@ cursor 0 127 lines 6 7 mode 3
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
 |║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
+|║notes    doc│            │    │  seTup...                    │e on drive C:   ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx9 1Ex2 1Bx4
+|║data     bin│            │    │ ──────────────────────────── │2 bytes in      ║| 1Bx31 30x32 06x1 03x1 1Bx15
+|║run      bat│            │    │  Auto menus                  │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║empty    dat│            │    │√ Path prompt                 │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │√ Key bar            Ctrl-B   │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │√ Full screen                 │ this directory ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx5 48x1 3Fx21 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │                ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
 |║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 |║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
-|║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
 |║..           ►UP--DIR◄ 16.06.00  12:00║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
@@ -154,19 +154,19 @@ cursor 0 127 lines 6 7 mode 3
 |║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
 |║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
+|║notes    doc│            │    │  seTup...                    │e on drive C:   ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx9 1Ex2 1Bx4
+|║data     bin│            │    │ ──────────────────────────── │2 bytes in      ║| 1Bx31 30x32 06x1 03x1 1Bx15
+|║run      bat│            │    │  Auto menus                  │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║empty    dat│            │    │√ Path prompt                 │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │√ Key bar            Ctrl-B   │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │√ Full screen                 │ this directory ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx5 48x1 3Fx21 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │                ║| 1Bx31 30x1 3Fx7 3Ex1 3Fx22 30x1 03x2 1Bx15
 |║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
 |║            │            │    │√ cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
 |║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
 |║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 |║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 |║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
-|║            │            │            ║║                                      ║| 1Bx80
 |╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
 |║..           ►UP--DIR◄ 16.06.00  12:00║║                                      ║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80

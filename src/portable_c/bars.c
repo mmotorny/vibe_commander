@@ -102,6 +102,40 @@ static const u8 CODE Key_S[33][6] = {
     {'R', 'e', 's', 'c', 'a', 'n'},     /* 32 */
 };
 
+/* The key bars of the setup, which PutKey0 shows while the setup is open
+   (StOpen of vc.h): KeyB_T, KeyC_T and Key_S of the setup program. A bar
+   is the same whichever of Shift, Ctrl and Alt is held: 0 is that of the
+   setup's menu, 1 that of a dialog, 2 that of a palette and of the
+   help, and 3 has Quit alone. */
+static const u8 CODE StKeyB_T[4][4] = {
+    {1, 0, 0, 0},                       /*  0 */
+    {2, 0, 0, 0},                       /*  1 */
+    {3, 0, 0, 0},                       /*  2 */
+    {4, 0, 0, 0},                       /*  3 */
+};
+
+static const u8 CODE StKeyC_T[5][10] = {
+    { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0},   /*  0 */
+    { 1,  2,  3,  4,  5,  6,  7,  8,  9, 10},   /*  1 */
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  2 */
+    { 1,  0,  0,  0,  0,  0,  0,  8,  0, 10},   /*  3 */
+    { 0,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  4 */
+};
+
+static const u8 CODE StKey_S[11][6] = {
+    {' ', ' ', ' ', ' ', ' ', ' '},     /*  0 */
+    {'H', 'e', 'l', 'p', ' ', ' '},     /*  1 */
+    {'C', 'o', 'n', 'f', 'i', 'g'},     /*  2 */
+    {'S', 'c', 'r', 'e', 'e', 'n'},     /*  3 */
+    {'P', 'a', 'n', 'e', 'l', 's'},     /*  4 */
+    {'B', '&', 'W', ' ', ' ', ' '},     /*  5 */
+    {'C', 'o', 'l', 'o', 'r', ' '},     /*  6 */
+    {'L', 'a', 'p', 't', 'o', 'p'},     /*  7 */
+    {'R', 'e', 's', 'e', 't', ' '},     /*  8 */
+    {'C', 'n', 't', 'r', 'y', ' '},     /*  9 */
+    {'Q', 'u', 'i', 't', ' ', ' '},     /* 10 */
+};
+
 /* The menu bar: the names of its five menus, each behind four spaces, and
    spaces to the end of the row. It is a constant of bars_t.c, which
    the menu reads too. */
@@ -130,7 +164,16 @@ u16 *ClsLine(u16 place, u16 segment)
 /* Draw the key bar `bar` as it is with none of Shift, Ctrl and Alt held,
    0, or with Shift, Ctrl or Alt, 1, 2 and 3 for `shift`: the numbers of
    the ten keys and what each does. Nothing is drawn if the bar shows that
-   already. Only the low bytes of both count. */
+   already. Only the low bytes of both count.
+
+   While the setup is open the bars are the setup's: its tables, and
+   this routine all the same. The setup program has a copy of it that
+   looks whether a key was the last behind the space that it writes
+   after the key's name, where the main program's looks before, and so
+   writes a space behind the tenth key too, an 81st cell in a row of 80:
+   the first of the next row of the screen buffer, or, on a screen of 50
+   lines, of what stands behind the buffer, which is what DOS had on the
+   screen. Not here: the bar is 80 cells in both (see DEVIATIONS.md). */
 void PutKey0(u16 bar, u16 shift)
 {
     u16 index = ((bar << 2 & 0xFF) | shift) & 0xFF;
@@ -138,7 +181,10 @@ void PutKey0(u16 bar, u16 shift)
     u16 place, title, number, key, name, i;
     u16 *screen;
 
-    if (index < sizeof KeyB_T)
+    if (StOpen != 0) {
+        if (index < sizeof StKeyB_T)
+            row = StKeyB_T[index >> 2][index & 3];
+    } else if (index < sizeof KeyB_T)
         row = KeyB_T[index >> 2][index & 3];
     if (row == md.BarPrev)
         return;
@@ -154,9 +200,15 @@ void PutKey0(u16 bar, u16 shift)
         } else {
             *screen++ = number | ('1' + key);
         }
-        name = KeyC_T[row][key];
-        for (i = 0; i < 6; i++)
-            *screen++ = title | Key_S[name][i];
+        if (StOpen != 0) {
+            name = StKeyC_T[row][key];
+            for (i = 0; i < 6; i++)
+                *screen++ = title | StKey_S[name][i];
+        } else {
+            name = KeyC_T[row][key];
+            for (i = 0; i < 6; i++)
+                *screen++ = title | Key_S[name][i];
+        }
         if (key != 9)
             *screen++ = number | ' ';
     }

@@ -1264,8 +1264,13 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_M70_00: return MnuEnd(M70_00(panel), r);
     case CMD_M71_00: return MnuEnd(M71_00(panel), r);
     case CMD_M72_00: return MnuEnd(M72_00(panel), r);
-    default:                            /* CMD_M75_00 */
-        return MnuEnd(M75_00(panel), r);
+    case CMD_M75_00: return MnuEnd(M75_00(panel), r);
+
+    /* The setup, stmain.c: when it has been left, the program goes on
+       as when a command of DOS has ended. */
+    default:                            /* CMD_SETUP */
+        StSetup();
+        return END_INIT11;
     }
 }
 
@@ -1430,7 +1435,12 @@ extern const u8 __far FtEr2_B[];
    BlocEr does the same for those who want no box at all.
 
    The clock and the screen blanker are off while the box is up, and
-   nothing is to happen by itself then: AutoTim. */
+   nothing is to happen by itself then: AutoTim.
+
+   The box is the main program's also while the setup is open, where
+   the original's setup program has no box and leaves the error to DOS's
+   own words (see DEVIATIONS.md): its dialog and its key bar are not the
+   setup's, and the setup draws its own key bar anew afterwards. */
 static u16 FtErr1(u16 ax, u16 code, const u8 __far *device)
 {
     u16 assembly = AsmSeg();
@@ -1439,7 +1449,7 @@ static u16 FtErr1(u16 ax, u16 code, const u8 __far *device)
     u8 *to = md.TmpErr + 1;
     u8 *name;
     u16 i, answer;
-    u8 clock, delay, page;
+    u8 clock, delay, page, setup;
 
     if (md.ErrDat | md.BlocEr)
         return ERR_FAIL;
@@ -1487,6 +1497,8 @@ FtErr5:
     delay = md.BlDelay;
     md.BlDelay = 0;
     page = md.HlpPage;
+    setup = StOpen;
+    StOpen = 0;
     *(u16 *)&md.AutoTim = 0xFFFF;
     if (ax & 0x1000)
         answer = (u8)Dialog(OFFSET(FtEr1_B), (u16)(u32)text, 0, 0, MAIN_SEG)
@@ -1498,6 +1510,10 @@ FtErr5:
     md.Clock = clock;                   /* FtErr8 */
     md.BlDelay = delay;
     md.HlpPage = page;
+    if (setup != 0) {
+        StOpen = setup;
+        md.BarPrev = 0xFF;
+    }
     if (answer != ERR_RETRY)
         md.ErrDat = 1;
     return answer;

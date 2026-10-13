@@ -37,7 +37,8 @@ this tool's. A function of the setup's that reads a box or a dialog
 handed to it by its offset goes into READERS. The files of the setup
 program are SETUP_FILES: a tree that is declared to have no setup
 program has none of them, and what REVIEWED has for them is not held
-against it.
+against it; nor is what it has for a table of the setup's in a file
+that both programs have, SETUP_PLACES.
 
     reads.py BUILD_DIR          every place, with the bytes read there:
                                 build/c for the C translation, whose
@@ -73,6 +74,12 @@ READERS = ("Dialog", "DialBox", "OncZoom", "MinMnu", "MnMn10", "MnMn40",
 # setup program, deviations.TREES.
 SETUP_FILES = ("stmain.c", "stopts.c", "stcolor.c", "sthelp.c")
 
+# And the constants of the setup program that a file of the main program
+# has, where a routine that both programs have reads the setup's tables:
+# the entries of REVIEWED for them are none for such a tree either.
+SETUP_PLACES = (("bars.c", "StKeyB_T"), ("bars.c", "StKeyC_T"),
+                ("bars.c", "StKey_S"))
+
 # Places that are not known by their form: (file, name) -> (what is read,
 # how that is known). A number is a count of bytes from the start of the
 # object. It holds for every place in the file that names the constant
@@ -81,6 +88,9 @@ REVIEWED = {
     ("bars.c", "KeyB_T"): (OWN, "the index is held below its size"),
     ("bars.c", "KeyC_T"): (OWN, "a row of KeyB_T and one of ten keys"),
     ("bars.c", "Key_S"): (OWN, "a name of KeyC_T, six bytes each"),
+    ("bars.c", "StKeyB_T"): (OWN, "the index is held below its size"),
+    ("bars.c", "StKeyC_T"): (OWN, "a row of StKeyB_T and one of ten keys"),
+    ("bars.c", "StKey_S"): (OWN, "a name of StKeyC_T, six bytes each"),
     ("bars.c", "PtMnu_B"): (1, "the colours of the bar's names, PtMnu_S, "
                                "which has no markup: the first only"),
     ("bars.c", "PtMnu_S"): (OWN, "the names of the menus, counted by "
@@ -211,6 +221,14 @@ REVIEWED = {
     ("start.c", "Comsp"): (OWN, "compared at its size"),
     ("start.c", "Init_F"): (13, "ReadOne copies a name as 13 bytes"),
     ("start.c", "Ext_F"): (13, "ReadOne copies a name as 13 bytes"),
+    ("stmain.c", "StPalets"): (330, "StDefault copies the setup, CmnIni "
+                                    "bytes"),
+    ("stmain.c", "StMainHlp"): (OWN, "by the item of the menu that the "
+                                     "cursor is on, one of nine"),
+    ("stmain.c", "StStErr_S"): (49, "DOS writes it as far as its dollar "
+                                    "sign, which is its last byte"),
+    ("stmain.c", "StNoFnd_S"): (ZERO, "an include line"),
+    ("stmain.c", "StNoIni_S"): (ZERO, "an include line"),
     ("tree.c", "PutTr_P"): (4, "the colours of the tree, four"),
     ("treebox.c", "Scan_P"): (4, "the colours of a line: any of four"),
     ("treebox.c", "ChTr_P"): (4, "the colours of the tree and of a line: "
@@ -425,7 +443,8 @@ def check(source, objects, contents, variables=()):
     listed = set(REVIEWED)
     if deviations.declared(Path(source).name).no_setup:
         listed = {(file, name) for file, name in listed
-                  if file not in SETUP_FILES}
+                  if file not in SETUP_FILES
+                  and (file, name) not in SETUP_PLACES}
     for file, name in sorted(listed - used - set(gone)):
         wrong.append(f"{file} and {name} are listed in "
                      f"{Path(__file__).name}, and the file does not name "

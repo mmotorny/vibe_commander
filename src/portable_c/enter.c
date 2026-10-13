@@ -87,8 +87,9 @@ static struct Onward To(u16 place)
    attributes, in the part of it that stays in the memory. The portable
    C keeps the panel where it is, and has no need of the limit; the
    list is cut all the same, so that what a command leaves selected is
-   what the original leaves (see DEVIATIONS.md). */
-static void F21_40(u16 panel)
+   what the original leaves (see DEVIATIONS.md). The setup, which is
+   entered as a command is run, cuts it too: StSetup of stmain.c. */
+void F21_40(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;

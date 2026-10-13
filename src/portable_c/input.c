@@ -334,7 +334,10 @@ Inpt41:
 }
 
 /* Wait for a key with the key bar `bar` on the screen and return it. F1
-   is the help, and is not returned. */
+   is the help, and is not returned: the help of the program, or, while
+   the setup is open (StOpen of vc.h), that of the setup, which is
+   another. The setup program has this routine word for word, with its
+   own Help behind the name. */
 u16 Input(u16 bar)
 {
     u16 key;
@@ -343,7 +346,10 @@ u16 Input(u16 bar)
         key = Input0(bar).key;
         if (key != KEY_F1)
             return key;
-        Help00();
+        if (StOpen != 0)
+            StHelp();
+        else
+            Help00();
     }
 }
 

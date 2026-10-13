@@ -1,0 +1,537 @@
+Volkov Commander 4.05 in the scenario setup-cancel: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 1: "d:\vc\vcsetup>nul" Enter
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 3Fx41 07x20
+|                      ╔═════════════ Setup ═════════════╗                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F2   Configuration              ║                       | 07x19 3Fx9 0Fx27 3Fx5 0Fx2 07x18
+|                      ║ F3   Screen and Mouse           ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F4   Panel options              ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F5   Set Black & White palette  ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F6   Set Color palette          ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F7   Set Laptop palette         ║                       | 07x19 3Fx21 48x1 3Fx19 0Fx2 07x18
+|                      ║ F8   Set default configuration  ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F9   Country info               ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F10  Exit                       ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ╚═════════════════════════════════╝                       | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x21 0Fx41 07x18
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2Config 3Screen 4Panels 5B&W    6Color  7Laptop 8Reset  9Cntry  10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 2: F8
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 70x42 07x19
+|                      ╔═════════════ Setup ══════════════╗                      | 07x19 70x42 0Fx2 07x17
+|                      ║ Do you wish to reset all options ║                      | 07x19 70x42 0Fx2 07x17
+|                      ║        to default value?         ║                      | 07x19 70x42 0Fx2 07x17
+|                      ║             Yes   No             ║                      | 07x19 70x16 30x5 70x21 0Fx2 07x17
+|                      ╚══════════════════════════════════╝                      | 07x19 70x21 07x1 70x20 0Fx2 07x17
+|                                                                                | 07x19 70x42 0Fx2 07x17
+|                                                                                | 07x21 0Fx42 07x17
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 3: Enter
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 3Fx41 07x20
+|                      ╔═════════════ Setup ═════════════╗                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F2   Configuration              ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F3   Screen and Mouse           ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F4   Panel options              ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F5   Set Black & White palette  ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F6   Set Color palette          ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F7   Set Laptop palette         ║                       | 07x19 3Fx21 48x1 3Fx19 0Fx2 07x18
+|                      ║ F8   Set default configuration  ║                       | 07x19 3Fx9 0Fx27 3Fx5 0Fx2 07x18
+|                      ║ F9   Country info               ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F10  Exit                       ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ╚═════════════════════════════════╝                       | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x21 0Fx41 07x18
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2Config 3Screen 4Panels 5B&W    6Color  7Laptop 8Reset  9Cntry  10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 4: F8
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 70x42 07x19
+|                      ╔═════════════ Setup ══════════════╗                      | 07x19 70x42 0Fx2 07x17
+|                      ║ Do you wish to reset all options ║                      | 07x19 70x42 0Fx2 07x17
+|                      ║        to default value?         ║                      | 07x19 70x42 0Fx2 07x17
+|                      ║             Yes   No             ║                      | 07x19 70x16 30x5 70x21 0Fx2 07x17
+|                      ╚══════════════════════════════════╝                      | 07x19 70x21 07x1 70x20 0Fx2 07x17
+|                                                                                | 07x19 70x42 0Fx2 07x17
+|                                                                                | 07x21 0Fx42 07x17
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 5: Alt+F10
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 70x42 07x19
+|                      ╔═════════════ Setup ══════════════╗                      | 07x19 70x42 0Fx2 07x17
+|                      ║ Do you wish to reset all options ║                      | 07x19 70x42 0Fx2 07x17
+|                      ║        to default value?         ║                      | 07x19 70x42 0Fx2 07x17
+|                      ║             Yes   No             ║                      | 07x19 70x16 30x5 70x21 0Fx2 07x17
+|                      ╚══════════════════════════════════╝                      | 07x19 70x21 07x1 70x20 0Fx2 07x17
+|                                                                                | 07x19 70x42 0Fx2 07x17
+|                                                                                | 07x21 0Fx42 07x17
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 6: Esc
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 3Fx41 07x20
+|                      ╔═════════════ Setup ═════════════╗                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F2   Configuration              ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F3   Screen and Mouse           ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F4   Panel options              ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F5   Set Black & White palette  ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F6   Set Color palette          ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F7   Set Laptop palette         ║                       | 07x19 3Fx21 48x1 3Fx19 0Fx2 07x18
+|                      ║ F8   Set default configuration  ║                       | 07x19 3Fx9 0Fx27 3Fx5 0Fx2 07x18
+|                      ║ F9   Country info               ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F10  Exit                       ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ╚═════════════════════════════════╝                       | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x21 0Fx41 07x18
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2Config 3Screen 4Panels 5B&W    6Color  7Laptop 8Reset  9Cntry  10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 7: F10
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x25 70x29 07x26
+|                            ╔═══════ Setup ═══════╗                             | 07x25 70x29 0Fx2 07x24
+|                            ║ Do you wish to save ║                             | 07x25 70x29 0Fx2 07x24
+|                            ║  the current setup? ║                             | 07x25 70x29 0Fx2 07x24
+|                            ║    Save   Cancel    ║                             | 07x25 70x7 30x6 70x16 0Fx2 07x24
+|                            ╚═════════════════════╝                             | 07x25 70x29 0Fx2 07x24
+|                                                                                | 07x25 70x29 0Fx2 07x24
+|                                                                                | 07x27 0Fx13 78x1 0Fx15 07x24
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 8: Right Enter
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 9: F9 o Enter
+cursor 15 6 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..                                                                        ────╢| 1Bx1 30x4 3Fx70 1Bx5
+|║DOCS   ╔═══════════════════════ Configuration ════════════════════════╗       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║SRC    ║  ┌ Screen colors ──────┐  ┌ Panel options ────────────────┐  ║       ║| 1Bx5 3Fx8 3Ex13 3Fx12 3Ex13 3Fx24 03x2 1Bx3
+|║read   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║hell   ║  │  (•) Color          │  │  [x] Auto change directory    │  ║   C:  ║| 1Bx5 3Fx70 06x2 1Bx3
+|║note   ║  │  ( ) Laptop         │  └───────────────────────────────┘  ║   :   ║| 1Bx5 3Fx70 06x1 03x1 1Bx3
+|║data   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
+|║run    ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
+|║empt   ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║   ────╢| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║   ory ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
+|║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  ( )  1 minute      │  ┌ Mouse options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
+|║       ║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  └─────────────────────┘  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║        Press  Space  to change an option,  ↑  and  ↓         ║       ║| 1Bx5 3Fx18 0Fx7 3Fx22 0Fx3 3Fx5 0Fx3 3Fx12 03x2 1Bx3
+|║       ║                   to move between options                    ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ╟──────────────────────────────────────────────────────────────╢       ║| 1Bx5 3Fx70 03x2 1Bx3
+|╟────   ║                     [ Ok ]   [ Cancel ]                      ║       ║| 1Bx5 3Fx25 3Ex6 3Fx39 03x2 1Bx3
+|║..     ╚══════════════════════════════════════════════════════════════╝       ║| 1Bx5 3Fx70 03x2 1Bx3
+|╚════                                                                      ════╝| 1Bx5 3Fx70 03x2 1Bx3
+|C:\WORK>                                                                        | 07x7 0Fx70 07x3
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 10: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 11: "d:\vc\vcsetup>nul" Enter
+cursor 0 127 lines 6 7 mode 3
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 3Fx41 07x20
+|                      ╔═════════════ Setup ═════════════╗                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F2   Configuration              ║                       | 07x19 3Fx9 0Fx27 3Fx5 0Fx2 07x18
+|                      ║ F3   Screen and Mouse           ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F4   Panel options              ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F5   Set Black & White palette  ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F6   Set Color palette          ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F7   Set Laptop palette         ║                       | 07x19 3Fx21 48x1 3Fx19 0Fx2 07x18
+|                      ║ F8   Set default configuration  ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F9   Country info               ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F10  Exit                       ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ╚═════════════════════════════════╝                       | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x21 0Fx41 07x18
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2Config 3Screen 4Panels 5B&W    6Color  7Laptop 8Reset  9Cntry  10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 12: F8
+cursor 0 127 lines 6 7 mode 3
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 70x42 07x19
+|                      ╔═════════════ Setup ══════════════╗                      | 07x19 70x42 0Fx2 07x17
+|                      ║ Do you wish to reset all options ║                      | 07x19 70x42 0Fx2 07x17
+|                      ║        to default value?         ║                      | 07x19 70x42 0Fx2 07x17
+|                      ║             Yes   No             ║                      | 07x19 70x16 30x5 70x21 0Fx2 07x17
+|                      ╚══════════════════════════════════╝                      | 07x19 70x21 07x1 70x20 0Fx2 07x17
+|                                                                                | 07x19 70x42 0Fx2 07x17
+|                                                                                | 07x21 0Fx42 07x17
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 13: Enter
+cursor 0 127 lines 6 7 mode 3
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 3Fx41 07x20
+|                      ╔═════════════ Setup ═════════════╗                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F2   Configuration              ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F3   Screen and Mouse           ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F4   Panel options              ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F5   Set Black & White palette  ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F6   Set Color palette          ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F7   Set Laptop palette         ║                       | 07x19 3Fx21 48x1 3Fx19 0Fx2 07x18
+|                      ║ F8   Set default configuration  ║                       | 07x19 3Fx9 0Fx27 3Fx5 0Fx2 07x18
+|                      ║ F9   Country info               ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ║ F10  Exit                       ║                       | 07x19 3Fx41 0Fx2 07x18
+|                      ╚═════════════════════════════════╝                       | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x19 3Fx41 0Fx2 07x18
+|                                                                                | 07x21 0Fx41 07x18
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2Config 3Screen 4Panels 5B&W    6Color  7Laptop 8Reset  9Cntry  10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 14: Esc
+cursor 0 127 lines 6 7 mode 3
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x25 70x29 07x26
+|                            ╔═══════ Setup ═══════╗                             | 07x25 70x29 0Fx2 07x24
+|                            ║ Do you wish to save ║                             | 07x25 70x29 0Fx2 07x24
+|                            ║  the current setup? ║                             | 07x25 70x29 0Fx2 07x24
+|                            ║    Save   Cancel    ║                             | 07x25 70x7 30x6 70x16 0Fx2 07x24
+|                            ╚═════════════════════╝                             | 07x25 70x29 0Fx2 07x24
+|                                                                                | 07x25 70x29 0Fx2 07x24
+|                                                                                | 07x27 0Fx13 78x1 0Fx15 07x24
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 15: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 16: F9 o o
+cursor 25 6 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+|║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 17: Esc
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

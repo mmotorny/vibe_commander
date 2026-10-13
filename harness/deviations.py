@@ -287,6 +287,9 @@ _NO_MAP = ("it shows the map of the memory, Alt+F5, and the programs "
            "that stay in the memory listed and released there: the "
            "portable C has no such map and keeps no such list")
 _NO_LINE = ", without Memory info"
+_OPTIONS = ("the Options menu, with the setup behind the editors and "
+            "without Memory allocation: as many lines as the original's, "
+            "with seven of them a row further down")
 _FDAPM = '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter'
 _NO_SETUP_YET = ("the portable C has no setup yet: what the scenario "
                  "shows of it is still to be translated")
@@ -300,9 +303,10 @@ TREES = {
                  "that tree has not",
     ),
     # The portable C stays in the memory whole while a command runs, and
-    # has no Memory allocation in its Options menu; and it has no map of
+    # has no Memory allocation in its Options menu; it has no map of
     # the memory, Alt+F5, and no watch on the programs that stay in the
-    # memory.
+    # memory; and it has the setup program in itself, an item of its
+    # Options menu.
     "portable_c": Declared(
         not_run={
             "memory": "it switches Memory allocation off and shows the "
@@ -382,10 +386,12 @@ TREES = {
                     "command, and so does not miss its file",
             "quick": "Memory allocation is not switched off before the "
                      "last command",
-            "clock": "the Options menu, a line shorter",
-            "clock-russia": "the Options menu, a line shorter",
-            "menu": "the Options menu, a line shorter; and the Commands "
-                    "menu, a line shorter" + _NO_LINE,
+            "clock": _OPTIONS,
+            "clock-russia": _OPTIONS,
+            "menu": _OPTIONS + ", so that the help of its seventh line "
+                    "is the index of the help, for the setup, where the "
+                    "original has the page of Auto menus; and the "
+                    "Commands menu, a line shorter" + _NO_LINE,
             "menu-items": "Memory info is not chosen from the Commands "
                           "menu",
             "mouse-menu": "the Commands menu, a line shorter" + _NO_LINE,
