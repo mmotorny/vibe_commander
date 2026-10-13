@@ -2368,6 +2368,51 @@ in "The portable C".
     of constants or of memory without a value among them. The table
     in the plan has which link broke what.
 
+- The tables of the program of 32 bits are held by a test of their
+  own, `portable_c32-data`: `harness/datacheck.py` with
+  `build/portable_c32` and `--source src/portable_c` (`TODO.md`, "H4,
+  the test of the data"). What "Moving the data of a file to C" says
+  of `c-data` holds for it, its messages and its tables, with this
+  besides:
+  - A word of a table that names something is a pointer of four bytes
+    there, so a box, a dialog and a table of pointers are longer than
+    the original's and are held field by field. Which fields are
+    pointers the test reads in the declaration: `BOX`, `BOX1`, `BOX2`,
+    `DIALOG` with a count, at the start of a line, an array of
+    pointers, or an array of a structure of nothing but pointers. An
+    object with pointers that is declared in another way is taken for
+    bytes and fails, "has an address at +N ..., where its declaration
+    has no pointer": `declared_shapes` and `SHAPES` there want it.
+  - The place in a message is counted as the original lays the object
+    out, which is what `DECLARED`, `NAMED_OTHERWISE` and `COUNTED`
+    count in, and the message says where that is in the object itself:
+    "StDfCol_P+10, which is +12 of it as it is here".
+  - Where the original names something, the pointer has to be an
+    address that the extender sets: "the translation has the number
+    1234h, in a word that could name something, and no address that
+    the extender sets" is a `NUMBER` or a 0 where a name belongs. Where
+    the original has a number, it has to be none: "the translation has
+    the address of X, ..., where the original has a number and names
+    nothing". The first of the two passes in no program; the second
+    is a mistake that only this test names for what it is.
+  - A change to a file of tables is held by both tests. Read
+    `portable_c-data` first: it says the same in fewer words.
+  - Data that only this program has is that of `dos32.c`. A constant
+    of that file wants a line in `OWN_OF_FLAT` there, and one in
+    `REVIEWED` of `reads.py` for where code reads it; `reads.py` leaves
+    out the file of the system's functions that a program is not built
+    of, `SYSTEM_FILE`. A variable of that file wants nothing, with a
+    value or without: those are left out as what they are. In any other
+    file a variable with a value is held like a constant.
+  - `wcc386` puts nothing between the fields of a box or a dialog, nor
+    between two objects of a file: every object is as long as the
+    original's but for its pointers. It does round what a file has of
+    a segment up to four bytes, so the linker's map does not say how
+    long the last object of a file is; the object file does.
+  - A box cannot be declared before it is defined: each `BOX(n)` is a
+    structure of its own, and a second declaration is "Type does not
+    agree with previous definition". Buttons can, being arrays.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through

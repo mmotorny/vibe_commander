@@ -2412,7 +2412,7 @@ The trial's seven changes, set against the pieces of the program:
 | 4 | `DRIVER.ASM`: the block move for `AutoTim`, `Clock` and the stack; then every golden derived again, which must change none | H2, done: none changed | The same |
 | 5 | `coverage.py` and `ported.py` on the reader, with the stub left out; the record of the scenarios that pass | H3 | The 32-bit build can be held to anything. What ran of the C is asked only once every scenario passes |
 | 6 | The scenarios' test: the stack, the limits above | H3 | The switch |
-| 7 | `datacheck.py`, with `tools/figures.py`; `reads.py` goes by the text of the C and stays | H4 | The switch: until then the 16-bit build holds the tables, which are the same source |
+| 7 | `datacheck.py`, with `tools/figures.py`; `reads.py` goes by the text of the C and stays | H4, done: the test `portable_c32-data` | The switch: until then the 16-bit build holds the tables, which are the same source, and both tests do |
 
 The record: `harness/pass32.txt`, the names of the scenarios that the
 32-bit build passes, written by `ported.py --record`. The test
@@ -2662,6 +2662,220 @@ For H3:
   for programs of 16 bits. What it should say of the block move goes
   in with W, when a program of the project is flat.
 
+### H4, the test of the data: done, and what a later piece should know
+
+The test `portable_c32-data` holds the texts and tables of
+`build/portable_c32/VC.EXE` against the original's: `harness/datacheck.py`
+with that directory, the same file that makes `c-data` and
+`portable_c-data`, which print what they printed, to the line. Its top
+says how a flat program is held; this is what was decided, what was
+seen, and what a later piece starts from.
+
+    python3 harness/datacheck.py --source src/portable_c \
+        build/shareware-layout build/portable_c32
+
+As the build links the program it passes, as B2 linked it and with
+what D2 has made of `dos32.c` since, and so does the program for finding
+a fault, by hand, `build/portable_c32/debug`, which no test of the data
+judges:
+
+    600 objects of the C code, 25273 bytes, are as the original, 37 of
+        them but for what src/portable_c/DEVIATIONS.md declares
+    149 of them, 12523 bytes, are the original's setup program's
+    153 of them are boxes, dialogs and tables of pointers by their
+        declarations, with 643 words that are pointers of 4 bytes, 555
+        of them addresses that the extender sets: 23987 bytes as the
+        original lays them out
+
+Those are the 600 objects of `portable_c-data`, each by the same name in
+the same file against the same address of the original, with the same
+note, which was held line by line; and 23,987 bytes as the original lays
+them out is that test's count of bytes, 25,273 being two more for each
+of the 643 pointers. Not compared are the same six, and what only this
+program has, the data of `dos32.c`: see below.
+
+**Where each thing is read, and why.**
+
+| What | Where | Why there |
+|---|---|---|
+| The bytes of an object, and which of its words are addresses and of what | The file, through `le.Linear`: `image()` and `relocated()` | It is what is loaded, and the linker has left nothing to be worked out. An object file has the same before the linker, in records of 32 bits that would have to be read and then believed |
+| Where an object is | The linker's map, `le.Map`, static ones too | As for a program of 16 bits |
+| How long an object is | Its object file: the next symbol of its segment there, or the segment's end | Neither the file nor the map says. `wcc386` rounds what a file has of `CONST2` up to four bytes, so the last object of a file ends up to three bytes before the first of the next begins, and the map does not have where a file's part of a segment ends. `ObjectFile` reads the two records that this takes in their forms of 32 bits, 99h for a segment, 91h and B7h for symbols; A1h and 9Dh, what a segment holds and the addresses in that, it does not read |
+| Which fields of an object are pointers | The declaration, in the source: `declared_shapes` | The plan's way. A pointer that holds a number, `NUMBER(LenStr)` or the 0 of a line across a box, has no relocation, so the file cannot say that those four bytes are one word |
+
+**The shapes.** `SHAPES` of `datacheck.py` has the five of the plan as
+four words and one rule: `BOX(n)`, `BOX1(n)`, `BOX2(n)` and `DIALOG(n)`,
+read where a declaration begins its line, `(static) const BOX1(4) Name =`,
+as all 151 of the tree do; and "pointers", an array of pointers, which
+is `Menu_T` of `commands_t.c` and `Fnc_T` of `dirfunc.c`, or an array of
+a structure that is declared with it and has nothing but pointers,
+`StPagTab` of `stcolor_t.c`. A structure with pointers and other things
+in it stops the test and asks for a shape. Everything else is bytes.
+What a shape is, in bytes and pointers, is written there once, from
+`tables.h`: 8 bytes and the lines for a box, with 4 more for each text
+that it puts in; the word of the box and 8 bytes, a field of 9 bytes
+and its word, and a byte for a dialog.
+
+**How an object is held.** It is read as the original lays it out, a
+pointer as a word, and then held by the rules that a program of 16 bits
+is held by, with every table of the test applying as it does there:
+the places of `DECLARED`, `NAMED_OTHERWISE` and `COUNTED` are counted in
+the original's layout, and so is the place in a message, which says
+where that is in the object itself too. Of a pointer:
+
+| The original has there | The pointer has to be | Else the test says |
+|---|---|---|
+| A name, held against where the tree has the thing: a text, a box, buttons, a table of commands, a picture | An address that the extender sets, of what the tree has by that name, static copies and the setup program's things as in 16 bits, as far behind it as the original's word is behind its label | `StDfCol_P+10, which is +12 of it as it is here: the translation has the address of StDfCo2_S, 0002:00006ea5, which is not where it has DfCo1_S, 0002:00006e83: the original names DfCo1_S there`; or `the translation has the number 1234h, in a word that could name something, and no address that the extender sets: the original names YesNo_S there, and it is to be where it has YesNo_S` |
+| A number, or a name that a tree has a number for: a place of the main data, the number of a command or of a routine | No address: its low half is held as the two bytes are in 16 bits, and its high half is 0 | `Find_B+19, which is +21 of it as it is here: the translation has the address of FnFl_P, 0002:00005fda, where the original has a number and names nothing, 40h its low byte`; or `Find_B has at +34, as it is here, a pointer that is no address which the extender sets and holds 00010140h: a number in the place of what a word names is one of 16 bits, and the program reads no more of it` |
+
+And of the object: one that is not as long as its declaration makes it
+with pointers of four bytes fails, and so does an address of the file
+anywhere in it but in a pointer of its shape, in bytes or across two
+fields. That is how a declaration read wrong shows, and how a gap would
+show that the compiler had put into a structure.
+
+**No gap, and nothing moved.** Of the 606 objects that both programs
+have, 605 are, read so, exactly as long as in the program of 16 bits;
+the other is `Fnc_T`, five pointers to functions, which are far on DOS
+and so 20 bytes in both, and which the original has not. `wcc386`
+puts nothing between the fields of a box or a dialog nor between two
+objects of a file, with the structures of `tables.h` packed and a box's
+pointers falling on a multiple of four by themselves (8, 12 and 16 bytes
+in front of them). So there is no finding about the layout, and
+`tables.h`, `vc.h` and the files of tables are as they were. A dialog's
+fields are 13 bytes each and their pointers lie at any address, which
+the 386 reads.
+
+**Seen to fail.** Each planted in the source, both programs built, and
+the two tests asked. `portable_c-data` fails for each as well, in its
+own words, but for the number of more than 16 bits:
+
+| Planted | `portable_c32-data` says |
+|---|---|
+| A byte of a text, `" filez\0 found."` | `FnFl6_S+5: the translation has 7Ah, the original 73h` |
+| Two lines of a box exchanged, in `StDfCol_P` | The first message of the table above |
+| A dialog that names another's box, `SrEr_B` with `&FndEr_P` | `SrEr_B+0: the translation has the address of FndEr_P, 0002:0000a1ef, which is not where it has SrEr_P, 0002:0000a225: the original names SrEr_P there` |
+| A field that names other buttons, `StColNm_P` for `YesNo_D` | `StDfCol_B+19, which is +21 of it as it is here: the translation has the address of StColNm_P, 0002:00007292, which is not where it has YesNo_D, 0002:000062c6: the original names YesNo_D there` |
+| `MD_AT` of another field, `SrchStr` for `FindStr` | `Find_B+17, which is +19 of it as it is here: the translation has 7Fh, the original 3Eh` |
+| The same where a box of the setup keeps what it covers, `WinBuf` for `ErrBuf` | `StDfCol_P+6: the translation has 6228h, which is not where the main data has ErrBuf, 7F08h: the original names BoxBuf there` |
+| A number where a name belongs: `NUMBER(0x1234)` for a line, `NUMBER(5)` for buttons, 0 for a line | The second message of the table above, and the same with `0005h` and `0000h` |
+| A name where a number belongs, `FnFl_P` for `NUMBER(LenStr)` | The third message of the table above |
+| A count of lines one off, 3 for 4 | `StDfCol_P+4: the translation has 03h, the original 04h` |
+| Two tables of `Menu_T` exchanged | `Menu_T+2, which is +4 of it as it is here: the translation has the address of Menu3_T, 0002:0000433c, which is not where it has Menu2_T, 0002:0000431a: the original names Menu2_T there` |
+| The halves of a picture of `StPagTab` exchanged | `StPagTab+4, which is +8 of it as it is here: the translation has the address of StColr2_T, 0002:00008a70, which is not where it has Page2_S, 0002:0000786f: the original names Page2_S there` |
+| Another command in a menu's table | `Menu1_T+2: the translation has 0050h, which is not the number of the command M01_00 in portable_c/vc.h, 004Fh: the original names M01_00 there` |
+| A number of more than 16 bits, `NUMBER(0x10100 + LenStr)`: the 16-bit program does not have it, the compiler cutting it, and that test passes | The fourth message of the table above |
+| An array of pointers that the original has not, `Planted[1]` | `the original has no data called Planted: say in ELSEWHERE or in OWN of datacheck.py what Planted is` |
+
+And with the reading of the declarations made wrong by hand, in the
+test itself: `Menu_T` taken for bytes, `Menu_T has an address at +0 of
+its 24 bytes, that of Menu1_T, where its declaration has no pointer`; a
+box with a count one less, `Filt_P is declared BOX(6), which is 32
+bytes where a word that names something is 4, as tables.h has it, and
+the object is 36 bytes`; and a `BOX(4)` taken for a `BOX1(3)`, which is
+as long, `StDfCol_P has an address at +8 of its 24 bytes, that of
+StColor_S, where its declaration has none, BOX1(3)`.
+
+**What only this program has.** The data of `dos32.c`, 17 objects
+today, where `dos.c` has none.
+
+- Its constants are in `OWN_OF_FLAT` of `datacheck.py` by their names,
+  each with its reason, a table like `OWN_OF` that a program of 16 bits
+  is not held to: `Shell_T`, the instructions of real mode by which a
+  command is handed to the shell, and `NoStart_S`, the words of
+  `Aloc_S` once more, ended as DOS takes a text. `reads.py` has both in
+  `REVIEWED`.
+- Its variables with a value, 15 of them, a selector, a vector that was
+  taken, where the PSP is, are left out by what they are and not by
+  their names: an object of the file of the system's functions that the
+  compiler has with what has a value, `SYSTEM_VARIABLE` there. The
+  piece began with a name and a reason for each, as every other object
+  that is not compared has one. B2's file had two; D2 landed beside
+  this with fifteen, every one written `= 0`, and each that the
+  convergence adds would have failed this test until someone gave it a
+  line, for no table of the original's held any better. And a name
+  among them could be one of the original's by chance, and would then
+  be held against whatever that is; none is today. By the rule it is
+  left out before it is looked for there. The rule holds for `dos.c`
+  in a program of 16 bits alike, where it meets nothing. It is a change
+  to what this test leaves out, and it was not asked: say if each is
+  to have its line.
+
+**`reads.py`.** Nothing of it is of 16 bits in kind: it finds the
+places in the text of the source, and a count is of bytes of a text or
+of a table of bytes, which are the same in both programs. For the flat
+program it lists what it lists for the one of 16 bits, place for place,
+with the lengths of the boxes and dialogs as they are there, none of
+which is read by a count, and the two places of `dos32.c`. Two things it had to be told. Which file of
+the system's functions the program is built of, `SYSTEM_FILE`: it read
+every file of the directory, `dos32.c` too for the program of 16 bits,
+which named no constant then; now the other one is not read and what
+`REVIEWED` has for it is not held against the program. And where the
+source is, for a build's directory that has not the tree's name:
+`python3 harness/reads.py build/portable_c32 src/portable_c`.
+
+**The figures.** One row, behind the addresses that the extender sets:
+how many words of the tables are pointers, and how many of those are
+such addresses, 643 and 555. `datacheck.check` gives them, the test's
+own counts; `main` of that file is the command line around it. The
+data of the program has 560 addresses in all, by `le.py`: these 555,
+which name data, so that every one of them is in a table that the test
+holds, and five that name code, `Fnc_T`, which is not compared. H1
+counted the same two numbers in the trial's file.
+
+**`arithcheck.py`** has nothing to hold in a program of 32 bits and was
+left as it is: it runs `__U4M` and `__U4D` of `arith.c`, which the
+compiler for 16 bits calls and `wcc386` does not, so the file is not
+built for 32 bits and there is no test `portable_c32-arith`. It goes
+with `arith.c`, in Z1.
+
+**Otherwise than the plan had it.**
+
+- "A field that holds an offset in the main data ... written so that it
+  may also be a relocation that names `md` and that offset" is not
+  written so. Such a field is a number of 16 bits in every table today,
+  `MD_AT`, and in step 1 an address in its place would be wrong: the
+  code reads 16 bits of it. The test fails for one. Step 2, which makes
+  those fields pointers, changes the shapes of `tables.h` and of
+  `SHAPES` together, and gives the rule then: where a number is to be
+  the place of a field, an address of `md` and that many bytes.
+  `Flat.variable` and `Flat.main` have what it takes.
+- The test reads object files after all, for the lengths alone.
+- No test for the debug program: it passes, the tables being the same
+  source, and the plan has that program judged by none.
+
+**What a later piece should know.**
+
+- M1 and the convergence: a constant that `dos32.c` gains fails the
+  test, "the original has no data called X", until it is in
+  `OWN_OF_FLAT`, and "how much of X is read here is not known" until
+  `REVIEWED` of `reads.py` has the place; one that goes has to go from
+  both, which the test says as well. A variable of that file needs
+  nothing, with a value or without. In any other file a variable with a
+  value is an object like a constant, as the five texts of `stopts_t.c`
+  are that the program writes to.
+- A file of tables that is changed is held by both tests, and each
+  says the same thing in its own way: read the 16-bit one first, it
+  is shorter. Where only `portable_c32-data` fails, it is one of the
+  two things that only 32 bits can have wrong, a number where an
+  address belongs or the other way round, or the test's reading of a
+  declaration: a new way of declaring an object with pointers wants a
+  line in `declared_shapes`.
+- A box cannot be declared before it is defined, `static const BOX1(4)
+  Name;`: each `BOX(n)` is a structure of its own to the compiler, and
+  the second is "Type does not agree with previous definition". Only
+  arrays can stand behind what names them, as buttons do.
+- W: the test is named for the build, and its tables go by the source's
+  name, `--source`. When the tests of the portable C judge the program
+  of 32 bits, `OWN_OF_FLAT` and `SYSTEM_FILE` still tell the two
+  programs apart for as long as both are built; with Z1 the first
+  becomes a part of `OWN_OF` and the second goes.
+- Step 2: `NAMED` going, and a table handed on as a pointer, changes
+  nothing here: the tables hold pointers already. What changes is a
+  field that becomes a pointer, above, and `struct Picture` of
+  `stcolor.c`, which nothing holds to `StPagTab`'s own declaration
+  (P3).
+
 ### The pieces
 
 P and S change the program under the 16-bit build; D, B and H make the
@@ -2685,7 +2899,7 @@ and H1 are started at once by the session.
 | H1, the reader. Done: see "Piece H1, the reader" below | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
 | H2, the driver. Done: see "Piece H2, the driver" above | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
 | H3, the scenarios' test | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
-| H4, the test of the data | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |
+| H4, the test of the data. Done: see "H4, the test of the data" above | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |
 | R1, `resident.c` renamed | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
 | C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
