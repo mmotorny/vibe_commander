@@ -790,8 +790,8 @@ What rests on Open Watcom, for the portable C. Of what the code is
 written in, the first table above: `__far`, `STACK` and `CODE`,
 `#pragma aux` and `#pragma pack(1)`, each as often as [the
 figures](#the-figures) say; three of the five `__interrupt` functions,
-`FatErr` and `CtrlC`, which are in `dos.c` there, and `Exit05` of
-`resident.c`, `Int27` having gone with the watch on DOS and `Int21`
+`FatErr`, `CtrlC` and `Exit05`, which are all in `dos.c` there, `Int27`
+having gone with the watch on DOS and `Int21`
 with the program's own call; two `__loadds` functions, `Alloc0`, where DOS enters the program,
 and `Exec2E`, where it goes on behind INT 2Eh; two of the four
 `__declspec(naked)` functions, `Exit01` and `Int2E`, without `New27`
@@ -812,7 +812,7 @@ here:
 | 5 | No code is within 4K of the stack, the tables being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 2; the files of the second code segment in `CMakeLists.txt` | `portable_c-scenarios` reads the linker's map, where `tools/mkexe.c` stopped the build |
 | 6 | The segment of a far pointer made of a near one is DS, `MAIN_SEG` | `src/portable_c/vc.h` | every scenario |
 | 7 | The segment of a far pointer to an object of a group is the group's, and `seg` and `offset` in `_asm` are those of the group too: so the stack that `Int2E` sets is the one that the file's header names, and a table is read at its offset in `AsmSeg` | `src/portable_c/resident.c`, `misc.c` | the scenarios of INT 2Eh, `quick`; every scenario |
-| 8 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with `DGROUP`, as a `__loadds` function does | `src/portable_c/vc.h`, `dos.c`, `resident.c` | the scenarios of the critical error, and of the program ended by DOS, `ended` |
+| 8 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with `DGROUP`, as a `__loadds` function does | `src/portable_c/dos.c` | the scenarios of the critical error, and of the program ended by DOS, `ended` |
 | 9 | `_enable` is `STI` and `CLD`: the first thing that the entry of the program does clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/portable_c/dos.c`, `Alloc0` | every scenario |
 
 Gone are 2, 4 to 7, 9, 10, 12, 15 and 17 of that table, and with 15 the
@@ -830,7 +830,7 @@ were left for the program's own call, three `CMP` with their jumps, the
 jump to the interrupt function that answered it and the far `JMP`
 through `Vect21` for every other call, went [with that
 call](#the-setup-program-in-it). The program has no entry of INT 21h.
-`Exit01` is as it was. `Int2E` is an instruction shorter: `INT 2Eh`, `CLI`,
+`Exit01` is as it was, and is in `dos.c` there. `Int2E` is an instruction shorter: `INT 2Eh`, `CLI`,
 `MOV AX` with the segment of the stack, `MOV SS,AX`, `MOV SP`, `STI`,
 `CLD` and the jump; it no longer loads DS, which the function that it
 jumps to does for itself. Of the three instructions that are the
@@ -864,7 +864,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 95 functions
+In the portable C that place is `src/portable_c/sys.h`: 97 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
 has the file clean. `dos.c` is those functions for DOS on a PC, and the
@@ -882,7 +882,7 @@ file beside it.
 | Memory: a block taken, given back, made another size, where the system looks for one, and the program's own block made as long as the program | 6 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
 | Other programs: one run, with what it is told behind its name, and this one ended, on an old DOS too; what this one was told when it was started, and its environment | 6 |
-| What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again | 8 |
+| What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again; the program told when the system has ended it, taken and given back | 10 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
 | The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, the font of an EGA and what Print Screen prints of its rows, where the cells are and the cells themselves | 17 |
@@ -932,7 +932,14 @@ with Retry and Abort, is the program's own function, `FtErr1` of
 entry, `FatErr`, reads DOS's registers and the header of the device and
 calls it as any function is called, with the drive or the device's
 name, DOS's number for what is wrong and whether DOS can try again, and
-hands DOS what it answers.
+hands DOS what it answers. The fourth thing that DOS enters is where it
+goes on when it has ended the program, by another program's hand: the
+PSP names a routine of `dos.c` for that, `Exit01`, while the program
+has taken its end, and that calls the function which the program
+handed over, `Exit02` of `resident.c`, which has DOS look for Ctrl-C as
+it did; then the program that started this one goes on, with the
+registers that the original leaves for it, which are `dos.c`'s to
+leave.
 
 Not in the header, and in `dos.c` all the same, is what only DOS on a
 PC has: where DOS enters the program, `Alloc0`, which asks DOS where
@@ -940,16 +947,12 @@ the program's PSP is, keeps that, and calls `Main` of `main.c`, which is
 the program. What the program does first it asks through the header
 like everything else: the version of DOS, and that it keep no more of
 the memory than it is. What is left of DOS outside `dos.c` is in
-`resident.c`: where DOS goes on when it ends
-the program, and the call of COMMAND.COM's own interrupt for Quick
-execute, each with what assembly it has. Of the PSP those read one
-thing themselves,
-the address at which DOS goes on when the program has ended, by the
-segment that `vc.h` declares for them; what else
-is read there, the command tail and the environment,
-`dos.c` reads for the functions that answer with them, and it
-makes the block that DOS is told of a program to run. `TODO.md`
-says what is to become of them. The map of the memory and the watch on
+`resident.c`: the call of COMMAND.COM's own interrupt for Quick
+execute, with what assembly it has. The PSP is read and written in
+`dos.c` alone: the command tail and the environment, for the functions
+that answer with them, and the address at which DOS goes on when the
+program has ended; and `dos.c` makes the block that DOS is told of a
+program to run. `TODO.md` says what is to become of Quick execute. The map of the memory and the watch on
 DOS, which were of DOS alone, [are gone](#what-a-user-sees-no-more).
 
 Every file asks the system through the header: the 348 calls went over

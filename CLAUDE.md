@@ -2390,6 +2390,7 @@ is called both ways the bare function says so in its name.
 | 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is `dos.c`'s to make |
 | 4Ch | bare | `ProgramEnd(code)` |
 | INT 20h, entered at the start of the PSP | | `ProgramEndOld()`, for a DOS before 3 |
+| The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake(told)` and `ProgramEndedGive()`: the PSP names `Exit01` of `dos.c` between the two, which calls `told` when DOS has ended the program |
 | 51h | bare | No function of `sys.h`: the entry of the program, `Alloc0` of `dos.c`, asks where the PSP is, as the first thing that DOS is asked, by `ProgramPrefix`, static there. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
 | 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
 | 56h | asked | `FileRename(from, to)` |

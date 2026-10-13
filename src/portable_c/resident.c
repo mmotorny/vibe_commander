@@ -18,11 +18,10 @@
  *
  * The second is the commands: Exec runs those that the command line
  * holds, DosBuf, by COMMAND.COM or by the interrupt that COMMAND.COM has
- * for that; and what the program does when it leaves, or when DOS ends
- * it. Where DOS ends it, Exit01, is entered on the stack of the program
- * that started this one: nothing there takes the stack to be the
- * program's own, and a pointer to a local variable is declared STACK, as
- * everywhere.
+ * for that; and what the program does when it leaves, or when DOS has
+ * ended it. Where DOS goes on then is the system's, Exit01 of dos.c,
+ * which calls Exit02 here on the stack of the program that started this
+ * one: nothing there takes the stack to be the program's own.
  *
  * The original has a third here, which takes INT 21h, DOS's own
  * interrupt, while the program runs and while a command runs from it.
@@ -52,10 +51,6 @@ static const u8 Retr_S[] =
     "\015\012" "Press ENTER to try again or ESC to abort\015\012";
 static const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
 
-/* Where INT 22h went before the program took it: where the program that
-   started this one goes on when this one has ended. */
-static u32 Vect22;
-
 /* The prompt that is written in front of a command which follows
    another, with the path if the setup says so: Exec02 makes it here.
    The original makes it where its watch notes the interrupts when a
@@ -65,24 +60,6 @@ static u8 PromptLine[2 + 3 + 64 + 1 + 1];
 
 /* A text of main_t.c, for a DOS that is too old. */
 extern const u8 __far Vers_S[];
-
-/* The PSP, by its segment, PspSeg of dos.c: where the program goes on
-   when DOS has ended it. */
-#define PSP_EXIT (*(u32 __far *)DOS_AT(PspSeg, 0x0A))
-
-/* Where a routine is, as an address for DOS and for a return. */
-#define ROUTINE(function) ((const u8 __far *)(void __far *)(function))
-
-#define FLAG_CARRY     0x0001
-#define FLAG_PARITY    0x0004
-#define FLAG_AUX       0x0010
-#define FLAG_ZERO      0x0040
-#define FLAG_SIGN      0x0080
-#define FLAG_OVERFLOW  0x0800
-
-/* The six that an instruction leaves of what it has worked out. */
-#define FLAGS_RESULT (FLAG_CARRY | FLAG_PARITY | FLAG_AUX | FLAG_ZERO \
-                      | FLAG_SIGN | FLAG_OVERFLOW)
 
 /* Where things are in the original, as it was shipped: what its
    registers hold when it calls the BIOS with them unset, and the BIOS
@@ -94,53 +71,6 @@ extern const u8 __far Vers_S[];
 #define WAS(address) ((u16)(address) - (u16)&md + COMNINI_WAS)
 #define EPB_WAS     WAS(&md.EPB)
 #define RESPARS_WAS 0x031A
-
-/* A return address as an interrupt leaves one on the stack, behind the
-   registers that an interrupt function of the compiler saves there:
-   struct Saved of vc.h. */
-struct Frame {
-    u16 ip, cs, flags;
-};
-
-/*----------------------- The flags -----------------------
-   The assembly goes on in the program that started this one, when DOS
-   has ended the program, with the flags as its last instruction of
-   arithmetic left them. These say what that is, so that the C can leave
-   the same. */
-
-/* What a result of 16 bits leaves of them: zero, sign, and parity, which
-   is of its low byte. */
-static u16 Result(u16 result)
-{
-    u8 bits = (u8)result;
-    u16 flags = 0;
-
-    bits ^= bits >> 4;
-    bits ^= bits >> 2;
-    bits ^= bits >> 1;
-    if (!(bits & 1))
-        flags |= FLAG_PARITY;
-    if (result == 0)
-        flags |= FLAG_ZERO;
-    if (result & 0x8000)
-        flags |= FLAG_SIGN;
-    return flags;
-}
-
-/* CMP: `b` taken from `a`. */
-static u16 Taken(u16 a, u16 b)
-{
-    u16 rest = a - b;
-    u16 flags = Result(rest);
-
-    if (a < b)
-        flags |= FLAG_CARRY;
-    if ((a ^ b ^ rest) & 0x10)
-        flags |= FLAG_AUX;
-    if ((a ^ b) & (a ^ rest) & 0x8000)
-        flags |= FLAG_OVERFLOW;
-    return flags;
-}
 
 /*------------------- Execute commands ------------------*/
 
@@ -196,84 +126,40 @@ void SetBrk(void)
     CtrlCTake();
 }
 
-/* Leave: have DOS look for Ctrl-C as it did. Then end the program with
-   `code`, unless DOS has ended it already and this is where it went on:
-   then return.
+/* What the program puts back when it leaves, and when DOS has ended
+   it: DOS looks for Ctrl-C as it did. The system calls this where DOS
+   has ended the program (see ProgramEndedTake of sys.h), on the stack
+   of the program that started this one, and Exit00 where the program
+   leaves by itself. What the program that started this one then goes
+   on with, the registers that the scenario ended shows, is the
+   system's: Exit05 of dos.c.
 
    The original first releases the programs that have stayed in the
    memory since it was started, by the list that its watch on DOS keeps,
    and gives INT 21h and INT 27h back, if its setup has it keep that
    watch; the portable C keeps no such list and takes neither interrupt
    (see DEVIATIONS.md). What a command has left in the memory stays there
-   when the program leaves.
-
-   `r` and `flags` are the registers and the flags that this was entered
-   with, and they are left as the assembly leaves its own where it has
-   taken no interrupt, without what is gone, for the program that this
-   returns to when DOS has ended this one: ES on the segment of this
-   program's PSP, and in DL what DOS was just told of Ctrl-C. The others
-   are as they came, DS and the high byte of DX among them, where the
-   original that has taken the two interrupts leaves the address that
-   the second went to before. The flags are those of the segment that
-   the program goes on in, compared with 0. */
-static void Exit02(u16 code, struct Saved STACK *r, u16 STACK *flags)
+   when the program leaves. */
+static void Exit02(void)
 {
-    r->es = PspSeg;                     /* Exit01 */
-    SetBreakCheck(md.BreakFl);
-    r->dx = r->dx & 0xFF00 | md.BreakFl;
-    if ((u16)(Vect22 >> 16) == 0)       /* Exit04 */
-        ProgramEnd(code);
-    *flags = *flags & ~FLAGS_RESULT | Taken((u16)(Vect22 >> 16), 0);
+    SetBreakCheck(md.BreakFl);          /* Exit01 */
 }
 
-/* Leave the program with `code`: the PSP gets back the address at which
-   the program that started this one goes on, and DOS ends this one.
-   Nobody gets the registers that Exit02 leaves. */
+/* Leave the program with `code`: the system is told that the program
+   ends itself, so that the program that started this one goes on where
+   it would have, the PSP's address for that being as it was; and DOS
+   ends this one. */
 void Exit00(u16 code)
 {
-    struct Saved r;
-    u16 flags;
-
-    PSP_EXIT = Vect22;
-    Vect22 &= 0xFFFF;
-    Exit02(code, &r, &flags);
+    ProgramEndedGive();
+    Exit02();
+    ProgramEnd(code);                   /* Exit04 */
 }
 
-/* While the program runs, its PSP names Exit01 as the place to go on
-   when the program has ended: so if DOS ends it, by whatever means, DOS
-   goes on there, on the stack of the program that started this one, and
-   what Exit02 does is done all the same. Then on to where that program
-   goes on, with the stack as it is, and with the registers and the
-   flags as Exit02 leaves them. That is done by four instructions of
-   assembly, room on the stack for one more return address with the
-   flags as they are on top of it, and a jump to an interrupt function
-   of the compiler's: that saves the registers and finds DS, has them as
-   `r`, to read and to change, and the room as `on`, and ends as every
-   interrupt function does, by taking `on` off the stack and going
-   there, with the registers as they are in `r`, the flags of `on`, and
-   the stack as it was found. The assembly took of that program's stack
-   here too. */
-void __interrupt __far Exit05(struct Saved r, struct Frame on);
-
-__declspec(naked) void __far Exit01(void)
-{
-    _asm {
-        pushf
-        push ax
-        push ax
-        jmp Exit05
-    }
-}
-
-void __interrupt __far Exit05(struct Saved r, struct Frame on)
-{
-    Exit02(r.ax, &r, &on.flags);
-    on.ip = (u16)Vect22;
-    on.cs = (u16)(Vect22 >> 16);
-}
-
-/* Have the program go on in Exit01 when DOS ends it: when the program
-   has started. This was TakeDos while it took INT 21h as well.
+/* Have the program be told when DOS ends it: when the program has
+   started. On DOS the system has the PSP name a routine of its own for
+   that, Exit01 of dos.c, which calls Exit02. This was TakeDos while it
+   took INT 21h as well.
 
    The original takes INT 21h here too, and INT 27h with it, if its
    setup has it know of the programs that stay in the memory, TSR manager
@@ -283,8 +169,7 @@ void __interrupt __far Exit05(struct Saved r, struct Frame on)
    setup in itself (see DEVIATIONS.md), and takes neither. */
 void TakeEnd(void)
 {
-    Vect22 = PSP_EXIT;
-    PSP_EXIT = (u32)ROUTINE(Exit01);
+    ProgramEndedTake(Exit02);
 }
 
 /* No memory: say so and leave. `bx` is what the assembly has in BX

@@ -4050,6 +4050,54 @@ bits, and has no entry of its own any more; its `Main` asks `MemOwn`
 first, as the program does, and its first page prints whether that
 failed. `whole.py` starts its program at `Start_` of `dos32.c`.
 
+**The ends: done.** Where DOS goes on when it has ended the program
+is `dos.c`'s: `Exit01`, the four instructions that the PSP names, and
+`Exit05`, the interrupt function that they jump to, with `struct
+Saved`, which has left `vc.h`, the return address behind it, the flags
+that an instruction leaves, and `Vect22`, where the PSP had DOS go on
+before. The program takes its end by two functions of `sys.h`, 97
+where there were 95, in the group of what the system asks the program:
+
+| Function | What it is | In `dos.c` | In `dos32.c` |
+|---|---|---|---|
+| `ProgramEndedTake(told)` | From now on the program is told when the system has ended it by another's hand: `told` is called, a function that takes and answers nothing | `told` kept, the PSP's address at 0Ah kept in `Vect22`, and `Exit01` written there. No call of DOS | Not made: nothing, and `told` is never called |
+| `ProgramEndedGive()` | Nobody is told any more: said before the program ends itself | `Vect22` written back to the PSP | Not made: nothing |
+
+What the program does at its end is the program's, `Exit02` of
+`resident.c`, which has DOS look for Ctrl-C as it did, the one call
+of DOS that the original makes there with nothing to release: `TakeEnd`
+hands it over, `Exit05` calls it through the pointer, and `Exit00`
+calls it where the program leaves by itself, between
+`ProgramEndedGive` and `ProgramEnd`. The order is the original's: the
+PSP written back, 3301h, 4Ch.
+
+What `Exit05` leaves for the program that started this one is what
+`Exit02` of `resident.c` left: ES on the PSP, the flags of the segment
+that the program goes on in compared with 0, every other register as
+it came, and in DL what DOS was last told of Ctrl-C. For the last,
+`SetBreakCheck` of `dos.c` keeps what it tells DOS, in a byte of its
+own: the original has DL there because that call was the last, and
+`dos.c` reads nothing of the program's for it. `ended` shows the
+registers and passes as it did. No row of entry 6 of `DEVIATIONS.md`
+is new: the two calls are made by the functions that made them.
+
+Otherwise than it was, where nothing shows: `Exit00` gave the PSP its
+address back and made the segment of `Vect22` 0, by which `Exit02`
+knew whether to end the program or to return to DOS's caller; the two
+are two functions now and nothing is asked. `ProgramEnd` itself gives
+nothing back, so a program that ends by it without `ProgramEndedGive`
+first, as the start does for an old DOS or for want of memory, before
+`TakeEnd`, has taken nothing yet.
+
+`PspSeg` is static in `dos.c` and `DOS_AT` is gone from `vc.h`: no
+file but `dos.c` reads the PSP. With `Exit05` gone from it,
+`resident.c` compiles for 32 bits, and the build said so: it is off
+B1's list, which is empty, with `tools/refused.cmake` still there for
+it. `whole.py` makes one object itself, for `__GETDS`, which `Exec2E`
+still asks for. `VC.EXE` is 4 bytes shorter, 197,106. The stack: 157
+figures of 159 as the entry left them, `command` 14 more, which is the
+12 of the others after all, and `mouse-select` 2 fewer.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")

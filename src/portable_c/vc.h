@@ -417,7 +417,7 @@ extern u8 __far Stack[];
 /* What the program knows of DOS around it, resident.c. Of its routines
    there, Alloc3 is what the program does first: it looks at the version
    of DOS and keeps no more of the memory than it is.
-   TakeEnd has the program go on in Exit01 when DOS ends it. SetBrk
+   TakeEnd has the program be told when DOS ends it. SetBrk
    notes whether DOS looks for Ctrl-C at every call, has it not do so,
    and takes Ctrl-C, so that nothing happens for it. Exec runs the
    commands of DosBuf. AlocEr
@@ -648,20 +648,6 @@ void StF09_00(void);
    F1. */
 void StRdHelp(void);
 void StHelp(void);
-
-/* What is of DOS on a PC alone, and no part of sys.h: the segment of
-   the program's PSP, as dos.c keeps it from when the program begins,
-   for its functions that read the PSP. resident.c still reads the PSP
-   by it, for where DOS goes on when the program has ended. */
-extern u16 PspSeg;
-
-/* The registers as an interrupt function of the compiler saves them on
-   the stack and puts them back: its first parameter. dos.c has such
-   functions, where DOS and the BIOS enter the program, and resident.c
-   one, where DOS goes on when it has ended it. */
-struct Saved {
-    u16 gs, fs, es, ds, di, si, bp, sp, bx, dx, cx, ax;
-};
 
 /* A line as the original hands it over: the registers that describe
    it. */
@@ -1474,7 +1460,7 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    means what it means on DOS. It takes for granted that the segment is
    one of the megabyte: the main data's, that of the tables, or one that
    the functions for the memory handed out. A segment of DOS's own, the
-   PSP's or the environment's, is not: see DOS_AT. */
+   PSP's or the environment's, is not: those are read in dos.c alone. */
 #define AT(segment, offset) \
     (ARENA + ((u32)(u16)(segment) << 4) + (u16)(offset))
 
@@ -1546,18 +1532,6 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #define MD_POINTER(place) ((u8 *)&md + (u16)(place))
 
 #endif
-
-/* What is at a segment and an offset of DOS's own memory, outside all
-   that the words above name: the PSP, which resident.c still reads
-   and writes so. It has the one body, a far
-   pointer of 16 bits: its places go to dos.c or behind functions of
-   sys.h before the program is run in 32 bits (TODO.md, the pieces S1
-   to S3 of the plan), and it goes with the last of them. Until then
-   another compiler reads it as a number made a pointer, which the host
-   check counts, and a program of 32 bits would read the wrong address
-   by it. */
-#define DOS_AT(segment, offset) \
-    ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 
 /* Where in a panel's segment its list of files begins, DskBuf, and where
    in the main data the list of the tree's directories, TreeBuf.TreList.

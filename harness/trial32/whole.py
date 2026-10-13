@@ -11,10 +11,9 @@ those objects and of what the build does not make:
   - a file that the build lists as not ready for 32 bits, and tries: it
     leaves <file>.refused there and no object. Such a file is compiled
     here with its warnings, which the build takes for errors;
-  - what the tree has of DOS outside sys.h, and so outside dos32.c: the
-    segment of the PSP, which vc.h declares, and `__GETDS`, which an
-    interrupt function of the compiler's asks for and is written here as
-    a function that does nothing.
+  - what the tree has of DOS outside sys.h, and so outside dos32.c:
+    `__GETDS`, which a function of the compiler's that loads DS asks for
+    and is written here as a function that does nothing.
 
 It has the build make the objects first, links them as build.sh links a
 toy, with DOS/32A for the stub and Start of dos32.c for where the
@@ -46,7 +45,6 @@ OUT = ROOT / "build" / "trial32" / "whole"
 
 # What the tree calls of DOS that is no function of sys.h.
 OUTSIDE = """#include "vc.h"
-u16 PspSeg;
 void GetDs(void) { }
 #pragma aux GetDs "__GETDS"
 """

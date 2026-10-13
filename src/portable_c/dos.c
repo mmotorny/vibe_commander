@@ -12,7 +12,8 @@
  * do. The registers go into the instruction and come out of it as
  * arguments and as what it returns; the compiler loads them. What other
  * inline assembly there is, is where DOS goes on when it has ended the
- * program and where COMMAND.COM's interrupt is called, in resident.c.
+ * program, Exit01 here, and where COMMAND.COM's interrupt is called, in
+ * resident.c.
  * The memory of the machine that the program reads and writes is here
  * too, the BIOS's data and the cells of the display, through far
  * pointers in plain C; and the interrupt flag of the machine, for which
@@ -20,7 +21,8 @@
  *
  * The interrupts that the program takes arrive here as well, DOS's
  * critical error, Ctrl-Break and Ctrl-C, at interrupt functions of the
- * compiler. What the program does about the first is the program's: a
+ * compiler; and so does DOS when it has ended the program, at one more.
+ * What the program does about the first and the last is the program's: a
  * function of its own that it hands over, and that is called from here
  * as any function is.
  *
@@ -205,14 +207,19 @@ static u16 Mouse(u16 ax, u16 bx, u16 cx, u16 dx)
    environment, where the memory ends, and where DOS goes on when the
    program has ended. The original is a .COM file and has all its
    segment registers there. Alloc0, at the end of this file, sets this
-   when the program begins, by ProgramPrefix. resident.c still reads the
-   PSP itself for where DOS goes on, and vc.h declares this for it. */
-u16 PspSeg;
+   when the program begins, by ProgramPrefix. */
+static u16 PspSeg;
 
+#define PSP_GOES_ON 0x0A                /* where DOS goes on when the
+                                           program has ended */
 #define PSP_ENVIRON 0x2C                /* the segment of the environment */
 #define PSP_TAIL    0x81                /* the command tail, behind its
                                            count */
 #define PSP_WORD(offset) (*(const u16 __far *)POINTER(PspSeg, offset))
+/* An address in the PSP, to read and to write: the offset in its low
+   word. */
+#define PSP_ADDRESS(offset) \
+    (*(u32 __far *)((u32)PspSeg << 16 | (u16)(offset)))
 
 #define ERR_NOT_READY 0x53              /* the error of a call that the
                                            user gave up, when a device was
@@ -806,7 +813,11 @@ struct SysVersion SystemTrueVersion(void)
 }
 
 /* Ctrl-C, AX 3300h and 3301h: DL is 1 if DOS looks for it at every
-   call. */
+   call. What DOS was last told is kept: where DOS has ended the
+   program, Exit05 below, the program that started it goes on with that
+   in DL, as the original leaves it there from this call. */
+static u8 BreakTold;
+
 u16 BreakCheck(void)
 {
     struct DosRegs regs;
@@ -821,6 +832,7 @@ void SetBreakCheck(u16 on)
 {
     struct DosRegs regs;
 
+    BreakTold = (u8)on;
     regs.ax = 0x3301;
     regs.name = NUMBER(on & 0xFF);
     Tell(REGS(regs));
@@ -908,11 +920,23 @@ const u8 FAR *ProgramEnvironment(void)
 }
 
 /* What DOS and the BIOS enter of the program: three interrupts that it
-   takes. DOS says where an interrupt goes (AH 35h, which answers in
-   ES:BX) and has one go somewhere (AH 25h, with the address at DS:DX),
-   and is asked both bare. Who had the critical error and Ctrl-Break is
-   kept where the original keeps it, in ErrVct and BrkVct of the main
-   data, which nothing else reads. */
+   takes, and where DOS goes on when it has ended the program. DOS says
+   where an interrupt goes (AH 35h, which answers in ES:BX) and has one
+   go somewhere (AH 25h, with the address at DS:DX), and is asked both
+   bare. Who had the critical error and Ctrl-Break is kept where the
+   original keeps it, in ErrVct and BrkVct of the main data, which
+   nothing else reads. */
+
+/* The registers as an interrupt function of the compiler saves them on
+   the stack and puts them back: its first parameter. Behind them is a
+   return address as an interrupt leaves one there, with the flags. */
+struct Saved {
+    u16 gs, fs, es, ds, di, si, bp, sp, bx, dx, cx, ax;
+};
+
+struct Frame {
+    u16 ip, cs, flags;
+};
 
 #define INT_CTRL_BREAK 0x1B             /* the BIOS's, from the keyboard */
 #define INT_CTRL_C     0x23             /* DOS's, where it finds the key */
@@ -1035,6 +1059,130 @@ void CtrlCTake(void)
     SetVector(INT_CTRL_C, HANDLER(CtrlC));
 }
 
+/* The program ended by DOS. A program's PSP has, at 0Ah, the address at
+   which DOS goes on when the program has ended: in the program that
+   started it. While the program has taken its end, the PSP names Exit01
+   there instead: so if DOS ends the program, by whatever means, DOS
+   goes on in Exit01, with the program's memory given back and its code
+   still in it, on the stack of the program that started this one. DOS
+   is not asked for any of this: the PSP is read and written. */
+
+/* Where the PSP had DOS go on before the program took that. */
+static u32 Vect22;
+
+/* The function that the program has handed ProgramEndedTake. */
+static ProgramEndedFn *EndedTell;
+
+/* The flags, as an instruction of arithmetic leaves them: the assembly
+   goes on in the program that started this one with the flags as its
+   last such instruction left them, and these say what that is, so that
+   the C can leave the same. */
+#define FLAG_CARRY     0x0001
+#define FLAG_PARITY    0x0004
+#define FLAG_AUX       0x0010
+#define FLAG_ZERO      0x0040
+#define FLAG_SIGN      0x0080
+#define FLAG_OVERFLOW  0x0800
+
+/* The six that an instruction leaves of what it has worked out. */
+#define FLAGS_RESULT (FLAG_CARRY | FLAG_PARITY | FLAG_AUX | FLAG_ZERO \
+                      | FLAG_SIGN | FLAG_OVERFLOW)
+
+/* What a result of 16 bits leaves of them: zero, sign, and parity, which
+   is of its low byte. */
+static u16 Result(u16 result)
+{
+    u8 bits = (u8)result;
+    u16 flags = 0;
+
+    bits ^= bits >> 4;
+    bits ^= bits >> 2;
+    bits ^= bits >> 1;
+    if (!(bits & 1))
+        flags |= FLAG_PARITY;
+    if (result == 0)
+        flags |= FLAG_ZERO;
+    if (result & 0x8000)
+        flags |= FLAG_SIGN;
+    return flags;
+}
+
+/* CMP: `b` taken from `a`. */
+static u16 Taken(u16 a, u16 b)
+{
+    u16 rest = a - b;
+    u16 flags = Result(rest);
+
+    if (a < b)
+        flags |= FLAG_CARRY;
+    if ((a ^ b ^ rest) & 0x10)
+        flags |= FLAG_AUX;
+    if ((a ^ b) & (a ^ rest) & 0x8000)
+        flags |= FLAG_OVERFLOW;
+    return flags;
+}
+
+/* Where DOS goes on when it has ended the program, Exit01, and the
+   interrupt function that it goes on in, Exit05: the program is told,
+   by the function that it handed over, and then the program that
+   started this one goes on where it would have, with the stack as it
+   is, and with the registers and the flags as the assembly leaves its
+   own where it has taken no interrupt, without what is gone (see
+   DEVIATIONS.md): ES on the segment of this program's PSP, and in DL
+   what DOS was last told of Ctrl-C, which is what the program's
+   function tells it. The others are as they came, DS and the high byte
+   of DX among them, where the original that has taken INT 21h and INT
+   27h leaves the address that the second went to before. The flags are
+   those of the segment that the program goes on in, compared with 0.
+
+   That is done by four instructions of assembly, room on the stack for
+   one more return address with the flags as they are on top of it, and
+   a jump to an interrupt function of the compiler's: that saves the
+   registers and finds DS, has them as `r`, to read and to change, and
+   the room as `on`, and ends as every interrupt function does, by
+   taking `on` off the stack and going there, with the registers as
+   they are in `r`, the flags of `on`, and the stack as it was found.
+   The assembly took of that program's stack here too.
+
+   Neither is static, though nothing else names them: the scenarios'
+   test holds that the functions of these names have run, as it does of
+   FatErr above. */
+void __interrupt __far Exit05(struct Saved r, struct Frame on);
+
+__declspec(naked) void __far Exit01(void)
+{
+    _asm {
+        pushf
+        push ax
+        push ax
+        jmp Exit05
+    }
+}
+
+void __interrupt __far Exit05(struct Saved r, struct Frame on)
+{
+    u16 segment = (u16)(Vect22 >> 16);
+
+    EndedTell();
+    r.es = PspSeg;
+    r.dx = r.dx & 0xFF00 | BreakTold;
+    on.flags = on.flags & ~FLAGS_RESULT | Taken(segment, 0);
+    on.ip = (u16)Vect22;
+    on.cs = segment;
+}
+
+void ProgramEndedTake(ProgramEndedFn *told)
+{
+    EndedTell = told;
+    Vect22 = PSP_ADDRESS(PSP_GOES_ON);
+    PSP_ADDRESS(PSP_GOES_ON) = HANDLER(Exit01);
+}
+
+void ProgramEndedGive(void)
+{
+    PSP_ADDRESS(PSP_GOES_ON) = Vect22;
+}
+
 /* The console: AH 6, with the character in DL, and AH 9. */
 
 void ConsoleChar(u16 character)
@@ -1057,9 +1205,8 @@ void ConsoleText(const u8 FAR *text)
 
 /* The keyboard: the BIOS's calls 1, which leaves the zero flag set if no
    key waits, 0 and 2; and the byte of the BIOS's data that has the keys
-   which are held down, whose highest bit is Ins. */
-
-#define FLAG_ZERO 0x40
+   which are held down, whose highest bit is Ins. The zero flag is
+   FLAG_ZERO, above. */
 
 struct Keys KeyWaiting(void)
 {

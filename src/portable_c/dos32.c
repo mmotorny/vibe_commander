@@ -49,7 +49,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 74 of the 95, six of them in real mode; the 21 that are not made
+ * 74 of the 97, six of them in real mode; the 23 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -1054,7 +1054,7 @@ void IntOn(void)
 }
 
 /*
- * The 21 functions of sys.h that are not made here yet. Each does
+ * The 23 functions of sys.h that are not made here yet. Each does
  * nothing, and answers as a system does that failed or does not know
  * the question; none of them calls DOS, since a call that the extender
  * does not translate has DOS write wherever the registers happen to
@@ -1073,7 +1073,9 @@ void IntOn(void)
  *   - what DOS and the BIOS enter of the program, the critical error,
  *     Ctrl-Break and Ctrl-C, which are taken through the extender here
  *     and arrive at routines of protected mode: the seven that note,
- *     take and give them, at the end of this part.
+ *     take and give them, at the end of this part; and behind those the
+ *     two for the system ending the program, ProgramEndedTake and
+ *     ProgramEndedGive.
  *
  * ProgramRun and ProgramRunBare take the name and the tail, and what
  * else DOS is told of a program that it runs is theirs to make, in the
@@ -1224,6 +1226,32 @@ void CtrlBreakGive(void)
 }
 
 void CtrlCTake(void)
+{
+}
+
+/* The program ended by another's hand: nobody is told. dos.c has the
+   PSP name a routine of its own for where DOS goes on when the program
+   has ended, which calls `told` and then goes on where DOS would have,
+   in the program that started this one, with registers that the
+   original leaves for it. Here the PSP that DOS knows is the
+   extender's, and it is the extender that DOS ends: whether anything of
+   the program can run then, and what, was not tried, and is for the
+   user to decide when it has been (TODO.md, "The portable C in 32
+   bits: the plan", what is open, 4). Until then `told` is never called,
+   and what the program would put back there is left as it is: DOS goes
+   on looking for Ctrl-C as the program set it.
+
+   What is this file's own to put back when the program ends, by itself
+   or not, the interrupts that it has taken through the extender, it
+   puts back where it ends the program, and no function of the program
+   is asked for that. */
+
+void ProgramEndedTake(ProgramEndedFn *told)
+{
+    (void)told;
+}
+
+void ProgramEndedGive(void)
 {
 }
 

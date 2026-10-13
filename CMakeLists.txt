@@ -407,17 +407,14 @@ function(add_portable_c32 target directory)
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
     # What is not ready for 32 bits, each with the piece of the plan that
-    # takes it off. The list may only get shorter. A file on it is
-    # compiled all the same, and the build stops when the compiler takes
-    # it: tools/refused.cmake, which leaves what the compiler said next to
-    # the objects, as <file>.refused.
-    #   resident.c   "Pointer truncated", twice of one line: what an
-    #                interrupt function is entered with is far to this
-    #                compiler too, and Exit05 hands the address of the
-    #                registers and of the flags to a function that takes
-    #                plain pointers. It goes into dos.c with the entry
-    #                of the program, its end and Quick execute: S3
-    set(c_waiting resident.c)
+    # takes it off. The list may only get shorter, and nothing is on it:
+    # resident.c was, for the interrupt function in which DOS goes on
+    # when it has ended the program, and came off when that went into
+    # dos.c with the piece S3. A file on it is compiled all the same, and
+    # the build stops when the compiler takes it: tools/refused.cmake,
+    # which leaves what the compiler said next to the objects, as
+    # <file>.refused.
+    set(c_waiting "")
     # A file that is named and is not there has left its name behind.
     foreach(source ${portable_c_16_alone} ${portable_c_32_alone} ${c_waiting})
         if(NOT source IN_LIST c_files)

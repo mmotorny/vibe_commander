@@ -849,6 +849,12 @@ TEXT(Mask_S, "TOY?.DAT");
 TEXT(Toy1_S, "TOY1.DAT");
 TEXT(Lower_S, "hello.txt");
 
+/* What the toy has the system tell it when DOS has ended it: nothing.
+   Nobody ends the toy. */
+static void Told(void)
+{
+}
+
 /* What the toy has the system ask about a device that fails: it has
    the call fail. No device of the toy's does. */
 static u16 Fail(u16 how, u16 error, const u8 FAR *device)
@@ -949,6 +955,13 @@ static void Later(void)
     DeviceErrorGive();
     CtrlBreakGive();
     SAY("DeviceError and CtrlBreak noted, taken, given back; CtrlCTake");
+    Line();
+    /* The end of the toy by another's hand, taken and given back: in 16
+       bits the PSP names a routine of dos.c meanwhile, and the toy ends
+       as it did, behind this, into the program that started it. */
+    ProgramEndedTake(Told);
+    ProgramEndedGive();
+    SAY("ProgramEnded taken, given back");
     Line();
 }
 

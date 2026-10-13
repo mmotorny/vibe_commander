@@ -378,7 +378,8 @@ const u8 FAR *ProgramEnvironment(void);
  * program with them, in the middle of whatever the program does. The
  * program takes each, and what it has taken it may give back to whoever
  * had it before, which is what Note is for: Note first, Take, and Give
- * when another program is to have it as this one found it.
+ * when another program is to have it as this one found it. The last of
+ * them is the system ending the program.
  */
 
 /* A device that does not do what the system wants of it, while the
@@ -435,6 +436,23 @@ void CtrlBreakGive(void);
    nothing happens. The system gives it back by itself when the program
    ends. */
 void CtrlCTake(void);
+
+/* The program ended by another's hand. DOS ends whatever program it has
+   as the current one when it is told to, by a program that this one has
+   run and that has stayed in the memory, say, and with no word to the
+   program. Once the program has taken that, it is told, by a function
+   of this kind: the system calls it when it has ended the program,
+   before the program that started this one goes on. The function puts
+   back what the program has changed of the system and the system does
+   not put back by itself, and returns. It may ask what the program asks
+   when it leaves by itself, and nothing else; and it is entered on a
+   stack that is not the program's.
+
+   Take, and Give before the program ends itself: then nobody is told,
+   and the program does for itself what the function would. */
+typedef void ProgramEndedFn(void);
+void ProgramEndedTake(ProgramEndedFn *told);
+void ProgramEndedGive(void);
 
 /*
  * The console: what the system writes where the screen has its cursor,
