@@ -37,7 +37,7 @@
 #include "vc.h"
 
 /* The registers that go round the loop are struct Regs of vc.h. */
-static u16 CmdEnd(u32 answer, struct Regs STACK *r);
+static u16 CmdEnd(struct Onward next, struct Regs STACK *r);
 static u16 Command(u16 command, u16 panel, struct Regs STACK *r);
 u16 ErrRdy(u16 letter);
 static void Exit(void);
@@ -912,6 +912,19 @@ static u16 V00_03(u16 menu, u16 edit, u16 whole)
     return INIT50;
 }
 
+/* What a command of enter.c returns, as what CmdEnd takes, struct Onward
+   of vc.h: such a command returns the place alone, and as a number still
+   (see TODO.md). None of its places takes a panel. */
+static struct Onward OfEnter(u32 place)
+{
+    struct Onward next;
+
+    next.place = (u8)place;
+    next.item = 0;
+    next.panel = 0;
+    return next;
+}
+
 /* After a command of the menus, of commands.c: MnuEnd. */
 static u16 MnuEnd(u16 answer, struct Regs STACK *r)
 {
@@ -921,7 +934,7 @@ static u16 MnuEnd(u16 answer, struct Regs STACK *r)
     case MNU_INIT50:
         return INIT50;
     case MNU_F24_01:                    /* MnuF24 */
-        return CmdEnd(F24_01(r->ds, (u16)md.TmpBuf), r);
+        return CmdEnd(OfEnter(F24_01(r->ds, (u16)md.TmpBuf)), r);
     default:                            /* MnuV00, MNU_V00_01: the menu of
                                            the command is in CL */
         return V00_03(r->cx & 0xFF, 1, 1);
@@ -929,17 +942,19 @@ static u16 MnuEnd(u16 answer, struct Regs STACK *r)
 }
 
 /* After a command of the keys of the panels, of keys.c, enter.c and
-   view.c: CmdEnd. `r->ax` is the key still, for the command line.
+   view.c: CmdEnd. `next` is what the command returned, with the panel
+   and the item for a routine of a panel's menu; `r->ax` is the key
+   still, for the command line.
 
    Func07 is the one place of the loop where the next command gets BX and
    DX as this one leaves them. Only the keys of the cursor go there, and
    they have put into `r` what the original leaves in the two. */
-static u16 CmdEnd(u32 answer, struct Regs STACK *r)
+static u16 CmdEnd(struct Onward next, struct Regs STACK *r)
 {
-    u16 byte = (u16)answer >> 8;
-    u16 panel = (u16)(answer >> 16);
+    u16 item = next.item;
+    u16 panel = next.panel;
 
-    switch ((u8)answer) {
+    switch (next.place) {
     case NEXT_FUNC07:
         return FUNC07;
     case NEXT_FUNC05:
@@ -956,9 +971,9 @@ static u16 CmdEnd(u32 answer, struct Regs STACK *r)
         F73_00(r->ax);
         return FUNC05;
     case NEXT_EARLIER:
-        return CmdEnd(F25_00(), r);
+        return CmdEnd(OfEnter(F25_00()), r);
     case NEXT_LATER:
-        return CmdEnd(F26_00(), r);
+        return CmdEnd(OfEnter(F26_00()), r);
     case NEXT_INIT40:
         return INIT40;
     case NEXT_INIT50:
@@ -968,9 +983,9 @@ static u16 CmdEnd(u32 answer, struct Regs STACK *r)
         return MnuEnd(M01_01(panel, (u16)PANEL(panel)->BrfFul << 8
                                     | PANEL(panel)->SortTyp), r);
     case NEXT_M03_00:                   /* CmdM03 */
-        return MnuEnd(M03_00(panel, byte << 8), r);
+        return MnuEnd(M03_00(panel, item << 8), r);
     case NEXT_M06_00:                   /* CmdM06 */
-        return MnuEnd(M06_00(panel, byte << 8 | byte), r);
+        return MnuEnd(M06_00(panel, item << 8 | item), r);
     case NEXT_INIT11:                   /* CmdIni */
         return LEAVE | END_INIT11;
     case NEXT_EXEC:                     /* CmdExe */
@@ -978,7 +993,9 @@ static u16 CmdEnd(u32 answer, struct Regs STACK *r)
     case NEXT_VIEW:                     /* V00_00: with the Files menu
                                            marked, and in DL whether to
                                            edit */
-        return V00_03(2, panel & 0xFF, 1);
+        return V00_03(2, 0, 1);
+    case NEXT_EDIT:
+        return V00_03(2, 1, 1);
     case NEXT_DIRINFO:                  /* CmdV02 */
         return V00_03(2, 1, 0);
     default:                            /* NEXT_EXIT */
@@ -1117,7 +1134,7 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_F68_00:                     /* the history: a command to run? */
         if (F68_00() == 0)
             return FUNC04;
-        return CmdEnd(F21_25(), r);
+        return CmdEnd(OfEnter(F21_25()), r);
 
     /* The keys of the panels, keys.c. The mouse has its buttons in BP. */
     case CMD_F00_60:
@@ -1153,24 +1170,24 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_F20_00: return CmdEnd(F20_00(panel), r);
 
     /* Enter, the directory changed and the history, enter.c. */
-    case CMD_F21_00: return CmdEnd(F21_00(panel), r);
-    case CMD_F21_10: return CmdEnd(F21_10(panel), r);
-    case CMD_F21_31: return CmdEnd(F21_31(), r);
-    case CMD_F22_00: return CmdEnd(F22_00(panel), r);
-    case CMD_F23_00: return CmdEnd(F23_00(panel), r);
-    case CMD_F24_00: return CmdEnd(F24_00(panel), r);
-    case CMD_F25_00: return CmdEnd(F25_00(), r);
-    case CMD_F26_00: return CmdEnd(F26_00(), r);
-    case CMD_F27_00: return CmdEnd(F27_00(panel), r);
-    case CMD_F30_00: return CmdEnd(F30_00(panel), r);
-    case CMD_F75_00: return CmdEnd(F75_00(panel), r);
+    case CMD_F21_00: return CmdEnd(OfEnter(F21_00(panel)), r);
+    case CMD_F21_10: return CmdEnd(OfEnter(F21_10(panel)), r);
+    case CMD_F21_31: return CmdEnd(OfEnter(F21_31()), r);
+    case CMD_F22_00: return CmdEnd(OfEnter(F22_00(panel)), r);
+    case CMD_F23_00: return CmdEnd(OfEnter(F23_00(panel)), r);
+    case CMD_F24_00: return CmdEnd(OfEnter(F24_00(panel)), r);
+    case CMD_F25_00: return CmdEnd(OfEnter(F25_00()), r);
+    case CMD_F26_00: return CmdEnd(OfEnter(F26_00()), r);
+    case CMD_F27_00: return CmdEnd(OfEnter(F27_00(panel)), r);
+    case CMD_F30_00: return CmdEnd(OfEnter(F30_00(panel)), r);
+    case CMD_F75_00: return CmdEnd(OfEnter(F75_00(panel)), r);
 
     /* The user menu, usermenu.c: a line with a command to run? */
     case CMD_F32_00:
     case CMD_F42_00:
         if (F32_00(command == CMD_F42_00) == 0)
             return FUNC04;              /* Run_0A */
-        return CmdEnd(F21_30(), r);
+        return CmdEnd(OfEnter(F21_30()), r);
 
     /* The viewer and the editor, view.c. */
     case CMD_F33_00: return CmdEnd(F33_00(panel), r);
@@ -1216,7 +1233,7 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_F67_00:
         pair = F67_00();
         if ((u16)pair == TO_F24_02)
-            return CmdEnd(F24_02((u16)(pair >> 16)), r);    /* F67_01 */
+            return CmdEnd(OfEnter(F24_02((u16)(pair >> 16))), r);  /* F67_01 */
         return F1Next((u16)pair);
 
     /* The commands of the menus, commands.c. Those of a panel's menu

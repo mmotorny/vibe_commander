@@ -1560,10 +1560,10 @@ none:
  *
  * They are commands, as in keys.c and enter.c: functions that get the
  * panel which the original has in DS and return where the program goes
- * on. NEXT_VIEW, with 1 in the high word for the editor, is V00_00 above
- * for the file ViewFil, and NEXT_DIRINFO is V00_02 for the editor in the
- * window of an Info panel; the main loop goes on from there to the
- * editor, or back here: V00_03 of main.c.
+ * on, struct Onward of vc.h. NEXT_VIEW is V00_00 above for the file
+ * ViewFil, NEXT_EDIT the same for the editor, and NEXT_DIRINFO is V00_02
+ * for the editor in the window of an Info panel; the main loop goes on
+ * from there to the editor, or back here: V00_03 of main.c.
  *
  * Where the setup has the viewer or the editor be another program, that
  * is looked for in VCVIEW.EXT or VCEDIT.EXT, of the current directory or
@@ -1605,7 +1605,23 @@ extern const u8 __far Run2_S[];         /* "Try rebooting." */
 
 #define EOF_CHAR 0x1A
 
-#define GO_VIEW(edit) ((u32)(u8)(edit) << 16 | NEXT_VIEW)
+/* What a command returns, struct Onward of vc.h: the place where the
+   program goes on, a NEXT_ there. None of these places takes a panel. */
+static struct Onward To(u16 place)
+{
+    struct Onward next;
+
+    next.place = (u8)place;
+    next.item = 0;
+    next.panel = 0;
+    return next;
+}
+
+/* On in the program's own viewer, or in its editor if `edit` is not 0. */
+static struct Onward Own(u16 edit)
+{
+    return To(edit != 0 ? NEXT_EDIT : NEXT_VIEW);
+}
 
 /* What a program that is run as the viewer or the editor finds behind
    the name of the file, in the tail of its command line: ViewPar, with
@@ -1742,8 +1758,10 @@ command:
    editor: Aexec0. The box that says so stays until the program is done,
    and the screen is then written as it was, which leaves nothing of what
    the program has shown; the panels are read again. A program that DOS
-   will not run is said in a box. */
-static u32 Aexec0(u16 edit)
+   will not run is said in a box. In the original this is the end of a
+   command, which jumps to where the loop draws the panels: the command
+   that calls it says so. */
+static void Aexec0(u16 edit)
 {
     u16 code = AsmSeg();
     struct DosRegs regs;
@@ -1819,7 +1837,6 @@ static u32 Aexec0(u16 edit)
     Window(0, (u16)md.Lines << 8 | 80);
     CurShp(*(u16 *)(md.TmpBuf + 93));
     FncEx1();
-    return NEXT_INIT50;
 }
 
 /* View or edit the file ViewFil: F34_11. `how` is 1 in its low byte for
@@ -1830,7 +1847,7 @@ static u32 Aexec0(u16 edit)
    What else the viewer is, the extension file says, VCVIEW.EXT or
    VCEDIT.EXT. One that is not there, or has nothing for files of this
    kind, leaves the program's own; one that cannot be read, nothing. */
-static u32 F34_11(u16 how)
+static struct Onward F34_11(u16 how)
 {
     u16 code = AsmSeg();
     const u8 __far *name;
@@ -1846,7 +1863,7 @@ static u32 F34_11(u16 how)
     if ((edit != 0 ? md.AltEdit : md.AltView) == 0)
         own = own == 0;
     if (own != 0)
-        return GO_VIEW(edit);
+        return Own(edit);
     HidCur();
     PutMnu(2);
     name = AT(code, OFFSET(ViewE_F));
@@ -1856,19 +1873,19 @@ static u32 F34_11(u16 how)
     for (i = 0; i < 13; i++)
         md.TmpBuf[i] = from[i];
     if (ChgDisk(md.TmpBuf))
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     file = OpenFil(md.TmpBuf, 0x40);
     if (file.failed) {
         if ((u8)file.value != ERR_NO_FILE)
-            return NEXT_FUNC04;
+            return To(NEXT_FUNC04);
         MainFil(md.TmpBuf, name);
         if (ChgDisk(md.TmpBuf))
-            return GO_VIEW(edit);
+            return Own(edit);
         file = OpenFil(md.TmpBuf, 0x40);
         if (file.failed) {
             if ((u8)file.value <= 3)
-                return GO_VIEW(edit);
-            return NEXT_FUNC04;
+                return Own(edit);
+            return To(NEXT_FUNC04);
         }
     }
     regs.ax = 0x3F00;
@@ -1881,41 +1898,44 @@ static u32 F34_11(u16 how)
     regs.ax = 0x3E00;
     regs.bx = file.value;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     if (failed)
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     md.MenuBuf[count] = EOF_CHAR;
     command = FindExt(CutPath(md.ViewFil));
     if (command == 0)
-        return GO_VIEW(edit);
+        return Own(edit);
     next = F34_30(command);
     if (next.none)
-        return GO_VIEW(edit);
+        return Own(edit);
     named = F34_40(next.at, 1);
     if (named.file == 0) {
         command = named.at;
         *(u8 *)command = ' ';
+        /* F21_30 of enter.c returns the place alone, as a number,
+           still. */
         if (Run_00(command, 1))
-            return F21_30();
-        return NEXT_FUNC04;
+            return To((u16)F21_30());
+        return To(NEXT_FUNC04);
     }
     /* A program: is it there? */
     if (ChgDisk(md.TmpBuf))
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     regs.ax = 0x4E00;
     regs.bx = regs.si = regs.di = 0;
     regs.cx = 0x27;
     regs.name = md.TmpBuf;
     if (Intr21((struct DosRegs STACK *)&regs)) {
         if (regs.ax == ERR_NOT_READY)
-            return NEXT_FUNC04;
-        return GO_VIEW(edit);
+            return To(NEXT_FUNC04);
+        return Own(edit);
     }
-    return Aexec0(edit);
+    Aexec0(edit);
+    return To(NEXT_INIT50);
 }
 
 /* Ask for the name of the file to view or to edit: F44_01. */
-static u32 F44_01(u16 how)
+static struct Onward F44_01(u16 how)
 {
     u16 include = OFFSET(ViFl_S) + 1;
 
@@ -1923,16 +1943,16 @@ static u32 F44_01(u16 how)
         include = OFFSET(EdFl_S) + 1;
     md.HlpPage = (u8)(how + 18);
     if ((u8)Dialog(OFFSET(ViFil_B), include, 0, 0, MAIN_SEG) != 0)
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     if (md.ViewFil[0] == 0)
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     return F34_11(how);
 }
 
 /* The editor on the file dirinfo of the directory that an Info panel
    shows, in the lower part of the panel, under the word Edit: F34_10,
    where a click of the mouse in that part comes in as well. */
-u32 F34_10(u16 panel)
+struct Onward F34_10(u16 panel)
 {
     const u8 __far *from = AT(AsmSeg(), OFFSET(DrIn_F));
     u16 begin = BegBX(panel);
@@ -1949,13 +1969,13 @@ u32 F34_10(u16 panel)
     begin = ADD_LOW(begin - 0x100, 15);
     MvsBw(BasAdr(begin), AT(AsmSeg(), OFFSET(EdFl_S)), 6,
           Color(Slct_C) << 8);
-    return NEXT_DIRINFO;
+    return To(NEXT_DIRINFO);
 }
 
 /* View or edit what the cursor of the panel is on, a file, or for the
    editor the dirinfo of an Info panel: F34_01. With the panels off, in a
    tree, and for the viewer in an Info panel, the name is asked for. */
-static u32 F34_01(u16 panel, u16 how)
+static struct Onward F34_01(u16 panel, u16 how)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     const struct FILENT __far *file;
@@ -1965,10 +1985,10 @@ static u32 F34_01(u16 panel, u16 how)
         return F44_01(how);
     if (wcb->WinTyp == 0) {
         if (wcb->CurAdr >= wcb->EndBuf)
-            return NEXT_FUNC04;
+            return To(NEXT_FUNC04);
         file = ENTRY(wcb, wcb->CurAdr);
         if (file->AttrF & ATTR_DIRECTORY)
-            return NEXT_FUNC04;
+            return To(NEXT_FUNC04);
         for (i = 0; i < 13; i++)
             md.ViewFil[i] = file->NameF[i];
         return F34_11(how);
@@ -1978,32 +1998,32 @@ static u32 F34_01(u16 panel, u16 how)
     return F34_10(panel);
 }
 
-u32 F43_00(void)                        /* Shift-F3: View... */
+struct Onward F43_00(void)              /* Shift-F3: View... */
 {
     return F44_01(0);
 }
 
-u32 F44_00(void)                        /* Shift-F4: Edit... */
+struct Onward F44_00(void)              /* Shift-F4: Edit... */
 {
     return F44_01(1);
 }
 
-u32 F63_00(u16 panel)                   /* Alt-F3 */
+struct Onward F63_00(u16 panel)         /* Alt-F3 */
 {
     return F34_01(panel, 0x100);
 }
 
-u32 F64_00(u16 panel)                   /* Alt-F4 */
+struct Onward F64_00(u16 panel)         /* Alt-F4 */
 {
     return F34_01(panel, 0x101);
 }
 
-u32 F33_00(u16 panel)                   /* F3 */
+struct Onward F33_00(u16 panel)         /* F3 */
 {
     return F34_01(panel, 0);
 }
 
-u32 F34_00(u16 panel)                   /* F4 */
+struct Onward F34_00(u16 panel)         /* F4 */
 {
     return F34_01(panel, 1);
 }

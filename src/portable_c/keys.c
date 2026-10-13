@@ -8,7 +8,7 @@
  * These are commands, not routines: see "The commands" in vc.h, which
  * declares them. The main loop, MainLoop of main.c, calls one for its key
  * with the current panel, and what it returns says where the program
- * goes on: see GO below, and CmdEnd in main.c.
+ * goes on: see To below, and CmdEnd in main.c.
  *
  * The pull-down menus have some of these too, and the mouse, which the
  * loop reads, enters three of them past their start: F00_05, F01_05 and
@@ -19,16 +19,6 @@
 void F20_02(u16 panel);
 
 /* F20_02 is a routine, which other files call too, as F00_50 of vc.h. */
-
-/* What a command returns: where the program goes on, a NEXT_ of vc.h.
-   The menu's routines take a panel, in the high word, and a byte, in the
-   high byte of the low one: for M03_00 five less the kind of panel, for
-   M06_00 the place in the menu bar that is lit meanwhile. M01_01 takes
-   neither byte. */
-#define GO(where)                    ((u32)(where))
-
-#define GO_PANEL(where, panel, byte) \
-    ((u32)(panel) << 16 | (u16)((u16)(u8)(byte) << 8 | (where)))
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
@@ -96,6 +86,32 @@ static void PtFs00(u16 panel)
         PutTre(panel);
     else
         PutInf(panel);
+}
+
+/* What a command returns, struct Onward of vc.h: the place where the
+   program goes on, a NEXT_ there. */
+static struct Onward To(u16 place)
+{
+    struct Onward next;
+
+    next.place = (u8)place;
+    next.item = 0;
+    next.panel = 0;
+    return next;
+}
+
+/* The same where the place is a routine of a panel's menu, which takes
+   the panel and an item: for M03_00 five less the kind of panel, for
+   M06_00 the place in the menu bar that is lit meanwhile. M01_01 takes
+   no item. */
+static struct Onward ToMenu(u16 place, u16 panel, u16 item)
+{
+    struct Onward next;
+
+    next.place = (u8)place;
+    next.item = (u8)item;
+    next.panel = panel;
+    return next;
 }
 
 /* What a routine leaves in BX and DX, for the keys of the cursor: they go
@@ -227,7 +243,8 @@ static void F00_70(u16 panel, u16 cursor, u16 first, struct Regs STACK *r)
 /* The same for Up and Down, and for the mouse, whose buttons are in
    `buttons`: with the right one held it selects the files it passes
    over, or unselects them if the first of them was selected. */
-u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons, struct Regs STACK *r)
+struct Onward F00_60(u16 panel, u16 cursor, u16 first, u16 buttons,
+                     struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;
@@ -254,7 +271,7 @@ u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons, struct Regs STACK *r)
     } else
         md.WinMous &= MOUSE_HELD;
     F00_70(panel, cursor, first, r);
-    return GO(NEXT_FUNC07);
+    return To(NEXT_FUNC07);
 }
 
 /* The place of the cursor for the keys that go by pages: F04_30. Returns
@@ -282,30 +299,31 @@ static u16 F03_30(u16 number, u16 more, u16 last)
 
 /* Up, and the mouse held above the entries: F00_05, which has the place
    of the cursor already. With the panels off Up is the command before. */
-u32 F00_05(u16 panel, u16 cursor, u16 first, u16 buttons, struct Regs STACK *r)
+struct Onward F00_05(u16 panel, u16 cursor, u16 first, u16 buttons,
+                     struct Regs STACK *r)
 {
     if (cursor != 0)
         cursor--;
     return F00_60(panel, cursor, first, buttons, r);
 }
 
-u32 F00_00(u16 panel, struct Regs STACK *r)
+struct Onward F00_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
 
     if (wcb->Visible == 0)
-        return GO(NEXT_EARLIER);
+        return To(NEXT_EARLIER);
     if (wcb->WinTyp > 1)
-        return GO(NEXT_FUNC07);
+        return To(NEXT_FUNC07);
     AdrNum(panel, (struct Place STACK *)&place);
     return F00_05(panel, place.cursor, place.first, 0, r);
 }
 
 /* Down, and the mouse held below the entries: F01_05. With the panels
    off Down is the command after. */
-u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons,
-           struct Regs STACK *r)
+struct Onward F01_05(u16 panel, u16 cursor, u16 first, u16 last,
+                     u16 buttons, struct Regs STACK *r)
 {
     if (cursor < last)
         cursor++;
@@ -313,34 +331,34 @@ u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons,
 }
 
 /* F01_01, where Ins goes on to. */
-static u32 F01_01(u16 panel, struct Regs STACK *r)
+static struct Onward F01_01(u16 panel, struct Regs STACK *r)
 {
     struct Place place;
 
     if (PANEL(panel)->WinTyp > 1)
-        return GO(NEXT_FUNC07);
+        return To(NEXT_FUNC07);
     AdrNum(panel, (struct Place STACK *)&place);
     return F01_05(panel, place.cursor, place.first, place.last, 0, r);
 }
 
-u32 F01_00(u16 panel, struct Regs STACK *r)
+struct Onward F01_00(u16 panel, struct Regs STACK *r)
 {
     if (PANEL(panel)->Visible == 0)
-        return GO(NEXT_LATER);
+        return To(NEXT_LATER);
     return F01_01(panel, r);
 }
 
 /* Left and Right, in a panel of files in brief: a column back and on. In
    any other panel, and with the panels off, they are keys of the command
    line. */
-u32 F02_00(u16 panel, struct Regs STACK *r)
+struct Onward F02_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
     u16 cursor, first;
 
     if (wcb->Visible == 0 || wcb->WinTyp != 0 || wcb->BrfFul != 0)
-        return GO(NEXT_INPUT);
+        return To(NEXT_INPUT);
     AdrNum(panel, (struct Place STACK *)&place);
     cursor = place.cursor;
     first = place.first;
@@ -356,17 +374,17 @@ u32 F02_00(u16 panel, struct Regs STACK *r)
             cursor = first = 0;
     }
     F00_70(panel, cursor, first, r);
-    return GO(NEXT_FUNC07);
+    return To(NEXT_FUNC07);
 }
 
-u32 F03_00(u16 panel, struct Regs STACK *r)
+struct Onward F03_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
     u16 cursor, first, column;
 
     if (wcb->Visible == 0 || wcb->WinTyp != 0 || wcb->BrfFul != 0)
-        return GO(NEXT_INPUT);
+        return To(NEXT_INPUT);
     AdrNum(panel, (struct Place STACK *)&place);
     first = place.first;
     column = place.cursor - first;
@@ -381,18 +399,18 @@ u32 F03_00(u16 panel, struct Regs STACK *r)
             cursor = first = place.last;
     }
     F00_70(panel, cursor, first, r);
-    return GO(NEXT_FUNC07);
+    return To(NEXT_FUNC07);
 }
 
 /* PgUp and PgDn. */
-u32 F04_00(u16 panel, struct Regs STACK *r)
+struct Onward F04_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
     u16 cursor, first, page;
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
-        return GO(NEXT_FUNC07);
+        return To(NEXT_FUNC07);
     page = F04_30(panel, (struct Place STACK *)&place);
     cursor = place.cursor;
     first = place.first;
@@ -404,17 +422,17 @@ u32 F04_00(u16 panel, struct Regs STACK *r)
             cursor = page + first;
     }
     F00_70(panel, cursor, first, r);
-    return GO(NEXT_FUNC07);
+    return To(NEXT_FUNC07);
 }
 
-u32 F05_00(u16 panel, struct Regs STACK *r)
+struct Onward F05_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
     u16 cursor, first, page, limit;
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
-        return GO(NEXT_FUNC07);
+        return To(NEXT_FUNC07);
     page = F04_30(panel, (struct Place STACK *)&place);
     cursor = place.cursor;
     first = F03_30(place.first, page, place.last);
@@ -426,47 +444,47 @@ u32 F05_00(u16 panel, struct Regs STACK *r)
     else if (first > cursor)
         cursor = first;
     F00_70(panel, cursor, first, r);
-    return GO(NEXT_FUNC07);
+    return To(NEXT_FUNC07);
 }
 
 /* Home and End. With the panels off, and in the Info, they are keys of
    the command line. */
-u32 F06_00(u16 panel, struct Regs STACK *r)
+struct Onward F06_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
-        return GO(NEXT_INPUT);
+        return To(NEXT_INPUT);
     F00_70(panel, 0, 0, r);
-    return GO(NEXT_FUNC07);
+    return To(NEXT_FUNC07);
 }
 
-u32 F07_00(u16 panel, struct Regs STACK *r)
+struct Onward F07_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct Place place;
 
     if (wcb->Visible == 0 || wcb->WinTyp > 1)
-        return GO(NEXT_INPUT);
+        return To(NEXT_INPUT);
     AdrNum(panel, (struct Place STACK *)&place);
     F00_70(panel, place.last, place.last, r);
-    return GO(NEXT_FUNC07);
+    return To(NEXT_FUNC07);
 }
 
 /* Ins: select the file under the cursor, or unselect it, and go down a
    line if Ins is set up to. The BIOS is told that the key is up again
    then, unless the cursor is on the last file. */
-u32 F08_00(u16 panel, struct Regs STACK *r)
+struct Onward F08_00(u16 panel, struct Regs STACK *r)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;
     u16 address;
 
     if (!FilePan(panel))
-        return GO(NEXT_FUNC07);
+        return To(NEXT_FUNC07);
     address = wcb->CurAdr;
     if (address >= wcb->EndBuf)
-        return GO(NEXT_FUNC07);
+        return To(NEXT_FUNC07);
     if (md.InsDwn != 0
         && address + sizeof(struct FILENT) < wcb->EndBuf)
         *KEYS_DOWN &= 0x7F;
@@ -475,7 +493,7 @@ u32 F08_00(u16 panel, struct Regs STACK *r)
         file->AttrF ^= ATTR_SELECTED;
     F08_10(panel, r);
     if (md.InsDwn == 0)
-        return GO(NEXT_FUNC07);
+        return To(NEXT_FUNC07);
     return F01_01(panel, r);
 }
 
@@ -483,17 +501,17 @@ u32 F08_00(u16 panel, struct Regs STACK *r)
    as `include` says, the word that the dialog has for ^I. Directories
    are unselected by a mask and nothing else. In a panel that shows no
    files the key goes to the command line. */
-static u32 F10_01(u16 panel, u16 include)
+static struct Onward F10_01(u16 panel, u16 include)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;
     u16 address, found;
 
     if (!FilePan(panel))
-        return GO(NEXT_INPUT);
+        return To(NEXT_INPUT);
     if ((u8)Dialog(OFFSET(Sel_B), include, 0, 0, MAIN_SEG) != 0
         || md.SelMas[0] == 0)
-        return GO(NEXT_FUNC04);
+        return To(NEXT_FUNC04);
     Convert(md.SelMas, md.TmpBuf);
     found = 0;
     for (address = DSKBUF; address < wcb->EndBuf;
@@ -513,59 +531,59 @@ static u32 F10_01(u16 panel, u16 include)
         }
     }
     if (found)
-        return GO(NEXT_FUNC01);
+        return To(NEXT_FUNC01);
     Dialog(OFFSET(ErSel_B), include, 0, 0, MAIN_SEG);
-    return GO(NEXT_FUNC04);
+    return To(NEXT_FUNC04);
 }
 
 /* Grey * turns the selection round, when nothing has been typed: it is a
    character of a command too. F76_01 is where the menu comes in. */
-u32 F76_01(u16 panel)
+struct Onward F76_01(u16 panel)
 {
     return F10_01(panel, OFFSET(Inv_S));
 }
 
-u32 F76_00(u16 panel)
+struct Onward F76_00(u16 panel)
 {
     if (md.DosBuf[0] != 0)
-        return GO(NEXT_INPUT);
+        return To(NEXT_INPUT);
     return F76_01(panel);
 }
 
 /* Grey + and Grey -. */
-u32 F09_00(u16 panel)
+struct Onward F09_00(u16 panel)
 {
     return F10_01(panel, OFFSET(Sel_S));
 }
 
-u32 F10_00(u16 panel)
+struct Onward F10_00(u16 panel)
 {
     return F10_01(panel, OFFSET(Unsl_S));
 }
 
 /* ^M: select again what was selected before a command went through the
    selected files. */
-u32 F78_00(u16 panel)
+struct Onward F78_00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;
     u16 address;
 
     if (!FilePan(panel))
-        return GO(NEXT_FUNC04);
+        return To(NEXT_FUNC04);
     for (address = DSKBUF; address < wcb->EndBuf;
          address += sizeof(struct FILENT)) {
         file = ENTRY(wcb, address);
         if (file->NameF[0] != '.' && file->AttrF & ATTR_WAS_SELECTED)
             file->AttrF |= ATTR_SELECTED;
     }
-    return GO(NEXT_FUNC01);
+    return To(NEXT_FUNC01);
 }
 
 /* ^O: both panels off, with what DOS has shown in their place, or on
    again: the other one if it was on, which Ctrl_O keeps. The menu bar is
    drawn first if a panel is to be read again. */
-u32 F11_00(u16 panel)
+struct Onward F11_00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct WCBdef __far *second = PANEL(md.WCBsec);
@@ -579,7 +597,7 @@ u32 F11_00(u16 panel)
         size = SizDX() & 0xFF00 | 80;
         ResUser(begin, size);
         Window(begin, size);            /* Func03 */
-        return GO(NEXT_FUNC04);
+        return To(NEXT_FUNC04);
     }
     was = md.Ctrl_O;
     second->Visible = (u8)was;
@@ -587,41 +605,41 @@ u32 F11_00(u16 panel)
     wcb->Visible = 1;
     if (wcb->ChgFlg != 0 || was != 0 && changed != 0)
         PutMnu(3);                      /* PutMnu3 */
-    return GO(NEXT_INIT50);
+    return To(NEXT_INIT50);
 }
 
 /* ^P, ^F1 and ^F2: the other panel, the left and the right one off or
    on, which is in the menu of a panel. */
-u32 F12_00(u16 panel)
+struct Onward F12_00(u16 panel)
 {
     if (PANEL(panel)->Visible == 0)
-        return GO(NEXT_POP_FUNC05);
-    return GO_PANEL(NEXT_M06_00, md.WCBsec, 0);
+        return To(NEXT_POP_FUNC05);
+    return ToMenu(NEXT_M06_00, md.WCBsec, 0);
 }
 
-u32 F13_00(void)
+struct Onward F13_00(void)
 {
-    return GO_PANEL(NEXT_M06_00, md.WCB1seg, 1);
+    return ToMenu(NEXT_M06_00, md.WCB1seg, 1);
 }
 
-u32 F14_00(void)
+struct Onward F14_00(void)
 {
-    return GO_PANEL(NEXT_M06_00, md.WCB2seg, 5);
+    return ToMenu(NEXT_M06_00, md.WCB2seg, 5);
 }
 
 /* ^U: the panels change places. */
-u32 F15_00(u16 panel)
+struct Onward F15_00(u16 panel)
 {
     u16 left;
 
     if (PANEL(panel)->Visible == 0)
-        return GO(NEXT_FUNC04);
+        return To(NEXT_FUNC04);
     left = md.WCB1seg;
     md.WCB1seg = md.WCB2seg;
     md.WCB2seg = left;
     InvVar(&md.Active);
     ResUser(BegBX(panel) & 0xFF00, SizDX() & 0xFF00 | 80);
-    return GO(NEXT_INIT50);
+    return To(NEXT_INIT50);
 }
 
 /* ^B: the key bar off or on. Where the command line is on the last line
@@ -629,7 +647,7 @@ u32 F15_00(u16 panel)
    again, and the program looks for the command line anew, which moves
    everything up a line. The assembly asks where a panel begins with DS
    on the main data: only the row counts, which is that of any panel. */
-u32 F16_00(void)
+struct Onward F16_00(void)
 {
     u16 last = (u16)(u8)(md.Lines - 1) << 8;
     u16 begin, size;
@@ -639,11 +657,11 @@ u32 F16_00(void)
         md.BarPrev = 0xFF;
         ClsLine(last, MAIN_SEG);
         Window(last, 0x150);
-        return GO(NEXT_FUNC04);
+        return To(NEXT_FUNC04);
     }
     md.KeyBar = 1;
     if (last >> 8 != md.DosLin)
-        return GO(NEXT_FUNC04);
+        return To(NEXT_FUNC04);
     begin = BegBX(MAIN_SEG) & 0xFF00;
     size = SizDX() & 0xFF00 | 80;
     ResUser(begin, size);
@@ -651,14 +669,14 @@ u32 F16_00(void)
     Cursor1();
     SavMous();
     CurMous(0);
-    return GO(NEXT_INIT40);
+    return To(NEXT_INIT40);
 }
 
 /* F17_06: a panel is to be one of files, and read. */
-static u32 F17_06(u16 panel)
+static struct Onward F17_06(u16 panel)
 {
     PANEL(panel)->ChgFlg = 1;
-    return GO_PANEL(NEXT_M01_01, panel, 0);
+    return ToMenu(NEXT_M01_01, panel, 0);
 }
 
 /* ^R: read a panel again. Files: none is selected afterwards and the
@@ -668,7 +686,7 @@ static u32 F17_06(u16 panel)
    what DOS answered to the one byte written, 1, which is the tree's.
 
    F17_01 is where the menu of a panel comes in, with that panel. */
-u32 F17_01(u16 panel)
+struct Onward F17_01(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     u16 kind = wcb->WinTyp;
@@ -677,14 +695,14 @@ u32 F17_01(u16 panel)
 
     if (kind != 0) {
         if (kind > 2)
-            return GO(NEXT_POP_FUNC04);
+            return To(NEXT_POP_FUNC04);
         if (kind != 2) {
             marked = DelTr0(md.DosPth);
             if (marked.failed != 0)
-                return GO(NEXT_POP_FUNC04);
+                return To(NEXT_POP_FUNC04);
             kind = (u8)marked.value;
         }
-        return GO_PANEL(NEXT_M03_00, panel, 5 - kind);       /* F17_02 */
+        return ToMenu(NEXT_M03_00, panel, 5 - kind);       /* F17_02 */
     }
     address = wcb->EndBuf;
     wcb->CurAdr = address;
@@ -698,30 +716,30 @@ u32 F17_01(u16 panel)
 /* ^Z and ^L: the tree, or the Info, in the other panel, if neither panel
    shows it; and if one does, what that panel showed before, which Ctrl_L
    keeps. */
-static u32 F18_01(u16 panel, u16 kind)
+static struct Onward F18_01(u16 panel, u16 kind)
 {
     struct WCBdef __far *wcb = PANEL(panel);
 
     if (wcb->Visible == 0)
-        return GO(NEXT_POP_FUNC04);
+        return To(NEXT_POP_FUNC04);
     if (kind != wcb->WinTyp) {
         panel = InvWCB(panel);
         wcb = PANEL(panel);
         if (wcb->Visible == 0 || kind != wcb->WinTyp)
-            return GO_PANEL(NEXT_M03_00, panel, 5 - kind);
+            return ToMenu(NEXT_M03_00, panel, 5 - kind);
     }
     kind = wcb->Ctrl_L;
     if (kind == 0)
         return F17_06(panel);
-    return GO_PANEL(NEXT_M03_00, panel, 5 - kind);
+    return ToMenu(NEXT_M03_00, panel, 5 - kind);
 }
 
-u32 F79_00(u16 panel)
+struct Onward F79_00(u16 panel)
 {
     return F18_01(panel, 1);
 }
 
-u32 F18_00(u16 panel)
+struct Onward F18_00(u16 panel)
 {
     return F18_01(panel, 2);
 }
@@ -788,13 +806,13 @@ same:
 
 /* Tab: to the other panel, if it is on. The panel that is left is drawn
    as the one that is not current. */
-u32 F20_00(u16 panel)
+struct Onward F20_00(u16 panel)
 {
     u16 other = InvWCB(panel);
     u16 current;
 
     if (PANEL(other)->Visible == 0)
-        return GO(NEXT_FUNC05);
+        return To(NEXT_FUNC05);
     current = md.WCBcrn;
     md.WCBcrn = other;
     PutPath(panel);
@@ -802,5 +820,5 @@ u32 F20_00(u16 panel)
     md.WCBcrn = current;
     F20_02(panel);
     PutPath(md.WCBcrn);
-    return GO(NEXT_FUNC01);
+    return To(NEXT_FUNC01);
 }

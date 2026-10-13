@@ -707,10 +707,8 @@ enum {
 };
 
 /* Where the program goes on after a command of the keys of the panels,
-   of keys.c, enter.c and view.c, in the low byte of what it returns. The
-   routines of a panel's menu take a panel, in the high word, and a byte,
-   the high byte of the low word: for M03_00 five less the kind of panel,
-   and for M06_00 the place in the menu bar that is lit meanwhile. */
+   of keys.c, enter.c and view.c: the place that such a command returns,
+   in struct Onward below. */
 enum {
     NEXT_FUNC07,                        /* wait for the next key */
     NEXT_FUNC05,                        /* first save the setup, if it has
@@ -745,11 +743,27 @@ enum {
     NEXT_EXEC,                          /* and first have that part run
                                            the commands saved there */
     NEXT_VIEW,                          /* V00_00: the viewer on the file
-                                           ViewFil, or with 1 in the high
-                                           word the editor */
+                                           ViewFil */
+    NEXT_EDIT,                          /* the same with 1 in DL: the
+                                           editor on it */
     NEXT_DIRINFO,                       /* V00_02: the editor in the window
                                            of an Info panel */
     NEXT_EXIT                           /* leave the program */
+};
+
+/* What a command of the keys of the panels returns: the place, and for
+   the three places that are routines of a panel's menu what the routine
+   takes, which is 0 with any other place. The commands of enter.c return
+   the place alone, as a number, still: see TODO.md. */
+struct Onward {
+    u8  place;                          /* where the program goes on: a
+                                           NEXT_ */
+    u8  item;                           /* for M03_00 five less the kind of
+                                           panel, and for M06_00 the place
+                                           in the menu bar that is lit
+                                           meanwhile */
+    u16 panel;                          /* the panel that the routine of
+                                           the menu is for */
 };
 
 /* After a command of the menus, of commands.c. */
@@ -811,36 +825,36 @@ struct Left {
                                            holds */
 };
 struct Left F00_50(u16 panel, u16 cursor, u16 first);
-u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons,
-           struct Regs STACK *r);
-u32 F00_00(u16 panel, struct Regs STACK *r);
-u32 F00_05(u16 panel, u16 cursor, u16 first, u16 buttons,
-           struct Regs STACK *r);
-u32 F01_00(u16 panel, struct Regs STACK *r);
-u32 F01_05(u16 panel, u16 cursor, u16 first, u16 last, u16 buttons,
-           struct Regs STACK *r);
-u32 F02_00(u16 panel, struct Regs STACK *r);
-u32 F03_00(u16 panel, struct Regs STACK *r);
-u32 F04_00(u16 panel, struct Regs STACK *r);
-u32 F05_00(u16 panel, struct Regs STACK *r);
-u32 F06_00(u16 panel, struct Regs STACK *r);
-u32 F07_00(u16 panel, struct Regs STACK *r);
-u32 F08_00(u16 panel, struct Regs STACK *r);
-u32 F76_00(u16 panel);
-u32 F76_01(u16 panel);
-u32 F09_00(u16 panel);
-u32 F10_00(u16 panel);
-u32 F78_00(u16 panel);
-u32 F11_00(u16 panel);
-u32 F12_00(u16 panel);
-u32 F13_00(void);
-u32 F14_00(void);
-u32 F15_00(u16 panel);
-u32 F16_00(void);
-u32 F17_01(u16 panel);
-u32 F79_00(u16 panel);
-u32 F18_00(u16 panel);
-u32 F20_00(u16 panel);
+struct Onward F00_60(u16 panel, u16 cursor, u16 first, u16 buttons,
+                     struct Regs STACK *r);
+struct Onward F00_00(u16 panel, struct Regs STACK *r);
+struct Onward F00_05(u16 panel, u16 cursor, u16 first, u16 buttons,
+                     struct Regs STACK *r);
+struct Onward F01_00(u16 panel, struct Regs STACK *r);
+struct Onward F01_05(u16 panel, u16 cursor, u16 first, u16 last,
+                     u16 buttons, struct Regs STACK *r);
+struct Onward F02_00(u16 panel, struct Regs STACK *r);
+struct Onward F03_00(u16 panel, struct Regs STACK *r);
+struct Onward F04_00(u16 panel, struct Regs STACK *r);
+struct Onward F05_00(u16 panel, struct Regs STACK *r);
+struct Onward F06_00(u16 panel, struct Regs STACK *r);
+struct Onward F07_00(u16 panel, struct Regs STACK *r);
+struct Onward F08_00(u16 panel, struct Regs STACK *r);
+struct Onward F76_00(u16 panel);
+struct Onward F76_01(u16 panel);
+struct Onward F09_00(u16 panel);
+struct Onward F10_00(u16 panel);
+struct Onward F78_00(u16 panel);
+struct Onward F11_00(u16 panel);
+struct Onward F12_00(u16 panel);
+struct Onward F13_00(void);
+struct Onward F14_00(void);
+struct Onward F15_00(u16 panel);
+struct Onward F16_00(void);
+struct Onward F17_01(u16 panel);
+struct Onward F79_00(u16 panel);
+struct Onward F18_00(u16 panel);
+struct Onward F20_00(u16 panel);
 
 /* Enter, the directory changed and the history, enter.c. F21_10 is Enter
    on the entry under the cursor, F21_25 a command of the command line
@@ -876,13 +890,13 @@ struct Open {
     struct Box box;                     /* where the box "Reading the
                                            file" is */
 };
-u32 F43_00(void);
-u32 F44_00(void);
-u32 F63_00(u16 panel);
-u32 F64_00(u16 panel);
-u32 F33_00(u16 panel);
-u32 F34_00(u16 panel);
-u32 F34_10(u16 panel);
+struct Onward F43_00(void);
+struct Onward F44_00(void);
+struct Onward F63_00(u16 panel);
+struct Onward F64_00(u16 panel);
+struct Onward F33_00(u16 panel);
+struct Onward F34_00(u16 panel);
+struct Onward F34_10(u16 panel);
 u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open);
 void V00_10(u16 handle);
 void V13_00(void);
