@@ -43,7 +43,7 @@ mask.c        clean
 menu.c        clean
 misc.c        clean
 mouse.c       clean
-panel.c       to-pointer 1
+panel.c       clean
 place.c       clean
 read.c        to-number 1
 resident.c    to-number 17, to-pointer 10, function 3, interrupt 3, loadds 3, naked 2, asm 2, registers 1, aborts 3
@@ -64,8 +64,8 @@ sys.h         clean
 system.c      clean
 system_t.c    clean
 tables.h      clean
-tree.c        to-number 8
-treebox.c     to-number 4, to-pointer 3
+tree.c        clean
+treebox.c     clean
 treebox_t.c   clean
 usermenu.c    to-number 9, to-pointer 5
 vc.h          interrupt 1, aborts 4

@@ -436,7 +436,7 @@ void SetCur(u16 panel, u16 set)
         /* A directory up to 11 levels down has its name at its level,
            two or three columns to each; one further down in the last
            column. */
-        lines = ((struct DIRENT *)md.TreAdr)->DirLevel;
+        lines = ((struct DIRENT *)MD_POINTER(md.TreAdr))->DirLevel;
         if (lines <= 11) {
             width = lines + lines - 0x17;
             if (md.TreeTyp != 0)

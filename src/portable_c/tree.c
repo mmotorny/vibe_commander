@@ -99,13 +99,13 @@ static const u8 CODE PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
         md.MenuBuf[1] = ':'; \
         md.MenuBuf[2] = '\\'; \
         md.MenuBuf[3] = 0; \
-        entry = (struct DIRENT *)TRELIST; \
+        entry = (struct DIRENT *)MD_POINTER(TRELIST); \
         for (count = TREE->TreeLen; count; count--) { \
             if (entry->DirLevel != 0) \
                 DESCEND(md.MenuBuf, entry, text, i, n); \
             IS_PATH(found, md.MenuBuf, md.CrnPath, i, n); \
             if (found) { \
-                md.TreAdr = (u16)entry; \
+                md.TreAdr = MD_PLACE(entry); \
                 break; \
             } \
             entry++; \
@@ -158,7 +158,7 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors)
     OWNER = panel;
     STATUS = place + (size & 0xFF00) - 0x200 + 1;
     md.TreCrnt = 0;
-    entry = (struct DIRENT *)TRELIST;
+    entry = (struct DIRENT *)MD_POINTER(TRELIST);
     n = TREE->TreeLen;
     for (i = 0; i < n && entry[i].DirLevel <= 7; i++)
         ;
@@ -192,7 +192,7 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors)
         n = entry->DirLevel;
         if (n != 0) {
             while (--n) {
-                if ((u16)entry >= md.TreFrst && goes_on <= GOES_ON + 10) {
+                if (MD_PLACE(entry) >= md.TreFrst && goes_on <= GOES_ON + 10) {
                     if (goes_on < GOES_ON + 10) {
                         if (*goes_on != 0)
                             *(u8 *)cell = RUNS_DOWN;
@@ -209,7 +209,7 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors)
                 *goes_on = 0;
             }
             goes_on++;
-            if ((u16)entry >= md.TreFrst) {
+            if (MD_PLACE(entry) >= md.TreFrst) {
                 if (goes_on < GOES_ON + 12)
                     *(u8 *)cell = (u8)n;
                 cell++;
@@ -225,21 +225,21 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors)
             *goes_on = 1;
         if (entry->DirLevel != 0)
             DESCEND(PATH, entry, text, i, n);
-        if ((u16)entry < md.TreFrst)
+        if (MD_PLACE(entry) < md.TreFrst)
             continue;
 
         width = 12;
-        if ((u16)entry == TRELIST)
+        if (MD_PLACE(entry) == TRELIST)
             width = 1;
         IS_PATH(color, PATH, md.DosPth, i, n);
         if (color) {
-            md.TreCrnt = (u16)entry;
+            md.TreCrnt = MD_PLACE(entry);
             screen[36] = Color(colors[2]) << 8 | MARK_CURRENT;
             color = 2;
         }
         /* `color` is which of the colours a directory has here, and the
            one after it is that of the cursor. */
-        if ((u16)entry != md.TreAdr) {
+        if (MD_PLACE(entry) != md.TreAdr) {
             color = Color(colors[color]) << 8;
         } else {
             n = BRACKETS;
