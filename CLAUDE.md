@@ -2033,14 +2033,17 @@ What moving `blank.c`, `main.c`, `enter.c`, `commands.c`, `keys.c`,
   sentence at the top of `main.c` that says which registers the commands
   read. EGA lines is still on `Int10` for that and for its call for
   Print Screen: `TODO.md`.
-- Many runs of the scenarios at once fill `/tmp`, which is in the memory
-  and has a limit: with six checkouts testing, and one of them three
-  copies at a time, the scenarios' tests of all of them failed in the
-  same minute, the C translation's too, with "the machine stopped: it
-  was reset, or QEMU ended" or "Disk quota exceeded". That is the
-  machine and not the program. `TMPDIR` set to a directory in the
-  checkout's `build/` puts the disks of the machines there instead:
-  `TMPDIR=$PWD/build/tmp ctest --test-dir build`.
+- Many runs of the scenarios at once filled `/tmp`, which is in the
+  memory and has a limit: with six checkouts testing, and one of them
+  three copies at a time, the scenarios' tests of all of them failed in
+  the same minute, the C translation's too, with "the machine stopped:
+  it was reset, or QEMU ended" or "Disk quota exceeded". That was the
+  machine and not the program. The harness has the disks of its machines
+  in the checkout's `build/tmp` since, by itself, and nothing is to be
+  set for it: `workdir` of `harness/dos.py`, which every tool of the
+  harness comes to for such a directory. A run removes what it made
+  there, and what a run that was killed has left, the next one removes.
+  A `TMPDIR` that is set is used as it is.
 
 What moving `dirfunc.c`, `read.c`, `usermenu.c`, `treebox.c`, `drive.c`
 and `setup.c` met:
@@ -2057,10 +2060,13 @@ and `setup.c` met:
   look for a read of `value` where `failed` is 0. One that takes the
   high byte alone, as `DirFunc` and `GetVol` do, is not of this kind:
   the function hands the service over there as the original does.
-- The directory that `TMPDIR` names for the tests, of the note above,
-  wants a short path: QEMU's socket is in it, and a path of more than
-  107 characters is refused, "AF_UNIX path too long". `build/tmp` does;
-  a directory two levels further down did not.
+- The directory of the machines' disks, of the note above, wants a
+  short path: QEMU's socket is in it, and a path of more than 107
+  characters is refused, "AF_UNIX path too long". `build/tmp` of a
+  checkout does; where it would not, for a checkout that lies deep, the
+  harness says so and uses the system's directory. A `TMPDIR` set by
+  hand to a directory two levels further down did not: the harness
+  names the path that is too long then, and starts no machine.
 
 What `copy.c` added to that, which went over a family of calls at a
 time, a commit each:

@@ -13,16 +13,16 @@ from there in QEMU. Written to the output directory:
 """
 import argparse
 import json
-import tempfile
 from pathlib import Path
 
 import deps
+import dos
 import setups
 
 
 def capture(out, scale):
     out.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as workdir:
+    with dos.workdir() as workdir:
         with setups.fresh_install(Path(workdir)) as machine:
             machine.wait_for_boot()
             screen = machine.wait_for_screen()

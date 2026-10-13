@@ -22,13 +22,13 @@ Two setups share one clock and one source of files:
 """
 import io
 import shutil
-import tempfile
 import threading
 import zipfile
 from dataclasses import dataclass, field
 from pathlib import Path
 
 import deps
+import dos
 import driver
 from dos import BOOT_TIME, FatImage, Machine, MachineError, boot_floppy, \
     timestamp
@@ -366,7 +366,7 @@ class Benches:
     """
 
     def __enter__(self):
-        self._directory = tempfile.TemporaryDirectory()
+        self._directory = dos.workdir()
         self._benches = {}
         self._lock = threading.Lock()
         return self

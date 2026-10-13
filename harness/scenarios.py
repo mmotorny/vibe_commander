@@ -1003,12 +1003,12 @@ ends 26.9 seconds past noon in the original and 28.1 in the translation, and
 `delete`, of 63, 25.8 and 28.6: the translation has taken up to a sixth
 longer.
 """
-import tempfile
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import coverage
 import deviations
+import dos
 import driver
 import fat
 import setups
@@ -5497,7 +5497,7 @@ def run(scenario, program, bench, trace=False, blinking=False,
     steps = ("",) + scenario.steps
     known = driver.facts(program, stack)
     script = driver.script(scenario.steps, known, blinking)
-    with tempfile.TemporaryDirectory() as workdir:
+    with dos.workdir() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None
         with bench.start(workdir, program, script, log) as machine:

@@ -1066,6 +1066,16 @@ its file size from appearing on screen as free space. A scenario that wants
 the program set up differently does that itself, through the menus. When a
 build is tested, up to four scenarios run side by side.
 
+What the machines need while they run, the images of their disks above
+all, 60 to 130 MB for a scenario, is kept in `build/tmp` of the checkout
+and removed when a run ends; what a run has left there by being killed,
+the next run removes. A directory that the environment names for
+temporary files, by `TMPDIR`, is used in its place. So is the system's,
+with a line that says so, where the checkout lies so deep that the
+socket by which QEMU is spoken to would have too long a path there.
+`workdir` of `harness/dos.py` is the one place that makes such a
+directory.
+
 The hard disks are SD cards, each in a controller of its own, which the
 BIOS serves like any hard disk; DOS and the program know a disk only
 through the BIOS. QEMU reads a sector of an SD card, as of a diskette,

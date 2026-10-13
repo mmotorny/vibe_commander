@@ -5,15 +5,21 @@ Needs `qemu-system-i386` and `mtools` on the PATH.
 import calendar
 import json
 import os
+import shutil
 import socket
 import struct
 import subprocess
+import sys
+import tempfile
+import threading
 import time
 import zipfile
 from dataclasses import dataclass, replace
 from pathlib import Path
 
 from image import Image
+
+ROOT = Path(__file__).resolve().parent.parent
 
 COLUMNS, ROWS = 80, 25
 TEXT_MEMORY = 0xB8000             # the colour text screen: character, attribute
@@ -95,6 +101,74 @@ START_TIME = 60     # QEMU, to open the socket it is spoken to through
 LOAD_TIME = 120     # a saved state, to be loaded
 SAVE_TIME = 120     # a state, to be saved
 BOOT_TIME = 300     # DOS, to boot; and a screen, to stand still after it
+
+# Where the harness keeps what its machines need while they run, the
+# images of their disks above all, 60 to 130 MB for a scenario: in the
+# checkout's build directory, unless the environment names a directory
+# for temporary files, by one of these, which is then taken as it is. The
+# system's own is often in the memory, with a limit that a few test runs
+# side by side reach.
+WORK = ROOT / "build" / "tmp"
+NAMED_BY = ("TMPDIR", "TEMP", "TMP")
+# QEMU is spoken to through a socket in such a directory, and the path of
+# a socket has this many characters at the most. Below a directory that
+# workdir() makes, the harness goes this much further down to a socket at
+# the most, where a bench has the original save its setup: Machine says
+# so if it is ever more.
+SOCKET_PATH = 107
+BELOW = len("/russia/setup/qmp.sock")
+
+_swept = threading.Lock()
+_sweep = True
+
+
+def _stale(base):
+    """Remove from `base` the directories of runs that have ended without
+    removing them, as a run does that is killed: each is named for the
+    process that made it, and goes if there is no such process."""
+    for path in base.iterdir():
+        number = path.name.partition("-")[0]
+        if not number.isdigit():
+            continue
+        try:
+            os.kill(int(number), 0)
+        except ProcessLookupError:
+            shutil.rmtree(path, ignore_errors=True)
+        except OSError:
+            pass                        # somebody else's process: it lives
+
+
+def workdir():
+    """A directory for what a machine needs while it runs, as a
+    tempfile.TemporaryDirectory: to be used in a `with` statement, which
+    removes it. Every directory of that kind that the harness makes, it
+    makes here.
+
+    It is under the checkout's build/tmp, on a disk, and what an earlier
+    run has left there by being killed is removed when a run first comes
+    here. Where the environment names a directory for temporary files,
+    that one is used, and nothing is removed from it. And where the
+    checkout is so deep in the file system that QEMU's socket would not
+    get a path, the system's is used, and this says so."""
+    global _sweep
+    if any(os.environ.get(name) for name in NAMED_BY):
+        return tempfile.TemporaryDirectory()
+    prefix = f"{os.getpid()}-"
+    # tempfile puts eight characters of its own behind the prefix.
+    longest = len(os.fsencode(WORK)) + 1 + len(prefix) + 8 + BELOW
+    with _swept:
+        first, _sweep = _sweep, False
+    if longest > SOCKET_PATH:
+        if first:
+            print(f"{WORK} is {longest - SOCKET_PATH} characters too long "
+                  "a path for QEMU's socket: the machines' disks go to "
+                  f"{tempfile.gettempdir()} instead", file=sys.stderr)
+        return tempfile.TemporaryDirectory()
+    WORK.mkdir(parents=True, exist_ok=True)
+    if first:
+        _stale(WORK)
+    return tempfile.TemporaryDirectory(prefix=prefix, dir=WORK)
+
 
 CP437_CONTROLS = ("\u0020\u263a\u263b\u2665\u2666\u2663\u2660\u2022\u25d8"
                   "\u25cb\u25d9\u2642\u2640\u266a\u266b\u263c\u25ba\u25c4"
@@ -290,6 +364,12 @@ class Machine:
         self._scratch = self._workdir / "scratch.bin"
         self._written = self._workdir / "written.bin"
         control = self._workdir / "qmp.sock"
+        if len(os.fsencode(control)) > SOCKET_PATH:
+            raise MachineError(
+                f"{control} is too long a path for a socket, which may "
+                f"have {SOCKET_PATH} characters: the directory for "
+                "temporary files lies too deep, or BELOW of dos.py is no "
+                "longer how far down the harness goes in one")
         command = [
             "qemu-system-i386", "-machine", "pc", "-cpu", "486", "-m", "16",
             "-nodefaults", "-vga", "std", "-display", "none", "-no-reboot",

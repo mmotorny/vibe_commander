@@ -24,9 +24,9 @@ import argparse
 import shutil
 import subprocess
 import sys
-import tempfile
 from pathlib import Path
 
+import dos
 import setups
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -87,7 +87,7 @@ def main():
         program = setups.Program.load(path)
     else:
         sys.exit(f"{path} is not there: build the project first")
-    with tempfile.TemporaryDirectory() as directory:
+    with dos.workdir() as directory:
         print("Making the bench...", flush=True)
         floppy, disks = machine(Path(directory), program, args.country)
         subprocess.run(command(floppy, disks, args.display), check=False)
