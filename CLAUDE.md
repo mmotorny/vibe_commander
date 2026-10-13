@@ -1893,6 +1893,24 @@ What making the first files so met:
   call of `ScreenPut` or `ScreenGet` each.
 - The functions that nobody calls yet need nothing to keep them: a
   function that is not static is in the program whoever calls it.
+- What a row of the deviation's table says of the original is read in
+  the assembly, not in the structure of registers: that has what the C
+  translation handed over, which is the original's only where it kept a
+  register from one call to the next. Where it set one by itself, 0 in
+  AL behind a `MOV AH`, zeros in SI and DI, the address of `TmpBuf` to
+  have DS on the main data, the original has something else, and the
+  row says both. `iconv -f cp866` of the assembly's file into `build/`
+  and `grep -n 'Intr21\|INT'` there finds the calls. AL of 4Eh, which
+  APPEND goes by, is such a register in `FindFil` and in `F34_11`: 0 in
+  the C translation, a leftover in the original.
+- A call that takes no address was still made with DS where
+  `regs.name` had it: on the text of the viewer or the editor, on the
+  list of the file search. The functions have DS on the main data
+  there, and that is a row too.
+- The scenarios take long with several agents at work. A commit's build
+  can be copied and tested as the note on copies above has it, while
+  the next file is moved: `harness/ported.py` with the copy's `VC.EXE`
+  and `VC.MAP` and the original's listing.
 
 ## Work by several agents
 
