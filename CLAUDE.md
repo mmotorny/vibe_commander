@@ -2413,6 +2413,40 @@ in "The portable C".
     structure of its own, and a second declaration is "Type does not
     agree with previous definition". Buttons can, being arrays.
 
+- The program of 32 bits goes through the scenarios by a test of its
+  own, `portable_c32-scenarios`, since the piece H3 (`TODO.md`, "Piece
+  H3, the scenarios' test", which has the commands). What that met:
+  - It is held to a record, `harness/pass32.txt`, and not to passing
+    everything: the test fails for a scenario of the record that fails
+    and for one that passes and is not on it. A fix that makes a
+    scenario pass is committed with the record written anew, `python3
+    harness/ported.py --record build/portable_c32/VC.EXE`, or the test
+    fails for the fix.
+  - To the harness that build is a tree, `portable_c32`, with the
+    source of another: `SOURCE` of `harness/deviations.py`. What is
+    declared for the portable C holds for it without being said again,
+    its patches too. Where a table of the harness goes by a tree's
+    name and means its source, it asks `deviations.source(tree)`.
+  - A scenario of that test is ended at its first screen that differs.
+    What the keys of a scenario do in a program that has left, or that
+    stands in another box than the scenario takes it to, is not worth
+    reading, and such a program waits for keys that do not come: DOS's
+    prompt takes no click of the mouse, and a step with one waits
+    until its time runs out.
+  - When the program leaves by itself, DOS goes on in the bench's batch
+    file to the command that switches the machine off, and QEMU ends
+    with the driver's script half played. A check that looks at what
+    the driver has written must look once more after the machine has
+    ended, and a pause asked of a machine that has just ended fails.
+  - What is looked for in a program's image for every block of QEMU's
+    log is looked for in its code alone. With the 640K that the
+    program hands out in the image, a scenario took 14 seconds where
+    it takes 3: Python's threads take turns at such work, so four
+    scenarios side by side waited on one another.
+  - A second copy of the program, started from the command line of
+    the first, is loaded behind it, at 001DA1A0h on the bench. The
+    driver of the tests knows the first copy's place alone.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through

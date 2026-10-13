@@ -2410,15 +2410,16 @@ The trial's seven changes, set against the pieces of the program:
 | 2 | A reader of LE files and of the flat map | H1 | Everything below |
 | 3 | `driver.py`: the facts of a flat program as linear addresses, and the script's second header, which became an event | H2, done | The first run that is to be judged. Before it `harness/trial32/run.py` runs the program and prints its screens, with every step that waits on `AutoTim` ended early |
 | 4 | `DRIVER.ASM`: the block move for `AutoTim`, `Clock` and the stack; then every golden derived again, which must change none | H2, done: none changed | The same |
-| 5 | `coverage.py` and `ported.py` on the reader, with the stub left out; the record of the scenarios that pass | H3 | The 32-bit build can be held to anything. What ran of the C is asked only once every scenario passes |
-| 6 | The scenarios' test: the stack, the limits above | H3 | The switch |
+| 5 | `coverage.py` and `ported.py` on the reader, with the stub left out; the record of the scenarios that pass | H3, done | The 32-bit build can be held to anything. What ran of the C is asked only once every scenario passes |
+| 6 | The scenarios' test: the stack, the limits above | H3, done | The switch |
 | 7 | `datacheck.py`, with `tools/figures.py`; `reads.py` goes by the text of the C and stays | H4, done: the test `portable_c32-data` | The switch: until then the 16-bit build holds the tables, which are the same source, and both tests do |
 
 The record: `harness/pass32.txt`, the names of the scenarios that the
 32-bit build passes, written by `ported.py --record`. The test
 `portable_c32-scenarios` fails when one of them fails, and when one
 passes that is not in it, so that the record is what is so; a piece
-commits it with the change that made it grow.
+commits it with the change that made it grow. "Piece H3, the scenarios'
+test" below has how it is run and read.
 
 ### Piece H1, the reader: done, and what a later piece should know
 
@@ -2456,7 +2457,9 @@ Where the plan and the code differ:
   `coverage.origin` and `coverage.relocated` read the header of a
   program of 16 bits: those are H2's and H3's to give a second form.
   H2 gave `driver.facts` its own and `coverage.stack` a second
-  function beside it, `flat_stack`; the others are H3's still.
+  function beside it, `flat_stack`; H3 gave the others theirs:
+  `coverage.place` for an address of either map, and `executed` by
+  the image.
   `datacheck.py` and `arithcheck.py` each
   still read the lines of the 16-bit map by themselves; `le.Map` has
   what `Translation` of `datacheck.py` reads there, modules and static
@@ -2540,7 +2543,7 @@ What there is:
 
 | | |
 |---|---|
-| `driver.facts(program, stack)` | As it was for a program of 16 bits. A flat one, which is one whose file `le.Linear` takes (`driver.linear`), gets `Facts` with `flat` set, whose three places are addresses of the machine's memory: `_md` of the map, placed from `le.BENCH`, with the offsets of `AutoTim` and `Clock` from the original's listing as before; and the stack. So `scenarios.run`, `show.py --program` and the scenarios' test have the driver's side of a flat program with no change of theirs |
+| `driver.facts(program, stack)` | As it was for a program of 16 bits. A flat one, which is one whose file `le.Linear` takes (`le.linear`, since H3), gets `Facts` with `flat` set, whose three places are addresses of the machine's memory: `_md` of the map, placed from `le.BENCH`, with the offsets of `AutoTim` and `Clock` from the original's listing as before; and the stack. So `scenarios.run`, `show.py --program` and the scenarios' test have the driver's side of a flat program with no change of theirs |
 | `driver.flat_facts(name, program, linked, auto_time, clock, stack, base)` | The same of any flat program: each of the two is a symbol of the map and an offset from it, or None. The trial's toys go through it, with `_AutoTim` and `_Clock` of their own |
 | `coverage.flat_stack(program, linked)` | Where the stack is, as two places: the segment of the map that ends where the header of the file has the top of the stack. What it holds when loaded is `image()` there |
 | The script | Its header is as it was. For a flat program the four words say none, none, 0 and the stack's length, and an event 06 follows, before the first key: three addresses of 32 bits, 0 for one that is not above the megabyte |
@@ -2661,6 +2664,182 @@ For H3:
 - The README says how a step is finished, "When a step is finished",
   for programs of 16 bits. What it should say of the block move goes
   in with W, when a program of the project is flat.
+
+### Piece H3, the scenarios' test: done, and what a later piece should know
+
+The scenarios' test judges the program of 32 bits: `harness/ported.py`
+with `build/portable_c32/VC.EXE`, the test `portable_c32-scenarios`.
+The program is held to a record of the scenarios that it passes,
+`harness/pass32.txt`, which has 145 of the 159 that the portable C is
+taken through: D2 landed while this was made, and the program runs.
+The two trees of 16 bits are judged as they were: at each commit of
+this piece the test of each printed what it printed before, to the
+line.
+
+**How to go by it.** The harness keeps its machines' disks in the
+checkout's `build/tmp` by itself; no `TMPDIR` is wanted.
+
+| To | Do |
+|---|---|
+| Run the test | `ctest --test-dir build -R portable_c32-scenarios --output-on-failure`, or `python3 harness/ported.py build/portable_c32/VC.EXE > build/NAME.txt`, which is the same and keeps what it printed. Three minutes and a quarter by itself, with other agents' tests on the machine; six in the whole suite, `ctest --test-dir build -j8`, where the three scenarios' tests run side by side and all fourteen take as long |
+| Read what it says of a scenario that fails | A line `NAME: differs from the original, first after step 9: KEYS`, and under it the first row of that screen that differs, as it is expected and as the build showed it, with `^` under a cell whose character differs and `~` under one whose colour does. Or `NAME: stopped after step 4, KEYS: the program did not come to wait for a key within 60 s; it shows`, and the screen as it stood. The scenario was ended there: nothing behind its first screen that differs is known |
+| Sort the failures by cause | Behind the scenarios, under "What fails, by what was first otherwise": the scenarios that showed the same thing in the same row are on one line, the largest family first |
+| Run one scenario, with every row of every screen that differs | `python3 harness/compare.py build/portable_c32/VC.EXE NAME`. With `--first` as the test runs it; with `--limit 30` a step is given up after 30 seconds, where it has 300 |
+| Try steps out, and see every screen | `python3 harness/show.py --program build/portable_c32/VC.EXE STEP...`, as for any program |
+| Use the program for finding a fault | The same commands with `build/portable_c32/debug/VC.EXE`: the harness takes it for the same tree, with its rules and patches. It takes more instructions, so a scenario that shows the time of day may fail in it alone |
+| See which functions ran, and where a run ended | `harness/trial32/ran.py`, as B2 has it, with a trace of `harness/trial32/run.py --trace` |
+| Put a scenario on the record | `python3 harness/ported.py --record build/portable_c32/VC.EXE`, which runs them all and adds every one that has come to pass, and commit `harness/pass32.txt` with the change that made it pass. It writes nothing while a scenario of the record fails |
+| Take one off | By hand, a line of the file, with the reason in the commit. From M1 on a piece that does so does not land |
+| Give a scenario more time than the test does | `--limit SECONDS`, of the test and of `--record`: see the time below |
+| Declare that the build shows something otherwise than the portable C of 16 bits | `TREES["portable_c32"]` of `harness/deviations.py`, in the words of `Declared.also()`; and for the rows of one scenario a patch of its own, `python3 harness/goldens.py patch --tree portable_c32 NAME`, which is written to `harness/goldens/portable_c32/` and then stands in the place of the portable C's for that scenario. That was tried, with `command` and with `banner`, and the files taken away again. Both are deviations, and asked first |
+
+**What there is.**
+
+| | |
+|---|---|
+| The tree | `portable_c32`, the name of the build's directory. `deviations.SOURCE` says that it is built from the source of `portable_c`, and its entry of `TREES` is that tree's with nothing added. `goldens.patch_path` gives it the portable C's patch for a scenario unless it has one of its own; `GONE` and `RENAMED` of `ported.py` are the portable C's with the entries of `dos.c` |
+| `setups.Program.load` | The tree of a file is its directory, or the one above if that is named as a tree is: `debug/VC.EXE` is of `portable_c32` |
+| `le.linear(contents)` | The flat program of a file, or None. It was `driver.linear` |
+| `coverage.executed` | Of a flat program: by its image, `le.Linear.image(base)`, as far as that has code, counted in places. It answers an `Executed`, a dict with `at`, the addresses at which the program was found |
+| `coverage.place(contents)` | Makes of an address of the map what `executed` counts by, for either kind of program. `check_translation` goes by it |
+| `coverage.stack_size`, `coverage.STACK_LEFT` | The stack's length of either kind; and the one number for the half, which `layoutcheck.pages` reads too |
+| `compare.compare` | Answers an `Outcome` for each scenario: the run, or why the machine did not get through, and how the run departs. `first` ends a scenario at its first screen that departs; `limits` gives a scenario its own time for a step |
+| `scenarios.run(..., until=)` | Asked of every screen as the driver writes it; a `Run` that it ended is `cut`, with no disks |
+| `ported.py` | `RECORDS`, `check_record`, `--record`, `--limit`; `check_flat_layout`, which is `layoutcheck.Check(...).all()` and nothing of its own; `check_place`; `SHORT_STEP` and `short_step` |
+| `harness/pass32.txt` | The record: what it is, an empty line, and a name on each line, in the order of the scenarios |
+
+**Where the plan and the code differ.**
+
+- A scenario is ended where it first departs, which the plan did not
+  have. The program as B2 left it ended at once, and DOS's prompt took
+  the keys of every scenario: 38 of them waited a minute each for a
+  click of the mouse that a prompt does not take, and the run was more
+  than ten minutes. Ended at the first screen that differs it was two.
+  So nothing is known of a failing scenario behind that screen, and the
+  test says so by what it prints.
+- The time of a step. A scenario of the record has 300 seconds, as
+  those of every tree have. One that is not has 60, `SHORT_STEP`, and
+  twice its longest `Wait*ticks` besides: a program that hangs in a
+  scenario that is expected to fail is waited for that long. That
+  cannot fail the test for a slow machine, since such a scenario is not
+  held to pass; what it can do is keep a scenario that would pass off
+  the record, reported as stopped. Run it by itself then, and write the
+  record with `--limit 300`.
+- Once the program has not come to its first screen in a scenario, the
+  others of that country are not run and are reported as stopped at the
+  start: every scenario starts the program the same way. Without that,
+  a program that hangs when it starts costs 145 times 300 seconds in
+  fours, three hours, of which CTest allows one.
+- `--record` only adds. The plan had it write the record. With a
+  scenario of the record failing it writes nothing and says which.
+- What ran of the C is not asked while a scenario fails, as the plan
+  has it; that every function of a batch is linked, or is gone or
+  renamed as the tables say, is held from the first day. `FatErr`,
+  `Exit01` and `Exit05` are gone from this tree and `Alloc0` is
+  `Start`, as S3 and D2 wrote for this piece. The entry of the critical
+  error in `dos32.c`, `DeviceEntry`, is static, and the map as
+  `coverage.link_map` reads it has no static name: when what ran is
+  asked, nothing holds that it ran but the scenarios that show the box.
+- `check_place`, which the plan did not have: from QEMU's log, the test
+  holds in every scenario that the program's code ran with its first
+  object at `le.BENCH`, where the driver reads. H2 had that as a thing
+  to ask by hand after a change of the bench.
+- The stack is looked at in the scenarios that pass, of every tree: one
+  that fails has used its stack for what failed it.
+- A scenario that the machine does not get through is reported and no
+  longer ends the test with a traceback, for the trees of 16 bits too.
+- The limits are as the plan's table has them. The length of the file:
+  none. Code below F000h: not asked of a flat program. The page rule,
+  the megabyte, the tables and `IniSave`: `layoutcheck.py`, which the
+  scenarios' test asks before it runs anything and whose lines it
+  prints; the stub is the layout's own test's to hold. Half of the
+  stack: as for every tree, of 16,384 bytes.
+
+**What was seen.**
+
+- The program as B2 left it, which printed that it was too big and
+  left: all 159 scenarios failed at the start, one family, in two
+  minutes; the record was empty and the test passed with it. Its code
+  ran at 00100010h in every one, and of the functions that B2 lists the
+  ones asked by name had run, `Start`, `Main`, `Init00`, `Init11`,
+  `AlocEr`, `Exit00`, and `IniData` had not.
+- The program as D2 left it: 145 pass, in two runs one behind the
+  other, and the test passes with the record of them, in 194 seconds.
+  A scenario takes 3.1 seconds at the middle, where one of the 16-bit
+  program takes 2.5.
+- The driver's facts with the real program, which H2 left waiting.
+  The debug program's listings have `md.AutoTim` at `_md+0xaf5` and
+  `md.Clock` at `_md+0xf7`, which are the original's listing's offsets,
+  so the driver is told the addresses that the program's own code has.
+  `tree`, which waits on `AutoTim`, and the six scenarios of the clock
+  pass. The stack is read: 16,384 bytes, of which 14,790 are left at
+  the least, in `attributes-directory`; the 16-bit program leaves 3,514
+  of 4,096 at the least, in `copy-dirs`.
+- A machine's second takes longer while this program idles than while
+  the 16-bit one does: `blank-timed` has the driver wait 1,300 ticks,
+  71 seconds, which were 14 of the test's for the 16-bit program and
+  more than 60 for this one. That is the block moves and the extender
+  at every idle round, as "What could go wrong", 4, has it; no scenario
+  that shows the time of day fails for it.
+
+The 14 that fail, as the test prints them, for whoever takes them:
+
+| Scenarios | First otherwise | |
+|---|---|---|
+| `editor-long`, `editor-full`, `editor-buffer` | After step 9, `Ctrl+y Ctrl+u ...`, row 16: every cell has another character, and both rows print as blanks | One cause by the look of it. `compare.py` prints a character that is no letter as a blank: what the cells hold is in the run's screen, `show.py` |
+| `comspec`, `user-menu`, `user-menu-run`, `view-commands`, `editor-save` | In the editor, on a file of the program's own, `vc.mnu`, `vcview.ext`, `vc.ext`: the status says Line 1 with a column further right, where the original is on line 2 or 3 at column 1 | A line's end that the editor does not take for one, by the look of it |
+| `editor-keys` | After step 7, in the editor: Col 157 for Col 13 | |
+| `editor-big` | After step 28, `F4`: the editor is open on `b`, where the original shows the panels | |
+| `command` | After step 7, `Ctrl+o`: `mem` of DOS, run from the program, says 15,360K of extended memory, in all and free, for 15,232K, and 16,384K of memory in all for 16,256K: 128K more of each | What the extender makes of the machine's memory while a command runs: not looked into. If it is a figure that follows what the program is and not what it does, `harness/deviations.py` leaves such out, which is asked first |
+| `second-copy`, `start-memory`, `ended` | After `Ctrl+o`, steps 6, 12 and 40: what the screen behind the panels has of a second copy of the program is otherwise than the patch of the 16-bit build expects, which says that a second copy has no memory to run; in `ended`, of the registers that the program leaves for the one that started it, three words are others | Not looked into further: 3 and 4 of what is open for the user are of these three scenarios |
+
+**A second copy, which the driver does not know.** In six scenarios
+the program is started a second time from the command line of the
+first, and QEMU's log has its code at 00100010h and at 001DA1A0h:
+`second-copy`, `comspec`, `ended`, `start-setup`, `start-screen`,
+`start-memory`. The driver of the tests is told one place for
+`AutoTim`, `Clock` and the stack, the first copy's, and takes an idle
+call for the program's by the name of the program that DOS has as the
+current one: while the second copy idles, it reads the first copy's
+variables and writes out the first copy's stack. Of a program of 16
+bits it reads in the segment that DS is on at the idle call, so either
+copy's.
+`start-setup` and `start-screen` pass all the same. Whether one of the
+four that fail does so for this is not known; a step that ends too
+early or never in a second copy, or a clock that is taken to blink
+where none does, would be it. The test names these scenarios in its
+line on the place. To mend it the driver would have to know where the
+copy is that idles, which a flat program does not say by a segment
+register; how, is for whoever finds that a scenario needs it.
+
+**What waits.**
+
+- What ran of the C, until every scenario passes. `check_translation`
+  was run by hand against a traced scenario of the flat program, and
+  finds `Start_` and `Main_` at their places. In the program that is
+  shipped several functions of `dos32.c` are one address (B2): one of
+  them counts as run when another did.
+- The checks of the words of the addresses in the debug program,
+  `CHECKED`, which B2 left to whoever first has a wild read to find.
+- `harness/place.py` and `harness/notice.py` know the two trees of 16
+  bits and no other.
+
+For the convergence: a piece runs the test, takes a family from "What
+fails", mends it under both builds, runs `--record`, and commits the
+record with the fix; `ctest --test-dir build -j8` then has both builds
+judged. The record is a file of names one to a line: two pieces that
+each add a scenario meet in it at a rebase only where their lines are
+neighbours, and the one that rebases writes it anew.
+
+For W: the tree's name is in `deviations.SOURCE` and `TREES`,
+`goldens.TREES`, `RECORDS`, `GONE` and `RENAMED` of `ported.py`, and
+the test's name in `CMakeLists.txt`. When the 32-bit build is the
+portable C and the 16-bit one has another name, `SOURCE` turns round,
+and the patches that are then the 16-bit build's alone go to the
+directory of its name. A record that has every scenario says nothing
+any more: `RECORDS` loses the tree, and it is judged as the others are.
+The README's "When a step is finished" is still of a program of 16
+bits (H2).
 
 ### H4, the test of the data: done, and what a later piece should know
 
@@ -2898,7 +3077,7 @@ and H1 are started at once by the session.
 | B2, the program. Done: see "B2, the program" below | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
 | H1, the reader. Done: see "Piece H1, the reader" below | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
 | H2, the driver. Done: see "Piece H2, the driver" above | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
-| H3, the scenarios' test | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
+| H3, the scenarios' test. Done: see "Piece H3, the scenarios' test" above | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
 | H4, the test of the data. Done: see "H4, the test of the data" above | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |
 | R1, `resident.c` renamed | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
@@ -4016,6 +4195,10 @@ What the pieces behind this one should know:
     32K in front of the main data. B2 did both: what has a value is
     one class with the constants in the linker's order, and
     `portable_c32-layout` holds the two.
+15. A second copy of the program. It is loaded behind the first, and
+    the driver of the tests reads the first copy's `AutoTim`, `Clock`
+    and stack while the second idles: "Piece H3, the scenarios' test",
+    which met it, has the six scenarios.
 
 ### The estimate
 
