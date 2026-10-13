@@ -65,6 +65,7 @@ u16 F62_01(u16 panel, u16 item)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct DosRegs regs;
+    struct Answer asked;
     struct Mouse pointer;
     u16 __far *next;
     u16 *screen;
@@ -75,7 +76,7 @@ u16 F62_01(u16 panel, u16 item)
     u16 cursor;                         /* CH: the one of the cursor */
     u16 apart;                          /* BP: cells between two letters */
     u16 wide, letter, unit, active, place, right, color, c, i, key;
-    u16 state, look, mouse, at, index, failed;
+    u16 state, look, mouse, at, index;
 
     regs.cx = item;
     regs.name = md.TmpBuf;
@@ -311,17 +312,13 @@ F62_41:                                 /* the drive, and where it is */
     DX_OF(regs) = size & 0xFF00 | unit;
     Int21d((struct DosRegs STACK *)&regs);
     md.BlocEr = 1;
-    regs.ax = 0x4700 | regs.ax & 0xFF;
-    regs.si = (u16)(u32)(void __far *)(wcb->WinPath + 3);
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    if (!failed) {
+    asked = DirCurrent(unit, wcb->WinPath + 3);
+    if (!asked.failed) {
         wcb->WinPath[0] = (u8)letter;
-        regs.name = wcb->WinPath;
-        regs.ax = 0x3B00 | regs.ax & 0xFF;
-        failed = Intr21((struct DosRegs STACK *)&regs);
+        asked = DirChange(wcb->WinPath);
     }
     md.BlocEr = 0;
-    if (failed) {
+    if (asked.failed) {
         letter = ErrRdy(letter) & 0xFF;
         goto F62_41;
     }
@@ -329,9 +326,7 @@ F62_41:                                 /* the drive, and where it is */
        and shows files. */
     if (panel != md.WCBcrn && FilePan(InvWCB(panel)))
         goto F62_45;
-    regs.ax = 0x0E00 | regs.ax & 0xFF;
-    DX_OF(regs) = unit - 1;
-    Int21d((struct DosRegs STACK *)&regs);
+    DriveSelect(unit - 1);
 F62_45:
     wcb->WinTyp = 0;
     wcb->ChgFlg = 1;

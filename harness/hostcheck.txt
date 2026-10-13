@@ -20,7 +20,7 @@ digits.c      clean
 dirfunc.c     to-number 93, to-pointer 33
 dirfunc_t.c   clean
 dos.c         to-number 54, to-pointer 14, asm-pragma 7, registers 1, intrinsic 1
-drive.c       to-number 3, to-pointer 1
+drive.c       to-number 2, to-pointer 1
 edit.c        to-number 54, to-pointer 35
 edit_t.c      clean
 enter.c       to-number 8, to-pointer 19
