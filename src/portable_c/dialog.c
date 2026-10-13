@@ -91,8 +91,8 @@
 #define FIELD(offset) ((const struct BOXMN __far *)AT(code, offset))
 
 /* A byte and a word of the main data, by their offsets. */
-#define MD(offset)  (*(u8 *)(offset))
-#define MDW(offset) (*(u16 *)(offset))
+#define MD(offset)  (*MD_POINTER(offset))
+#define MDW(offset) (*(u16 *)MD_POINTER(offset))
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -231,7 +231,7 @@ void InSt10(u16 place, u16 text, u16 length, u16 color)
 {
     u16 *screen = BasAdr(place);
     u16 cell = Color(color >> 8) << 8;
-    const u8 *from = (const u8 *)text;
+    const u8 *from = MD_POINTER(text);
     u16 count = length;
     u16 c;
 
@@ -533,7 +533,7 @@ static struct Typed InpStr(u16 place, u8 *text, u16 cursor, u16 length,
     struct Mouse pointer;
 
     for (;;) {                          /* InSt01 */
-        InSt10(place, (u16)text, length, color << 8);
+        InSt10(place, MD_PLACE(text), length, color << 8);
         Cursor(place + cursor);
         key = Input(bar);
         if (key >> 8 == KEY_MOUSE) {
@@ -868,7 +868,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
             for (count = control & 0xFF; count != 0; count--)
                 *text++ = *from++;
             *text = 0;
-            InSt10(place, (u16)(INPUT(control) + 3), control & 0xFF,
+            InSt10(place, MD_PLACE(INPUT(control) + 3), control & 0xFF,
                    (u16)colors[1] << 8);
         } else if (type == FIELD_SELECT) {
             *((u8 *)screen + MD(field->mPoint) * (2 * 80)) = BULLET;
