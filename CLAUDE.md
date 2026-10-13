@@ -1380,11 +1380,61 @@ in "The portable C".
     first. A file loses them with its last number, and then the
     compiler refuses the macro it does not know, whatever the function
     returns.
+- What the commands met, and what else comes back to the main loop,
+  49 functions, with those of `enter.c` still to do (`TODO.md` has what
+  that takes):
+  - What a command of the keys returns, `struct Onward` of `vc.h`, is
+    two bytes and a word, four bytes, and comes back in DX:AX as the
+    number did, the bytes where they were: `To` of `keys.c`, which
+    makes one of a place, is three instructions with its return, and
+    `ToMenu` two. A structure of more than four bytes comes back
+    through a pointer to room in the caller's frame; this one was kept
+    to four for that.
+  - A member that is a byte holds a byte, where the number took
+    whatever was shifted into it: `table << 8 | held` of the menu bar
+    has the bits of `held` above the eighth in `table`. The two are
+    the same only where every value fits its byte, and that is read
+    from every assignment to it, as for `F39_00` of `menu.c`.
+  - A flag next to a place may be a place of its own: the editor was
+    the viewer's place with 1 in the high word, and is `NEXT_EDIT`.
+    The list of the places is an `enum`, so a place put in moves the
+    numbers of those behind it, in every file that is compiled.
+  - Where one place of a family takes a second thing, it has a
+    function of its own that makes it, and the others one that takes
+    the place alone: `Shows` and `To` of `find.c`, `Masked` and `Go` of
+    `copy.c`. One function with an argument that is 0 at every call
+    but one says less.
+  - Each file makes its structures by static functions of its own, as
+    `To` is in `keys.c` and in `view.c`: a macro cannot make one, and
+    a function of another file is a far call, with a relocation from
+    the other code segment.
+  - While one file still returns the number, what takes the structure
+    has a function that makes it of the number, `OfEnter` of `main.c`,
+    and the calls of that file go through it. An old call is refused
+    both ways then: a number where the structure is taken, and later a
+    structure where `OfEnter` takes a number. Twelve lines put back as
+    they were, one of each kind, were all refused, with the trial of
+    the note above.
+  - The variable that two calls of `Command` shared, `pair`, went, and
+    each call has a variable of its structure: every read stood right
+    behind its call there.
+  - `tools/pairs.py` goes by the type `u32`, so it does not list a
+    number of 16 bits with two things in it: `TODO.md` names those
+    that are known.
 - A build can be tested while the tree goes on changing: copy
   `build/portable_c/VC.EXE`, `VC.MAP` and the object files elsewhere
   in `build/`, and run `harness/datacheck.py` (at once: it reads the
   source), `harness/arithcheck.py` and `harness/ported.py` on the copy.
-  The commit has to be made when the copy is.
+  The commit has to be made when the copy is. The copy is in a
+  directory called `portable_c`, `build/copy/portable_c`: the harness
+  knows the tree by that name, and holds a build of any other name to
+  the original's goldens with nothing declared for it.
+- For the audit with `clang`, of the note on local variables above:
+  the `LAID_OUT` lines go from `tables.h` as well as from `vc.h`, and
+  `-fsyntax-only -ffreestanding -Wno-everything` with the three
+  warnings wanted, `-Wuninitialized` the third, leaves the two
+  variables that are known and nothing else; `_asm` is defined away
+  like the other words.
 
 ## Work by several agents
 

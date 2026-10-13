@@ -567,12 +567,16 @@ takes apart. In the portable C such a function returns a structure
 with members named for what they are: `GetMous` the buttons and the
 place of the mouse, `OpenFil` what DOS answered and whether that is an
 error, `EdLin` the cursor and whether anything changed, and so on. A
-call that still took such a number apart would not compile. 41 of 114
+call that still took such a number apart would not compile. 90 of 114
 are done: those that files of every kind call, those inside the
-editor, and those that another file keeps to itself and that are no
-commands, two of which had less than two things to return and have no
-structure. The others, the commands and what they hand back to the
-main loop, are still to do (see `TODO.md`).
+editor, those that another file keeps to itself, and the commands with
+what else comes back to the main loop: a command of the keys returns
+the place of the loop where the program goes on, and the panel and the
+item of the menu where that place takes them. Three of the 90 had less
+than two things to return and have no structure. Of the others, 19 are
+the commands of `src/portable_c/enter.c`, which return such a place as
+a number still, 2 go with the two parts of the program, and 3 are
+numbers and stay (see `TODO.md`).
 
 The lines that say something of registers still, and why:
 
@@ -608,13 +612,14 @@ in any other. What still has its name from a `#pragma aux`:
 | `TrnMain`, as the part that stays names it for its address | An object there, a function where it is defined | 1 |
 
 That leaves 80 lines of `#pragma aux` in the portable C where the C
-translation has 863. Its `VC.EXE` is 132,320 bytes, 736 fewer than the
+translation has 863. Its `VC.EXE` is 132,368 bytes, 688 fewer than the
 C translation's: no effort went into the size. A function that saves
 the registers it uses by the compiler's rule comes out a little longer
-here and a little shorter there, 448 bytes more in all; the editor is
-304 bytes shorter for a function that is called where a macro was
-written out; and what loaded the program again after a command, which
-is gone, was 880 bytes.
+here and a little shorter there, 448 bytes more in all; the structures
+that the commands return are 48 more; the editor is 304 bytes shorter
+for a function that is called where a macro was written out; and what
+loaded the program again after a command, which is gone, was 880
+bytes.
 
 ### Staying in the memory whole
 

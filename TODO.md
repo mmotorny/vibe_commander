@@ -24,24 +24,54 @@ time of the attributes, the label of a drive. The other two had less
 than two things: `F36_04` of `copy.c` returns nothing, and `MenuItem`
 of `usermenu.c` is gone.
 
-73 are left, and `python3 tools/pairs.py` lists them as they stand, by
+So do the commands and what else comes back to the main loop, 49
+functions, all but those of `enter.c`:
+
+- What a command of the keys of the panels returns is `struct Onward`
+  of `vc.h`: the place where the program goes on, a `NEXT_`, and for
+  the three places that are routines of a panel's menu the panel and
+  the item that the routine takes. The 31 commands of `keys.c` and 10
+  of `view.c` return it, and `CmdEnd` of `main.c` takes it. The editor
+  on a file was the viewer's place with 1 in the high word, and is a
+  place of its own, `NEXT_EDIT`. `Aexec0` of `view.c` had one thing to
+  return, the same place from its one return, and returns nothing.
+- The cursor moved: `F00_50` of `keys.c` returns what it leaves in BX
+  and DX, `struct Left`, and `ChgAdr` of `place.c` what the panel
+  showed before, `struct Shown`.
+- The speed search, `F77_00` of `cmdline.c`: its key and where its box
+  was, `struct SpeedKey`. The file search, `F67_00` of `find.c`, and
+  Copy and Rename, `F35_01` and `F45_01` of `copy.c`: a place of their
+  own families, a `TO_` or a `GO_`, with the panel or the title that
+  one place of each takes, `struct Searched` and `struct Copied`. The
+  menu bar, `F39_00` of `menu.c`: the menu, the item, the table of the
+  commands and what was held down, `struct Picked`.
+
+24 are left, and `python3 tools/pairs.py` lists them as they stand, by
 file, with the files that call each:
 
-- 68, the commands and the loop: what a command returns, a place of
-  the loop with a byte and a panel, in `keys.c` (32), `enter.c` (19)
-  and `view.c` (11), which `CmdEnd` of `main.c` takes apart; and what
-  comes back to `main.c` besides: `F77_00` of `cmdline.c`, `F39_00` of
-  `menu.c`, `F67_00` of `find.c`, `F35_01` and `F45_01` of `copy.c`;
-  with them `ChgAdr` of `place.c`, which only `keys.c` calls. One piece
-  of work: every one of them meets `Command` and `CmdEnd`.
+- 19, the commands of `enter.c`: Enter, the directory changed, the
+  history and leaving. Every one of them returns a place and nothing
+  with it, since none of the places that they return takes a panel or
+  an item: they are to return `struct Onward` as the other commands do,
+  made by a function of the file like `To` of `keys.c` and of `view.c`.
+  Until they do, `main.c` takes both kinds: `OfEnter` there makes the
+  structure of the number, at its 17 calls of a command of `enter.c`,
+  and `view.c` does the same at its one, of `F21_30`. Those 18 calls,
+  `OfEnter`, the declarations in `vc.h` and its comment at `struct
+  Onward` are all that changes outside `enter.c`, and a call left as it
+  is does not compile either way. `F27_07` and `F27_06` there return
+  one place from every return. This waits for the work below, "one
+  program", which changes that file.
 - 2 of the seam between the two parts of the program, `Init11` of
   `start.c` and `TrnMain` of `main.c`, which go with that.
 - 3 that are numbers and stay: `Timer`, `__U4M`, and `Dos35` of
   `main.c`, an address as DOS has it.
 
-What is left to do is one piece of work, the commands. The ten that a
-file kept to itself, the rest of `view.c` and the editor, which were
-kinds of their own, are done.
+`tools/pairs.py` goes by the type `u32`. A number of 16 bits with a
+thing in each byte, or with a flag above something, it does not list:
+`T00_00` of `edit.c` returns what `V13_01` takes in the high byte, and
+in `main.c` `Command` returns a place of the loop or, with `LEAVE`, why
+the loop is left, and `Func21` a command or, with `AGAIN`, a place.
 
 `CLAUDE.md`, "Notes on the portable C", has how such a function is
 written so that a call that was not changed does not compile, and what

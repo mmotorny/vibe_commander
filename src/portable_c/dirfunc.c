@@ -863,10 +863,9 @@ u16 DirFunc(void)
 
 /* Mark the tree's file of a drive as out of date: its first byte is made
    0. The drive is that of `path`, or the current one if it names none.
-   Returns what DOS answered in the low word, and something that is not 0
-   in the high one if the file could not be opened, written or closed. A
-   file that may not be written, and a disk that is full, are a beep and
-   no error.
+   Returns what DOS answered, and that it failed if the file could not
+   be opened, written or closed. A file that may not be written, and a
+   disk that is full, are a beep and no error.
 
    This is DelTree of the original from its label DelTr0 on, which ^R in
    a tree and the tree in a box call. DelTree itself does nothing unless
