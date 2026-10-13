@@ -198,13 +198,38 @@ class Declared:
     # why. For keys that choose what the tree has no more, and would do
     # something else there.
     left_out: dict = field(default_factory=dict)
+    # Steps that the tree is not taken through in one scenario: scenario
+    # -> steps that follow one another there -> why. For a look at what
+    # the tree has no more on the way to something else, by keys that
+    # mean something elsewhere: Esc, which leaves a box in one place and
+    # switches the panels off in another. The steps are left out wherever
+    # the scenario has them one behind the other.
+    left_out_of: dict = field(default_factory=dict)
     # Scenarios that the tree is held in against a golden of its own:
     # scenario -> what changes in it.
     changed: dict = field(default_factory=dict)
 
-    def steps(self, steps):
-        """The steps of `steps` that the tree is taken through."""
-        return tuple(step for step in steps if step not in self.left_out)
+    def steps(self, steps, name=None):
+        """The steps of `steps`, those of the scenario `name`, that the
+        tree is taken through."""
+        steps = [step for step in steps if step not in self.left_out]
+        for gone in self.left_out_of.get(name, {}):
+            for at in reversed(found(steps, gone)):
+                del steps[at:at + len(gone)]
+        return tuple(steps)
+
+
+def found(steps, some):
+    """Where `steps` has the steps of `some` one behind the other: the
+    places, none of them within another."""
+    places, at = [], 0
+    while at + len(some) <= len(steps):
+        if tuple(steps[at:at + len(some)]) == tuple(some):
+            places.append(at)
+            at += len(some)
+        else:
+            at += 1
+    return places
 
 
 _MAP = ("the map of the memory has the program with a block more, and "

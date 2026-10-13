@@ -5435,7 +5435,8 @@ def of(name, tree=None):
     that tree."""
     scenario = SCENARIOS[name]
     return replace(scenario,
-                   steps=deviations.declared(tree).steps(scenario.steps))
+                   steps=deviations.declared(tree).steps(scenario.steps,
+                                                         name))
 
 
 def run(scenario, program, bench, trace=False, blinking=False,

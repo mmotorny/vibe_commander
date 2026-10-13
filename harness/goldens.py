@@ -381,6 +381,8 @@ def changes(name, tree):
         if found:
             report += [f"--- after step {number}: {step}"] + found
         at += 1
+    report += [f"--- step {number} of the original is left out: {step}"
+               for number, step in enumerate(theirs.steps) if number >= at]
     report += disk_differences(theirs.disks, ours.disks)
     return report
 

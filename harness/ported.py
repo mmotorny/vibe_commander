@@ -1278,6 +1278,20 @@ def check_declared(tree, names):
             passed = False
             print(f"  {name} has a step that is left out for {tree}, "
                   f"{sorted(left)[0]}, and is not declared to change")
+    for name, gone in declared.left_out_of.items():
+        if name not in names or name not in declared.changed:
+            passed = False
+            print(f"  steps are left out of {name} for {tree}, which is "
+                  "not run for it, or is not declared to change")
+            continue
+        steps = [step for step in scenarios.SCENARIOS[name].steps
+                 if step not in declared.left_out]
+        for some in gone:
+            if not deviations.found(steps, some):
+                passed = False
+                print(f"  left out of {name} for {tree}, and the scenario "
+                      f"has no such steps one behind the other: "
+                      f"{', '.join(some)}")
     directory = goldens.DIRECTORY / tree
     for file in sorted(directory.glob("*")) if directory.is_dir() else []:
         if file.suffix != ".txt" or file.stem not in declared.changed:

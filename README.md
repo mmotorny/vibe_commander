@@ -961,8 +961,10 @@ The second prints how each such golden differs from the original's, of
 every screen the rows that do. A golden of that kind says in its first
 line where it is from. It is no measure of the program: it shows that
 nothing has changed since it was recorded. Which scenarios have one,
-which are not run for the tree at all, and which step is left out of
-every scenario for it, is in `harness/deviations.py`, under `TREES`, as
+which are not run for the tree at all, which step is left out of every
+scenario for it, and which steps of one scenario, where they pass
+through something that the tree has no more, is in
+`harness/deviations.py`, under `TREES`, as
 `src/portable_c/DEVIATIONS.md` declares it; a scenario cannot be
 recorded for a tree that is not declared to change it.
 
