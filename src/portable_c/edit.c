@@ -239,8 +239,9 @@ static const u8 CODE MainExt_F[] = "VC.EXT";
 #define PIECE 0xFF00                    /* bytes moved at a time, */
 #define PIECE_SEGMENTS 0x0FF0           /* and that in segments */
 
-/* Errors of DOS, the one that Intr21 makes of a drive that is not ready,
-   and the one that the editor makes of a disk that is full. */
+/* Errors of DOS, the one of a call that the user gave up when a drive
+   was not ready (sys.h), and the one that the editor makes of a disk
+   that is full. */
 #define ERR_NO_FILE   0x02
 #define ERR_NO_ACCESS 0x05
 #define ERR_NOT_READY 0x53

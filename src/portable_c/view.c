@@ -142,8 +142,8 @@ static const u8 CODE Byts_S[6] = " Bytes";
 #define Menu_C 7                        /* the colour of the menu bar, and of
                                            the status line */
 
-/* An error of DOS: no such file; and what Intr21 makes of a drive that is
-   not ready. */
+/* An error of DOS: no such file; and the one of a call that the user
+   gave up when a drive was not ready (sys.h). */
 #define ERR_NO_FILE   0x02
 #define ERR_NOT_READY 0x53
 
@@ -171,9 +171,9 @@ static const u8 CODE Byts_S[6] = " Bytes";
    does. */
 u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open)
 {
-    struct DosRegs regs;
     u32 length;
     struct Answer file;
+    struct FilePlace end;
     u16 include, handle;
 
     if (whole) {
@@ -212,19 +212,13 @@ opened:
         goto none;
     VI->ViHandle = handle;
     length = 0;
-    regs.bx = handle;
     if (handle != 0xFFFF) {
-        regs.ax = 0x4202;
-        regs.cx = 0;
-        regs.name = AT(MAIN_SEG, 0);                    /* DX */
-        if (!Intr21((struct DosRegs STACK *)&regs))
-            length = (u32)(u16)(u32)regs.name << 16 | regs.ax;
+        end = FileSeek(handle, 2, 0);
+        if (!end.failed)
+            length = end.place;
     }
     VI->ViLen = length;
-    regs.ax = 0x4200;
-    regs.cx = 0;
-    regs.name = AT(MAIN_SEG, 0);
-    Intr21((struct DosRegs STACK *)&regs);
+    FileSeek(handle, 0, 0);
     VI->ViKeyBar = (u16)md.KeyBar << 8 | md.Clock;
     open->handle = handle;
     if (VI->ViewEdit != 0)
@@ -625,15 +619,7 @@ u16 V40_00(void)
    `count` bytes to `to` in the text. */
 static void Load(u16 segment, u32 position, u16 to, u16 count)
 {
-    struct DosRegs regs;
-
-    regs.ax = 0x4200;
-    regs.bx = VI->ViHandle;
-    regs.cx = (u16)(position >> 16);
-    regs.name = TEXT(segment) + (u16)position;          /* DX */
-    Intr21((struct DosRegs STACK *)&regs);
-    if (regs.ax == (u16)position
-        && (u16)(u32)regs.name == (u16)(position >> 16))
+    if (FileSeek(VI->ViHandle, 0, position).place == position)
         V55_00(segment, to, count, VI->ViHandle);
 }
 
@@ -721,17 +707,13 @@ void V51_00(u16 segment)
    filled with zeros first. */
 void V55_00(u16 segment, u16 to, u16 count, u16 handle)
 {
-    struct DosRegs regs;
     u8 __far *text = TEXT(segment) + to;
+    u8 __far *at = text;
     u16 left;
 
-    regs.name = text;
     for (left = count; left; left--)
-        *text++ = 0;
-    regs.ax = 0x3F00;
-    regs.bx = handle;
-    regs.cx = count;
-    Intr21((struct DosRegs STACK *)&regs);
+        *at++ = 0;
+    FileRead(handle, text, count);
 }
 
 /* Make the table of lines for the text from `at` on: `table` is the
@@ -834,7 +816,7 @@ void V00_10(u16 handle)
     const u8 __far *text = TEXT(segment);
     struct Line line;
     struct Box box;
-    struct DosRegs regs;
+    struct Answer read;
     u32 rest, position;
     struct Sought sought;
     struct Mouse pointer;
@@ -1184,12 +1166,8 @@ V09_00:                                 /* Home */
     if (HIGH(VI->ViLen) == 0 && count > LOW(VI->ViLen))
         count = LOW(VI->ViLen);
     VI->ViLoaded = count;
-    regs.ax = 0x4200;
-    regs.bx = VI->ViHandle;
-    regs.cx = 0;
-    regs.name = text;                                   /* DX */
-    Intr21((struct DosRegs STACK *)&regs);
-    V55_00(segment, 0, count, regs.bx);
+    FileSeek(VI->ViHandle, 0, 0);
+    V55_00(segment, 0, count, VI->ViHandle);
     goto V00_15;
 
 V10_00:                                 /* End */
@@ -1270,20 +1248,11 @@ V15_04:                                 /* and on in the file, a piece of
     count = LenMenu;
     if (HIGH(rest) == 0 && count > LOW(rest))
         count = LOW(rest);
-    regs.ax = 0x4200;
-    regs.bx = VI->ViHandle;
-    regs.cx = HIGH(VI->ViSearch);
-    regs.name = text + LOW(VI->ViSearch);               /* DX */
-    Intr21((struct DosRegs STACK *)&regs);
-    if (regs.ax != LOW(VI->ViSearch)
-        || (u16)(u32)regs.name != HIGH(VI->ViSearch))
+    if (FileSeek(VI->ViHandle, 0, VI->ViSearch).place != VI->ViSearch)
         goto V15_07;
-    regs.ax = 0x3F00;
-    regs.cx = count;
-    regs.name = md.MenuBuf;
-    result = Intr21((struct DosRegs STACK *)&regs);
-    count = regs.ax;
-    if (result) {
+    read = FileRead(VI->ViHandle, md.MenuBuf, count);
+    count = read.value;
+    if (read.failed) {
         result = 2;
         goto V15_22;
     }
@@ -1371,12 +1340,7 @@ leave:
    and go back to the panels. */
 void V13_00(void)
 {
-    struct DosRegs regs;
-
-    regs.ax = 0x3E00;
-    regs.bx = VI->ViHandle;
-    regs.name = md.TmpBuf;
-    Intr21((struct DosRegs STACK *)&regs);
+    FileClose(VI->ViHandle);
     V13_01(0);
 }
 
@@ -1764,12 +1728,12 @@ command:
 static void Aexec0(u16 edit)
 {
     u16 code = AsmSeg();
-    struct DosRegs regs;
-    struct BiosRegs bios;
     struct Box where;
+    struct Answer ran;
+    struct Block all;
     const u8 __far *from;
     u8 *tail;
-    u16 box, include, failed, error, i;
+    u16 box, include, error, i;
 
     tail = (u8 *)(u16)(u32)MvzLine(md.TmpBuf + 101, md.ViewFil, LenStr + 1);
     md.TmpBuf[100] = (u8)((u16)(tail - (md.TmpBuf + 101)) + 45);
@@ -1781,11 +1745,7 @@ static void Aexec0(u16 edit)
     Window(where.begin, where.size);
     *(u16 *)(md.TmpBuf + 95) = where.begin;
     *(u16 *)(md.TmpBuf + 97) = where.size;
-    bios.ax = 0x0300;                   /* the shape of the cursor */
-    bios.bx = where.begin & 0xFF;
-    bios.cx = bios.dx = 0;
-    Int10((struct BiosRegs STACK *)&bios);
-    *(u16 *)(md.TmpBuf + 93) = bios.cx;
+    *(u16 *)(md.TmpBuf + 93) = CursorWhere(0).shape;
     for (i = 0; i < sizeof ViewPar; i++)
         tail[i] = ViewPar[i];
     for (; i < 45; i++)
@@ -1800,33 +1760,20 @@ static void Aexec0(u16 edit)
     /* The panels keep their memory, and the viewer as much as it needs
        at the least: the block that both are in is made that long. In
        the original it begins with the main data. */
-    regs.ax = 0x4A00;
-    regs.bx = md.ViewSeg - md.MemSeg + ((MinView - 1) >> 4) + 1;
-    regs.cx = regs.si = regs.di = 0;
-    regs.name = md.TmpBuf;
-    regs.es = md.MemSeg;
-    Int21e((struct DosRegs STACK *)&regs);
+    MemResize(md.MemSeg,
+              md.ViewSeg - md.MemSeg + ((MinView - 1) >> 4) + 1);
     md.EPB.CmdLine = (u32)MAIN_SEG << 16 | (u16)(md.TmpBuf + 100);
     LetLin(md.TmpBuf);
-    regs.ax = 0x4B00;
-    regs.bx = (u16)&md.EPB;
-    regs.name = md.TmpBuf;
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    error = regs.ax;
+    ran = ProgramRun(md.TmpBuf, &md.EPB);
+    error = ran.value;
     /* All the memory that there is, again: DOS says how much that is
        when it is asked for more. */
-    regs.ax = 0x4A00;
-    regs.bx = 0xFFFF;
-    regs.name = md.TmpBuf;
-    regs.es = md.MemSeg;
-    Int21e((struct DosRegs STACK *)&regs);
-    regs.ax = 0x4A00 | regs.ax & 0xFF;
-    regs.es = md.MemSeg;
-    Int21e((struct DosRegs STACK *)&regs);
+    all = MemResize(md.MemSeg, 0xFFFF);
+    MemResize(md.MemSeg, all.largest);
     HidCur();
     SavMous();
     IniMous();
-    if (failed && error != ERR_NOT_READY) {
+    if (ran.failed && error != ERR_NOT_READY) {
         include = OFFSET(RunEr_S);
         if (error != 8 && error != 7) {
             include = OFFSET(Run1_S);
@@ -1856,13 +1803,12 @@ static struct Onward F34_11(u16 how)
     u16 code = AsmSeg();
     const u8 __far *name;
     const u8 __far *from;
-    struct DosRegs regs;
     struct Named named;
     struct Next next;
-    struct Answer file;
+    struct Answer file, read, found;
     u16 edit = how & 0xFF;
     u16 own = how >> 8;
-    u16 failed, count, command, i;
+    u16 count, command, i;
 
     if ((edit != 0 ? md.AltEdit : md.AltView) == 0)
         own = own == 0;
@@ -1892,18 +1838,11 @@ static struct Onward F34_11(u16 how)
             return To(NEXT_FUNC04);
         }
     }
-    regs.ax = 0x3F00;
-    regs.bx = file.value;
-    regs.cx = LenMenu - 1;
-    regs.si = regs.di = 0;
-    regs.name = md.MenuBuf;
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    count = regs.ax;
-    regs.ax = 0x3E00;
-    regs.bx = file.value;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    read = FileRead(file.value, md.MenuBuf, LenMenu - 1);
+    count = read.value;
+    if (FileClose(file.value).failed)
         return To(NEXT_FUNC04);
-    if (failed)
+    if (read.failed)
         return To(NEXT_FUNC04);
     md.MenuBuf[count] = EOF_CHAR;
     command = FindExt(CutPath(md.ViewFil));
@@ -1923,12 +1862,9 @@ static struct Onward F34_11(u16 how)
     /* A program: is it there? */
     if (ChgDisk(md.TmpBuf))
         return To(NEXT_FUNC04);
-    regs.ax = 0x4E00;
-    regs.bx = regs.si = regs.di = 0;
-    regs.cx = 0x27;
-    regs.name = md.TmpBuf;
-    if (Intr21((struct DosRegs STACK *)&regs)) {
-        if (regs.ax == ERR_NOT_READY)
+    found = FindFirst(md.TmpBuf, 0x27);
+    if (found.failed) {
+        if (found.value == ERR_NOT_READY)
             return To(NEXT_FUNC04);
         return Own(edit);
     }

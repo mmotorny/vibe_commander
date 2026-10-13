@@ -423,6 +423,11 @@ are added here as they go.
 | `ReadOne`, `start.c` | DOS 3Dh, 3Fh and 3Eh, a file read | 3Dh: BX, CX, SI and DI 0. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still | 3Dh: those four as they come. AL 0 for the other two, and for 3Eh CX as it comes and DX 0 |
 | `IniData`, `start.c` | DOS 38h, the country, and DOS's routine for capitals, 128 times | 38h: BX and CX as the BIOS left them at the call before, the page and the shape of the cursor. The routine: AH as 38h left it | BX and CX as they come; AH 0 |
 | `HelpFil`, `help.c` | DOS 3Eh, the help file closed | DX as the code before left it, the address of the file's name in the C translation | DX 0 |
+| `Load`, and Home and the search of `V00_10`, `view.c` | DOS 4200h, a place of the file gone to | DS: the segment of the text | DS on the main data |
+| `V13_00`, `view.c` | DOS 3Eh, the file closed | DS: the segment of the text. DX as the key before left it, the address of `TmpBuf` in the C translation | DS on the main data, DX 0 |
+| `Aexec0`, `view.c` | BIOS 03h, the shape of the cursor | BL: the column that the box begins in | BL 0 |
+| `Aexec0`, `view.c` | DOS 4Ah, the block of the memory made shorter, 4B00h, the viewer run, and 4Ah twice, the block made longer | 4Ah: DX as the code or DOS before left it, the address of the viewer's name in the C translation; the third time AL the low byte of the error of the second, 8. 4Ah the first time and 4B00h: CX, SI and DI as the code before left them, 0 in the C translation | 4Ah: AL and DX 0. CX, SI and DI as they come |
+| `F34_11`, `view.c` | DOS 3Fh and 3Eh, the extension file read and closed, and 4Eh, the viewer looked for | 3Eh: CX and DS:DX the count and the buffer still. 3Fh and 4Eh: SI and DI, and for 4Eh BX, as the code before left them, 0 in the C translation | 3Eh: CX and DX 0. SI, DI and BX as they come |
 
 What is known to read such a register, and where the portable C will
 hand it something else when the file goes over:
