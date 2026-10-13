@@ -540,6 +540,14 @@ class Declared:
     # (scenarios.Scenario.setup), whichever there are, or None if it is
     # taken through them: for a tree that has no setup program.
     no_setup: str = None
+    # Scenarios that the tree, another build of a tree's source (SOURCE),
+    # is held against the original's golden for with no patch, although
+    # the tree of its source has one: scenario -> why. For a scenario in
+    # which the build does again what the original does and that tree
+    # cannot. One that the build still shows otherwise in some row has
+    # a patch of its own instead, with those rows alone, which stands in
+    # the place of the other tree's by being there.
+    unpatched: dict = field(default_factory=dict)
 
     def also(self, **more):
         """What a tree is declared to do that does all of this and
@@ -966,11 +974,17 @@ SOURCE = {"portable_c32": "portable_c"}
 # (DEVIATIONS.md, "The editor of the program of 32 bits has room for a
 # larger file"), and the scenario that has the editor refuse such a file
 # is not run for it. What that scenario alone tested is listed in
-# TODO.md, "The editor's room: untested in the program of 32 bits". What
-# else it will have to be declared for is in the plan there, "Open, for
-# the user": what a second copy of the program does once it has the
-# memory to run, in second-copy, start-memory and ended, and what the
-# program can do when DOS ends it by another program's hand, in ended.
+# TODO.md, "The editor's room: untested in the program of 32 bits".
+#
+# And it shows two scenarios otherwise than the portable C of 16 bits,
+# by patches of its own: a second copy of it has the memory to run a
+# command, which one of the 16-bit program has not, and where it does
+# again what the original does, it is held to the original's golden,
+# its patch saying only what still differs: second-copy and
+# start-memory (src/portable_c/DEVIATIONS.md, 1). Where such a build
+# shows the original's golden as the rules leave it, and the tree of
+# its source has a patch, the build says so in `unpatched` of its
+# entry, the scenario and why. Nothing does today.
 #
 # What is said here for the build alone is held as what is said for a
 # tree is (ported.check_declared), and besides: a scenario that is not

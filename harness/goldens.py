@@ -55,7 +55,15 @@ golden is read for the tree (read), and written nowhere:
      `in_place_in` there has None for).
 
 A patch is a file of harness/goldens/TREE/, NAME.patch for the scenario
-NAME. It says which rows of the original's golden the tree is expected to
+NAME. A tree that is another build of a tree's source, as the program of
+32 bits is of the portable C's (deviations.SOURCE), has the patches of
+that tree, each of them unless it has a file of its own for the
+scenario, in the directory of its own name, with the rows that this
+build is expected to show otherwise and no others; or is declared to
+want none there, in `unpatched` of its entry of deviations.TREES, where
+it shows the original's golden as the rules leave it.
+
+A patch says which rows of the original's golden the tree is expected to
 show otherwise, and what it is expected to show there. It is written by
 whoever declared the deviation, as their statement of what is right, and
 the tests hold the tree to it; it is no record of what the tree did. The
@@ -267,10 +275,12 @@ def patch_path(name, tree):
     """Where the patch of the tree `tree` for the scenario `name` is, if
     it has one: its own file. A tree that is another build of a tree's
     source (deviations.SOURCE) and has no file of its own for the
-    scenario has that tree's."""
+    scenario has that tree's, unless it is declared to have none there
+    (`unpatched` of deviations.TREES)."""
     own = own_patch_path(name, tree)
     source = deviations.source(tree)
-    if source == tree or own.exists():
+    if source == tree or own.exists() \
+            or name in deviations.declared(tree).unpatched:
         return own
     return patch_path(name, source)
 
@@ -279,12 +289,15 @@ def patches(tree):
     """The files of patches that the tree `tree` has, by patch_path():
     those of its own directory, and for another build of a tree's source
     those of that tree for the scenarios that it has none of its own
-    for. Whatever else lies in those directories is among them."""
+    for and is not declared to have none for. Whatever else lies in
+    those directories is among them."""
     found, source = {}, tree
+    none = {f"{name}.patch" for name in deviations.declared(tree).unpatched}
     while True:
         directory = DIRECTORY / source
         for file in sorted(directory.glob("*")) if directory.is_dir() else []:
-            found.setdefault(file.name, file)
+            if source == tree or file.name not in none:
+                found.setdefault(file.name, file)
         if source == deviations.source(source):
             return sorted(found.values(), key=lambda file: file.name)
         source = deviations.source(source)

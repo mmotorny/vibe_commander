@@ -37,7 +37,10 @@ What the harness goes by of this, the steps that are left out, the rules
 and the scenarios that are not run, is in `harness/deviations.py`, under
 `TREES`. The patches are in `harness/goldens/portable_c/`, `NAME.patch` for
 the scenario `NAME`, and the top of `harness/goldens.py` says how one is
-written. `python3 harness/goldens.py changes --tree portable_c` prints what
+written; the program of 32 bits has those, and in
+`harness/goldens/portable_c32/` its own for the scenarios that it is to
+show otherwise than the program of 16 bits, each in the place of the
+other. `python3 harness/goldens.py changes --tree portable_c` prints what
 each says, with the cells that differ marked. `python3 harness/goldens.py
 patch --tree portable_c NAME` writes one from a run of the build, which is
 where its rows come from and not what makes them right: its author reads
@@ -178,6 +181,45 @@ memory to run anything; and behind a program that has stayed in the
 memory, with the gap that COMMAND.COM leaves in front of it, a second
 copy does not start at all.
 
+**The program of 32 bits.** The portable C is built a second way, as a
+program of 32 bits that an extender, DOS/32A, starts above the megabyte,
+and this entry is of both. What it says above holds for both but for
+these, where it is of the program of 16 bits alone and the program of
+32 bits is as said here:
+
+- Where the program is. The code, the main data, the stack and the
+  panels of the program of 32 bits are above the megabyte, all of them
+  while a command runs; below it stays the extender, some 52 KB. So
+  the count of what the program costs in memory, above, is the 16-bit
+  program's: a command run from the program of 32 bits has of DOS's
+  memory all but the extender's part. Of the memory above the megabyte
+  it has none, the extender having taken all of that: this is not
+  declared here, and is the user's to decide (`TODO.md`, the plan, 9 of
+  what is open); the scenario `command` shows it and fails for it.
+- The block of the panels. The program of 32 bits has it of 640 KB that
+  are its own, above the megabyte, which it hands out to itself as DOS
+  hands out its memory; it makes the block shorter for a command and
+  longer again afterwards as the program of 16 bits does, since the code
+  is the same, and DOS gains nothing by it.
+- A second copy. One of the program of 32 bits has the memory to run a
+  command, as the original's has: the last three sentences of the
+  count, "It is enough for every command" and on, are not of it.
+- "Program too big to fit in memory" after a command. The program of 32
+  bits never says it there: the memory that the viewer needs is of
+  those 640 KB, which no command takes. It says it when it starts and
+  DOS has not the 512 bytes below the megabyte that the system's
+  functions keep there; with less memory above the megabyte than the
+  program wants, the extender does not start it, and says so in words
+  of its own.
+- The file. That of 32 bits is the extender, a program of DOS, with the
+  program behind it as a linear executable, which the extender loads
+  and relocates.
+
+Everything else is of both: the menu without Memory allocation, no
+check sum and no "Bad or missing", a panel left with 256 files for a
+command, the byte of the setup file, the setup without the box, the
+help file.
+
 **Why.** The user's decision, on 12 October 2026: giving up the code and
 the data and making them again saves memory that only DOS is short of,
 at the price of reading the program's file and its directories after
@@ -185,11 +227,19 @@ every command, and of a program in two parts with copies between them.
 It "only matters on DOS"; "it's OK for our port to be less memory- and
 disk-efficient, as long as it's functionally equivalent"; and the option
 "in the new tree goes away. It's going to be a pattern for a lot of
-features that only made sense on DOS."
+features that only made sense on DOS." And on 13 October 2026: where the
+program of 32 bits does again what the original does and the program of
+16 bits could not, a second copy that has the memory to run a command,
+it is held to the original's golden, and this entry says only what still
+differs.
 
 **Which scenarios show it.** Each of these is held against the original's
 golden with what its row says made to it: by its patch, or, where the row
-says that every screen is as the original's, by the steps left out alone:
+says that every screen is as the original's, by the steps left out alone.
+A row is of both programs unless it says of which; where the program of
+32 bits is to show other rows than the program of 16 bits, it has a
+patch of its own, in `harness/goldens/portable_c32/`, with those rows
+and no others:
 
 | Scenario | What changes in it |
 |---|---|
@@ -197,12 +247,12 @@ says that every screen is as the original's, by the steps left out alone:
 | `clock`, `clock-russia` | The Options menu where it shows: without Memory allocation, so with Save setup a row further up. And by 8: with two rows more at its bottom, a line across the menu and More setup, so a row taller than the original's |
 | `menu` | The same. By 8: Up from the top of the menu, and PgDn, go to More setup, the last item, where the original has Save setup, and Up from there goes to Save setup, where the original goes on from that to Memory allocation. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
 | `quick` | The step that switches Memory allocation off before the last command is left out; every screen is as the original's after the same step |
-| `second-copy` | The second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work |
-| `start-memory` | The second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with the mini status that the first copy's have not |
+| `second-copy` | In 16 bits: the second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work. In 32 bits: every screen is as the original's, the copy having run its command; its patch is of 10 alone |
+| `start-memory` | In 16 bits: the second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with the mini status that the first copy's have not. In 32 bits: the copy runs the command, as the original's does, which stays in the memory and leaves 75 KB of DOS's; the copy needs none of that to come back and says nothing, so the command line shows a row less of it, and it is still there afterwards, with the same three screens |
 | `setup-config` | The Configuration of the setup where it shows: without Memory allocation, and by 7 without TSR manager. In the right half of its box, Quick execute commands is a row further up, the frame of Execute options ends below it, the Keyboard options are two rows further up, and the last two rows are empty. The two steps that untick Memory allocation and TSR manager are left out; Quick execute commands is ticked where the cursor is when it comes down from the left half, by Space where the original goes down a line first. Left from Clear keyboard buffer is Error sound, the box of its row, where the original has Show logical drive B: there. And the setup file that is saved has the two bytes as it had them, 1 and 1, where the original's has 0 and 0, with another sum for that: three bytes of the file |
 | `setup-config-mouse` | The Configuration so. The click on Quick execute commands is a row further up and those on Alt alone selects menu two rows, and the mouse pointer with them. Every box is ticked as in the original, and the setup file that is saved is the original's |
 | `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The Configuration so, where each shows it; under the help of `setup-help-screens` nothing of its right half shows. In the Configuration the steps are the original's, since none goes into its right half. All but `setup-missing-saved` show Screen and Mouse too, which is otherwise by 5 |
-| `ended` | The program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. And by 7: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. And by 8, with no interrupt of DOS's taken: DX has in its low byte what DOS was last told of Ctrl-C and is as it came above that, which is what the original leaves there where its setup has TSR manager off; and DS is as it came, on the program that started the copy, a segment that follows the size of the program and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
+| `ended` | In 16 bits the program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. In 32 bits the copy has the memory and runs it, and it stays in the memory, 448 bytes, also when DOS has ended the copy, which by 7 keeps no list of such programs to release: no screen of the scenario shows that, since the program that started the copy clears the screen, and both programs are held to the one patch. And by 7, for both: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. And by 8, with no interrupt of DOS's taken: DX has in its low byte what DOS was last told of Ctrl-C and is as it came above that, which is what the original leaves there where its setup has TSR manager off; and DS is as it came, on the program that started the copy, a segment that follows the size of the program and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
 
 A step that switches Memory allocation, "F9 o m", is left out of every
 scenario for the portable C: there it would enter the setup (see 8).
@@ -219,7 +269,7 @@ have both.
 | Scenario | Why |
 |---|---|
 | `memory` | It switches Memory allocation off, for the Info panel to show the other number, and shows the menu without the mark |
-| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." And the portable C does not take INT 21h any more, so no call of DOS passes it and it has none to hand on: see 8, where `handed-on`, which sees the same with one copy, is not run for that |
+| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C of 16 bits behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." And the portable C does not take INT 21h any more, in 16 bits or in 32, so no call of DOS passes it and it has none to hand on: see 8, where `handed-on`, which sees the same with one copy, is not run for that |
 
 **In the data.** The test `portable_c-data` holds five tables of the menus
 against the original's with this difference declared for each, in

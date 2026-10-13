@@ -1946,6 +1946,18 @@ def check_declared(tree, names):
                 print(f"  {tree} is declared to be taken through other "
                       f"steps in place of some that {name} has not one "
                       f"behind the other: {', '.join(some)}")
+    for name in declared.unpatched:
+        other = goldens.patch_path(name, deviations.source(tree))
+        if goldens.own_patch_path(name, tree).exists() \
+                or deviations.source(tree) == tree or not other.exists():
+            passed = False
+            print(f"  {tree} is declared to have no patch for {name}, "
+                  "where it has "
+                  + ("one of its own"
+                     if goldens.own_patch_path(name, tree).exists()
+                     else "none that another tree's would be in the "
+                          "place of") + ": the entry of `unpatched` is to "
+                  "go from deviations.py")
     patched = {}
     for file in goldens.patches(tree):
         name = file.stem

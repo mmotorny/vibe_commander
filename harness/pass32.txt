@@ -32,6 +32,7 @@ quit
 not-ready
 banner
 diskette-command
+second-copy
 quick
 comspec
 device
@@ -130,6 +131,7 @@ blank
 blank-timed
 start-setup
 start-screen
+start-memory
 setup
 setup-config
 setup-config-mouse
