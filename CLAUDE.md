@@ -1906,6 +1906,27 @@ in "The portable C".
   - The calls of DOS and the BIOS that setup makes have rows in entry
     6 of `DEVIATIONS.md` like any others, read from the setup
     program's assembly: a piece adds the rows of its calls.
+  - A routine that the setup program alone has by its name may be the
+    main program's by its text: `Main50`, the mouse at its menu, is
+    `F32_70` word for word. `harness/vcsetup/procs.py` goes by names.
+    Before translating such a routine, hold it against the main
+    program's with the labels taken out of both. One that is the same
+    and names nothing but routines that are the same too is called,
+    not written again, and is listed in the setup's batch all the
+    same, so that all of it has to have run in the setup program. One
+    that names data is another matter: `HlpLine` is `Help77` by its
+    text, and the table of colours that it names is the setup
+    program's own.
+  - What the original's setup program prints through DOS is sent
+    nowhere in a scenario, all of it: the banner, and with it the line
+    for a setup file that could not be written. A tree writes that
+    line on the screen, so what DOS has shown differs from then on,
+    and a scenario does not look at it after a save that failed.
+  - A golden that would hold the original's edition, because a bug
+    has changed the line that `harness/deviations.py` knows the banner
+    by, is not mended there: the scenario first has that line gone
+    from the screen. `setup-lines` does, for the corner that the key
+    bar's 81st cell blanks.
 - What the help of the setup program met, the first of its pieces to
   have code, before the setup could be entered:
   - Every C file of `src/portable_c/` is in the next build, by its

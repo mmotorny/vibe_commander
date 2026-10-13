@@ -355,7 +355,7 @@ batch, with what no scenario reaches.
 | A, the options. Done | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | Eight, 320 steps, see "Piece A" below. As planned: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
 | B, the colours. Done | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6; and `ShadCol`, taken out of `Shadow` of `screen.c`, which 0b left as it is. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
 | C, the help. Done | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
-| D, what is left of S1 and of leaving | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | About 100 instructions | About 3: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and, once A is there, a setup saved whose file is missing | 0b; A for the last |
+| D, what is left of S1 and of leaving. Done | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | 80 instructions, 74 of them the main program's routine | Six, 100 steps, see "Piece D" below: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and F1 from the other pieces' screens. A setup saved whose file is missing is A's, `setup-missing-saved` | 0b; A, B and C for three of the scenarios |
 | E1, the program's own call of DOS goes | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; `ended` has its golden of the tree's own recorded again, for the registers that the program leaves | A to D |
 | E2, three settings go | `stopts.c`, `stopts_t.c`: Memory allocation and TSR manager out of S2, Screen output out of S3; entries 1, 5 and 7 of `DEVIATIONS.md`, which say that the setup program still shows them | Small | The scenarios of A that show the two dialogs get goldens of the portable C's own, read with `goldens.py changes` | A |
 
@@ -367,10 +367,12 @@ taken out of there by the commit that makes it pass. Nothing is
 declared for the C translation: it is taken through no scenario of the
 setup program, by their kind.
 
-In all, some 22 scenarios and 600 steps, where the main program has 134
-and 3,358 for twelve times the code: nearly every instruction here is a
-key or a button of the mouse, and little of it is something that other
-scenarios pass through anyway.
+In all, some 22 scenarios and 600 steps were planned, where the main
+program has 134 and 3,358 for twelve times the code: nearly every
+instruction here is a key or a button of the mouse, and little of it is
+something that other scenarios pass through anyway. With 0a to D done
+there are 33 of 889 steps, and none waits in `not_run`. What is still
+to come is E1 and E2, which take things out.
 
 **What 0a made of the harness.** The nine things that it was to
 change, each as it is now, and what came out otherwise than planned.
@@ -506,10 +508,10 @@ for it, "The setup program": read both first.
   scenario**, each with the address in `harness/ported.py`: the test
   fails on the entry once a scenario runs it, and the piece then takes
   it out.
-  - D: `Main30`, six instructions that call `Main50`, which is where
-    the button of a mouse goes in `StMain00`, the two `goto Main30`
-    that go straight back today; and `Exit5`, three, the line that DOS
-    writes for a setup file that could not be written.
+  - D: nothing any more. `Main30`, six instructions that call
+    `Main50`, is translated and run by `setup-mouse`; and `Exit5`,
+    three, the line that DOS writes for a setup file that could not be
+    written, by `setup-save-fails`.
   - A: nothing any more. Three of `Exit` were listed, for a setup
     saved whose file is not there, which takes a setting changed
     without a file: `setup-missing-saved` runs them in the original.
@@ -803,7 +805,7 @@ last.
 | With E2: no Memory allocation and no TSR manager in S2, no Screen output in S3 | The scenarios of piece A that show the two dialogs |
 | The program's box for a critical error of DOS while setup is open, where the original's setup program leaves the error to DOS's own words. And setup's calls for files are asked with the program's errors, where the original's setup program calls DOS itself: a drive that is not ready has the program's box, a call given up there is the error 53h, and DOS is asked what was wrong behind a call that failed | No scenario |
 | The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. **This waits for the user's word**: it was met while 0b was made, and is not among the seven things decided | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
-| The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | None yet: D's scenario of 50 lines, with a golden of the portable C's own for the corner |
+| The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | `setup-lines`, with a golden of the portable C's own for the corner: one cell, on two screens |
 | The directory of the setup file is the one that the program has, made by the main program's rule: in capitals, and with a backslash behind whatever `VC=` names, where the setup program adds none behind a colon | No scenario: the bench has no `VC=` |
 
 ### The bugs of the original that stay
@@ -845,13 +847,20 @@ on the bench.
   has zeros for all 64. See "The deviations to declare".
 - A file that could not be written is said in a line on what DOS has
   shown, which the panels of a running copy cover at once, and the
-  running copy takes the settings all the same.
+  running copy takes the settings all the same. `setup-save-fails`
+  holds that the program takes them and that the file stays; the line
+  itself no scenario can hold, see "Piece D".
 - `DeCode`, which takes the mark off what `RdHelp` has read, takes a
   count of 0 for one of 65,536: a help file whose index says that it
   has no text, or whose 62nd page is where its 55th is, has the setup
   program write over all of its segment, itself included. The portable
   C has it as it is, in the one `DeCode` of `help.c`, over the segment
   of the main data. No scenario has such a file.
+- A second click on a line of the menu enters the item under the
+  cursor, not the item that was clicked: `Main50` says only that it
+  was a second click, and `Main32` goes by the cursor. They differ
+  when a key has moved the cursor between the two clicks. Seen on the
+  bench, and `setup-mouse` has it.
 
 ### Piece C, the help: done, and what a later piece should know
 
@@ -1294,6 +1303,126 @@ public: a static function is not found there, and the test ends with
   top of the loops, which go by the buttons alone.
 - A file of code reads a table of `stcolor_t.c` as a far object, and a
   word of `StPagTab` is an offset in the segment that `AsmSeg` returns.
+
+### Piece D, what is left of the menu and of leaving: done, and what a later piece should know
+
+The mouse at the setup's menu is in the portable C, and six scenarios
+hold it and what crosses the screens of the other pieces: the clock
+under them, the buttons of the mouse exchanged in them, the help over
+them. Each golden was derived twice with the same result. Five are held
+against the original's golden and one against a golden of the portable
+C's own, for one cell.
+
+| Scenario | Steps | What | For the portable C |
+|---|---|---|---|
+| `setup-mouse` | 21 | S1 by the mouse: a line by either button, the frame and the margin of the box, a button held and moved, a click too short to be seen, a second click with a key between, one let go beside its line and one outside the box, Exit by its line, the middle button, the shadow, and the left button let go outside | As the original |
+| `setup-save-fails` | 8 | The setup file read-only, a setup changed and saved: the file stays, and the program has the setup | As the original; it needed no code |
+| `setup-lines` | 9 | 50 lines over what DOS has shown, a click on a line of the menu there, and the corner that the 81st cell of the key bar lands in | Against a golden of its own: entry 9 of `DEVIATIONS.md` |
+| `setup-clock` | 16 | Clock ticked: the clock over the menu, a dialog, the help, the list of colours, not in a picture; unticked, and gone. `setup_clock=True` | As the original |
+| `setup-left-handed` | 15 | Left-handed mouse ticked: the buttons exchanged at the menu, in a dialog and in the help, and in the program when it is saved | As the original |
+| `setup-help-screens` | 31 | F1 from the Configuration, from the line of Screen and Mouse, from the list of colours, its box and a picture, from Country info and from "save the current setup?" | As the original |
+
+`python3 harness/reach.py --setup Main50 Init15 Exit` says what the
+scenarios of the setup run of the original: all 74 instructions of
+`Main50`, the six of `Main30`, and `Exit5`. Nothing of piece D is
+listed as out of reach.
+
+**How the last three came in.** `setup-clock`, `setup-left-handed` and
+`setup-help-screens` were written against the original while the
+dialogs, the colours and the help were still to come, and waited in
+`not_run`. With all three pieces in the tree they passed as they were
+written, at the first run: nothing of the C of any piece had to change
+where two of them meet. The golden of `setup-lines` of the portable C's
+own, which was recorded while F6 was a place-holder, came out the same
+with the list of colours behind that key, cell for cell: `python3
+harness/goldens.py changes --tree portable_c setup-lines` has one cell
+on each of the last two screens, the corner, and no other row.
+That golden is to become a patch of one cell on two screens, applied
+to the original's golden, once the harness holds a deviation by a patch
+(`CLAUDE.md`, "The portable C"): it landed as a golden of the tree's
+own, like the fifteen others of that kind.
+
+**A seventh that went.** `setup-save-new`, a setup saved without a
+setup file, was written here while piece A had the same thing in hand,
+and A's is the one that is kept, `setup-missing-saved`: the file
+deleted, the setup started, a box of the Configuration ticked, saved,
+and the main program's own setup written over the file. This one ran
+nothing of the original that the other does not run, but for what the
+Configuration and `PutKey` do with the key bar switched off, which was
+the box that it changed and is what `setup` has; and it showed nothing
+more.
+The three instructions of `Exit` for a file that is not there are run
+by `setup-missing-saved`.
+
+**The code.** `Main50` is the main program's `F32_70`, of
+`usermenu.c`, word for word but for its labels: the routine of the user
+menu and of the history for the mouse in a list that is in a box.
+`harness/vcsetup/procs.py` has it as the setup program's alone, since it
+goes by names. `StMain00` calls `F32_70`, and `Main30` is the six
+instructions around the call. `Main50` is listed in the setup's batch of
+`harness/ported.py`, so that all of it has to have run in the setup
+program. `HlpLine` is the main program's `Help77` by its text in the
+same way, but names a table of colours, which the setup program has of
+its own: piece C has written it, `StHlpLine`.
+
+**What the original does there that the plan did not have.**
+
+- The second click enters the item under the cursor: see "The bugs of
+  the original that stay".
+- A second click that comes up beside its line, or outside the box,
+  chooses nothing and does not leave: `DoublMo` waits for the button
+  itself, and `Main50` never sees where it came up.
+- The shadow of the menu is outside the box for the left button, which
+  leaves when it is let go there.
+- The line for a file that could not be written goes where the banner
+  goes, to DOS's standard output: the step that starts the original
+  sends both nowhere, `>nul`. So the original shows no such line in a
+  scenario, and the portable C, which writes it on the screen, has what
+  DOS had shown a row further up than the original from then on. No
+  scenario can hold the line, and none may look at what DOS has shown
+  after a save that failed: the top of `harness/scenarios.py` says so.
+  With the panels on, which is how `setup-save-fails` ends, the two
+  show the same.
+- F1 where the help has no page, over a dialog: the beep moves the
+  screen up a row under a box that is kept in `BoxBuf` over a dialog
+  that is kept in `WinBuf`, and each puts back what it covered as it
+  was before the beep. What is left on the screen is in the golden of
+  `setup-help-screens`, rows of the dialog a row up around the box.
+- Clock unticked and Ok takes the clock off the screen at once.
+
+**Decided here.**
+
+- The corner on 50 lines is shown without a change to
+  `harness/deviations.py`. The banner's first line is in the first row
+  of what DOS has shown on the bench, and with its first cell blank the
+  entry of `DEVIATIONS` there that reads the original's "shareware" as a
+  build's "freeware" does not know it: the golden would have the
+  original's word. `setup-lines` first has that line gone from the
+  screen, by a command that prints nothing with the key bar off, which
+  moves the screen by one row: the corner is then the C of "Copyright",
+  which nothing in the harness goes by. The other way would have been
+  to have that entry begin with `^[T ]he` in place of `^The`, which is
+  a change to what the comparison takes for equal and was not made.
+- `setup-lines` goes into the colours and back in one step, "F6 Esc":
+  that is where the original first puts the screen back from what it
+  kept, so the corner is blank under the menu already.
+
+**For a later piece.**
+
+- E2, which takes Memory allocation and TSR manager out of the
+  Configuration and Screen output out of Screen and Mouse: `setup-clock`
+  gets to Clock by five times Down, `setup-left-handed` clicks a line
+  of each of the two dialogs by its place, and `setup-help-screens`
+  shows both under the help. Each then wants its steps looked at again
+  and a golden of the portable C's own, read with `goldens.py changes`,
+  as the scenarios of A do.
+- The line "There was an error while saving the setup file" is held by
+  no scenario, as above: whoever changes where it is written has to
+  look at it by hand, `harness/show.py --program` with the steps of
+  `setup-save-fails` and Ctrl+o.
+- A scenario that says `setup_clock=True` does not have the original's
+  main program watched (the top of `harness/scenarios.py`):
+  `setup-clock` unticks Clock before it leaves the setup, for that.
 
 ## The portable C: what another compiler says of it
 
