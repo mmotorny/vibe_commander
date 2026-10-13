@@ -19,7 +19,7 @@ dialog.c      clean
 digits.c      clean
 dirfunc.c     clean
 dirfunc_t.c   clean
-dos.c         to-number 23, to-pointer 17, asm-pragma 7, registers 1, intrinsic 1
+dos.c         to-number 26, to-pointer 18, function 3, interrupt 2, asm-pragma 7, registers 1, intrinsic 1
 dos32.c       to-number 9, to-pointer 6, asm-pragma 9, intrinsic 1
 drive.c       clean
 edit.c        clean
@@ -37,7 +37,7 @@ input.c       clean
 keys.c        clean
 keys_t.c      clean
 line.c        clean
-main.c        to-number 10, to-pointer 1, function 2, interrupt 1, data_seg 2, aborts 1
+main.c        to-number 8, data_seg 2, aborts 1
 main_t.c      clean
 mask.c        clean
 menu.c        clean
@@ -46,7 +46,7 @@ mouse.c       clean
 panel.c       clean
 place.c       clean
 read.c        clean
-resident.c    to-number 16, to-pointer 8, function 3, interrupt 3, loadds 3, naked 2, asm 2, registers 1, aborts 3
+resident.c    to-number 15, to-pointer 8, function 2, interrupt 2, loadds 3, naked 2, asm 2, registers 1, aborts 3
 screen.c      clean
 setup.c       clean
 stack.c       data_seg 2
@@ -68,7 +68,7 @@ tree.c        clean
 treebox.c     clean
 treebox_t.c   clean
 usermenu.c    clean
-vc.h          interrupt 1, aborts 4
+vc.h          aborts 4
 view.c        clean
 view_t.c      clean
 window.c      clean

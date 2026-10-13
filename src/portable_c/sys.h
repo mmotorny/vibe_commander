@@ -1,9 +1,10 @@
 /*
  * What the program asks of the system that it runs on: files,
  * directories and drives, memory, the time, other programs, the keyboard,
- * the screen, the mouse and the timer. Each thing that it asks is a
- * function here, named for what is asked, and nothing here says how the
- * system is asked: no register, no number of a service, no interrupt.
+ * the screen, the mouse and the timer; and what the system asks the
+ * program. Each thing that it asks is a function here, named for what is
+ * asked, and nothing here says how the system is asked: no register, no
+ * number of a service, no interrupt.
  * dos.c is these functions for DOS on a PC, and the only file that knows
  * those; the same functions for another system are another file beside
  * it.
@@ -31,7 +32,8 @@
  * each group below says which of its functions are of which:
  *
  *   - Asked with the program's errors. A device that is not ready has the
- *     program show its box and ask for another try (FatErr of main.c).
+ *     program show its box and ask for another try (FtErr1 of main.c,
+ *     which the program has the system ask: see DeviceErrorTake).
  *     If the user gives up there, the function has failed with the error
  *     53h. A failure that the system reports itself comes back as its
  *     extended error, which DOS is asked for behind the call. And the
@@ -355,6 +357,62 @@ const u8 FAR *ProgramTail(void);
    behind the last; then two bytes, and behind them the path of the
    program's own file, ended by a zero byte. */
 const u8 FAR *ProgramEnvironment(void);
+
+/*
+ * What the system asks the program, and the keys that stop one.
+ *
+ * These are not asked of the system: it is the system that comes to the
+ * program with them, in the middle of whatever the program does. The
+ * program takes each, and what it has taken it may give back to whoever
+ * had it before, which is what Note is for: Note first, Take, and Give
+ * when another program is to have it as this one found it.
+ */
+
+/* A device that does not do what the system wants of it, while the
+   system does something that the program asked: a drive without a disk,
+   a disk that cannot be written, a printer without paper. The system
+   then asks what to do about it, and of the program once the program has
+   taken that, by a function of this kind:
+
+     `how`     DOS's word for it: in the low byte the drive, 0 for A:,
+               where it is a drive; 1000h is set if the system can try
+               again; and 8000h is set if it is no place of a disk that
+               failed, which of a drive says that what the system keeps
+               of the disk's table of files is bad
+     `error`   what is wrong, DOS's number for it: 0 a disk that is
+               protected, 2 a device that is not ready, and so on
+     `device`  0 for a drive; else the name of the device, 8 characters,
+               with blanks behind a shorter one
+
+   It answers DEVICE_RETRY to have the system try again, or DEVICE_FAIL
+   to have what the program asked fail. The system is in the middle of
+   that call meanwhile: the function may ask for the screen, the keys,
+   the mouse and the timer, and may say that it is idle, and nothing
+   else. It may be entered with the machine kept from interrupting the
+   program, and on a stack that is not the program's, if a program that
+   this one has run has left the question to it. */
+typedef u16 DeviceErrorFn(u16 how, u16 error, const u8 FAR *device);
+#define DEVICE_RETRY 1
+#define DEVICE_FAIL  3
+
+/* Note who is asked about such a device now; have `ask` be asked from
+   now on; and have whoever was noted be asked again. */
+void DeviceErrorNote(void);
+void DeviceErrorTake(DeviceErrorFn *ask);
+void DeviceErrorGive(void);
+
+/* Ctrl-Break, the key of a PC that stops a program wherever it is: note
+   who has it now; take it, so that nothing happens when it is pressed;
+   and give it back to whoever was noted. */
+void CtrlBreakNote(void);
+void CtrlBreakTake(void);
+void CtrlBreakGive(void);
+
+/* Ctrl-C, for which the system ends a program when it finds the key
+   while it is asked something (see BreakCheck): take it, so that
+   nothing happens. The system gives it back by itself when the program
+   ends. */
+void CtrlCTake(void);
 
 /*
  * The console: what the system writes where the screen has its cursor,

@@ -2393,7 +2393,7 @@ is called both ways the bare function says so in its name.
 | 56h | asked | `FileRename(from, to)` |
 | 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |
 | 60h | asked | `FileTrueName(name, to)` |
-| 25h, 35h | bare | `SetVector(number, to)`, `Vector(number)`, of `vc.h` and not of `sys.h`; `PutVector(number, to)` beside them wrote the machine's table without DOS, for INT 21h, and went with that |
+| 25h, 35h | bare | The seven by which the program takes what DOS and the BIOS enter of it: `DeviceErrorNote()`, `DeviceErrorTake(ask)` and `DeviceErrorGive()` for INT 24h, `CtrlBreakNote()`, `CtrlBreakTake()` and `CtrlBreakGive()` for INT 1Bh, `CtrlCTake()` for INT 23h. `SetVector(number, to)` and `Vector(number)` are static in `dos.c` behind them; `PutVector(number, to)` beside them wrote the machine's table without DOS, for INT 21h, and went with that |
 
 The BIOS for the screen, `Int10`, by AH: 0Fh is `ScreenState()`, 0
 `ScreenSetMode(mode)`, 1 `CursorShape(shape)`, 2 `CursorTo(page,
@@ -2808,6 +2808,51 @@ the header (`TODO.md`, the piece S1 of the plan for the 32 bits):
   32 bits, has each such name in a list of its own, `OUTSIDE`. `python3
   harness/trial32/both.py` and `whole.py` take seconds and say whether
   the three still fit.
+
+What the critical error, Ctrl-Break and Ctrl-C met, when where they
+arrive went into `dos.c` (`TODO.md`, the piece S2 of the plan for the
+32 bits):
+
+- What a system enters of the program is two things, and they are
+  kept apart. Where it arrives, with DOS's registers, a segment
+  register to load and an `IRET`, is the system's: an interrupt
+  function of `dos.c`, `FatErr`. What the program does about it is a
+  function of the program's, of a type that `sys.h` names,
+  `DeviceErrorFn`, which the program hands over where it takes the
+  thing, `DeviceErrorTake(FtErr1)`, and which is called through a
+  pointer as any function is. It takes what it needs by what that is,
+  in DOS's shapes as everything of `sys.h` does, and no address of
+  real mode: of the header of the device that DOS names, whether it is
+  a drive, and a pointer to the name if not.
+- Each of the seven functions is one call of DOS, and the row is the
+  program's: `HookVct` notes who has the critical error and who has
+  Ctrl-Break and then takes both, as the original asks, and a function
+  that noted and took one of them at once would have changed the
+  order.
+- What `dos.c` keeps for the program's sake stays where the original
+  has it while the layout of the main data is held: `ErrVct` and
+  `BrkVct`, as `EPB` before them. Look for every line that names such a
+  field first; nothing else read these.
+- The scenarios' test holds a function of a batch to have run by its
+  name in the linker's map, among the symbols that are not static:
+  `FatErr` is not static in `dos.c` for that, and keeps the name of the
+  routine. A function that moves and becomes static fails the test
+  with "the link map has no function", behind every scenario passed.
+- The call through the pointer has its arguments in registers and
+  costs the stack what the call of a static function cost: every
+  scenario left to the byte what it had left.
+- DOS enters the critical error with the machine kept from
+  interrupting, and the compiler's interrupt function leaves it so:
+  the box gets its keys because `Window`, `MovScr` and `MinBx3` call
+  `IntOn`, as the original has `STI` there.
+- A decision of the program's that is still in `dos.c`: `AskEs` clears
+  `md.ErrDat` in front of a call and makes the error 53h of a call
+  behind which it is set. What the function answered does not say
+  that: it answers `DEVICE_FAIL` with `BlocEr` set and no box shown,
+  too, and such a call is asked about like any that failed. `TODO.md`
+  says what moving it would take.
+- A macro of `dos.c` may not have a name that `vc.h` has, which the
+  file includes: W140 stops the build, as it did for `ENTRY`.
 
 ## Work by several agents
 

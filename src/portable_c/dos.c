@@ -11,12 +11,18 @@
  * assembly, in a #pragma aux of its own, with as little beside it as will
  * do. The registers go into the instruction and come out of it as
  * arguments and as what it returns; the compiler loads them. What other
- * inline assembly there is, is where interrupts arrive and where
- * COMMAND.COM's is called, in resident.c. The memory of the machine that
- * the program reads and writes is here too, the BIOS's data and the
- * cells of the display, through far pointers in plain C; and the
- * interrupt flag of the machine, for which the compiler has intrinsic
- * functions.
+ * inline assembly there is, is where DOS goes on when it has ended the
+ * program and where COMMAND.COM's interrupt is called, in resident.c.
+ * The memory of the machine that the program reads and writes is here
+ * too, the BIOS's data and the cells of the display, through far
+ * pointers in plain C; and the interrupt flag of the machine, for which
+ * the compiler has intrinsic functions.
+ *
+ * The interrupts that the program takes arrive here as well, DOS's
+ * critical error, Ctrl-Break and Ctrl-C, at interrupt functions of the
+ * compiler. What the program does about the first is the program's: a
+ * function of its own that it hands over, and that is called from here
+ * as any function is.
  *
  * The file has two parts: the functions of sys.h, and behind them what
  * is of DOS alone and no part of sys.h. A structure of registers, as the
@@ -238,8 +244,9 @@ static struct Answer Tell(struct DosRegs STACK *regs)
 /* Ask DOS with the program's errors: Intr21 of the original, with ES as
    `regs` has it, and with the carry flag set first if `flagged` is not
    0. When DOS asks what to do about a device, the program's routine for
-   that, FatErr of main.c, shows a box and notes in ErrDat if the user
-   gave up there; the call then counts as failed with the error 53h, and
+   that, FtErr1 of main.c, which FatErr below calls, shows a box and
+   notes in ErrDat if the user gave up there; the call then counts as
+   failed with the error 53h, and
    until the next call that comes here DOS is answered without a box.
    An error that DOS reports itself is asked about once more, and its
    extended code is what comes back: for that call AH is 59h and BX 0,
@@ -874,6 +881,127 @@ const u8 FAR *ProgramEnvironment(void)
     return POINTER(PSP_WORD(PSP_ENVIRON), 0);
 }
 
+/* What DOS and the BIOS enter of the program: three interrupts that it
+   takes. DOS says where an interrupt goes (AH 35h, which answers in
+   ES:BX) and has one go somewhere (AH 25h, with the address at DS:DX),
+   and is asked both bare. Who had the critical error and Ctrl-Break is
+   kept where the original keeps it, in ErrVct and BrkVct of the main
+   data, which nothing else reads. */
+
+#define INT_CTRL_BREAK 0x1B             /* the BIOS's, from the keyboard */
+#define INT_CTRL_C     0x23             /* DOS's, where it finds the key */
+#define INT_ERROR      0x24             /* DOS's critical error */
+
+/* Where an interrupt goes, as an address with the offset in the low
+   word, and one made to go somewhere. The low byte of `number` is the
+   interrupt. */
+static u32 Vector(u16 number)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x3500 | number & 0xFF;
+    regs.name = NUMBER(0);
+    Tell(REGS(regs));
+    return (u32)regs.es << 16 | regs.bx;
+}
+
+static void SetVector(u16 number, u32 to)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x2500 | number & 0xFF;
+    regs.name = (const u8 __far *)to;
+    Tell(REGS(regs));
+}
+
+/* Where a function is, as such an address. */
+#define HANDLER(function) ((u32)(void __far *)(function))
+
+/* The function that the program has handed DeviceErrorTake. */
+static DeviceErrorFn *DeviceAsk;
+
+/* The header of a device, which DOS names when it asks about one: the
+   high byte of its attributes, where 80h says that it is no drive, and
+   the name that such a device has there, 8 characters. */
+#define HEADER_KIND 5
+#define HEADER_NAME 10
+
+/* INT 24h: what DOS calls for a critical error, with what it says of it
+   in AX and DI and the header of the device at BP:SI, with the machine
+   kept from interrupting, and on the stack of whoever called DOS: the
+   program, or a program that this one has run without giving the
+   critical error back first (Aexec0 of view.c). It answers in AL, and
+   every other register comes back as it was. An interrupt function is
+   entered with DS anywhere, and the compiler has it load DS with the
+   program's data.
+
+   The program is asked what to do, by the function that it handed
+   over, with what sys.h says that such a function takes: DOS's two
+   words as they are, DI whole, as the original reads it, and of the
+   header whether it is a drive and, if not, where the name is. AX
+   whole is what the function answers, which is DOS's number for it.
+
+   The header is read before the program is asked. The original reads
+   it only where it shows a box, behind the two bytes by which it
+   answers without one, ErrDat and BlocEr: those are the program's, and
+   its function looks at them first, as before.
+
+   Not static, though nothing else names it: the scenarios' test holds
+   that the function of this name has run, and looks for it in the
+   linker's map among those that are not (harness/ported.py). */
+void __interrupt __far FatErr(struct Saved r)
+{
+    const u8 __far *device = POINTER(r.bp, r.si);
+
+    if (device[HEADER_KIND] & 0x80)
+        device += HEADER_NAME;
+    else
+        device = 0;
+    r.ax = DeviceAsk(r.ax, r.di, device);
+}
+
+/* INT 1Bh, Ctrl-Break of the BIOS, and INT 23h, Ctrl-C of DOS, while the
+   program has them: nothing. */
+static void __interrupt __far CtrlC(void)
+{
+}
+
+void DeviceErrorNote(void)
+{
+    md.ErrVct = Vector(INT_ERROR);
+}
+
+void DeviceErrorTake(DeviceErrorFn *ask)
+{
+    DeviceAsk = ask;
+    SetVector(INT_ERROR, HANDLER(FatErr));
+}
+
+void DeviceErrorGive(void)
+{
+    SetVector(INT_ERROR, md.ErrVct);
+}
+
+void CtrlBreakNote(void)
+{
+    md.BrkVct = Vector(INT_CTRL_BREAK);
+}
+
+void CtrlBreakTake(void)
+{
+    SetVector(INT_CTRL_BREAK, HANDLER(CtrlC));
+}
+
+void CtrlBreakGive(void)
+{
+    SetVector(INT_CTRL_BREAK, md.BrkVct);
+}
+
+void CtrlCTake(void)
+{
+    SetVector(INT_CTRL_C, HANDLER(CtrlC));
+}
+
 /* The console: AH 6, with the character in DL, and AH 9. */
 
 void ConsoleChar(u16 character)
@@ -1144,31 +1272,9 @@ u32 Ticks(void)
 }
 
 /*
- * What is of DOS on a PC alone, and no part of sys.h: where an interrupt
- * goes, and the interrupt flag.
+ * What is of DOS on a PC alone, and no part of sys.h: where the PSP is,
+ * and the interrupt flag.
  */
-
-/* Where an interrupt goes, as DOS says (AH 35h, which answers in ES:BX):
-   the offset in the low word. And have one go somewhere (AH 25h, with
-   the address at DS:DX). The low byte of `number` is the interrupt. */
-u32 Vector(u16 number)
-{
-    struct DosRegs regs;
-
-    regs.ax = 0x3500 | number & 0xFF;
-    regs.name = NUMBER(0);
-    Tell(REGS(regs));
-    return (u32)regs.es << 16 | regs.bx;
-}
-
-void SetVector(u16 number, u32 to)
-{
-    struct DosRegs regs;
-
-    regs.ax = 0x2500 | number & 0xFF;
-    regs.name = (const u8 __far *)to;
-    Tell(REGS(regs));
-}
 
 /* Where the PSP is, its segment, as DOS says (AH 51h, which answers in
    BX: as 62h, and of DOS 2 too). The program's block of the memory is

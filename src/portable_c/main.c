@@ -1387,21 +1387,17 @@ void Quit(void)
     ResUser(0, line << 8 | 80);
 }
 
-/* The two interrupts that the program takes. */
-#define INT_BREAK 0x1B                  /* Ctrl-Break */
-#define INT_ERROR 0x24                  /* DOS's critical error */
-
 /* Give Ctrl-Break back to whoever had it. */
 void RstVc1(void)
 {
-    SetVector(INT_BREAK, md.BrkVct);
+    CtrlBreakGive();
 }
 
 /* Give the critical error of DOS and Ctrl-Break back to whoever had
    them. */
 void RestVct(void)
 {
-    SetVector(INT_ERROR, md.ErrVct);
+    DeviceErrorGive();
     RstVc1();
 }
 
@@ -1416,15 +1412,14 @@ extern const u8 __far FatEr_S[];
 extern const u8 __far FtEr1_B[];
 extern const u8 __far FtEr2_B[];
 
-/* What DOS is answered for a critical error. */
-#define ERR_RETRY 1
-#define ERR_FAIL  3
-
-/* A critical error of DOS: `ax` and `code` are what DOS hands over in AX
-   and DI, and `device` is the header of the device. Say which drive or
-   which device and what is wrong, in a box, and ask whether to try
-   again, where DOS allows that; else the box has Ok alone. Returns what
-   DOS is to do: try again, or have its call fail.
+/* A critical error of DOS, which the system asks the program about once
+   HookVct has handed it this function: `how`, `code` and `device` are
+   what sys.h says that such a function takes, the drive and DOS's bits,
+   DOS's number for what is wrong, and the name of a device that is no
+   drive. Say which drive or which device and what is wrong, in a box,
+   and ask whether to try again, where DOS allows that; else the box has
+   Ok alone. Returns what DOS is to do: try again, or have its call
+   fail.
 
    Once a call has been let fail, ErrDat is set, and every error after
    it fails without a box until a function of sys.h that is asked with
@@ -1438,7 +1433,7 @@ extern const u8 __far FtEr2_B[];
    the original's setup program has no box and leaves the error to DOS's
    own words (see DEVIATIONS.md): its dialog and its key bar are not the
    setup's, and the setup draws its own key bar anew afterwards. */
-static u16 FtErr1(u16 ax, u16 code, const u8 __far *device)
+static u16 FtErr1(u16 how, u16 code, const u8 FAR *device)
 {
     u16 assembly = AsmSeg();
     const u8 __far *from;
@@ -1449,17 +1444,17 @@ static u16 FtErr1(u16 ax, u16 code, const u8 __far *device)
     u8 clock, delay, page, setup;
 
     if (md.ErrDat | md.BlocEr)
-        return ERR_FAIL;
+        return DEVICE_FAIL;
     from = AT(assembly, OFFSET(Err_S) + 1);
     for (i = 6; i; i--)
         *to++ = *from++;
     text = AT(assembly, OFFSET(Errs_S));
-    if (!(device[5] & 0x80)) {          /* a disk */
+    if (device == 0) {                  /* a disk */
         from = AT(assembly, OFFSET(OnDr_S));
         for (i = 11; i; i--)
             *to++ = *from++;
-        to[-2] += (u8)ax;
-        if (ax & 0x8000) {
+        to[-2] += (u8)how;
+        if (how & 0x8000) {
             text = AT(assembly, OFFSET(FatEr_S));
             goto FtErr5;
         }
@@ -1468,7 +1463,7 @@ static u16 FtErr1(u16 ax, u16 code, const u8 __far *device)
         for (i = 10; i; i--)
             *to++ = *from++;
         name = to;
-        from = device + 10;
+        from = device;
         for (i = 8; i; i--)
             *to++ = *from++;
         *to = ' ';
@@ -1497,12 +1492,12 @@ FtErr5:
     setup = StOpen;
     StOpen = 0;
     *(u16 *)&md.AutoTim = 0xFFFF;
-    if (ax & 0x1000)
+    if (how & 0x1000)
         answer = (u8)Dialog(OFFSET(FtEr1_B), (u16)(u32)text, 0, 0, MAIN_SEG)
-                 == 0 ? ERR_RETRY : ERR_FAIL;
+                 == 0 ? DEVICE_RETRY : DEVICE_FAIL;
     else {
         Dialog(OFFSET(FtEr2_B), (u16)(u32)text, 0, 0, MAIN_SEG);
-        answer = ERR_FAIL;
+        answer = DEVICE_FAIL;
     }
     md.Clock = clock;                   /* FtErr8 */
     md.BlDelay = delay;
@@ -1511,30 +1506,22 @@ FtErr5:
         StOpen = setup;
         md.BarPrev = 0xFF;
     }
-    if (answer != ERR_RETRY)
+    if (answer != DEVICE_RETRY)
         md.ErrDat = 1;
     return answer;
 }
 
-/* INT 24h: what DOS calls for a critical error, with the error in AX and
-   DI and the device at BP:SI, on the stack of whoever called DOS, which
-   is the program's. It answers in AL, and every other register comes
-   back as it was. An interrupt function is entered with DS anywhere,
-   and the compiler has it load DS with the program's data. */
-void __interrupt __far FatErr(struct Saved r)
-{
-    r.ax = FtErr1(r.ax, r.di, DOS_AT(r.bp, r.si));
-}
-
-/* Take the critical error of DOS, for FatErr, and Ctrl-Break, for a
-   routine that only returns, CtrlC of resident.c, and note who had
-   them. */
+/* Note who had the critical error of DOS and Ctrl-Break, and take them:
+   the first for FtErr1, and the second so that nothing happens. Both
+   are noted before either is taken, as the original asks DOS. Where
+   they arrive, FatErr and CtrlC of the original, is the system's:
+   dos.c. */
 void HookVct(void)
 {
-    md.ErrVct = Vector(INT_ERROR);
-    md.BrkVct = Vector(INT_BREAK);
-    SetVector(INT_ERROR, (u32)(void __far *)FatErr);
-    SetVector(INT_BREAK, (u32)(void __far *)CtrlC);
+    DeviceErrorNote();
+    CtrlBreakNote();
+    DeviceErrorTake(FtErr1);
+    CtrlBreakTake();
 }
 
 /* Leave the program: the screen as DOS had it, with the cursor on the

@@ -12,7 +12,7 @@ those objects and of what the build does not make:
     leaves <file>.refused there and no object. Such a file is compiled
     here with its warnings, which the build takes for errors;
   - what the tree has of DOS outside sys.h, and so outside dos32.c: the
-    four functions that vc.h declares and the segment of the PSP, and
+    two functions that vc.h declares and the segment of the PSP, and
     `__GETDS`, which an interrupt function of the compiler's asks for.
     Each function is written here as one that does nothing.
 
@@ -27,8 +27,7 @@ of the addresses of vc.h in their second bodies. Then it compiled the
 tree itself, and had every function of sys.h do nothing; since there
 is dos32.c, what it links is that. That the file links says nothing of
 whether the program would run: a place of the main data is still cast
-to 16 bits in many files, and fifteen functions of dos32.c are not
-made.
+to 16 bits in many files, and 22 functions of dos32.c are not made.
 """
 import re
 import struct
@@ -46,8 +45,6 @@ OUT = ROOT / "build" / "trial32" / "whole"
 
 # What the tree calls of DOS that is no function of sys.h.
 OUTSIDE = """#include "vc.h"
-u32 Vector(u16 number) { return number; }
-void SetVector(u16 number, u32 to) { }
 void IntOn(void) { }
 u16 ProgramPrefix(void) { return 0; }
 u16 PspSeg;

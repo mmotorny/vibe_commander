@@ -49,7 +49,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 71 of the 85, six of them in real mode; the 14 that are not made
+ * 71 of the 92, six of them in real mode; the 21 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -329,7 +329,7 @@ static struct Answer Tell(struct DosRegs *regs)
 
 /* Ask DOS with the program's errors: Intr21 of the original. When DOS
    asks what to do about a device, the program's routine for that,
-   FatErr of main.c, shows a box and notes in ErrDat if the user gave up
+   FtErr1 of main.c, shows a box and notes in ErrDat if the user gave up
    there; the call then counts as failed with the error 53h, and until
    the next call that comes here DOS is answered without a box. An error
    that DOS reports itself is asked about once more, and its extended
@@ -1022,7 +1022,7 @@ u32 Ticks(void)
 }
 
 /*
- * The 14 functions of sys.h that are not made here yet. Each does
+ * The 21 functions of sys.h that are not made here yet. Each does
  * nothing, and answers as a system does that failed or does not know
  * the question; none of them calls DOS, since a call that the extender
  * does not translate has DOS write wherever the registers happen to
@@ -1037,7 +1037,11 @@ u32 Ticks(void)
  *     memory of the program's own; MemSetSearch and MemSetUpper;
  *   - out of the PSP, which is below the megabyte, once the start of
  *     the program knows where that is: ProgramTail and
- *     ProgramEnvironment.
+ *     ProgramEnvironment;
+ *   - what DOS and the BIOS enter of the program, the critical error,
+ *     Ctrl-Break and Ctrl-C, which are taken through the extender here
+ *     and arrive at routines of protected mode: the seven that note,
+ *     take and give them, at the end of this part.
  *
  * ProgramRun and ProgramRunBare take the name and the tail, and what
  * else DOS is told of a program that it runs is theirs to make, in the
@@ -1149,6 +1153,46 @@ const u8 FAR *ProgramTail(void)
 const u8 FAR *ProgramEnvironment(void)
 {
     return NoEnvironment;
+}
+
+/* The critical error, Ctrl-Break and Ctrl-C: none is noted, taken or
+   given back, so each goes where the extender has it go, and the
+   program is not asked about a device. dos.c has the three as
+   interrupt functions that DOS's services for the vectors name, and
+   the first calls the function that the program hands over, with what
+   sys.h says: the same call is to be made here from a routine of
+   protected mode that the extender's services name, with the header of
+   the device read at its address of real mode, and on the program's own
+   stack, since such a routine is entered on one of the extender's.
+   What the function answers goes back to DOS in AL. */
+
+void DeviceErrorNote(void)
+{
+}
+
+void DeviceErrorTake(DeviceErrorFn *ask)
+{
+    (void)ask;
+}
+
+void DeviceErrorGive(void)
+{
+}
+
+void CtrlBreakNote(void)
+{
+}
+
+void CtrlBreakTake(void)
+{
+}
+
+void CtrlBreakGive(void)
+{
+}
+
+void CtrlCTake(void)
+{
 }
 
 /*

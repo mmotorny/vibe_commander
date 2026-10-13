@@ -71,9 +71,6 @@ extern const u8 __far Vers_S[];
 /* Where a routine is, as an address for DOS and for a return. */
 #define ROUTINE(function) ((const u8 __far *)(void __far *)(function))
 
-/* The interrupt that the program takes here: Ctrl-C of DOS. */
-#define INT_CTRL_C 0x23
-
 #define FLAG_CARRY     0x0001
 #define FLAG_PARITY    0x0004
 #define FLAG_AUX       0x0010
@@ -143,14 +140,6 @@ static u16 Taken(u16 a, u16 b)
     return flags;
 }
 
-/*----------------------- The interrupts -----------------------*/
-
-/* Ctrl-C of DOS and Ctrl-Break of the BIOS, while the program has them:
-   nothing. */
-void __interrupt __far CtrlC(void)
-{
-}
-
 /*------------------- Execute commands ------------------*/
 
 /* Write the text at `text` on the screen as a teletype would, in grey,
@@ -202,7 +191,7 @@ void SetBrk(void)
 {
     md.BreakFl = (u8)BreakCheck();
     SetBreakCheck(0);
-    SetVector(INT_CTRL_C, (u32)ROUTINE(CtrlC));
+    CtrlCTake();
 }
 
 /* Leave: have DOS look for Ctrl-C as it did. Then end the program with

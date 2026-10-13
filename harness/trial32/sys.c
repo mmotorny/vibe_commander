@@ -44,7 +44,10 @@
    (both.py, NOT_MADE): there the two differ until it does. ProgramRun
    and ProgramRunBare are not asked at all: a program that the toy could
    run, and what shows that it ran, come with the piece that makes them
-   (TODO.md, "The portable C in 32 bits: the plan", D2). */
+   (TODO.md, "The portable C in 32 bits: the plan", D2). And the seven
+   by which the program takes the critical error, Ctrl-Break and Ctrl-C
+   are called and no more: a device that fails, and what the program is
+   asked then, come with that piece too. */
 #include "vc.h"
 
 /* The main data, which the functions keep two things in: ErrDat and
@@ -839,6 +842,16 @@ TEXT(Mask_S, "TOY?.DAT");
 TEXT(Toy1_S, "TOY1.DAT");
 TEXT(Lower_S, "hello.txt");
 
+/* What the toy has the system ask about a device that fails: it has
+   the call fail. No device of the toy's does. */
+static u16 Fail(u16 how, u16 error, const u8 FAR *device)
+{
+    (void)how;
+    (void)error;
+    (void)device;
+    return DEVICE_FAIL;
+}
+
 /* The functions that dos32.c does not make yet: both.py knows the page
    by its first line. */
 static void Later(void)
@@ -916,6 +929,19 @@ static void Later(void)
     Cell('\'');
     Line();
     SAY("ProgramEnvironment "); Quoted(ProgramEnvironment(), 40);
+    Line();
+    /* What the system enters of the program, noted, taken and given
+       back in the order in which the program asks for that. Nothing
+       shows of it until a device fails or a key is pressed, which is
+       for a toy of the piece that makes them in dos32.c. */
+    DeviceErrorNote();
+    CtrlBreakNote();
+    DeviceErrorTake(Fail);
+    CtrlBreakTake();
+    CtrlCTake();
+    DeviceErrorGive();
+    CtrlBreakGive();
+    SAY("DeviceError and CtrlBreak noted, taken, given back; CtrlCTake");
     Line();
 }
 

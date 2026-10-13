@@ -1076,7 +1076,9 @@ BATCHES = [
         source="main.c",
         # FatErr is an interrupt function, which DOS calls and no stub:
         # it begins by loading DS with a number that is relocated, which
-        # coverage.py knows of.
+        # coverage.py knows of. In the portable C it is a static function
+        # of dos.c, the entry alone, and calls FtErr1 of main.c, which
+        # the program hands the system.
         routines=("FatErr",),
         functions=("FatErr",),
         unreached={

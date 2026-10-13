@@ -418,13 +418,13 @@ extern u8 __far Stack[];
    there, Alloc0 is where the program begins.
    TakeEnd has the program go on in Exit01 when DOS ends it. SetBrk
    notes whether DOS looks for Ctrl-C at every call, has it not do so,
-   and takes Ctrl-C, for CtrlC, which only returns. Exec runs the commands of DosBuf. AlocEr
+   and takes Ctrl-C, so that nothing happens for it. Exec runs the
+   commands of DosBuf. AlocEr
    says that there is no memory and leaves, with `bx` for what the
    original has in BX there, and Exit00 leaves with what DOS is to be
    told. */
 void TakeEnd(void);
 void SetBrk(void);
-void __interrupt __far CtrlC(void);
 void Exec(void);
 void AlocEr(u16 bx);
 void Exit00(u16 code);
@@ -480,8 +480,8 @@ enum {
 };
 u16 FncCall(u16 attributes);
 /* RestVct gives the vectors of the critical error and of Ctrl-Break back
-   to whoever had them, and HookVct takes them again, for FatErr and for
-   CtrlC of resident.c. Quit puts back what DOS had on the screen before
+   to whoever had them, and HookVct takes them again, the first for the
+   program's box, FtErr1. Quit puts back what DOS had on the screen before
    the program drew over it, but for the line of the key bar, which is
    blank if there is one. ErrRdy says that the disk of a drive cannot be
    read and asks for another drive: it returns the letter in the low
@@ -646,20 +646,19 @@ void StF09_00(void);
 void StRdHelp(void);
 void StHelp(void);
 
-/* What is of DOS on a PC alone, and no part of sys.h: where an interrupt
-   goes, as an address with the offset in the low word, and one made to
-   go somewhere, by DOS; the machine let interrupt the program again;
-   and the segment of the program's PSP, as DOS says it and as Alloc0 of
-   resident.c keeps it when the program begins, for itself and for the
-   functions of sys.h that read the PSP. See each in dos.c. */
-u32 Vector(u16 number);
-void SetVector(u16 number, u32 to);
+/* What is of DOS on a PC alone, and no part of sys.h: the machine let
+   interrupt the program again; and the segment of the program's PSP, as
+   DOS says it and as Alloc0 of resident.c keeps it when the program
+   begins, for itself and for the functions of sys.h that read the PSP.
+   See each in dos.c. */
 void IntOn(void);
 u16 ProgramPrefix(void);
 extern u16 PspSeg;
 
 /* The registers as an interrupt function of the compiler saves them on
-   the stack and puts them back: its first parameter. */
+   the stack and puts them back: its first parameter. dos.c has such
+   functions, where DOS and the BIOS enter the program, and resident.c
+   one, where DOS goes on when it has ended it. */
 struct Saved {
     u16 gs, fs, es, ds, di, si, bp, sp, bx, dx, cx, ax;
 };
@@ -1549,8 +1548,8 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #endif
 
 /* What is at a segment and an offset of DOS's own memory, outside all
-   that the words above name: the PSP, the environment, the header of a
-   device that DOS hands the critical error. It has the one body, a far
+   that the words above name: the PSP, which resident.c still reads
+   and writes so. It has the one body, a far
    pointer of 16 bits: its places go to dos.c or behind functions of
    sys.h before the program is run in 32 bits (TODO.md, the pieces S1
    to S3 of the plan), and it goes with the last of them. Until then

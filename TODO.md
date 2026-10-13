@@ -2235,7 +2235,10 @@ The 84 functions that `sys.h` had when this was written, by what the
 trial found of DOS/32A. It has 85 now: with S1 `ProgramPrefix` left
 it, and `ProgramTail`, `ProgramEnvironment` and `MemEnd` came, which
 read the PSP below the megabyte and ask DOS nothing; and `MemEnd` has
-gone again, with the Info panel's two lines on the memory.
+gone again, with the Info panel's two lines on the memory. And 92
+since S2, with the seven by which the program notes, takes and gives
+back the critical error, Ctrl-Break and Ctrl-C: those are of none of
+the three kinds below, since they ask the extender and not DOS.
 
 | Kind | Functions | Which |
 |---|---|---|
@@ -2250,7 +2253,7 @@ What is 16 bits in kind and changes shape for both builds, under the
 |---|---|---|---|
 | `ProgramRun(name, block)` | `struct EPBs`: three far pointers of real mode, which `resident.c`, `start.c` and `view.c` make with `MAIN_SEG` | `ProgramRun(name, tail)`; the block is `dos.c`'s to make, with the two file control blocks where the original has them | S1, done |
 | `ProgramPrefix()` and `PspSeg` | The PSP's segment, read at 0Ah, 2Ch, 02h and 81h in three files, 10 places | The command tail and the environment as pointers that `sys.h` answers with; the end of the memory as a number, if the Info still shows it then | S1, done for 2Ch and 81h: `ProgramEnvironment` and `ProgramTail`. 02h, the end of the memory, was `MemEnd` with S1 and is read no more: the Info does not show it (`DEVIATIONS.md`, 11). 0Ah, and the two themselves, are S3's: see "S1, the PSP and a program run" |
-| `Vector`, `SetVector` of `vc.h`; `FatErr` of `main.c`, `CtrlC` of `resident.c` | The program takes INT 24h, 1Bh and 23h itself, with interrupt functions | Functions of `sys.h` that take and give back the critical error and Ctrl-Break, in the order of today's calls; the entries in `dos.c`, which call `FtErr1` of `main.c` as a plain function | S2 |
+| `Vector`, `SetVector` of `vc.h`; `FatErr` of `main.c`, `CtrlC` of `resident.c` | The program takes INT 24h, 1Bh and 23h itself, with interrupt functions | Functions of `sys.h` that take and give back the critical error and Ctrl-Break, in the order of today's calls; the entries in `dos.c`, which call `FtErr1` of `main.c` as a plain function | S2, done: seven functions, and `FtErr1` is handed over where the critical error is taken and called through a pointer. See "S2, what DOS enters" |
 | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` of `resident.c` | The entry of the program, what DOS does when it ends it, COMMAND.COM's interrupt with the stack set by hand | In `dos.c`. `Main` is called by the entry; leaving is `ProgramEnd` with what has to be done first; Quick execute is a function that comes back, the stack kept and put back around the interrupt | S3 |
 | The memory by segment and paragraph | `MemTake`, `MemGive`, `MemResize` | As they are, through step 1 | Step 2 |
 
@@ -2661,7 +2664,7 @@ and H1 are started at once by the session.
 | P3, the tables read as what they are. Done: see below | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
 | P4, arithmetic. Done: see below | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
 | S1, the PSP and a program run. Done: see below | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
-| S2, what DOS enters | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
+| S2, what DOS enters. Done: see below | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
 | S3, the entry, the end, Quick execute | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
 | D1, `dos32.c`: what goes straight through. Done: see "Piece D1" below | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
 | D2, `dos32.c`: the rest | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
@@ -2765,7 +2768,7 @@ bits and plain in 32.
 | `MD_PLACE(pointer)` | A pointer into the main data | Its place there, a word | How far it is behind `&md` |
 | `MD_POINTER(place)` | A place of the main data | `u8 *` to it | `&md` and the place, cut to 16 bits first |
 | `TRELIST` | | Where the list of the tree begins, a place | One body, on `MD_PLACE` |
-| `DOS_AT(segment, offset)` | A segment of DOS's own and an offset: the PSP, the environment, the header of a device | A far pointer | None of its own: it is the cast in both, the host check counts it, and S1 to S3 take its 13 places away: S1 took eight, and five are left, one of S2 and four of S3 |
+| `DOS_AT(segment, offset)` | A segment of DOS's own and an offset: the PSP, the environment, the header of a device | A far pointer | None of its own: it is the cast in both, the host check counts it, and S1 to S3 take its 13 places away: S1 took eight and S2 one, and four are left, in `resident.c`, which are S3's |
 
 What is otherwise than the plan had it:
 
@@ -3803,6 +3806,183 @@ For D2:
   one. `ProgramRun` and `ProgramRunBare` are not asked: they want a
   program on the toy's disk to run and something that shows that it
   ran with the tail.
+
+### S2, what DOS enters: done, and what a later piece should know
+
+The three interrupts that the program takes are taken through `sys.h`,
+and where they arrive is in `dos.c`. `sys.h` has 92 functions, where it
+had 85, and a group of its own for them, "What the system asks the
+program, and the keys that stop one":
+
+| Function | What it is | In `dos.c` | In `dos32.c` |
+|---|---|---|---|
+| `DeviceErrorNote()` | Who is asked about a device that fails is noted | AX 3524h, into `ErrVct` of the main data | Not made: nothing |
+| `DeviceErrorTake(ask)` | The program is asked from now on, by the function `ask` | `ask` kept, and AX 2524h with the address of `FatErr` | Not made: nothing, and `ask` is never called |
+| `DeviceErrorGive()` | Whoever was noted is asked again | AX 2524h with `ErrVct` | Not made |
+| `CtrlBreakNote()`, `CtrlBreakTake()`, `CtrlBreakGive()` | The same for Ctrl-Break, which is taken so that nothing happens | AX 351Bh into `BrkVct`, 251Bh with the address of `CtrlC`, 251Bh with `BrkVct` | Not made |
+| `CtrlCTake()` | Ctrl-C taken so that nothing happens; DOS gives it back itself | AX 2523h with the address of `CtrlC` | Not made |
+
+What the program is asked by is a type of `sys.h`, `DeviceErrorFn`:
+
+    u16 ask(u16 how, u16 error, const u8 FAR *device)
+
+`how` is DOS's word for the error, AX as INT 24h has it, with the drive
+in the low byte, 1000h where DOS can try again and 8000h where no
+sector failed; `error` is DOS's number, DI whole, as the original reads
+it; `device` is 0 for a drive and else the name of the device, its 8
+characters in the header that DOS names. It answers `DEVICE_RETRY` or
+`DEVICE_FAIL`, DOS's 1 and 3. `FtErr1` of `main.c` is that function,
+static there, and `HookVct` hands it over. No address of real mode and
+no register crosses the header: the entry, `FatErr` of `dos.c`, reads
+BP:SI and the two bytes of the header that say what the device is.
+
+The seven places, each as it was and as it is:
+
+| Routine | Was | Is |
+|---|---|---|
+| `HookVct`, `main.c` | `md.ErrVct = Vector(INT_ERROR)`, `md.BrkVct = Vector(INT_BREAK)`, `SetVector(INT_ERROR, FatErr)`, `SetVector(INT_BREAK, CtrlC)` | `DeviceErrorNote()`, `CtrlBreakNote()`, `DeviceErrorTake(FtErr1)`, `CtrlBreakTake()` |
+| `RestVct`, `main.c` | `SetVector(INT_ERROR, md.ErrVct)`, then `RstVc1` | `DeviceErrorGive()`, then `RstVc1` |
+| `RstVc1`, `main.c` | `SetVector(INT_BREAK, md.BrkVct)` | `CtrlBreakGive()` |
+| `SetBrk`, `resident.c` | `SetVector(INT_CTRL_C, CtrlC)` behind the two calls for the check | `CtrlCTake()` behind them |
+
+And the three entries: `FatErr` was an interrupt function of `main.c`
+and is one of `dos.c`; `CtrlC` was one of `resident.c` and is one of
+`dos.c`, static; and the header of the device, the one place of
+`DOS_AT` that was S2's, is read there. `Vector` and `SetVector` are
+static in `dos.c` and gone from `vc.h`.
+
+What decided: the whole suite, with `VC.EXE` 26 bytes longer, 197,052
+behind the Info panel's piece, which landed in front of this one; no
+golden changed; `python3 tools/calls.py`
+counts none; the host check's record is written anew, with `main.c`
+down to 8 numbers and no interrupt function, `resident.c` an interrupt
+function and a function's address fewer, `vc.h` without its interrupt
+function, and `dos.c` with the two entries and the three addresses of
+them; `python3 harness/trial32/both.py` passes, and `whole.py` links.
+
+What DOS is asked and in which order is what it was: the four calls of
+`HookVct` are still four calls in its own lines, both read and then
+both set, and each function is the one call that the line was, through
+the same `Vector` and `SetVector` with the same registers. No row was
+added to entry 6 of `DEVIATIONS.md`, and no deviation is declared: no
+call was added, taken away or moved, and none hands DOS anything else.
+One thing is read earlier, which no call and no screen shows: the entry
+looks at the header of the device before it asks the program, where the
+original looks at it only when it shows a box, behind `ErrDat` and
+`BlocEr`. It is a byte of DOS's memory read, at an address that DOS has
+just handed over.
+
+The stack: every scenario leaves to the byte what it left before, 159
+figures of 159, 3,502 at the least, in `copy-dirs`; `not-ready` and
+`phantom` 3,662, `device` 3,504. That was measured on the tree as it
+was before the Info panel's piece. The call through the pointer costs
+what the call of a static function of the same file cost, a far return
+address, and what `ask` takes goes in registers.
+
+What is otherwise than the plan had it:
+
+- The program's function is handed over, and not called by its name.
+  The plan had `dos.c` call `FtErr1` of `main.c`; "An implementation of
+  the layer for tests" asks for call backs "that the layer names and
+  the program hands it", and that costs four bytes of data and a call
+  through them. So `dos.c` names nothing of the program, `FtErr1`
+  stays static, and the toy needs no function of that name: S1's
+  warning for this piece is moot, and it stands for S3, which has
+  `dos.c` call `Main`.
+- Ctrl-Break and Ctrl-C have no call back: the program does nothing
+  when either arrives, and `CtrlC` of `dos.c` is the routine that only
+  returns. A system that has something to say there gets a function
+  handed over as the critical error has.
+- `FatErr` is not static in `dos.c`, though only `dos.c` names it:
+  `harness/ported.py` holds that the function of that name has run, in
+  the batch of the critical error, and looks for it among the map's
+  symbols that are not static. The first run of the suite failed for
+  that alone, with every scenario passed. Both entries keep the names
+  that the routines have in the assembly, since they are what those
+  are.
+- Who had the two is kept where it was, in `ErrVct` and `BrkVct` of the
+  main data, which `dos.c` writes and reads now and nothing else does:
+  the layout of the main data is held, as it was for `EPB` in S1.
+- `SetBrk` stays in `resident.c` and is the program's: three functions
+  of `sys.h` in the original's order, with nothing of DOS left in it.
+
+`AskEs`, and what was found of it. It was not moved, and the entry's
+move did not force it: `FtErr1` sets `md.ErrDat` as before, and `AskEs`
+of `dos.c` clears it in front of a call and reads it behind. What
+keeps that decision under the header is not the entry any more. It is
+that a call given up is known by a byte of the program's: the answer
+`DEVICE_FAIL` does not say it, since `FtErr1` answers that also where
+it shows no box, with `BlocEr` set and `ErrDat` clear, and such a call
+is not made the error 53h but asked about, AH 59h. So `dos.c` cannot
+go by what the function answered without a third answer for "fail, and
+I did not ask". To have the decision above the header, the functions
+that are asked with the program's errors would be the bare ones with a
+routine of the program around each, which clears `ErrDat`, looks at it
+and asks for the extended error: one function more in `sys.h`, for AH
+59h, and some forty to go through. That is step 3's to weigh.
+
+`IntOn`, which is not of this piece's row and is where the critical
+error still shows in the common code: DOS enters `FatErr` with the
+machine kept from interrupting, the compiler's interrupt function
+leaves it so, and the box that `FtErr1` shows gets its keys because
+`Window`, `MovScr` and `MinBx3` call `IntOn`. It is declared in `vc.h`
+with what is of DOS alone, and `dos32.c` has none.
+
+For S3:
+
+- `dos.c` has interrupt functions now, with `struct Saved` of `vc.h`
+  for the registers, and `HANDLER(function)` for the address of one as
+  DOS takes it, which is what `ROUTINE` of `resident.c` is. When
+  `Exit01` and `Exit05` are there, `struct Saved` can leave `vc.h`.
+- A function of a batch's `functions` in `harness/ported.py` that
+  becomes static is not found: see `FatErr` above. Look at the batches
+  for the names that move, before the suite is run.
+- A macro of `dos.c` may not have the name of one of `vc.h`: `ENTRY` is
+  a file of a panel by its address there, and the build stopped for
+  it, W140.
+- The program gives Ctrl-Break back when it leaves, `Exit` of `main.c`
+  by `RstVc1`, and not the critical error or Ctrl-C, which DOS puts
+  back from the PSP. That is the original's, and stays the program's
+  row. The plan has the extender write a warning for a vector that is
+  still taken when the program ends: giving those two back is then
+  `dos32.c`'s own business where it ends the program, and no call of
+  the program's.
+- `DOS_AT` has four places left, all in `resident.c`: `PSP_EXIT` three
+  times and the far call into the PSP in `Alloc0`.
+- The four functions of `sys.h` that the entry of the program asks
+  before `Main`, and what leaving does, are untouched by this piece.
+
+For D2:
+
+- The seven are stubs in `dos32.c`, at the end of its second part, 21
+  that are not made where it had 14; the comment in front of them says
+  what the call has to be. What the plan has for them stands: DPMI
+  0204h and 0205h for the three, with who had the first two kept in
+  variables of `dos32.c`, six bytes each, and not in `ErrVct` and
+  `BrkVct`, which are four.
+- The routine that the critical error arrives at has to call
+  `ask(how, error, device)` with AX and DI as DOS has them and
+  `device` a pointer: the header is at BP:SI of real mode, 16 times BP
+  and SI in a flat memory, the byte at 5 says with 80h that it is no
+  drive, and the name is at 10. AL of the answer goes back to DOS; the
+  original has AH 0 there, and `dos.c` hands back the whole word.
+- It has to go over to the program's stack first, and that stack is
+  in use: DOS was called from somewhere in the program, or a program
+  that this one has run called it (`Aexec0` of `view.c` runs the
+  viewer and the editor that a user has set up with the critical error
+  still the program's). So the routine wants the stack pointer as it
+  was where DOS was called, and goes on below it: `Dos` of `dos32.c`
+  and the call in real mode are where that is known.
+- What `ask` does inside: it draws a box, `Dialog`, which waits for
+  keys, calls the BIOS and the mouse, reads the timer and makes the
+  idle call, INT 28h, each through the extender again; and
+  `IntOn`. "What could go wrong", 3, is that.
+- The toy calls the seven in the program's order on its last page,
+  with a function that answers `DEVICE_FAIL`, and prints a line; in
+  16 bits that takes the three and gives two back on the bench.
+  Nothing makes a device fail there. A file made on the diskette that
+  the bench boots from does, by the trial; in 32 bits that waits for
+  the functions, since DOS's own question would wait for a key.
 
 ## The portable C in 32 bits: what a trial on the bench showed
 
