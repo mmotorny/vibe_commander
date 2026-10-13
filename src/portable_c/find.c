@@ -67,7 +67,6 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
    declared in vc.h: it returns where the program goes on, one of the TO_
    there, and in the high word, for TO_F24_02, the panel whose directory
    is another now. */
-#pragma aux FindFil "*_c" __far parm [ax] value [ax] modify exact [ax]
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -120,8 +119,6 @@ void NormStr(u8 __far *text);
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
 void V81_00(void);                                      /* view.c */
 u32 V82_00(u16 segment, u16 at, u16 count);
-#pragma aux V81_00  "*_c" __far modify exact [ax]
-#pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
 /* Objects that are named by their offsets, of src/c/find_t.c but for
    Mask_S, which is of another file: Mask_S is \*.*, and four bytes are

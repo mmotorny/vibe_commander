@@ -540,23 +540,35 @@ multiply and divide such numbers. In the part that stays in the memory
 one jump of the inline assembly is far for it: from the nine
 instructions of INT 2Eh to the function that goes on behind them.
 
-The registers go from its functions. In the C translation a function
-that another file calls takes its arguments and returns its value in the
-registers that the assembly called it with, by a `#pragma aux` that also
-says what it changes and gives it a name of its own for the linker;
-there is no assembly left to call it, and in the portable C such a
-function is called as the compiler calls any other, under the name that
-the compiler gives it. So far that holds for the routines that the rest
-of the program rests on: the screen buffer, numbers and texts, the
-lists of files, the places of the panels, boxes and windows, the mouse,
-the keys and the line that is typed into, the bars, the extension
-files, the setup file, and the calls of DOS and the BIOS; and for what
-is drawn and asked at the panels: a panel of files, the tree and the
-Info, the tree in its box, the box of the drives, the help, the menu
-bar, the dialogs, the command line, the user menu and the map of the
-memory. Those are 169 functions of 330. The functions of
-`src/portable_c/dos.c` keep a `#pragma aux` for their names alone, since
-that file is compiled twice.
+The registers are gone from its functions. In the C translation a
+function that another file calls takes its arguments and returns its
+value in the registers that the assembly called it with, by a
+`#pragma aux` that also says what it changes and gives it a name of its
+own for the linker; there is no assembly left to call it, and in the
+portable C such a function is called as the compiler calls any other,
+under the name that the compiler gives it: 329 functions, and the type
+of the five among them that are called through a table. What a function
+takes and returns is as it was, so one that hands back two things still
+has them as the halves of one number; making those what they mean, a
+structure or two functions, is the next step there (see `TODO.md`).
+
+The lines that say something of registers still, and why:
+
+| What | Where | How many |
+|---|---|---|
+| Inline assembly: the instruction and the registers it takes and leaves | `src/portable_c/dos.c`, and `DataSeg` of `main.c` | 10 |
+| The compiler's own routines for arithmetic on 32 bits, which it calls with registers of its choosing | `__U4M`, `__U4D` of `arith.c` | 2 |
+| DOS's routine for capitals, which is no function of the program: called through a pointer, with the letter in AL | `CaseMapFn` of `dos.c` | 1 |
+| Where the part that stays in the memory calls the rest of the program, and the rest calls it, through far pointers made when the program runs: the two sides are compiled apart and agree by these lines | `TrnMain` of `vc.h`, `Transit`, `Release`, `SetBrk` of `resident.c`, `ReleaseFn` of `memory.c`, `StaysFn` of `start.c` | 6 |
+| The command for COMMAND.COM's INT 2Eh, in SI as the interrupt takes it, for a function that is inline assembly | `Int2E` of `resident.c` | 1 |
+
+The two functions of `resident.c` among those are `__loadds` besides:
+they are entered with DS anywhere and load it themselves. An interrupt
+function has no such line, since the compiler saves every register for
+it. Seven more lines say that a function does not return, `aborts`,
+one of them with its name.
+The functions of `src/portable_c/dos.c` keep a `#pragma aux` for their
+names alone, since that file is compiled twice, once into each part.
 
 ## Testing
 

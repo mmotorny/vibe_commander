@@ -56,8 +56,6 @@ u16 F35_61(u16 answer, u16 place);
 /* C00_00 is what FncAddr names, and F35_61 what the dialogs of the
    commands name for F10. The commands, F35_01 and F45_01, are declared in
    vc.h. */
-#pragma aux C00_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F35_61 "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.

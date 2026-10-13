@@ -407,7 +407,6 @@ enum {
     FNC_M30_50                          /* set attributes: dirfunc.c */
 };
 u16 FncCall(u16 attributes);
-#pragma aux FncCall "*_c" __far parm [ax] value [ax] modify exact [ax]
 /* RestVct gives the vectors of the critical error and of Ctrl-Break back
    to whoever had them, and HookVct takes them again: it returns where
    its routine for Ctrl-Break is, in the part of the program that stays
@@ -420,10 +419,6 @@ void RestVct(void);
 u16 HookVct(void);
 void Quit(void);
 u16 ErrRdy(u16 letter);
-#pragma aux RestVct "*_c" __far modify exact [ax dx]
-#pragma aux HookVct "*_c" __far value [ax] modify exact [ax]
-#pragma aux Quit    "*_c" __far modify exact [ax]
-#pragma aux ErrRdy  "*_c" __far parm [ax] value [ax] modify exact [ax]
 /* The start of the program, start.c. Init00 reads the setup, when the
    program has been loaded, and Init11 asks DOS for the main data, when it
    has, and after every command: `stays` is the segment of the part of
@@ -443,15 +438,11 @@ void Init00(u16 stays);
 u32 Init11(u16 stays, u16 block);
 void IniData(void);
 u32 TrnMain(u16 first);
-#pragma aux Init00  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux Init11  "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
-#pragma aux IniData "*_c" __far modify exact [ax]
 #pragma aux TrnMain "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 /* Read what a panel shows, keeping the cursor of a list of files and
    what is selected in it if `keep` is not 0: not 0 if it could not be
    read. See read.c. */
 u16 ReDir(u16 panel, u16 keep);
-#pragma aux ReDir   "*_c" __far parm [dx] [ax] value [ax] modify exact [ax]
 /* The setup file: see each in setup.c. MakeIni writes into MenuBuf what
    the file holds, and returns how long that is. SaveSet writes it to the
    file: 1 in the high word if it could not, with what DOS answered in
@@ -758,7 +749,6 @@ struct Regs {
    moves the cursor and which the speed search calls too, returns what it
    leaves in the two, BX in the low word. */
 u32 F00_50(u16 panel, u16 cursor, u16 first);
-#pragma aux F00_50 "*_c" __far parm [ax] [si] [di] value [dx ax] modify exact [ax dx]
 u32 F00_60(u16 panel, u16 cursor, u16 first, u16 buttons,
            struct Regs STACK *r);
 u32 F00_00(u16 panel, struct Regs STACK *r);
@@ -789,33 +779,6 @@ u32 F17_01(u16 panel);
 u32 F79_00(u16 panel);
 u32 F18_00(u16 panel);
 u32 F20_00(u16 panel);
-#pragma aux F00_60 "*_c" __far parm [ax] [si] [di] [cx] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F00_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F00_05 "*_c" __far parm [ax] [si] [di] [cx] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F01_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F01_05 "*_c" __far parm [ax] [si] [di] [dx] [cx] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F02_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F03_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F04_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F05_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F06_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F07_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F08_00 "*_c" __far parm [ax] [bx] value [dx ax] modify exact [ax dx]
-#pragma aux F76_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F76_01 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F09_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F10_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F78_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F11_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F12_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F13_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F14_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F15_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F16_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F17_01 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F79_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F18_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F20_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 
 /* Enter, the directory changed and the history, enter.c. F21_10 is Enter
    on the entry under the cursor, F21_25 a command of the command line
@@ -836,20 +799,6 @@ u32 F26_00(void);
 u32 F27_00(u16 panel);
 u32 F30_00(u16 panel);
 u32 F75_00(u16 panel);
-#pragma aux F21_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F21_10 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F21_25 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F21_31 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F22_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F23_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F24_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F24_01 "*_c" __far parm [ax] [dx] value [dx ax] modify exact [ax dx]
-#pragma aux F24_02 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F25_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F26_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F27_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F30_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F75_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 
 /* The viewer and the editor, view.c and edit.c: the commands, and what
    they go on in. V00_02 opens the file ViewFil and says in `open` what it
@@ -876,19 +825,7 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open);
 void V00_10(u16 handle);
 void V13_00(void);
 void V13_01(u16 changed);
-#pragma aux F43_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F44_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux F63_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F64_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F33_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F34_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F34_10 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux V00_02 "*_c" __far parm [ax] [dx] [bx] [di] value [ax] modify exact [ax]
-#pragma aux V00_10 "*_c" __far parm [bx] modify exact [ax]
-#pragma aux V13_00 "*_c" __far modify exact [ax]
-#pragma aux V13_01 "*_c" __far parm [ax] modify exact [ax]
 u16 T00_00(u16 handle, u16 begin, u16 size, u16 saved);
-#pragma aux T00_00 "*_c" __far parm [bx] [ax] [dx] [si] value [ax] modify exact [ax bx cx dx si di es]
 
 /* The commands of the menus, commands.c: `panel` is the current panel,
    or the panel of the Left or the Right menu, and `item` what the
@@ -923,34 +860,6 @@ u16 M71_00(u16 panel);
 u16 M72_00(u16 panel);
 u16 M73_00(u16 panel);
 u16 M75_00(u16 panel);
-#pragma aux M01_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M01_01 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M03_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M06_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M06_10 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M08_00 "*_c" __far parm [ax] [cx] value [ax] modify exact [ax]
-#pragma aux M16_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M16_01 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M16_10 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M21_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux M41_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux M42_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F69_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M49_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M60_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux M61_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux M53_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M62_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M63_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M64_00 "*_c" __far parm [cx] value [ax] modify exact [ax]
-#pragma aux M66_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M67_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M69_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M70_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M71_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M72_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M73_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M75_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
 
 /* Directories made, files deleted, attributes and the label, dirfunc.c;
    and where a command ends that goes through files: FncSel for those
@@ -967,16 +876,6 @@ u16 F54_00(void);
 u16 FncMas(u16 include);
 u16 FncSel(void);
 u16 FncExt(void);
-#pragma aux F37_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F47_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux F38_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F48_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux F58_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M30_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F54_00 "*_c" __far value [ax] modify exact [ax]
-#pragma aux FncMas "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux FncSel "*_c" __far value [ax] modify exact [ax]
-#pragma aux FncExt "*_c" __far value [ax] modify exact [ax]
 
 /* Copy and Rename, copy.c: `command` is 1 to rename, and `directories`
    and `files` are what the original has in BX and DX at the jump. Where
@@ -984,8 +883,6 @@ u16 FncExt(void);
    they come: see F35_50 there. */
 u32 F35_01(u16 panel, u16 command, u16 directories, u16 files);
 u32 F45_01(u16 panel, u16 command, u16 directories, u16 files);
-#pragma aux F35_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
-#pragma aux F45_01 "*_c" __far parm [ax] [cx] [bx] [dx] value [dx ax] modify exact [ax dx]
 
 /* The file search, find.c, which returns a place of dirfunc.c's and in
    the high word, with TO_F24_02, the panel; the map of the memory,
@@ -996,7 +893,6 @@ u32 F45_01(u16 panel, u16 command, u16 directories, u16 files);
    the box of the drives, drive.c; and the menu bar, menu.c. See each
    there. */
 u32 F67_00(void);
-#pragma aux F67_00 "*_c" __far value [dx ax] modify exact [ax dx]
 void F65_00(void);
 void F73_00(u16 key);
 u16 F74_00(void);
@@ -1015,7 +911,6 @@ u32 F39_00(u16 again, u16 panel);
    its turn. See
    enter.c. */
 u32 F21_30(void);
-#pragma aux F21_30 "*_c" __far value [dx ax] modify exact [ax dx]
 /* The commands of a line of an extension file or a menu file, in
    MenuBuf: F34_30 looks for the next one from `text`, and F34_40 at
    whether the command at `text` is only the name of a file, a program
@@ -1024,23 +919,18 @@ u32 F21_30(void);
    command, or if it is such a name. See view.c. */
 u32 F34_30(u16 text);
 u32 F34_40(u16 text, u16 view);
-#pragma aux F34_30 "*_c" __far parm [si] value [dx ax] modify exact [ax dx]
-#pragma aux F34_40 "*_c" __far parm [si] [cx] value [dx ax] modify exact [ax dx]
 /* Have both panels read again: where a command ends that has changed
    what is on the disk. Returns 1. See dirfunc.c. */
 u16 FncEx1(void);
-#pragma aux FncEx1 "*_c" __far value [ax] modify exact [ax]
 
 /* Calls what FncAddr names for every file of the directory at TmpBuf, and
    returns 1 if every call did what it was to, 0 if one did not, and 100h
    when it was stopped. */
 u16 DirFunc(void);                                      /* dirfunc.c */
-#pragma aux DirFunc "*_c" __far value [ax] modify exact [ax]
 /* Marks the tree's file of the drive that `path` names, or of the current
    one, as out of date. Returns what DOS answered in the low word, and
    something that is not 0 in the high one for an error. */
 u32 DelTr0(const u8 *path);
-#pragma aux DelTr0  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 
 /* The boxes and the dialogs, which the assembly describes: `box`,
    `include`, `table`, `control` and `colors` are offsets in its code

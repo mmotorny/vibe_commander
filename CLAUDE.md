@@ -1218,6 +1218,54 @@ in "The portable C".
   name of a function for a far place: `jmp Exec2E` in `Int2E` of
   `resident.c` is a far jump there, with a relocation of the part that
   stays.
+- What the compiler does with a function that has no `#pragma aux`,
+  read in the listings: the arguments come in AX, DX, BX and CX in
+  their order, a far pointer in two of them, and what does not fit
+  there on the stack; a value in AX or in DX:AX; a structure of four
+  bytes or fewer in DX:AX as well, and a larger one through a pointer
+  in SI to room in the caller's frame, which the function fills through
+  SS, so it works with the stack outside the data. The function keeps
+  every register that carries neither, but ES.
+- The registers went from a function in every file at once. A file
+  that calls a function of another often declares it for itself, with
+  a line of its own, and the name went with the registers, `Name_`
+  where it was `Name_c`: a declaration left behind is an undefined
+  symbol at the linker. A line that kept the name and lost the
+  registers in one file only would link, and call wrongly.
+  `harness/ported.py` finds a function under either name.
+- A pointer to a function has the convention of its type, and nothing
+  holds that against the function at the linker: the type and every
+  function called through it change together. `FncFn` of `dirfunc.c`
+  and its five functions did; the casts in their table went, since the
+  functions are of that type now.
+- Before the registers of a function go, two things are worth knowing,
+  and were looked at for all of them by a script: that every
+  declaration of it is its definition word for word, and whether a
+  call has arguments whose order of working out could matter, one that
+  calls something next to one that calls or reads memory. There were
+  20 such calls, and none where it matters.
+- A comment in front of the lines often said what they were for, "How
+  the assembly passes arguments to these", "saves every register", and
+  is stale when they go: look at what stood in front of each line
+  taken out.
+- What still has registers in a `#pragma aux`, and stays so until the
+  thing itself changes: the inline assembly of `dos.c` and `DataSeg`;
+  `__U4M` and `__U4D`, whose registers are the compiler's; `CaseMapFn`,
+  DOS's routine; and the seam between the two parts of the program,
+  `TrnMain`, `Transit`, `Release`, `SetBrk`, `ReleaseFn`, `StaysFn`,
+  with `Int2E`. The functions of `dos.c` have a `#pragma aux` for the
+  name alone, `DOS_NAME`, since the file is compiled twice. All of the
+  seam goes when the program stays in the memory whole.
+- A function that returned two things as one number of 32 bits is to
+  return what it means (`TODO.md` has the list and how it divides).
+  Change it so that a call which was not changed does not compile: a
+  structure returned by value does that, since no shift or cast takes
+  one apart, and costs nothing where it is two words. A value with a
+  pointer for the second thing does too, by the count of arguments,
+  but the pointer is to a local variable and wants `STACK`, which is
+  this compiler's. What does not: the same function returning one of
+  the two as a `u16`, which every old caller still compiles against,
+  and reads as the low word.
 
 ## Work by several agents
 

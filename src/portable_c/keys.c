@@ -19,7 +19,6 @@
 void F20_02(u16 panel);
 
 /* F20_02 is a routine, which other files call too, as F00_50 of vc.h. */
-#pragma aux F20_02 "*_c" __far parm [ax] modify exact [ax]
 
 /* What a command returns: where the program goes on, a NEXT_ of vc.h.
    The menu's routines take a panel, in the high word, and a byte, in the

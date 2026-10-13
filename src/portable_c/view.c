@@ -95,21 +95,6 @@ u32 V82_00(u16 segment, u16 at, u16 count);
    called by the keys of the viewer, which are looked at here: V80_00 and
    V82_00 by the editor too, V82_00 by the file search. The segment of the
    text is what the assembly has in DS. */
-#pragma aux V80_00  "*_c" __far parm [ax] [bx] modify exact [ax]
-#pragma aux NextLin "*_c" __far parm [dx] [bx] value [ax] modify exact [ax]
-#pragma aux PrevLin "*_c" __far parm [dx] [bx] value [ax] modify exact [ax]
-#pragma aux V20_00  "*_c" __far parm [ax] value [si] modify exact [si]
-#pragma aux V25_00  "*_c" __far modify exact [ax]
-#pragma aux V30_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux V31_00  "*_c" __far parm [bx] modify exact [ax]
-#pragma aux V32_00  "*_c" __far parm [bx] [ax] [si] [cx] modify exact [ax]
-#pragma aux V40_00  "*_c" __far value [ax] modify exact [ax]
-#pragma aux V50_00  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux V51_00  "*_c" __far parm [ax] modify exact [ax]
-#pragma aux V55_00  "*_c" __far parm [ax] [dx] [cx] [bx] modify exact [ax]
-#pragma aux V60_00  "*_c" __far parm [ax] [si] [di] modify exact [ax]
-#pragma aux V81_00  "*_c" __far modify exact [ax]
-#pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -136,8 +121,6 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 u32 T70_00(u16 line);                                   /* edit.c */
 void T71_00(u16 function, u16 place, u16 step);
-#pragma aux T70_00  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux T71_00  "*_c" __far parm [ax] [bx] [dx] modify exact [ax bx cx dx si di]
 
 /* Boxes, dialogs and texts of src/c/view_t.c, which DialBox and Dialog
    take by their offsets in the segment that AsmSeg returns. */

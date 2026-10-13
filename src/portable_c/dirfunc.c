@@ -46,12 +46,7 @@ u32 M30_60(u16 answer);
 static u32 F38_60(void);
 static u16 FncMs1(u16 include);
 
-/* The registers of these are those that the assembly called them with,
-   while it did. DirFunc and DelTr0 are in vc.h. */
-#pragma aux F38_10  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux F38_40  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M30_50  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M30_60  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
+/* DirFunc and DelTr0 are in vc.h. */
 /* The commands, with FncMas, FncSel and FncExt, are declared in vc.h:
    see "The commands" there. */
 
@@ -97,7 +92,6 @@ void PutDate(u16 date, struct DateText STACK *text);
 u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText STACK *text);
 u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
-#pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 
 /* Boxes and texts, constants of src/c/dirfunc_t.c but for Empty_S, which
    OncZoom and Dialog take by their offsets in the segment that the
@@ -184,14 +178,9 @@ extern const u8 __far NoFnc_B[];        /* "Can't find file" */
 u16 C00_00(u16 attributes);
 u16 DiSi10(u16 attributes);
 u16 FindFil(u16 attributes);
-#pragma aux C00_00  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux DiSi10  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux FindFil "*_c" __far parm [ax] value [ax] modify exact [ax]
-typedef u16 __far FncFn(u16 attributes);
-#pragma aux FncFn parm [ax] value [ax] modify exact [ax]
+typedef u16 FncFn(u16 attributes);
 static FncFn * const CODE Fnc_T[] = {
-    (FncFn *)C00_00, (FncFn *)DiSi10, (FncFn *)FindFil, (FncFn *)F38_40,
-    (FncFn *)M30_50
+    C00_00, DiSi10, FindFil, F38_40, M30_50
 };
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))

@@ -44,8 +44,6 @@ static void Exit(void);
 /* Quit, RestVct and HookVct are in vc.h. */
 void RstVc1(void);
 
-#pragma aux ErrRdy   "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux RstVc1   "*_c" __far modify exact [ax dx]
 
 /* Where the loop is entered: what Command returns. */
 enum {

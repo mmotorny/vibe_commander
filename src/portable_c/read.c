@@ -49,12 +49,7 @@ u16 DiSi10(u16 attributes);
 void TstInfo(u16 panel);
 static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
 
-/* The registers of these are those that the assembly called them with,
-   while it did. ReDir is in vc.h. */
-#pragma aux GetVol  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux DirSize "*_c" __far parm [ax] modify exact [ax]
-#pragma aux DiSi10  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux TstInfo "*_c" __far parm [ax] modify exact [ax]
+/* ReDir is in vc.h. */
 
 /* The names of files: Mask_S is \*.* and Ext_F is VC.EXT. They are
    copied with MvzLine, which takes what follows a text along, so they

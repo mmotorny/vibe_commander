@@ -118,31 +118,8 @@ void T75_00(u16 number, u16 *screen, u16 color);
 void T76_00(u16 place, u16 segment, u16 text, u16 colors);
 u16 T80_00(void);
 
-/* T00_00, the editor itself, is declared in vc.h. The registers of the
-   others are those that the assembly called them with, while it did:
-   the viewer calls T70_00 and T71_00. */
-#pragma aux T50_00 "*_c" __far modify exact [ax]
-#pragma aux T51_00 "*_c" __far modify exact [ax]
-#pragma aux T53_00 "*_c" __far parm [bx] value [ax] modify exact [ax]
-#pragma aux T53_10 "*_c" __far parm [dx] [si] value [dx ax] modify exact [ax dx]
-#pragma aux T54_00 "*_c" __far parm [bx] value [ax] modify exact [ax]
-#pragma aux T55_00 "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux T56_00 "*_c" __far parm [dx] [bx] [di] [cx] [ax] modify exact [ax bx cx dx si di]
-#pragma aux T57_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux T57_01 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux T57_02 "*_c" __far value [ax] modify exact [ax dx]
-#pragma aux T62_00 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux T63_01 "*_c" __far parm [dx] [bx] value [ax] modify exact [ax]
-#pragma aux T64_00 "*_c" __far parm [dx si] [di] [cx] value [ax] modify exact [ax]
-#pragma aux T70_00 "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux T71_00 "*_c" __far parm [ax] [bx] [dx] modify exact [ax bx cx dx si di]
-#pragma aux T72_00 "*_c" __far parm [ax] [dx] [si] [bx] modify exact [ax]
-#pragma aux T73_00 "*_c" __far modify exact [ax]
-#pragma aux T73_10 "*_c" __far value [dx ax] modify exact [ax dx]
-#pragma aux T74_00 "*_c" __far modify exact [ax cx si di]
-#pragma aux T75_00 "*_c" __far parm [cx] [di] [ax] modify exact [ax]
-#pragma aux T76_00 "*_c" __far parm [bx] [dx] [si] [ax] modify exact [ax]
-#pragma aux T80_00 "*_c" __far value [ax] modify exact [ax bx cx dx si di]
+/* T00_00, the editor itself, is declared in vc.h. Of the others the
+   viewer calls T70_00 and T71_00. */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -172,8 +149,6 @@ void PathLin(u8 __far *text);                           /* string.c */
    0 for the bytes that it names in hex, and 100h for neither. */
 void V80_00(u16 include, struct Box STACK *where);      /* view.c */
 u32 V82_00(u16 segment, u16 at, u16 count);
-#pragma aux V80_00  "*_c" __far parm [ax] [bx] modify exact [ax]
-#pragma aux V82_00  "*_c" __far parm [bx] [si] [cx] value [dx ax] modify exact [ax dx]
 
 /* How long the text is that V80_00 has made ready. */
 #define SrchLen (*(u16 *)(md.HelpBuf + 90))

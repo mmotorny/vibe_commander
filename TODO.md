@@ -3,6 +3,49 @@
 Things that are known and not done. Standing instructions are in
 `CLAUDE.md`; this is the list of loose ends.
 
+## The portable C: two things in one number
+
+The functions of `src/portable_c/` have lost the registers that the
+assembly called them in (see the README, "The portable C"). What they
+take and return has not changed, and that is the half of the work that
+is left: where the assembly handed back two registers, or a register
+and a flag, the C translation returns one number of 32 bits with a
+thing in each half, and the caller takes it apart with shifts and
+casts. 114 functions return such a number. A few of them are numbers:
+`Timer`, the product and the quotient of `arith.c`, an address as DOS
+has it. The others are to return what they mean, a structure as a rule,
+and every caller to read that.
+
+It divides, by who calls what:
+
+- First, by one agent, what nearly every file calls, since it changes
+  lines everywhere: `GetMous` (45 calls in 15 files), `Int16` (21 in
+  9), `OpenFil` (17 in 8), `EdLin`, `Int10m`, `PgUp` and `PgDn`,
+  `DosTime`, `TotSel`, `DelTr0`, `MinMnu` and `MnMn10`, `Int2F`,
+  `Input0`, `FndItem`, `SaveSet`.
+- Then side by side, each with files that the others leave alone:
+  - the commands and the loop: what a command returns, a place of the
+    loop with a byte and a panel, in `keys.c`, `enter.c` and the
+    commands of `view.c`, and `CmdEnd` of `main.c`, which takes it
+    apart; with them `F00_50`, `F77_00` of `cmdline.c`, `F39_00` of
+    `menu.c`, `F67_00` of `find.c`, `F35_01` and `F45_01` of `copy.c`,
+    `Init11` of `start.c`, which all come back to `main.c`;
+  - the editor, `edit.c`: ten functions that only it calls, but for one
+    call of `T70_00` in `view.c`;
+  - the rest of `view.c`: `V82_00`, `F34_30`, `F34_40`, with their
+    calls in `edit.c`, `find.c` and `usermenu.c`;
+  - what a file keeps to itself: `dialog.c`, `copy.c`, `dirfunc.c`,
+    `extfile.c`, `usermenu.c`, `read.c`.
+  `vc.h` has the declarations in blocks by file, so each changes its
+  own block. `main.c` is the one file that two of them meet in: the
+  commands' agent has `Command` and `CmdEnd`, and `F35_90` there goes
+  with `copy.c`.
+- They are found by their type: a function defined `u32`, and every
+  place where its name stands in front of a parenthesis.
+
+`CLAUDE.md`, "Notes on the portable C", has how such a function is
+written so that a call that was not changed does not compile.
+
 ## The last of the assembly
 
 Done: the C translation has no assembly file, and its build runs no

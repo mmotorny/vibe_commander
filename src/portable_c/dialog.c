@@ -120,9 +120,6 @@
 u16 F38_10(u16 answer);                                 /* dirfunc.c */
 u32 M30_60(u16 answer);
 u16 F35_61(u16 answer, u16 place);                      /* copy.c */
-#pragma aux F38_10  "*_c" __far parm [ax] value [ax] modify exact [ax]
-#pragma aux M30_60  "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
-#pragma aux F35_61  "*_c" __far parm [ax] [bx] value [ax] modify exact [ax]
 
 /* C routines of other files that vc.h does not have. */
 u16 LnStr(const struct LineArgs STACK *args);           /* line.c */
