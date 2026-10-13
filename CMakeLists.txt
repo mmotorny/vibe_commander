@@ -650,7 +650,7 @@ add_test(NAME harness-le
 # where the linker has put the tables, the main data, the stack and what
 # has no value, by the file and the linker's map of it, and that its stub
 # is DOS/32A's with the banner switched off. See harness/layoutcheck.py.
-# It runs no machine. No other test reads those programs yet.
+# It runs no machine.
 foreach(tree portable_c32 portable_c32-debug)
     # Each under the name of its target, and the second in the directory
     # debug of the first.
@@ -671,3 +671,17 @@ add_test(NAME portable_c32-data
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
             --quiet --source ${CMAKE_SOURCE_DIR}/src/portable_c
             ${layout_dir} ${CMAKE_BINARY_DIR}/portable_c32)
+# The program of 32 bits through the scenarios, as the C trees above go
+# through them, by the same harness/ported.py. It is the portable C built
+# another way, and a tree of its own to the harness, portable_c32. It is
+# not held to pass every scenario, as those are, but to a record of the
+# ones that it passes, harness/pass32.txt: the test fails for a scenario
+# of the record that fails and for one that passes and is not there, and
+# `python3 harness/ported.py --record build/portable_c32/VC.EXE` writes
+# the record anew. The program for finding a fault, in debug, is run by
+# hand and is in no test of the machine.
+add_test(NAME portable_c32-scenarios
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
+            ${CMAKE_BINARY_DIR}/portable_c32/VC.EXE
+            ${CMAKE_BINARY_DIR}/portable_c32/VC.MAP ${layout_dir}/VC.LST)
+set_tests_properties(portable_c32-scenarios PROPERTIES TIMEOUT 3600)

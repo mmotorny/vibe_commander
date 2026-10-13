@@ -4,6 +4,12 @@ to C, or the portable C, which began as a copy of that. Either is "the
 translation" below, and the one that is checked is the one whose VC.EXE
 and link map are named.
 
+    ported.py build/c/VC.EXE
+    ported.py build/portable_c/VC.EXE
+    ported.py build/portable_c32/VC.EXE           the portable C built for
+                                                  32 bits: see below
+    ported.py --record build/portable_c32/VC.EXE  write its record anew
+
 The translation is taken through every scenario and must show the same
 screens and leave the same disks as the original did, which the goldens
 record (see compare.py and goldens.py). That alone would say little about a
@@ -65,6 +71,53 @@ coverage.py). The assembly is identified by the listing of the build that is
 laid out like the original, and the C functions by the translation's link
 map.
 
+The portable C is built a second way, as a flat program of 32 bits for
+DOS under an extender, build/portable_c32/VC.EXE (TODO.md, "The portable
+C in 32 bits: the plan"). That build is a tree of its own here,
+portable_c32, of the portable C's source: it is declared to do what the
+portable C is declared to, with what the two builds show otherwise
+added, of which there is nothing (deviations.SOURCE and TREES); it has
+the patches of the portable C, and one of its own where it has a file
+for a scenario; the functions that it has not or has under another name
+are those of the portable C and those of dos.c, which it has dos32.c in
+place of (GONE, RENAMED). Its file and the linker's map of it are read
+by le.py, and what ran of it is known by its objects as the extender
+loads them (coverage.py).
+
+It does not pass every scenario yet, and is not held to that but to a
+record of the scenarios that it passes, harness/pass32.txt (RECORDS),
+which may only grow:
+
+  - The test passes if every scenario of the record passes and no other
+    does. A scenario that has come to pass is put on the record with the
+    change that made it pass, by --record, so that the record is always
+    what is so. --record adds, and takes nothing away: with a scenario
+    of the record failing it writes nothing.
+  - A scenario is ended at the first screen that is otherwise than its
+    golden, and of that screen the first row that differs is printed,
+    with the step: the keys of a scenario say nothing of a program that
+    is no longer where the scenario takes it to be, and such a program
+    may wait for keys that do not come. A scenario that is not on the
+    record has SHORT_STEP seconds for a step, --limit, where one that is
+    has scenarios.STEP_TIME: a program that hangs is waited for that
+    long. What the machine did not get through is reported as stopped,
+    with the step and the screen as it stood. Once the program has not
+    come to its first screen in a scenario, the others of that country
+    are not run: they start as that one did.
+  - Below the scenarios, what failed is listed by what was first
+    otherwise, the scenarios that fail alike together.
+  - Which C functions ran is asked once every scenario passes. That
+    each is linked, or gone or renamed as the tables say, is held from
+    the first day.
+  - The stack is looked at in the scenarios that pass.
+  - The layout is harness/layoutcheck.py's, which this asks before
+    anything is run; and from QEMU's log, that the program was in the
+    memory where the driver of the tests reads it (check_place).
+
+One scenario by itself, with every row of every screen that differs:
+compare.py build/portable_c32/VC.EXE NAME, and with --first as the test
+runs it; show.py --program for steps that are tried out.
+
 Exits with status 0 if all of this holds and 1 otherwise.
 """
 import argparse
@@ -80,6 +133,8 @@ import deps
 import deviations
 from driver import COM_ORIGIN
 import goldens
+import layoutcheck
+import le
 import scenarios
 import setups
 
@@ -95,9 +150,12 @@ SIZE_LIMIT = {"c": 3}
 
 # Where a segment of compiled code may end at the most, counted from where
 # its segment register points, and how far code has to be from the stack:
-# both for the machine of the tests, not for the program. tools/mkexe.c
-# holds the C translation to them when it is built, and says why at its
-# top; check_layout() holds a program that the linker wrote.
+# both for the machine of the tests, not for the program, and both of a
+# program of 16 bits. tools/mkexe.c holds the C translation to them when
+# it is built, and says why at its top; check_layout() holds a program
+# that the linker wrote. A flat program has one segment of code, in which
+# no call goes round the end of 64K, and is held to what
+# harness/layoutcheck.py says of its layout.
 CODE_END = 0xF000
 PAGE = 0x1000
 
@@ -106,8 +164,34 @@ PAGE = 0x1000
 # for its use to need no care while the program is translated, and this is
 # where that would have stopped being true. The rest is room for what no
 # scenario has: a critical error of DOS at the bottom of deep calls, an
-# interrupt that arrives there.
-STACK_LEFT = 2
+# interrupt that arrives there. The layout of a flat program goes by the
+# same number: what a scenario may use of the stack is what must not
+# share a page with code.
+STACK_LEFT = coverage.STACK_LEFT
+
+# The trees that are held to a record of the scenarios that they pass,
+# and not to passing them all: tree -> the file of its record. The
+# portable C built for 32 bits is brought to pass the scenarios one
+# cause of failing at a time, and from its first run on the record says
+# which it passes: the test fails for a scenario of the record that
+# fails, and for one that passes and is not there, so that the record
+# is what is so and can only grow. See check_record().
+RECORDS = {"portable_c32": Path(__file__).resolve().parent / "pass32.txt"}
+
+# How long a step may take in a scenario that is not on a tree's record,
+# in seconds, where one that is has scenarios.STEP_TIME: such a scenario
+# is expected to fail, and a program that hangs in it is waited for
+# this long at every one. The longest that the driver writes nothing in
+# a scenario that passes was 14 seconds on a machine by itself, in one
+# scenario, 5 in another and under a second in the rest. A scenario cut
+# short by this that would have passed is reported as stopped, and stays
+# off the record until it is run with more time: --limit. A scenario
+# that has the driver wait on purpose, Wait*ticks in a step, gets twice
+# the longest such wait besides: while the program of 32 bits idles, a
+# second of the machine was seen to take most of one here, and the 71
+# of blank-timed more than 60. See short_step().
+SHORT_STEP = 60
+TICKS = 1193180 / 65536           # of the machine's timer, in a second
 
 
 @dataclass(frozen=True)
@@ -1438,11 +1522,20 @@ def linked_as(symbols, name):
     raise KeyError(f"the link map has no function {name}")
 
 
-def check_translation(link_map, executed, tree, origin, batches):
+def check_translation(link_map, executed, tree, place, batches):
     """Report on the C functions that replace what `batches` list; return
     success. `tree` is the tree that is checked: what GONE has for it is
-    to be gone. `origin` is where the file has what the map has at 0, as
-    coverage.origin() says it."""
+    to be gone. `place` makes of an address of the map what `executed`
+    counts by, as coverage.place() says it.
+
+    With None for `executed`, whether the functions ran is not asked,
+    and nothing is said of a batch: that each is linked, or is gone or
+    renamed as the tables say, is held all the same.
+
+    In a flat program that is compiled for size, several functions may
+    be one place of the map: the compiler gives a function no
+    instructions of its own where the one behind it in its file has the
+    same. Such a function counts as run when another of its place did."""
     symbols = coverage.link_map(link_map)
     gone = GONE.get(tree, {})
     renamed = RENAMED.get(tree, {})
@@ -1478,13 +1571,18 @@ def check_translation(link_map, executed, tree, origin, batches):
                 print(f"  in {tree} {name} is {renamed[name][0]}: "
                       f"{renamed[name][1]}")
                 name = renamed[name][0]
-            segment, offset = linked_as(symbols, name)
-            start = segment * 16 + offset
-            if start + origin not in executed:
+            try:
+                start = place(*linked_as(symbols, name))
+            except KeyError as error:
+                passed = False
+                print(f"  {error.args[0]}")
+                continue
+            if executed is not None and start not in executed:
                 passed = False
                 print(f"  not executed in the translation: {name}")
-        print(f"{batch.title}: {len(batch.functions)} C functions of "
-              f"{batch.source} checked")
+        if executed is not None:
+            print(f"{batch.title}: {len(batch.functions)} C functions of "
+                  f"{batch.source} checked")
     return passed
 
 
@@ -1532,6 +1630,8 @@ def check_layout(program):
     no segment of code may reach into the last 4K of its 64K. And QEMU
     is many times slower at a write to a page that has code which it has
     run, and a push is a write: so no code within 4K of the stack."""
+    if le.linear(program.contents):
+        return check_flat_layout(program)
     if coverage.made_by_mkexe(program.contents):
         return True
     found = coverage.segments(program.linked)
@@ -1570,6 +1670,192 @@ def check_layout(program):
         + f"; the limit is {CODE_END:X}h, no code is within 4K of the "
         "stack, and the stack is the last of the program")
     return passed
+
+
+def check_flat_layout(program):
+    """Report on how `program`, a flat program of 32 bits, is laid out;
+    return success. What its layout has to be, for the words of the
+    program's addresses and for the machine of the tests, and why, is
+    harness/layoutcheck.py's to say and to hold, which this asks: the
+    test of the layout does the same without a machine, and holds the
+    stub of the file besides.
+
+    Of the two limits that a program of 16 bits is held to, the first
+    is gone with the segments of 64K. The second is there in another
+    form: nothing that a scenario writes lies in a page of 4K that has
+    code, of the stack the part that check_stack() lets a scenario
+    use."""
+    check = layoutcheck.Check(program.contents, program.linked)
+    passed = check.all()
+    for problem in check.problems:
+        print(textwrap.fill(problem, width=78, initial_indent="  ",
+                            subsequent_indent="    ",
+                            break_on_hyphens=False))
+    print(textwrap.fill(
+        "The layout, as harness/layoutcheck.py holds a flat program to "
+        "it: " + "; ".join(check.found), width=78, subsequent_indent="  ",
+        break_on_hyphens=False))
+    return passed
+
+
+def check_place(program, outcomes):
+    """Report on where `program` was in the memory of the machine, if it
+    is a flat program; return success. The driver of the tests reads
+    what it watches of such a program at addresses of the memory, which
+    the harness works out with the program's first object at le.BENCH,
+    where the extender put it in every run that was looked at and where
+    nothing promises it: at another place the driver reads other bytes,
+    a step ends when it should not or never, and no stack is what it
+    seems. QEMU's log of the code that ran says where the program was
+    (coverage.executed).
+
+    A scenario that starts the program a second time, from the command
+    line of the first, has it in two places, and passes this: the first
+    is where it is taken to be. The driver knows the one place, and
+    reads the variables and the stack of the first copy while the second
+    is the program that DOS has as the current one, which is said here
+    of each such scenario."""
+    if not le.linear(program.contents):
+        return True
+    ran = {outcome.name: outcome.run.executed.at for outcome in outcomes
+           if outcome.run is not None}
+    elsewhere = {name: at for name, at in ran.items()
+                 if at and le.BENCH not in at}
+    never = [name for name, at in ran.items() if not at]
+    # A second copy of the program, which a scenario starts from the
+    # first one's command line, is loaded behind the first.
+    second = {name: at for name, at in ran.items()
+              if le.BENCH in at and len(at) > 1}
+    for name, at in elsewhere.items():
+        print(f"  in {name} the program ran at "
+              + ", ".join(f"{address:08X}h" for address in at)
+              + f", and the driver of the tests took it to be at "
+              f"{le.BENCH:08X}h: see BENCH of harness/le.py, and "
+              "harness/drivercheck.py --trace")
+    print(textwrap.fill(
+        f"The place: in {len(ran) - len(elsewhere) - len(never)} of the "
+        f"{len(ran)} scenarios that the machine got through, the "
+        f"program's code ran with its first object at {le.BENCH:08X}h, "
+        "where the driver of the tests reads it"
+        + (f"; in {len(never)} none of it was seen to run: "
+           f"{', '.join(never)}" if never else "")
+        + (f". In {len(second)} a copy of it ran elsewhere as well, "
+           "which the driver watches by what it reads of the first: "
+           + ", ".join(
+               f"{name} at "
+               + " and ".join(f"{address:08X}h" for address in at
+                              if address != le.BENCH)
+               for name, at in second.items()) if second else ""),
+        width=78, subsequent_indent="  ", break_on_hyphens=False))
+    return not elsewhere
+
+
+def short_step(name, tree, limit):
+    """How many seconds a step may take in the scenario `name` of the
+    tree `tree`, where it is not on the tree's record: `limit`, and
+    twice the longest wait that a step of it asks the driver for."""
+    waits = [int(ticks) for step in scenarios.of(name, tree).steps
+             for ticks in re.findall(r"\bWait\*(\d+)", step)]
+    return limit + 2 * max(waits, default=0) / TICKS
+
+
+def recorded(file):
+    """The record of the file `file`: the names of the scenarios that it
+    has, in its order. They are behind the first empty line; what is in
+    front says what the file is. None on it, if it is not there."""
+    if not file.exists():
+        return []
+    return file.read_text(encoding="utf-8").partition("\n\n")[2].split()
+
+
+def record_text(program, names):
+    """The record of the scenarios `names` for `program`, as the text of
+    its file."""
+    tree = program.tree
+    return "\n".join(textwrap.wrap(
+        f"The scenarios that build/{tree}/VC.EXE passes, of those that it "
+        "is taken through: each as the original's golden has it, with "
+        "what is declared for the tree made to that (harness/"
+        "deviations.py). harness/ported.py wrote this, from a run of them "
+        f"all. The test {tree}-scenarios holds the program to it: it "
+        "fails for a scenario that is here and fails, and for one that "
+        "passes and is not here. `python3 harness/ported.py --record "
+        f"build/{tree}/VC.EXE` adds what has come to pass, and takes "
+        "nothing away: a scenario leaves the record by hand, with the "
+        "reason in the commit.", width=72, break_on_hyphens=False)
+        + ([""] + list(names) if names else [])) + "\n"
+
+
+def check_record(program, names, outcomes, write=False):
+    """Report on the record of the tree of `program`, which is taken
+    through the scenarios `names` with the compare.Outcome `outcomes`;
+    return success. The record is the scenarios that the program passes:
+    it holds if each of them passed, no other did, and each is one that
+    the tree is taken through. With `write` the record is written anew,
+    with what has come to pass added, if nothing would leave it but
+    scenarios that the tree is no more taken through.
+
+    What failed is listed by what was first otherwise, the scenarios
+    that fail alike together: the row that the build showed, or why the
+    machine did not get through."""
+    file = RECORDS[program.tree]
+    shown = goldens.shown(file)
+    had = recorded(file)
+    passed = [outcome.name for outcome in outcomes if outcome.passed]
+    lost = [name for name in had if name in names and name not in passed]
+    gained = [name for name in passed if name not in had]
+    stale = [name for name in had if name not in names]
+    print(f"The record, {shown}: {len(passed)} of the {len(names)} "
+          f"scenarios pass, and the record has {len(had)}")
+    for name in lost:
+        print(f"  on the record, and fails: {name}")
+    if write and not lost:
+        file.write_text(record_text(program, passed), encoding="utf-8")
+        print(f"  written anew: {len(gained)} more than it had"
+              + (f", {', '.join(gained)}" if gained else "")
+              + (f"; {len(stale)} gone that {program.tree} is no more "
+                 f"taken through, {', '.join(stale)}" if stale else ""))
+    elif write:
+        print(textwrap.fill(
+            "not written: a record only grows, and these would leave "
+            "it. Mend what made them fail. A scenario that is to leave "
+            f"the record all the same is taken out of {shown} by hand, "
+            "with the reason in the commit.", width=78,
+            initial_indent="  ", subsequent_indent="  ",
+            break_on_hyphens=False))
+    else:
+        for name in gained:
+            print(f"  passes, and is not on the record: {name}")
+        for name in stale:
+            print(f"  on the record, and no scenario that {program.tree} "
+                  f"is taken through: {name}")
+        if gained or stale:
+            print(textwrap.fill(
+                "The record is to say what is so: write it anew, python3 "
+                f"harness/ported.py --record build/{program.tree}/VC.EXE, "
+                "and commit it with the change that made it so.",
+                width=78, initial_indent="  ", subsequent_indent="  ",
+                break_on_hyphens=False))
+    causes = {}
+    for outcome in outcomes:
+        if not outcome.passed:
+            causes.setdefault(outcome.cause, []).append(outcome.name)
+    if causes:
+        print(textwrap.fill(
+            "What fails, by what was first otherwise: the row as the "
+            "build showed it, or why the machine did not get through. "
+            "Each scenario has its step above, and the row as it is "
+            "expected.", width=78, subsequent_indent="  ",
+            break_on_hyphens=False))
+    for cause, some in sorted(causes.items(),
+                              key=lambda item: -len(item[1])):
+        print(f"  {len(some)} scenario{'s' if len(some) > 1 else ''}: "
+              f"{cause}")
+        print(textwrap.fill(", ".join(some), width=78,
+                            initial_indent="      ",
+                            subsequent_indent="      ",
+                            break_on_hyphens=False))
+    return not lost and (write or not gained and not stale)
 
 
 def check_declared(tree, names):
@@ -1774,30 +2060,62 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("translation", help="the VC.EXE of a C tree: "
-                                            "build/c/VC.EXE, or "
-                                            "build/portable_c/VC.EXE")
-    parser.add_argument("link_map", help="its link map")
-    parser.add_argument("listing", help="the listing of VC.COM laid out "
-                                        "like the original; that of "
-                                        "VCSETUP.COM is taken to be next "
-                                        "to it")
+                                            "build/c/VC.EXE, "
+                                            "build/portable_c/VC.EXE, or "
+                                            "build/portable_c32/VC.EXE")
+    parser.add_argument("link_map", nargs="?",
+                        help="its link map (default: VC.MAP next to it)")
+    parser.add_argument("listing", nargs="?", default=setups.LISTING,
+                        help="the listing of VC.COM laid out like the "
+                             "original; that of VCSETUP.COM is taken to "
+                             "be next to it (default: that of the build, "
+                             "build/shareware-layout/VC.LST)")
+    parser.add_argument("--record", action="store_true",
+                        help="of a tree that is held to a record of the "
+                             "scenarios that it passes: write the record "
+                             "anew, with what has come to pass")
+    parser.add_argument("--limit", type=float, metavar="SECONDS",
+                        default=SHORT_STEP,
+                        help="of such a tree: give a step up after so "
+                             "many seconds in a scenario that is not on "
+                             f"the record (default: {SHORT_STEP}; one "
+                             "that is on it has "
+                             f"{scenarios.STEP_TIME})")
     args = parser.parse_args()
 
     original = setups.original_vc()
     translation = setups.Program.load(args.translation)
+    if args.link_map:
+        translation = replace(translation, linked=Path(args.link_map))
+    tree = translation.tree
+    record = RECORDS.get(tree)
+    if args.record and not record:
+        parser.error(f"{tree} is held to pass every scenario that it is "
+                     "taken through, and has no record of those that it "
+                     "passes")
     size = len(translation.contents)
-    times = SIZE_LIMIT.get(translation.tree)
+    times = SIZE_LIMIT.get(tree)
     too_long = times is not None and size > times * len(original.contents)
     print(f"VC.EXE is {size} bytes, {size / len(original.contents):.2f} "
           f"times the original's {len(original.contents)}; "
           + (f"the limit is {times} times" if times is not None else
-             f"{translation.tree} is held to no multiple of that"))
+             f"{tree} is held to no multiple of that"))
 
     if not check_layout(translation):
         sys.exit(1)
-    names = scenarios.names(translation.tree)
-    failed, outcomes = compare.compare(names, translation, trace=True,
-                                       stack=True)
+    names = scenarios.names(tree)
+    # A tree with a record is expected to fail the scenarios that are
+    # not on it: each of those is given less time for a step, and a
+    # scenario is ended where it first shows something else, with only
+    # that printed.
+    on_record = recorded(record) if record else names
+    failed, outcomes = compare.compare(
+        names, translation, trace=True, stack=True, first=bool(record),
+        limits={name: short_step(name, tree, args.limit) for name in names
+                if name not in on_record})
+    if record:
+        failed = not check_record(translation, names, outcomes,
+                                  args.record)
     # What ran in the original is of every scenario, also of one that
     # the tree is not taken through: of VC.COM by the scenarios of the
     # main program, and of VCSETUP.COM by those of the setup program.
@@ -1808,18 +2126,29 @@ def main():
     batches = list(BATCHES)
     passed = check_original(coverage.Listing(args.listing), goldens.ran(),
                             BATCHES)
-    if not deviations.declared(translation.tree).no_setup:
+    if not deviations.declared(tree).no_setup:
         of_setup = Path(args.listing).with_name(setups.SETUP_LISTING.name)
         passed = check_original(coverage.Listing(of_setup),
                                 goldens.ran(setup=True),
                                 SETUP_BATCHES) and passed
         batches += SETUP_BATCHES
-    passed = check_translation(args.link_map, in_translation,
-                               translation.tree,
-                               coverage.origin(translation.contents),
+    # Which functions of the C ran is asked of a tree that passes every
+    # scenario it is taken through, or is held to: one that some still
+    # fail has not been where they would take it.
+    every = all(outcome.passed for outcome in outcomes)
+    if record and not every:
+        in_translation = None
+        print(textwrap.fill(
+            "The C functions: whether each ran is not asked while "
+            f"{tree} does not pass every scenario; that each is linked, "
+            "or gone or renamed as is said of it, is held",
+            width=78, subsequent_indent="  ", break_on_hyphens=False))
+    passed = check_translation(translation.linked, in_translation, tree,
+                               coverage.place(translation.contents),
                                batches) and passed
+    passed = check_place(translation, outcomes) and passed
     passed = check_stack(translation, outcomes) and passed
-    passed = check_declared(translation.tree, names) and passed
+    passed = check_declared(tree, names) and passed
     passed = check_comparison(outcomes, translation) and passed
     sys.exit(failed or not passed or too_long)
 

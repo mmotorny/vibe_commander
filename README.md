@@ -1107,7 +1107,7 @@ judge and that everything else here is said of.
 
 | Program | What it is |
 |---|---|
-| `build/portable_c32/VC.EXE` | The program: compiled for the 386 in the flat model, for small code as the one of 16 bits is (`-os`), with nothing for a debugger. It is the one that is to be shipped, and the one that the tests will judge |
+| `build/portable_c32/VC.EXE` | The program: compiled for the 386 in the flat model, for small code as the one of 16 bits is (`-os`), with nothing for a debugger. It is the one that is to be shipped, and the one that the tests judge |
 | `build/portable_c32/debug/VC.EXE` | The same source for finding a fault, to be run by hand: compiled as it is written, with nothing moved or left out (`-od`), with the lines of the source between the instructions of its listings (`-d2`), and with `CHECKED` defined, by which the words that make a pointer of a segment and an offset are to look at what they are handed. Nothing reads `CHECKED` yet. No test runs this program, since unoptimised code takes more instructions and the machine's clock is counted in those; it is built so that it does not rot |
 
 Each is a linear executable that Open Watcom's linker writes, with its
@@ -1145,13 +1145,14 @@ original's field by field, by the test `portable_c32-data`, where those
 of the 16-bit program are held byte for byte: [the figures](#the-figures)
 have how many such words there are.
 
-No test runs it yet. `dos32.c` has 96 of the 98 functions of `sys.h`;
-the two that it has not are those by which the program is told that DOS
-has ended it by another program's hand, which do nothing there. Started
-on the bench of the tests, the program shows its panels, runs a command
-and comes back, and leaves when it is told to; what it does otherwise
-than the program of 16 bits, scenario by scenario, has not been looked
-at. It is started there as any program is:
+The test `portable_c32-scenarios` takes it through the scenarios of the
+portable C, and holds it to a record of those that it passes,
+`harness/pass32.txt`, which has most of them and not yet all:
+[Testing](#testing) says how. `dos32.c` has 96 of the 98 functions of
+`sys.h`; the two that it has not are those by which the program is told
+that DOS has ended it by another program's hand, which do nothing
+there. By hand it is started on the bench of the tests as any program
+is:
 
 ```sh
 mkdir -p build/tmp
@@ -1191,15 +1192,16 @@ asks `clang`: each is skipped where there is none.
 ctest --test-dir build --output-on-failure
 ```
 
-There are thirteen tests: one of the assembly, three of each C tree,
+There are fourteen tests: one of the assembly, three of each C tree,
 named by the tree that they judge, `c-` for the C translation and
 `portable_c-` for the portable C, two more of the portable C, of its
-source, three of its programs of 32 bits, `portable_c32-`, and one of the
-harness itself. The two trees are held to the same checks, against the
-same goldens. Eleven of the tests run no machine and take a few seconds at
-the most; `c-scenarios` and `portable_c-scenarios` each run every
-scenario, in a little under two minutes on a machine that does nothing
-else, so all thirteen take three minutes and forty seconds.
+source, four of its programs of 32 bits, `portable_c32-`, and one of
+the harness itself. The two trees are held to the same checks, against
+the same goldens. Eleven of the tests run no machine and take a few
+seconds at the most; `c-scenarios` and `portable_c-scenarios` each run
+every scenario, in a little under two minutes on a machine that does
+nothing else, and `portable_c32-scenarios` in some three, so all
+fourteen take about seven minutes.
 
 | Test | What it checks |
 |---|---|
@@ -1211,6 +1213,7 @@ else, so all thirteen take three minutes and forty seconds.
 | `portable_c-int16` | The arithmetic of the portable C that counts on an int of 16 bits. C makes an int of two numbers of 16 bits before it adds them or takes one from the other: without a sign and wrapped round on DOS, with a sign and not wrapped where an int has 32 bits. `harness/int16.py` has clang read every file that both builds have, for a machine whose int has 32 bits, and works out by the rules of C where a number that the two may have otherwise is looked at before it is put back into 16 bits: held against another, divided, shifted right, made a number of 32 bits, asked whether it is 0, added to a pointer. `harness/int16.txt` has every such place, with the reason why it is the same in both builds all the same, written by whoever read it; a place that can differ has no reason and gets the cast that says what DOS does, `(u16)(a - b) < c`, which is no code there. The test fails for a place that the record has not, for one of the record that is gone, and for one without a reason. The finder is held against lines that were written for it, `harness/int16check.c`, each time it runs. `--show` lists the places of a file or of a kind, and `--record` writes the record anew and keeps the reasons. Nothing is compiled or run for it. It is skipped where there is no clang |
 | `portable_c32-layout`, `portable_c32-debug-layout` | [The two programs of 32 bits](#the-program-of-32-bits), each as the linker wrote it, against the layout that it rests on: nothing in such a program looks whether a table, the main data or the stack is where the words that make its pointers take it to be, and one that is linked otherwise reads and writes somewhere else with no word said. `harness/layoutcheck.py` reads the file and the linker's map of it, with the harness's reader, and holds: that every object of the files of tables, those that the program writes to among them, lies in the 64K that the offset of a table is counted in, from 32K below `Title_S`, and that `Title_S` is no more than 32K in front of the main data; that `IniSave` ends within 64K of where the main data begins; that the program ends within the megabyte that a segment can name; that the stack is the segment which ends where the file's header has the stack's top, as the driver of the tests looks for it, and is in the file as zeros; that the file holds of the data everything but what has no value; and that nothing which a scenario writes shares a page of the memory with code. And of the file itself: two objects, each as long as the map has it, the entry at `Start`, every relocation an address with the offset of what it names in the file, and a stub that is DOS/32A's with the banner switched off and nothing else changed. The top of the script says which word of `vc.h` goes by each. They are the only tests that read those programs yet: no machine is run for them, and neither program is run |
 | `portable_c32-data` | The check of `portable_c-data` for [the program of 32 bits](#the-program-of-32-bits), `build/portable_c32/VC.EXE`: the same objects of the same source, against the same bytes of the original, with the same tables of `harness/datacheck.py` for what `src/portable_c/DEVIATIONS.md` declares otherwise. A text or a table of bytes is the same bytes in both programs. A box, a dialog and a table of pointers are not: a word that names something is a pointer in C, four bytes in such a program with whatever stands behind it that much further on, so the object is longer than the original's and is held against it field by field. Which of its fields are pointers, the test reads in the declaration, `BOX`, `BOX1`, `BOX2` or `DIALOG` of `src/portable_c/tables.h` with its count, or an array of pointers; it fails for an object that is not as long as its declaration makes it with pointers of four bytes, which is how it would show a gap that the compiler had put in, and there is none. A pointer that the original has a name for has to be an address that the extender sets when it loads the program, a relocation of the file, of the thing that the tree has by that name, with the same distance from it; one that the original has a number for, the length of a line that is typed into, or nothing, a line across a box, has to be no such address, with the number in its low half and 0 in its high one; and an address anywhere else in an object fails. Every other byte is held as in a program of 16 bits, a place of the main data among them, which is the same number of 16 bits in both. The bytes and the addresses are read in the file, with the harness's reader, where each object is in the linker's map, and how long it is in its object file, since the compiler rounds what a file has of a segment up to four bytes. No machine is run for it |
+| `portable_c32-scenarios` | The program of 32 bits, `build/portable_c32/VC.EXE`, through the scenarios of the portable C, by the same `harness/ported.py` and against the same goldens, patches and rules: it is the same source, and a tree of its own to the harness only so that it can be declared to show something otherwise, which it is not. It does not pass them all yet, and is held to a record of those that it passes, `harness/pass32.txt`, which may only grow: the test fails for a scenario of the record that fails, and for one that passes and is not on it, so that the record is always what is so, and `python3 harness/ported.py --record build/portable_c32/VC.EXE` adds what has come to pass. A scenario is ended at the first screen that is otherwise than expected, and the test prints the step and the first row of it that differs, or why the machine did not get through, and then the scenarios that fail alike together. Before anything is run it asks `harness/layoutcheck.py` for the layout, as the test above does; and from QEMU's log of the code that ran, it holds that the program was in the memory where the driver of the tests reads its variables and its stack. Half of the stack is to be left in every scenario that passes. Which C functions ran is asked once every scenario passes |
 | `harness-le` | It judges the harness and no tree, and is named for that. The harness's own reader of a 32-bit program for DOS, `harness/le.py`, which the tests of the portable C are to go by once that is such a program (`TODO.md`, "The portable C in 32 bits: the plan"). `harness/lecheck.py` builds a toy, `harness/lecheck.c`, as a flat program with DOS/32A for its stub, with the compiler and the linker that the build fetches, and holds what the reader finds in the file and in the linker's map against what the toy's source says must be there: where the stub ends, the objects and how much of each the file has, the entry and the stack, where a symbol is, a static one too, and every address that the extender puts in when it loads the program, with those that lie across the end of a page and those that name something outside their object. The toy is not run; what it shows of itself on the bench, and how that is held against the reader by hand, is at the top of `harness/lecheck.py`. No machine is run for it |
 | `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
