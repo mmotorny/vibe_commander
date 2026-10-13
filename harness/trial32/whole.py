@@ -12,12 +12,13 @@ those objects and of what the build does not make:
     leaves <file>.refused there and no object. Such a file is compiled
     here with its warnings, which the build takes for errors;
   - what the tree has of DOS outside sys.h, and so outside dos32.c: the
-    function that vc.h declares and the segment of the PSP, and
-    `__GETDS`, which an interrupt function of the compiler's asks for.
-    Each function is written here as one that does nothing.
+    segment of the PSP, which vc.h declares, and `__GETDS`, which an
+    interrupt function of the compiler's asks for and is written here as
+    a function that does nothing.
 
 It has the build make the objects first, links them as build.sh links a
-toy, with DOS/32A for the stub, and prints what the file has: its
+toy, with DOS/32A for the stub and Start of dos32.c for where the
+program begins, and prints what the file has: its
 length, its objects, and its relocations. The project has to be
 configured, and its tools fetched.
 
@@ -45,7 +46,6 @@ OUT = ROOT / "build" / "trial32" / "whole"
 
 # What the tree calls of DOS that is no function of sys.h.
 OUTSIDE = """#include "vc.h"
-u16 ProgramPrefix(void) { return 0; }
 u16 PspSeg;
 void GetDs(void) { }
 #pragma aux GetDs "__GETDS"
@@ -115,7 +115,7 @@ def main():
         [BIN / "wlink", "option", "quiet", "format", "os2", "le",
          "name", OUT / "VC.EXE",
          *(word for path in objects for word in ("file", path)),
-         "option", "start=Alloc0_",
+         "option", "start=Start_",
          "option", f"stub={WATCOM / 'binw' / 'dos32a.exe'}",
          "option", f"map={OUT / 'VC.MAP'},static",
          "order", "clname", "CODE", "clname", "MAIN", "clname", "DATA",

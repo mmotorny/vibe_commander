@@ -11,7 +11,7 @@
  * the stack and has the header of the program name its end, so DOS
  * starts the program on it. The linker's command has it last. So the
  * program ends where its stack does, which is how it knows how long it
- * is (Alloc0 of resident.c).
+ * is (MemOwn of dos.c).
  *
  * The stack is not of the segment that DS is on because it does not fit
  * there beside the main data. A pointer to a local variable is declared

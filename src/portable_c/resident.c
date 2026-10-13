@@ -11,8 +11,10 @@
  * of it like any other: DS is on the program's data, md is the main
  * data, and its variables are variables.
  *
- * Two things are here. The program begins here, at Alloc0: DOS enters
- * it there.
+ * Two things are here. The first is what the program does before
+ * anything else, Alloc3: it looks at the version of DOS and keeps no more
+ * of the memory than it is. Where DOS enters the program is the
+ * system's, Alloc0 of dos.c, which calls Main of main.c.
  *
  * The second is the commands: Exec runs those that the command line
  * holds, DosBuf, by COMMAND.COM or by the interrupt that COMMAND.COM has
@@ -473,7 +475,7 @@ static void __loadds Exec2E(void)
     Again();
 }
 
-/*---------------------- The entry ----------------------*/
+/*---------------------- The start ----------------------*/
 
 /* Have DOS look for memory as it does when it starts: the lowest block
    that fits, and the upper memory not in its chain of blocks. This is
@@ -497,17 +499,15 @@ static void Alloc9(void)
 }
 #pragma aux Alloc9 aborts
 
-/* The program begins here: DOS has loaded the file, set the words of it
-   that hold a segment, and enters this on the stack that the header of
-   the file names, with DS on the PSP. It is told to load DS for itself,
-   as a function is that is entered from elsewhere, and then asks DOS
-   where the PSP is.
+/* What the program does first, before anything else is asked of the
+   system: Main of main.c calls this when the system has entered the
+   program. It is the original's Alloc0 from its label Alloc3 on; what
+   stands in front of that label there, and where DOS enters the
+   program, is the system's: Alloc0 of dos.c.
 
    DOS has to be 3.20 at the least. DOS has given the program all of the
-   memory: its block is made as long as the program is, which ends where
-   its stack does (see stack.c), and the rest is asked for again when the
-   panels are made, Init11 of start.c. Then Main of main.c is the
-   program.
+   memory: its block is made as long as the program is, MemOwn, and the
+   rest is asked for again when the panels are made, Init11 of start.c.
 
    Ported as it is: how DOS looks for memory is set to what it is when
    DOS starts, the lowest block that fits and no upper memory, whatever
@@ -515,10 +515,8 @@ static void Alloc9(void)
 
    Not as the original, which is a .COM file (see DEVIATIONS.md): a DOS
    before 3 is left through the INT 20h that every PSP begins with,
-   entered by a far call, where the original returns there. DOS wants CS
-   on the PSP when a program ends that way, and nothing else of this
-   program is in that segment. And the call that says where the PSP is
-   is one of DOS 2 and later.
+   entered by a far call, where the original returns there:
+   ProgramEndOld.
 
    Not in the portable C, which does not load itself again after a
    command: the original first takes the check sum of its file as it is
@@ -530,27 +528,18 @@ static void Alloc9(void)
    has run, and applies its own relocations: the C translation's file
    is laid out for that by a tool, where the portable C's is as the
    linker writes it. */
-void __loadds Alloc0(void)
+void Alloc3(void)
 {
     struct SysVersion system;
-    u32 end = (u32)(void __far *)Stack;
-    u16 length;
 
-    IntOn();                            /* for the direction flag, which
-                                           the compiler wants clear */
-    PspSeg = ProgramPrefix();
     system = SystemVersion();           /* Check DOS version */
     if ((u8)system.version < 3)         /* Alloc4 */
-        ((void (__far *)(void))DOS_AT(PspSeg, 0))();
+        ProgramEndOld();
     if (((system.version & 0xFF) << 8 | system.version >> 8) < 0x314) {
         OutStr(Vers_S, system.other);   /* BX: as DOS answered */
         ProgramEnd(2);
     }
-    length = (u16)(end >> 16) + (((u16)end + LenStk + 15) >> 4)
-             - PspSeg;                  /* Alloc5 */
-    if (MemResize(PspSeg, length).failed)
+    if (MemOwn().failed)                /* Alloc5 */
         Alloc9();
     SetStat();                          /* Alloc7 */
-    Main();
 }
-#pragma aux Alloc0 aborts

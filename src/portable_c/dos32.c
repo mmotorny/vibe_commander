@@ -49,7 +49,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 72 of the 93, six of them in real mode; the 21 that are not made
+ * 74 of the 95, six of them in real mode; the 21 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -774,6 +774,28 @@ void ProgramEnd(u16 code)
 
     Set(&regs, 0x4C00 | code & 0xFF, 0, 0, 0);
     Tell(&regs);
+}
+
+/* The extender does not start on a DOS before 3, so there is none to
+   leave another way: nothing, and the program goes on to say what it
+   says of a DOS that is too old for it. */
+void ProgramEndOld(void)
+{
+}
+
+/* The memory that the program is in is the extender's to hand out, and
+   it has given the program what its file says and no more; what
+   MemTake hands out is of the program's own. So there is nothing to
+   make shorter, and nothing has failed: `paragraphs` is as it came,
+   none. */
+struct Block MemOwn(void)
+{
+    struct Block block;
+
+    block.value = 0;
+    block.failed = 0;
+    block.largest = 0;
+    return block;
 }
 
 /* The console. */

@@ -313,7 +313,7 @@ endfunction()
 #
 # The portable C is one program, and the linker writes its file: DOS
 # loads it, sets the words of it that hold a segment and starts it at
-# Alloc0 of resident.c, on the stack that the file's header names. It is
+# Alloc0 of dos.c, on the stack that the file's header names. It is
 # compiled in the medium model: a function is far by the compiler's own
 # rule, and needs no word of this compiler to say so.
 function(add_portable_c)
@@ -368,7 +368,7 @@ function(add_portable_c)
     # the program, at offset 0 of the segment that DS is on, as the code
     # takes it to be; the rest of DGROUP; the code; the tables; and last
     # the stack, where the program ends, which is how it knows its
-    # length (Alloc0 of resident.c). The tables stand between the code
+    # length (MemOwn of dos.c). The tables stand between the code
     # and the stack: the machine of the tests is many times slower at a
     # write to a page of the memory that has code which it has run, and
     # a push is a write. The directive is Open Watcom's, and its help

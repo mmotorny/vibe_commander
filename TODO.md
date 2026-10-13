@@ -4006,6 +4006,50 @@ For D2:
   the bench boots from does, by the trial; in 32 bits that waits for
   the functions, since DOS's own question would wait for a key.
 
+### S3, the entry, the end, Quick execute: under way
+
+The piece is made a family at a time, a commit each, with the whole
+suite at each: the entry; the ends; Quick execute; the places of the
+main data. Whoever goes on reads here which are done.
+
+**The entry: done.** Where DOS enters the program is `Alloc0` of
+`dos.c`, and it is what is of DOS there and no more: the direction
+flag, DS, and the PSP asked for, AH 51h, the first thing that DOS is
+asked. Then it calls `Main` of `main.c`. What the original's `Alloc0`
+does from its label `Alloc3` on is the program's, a function of that
+name in `resident.c` that `Main` calls first: the version of DOS, with
+what the program says of one that is too old, the program's block made
+as long as the program, with what it says where that fails, and
+`SetStat`. It asks through `sys.h`, by two functions that are new, 95
+where there were 93:
+
+| Function | What it is | In `dos.c` | In `dos32.c` |
+|---|---|---|---|
+| `MemOwn()` | The block that the system loaded the program into, made as long as the program is. Answers as `MemResize` | `MemResize` of the PSP's segment, to where the stack ends | Made: nothing to do, and not failed |
+| `ProgramEndOld()` | The program ended on a DOS before 3, which the original leaves by returning into its PSP | The far call to the PSP's first bytes, INT 20h | Made: nothing, and the program goes on to say that DOS is too old |
+
+DOS is asked what it was asked, in the order that it was: 51h, 30h,
+4Ah, 5801h, 5803h, each through the function that asked it before,
+and `MemOwn` works out the paragraphs as `Alloc0` did. `VC.EXE` is 58
+bytes longer, 197,110.
+
+The stack: 157 of the 159 scenarios leave 12 bytes more than they did,
+3,514 at the least, in `copy-dirs`. The frame of `Alloc0`, which lay
+under everything, had the version, the end of the program and the
+saved registers in it, 14 bytes; now it is the one word of DS that
+`Alloc0` of `dos.c` pushes, and `Alloc3` has returned before anything
+else is called. `mouse-find` leaves 16 more and `command` 2 fewer.
+That is taken to be an interrupt of the machine, the timer's or the
+keyboard's, which takes of the stack wherever the program is, meeting
+the deepest call elsewhere in a file that is laid out otherwise: 14
+bytes are what such an interrupt takes at the least. It was not looked
+into further.
+
+The toy is entered as the program is, at `Alloc0_` of `dos.obj` in 16
+bits, and has no entry of its own any more; its `Main` asks `MemOwn`
+first, as the program does, and its first page prints whether that
+failed. `whole.py` starts its program at `Start_` of `dos32.c`.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")

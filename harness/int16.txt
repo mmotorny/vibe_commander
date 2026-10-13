@@ -143,13 +143,6 @@ panel.c, PutPath: shift
     | place = ADD_LOW(place, -((length - least >> 1) + 1));
     Three lines above ask that length is least or more.
 
-resident.c, Alloc0: shift
-    | length = (u16)(end >> 16) + (((u16)end + LenStk + 15) >> 4)
-    The low word of `end` is where the stack begins in its segment, which
-    holds nothing else (stack.c), and LenStk is 4,096. The line is of the
-    entry of the program for DOS, which goes to dos.c (TODO.md, the plan
-    of the 32 bits, S3).
-
 screen.c, BasAdr: index
     | return md.ScrBuf + (row << 6) + (row << 4) + (place & 0xFF);
     row is the high byte of place, by the line that declares it: 255 times

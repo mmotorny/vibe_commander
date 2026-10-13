@@ -415,7 +415,8 @@ extern u8 __far Stack[];
 #endif
 
 /* What the program knows of DOS around it, resident.c. Of its routines
-   there, Alloc0 is where the program begins.
+   there, Alloc3 is what the program does first: it looks at the version
+   of DOS and keeps no more of the memory than it is.
    TakeEnd has the program go on in Exit01 when DOS ends it. SetBrk
    notes whether DOS looks for Ctrl-C at every call, has it not do so,
    and takes Ctrl-C, so that nothing happens for it. Exec runs the
@@ -423,6 +424,7 @@ extern u8 __far Stack[];
    says that there is no memory and leaves, with `bx` for what the
    original has in BX there, and Exit00 leaves with what DOS is to be
    told. */
+void Alloc3(void);
 void TakeEnd(void);
 void SetBrk(void);
 void Exec(void);
@@ -529,7 +531,8 @@ struct Answer SaveSet(void);
    command. GiveMem gives all of that memory but the panels back to DOS,
    for a command, and TakeMem takes it again afterwards, and answers as
    Init11 does. Main of main.c is the program from when DOS has loaded it:
-   Alloc0 of resident.c calls it, and it does not return. Again of
+   the system calls it where it enters the program, Alloc0 of dos.c, and
+   it does not return. Again of
    main.c is where the program goes on when commands have been run on a
    stack that was set anew, behind COMMAND.COM's own interrupt for
    them. */
@@ -647,10 +650,9 @@ void StRdHelp(void);
 void StHelp(void);
 
 /* What is of DOS on a PC alone, and no part of sys.h: the segment of
-   the program's PSP, as DOS says it and as Alloc0 of resident.c keeps
-   it when the program begins, for itself and for the functions of
-   sys.h that read the PSP. See both in dos.c. */
-u16 ProgramPrefix(void);
+   the program's PSP, as dos.c keeps it from when the program begins,
+   for its functions that read the PSP. resident.c still reads the PSP
+   by it, for where DOS goes on when the program has ended. */
 extern u16 PspSeg;
 
 /* The registers as an interrupt function of the compiler saves them on

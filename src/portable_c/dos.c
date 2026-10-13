@@ -25,9 +25,10 @@
  * as any function is.
  *
  * The file has two parts: the functions of sys.h, and behind them what
- * is of DOS alone and no part of sys.h, where the PSP is. A structure of
- * registers, as the C translation hands one to an interrupt from every
- * file, is known here and nowhere else.
+ * is of DOS alone and no part of sys.h, where the PSP is and where DOS
+ * enters the program. A structure of registers, as the C translation
+ * hands one to an interrupt from every file, is known here and nowhere
+ * else.
  */
 #include "vc.h"
 
@@ -203,9 +204,9 @@ static u16 Mouse(u16 ax, u16 bx, u16 cx, u16 dx)
    front of it: the command tail is there, the segment of the
    environment, where the memory ends, and where DOS goes on when the
    program has ended. The original is a .COM file and has all its
-   segment registers there. Alloc0 of resident.c sets this when the
-   program begins, by ProgramPrefix, and reads the PSP itself for where
-   DOS goes on; vc.h declares both for it. */
+   segment registers there. Alloc0, at the end of this file, sets this
+   when the program begins, by ProgramPrefix. resident.c still reads the
+   PSP itself for where DOS goes on, and vc.h declares this for it. */
 u16 PspSeg;
 
 #define PSP_ENVIRON 0x2C                /* the segment of the environment */
@@ -702,6 +703,21 @@ struct Block MemResize(u16 block, u16 paragraphs)
     return Paragraphs(REGS(regs));
 }
 
+/* The program's own block is known by the segment of its PSP, and DOS
+   has made it all of the memory. The program ends where its stack does,
+   which the linker has last (see stack.c): the block is made as long as
+   it is from the PSP to there, in paragraphs, by MemResize. The offset
+   of the stack in its segment is not 0 where the segment does not begin
+   on a paragraph. */
+struct Block MemOwn(void)
+{
+    u32 end = (u32)(void __far *)Stack;
+
+    return MemResize(PspSeg, SEGMENT(end)
+                             + ((OFFSET_OF(end) + LenStk + 15) >> 4)
+                             - PspSeg);
+}
+
 /* How DOS looks for memory, AX 5801h, and whether the upper memory is in
    its chain of blocks, AX 5803h, which DOS has since its version 5: both
    take what is set in BX. */
@@ -867,6 +883,16 @@ void ProgramEnd(u16 code)
     Tell(REGS(regs));
 }
 
+/* A DOS before 2 has no call that ends a program with a number: a
+   program ends there by INT 20h with CS on its PSP, and every PSP begins
+   with that instruction. The original, a .COM file with CS there, returns
+   to it; here it is entered by a far call, nothing else of the program
+   being in that segment. DOS does not come back from it. */
+void ProgramEndOld(void)
+{
+    ((void (__far *)(void))POINTER(PspSeg, 0))();
+}
+
 /* What the program was started with is in its PSP: the tail from 81h
    on, behind the byte that counts it, and the segment of the
    environment. DOS is not asked. */
@@ -983,9 +1009,7 @@ void DeviceErrorGive(void)
 }
 
 /* The interrupt flag set, by the compiler's own function for that,
-   which is STI and CLD: the direction flag is clear afterwards, as the
-   compiler wants it, and the entry of the program calls this for that,
-   Alloc0 of resident.c. */
+   which is STI and CLD. */
 void IntOn(void)
 {
     _enable();
@@ -1281,13 +1305,14 @@ u32 Ticks(void)
 }
 
 /*
- * What is of DOS on a PC alone, and no part of sys.h: where the PSP is.
+ * What is of DOS on a PC alone, and no part of sys.h: where the PSP is,
+ * and where DOS enters the program.
  */
 
 /* Where the PSP is, its segment, as DOS says (AH 51h, which answers in
    BX: as 62h, and of DOS 2 too). The program's block of the memory is
    known by the same segment. */
-u16 ProgramPrefix(void)
+static u16 ProgramPrefix(void)
 {
     struct DosRegs regs;
 
@@ -1296,3 +1321,30 @@ u16 ProgramPrefix(void)
     Tell(REGS(regs));
     return regs.bx;
 }
+
+/* The program begins here: DOS has loaded the file, set the words of it
+   that hold a segment, and enters this on the stack that the header of
+   the file names, with DS on the PSP. The linker is told the name
+   (`option start=Alloc0_`). The function is told to load DS for itself,
+   as one is that is entered from elsewhere. The direction flag is as DOS
+   leaves it, and the compiler wants it clear: its function for the
+   interrupt flag clears it. Then DOS is asked where the PSP is, the
+   first thing that it is asked, for the functions above that read the
+   PSP, make the program's block shorter by its segment, and leave an old
+   DOS through it.
+
+   That is all that is of DOS here. What the program does first, which
+   is to look at the version of DOS and to keep no more of the memory
+   than it is, it asks through sys.h like everything else: Main of main.c
+   is the program, and does not return.
+
+   Not as the original, which is a .COM file (see DEVIATIONS.md): that is
+   entered with every segment register on the PSP and asks nobody where
+   it is, and the call that says so is one of DOS 2 and later. */
+void __loadds Alloc0(void)
+{
+    _enable();
+    PspSeg = ProgramPrefix();
+    Main();
+}
+#pragma aux Alloc0 aborts

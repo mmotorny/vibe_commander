@@ -271,6 +271,9 @@ TEXT(Here_S, "C:\\WORK\\NEWDIR");
 TEXT(Full_S, "C:\\STAMPS");
 
 /* The system, the time and the drives. */
+static u16 Owned;                       /* whether MemOwn failed, which
+                                           Main asked first */
+
 static void System(void)
 {
     struct SysVersion version;
@@ -280,6 +283,7 @@ static void System(void)
     u32 ticks;
     u16 was;
 
+    SAY("MemOwn failed "); H4(Owned);
     version = SystemVersion();
     SAY("SystemVersion "); H4(version.version); H4(version.other);
     version = SystemTrueVersion();
@@ -948,9 +952,16 @@ static void Later(void)
     Line();
 }
 
-/* The pages, a step of the script behind each. */
+/* The pages, a step of the script behind each.
+
+   The toy is entered where the program is, at Alloc0 of dos.c in 16
+   bits and at Start of dos32.c in 32, each of which calls Main. The
+   first thing asked is what the program asks first, that it keep no
+   more of the memory than it is: in 16 bits there is none to ask for
+   otherwise. */
 void Main(void)
 {
+    Owned = MemOwn().failed;
     Clear();
     System();
     Page(0);
@@ -977,31 +988,3 @@ void Main(void)
     CursorTo(0, Row << 8);
     ProgramEnd(7);
 }
-
-/* In 32 bits the program is entered at Start of dos32.c, which calls
-   Main. In 16 bits it is entered here, where DOS has DS on the PSP and
-   has given the program all of the memory: the function loads DS, and
-   makes the program's block as long as the program is, which ends where
-   its stack does, as Alloc0 of the program's resident.c does. So there
-   is memory to ask for. The PSP is asked for here, since ProgramPrefix
-   of dos.c is no function of sys.h, and its segment is kept where
-   Alloc0 keeps it, for the functions that read the PSP. */
-#ifdef __I86__
-static u16 Prefix(void);
-#pragma aux Prefix = \
-    "cld" \
-    "mov ah,51h" \
-    "int 21h" \
-    value [bx] modify exact [ax bx]
-
-void __loadds Entry(void)
-{
-    u32 end = (u32)(void __far *)Stack;
-    u16 prefix = Prefix();
-
-    PspSeg = prefix;
-    MemResize(prefix,
-              (u16)(end >> 16) + (((u16)end + LenStk + 15) >> 4) - prefix);
-    Main();
-}
-#endif

@@ -58,7 +58,7 @@ if [ "$name" = sys ]; then
                   clname FAR_DATA clname STACK \
             file "$out/sys16.obj" file "$made/dos.obj" \
             file "$made/arith.obj" file "$made/stack.obj" \
-            option map="$out/sys-16.map" option start=Entry_;;
+            option map="$out/sys-16.map" option start=Alloc0_;;
     32)
         files=""
         for source in "$here/sys.c" "$tree/dos32.c" "$tree/stack.c"; do

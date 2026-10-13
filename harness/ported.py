@@ -1526,8 +1526,8 @@ def check_layout(program):
     if top != end:
         passed = False
         print("  the stack is not the last of the program, which takes "
-              "itself to end where its stack does (Alloc0 of "
-              "src/portable_c/resident.c): see the linker's command in "
+              "itself to end where its stack does (MemOwn of "
+              "src/portable_c/dos.c): see the linker's command in "
               "CMakeLists.txt")
     print("The layout: " + ", ".join(
         f"{name} ends at {offset + size:X}h" for name, _, offset, size in code)

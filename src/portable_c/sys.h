@@ -288,6 +288,14 @@ struct Block MemResize(u16 block, u16 paragraphs);
 void MemSetSearch(u16 how);
 void MemSetUpper(u16 on);
 
+/* The memory that the program itself is in. DOS gives a program all of
+   the memory when it starts it, in one block, and this makes that block
+   as long as the program is, so that the rest is there to be taken:
+   asked once, when the program begins, before anything is taken. It
+   answers as MemResize does. A system that gave the program no more
+   than it is has nothing to do here, and has not failed. */
+struct Block MemOwn(void);
+
 /*
  * The time, the country, the system itself. All Bare.
  */
@@ -347,6 +355,11 @@ struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail);
 /* End the program, with a number for whoever started it. Does not
    return. */
 void ProgramEnd(u16 code);
+
+/* End the program on a system that is too old to be told a number, and
+   too old for the program: a DOS before 3. It does not return there. A
+   system that cannot be that old has nothing to do here. */
+void ProgramEndOld(void);
 
 /* What this program was told behind its name when it was started, its
    command tail: the characters, as far as a carriage return. */

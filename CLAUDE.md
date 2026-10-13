@@ -2385,10 +2385,12 @@ is called both ways the bare function says so in its name.
 | 440Eh, 440Fh | bare | `DriveLetter(drive)`, `DriveSetLetter(drive)` |
 | 47h | asked, bare | `DirCurrent(drive, to)`, `DirCurrentBare` |
 | 48h, 49h, 4Ah | bare | `MemTake(paragraphs)`, `MemGive(block)`, `MemResize(block, paragraphs)` |
+| 4Ah, of the program's own block | bare | `MemOwn()`: the block that DOS loaded the program into made as long as the program is. Which block that is and how long the program is, `dos.c` knows |
 | 5801h, 5803h | bare | `MemSetSearch(how)`, `MemSetUpper(on)` |
 | 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is `dos.c`'s to make |
 | 4Ch | bare | `ProgramEnd(code)` |
-| 51h | bare | `ProgramPrefix()`, the segment of the PSP: of `vc.h` and not of `sys.h`, for the entry of the program. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
+| INT 20h, entered at the start of the PSP | | `ProgramEndOld()`, for a DOS before 3 |
+| 51h | bare | No function of `sys.h`: the entry of the program, `Alloc0` of `dos.c`, asks where the PSP is, as the first thing that DOS is asked, by `ProgramPrefix`, static there. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
 | 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
 | 56h | asked | `FileRename(from, to)` |
 | 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |
@@ -2798,10 +2800,11 @@ the header (`TODO.md`, the piece S1 of the plan for the 32 bits):
 - A place of DOS's own that is kept as a number stays one: `ComSpec` of
   the main data is where the name of the shell is in the environment,
   and is added to what `ProgramEnvironment` answers.
-- What `dos.c` goes by that something else sets is said in `vc.h`, with
-  what is of DOS alone: `PspSeg`, which the entry of the program sets
-  by `ProgramPrefix`. The toy of `harness/trial32/sys.c` has an entry of
-  its own and sets it there. A function of `sys.h` is also a function
+- What `dos.c` goes by that something else sets was said in `vc.h`,
+  with what is of DOS alone: `PspSeg`, which the entry of the program
+  set by `ProgramPrefix`, and the toy of `harness/trial32/sys.c` in an
+  entry of its own. The entry is `dos.c`'s since the piece S3, and the
+  toy is entered there as the program is. A function of `sys.h` is also a function
   of `dos32.c`, made or not, which the build compiles for 32 bits with
   the rest; and what is of DOS alone and outside `sys.h` is in no
   `dos32.c`, so `harness/trial32/whole.py`, which links the tree for

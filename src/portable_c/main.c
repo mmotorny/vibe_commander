@@ -1574,14 +1574,17 @@ static void Round(void)
 }
 #pragma aux Round aborts
 
-/* The program, from when DOS has loaded it: Alloc0 of resident.c
-   calls this, and it does not return. The setup is read, Init00, and
-   the memory of the panels asked for, Init11; with too little of it the
-   program says so and leaves. */
+/* The program, from when DOS has loaded it: the system calls this
+   where it enters the program, Alloc0 of dos.c, and it does not return.
+   The version of DOS is looked at and the memory that the program does
+   not fill is let go, Alloc3; the setup is read, Init00, and the memory
+   of the panels asked for, Init11; with too little of it the program
+   says so and leaves. */
 void Main(void)
 {
     struct Answer memory;
 
+    Alloc3();
     Init00();
     memory = Init11();
     if (memory.failed)                  /* AlocEr */

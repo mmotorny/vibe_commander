@@ -741,7 +741,7 @@ setup program in it](#the-setup-program-in-it).
 
 How the program is laid out now. The linker writes `VC.EXE`, DOS loads
 it and sets the words of it that hold a segment, and it starts at
-`Alloc0` of `resident.c` on the stack that the file's header names. Its
+`Alloc0` of `dos.c` on the stack that the file's header names. Its
 data is three segments, because it is more than one holds, 62.6 KB of
 main data, 8.9 KB of tables and 4 KB of stack:
 
@@ -808,12 +808,12 @@ here:
 | 1 | The option `-nd=NAME` gives the data of a file a group of its own: `T_GROUP` for the tables, in which a word that names a text is its offset, and `S_GROUP` for the stack | `CMakeLists.txt`, for `src/portable_c/*_t.c` and `stack.c` | `portable_c-data` holds such a word against the offset in the group; every scenario |
 | 2 | The linker's `order` directive, which its help does not list for DOS: the order of the classes | `CMakeLists.txt`, the linker's command | the checks of 3, 4 and 5 |
 | 3 | `#pragma data_seg` makes a segment of the compiler's group, of the class that it names: the main data is of a class of its own, which the linker's command has first, and so is at offset 0 of `DGROUP` and of the program | `src/portable_c/main.c` | the tests refuse a program whose `md` is not at 0 (`facts` of `harness/driver.py`) |
-| 4 | In a file compiled with `-nd=S` the same line makes a segment of the class `STACK` outside `DGROUP`; the linker takes a segment of that class for the stack and names its end in the file's header; given a value, zeros, it is in the file; and the linker's command has it last, so the program ends there | `src/portable_c/stack.c`, `Alloc0` of `resident.c` | `portable_c-scenarios` fails if the stack is not the last of the program, or not in the file |
+| 4 | In a file compiled with `-nd=S` the same line makes a segment of the class `STACK` outside `DGROUP`; the linker takes a segment of that class for the stack and names its end in the file's header; given a value, zeros, it is in the file; and the linker's command has it last, so the program ends there | `src/portable_c/stack.c`, `MemOwn` of `dos.c` | `portable_c-scenarios` fails if the stack is not the last of the program, or not in the file |
 | 5 | No code is within 4K of the stack, the tables being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 2; the files of the second code segment in `CMakeLists.txt` | `portable_c-scenarios` reads the linker's map, where `tools/mkexe.c` stopped the build |
 | 6 | The segment of a far pointer made of a near one is DS, `MAIN_SEG` | `src/portable_c/vc.h` | every scenario |
 | 7 | The segment of a far pointer to an object of a group is the group's, and `seg` and `offset` in `_asm` are those of the group too: so the stack that `Int2E` sets is the one that the file's header names, and a table is read at its offset in `AsmSeg` | `src/portable_c/resident.c`, `misc.c` | the scenarios of INT 2Eh, `quick`; every scenario |
 | 8 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with `DGROUP`, as a `__loadds` function does | `src/portable_c/vc.h`, `dos.c`, `resident.c` | the scenarios of the critical error, and of the program ended by DOS, `ended` |
-| 9 | `_enable` is `STI` and `CLD`: the first call of the program, `IntOn`, clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/portable_c/resident.c`, `Alloc0` | every scenario |
+| 9 | `_enable` is `STI` and `CLD`: the first thing that the entry of the program does clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/portable_c/dos.c`, `Alloc0` | every scenario |
 
 Gone are 2, 4 to 7, 9, 10, 12, 15 and 17 of that table, and with 15 the
 rule that a file of code may have no variable and no string: nothing
@@ -864,7 +864,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 93 functions
+In the portable C that place is `src/portable_c/sys.h`: 95 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
 has the file clean. `dos.c` is those functions for DOS on a PC, and the
@@ -879,9 +879,9 @@ file beside it.
 | Files by a file control block: a mask deleted at one call, a label | 2 |
 | Directories: what is in one, made, removed, the current one | 8 |
 | Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
-| Memory: a block taken, given back, made another size, and where the system looks for one | 5 |
+| Memory: a block taken, given back, made another size, where the system looks for one, and the program's own block made as long as the program | 6 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
-| Other programs: one run, with what it is told behind its name, and this one ended; what this one was told when it was started, and its environment | 5 |
+| Other programs: one run, with what it is told behind its name, and this one ended, on an old DOS too; what this one was told when it was started, and its environment | 6 |
 | What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again | 8 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
@@ -935,16 +935,19 @@ name, DOS's number for what is wrong and whether DOS can try again, and
 hands DOS what it answers.
 
 Not in the header, and in `dos.c` all the same, is what only DOS on a
-PC has: where the program's PSP is, which the entry of the program
-asks DOS for and keeps. `vc.h` declares that. What is left of DOS
-outside `dos.c` is in
-`resident.c`: the entry of the program, where DOS goes on when it ends
+PC has: where DOS enters the program, `Alloc0`, which asks DOS where
+the program's PSP is, keeps that, and calls `Main` of `main.c`, which is
+the program. What the program does first it asks through the header
+like everything else: the version of DOS, and that it keep no more of
+the memory than it is. What is left of DOS outside `dos.c` is in
+`resident.c`: where DOS goes on when it ends
 the program, and the call of COMMAND.COM's own interrupt for Quick
 execute, each with what assembly it has. Of the PSP those read one
-thing more themselves,
-the address at which DOS goes on when the program has ended; what else
-is read there, the command tail, the environment and where the memory
-ends, `dos.c` reads for the functions that answer with them, and it
+thing themselves,
+the address at which DOS goes on when the program has ended, by the
+segment that `vc.h` declares for them; what else
+is read there, the command tail and the environment,
+`dos.c` reads for the functions that answer with them, and it
 makes the block that DOS is told of a program to run. `TODO.md`
 says what is to become of them. The map of the memory and the watch on
 DOS, which were of DOS alone, [are gone](#what-a-user-sees-no-more).
