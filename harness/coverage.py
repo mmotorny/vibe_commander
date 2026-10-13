@@ -24,6 +24,18 @@ The portable C's file is an .EXE as the linker writes it, which DOS
 relocates by the table in its header: the same holds of it, with that
 table. Which of the two a file is, its header says: see origin().
 
+The portable C as a flat program of 32 bits is a third kind of file, a
+linear executable behind the stub of its extender, which le.py reads. It
+is not held against its file at all, but against its objects as they lie
+in the memory, the image of le.py: what ran of it is counted in places,
+from where its first object begins, and place() makes such a place of an
+address of the linker's map, as it makes an offset in the file of one for
+a program of 16 bits. The extender puts the addresses in before the
+program is entered, 4 bytes at each place that the file has a relocation
+for, so such a program is in the memory in one way only, and its code
+never moves. The stub is the extender's own program, of real mode: it is
+not in the image, and nothing of it counts as the program's.
+
 Two programs of the original run in one machine where a scenario is of
 the setup program: VC.COM, and VCSETUP.COM started from its command line.
 The two files have routines of the same bytes, in the same order, 68 of
@@ -82,16 +94,32 @@ def made_by_mkexe(contents):
 
 
 def origin(contents):
-    """Where in the .EXE file `contents` the byte is that the linker's map
-    has at 0000:0000, which is also where the words that hold a segment
-    count from: add it to an address of the map for the place in the
-    file. The map of a file that tools/mkexe.c made counts from the PSP,
-    100h before the file's contents, so this is below 0 for it; that of
-    one as the linker writes it counts from the contents, behind the
-    header."""
+    """Where in the .EXE file `contents`, of a program of 16 bits, the
+    byte is that the linker's map has at 0000:0000, which is also where
+    the words that hold a segment count from: add it to an address of the
+    map for the place in the file. The map of a file that tools/mkexe.c
+    made counts from the PSP, 100h before the file's contents, so this is
+    below 0 for it; that of one as the linker writes it counts from the
+    contents, behind the header."""
     if made_by_mkexe(contents):
         return EXE_HEADER - COM_ORIGIN
     return struct.unpack_from("<H", contents, EXE_PARAGRAPHS)[0] * 16
+
+
+def place(contents):
+    """How an address of the linker's map of the program `contents` is
+    counted by executed(): a function that makes of the two numbers of
+    such an address what executed() has for the byte there. Of a program
+    of 16 bits those are a paragraph and an offset, and the byte is known
+    by its offset in the file (see origin()). Of a flat program they are
+    an object's number and an offset in it, and the byte by its place,
+    counted from where the first object begins in the memory (see
+    le.py)."""
+    flat = le.linear(contents)
+    if flat:
+        return flat.place
+    in_file = origin(contents)
+    return lambda first, offset=0: first * 16 + offset + in_file
 
 _LINE = re.compile(r"0x([0-9a-f]{8}):  ((?:[0-9a-f]{2} )*[0-9a-f]{2})"
                    r"(?:  +(\S.*))?$")
@@ -121,10 +149,12 @@ def blocks(trace_path):
 
 
 def relocated(contents, linked=None):
-    """The offsets in `contents`, a program file, of the words that the
-    program adds its segment to when it is loaded: those of the
-    translation's relocation table, with the linker's map of the translation
-    at `linked`. None of them for a file that is no .EXE, the original."""
+    """The offsets in `contents`, the file of a program of 16 bits, of
+    the words that the program adds its segment to when it is loaded:
+    those of the translation's relocation table, with the linker's map of
+    the translation at `linked`. None of them for a file that is no .EXE,
+    the original. A flat program has addresses of four bytes in their
+    place, which le.Linear.image() puts in."""
     if contents[:2] != b"MZ":
         return ()
     in_file = origin(contents)              # from the segment to the file
@@ -160,13 +190,35 @@ def _loaded(contents, words, base):
     return bytes(there)
 
 
+class Executed(dict):
+    """What executed() answers: offset -> length of every instruction
+    that ran, and in `at` the addresses in the machine's memory at which
+    the program was found to have run, each that of the byte which the
+    offsets count from."""
+    at = ()
+
+
 def executed(trace_path, contents, linked=None, others=()):
     """Offset -> length in `contents` (a program file) of what was
-    executed. `linked` is the linker's map of the translation, for where its
-    relocation table is. `others` are the files of the other programs
-    that ran in the same machine and have code of the same bytes as this
-    one, as the two programs of the original have: a block that one of
-    them has too says nothing of where this program is."""
+    executed, an Executed. `linked` is the linker's map of the
+    translation, for where its relocation table is. `others` are the
+    files of the other programs that ran in the same machine and have
+    code of the same bytes as this one, as the two programs of the
+    original have: a block that one of them has too says nothing of
+    where this program is.
+
+    Of a flat program the offsets are places, counted from where its
+    first object begins in the memory, and what is held against the log
+    is its image and not its file: see the top, and place()."""
+    flat = le.linear(contents)
+    if flat:
+        # Of the image, as far as it has code: what lies behind is data,
+        # most of it the memory that the program hands out, and looking
+        # through that for every block of the log takes many times as
+        # long as everything else here.
+        ends = max(found.place + found.size for found in flat.objects
+                   if found.code)
+        contents = flat.image()[:ends]
     logged = list(blocks(trace_path))
     votes = Counter()
     # Instructions that follow one another in memory vote as one block
@@ -193,30 +245,41 @@ def executed(trace_path, contents, linked=None, others=()):
 
     # A block is in the program if every instruction of it is, at one and
     # the same place: single instructions are too short to go by.
-    words = relocated(contents, linked)
-    there = {base: _loaded(contents, words, base) if words else contents
-             for base in bases}
-    bases = [base for base in bases if there[base] is not None]
-    result = {}
+    if flat:
+        # As the extender leaves it at that place, and in no other way:
+        # the addresses are in before the program is entered.
+        there = {base: (flat.image(base)[:ends],) for base in bases}
+    else:
+        # As the program is at that place, or as it is in the file: the
+        # part that stays runs before it relocates itself.
+        words = relocated(contents, linked)
+        there = {base: _loaded(contents, words, base) if words else contents
+                 for base in bases}
+        there = {base: tuple(dict.fromkeys((image, contents)))
+                 for base, image in there.items() if image is not None}
+    result = Executed()
+    found = []
     for block in logged:
-        for base in bases:
-            # As the program is at that place, or as it is in the file:
-            # the part that stays runs before it relocates itself.
-            if any(all(_matches(image, address - base, code)
+        for base in there:
+            if any(all(_matches(image, address - base, code, far=not flat)
                        for address, code in block)
-                   for image in dict.fromkeys((there[base], contents))):
+                   for image in there[base]):
                 for address, code in block:
                     result[address - base] = len(code)
+                if base not in found:
+                    found.append(base)
                 break
+    result.at = tuple(found)
     return result
 
 
-def _matches(contents, offset, code):
+def _matches(contents, offset, code, far=True):
     if offset < 0:
         return False
     there = contents[offset:offset + len(code)]
-    # A far call or jump has had its segment relocated.
-    return there == code or (code[0] in (FAR_CALL, FAR_JUMP)
+    # A far call or jump of a program of 16 bits has had its segment
+    # relocated.
+    return there == code or (far and code[0] in (FAR_CALL, FAR_JUMP)
                              and there[:3] == code[:3])
 
 
@@ -381,6 +444,14 @@ def link_map(path):
 STACKS = (("DataSav", "R_BSS"), ("_Stack", "SSTACK"))
 
 
+# How much of its stack a C tree must leave untouched in every scenario:
+# one part in this many. The scenarios' test holds a tree to it and says
+# why (STACK_LEFT of ported.py); the layout of a flat program is held to
+# have no code in a page with the rest, which a scenario may write
+# (layoutcheck.py).
+STACK_LEFT = 2
+
+
 def flat_stack(program, linked):
     """Where the stack of a flat program begins and ends, an le.Linear
     with its le.Map: two places, counted from where the first object
@@ -396,6 +467,15 @@ def flat_stack(program, linked):
                      "file's header has the top of the stack")
 
 
+def stack_size(contents, linked):
+    """How long the stack of a C tree is, by its file `contents` and the
+    linker's map of it at `linked`: of a program of 16 bits or of a flat
+    one."""
+    flat = le.linear(contents)
+    bottom, top = flat_stack(flat, le.Map(linked)) if flat else stack(linked)
+    return top - bottom
+
+
 def segments(path):
     """Read a wlink map: its segments, each as name, class, where it
     begins, as the paragraph and the offset that the map has, and how
@@ -405,8 +485,9 @@ def segments(path):
 
 
 def stack(path):
-    """Where the stack of a C tree begins and ends, by the wlink map at
-    `path`: two addresses as the map counts them (see origin())."""
+    """Where the stack of a C tree of 16 bits begins and ends, by the
+    wlink map at `path`: two addresses as the map counts them (see
+    origin()). Of a flat program, flat_stack() says it."""
     symbols = link_map(path)
     array, segment = next(names for names in STACKS if names[0] in symbols)
     at, offset = symbols[array]

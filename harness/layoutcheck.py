@@ -52,7 +52,8 @@ What is held of the layout, each with the word that goes by it:
     pages are those of the memory on the bench, le.BENCH. The constants
     of the class DATA are not written, CONST and CONST2; of the stack
     the upper half counts, which is what the scenarios' test lets a
-    scenario use; everything else of the data does.
+    scenario use (coverage.STACK_LEFT); everything else of the data
+    does.
 
 And of the file, against the map, which is what says that the reader
 has read it right (lecheck.py holds the reader to a toy the same way):
@@ -361,8 +362,8 @@ class Check:
             what = segment.name
             if stack and program.place(segment.first, segment.offset) \
                     == stack[0]:
-                begins += segment.size // 2
-                what = "the upper half of the stack"
+                begins += segment.size // coverage.STACK_LEFT
+                what = "what a scenario may use of the stack"
             if begins < clear:
                 self.wrong(
                     f"{what} begins at {begins:08X}h on the bench, in a "

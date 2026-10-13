@@ -258,6 +258,16 @@ class Linear:
                 for one in self.relocations}
 
 
+def linear(contents):
+    """The flat program whose file `contents` is, a Linear, or None for a
+    file that is none: a program of 16 bits, the original. What reads
+    both kinds of program asks this which it has."""
+    try:
+        return Linear(contents)
+    except Unknown:
+        return None
+
+
 @dataclass(frozen=True)
 class Segment:
     """A segment of the linker's map. `first` and `offset` are the two

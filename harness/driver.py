@@ -213,7 +213,7 @@ def facts(program, stack=False):
 
     auto_time = symbol(r"^ *AutoTim [ .]*([0-9A-F]+) +DWord")
     clock = symbol(r"^ *Clock [ .]*([0-9A-F]+) +Byte")
-    flat = linear(code)
+    flat = le.linear(code)
     if flat:
         return flat_facts(name, flat, le.Map(program.linked),
                           ("_md", auto_time), ("_md", clock), stack)
@@ -249,15 +249,6 @@ def facts(program, stack=False):
                 "what it holds when the program has been loaded is not "
                 "known")
     return found
-
-
-def linear(contents):
-    """The flat program whose file `contents` is, as le.py reads it, or
-    None for a program of 16 bits."""
-    try:
-        return le.Linear(contents)
-    except le.Unknown:
-        return None
 
 
 def flat_facts(name, program, linked, auto_time, clock, stack=False,
