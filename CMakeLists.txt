@@ -510,6 +510,9 @@ function(add_portable_c32 target directory)
     #   and the scenarios' test fails one that uses half. The constants
     #   stand between the stack and everything else that is written.
     #
+    # The test <target>-layout holds the linked file to each of these, by
+    # the linker's map: harness/layoutcheck.py.
+    #
     # The extender writes two lines of its name when it starts, onto what
     # would be the program's first screen: tools/stub.c switches that off
     # in the file, by one bit of the stub's settings.
@@ -643,3 +646,18 @@ add_test(NAME harness-le
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/lecheck.py
             --watcom ${open_watcom_SOURCE_DIR} --tools ${watcom_bin}
             --out ${CMAKE_BINARY_DIR}/lecheck)
+# The two programs of 32 bits, each against the layout that it rests on:
+# where the linker has put the tables, the main data, the stack and what
+# has no value, by the file and the linker's map of it, and that its stub
+# is DOS/32A's with the banner switched off. See harness/layoutcheck.py.
+# It runs no machine. No other test reads those programs yet.
+foreach(tree portable_c32 portable_c32-debug)
+    # Each under the name of its target, and the second in the directory
+    # debug of the first.
+    string(REPLACE "-" "/" c_dir ${tree})
+    set(c_dir ${CMAKE_BINARY_DIR}/${c_dir})
+    add_test(NAME ${tree}-layout
+        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/layoutcheck.py
+                --stub ${open_watcom_SOURCE_DIR}/binw/dos32a.exe
+                ${c_dir}/VC.EXE ${c_dir}/VC.MAP)
+endforeach()
