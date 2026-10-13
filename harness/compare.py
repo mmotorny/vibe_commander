@@ -31,7 +31,6 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
 
-import deviations
 import goldens
 import scenarios
 import setups
@@ -99,7 +98,7 @@ def main():
         if name not in run:
             parser.error(
                 f"{name} is not run for {program.tree}: "
-                + deviations.declared(program.tree).not_run[name])
+                + scenarios.not_run(program.tree)[name])
     failed, _ = compare(args.scenario or run, program,
                         together=args.together)
     sys.exit(failed)

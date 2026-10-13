@@ -9,6 +9,13 @@ mode, and at the end the files on the disks. Next to that goes a list of
 the original's code that ran, which ported.py holds against the routines
 that have been translated.
 
+The original is two programs, and a scenario is of one of them (see "The
+scenarios of the setup program" at the top of scenarios.py). The golden of
+a scenario of the setup program is what the original's setup program
+showed, started from the main program, and the list next to it is of the
+code of VCSETUP.COM that ran, with nothing of VC.COM's: ran() keeps the
+two kinds apart, and nothing else reads the lists of all scenarios.
+
 A golden is derived, never edited. Where a build is meant to differ from
 the original, deviations.py says how, and the golden is derived with that
 difference in it: it holds what a build is expected to show. What is not
@@ -248,12 +255,31 @@ def derived(name):
 
 
 def read_ran(name):
-    """The offsets in the original's file of the bytes that ran."""
+    """The offsets in the original's file of the bytes that ran in the
+    scenario `name`: in VC.COM, or in VCSETUP.COM if the scenario is of
+    the setup program."""
     ran = set()
     for word in ran_path(name).read_text().split():
         first, last = (int(part, 16) for part in word.split("-"))
         ran.update(range(first, last))
     return ran
+
+
+def ran(setup=False, missing=None):
+    """The offsets in a file of the original of the bytes that ran in
+    any scenario: in VC.COM, by the scenarios of the main program, or
+    with `setup` in VCSETUP.COM, by those of the setup program. The two
+    files have routines of the same bytes at other offsets, and what one
+    kind of scenario recorded says nothing of the other file. A scenario
+    without a golden fails this, unless `missing` is a list, which then
+    gets its name."""
+    found = set()
+    for name in scenarios.names(setup=setup):
+        if missing is not None and not derived(name):
+            missing.append(name)
+        else:
+            found |= read_ran(name)
+    return found
 
 
 def differences(golden, run, programs):
@@ -333,18 +359,27 @@ def screen_differences(expected, actual):
 
 
 def derive(name, benches):
-    """Take the original through scenario `name` and write its golden."""
+    """Take the original through scenario `name` and write its golden.
+    In a scenario of the setup program the original is both its
+    programs: either file stands for the program under test on the
+    disks, where a C tree has one, and what is written as having run is
+    the setup program's."""
     scenario = scenarios.SCENARIOS[name]
     original = setups.original_vc()
     run = scenarios.run(scenario, original, benches[scenario.country],
                         trace=True, blinking=True)
+    programs = {original.filename}
+    if scenario.setup:
+        programs.add(setups.SETUP_PROGRAM)
     write(Golden(name, setups.codepage(scenario.country), [],
                  [deviations.compared(deviations.expected(screen))
                   for screen in run.screens],
-                 disk_lines(run.disks, {original.filename})))
+                 disk_lines(run.disks, programs)))
     write_ran(name, run.executed)
     print(f"{name}: derived, {len(run.screens)} screen"
-          f"{'s' if len(run.screens) > 1 else ''}")
+          f"{'s' if len(run.screens) > 1 else ''}"
+          + (f", {sum(run.executed.values())} bytes of "
+             f"{setups.SETUP_PROGRAM} ran" if scenario.setup else ""))
 
 
 def record(name, program, benches):
@@ -369,10 +404,14 @@ def changes(name, tree):
     after the same step, which then has more behind it."""
     ours = read(name, tree)
     theirs = read(name)
+    # A step that the tree is taken through in place of another stands
+    # for that one.
+    instead = deviations.declared(tree).in_place_of
+    stands_for = [instead.get(step, (step,))[0] for step in theirs.steps]
     report = []
     at = 0
     for number, step in enumerate(ours.steps):
-        while theirs.steps[at] != step:
+        while stands_for[at] != step:
             report.append(f"--- step {at} of the original is left out: "
                           f"{theirs.steps[at]}")
             at += 1

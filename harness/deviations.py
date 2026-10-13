@@ -82,7 +82,30 @@ DEVIATIONS = [
     # here too.
     (re.compile(r"║ . [0-9A-F]{4}[ \d]{6}[ \d,]{10} {3}VC\.(COM) "), "EXE",
      None),
+    # The original's setup program is a program of its own, and a
+    # scenario of it starts it from the command line of the main program
+    # (SETUP_COMMAND, below), which writes the prompt and the command
+    # where its command line is before it runs a command. That line is
+    # among what DOS has shown, which is what stands behind the setup
+    # program for as long as it is open. In a C tree the setup is a part
+    # of the one program, chosen from its menu: no command starts it, and
+    # what DOS has shown has no such line. It is known by the command,
+    # which nothing else types, behind whatever prompt, where it is all
+    # that a row has, and is nothing but spaces in a build. A beep moves
+    # it up a row with the rest of what DOS has shown, and it is known
+    # there too.
+    (re.compile(r"^(\S[^>]*>d:\\vc\\vcsetup>nul) *$"), " " * COLUMNS, None),
 ]
+
+# The step by which a scenario of the setup program starts the original's
+# setup program: its file by its path, at the command line of the main
+# program, with what it prints sent nowhere. It prints a banner through
+# DOS when it starts, which would move what DOS has shown up by four
+# lines; a C tree has no such banner. And the keys by which the same is
+# chosen in a tree that has the setup program in itself: seTup... of the
+# Options menu.
+SETUP_COMMAND = '"d:\\vc\\vcsetup>nul" Enter'
+SETUP_ITEM = "F9 o t"
 
 # What stands in a golden for a character that is not compared.
 BLANK = "#"
@@ -221,6 +244,18 @@ class Declared:
     # Scenarios that the tree is held in against a golden of its own:
     # scenario -> what changes in it.
     changed: dict = field(default_factory=dict)
+    # Steps that the tree is taken through in place of others, one for
+    # one, in every scenario: the step of the original -> (the step of
+    # the tree, why). For what the tree gets to by other keys than the
+    # original and then shows alike: the screen behind the tree's step is
+    # held against the one behind the original's, and so is every screen
+    # after it. Such a step changes no scenario by itself, and is no
+    # reason for a golden of the tree's own.
+    in_place_of: dict = field(default_factory=dict)
+    # Why the tree is taken through no scenario of the setup program
+    # (scenarios.Scenario.setup), whichever there are, or None if it is
+    # taken through them: for a tree that has no setup program.
+    no_setup: str = None
 
     def steps(self, steps, name=None):
         """The steps of `steps`, those of the scenario `name`, that the
@@ -229,7 +264,8 @@ class Declared:
         for gone in self.left_out_of.get(name, {}):
             for at in reversed(found(steps, gone)):
                 del steps[at:at + len(gone)]
-        return tuple(steps)
+        return tuple(self.in_place_of.get(step, (step,))[0]
+                     for step in steps)
 
 
 def found(steps, some):
@@ -252,8 +288,17 @@ _NO_MAP = ("it shows the map of the memory, Alt+F5, and the programs "
            "portable C has no such map and keeps no such list")
 _NO_LINE = ", without Memory info"
 _FDAPM = '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter'
+_NO_SETUP_YET = ("the portable C has no setup yet: what the scenario "
+                 "shows of it is still to be translated")
 
 TREES = {
+    # The C translation is the main program and nothing else.
+    "c": Declared(
+        no_setup="the setup program is not translated in the C "
+                 "translation, which is the main program alone, finished "
+                 "and frozen: the original's is a file of its own, which "
+                 "that tree has not",
+    ),
     # The portable C stays in the memory whole while a command runs, and
     # has no Memory allocation in its Options menu; and it has no map of
     # the memory, Alt+F5, and no watch on the programs that stay in the
@@ -274,6 +319,11 @@ TREES = {
             "mouse-memory": _NO_MAP,
             "stay": _NO_MAP + ". What it has besides, a program that asks "
                     "the program for its data, asked has by itself",
+            # The scenarios of the setup program, until the tree has the
+            # code that each shows: an entry goes with the commit that
+            # makes its scenario pass (TODO.md, "The setup program in the
+            # portable C: the plan").
+            "setup": _NO_SETUP_YET,
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "
@@ -339,6 +389,12 @@ TREES = {
             "mouse-drag-lists": "no program stays in the memory, and no "
                                 "button is moved in the map of the "
                                 "memory",
+        },
+        in_place_of={
+            SETUP_COMMAND: (SETUP_ITEM,
+                            "the setup is no program of its own in the "
+                            "portable C, and no command starts it: it is "
+                            "an item of the Options menu, seTup..."),
         },
     ),
 }

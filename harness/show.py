@@ -14,6 +14,12 @@ quotes around it. The program is the original unless another is named:
 --program build/c/VC.EXE is the C translation, and
 --program build/portable_c/VC.EXE the portable C.
 
+With --setup the bench has the original's setup program next to the
+original, for a step to start, as a scenario of the setup program has it
+(see the top of scenarios.py):
+
+    show.py --setup '"d:\\vc\\vcsetup>nul" Enter' F2
+
 A screen is 25 rows, and most of what a key does is in a few of them:
 
     show.py --changes F9 o Enter        of each screen only the rows that
@@ -138,12 +144,16 @@ def main():
                         help="the country DOS is configured for")
     parser.add_argument("--program", help="the VC.COM or VC.EXE to run "
                                           "(default: the original)")
+    parser.add_argument("--setup", action="store_true",
+                        help="have the original's setup program on the "
+                             "bench, next to the original")
     add_arguments(parser)
     args = parser.parse_args()
 
     program = setups.Program.load(args.program) if args.program \
         else setups.original_vc()
-    scenario = scenarios.Scenario("", tuple(args.step), args.country)
+    scenario = scenarios.Scenario("", tuple(args.step), args.country,
+                                  setup=args.setup)
     with setups.Benches() as benches:
         made = run(scenario, program, benches[args.country], args.limit)
     print_screens(scenario.steps, made.screens,

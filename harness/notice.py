@@ -105,8 +105,11 @@ def scenarios_running(routines, tree):
             sys.exit(f"no procedure {name} in {LISTING}")
     addresses = {line.address - COM_ORIGIN for name in routines
                  for line in listing.procedure(name)}
+    # The routines are of VC.COM: what a scenario of the setup program
+    # recorded as having run is of VCSETUP.COM, at other offsets.
+    main = set(scenarios.names(tree, setup=False))
     return [name for name in with_goldens(tree)
-            if addresses & goldens.read_ran(name)]
+            if name in main and addresses & goldens.read_ran(name)]
 
 
 def with_goldens(tree):

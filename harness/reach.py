@@ -42,20 +42,28 @@ new scenario. That takes most of a second for every step.
     reach.py NgLine --steps F1 --limit 10       give a step up after 10
                                                 seconds, not five minutes
 
+With --setup the routines are those of the original's setup program,
+VCSETUP.COM, and what has run is what the scenarios of the setup program
+have run of it (scenarios.Scenario.setup); steps are pressed on a bench
+that has the setup program for them to start, and what counts is what
+they reach of that program:
+
+    reach.py --setup Main00 Default
+    reach.py --setup F04_10 --steps '"d:\\vc\\vcsetup>nul" Enter' F4 Enter
+
 The routines are found in the listing of the build that is laid out like
-the original, build/shareware-layout/VC.LST, which has to be built first.
+the original, build/shareware-layout/VC.LST, or VCSETUP.LST there, which
+has to be built first.
 """
 import argparse
 import sys
 
 import coverage
-import deps
 import goldens
 import scenarios
 import setups
 import show
 
-LISTING = deps.ROOT / "build" / "shareware-layout" / "VC.LST"
 COM_ORIGIN = 0x100                # where a .COM file is loaded
 
 
@@ -70,6 +78,9 @@ def main():
     parser.add_argument("--country", default="us",
                         choices=sorted(setups.COUNTRIES),
                         help="the country DOS is configured for")
+    parser.add_argument("--setup", action="store_true",
+                        help="the routines are of the original's setup "
+                             "program, and so is what has run")
     parser.add_argument("--screens", action="store_true",
                         help="print the screen after every step")
     show.add_arguments(parser)
@@ -78,21 +89,20 @@ def main():
                              "its text")
     args = parser.parse_args()
 
-    listing = coverage.Listing(LISTING)
+    path = setups.SETUP_LISTING if args.setup else setups.LISTING
+    listing = coverage.Listing(path)
     for name in args.routine:
         if name not in listing.procedures:
-            sys.exit(f"no procedure {name} in {LISTING}")
-    ran = set()
-    for name in scenarios.SCENARIOS:
-        if goldens.derived(name):
-            ran |= goldens.read_ran(name)
-        else:
-            print(f"{name} has no golden yet and is left out",
-                  file=sys.stderr)
+            sys.exit(f"no procedure {name} in {path}")
+    missing = []
+    ran = goldens.ran(args.setup, missing)
+    for name in missing:
+        print(f"{name} has no golden yet and is left out", file=sys.stderr)
 
     tried = None
     if args.steps:
-        scenario = scenarios.Scenario("", tuple(args.steps), args.country)
+        scenario = scenarios.Scenario("", tuple(args.steps), args.country,
+                                      setup=args.setup)
         original = setups.original_vc()
         with setups.Benches() as benches:
             run = show.run(scenario, original, benches[args.country],

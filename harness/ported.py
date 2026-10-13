@@ -45,6 +45,16 @@ original's, or that nothing declares. A scenario that only shows what
 the tree has no more is not run, and a function that the tree has no
 more is listed in GONE, with what took it away.
 
+The original is two programs, and its setup program, VCSETUP.COM, goes
+into the portable C as a part of the one program (TODO.md, "The setup
+program in the portable C: the plan"). Its routines are listed below
+too, apart, in SETUP_BATCHES: they are held against the listing of the
+setup program, and against what ran of that program in the scenarios
+that are of it (scenarios.Scenario.setup), where the others are held
+against what ran of VC.COM in the scenarios of the main program. They
+are checked for a tree that has the setup program, which the C
+translation is declared not to have.
+
 The build of the translation that is tested is the one that is shipped. What
 ran in the original was recorded with the goldens; what runs in the
 translation is read from QEMU's log of the code it executed (see
@@ -58,6 +68,7 @@ import argparse
 import sys
 import textwrap
 from dataclasses import dataclass, field, replace
+from pathlib import Path
 
 import compare
 import coverage
@@ -108,6 +119,13 @@ class Batch:
     functions: tuple
     # Address in the original -> why no scenario executes the instruction.
     unreached: dict = field(default_factory=dict)
+    # Address in the original -> why the instruction is not carried over
+    # into the tree: for a routine of the setup program that is translated
+    # in part, the rest of it being what a program of its own does when
+    # it starts or ends and the one program has no place for. Such an
+    # instruction is not asked to have run, and is not held to be
+    # translated; whether it ran says nothing here.
+    not_carried: dict = field(default_factory=dict)
 
 
 BATCHES = [
@@ -1070,6 +1088,43 @@ BATCHES = [
 ]
 
 
+# The routines of the original's setup program, VCSETUP.COM, as they are
+# translated into a tree that has the setup program: batches like those
+# above, with three things otherwise.
+#
+#   - `routines` are procedures and labels of the setup program's listing,
+#     build/shareware-layout/VCSETUP.LST, and the addresses of `unreached`
+#     and `not_carried` are of that listing. What has to have run of them
+#     ran in VCSETUP.COM, in a scenario of the setup program.
+#     `python3 harness/reach.py --setup NAME...` says what is left of a
+#     routine, as reach.py says it of the main program's.
+#   - A routine that the setup program has word for word as the main
+#     program has it is not listed here: it is not translated twice, and
+#     the batch above that has it holds it.
+#   - `functions` are named as the tree has them, with St in front of the
+#     routine's name: StMain00 for Main00.
+#
+# A batch of the plan's pieces, as an example of the form:
+#
+#     Batch(
+#         title="The setup program: its menu",
+#         source="stmain.c",
+#         routines=("Main00",),
+#         functions=("StMain00",),
+#         unreached={
+#             0x0417: "Main10, for ...: no scenario can ...",
+#         },
+#         not_carried={
+#             **dict.fromkeys(
+#                 (0x0405, 0x0408),
+#                 "the screen saved when the setup program starts: the "
+#                 "one program has it saved already"),
+#         },
+#     ),
+SETUP_BATCHES = [
+]
+
+
 # Functions of the batches that a tree has no more: tree -> function ->
 # why. Each has to be gone from the tree's link map.
 GONE = {
@@ -1100,15 +1155,25 @@ RENAMED = {
 }
 
 
-def check_original(listing, ran):
-    """Report on the assembly that has been replaced; return success.
+def check_original(listing, ran, batches):
+    """Report on the assembly that `batches` say has been replaced;
+    return success.
 
-    `ran` holds the offsets in the original's file of the bytes that ran.
+    `listing` is that of the program whose routines they name, and `ran`
+    holds the offsets in that program's file of the bytes that ran.
     """
     passed = True
-    for batch in BATCHES:
-        lines = [line for name in batch.routines
+    for batch in batches:
+        for name in batch.routines:
+            if name not in listing.procedures:
+                passed = False
+                print(f"  {batch.title}: the listing has no procedure "
+                      f"and no code between procedures called {name}")
+        every = [line for name in batch.routines
+                 if name in listing.procedures
                  for line in listing.procedure(name)]
+        lines = [line for line in every
+                 if line.address not in batch.not_carried]
         missed = [line for line in lines
                   if line.address - COM_ORIGIN not in ran]
         excused = [line for line in missed if line.address in batch.unreached]
@@ -1116,15 +1181,23 @@ def check_original(listing, ran):
                        - {line.address for line in missed})
         print(f"{batch.title}: {len(lines) - len(missed)} of {len(lines)} "
               f"instructions of the original ran, {len(excused)} more are "
-              "listed as out of reach")
+              "listed as out of reach"
+              + (f"; {len(every) - len(lines)} are not carried over"
+                 if batch.not_carried else ""))
         for line in missed:
             if line.address not in batch.unreached:
                 passed = False
                 print(f"  not executed: {line.address:04X} {line.text}")
         for address in stale:
             passed = False
-            print(f"  listed as out of reach, but executed or not an "
-                  f"instruction of these routines: {address:04X}")
+            print(f"  listed as out of reach, but executed, not carried "
+                  f"over or not an instruction of these routines: "
+                  f"{address:04X}")
+        for address in sorted(set(batch.not_carried)
+                              - {line.address for line in every}):
+            passed = False
+            print(f"  listed as not carried over, and not an instruction "
+                  f"of these routines: {address:04X}")
     return passed
 
 
@@ -1140,26 +1213,26 @@ def linked_as(symbols, name):
     raise KeyError(f"the link map has no function {name}")
 
 
-def check_translation(link_map, executed, tree, origin):
-    """Report on the C functions that replace it; return success. `tree`
-    is the tree that is checked: what GONE has for it is to be gone.
-    `origin` is where the file has what the map has at 0, as
+def check_translation(link_map, executed, tree, origin, batches):
+    """Report on the C functions that replace what `batches` list; return
+    success. `tree` is the tree that is checked: what GONE has for it is
+    to be gone. `origin` is where the file has what the map has at 0, as
     coverage.origin() says it."""
     symbols = coverage.link_map(link_map)
     gone = GONE.get(tree, {})
     renamed = RENAMED.get(tree, {})
     passed = True
-    for name in sorted(set(renamed) - {name for batch in BATCHES
+    for name in sorted(set(renamed) - {name for batch in batches
                                        for name in batch.functions}):
         passed = False
         print(f"  listed as renamed in {tree}, and no function of a "
               f"batch: {name}")
-    for name in sorted(set(gone) - {name for batch in BATCHES
+    for name in sorted(set(gone) - {name for batch in batches
                                     for name in batch.functions}):
         passed = False
         print(f"  listed as gone from {tree}, and no function of a batch: "
               f"{name}")
-    for batch in BATCHES:
+    for batch in batches:
         for name in batch.functions:
             if name in gone:
                 try:
@@ -1272,13 +1345,21 @@ def check_declared(tree, names):
     through; return success. A golden of its own has to be other than
     the original's, where both are of the same steps, and to be declared."""
     declared = deviations.declared(tree)
+    not_run = scenarios.not_run(tree)
     passed = True
     for name in sorted(set(declared.changed) | set(declared.not_run)):
         if name not in scenarios.SCENARIOS:
             passed = False
             print(f"  declared for {tree}, and no scenario: {name}")
+    every = {step for scenario in scenarios.SCENARIOS.values()
+             for step in scenario.steps}
+    for step, (instead, _) in declared.in_place_of.items():
+        if step not in every:
+            passed = False
+            print(f"  {tree} is declared to be taken through {instead} in "
+                  f"place of a step that no scenario has: {step}")
     for name, why in declared.changed.items():
-        if name in declared.not_run or name not in scenarios.SCENARIOS:
+        if name in not_run or name not in scenarios.SCENARIOS:
             continue
         ours, theirs = goldens.read(name, tree), goldens.read(name)
         if ours.steps == theirs.steps and not goldens.changes(name, tree):
@@ -1325,6 +1406,19 @@ def check_declared(tree, names):
         print(textwrap.fill(f"not run for {tree}: {name}, {why}", width=78,
                             initial_indent="  ", subsequent_indent="    ",
                             break_on_hyphens=False))
+    of_setup = [name for name in scenarios.names(setup=True)
+                if name not in declared.not_run]
+    if declared.no_setup and of_setup:
+        print(textwrap.fill(
+            f"not run for {tree}: the scenarios of the setup program, "
+            f"{', '.join(of_setup)}; {declared.no_setup}", width=78,
+            initial_indent="  ", subsequent_indent="    ",
+            break_on_hyphens=False))
+    for step, (instead, why) in declared.in_place_of.items():
+        print(textwrap.fill(
+            f"{tree} is taken through {instead} in place of {step}: {why}",
+            width=78, initial_indent="  ", subsequent_indent="    ",
+            break_on_hyphens=False))
     return passed
 
 
@@ -1367,7 +1461,9 @@ def main():
                                             "build/portable_c/VC.EXE")
     parser.add_argument("link_map", help="its link map")
     parser.add_argument("listing", help="the listing of VC.COM laid out "
-                                        "like the original")
+                                        "like the original; that of "
+                                        "VCSETUP.COM is taken to be next "
+                                        "to it")
     args = parser.parse_args()
 
     original = setups.original_vc()
@@ -1386,16 +1482,24 @@ def main():
     failed, runs = compare.compare(names, translation, trace=True,
                                    stack=True)
     # What ran in the original is of every scenario, also of one that
-    # the tree is not taken through.
-    in_original, in_translation = set(), {}
-    for name in scenarios.SCENARIOS:
-        in_original |= goldens.read_ran(name)
+    # the tree is not taken through: of VC.COM by the scenarios of the
+    # main program, and of VCSETUP.COM by those of the setup program.
+    in_translation = {}
     for run in runs:
         in_translation.update(run.executed)
-    passed = check_original(coverage.Listing(args.listing), in_original)
+    batches = list(BATCHES)
+    passed = check_original(coverage.Listing(args.listing), goldens.ran(),
+                            BATCHES)
+    if not deviations.declared(translation.tree).no_setup:
+        of_setup = Path(args.listing).with_name(setups.SETUP_LISTING.name)
+        passed = check_original(coverage.Listing(of_setup),
+                                goldens.ran(setup=True),
+                                SETUP_BATCHES) and passed
+        batches += SETUP_BATCHES
     passed = check_translation(args.link_map, in_translation,
                                translation.tree,
-                               coverage.origin(translation.contents)) and passed
+                               coverage.origin(translation.contents),
+                               batches) and passed
     passed = check_stack(args.link_map, names, runs) and passed
     passed = check_declared(translation.tree, names) and passed
     passed = check_comparison(names[0], runs[0], translation) and passed

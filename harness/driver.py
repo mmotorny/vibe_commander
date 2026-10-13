@@ -230,6 +230,35 @@ def facts(program, stack=False):
     return found
 
 
+def setup_facts(program):
+    """The Facts of `program`, the original's setup program (see
+    setups.original_setup): its name, and where Clock is in its one
+    segment, by its listing. A script that is written with these has the
+    driver take the setup program for the program that it watches, and
+    not the main program, which started it: that is for a scenario that
+    shows the setup program's clock, whose blinking the driver then
+    records (see the top of scenarios.py). The setup program has no time
+    at which it does something by itself, and its stack is not looked
+    at.
+
+    The listing has a variable by its place in the segment of what has
+    no value, _BSS, and says in its map of the file where that segment
+    begins in the program."""
+    if not program.listing or not Path(program.listing).exists():
+        raise RuntimeError(
+            f"the driver needs the listing of {program.filename}, which "
+            "the build writes into build/shareware-layout")
+    text = Path(program.listing).read_text(encoding="cp866")
+    begins = re.search(r"^_BSS +[0-9A-F]+ +([0-9A-F]+) ", text, re.M)
+    clock = re.search(r"^Clock [ .]*Byte +([0-9A-F]+)h +_BSS", text, re.M)
+    if not begins or not clock:
+        raise RuntimeError(f"{program.listing} does not say where the "
+                           "setup program keeps Clock")
+    name = Path(program.filename).stem.upper().encode("ascii")
+    return Facts(name[:NAME].ljust(NAME, b"\0"), NONE,
+                 int(begins[1], 16) + int(clock[1], 16))
+
+
 def program(pad=0):
     """The driver's file, for a driver that keeps `pad` paragraphs of
     memory beyond its own."""

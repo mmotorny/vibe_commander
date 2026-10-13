@@ -19,6 +19,13 @@ Two setups share one clock and one source of files:
                   driver.py), which takes the program through a
                   scenario's steps from a script on a third disk, one
                   without a file system.
+
+                  For a scenario of the setup program the original has
+                  its setup program next to it in D:\\VC, VCSETUP.COM
+                  of the same distribution, which the scenario starts
+                  from the program's command line (see beside(), and
+                  the top of scenarios.py). No other machine has that
+                  file.
 """
 import io
 import shutil
@@ -43,6 +50,9 @@ DOS_CLOCK = ((2000 - 1980) << 9 | 6 << 5 | 16, 12 << 11)   # date, time words
 SUPPORT_FILES = ["VC.HLP", "VC.INI", "VC.EXT", "VCVIEW.EXT", "VCEDIT.EXT",
                  "VC.MNU", "ARCHIVES.MNU", "FORMAT.MNU"]
 SETUP_FILE = "VC.INI"
+# The setup program of the distribution: a program of its own in the
+# original, and a part of the one program in the portable C.
+SETUP_PROGRAM = "VCSETUP.COM"
 
 # The keys that switch the clock from on to off or back, in the Options
 # menu, and those that save the setup.
@@ -78,6 +88,8 @@ STAMPS_FILES = [
 # the original is, and is the same byte for byte: it says where the
 # original has its routines and its variables.
 LISTING = deps.ROOT / "build" / "shareware-layout" / "VC.LST"
+# And the same of the setup program.
+SETUP_LISTING = LISTING.with_name("VCSETUP.LST")
 
 
 @dataclass(frozen=True)
@@ -128,6 +140,21 @@ def distribution():
 def original_vc():
     """The original VC.COM."""
     return Program("VC.COM", distribution()["VC.COM"][0], LISTING)
+
+
+def original_setup():
+    """The original VCSETUP.COM."""
+    return Program(SETUP_PROGRAM, distribution()[SETUP_PROGRAM][0],
+                   SETUP_LISTING)
+
+
+def beside(program):
+    """The program that `program` has next to it in D:\\VC for a scenario
+    of the setup program: the original VCSETUP.COM for the original,
+    which is two programs, and for any other program that is no C tree's;
+    none for a build of a C tree, which has the setup in itself, as the
+    portable C is to, or not at all."""
+    return None if program.tree else original_setup()
 
 
 def _floppy(workdir, commands, country=None, keyboard=None, bench=None):
@@ -251,7 +278,8 @@ class Bench:
                                bench=country).path
         self._work = self._workdir / "c.img"
         _work_disk(self._work, self._workdir)
-        self._programs = {}             # Program -> its disk image
+        self._programs = {}             # Program, and the one beside it
+                                        # or None -> their disk image
         self._lock = threading.Lock()
         self._state = self._workdir / "state"
         shipped = distribution()[SETUP_FILE][0]
@@ -292,9 +320,11 @@ class Bench:
                                "the clock switched off")
         return setup
 
-    def _new_disk(self, filename, program, setup):
+    def _new_disk(self, filename, program, setup, beside=None):
         """Build drive D: in the file `filename`: `program`, if any, and
-        what it reads from its directory, with `setup` as its setup file."""
+        what it reads from its directory, with `setup` as its setup file;
+        and `beside`, a second program, if any, behind those: what every
+        disk has is the first of the directory on every disk."""
         disk = FatImage.hard_disk(self._workdir / filename, self._workdir,
                                   EPOCH, label="PROGRAM", serial="20000617")
         disk.mkdir("VC")
@@ -305,15 +335,19 @@ class Bench:
             data, date = files[name]
             disk.write(f"VC/{name}", setup if name == SETUP_FILE else data,
                        date)
+        if beside:
+            disk.write(f"VC/{beside.filename}", beside.contents, EPOCH)
         return disk.path
 
-    def _program_disk(self, program):
-        """The image of drive D: with `program` on it."""
+    def _program_disk(self, program, beside=None):
+        """The image of drive D: with `program` on it, and with `beside`
+        next to it, if that is given."""
         with self._lock:                # scenarios may run side by side
-            if program not in self._programs:
-                self._programs[program] = self._new_disk(
-                    f"d{len(self._programs)}.img", program, self.setup)
-            return self._programs[program]
+            if (program, beside) not in self._programs:
+                self._programs[program, beside] = self._new_disk(
+                    f"d{len(self._programs)}.img", program, self.setup,
+                    beside)
+            return self._programs[program, beside]
 
     def _machine(self, workdir, program_disk, script, trace=None):
         """A machine with a copy of `program_disk` as drive D: and `script`
@@ -330,15 +364,17 @@ class Bench:
         machine.disks = disks
         return machine
 
-    def start(self, workdir, program, script, trace=None):
+    def start(self, workdir, program, script, trace=None, beside=None):
         """A machine in which `program` is about to start and the driver
         is about to go by `script` (see driver.script): paused, until
-        resume().
+        resume(). With `beside`, that program is in D:\\VC as well, for
+        the steps to start: see beside().
 
         It has a `disks` attribute: drive letter -> image file, to read
         once the machine has been shut down.
         """
-        return self._machine(Path(workdir), self._program_disk(program),
+        return self._machine(Path(workdir),
+                             self._program_disk(program, beside),
                              script, trace)
 
 

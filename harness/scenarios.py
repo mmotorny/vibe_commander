@@ -982,6 +982,139 @@ out again (show.py --changes is how):
     had: FreeDOS goes on with 0202h or so, the direction flag clear.
     A copy that is ended like that leaves its panels on the screen
     and the cursor below it: p.com sets the mode, which clears both.
+
+The scenarios of the setup program
+
+The original is two programs: VC.COM, and its setup program, VCSETUP.COM.
+The portable C is to be one, with the setup an item of its Options menu
+(TODO.md, "The setup program in the portable C: the plan"). A scenario of
+the setup program is held as every other is: its golden is what the
+original showed, which here is the original's setup program, and a tree
+that has the setup in itself has to show the same. The scenario `setup`
+is the first, and the form of the others:
+
+    "setup": Scenario(
+        "The setup program: started, its menu, ...",
+        steps=(
+            _SETUP,                       # the menu of the setup program
+            "F2",                         # Configuration
+            "Down Down Space",            # Key bar, off
+            "Enter",                      # Ok: the bar is gone at once
+            ...
+            "F10",                        # Exit: save the setup?
+            "Enter",                      # Save: the panels, and no bar
+        ),
+        setup=True),
+
+  - Written. It says `setup=True`, and gets to the setup program by the
+    step _SETUP, which is the original's: the file of the setup program
+    typed at the command line of the main program, with its path, and
+    Enter. Steps in front of that are of the main program, like any
+    scenario's, and so are steps behind the one that leaves the setup
+    program; the steps between are the keys of the setup program as the
+    original takes them. It may be started more than once.
+  - Started. For a scenario that says `setup=True` the original has
+    VCSETUP.COM of its distribution next to it in D:\\VC, and no other
+    machine has that file (setups.beside). A tree that has the setup in
+    itself is taken through the keys of its menu's item in place of
+    _SETUP, "F9 o t" for the portable C: deviations.TREES says so once,
+    in `in_place_of`, for every scenario. Every other step is the same,
+    and every screen is held against the original's golden, the one
+    behind that step too.
+  - What is behind the setup program is what DOS has shown, with the
+    panels gone. _SETUP sends what the setup program prints nowhere,
+    ">nul": it prints a banner through DOS when it starts, which would
+    move all of that up by four lines, and which a tree has not. The one
+    line more that the original has there is the command itself, as the
+    main program wrote it: "C:\\WORK>d:\\vc\\vcsetup>nul", on row 23
+    with the panels on a screen of 25 lines. deviations.DEVIATIONS has
+    that line as spaces in a build, so a golden is derived without it.
+    The line is known when all of it shows: a box that covered a part
+    of that row would leave the rest in the golden. The menu and the
+    dialogs of the setup program do not reach it, and the picture of a
+    colour covers the row whole. And no scenario looks at what DOS has
+    shown after the setup program has been left, Ctrl+o, or at the
+    history, Alt+F8 and Ctrl+e: the original has the command there, and
+    a line more on the screen, and a tree has neither.
+  - Driven. The driver of the tests feeds the setup program and writes
+    its screens out as it does for the main program, unchanged: the
+    setup program says that it is idle in the same way, and asks the
+    mouse driver in the same way. The script names the main program, so
+    the driver does not take the setup program for the one it watches.
+  - The clock. With Clock ticked in the Configuration of the setup
+    program and Ok, the clock shows in the corner at once and blinks.
+    A scenario that shows it says `setup_clock=True` as well: the script
+    of the original's run then names the setup program, with where that
+    keeps Clock, and the screens are recorded in both states of what
+    blinks (driver.setup_facts). In such a scenario the original's main
+    program is not watched at all: nothing waits there for the time
+    that a tree's cursor sets, and its clock would be recorded in
+    whichever state it was. So the scenario unticks Clock in the setup
+    program again, or leaves that without saving, before it is back at
+    the main program, and moves no cursor of a tree afterwards. It shows
+    the clock within the machine's first minute, like any scenario.
+  - Tried out. `show.py --setup STEP...` prints the screens of the
+    original, with the setup program on the bench for a step to start,
+    and `reach.py --setup ROUTINE... --steps STEP...` says what steps
+    reach of routines of the setup program, which are found in
+    build/shareware-layout/VCSETUP.LST.
+  - Recorded. `python3 harness/goldens.py derive NAME`, as for any
+    scenario: NAME.txt is what the setup program showed and what was
+    left on the disks, with either file of the original as the program
+    under test, and NAME.ran is what ran of VCSETUP.COM, with nothing
+    of VC.COM in it. Derive it twice: the two are the same byte for
+    byte. Read the golden before it is committed. Nothing of the
+    original's binary may be in it that the published source has not:
+    the banner of the setup program has two such texts, which is one
+    more reason for ">nul", and so has the dialog that the binary shows
+    when it is given an argument, which no scenario gives it.
+  - Held. The test of a tree takes it through the scenario and holds it
+    against that golden. What ran of the setup program in all such
+    scenarios is held against the routines that ported.SETUP_BATCHES
+    lists, as what ran of VC.COM is against ported.BATCHES; the two are
+    kept apart (goldens.ran).
+  - Declared. The C translation has no setup program and is taken
+    through none of these scenarios, whichever there are: `no_setup` of
+    deviations.TREES, with nothing to add for a new one. The portable C
+    is taken through each from the commit on that makes it pass. Until
+    then a scenario is in `not_run` of deviations.TREES["portable_c"],
+    by its name, with _NO_SETUP_YET for the reason: a piece of the plan
+    writes its scenarios and derives their goldens before its code is
+    there, lists each so, and takes the entries out in the commit that
+    brings the code. That commit also lists the routines in
+    ported.SETUP_BATCHES, with what no scenario reaches and what of them
+    is not carried over. Where the portable C is later declared to do
+    otherwise than the original's setup program, the scenario goes to
+    `changed` there, as for the main program, and gets a golden of the
+    tree's own, `goldens.py record --tree portable_c NAME`.
+
+What has been found out about driving the setup program, on the bench
+with the original:
+
+  - Its menu takes F2 to F9 for its items at once, Up, Down, Home, End,
+    PgUp and PgDn, and Enter for the item under the cursor; Esc and F10
+    are Exit, and F1 is the help of the item under the cursor. From
+    anywhere in it F10 or Esc gets back to the menu, and the menu has
+    the cursor on the item that was chosen last.
+  - Its dialogs take the keys of the main program's: Tab, Up and Down,
+    Space, Enter for Ok and Esc for Cancel. In the Configuration, F2,
+    "Down Down Space" is Key bar and five times Down is Clock; both hold
+    inside the setup program as soon as the dialog is left with Ok.
+  - Exit asks whether to save only if something has changed. Save
+    writes D:\\VC\\VC.INI and leaves, and the main program then has
+    what was saved: the key bar is gone from its screen in `setup`.
+    Cancel and Esc leave as well, without saving: nothing there goes
+    back to the menu.
+  - The mouse is as in the main program's boxes: "Click@30,9" on a line
+    of the menu puts the cursor there and a second click on it is Enter,
+    with either button; the right button in a dialog is Enter; the
+    middle button at the menu is Exit, and so is the left one let go
+    outside the box.
+  - A beep moves the screen up a line, as in the main program, since
+    the cursor is hidden below the last row: the box "Help contents is
+    not available" beeps, which F1 brings up on the items Country info
+    and Exit.
+
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
 is off, started in C:\\WORK. A scenario that wants something else arranges
@@ -1026,6 +1159,15 @@ class Scenario:
     description: str
     steps: tuple = ()
     country: str = "us"           # see setups.COUNTRIES
+    # Of the setup program, not of the main one: the original has its
+    # setup program next to it for the steps to start, _SETUP below, and
+    # what is recorded as having run is that program's. See "The
+    # scenarios of the setup program" at the top.
+    setup: bool = False
+    # With `setup`: the scenario shows the clock of the setup program,
+    # and the driver of the tests is told of that program in place of
+    # the main one while the original is taken through it.
+    setup_clock: bool = False
 
 
 @dataclass
@@ -1034,7 +1176,9 @@ class Run:
     screens: list                 # after the start and after each step
     disks: dict                   # drive letter -> fat.read_tree() of it
     # Offset and length in the program file of every instruction that ran,
-    # if the run was traced.
+    # if the run was traced. Where the original was taken through a
+    # scenario of the setup program, the file is that of its setup
+    # program, and nothing is said of the main one.
     executed: dict = field(default_factory=dict)
     # The fewest bytes of its stack that the program had never used, of
     # all the steps that ended with it waiting for a key; None if its stack
@@ -1150,6 +1294,12 @@ _CLOCK_EARLY_STEPS = (
     '"time" Space "9:59"',
     "Enter",
 )
+
+# The step that starts the setup program: the original's, from the command
+# line of the main program. A tree that has the setup in itself is taken
+# through the keys of its menu's item in its place (see "The scenarios of
+# the setup program" at the top, and deviations.TREES).
+_SETUP = deviations.SETUP_COMMAND
 
 SCENARIOS = {
     "start": Scenario(
@@ -5453,16 +5603,48 @@ SCENARIOS = {
             "Ctrl+PgUp",                  # the first copy still works
         )),
 
+    "setup": Scenario(
+        "The setup program: started, its menu, the Configuration with "
+        "the key bar switched off there, Screen and Mouse looked at and "
+        "left, and the setup saved on the way out, which the program "
+        "then goes by",
+        steps=(
+            _SETUP,                       # the menu of the setup program
+            "F2",                         # Configuration
+            "Down Down Space",            # Key bar, off
+            "Enter",                      # Ok: the bar is gone at once
+            "F3",                         # Screen and Mouse
+            "Esc",
+            "F10",                        # Exit: save the setup?
+            "Enter",                      # Save: the panels, and no bar
+        ),
+        setup=True),
+
 }
 
 
 
-def names(tree=None):
+def not_run(tree=None):
+    """The scenarios that a program of the tree `tree` is not taken
+    through, each with the reason: those that are declared so by name,
+    and every scenario of the setup program for a tree that is declared
+    to have none (see deviations.TREES). None for the original."""
+    declared = deviations.declared(tree)
+    return {name: declared.not_run.get(name) or declared.no_setup
+            for name, scenario in SCENARIOS.items()
+            if name in declared.not_run
+            or scenario.setup and declared.no_setup}
+
+
+def names(tree=None, setup=None):
     """The scenarios that a program of the tree `tree` is taken through:
     all of them for the original, None, and for a tree that is declared
-    to have nothing otherwise (see deviations.TREES)."""
-    declared = deviations.declared(tree)
-    return [name for name in SCENARIOS if name not in declared.not_run]
+    to have nothing otherwise (see deviations.TREES). With `setup` True
+    or False, of those only the scenarios of the setup program, or only
+    those of the main program."""
+    left = not_run(tree)
+    return [name for name, scenario in SCENARIOS.items()
+            if name not in left and setup in (None, scenario.setup)]
 
 
 def of(name, tree=None):
@@ -5493,14 +5675,25 @@ def run(scenario, program, bench, trace=False, blinking=False,
     driver.stack_left). `limit` is for how many seconds the driver may
     write nothing before the program counts as stuck: STEP_TIME for a
     test, and less where steps are tried out (see show.py).
+
+    In a scenario of the setup program the original, which is two
+    programs, has the second next to it for the steps to start (see
+    setups.beside): what is recorded as executed is then the setup
+    program's, and where the scenario shows the setup program's clock,
+    that is the program the driver is told of. A C tree is one program
+    there as anywhere.
     """
     steps = ("",) + scenario.steps
-    known = driver.facts(program, stack)
+    beside = setups.beside(program) if scenario.setup else None
+    if beside and scenario.setup_clock:
+        known = driver.setup_facts(beside)
+    else:
+        known = driver.facts(program, stack)
     script = driver.script(scenario.steps, known, blinking)
     with dos.workdir() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None
-        with bench.start(workdir, program, script, log) as machine:
+        with bench.start(workdir, program, script, log, beside) as machine:
             machine.resume()
             try:
                 machine.wait_for_end(limit)
@@ -5525,7 +5718,13 @@ def run(scenario, program, bench, trace=False, blinking=False,
         result = Run([step.screen for step in done],
                      {drive: fat.read_tree(path, codepage)
                       for drive, path in disks.items()})
-        if trace:
+        if trace and beside:
+            # Two programs with routines of the same bytes ran here. What
+            # ran of the main one is not looked for: every scenario of
+            # the main program says that, with nothing beside it.
+            result.executed = coverage.executed(
+                log, beside.contents, others=(program.contents,))
+        elif trace:
             result.executed = coverage.executed(log, program.contents,
                                                 program.linked)
         left = [driver.stack_left(step.stack, known) for step in done

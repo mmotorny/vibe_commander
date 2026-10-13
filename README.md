@@ -972,13 +972,32 @@ python3 harness/goldens.py derive [SCENARIO...]
 
 Where a build is meant to differ from the original, `harness/deviations.py`
 says how, and the golden is derived with that difference in it, so that it
-holds exactly what a build should show. There are two such places. The
+holds exactly what a build should show. There are three such places. The
 banner names the edition, and the published source is of another edition
 than the binaries shipped in 2000: that holds for as much of the name as
 shows, its beginning next to a panel on the right or its end next to one
-on the left. And the program names its own file when
+on the left. The program names its own file when
 it cannot load it again after a command: the original is `VC.COM`, the
-translation `VC.EXE`.
+translation `VC.EXE`. And the command that starts the original's setup
+program, of which the next paragraph says more, is no line of what a
+build shows.
+
+The original is two programs, `VC.COM` and its setup program,
+`VCSETUP.COM`, and the portable C is to be one, with the setup an item of
+its Options menu. A scenario may be of the setup program: it says so in
+`harness/scenarios.py`, and the original then has `VCSETUP.COM` of its
+distribution next to it on the bench, which a step starts from the
+original's own command line, with the banner that it prints sent
+nowhere. Its golden is what the setup program showed, driven and
+recorded as the main program is, and the list of what ran that is kept
+with it is of `VCSETUP.COM`, apart from those of `VC.COM`. A tree that
+has the setup in itself is taken through the same steps, but for the
+keys of its menu's item in place of the command, and has to show the
+same, screen for screen: behind the setup program is what DOS has shown,
+and the one line there that a build has not is the command's own. The C
+translation has no setup program and is taken through none of these
+scenarios. The top of `harness/scenarios.py` says how such a scenario is
+written, derived and declared; `setup` is the first.
 
 Some numbers on the screen are not compared at all: the bytes that the
 editor says it has free, the memory that the Info panel says is free, and
@@ -1041,13 +1060,16 @@ one before, which is most of what there is to see; rows that are again as
 they were after an earlier step, as when a dialog closes, it names in a
 line. A step that the program does not get through ends the run after
 five minutes, as in a test, or after `--limit SECONDS`, with the screen
-it stopped on.
+it stopped on. With `--setup` the bench has the original's setup program
+for a step to start.
 
 `python3 harness/reach.py ROUTINE...` says of each routine of the original
 how many of its instructions some scenario has run and which are left, by
 their addresses, in a line; with `--list` it prints those that are left as
 the listing has them. With `--steps` it says which of them some steps
-would reach, and takes `--limit` like `show.py`.
+would reach, and takes `--limit` like `show.py`. With `--setup` the
+routines are those of the original's setup program, and what has run is
+what the scenarios of the setup program have run of it.
 
 `python3 harness/notice.py FILE OLD NEW` makes one change to a copy of a
 C tree, the one that `FILE` is of, builds it, and says which scenario
