@@ -20,10 +20,11 @@ What is measured, of build/portable_c/VC.EXE and its link map: the length
 of the file, the relocations in its header, where its segments of code
 end. What is counted, in src/portable_c/, comments left out: inline
 assembly, by its pieces and instructions, and the lines of #pragma aux
-and pack. The words __far, STACK and CODE are counted by the host check,
-harness/hostcheck.py, whose function is called here; the other things
-that only Open Watcom reads, by their kinds, are that test's to count,
-and its table is in TODO.md. What is worked out:
+and pack; and the calls that still hand registers to an interrupt, which
+tools/calls.py counts. The words __far, FAR, STACK and CODE are counted
+by the host check, harness/hostcheck.py, whose function is called here;
+the other things that only Open Watcom reads, by their kinds, are that
+test's to count, and its table is in TODO.md. What is worked out:
 
   - What the program keeps while a command runs: what DOS loads of the
     file, which is the file less its header, and the 256 bytes of the PSP
@@ -48,6 +49,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "harness"))
 
+import calls  # noqa: E402  (of tools/, next to this)
 import coverage  # noqa: E402  (of harness/, not the package of that name)
 import hostcheck  # noqa: E402
 import ported  # noqa: E402
@@ -188,6 +190,14 @@ def table():
         "the word stands in the code",
         ", ".join(number(places[word])
                   for word in hostcheck.SEGMENT_WORDS)))
+    # What still asks the system by handing registers to an interrupt,
+    # and not through sys.h: tools/calls.py counts it, by file.
+    left = calls.count(SOURCE)
+    rows.append((
+        "Calls that still hand registers to an interrupt, which are to "
+        "go through `sys.h`, as `tools/calls.py` counts them",
+        f"{number(sum(sum(counts) for _, counts in left))}, in "
+        f"{len(left)} files"))
 
     return (["| What | Figure |", "|---|---|"]
             + [f"| {what} | {figure} |" for what, figure in rows])
