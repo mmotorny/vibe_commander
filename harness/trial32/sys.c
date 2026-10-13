@@ -18,7 +18,7 @@
    is the screen of one step of a script, and the next page begins with
    what turned it: the key as KeyWaiting and KeyRead had it and what
    KeysHeld said then, or where the mouse was when a button went down.
-   The steps are both.py's STEPS, ten of them for the eleven pages.
+   The steps are both.py's STEPS, one behind each page but the last.
 
    An item is a name and what was answered, in hex: of a struct Answer
    the value and, behind a slash, whether it failed. What turns out
@@ -865,14 +865,131 @@ static u16 Fail(u16 how, u16 error, const u8 FAR *device)
     return DEVICE_FAIL;
 }
 
+/* What a block of the memory is answered with, behind its name: the
+   error if it failed, and else how far what is answered is behind the
+   block `from`. DOS leaves the block's segment in AX where it has made
+   one longer or shorter. */
+static void Block(const u8 FAR *name, struct Block block, u16 from)
+{
+    Put(name);
+    Cell(' ');
+    Digits(block.failed ? block.value : block.value - from, 4);
+    Cell('/');
+    Hex(block.failed, 4);
+    H4(block.largest);
+}
+
+#define BLOCK(name, call, from) { TEXT(said, name); Block(said, call, from); }
+
+/* The memory, in blocks by their segments, and what the PSP says. How
+   much memory there is and where a block lies follow the program's
+   length and what it is built for: of the first only that it is
+   plausible is written, and of the second how far a block is behind the
+   first one. The first is all that there is, as the program asks for
+   it, and is written to at both ends, through the segment that it was
+   answered with. */
+static void Memory(void)
+{
+    struct Block block;
+    const u8 FAR *text;
+    u16 all, first, second, third, at;
+
+    block = MemTake(0xFFFF);
+    all = block.largest;
+    SAY("MemTake FFFF: "); H4(block.value); H4(block.failed);
+    SAY("at least 256 KB and no more than 640 ");
+    H2(all >= 0x4000 && all <= 0xA000);
+    Line();
+    block = MemTake(all);
+    first = block.value;
+    SAY("MemTake of all that: "); H4(block.failed);
+    H2(block.largest == all);
+    *(u8 FAR *)AT(first, 0) = 0x12;
+    *(u8 FAR *)AT(first + all - 1, 15) = 0x34;
+    SAY("written at its ends: "); H2(*(const u8 FAR *)AT(first, 0));
+    H2(*(const u8 FAR *)AT(first + all - 1, 15));
+    Line();
+    /* DOS on the bench has a block or two free besides that one, lower
+       in its memory, and how many and how long depends on the bench:
+       they are taken too, and kept, so that what is asked for below is
+       given of what the first block leaves when it is made shorter. */
+    for (;;) {
+        block = MemTake(0xFFFF);
+        if (block.largest == 0)
+            break;
+        MemTake(block.largest);
+    }
+    BLOCK("MemResize of it to 100:", MemResize(first, 0x100), first);
+    block = MemTake(0x80);
+    second = block.value;
+    SAY("MemTake 80: "); H4(block.failed); H4(second - first);
+    block = MemTake(0x40);
+    third = block.value;
+    SAY("MemTake 40: "); H4(block.failed); H4(third - first);
+    Line();
+    block = MemTake(0xFFFF);
+    SAY("what is left is less by "); H4(all - block.largest);
+    ANSWER("MemGive of the second:", MemGive(second));
+    block = MemTake(0x20);
+    second = block.value;
+    SAY("MemTake 20: "); H4(block.failed); H4(second - first);
+    Line();
+    block = MemTake(0x60);
+    SAY("MemTake 60: "); H4(block.failed); H4(block.value - first);
+    MemGive(block.value);
+    BLOCK("MemResize of the first to 200:", MemResize(first, 0x200), first);
+    Line();
+    MemGive(second);
+    BLOCK("with the second given:", MemResize(first, 0x200), first);
+    BLOCK("to 181:", MemResize(first, 0x181), first);
+    Line();
+    BLOCK("to 80:", MemResize(first, 0x80), first);
+    block = MemTake(0x100);
+    SAY("MemTake 100: "); H4(block.failed); H4(block.value - first);
+    MemGive(block.value);
+    Line();
+    /* A block that is none: what is in front of it is the first
+       paragraph of a block, written here. */
+    for (at = 0; at < 16; at++)
+        *(u8 FAR *)AT(first, at) = 0;
+    ANSWER("MemGive of what is no block:", MemGive(first + 1));
+    BLOCK("MemResize of it:", MemResize(first + 1, 1), first);
+    Line();
+    ANSWER("MemGive of the third:", MemGive(third));
+    ANSWER("of the first:", MemGive(first));
+    ANSWER("again:", MemGive(first));
+    block = MemTake(0xFFFF);
+    SAY("all is left again "); H2(block.largest == all);
+    Line();
+    MemSetSearch(0);
+    MemSetUpper(0);
+    SAY("MemSetSearch, MemSetUpper");
+    Line();
+    /* What the PSP says: the tail that the toy was started with, as far
+       as its carriage return; the first text of its environment; and
+       what is behind the environment's end, where the program looks for
+       the path of its own file. */
+    text = ProgramTail();
+    SAY("ProgramTail '");
+    for (at = 0; at < 20 && text[at] != '\r'; at++)
+        Cell(text[at] < ' ' ? '.' : text[at]);
+    Cell('\'');
+    Line();
+    text = ProgramEnvironment();
+    SAY("ProgramEnvironment "); Quoted(text, 40);
+    for (at = 0; at < 0x7FFF && (text[at] != 0 || text[at + 1] != 0); at++)
+        ;
+    SAY("and behind its end "); H2(text[at + 2]); H2(text[at + 3]);
+    Quoted(text + at + 4, 40);
+    Line();
+}
+
 /* The functions that dos32.c does not make yet: both.py knows the page
    by its first line. */
 static void Later(void)
 {
-    struct Block block;
     struct Answer asked;
-    const u8 FAR *tail;
-    u16 at, taken;
+    u16 at;
 
     SAY("Not made in dos32.c yet:");
     Line();
@@ -909,39 +1026,6 @@ static void Later(void)
     Quoted(md.Country.DateSep, 2); Quoted(md.Country.TimeSep, 2);
     SAY("CaseMap "); H4(CaseMap(0x1200 | 'a')); H4(CaseMap(0x84));
     H4(CaseMap(0xA0)); H4(CaseMap(0x3481));
-    Line();
-    /* How much memory there is follows the program's length: only that
-       it is plausible is written. */
-    block = MemTake(0xFFFF);
-    SAY("MemTake FFFF: "); H4(block.value); H4(block.failed);
-    SAY("at least 256 KB and no more than 640 ");
-    H2(block.largest >= 0x4000 && block.largest <= 0xA000);
-    Line();
-    block = MemTake(0x100);
-    taken = block.value;
-    SAY("MemTake 100: it is given "); H2(block.failed == 0 && taken != 0);
-    H4(block.failed); H4(block.largest);
-    block = MemResize(taken, 0x200);
-    SAY("MemResize 200: "); H4(block.failed); H4(block.largest);
-    block = MemResize(taken, 0xFFFF);
-    SAY("FFFF: "); H4(block.value); H4(block.failed);
-    Line();
-    ANSWER("MemGive", MemGive(taken));
-    ANSWER("again:", MemGive(taken));
-    MemSetSearch(0);
-    MemSetUpper(0);
-    SAY("MemSetSearch, MemSetUpper");
-    Line();
-    /* What the PSP says: the tail that the toy was started with, as
-       far as its carriage return; and the first text of its
-       environment. */
-    tail = ProgramTail();
-    SAY("ProgramTail '");
-    for (at = 0; at < 20 && tail[at] != '\r'; at++)
-        Cell(tail[at] < ' ' ? '.' : tail[at]);
-    Cell('\'');
-    Line();
-    SAY("ProgramEnvironment "); Quoted(ProgramEnvironment(), 40);
     Line();
     /* What the system enters of the program, noted, taken and given
        back in the order in which the program asks for that. Nothing
@@ -1005,6 +1089,8 @@ void Main(void)
     Pointer();
     Page(0);
     Keyboard();
+    Page(0);
+    Memory();
     Page(0);
     Later();
     Page(0);

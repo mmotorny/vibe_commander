@@ -4673,6 +4673,98 @@ in the batch of the entry, which holds `Alloc0` alone: the C
 translation has no function of that name, and the tables are one for
 both trees.
 
+### Piece D2, `dos32.c`, the rest: under way, a part at a time
+
+The piece is made in five parts, a commit each, in this order: the
+start, the memory and the PSP; the functions through real mode; a
+program run and Quick execute; what DOS enters; the ends. Whoever goes
+on reads this first: each part says what is done, what was found, and
+what the next needs. `python3 harness/trial32/both.py` passes at each,
+for both countries, and `whole.py` links.
+
+**The start, the memory, the PSP: done.** `dos32.c` makes 81 of the 98
+functions and has 17 that do nothing. New are `MemTake`, `MemGive`,
+`MemResize`, `MemSetSearch`, `MemSetUpper`, `ProgramTail` and
+`ProgramEnvironment`.
+
+What `Start` has ready before `Main`, and whom it asks:
+
+| What | How | Found |
+|---|---|---|
+| ES on the data, the direction flag clear | One piece of inline assembly, `Entered`, which answers with what ES was: the PSP's selector. It is the first thing of `Start`, so nothing is lost any more | |
+| Where the PSP is | DPMI 0006h, where the segment of that selector begins. DOS is not asked, where the program of 16 bits asks 51h first | 25E60h on the bench, the PSP as DOS has it, 25E6 |
+| Where the environment is | The word of the PSP at 2Ch, and DPMI 0006h of it | **The extender has put a selector there**, 0060h on the bench, where DOS had the segment, 25DC. The trial had not looked. Should the extender not know the word as a selector, it is taken for a segment |
+| The block below the megabyte | DPMI 0100h, as D1 had it | A program that does not get it writes "Not enough memory" by DOS, 09h, and ends with 8. D1 had it end and say nothing, and left the saying to this piece. The words are this piece's own, since `dos32.c` names nothing of the program's tables: for the user to change if they are not the right ones |
+| The program's own memory | `OwnSet`: no call | |
+
+That word at 2Ch matters beyond `ProgramEnvironment`: DOS itself reads
+it. A program run with no environment named gets a copy of its
+parent's, which DOS finds through the parent's PSP, and there it is a
+selector now. The next part but one has to name the environment's
+segment to DOS at 4Bh, or the program that is run gets whatever lies
+at 0060:0000. The trial's `command.c` named none, and its commands
+were such that it did not show.
+
+The memory, as "The memory" above has it: `Own` of `dos32.c`, 640 KB
+and a paragraph, among what has no value. `OwnSet` works out its first
+paragraph in the megabyte, `(Own + 15 - ARENA) >> 4`, and takes all of
+it or none: if it does not lie behind `ARENA` with its end below the
+paragraph FFFFh, `MemTake` answers that there is no memory, and the
+program says "Program too big to fit in memory" and leaves. Nothing
+else checks where the linker has put it, so:
+
+- **For B2.** The 640 KB are in the segment `_BSS` of `dos32.obj`. The
+  linker's order has to have the class BSS behind `MAIN`, as the plan
+  has it, and last, or 640 KB of zeros are in the file: `whole.py`,
+  which names no order, makes a file of 952,976 bytes now. In its map
+  `_BSS` begins 15828h behind `md`, which is paragraph 2583h of the
+  megabyte, and the 640 KB end at C584h. The test of the layout should
+  hold `Own` of the map to lie behind `md` and to end below `md` +
+  F0000h.
+- The toy has `md` among what has no value too, in front of `Own` by
+  the order of its objects, so the toy says nothing of the order that
+  the program needs.
+
+The blocks are handed out as DOS hands out its own, since the program
+goes by that (`Init11`, `GiveMem` and `TakeMem` of `start.c`, `Aexec0`
+of `view.c`): a paragraph in front of each block says whether another
+follows, whether it is taken and how long it is; the lowest block that
+is long enough is given; a refusal says the longest; free blocks that
+lie one behind the other become one when the memory is looked through,
+not when one is given back; a block that is to grow is first made as
+long as it can be and stays so when that is not enough. That is
+FreeDOS as its source has it and as the toy shows it on the bench, and
+what comes back in `value` is what it leaves in AX:
+
+| | Not failed | Failed |
+|---|---|---|
+| `MemTake` | The block | 8, `failed` FFFFh, `largest` the longest that is free; 7 if what is in front of a block is spoilt |
+| `MemGive` | 4900h, also for a block that was given back already | 9 for what is no block |
+| `MemResize` | The block: FreeDOS leaves ES in AX there | 8 with how long the block has become; 7 for what is no block |
+
+`MemSetSearch` and `MemSetUpper` are passed to DOS as they are, 5801h
+and 5803h, as the plan has it: they say how DOS looks through its own
+memory, which a program that this one runs is given of.
+
+One thing is otherwise than on DOS and stays so: with the largest
+block taken, DOS on the bench still has memory to give, a block or two
+lower down that are free besides, one paragraph on the bench of the
+United States and more than 80h on the Russian one. The program's own
+memory is one stretch. The toy takes those blocks too before it asks
+for more, so that both builds give of what the first block leaves.
+
+The toy has a page of its own for these, behind a step `m`, 12 pages
+for 11 steps: all the memory taken as the program takes it and written
+at both ends through its segment, which in 32 bits holds that the
+block is where `AT` of `vc.h` looks for it; three blocks taken, given
+and taken again, with where each lies behind the first; a block made
+shorter and longer, refused with a block behind it and with too little
+free behind it; what is no block given back and made longer; a block
+given back twice. And of the PSP the tail, the first text of the
+environment, and behind the environment's end the two bytes and the
+path of the program's own file, `D:\VC\VC.EXE` in both. The page is
+the same in both, line for line.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")

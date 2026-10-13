@@ -49,7 +49,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 74 of the 98, six of them in real mode; the 24 that are not made
+ * 81 of the 98, six of them in real mode; the 17 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -117,17 +117,31 @@ static u32 Dos(struct DosRegs *regs);
     "sbb eax,eax" \
     parm [ebx] value [eax] modify exact [eax ebx ecx edx esi edi]
 
-/* INT 31h, the extender's own services, which are DPMI's: AX as it
-   leaves it, and above that FFFFh if it leaves the carry flag set, which
-   is how it says that it failed. EDI is the address of what a service
-   takes in ES:EDI. */
-static u32 Extender(u32 eax, u32 ebx, u32 ecx, void *edi);
-#pragma aux Extender = \
+/* INT 31h, the extender's own services, which are DPMI's, with the
+   registers of `regs`, as Dos has DOS's: EAX, EBX, ECX and EDX go back
+   into `regs`, and what is returned is not 0 if the extender leaves the
+   carry flag set, which is how it says that it refused. EDI is the
+   address of what a service takes at ES:EDI. */
+static u32 Dpmi(struct DosRegs *regs);
+#pragma aux Dpmi = \
+    "push ebp" \
+    "push ebx" \
+    "mov eax,[ebx]" \
+    "mov ecx,[ebx+8]" \
+    "mov edx,[ebx+12]" \
+    "mov esi,[ebx+16]" \
+    "mov edi,[ebx+20]" \
+    "mov ebx,[ebx+4]" \
     "int 31h" \
-    "sbb edx,edx" \
-    "shl edx,16" \
-    "mov dx,ax" \
-    parm [eax] [ebx] [ecx] [edi] value [edx] modify exact [eax ebx edx]
+    "xchg ebx,[esp]" \
+    "mov [ebx],eax" \
+    "mov [ebx+8],ecx" \
+    "mov [ebx+12],edx" \
+    "pop eax" \
+    "mov [ebx+4],eax" \
+    "pop ebp" \
+    "sbb eax,eax" \
+    parm [ebx] value [eax] modify exact [eax ebx ecx edx esi edi]
 
 /* INT 10h with EAX, EBX, ECX and EDX, whose low words go back into the
    four words at `regs` as the BIOS leaves them: more than a function can
@@ -200,6 +214,9 @@ static u16 LowSeg = 0;
 #define LOW_SIZE   192
 #define LOW(place) ((u8 *)(((u32)LowSeg << 4) + (place)))
 
+#define DPMI_SEGMENT_BASE 0x0006        /* where the segment of the
+                                           selector in BX begins: CX above
+                                           DX */
 #define DPMI_LOW_BLOCK 0x0100           /* a block of DOS's memory: BX
                                            paragraphs; AX its segment */
 #define DPMI_REAL_INT  0x0300           /* an interrupt in real mode: BL
@@ -208,15 +225,30 @@ static u16 LowSeg = 0;
                                            registers */
 #define FLAG_CARRY 1
 
-/* DOS, with the registers of `regs` and their answer there. Not 0 if
-   DOS leaves the carry flag set: FFFFh, as in dos.c, which is what a
-   function that asks bare answers with for `failed`. */
-static u16 Call(struct DosRegs *regs)
+/* The extender, asked for the service `ax` with these registers, and
+   with `at` for what the service takes at ES:EDI. EAX, EBX, ECX and EDX
+   are in `regs` afterwards as it leaves them. Not 0 if it refused. */
+static u16 Extender(struct DosRegs *regs, u16 ax, u32 ebx, u32 ecx, u32 edx,
+                    void *at)
+{
+    regs->eax = ax;
+    regs->ebx = ebx;
+    regs->ecx = ecx;
+    regs->edx = edx;
+    regs->esi = 0;
+    regs->edi = (u32)at;
+    regs->low = 0;
+    return (u16)Dpmi(regs);
+}
+
+/* An interrupt made in real mode, with the registers of `regs` and their
+   answer there, and with DS and ES on the block below the megabyte.
+   Returns the flags as the interrupt leaves them. */
+static u16 Real(struct DosRegs *regs, u16 number)
 {
     struct RealRegs real;
+    struct DosRegs asked;
 
-    if (!regs->low)
-        return (u16)Dos(regs);
     real.eax = regs->eax;
     real.ebx = regs->ebx;
     real.ecx = regs->ecx;
@@ -228,12 +260,22 @@ static u16 Call(struct DosRegs *regs)
     real.ds = real.es = LowSeg;
     real.fs = real.gs = 0;
     real.sp = real.ss = 0;
-    Extender(DPMI_REAL_INT, 0x21, 0, &real);
+    Extender(&asked, DPMI_REAL_INT, number, 0, 0, &real);
     regs->eax = real.eax;
     regs->ebx = real.ebx;
     regs->ecx = real.ecx;
     regs->edx = real.edx;
-    return real.flags & FLAG_CARRY ? 0xFFFF : 0;
+    return real.flags;
+}
+
+/* DOS, with the registers of `regs` and their answer there. Not 0 if
+   DOS leaves the carry flag set: FFFFh, as in dos.c, which is what a
+   function that asks bare answers with for `failed`. */
+static u16 Call(struct DosRegs *regs)
+{
+    if (!regs->low)
+        return (u16)Dos(regs);
+    return Real(regs, 0x21) & FLAG_CARRY ? 0xFFFF : 0;
 }
 
 /* The BIOS for the screen, with these registers, which come back in
@@ -703,6 +745,232 @@ u16 DriveCd(u16 drive)
     return (u16)(pair >> 16) == 0xADAD && (u16)pair != 0;
 }
 
+/* Memory. In 16 bits it is DOS's, in blocks that DOS hands out by their
+   segments, and the program asks for the largest that there is and cuts
+   it up by segments itself, for its panels and the text of the viewer.
+   It does the same here, as long as a segment is a number in it (vc.h,
+   "The words of the addresses"): so the memory that it gets has to be
+   where a segment can name it, in the megabyte that begins 64K below
+   the main data, and that is no memory of DOS's nor a block that the
+   extender gives wherever it likes. It is of the program's own: 640 KB
+   among what has no value, which the linker is to have behind the main
+   data, with a paragraph in front for what is kept of the first block.
+
+   It is handed out as DOS hands out its own, since the program goes by
+   that: a block is known by its paragraph in the megabyte, in front of
+   each is a paragraph that says how long it is and whether it is taken,
+   the lowest block that is long enough is given, a refusal says how
+   long the longest is, and free blocks that lie one behind the other
+   become one when the memory is looked through and not when a block is
+   given back. What it answers with, DOS's AX and its numbers for an
+   error, is what the DOS of the test bench answers, FreeDOS. */
+
+#define OWN_PARAGRAPHS 0xA000           /* 640 KB */
+
+static u8 Own[((u32)OWN_PARAGRAPHS + 1) * 16 + 15];
+
+/* The first paragraph of it in the megabyte, where what is kept of the
+   first block is, and how many paragraphs there are from there on: none
+   if it is not where a segment can name all of it. */
+static u16 OwnFirst = 0, OwnCount = 0;
+
+/* What is kept in front of a block: whether one follows it, whether it
+   is taken, and its paragraphs. */
+struct Held {
+    u8 kind;
+    u8 taken;
+    u16 paragraphs;
+};
+
+#define HELD_MORE 'M'
+#define HELD_LAST 'Z'
+#define HELD(block) ((struct Held *)AT((block) - 1, 0))
+
+#define ERR_NO_FUNCTION 1               /* DOS's error for a call that it
+                                           does not know */
+#define ERR_BAD_CHAIN   7               /* for what it keeps of its blocks
+                                           being spoilt */
+#define ERR_NO_MEMORY   8               /* for want of memory */
+#define ERR_NO_BLOCK    9               /* and for a block that is none */
+
+/* The start of the program has all of it be one block that is free. */
+static void OwnSet(void)
+{
+    u32 first = (u32)(Own + 15 - ARENA) >> 4;
+    struct Held *held;
+
+    if (first > 0xFFFF - OWN_PARAGRAPHS)
+        return;
+    OwnFirst = (u16)first;
+    OwnCount = OWN_PARAGRAPHS + 1;
+    held = HELD(OwnFirst + 1);
+    held->kind = HELD_LAST;
+    held->taken = 0;
+    held->paragraphs = OWN_PARAGRAPHS;
+}
+
+/* Is `block` a block, by what is in front of it? */
+static u16 Known(u16 block)
+{
+    struct Held *held;
+
+    if (block <= OwnFirst || (u32)block - OwnFirst > OwnCount)
+        return 0;
+    held = HELD(block);
+    return held->kind == HELD_MORE || held->kind == HELD_LAST;
+}
+
+/* The free blocks that follow `block` become part of it. */
+static void Join(u16 block)
+{
+    struct Held *held = HELD(block);
+    struct Held *next;
+
+    while (held->kind == HELD_MORE) {
+        next = HELD(block + held->paragraphs + 1);
+        if (next->taken)
+            break;
+        held->kind = next->kind;
+        held->paragraphs += next->paragraphs + 1;
+    }
+}
+
+/* `block` made so many paragraphs, which is no more than it has: what
+   is left behind it becomes a block that is free. */
+static void Split(u16 block, u16 paragraphs)
+{
+    struct Held *held = HELD(block);
+    struct Held *rest;
+
+    if (held->paragraphs == paragraphs)
+        return;
+    rest = HELD(block + paragraphs + 1);
+    rest->kind = held->kind;
+    rest->taken = 0;
+    rest->paragraphs = held->paragraphs - paragraphs - 1;
+    held->kind = HELD_MORE;
+    held->paragraphs = paragraphs;
+}
+
+static struct Block Refused(u16 error, u16 largest)
+{
+    struct Block block;
+
+    block.value = error;
+    block.failed = 0xFFFF;
+    block.largest = largest;
+    return block;
+}
+
+struct Block MemTake(u16 paragraphs)
+{
+    struct Block block;
+    struct Held *held;
+    u16 at = OwnFirst + 1;
+    u16 largest = 0;
+
+    if (OwnCount == 0)
+        return Refused(ERR_NO_MEMORY, 0);
+    for (;;) {
+        held = HELD(at);
+        if (!Known(at))
+            return Refused(ERR_BAD_CHAIN, paragraphs);
+        if (!held->taken) {
+            Join(at);
+            if (held->paragraphs >= paragraphs)
+                break;
+            if (held->paragraphs > largest)
+                largest = held->paragraphs;
+        }
+        if (held->kind == HELD_LAST)
+            return Refused(ERR_NO_MEMORY, largest);
+        at += held->paragraphs + 1;
+    }
+    Split(at, paragraphs);
+    held->taken = 1;
+    block.value = at;
+    block.failed = 0;
+    block.largest = paragraphs;
+    return block;
+}
+
+/* A block that is given back stays as long as it is, and is given back
+   a second time without a word, as DOS has it. */
+struct Answer MemGive(u16 block)
+{
+    struct Answer answer;
+
+    if (!Known(block)) {
+        answer.value = ERR_NO_BLOCK;
+        answer.failed = 0xFFFF;
+        return answer;
+    }
+    HELD(block)->taken = 0;
+    answer.value = 0x4900;
+    answer.failed = 0;
+    return answer;
+}
+
+/* A block that is to be longer is first made as long as it can be, by
+   what is free behind it, and stays so where that is not long enough:
+   the refusal says how long it is then. */
+struct Block MemResize(u16 block, u16 paragraphs)
+{
+    struct Block made;
+    struct Held *held = HELD(block);
+
+    if (!Known(block))
+        return Refused(ERR_BAD_CHAIN, paragraphs);
+    if (paragraphs > held->paragraphs) {
+        Join(block);
+        if (paragraphs > held->paragraphs)
+            return Refused(ERR_NO_MEMORY, held->paragraphs);
+    }
+    if (paragraphs < held->paragraphs) {
+        Split(block, paragraphs);
+        Join(block + paragraphs + 1);
+    }
+    held->taken = 1;
+    made.value = block;
+    made.failed = 0;
+    made.largest = paragraphs;
+    return made;
+}
+
+/* The memory that the program is in is the extender's to hand out, and
+   it has given the program what its file says and no more; what
+   MemTake hands out is of the program's own. So there is nothing to
+   make shorter, and nothing has failed: `paragraphs` is as it came,
+   none. */
+struct Block MemOwn(void)
+{
+    struct Block block;
+
+    block.value = 0;
+    block.failed = 0;
+    block.largest = 0;
+    return block;
+}
+
+/* How DOS looks through its own memory, which is what a program that
+   this one runs is given of: DOS is told as it is in 16 bits, though
+   the program's own blocks are not DOS's here. */
+void MemSetSearch(u16 how)
+{
+    struct DosRegs regs;
+
+    Set(&regs, 0x5801, how, 0, 0);
+    Tell(&regs);
+}
+
+void MemSetUpper(u16 on)
+{
+    struct DosRegs regs;
+
+    Set(&regs, 0x5803, on, 0, 0);
+    Tell(&regs);
+}
+
 /* The time, the system itself. */
 
 struct Time TimeOfDay(void)
@@ -783,19 +1051,26 @@ void ProgramEndOld(void)
 {
 }
 
-/* The memory that the program is in is the extender's to hand out, and
-   it has given the program what its file says and no more; what
-   MemTake hands out is of the program's own. So there is nothing to
-   make shorter, and nothing has failed: `paragraphs` is as it came,
-   none. */
-struct Block MemOwn(void)
-{
-    struct Block block;
+/* What the program was started with is in its PSP, which is DOS's and
+   below the megabyte: the tail from 81h on, and at 2Ch what names the
+   environment. Start has found both. The environment is DOS's own
+   block, so what lies behind its end, the path of the program's file,
+   is there to be read as in 16 bits. */
 
-    block.value = 0;
-    block.failed = 0;
-    block.largest = 0;
-    return block;
+#define PSP_ENVIRON 0x2C
+#define PSP_TAIL    0x81
+
+static const u8 *Psp = 0;
+static const u8 *Environment = 0;
+
+const u8 FAR *ProgramTail(void)
+{
+    return Psp + PSP_TAIL;
+}
+
+const u8 FAR *ProgramEnvironment(void)
+{
+    return Environment;
 }
 
 /* The console. */
@@ -1054,7 +1329,7 @@ void IntOn(void)
 }
 
 /*
- * The 24 functions of sys.h that are not made here yet. Each does
+ * The 17 functions of sys.h that are not made here yet. Each does
  * nothing, and answers as a system does that failed or does not know
  * the question; none of them calls DOS, since a call that the extender
  * does not translate has DOS write wherever the registers happen to
@@ -1066,11 +1341,6 @@ void IntOn(void)
  *     block: FileTrueName, FcbParse, FcbDelete, CountryInfo, CaseMap,
  *     ProgramRun and ProgramRunBare; and ShellRun, by a stretch of code
  *     of real mode there;
- *   - other in 32 bits: MemTake, MemGive and MemResize, which hand out
- *     memory of the program's own; MemSetSearch and MemSetUpper;
- *   - out of the PSP, which is below the megabyte, once the start of
- *     the program knows where that is: ProgramTail and
- *     ProgramEnvironment;
  *   - what DOS and the BIOS enter of the program, the critical error,
  *     Ctrl-Break and Ctrl-C, which are taken through the extender here
  *     and arrive at routines of protected mode: the seven that note,
@@ -1083,10 +1353,6 @@ void IntOn(void)
  * block below the megabyte: see Run of dos.c for what that is, the two
  * file control blocks above all, which are bytes of the main data.
  */
-
-#define ERR_NO_FUNCTION 1               /* DOS's error for a call that it
-                                           does not know */
-#define ERR_NO_MEMORY   8               /* and for want of memory */
 
 static struct Answer NotMade(u16 error)
 {
@@ -1117,39 +1383,6 @@ struct Answer FcbDelete(const u8 FAR *fcb, u16 flagged)
     (void)fcb;
     (void)flagged;
     return NotMade(ERR_NO_FUNCTION);
-}
-
-struct Block MemTake(u16 paragraphs)
-{
-    struct Block block;
-
-    (void)paragraphs;
-    block.value = ERR_NO_MEMORY;
-    block.failed = 1;
-    block.largest = 0;
-    return block;
-}
-
-struct Answer MemGive(u16 block)
-{
-    (void)block;
-    return NotMade(ERR_NO_FUNCTION);
-}
-
-struct Block MemResize(u16 block, u16 paragraphs)
-{
-    (void)block;
-    return MemTake(paragraphs);
-}
-
-void MemSetSearch(u16 how)
-{
-    (void)how;
-}
-
-void MemSetUpper(u16 on)
-{
-    (void)on;
 }
 
 void CountryInfo(struct CNTRY FAR *to)
@@ -1189,22 +1422,6 @@ struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
 void ShellRun(const u8 FAR *command)
 {
     (void)command;
-}
-
-/* A tail of no characters, and an environment of no texts with no
-   path of the program's file behind it: as many zero bytes as the
-   program reads there, the path being read as LenPath bytes. */
-static const u8 NoTail[] = "\r";
-static const u8 NoEnvironment[1 + 2 + LenPath] = { 0 };
-
-const u8 FAR *ProgramTail(void)
-{
-    return NoTail;
-}
-
-const u8 FAR *ProgramEnvironment(void)
-{
-    return NoEnvironment;
 }
 
 /* The critical error, Ctrl-Break and Ctrl-C: none is noted, taken or
@@ -1278,34 +1495,73 @@ void ProgramEndedGive(void)
  */
 
 /* ES put on the data, where compiled code takes it to be, and the
-   direction flag cleared, which it takes to be clear. */
-static void Settle(void);
-#pragma aux Settle = \
+   direction flag cleared, which it takes to be clear: with what ES was
+   until then, the selector of the PSP. */
+static u32 Entered(void);
+#pragma aux Entered = \
+    "xor eax,eax" \
+    "mov ax,es" \
     "push ds" \
     "pop es" \
     "cld" \
-    modify exact []
+    value [eax] modify exact [eax]
+
+/* Where the segment of a selector begins in the memory, or `none` if
+   the extender does not know the selector. */
+static u32 Base(u16 selector, u32 none)
+{
+    struct DosRegs regs;
+
+    if (Extender(&regs, DPMI_SEGMENT_BASE, selector, 0, 0, 0))
+        return none;
+    return (u32)(u16)regs.ecx << 16 | (u16)regs.edx;
+}
+
+/* What the program says where it cannot start for want of memory below
+   the megabyte, as DOS writes a text. */
+static const u8 NoStart_S[] = "Not enough memory\r\n$";
 
 /* The program begins here: the extender has loaded the file, set the
    words of it that hold an address, and enters this on the stack that
    the header of the file names, with interrupts on, CS, DS and SS on
    all of the memory, and ES on the PSP. The linker is told the name
-   (`option start=Start_`). Settling the two things is all that a C
-   library's start-up would have had to do, and the program has none.
+   (`option start=Start_`). Settling ES and the direction flag is all
+   that a C library's start-up would have had to do, and the program has
+   none.
 
-   The block below the megabyte is asked for here, once, for the calls
-   that are made in real mode: DOS has it for the program, and takes it
-   back when the program ends. A program that does not get it ends at
-   once, with DOS's error for want of memory as its number. Main of
-   main.c is the program, and does not return. */
+   What the functions of this file need before the program asks the
+   first of them is made ready here, and only the extender is asked for
+   it, by services that DOS does not see but for the block:
+
+     - Where the PSP is, which is DOS's, below the megabyte: where the
+       segment of ES begins. The program of 16 bits asks DOS for that,
+       as the first thing that it asks.
+     - Where the environment is. The extender has put a selector for it
+       into the PSP at 2Ch, where DOS had its segment; should it not
+       know what is there for a selector, that is taken for the segment.
+     - The block below the megabyte for the calls that are made in real
+       mode: DOS has it for the program, and takes it back when the
+       program ends. A command that the program runs finds that much
+       less of DOS's memory.
+     - The program's own memory, for MemTake.
+
+   A program that does not get the block says so and ends at once, with
+   DOS's error for want of memory as its number. Main of main.c is the
+   program, and does not return. */
 void Start(void)
 {
-    u32 block;
+    struct DosRegs regs;
+    u16 selector = (u16)Entered();
+    u16 environment;
 
-    Settle();
-    block = Extender(DPMI_LOW_BLOCK, (LOW_SIZE + 15) >> 4, 0, 0);
-    if (block >> 16)
+    Psp = (const u8 *)Base(selector, 0);
+    environment = *(const u16 *)(Psp + PSP_ENVIRON);
+    Environment = (const u8 *)Base(environment, (u32)environment << 4);
+    if (Extender(&regs, DPMI_LOW_BLOCK, (LOW_SIZE + 15) >> 4, 0, 0, 0)) {
+        ConsoleText(NoStart_S);
         ProgramEnd(ERR_NO_MEMORY);
-    LowSeg = (u16)block;
+    }
+    LowSeg = (u16)regs.eax;
+    OwnSet();
     Main();
 }

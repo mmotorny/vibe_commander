@@ -44,7 +44,7 @@ OUT = ROOT / "build" / "trial32"
 # keys with and without Shift, Ctrl and Alt, a key of the cursor, a
 # button of the mouse.
 STEPS = ["a", "F5", "Shift+F6", "Alt+F1", "Ctrl+o", "Up", "Tab",
-         "Click@3,5", "Ins", "q"]
+         "Click@3,5", "Ins", "m", "q"]
 
 # The first line, behind the one that says what turned the page, of the
 # page of the functions that dos32.c does not make yet.
