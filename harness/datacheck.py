@@ -30,6 +30,23 @@ word holds. So an object is written in C as it is in the assembly, with
 the names of what it names, and the compiler and the linker see to the
 addresses.
 
+The original is two programs, and a tree may have the second in itself:
+the setup program, VCSETUP.COM, which goes into the portable C as a part
+of the one program (TODO.md, "The setup program in the portable C: the
+plan"). It is laid out, listed and assembled as an object file next to
+the main program, build/shareware-layout/VCSETUP.COM, .LST and .OBJ, and
+is a second original here. Many of its things have the names of the main
+program's, with other contents, so a tree has every thing of the setup
+program under the name of the assembly with St in front: StConf_B is
+held against Conf_B of VCSETUP.COM, and a word of it that names Cnf01_S
+there against where the tree has StCnf01_S. The setup program has texts
+and tables that are the main program's byte for byte, too; a tree need
+not have those twice. A word of the setup program's may name the main
+program's thing of the same name, if the tree has none with St in front
+and that thing is, as long as the tree has it, what the setup program
+has there. For a tree that is declared to have no setup program, the C
+translation, nothing is held against the second original.
+
 An object is compared as long as it is, and the program reads more of
 some than their own bytes: a name that it copies as 13 bytes whatever
 its length, a table of two colours of which a line may ask for the
@@ -53,6 +70,7 @@ from pathlib import Path
 
 from bytecheck import REGIONS
 import coverage
+import deviations
 import reads
 
 COM_ORIGIN = 0x100          # where a .COM file is loaded, and the PSP ends
@@ -74,6 +92,23 @@ ELSEWHERE = {
     "MenuLn": ("MenuLn1", 0),
     "MnuHlp": ("MnuHlp1", 0),
     "SubDir": ("SubDir", 1),
+}
+
+# What a tree has in front of the name of a thing of the original's setup
+# program, and the files of that program in the directory of the layout.
+# An object of that name is held against the setup program's object of the
+# name without it, if that program has data of that name: StConf_B against
+# Conf_B of VCSETUP.COM. No data of the main program has such a name; if
+# one ever does, the test fails for it and says so.
+SETUP_PREFIX = "St"
+SETUP_PROGRAM = "VCSETUP"
+# The structure of the main program's listing that is its main data.
+MAIN_DATA = "MainDat"
+
+# As ELSEWHERE, for the constants of the setup program: the name that the
+# tree has -> (the label of the setup program's listing, how far behind
+# it). For one that the rule of the prefix does not find.
+SETUP_ELSEWHERE = {
 }
 
 # Constants of the C code that the original has not as data, or not in one
@@ -190,7 +225,13 @@ DECLARED = {
 # `what` instead; "behind" is a number, how far what the original names
 # there is behind the label `what` of the original; "is" is the number
 # `what` itself, as where a routine is named by its place in a table of
-# functions.
+# functions; "field" is the place in the main data of its field `what`,
+# and as far behind that as what the original names is behind its own
+# label, for a variable of the setup program that a tree keeps in a field
+# of another name: its BoxBuf in ErrBuf.
+#
+# A word of the setup program's that names one of that program's
+# variables needs no entry, as a rule: see compare().
 _MENUS = ("the C has the lines of the menus in one array and the pages of "
           "their help in another, and a menu by its place in them")
 NAMED_OTHERWISE = {
@@ -360,16 +401,22 @@ def listed_symbols(path):
 
 
 class Original:
-    """The original program, as its source is laid out like the shipped
-    binary: the bytes, where every label is, and which words hold the
-    address of what."""
+    """A program of the original, as its source is laid out like the
+    shipped binary: the bytes, where every label is, and which words hold
+    the address of what. `program` is the name of its files in
+    `directory`, VC or VCSETUP, and `prefix` what a tree has in front of
+    the names of that program's things: nothing for the main program's,
+    and SETUP_PREFIX for the setup program's."""
 
-    def __init__(self, directory):
-        self.image = (directory / "VC.COM").read_bytes()
+    def __init__(self, directory, program="VC", prefix=""):
+        self.directory = directory
+        self.program = program
+        self.prefix = prefix
+        self.image = (directory / f"{program}.COM").read_bytes()
         # Where each segment begins, counted from the PSP: the listing's
         # map of the file. The listing counts the code from 100h already.
         begins = {}
-        with open(directory / "VC.LST", encoding="cp866") as listing:
+        with open(directory / f"{program}.LST", encoding="cp866") as listing:
             for line in listing:
                 match = re.match(r"(\w+) +([0-9A-F]+) +([0-9A-F]+) +"
                                  r"([0-9A-F]+) +[0-9A-F]+\s*$", line)
@@ -383,17 +430,22 @@ class Original:
         self.kinds = {}             # name -> "code" or "data"
         self.segment_of = {}
         for name, (segment, value, kind) in listed_symbols(
-                directory / "VC.LST").items():
+                directory / f"{program}.LST").items():
             if segment in self.begins:
                 self.labels[name] = self.begins[segment] + value
                 self.kinds[name] = kind
                 self.segment_of[name] = segment
         self.places = sorted((address, name)
                              for name, address in self.labels.items())
+        # The fields of the main data, as the main program's listing has
+        # them, a structure: name -> where it is there. A tree has its
+        # main data laid out so, in the segment that it reads through,
+        # and so its word for a field holds this.
+        self.fields = {}
         # The words that hold an address, and the address: from the same
         # source assembled as an object file.
         self.named = {}             # where the word is -> what it names
-        module = ObjectFile(directory / "VC.OBJ")
+        module = ObjectFile(directory / f"{program}.OBJ")
         base = [None] + [self.begins[name]
                          for name, _, _ in module.segments[1:]]
         held = {number: module.contents(number)
@@ -407,11 +459,30 @@ class Original:
             self.named[base[segment] + offset] = address
         for where, address in self.named.items():
             if self.word(where) != address:
-                raise Problem(f"the object file of the original and its "
-                              f"program differ at {where:04X}h")
+                raise Problem(f"the object file of the original's "
+                              f"{program} and its program differ at "
+                              f"{where:04X}h")
 
     def word(self, address):
         return struct.unpack_from("<H", self.image, address - COM_ORIGIN)[0]
+
+    def members(self, structure):
+        """The members of a structure of this program's listing: name ->
+        where it is in the structure."""
+        found, inside = {}, False
+        path = self.directory / f"{self.program}.LST"
+        with open(path, encoding="cp866") as listing:
+            for line in listing:
+                if re.match(rf"{structure} [ .]*[0-9A-F]+\s*$", line):
+                    inside = True
+                elif inside:
+                    match = re.match(r"  (\w+) [ .]*([0-9A-F]+)   \S", line)
+                    if not match:
+                        break
+                    found[match[1]] = int(match[2], 16)
+        if not found:
+            raise Problem(f"{path.name} lists no structure {structure}")
+        return found
 
     def extent(self, name):
         """How far the object at a label goes: to the next label."""
@@ -440,7 +511,7 @@ class Original:
         something in and the published source has not."""
         return any(address - COM_ORIGIN < offset + size
                    and offset < address - COM_ORIGIN + length
-                   for offset, size, _, _ in REGIONS["VC.COM"])
+                   for offset, size, _, _ in REGIONS[f"{self.program}.COM"])
 
 
 def source_of(directory):
@@ -538,13 +609,68 @@ class Translation:
         return None
 
 
+def whose(name, original, setup):
+    """Which program of the original the object `name` of a tree is held
+    against, and where: the program, the label there, and how far behind
+    it. `setup` is the original's setup program, or None for a tree that
+    has none. Returns a line that says what is wrong if neither has it."""
+    label, behind = ELSEWHERE.get(name, (name, 0))
+    of_main = original.kinds.get(label) == "data"
+    there = None
+    if setup and name in SETUP_ELSEWHERE:
+        there = SETUP_ELSEWHERE[name]
+    elif setup and name.startswith(SETUP_PREFIX):
+        there = (name.removeprefix(SETUP_PREFIX), 0)
+    # What has no value in the setup program's file is a variable.
+    of_setup = there is not None and setup.kinds.get(there[0]) == "data" \
+        and setup.segment_of[there[0]] != "_BSS"
+    if of_main and of_setup:
+        return (f"{name} is data of the original's main program, {label}, "
+                f"and by the name that follows {SETUP_PREFIX} data of its "
+                f"setup program too, {there[0]}: say in OWN of "
+                f"{Path(__file__).name} which it is, or give it another "
+                "name")
+    if of_main:
+        return original, label, behind
+    if of_setup:
+        return setup, *there
+    return (f"the original has no data called {label}"
+            + (f", and its setup program none called {there[0]}"
+               if there else "")
+            + f": say in ELSEWHERE or in OWN of {Path(__file__).name} what "
+            f"{name} is")
+
+
+def known(original, translation, candidate):
+    """Where the translation has what `original`, a program of the
+    original, calls `candidate`: what a word has that names it, and from
+    where that counts, as Translation.named has it. That is under the
+    name with the program's prefix. A thing of the setup program may be
+    the main program's thing of the same name as well, where the tree
+    has none with the prefix: but only if every object of that name is,
+    as long as the tree has it, what the setup program has there."""
+    found = translation.named.get(original.prefix + candidate, [])
+    if found or not original.prefix or candidate not in original.labels:
+        return found
+    shared = [(address, length)
+              for _, name, address, length in translation.objects
+              if name == candidate]
+    if shared and all(compare(original, translation, candidate,
+                              original.labels[candidate], address,
+                              length) is None
+                      for address, length in shared):
+        return translation.named.get(candidate, [])
+    return []
+
+
 def compare(original, translation, name, there, address, length,
             otherwise=()):
     """Hold `length` bytes of the translation at `address` against the
     original at `there`, for the object `name`. Returns None if they are the
     same, or a line that says where they are not. `otherwise` is what the
     object is declared to have otherwise than the original's, as DECLARED
-    has it: it is held against the original's with that done to it."""
+    has it: it is held against the original's with that done to it.
+    `original` is the program of the original that has the object."""
     ours = translation.bytes(address, length)
     # For each byte of the object, where the original has it, counted
     # from `there`, or the byte that is declared to be there instead.
@@ -588,6 +714,26 @@ def compare(original, translation, name, there, address, length,
         elif how == "is":
             wanted = [label]
             instead = "the number that it is to have"
+        elif how == "field":
+            wanted = [original.fields[label] + behind & 0xFFFF]
+            instead = (f"where the main data has {label}"
+                       + (f"+{behind}" if behind else ""))
+        elif original.prefix and original.segment_of[names[0]] == "_BSS":
+            # A variable of the setup program, which is a program of
+            # one segment. A tree has it as a variable of its own, by
+            # the name with the prefix, or else as the field of that
+            # name of the main data, which is what the setup program's
+            # variables are while the setup is open.
+            wanted = [offset + behind & 0xFFFF
+                      for candidate in names for offset, _
+                      in translation.named.get(original.prefix + candidate,
+                                               [])]
+            wanted = wanted or [original.fields[candidate] + behind & 0xFFFF
+                                for candidate in names
+                                if candidate in original.fields]
+            instead = (f"where it has {original.prefix}{said}, or where "
+                       f"the main data has {said}")
+            how = "variable"
         elif name in COMMAND_TABLES:
             numbers = commands(translation.source)
             wanted = [numbers[candidate] for candidate in names
@@ -598,13 +744,16 @@ def compare(original, translation, name, there, address, length,
             groups = {offset + behind & 0xFFFF: group
                       for candidate in names
                       for offset, group
-                      in translation.named.get(candidate, [])}
+                      in known(original, translation, candidate)}
             wanted = list(groups)
             instead = f"where it has {said}"
             if not wanted:
                 return (f"{name}+{at}: the original names {said} there, "
-                        f"which the translation has not by that name: see "
-                        f"NAMED_OTHERWISE in {Path(__file__).name}")
+                        f"which the translation has not by that name"
+                        + (f", {original.prefix}{names[0]}, nor as the "
+                           f"main program's {names[0]} with the setup "
+                           f"program's bytes" if original.prefix else "")
+                        + f": see NAMED_OTHERWISE in {Path(__file__).name}")
         if word not in wanted:
             return (f"{name}+{at}: the translation has {word:04X}h, which "
                     f"is not {instead}, "
@@ -632,7 +781,8 @@ def main():
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("layout", type=Path,
                         help="the directory of the original laid out like "
-                             "the shipped binary: VC.COM, VC.LST, VC.OBJ")
+                             "the shipped binary: VC.COM, VC.LST, VC.OBJ, "
+                             "and the same of VCSETUP")
     parser.add_argument("translation", type=Path,
                         help="the directory of the translation: VC.EXE, "
                              "VC.MAP and the object files")
@@ -647,6 +797,12 @@ def main():
     try:
         original = Original(args.layout)
         translation = Translation(args.translation, args.source)
+        # The setup program, for a tree that has it in itself.
+        original.fields = original.members(MAIN_DATA)
+        setup = None
+        if not deviations.declared(translation.source.name).no_setup:
+            setup = Original(args.layout, SETUP_PROGRAM, SETUP_PREFIX)
+            setup.fields = original.fields
     except Problem as problem:
         sys.exit(f"datacheck: {problem}")
 
@@ -655,8 +811,10 @@ def main():
     variables = reads.VARIABLES.get(translation.source.name, {})
     failed = []
     count = bytes_held = 0
+    of_setup = bytes_of_setup = 0
     stale = (set(DIFFERENT) | set(ELSEWHERE) | set(OWN) | set(declared)
-             | set(variables)) - set(gone)
+             | set(variables) | set(SETUP_ELSEWHERE if setup else ())) \
+        - set(gone)
     used = set()
     for module, name, address, length in translation.objects:
         stale.discard(name)
@@ -669,21 +827,20 @@ def main():
                 print(f"  {module:12} {name:11} {length:4}  not "
                       f"compared: {OWN.get(name) or variables[name]}")
             continue
-        label, behind = ELSEWHERE.get(name, (name, 0))
-        if original.kinds.get(label) != "data":
-            failed.append(f"{module}: the original has no data called "
-                          f"{label}: say in ELSEWHERE or in OWN of "
-                          f"{Path(__file__).name} what {name} is")
+        found = whose(name, original, setup)
+        if isinstance(found, str):
+            failed.append(f"{module}: {found}")
             continue
-        there = original.labels[label] + behind
-        if original.reserved(there, length):
+        program, label, behind = found
+        there = program.labels[label] + behind
+        if program.reserved(there, length):
             if not args.quiet:
                 print(f"  {module:12} {name:11} {length:4}  not compared: "
                       "in the room reserved for what only the shipped "
                       "binary has")
             continue
         why, otherwise = declared.get(name, (None, ()))
-        difference = compare(original, translation, name, there, address,
+        difference = compare(program, translation, name, there, address,
                              length, otherwise)
         used |= {key for key in NAMED_OTHERWISE if key[0] == name}
         if name in DIFFERENT:
@@ -699,12 +856,18 @@ def main():
             continue
         count += 1
         bytes_held += length
+        if program is setup:
+            of_setup += 1
+            bytes_of_setup += length
         if not args.quiet:
-            whole = original.extent(label) - behind
+            whole = program.extent(label) - behind
             note = "" if length == whole else (
                 f"  {length} of {whole} bytes" if length < whole else
                 "  with what follows it")
-            if label != name or behind:
+            if program is setup:
+                note += f"  {label} of {SETUP_PROGRAM}" \
+                    + (f"+{behind}" if behind else "")
+            elif label != name or behind:
                 note += f"  {label}" + (f"+{behind}" if behind else "")
             if why:
                 note += f"  but for what is declared: {why}"
@@ -725,6 +888,9 @@ def main():
           "original" + (f", {len(declared)} of them but for what "
                         f"src/{translation.source.name}/DEVIATIONS.md "
                         "declares" if declared else ""))
+    if setup:
+        print(f"{of_setup} of them, {bytes_of_setup} bytes, are the "
+              "original's setup program's")
     for line in failed:
         print(f"DIFFERS  {line}")
     sys.exit(1 if failed else 0)

@@ -101,22 +101,29 @@ add_programs(programs ${CMAKE_BINARY_DIR})
 set(layout_dir ${CMAKE_BINARY_DIR}/shareware-layout)
 add_programs(shareware-layout ${layout_dir} -DSHAREWARE_LAYOUT)
 
-# And VC once more with that layout, as an object file: its relocations say
-# which words of the original hold the address of something, and of what.
-# The test of a C tree's data goes by them (harness/datacheck.py).
-list(TRANSFORM VC_includes PREPEND ${CMAKE_SOURCE_DIR}/src/asm/
-     OUTPUT_VARIABLE layout_includes)
-add_custom_command(
-    OUTPUT ${layout_dir}/VC.OBJ
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${layout_dir}
-    COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
-            $<TARGET_FILE:jwasm> -nologo -q -omf -DSHAREWARE_LAYOUT
-            -I${CMAKE_SOURCE_DIR}/src/asm -Fo ${layout_dir}/VC.OBJ
-            ${CMAKE_SOURCE_DIR}/src/asm/VC.ASM
-    DEPENDS jwasm ${CMAKE_SOURCE_DIR}/src/asm/VC.ASM ${layout_includes}
-    COMMENT "Assembling VC.OBJ (shareware-layout)"
-    VERBATIM)
-add_custom_target(shareware-relocations ALL DEPENDS ${layout_dir}/VC.OBJ)
+# And both once more with that layout, as object files: their relocations
+# say which words of the original hold the address of something, and of
+# what. The test of a C tree's data goes by them (harness/datacheck.py):
+# by VC's for the main program, and by VCSETUP's for the setup program
+# where a tree has that in itself.
+set(layout_objects "")
+foreach(name VC VCSETUP)
+    list(TRANSFORM ${name}_includes PREPEND ${CMAKE_SOURCE_DIR}/src/asm/
+         OUTPUT_VARIABLE layout_includes)
+    add_custom_command(
+        OUTPUT ${layout_dir}/${name}.OBJ
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${layout_dir}
+        COMMAND ${CMAKE_COMMAND} -E env --unset=JWASM
+                $<TARGET_FILE:jwasm> -nologo -q -omf -DSHAREWARE_LAYOUT
+                -I${CMAKE_SOURCE_DIR}/src/asm -Fo ${layout_dir}/${name}.OBJ
+                ${CMAKE_SOURCE_DIR}/src/asm/${name}.ASM
+        DEPENDS jwasm ${CMAKE_SOURCE_DIR}/src/asm/${name}.ASM
+                ${layout_includes}
+        COMMENT "Assembling ${name}.OBJ (shareware-layout)"
+        VERBATIM)
+    list(APPEND layout_objects ${layout_dir}/${name}.OBJ)
+endforeach()
+add_custom_target(shareware-relocations ALL DEPENDS ${layout_objects})
 
 # --- The C trees --------------------------------------------------------------
 # Volkov Commander in C, twice: src/c/, the C translation, which is the

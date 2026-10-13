@@ -28,6 +28,14 @@ an index which the program does not keep inside it, where REVIEWED says
 of the C, not by what the compiler made of it: a constant that is handed
 through a variable is known only as far as REVIEWED says.
 
+A constant of the setup program has St in front of its name in a tree
+that has that program in itself (see datacheck.py), and is a constant
+like any other here: its places are found by that name, and REVIEWED
+has it by that name, ("stopts.c", "StConf_P"). Which of the original's
+two programs its bytes are held against is datacheck.py's to know, not
+this tool's. A function of the setup's that reads a box or a dialog
+handed to it by its offset goes into READERS.
+
     reads.py BUILD_DIR          every place, with the bytes read there:
                                 build/c for the C translation, whose
                                 files are src/c, build/portable_c for
