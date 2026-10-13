@@ -29,7 +29,7 @@ files.c       to-number 1, to-pointer 5
 find.c        to-number 19, to-pointer 11
 find_t.c      clean
 format.c      to-number 1
-help.c        to-number 12, to-pointer 1
+help.c        to-number 11
 help_t.c      clean
 info.c        to-number 7, to-pointer 2
 input.c       to-number 2, to-pointer 1

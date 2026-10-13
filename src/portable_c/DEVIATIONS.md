@@ -422,6 +422,7 @@ are added here as they go.
 | `FncMs1`, `dirfunc.c` | DOS 4Fh, the next file | CX 37h and DS:DX on the mask, of the call for the first file | CX and DX 0 |
 | `ReadOne`, `start.c` | DOS 3Dh, 3Fh and 3Eh, a file read | 3Dh: BX, CX, SI and DI 0. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still | 3Dh: those four as they come. AL 0 for the other two, and for 3Eh CX as it comes and DX 0 |
 | `IniData`, `start.c` | DOS 38h, the country, and DOS's routine for capitals, 128 times | 38h: BX and CX as the BIOS left them at the call before, the page and the shape of the cursor. The routine: AH as 38h left it | BX and CX as they come; AH 0 |
+| `HelpFil`, `help.c` | DOS 3Eh, the help file closed | DX as the code before left it, the address of the file's name in the C translation | DX 0 |
 
 What is known to read such a register, and where the portable C will
 hand it something else when the file goes over:

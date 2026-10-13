@@ -163,30 +163,23 @@ static void DeCode(u8 *at, u16 count)
    elsewhere. */
 static u16 SeekDsk(u16 high, u16 low)
 {
-    struct DosRegs regs;
+    u32 place = (u32)high << 16 | low;
+    struct FilePlace sought = FileSeek(hd.HlpHndl, 0, place);
 
-    regs.ax = 0x4200;
-    regs.bx = hd.HlpHndl;
-    regs.cx = high;
-    regs.name = (const u8 __far *)(u8 *)low;            /* DX */
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (sought.failed)
         return 1;
-    return regs.ax != low || (u16)(u32)regs.name != high;
+    return sought.place != place;
 }
 
 /* Read `count` bytes of the help file. Not 0 if DOS would not, or read
    fewer. */
 static u16 ReadDsk(u8 *to, u16 count)
 {
-    struct DosRegs regs;
+    struct Answer read = FileRead(hd.HlpHndl, to, count);
 
-    regs.ax = 0x3F00;
-    regs.bx = hd.HlpHndl;
-    regs.cx = count;
-    regs.name = to;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (read.failed)
         return 1;
-    return regs.ax != count;
+    return read.value != count;
 }
 
 /* Read the entry at HlpOffs. For a page that follows the index, the first
@@ -559,7 +552,6 @@ Help66:                                 /* Esc */
    read. Without the file there is no help, and nothing is said. */
 static void HelpFil(void)
 {
-    struct DosRegs regs;
     struct Answer opened;
     u16 i;
 
@@ -594,10 +586,7 @@ Help01:
     Dialog(OFFSET(HlpEr_B), 0, 0, 0, MAIN_SEG);
 
 Help67:
-    regs.ax = 0x3E00;
-    regs.bx = hd.HlpHndl;
-    regs.name = md.HelpBuf;
-    Intr21((struct DosRegs STACK *)&regs);
+    FileClose(hd.HlpHndl);
 }
 
 /* The help, for F1: on the page that HlpPage names. While it is shown
