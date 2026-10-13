@@ -92,7 +92,9 @@ holds it.
 the memory while a command runs: its code, its main data, its stack and
 its two panels. It has no part that stays and none that goes, keeps no
 copy of anything, never loads itself again and has no switch for any of
-it.
+it. It is a program of 32 bits, which an extender, DOS/32A, starts
+above the megabyte: all of it is there, also while a command runs, and
+below the megabyte stays the extender.
 
 - The Options menu has no line Memory allocation: Save setup, below
   it, stands a row further up for that. The letter M chooses another
@@ -103,12 +105,11 @@ it.
   file is deleted while a command runs.
 - The main data is of the program, not a block that it asks DOS for. The
   panels, with the memory of the viewer behind them, are a block that it
-  asks for when it starts. For a command that block is made as long as
-  two panels of 256 files, and the rest is DOS's. Afterwards the program
-  asks for the largest block that there is, as the original does, and
-  moves its panels there if that is another: so its memory lies where
-  the original's does, in front of a program that a command has left in
-  the memory or behind it.
+  asks for when it starts, and not of DOS either: the program has 640 KB
+  of its own, above the megabyte, which it hands out to itself as DOS
+  hands out its memory. For a command that block is made as long as two
+  panels of 256 files, and afterwards the program asks for the largest
+  block that there is, as the original does; DOS gains nothing by it.
 - A panel is left with 256 files for a command, as the original leaves
   it, the cursor's file and the first one shown put last if they are
   beyond, and is read again afterwards: what stays selected is what the
@@ -117,21 +118,19 @@ it.
 - What the main data has behind the command line, which the original
   has as whatever the memory holds after a command until it is set
   again, is as it was before the command.
-- "Program too big to fit in memory" after a command comes only when
-  less is free than the viewer needs at the least, 8,000 bytes: the main
-  data and the panels are there already. When the program starts, it
-  comes when there is less than two panels and that. With less memory
-  than the program itself, DOS does not load it, and says so in its own
-  words.
-- The Info panel, which said how much memory a command has while the
-  portable C had the line, all that is behind the panels, says nothing
-  of the memory since: see 11.
-- The map of the memory, which listed what stays as the program's, is
-  gone from the portable C since: see 7.
-- The program's own call, which handed out the main data and the
-  panels themselves while the portable C had it, is gone from the
-  portable C since, with the setup program made a part of the program:
-  see 8.
+- "Program too big to fit in memory" is never said after a command: the
+  memory that the viewer needs is of those 640 KB, which no command
+  takes. The program says it when it starts and DOS has not the 512
+  bytes below the megabyte that the system's functions keep there; with
+  less memory above the megabyte than the program wants, the extender
+  does not start it, and says so in words of its own.
+- The Info panel, which says in the original how much memory a command
+  gets, says nothing of the memory: see 11.
+- The map of the memory, which lists in the original what a command
+  will find free, is gone from the portable C: see 7.
+- The program's own call, by which another program is handed the
+  copies, is gone from the portable C, with the setup program made a
+  part of the program: see 8.
 - The byte of the setup file that held the switch is kept as it is found
   and written back as it was; the program does not go by it. A setup file
   of the original is one of the portable C and the other way round.
@@ -149,129 +148,81 @@ it.
   page of the Configuration that the setup shows for F1 still has its
   paragraph on the box, behind that on Show logical drive B:: the help
   file is the distribution's.
-- It is an `.EXE` file, with the main data in it, which DOS loads and
-  relocates. A DOS before 3 is left through the INT 20h of the
-  PSP, as the original leaves it, by a call instead of a return; the
-  call by which the program asks DOS for its PSP is one of DOS 2 and
-  later.
+- The file is an `.EXE` file: the extender, a program of DOS, with the
+  program behind it as a linear executable, the main data in it, which
+  the extender loads and relocates.
 
-What it costs in memory. While a command runs the portable C keeps the
-program and its panels, where the original keeps 12,704 bytes and the C
-translation 19,728; and on the bench of the tests DOS has that much less
-for a command than the 412,848 bytes that it has for one run from the
-original as it is distributed, or the 405,824 for one run from the C
-translation. How much the portable C keeps, and what DOS has for a
-command then, changes with every step of the work: the README has both
-as they stand, under "The figures". It is enough for every command of
-the scenarios but those of a second copy of the program: the bench has
-500,128 bytes from where the program is loaded, two copies with the
-COMMAND.COM that runs the second take most of it, and what is left is
-less than the 73K of the COMMAND.COM that a command of the second copy
-wants. So a second copy starts there and shows its panels, and has no
-memory to run anything; and behind a program that has stayed in the
-memory, with the gap that COMMAND.COM leaves in front of it, a second
-copy does not start at all.
+What follows from the program's being where it is, with its extender
+below it. The last four points are declared as they are on the user's
+word of 13 October 2026:
 
-**The program of 32 bits.** The portable C is built a second way, as a
-program of 32 bits that an extender, DOS/32A, starts above the megabyte,
-and this entry is of both. What it says above holds for both but for
-these, where it is of the program of 16 bits alone and the program of
-32 bits is as said here:
-
-- Where the program is. The code, the main data, the stack and the
-  panels of the program of 32 bits are above the megabyte, all of them
-  while a command runs; below it stays the extender, some 52 KB. So
-  the count of what the program costs in memory, above, is the 16-bit
-  program's: a command run from the program of 32 bits has of DOS's
-  memory all but the extender's part. What it has of the memory above
-  the megabyte is the next point.
-- The memory above the megabyte, while a command runs. Of the program
-  of 32 bits alone, and declared as it is on the user's word of 13
-  October 2026. The original takes none of that memory, and the program
-  of 16 bits none: a command of either has all of it, 15,232K on the
-  bench by the BIOS, and with an XMS driver loaded 14,978K of them
-  free. The extender of the program of 32 bits takes all of it when it
-  starts, as it comes, and holds it while a command runs. Where no XMS
-  driver and no other memory manager is loaded, as on the bench, it has
-  INT 15h for that and answers a command in the BIOS's place: by
-  function 88h that there are 0K, and E801h and E820h it refuses. With
-  an XMS driver loaded, 0K are free to a command. So a command that
-  wants such memory for itself finds none: a program with another
-  extender, a cache, a RAM disk, which is from what a command is told
-  and was tried with none of them. A program that DOS/32A starts gets
-  memory all the same, since its extender asks the one that is in the
-  memory, and a second copy of the program is such a one. On the bench
-  the scenario `command` shows it in what FreeDOS's `mem` prints, run
-  as a command: told by the BIOS that there is no such memory, it goes
-  by the two bytes of the clock's memory, which say 15,360K, 128K more
-  than the BIOS tells a command of the original, since the BIOS keeps
-  that much at the top for itself. The extended memory in all and what
-  is used of it are that much more there, and the total memory; the
-  total that is used follows the same and is left out of the comparison
-  for following the size of the program. The extender can be told how
-  much to take, by four bytes of its settings, which was seen on a copy
-  of the file and is not done: `TODO.md`, "C2, a second copy in the
-  driver, and `command`", has what a command is told, call by call, and
-  what that setting would cost.
-- The block of the panels. The program of 32 bits has it of 640 KB that
-  are its own, above the megabyte, which it hands out to itself as DOS
-  hands out its memory; it makes the block shorter for a command and
-  longer again afterwards as the program of 16 bits does, since the code
-  is the same, and DOS gains nothing by it.
-- A second copy. One of the program of 32 bits has the memory to run a
-  command, as the original's has: the last three sentences of the
-  count, "It is enough for every command" and on, are not of it.
-- "Program too big to fit in memory" after a command. The program of 32
-  bits never says it there: the memory that the viewer needs is of
-  those 640 KB, which no command takes. It says it when it starts and
-  DOS has not the 512 bytes below the megabyte that the system's
-  functions keep there; with less memory above the megabyte than the
-  program wants, the extender does not start it, and says so in words
-  of its own.
-- What it wants of the machine, where it cannot start. Of the program
-  of 32 bits alone, and declared on the user's word of 13 October 2026.
-  It is compiled for the 386 and started by an extender that needs
-  one, and it wants memory above the megabyte for all of itself, its
-  640 KB among it, some 900 KB; the original runs on any PC that DOS
-  runs on, and wants no memory there. Without that memory the extender
-  does not start it and says so in its own words, not in the
-  program's: "DOS/32A fatal (4003): not enough extended memory to load
-  application exec" is what a second copy was told on the bench when
-  the first had been left a megabyte for the two of them. What a
-  machine without a 386 is told is the extender's as well, and was not
-  seen: the bench has no such machine. And where the program itself
-  says "Program too big to fit in memory", for want of the 512 bytes,
-  the words are the original's, written through DOS from a copy that
-  `dos32.c` has of them, and the program ends with 8, DOS's number for
-  too little memory; the original and the program of 16 bits end with
-  1 behind those words. No scenario shows any of this.
+- What it costs of DOS's memory. While a command runs, the original
+  keeps 12,704 bytes of it and the C translation 19,728: on the bench of
+  the tests DOS has 412,848 bytes for a command that is run from the
+  original as it is distributed, and 405,824 for one run from the C
+  translation. A command run from the portable C has of DOS's memory
+  all but the extender's part, some 52 KB.
+- A second copy of the program has the memory to run a command, as the
+  original's has.
+- The memory above the megabyte, while a command runs. The original
+  takes none of that memory: a command of it has all of it, 15,232K on
+  the bench by the BIOS, and with an XMS driver loaded 14,978K of them
+  free. The extender of the portable C takes all of it when it starts,
+  as it comes, and holds it while a command runs. Where no XMS driver
+  and no other memory manager is loaded, as on the bench, it has INT
+  15h for that and answers a command in the BIOS's place: by function
+  88h that there are 0K, and E801h and E820h it refuses. With an XMS
+  driver loaded, 0K are free to a command. So a command that wants such
+  memory for itself finds none: a program with another extender, a
+  cache, a RAM disk, which is from what a command is told and was tried
+  with none of them. A program that DOS/32A starts gets memory all the
+  same, since its extender asks the one that is in the memory, and a
+  second copy of the program is such a one. On the bench the scenario
+  `command` shows it in what FreeDOS's `mem` prints, run as a command:
+  told by the BIOS that there is no such memory, it goes by the two
+  bytes of the clock's memory, which say 15,360K, 128K more than the
+  BIOS tells a command of the original, since the BIOS keeps that much
+  at the top for itself. The extended memory in all and what is used of
+  it are that much more there, and the total memory; the total that is
+  used follows the same and is left out of the comparison for following
+  the size of the program. The extender can be told how much to take,
+  by four bytes of its settings, which was seen on a copy of the file
+  and is not done: `TODO.md`, "C2, a second copy in the driver, and
+  `command`", has what a command is told, call by call, and what that
+  setting would cost.
+- What it wants of the machine, where it cannot start. It is compiled
+  for the 386 and started by an extender that needs one, and it wants
+  memory above the megabyte for all of itself, its 640 KB among it,
+  some 900 KB; the original runs on any PC that DOS runs on, and wants
+  no memory there. Without that memory the extender does not start it
+  and says so in its own words, not in the program's: "DOS/32A fatal
+  (4003): not enough extended memory to load application exec" is what
+  a second copy was told on the bench when the first had been left a
+  megabyte for the two of them. What a machine without a 386 is told is
+  the extender's as well, and was not seen: the bench has no such
+  machine. And where the program itself says "Program too big to fit in
+  memory", for want of the 512 bytes, the words are the original's,
+  written through DOS from a copy that `dos32.c` has of them, and the
+  program ends with 8, DOS's number for too little memory; the original
+  ends with 1 behind those words. No scenario shows any of this.
 - What the extender is in the machine while the program runs, a
-  command of the program's included. Of the program of 32 bits alone,
-  and declared on the user's word of 13 October 2026. Its part of real
-  mode lies below the megabyte in the program's own block, 51,696 bytes
-  on the bench, with the 512 bytes of the system's functions in a block
-  of DOS's behind it. INT 21h of real mode goes to the extender for as
-  long as the program is in the memory, so a call of DOS that another
-  program makes then passes the extender on its way; so does INT 15h
-  where no memory manager is loaded, by which a command is told of the
-  memory above the megabyte: the point on that memory, above. When it
-  starts, the extender sets the counter of the machine's timer anew, in
-  its mode 3 where the BIOS has it in mode 2, and it keeps the line A20
-  on. The program runs in protected mode at the highest privilege, with
-  no memory protected from it, as nothing is on DOS. And the call by
-  which the program says that it is idle, INT 28h, comes to whoever has
-  taken that interrupt from the extender's part of real mode, on a
-  stack of the extender's, 512 bytes, with DS and ES 0, where the
-  original's comes from the program on the program's stack with DS on
-  the main data. No screen shows any of this, and no scenario.
-- The file. That of 32 bits is the extender, a program of DOS, with the
-  program behind it as a linear executable, which the extender loads
-  and relocates.
-
-Everything else is of both: the menu without Memory allocation, no
-check sum and no "Bad or missing", a panel left with 256 files for a
-command, the byte of the setup file, the setup without the box, the
-help file.
+  command of the program's included. Its part of real mode lies below
+  the megabyte in the program's own block, 51,696 bytes on the bench,
+  with the 512 bytes of the system's functions in a block of DOS's
+  behind it. INT 21h of real mode goes to the extender for as long as
+  the program is in the memory, so a call of DOS that another program
+  makes then passes the extender on its way; so does INT 15h where no
+  memory manager is loaded, by which a command is told of the memory
+  above the megabyte: the point on that memory, above. When it starts,
+  the extender sets the counter of the machine's timer anew, in its
+  mode 3 where the BIOS has it in mode 2, and it keeps the line A20 on.
+  The program runs in protected mode at the highest privilege, with no
+  memory protected from it, as nothing is on DOS. And the call by which
+  the program says that it is idle, INT 28h, comes to whoever has taken
+  that interrupt from the extender's part of real mode, on a stack of
+  the extender's, 512 bytes, with DS and ES 0, where the original's
+  comes from the program on the program's stack with DS on the main
+  data. No screen shows any of this, and no scenario.
 
 **Why.** The user's decision, on 12 October 2026: giving up the code and
 the data and making them again saves memory that only DOS is short of,
@@ -281,14 +232,15 @@ It "only matters on DOS"; "it's OK for our port to be less memory- and
 disk-efficient, as long as it's functionally equivalent"; and the option
 "in the new tree goes away. It's going to be a pattern for a lot of
 features that only made sense on DOS." And on 13 October 2026: where the
-program of 32 bits does again what the original does and the program of
-16 bits could not, a second copy that has the memory to run a command,
-it is held to the original's golden, and this entry says only what still
-differs. And the same day, of the program of 32 bits alone: what follows
-from its running under an extender and shows on no screen is declared
-as it is, what it wants of the machine and what the extender is in the
-machine while it runs among it. The user's word, "declare all five", on
-a list of what differs in that program (`TODO.md`, "The program of 32
+program as one of 32 bits does again what the original does, and what it
+could not do while it was built as a program of 16 bits and kept all of
+itself in DOS's memory, a second copy that has the memory to run a
+command, it is held to the original's golden, and this entry says only
+what still differs. And the same day: what follows from its running
+under an extender and shows on no screen is declared as it is, what it
+wants of the machine and what the extender is in the machine while it
+runs among it. The user's word, "declare all five", on a list of what
+differs in the program for its 32 bits (`TODO.md`, "The program of 32
 bits: what differs from the original, for the user", 6 to 10 there; the
 others of the five are in 6 and in 8). And the same day, when the last
 of that list had been put to them: that a command finds no memory above
@@ -298,24 +250,19 @@ C").
 
 **Which scenarios show it.** Each of these is held against the original's
 golden with what its row says made to it: by its patch, or, where the row
-says that every screen is as the original's, by the steps left out alone.
-The portable C is the program of 32 bits, and a row is of it. What a
-row says of the program of 16 bits is of the build that the portable C
-was until the tests came to judge the one of 32, on 13 October 2026:
-that build is gone, and its patches with it, where the program of 32
-bits had one of its own in their place:
+says that every screen is as the original's, by the steps left out alone:
 
 | Scenario | What changes in it |
 |---|---|
 | `lost` | The program's file is deleted by a command. The original asks for it, twice, and ends; the portable C is back at its panels, and the keys that answered the original are keys at the panels: a space into the command line, Enter, which runs it, and Esc, which switches the panels off |
 | `clock`, `clock-russia` | The Options menu where it shows: without Memory allocation, so with Save setup a row further up. And by 8: with two rows more at its bottom, a line across the menu and More setup, so a row taller than the original's |
 | `menu` | The same. By 8: Up from the top of the menu, and PgDn, go to More setup, the last item, where the original has Save setup, and Up from there goes to Save setup, where the original goes on from that to Memory allocation. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
-| `second-copy` | In 16 bits: the second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work. In 32 bits: every screen is as the original's, the copy having run its command; its patch is of 10 alone |
-| `start-memory` | In 16 bits: the second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with the mini status that the first copy's have not. In 32 bits: the copy runs the command, as the original's does, which stays in the memory and leaves 75 KB of DOS's; the copy needs none of that to come back and says nothing, so the command line shows a row less of it, and it is still there afterwards, with the same three screens |
-| `command` | In 32 bits alone, by a patch of that program's own; the program of 16 bits shows every screen as the original's. Where `mem` is run as a command, two rows of what it prints: the extended memory, in all and used, 15,360K where the original has 15,232K, and the total memory, 16,384K where it has 16,256K. A command is told that there is no memory above the megabyte, and `mem` goes by the clock's memory, which has 128K more |
+| `second-copy` | Every screen is as the original's: the second copy is started with a command to run and runs it. Its patch is of 10 alone |
+| `start-memory` | The second copy runs the command that was to leave it without memory for its data, as the original's does, which stays in the memory and leaves 75 KB of DOS's. The original's copy then says "Program too big to fit in memory" and ends. The portable C's needs none of DOS's memory to come back and says nothing, so the screen shows a row less there, and it is still there afterwards: the panels of the last three screens are the copy's, with the mini status that the first copy's have not |
+| `command` | Where `mem` is run as a command, two rows of what it prints: the extended memory, in all and used, 15,360K where the original has 15,232K, and the total memory, 16,384K where it has 16,256K. A command is told that there is no memory above the megabyte, and `mem` goes by the clock's memory, which has 128K more |
 | `setup-config` | The Configuration of the setup where it shows: without Memory allocation, by 7 without TSR manager and by 14 without Quick execute commands, so without Execute options. The row of the scenario in 14 says all that differs in it: of this entry, the step that unticks Memory allocation is left out, and the setup file that is saved has the byte as it had it, 1, where the original's has 0 |
 | `setup-config-mouse`, `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The Configuration so, where each shows it: their rows are in 14. All but `setup-config-mouse` and `setup-missing-saved` show Screen and Mouse too, which is otherwise by 5 |
-| `ended` | In 16 bits the program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. In 32 bits the copy has the memory and runs it, and it stays in the memory, 448 bytes, also when DOS has ended the copy, which by 7 keeps no list of such programs to release: no screen of the scenario shows that, since the program that started the copy clears the screen, and both programs are held to the one patch. And by 7, for both: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. And by 8, with no interrupt of DOS's taken: DX has in its low byte what DOS was last told of Ctrl-C and is as it came above that, which is what the original leaves there where its setup has TSR manager off; and DS is as it came, on the program that started the copy, a segment that follows the size of the program and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
+| `ended` | The second copy runs the program that it is to leave in the memory before DOS ends it, and that stays in the memory, 448 bytes, also when DOS has ended the copy, which by 7 keeps no list of such programs to release: no screen of the scenario shows that, since the program that started the copy clears the screen. And by 7: the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. And by 8, with no interrupt of DOS's taken: DX has in its low byte what DOS was last told of Ctrl-C and is as it came above that, which is what the original leaves there where its setup has TSR manager off; and DS is as it came, on the program that started the copy, a segment that follows the size of the program and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
 
 A step that switches Memory allocation, "F9 o m", is left out of every
 scenario for the portable C: there it would enter the setup (see 8). Of
@@ -334,7 +281,7 @@ up, in the colours of its line. The patches have both.
 | Scenario | Why |
 |---|---|
 | `memory` | It switches Memory allocation off, for the Info panel to show the other number, and shows the menu without the mark |
-| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C of 16 bits behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." And the portable C does not take INT 21h any more, in 16 bits or in 32, so no call of DOS passes it and it has none to hand on: see 8, where `handed-on`, which sees the same with one copy, is not run for that |
+| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The portable C does not take INT 21h, so no call of DOS passes it and it has none to hand on: see 8, where `handed-on`, which sees the same with one copy, is not run for that |
 
 **In the data.** The test `portable_c-data` holds five tables of the menus
 against the original's with this difference declared for each, in
@@ -363,10 +310,11 @@ the call takes the segment of the buffer.
 
 **What the portable C does.** It makes neither call. Its screen is the
 memory of the display, at the page that the BIOS shows, whatever runs
-besides. `TopView` and `TopScr` of `dos.c` are gone, with the inline
-assembly that they were made of, `VideoBuffer`, three instructions. The
-byte of the main data that said whether such a buffer is drawn into,
-`TopView`, keeps its place and is neither set nor read.
+besides. `TopView` and `TopScr`, which the C translation has in its
+`dos.c`, are gone, with the inline assembly that they were made of,
+`VideoBuffer`, three instructions. The byte of the main data that said
+whether such a buffer is drawn into, `TopView`, keeps its place and is
+neither set nor read.
 
 **Why.** It only made sense on DOS. TopView and DESQview shared a PC
 among programs each of which took the machine for its own, and a program
@@ -403,14 +351,15 @@ DESQview it does three things otherwise:
   each key that it has taken, whatever the Configuration has for "Clear
   keyboard buffer".
 
-**What the portable C does.** It does not ask, and does what the original
-does without DESQview, also under it: it makes none of those calls, Alt
-alone brings up the menu bar if the Configuration says so, and the editor
-empties the keyboard if the Configuration says so. `DvPause` of `dos.c`
-is gone, with the inline assembly that it was, `DesqviewPause`, six
-instructions, and the call of DOS in `IniData` of `start.c`. The byte of
-the main data that said whether DESQview runs, `DesqVie`, keeps its place
-and is neither set nor read.
+**What the portable C does.** It does not ask, and does what the
+original does without DESQview, also under it: it makes none of those
+calls, Alt alone brings up the menu bar if the Configuration says so,
+and the editor empties the keyboard if the Configuration says so.
+`DvPause`, which the C translation has in its `dos.c`, is gone, with the
+inline assembly that it was, `DesqviewPause`, six instructions, and the
+call of DOS in `IniData` of `start.c`. The byte of the main data that
+said whether DESQview runs, `DesqVie`, keeps its place and is neither
+set nor read.
 
 **Why.** It only made sense on DOS, and there only next to that one
 program. A system that shares the machine among programs by itself is
@@ -441,8 +390,9 @@ command.
 
 **What the portable C does.** It calls INT 28h and no more. The byte of
 the main data that said that nothing answers, `WinLeav`, keeps its place
-and is neither set nor read. `Int2F` of `dos.c` stays, for the search of
-files, which asks the CD-ROM extensions whether a drive is theirs.
+and is neither set nor read. The one call of INT 2Fh that stays is
+`DriveCd` of `sys.h`, for the search of files, which asks the CD-ROM
+extensions whether a drive is theirs.
 
 In a window of such a system the portable C built for DOS thus takes
 all of its turn while it waits, unless that system knows a program to
@@ -495,13 +445,14 @@ interrupting, which it may again afterwards. The original says so after
 every cell and every seven rows whatever the display is.
 
 **What the portable C does.** It does not test the display, and writes
-to its memory and reads it at once. `InPort` of `dos.c` is gone, and of
-the compiler's intrinsic functions `inp`, the instruction `IN`: the
-program reads no port any more. The byte of the main data that said
-whether to wait, `Snow`, keeps its place and is neither set nor read.
-Snow mode is a byte of the setup that is kept as it is found and written
-back as it was, 2 in a setup made of the defaults: a setup file of the
-original is one of the portable C and the other way round.
+to its memory and reads it at once. `InPort`, which the C translation
+has in its `dos.c`, is gone, and of the compiler's intrinsic functions
+`inp`, the instruction `IN`: the program reads no port any more. The
+byte of the main data that said whether to wait, `Snow`, keeps its place
+and is neither set nor read. Snow mode is a byte of the setup that is
+kept as it is found and written back as it was, 2 in a setup made of the
+defaults: a setup file of the original is one of the portable C and the
+other way round.
 
 The setup has no choice for it either. The original's setup program has
 it in Screen and Mouse, the group Screen output at the top of the right
@@ -588,114 +539,120 @@ hands over something else: a register that it never sets is what the
 stack holds, and `TODO.md` says where.
 
 **What the portable C does.** It asks through the functions of `sys.h`,
-and a function is handed what is asked and nothing else. So a call gets
-the registers that it takes from the function's arguments; AL is 0
-where the service takes nothing there, and so is the half of BX that it
-does not take; DS is on the main data where no address is handed over;
-and a register that the service takes nothing in is 0 or what the stack
-holds, as `dos.c` has it. The calls, their order and every register
-that a call takes are the original's. That is the program of 16 bits;
-"The program of 32 bits", below, says what is otherwise for that one,
-in the registers and in which calls are made.
+and a function is handed what is asked and nothing else. `dos32.c` is
+those functions, for a program of 32 bits whose extender takes each call
+down to real mode, where DOS and the BIOS are. A call gets the registers
+that it takes from the function's arguments, and 0 in every other of AX,
+BX, CX, DX, SI and DI, and in the half of one that it takes nothing in:
+at a call of DOS by `Set` of `dos32.c`, which fills all six, and at a
+call of the BIOS or of the mouse driver by the function that makes it.
+Nothing is what the code before left there, and nothing what the stack
+holds. One call is handed something else than 0 where it takes nothing,
+the BIOS asked about its font: "What is known to read such a register",
+below. What is in DS, in ES and in the carry flag is the extender's
+doing, and so is that some calls of the original's are not made: both
+are below, behind the table. Every other call, its place in the order
+and every register that it takes are the original's.
 
 The places, file by file and in each file as its routines stand, each
-with what the original hands over there in a register that the call
-does not take, read from the assembly; what the C translation handed
-over, where that was noted to be something else; and what the portable C
-hands over. Where that column is empty, nothing was noted: as a rule
-the C translation handed over what the original does. Every file of
-the program has gone over to `sys.h`, and each added its places here as
-it went. A call that the portable C makes no more has no row: DOS
-asked where INT 21h goes, when the program starts, went with the
-program's own call (see 8); the five calls of the BIOS in `F69_00` of
-`commands.c`, the font asked about, the mode set, the small font
-loaded, Print Screen told of the rows and the font asked about again,
-went with EGA lines (see 12); and INT 2Eh, a command handed to the
-COMMAND.COM that is in the memory, went with Quick execute commands,
+with what the original hands over there in a register that the call does
+not take, read from the assembly, and what the C translation handed
+over, where that was noted to be something else: where that column is
+empty, nothing was noted, and as a rule the C translation handed over
+what the original does. What the portable C hands over has no column: it
+is 0 in each of the six registers that a row names, and in DS what is
+said below. Every file of the program has gone over to `sys.h`, and each
+added its places here as it went. A call that the portable C makes no
+more has no row: DOS asked where INT 21h goes, when the program starts,
+went with the program's own call (see 8); the five calls of the BIOS in
+`F69_00` of `commands.c`, the font asked about, the mode set, the small
+font loaded, Print Screen told of the rows and the font asked about
+again, went with EGA lines (see 12); and INT 2Eh, a command handed to
+the COMMAND.COM that is in the memory, went with Quick execute commands,
 as did DOS asked for the current drive in two places for that way alone
 (see 14).
 
-| Routine | Call | The original | The C translation, where it differed | The portable C |
-|---|---|---|---|---|
-| `Blank`, `blank.c`, with its `Star` | BIOS 0Fh, 03h, 01h, 02h and 09h: the cursor noted, hidden and put back, and a star written | 0Fh: AL and BX as the code before left them, for a star that changes its look and its clock and kind. 03h, 01h and 02h: AL the mode, as 0Fh left it. 01h: BH the page, and DX where the cursor is or was put. 02h: BL and CX as the code before left them, for a star its clock and a count of the stars. 09h: DX the place of the star |  | AL 0 at all but 09h; BX, CX and DX 0 where the call takes nothing in them |
-| `M02_10`, `commands.c` | DOS 3Bh, the directory of a panel made current | AL the drive, 1 for A: |  | AL 0 |
-| `F35_61`, `copy.c` | DOS 0Eh, a drive made the current one, twice | AL the drive, as in DL, the first time, and as choosing from the tree left it the second; DH as the code before left it |  | AL and DH 0 |
-| `C00_01`, `copy.c` | DOS 4400h, what a handle is, and 3Eh, the file closed | 4400h: CX what was left of comparing the target with the directory of the other panel, DX the address of the name. 3Eh: AL as 4400h left it, CX that still, DX what the handle is |  | CX as it comes and DX 0 at 4400h. AL, CX and DX 0 at 3Eh |
-| `C00_01`, `C10_00`, `C20_00` and `C30_00`, `copy.c` | DOS 4300h, the attributes of a file or a directory, at seven of the eight places | CX as the code before left it: what was left of comparing two names or of a piece, or the attributes that the call before answered with |  | CX 0 |
-| `C10_00` and `C20_00`, `copy.c` | DOS 41h, a file deleted, at nine places | AL as the call or the dialog before left it; CX the attributes of the file, as they were asked for or the 20h just set, or what else the code before left |  | AL and CX 0 |
-| `C10_00` and `C30_00`, `copy.c` | DOS 56h, a file or a directory renamed, at three places | CX what was left of comparing the two names, or at the second try of `C10_00` the attributes of the target, with AL as 41h left it |  | CX as it comes; AL 0 |
-| `C20_00`, `copy.c` | DOS 4400h, what a handle is, for the source and for the target; 3Ch, the target made; and 3Eh, a file closed, at five places | 4400h: DX the address of the name, CX what the code before left, 20h behind a file made. 3Ch: AL as the call before left it, the error of 4300h or what 41h answered. 3Eh: AL as the call before left it at three of the five; CX and DX what that call took or answered, which is what was left of a piece and where it was to go in the memory, the time and the date just set, the length of the file, or the address of the name; and DS on the memory that the file is read into, at three |  | CX as it comes and DX 0 at 4400h. AL 0 at 3Ch. AL, CX and DX 0 and DS on the main data at 3Eh |
-| `C20_00`, `copy.c` | DOS 3Fh, the last byte read of a file that is appended to; 36h, the room of a drive; and 40h, what still fits of a piece written | 3Fh: AL the low byte of the place just gone to. 36h: BX the handle and CX the size of the piece, DH the second character of the target's name, DS on the memory that the file is read into. 40h: AL the low byte of the count, as in CL |  | AL 0 at 3Fh and 40h. BX, CX and DH 0 and DS on the main data at 36h |
-| `C20_00`, `copy.c` | DOS 5700h, the date and the time of a file: of a source that is a device, and of a target that is appended to | CX and DX: what was left of comparing the two names, or the attributes just kept or set, and the address of the name |  | CX and DX 0 |
-| `C20_00`, `C30_00` and `F36_04`, `copy.c` | DOS 39h, a directory made; 3Ah, one removed; and 3Bh, one made the current one | AL as the call before left it, but at 39h of `C20_00`; CX the attributes of the source or of the target at 39h and 3Ah of `C30_00`, what was left of looking for the end of the path from the second directory that `C20_00` makes, or what else the code before left |  | AL and CX 0 |
-| `F38_40`, `dirfunc.c` | DOS 41h, a file deleted that was read-only | CX 20h, of the call that set its attributes |  | CX 0 |
-| `M30_50`, `dirfunc.c` | DOS 5700h, the date and the time of a file, and 3Eh, the file closed | 5700h: CX the attributes and DX the address of the name. 3Eh: CX the time just set and DX the address of the name |  | CX and DX 0 at both |
-| `F38_60`, `dirfunc.c` | DOS 60h, 3Bh and 3Ah, the current directory left and removed | 60h: DX the address of the path, as SI. 3Bh and 3Ah: SI on the path and DI behind the two full stops, of 60h and of what was written since |  | DX 0 at 60h; SI and DI as they come at 3Bh and 3Ah |
-| `FncMs1`, `dirfunc.c` | DOS 4Fh, the next file | CX 37h and DS:DX on the mask, of the call for the first file |  | CX and DX 0 |
-| `DirFunc`, `dirfunc.c` | DOS 4Eh and 4Fh, the first file and the next, in both of its searches | 4Eh: AL the last character of the directory's path. 4Fh: DS:DX on the mask, of the call for the first file, and CX 37h of that call or what a count has come down to since |  | AL 0 at 4Eh, CX and DX 0 at 4Fh |
-| `DelTr0`, `dirfunc.c` | DOS 3Eh, a file closed | CX 1 and DX the address of the byte, of the call that wrote it |  | CX and DX 0 |
-| `F54_00`, `dirfunc.c` | DOS 13h, the label deleted for a new one, and 3Eh, the new one's file closed | 13h: AL a space, of filling the name with them. 3Eh: CX 8 and DX the address of the name, of the call that made the file |  | AL 0 at 13h, CX and DX 0 at 3Eh |
-| `F62_01`, `drive.c` | DOS 440Eh, the letter that a floppy drive goes by, for A: and for B:, and 440Fh, the letter that was chosen made the drive's | 440Eh: BH the other of the two drives, CX the item of the menu bar, DX as looking for the drives left it. 440Fh: BH the letter, CX the item, DX the drive with the height of the box above it. DS on the panel at both | 440Eh: DX the address of `TmpBuf`, DS on the main data | BH and DX 0, CX as it comes, DS on the main data |
-| `F62_01`, `drive.c` | DOS 47h, 3Bh and 0Eh, a panel put on the drive that was chosen | 47h: AL as 440Fh answered, the drive that the unit goes by; BX the letter and the drive, of that call; CX the item of the menu bar; DH the height of the box. 3Bh: AL the low byte of what 47h left, BX and CX still. 0Eh: AL the low byte of the panel's segment, DH still, and DS on a panel |  | AL 0 at the three; BX and CX as they come at 47h, and CX 0 at 3Bh; DH 0; DS on the main data at 0Eh |
-| `T80_02`, `edit.c` | DOS 4400h, what the handle of the file is that was made, and 3Eh, the file closed | 4400h: CX the attributes and DS:DX on the name of the file. 3Eh: CX the attributes, and DX as the call before left it | 3Eh: CX the count of the last write, DS on the piece last written | CX as it comes and DX 0 at 4400h. CX and DX 0 and DS on the main data at 3Eh |
-| `T00_00`, `edit.c` | DOS 3Eh, the file closed that was read | CX the count of the last read. DS on the segment of the piece last read |  | CX 0, DS on the main data |
-| `F21_10`, `enter.c` | DOS 3Bh, the directory of the tree made current | CX 37h, of the call that looked for the directory, where it did |  | CX 0 |
-| `FindFil`, `find.c` | DOS 4Fh, the next file | CX as the code before left it, and DS:DX on the path |  | CX and DX 0 |
-| `FindFil`, `find.c` | DOS 4201h, 80 bytes gone back in a file that is searched | DS on the segment that the file is read to |  | DS on the main data |
-| `FindFil`, `find.c` | DOS 3Eh, a file that was searched closed | CX and DX as the calls before left them | DX the address of `TmpBuf` | CX and DX 0 |
-| `F67_00`, `find.c` | DOS 4409h and 4408h, a drive asked whether it is of a network and whether its disk can be taken out | CX the drive, 0 for A:. DX the address of the path at 4409h, and at 4408h what 4409h left there |  | CX as it comes, DX 0 |
-| `F67_00`, `find.c` | DOS 0Eh and 19h behind Go to, a drive made the current one and the current one asked for | DS on the segment of the list at 0Eh and of the panel at 19h. DL the drive still at 19h | DS on the segment of the list at both | DS on the main data. DL 0 at 19h |
-| `HelpFil`, `help.c` | DOS 3Eh, the help file closed | DX as the code before left it | DX the address of the file's name | DX 0 |
-| `ErrRdy`, `main.c` | DOS 440Fh, the drive of the box made the one that its unit goes by | BH the row of the box, CX the letter of the drive, DX the size of the box |  | BH and DX 0, CX as it comes |
-| `Init40`, `main.c` | BIOS 03h, where the cursor is, and 0Eh, a line feed typed | 03h: AL the mode, as 0Fh left it. 0Eh: CX the shape of the cursor and DX its place, as 03h left them, with the row that the program goes on with |  | AL 0 at 03h, CX and DX 0 at 0Eh |
-| `Init50`, `main.c` | DOS 47h, the current directory of the drive that was chosen | AL the drive, 1 for A:. DH the rows of the screen. CL the letter of the drive |  | AL and DH 0, CX as it comes |
-| `F39_00`, `menu.c` | BIOS 02h of the keyboard, the keys that are held | AL 2, the menu that the command is of |  | AL 0 |
-| `ReDr00`, `read.c` | DOS 4Eh, 47h and 4Fh, the directory of a panel read | 4Eh: AL the drive, 1 for A:. 47h: AL the drive too, and CX 37h of the search. 4Fh: DS:DX on the mask, of the call for the first file, and CX 37h of that call or 0, where a copy has counted it down |  | AL 0 at 4Eh and 47h, CX as it comes at 47h, CX and DX 0 at 4Fh |
-| `ReDr00`, `read.c` | DOS 3Fh and 3Eh, the extension file of the directory read and closed | 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what reading answered, CX and DS:DX the count and the buffer still. And the original reads AL back behind 3Eh (see below) |  | AL 0 at both, CX and DX 0 at 3Eh |
-| `RdInfo`, `read.c` | DOS 36h, the room of the drive, and 3Fh and 3Eh, dirinfo read | 36h: AL the drive, as DL. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  | AL 0 at the three, CX and DX 0 at 3Eh |
-| `GetVol`, `read.c` | DOS 60h, the full name of the drive, and 4Eh, its label | 60h: BX, CX and DX as the caller has them, for the Info the handle of dirinfo, the count and the buffer. 4Eh: AL 5Ch, of the two backslashes that the name was held against |  | BX and CX as they come and DX 0 at 60h. AL 0 at 4Eh |
-| `OutStr`, with `OutStr0`, `resident.c` | BIOS 0Eh, a character typed, for every character of what the code of the commands writes | CX and DX as the code before left them | CX and DX 0 | CX and DX 0 |
-| `NotFind`, `resident.c` | BIOS 00h of the keyboard, a key waited for | AL as the call before left it | AL 0 | AL 0 |
-| `SetBrk`, `resident.c` | DOS 3300h and 3301h, whether DOS looks for Ctrl-C at every call, asked and set | 3300h: DX as whoever calls has it. 3301h: DH as 3300h left it | DS 0 at both, DX 0 at 3300h | DX 0 at 3300h and DH 0 at 3301h, DS on the main data |
-| `Exit00`, `resident.c`, and `Exit05`, `dos.c`, which is the original's `Exit02` where DOS has ended the program | DOS 3301h, Ctrl-C looked for as before, and 4Ch, the program ended | 3301h: DH as the code or DOS before left it. 4Ch: DS:DX on where an interrupt went before the program took it, of giving it back, where the watch on DOS is on | DS 0 at 3301h | DH 0 at 3301h; DS on the main data at both, and DX 0 at 4Ch |
-| `Exec02`, `resident.c` | DOS 3301h, Ctrl-C looked for as before; 4B00h, COMMAND.COM run; 19h and 47h, the current drive and its directory for the prompt; BIOS 0Eh, the end of the line typed, twice | 3301h: DH as the code before left it. 4B00h: CX the length of the command's tail, with the slash above it; SI on the tail and DI on the name COMMAND.COM. 19h: AL 0Dh, of the start of the prompt, and DX as the command or DOS left it. 47h: AL a colon, of the prompt. 0Eh: CX and DX as the code before left them | CX and DX 0 at 0Eh | DH 0 at 3301h. CX, SI and DI as they come at 4B00h. AL and DX 0 at 19h, AL 0 at 47h. CX and DX 0 at 0Eh |
-| `SetStat`, `resident.c` | DOS 5801h and 5803h, how DOS looks for memory | CX and DX as the code before left them |  | CX as it comes, DX 0 |
-| `Alloc3`, `resident.c`, the original's `Alloc0` from that label on | DOS 30h, the version, and 4Ah, the block of the program made shorter | 30h: AL as taking the check sum of the file left it, which the portable C does not take. 4Ah: AL the minor number of the version; CX and DX how much of itself the original then moves, in bytes and in paragraphs |  | AL 0 at both, CX as it comes and DX 0 at 4Ah |
-| `SaveSet`, `setup.c` | DOS 4300h, 3Ch, 40h and 3Eh, the setup file written | 4300h: BX the length of the file. 3Ch: AL the low byte of what 4300h answered, BX the length still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still |  | AL 0 at the three; BX as it comes at 4300h and 3Ch; CX and DX 0 at 3Eh |
-| `ReadOne`, `start.c` | DOS 3Dh, 3Fh and 3Eh, a file read | 3Dh: BX, CX, SI and DI 0. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  | BX, CX, SI and DI as they come at 3Dh. AL 0 at 3Fh and 3Eh; CX as it comes and DX 0 at 3Eh |
-| `Init00`, `start.c` | DOS 19h and 47h, the current drive and its directory; BIOS 00h, the mode set; DOS 09h, the banner written | BX 1 if the setup file was not one of the program's and 0 if it was or there is none, and from the BIOS's call on the page that is shown above that. CX 0 at 19h and 47h |  | BX and CX as they come at the calls of DOS, BX 0 at the BIOS's |
-| `Init11`, and `TakeMem`, which asks as it does, `start.c` | DOS 48h, a block of the memory, the second time | AL the low byte of the error of the first time, 8 for too little memory |  | AL 0 |
-| `IniData`, `start.c` | DOS 38h, the country, and DOS's routine for capitals, 128 times | 38h: BX and CX as the BIOS left them at the call before, the page and the shape of the cursor. The routine: AH as 38h left it |  | BX and CX as they come at 38h. AH 0 at the routine |
-| `IniData`, `start.c`, where a command has left a screen that is not text of 80 columns | BIOS 01h, the cursor hidden; 00h, the mode set; 0Fh, the mode | 01h: AL the mode, as 0Fh left it (see below), and BX the page and the columns. 00h: BX the same, and CX 2000h, the shape that hides the cursor. 0Fh: AL as 00h left it, BX and CX the same |  | AL 0 at 01h and 0Fh; BX and CX 0 where the call takes none |
-| `IniData`, `start.c` | BIOS 03h and 01h, the shape of the cursor asked for and set | 03h: AL the mode; BL, CX and DX as the calls before left them. 01h: AL as 03h left it, the mode from a BIOS that leaves AX alone (see below); BH the page; DX where the cursor is, as 03h answered |  | AL 0 at both; BL, CX and DX 0 at 03h, BX and DX 0 at 01h |
-| `IniData`, `start.c` | BIOS 12h and 1130h, an EGA and its font | 12h: AL the current drive, as DOS answered the call before, AH 19h, which the portable C does not make (see 14); CX and DX as left. 1130h: BL and CX as 12h answered, the memory of the EGA and its switches (see below); DH as left |  | AL, CX and DX 0 at 12h. BL and DH 0 and CX 16 at 1130h |
-| `IniData`, `start.c` | DOS 3306h and 30h, the version | 30h: BX what 3306h left in AX. CX and DX of both as the calls before left them |  | BX and CX as they come, DX 0 |
-| `IniData` with `CurNl`, `start.c` | The colour that DOS writes in: BIOS 0Fh and 03h, the page and the cursor, twice; 0Eh, a carriage return or a line feed typed, three times; 08h, the cell at the cursor, twice; DOS 06h, a space written; BIOS 09h, the cell written back | 0Eh: BL what DOS left when it was asked for its version, the low byte of AX from 3306h or BL from 30h; the BIOS takes a colour there only where the screen is graphics. 06h: AL the character at the cursor, as 08h answered; DH the row of the cursor; BX and CX as the BIOS left them. AL of 0Fh, 03h and 08h as the call before left it. CX and DX of the BIOS's calls the shape of the cursor and where it is, as 03h answered, with the space in DL from 06h on |  | BL 0 at 0Eh. AL and DH 0 at 06h, BX and CX as they come. AL 0 at 0Fh, 03h and 08h, and 0 in whichever of BL, CX and DX a call of the BIOS does not take |
-| `StRdHelp`, `sthelp.c` | DOS 3Dh, 3Fh and 3Eh, the pages of the setup's help read from the help file | 3Dh: BX, SI and DI as finding the directory and copying the name left them, CX 0, of that copy. 3Fh, five times: AL the low byte of the place in the file that was just gone to, or of what was worked out since, the room for the index or the bytes between two pages. 3Eh: AL as the call before left it, the low byte of what was read where all went well; CX and DS:DX the count and the buffer still, or what the look at the header left |  | BX, SI and DI as they come at 3Dh. AL 0 at 3Fh and 3Eh; CX and DX 0 at 3Eh |
-| `StDefault`, `stmain.c` | DOS 19h, the current drive, for the panels that the setup makes without a setup file | AL as the code before left it: what DOS answered about the setup file, or 0, the answer of the box that asks |  | AL 0 |
-| `StInit15`, `stmain.c` | DOS 3Dh, 3Fh and 3Eh, the setup file read | 3Dh: BX, CX, SI and DI as the help file read and the name copied left them. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  | BX, CX, SI and DI as they come at 3Dh. AL 0 at 3Fh and 3Eh; CX and DX 0 at 3Eh |
-| `StExit`, `stmain.c` | BIOS 01h, the cursor in its shape again; DOS 4300h, 3Ch, 40h and 3Eh, the setup file written; 09h, the line that says it could not be | 01h: DX the rows of the screen and 80, of the screen put back. 4300h: BX the sum of the file. 3Ch: AL as 4300h left it, or 0 for a file that is not there; BX the sum still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still. 09h: AL, BX and CX as the calls before left them |  | DX 0 at 01h. AL 0 at 3Ch, 40h, 3Eh and 09h; BX as it comes at 4300h and 3Ch; CX and DX 0 at 3Eh; BX and CX as they come at 09h |
-| `StSetup`, `stmain.c` | BIOS 0Fh and 03h, the page and the cursor, where the setup notes the row and the shape of the cursor | 0Fh: AL and BX as making the table of the small letters left them. 03h: AL the mode, as 0Fh left it; BL, CX and DX as the code before left them |  | AL 0 at both; BX 0 at 0Fh, and BL, CX and DX 0 at 03h |
-| `StF07_10`, `stcolor.c`, of the setup program's `F07_16` | BIOS 06h and 07h, the lines of the list of colours moved by one | BL the column of the lines, 8 |  | BL 0 |
-| `StF07_01`, `stcolor.c`, of the setup program's `F07_57` | BIOS 01h, the shape of the cursor put back when the list of colours is left | AL the low byte of the key that left the list, 1Bh for Esc and 0 for F10, or 0 behind the mouse; BX and DX where the box of the list is and its size |  | AL, BX and DX 0 |
-| `OpenFil`, `system.c` | DOS 3Dh, a file opened, both times | BX the service and the mode, as in AX |  | BX as it comes |
-| `SetPth`, `system.c` | DOS 47h, the current directory | AL the drive, 1 for A: |  | AL 0 |
-| `Fantom`, `system.c` | DOS 440Fh, the drive that a unit goes by, three times | BH the other of the two drives |  | BH 0 |
-| `ReadTre`, `treebox.c` | DOS 3Fh and 3Eh, the tree's file read | 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  | AL 0 at both, CX and DX 0 at 3Eh |
-| `ReadTre`, `treebox.c` | DOS 4Eh and 4Fh, the directories of the disk read | AL 2 at both, which is put there for how the reading ends if a key stops it. 4Fh: CX and DX as the code between left them, 37h and the address of the mask, of the call for the first file, or a count and the size of the box that counts |  | AL 0 at both, CX and DX 0 at 4Fh |
-| `ReadTre`, `treebox.c` | DOS 41h, the tree's file deleted, and 4300h, 3Ch, 40h and 3Eh, the file written | 41h: CX as the reading of the disk left it. 4300h: BX and CX the length of the file and of its list. 3Ch: AL the low byte of what 4300h answered, BX the length still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still |  | AL 0 at all of them; CX 0 at 41h, 4300h and 3Eh; BX as it comes at 4300h and 3Ch; DX 0 at 3Eh |
-| `FileLst`, `usermenu.c` | DOS 41h, 3Ch, 40h and 3Eh, the list of the selected files written | 41h: AL the low byte of what setting the attributes answered, and CX 20h of that call. 3Ch: AL as the call before left it. 40h, for the mask of a directory and for the end of a line: AL the low byte of what the write before answered. 3Eh: AL as the last write left it, with CX and DS:DX the count and the text of that write |  | AL 0 at all of them, CX 0 at 41h, CX and DX 0 at 3Eh |
-| `F32_00`, `usermenu.c` | DOS 3Fh and 3Eh, the menu file read | 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  | AL 0 at both, CX and DX 0 at 3Eh |
-| `Load`, and Home and the search of `V00_10`, `view.c` | DOS 4200h, a place of the file gone to | DS on the segment of the text |  | DS on the main data |
-| `V13_00`, `view.c` | DOS 3Eh, the file closed | DS on the segment of the text. DX as the key before left it | DX the address of `TmpBuf` | DS on the main data, DX 0 |
-| `Aexec0`, `view.c` | BIOS 03h, the shape of the cursor | BL the column that the box begins in |  | BL 0 |
-| `Aexec0`, `view.c` | DOS 4Ah, the block of the memory made shorter, 4B00h, the viewer run, and 4Ah twice, the block made longer | 4Ah: DX as the code or DOS before left it; the third time AL the low byte of the error of the second, 8. 4Ah the first time and 4B00h: CX, SI and DI as the code before left them | 4Ah: DX the address of the viewer's name. 4Ah the first time and 4B00h: CX, SI and DI 0 | AL and DX 0 at 4Ah. CX, SI and DI as they come |
-| `F34_11`, `view.c` | DOS 3Fh and 3Eh, the extension file read and closed, and 4Eh, the viewer looked for | 3Eh: CX and DS:DX the count and the buffer still. 3Fh and 4Eh: SI and DI, and at 4Eh BX, as the code before left them | 3Fh and 4Eh: SI and DI 0, and BX 0 at 4Eh | CX and DX 0 at 3Eh. SI, DI and BX as they come |
-| `ChkMode`, `window.c` | BIOS 0Fh, the mode | BX as the caller has it |  | BX 0 |
-| `Cursor`, `window.c` | BIOS 0Fh and 02h, the cursor placed | 0Fh: AL the column, DX the place. 02h: AL the mode, as 0Fh left it |  | AL 0 at both, DX 0 at 0Fh |
-| `ChgCur`, `window.c` | BIOS 01h, the shape of the cursor | DX where the cursor is, as 03h left it |  | DX 0 |
-| `GetCur`, `window.c` | BIOS 03h, where the cursor is | AL the mode, as 0Fh left it |  | AL 0 |
-| `Scroll`, `window.c`, for its seven callers | BIOS 06h and 07h, a window scrolled | BL the column of a place that the caller has |  | BL 0 |
+| Routine | Call | The original | The C translation, where it differed |
+|---|---|---|---|
+| `Blank`, `blank.c`, with its `Star` | BIOS 0Fh, 03h, 01h, 02h and 09h: the cursor noted, hidden and put back, and a star written | 0Fh: AL and BX as the code before left them, for a star that changes its look and its clock and kind. 03h, 01h and 02h: AL the mode, as 0Fh left it. 01h: BH the page, and DX where the cursor is or was put. 02h: BL and CX as the code before left them, for a star its clock and a count of the stars. 09h: DX the place of the star |  |
+| `M02_10`, `commands.c` | DOS 3Bh, the directory of a panel made current | AL the drive, 1 for A: |  |
+| `F35_61`, `copy.c` | DOS 0Eh, a drive made the current one, twice | AL the drive, as in DL, the first time, and as choosing from the tree left it the second; DH as the code before left it |  |
+| `C00_01`, `copy.c` | DOS 4400h, what a handle is, and 3Eh, the file closed | 4400h: CX what was left of comparing the target with the directory of the other panel, DX the address of the name. 3Eh: AL as 4400h left it, CX that still, DX what the handle is |  |
+| `C00_01`, `C10_00`, `C20_00` and `C30_00`, `copy.c` | DOS 4300h, the attributes of a file or a directory, at seven of the eight places | CX as the code before left it: what was left of comparing two names or of a piece, or the attributes that the call before answered with |  |
+| `C10_00` and `C20_00`, `copy.c` | DOS 41h, a file deleted, at nine places | AL as the call or the dialog before left it; CX the attributes of the file, as they were asked for or the 20h just set, or what else the code before left |  |
+| `C10_00` and `C30_00`, `copy.c` | DOS 56h, a file or a directory renamed, at three places | CX what was left of comparing the two names, or at the second try of `C10_00` the attributes of the target, with AL as 41h left it |  |
+| `C20_00`, `copy.c` | DOS 4400h, what a handle is, for the source and for the target; 3Ch, the target made; and 3Eh, a file closed, at five places | 4400h: DX the address of the name, CX what the code before left, 20h behind a file made. 3Ch: AL as the call before left it, the error of 4300h or what 41h answered. 3Eh: AL as the call before left it at three of the five; CX and DX what that call took or answered, which is what was left of a piece and where it was to go in the memory, the time and the date just set, the length of the file, or the address of the name; and DS on the memory that the file is read into, at three |  |
+| `C20_00`, `copy.c` | DOS 3Fh, the last byte read of a file that is appended to; 36h, the room of a drive; and 40h, what still fits of a piece written | 3Fh: AL the low byte of the place just gone to. 36h: BX the handle and CX the size of the piece, DH the second character of the target's name, DS on the memory that the file is read into. 40h: AL the low byte of the count, as in CL |  |
+| `C20_00`, `copy.c` | DOS 5700h, the date and the time of a file: of a source that is a device, and of a target that is appended to | CX and DX: what was left of comparing the two names, or the attributes just kept or set, and the address of the name |  |
+| `C20_00`, `C30_00` and `F36_04`, `copy.c` | DOS 39h, a directory made; 3Ah, one removed; and 3Bh, one made the current one | AL as the call before left it, but at 39h of `C20_00`; CX the attributes of the source or of the target at 39h and 3Ah of `C30_00`, what was left of looking for the end of the path from the second directory that `C20_00` makes, or what else the code before left |  |
+| `F38_40`, `dirfunc.c` | DOS 41h, a file deleted that was read-only | CX 20h, of the call that set its attributes |  |
+| `M30_50`, `dirfunc.c` | DOS 5700h, the date and the time of a file, and 3Eh, the file closed | 5700h: CX the attributes and DX the address of the name. 3Eh: CX the time just set and DX the address of the name |  |
+| `F38_60`, `dirfunc.c` | DOS 60h, 3Bh and 3Ah, the current directory left and removed | 60h: DX the address of the path, as SI. 3Bh and 3Ah: SI on the path and DI behind the two full stops, of 60h and of what was written since |  |
+| `FncMs1`, `dirfunc.c` | DOS 4Fh, the next file | CX 37h and DS:DX on the mask, of the call for the first file |  |
+| `DirFunc`, `dirfunc.c` | DOS 4Eh and 4Fh, the first file and the next, in both of its searches | 4Eh: AL the last character of the directory's path. 4Fh: DS:DX on the mask, of the call for the first file, and CX 37h of that call or what a count has come down to since |  |
+| `DelTr0`, `dirfunc.c` | DOS 3Eh, a file closed | CX 1 and DX the address of the byte, of the call that wrote it |  |
+| `F54_00`, `dirfunc.c` | DOS 13h, the label deleted for a new one, and 3Eh, the new one's file closed | 13h: AL a space, of filling the name with them. 3Eh: CX 8 and DX the address of the name, of the call that made the file |  |
+| `F62_01`, `drive.c` | DOS 440Eh, the letter that a floppy drive goes by, for A: and for B:, and 440Fh, the letter that was chosen made the drive's | 440Eh: BH the other of the two drives, CX the item of the menu bar, DX as looking for the drives left it. 440Fh: BH the letter, CX the item, DX the drive with the height of the box above it. DS on the panel at both | 440Eh: DX the address of `TmpBuf`, DS on the main data |
+| `F62_01`, `drive.c` | DOS 47h, 3Bh and 0Eh, a panel put on the drive that was chosen | 47h: AL as 440Fh answered, the drive that the unit goes by; BX the letter and the drive, of that call; CX the item of the menu bar; DH the height of the box. 3Bh: AL the low byte of what 47h left, BX and CX still. 0Eh: AL the low byte of the panel's segment, DH still, and DS on a panel |  |
+| `T80_02`, `edit.c` | DOS 4400h, what the handle of the file is that was made, and 3Eh, the file closed | 4400h: CX the attributes and DS:DX on the name of the file. 3Eh: CX the attributes, and DX as the call before left it | 3Eh: CX the count of the last write, DS on the piece last written |
+| `T00_00`, `edit.c` | DOS 3Eh, the file closed that was read | CX the count of the last read. DS on the segment of the piece last read |  |
+| `F21_10`, `enter.c` | DOS 3Bh, the directory of the tree made current | CX 37h, of the call that looked for the directory, where it did |  |
+| `FindFil`, `find.c` | DOS 4Fh, the next file | CX as the code before left it, and DS:DX on the path |  |
+| `FindFil`, `find.c` | DOS 4201h, 80 bytes gone back in a file that is searched | DS on the segment that the file is read to |  |
+| `FindFil`, `find.c` | DOS 3Eh, a file that was searched closed | CX and DX as the calls before left them | DX the address of `TmpBuf` |
+| `F67_00`, `find.c` | DOS 4409h and 4408h, a drive asked whether it is of a network and whether its disk can be taken out | CX the drive, 0 for A:. DX the address of the path at 4409h, and at 4408h what 4409h left there |  |
+| `F67_00`, `find.c` | DOS 0Eh and 19h behind Go to, a drive made the current one and the current one asked for | DS on the segment of the list at 0Eh and of the panel at 19h. DL the drive still at 19h | DS on the segment of the list at both |
+| `HelpFil`, `help.c` | DOS 3Eh, the help file closed | DX as the code before left it | DX the address of the file's name |
+| `ErrRdy`, `main.c` | DOS 440Fh, the drive of the box made the one that its unit goes by | BH the row of the box, CX the letter of the drive, DX the size of the box |  |
+| `Init40`, `main.c` | BIOS 03h, where the cursor is, and 0Eh, a line feed typed | 03h: AL the mode, as 0Fh left it. 0Eh: CX the shape of the cursor and DX its place, as 03h left them, with the row that the program goes on with |  |
+| `Init50`, `main.c` | DOS 47h, the current directory of the drive that was chosen | AL the drive, 1 for A:. DH the rows of the screen. CL the letter of the drive |  |
+| `F39_00`, `menu.c` | BIOS 02h of the keyboard, the keys that are held | AL 2, the menu that the command is of |  |
+| `ReDr00`, `read.c` | DOS 4Eh, 47h and 4Fh, the directory of a panel read | 4Eh: AL the drive, 1 for A:. 47h: AL the drive too, and CX 37h of the search. 4Fh: DS:DX on the mask, of the call for the first file, and CX 37h of that call or 0, where a copy has counted it down |  |
+| `ReDr00`, `read.c` | DOS 3Fh and 3Eh, the extension file of the directory read and closed | 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what reading answered, CX and DS:DX the count and the buffer still. And the original reads AL back behind 3Eh (see below) |  |
+| `RdInfo`, `read.c` | DOS 36h, the room of the drive, and 3Fh and 3Eh, dirinfo read | 36h: AL the drive, as DL. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  |
+| `GetVol`, `read.c` | DOS 60h, the full name of the drive, and 4Eh, its label | 60h: BX, CX and DX as the caller has them, for the Info the handle of dirinfo, the count and the buffer. 4Eh: AL 5Ch, of the two backslashes that the name was held against |  |
+| `OutStr`, with `OutStr0`, `exec.c` | BIOS 0Eh, a character typed, for every character of what the code of the commands writes | CX and DX as the code before left them | CX and DX 0 |
+| `NotFind`, `exec.c` | BIOS 00h of the keyboard, a key waited for | AL as the call before left it | AL 0 |
+| `SetBrk`, `exec.c` | DOS 3300h and 3301h, whether DOS looks for Ctrl-C at every call, asked and set | 3300h: DX as whoever calls has it. 3301h: DH as 3300h left it | DS 0 at both, DX 0 at 3300h |
+| `Exit00`, `exec.c` | DOS 3301h, Ctrl-C looked for as before, and 4Ch, the program ended | 3301h: DH as the code or DOS before left it. 4Ch: DS:DX on where an interrupt went before the program took it, of giving it back, where the watch on DOS is on | DS 0 at 3301h |
+| `Exec02`, `exec.c` | DOS 3301h, Ctrl-C looked for as before; 4B00h, COMMAND.COM run; 19h and 47h, the current drive and its directory for the prompt; BIOS 0Eh, the end of the line typed, twice | 3301h: DH as the code before left it. 4B00h: CX the length of the command's tail, with the slash above it; SI on the tail and DI on the name COMMAND.COM. 19h: AL 0Dh, of the start of the prompt, and DX as the command or DOS left it. 47h: AL a colon, of the prompt. 0Eh: CX and DX as the code before left them | CX and DX 0 at 0Eh |
+| `SetStat`, `exec.c` | DOS 5801h and 5803h, how DOS looks for memory | CX and DX as the code before left them |  |
+| `Alloc3`, `exec.c`, the original's `Alloc0` from that label on | DOS 30h, the version, and 4Ah, the block of the program made shorter | 30h: AL as taking the check sum of the file left it, which the portable C does not take. 4Ah: AL the minor number of the version; CX and DX how much of itself the original then moves, in bytes and in paragraphs |  |
+| `SaveSet`, `setup.c` | DOS 4300h, 3Ch, 40h and 3Eh, the setup file written | 4300h: BX the length of the file. 3Ch: AL the low byte of what 4300h answered, BX the length still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still |  |
+| `ReadOne`, `start.c` | DOS 3Dh, 3Fh and 3Eh, a file read | 3Dh: BX, CX, SI and DI 0. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  |
+| `Init00`, `start.c` | DOS 19h and 47h, the current drive and its directory; BIOS 00h, the mode set; DOS 09h, the banner written | BX 1 if the setup file was not one of the program's and 0 if it was or there is none, and from the BIOS's call on the page that is shown above that. CX 0 at 19h and 47h |  |
+| `Init11`, and `TakeMem`, which asks as it does, `start.c` | DOS 48h, a block of the memory, the second time | AL the low byte of the error of the first time, 8 for too little memory |  |
+| `IniData`, `start.c` | DOS 38h, the country, and DOS's routine for capitals, 128 times | 38h: BX and CX as the BIOS left them at the call before, the page and the shape of the cursor. The routine: AH as 38h left it |  |
+| `IniData`, `start.c`, where a command has left a screen that is not text of 80 columns | BIOS 01h, the cursor hidden; 00h, the mode set; 0Fh, the mode | 01h: AL the mode, as 0Fh left it (see below), and BX the page and the columns. 00h: BX the same, and CX 2000h, the shape that hides the cursor. 0Fh: AL as 00h left it, BX and CX the same |  |
+| `IniData`, `start.c` | BIOS 03h and 01h, the shape of the cursor asked for and set | 03h: AL the mode; BL, CX and DX as the calls before left them. 01h: AL as 03h left it, the mode from a BIOS that leaves AX alone (see below); BH the page; DX where the cursor is, as 03h answered |  |
+| `IniData`, `start.c` | BIOS 12h and 1130h, an EGA and its font | 12h: AL the current drive, as DOS answered the call before, AH 19h, which the portable C does not make (see 14); CX and DX as left. 1130h: BL and CX as 12h answered, the memory of the EGA and its switches (see below); DH as left |  |
+| `IniData`, `start.c` | DOS 3306h and 30h, the version | 30h: BX what 3306h left in AX. CX and DX of both as the calls before left them |  |
+| `IniData` with `CurNl`, `start.c` | The colour that DOS writes in: BIOS 0Fh and 03h, the page and the cursor, twice; 0Eh, a carriage return or a line feed typed, three times; 08h, the cell at the cursor, twice; DOS 06h, a space written; BIOS 09h, the cell written back | 0Eh: BL what DOS left when it was asked for its version, the low byte of AX from 3306h or BL from 30h; the BIOS takes a colour there only where the screen is graphics. 06h: AL the character at the cursor, as 08h answered; DH the row of the cursor; BX and CX as the BIOS left them. AL of 0Fh, 03h and 08h as the call before left it. CX and DX of the BIOS's calls the shape of the cursor and where it is, as 03h answered, with the space in DL from 06h on |  |
+| `StRdHelp`, `sthelp.c` | DOS 3Dh, 3Fh and 3Eh, the pages of the setup's help read from the help file | 3Dh: BX, SI and DI as finding the directory and copying the name left them, CX 0, of that copy. 3Fh, five times: AL the low byte of the place in the file that was just gone to, or of what was worked out since, the room for the index or the bytes between two pages. 3Eh: AL as the call before left it, the low byte of what was read where all went well; CX and DS:DX the count and the buffer still, or what the look at the header left |  |
+| `StDefault`, `stmain.c` | DOS 19h, the current drive, for the panels that the setup makes without a setup file | AL as the code before left it: what DOS answered about the setup file, or 0, the answer of the box that asks |  |
+| `StInit15`, `stmain.c` | DOS 3Dh, 3Fh and 3Eh, the setup file read | 3Dh: BX, CX, SI and DI as the help file read and the name copied left them. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  |
+| `StExit`, `stmain.c` | BIOS 01h, the cursor in its shape again; DOS 4300h, 3Ch, 40h and 3Eh, the setup file written; 09h, the line that says it could not be | 01h: DX the rows of the screen and 80, of the screen put back. 4300h: BX the sum of the file. 3Ch: AL as 4300h left it, or 0 for a file that is not there; BX the sum still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still. 09h: AL, BX and CX as the calls before left them |  |
+| `StSetup`, `stmain.c` | BIOS 0Fh and 03h, the page and the cursor, where the setup notes the row and the shape of the cursor | 0Fh: AL and BX as making the table of the small letters left them. 03h: AL the mode, as 0Fh left it; BL, CX and DX as the code before left them |  |
+| `StF07_10`, `stcolor.c`, of the setup program's `F07_16` | BIOS 06h and 07h, the lines of the list of colours moved by one | BL the column of the lines, 8 |  |
+| `StF07_01`, `stcolor.c`, of the setup program's `F07_57` | BIOS 01h, the shape of the cursor put back when the list of colours is left | AL the low byte of the key that left the list, 1Bh for Esc and 0 for F10, or 0 behind the mouse; BX and DX where the box of the list is and its size |  |
+| `OpenFil`, `system.c` | DOS 3Dh, a file opened, both times | BX the service and the mode, as in AX |  |
+| `SetPth`, `system.c` | DOS 47h, the current directory | AL the drive, 1 for A: |  |
+| `Fantom`, `system.c` | DOS 440Fh, the drive that a unit goes by, three times | BH the other of the two drives |  |
+| `ReadTre`, `treebox.c` | DOS 3Fh and 3Eh, the tree's file read | 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  |
+| `ReadTre`, `treebox.c` | DOS 4Eh and 4Fh, the directories of the disk read | AL 2 at both, which is put there for how the reading ends if a key stops it. 4Fh: CX and DX as the code between left them, 37h and the address of the mask, of the call for the first file, or a count and the size of the box that counts |  |
+| `ReadTre`, `treebox.c` | DOS 41h, the tree's file deleted, and 4300h, 3Ch, 40h and 3Eh, the file written | 41h: CX as the reading of the disk left it. 4300h: BX and CX the length of the file and of its list. 3Ch: AL the low byte of what 4300h answered, BX the length still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still |  |
+| `FileLst`, `usermenu.c` | DOS 41h, 3Ch, 40h and 3Eh, the list of the selected files written | 41h: AL the low byte of what setting the attributes answered, and CX 20h of that call. 3Ch: AL as the call before left it. 40h, for the mask of a directory and for the end of a line: AL the low byte of what the write before answered. 3Eh: AL as the last write left it, with CX and DS:DX the count and the text of that write |  |
+| `F32_00`, `usermenu.c` | DOS 3Fh and 3Eh, the menu file read | 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  |
+| `Load`, and Home and the search of `V00_10`, `view.c` | DOS 4200h, a place of the file gone to | DS on the segment of the text |  |
+| `V13_00`, `view.c` | DOS 3Eh, the file closed | DS on the segment of the text. DX as the key before left it | DX the address of `TmpBuf` |
+| `Aexec0`, `view.c` | BIOS 03h, the shape of the cursor | BL the column that the box begins in |  |
+| `Aexec0`, `view.c` | DOS 4Ah, the block of the memory made shorter, 4B00h, the viewer run, and 4Ah twice, the block made longer | 4Ah: DX as the code or DOS before left it; the third time AL the low byte of the error of the second, 8. 4Ah the first time and 4B00h: CX, SI and DI as the code before left them | 4Ah: DX the address of the viewer's name. 4Ah the first time and 4B00h: CX, SI and DI 0 |
+| `F34_11`, `view.c` | DOS 3Fh and 3Eh, the extension file read and closed, and 4Eh, the viewer looked for | 3Eh: CX and DS:DX the count and the buffer still. 3Fh and 4Eh: SI and DI, and at 4Eh BX, as the code before left them | 3Fh and 4Eh: SI and DI 0, and BX 0 at 4Eh |
+| `ChkMode`, `window.c` | BIOS 0Fh, the mode | BX as the caller has it |  |
+| `Cursor`, `window.c` | BIOS 0Fh and 02h, the cursor placed | 0Fh: AL the column, DX the place. 02h: AL the mode, as 0Fh left it |  |
+| `ChgCur`, `window.c` | BIOS 01h, the shape of the cursor | DX where the cursor is, as 03h left it |  |
+| `GetCur`, `window.c` | BIOS 03h, where the cursor is | AL the mode, as 0Fh left it |  |
+| `Scroll`, `window.c`, for its seven callers | BIOS 06h and 07h, a window scrolled | BL the column of a place that the caller has |  |
 
 What is known to read such a register, and what the portable C hands
 it:
@@ -747,42 +704,34 @@ does change AX when it closes a file the original goes by what that DOS
 leaves, and does not mark the panel unless that happens to be 53h; the
 portable C marks it there too.
 
-**The program of 32 bits.** What is said above is of the program of 16
-bits, whose functions of `sys.h` are `dos.c`. The program of 32 bits
-has `dos32.c` for them, and DOS and the BIOS are of real mode, where
-its extender takes each call. Two things are otherwise for it, of that
-program alone, and both are declared on the user's word of 13 October
-2026. Both were seen on the bench, by a program of real mode that takes
-INT 21h, runs the program and writes down every call as DOS gets it,
-`harness/trial32/calls.asm`, with each of the two programs taken
-through its start, a command and its end.
+DOS and the BIOS are of real mode, where the extender takes each call,
+and what follows from that is declared as it is, on the user's word of
+13 October 2026. It was seen on the bench, by a program of real mode
+that takes INT 21h, runs the program and writes down every call as DOS
+gets it, `harness/trial32/calls.asm`, with the program taken through its
+start, a command and its end.
 
-What DOS is handed in a register that a call does not take:
+What DOS is handed besides the six registers:
 
-- AX, BX, CX, DX, SI and DI hold what the call takes and 0 wherever it
-  takes nothing, at every call: `Set` of `dos32.c`. Nothing is "as it
-  comes" there, as it is in rows of the table above, and nothing is
-  what the stack holds. At the calls of the BIOS and of the mouse
-  driver those registers are what the program of 16 bits hands over.
-- DS and ES are not on the main data, which is above the megabyte:
-  they are what the extender has in them when it goes over to real
-  mode. At a call that takes no address, DS held the number that is in
-  AX and ES 0, at every such call that was seen: 1900h in both for the
-  current drive, 3301h, 2C00h, 4C00h. At a call that the extender
-  translates, a name or a buffer handed over, DS was on the extender's
-  own buffer below the megabyte, to which it copies the name, and ES
-  as the extender left it. At the thirteen functions that `dos32.c`
-  makes in real mode, both are on the program's 512 bytes below the
-  megabyte, where the name or the buffer then is.
+- DS and ES are not on the main data, as the original's DS is, since
+  that is above the megabyte: they are what the extender has in them
+  when it goes over to real mode. At a call that takes no address, DS
+  held the number that is in AX and ES 0, at every such call that was
+  seen: 1900h in both for the current drive, 3301h, 2C00h, 4C00h. At a
+  call that the extender translates, a name or a buffer handed over, DS
+  was on the extender's own buffer below the megabyte, to which it
+  copies the name, and ES as the extender left it. At the thirteen
+  functions that `dos32.c` makes in real mode, both are on the program's
+  512 bytes below the megabyte, where the name or the buffer then is.
 - The carry flag is clear at the two calls that the original makes
   with it set and that DOS leaves it at, 36h and 13h: the extender does
   not carry the program's flag down. `dos32.c` counts it as set
   afterwards, so the program goes on as the original does behind a DOS
   that leaves the flag; a DOS that looked at it would see it clear.
 - At 4B00h, a program run, DOS's block names the program's environment
-  by its segment, where the original and the program of 16 bits name
-  none and DOS copies the program's own: it is the same environment,
-  named because the word of the PSP through which DOS would find it is
+  by its segment, where the original names none and DOS copies the
+  program's own: it is the same environment, named because the word of
+  the PSP through which DOS would find it is
   a selector of the extender's. CX, SI and DI are 0 there.
 - When DOS has ended the program by another program's hand and is told
   of Ctrl-C by the routine of real mode that the program has left for
@@ -790,20 +739,19 @@ What DOS is handed in a register that a call does not take:
   program that started this one left them, which is what the original
   hands DOS there.
 
-Which calls DOS is asked. "The calls, their order and every register
-that a call takes are the original's" is so of the program of 16 bits.
-Of the program of 32 bits it is so of every call but these, which it
-does not make, and one that it makes besides:
+Which calls DOS is asked. The calls, their order and every register that
+a call takes are the original's, but for these calls of the original's,
+which the portable C does not make, and one that it makes besides:
 
-| When | The program of 16 bits, as the original | The program of 32 bits |
+| When | The original | The portable C |
 |---|---|---|
-| It starts | 51h, where the PSP is, the first call; 4Ah, its own block made as long as the program is | Neither: the extender is asked where the PSP is, and the block is the extender's, which has asked DOS both for itself before the program is entered. One call more, before the first of the program's: 48h for 20h paragraphs, the 512 bytes below the megabyte |
-| It starts, and comes back from a command | 2523h, Ctrl-C taken; 48h twice, how much memory there is and all of it taken; 3524h and 351Bh, who has the critical error and Ctrl-Break; 2524h and 251Bh, both taken. Behind a command 49h first, the memory given back | None of them. The memory of the panels, the viewer and the editor is the program's own 640 KB, handed out by `dos32.c` as DOS hands out its memory, and the three interrupts are taken through the extender, which DOS does not see: so `ErrVct` and `BrkVct` of the main data, where the program of 16 bits keeps who had the two, are never written |
+| It starts | 4Ah, its own block made as long as the program is | Not that: the block is the extender's, which has asked DOS for it before the program is entered. Where the PSP is, the extender is asked, and not DOS. One call more, before the first of the program's: 48h for 20h paragraphs, the 512 bytes below the megabyte |
+| It starts, and comes back from a command | 2523h, Ctrl-C taken; 48h twice, how much memory there is and all of it taken; 3524h and 351Bh, who has the critical error and Ctrl-Break; 2524h and 251Bh, both taken. Behind a command 49h first, the memory given back | None of them. The memory of the panels, the viewer and the editor is the program's own 640 KB, handed out by `dos32.c` as DOS hands out its memory, and the three interrupts are taken through the extender, which DOS does not see: so `ErrVct` and `BrkVct` of the main data, where the original keeps who had the two, are never written |
 | It runs a command | 2524h and 251Bh, the two given back; 4Ah, the block of the panels made shorter | Neither, for the same two reasons. The extender is asked where INT 22h of real mode goes before 4B00h and has it put back behind it, since DOS changes it for the program that is run and the extender would write a warning of that when the program ends |
 | It is left | 251Bh, Ctrl-Break given back | Not that: the extender gives back the three that the program took through it |
 
-Every other call is made by both, in the same order, with the
-registers that it takes: the version, how DOS looks for memory, the
+Every other call is made as the original makes it, in the same order,
+with the registers that it takes: the version, how DOS looks for memory, the
 files, the directories and the searches, the country, the drives, the
 time, a program run and the end. What the extender asks DOS for itself,
 while it loads the program and when it leaves, is not the program's
@@ -864,12 +812,12 @@ INT 21h, and nothing answers that call.
 watch.
 
 - Alt+F5 is a key that has no command, and does nothing. The Commands
-  menu has no line "memory Info": it has a line less than the
-  original's thirteen for that, Directory sizes stands a row further up
-  with what is below it, and the box is a row shorter. (It is one more
-  line and row shorter since, without EGA lines: see 12.) The letter I
-  chooses nothing there, and Alt+F5 nothing in any open menu. The key
-  bar has no name for F5 while Alt is held.
+  menu has no line "memory Info": it has a line less than the original's
+  thirteen for that, Directory sizes stands a row further up with what
+  is below it, and the box is a row shorter. (It is one more line and
+  row shorter since, without EGA lines: see 12.) The letter I chooses
+  nothing there, and Alt+F5 nothing in any open menu. The key bar has no
+  name for F5 while Alt is held.
 - The program does not take INT 27h, notes nothing of the programs that
   are run, and writes no record: a program that stays in the memory
   keeps the block that it asked for, as long as it asked. Any number of
@@ -877,59 +825,56 @@ watch.
 - Nothing releases a program that has stayed. It is still in the memory
   when the program is left, as it is when it was run from DOS's own
   command line, and what gets it out again is whatever does there.
-  Behind the program of 16 bits it goes on working, as it does there.
-- Behind the program of 32 bits such a program keeps its memory and is
-  cut off from its interrupts, by the extender. Of that program alone,
-  and declared as it is on the user's word of 13 October 2026, with no
-  change of the program. As the program is left, its extender holds
-  the interrupts of real mode against what they were when the program
-  was started, writes a line onto the screen that is left for each
-  that is otherwise, "DOS/32A warning (9003): real mode interrupt
-  vector has been modified: INT 1Ch", and puts every one back. So the
-  program that stayed has none of its interrupts, which is the
-  original's, that gave each back as it released the program; and it
-  keeps its memory, which the original gave back to DOS, with the
-  extender's lines on the screen, which are of neither. And Ctrl-Break,
-  INT 1Bh, it has lost before, while the program of 32 bits still runs:
-  the program takes that interrupt through the extender behind every
-  command and gives it back in front of the next and at its end, and
-  the extender then has it go where it went when the extender started,
-  not to who has taken it since.
-  What is known of this, and how. Seen on the bench: in `stay-left`, a
-  program that stays with INT 1Bh, 1Ch, 21h, 2Fh and 60h taken, and a
-  second that asks by INT 2Fh who the first is and prints which of the
-  five go to it. Run from the program with the first in the memory, it
-  prints all but INT 1Bh; the program left, the screen has four lines
-  of the warning, for INT 1Ch, 21h, 2Fh and 60h; and at DOS's prompt it
-  prints two dashes for each of the five. Since it finds the first by
-  INT 2Fh, those dashes say only that INT 2Fh no longer goes there, and
-  nothing of the other four: that those are put back too is by the four
-  lines, and by the extender's code. And seen with FDAPM, which the
-  bench has: run from the program as `fdapm apmdos`, it leaves four
-  lines for INT 16h, 28h, 2Ah and 2Fh when the program is left, and
-  `fdapm stats` says then that none is resident, where behind the
-  program of 16 bits it finds it. Read in the extender's code, and
-  seen no further than that: that all 256 interrupts are put back
+- When the program is left, such a program keeps its memory and is cut
+  off from its interrupts, by the extender. Declared as it is on the
+  user's word of 13 October 2026, with no change of the program. As the
+  program is left, its extender holds the interrupts of real mode
+  against what they were when the program was started, writes a line
+  onto the screen that is left for each that is otherwise, "DOS/32A
+  warning (9003): real mode interrupt vector has been modified: INT
+  1Ch", and puts every one back. So the program that stayed has none of
+  its interrupts, which is the original's, that gave each back as it
+  released the program; and it keeps its memory, which the original gave
+  back to DOS, with the extender's lines on the screen, which are of
+  neither. And Ctrl-Break, INT 1Bh, it has lost before, while the
+  program still runs: the program takes that interrupt through the
+  extender behind every command and gives it back in front of the next
+  and at its end, and the extender then has it go where it went when the
+  extender started, not to who has taken it since. What is known of
+  this, and how. Seen on the bench: in `stay-left`, a program that stays
+  with INT 1Bh, 1Ch, 21h, 2Fh and 60h taken, and a second that asks by
+  INT 2Fh who the first is and prints which of the five go to it. Run
+  from the program with the first in the memory, it prints all but INT
+  1Bh; the program left, the screen has four lines of the warning, for
+  INT 1Ch, 21h, 2Fh and 60h; and at DOS's prompt it prints two dashes
+  for each of the five. Since it finds the first by INT 2Fh, those
+  dashes say only that INT 2Fh no longer goes there, and nothing of the
+  other four: that those are put back too is by the four lines, and by
+  the extender's code. And seen with FDAPM, which the bench has: run
+  from the program as `fdapm apmdos`, it leaves four lines for INT 16h,
+  28h, 2Ah and 2Fh when the program is left, and `fdapm stats` says then
+  that none is resident, where it found it behind the portable C as that
+  was built for 16 bits, with no extender. Read in the extender's code,
+  and seen no further than that: that all 256 interrupts are put back
   there, with the masks of the two interrupt controllers, and INT 1Bh,
   1Ch, 21h, 23h, 24h and 2Fh whatever its settings say; that the mouse
   driver is told there to call nobody, so that a program which has
-  stayed and has given the driver a routine of its own would lose
-  that, which is not among what was decided and is the user's still;
-  and that when DOS ends the program by another's hand that part of
-  the extender is not reached, so that no line is written and those
-  six alone are put back, with INT 15h where the extender has it. A
-  mend was built and dropped on the user's
-  word the same day: it left such a program at work but for INT 21h,
-  which the extender has while the program runs and which nothing of
-  the program can keep for another. `TODO.md`, "L, a program that has
-  stayed in the memory, when the program is left", has the mend in
-  words and what was read of the extender.
+  stayed and has given the driver a routine of its own would lose that,
+  which is not among what was decided and is the user's still; and that
+  when DOS ends the program by another's hand that part of the extender
+  is not reached, so that no line is written and those six alone are put
+  back, with INT 15h where the extender has it. A mend was built and
+  dropped on the user's word the same day: it left such a program at
+  work but for INT 21h, which the extender has while the program runs
+  and which nothing of the program can keep for another. `TODO.md`, "L,
+  a program that has stayed in the memory, when the program is left",
+  has the mend in words and what was read of the extender.
 - The program does not take INT 21h either, since. When the watch went
-  the entry of that interrupt was kept for the program's own call,
-  which the same entry takes, and handed every other call of DOS on
-  untouched; it went with that call when the setup program became a
-  part of the program: see 8. A call of DOS that another program makes
-  goes to DOS, and does not pass the program.
+  the entry of that interrupt was kept for the program's own call, which
+  the same entry takes, and handed every other call of DOS on untouched;
+  it went with that call when the setup program became a part of the
+  program: see 8. A call of DOS that another program makes goes to DOS,
+  and does not pass the program.
 - When DOS ends the program, it goes on in the program that started it
   with the registers as the program leaves them, which are others: CX
   and SI are as they came, where the original has 0 in CX, its count of
@@ -943,12 +888,11 @@ watch.
   is one of the portable C and the other way round.
 - The setup has no box for it. The original's setup program has TSR
   manager in its Configuration, the last of three boxes of Execute
-  options, and writes the byte. In the setup of the portable C, which
-  is that program (see 8), the box is gone, with those of Memory
-  allocation (see 1) and of Quick execute commands: 14 says how the
-  dialog stands without the three, which were all of its Execute
-  options. The setup writes the byte into the setup file as it read it,
-  and Set default
+  options, and writes the byte. In the setup of the portable C, which is
+  that program (see 8), the box is gone, with those of Memory allocation
+  (see 1) and of Quick execute commands: 14 says how the dialog stands
+  without the three, which were all of its Execute options. The setup
+  writes the byte into the setup file as it read it, and Set default
   configuration makes it 1, as the original's does. When the setup is
   left with Save, the program keeps the byte that it had, as the
   original's running program does.
@@ -957,21 +901,21 @@ watch.
   page of the Configuration that the setup shows for F1 still has its
   paragraph on TSR manager, behind that on Quick execute commands.
 
-Gone are `memory.c` and `memory_t.c`, all of the map; and of
-`resident.c` the list, `Counter` and `PrgList`, the records and what
-made and read them, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk` and
-`Release`, the entry of INT 27h, `New27`, with the interrupt function
-`Int27` behind it, the interrupts noted, `IntTab`, `SavePtr` and
-`NameBuf`, and `GetStat`, which noted how DOS looks for memory before a
-program was released. The entry of INT 21h, `New21`, was left then as
-the three comparisons that know the program's own call and two jumps,
-with `Int21`, the interrupt function that it went on in, which answered
-that call and returned: both have gone since, with the call (see 8).
-What is left for two things that are not the map: `SetStat`
-with 0, by which the program has DOS look for memory in the lowest block
-first when it starts, as the original does; and the prompt that is
-written between two commands, which the original makes where its watch
-notes the interrupts and the portable C in a buffer of its own.
+Gone are `memory.c` and `memory_t.c`, all of the map; and of `exec.c`
+the list, `Counter` and `PrgList`, the records and what made and read
+them, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk` and `Release`, the entry
+of INT 27h, `New27`, with the interrupt function `Int27` behind it, the
+interrupts noted, `IntTab`, `SavePtr` and `NameBuf`, and `GetStat`,
+which noted how DOS looks for memory before a program was released. The
+entry of INT 21h, `New21`, was left then as the three comparisons that
+know the program's own call and two jumps, with `Int21`, the interrupt
+function that it went on in, which answered that call and returned: both
+have gone since, with the call (see 8). What is left for two things that
+are not the map: `SetStat` with 0, by which the program has DOS look for
+memory in the lowest block first when it starts, as the original does;
+and the prompt that is written between two commands, which the original
+makes where its watch notes the interrupts and the portable C in a
+buffer of its own.
 
 **Why.** It only made sense on DOS. The map is of DOS's chain of blocks
 and of the table of interrupts of a PC, and a program that stays in the
@@ -1111,17 +1055,16 @@ of it.
   but for three settings of what the program has no more, which its
   dialogs do not have: Memory allocation and TSR manager in the
   Configuration (see 1 and 7), and Screen output in Screen and Mouse
-  (see 5).
-  There is no word on the version of DOS or on the memory, no mode set
-  and no banner: the program has started already. The directory is the
-  one that the program has, which it makes by its own rule: in capitals,
-  and with a backslash behind whatever `VC=` names, where the setup
-  program adds none behind a colon. The pages of the help are read from
-  the help file there, as the setup program reads them when it starts,
-  and nothing is said if they cannot be: "Error reading data from the
-  help file." is among what the setup program wrote through DOS at its
-  start, and is not shown. F1 then says, as in the original, that the
-  help is not available.
+  (see 5). There is no word on the version of DOS or on the memory, no
+  mode set and no banner: the program has started already. The directory
+  is the one that the program has, which it makes by its own rule: in
+  capitals, and with a backslash behind whatever `VC=` names, where the
+  setup program adds none behind a colon. The pages of the help are read
+  from the help file there, as the setup program reads them when it
+  starts, and nothing is said if they cannot be: "Error reading data
+  from the help file." is among what the setup program wrote through DOS
+  at its start, and is not shown. F1 then says, as in the original, that
+  the help is not available.
 - The setup file is asked for as the rest of the program asks for its
   files, with the program's errors (see `sys.h`): a drive that is not
   ready has the program's box, a call that was given up there is the
@@ -1145,36 +1088,35 @@ of it.
   INT 21h: it does not take that interrupt, has none to give back when
   it is left or DOS ends it, and a call of DOS that another program
   makes goes to DOS without passing the program. A program that makes
-  the call all the same, as the original's setup program does when it
-  is run from the portable C as a command, is answered by DOS, which
-  has AH 2Bh for setting the date and refuses this one: the original's
-  setup program has written the setup file by then and takes that for
-  no main program in the memory, and the portable C goes on with the
-  setup that it has.
+  the call all the same, as the original's setup program does when it is
+  run from the portable C as a command, is answered by DOS, which has AH
+  2Bh for setting the date and refuses this one: the original's setup
+  program has written the setup file by then and takes that for no main
+  program in the memory, and the portable C goes on with the setup that
+  it has.
 - When DOS ends the program, the program that started it goes on with
   the registers as the portable C leaves them: ES on the PSP of the
-  program that was ended, as in the original; in the low byte of DX
-  what DOS was last told of Ctrl-C, and DS and the high byte of DX as
-  they came, which is what the original leaves there where its setup
-  has TSR manager off and it has no interrupt to give back; and CX and
-  SI as they came (see 7). The flags are the original's.
-- What the program of 32 bits leaves of the interrupts then is
-  otherwise, by its extender, and is declared on the user's word of 13
-  October 2026 for what follows from running under an extender and
-  shows on no screen (see 1). The original never gives Ctrl-Break, INT
-  1Bh, back when DOS ends it, and INT 22h, which DOS sets from the PSP,
-  names the routine in which the original goes on then: both go into
-  the ended program, memory that is free from then on, and the program
-  of 16 bits leaves both so. The extender of the program of 32 bits
-  sees the call that ends the program and, as it takes itself out, has
-  Ctrl-Break go where it went when the program was started. And INT
-  22h names the few instructions of real mode that `dos32.c` keeps in
-  its 512 bytes below the megabyte, in which DOS goes on then, since
-  nothing of a program of 32 bits can run there: memory that DOS has
-  freed like the ended program, where the interrupt stays until DOS
-  sets it anew for the next program that it runs. The registers are
-  those above, left by those instructions; what DOS is handed there in
-  the registers that its call does not read is in 6.
+  program that was ended, as in the original; in the low byte of DX what
+  DOS was last told of Ctrl-C, and DS and the high byte of DX as they
+  came, which is what the original leaves there where its setup has TSR
+  manager off and it has no interrupt to give back; and CX and SI as
+  they came (see 7). The flags are the original's.
+- What the program leaves of the interrupts then is otherwise than the
+  original, by its extender, and is declared on the user's word of 13
+  October 2026 for what follows from running under an extender and shows
+  on no screen (see 1). The original never gives Ctrl-Break, INT 1Bh,
+  back when DOS ends it, and INT 22h, which DOS sets from the PSP, names
+  the routine in which the original goes on then: both go into the ended
+  program, memory that is free from then on. The extender sees the call
+  that ends the program and, as it takes itself out, has Ctrl-Break go
+  where it went when the program was started. And INT 22h names the few
+  instructions of real mode that `dos32.c` keeps in its 512 bytes below
+  the megabyte, in which DOS goes on then, since nothing of a program of
+  32 bits can run there: memory that DOS has freed like the ended
+  program, where the interrupt stays until DOS sets it anew for the next
+  program that it runs. The registers are those above, left by those
+  instructions; what DOS is handed there in the registers that its call
+  does not read is in 6.
 - The setup that is made without a good file, and for Set default
   configuration, has zeros in the 64 bytes behind the path of each
   panel. A setup file that the setup saves of it differs from the
@@ -1598,10 +1540,10 @@ with a line there, and its name in the key bar; the key bar of the
 panels for a display without EGA lines, with its row of names, and the
 main loop's choice between the two; the test that made the item of the
 menu dark; and two functions of `sys.h` that only the command asked,
-`ScreenSmallFont` and `ScreenPrintAll`, with their bodies in `dos.c` and
-in `dos32.c`. `ScreenEga` and `ScreenFont` stay, for the rows that the
-program finds; so does the byte of the main data that says whether the
-display is an EGA or a VGA, which the start sets and reads.
+`ScreenSmallFont` and `ScreenPrintAll`, with their bodies in `dos32.c`.
+`ScreenEga` and `ScreenFont` stay, for the rows that the program finds;
+so does the byte of the main data that says whether the display is an
+EGA or a VGA, which the start sets and reads.
 
 **Why.** The user's decision, of 13 October 2026: EGA lines goes, and
 the rows of the screen are to come from the system that the program
@@ -1809,18 +1751,16 @@ original runs one with the setting off.
   options, and in the page of the Configuration that the setup shows
   for F1: the help file is the distribution's.
 
-Gone are the way through the shell in `Exec02` of `resident.c`, with the
+Gone are the way through the shell in `Exec02` of `exec.c`, with the
 command kept in `BatPoin` of the main data meanwhile, a word that keeps
 its place and is neither set nor read; what `F21_31` of `enter.c` and
 `IniData` of `start.c` did for the command that goes to the drive; and
 the function of `sys.h` by which the shell was handed a command,
-`ShellRun`. With that, of `dos.c`: `Int2E`, fourteen instructions of
-inline assembly around the interrupt, the one place where the program
-kept its stack by hand and put it back, with the two words that it was
-kept in. And of `dos32.c`: the 26 bytes of instructions of real mode,
-`Shell_T`, which did the same for the program of 32 bits below the
-megabyte, and the 48 bytes of the block there that they stood in. The
-program has one way of running a command.
+`ShellRun`. With that, of `dos32.c`: the 26 bytes of instructions of
+real mode, `Shell_T`, by which the interrupt was called below the
+megabyte, with the stack kept by hand around it and put back, and the 48
+bytes of the block there that they stood in. The program has one way of
+running a command.
 
 **Why.** The user's decision, on 13 October 2026, as `CLAUDE.md` has it
 under "The portable C": Quick execute commands goes, the setting and the
@@ -1873,7 +1813,6 @@ against the original's line of that name as far as its left half goes
 and from there against the right half of the original's line five
 further down, and the five that have nothing there against their left
 halves, with spaces declared behind. The box itself, `StConf_P`, is the
-original's. The program of 32 bits is held in the same way, by the same
-table; the instructions of real mode that it had for the shell,
-`Shell_T`, a table of its own that was not compared, are gone from what
-that test lists.
+original's. The instructions of real mode that the program had for the
+shell, `Shell_T`, a table of its own that was not compared, are gone
+from what that test lists.
