@@ -2812,10 +2812,10 @@ the header (`TODO.md`, the piece S1 of the plan for the 32 bits):
   toy is entered there as the program is. A function of `sys.h` is also a function
   of `dos32.c`, made or not, which the build compiles for 32 bits with
   the rest; and what is of DOS alone and outside `sys.h` is in no
-  `dos32.c`, so `harness/trial32/whole.py`, which links the tree for
-  32 bits, has each such name in a list of its own, `OUTSIDE`. `python3
-  harness/trial32/both.py` and `whole.py` take seconds and say whether
-  the three still fit.
+  `dos32.c`, so the build, which links the tree for 32 bits too,
+  stops at each such name as one that the linker does not find.
+  `python3 harness/trial32/both.py` takes seconds and says whether the
+  two files still answer alike.
 
 What the critical error, Ctrl-Break and Ctrl-C met, when where they
 arrive went into `dos.c` (`TODO.md`, the piece S2 of the plan for the
@@ -2919,9 +2919,9 @@ the 32 bits):
 - The toy of `harness/trial32/sys.c` is entered where the program is,
   at `Alloc0_` of `dos.obj` in 16 bits and at `Start_` of `dos32.c` in
   32, and defines `Main`, the one name of the program that `dos.c`
-  calls. `whole.py` links the build's objects for 32 bits and nothing
-  else: a name of DOS that the tree asks for outside `sys.h` would
-  show there as one that the linker does not find.
+  calls. The build links the objects for 32 bits and nothing else,
+  `build/portable_c32/VC.EXE`: a name of DOS that the tree asks for
+  outside `sys.h` shows there as one that the linker does not find.
 - The stack figures of the scenarios follow the layout of the file in
   two or three scenarios, `command`, `mouse-select` and `mouse-find`,
   by 2 to 16 bytes, at every change of the code: hold a change to the

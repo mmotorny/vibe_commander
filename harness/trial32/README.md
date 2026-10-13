@@ -96,17 +96,21 @@ the finding: see `csover.c`.
 The three of real mode are run under the program's name: `run.py --name
 VC.COM build/trial32/rmbench.com`.
 
-## Two scripts of the plan
+## A script of the plan
 
 When the step was planned, on 13 October 2026 (`TODO.md`, "The portable
 C in 32 bits: the plan"), the tree itself was asked three things, by
-scripts that read and compile it and run nothing. Two are here for the
+scripts that read and compile it and run nothing. One is here for the
 pieces of that plan to start from, and what each printed that day is in
-the plan. The third, which asked where the program can tell an int of
-32 bits from one of 16, has become a test of the build,
+the plan. The second, `whole.py`, asked whether the tree links as a
+flat program and how long that is: the project's build links that
+program now, `build/portable_c32/VC.EXE`, `python3 harness/le.py` with
+the file and its map prints what the script printed of it, but for how
+many bytes of the file its relocations take, and the script is gone.
+The third, which asked where the program can tell an
+int of 32 bits from one of 16, has become a test of the build,
 `portable_c-int16`, and is `harness/int16.py`.
 
 | File | What it asks |
 |---|---|
 | `casts.py` | Of the places where a pointer is kept in a number or made of one, which `harness/hostcheck.py` counts: what is each, a place of the main data, a table by its offset, a panel by its segment? It prints the classes of the plan with their files, and the places of one. It needs gcc, as the host check does |
-| `whole.py` | Does the tree link as a flat program, and how long is that? It has the project's build compile the tree for 32 bits, into `build/portable_c32/`, and links those objects, `dos32.c` among them, with what the build does not make: a file that the build lists as not ready for 32 bits, compiled here with its warnings. There is none since the piece S3, and it no longer adds functions that do nothing for what the tree had of DOS outside `sys.h`: nothing is left there, and the program begins at `Start` of `dos32.c`. It prints the file's length, its objects and its relocations. Nothing that it makes runs. When the plan was made it compiled the tree itself, and had every function of `sys.h` do nothing |

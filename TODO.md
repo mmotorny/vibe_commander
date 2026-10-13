@@ -2020,10 +2020,11 @@ October 2026 at `c0b3cad`, before any of it was begun, by reading the
 tree and by trials that compile and link and run nothing. What the
 bench does with such a program is in the section behind this one, "what
 a trial on the bench showed", and is not said again. Two scripts of
-this plan's trials are kept with the toys, in `harness/trial32/`,
+this plan's trials were kept with the toys, in `harness/trial32/`,
 `casts.py` and `whole.py`; the third, `int16.py`, was there too until
-P4 made the test `portable_c-int16` of it, `harness/int16.py`. A count
-below says which of them counted it.
+P4 made the test `portable_c-int16` of it, `harness/int16.py`, and
+`whole.py` until B2 had the build link the program. A count below says
+which of them counted it.
 
 ### In short
 
@@ -3772,9 +3773,10 @@ For S2 and S3:
   with the counts at its top and in front of its second part, 71 made
   and 14 not; the README's table of the groups, and its 85; the table
   of `CLAUDE.md`, "Moving a file to the system's functions"; `NAMED` of
-  `harness/reads.py`, if it takes a name; `OUTSIDE` of `whole.py`, if
-  it is of DOS alone and no function of `sys.h`; and the toy's last
-  page.
+  `harness/reads.py`, if it takes a name; and the toy's last
+  page. What is of DOS alone and no function of `sys.h` was a seventh,
+  `OUTSIDE` of `whole.py`, until the build linked the program of 32
+  bits: such a name stops the build now.
 - The toy for 16 bits is linked of `dos.obj` as the build made it, the
   stack and the arithmetic, and nothing else of the program
   (`harness/trial32/build.sh`). Whatever `dos.c` comes to call of the
