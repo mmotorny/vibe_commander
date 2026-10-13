@@ -909,6 +909,399 @@ last 35 calls, with the functions of the old way that went behind
 them, gave back 738 bytes. The README's figures say where the file
 stands.
 
+## The portable C in 32 bits: what a trial on the bench showed
+
+The first step of the portable C's road (`CLAUDE.md`, "The portable C")
+is a 32-bit program for DOS, built by Open Watcom's `wcc386` in the flat
+model with a DOS extender, and judged on the same bench. Before anyone
+touched the program, on 12 October 2026, toys of a few dozen lines each
+were built that way, with no C library, and run on the bench through the
+harness as it is. This is what they showed, for whoever does the step.
+The toys are kept in `harness/trial32/`, with a README that says what
+each asks and how to run one; nothing there is built or tested by the
+project. What is said here of a toy can be seen again by running it.
+
+In short: DOS/32A runs a flat program on the bench as it is, and the
+driver of the tests as it is takes its idle call and feeds it keys and
+the mouse. CauseWay does not run there, for a fault of QEMU's. The one
+thing the driver cannot do is read `AutoTim`, `Clock` and the stack,
+which are above the megabyte: the BIOS's block move does that, and was
+tried. The limit most likely to be met is the size of the file.
+
+### The extender: DOS/32A, since CauseWay does not run in this QEMU
+
+The pinned Open Watcom has two extenders with a clean licence,
+CauseWay (`binw/cwstub.exe`, 47,152 bytes) and DOS/32A
+(`binw/dos32a.exe`, 27,504 bytes), each the stub of the program's file.
+DOS/4GW and PMODE/W are there too and are not open: they were neither
+linked nor run, and must not be.
+
+- CauseWay says of itself, in its banner and nowhere else in the
+  snapshot, "No copyright. Public domain software. No rights retained."
+  There is no licence file for it.
+- DOS/32A has `binw/license.d32`: redistribution in source and binary
+  form, with or without modification, provided that the copyright
+  notice, the conditions and the disclaimer go with what is
+  distributed, that documentation for the user says "This product uses
+  DOS/32 Advanced DOS Extender technology.", and that nothing derived
+  from it is called DOS/32A. So a program that is shipped with it needs
+  that sentence in the README and the licence's text beside it; the
+  stub itself is fetched with Open Watcom at build time and is not
+  committed. Where the text goes is the user's to say.
+- Open Watcom's own `license.txt` says nothing of either.
+
+CauseWay stops every program on the bench with "Exception: 0D, Error
+code: 1284" at 00EF:000000B5, at the program's first software
+interrupt: a toy, and Open Watcom's own hello-world with its C library
+and start-up (`hello.c`); with `cwstub.exe` and with `cw32.exe`; on a
+486 and on a Pentium, with 16 MB and with 32, with an XMS driver and
+without. The cause is QEMU's, 11.1.2:
+
+- **The fault.** In a code segment whose base is not 0, while DS, ES
+  and SS all have the base 0, an instruction with 32-bit addressing
+  that reads memory through `cs:` reads at the same offset from 0
+  instead. A processor reads through CS.
+- **How it was shown without CauseWay.** `csover.c`, under DOS/32A,
+  makes a code segment at its own data and runs `mov ax,cs:[18h]`
+  there: it reads 12C2h, the word at linear 18h, where the segment has
+  0830h at its 18h. The two forms that load a segment register the
+  same way fault with that word as their error code.
+- **In CauseWay** the instruction is `mov ds,cs:[0000000Ch]`, the first
+  thing its entry of every interrupt does once the registers are
+  pushed; the word there is the good selector 0083h (`cwtables.c`
+  reads it), the word at linear 0Ch on the bench is 1285h, and the
+  error code is that.
+- **QEMU's own log shows it**: with `-d int -D FILE` (`run.py --qemu`)
+  the fault is the line `v=0d e=1284 ... IP=00ef:000000b5`, with the
+  registers.
+- A flat program has CS at 0 and is not touched by it. DOS/32A is not
+  either, through everything below; that its own code is of 16 bits,
+  where QEMU always adds the segment, is a guess at why, and where the
+  fault's edge lies was not looked for.
+
+So CauseWay cannot be judged on this bench until QEMU is another, and
+what is said of it anywhere is from its manual (`docs/cw.pdf`,
+`binw/cw.ihp`), not from a run.
+
+### What the bench has, and where the program lands
+
+`rmbench.asm`, a program of real mode run there: no XMS (INT 2Fh with
+4300h comes back as it went), no DPMI (1687h the same), no EMS (INT 67h
+is the BIOS's, F000:FF53, and `FDCONFIG.SYS` loads no driver), real
+mode, 15,232 KB above the megabyte by INT 15h function 88h and 639 KB
+below.
+
+DOS/32A therefore runs raw: it says so (INT 31h with EEFFh answers
+"D32A", kind of system 0, version 090Ch), takes the memory from 100000h
+itself and keeps the line A20 on. The program runs at privilege level
+0, with CR0 00000011h: no paging, so a wild write is caught by nothing,
+as under DOS today. CS, DS and SS are flat, ES is the PSP's selector
+where the program is entered, and FS a second flat one.
+
+| What | Where, on the bench |
+|---|---|
+| The PSP, and DOS/32A's part of real mode behind it, one block of DOS's named for the program | segment 25E6, 0C9Fh paragraphs: 51,696 bytes |
+| The first object of the file, the code | 00100010h |
+| The second, the data | behind the code, at its end rounded up to 16, and 16 more |
+| Blocks of DOS's that the program asks for (DPMI 0100h) | from segment 3286 on, right behind that block |
+| The same with an XMS driver loaded, which is not the bench | code at 00127C10h, kind of system 1 |
+
+The objects are packed, not put on pages: the first of the data shares
+a page of 4K with the last of the code. What was not in the file was
+all zeros when the program was entered (`zero.c`); whether DOS/32A
+clears it or the bench's memory had simply never been written was not
+told apart.
+
+What starting costs, by the machine's ACPI timer between the entry of
+a program of real mode and that of the toy (`rmstart.asm`, `start.c`):
+
+| The file | Machine time | Instructions |
+|---|---|---|
+| 32 KB: the stub and a toy | 83 ms | 324,000 |
+| with 180,000 bytes more, and no address in them | 358 ms | 1.4 million |
+| 393 KB: 100,000 bytes and 20,000 relocations | 896 ms | 3.5 million |
+
+About 1.5 ms for each KB of the file and 50 instructions for a
+relocation: some 0.4 s for the program, before a first screen at ten
+seconds. What DOS takes to load today's `VC.EXE` was not measured.
+
+DOS/32A sets the timer's counter 0 anew as it starts, to mode 3 where
+the BIOS leaves mode 2 (status 36h for 34h, `timer.c`): the tick's
+phase begins again once, the same in every run. A count read from that
+counter is no place in the tick in mode 3; the toys measure by the
+ACPI timer, port 608h, 3,579,545 counts to a second.
+
+### Building one, with no C library
+
+`harness/trial32/build.sh` is the whole of it. What had to be found
+out:
+
+- `binl64/wlink.lnk`, the linker's file of systems for Linux, has
+  neither `causeway` nor `dos32a`; `binw/wlink.lnk` has. The linker
+  warns of an "undefined system name" and goes on without what the
+  system would have said. Say `format os2 le` and `option stub=` with
+  the stub's path.
+- The compiler: `wcc386 -mf -zl -zls -s`: flat, no library asked for,
+  and no check of the stack, which would call one. Division and
+  multiplication of 32 bits need no helper.
+- The entry is a function named to the linker, `option start=Start_`.
+  The extender enters it on the stack that the file's header names,
+  with interrupts on. `Start` of `lib.c` is all a start-up has to do:
+  put ES on the data, clear the direction flag, go on.
+- The linker wants a segment of the class STACK, or it warns, the
+  header names no stack, and neither extender gets the program going.
+  That is `#pragma data_seg("STACK", "STACK")` with 16 bytes that have
+  a value, and `option stack=16k`, which makes the segment that long
+  without putting it in the file.
+- The linker's command needs `order clname CODE clname DATA clname
+  STACK clname BSS`. Without it the stack is behind what has no value,
+  and all of that is in the file as zeros: 232,840 bytes for a toy
+  that is 32,404 with it. With the main data among what has no value,
+  that is 62 KB of the file.
+- Both extenders write a banner when they start. DOS/32A's goes with
+  bit 3 of the byte 15h behind the letters `ID32` in the stub cleared
+  (`quiet.py`; found by clearing each bit of its settings in turn,
+  since the snapshot does not describe them). It then writes nothing
+  and leaves the cursor at 0,0. The same settings seem to have the
+  number and the length of its stacks at the bytes 0Ah to 0Fh, 08h,
+  08h, 0020h and 0020h: eight of 20h paragraphs for real mode, which
+  fits the 512 bytes seen below, and as many for protected mode. That
+  reading was not tried by changing them.
+- DOS/32A writes "warning (9003): real mode interrupt vector has been
+  modified" as the program ends, for every vector that is not as it
+  was, on the last screen of a scenario. The program gives back what
+  it took: the vectors of 1Bh and 24h set with DPMI 0205h went quiet
+  that way (`errors.c`). And a command run with INT 21h function 4Bh
+  leaves INT 22h of real mode changed, which DOS/32A warns of too:
+  put back as it was at the start, with DPMI 0201h, it does not
+  (`command.c`, the keys v and r).
+
+### The idle call and the keys
+
+An `int 28h` in protected mode reaches real mode like this, as a copy
+of the driver that writes it out saw it (`DRIVERX.ASM`, `run.py
+--debug`):
+
+| | The toy under DOS/32A | The 16-bit portable C |
+|---|---|---|
+| Comes from | 25FC:176C, DOS/32A's code in the program's own block, whose PSP is 25E6 and whose name is the program's | 42B2:32DC |
+| DS | 0000, and ES too | 25F6, on the main data |
+| SS:SP | 30C7:01FA, a stack of 512 bytes of the extender's | 4F4B:0F6C, the program's |
+| Flags | 3012h: interrupts off | 0246h |
+
+The driver as it is takes the call for the program's: it comes from
+the memory of the program that DOS has as the current one, and that
+has the script's name. It ended every step after two rounds and wrote
+the record of the stack, which it writes for the program's call only.
+Of that stack of 512 bytes its own work, DOS's and the BIOS's used 68
+at most, 82 with the block move below.
+
+Through the extender, by INT 16h functions 11h, 10h and 02h and INT
+33h function 3, the toy got what the driver put in through the
+keyboard controller, as the BIOS makes it (`keys.c`, `wait.c`): a, F5,
+Shift+F6 (5900h, shift 02h), Alt+F1 (6800h, 08h), Ctrl+o (180Fh, 04h),
+Up, Ins, a text typed, Cyrillic letters on the Russian bench (1EE4h),
+`Click@3,5` and `RightClick@40,12` with the driver counting the asks,
+`Wait*18`, and a key waited for inside the BIOS. Nothing has to change
+for the idle call or the keys.
+
+What does: DS is 0 there, so the driver's read of `AutoTim` at
+DS:[offset] reads the table of interrupt vectors. A flat program must
+not be given the offsets of the 16-bit one.
+
+### What the driver reads: the BIOS's block move
+
+`AutoTim`, `Clock` and the stack are in the program's data, above the
+megabyte. Three ways:
+
+| Way | What it costs |
+|---|---|
+| The driver reads there with INT 15h function 87h, at linear addresses that the harness gives it | The driver and the harness change, the program does not. Some 1,400 instructions more for each idle round: a round of the toy was 1,500 without and 2,900 with |
+| The two variables in a block of DOS's memory | The program is changed for the tests' sake, and the driver still has to find the block |
+| The idle call made by DPMI 0300h with DS of real mode on a copy of the main data below the megabyte | No change to the driver; 62 KB of conventional memory, and a program arranged around the tests |
+
+The first was tried and is the one to take: nothing in the program
+tells the tests where it is. `auto.c` keeps the two variables in its
+data; with the driver as it is the step that sets `AutoTim` ends at
+once, and with `DRIVERX.COM` told the two addresses it ends when the
+toy has done its thing nine ticks later, and a step with `Clock` set
+takes the 20 ticks of watching what blinks. That run made 2,124 block
+moves, and the extender went on unharmed: it is in real mode proper
+while the driver runs, and sets its own tables again on the way back.
+
+The addresses are the linker's map, object and offset, and where the
+extender puts the objects, which was the same in every run (the table
+above). `coverage.py`'s vote already finds where the code is from a
+trace, so one traced run of a program on a bench can say it instead of
+the rule being trusted.
+
+### DOS's services under DOS/32A
+
+`doscalls.c` made them from protected mode with every address above
+the megabyte; `realcalls.c` made those that failed in real mode, by
+DPMI 0300h with a buffer from DPMI 0100h.
+
+| | Services | What was seen |
+|---|---|---|
+| Translated | 09h, 1Ah, 39h, 3Ah, 3Bh, 3Ch, 3Dh, 3Fh, 40h, 41h, 4300h, 4301h, 47h, 4Eh, 4Fh, 56h; 2Fh and 35h in what they answer | They work. 3Fh and 40h took 12000h bytes at one call, read back without a wrong byte. 4Eh and 4Fh fill a DTA above the megabyte, and 2Fh answers its address there. 35h answers the vector of protected mode |
+| No address | 06h, 0Bh, 19h, 2Ch, 30h, 3306h, 36h, 3Eh, 42h, 4408h, 4409h, 440Eh, 4Ch, 4Dh, 5700h, 59h, 62h | They work. 62h answers the PSP's selector, and by what it costs is not passed on to DOS at all |
+| Not translated | 13h, 29h, 38h, 60h | Wrong from protected mode, and none says so in a way to go by: 60h answers error 2, 29h leaves the block empty, and 38h answers without an error and fills nothing in above the megabyte. Where its 34 bytes went was not looked at; with DS 0 in real mode, as at the idle call, that is low memory. All four work in real mode with a low buffer |
+| 48h | | Gives a block of DOS's memory and answers a selector, not a segment: 0828h for a block at segment 3286. BX FFFFh answers error 8 and the largest, 6CF9h paragraphs |
+| 4Bh | | In protected mode the name is translated and the program runs, but the block of parameters as DOS/4GW has it, which was a guess, did not deliver the tail: COMMAND.COM came up for keys. By DPMI 0300h, with the name, the tail and the block in a low block, it works |
+| INT 2Eh | | A stretch of 28 bytes of real mode in a low block, `int 2Eh` and the stack put back behind it, called with DPMI 0301h, comes back; COMMAND.COM answered AX FFFFh and ran nothing. One try, with the command as a count, the text and a carriage return; why was not looked for |
+| Not run | 0Eh, 25h, 3300h, 3301h, 4400h, 440Fh, 49h, 4Ah, 5701h, the calls for a label by a file control block | Of these 0Eh, 3300h, 3301h, 4400h, 440Fh and 5701h take no address. The vectors were set by DPMI 0205h, not by 25h |
+
+So for `dos.c`: files, directories and the search of a directory go
+straight through, with the program's own pointers. What goes by a file
+control block, 29h, 38h, 60h, 4Bh, and whatever answers an address of
+real mode, as 38h does for DOS's routine for capitals (00D8:12EA), go
+through one block below the megabyte and DPMI 0300h, or 0301h for a
+routine. CauseWay's manual lists much the same calls as translated and
+those by a file control block as not supported.
+
+The BIOS and the mouse from flat code (`realcalls.c`): writing the
+screen at B8000h and reading the BIOS's data at 400h and on work as
+they are. INT 10h functions 01h, 02h, 03h, 08h, 09h, 0Fh and 12h, INT
+33h functions 0, 1, 2, 3, 4 and 0Ah, and INT 2Fh with 150Bh work
+directly. INT 10h with 1130h answers CX and DL directly, and its
+ES:BP only to a call in real mode (C000:7260). Not run: INT 10h 06h,
+07h, 0Eh and 1112h, INT 33h 7 and 8; none takes an address.
+
+What a call costs, in instructions of the machine, of 64 in a row
+(`rmcalls.asm` for real mode, `realcalls.c`):
+
+| Call | From real mode | From the 32-bit toy |
+|---|---|---|
+| INT 16h, 11h | 194 | 367 |
+| INT 16h, 02h | 170 | 343 |
+| INT 10h, 03h | 107 | 301 |
+| INT 10h, 0Fh | 100 | 301 |
+| INT 33h, 3 | 46 | 243 |
+| INT 21h, 2Ch | 1,107 | 1,386 |
+| INT 21h, 19h | 604 | 883 |
+| INT 21h, 0Bh | 1,018 | 1,297 |
+| INT 21h, 62h | 78 | 136 |
+| INT 31h, 0006h | | 85 |
+| INT 10h, 03h by DPMI 0300h | | 683 |
+
+There and back is 175 to 200 instructions for the BIOS and 280 for
+DOS; a call made by DPMI 0300h is 380 more than one made directly.
+
+### The critical error and Ctrl-Break
+
+`errors.c` sets handlers of protected mode for 24h, 23h and 1Bh with
+DPMI 0205h; DOS/32A puts callbacks of its own into the vectors of real
+mode (31E7:004B and so on).
+
+| Interrupt | Made by | What was seen |
+|---|---|---|
+| 24h | a file made on A:, the diskette that the bench boots from, which cannot be written | The handler was called once, with AX 3900h, DI 0 and BP:SI 0070:0606, the device's header as an address of real mode, on a stack of the extender's, 0018:00031E32. It answered AL 3, and DOS came back with the carry flag, AX 5 and the extended error 13h |
+| 1Bh | Ctrl+Break | The handler was called. The harness has no name for that key: `run.py` adds Break, E0 46 |
+| 23h | Ctrl+c, with the keys left to DOS | The handler was called, and DOS wrote `^C` |
+
+Not tried: the phantom drive of the scenario `not-ready`, which needs
+the program's own dialogue; the answers Retry and Ignore; and a box
+drawn from inside the handler. The handler is entered on a stack of
+the extender's whose length was not measured, and the settings have
+the stacks of protected mode at 20h like those of real mode, which are
+512 bytes: it should go over to the program's own stack before any
+compiled code runs.
+
+### Running a command
+
+`command.c`, with 4Bh made in real mode:
+
+- `COMMAND.COM /C` ran a command and came back, with the exit code by
+  4Dh.
+- DOS's largest free block while the toy runs is 446,352 bytes: the
+  extender's 51,696 bytes below the megabyte are all that the program
+  keeps there, with what it asks for itself.
+- A second copy of the toy ran inside a command of the first: its
+  code right behind the first copy's above the megabyte, with some
+  321 KB of DOS's memory free in it. It ended with 7, which came back,
+  and the first copy went on.
+- INT 22h has to be put back: see "Building one".
+
+### Memory
+
+`memory.c`: DPMI 0500h says 00EDB650h bytes are free, 15.58 MB, with
+the toy loaded; DPMI 0501h gives blocks at linear addresses that flat
+code uses as they are, 001049B0h and on, right behind the program. INT
+21h function 48h is DOS's conventional memory behind a selector, as
+above; 49h and 4Ah were not run.
+What the panels are today, one block of DOS's cut up by segment
+arithmetic, is ordinary memory then: arrays among what has no value,
+or one block of 0501h, with pointers where the segment numbers are;
+the three functions of `sys.h` for memory answer in addresses.
+
+### What breaks in the harness, and the changes in order
+
+| File | What breaks with an LE file and a flat program |
+|---|---|
+| `coverage.py` | It takes DOS/32A's own code for the program's, 2,404 instructions of it in a run of `keys.c`, and none of the toy's: a place that is not on a paragraph by the MZ header is dropped. Of the toy's 65 blocks that ran, 22 hold a relocated address: the file has the target's offset in its object there, the memory that and where the object is |
+| `driver.py`, `facts` | `_md` at 0000:0000 of the map, and the stack by the SS of the MZ header, mean nothing. `link_map` reads offsets of four digits, and the map has eight |
+| `DRIVER.ASM` | Reads `AutoTim` and `Clock` through DS, and writes the stack out from the segment that SS is on: see above |
+| The scenarios' test, `ported.py` | The length of the file: below. The stack that stays half empty: it is above the megabyte, and what it holds when loaded is zeros if it is not in the file. No code segment beyond F000h: nothing of the kind in a flat program. No code within 4K of the stack: the data begins in the code's last page, so what comes first of the data should be what is not written, the tables, as today |
+| `datacheck.py`, `reads.py` | They read the MZ file and the 16-bit map; and a word that names a text is a pointer of four bytes in a flat program, or stays an offset from where the tables begin, which is the port's to decide |
+| `tools/figures.py` | The segments, the relocations of the MZ header and the limits that it reports |
+
+The changes, in the order to make them:
+
+| | What | How much |
+|---|---|---|
+| 1 | The build: `wcc386` and `wlink` as `build.sh` has them, with DOS/32A as the stub and the banner bit cleared by a tool of ten lines | 50 lines of `CMakeLists.txt`; half a day |
+| 2 | A reader of LE files for the harness: the header, the objects, the map of pages, the relocations; and of the 32-bit map | 100 to 150 lines; half a day to a day |
+| 3 | `driver.py`: the facts of a flat program as linear addresses, by the map and one traced run, and a second form of the script's header with fields of 32 bits | 100 lines; half a day |
+| 4 | `DRIVER.ASM`: the block move for `AutoTim`, `Clock` and the stack, where the header says so. The copy of the trial has the first two, in 1,526 of the file's 2,048 bytes with its record for the trial in. Then the goldens derived again: the driver's length and what it keeps of the memory must stay, and a golden that changes stops the work (`CLAUDE.md`, "Work by several agents") | 70 lines; half a day |
+| 5 | `coverage.py` and `ported.py` on that reader, with the stub left out | half a day |
+| 6 | The scenarios' test: the stack by the new record, the limit of F000h dropped for this tree, the rule of the page in its new form, and the length of the file as the user decides | half a day |
+| 7 | `datacheck.py`, `reads.py` and `tools/figures.py`, once the port has decided how a table names a text | a day or more |
+
+### The length of the file
+
+The scenarios' test fails a file longer than three times the
+original's 65,090 bytes: 195,270. `wcc386` was given the tree as it
+was that day, with `-i` for the compiler's own headers, which `vc.h`
+includes `stddef.h` from: it took 40 of the 55 files, and those link to
+106,853 bytes of code, where the 16-bit build of the same day had
+97,039, with 3,319 relocations in the file, 23,509 bytes of it: 3,175
+of 7 bytes, 141 of 9, for a target beyond 64K of its object, and 3 of
+5. A relocation is every place where code or a table names something
+by its address: the calls are not.
+
+It refused 15 files:
+
+| Files | Why |
+|---|---|
+| `dos.c` | Its inline assembly has registers of 16 bits for what a function returns and changes: "invalid return register in #pragma", "Illegal register modified" |
+| `arith.c` | The same, for the two routines that a 32-bit program does not need |
+| `dialog.c`, and the twelve files of tables that include `tables.h`: `bars_t.c`, `commands_t.c`, `copy_t.c`, `dirfunc_t.c`, `edit_t.c`, `find_t.c`, `help_t.c`, `keys_t.c`, `main_t.c`, `system_t.c`, `treebox_t.c`, `view_t.c` | `LAID_OUT(BOXHD, 10)` and `LAID_OUT(BOXMN, 11)`: the header of a box and a field of a dialog hold pointers, and are not as long as the original has them when a pointer is four bytes |
+
+That a file compiles says nothing of whether it works: a panel is
+still a segment's number there, and memory is cut up by segments.
+
+With the stub's 27.5 KB, the tables, `dos.c`, the relocations of both
+and the main data out of the file, the program comes to somewhere
+between 185 and 200 KB: at the limit. The README's figures have what
+the file is today. A change to that limit is the user's to decide.
+
+### What was not tried
+
+- Anything of CauseWay beyond its fault.
+- The services marked as not run above; 4Bh in protected mode with
+  another block; INT 2Eh beyond one try.
+- At the critical error: Retry and Ignore, the phantom drive, a box
+  drawn from inside the handler, and how long the extender's stack is
+  there.
+- The program itself, or any file of it, running in 32 bits; so also
+  how its scenarios that show the time of day fare, with a start some
+  0.4 s later and 175 to 280 instructions more for every call of the
+  system.
+- What DOS takes to load today's `VC.EXE`, to hold the start against.
+- DOS/32A with an XMS driver, beyond seeing it start there.
+- Whether the line A20, which DOS/32A leaves on, troubles anything
+  that a command runs.
+
 ## The last of the assembly
 
 Done: the C translation has no assembly file, and its build runs no

@@ -1088,6 +1088,17 @@ with it is less obvious:
   when QEMU is also given `-d nochain`, has met this or something like
   it: that keeps QEMU from the short cut that is wrong. All scenarios
   take a third longer with it.
+- QEMU 11.1 has a second fault with segments, which a flat 32-bit
+  program for a DOS extender does not meet in itself and may meet in
+  its extender. In a code segment whose base is not 0, while DS, ES and
+  SS all have the base 0, an instruction with 32-bit addressing that
+  reads memory through `cs:` reads at the same offset from 0 instead.
+  CauseWay enters every interrupt through such code, and stops every
+  program on the bench with exception 0Dh at its first interrupt;
+  DOS/32A is not touched by it. QEMU's log of interrupts, `-d int`,
+  shows the fault. `TODO.md`, "The portable C in 32 bits: what a trial
+  on the bench showed", has how it was shown and what else that trial
+  found.
 - A function with a `#pragma aux` that calls another of the same file
   does so by `push cs` and a near call, and may end by jumping into the
   end of another: `F01_05_c` goes on in `F00_05_c`. With `modify exact
