@@ -31,11 +31,6 @@ extern const u8 __far Init_F[];
 void FilZero(u8 __far *text, u16 length);               /* string.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 
-#define DOS_ATTRIBUTES 0x4300           /* of the file at DS:DX, into CX */
-#define DOS_CREATE     0x3C00           /* that file, with those of CX */
-#define DOS_WRITE      0x4000           /* CX bytes at DS:DX to BX */
-#define DOS_CLOSE      0x3E00
-
 #define ERR_NO_FILE 2
 #define ARCHIVE     0x20                /* the attribute of a file that
                                            has changed */
@@ -105,40 +100,30 @@ static struct Answer Failed(u16 error)
    is written: what it held is gone when the writing fails. */
 struct Answer SaveSet(void)
 {
-    struct DosRegs regs;
-    struct Answer answer;
-    u16 length, written, failed;
+    struct FileAttr had;
+    struct Answer opened, wrote, closed;
+    u16 length;
 
     length = MakeIni();
     MainFil(md.TmpBuf, AT(AsmSeg(), OFFSET(Init_F)));
     if (ChgDisk(md.TmpBuf))
         return Failed(0);
-    regs.bx = length;
-    regs.name = md.TmpBuf;
-    regs.ax = DOS_ATTRIBUTES;
-    if (Intr21((struct DosRegs STACK *)&regs)) {
-        if (regs.ax != ERR_NO_FILE)
-            return Failed(regs.ax);
-        regs.cx = 0;
+    had = FileAttributes(md.TmpBuf);
+    if (had.failed) {
+        if (had.value != ERR_NO_FILE)
+            return Failed(had.value);
+        had.attributes = 0;
     }
-    regs.cx |= ARCHIVE;                 /* SavSt1 */
-    regs.ax = DOS_CREATE | regs.ax & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs))
-        return Failed(regs.ax);
-    regs.bx = regs.ax;
-    regs.cx = length;
-    regs.name = md.MenuBuf;
-    regs.ax = DOS_WRITE | regs.ax & 0xFF;
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    written = regs.ax;
-    regs.ax = DOS_CLOSE | regs.ax & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs))
-        return Failed(regs.ax);
-    if (failed)
-        return Failed(written);
-    if (written != length)
-        return Failed(written & 0xFF00);        /* SavSt2 */
-    answer.value = written;
-    answer.failed = 0;
-    return answer;
+    opened = FileCreate(md.TmpBuf, had.attributes | ARCHIVE);   /* SavSt1 */
+    if (opened.failed)
+        return opened;
+    wrote = FileWrite(opened.value, md.MenuBuf, length);
+    closed = FileClose(opened.value);
+    if (closed.failed)
+        return closed;
+    if (wrote.failed)
+        return wrote;
+    if (wrote.value != length)
+        return Failed(wrote.value & 0xFF00);    /* SavSt2 */
+    return wrote;
 }
