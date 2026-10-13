@@ -7231,8 +7231,6 @@ build/portable_c` then.
      `resident.c` where a note means the portable C's file.
    - The top of `harness/scenarios.py` and the tops of the harness's
      scripts, where they describe two builds: not looked at.
-   - "The portable C in a flat memory: the plan" names `resident.c`
-     where it means `exec.c`; it is another agent's to change.
 
    What the list said before any of it was done:
    - **R1 goes with this stage: `resident.c` of the portable C becomes
@@ -8537,9 +8535,9 @@ plan is taken out; this paragraph is where it is told.
 ### What it rests on of the switch
 
 The switch is the piece "W and Z1" of the plan for the 32 bits, in
-five stages. Its first four have landed, at `8031e96`; the fifth, the
-documents turned round and `resident.c` renamed `exec.c`, is with an
-agent. There is one tree, `portable_c`, built by `wcc386` with
+five stages. Its first four have landed, at `8031e96`; of the fifth,
+`resident.c` is renamed `exec.c` and the README and `DEVIATIONS.md` are
+turned round, and the notes of `CLAUDE.md` are left. There is one tree, `portable_c`, built by `wcc386` with
 DOS/32A, and the 16-bit build is gone, with `dos.c`, `arith.c` and
 `harness/pass32.txt`. What the plan goes by of that:
 
@@ -9049,7 +9047,7 @@ thought and long in lines.
 | F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data. The room, the viewer's `count` and `FndSize` are left as wide as they are, for N3 and N5 | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images | Where the viewer counts on an offset wrapping at the top of its segment |
 | F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data. `EdSpace`, its lines and its count of free bytes are left as wide as they are, for N6 | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
 | F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
-| F7, the tree, the history, the commands | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `resident.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
+| F7, the tree, the history, the commands | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `exec.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
 | F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
 | F9, the memory from the extender | The three functions of `sys.h` answer with a pointer to a block of the extender's and take bytes in `MemSize`; the 640 KB go. `DEVIATIONS.md`: entry 13 written anew, with no cap and every row that "What a user would see otherwise" has as covered; entry 1, what the program wants of the machine; entry 6, that the extender is asked and DOS is not. The refusal of a file that is too large held to the original's golden again, and `view-window` kept as it is, by a scenario's machine with less memory: question 8, "The test". By what X found: the panels are taken first, so that the room has nothing behind it; "as long as it goes" is the room given back and taken anew, since 0503h refused answers no length; `behind()` of `harness/le.py` has a second copy behind the first copy's panels; entry 1 says that memory is given as it was left | `sys.h`, the system's file, the lines of `start.c` and `view.c` that call the three, `harness/scenarios.py`, `harness/deviations.py`, `harness/le.py`, `DEVIATIONS.md`, the README | F2, F4 to F8, X; the five clusters that count the room, N3, N5, N6, N9 and N11, and with N6 the answers to questions 8 and 5 | The scenarios, `second-copy`, `start-memory`, `command` above all, run once with the room cut to what the 640 KB gave, which is not committed, and then with all of it; `harness/trial32/calls.asm` lists the calls of DOS that it listed; the images, block for block | What the room is on the bench, and what the layer will be asked of the memory, call for call |
 | F10, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. Three rules out of the test of the layout. `aborts` behind a word. The README and the notes, where they say megabyte | `vc.h`, `harness/layoutcheck.py`, the documents | F9; may be one piece with it | The scenarios; the images; the words' record empty of what rests on the megabyte | |
@@ -9080,7 +9078,7 @@ for.
 | N11 † | `files.c`, `read.c`, `place.c` | 1,137; 124 | F7 | The old list's room in `ReDr00`. Meets question 3 |
 | N12 | `panel.c`, `info.c`, `drive.c` | 1,020; 108 | F7 | |
 | N13 | `tree.c`, `treebox.c`, `extfile.c` | 1,174; 99 | F7 | |
-| N14 | `cmdline.c`, `enter.c`, `resident.c`, which the switch's fifth stage renames `exec.c` | 1,490; 147 | F7 | Carries out the answer to question 4 |
+| N14 | `cmdline.c`, `enter.c`, `exec.c` | 1,490; 147 | F7 | Carries out the answer to question 4 |
 | N15 | `input.c`, `usermenu.c` | 1,406; 131 | F7 | |
 | N16 | `main.c` | 1,601; 117 | F8 | |
 | N17 | `keys.c`, `commands.c` | 1,414; 183 | F8 | |
