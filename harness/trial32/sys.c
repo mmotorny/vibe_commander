@@ -847,6 +847,7 @@ static void Keyboard(void)
 
 
 TEXT(Comspec_S, "COMSPEC=");
+TEXT(OnA_S, "A:\\X.TMP");
 TEXT(Ran_S, "RAN.TXT");
 TEXT(Echo_S, "/C ECHO ran>RAN.TXT");
 TEXT(Run_S, "/C ");
@@ -965,6 +966,13 @@ static void Second(void)
     struct Block block;
     u16 at;
 
+    if (tail[1] == '4') {
+        Row = 12;
+        SAY("the copy: FileCreate there:");
+        ANSWER("", FileCreate(OnA_S, 0));
+        Line();
+        ProgramEnd(4);
+    }
     Clear();
     SAY("a second copy, ProgramTail '");
     for (at = 0; at < 20 && tail[at] != '\r'; at++)
@@ -987,16 +995,6 @@ static void Second(void)
    Nobody ends the toy. */
 static void Told(void)
 {
-}
-
-/* What the toy has the system ask about a device that fails: it has
-   the call fail. No device of the toy's does. */
-static u16 Fail(u16 how, u16 error, const u8 FAR *device)
-{
-    (void)how;
-    (void)error;
-    (void)device;
-    return DEVICE_FAIL;
 }
 
 TEXT(Mask_S, "TOY?.DAT");
@@ -1216,24 +1214,160 @@ static void Memory(void)
     Line();
 }
 
+/* Wait as the program does, for a key, and read it. */
+static u16 Key(void)
+{
+    struct Keys waiting;
+
+    for (;;) {
+        Idle();
+        MouseWhere();
+        waiting = KeyWaiting();
+        if (!waiting.none)
+            return KeyRead();
+    }
+}
+
+/* What the toy has the system ask about a device that fails. It does
+   what the program does there, in small: it lets the machine interrupt
+   again, writes what it is asked onto the screen, waits for a key as
+   the program waits, by the idle call, the mouse and the keyboard, and
+   answers by the key. r has the system try again. f has the call fail
+   and notes that in ErrDat of the main data, as the program does when
+   the user gives up, by which the call counts as failed with the error
+   53h. Anything else has the call fail and notes nothing, and the
+   error is then what DOS says of the call. A step of the script ends
+   inside this, with the system in the middle of the call. */
+static u16 Asked;
+
+static u16 Device(u16 how, u16 error, const u8 FAR *device)
+{
+    u16 key;
+
+    Asked++;
+    IntOn();
+    Line();
+    SAY("  asked "); H4(how); H4(error);
+    if (device == 0) {
+        SAY("of a drive, ");
+    } else {
+        SAY("of the device "); Quoted(device, 8);
+    }
+    key = Key();
+    SAY("answered by "); H4(key);
+    Line();
+    if ((u8)key == 'r')
+        return DEVICE_RETRY;
+    if ((u8)key == 'f')
+        md.ErrDat = 1;
+    return DEVICE_FAIL;
+}
+
+TEXT(Com2_S, "COM2");
+TEXT(Copy_S, "/C COPY HELLO.TXT A:\\X.TMP");
+TEXT(Four_S, " 4");
+
+/* What the system enters of the program: the critical error, with the
+   toy asked from inside a call of DOS, and waiting there for a key.
+   The three interrupts are noted and taken in the order in which the
+   program does that. Each line of "asked" is a step of the script. */
+static void Devices(void)
+{
+    struct Answer asked;
+
+    BreakCheck();
+    SetBreakCheck(0);
+    CtrlCTake();
+    DeviceErrorNote();
+    CtrlBreakNote();
+    DeviceErrorTake(Device);
+    CtrlBreakTake();
+    SAY("the critical error, Ctrl-Break and Ctrl-C are taken");
+    Line();
+    SAY("FileCreate on a diskette that cannot be written:");
+    ANSWER("", FileCreate(OnA_S, 0));
+    SAY("asked "); H4(Asked);
+    Line();
+    SAY("again, failed without a note:");
+    ANSWER("", FileCreate(OnA_S, 0));
+    SAY("asked "); H4(Asked);
+    Line();
+    /* A call that the 32-bit program makes in real mode. */
+    SAY("FileSetAttributes of the shell's file:");
+    ANSWER("", FileSetAttributes(Variable(Comspec_S), 0));
+    SAY("asked "); H4(Asked);
+    Line();
+    /* A device that is no drive: the second serial port, which the
+       bench has not. */
+    asked = FileOpen(Com2_S, 1);
+    SAY("FileWrite to COM2:");
+    ANSWER("", FileWrite(asked.value, Com2_S, 1));
+    SAY("asked "); H4(Asked);
+    FileClose(asked.value);
+    Line();
+}
+
+/* The same from a program that the toy has run and that has not taken
+   the question itself: the shell, for a command that writes to the
+   diskette, and a second copy of the toy that makes a file there. DOS
+   asks whoever has the critical error, which is the toy, in the middle
+   of a call that is not the toy's. */
+static void Children(void)
+{
+    struct Answer ran;
+
+    CursorTo(0, 20 << 8);
+    SAY("the shell run for a copy to the diskette:");
+    ran = ProgramRunBare(Variable(Comspec_S), Tail(Copy_S, No_S, No_S));
+    Line();
+    ANSWER("it came back", ran);
+    SAY("asked "); H4(Asked);
+    Line();
+    SAY("a second copy run that makes a file there:");
+    ran = ProgramRun(Self(), Tail(Four_S, No_S, No_S));
+    Line();
+    ANSWER("it came back", ran);
+    SAY("asked "); H4(Asked);
+    Line();
+}
+
+/* Ctrl-Break, which the driver sends when the page has been written:
+   the BIOS calls its interrupt, which the toy has taken, and nothing
+   happens but that the BIOS has a key of no character for the next
+   page. And Ctrl-C: the toy has DOS look for it at every call and
+   waits until the BIOS has the key, without reading it; DOS finds it
+   at the next call, calls its interrupt, which the toy has taken, and
+   the toy goes on. */
+static void Breaks(void)
+{
+    struct Keys waiting;
+
+    SAY("Ctrl-Break came and went. Now Ctrl-C, with DOS looking for it");
+    Line();
+    SetBreakCheck(1);
+    CursorTo(0, 10 << 8);
+    do {
+        Idle();
+        MouseWhere();
+        waiting = KeyWaiting();
+    } while (waiting.none);
+    SAY("the BIOS has the key "); H4(waiting.key);
+    TimeOfDay();
+    SAY("DOS was asked the time, and the toy goes on. BreakCheck ");
+    H4(BreakCheck());
+    SetBreakCheck(0);
+    waiting = KeyWaiting();
+    SAY("KeyWaiting "); H4(waiting.key); H4(waiting.none);
+    while (!KeyWaiting().none)
+        KeyRead();
+    Line();
+}
+
 /* The functions that dos32.c does not make yet: both.py knows the page
    by its first line. */
 static void Later(void)
 {
     SAY("Not made in dos32.c yet:");
-    Line();
-    /* What the system enters of the program, noted, taken and given
-       back in the order in which the program asks for that. Nothing
-       shows of it until a device fails or a key is pressed, which is
-       for a toy of the piece that makes them in dos32.c. */
-    DeviceErrorNote();
-    CtrlBreakNote();
-    DeviceErrorTake(Fail);
-    CtrlBreakTake();
-    CtrlCTake();
-    DeviceErrorGive();
-    CtrlBreakGive();
-    SAY("DeviceError and CtrlBreak noted, taken, given back; CtrlCTake");
     Line();
     /* The end of the toy by another's hand, taken and given back: in 16
        bits the PSP names a routine of dos.c meanwhile, and the toy ends
@@ -1283,8 +1417,20 @@ void Main(void)
     Page(0);
     Copies();
     Page(0);
+    Devices();
+    Page(0);
+    Children();
+    Page(0);
+    Breaks();
+    Page(0);
     Later();
     Page(0);
+    /* The toy ends as the program does: it gives Ctrl-Break back, and
+       leaves the critical error and Ctrl-C taken, which DOS puts back
+       by itself in 16 bits and ProgramEnd of dos32.c in 32. An
+       interrupt that is left taken there has the extender write a
+       warning under the last line. */
+    CtrlBreakGive();
     SAY("ProgramEnd 7");
     Line();
     CursorTo(0, Row << 8);

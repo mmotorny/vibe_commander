@@ -4860,6 +4860,86 @@ registers that it does not read, call by call, for the program of 16
 bits. In 32 bits each of those is 0, at every call, and the
 environment is named at 4Bh: the entry wants a sentence for that.
 
+**What DOS enters: done.** 96 of the 98 are made; the two that are
+left are the program ended by another's hand. New are the seven of
+the critical error, Ctrl-Break and Ctrl-C. This is "What could go
+wrong", 3, and it did not go wrong: the program is asked from inside
+a call of DOS, draws, waits for keys through the extender, idles
+there with the driver of the tests taking each idle call and ending
+its steps on it, answers, and DOS goes on.
+
+How it is made:
+
+- The three are taken by DPMI 0205h, with a routine of protected mode
+  each, and who had one is asked by 0204h and kept in six bytes of
+  `dos32.c`. DOS is not asked for a vector, where `dos.c` asks 35h and
+  25h. `ErrVct` and `BrkVct` of the main data are not written.
+- `DeviceEntry` is where INT 24h arrives, 33 instructions of assembly.
+  It keeps the registers on the extender's stack, 44 bytes of it with
+  what the interrupt left there; finds the data by its selector, which
+  `Start` notes, read through CS; goes over to the program's stack;
+  calls `Arrived`, which is C; and goes back. `Arrived` reads the
+  header of the device at BP:SI of real mode, as `FatErr` of `dos.c`
+  does, and calls the function that the program handed over. AX whole
+  goes back to DOS.
+- Where the program's stack is free: `Below`, the stack pointer where
+  `Call` last called DOS or `Extender` the extender, less 512 bytes
+  (`STACK_KEPT`). The extender is entered on the program's stack and
+  keeps there what it needs of the call that is under way, so the
+  routine cannot go on right below where DOS was called. A toy that
+  filled the stack below the stack pointer and looked what a call had
+  written saw 190 bytes at a call that the extender translates, 3Dh,
+  3Fh, 4Eh; 130 at one made by DPMI 0300h; 74 at every other, of DOS,
+  the BIOS, the mouse and the idle call; and 70 for the timer's
+  interrupts in protected mode. The 512 are that and as much again.
+  **The program's stack is used that much deeper at a critical error
+  than in 16 bits**: for the test of the stack that stays half empty,
+  H3.
+- Ctrl-Break and Ctrl-C arrive at one instruction, `iretd`.
+- `CtrlCTake` notes who had Ctrl-C the first time that it is taken:
+  `sys.h` has no function for that, since DOS puts it back by itself
+  when a program of 16 bits ends.
+- `ProgramEnd` gives back what is still taken of the three before it
+  asks DOS, by the extender alone. Tried without: the extender writes
+  "warning (9003): real mode interrupt vector has been modified" for
+  INT 1Bh and for INT 24h onto the last screen, and nothing for 23h.
+  With it the last screen is as in 16 bits.
+
+What the toy shows, on eleven steps of four pages, 28 screens for 27
+steps, the same in both builds and for both countries:
+
+| What | What was seen |
+|---|---|
+| A file made on the diskette that the bench boots from, which cannot be written | The toy's function is asked, AX 3900h and DI 0, a drive. It lets the machine interrupt, writes a line, and waits as the program waits, by `Idle`, `MouseWhere`, `KeyWaiting` and `KeyRead`; a step of the script ends there, inside the question, in both builds |
+| Answered by `r` | DOS tries again and asks again |
+| Answered by `f`, noted in `ErrDat` as `FtErr1` notes it | The call fails with 53h |
+| Answered to fail and not noted | The call fails with what DOS says of it, 13h |
+| `FileSetAttributes` there, a call that `dos32.c` makes in real mode | The same |
+| A byte written to `COM2`, which the bench has not | Asked with AX B800h, DI 00B0h and the name `COM2    ` |
+| The shell run for a copy to the diskette | The toy is not asked: FreeCOM takes the critical error itself and asks by its own words, in both builds. DOS has put the toy's back when the shell has ended |
+| A second copy of the toy run, which makes a file on the diskette and has not taken the critical error | The first copy is asked, in the middle of a call of DOS that the second made: in 32 bits a second extender is in real mode then, and the first comes over to protected mode from under it, waits for its key, and goes back. The second gets its error, and the first is answered 53h for the run, as in 16 bits, since `ErrDat` is the first one's |
+| Ctrl-Break | Nothing, and a key of no character in the BIOS's buffer |
+| Ctrl-C, with DOS told to look for it at every call, and DOS asked the time | DOS writes `^C`, takes the key, and the toy goes on |
+
+Not tried, and why:
+
+- The phantom drive of `not-ready` and `phantom`. What the program does
+  there is its own, `Fantom` and `FtErr1` with `BlocEr`, through
+  `DriveLetter` and `DriveSetLetter`, which D1 made; to `dos32.c` it
+  is a question like any other. The first run of those two scenarios
+  judges it.
+- The answer Ignore: the program never gives it.
+- A program run by `Aexec0` that is of real mode and does not take the
+  critical error itself. The second copy stands for it, and is the
+  harder case.
+- How long the extender's stack of protected mode is. The routine
+  takes 44 bytes of it.
+
+For M1 and the convergence: a critical error inside a call counts
+toward what the program's stack has to hold twice over, the 512 and
+then what `FtErr1` and `Dialog` take. And `IntOn` inside the question
+is `sti` in protected mode, which the extender lets a program do.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")

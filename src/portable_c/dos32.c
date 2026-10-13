@@ -52,7 +52,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 89 of the 98, fourteen of them in real mode; the 9 that are not made
+ * 96 of the 98, fourteen of them in real mode; the 2 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -248,6 +248,9 @@ static u16 LowSeg = 0;
 #define DPMI_REAL_VECTOR 0x0200         /* where the interrupt in BL goes
                                            in real mode: CX:DX */
 #define DPMI_SET_REAL_VECTOR 0x0201     /* and that set */
+#define DPMI_VECTOR 0x0204              /* where the interrupt in BL goes
+                                           in protected mode: CX:EDX */
+#define DPMI_SET_VECTOR 0x0205          /* and that set */
 #define DPMI_REAL_INT  0x0300           /* an interrupt in real mode: BL
                                            which, CX words of the stack to
                                            take along, ES:EDI the
@@ -256,6 +259,26 @@ static u16 LowSeg = 0;
                                            returns far, at the CS:IP of
                                            the registers: the same */
 #define FLAG_CARRY 1
+
+/* The stack pointer. */
+static u32 StackNow(void);
+#pragma aux StackNow = \
+    "mov eax,esp" \
+    value [eax] modify exact [eax]
+
+/* Where the program's stack is free while DOS is at work for it, in
+   real mode: for the routine that DOS's question about a device arrives
+   at, which goes on there (see DeviceEntry). It is the stack pointer
+   where DOS, or the extender for a call of real mode, was last called,
+   less what the extender has of the program's stack meanwhile: it is
+   entered on that stack and keeps on it what it needs of the call that
+   is under way. The toys saw it write 190 bytes below the stack pointer
+   at a call of DOS that it translates, 130 at a call made in real mode
+   and 74 at any other, with the 8 that the instructions here push; the
+   512 are that and as much again. */
+#define STACK_KEPT 512
+
+static u32 Below = 0;
 
 /* The extender, asked for the service `ax` with these registers, and
    with `at` for what the service takes at ES:EDI. EAX, EBX, ECX and EDX
@@ -270,6 +293,7 @@ static u16 Extender(struct DosRegs *regs, u16 ax, u32 ebx, u32 ecx, u32 edx,
     regs->esi = 0;
     regs->edi = (u32)at;
     regs->low = 0;
+    Below = StackNow() - STACK_KEPT;
     return (u16)Dpmi(regs);
 }
 
@@ -310,9 +334,10 @@ static u16 Real(struct DosRegs *regs, u16 number, u32 routine)
    function that asks bare answers with for `failed`. */
 static u16 Call(struct DosRegs *regs)
 {
-    if (!regs->low)
-        return (u16)Dos(regs);
-    return Real(regs, 0x21, 0) & FLAG_CARRY ? 0xFFFF : 0;
+    if (regs->low)
+        return Real(regs, 0x21, 0) & FLAG_CARRY ? 0xFFFF : 0;
+    Below = StackNow() - STACK_KEPT;
+    return (u16)Dos(regs);
 }
 
 /* The BIOS for the screen, with these registers, which come back in
@@ -1165,6 +1190,227 @@ void Idle(void)
     DosIdle();
 }
 
+/* What DOS and the BIOS enter of the program: three interrupts of real
+   mode. The program takes them through the extender, which is told a
+   routine of protected mode for each (DPMI 0205h) and has the interrupt
+   of real mode go to a routine of its own that comes over to protected
+   mode and enters that. Who had an interrupt is asked of the extender
+   too (0204h), and is an address of protected mode, a selector and an
+   offset of 32 bits: so it is kept here, and not in ErrVct and BrkVct of
+   the main data, which have four bytes each. DOS is not asked, where
+   dos.c asks it AH 35h and 25h. */
+
+#define INT_CTRL_BREAK 0x1B             /* the BIOS's, from the keyboard */
+#define INT_CTRL_C     0x23             /* DOS's, where it finds the key */
+#define INT_ERROR      0x24             /* DOS's critical error */
+
+/* Where an interrupt goes in protected mode. */
+struct Vector {
+    u32 offset;
+    u16 selector;
+};
+
+/* Who had each of the three; and which of them the program has now, a
+   bit each, so that what it has not given back when it ends can be
+   (see ProgramEnd). */
+static struct Vector ErrorWas = { 0, 0 };
+static struct Vector BreakWas = { 0, 0 };
+static struct Vector CtrlCWas = { 0, 0 };
+
+#define TAKEN_ERROR  1
+#define TAKEN_BREAK  2
+#define TAKEN_CTRL_C 4
+
+static u16 Taken = 0;
+
+/* The selectors of the program's code and of its data: Start notes
+   them. A routine that the extender enters finds the data by the
+   second. */
+static u16 CodeSel = 0, DataSel = 0;
+
+static void Note(u16 number, struct Vector *was)
+{
+    struct DosRegs regs;
+
+    Extender(&regs, DPMI_VECTOR, number, 0, 0, 0);
+    was->offset = regs.edx;
+    was->selector = (u16)regs.ecx;
+}
+
+static void Go(u16 number, u16 selector, u32 offset)
+{
+    struct DosRegs regs;
+
+    Extender(&regs, DPMI_SET_VECTOR, number, selector, offset, 0);
+}
+
+/* An interrupt given back to whoever was noted, if someone was. */
+static void Give(u16 number, const struct Vector *was, u16 taken)
+{
+    if (was->selector != 0)
+        Go(number, was->selector, was->offset);
+    Taken &= ~taken;
+}
+
+/* The function that the program has handed DeviceErrorTake. */
+static DeviceErrorFn *DeviceAsk = 0;
+
+/* The header of a device, which DOS names when it asks about one: the
+   high byte of its attributes, where 80h says that it is no drive, and
+   the name that such a device has there, 8 characters. */
+#define HEADER_KIND 5
+#define HEADER_NAME 10
+
+/* DOS asks what to do about a device: INT 24h, as DeviceEntry below
+   hands it on. `how` and `error` are AX and DI as DOS has them, and the
+   header of the device is at BP:SI of real mode, `base` and `offset`.
+   The program is asked, by the function that it handed over, with what
+   sys.h says that such a function takes, as FatErr of dos.c asks it;
+   what it answers goes back to DOS. Where the stack is free is kept
+   around that, since the function may ask what sets it anew. */
+static u32 Arrived(u32 how, u32 error, u32 base, u32 offset)
+{
+    const u8 *device = (const u8 *)(((base & 0xFFFF) << 4)
+                                    + (offset & 0xFFFF));
+    u32 below = Below;
+    u16 answer;
+
+    if (device[HEADER_KIND] & 0x80)
+        device += HEADER_NAME;
+    else
+        device = 0;
+    answer = DeviceAsk((u16)how, (u16)error, device);
+    Below = below;
+    return answer;
+}
+#pragma aux Arrived parm [eax] [edi] [edx] [esi] value [eax]
+
+/* Where the extender enters the program for INT 24h. DOS is in the
+   middle of something that the program asked of it, or that a program
+   asked which this one has run; it has called the interrupt in real
+   mode, and the extender has come over. The registers are DOS's, their
+   low words: what it says of the error in AX and DI, the header of the
+   device at BP:SI. Everything else is the extender's: DS and ES are
+   anywhere, and the stack is one of its own, 512 bytes by what its
+   settings say, which is not enough for what the program does when it
+   is asked, a box drawn and a wait for a key, with the BIOS, the mouse
+   and the idle call each asked through the extender again.
+
+   So this is assembly, since no compiled instruction can run before DS
+   is on the data and the stack is the program's: the registers are
+   kept on the extender's stack; DS and ES are put on the data, by the
+   selector that Start noted, read through CS, which is on the same
+   memory; the stack goes over to the program's own, at Below, with
+   where the extender's was kept on top of it; Arrived is called; and
+   then all of it back, with what Arrived answered in AX for DOS, which
+   takes AL. An instruction that loads SS keeps the machine from
+   interrupting until the next one has run, so the two that change the
+   stack are never apart. */
+__declspec(naked) static void DeviceEntry(void)
+{
+    _asm {
+        push ds
+        push es
+        push ebx
+        push ecx
+        push edx
+        push esi
+        push edi
+        push ebp
+        mov bx,word ptr cs:DataSel
+        mov ds,bx
+        mov es,bx
+        cld
+        mov ecx,esp
+        mov edx,ss
+        mov ss,bx
+        mov esp,Below
+        push edx
+        push ecx
+        mov edx,ebp
+        call Arrived
+        pop ecx
+        pop edx
+        mov ss,dx
+        mov esp,ecx
+        pop ebp
+        pop edi
+        pop esi
+        pop edx
+        pop ecx
+        pop ebx
+        pop es
+        pop ds
+        iretd
+    }
+}
+
+/* INT 1Bh, Ctrl-Break of the BIOS, and INT 23h, Ctrl-C of DOS, while the
+   program has them: nothing. */
+__declspec(naked) static void NothingEntry(void)
+{
+    _asm {
+        iretd
+    }
+}
+
+void DeviceErrorNote(void)
+{
+    Note(INT_ERROR, &ErrorWas);
+}
+
+void DeviceErrorTake(DeviceErrorFn *ask)
+{
+    DeviceAsk = ask;
+    Go(INT_ERROR, CodeSel, (u32)DeviceEntry);
+    Taken |= TAKEN_ERROR;
+}
+
+void DeviceErrorGive(void)
+{
+    Give(INT_ERROR, &ErrorWas, TAKEN_ERROR);
+}
+
+void CtrlBreakNote(void)
+{
+    Note(INT_CTRL_BREAK, &BreakWas);
+}
+
+void CtrlBreakTake(void)
+{
+    Go(INT_CTRL_BREAK, CodeSel, (u32)NothingEntry);
+    Taken |= TAKEN_BREAK;
+}
+
+void CtrlBreakGive(void)
+{
+    Give(INT_CTRL_BREAK, &BreakWas, TAKEN_BREAK);
+}
+
+/* DOS gives Ctrl-C back by itself when a program of 16 bits ends, from
+   the PSP. What the program has taken through the extender only this
+   can give back, so who had it is noted here, the first time that it is
+   taken. */
+void CtrlCTake(void)
+{
+    if (!(Taken & TAKEN_CTRL_C))
+        Note(INT_CTRL_C, &CtrlCWas);
+    Go(INT_CTRL_C, CodeSel, (u32)NothingEntry);
+    Taken |= TAKEN_CTRL_C;
+}
+
+/* What the program has taken of the three and not given back, given
+   back: for where it ends. */
+static void GiveAll(void)
+{
+    if (Taken & TAKEN_ERROR)
+        Give(INT_ERROR, &ErrorWas, TAKEN_ERROR);
+    if (Taken & TAKEN_BREAK)
+        Give(INT_CTRL_BREAK, &BreakWas, TAKEN_BREAK);
+    if (Taken & TAKEN_CTRL_C)
+        Give(INT_CTRL_C, &CtrlCWas, TAKEN_CTRL_C);
+}
+
 /* What the program was started with is in its PSP, which is DOS's and
    below the megabyte: the tail from 81h on, and at 2Ch what names the
    environment. Start has found both. The environment is DOS's own
@@ -1320,11 +1566,20 @@ void ShellRun(const u8 FAR *command)
 }
 
 /* The end of the program. The extender takes the call for its own end
-   too, and leaves the machine as it found it. */
+   too, and leaves the machine as it found it.
+
+   The program gives Ctrl-Break back before it ends, and not the
+   critical error or Ctrl-C: DOS puts those two back from the PSP when a
+   program of 16 bits ends. Here they are taken through the extender,
+   which ends before DOS sees anything and writes a warning for every
+   interrupt of real mode that is not as it found it: so what is still
+   taken is given back first, of all three. It is asked of the extender
+   alone. */
 void ProgramEnd(u16 code)
 {
     struct DosRegs regs;
 
+    GiveAll();
     Set(&regs, 0x4C00 | code & 0xFF, 0, 0, 0);
     Tell(&regs);
 }
@@ -1592,55 +1847,9 @@ void IntOn(void)
 }
 
 /*
- * The 9 functions of sys.h that are not made here yet. Each does
- * nothing. They are what DOS and the BIOS enter of the program, the
- * critical error, Ctrl-Break and Ctrl-C, which are taken through the
- * extender here and arrive at routines of protected mode: the seven that
- * note, take and give them; and behind those the two for the system
- * ending the program, ProgramEndedTake and ProgramEndedGive. What each
- * needs is in TODO.md, "The portable C in 32 bits: the plan", with the
- * piece D2.
+ * The 2 functions of sys.h that are not made here yet, the two for the
+ * system ending the program. Each does nothing.
  */
-
-/* The critical error, Ctrl-Break and Ctrl-C: none is noted, taken or
-   given back, so each goes where the extender has it go, and the
-   program is not asked about a device. dos.c has the three as
-   interrupt functions that DOS's services for the vectors name, and
-   the first calls the function that the program hands over, with what
-   sys.h says: the same call is to be made here from a routine of
-   protected mode that the extender's services name, with the header of
-   the device read at its address of real mode, and on the program's own
-   stack, since such a routine is entered on one of the extender's.
-   What the function answers goes back to DOS in AL. */
-
-void DeviceErrorNote(void)
-{
-}
-
-void DeviceErrorTake(DeviceErrorFn *ask)
-{
-    (void)ask;
-}
-
-void DeviceErrorGive(void)
-{
-}
-
-void CtrlBreakNote(void)
-{
-}
-
-void CtrlBreakTake(void)
-{
-}
-
-void CtrlBreakGive(void)
-{
-}
-
-void CtrlCTake(void)
-{
-}
 
 /* The program ended by another's hand: nobody is told. dos.c has the
    PSP name a routine of its own for where DOS goes on when the program
@@ -1671,6 +1880,14 @@ void ProgramEndedGive(void)
 /*
  * The start of the program.
  */
+
+/* The selectors of the code and, below that, of the data. */
+static u32 Selectors(void);
+#pragma aux Selectors = \
+    "mov ax,cs" \
+    "shl eax,16" \
+    "mov ax,ds" \
+    value [eax] modify exact [eax]
 
 /* ES put on the data, where compiled code takes it to be, and the
    direction flag cleared, which it takes to be clear: with what ES was
@@ -1730,8 +1947,11 @@ void Start(void)
 {
     struct DosRegs regs;
     u16 selector = (u16)Entered();
+    u32 selectors = Selectors();
     u16 environment;
 
+    DataSel = (u16)selectors;
+    CodeSel = (u16)(selectors >> 16);
     Psp = (const u8 *)Base(selector, 0);
     environment = *(const u16 *)(Psp + PSP_ENVIRON);
     Environment = (const u8 *)Base(environment, (u32)environment << 4);
