@@ -40,14 +40,18 @@
    not leave them: `strayed` and a number on the screen says that one
    was not, 400h for the flag and anything else for ES.
 
-   The last page asks the functions that dos32.c does not make yet
-   (both.py, NOT_MADE): there the two differ until it does. ProgramRun
-   and ProgramRunBare are not asked at all: a program that the toy could
-   run, and what shows that it ran, come with the piece that makes them
-   (TODO.md, "The portable C in 32 bits: the plan", D2). And the seven
-   by which the program takes the critical error, Ctrl-Break and Ctrl-C
-   are called and no more: a device that fails, and what the program is
-   asked then, come with that piece too. */
+   The pages behind the first nine are of what a program of 32 bits has
+   to do otherwise than one of 16, each in a function below that says
+   what it asks: the memory in blocks and the PSP; the calls that are
+   made in real mode; other programs, with a second copy of the toy
+   itself, which is the toy started with something behind its name; the
+   critical error, where the toy is asked from inside a call of DOS and
+   a step of the script ends there; Ctrl-Break and Ctrl-C.
+
+   The last page asks the functions that dos32.c does not make
+   (both.py, NOT_MADE): the two for the program ended by another's
+   hand, which do nothing there. harness/trial32/ended.asm has DOS end
+   a program so. */
 #include "vc.h"
 
 /* The main data, which the functions keep two things in: ErrDat and

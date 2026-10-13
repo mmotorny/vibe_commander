@@ -37,6 +37,15 @@
  *     service for that, with the name and the record in a block below
  *     the megabyte that the program asks for when it starts, and what
  *     DOS wrote there copied to where the program wants it.
+ *   - An interrupt of real mode that the program takes, DOS's question
+ *     about a device, Ctrl-Break, Ctrl-C, is taken through the
+ *     extender, which comes over from real mode and enters a routine of
+ *     protected mode, on a stack of its own. And the extender is
+ *     entered on the program's stack at every call, and keeps there
+ *     what it needs of the call that is under way.
+ *   - The memory that the program asks for is neither DOS's nor the
+ *     extender's, but 640 KB of the program's own, handed out as DOS
+ *     hands out its memory: see MemTake.
  *
  * The memory of the machine that the program reads and writes, the
  * BIOS's data and the cells of the display, is at the addresses that it
@@ -52,8 +61,8 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 96 of the 98, fourteen of them in real mode; the 2 that are not made
- * yet, which do nothing and say so; and the start of the program.
+ * 96 of the 98, fourteen of them in real mode; the 2 that are not,
+ * which do nothing and say why; and the start of the program.
  */
 #include "vc.h"
 
@@ -1847,26 +1856,30 @@ void IntOn(void)
 }
 
 /*
- * The 2 functions of sys.h that are not made here yet, the two for the
- * system ending the program. Each does nothing.
+ * The 2 functions of sys.h that are not made here: the two for the
+ * system ending the program. Each does nothing, and what they are to do
+ * is the user's to decide.
  */
 
 /* The program ended by another's hand: nobody is told. dos.c has the
    PSP name a routine of its own for where DOS goes on when the program
    has ended, which calls `told` and then goes on where DOS would have,
    in the program that started this one, with registers that the
-   original leaves for it. Here the PSP that DOS knows is the
-   extender's, and it is the extender that DOS ends: whether anything of
-   the program can run then, and what, was not tried, and is for the
-   user to decide when it has been (TODO.md, "The portable C in 32
-   bits: the plan", what is open, 4). Until then `told` is never called,
-   and what the program would put back there is left as it is: DOS goes
-   on looking for Ctrl-C as the program set it.
+   original leaves for it.
 
-   What is this file's own to put back when the program ends, by itself
-   or not, the interrupts that it has taken through the extender, it
-   puts back where it ends the program, and no function of the program
-   is asked for that. */
+   Here the program that DOS ends is the extender's. It was tried, with
+   the toy harness/trial32/ended.asm, which has DOS end the program at
+   an idle call as the scenario `ended` does: the extender has INT 21h
+   of real mode while the program runs, sees the call that ends it, and
+   takes itself out before DOS does anything, the interrupts with it
+   that the program has taken through it. DOS then goes on in the
+   program that started this one, where the PSP says, with what DOS
+   leaves in the registers. Nothing of the program runs, and by then
+   nothing of it could in protected mode. So `told` is never called,
+   and what the program would put back there is left as it is: DOS goes
+   on looking for Ctrl-C as the program set it. What is to be done
+   about that is open (TODO.md, "The portable C in 32 bits: the plan",
+   what is open, 4, and the piece D2). */
 
 void ProgramEndedTake(ProgramEndedFn *told)
 {
@@ -1913,8 +1926,11 @@ static u32 Base(u16 selector, u32 none)
 }
 
 /* What the program says where it cannot start for want of memory below
-   the megabyte, as DOS writes a text. */
-static const u8 NoStart_S[] = "Not enough memory\r\n$";
+   the megabyte: what the original says where it has too little memory
+   to run, Aloc_S of resident.c, which is the nearest case that it
+   knows. It is a copy of this file's own, since this file reads nothing
+   of the program's, ended as DOS takes a text. */
+static const u8 NoStart_S[] = "Program too big to fit in memory\r\n$";
 
 /* The program begins here: the extender has loaded the file, set the
    words of it that hold an address, and enters this on the stack that
@@ -1940,7 +1956,8 @@ static const u8 NoStart_S[] = "Not enough memory\r\n$";
        less of DOS's memory.
      - The program's own memory, for MemTake.
 
-   A program that does not get the block says so and ends at once, with
+   A program that does not get the block says that it is too big to
+   fit in the memory, in the original's words, and ends at once, with
    DOS's error for want of memory as its number. Main of main.c is the
    program, and does not return. */
 void Start(void)

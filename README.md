@@ -675,15 +675,15 @@ the number. No test holds the table.
 | Pairs of `#pragma pack` | 7 |
 | `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 752, 106, 262, 92 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
-| The program of 32 bits, `build/portable_c32/VC.EXE` | 302,699 bytes, of which the extender's stub is 27,536 |
-| Its code, and what the file has of its data | 130,211 and 104,527 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 235,332 bytes |
-| The addresses in it that the extender sets when it loads it | 5,216 |
+| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,403 bytes, of which the extender's stub is 27,536 |
+| Its code, and what the file has of its data | 132,735 and 104,567 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,290 bytes |
+| The addresses in it that the extender sets when it loads it | 5,292 |
 | Its stack | 16,384 bytes |
-| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,180 and 16,408 bytes |
-| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,408 and 2,347 bytes |
-| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 396,155 bytes, 220,278 of them code |
-| Inline assembly of `dos32.c`, which the program of 32 bits has in place of that of `dos.c` | 45 instructions in 9 pieces |
+| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,172 and 16,428 bytes |
+| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,368 and 2,347 bytes |
+| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 400,875 bytes, 223,764 of them code |
+| Inline assembly of `dos32.c`, which the program of 32 bits has in place of that of `dos.c` | 98 instructions in 13 pieces |
 
 <!-- The end of the figures. -->
 
@@ -1132,11 +1132,13 @@ thing's place: the code, then the stack, the constants with the tables,
 the main data, and last what has no value, which is not in the file.
 Pointers in place of the numbers are the step behind this one.
 
-It does not run yet. `dos32.c` has 74 of the 98 functions of `sys.h`,
-and those by which the program takes its memory are among the 24 that
-are still to be made: started on the bench of the tests, the program
-writes its banner, says "Program too big to fit in memory" and leaves.
-It is started there as any program is:
+No test judges it yet. `dos32.c` has 96 of the 98 functions of `sys.h`;
+the two that it has not are those by which the program is told that DOS
+has ended it by another program's hand, which do nothing there. Started
+on the bench of the tests, the program shows its panels, runs a command
+and comes back, and leaves when it is told to; what it does otherwise
+than the program of 16 bits, scenario by scenario, has not been looked
+at. It is started there as any program is:
 
 ```sh
 mkdir -p build/tmp

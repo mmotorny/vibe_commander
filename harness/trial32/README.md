@@ -90,11 +90,13 @@ the finding: see `csover.c`.
 | `cwtables.c` | For CauseWay only: its tables read before its fault; it does not end, so `--limit 5` |
 | `hello.c` | The one program with Open Watcom's C library: `build.sh hello cw` |
 | `sys.c`, `both.py` | The functions of the portable C's `sys.h`, each asked and what it answers written out: one toy built both ways, with the program's `dos.c` for 16 bits and with its `dos32.c` for 32, which have to write the same. `both.py` builds both, runs them on the bench and says where they differ; see its top, and the top of `sys.c` |
+| `depth.c` | How much of the program's own stack the extender writes below the stack pointer during a call of DOS, of the BIOS, of the mouse and of real mode, and for the timer's interrupts |
+| `ended.asm` | Real mode: DOS ends a program by another's hand, as the scenario `ended` has it, and what is left then of a program of 32 bits and of its extender. Its top says how it is run and what it writes |
 | `rmbench.asm` | Real mode: what the bench has for an extender, XMS, DPMI, EMS and memory |
 | `rmstart.asm` | Real mode: when DOS enters a program, to hold `start.c` against |
 | `rmcalls.asm` | Real mode: what a call costs, to hold `realcalls.c` against |
 
-The three of real mode are run under the program's name: `run.py --name
+Those of real mode are run under the program's name: `run.py --name
 VC.COM build/trial32/rmbench.com`.
 
 ## A script of the plan

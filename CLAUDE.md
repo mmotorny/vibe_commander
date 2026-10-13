@@ -2968,6 +2968,60 @@ the 32 bits):
   by 2 to 16 bytes, at every change of the code: hold a change to the
   figures of the others.
 
+What the rest of `dos32.c` met, the functions that the extender does
+not carry through as they are (`TODO.md`, the piece D2 of the plan for
+the 32 bits):
+
+- The extender puts a selector into the PSP at 2Ch, where DOS has the
+  segment of the environment, and DOS reads that word itself: a program
+  run by 4Bh with no environment named gets a copy of whatever lies at
+  that selector's number taken for a segment. `Run` of `dos32.c` names
+  the environment's segment. Run through the shell, a program has an
+  environment all the same, FreeCOM's: try such a thing with a program
+  that is run by itself.
+- What a toy of the trial did once and came back from says little: the
+  trial's command ran with no environment named, through the shell.
+- Where DOS writes into a buffer of the program's and the call is made
+  in real mode, the program's bytes go down to the block first and
+  come up afterwards, as many as DOS may write: then the program has
+  what DOS wrote and, of the rest, what it had, as when DOS writes
+  there itself. FreeDOS writes 24 of the country's 34 bytes and leaves
+  a path alone where 60h fails, and the toy of both builds, which
+  fills each buffer first, shows either.
+- The extender is entered on the program's stack at every interrupt
+  that the program makes, and keeps there what it needs of the call
+  until that comes back: 190 bytes below the stack pointer at a call
+  of DOS that it translates, 130 at one made by DPMI 0300h, 74 at any
+  other. Whatever goes on on the program's stack while such a call is
+  under way, as the routine of the critical error does, starts below
+  that.
+- A routine that the extender enters from real mode, for an interrupt
+  taken by DPMI 0205h, has the registers of real mode in their low
+  words, DS and ES anywhere, and a stack of the extender's. `wcc386`
+  takes it as a `__declspec(naked)` function with `_asm`: `mov
+  bx,word ptr cs:Variable` reads a variable through CS, `mov
+  esp,Variable` and `call Function` are taken as written, and a static
+  function that only `_asm` calls is kept. Give the function that it
+  calls a `#pragma aux` with its registers, so that the call does not
+  rest on the compiler's options.
+- Nothing promises that what has no value is zeros when a program of
+  32 bits is entered. A variable of `dos32.c` has a value, `= 0`, but
+  for the 640 KB.
+- DOS on the bench has free blocks besides its largest, and how many
+  and how long differs between the two countries: a toy that is to be
+  given the same blocks in both builds takes all of them first.
+- Asked for the capital of a letter before the country has been asked
+  for, the toy of 16 bits ends in "Invalid Opcode": `CaseMap` of
+  `dos.c` calls what its four bytes hold. A toy of both builds asks
+  only what the program may ask.
+- `BREAK` off and Ctrl-Break at DOS's prompt end no step of a script,
+  whatever ran before: it looks like a machine that has stopped and
+  is none.
+- When DOS ends a program of 32 bits by another's hand, the extender
+  sees the call, since it has INT 21h of real mode while the program
+  runs, and takes itself out, with the interrupts that the program
+  took through it. `harness/trial32/ended.asm` shows it.
+
 ## Work by several agents
 
 Work that can be divided is done by several agents at a time, without

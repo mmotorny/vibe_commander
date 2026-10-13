@@ -2083,7 +2083,7 @@ To be asked when the work reaches them, and not before.
 | | What | When, and what is thought of it |
 |---|---|---|
 | 3 | What deviation 1 says, the program staying in the memory whole, once the program is above the megabyte and a second copy has the memory to run again. That moves toward the original. `second-copy`, `start-memory` and `ended` have patches that say a second copy has none | At W, with the three scenarios as the 32-bit build shows them. Thought: declared as it is found, where the difference is of memory alone, and the three patches made anew and read |
-| 4 | What the 32-bit program can do when DOS ends it by another program's hand. The 16-bit program has its say first, through its PSP, and leaves registers for the program that started it: `ended` prints them. Under an extender DOS would seem to go back to that program through the extender's own part of real mode, with nothing of the program run. That is from reading and was not tried | The piece that meets it, D2 or M1, tries it first and reports, and the user is asked with what was seen. Thought: declared, and `ended` not run for the portable C; `TakeEnd`, `Exit01` and `Exit05` go with the 16-bit build |
+| 4 | What the 32-bit program can do when DOS ends it by another program's hand. The 16-bit program has its say first, through its PSP, and leaves registers for the program that started it: `ended` prints them. Under an extender DOS would seem to go back to that program through the extender's own part of real mode, with nothing of the program run. That is from reading and was not tried | The piece that meets it, D2 or M1, tries it first and reports, and the user is asked with what was seen. Thought: declared, and `ended` not run for the portable C; `TakeEnd`, `Exit01` and `Exit05` go with the 16-bit build. **Tried by D2**: nothing of the program runs, but the extender takes itself out and leaves every interrupt of real mode as it found it; what is not put back is that DOS looks for Ctrl-C at every call, and whoever ended the program sees DOS's registers. "Piece D2" below has the table and the ways that there seem to be |
 | 8 | That the 16-bit build may go, which the road keeps for the user | Before Z1, when both builds pass every scenario from one source |
 
 ### The strategy
@@ -2679,7 +2679,7 @@ and H1 are started at once by the session.
 | S2, what DOS enters. Done: see below | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
 | S3, the entry, the end, Quick execute. Done: see below | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
 | D1, `dos32.c`: what goes straight through. Done: see "Piece D1" below | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
-| D2, `dos32.c`: the rest | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
+| D2, `dos32.c`: the rest. Done but for the two functions that wait for the user: see "Piece D2" below | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
 | B1, the objects. Done: see below | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt`, `tools/refused.cmake` | 50 lines | P1 | The build | Little |
 | B2, the program. Done: see "B2, the program" below | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
 | H1, the reader. Done: see "Piece H1, the reader" below | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
@@ -4673,14 +4673,40 @@ in the batch of the entry, which holds `Alloc0` alone: the C
 translation has no function of that name, and the tables are one for
 both trees.
 
-### Piece D2, `dos32.c`, the rest: under way, a part at a time
+### Piece D2, `dos32.c`, the rest: done but for what is the user's, and what a later piece should know
 
-The piece is made in five parts, a commit each, in this order: the
+`dos32.c` makes 96 of the 98 functions of `sys.h`. The two that it does
+not are `ProgramEndedTake` and `ProgramEndedGive`: what a program of 32
+bits can do when DOS ends it by another's hand was tried, as 4 of what
+is open for the user asks, and is reported in the last part below; the
+two do nothing until that is decided. The toy of the two builds,
+`python3 harness/trial32/both.py`, writes the same for every function,
+28 screens for 27 steps, for both countries; its last page has the two
+that are left, which write the same too, since nobody ends the toy.
+
+And the program itself runs: the piece B2 linked it while this one was
+under way, and with the first part of this piece in it
+`build/portable_c32/VC.EXE` shows its panels on the bench. With all of
+it, `harness/show.py --program build/portable_c32/VC.EXE` took it
+through F3, Esc, a command, `ver`, which the shell ran and which came
+back, Ctrl+o twice, F10 and Enter: it left with DOS's prompt and no
+word of the extender's. And the steps of three scenarios of the
+critical error were given to both programs by `show.py`, `device`
+with F10 and Enter behind it, `phantom` and `not-ready`, 9, 13 and 56
+steps: what it prints of the
+screens, their characters and where the cursor is, is the same for
+`build/portable_c/VC.EXE` and `build/portable_c32/VC.EXE`, line for
+line, the box of the critical error with Retry and Abort among them.
+No screen was held against a golden, and no colour was looked at;
+that is M1's.
+
+The piece was made in five parts, a commit each, in this order: the
 start, the memory and the PSP; the functions through real mode; a
-program run and Quick execute; what DOS enters; the ends. Whoever goes
-on reads this first: each part says what is done, what was found, and
-what the next needs. `python3 harness/trial32/both.py` passes at each,
-for both countries, and `whole.py` links.
+program run and Quick execute; what DOS enters; the ends. Each part
+below says what is done and what was found. `both.py` passed at each,
+for both countries, and the tree linked: by the trial's `whole.py`
+until B2 landed, and by the build since, whose two tests of the layout
+pass.
 
 **The start, the memory, the PSP: done.** `dos32.c` makes 81 of the 98
 functions and has 17 that do nothing. New are `MemTake`, `MemGive`,
@@ -4694,7 +4720,7 @@ What `Start` has ready before `Main`, and whom it asks:
 | ES on the data, the direction flag clear | One piece of inline assembly, `Entered`, which answers with what ES was: the PSP's selector. It is the first thing of `Start`, so nothing is lost any more | |
 | Where the PSP is | DPMI 0006h, where the segment of that selector begins. DOS is not asked, where the program of 16 bits asks 51h first | 25E60h on the bench, the PSP as DOS has it, 25E6 |
 | Where the environment is | The word of the PSP at 2Ch, and DPMI 0006h of it | **The extender has put a selector there**, 0060h on the bench, where DOS had the segment, 25DC. The trial had not looked. Should the extender not know the word as a selector, it is taken for a segment |
-| The block below the megabyte | DPMI 0100h, as D1 had it | A program that does not get it writes "Not enough memory" by DOS, 09h, and ends with 8. D1 had it end and say nothing, and left the saying to this piece. The words are this piece's own, since `dos32.c` names nothing of the program's tables: for the user to change if they are not the right ones |
+| The block below the megabyte | DPMI 0100h, as D1 had it | A program that does not get it writes "Program too big to fit in memory" by DOS, 09h, and ends with 8. D1 had it end and say nothing, and left the saying to this piece. The words are the original's for the nearest case that it knows, too little memory to run, where it ends with 1: `dos32.c` has a copy of its own, since it reads nothing of the program's tables. See what is the user's, below |
 | The program's own memory | `OwnSet`: no call | |
 
 That word at 2Ch matters beyond `ProgramEnvironment`: DOS itself reads
@@ -4713,17 +4739,23 @@ paragraph FFFFh, `MemTake` answers that there is no memory, and the
 program says "Program too big to fit in memory" and leaves. Nothing
 else checks where the linker has put it, so:
 
-- **For B2.** The 640 KB are in the segment `_BSS` of `dos32.obj`. The
-  linker's order has to have the class BSS behind `MAIN`, as the plan
-  has it, and last, or 640 KB of zeros are in the file: `whole.py`,
-  which names no order, makes a file of 952,976 bytes now. In its map
-  `_BSS` begins 15828h behind `md`, which is paragraph 2583h of the
-  megabyte, and the 640 KB end at C584h. The test of the layout should
-  hold `Own` of the map to lie behind `md` and to end below `md` +
-  F0000h.
+- The 640 KB are a variable of `dos32.c` without a value, `Own`, and
+  so of `_BSS`, as the piece B2 asks: with `dos32.obj` linked last it
+  is the last thing of the program and not in the file, and the tests
+  `portable_c32-layout` and `portable_c32-debug-layout` pass with it.
+  In the program as it is linked today `Own` begins 63,200 bytes
+  behind `md`: its first paragraph of the megabyte is 1F6Eh, and the
+  640 KB end at BF6Fh, of FFFFh.
+- Those tests hold that the program ends within the megabyte, and so
+  that `Own` does. That it begins on a paragraph is `OwnSet`'s doing.
 - The toy has `md` among what has no value too, in front of `Own` by
   the order of its objects, so the toy says nothing of the order that
-  the program needs.
+  the program needs; the layout's tests do.
+- Nothing promises that what has no value is zeros when the program
+  is entered (the trial, "What the bench has"). `OwnSet` writes what
+  it needs, and every other variable of `dos32.c` has a value and is
+  in the file. A program that reads its 640 KB before it has written
+  them finds whatever the memory held: "What could go wrong", 7.
 
 The blocks are handed out as DOS hands out its own, since the program
 goes by that (`Init11`, `GiveMem` and `TakeMem` of `start.c`, `Aexec0`
@@ -4887,8 +4919,8 @@ How it is made:
   (`STACK_KEPT`). The extender is entered on the program's stack and
   keeps there what it needs of the call that is under way, so the
   routine cannot go on right below where DOS was called. A toy that
-  filled the stack below the stack pointer and looked what a call had
-  written saw 190 bytes at a call that the extender translates, 3Dh,
+  fills the stack below the stack pointer and looks what a call has
+  written, `harness/trial32/depth.c`, saw 190 bytes at a call that the extender translates, 3Dh,
   3Fh, 4Eh; 130 at one made by DPMI 0300h; 74 at every other, of DOS,
   the BIOS, the mouse and the idle call; and 70 for the timer's
   interrupts in protected mode. The 512 are that and as much again.
@@ -4923,11 +4955,11 @@ steps, the same in both builds and for both countries:
 
 Not tried, and why:
 
-- The phantom drive of `not-ready` and `phantom`. What the program does
-  there is its own, `Fantom` and `FtErr1` with `BlocEr`, through
-  `DriveLetter` and `DriveSetLetter`, which D1 made; to `dos32.c` it
-  is a question like any other. The first run of those two scenarios
-  judges it.
+- The phantom drive of `not-ready` and `phantom`, by a toy. What the
+  program does there is its own, `Fantom` and `FtErr1` with `BlocEr`,
+  through `DriveLetter` and `DriveSetLetter`, which D1 made; to
+  `dos32.c` it is a question like any other. The program itself was
+  asked instead, once B2 had linked it: see the top of this section.
 - The answer Ignore: the program never gives it.
 - A program run by `Aexec0` that is of real mode and does not take the
   critical error itself. The second copy stands for it, and is the
@@ -4939,6 +4971,106 @@ For M1 and the convergence: a critical error inside a call counts
 toward what the program's stack has to hold twice over, the 512 and
 then what `FtErr1` and `Dialog` take. And `IntOn` inside the question
 is `sti` in protected mode, which the extender lets a program do.
+
+**The ends: `ProgramEnd` done, and what was seen of the program ended
+by another's hand.** `ProgramEnd` gives back what is still taken, as
+the part before has it; `ProgramEndOld` has nothing to do. For the
+other two it was tried what happens, with a toy of real mode,
+`harness/trial32/ended.asm`. It does what `p.com` of the scenario
+`ended` does: it takes INT 28h, runs a program with 1111h in SI and
+2222h in CX, and at that program's first idle call asks DOS which
+program runs, 62h, and has DOS end it, 4Ch. Then it writes the
+registers that it got back, what DOS says of the end, DOS's largest
+block, the memory above the megabyte, and every interrupt of real mode
+that no longer goes where it went before. It was given the program of
+16 bits and that of 32, each as it stood at its first screen, and
+keys were typed at DOS's prompt behind it:
+
+| | The program of 16 bits | The program of 32 bits |
+|---|---|---|
+| Where DOS goes on | In the program, `Exit01`, which tells the program's function and goes on in the parent | In the parent, behind its call |
+| CX, SI | 2222h, 1111h | The same: as they went |
+| ES | The PSP of the ended program | The parent's own PSP: as DOS leaves it |
+| DX | 0201h: in DL what DOS was last told of Ctrl-C | 02DFh, 0271h, 0260h in three runs: as DOS leaves it |
+| The flags | 0202h | 0202h |
+| What DOS says of the end, 4Dh | 0009h | 0009h |
+| Whether DOS looks for Ctrl-C at every call, which the bench has on and the program switches off while it runs | On again: the program's function did that | **Off**: nothing of the program ran |
+| Interrupts of real mode that go elsewhere than before | 1Bh, into the ended program, where Ctrl-Break was taken and is never given back; and 22h there too | 22h alone, to the parent's own call, which is DOS's doing |
+| DOS's largest block, the memory above the megabyte, the mode | 7898h paragraphs, 3B80h KB, real | The same |
+| The machine afterwards | A command runs, Ctrl-Break writes `^C` | A command runs; the program of 32 bits starts again and runs; Ctrl-Break writes `^C` once `BREAK ON` has been typed |
+
+So what the plan had from reading is half so. Nothing of the program
+runs, as it thought. But the extender is not left lying in the memory:
+while the program runs, INT 21h of real mode goes to the extender, in
+the program's own block (2707:0E99 for a PSP at 26F1), and when the
+call that ends the program comes by there in real mode, the extender
+takes itself out, before DOS does anything. Seen: at the idle call
+INT 1Bh, 23h and 24h went to the extender's routines, 32F2:0000, :0032
+and :004B, the program having taken all three, and behind the end
+every one of the 256 went where it had gone before the program was
+run, 1Bh among them, which DOS does not put back. The memory is DOS's
+again, and a second run starts as the first did. The program of 32
+bits leaves less behind than the one of 16, which leaves Ctrl-Break
+pointing into memory that is free.
+
+What is not put back is the one thing that the program's function is
+there for: DOS looks for Ctrl-C as the program set it, off. And the
+parent sees DOS's registers where the original leaves it ES on the
+ended program, DL and the flags of a segment compared, which `ended`
+prints.
+
+One thing that looked like a fault and is none: with `BREAK` off,
+Ctrl-Break at DOS's prompt ends no step of the script, on any
+program, the toy of real mode alone included: `run.py` then says that
+nothing was written for its limit of seconds. With `BREAK ON` typed
+first it writes `^C`.
+
+What is the user's of this piece:
+
+- What the program of 32 bits does when DOS ends it by another's
+  hand: 4 of what is open, with the report above and the ways below.
+- The words of a program that cannot start for want of memory below
+  the megabyte. It says "Program too big to fit in memory", the
+  original's words for the nearest case, by the session's word, so
+  that the program has no words that the original has not; the case
+  is one that the program of 16 bits cannot be in, and the user may
+  want others. `NoStart_S` of `dos32.c` is the one place.
+
+That is the report, for 4 of what is open. The ways that there seem
+to be, for the user:
+
+| Way | What it takes | What it leaves |
+|---|---|---|
+| Declared, as the plan thought: a program of 32 bits that DOS ends is not told | Nothing: the two functions do nothing, as they do. `ended` gets a patch or is not run for this build | DOS no longer looks for Ctrl-C at every call behind such an end, where it did before the program ran. Whoever ended the program sees DOS's registers |
+| A stretch of real mode for where DOS goes on, in the block below the megabyte, named in the PSP at 0Ah as `Exit01` is: it tells DOS to look for Ctrl-C as before, 3301h, makes the registers what `Exit05` makes them, and goes on where the PSP said | Some 30 bytes of real mode, written as bytes as `ShellRun`'s are, and run in a block that DOS has freed by then, as `Exit01` runs in a program that it has freed. Not tried | It cannot call the program's function, which is of protected mode in an extender that has gone: it does what that function does, so `dos32.c` knows what the program puts back, where `sys.h` has the program say it. `ProgramEndedTake` would want to take that as a number and not as a function, in both builds |
+| The extender left in place until the program's function has run | Not looked at: the extender takes the call in real mode before DOS, and nothing here is asked first | |
+
+Until it is decided `told` is never called, and the comment at the
+two in `dos32.c` says what was seen.
+
+**For M1 and those behind it**, of the whole piece:
+
+- The program's stack. A critical error takes of it what the program
+  had used where it asked DOS, 512 bytes that are left alone, and what
+  `FtErr1` and its box take. The toy, of 16K, leaves 15,558 bytes
+  never used without the pages of the critical error and 15,442 with
+  them.
+- `CaseMap` is a call of real mode, and the program asks it 128 times
+  as it starts.
+- A function of `sys.h` that is asked from inside the critical error
+  and goes by `Call` or by `Extender`, `CaseMap` say, sets `Below`
+  anew, deeper; `Arrived` puts it back when the program has answered.
+  DOS must not be asked there at all, as `sys.h` says.
+- What DOS is handed in the registers that a call does not read is 0
+  here, at every call, and the environment is named at 4Bh: for entry
+  6 of `DEVIATIONS.md`, at W.
+- The 16-bit program gives who had the critical error and Ctrl-Break
+  in `ErrVct` and `BrkVct` of the main data; here those two stay as
+  the memory had them, and nothing reads them.
+- `harness/trial32/both.py` and `sys.c` are the place to try a
+  function of `dos32.c` by itself, in ten seconds; a page wants a step
+  in `STEPS`. `build/portable_c/dos.obj` has to be built for the 16-bit
+  half.
 
 ## The portable C in 32 bits: what a trial on the bench showed
 
