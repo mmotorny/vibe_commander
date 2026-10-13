@@ -3,6 +3,87 @@
 Things that are known and not done. Standing instructions are in
 `CLAUDE.md`; this is the list of loose ends.
 
+## The portable C: what another compiler says of it
+
+The portable C is built by one compiler, for DOS. The test
+`portable_c-host` counts how far its source is from what another takes:
+`harness/hostcheck.py` has gcc read every file for a machine of 64
+bits, where a pointer is no segment and offset and fits no number of 32
+bits, and counts each place that gcc refuses and each that only Open
+Watcom reads. `harness/hostcheck.txt` has the counts of every file, and
+the test holds the tree to them, so the record is always what is so:
+the top of the script says how. This is what the kinds are waiting
+for, with the counts of when it was written; the test prints them as
+they stand.
+
+1,391 places in 50 of the 59 files, the two headers among them. Nine
+files are clean: `bars_t.c`, `blank.c`, `digits.c`, `line.c`, `mask.c`,
+`memory_t.c`, `mouse.c`, `screen.c` and `string.c`.
+
+| Kind | Places | Files | What it is | What it waits for |
+|---|---|---|---|---|
+| `to-number` | 898 | 45 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets, but for the 295 that are the offset of a field: see below |
+| `to-pointer` | 436 | 30 | A number of 16 or 32 bits made a pointer | The same. Where the address is the machine's, the screen in `window.c` and DOS's routine for capitals in `dos.c`, the system interface |
+| `layout` | 2 | 1 | `BOXHD` and `BOXMN` of `tables.h`, the header and a field of a dialog, are not as long as on DOS: each holds a pointer, which is a word there | Tables that are not held to the original's bytes where a pointer is no word: `LAID_OUT` for DOS alone, when the routines that read them take pointers |
+| `inconstant` | 2 | 2 | A length that gcc cannot work out when it compiles: `IniSave` of `setup.c`, and what `start.c` holds `Palets` to | The offset of a field, below |
+| `function` | 9 | 3 | The address of a function kept as that of data, for a vector of an interrupt, and once the other way, the call into the PSP | The system interface |
+| `interrupt` | 9 | 3 | `__interrupt`, where a function is declared or defined: `CtrlC`, `Int21`, `Int27` and `Exit05` of `resident.c`, `FatErr` of `main.c` | The system interface: what DOS enters is of DOS, and goes to a file that only the build for DOS has |
+| `loadds` | 3 | 1 | `__loadds`: `Alloc0` and `Exec2E` of `resident.c` | The same |
+| `naked`, `asm` | 4, 4 | 1 | The four functions of `resident.c` that are their `_asm` | The same |
+| `asm-pragma` | 7 | 1 | The seven pieces of inline assembly of `dos.c`, a `#pragma aux` each | The same: `dos.c` is the side of that interface which is DOS |
+| `registers` | 4 | 3 | A `#pragma aux` that names registers: `__U4M` and `__U4D` of `arith.c`, `CaseMapFn` of `dos.c`, `Int2E` of `resident.c` | The same for the last two. `arith.c` is Open Watcom's own, and another compiler's build leaves the file out |
+| `intrinsic` | 1 | 1 | `_disable` and `_enable` of `dos.c` | The system interface |
+| `data_seg` | 4 | 2 | The segment of the main data, in `main.c`, and of the stack, `stack.c` | A program that does not take the main data to be at offset 0 of its segment, which the tables and `MAIN_SEG` do; and a stack that the system gives |
+| `aborts` | 8 | 3 | A `#pragma aux` that says a function does not return | Nothing: another compiler passes over the line. Four are in `vc.h`, which is not clean for them and for the `__interrupt` of `CtrlC`. A word of `vc.h` could say it to every compiler in its own way |
+
+Most of the two casts are a few macros, and
+`python3 harness/hostcheck.py --macros` counts them as they stand:
+
+- The offset of a field, worked out from a pointer at 0: `MD_AT` 256
+  and `WCB_AT` 3 of `tables.h`, `WCBini` 24 and `CmnIni` 12 of `vc.h`,
+  and in files of their own `INI_CMN` 5 and `INI_WCB` 4 of `main.c`
+  and one line of `start.c`. No pointer is meant by these, and they
+  need no other program, only the macro written as `offsetof` is.
+- `OFFSET`, 208, which 17 files define each for itself: a box, a dialog
+  or a text of the tables handed on as its offset in their segment, to
+  `Dialog`, `DialBox`, `Ask`, `OncZoom` and what else takes one. And
+  `AT`, 154, which makes the pointer again of a segment and an offset.
+  They wait for those routines to take pointers.
+- `PANEL`, 148: a panel is its segment as a number, and the macro makes
+  the pointer. `MAIN_SEG`, 98: the segment of the main data, handed on
+  where a routine takes a panel's or that of the tables. They wait for
+  a panel that is a pointer.
+- `NEAR`, 50 of each kind: a far pointer that a shared routine returns,
+  kept as a near one. With `__far` nothing the macro has nothing to do.
+- `TRELIST`, 38: where the list of the tree begins in the main data, as
+  a number.
+- 145 and 58 are written out where they are, in no macro: a place of
+  the main data kept as a word, `(u16)md.WinBuf`, `md.HstAdr`,
+  `md.BatAdr`; DX of a call of DOS that is no pointer, written into
+  `name` of `struct DosRegs`; a far pointer made of a segment and an
+  offset by a shift.
+
+What the test does not see, since gcc only reads the files:
+
+- Arithmetic that counts on an int of 16 bits. Two numbers of 16 bits
+  are added and multiplied as numbers of 32 where an int has 32, and
+  what wraps round on DOS does not there: `(u16)(a + b)` is the same on
+  both, `(a + b) >> 1` and `a + b < a` are not. Nothing has looked for
+  these.
+- A number of 16 or 32 bits read or written at an address that is not
+  even, as `PUT16` does: right for the 8086 and its descendants, and
+  not promised by the language.
+- A pointer made of a number that is written out. gcc says nothing of
+  a constant cast to a pointer: the three places of the BIOS's data,
+  `BIOS_TICKS` of `system.c`, `BIOS_PAGE_OFFSET` of `window.c` and
+  `KEYS_DOWN` of `keys.c`, are counted nowhere, nor is `NUMBER` of
+  `tables.h`, a word of a dialog that holds a number where it could
+  hold an address, in 37 lines of the tables.
+- What a word that is taken for nothing meant. A file that is clean
+  compiles; it is not thereby right on another system. `mouse.c` is
+  clean and calls the mouse driver; the files of tables are clean and
+  are the original's bytes only where a pointer is a word.
+
 ## The portable C: one program
 
 The portable C stays in the memory whole while a command runs

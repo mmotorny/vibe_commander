@@ -1576,6 +1576,36 @@ in "The portable C".
   differs, in the order of two variables of `_BSS` and nothing else,
   it is this, and the program is as right as it was. `HOLDS` of `vc.h`
   is a tag for that reason.
+- The test `portable_c-host` has gcc read the tree for a machine of 64
+  bits and holds every file to its counts in `harness/hostcheck.txt`,
+  by kind: the top of `harness/hostcheck.py` says what is counted, and
+  `TODO.md` what each kind waits for. Using it and keeping it up:
+  - It fails for a file that has another count than the record, fewer
+    as well as more. Read what it names, `python3 harness/hostcheck.py
+    --show FILE` for the lines, and if the change was to do that, write
+    the record anew with `--record` and commit it with the change. The
+    record's lines in the commit then say what the change did: a kind
+    that went, a file that became clean. The test does not forbid a
+    count that goes up, or a file that is clean no more: it has the
+    change show in the commit.
+  - After a rebase the record is written anew, not merged: the others
+    have changed the files.
+  - The kind `other` is what gcc says that `SAYS` of the script does
+    not know. None is in the record. A file with a place of that kind
+    usually does not parse: something of Open Watcom's that nothing
+    takes out of gcc's sight, and gcc then says much about the lines
+    that follow. Find the first of them with `--show other`.
+  - The counts are gcc's, of any version: 13 and 15 agree place for
+    place. clang counts otherwise, 480 numbers made pointers where gcc
+    has 436 in the same source, and nothing for the address of a
+    function kept as that of data, so the test does not ask it.
+  - A cast that a macro makes is counted where the macro is used, so a
+    file is not clean while it uses `PANEL` or `AT` of `vc.h`. A macro
+    that is made right makes every file right that uses it, and
+    `--macros` says which macros there are and how many places each
+    makes.
+  - What gcc cannot say, since it only reads, is in `TODO.md`: above
+    all arithmetic that counts on an int of 16 bits.
 
 ## Work by several agents
 

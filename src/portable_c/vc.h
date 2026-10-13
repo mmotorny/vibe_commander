@@ -58,8 +58,21 @@ HOLDS(u8_has_8_bits, sizeof(u8) == 1 && (u8)-1 == 0xFF);
 HOLDS(u16_has_16_bits, sizeof(u16) == 2);
 HOLDS(u32_has_32_bits, sizeof(u32) == 4);
 
+/* The words by which the code says what segment a thing is in. They are
+   Open Watcom's, and mean something where the memory is in segments. A
+   compiler for a machine that has all of its memory at one address
+   after another takes them for nothing: a pointer is a pointer there.
+   Nothing else of Open Watcom's is defined away, an interrupt function
+   or a line of assembly: those are what the program has to lose before
+   another compiler takes it, and harness/hostcheck.py counts them. */
+#ifdef __I86__
 #define CODE  __based(__segname("_CODE"))   /* a constant, in the code segment */
 #define STACK __based(__segname("_STACK"))  /* a pointer to a local variable */
+#else
+#define CODE
+#define STACK
+#define __far
+#endif
 
 /* Write a 16-bit value to a buffer of bytes, low byte first, and step the
    pointer past it. */

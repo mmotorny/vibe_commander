@@ -687,9 +687,21 @@ the memory, with its copies and its second `dos.c`, is gone. While a
 command runs it keeps 194,480 bytes of the memory, the program and its
 panels, where the C translation keeps 19,728 and the original 12,704.
 
+How far the source is from what another compiler takes is counted, by
+the test `portable_c-host` (see [Testing](#testing)): gcc reads every
+file for a machine of 64 bits, where a pointer is no segment and offset
+and does not fit a number of 32 bits, and each place that it refuses is
+counted, with each that only Open Watcom reads, by kind and by file.
+`harness/hostcheck.txt` has the counts as they stand, and `TODO.md`
+what each kind waits for. The three words that say what segment a thing
+is in are not among them: `src/portable_c/vc.h` takes `__far`, `STACK`
+and `CODE` for nothing where the compiler is not Open Watcom's for the
+8086, as a build for a machine without segments will.
+
 What rests on Open Watcom, for the portable C. Of what the code is
-written in, the first table above: `__far` in 690 places, `STACK` in
-481, `CODE` in 96; `#pragma aux` in 19 lines; `#pragma pack(1)` in 7
+written in, the first table above: `__far` in 773 places, `STACK` in
+481, `CODE` in 94, which that test counts in its summary; `#pragma aux`
+in 19 lines; `#pragma pack(1)` in 7
 pairs; the five `__interrupt` functions; two `__loadds` functions,
 `Alloc0`, where DOS enters the program, and `Exec2E`, where it goes on
 behind INT 2Eh; the four `__declspec(naked)` functions; two of the
@@ -747,18 +759,21 @@ original's.
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
+One test, `portable_c-host`, asks `gcc`, and is skipped where there is
+none.
 
 ```sh
 ctest --test-dir build --output-on-failure
 ```
 
-There are seven tests: one of the assembly, and three of each C tree,
+There are eight tests: one of the assembly, three of each C tree,
 named by the tree that they judge, `c-` for the C translation and
-`portable_c-` for the portable C. The two trees are held to the same
-checks, against the same goldens. Five of the tests run no machine and
-take a second or two; `c-scenarios` and `portable_c-scenarios` each run
-every scenario, in a little under two minutes on a machine that does
-nothing else, so all seven take three minutes and forty seconds.
+`portable_c-` for the portable C, and one more of the portable C, of
+its source. The two trees are held to the same checks, against the same
+goldens. Six of the tests run no machine and take a second or two;
+`c-scenarios` and `portable_c-scenarios` each run every scenario, in a
+little under two minutes on a machine that does nothing else, so all
+eight take three minutes and forty seconds.
 
 | Test | What it checks |
 |---|---|
@@ -766,6 +781,7 @@ nothing else, so all seven take three minutes and forty seconds.
 | `c-data` | Every text, box, dialog and table of the translation that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
 | `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, called near or far as each returns, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
 | `portable_c-data`, `portable_c-arith`, `portable_c-scenarios` | The same three checks of the portable C, `build/portable_c/`: what is said of the translation in the rows above and below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A table that is declared to differ is held against the original's with that difference made to it. A scenario that is declared to change is held against a golden of the portable C's own, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original, and names the others |
+| `portable_c-host` | The source of the portable C as another compiler reads it: `harness/hostcheck.py` has gcc read every file of `src/portable_c/` for a machine of 64 bits, as strict C of 1999, and counts by kind what gcc refuses, a pointer cast to a number of 16 or 32 bits, a number made a pointer, a structure that is not as long as on DOS, and what only Open Watcom reads, an interrupt function, inline assembly, a `#pragma` of its own. `harness/hostcheck.txt` has what was counted last, of every file, and the test fails where a file has another count of any kind: more, and a clean file that is clean no more, and fewer too, so that the record is always what is so, and what a change did to it shows in the commit. `python3 harness/hostcheck.py --record` writes the record anew, `--show` lists the places of a file or of a kind, and `--macros` says which macros make the casts. Nothing is compiled or run for it. It is skipped where there is no gcc |
 | `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
 ### Scenarios and goldens

@@ -434,3 +434,10 @@ foreach(tree ${c_trees})
     # before it counts as stuck, where CTest would give it 25 minutes.
     set_tests_properties(${tree}-scenarios PROPERTIES TIMEOUT 3600)
 endforeach()
+# The source of the portable C against a compiler of this computer, gcc,
+# for a machine of 64 bits: what it refuses, counted by kind and held to
+# what was counted last. See harness/hostcheck.py. It builds nothing and
+# runs no machine, and is skipped where there is no gcc.
+add_test(NAME portable_c-host
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/hostcheck.py)
+set_tests_properties(portable_c-host PROPERTIES SKIP_RETURN_CODE 77)
