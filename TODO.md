@@ -2521,6 +2521,23 @@ P4 made the test `portable_c-int16` of it, `harness/int16.py`, and
 `whole.py` until B2 had the build link the program. A count below says
 which of them counted it.
 
+**Step 1 is done**, on 13 October 2026. The portable C is that program,
+`build/portable_c/VC.EXE`, its build for 16 bits is gone, and `src/c/`
+is the 16-bit program. What follows is the plan as it was made and
+followed, kept for what each piece met, and it is not brought up: it
+speaks of two builds, of `build/portable_c32/`, of `dos.c` beside
+`dos32.c`, of `resident.c` and of a record `harness/pass32.txt`, none of
+which is there any more. "W and Z1, the switch and the end of the 16-bit
+build", near its end, says what became of each, and has what is left of
+the documents. Every piece has a section, "done, and what a later piece
+should know", under its name in the table of "The pieces": P1 to P4 for
+the source, S1 to S3 and D1, D2 and E for the system's functions, B1
+and B2 for the build, H1 to H4 for the harness, C1 and C2 for the
+scenarios that failed, T and L for what was found on the way, W, Z1, Z2
+and R1 for the switch. Nothing of the plan is open: what was the user's
+is decided, in "Open, for the user", and the next step of the road has
+a plan of its own, "The portable C in a flat memory: the plan".
+
 ### In short
 
 - The same source is built twice, by `wcc` and by `wcc386`, from the
@@ -3664,13 +3681,13 @@ and H1 are started at once by the session.
 | H2, the driver. Done: see "Piece H2, the driver" above | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
 | H3, the scenarios' test. Done: see "Piece H3, the scenarios' test" above | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
 | H4, the test of the data. Done: see "H4, the test of the data" above | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |
-| R1, `resident.c` renamed: it becomes `exec.c`, with the fifth stage of "W and Z1" below, which has the places | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
+| R1, `resident.c` renamed: it is `exec.c`. Done: see the fifth stage of "W and Z1" below | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
 | C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
 | L, a program that has stayed in the memory, when the program is left. Tried, and dropped on the user's word of 13 October 2026: see "L, a program that has stayed in the memory" below | A program that a command has left in the memory was to be at work when the program of 32 bits has been left, as behind the one of 16 bits. The mend took two bits of the extender's settings, the three interrupts given back in real mode too, and a routine of real mode at every end of the program, and left such a program without INT 21h: it is in no commit. What is kept is the scenario, what was read of the extender, and the mend in words | The scenario `stay-left`; this plan | A scenario | E | `stay-left` for the original, the C translation and the program of 16 bits; the program of 32 bits failed it and is held to it by a patch of its own since the difference was declared | What was open, 10 of that table, is decided: declared as it is |
 | T, the time of a wait. Done: see "T, the time of a wait" below | Why a wait costs the host four times as much for the program of 32 bits, and what the time that a step has is counted in | `harness/dos.py`, `harness/scenarios.py`, `harness/ported.py` | 60 lines | H3; beside the convergence | The goldens derived again are as they are; a machine that hangs is given up and one that is kept from running is not; the whole suite | A program that hangs on a busy host is waited for until its machine has had its time |
 | W, the switch. Done, with Z1 as one piece and without a name for the 16-bit build: see "W and Z1" below | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
-| Z1, the 16-bit build goes. Done, but for the first bodies in `vc.h`, which go with the words, and for the README; and `dos32.c` keeps its name: see "W and Z1" below | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
+| Z1, the 16-bit build goes. Done; the first bodies in `vc.h` went with the words, and the README was brought up by the fifth stage of "W and Z1"; and `dos32.c` keeps its name: see "W and Z1" below | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
 | Z2, the words go. Done: the third and fourth stages of "W and Z1" below | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
 
 The order:
@@ -7167,9 +7184,57 @@ build/portable_c` then.
    - `tools/calls.py` needed nothing. `harness/trial32/casts.py` and
      `added.py` run as they did: 39 places of `dos32.c`, 160 places.
 
-5. **The documents.** Each says what is so now, once; what was true of
-   the 16-bit build alone goes, or is kept as a sentence of history
-   where it explains something that is still there.
+5. **The documents: begun, and what is left.** Each says what is so
+   now, once; what was true of the 16-bit build alone goes, or is kept
+   as a sentence of history where it explains something that is still
+   there.
+
+   **Done**, in the four commits from "Rename resident.c of the portable
+   C to exec.c" on:
+   - R1. The file is `src/portable_c/exec.c`, with a comment at its top
+     that says what it was called and why. `harness/reads.py` keeps the
+     entries of `REVIEWED` and `GONE` under the C translation's name,
+     one for both trees as before, and `FILES` there says which file of
+     a tree that is; `harness/ported.py` has a `FILES` too, for what a
+     batch prints. Without the first the data's test fails for each of
+     the seven places, which was tried. **The program is not the bytes
+     that it was**: the build links the files in the order of their
+     names, so `exec.obj` stands elsewhere among them than
+     `resident.obj` did. The same objects linked by hand in the order
+     of before give the file of before, byte for byte, so the name is
+     all that differs. The hashes above are of before; they are
+     `9887141a...567d9452` and `fbd3db81...9f3a8ff5` since. Whoever
+     adds or renames a file of the tree moves the program in the same
+     way, and a piece that is to leave the bytes alone holds them
+     against a build of its own first commit.
+   - `README.md`. "The program of 32 bits" is folded into "The portable
+     C" and "Staying in the memory whole"; "What rests on Open Watcom"
+     has a table of its own for the flat program and "Inline assembly"
+     the thirteen pieces of `dos32.c`; "The system in one place" is of
+     `dos32.c`; the tests are the eleven. What went from the tree is
+     named there as the C translation has it.
+   - `src/portable_c/DEVIATIONS.md`. Entry 1 and entry 6 say what the
+     program does; the column of entry 6's table for what the program
+     of 16 bits handed over is gone, since `dos32.c` hands over 0 in
+     every register that a call takes nothing in. Entry 13 is as it
+     was, title and all. One thing went that nothing says in its place:
+     how a DOS before 3 is left, which was of the program of 16 bits;
+     the extender does not start on one, and what a user is told there
+     was not looked at ("The program of 32 bits: what differs from the
+     original, for the user", its last lines).
+
+   **Left**, each as the list below has it, which is of before and
+   whose line numbers no longer hold:
+   - This plan, beyond its top: "In short", the strategy and "The
+     build" still say that the same source is built twice.
+   - `CLAUDE.md`, the notes: every place of the last point below, and
+     `resident.c` where a note means the portable C's file.
+   - The top of `harness/scenarios.py` and the tops of the harness's
+     scripts, where they describe two builds: not looked at.
+   - "The portable C in a flat memory: the plan" names `resident.c`
+     where it means `exec.c`; it is another agent's to change.
+
+   What the list said before any of it was done:
    - **R1 goes with this stage: `resident.c` of the portable C becomes
      `exec.c`.** The name was proposed by the agent of Z2 and accepted
      by the session: the largest part of the file is `Exec`, the
