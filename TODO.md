@@ -1841,10 +1841,11 @@ left open:
   decide.
 - Whether Quick execute commands stays, of the Advanced options, is
   the user's to decide, and it stays whole until then: the setting, and
-  `Int2E` and `Exec2E` of `resident.c`, by which the commands are handed
+  `ShellRun` of `sys.h` with `Int2E` of `dos.c` behind it, by which the
+  commands are handed
   to the COMMAND.COM that the program was started from, through its INT
   2Eh, in place of a second COMMAND.COM for each. The mechanism is of
-  DOS alone, and has the one place where the program sets its stack by
+  DOS alone, and has the one place where the stack is put back by
   hand. What it gives a user may not be: commands run by the shell that
   the program was started from, faster, and with what they set kept.
 - Whether the phantom drive B: stays is the user's to decide, and it
@@ -1970,29 +1971,30 @@ DOS and is not behind it yet.
   kept: the order in which DOS is asked, which is both vectors read and
   then both set in `HookVct`; and that `SetBrk` of `resident.c` names
   `CtrlC` too, for DOS's Ctrl-C.
-- What DOS does when it ends the program: `Exit01` and `Exit05` of
-  `resident.c`, with `TakeEnd`, which has the PSP name `Exit01`, and
-  `Exit02`, which has DOS look for Ctrl-C as before and leaves the
-  registers for the program that started this one. `Exit01` is entered
-  by DOS, on that program's stack, with what assembly that takes. The
-  program's own call of DOS was here too, with its entry of INT 21h,
-  `New21` and `Int21`, and `PutVector` of `dos.c`, which wrote into the
-  machine's table of interrupts: they went when the setup program had
-  been ported, as said above under what the map of the memory has
-  left.
-- The start of the program on DOS, `Alloc0` of `resident.c`. It asks
-  through `sys.h` now, for the PSP, the version and the block of the
-  program made its own size, and still knows what is of DOS: that a DOS
-  before 3 is left through the first bytes of the PSP, by a far call,
-  and where the program ends in the memory. Of the PSP itself it reads
-  one thing more by its offset, with `TakeEnd` and `Exit00`: the place
-  where DOS goes on. The rest of what was read there in three files is
-  `dos.c`'s since the piece S1 of the plan for the 32 bits, behind
-  functions of `sys.h` that say what is wanted: `ProgramTail` and
+- What DOS does when it ends the program was `Exit01` and `Exit05` of
+  `resident.c`, with `TakeEnd`, which had the PSP name `Exit01`, and
+  `Exit02`, which had DOS look for Ctrl-C as before and left the
+  registers for the program that started this one. Since the piece S3
+  of the plan for the 32 bits the two entries are `dos.c`'s, with the
+  registers, behind `ProgramEndedTake` and `ProgramEndedGive` of
+  `sys.h`, and `Exit02` is the function of the program that is called
+  there. The program's own call of DOS was here too, with its entry of
+  INT 21h, `New21` and `Int21`, and `PutVector` of `dos.c`, which wrote
+  into the machine's table of interrupts: they went when the setup
+  program had been ported, as said above under what the map of the
+  memory has left.
+- The start of the program on DOS was `Alloc0` of `resident.c`. Since
+  S3 it is `Alloc0` of `dos.c`, which asks for the PSP and calls `Main`,
+  and what the program does first is `Alloc3` of `resident.c`, which
+  asks through `sys.h`: the version, `ProgramEndOld` for a DOS before
+  3, and `MemOwn` for the block of the program made its own size. The
+  PSP is read in `dos.c` alone, since S1 for `ProgramTail` and
   `ProgramEnvironment`.
-- Quick execute, `Int2E` and `Exec2E` of `resident.c`: COMMAND.COM's
+- Quick execute was `Int2E` and `Exec2E` of `resident.c`: COMMAND.COM's
   own interrupt, called in assembly, with the stack set by hand behind
-  it. It stays whole and where it is until it is decided (above).
+  it. Since S3 it is `ShellRun` of `sys.h`, which comes back, with
+  `Int2E` in `dos.c`. The feature stays whole until it is decided
+  (above).
 - `MemSetSearch` and `MemSetUpper`, by which `SetStat` has DOS look for
   memory in the lowest block first when the program begins, and
   `ScreenPrintAll`, by which EGA lines tells the Print Screen key of the
@@ -2098,9 +2100,9 @@ nothing in 32 bits and goes with that build:
 |---|---|---|---|
 | `__far`, `FAR`, `STACK`, `CODE` | 790, 62, 262 and 96 places (`harness/hostcheck.py`) | Words in the source | Nothing already: `vc.h` defines them away where `__I86__` is not set. The words go by a script in the last piece |
 | The macros of the addresses | 5 names that files defined for themselves, 41 definitions in 23 files, and 4 of `vc.h` | Since P1: one block of `vc.h` with two bodies, under `#ifdef __I86__` | The second body. The first goes with the build, the second in step 2 |
-| The three groups of the data, the two code segments, `#pragma data_seg` | `CMakeLists.txt`; 4 pragmas in `main.c` and `stack.c` | The build; the pragmas under `__I86__` after S3 | One flat segment of each kind, by the linker's order |
+| The three groups of the data, the two code segments, `#pragma data_seg` | `CMakeLists.txt`; 4 pragmas in `main.c` and `stack.c` | The build. The pragmas were to be under `__I86__` after S3 and are not: a flat program needs both, see "S3" below | One flat segment of each kind, by the linker's order, with the class `STACK` for the stack and `MAIN` for the main data, which the two pragmas give them |
 | `arith.c`, the compiler's two helpers | 1 file | Not built for 32 bits | `wcc386` multiplies and divides without them |
-| Interrupt functions, `__loadds`, naked functions, `_asm`, registers in `#pragma aux` | 5, 3, 2, 2, 4 and 7 places | In `resident.c`, `main.c`, `vc.h`, `dos.c` today; in `dos.c` alone after S3 | `dos32.c` has its own, as inline assembly of 32 bits |
+| Interrupt functions, `__loadds`, naked functions, `_asm`, registers in `#pragma aux` | 5, 3, 2, 2, 4 and 7 places when the plan was made; 4, 1, 2, 2, 4 and 7 since S3 | In `dos.c` alone since S3, but for the two registers of `arith.c` | `dos32.c` has its own, as inline assembly of 32 bits |
 | `LAID_OUT(BOXHD, 10)` and `LAID_OUT(BOXMN, 11)` | 2 lines of `tables.h` | Nowhere, since P1: the two lines say 8 and 9 bytes and a pointer, which is 10 and 11 on DOS, and hold every compiler to it | 12 and 13 bytes: see "The tables" |
 | `dos.c` | 1,148 lines | A file that only the 16-bit build has | `dos32.c` |
 
@@ -2176,7 +2178,7 @@ written at it:
 | The same in the setup file | None: the file is three letters, of each panel what a `WCBdef` has before `CurAdr`, of the main data what it has before `LoadRes`, and a sum; no word of those is a segment or a place | The same file | The same file |
 | The copy of the screen, the boxes' and the help's buffers | Arrays of the main data, named by their offsets in 82 words of the tables | The same | Named by address |
 | The screen itself, the BIOS's data | Far pointers of `dos.c`, B800:0 and 40:6C | Flat addresses of `dos32.c`, B8000h and 46Ch | The same |
-| The PSP and the environment | Read by their offsets through `PspSeg`, in `resident.c`, `start.c` and `main.c`. Since S1 in `dos.c`, but for the place where DOS goes on, which is S3's | Below the megabyte and outside the program's own: `sys.h` hands out the command tail, the environment and where the memory ends, S1 | The same |
+| The PSP and the environment | Read by their offsets through `PspSeg`, in `resident.c`, `start.c` and `main.c`. Since S1 in `dos.c`, and since S3 the place where DOS goes on too: `PspSeg` is static there | Below the megabyte and outside the program's own: `sys.h` hands out the command tail, the environment and where the memory ends, S1 | The same |
 
 What keeps its layout through step 1, and who holds it:
 
@@ -2239,7 +2241,11 @@ gone again, with the Info panel's two lines on the memory. And 93
 since S2, with the seven by which the program notes, takes and gives
 back the critical error, Ctrl-Break and Ctrl-C, which are of none of
 the three kinds below, since they ask the extender and not DOS; and
-with `IntOn`, which asks nobody.
+with `IntOn`, which asks nobody. And 98 since S3: `MemOwn` and
+`ProgramEndOld`, which have nothing to do under the extender;
+`ProgramEndedTake` and `ProgramEndedGive`, which are of the PSP and
+ask DOS nothing; and `ShellRun`, which goes through real mode as the
+seven of the second kind do, by a routine there and not by a service.
 
 | Kind | Functions | Which |
 |---|---|---|
@@ -2255,7 +2261,7 @@ What is 16 bits in kind and changes shape for both builds, under the
 | `ProgramRun(name, block)` | `struct EPBs`: three far pointers of real mode, which `resident.c`, `start.c` and `view.c` make with `MAIN_SEG` | `ProgramRun(name, tail)`; the block is `dos.c`'s to make, with the two file control blocks where the original has them | S1, done |
 | `ProgramPrefix()` and `PspSeg` | The PSP's segment, read at 0Ah, 2Ch, 02h and 81h in three files, 10 places | The command tail and the environment as pointers that `sys.h` answers with; the end of the memory as a number, if the Info still shows it then | S1, done for 2Ch and 81h: `ProgramEnvironment` and `ProgramTail`. 02h, the end of the memory, was `MemEnd` with S1 and is read no more: the Info does not show it (`DEVIATIONS.md`, 11). 0Ah, and the two themselves, are S3's: see "S1, the PSP and a program run" |
 | `Vector`, `SetVector` of `vc.h`; `FatErr` of `main.c`, `CtrlC` of `resident.c` | The program takes INT 24h, 1Bh and 23h itself, with interrupt functions | Functions of `sys.h` that take and give back the critical error and Ctrl-Break, in the order of today's calls; the entries in `dos.c`, which call `FtErr1` of `main.c` as a plain function | S2, done: seven functions, and `FtErr1` is handed over where the critical error is taken and called through a pointer. See "S2, what DOS enters" |
-| `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` of `resident.c` | The entry of the program, what DOS does when it ends it, COMMAND.COM's interrupt with the stack set by hand | In `dos.c`. `Main` is called by the entry; leaving is `ProgramEnd` with what has to be done first; Quick execute is a function that comes back, the stack kept and put back around the interrupt | S3 |
+| `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` of `resident.c` | The entry of the program, what DOS does when it ends it, COMMAND.COM's interrupt with the stack set by hand | In `dos.c`. `Main` is called by the entry; leaving is `ProgramEnd` with what has to be done first; Quick execute is a function that comes back, the stack kept and put back around the interrupt | S3, done: `Alloc0`, `Exit01`, `Exit05` and `Int2E` are in `dos.c`; `TakeEnd`, `Exit00` and `Exit02` stay the program's and ask through five functions that are new; `Exec2E` is gone. See "S3" below |
 | The memory by segment and paragraph | `MemTake`, `MemGive`, `MemResize` | As they are, through step 1 | Step 2 |
 
 In `dos32.c`, by the trial: the entry puts ES on the data and clears
@@ -2666,7 +2672,7 @@ and H1 are started at once by the session.
 | P4, arithmetic. Done: see below | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
 | S1, the PSP and a program run. Done: see below | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
 | S2, what DOS enters. Done: see below | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
-| S3, the entry, the end, Quick execute | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
+| S3, the entry, the end, Quick execute. Done: see below | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
 | D1, `dos32.c`: what goes straight through. Done: see "Piece D1" below | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
 | D2, `dos32.c`: the rest | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
 | B1, the objects. Done: see below | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt`, `tools/refused.cmake` | 50 lines | P1 | The build | Little |
@@ -4006,11 +4012,29 @@ For D2:
   the bench boots from does, by the trial; in 32 bits that waits for
   the functions, since DOS's own question would wait for a key.
 
-### S3, the entry, the end, Quick execute: under way
+### S3, the entry, the end, Quick execute: done, and what a later piece should know
 
-The piece is made a family at a time, a commit each, with the whole
-suite at each: the entry; the ends; Quick execute; the places of the
-main data. Whoever goes on reads here which are done.
+What DOS enters of the program, and what the program asked of DOS
+outside `sys.h`, is in `dos.c`, all of it: no file but `dos.c` and
+`arith.c` has an interrupt function, `__loadds`, a naked function,
+`_asm` or a register in a `#pragma aux`; no file but `dos.c` reads the
+PSP; and the three files of the row are clean of casts in the host
+check. `sys.h` has 98 functions, where it had 93, and every file of
+the tree compiles for 32 bits. It was made a family at a time, a
+commit each, with the whole suite at each, ten tests of ten: the
+entry; the ends; Quick execute; the places of the main data. `VC.EXE`
+is 197,070 bytes, 18 longer than it was; no golden changed; `python3
+tools/calls.py` counts none; `python3 harness/trial32/both.py` passes
+and `whole.py` links, of the build's objects alone.
+
+The five functions, each with its family below:
+
+| Function | Group of `sys.h` | In `dos32.c` |
+|---|---|---|
+| `MemOwn()` | Memory | Made: nothing to do |
+| `ProgramEndOld()` | Other programs | Made: nothing to do |
+| `ShellRun(command)` | Other programs | Not made: no command is run |
+| `ProgramEndedTake(told)`, `ProgramEndedGive()` | What the system asks the program | Not made: nobody is told |
 
 **The entry: done.** Where DOS enters the program is `Alloc0` of
 `dos.c`, and it is what is of DOS there and no more: the direction
@@ -4199,6 +4223,160 @@ bits too, which is the one handle that B2 has to say where `md` is
 linked: in front of the 640 KB, and no more than 32K behind the
 tables. And an `#ifdef` in a file of code is what the plan itself
 rules out. `wcc386` takes the four lines as they are.
+
+What is otherwise than the plan had it:
+
+- Five functions are new in `sys.h`, where the plan had none: it had
+  `Main` called by the entry and leaving be `ProgramEnd` "with what has
+  to be done first". The entry does call `Main`. But what the program
+  does first and last is in an order with DOS's calls that is
+  behaviour, the version asked before the block is made shorter and
+  Ctrl-C put back before the program ends, so those stay rows of the
+  program, and each thing in them that only `dos.c` can do is a
+  function: `MemOwn`, `ProgramEndOld`, `ProgramEndedGive`.
+  `ProgramEnd` is as it was.
+- Of `Exit00` to `Exit05`, the two that DOS enters went to `dos.c`,
+  `Exit01` and `Exit05`. `Exit00`, `Exit02` and `TakeEnd` are the
+  program's, in `resident.c`, and know nothing of DOS but the functions
+  that they call.
+- The program's function for its end is handed over, as S2 has
+  `FtErr1`, and `dos.c` names of the program only `Main`. The toy
+  defines that already, for `Start` of `dos32.c`.
+- Quick execute comes back, which the row has and the brief had as
+  "moves as it is": see its family above.
+- The four `#pragma data_seg` are not under `__I86__`: see the last
+  family above.
+- `resident.c` came off B1's list with the second family and not the
+  last: it was `Exit05` alone that `wcc386` refused. The compiler for
+  32 bits takes a block of `_asm` with registers of 16 bits, `seg` and
+  all, and `__loadds`, with no word said, so "it compiles" said nothing
+  of `Int2E` and `Exec2E`, which were still there then.
+- The stack figures moved once, by 12 bytes in every scenario, with
+  the entry. Two scenarios, `command` and `mouse-select`, and once
+  `mouse-find`, moved by 2, 6, 14 or 16 bytes otherwise, back and
+  forth, at each of the four commits. That is taken to be an interrupt
+  of the machine meeting the deepest call elsewhere as the file is
+  laid out otherwise, and was not looked into further. So "the figures
+  did not move" was held to 157 of the 159 at each commit and no more.
+
+What is left of `resident.c`, and its name. Fourteen functions and 384
+lines: `Alloc3`, with `SetStat` and `Alloc9`, what the program does
+first; `Exec`, `Exec02` and `Exec10`, the commands, with `NotFind`,
+`OutStr` and `OutStr0`, which write for them; `SetBrk`; and `Exit00`,
+`Exit02`, `TakeEnd` and `AlocEr`, leaving. It asks DOS through `sys.h`
+like any file, has no word of Open Watcom but one `aborts`, and
+compiles for 32 bits. Nothing in it is resident, and nothing has been
+since the program stays in the memory whole: the name is the C
+translation's, and says what the file was. It was left, since three
+tables of the harness know the file by it, for both trees:
+`source="resident.c"` of three batches in `harness/ported.py`,
+`REVIEWED` and its like in `harness/reads.py`, and a text of
+`harness/datacheck.py`. What it is now would be `commands.c`, which is
+taken, or `shell.c`; a rename is one commit of `git mv` and those
+three, and is nobody's piece yet.
+
+For D2, what `Start` of `dos32.c` has to do before it can call `Main`.
+`Main` asks at once, in this order, and each has to answer:
+
+- `Alloc3`: `SystemVersion`, made. `MemOwn`, made. `MemSetSearch(0)`
+  and `MemSetUpper(0)`, not made: they are passed to DOS as they are,
+  by the plan, and take no address.
+- `Init00` of `start.c`: `ProgramEnvironment`, and behind the
+  environment's end the path of the program's own file, read as 68
+  bytes, by which the setup file, the extension file and the help are
+  found; then the current drive and its directory, the setup file
+  read, the screen's mode, the banner by `ConsoleText`; then `SetBrk`,
+  which is `BreakCheck`, `SetBreakCheck` and `CtrlCTake`; then
+  `TakeEnd`, which is `ProgramEndedTake`.
+- `Init11`: `MemTake(0xFFFF)`, which has to fail and say the largest
+  block, and `MemTake` of that. With too few paragraphs the program
+  says "Program too big to fit in memory" and leaves by `Exit00`.
+- `IniData`, at the head of `Round`: `HookVct`, which is the four of
+  the critical error and Ctrl-Break, the country and its capitals,
+  `ProgramEnvironment` again, and the rest of the machine.
+
+So before `Main`, `Start` has to have:
+
+1. ES on the data and the direction flag clear, which it does.
+2. The PSP's address, of which nothing is kept now: the extender
+   enters `Start` with ES on the PSP, a selector, and `Settle` puts ES
+   on the data as the first thing. The selector has to be read before
+   that, and its base asked for; `ProgramTail` is that and 81h. Where
+   the environment is under the extender, the word at 2Ch, a segment
+   of real mode or a selector, was not looked at by the trial.
+3. The block below the megabyte, which it asks for, with room for what
+   the seven functions of real mode and `ShellRun` put there.
+4. The 640 KB of the program's own, as `MemTake` is to hand them out:
+   beginning on a paragraph of the megabyte, which is counted from 64K
+   below `md`, so that `AT(segment, 0)` is where the block begins.
+5. Nothing for `MemOwn`, and nothing taken: the three interrupts and
+   the program's end are taken by the program, later, through the
+   functions.
+
+In 16 bits the first thing that DOS is asked is where the PSP is, AH
+51h, and nothing is asked before `Main` besides. What `Start` asks of
+the extender or of DOS before `Main` is its own, and behaviour that
+the 16-bit program has not: the block below the megabyte is DOS's
+memory, 48h in real mode, which a command run later finds taken.
+
+For D2, what the ends have to give back. The program leaves in this
+order: `Exit` of `main.c` gives Ctrl-Break back, `CtrlBreakGive`, and
+puts the screen back; `Exit00` calls `ProgramEndedGive`,
+`SetBreakCheck` with what `SetBrk` noted, and `ProgramEnd`. The
+critical error and Ctrl-C it does not give back: DOS puts both back
+from the PSP when a program of 16 bits ends. So:
+
+- `ProgramEnd` of `dos32.c` gives back what the file has taken
+  through the extender and the program has not given back, the
+  critical error and Ctrl-C, and INT 22h where a program was run (the
+  trial, "Building one"), or the extender writes its warning onto the
+  last screen. It is also called with nothing taken, by `Alloc3` for a
+  DOS that is too old and by `Alloc9`; and by `AlocEr`, through
+  `Exit00`, where the start finds too little memory, with Ctrl-C and
+  the program's end taken and the critical error and Ctrl-Break not
+  yet.
+- `ProgramEndedGive` gives back what `ProgramEndedTake` took, if that
+  comes to take anything.
+- `ProgramEndedTake(told)` is what is open for the user, 4 above: in
+  16 bits DOS goes on in the program when it has ended it, the
+  program's function has DOS look for Ctrl-C as before, and the
+  program that started it goes on with ES on the ended program's PSP,
+  DL what DOS was last told of Ctrl-C, and the flags of a segment
+  compared with 0, which `ended` prints. Whether the extender lets
+  anything of the program run then is to be tried before it is
+  written; `Exit05` of `dos.c` is the whole of what there is to
+  carry over.
+- `ShellRun`: the comment at it in `dos32.c` has what the trial did.
+  The command is 127 bytes at the most, a count, 123 characters and
+  the carriage return, or the four bytes of `DosChg`; it is in the
+  main data, above the megabyte, and has to be copied down. `quick`
+  cannot tell a function that runs nothing from one that calls the
+  interrupt, on the bench: the shell there runs nothing by it.
+
+For B2:
+
+- The program of 32 bits begins at `Start_` of `dos32.c`; the one of
+  16 bits at `Alloc0_`, of `dos.c` now, under the name that the
+  linker's command had.
+- `whole.py` is the link, less its order and the stub's bit: 62
+  objects of `build/portable_c32/`, none made beside them, no name
+  left over. Its two relocations of 5 bytes are gone, which were the
+  segments of 16 bits that `Int2E` of `resident.c` named.
+- `c_waiting` of `add_portable_c32` is empty and
+  `tools/refused.cmake` has nothing to try: both can go with the piece
+  that next has `CMakeLists.txt`. A stale `resident.refused` may lie
+  in a `build/portable_c32/` that was made before; `whole.py` passes
+  over it.
+- The classes `MAIN` and `STACK` are in the objects of 32 bits, by the
+  two pragmas that stayed.
+
+For H3: three batches of `harness/ported.py` hold that `Alloc0`,
+`Exit01` and `Exit05_` have run, and the build of 32 bits has none of
+them, as it has no `FatErr`: `GONE` wants them for that tree, with
+`Start` for the first if it is to be held at all. And `Alloc3` is not
+in the batch of the entry, which holds `Alloc0` alone: the C
+translation has no function of that name, and the tables are one for
+both trees.
 
 ## The portable C in 32 bits: what a trial on the bench showed
 

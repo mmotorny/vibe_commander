@@ -624,7 +624,7 @@ The lines that say something of registers still, and why:
 | Inline assembly: the instruction and the registers it takes and leaves | every piece of `src/portable_c/dos.c` |
 | The compiler's own routines for arithmetic on 32 bits, which it calls with registers of its choosing | `__U4M`, `__U4D` of `arith.c` |
 | DOS's routine for capitals, which is no function of the program: called through a pointer, with the letter in AL | `CaseMapFn` of `dos.c` |
-| The command for COMMAND.COM's INT 2Eh, in SI as the interrupt takes it, for a function that is inline assembly | `Int2E` of `resident.c` |
+| The command for COMMAND.COM's INT 2Eh, in DX:SI, for a function that is inline assembly and has DS:SI on it as the interrupt takes it | `Int2E` of `dos.c` |
 
 The other lines of `#pragma aux` say that a function does not return,
 `aborts`; [the figures](#the-figures) have how many lines there are in
@@ -663,19 +663,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,052 bytes |
+| `VC.EXE` | 197,070 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 63,996 bytes |
-| The relocations in its header, which DOS applies | 1,032 |
+| more than the C translation's 133,056 bytes | 64,014 bytes |
+| The relocations in its header, which DOS applies | 1,033 |
 | What it keeps of the memory while a command runs: the program and its panels | 206,688 bytes |
 | What DOS has for a command then, on the bench of the tests | 218,848 bytes |
-| The code segment `CTEXT` ends at | D2B1h, 7,503 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C599h, 10,855 bytes below the limit, F000h |
-| Inline assembly | 49 instructions in 9 pieces: 37 in 7 of `dos.c`, 12 in 2 of `resident.c` |
-| Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
+| The code segment `CTEXT` ends at | D0F3h, 7,949 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C74Ch, 10,420 bytes below the limit, F000h |
+| Inline assembly | 55 instructions in 9 pieces: 55 in 9 of `dos.c` |
+| Lines of `#pragma aux` | 17, of which 6 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 754, 103, 264, 92 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 752, 106, 262, 92 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->

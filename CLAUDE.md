@@ -1760,7 +1760,8 @@ in "The portable C".
   - Where a call of DOS or the BIOS goes, the registers that it left
     for the next call go too: read what the next call takes. `IniData`
     hands a structure of registers from call to call.
-  - `Exit05` of `resident.c` is no routine for INT 5: it is where DOS
+  - `Exit05`, of `resident.c` then and of `dos.c` since the piece S3,
+    is no routine for INT 5: it is where DOS
     goes on when it ends the program. The program does not take that
     interrupt. What it does for Print Screen is one call of the BIOS in
     EGA lines, `F69_00` of `commands.c`, which was taken out and put
@@ -2866,6 +2867,65 @@ arrive went into `dos.c` (`TODO.md`, the piece S2 of the plan for the
   says what moving it would take.
 - A macro of `dos.c` may not have a name that `vc.h` has, which the
   file includes: W140 stops the build, as it did for `ENTRY`.
+
+What the entry, the ends and Quick execute met, when the last of DOS
+outside `dos.c` went into it (`TODO.md`, the piece S3 of the plan for
+the 32 bits):
+
+- What DOS enters is `dos.c`'s, and what the program does there is the
+  program's, and the cut between them is where the order of DOS's calls
+  is: the entry asks DOS one thing, where the PSP is, and calls `Main`;
+  the version, the block made shorter and how DOS looks for memory stay
+  a row of the program, `Alloc3` of `resident.c`, in the original's
+  order, and each thing in that row that only `dos.c` can do is a
+  function of `sys.h`. Moving a row into `dos.c` whole would have moved
+  a call in front of a message of the program's.
+- A register that the program that started this one is left with when
+  DOS has ended the program is `dos.c`'s to leave, and it may be what a
+  call of the program's left there: DL is what DOS was last told of
+  Ctrl-C. `dos.c` keeps that where it tells DOS, in `SetBreakCheck`, and
+  reads nothing of the program's for it.
+- A function that is handed over and is static in its file is compiled
+  far and called through the pointer far, as `FtErr1` is: `Exit02` of
+  `resident.c` is called so by `Exit05`, and by its name from `Exit00`.
+- `_asm` in a function that is static and naked: the function is near,
+  `ret` is a near return, and the call of it is near. `seg` of a
+  variable of the program's data is the segment of its group, `DGROUP`,
+  the one that DS is on: `mov ax,seg ShellSp` in `Int2E`. A far pointer
+  in `parm [si dx]` has its offset in SI and its segment in DX. BP in a
+  `modify` list is not saved, so the instructions push and pop it; ES
+  may be listed there, DS may not.
+- What does not return cannot be a function of `sys.h` that another
+  system makes by a call which does. Before taking such a thing as it
+  is, read what the original does behind it: it set its stack anew
+  behind INT 2Eh because it never returns from running commands at
+  all, and the C had a second way into its loop for that alone,
+  `Again`. With the stack kept and put back, the loop of the commands
+  goes on behind the call, and what DOS is asked is the same row.
+- The compiler for 32 bits takes `_asm` with registers of 16 bits,
+  `seg` and `offset` of a segment of 16 bits, and `__loadds`, with no
+  word said. So that a file compiles for 32 bits does not say that it
+  has none: `resident.c` compiled the moment its interrupt function had
+  left it, with `Int2E` still in it. The host check's record is what
+  says that a file has none.
+- `dos.c` had a `FLAG_ZERO` of its own, for the keyboard, when the
+  flags of `resident.c` came over under the same names: look for a
+  name in the file before bringing a block of definitions into it.
+- A function is in more places than the six that the piece S1 has: a
+  row of entry 6 of `DEVIATIONS.md`, if a register that the call does
+  not take goes with it; and the README's paragraphs under "The system
+  in one place", "What rests on Open Watcom" and "Inline assembly",
+  which say where each thing of the compiler's is, by file.
+- The toy of `harness/trial32/sys.c` is entered where the program is,
+  at `Alloc0_` of `dos.obj` in 16 bits and at `Start_` of `dos32.c` in
+  32, and defines `Main`, the one name of the program that `dos.c`
+  calls. `whole.py` links the build's objects for 32 bits and nothing
+  else: a name of DOS that the tree asks for outside `sys.h` would
+  show there as one that the linker does not find.
+- The stack figures of the scenarios follow the layout of the file in
+  two or three scenarios, `command`, `mouse-select` and `mouse-find`,
+  by 2 to 16 bytes, at every change of the code: hold a change to the
+  figures of the others.
 
 ## Work by several agents
 

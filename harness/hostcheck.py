@@ -30,9 +30,9 @@ memory has no segments, as a build for such a machine will. The summary
 says how many there are.
 
 A place is counted for the file that it is written in, and what a macro
-makes is written where the macro is used: DOS_AT of vc.h makes a
-pointer of a number in every file that names it, and is counted in
-each. What is wrong in a header itself is counted once, for the header,
+makes is written where the macro is used: DOS_AT of vc.h made a
+pointer of a number in every file that named it, and was counted in
+each, while there was one. What is wrong in a header itself is counted once, for the header,
 however many files read it. A file with no place of any kind is clean.
 
 The words of the addresses in vc.h, AT, OFFSET, PANEL, MAIN_SEG, NEAR,
