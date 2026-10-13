@@ -328,12 +328,20 @@ def places(source, objects, variables=()):
     return found
 
 
+# Entries of REVIEWED that one tree has no constant for, since it is
+# declared to do without what read it (src/<tree>/DEVIATIONS.md): tree ->
+# (file, name) -> why. Each has to be gone from the tree.
+GONE = {
+}
+
+
 def check(source, objects, contents, variables=()):
     """What is wrong with how the code in the directory `source` reads
     the constants: a list of lines. `contents` gives the bytes of an
     object by its address and length."""
     wrong = []
     used = set()
+    gone = GONE.get(Path(source).name, {})
     where = {(module, name): address
              for module, name, address, _ in objects}
     for file, line, name, module, length, read, how in places(
@@ -353,10 +361,19 @@ def check(source, objects, contents, variables=()):
                          f"at {file}:{line}, and has none: write it with "
                          f"what the original has behind it, as far as the "
                          f"zero")
-    for file, name in sorted(set(REVIEWED) - used):
+    for file, name in sorted(set(REVIEWED) - used - set(gone)):
         wrong.append(f"{file} and {name} are listed in "
                      f"{Path(__file__).name}, and the file does not name "
                      f"the constant")
+    for file, name in sorted(set(gone) & used):
+        wrong.append(f"{file} and {name} are listed in "
+                     f"{Path(__file__).name} as gone from "
+                     f"{Path(source).name}, and the file names the "
+                     f"constant")
+    for file, name in sorted(set(gone) - set(REVIEWED)):
+        wrong.append(f"{file} and {name} are listed in "
+                     f"{Path(__file__).name} as gone from "
+                     f"{Path(source).name}, and are not in REVIEWED")
     return wrong
 
 

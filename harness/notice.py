@@ -96,26 +96,28 @@ def build(tree):
     return setups.Program.load(COPY_BUILD / tree / "VC.EXE")
 
 
-def scenarios_running(routines):
-    """The scenarios in which the original ran any of `routines`."""
+def scenarios_running(routines, tree):
+    """The scenarios of the tree `tree` in which the original ran any of
+    `routines`."""
     listing = coverage.Listing(LISTING)
     for name in routines:
         if name not in listing.procedures:
             sys.exit(f"no procedure {name} in {LISTING}")
     addresses = {line.address - COM_ORIGIN for name in routines
                  for line in listing.procedure(name)}
-    return [name for name in with_goldens()
+    return [name for name in with_goldens(tree)
             if addresses & goldens.read_ran(name)]
 
 
-def with_goldens():
-    """The scenarios that have a golden to be held against; the others
-    are named."""
-    for name in scenarios.SCENARIOS:
+def with_goldens(tree):
+    """The scenarios that the tree `tree` is taken through and that have
+    a golden to be held against; the others of them are named."""
+    names = scenarios.names(tree)
+    for name in names:
         if not goldens.derived(name):
             print(f"{name} has no golden yet and is left out",
                   file=sys.stderr)
-    return [name for name in scenarios.SCENARIOS if goldens.derived(name)]
+    return [name for name in names if goldens.derived(name)]
 
 
 def noticed(program, names):
@@ -126,13 +128,13 @@ def noticed(program, names):
     The first is run by itself: a break that shows everywhere is then
     found at once. The others run side by side, as compare.py has them."""
     def one(name):
-        scenario = scenarios.SCENARIOS[name]
+        scenario = scenarios.of(name, program.tree)
         try:
             run = scenarios.run(scenario, program,
                                 benches[scenario.country])
         except MachineError as error:
             return str(error).splitlines()
-        return goldens.differences(goldens.read(name), run,
+        return goldens.differences(goldens.read(name, program.tree), run,
                                    {program.filename})
 
     with setups.Benches() as benches, \
@@ -171,8 +173,8 @@ def main():
     if len(parts) != 3 or parts[0] != "src" or parts[1] not in TREES:
         sys.exit(f"{args.file} is not a file of src/portable_c/ or of "
                  "src/c/")
-    names = scenarios_running(args.routine) if args.routine \
-        else with_goldens()
+    names = scenarios_running(args.routine, parts[1]) if args.routine \
+        else with_goldens(parts[1])
     if not names:
         sys.exit("no scenario ran " + ", ".join(args.routine)
                  + " in the original")

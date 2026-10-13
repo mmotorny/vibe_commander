@@ -91,6 +91,11 @@ class Program:
     listing: Path = field(default=None, compare=False)
     # Of the C translation, the linker's map: where its stack is.
     linked: Path = field(default=None, compare=False)
+    # Of a C tree, which one: the name of its directory in src/ and in
+    # build/, "c" or "portable_c". None for the original. A tree may be
+    # declared to behave otherwise than the original (see deviations.py),
+    # and is then held against what is declared for it.
+    tree: str = field(default=None, compare=False)
 
     @classmethod
     def load(cls, path):
@@ -104,7 +109,7 @@ class Program:
             # data is laid out as the original's, and what the driver
             # watches there is where the original has it.
             return cls(path.name.upper(), contents, LISTING,
-                       path.with_suffix(".MAP"))
+                       path.with_suffix(".MAP"), path.resolve().parent.name)
         listing = path.with_suffix(".LST")
         if not listing.exists():
             # A copy of the original has the listing of the original.

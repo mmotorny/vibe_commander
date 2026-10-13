@@ -992,10 +992,11 @@ ends 26.9 seconds past noon in the original and 28.1 in the translation, and
 longer.
 """
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import coverage
+import deviations
 import driver
 import fat
 import setups
@@ -5292,6 +5293,23 @@ SCENARIOS = {
 
 }
 
+
+
+def names(tree=None):
+    """The scenarios that a program of the tree `tree` is taken through:
+    all of them for the original, None, and for a tree that is declared
+    to have nothing otherwise (see deviations.TREES)."""
+    declared = deviations.declared(tree)
+    return [name for name in SCENARIOS if name not in declared.not_run]
+
+
+def of(name, tree=None):
+    """The scenario `name` as a program of the tree `tree` is taken
+    through it: without the steps that are declared to be left out for
+    that tree."""
+    scenario = SCENARIOS[name]
+    return replace(scenario,
+                   steps=deviations.declared(tree).steps(scenario.steps))
 
 
 def run(scenario, program, bench, trace=False, blinking=False,

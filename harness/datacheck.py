@@ -114,6 +114,16 @@ COMMAND_TABLES = {"Menu1_T", "Menu2_T", "Menu3_T", "Menu4_T", "MenuS_T",
 DIFFERENT = {
 }
 
+# Objects of one tree that are declared to be otherwise than the
+# original's, in src/<tree>/DEVIATIONS.md: tree -> name -> (why, what is
+# otherwise). The second is where the object departs from the original's,
+# each place as where it is in the original's object, how many bytes of
+# the original it is, and the bytes that the tree has there instead, none
+# for bytes that are left out. The object is held against the original's
+# with that done to it, and has to be exactly that.
+DECLARED = {
+}
+
 # Words of an object that hold an address in the original, where the
 # translation has something else than the address of the thing of that name:
 # (object, offset) -> (how, what, why). "at" is the address of the label
@@ -464,21 +474,40 @@ class Translation:
         return None
 
 
-def compare(original, translation, name, there, address, length):
+def compare(original, translation, name, there, address, length,
+            otherwise=()):
     """Hold `length` bytes of the translation at `address` against the
     original at `there`, for the object `name`. Returns None if they are the
-    same, or a line that says where they are not."""
+    same, or a line that says where they are not. `otherwise` is what the
+    object is declared to have otherwise than the original's, as DECLARED
+    has it: it is held against the original's with that done to it."""
     ours = translation.bytes(address, length)
-    theirs = original.image[there - COM_ORIGIN:there - COM_ORIGIN + length]
-    if len(theirs) < length:
+    # For each byte of the object, where the original has it, counted
+    # from `there`, or the byte that is declared to be there instead.
+    origin, behind = [], 0
+    for where, count, instead in sorted(otherwise):
+        origin += list(range(behind, where)) + [bytes([b]) for b in instead]
+        behind = where + count
+    origin = (origin + list(range(behind, behind + length)))[:length]
+    last = max((o for o in origin if isinstance(o, int)), default=0)
+    theirs = original.image[there - COM_ORIGIN:there - COM_ORIGIN + last + 1]
+    if len(theirs) < last + 1:
         return f"{name} goes on beyond the end of the original"
     at = 0
     while at < length:
-        named = original.named.get(there + at)
-        if named is None or at + 2 > length:
-            if ours[at] != theirs[at]:
+        if isinstance(origin[at], bytes):
+            if ours[at] != origin[at][0]:
                 return (f"{name}+{at}: the translation has {ours[at]:02X}h, "
-                        f"the original {theirs[at]:02X}h")
+                        f"and is declared to have {origin[at][0]:02X}h "
+                        "there")
+            at += 1
+            continue
+        here = origin[at]
+        named = original.named.get(there + here)
+        if named is None or at + 2 > length or origin[at + 1] != here + 1:
+            if ours[at] != theirs[here]:
+                return (f"{name}+{at}: the translation has {ours[at]:02X}h, "
+                        f"the original {theirs[here]:02X}h")
             at += 1
             continue
         word = struct.unpack_from("<H", ours, at)[0]
@@ -557,9 +586,10 @@ def main():
     except Problem as problem:
         sys.exit(f"datacheck: {problem}")
 
+    declared = DECLARED.get(translation.source.name, {})
     failed = []
     count = bytes_held = 0
-    stale = set(DIFFERENT) | set(ELSEWHERE) | set(OWN)
+    stale = set(DIFFERENT) | set(ELSEWHERE) | set(OWN) | set(declared)
     used = set()
     for module, name, address, length in translation.objects:
         stale.discard(name)
@@ -581,8 +611,9 @@ def main():
                       "in the room reserved for what only the shipped "
                       "binary has")
             continue
+        why, otherwise = declared.get(name, (None, ()))
         difference = compare(original, translation, name, there, address,
-                             length)
+                             length, otherwise)
         used |= {key for key in NAMED_OTHERWISE if key[0] == name}
         if name in DIFFERENT:
             if difference is None:
@@ -604,6 +635,8 @@ def main():
                 "  with what follows it")
             if label != name or behind:
                 note += f"  {label}" + (f"+{behind}" if behind else "")
+            if why:
+                note += f"  but for what is declared: {why}"
             print(f"  {module:12} {name:11} {length:4}  {there:04X}h{note}")
     for name in sorted(stale):
         failed.append(f"{name} is listed in {Path(__file__).name}, and the "
@@ -617,7 +650,9 @@ def main():
                       "and the translation has no object of that name")
 
     print(f"{count} objects of the C code, {bytes_held} bytes, are as the "
-          "original")
+          "original" + (f", {len(declared)} of them but for what "
+                        f"src/{translation.source.name}/DEVIATIONS.md "
+                        "declares" if declared else ""))
     for line in failed:
         print(f"DIFFERS  {line}")
     sys.exit(1 if failed else 0)

@@ -6,9 +6,13 @@ holds exactly what a build is expected to show.
 
 Figures that follow the size of the program are not held against the
 original at all, and are declared here too: see IGNORED.
+
+That much holds for both C trees. The portable C is declared to behave
+otherwise than the original in more, in src/portable_c/DEVIATIONS.md; what
+the harness goes by of that is at the end of this file: see TREES.
 """
 import re
-from dataclasses import replace
+from dataclasses import dataclass, field, replace
 
 from dos import COLUMNS
 
@@ -164,3 +168,52 @@ IGNORED = [
 #   which writes the line, takes ^A for the character and ^C for the
 #   colour. The translation's NgLine takes them as LnStr does. No text of
 #   the program or of its help file has either. (NgLine in src/c/line.c.)
+
+
+# --- What a tree is declared to do otherwise --------------------------------
+#
+# The C translation, src/c/, behaves as the original but for the above, and
+# is held against the original's goldens in every scenario. The portable C,
+# src/portable_c/, is where the program leaves DOS behind: each place where
+# it is to behave otherwise than the original is declared in
+# src/portable_c/DEVIATIONS.md, with the scenarios that show it, and those
+# scenarios are named here again, for the harness to go by.
+#
+# A scenario that a deviation changes cannot be held against what the
+# original did. It gets a golden of the tree's own, recorded from the tree
+# (goldens.py record) and read by whoever recorded it, in a directory of
+# that tree's name next to the original's goldens. Such a golden shows that
+# nothing has changed since it was recorded, not that anything is right.
+# Every other scenario is held against the original's golden, as it is.
+
+
+@dataclass(frozen=True)
+class Declared:
+    """What a tree is declared to do otherwise than the original, as far
+    as the scenarios go."""
+    # Scenarios that the tree is not taken through: scenario -> why. For
+    # one that only shows what the tree has no more.
+    not_run: dict = field(default_factory=dict)
+    # Steps that the tree is not taken through, in any scenario: step ->
+    # why. For keys that choose what the tree has no more, and would do
+    # something else there.
+    left_out: dict = field(default_factory=dict)
+    # Scenarios that the tree is held in against a golden of its own:
+    # scenario -> what changes in it.
+    changed: dict = field(default_factory=dict)
+
+    def steps(self, steps):
+        """The steps of `steps` that the tree is taken through."""
+        return tuple(step for step in steps if step not in self.left_out)
+
+
+# A tree is added here when src/<tree>/DEVIATIONS.md first declares
+# something that a scenario shows.
+TREES = {
+}
+
+
+def declared(tree):
+    """What the tree `tree` is declared to do otherwise: nothing, for the
+    original, None, and for a tree that is not in TREES."""
+    return TREES.get(tree, Declared())

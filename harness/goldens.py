@@ -18,6 +18,24 @@ golden, so a golden need not be derived again when more is left out.
     goldens.py derive [SCENARIO...]     derive goldens from the original;
                                         all of them if none is named
 
+A C tree that is declared to behave otherwise than the original, the
+portable C, cannot be held against the original in the scenarios that
+show it (see deviations.TREES, and src/portable_c/DEVIATIONS.md). Each of
+those has a golden of the tree's own, in a directory of the tree's name
+next to the original's: recorded from the tree as it is built, in the
+same form, and saying in its first line where it is from. It is no
+measure of the tree: it shows that nothing has changed since it was
+recorded. Whoever records one reads it, against the original's:
+
+    goldens.py record --tree portable_c [SCENARIO...]
+                                        record the goldens of a tree from
+                                        its build; all that are declared
+                                        if none is named
+    goldens.py changes --tree portable_c [SCENARIO...]
+                                        print how each golden of a tree
+                                        differs from the original's, the
+                                        rows of each screen that do
+
 The files are text. A screen is 25 lines, each the row between bars and
 then its colours, as runs of an attribute byte: 1Fx80. Bytes that are not
 printable ASCII are written as the characters they show as in the code
@@ -28,12 +46,16 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
+import deps
 import deviations
 import scenarios
 import setups
 from dos import COLUMNS, CP437_CONTROLS, ROWS, Screen
 
 DIRECTORY = Path(__file__).resolve().parent / "goldens"
+
+# What a tree is called in the first line of a golden of its own.
+TREES = {"portable_c": "The portable C"}
 
 ATTRIBUTES = "RHSVDA"             # read-only, hidden, system, label, ...
 
@@ -59,9 +81,22 @@ class Golden:
     steps: list                   # what was done before each screen
     screens: list
     disks: dict                   # drive -> path -> line describing it
+    tree: str = None              # the tree it was recorded from, or None
+                                  # for the original's
 
 
-def path(name):
+def own(name, tree):
+    """Whether the tree `tree` has a golden of its own for the scenario
+    `name`: if it is declared to change it."""
+    return name in deviations.declared(tree).changed
+
+
+def path(name, tree=None):
+    """Where the golden of the scenario `name` is that a program of the
+    tree `tree` is held against: the tree's own, if it is declared to
+    change the scenario, and the original's otherwise."""
+    if own(name, tree):
+        return DIRECTORY / tree / f"{name}.txt"
     return DIRECTORY / f"{name}.txt"
 
 
@@ -102,12 +137,19 @@ def disk_lines(disks, programs):
 
 def write(golden):
     chars = charset(golden.codepage)
-    out = [f"Volkov Commander 4.05 in the scenario {golden.scenario}: what "
-           "the original shows and",
-           "leaves on its disks. Derived by harness/goldens.py; not to be "
-           "edited.",
-           f"code page {golden.codepage}"]
-    steps = ("the start",) + scenarios.SCENARIOS[golden.scenario].steps
+    if golden.tree:
+        out = [f"{TREES[golden.tree]} in the scenario {golden.scenario}: "
+               "what it showed and left on its disks",
+               "when this was recorded, not what the original does: see "
+               f"src/{golden.tree}/DEVIATIONS.md. Not to be edited.",
+               f"code page {golden.codepage}"]
+    else:
+        out = [f"Volkov Commander 4.05 in the scenario {golden.scenario}: "
+               "what the original shows and",
+               "leaves on its disks. Derived by harness/goldens.py; not to "
+               "be edited.",
+               f"code page {golden.codepage}"]
+    steps = ("the start",) + scenarios.of(golden.scenario, golden.tree).steps
     for number, (step, screen) in enumerate(zip(steps, golden.screens)):
         out += ["", f"== {number}: {step}",
                 f"cursor {screen.cursor[0]} {screen.cursor[1]} lines "
@@ -131,15 +173,27 @@ def write(golden):
     for drive in sorted(golden.disks):
         for name in sorted(golden.disks[drive]):
             out.append(f"{drive}:\\{name}  {golden.disks[drive][name]}")
-    DIRECTORY.mkdir(exist_ok=True)
-    path(golden.scenario).write_text("\n".join(out) + "\n", encoding="utf-8")
+    file = path(golden.scenario, golden.tree)
+    file.parent.mkdir(parents=True, exist_ok=True)
+    file.write_text("\n".join(out) + "\n", encoding="utf-8")
 
 
-def read(name):
-    lines = path(name).read_text(encoding="utf-8").split("\n")
+def read(name, tree=None):
+    """The golden that a program of the tree `tree` is held against in
+    the scenario `name`: the original's, or the tree's own where it is
+    declared to change the scenario."""
+    file = path(name, tree)
+    if not file.exists():
+        raise FileNotFoundError(
+            f"{file} is not there: " + (
+                f"record it, goldens.py record --tree {tree} {name}"
+                if own(name, tree) else f"derive it, goldens.py derive "
+                                        f"{name}"))
+    lines = file.read_text(encoding="utf-8").split("\n")
     codepage = int(lines[2].split()[-1])
     codes = {char: code for code, char in enumerate(charset(codepage))}
-    golden = Golden(name, codepage, [], [], {})
+    golden = Golden(name, codepage, [], [], {},
+                    tree if own(name, tree) else None)
     at = 3
     while at < len(lines):
         line = lines[at]
@@ -208,7 +262,7 @@ def differences(golden, run, programs):
     An empty list means it does not. `programs` as for disk_lines().
     """
     report = []
-    steps = ("the start",) + scenarios.SCENARIOS[golden.scenario].steps
+    steps = ("the start",) + scenarios.of(golden.scenario, golden.tree).steps
     if list(steps) != golden.steps:
         return ["the golden was derived for other steps than the scenario "
                 "has now: derive it again"]
@@ -220,7 +274,14 @@ def differences(golden, run, programs):
             deviations.compared(run.screens[number]))
         if found:
             report += [f"--- after step {number}: {step}"] + found
-    want, got = golden.disks, disk_lines(run.disks, programs)
+    return report + disk_differences(golden.disks,
+                                     disk_lines(run.disks, programs))
+
+
+def disk_differences(want, got):
+    """Describe how the disks `got` depart from `want`, both as
+    disk_lines() has them, as text lines."""
+    report = []
     for drive in sorted(want):
         for name in sorted(want[drive].keys() | got[drive].keys()):
             a, b = want[drive].get(name), got[drive].get(name)
@@ -286,17 +347,84 @@ def derive(name, benches):
           f"{'s' if len(run.screens) > 1 else ''}")
 
 
+def record(name, program, benches):
+    """Take `program`, the build of a tree, through the scenario `name`,
+    which the tree is declared to change, and write the tree's own golden
+    of it: what the build shows, with what is not compared blanked."""
+    scenario = scenarios.of(name, program.tree)
+    run = scenarios.run(scenario, program, benches[scenario.country],
+                        blinking=True)
+    write(Golden(name, setups.codepage(scenario.country), [],
+                 [deviations.compared(screen) for screen in run.screens],
+                 disk_lines(run.disks, {program.filename}), program.tree))
+    print(f"{name}: recorded from {program.tree}, {len(run.screens)} "
+          f"screen{'s' if len(run.screens) > 1 else ''}")
+
+
+def changes(name, tree):
+    """Describe how the golden of the tree `tree` for the scenario `name`
+    differs from the original's, as text lines: of each screen the rows
+    that differ, and the disks. Where the tree is taken through fewer
+    steps than the original, a screen is held against the original's
+    after the same step, which then has more behind it."""
+    ours = read(name, tree)
+    theirs = read(name)
+    report = []
+    at = 0
+    for number, step in enumerate(ours.steps):
+        while theirs.steps[at] != step:
+            report.append(f"--- step {at} of the original is left out: "
+                          f"{theirs.steps[at]}")
+            at += 1
+        found = screen_differences(deviations.compared(theirs.screens[at]),
+                                   ours.screens[number])
+        if found:
+            report += [f"--- after step {number}: {step}"] + found
+        at += 1
+    report += disk_differences(theirs.disks, ours.disks)
+    return report
+
+
 def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
-    parser.add_argument("command", choices=["derive"])
+    parser.add_argument("command", choices=["derive", "record", "changes"])
     parser.add_argument("scenario", nargs="*",
                         help=", ".join(scenarios.SCENARIOS))
+    parser.add_argument("--tree", choices=sorted(TREES),
+                        help="for record and changes: the tree whose "
+                             "goldens are meant")
     args = parser.parse_args()
-    names = args.scenario or list(scenarios.SCENARIOS)
+    if args.command == "derive":
+        if args.tree:
+            parser.error("derive is of the original: record is of a tree")
+        names = args.scenario or list(scenarios.SCENARIOS)
+        with setups.Benches() as benches:
+            for name in names:
+                derive(name, benches)
+        return
+    if not args.tree:
+        parser.error(f"{args.command} wants --tree")
+    declared = deviations.declared(args.tree).changed
+    names = args.scenario or list(declared)
+    for name in names:
+        if name not in declared:
+            parser.error(
+                f"{args.tree} is not declared to change the scenario "
+                f"{name}: it is held against the original's golden there. "
+                f"A deviation is declared first, in src/{args.tree}/"
+                "DEVIATIONS.md and in harness/deviations.py")
+    if args.command == "changes":
+        for name in names:
+            print(f"{name}: {declared[name]}")
+            print("\n".join(changes(name, args.tree)
+                            or ["as the original's golden"]))
+        return
+    program = setups.Program.load(
+        deps.ROOT / "build" / args.tree / "VC.EXE")
     with setups.Benches() as benches:
         for name in names:
-            derive(name, benches)
+            record(name, program, benches)
 
 
 if __name__ == "__main__":

@@ -35,6 +35,16 @@ found a difference. So one cell of a screen that the translation has shown
 is changed, and then one entry is taken off a disk it has left, and the
 comparison must report each.
 
+The portable C is declared to behave otherwise than the original in some
+things (src/portable_c/DEVIATIONS.md, and deviations.TREES for the
+scenarios). A scenario that it is declared to change is held against a
+golden of the tree's own, recorded from it; such a golden is no measure,
+so this says how many scenarios were held against the original and names
+the others, and fails for a golden of the tree's own that is as the
+original's, or that nothing declares. A scenario that only shows what
+the tree has no more is not run, and a function that the tree has no
+more is listed in GONE, with what took it away.
+
 The build of the translation that is tested is the one that is shipped. What
 ran in the original was recorded with the goldens; what runs in the
 translation is read from QEMU's log of the code it executed (see
@@ -51,6 +61,7 @@ from dataclasses import dataclass, field, replace
 
 import compare
 import coverage
+import deviations
 from driver import COM_ORIGIN, EXE_HEADER
 import goldens
 import scenarios
@@ -1046,6 +1057,12 @@ BATCHES = [
 ]
 
 
+# Functions of the batches that a tree has no more: tree -> function ->
+# why. Each has to be gone from the tree's link map.
+GONE = {
+}
+
+
 def check_original(listing, ran):
     """Report on the assembly that has been replaced; return success.
 
@@ -1086,12 +1103,29 @@ def linked_as(symbols, name):
     raise KeyError(f"the link map has no function {name}")
 
 
-def check_translation(link_map, executed):
-    """Report on the C functions that replace it; return success."""
+def check_translation(link_map, executed, tree):
+    """Report on the C functions that replace it; return success. `tree`
+    is the tree that is checked: what GONE has for it is to be gone."""
     symbols = coverage.link_map(link_map)
+    gone = GONE.get(tree, {})
     passed = True
+    for name in sorted(set(gone) - {name for batch in BATCHES
+                                    for name in batch.functions}):
+        passed = False
+        print(f"  listed as gone from {tree}, and no function of a batch: "
+              f"{name}")
     for batch in BATCHES:
         for name in batch.functions:
+            if name in gone:
+                try:
+                    linked_as(symbols, name)
+                except KeyError:
+                    print(f"  gone from {tree}: {name}, {gone[name]}")
+                else:
+                    passed = False
+                    print(f"  listed as gone from {tree}, but linked: "
+                          f"{name}")
+                continue
             segment, offset = linked_as(symbols, name)
             start = segment * 16 + offset
             if start - COM_ORIGIN + EXE_HEADER not in executed:
@@ -1125,6 +1159,54 @@ def check_stack(link_map, names, runs):
     return left[least] >= limit
 
 
+def check_declared(tree, names):
+    """Report on what the tree `tree` is declared to do otherwise than
+    the original, of which `names` are the scenarios it was taken
+    through; return success. A golden of its own has to be other than
+    the original's, where both are of the same steps, and to be declared."""
+    declared = deviations.declared(tree)
+    passed = True
+    for name in sorted(set(declared.changed) | set(declared.not_run)):
+        if name not in scenarios.SCENARIOS:
+            passed = False
+            print(f"  declared for {tree}, and no scenario: {name}")
+    for name, why in declared.changed.items():
+        if name in declared.not_run or name not in scenarios.SCENARIOS:
+            continue
+        ours, theirs = goldens.read(name, tree), goldens.read(name)
+        if ours.steps == theirs.steps and not goldens.changes(name, tree):
+            passed = False
+            print(f"  {name} has a golden of {tree}'s own that is as the "
+                  "original's: it is declared to change, and does not")
+    for name in names:
+        left = set(scenarios.SCENARIOS[name].steps) & set(declared.left_out)
+        if left and name not in declared.changed:
+            passed = False
+            print(f"  {name} has a step that is left out for {tree}, "
+                  f"{sorted(left)[0]}, and is not declared to change")
+    directory = goldens.DIRECTORY / tree
+    for file in sorted(directory.glob("*")) if directory.is_dir() else []:
+        if file.suffix != ".txt" or file.stem not in declared.changed:
+            passed = False
+            print(f"  {file.relative_to(goldens.DIRECTORY.parent)} is the "
+                  f"golden of nothing that is declared for {tree}")
+    held = [name for name in names if name not in declared.changed]
+    print(f"The goldens: {len(held)} scenarios were held against the "
+          "original's")
+    if declared.changed:
+        print(textwrap.fill(
+            f"against {tree}'s own, which only show that nothing has "
+            "changed since they were recorded: "
+            + ", ".join(name for name in names if name in declared.changed),
+            width=78, initial_indent="  ", subsequent_indent="    ",
+            break_on_hyphens=False))
+    for name, why in declared.not_run.items():
+        print(textwrap.fill(f"not run for {tree}: {name}, {why}", width=78,
+                            initial_indent="  ", subsequent_indent="    ",
+                            break_on_hyphens=False))
+    return passed
+
+
 def check_comparison(name, run, program):
     """Report on whether the comparison notices differences; return
     success.
@@ -1145,7 +1227,7 @@ def check_comparison(name, run, program):
         "an entry missing from drive C:": replace(
             run, disks={**run.disks, "C": entries}),
     }
-    golden = goldens.read(name)
+    golden = goldens.read(name, program.tree)
     passed = True
     for what, changed in changes.items():
         if goldens.differences(golden, changed, {program.filename}):
@@ -1175,16 +1257,21 @@ def main():
           f"times the original's {len(original.contents)}; the limit is "
           f"{SIZE_LIMIT} times")
 
-    names = list(scenarios.SCENARIOS)
+    names = scenarios.names(translation.tree)
     failed, runs = compare.compare(names, translation, trace=True,
                                    stack=True)
+    # What ran in the original is of every scenario, also of one that
+    # the tree is not taken through.
     in_original, in_translation = set(), {}
-    for name, run in zip(names, runs):
+    for name in scenarios.SCENARIOS:
         in_original |= goldens.read_ran(name)
+    for run in runs:
         in_translation.update(run.executed)
     passed = check_original(coverage.Listing(args.listing), in_original)
-    passed = check_translation(args.link_map, in_translation) and passed
+    passed = check_translation(args.link_map, in_translation,
+                               translation.tree) and passed
     passed = check_stack(args.link_map, names, runs) and passed
+    passed = check_declared(translation.tree, names) and passed
     passed = check_comparison(names[0], runs[0], translation) and passed
     sys.exit(failed or not passed or size > limit)
 
