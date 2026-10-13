@@ -32,9 +32,12 @@ build/portable_c32/VC.EXE, which the build links of the same source
 (TODO.md, "The portable C in 32 bits: the plan"): what the harness's
 reader of such a file, harness/le.py, finds in it, the length of the
 file and of the extender's stub in it, its code and its data, the
-addresses that the extender sets, the stack; how much room the layout
-that it rests on has left, as the test of that works it out,
-harness/layoutcheck.py; the length of the same program compiled for
+addresses that the extender sets, the stack; how many words of its
+tables are pointers where the original has a word of 16 bits, and how
+many of those are such addresses, as the test of its data counts them,
+harness/datacheck.py; how much room the layout that it rests on has
+left, as the test of that works it out, harness/layoutcheck.py; the
+length of the same program compiled for
 finding a fault; and the inline assembly of dos32.c, which only that
 program has. What is worked out:
 
@@ -70,6 +73,7 @@ sys.path.insert(0, str(ROOT / "harness"))
 
 import calls  # noqa: E402  (of tools/, next to this)
 import coverage  # noqa: E402  (of harness/, not the package of that name)
+import datacheck  # noqa: E402
 import hostcheck  # noqa: E402
 import layoutcheck  # noqa: E402
 import ported  # noqa: E402
@@ -161,6 +165,9 @@ def flat():
     pieces = inline_assembly({name: code(SOURCE / name)
                               for name in NOT_BUILT})
     room = check.room
+    # The test of the data, for what it counts: it says nothing here.
+    _, tables = datacheck.check(BUILD / "shareware-layout", directory,
+                                SOURCE, say=lambda line: None)
     return [
         ("The program of 32 bits, `build/portable_c32/VC.EXE`",
          f"{number(len(program.contents))} bytes, of which the extender's "
@@ -172,6 +179,12 @@ def flat():
          f"{number(instructions.size + data.size)} bytes"),
         ("The addresses in it that the extender sets when it loads it",
          number(len(program.relocations))),
+        ("The words of its boxes, dialogs and tables that are pointers, "
+         "four bytes where the original has a word of two; and how many "
+         "of them are among those addresses, the others holding a "
+         "number: as the test `portable_c32-data` holds them",
+         f"{number(tables['pointers'])} and "
+         f"{number(tables['addresses'])}"),
         ("Its stack", f"{number(top - bottom)} bytes"),
         ("How far its tables may grow, in front of `Title_S` and behind "
          "it, before the offset of one wraps round, as the test "

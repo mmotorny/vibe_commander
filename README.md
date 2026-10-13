@@ -679,6 +679,7 @@ the number. No test holds the table.
 | Its code, and what the file has of its data | 132,735 and 104,567 bytes |
 | What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,290 bytes |
 | The addresses in it that the extender sets when it loads it | 5,292 |
+| The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c32-data` holds them | 643 and 555 |
 | Its stack | 16,384 bytes |
 | How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,172 and 16,428 bytes |
 | How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,368 and 2,347 bytes |
@@ -1141,7 +1142,8 @@ a box or a dialog is longer than the original's by two bytes for each;
 the code asks such a word what it names and gets the offset as before
 (`NAMED` of `vc.h`). So the tables of this program are held against the
 original's field by field, by the test `portable_c32-data`, where those
-of the 16-bit program are held byte for byte.
+of the 16-bit program are held byte for byte: [the figures](#the-figures)
+have how many such words there are.
 
 No test runs it yet. `dos32.c` has 96 of the 98 functions of `sys.h`;
 the two that it has not are those by which the program is told that DOS
