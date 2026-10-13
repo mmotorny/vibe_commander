@@ -245,7 +245,6 @@ file. Whoever moves a file takes it out of the table:
 
 | Piece | Files, with the calls left in each | Calls |
 |---|---|---|
-| 1 | `copy.c` 60 | 60 |
 | 2 | `resident.c` 34, of which 11 stay | 34 |
 | 3 | `read.c` 2 and `drive.c` 2, which wait: see below | 4 |
 | 5 | `commands.c` 5 and `main.c` 1, which stay for now: see below | 6 |

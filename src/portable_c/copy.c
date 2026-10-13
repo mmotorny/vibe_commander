@@ -66,12 +66,14 @@ u16 F35_61(u16 answer, u16 place);
    both offsets in the assembly's code segment; where the box is comes back
    as a struct Box of vc.h. ResWin puts back what a box covers. ChgDisk
    asks for the disk of a drive that shares the floppy drive with another,
-   and is not 0 to stop. Intr21f is Intr21 with the carry flag set before
-   DOS is called if `carry` is not 0, and clear if it is: for a call that
-   leaves the flag as it finds it. */
+   and is not 0 to stop.
+
+   What the system is asked, it is asked by the functions of sys.h: for
+   files, directories and the room of a drive with the program's errors,
+   where the assembly calls DOS through Intr21, and bare for the current
+   drive, where it calls DOS itself. */
 /* AsmSeg returns the segment of the program's constants, where its
-   texts are (see dialog.c). SelDrv makes a drive the current one, 0
-   for A:, by the call of DOS that the assembly makes without Intr21. */
+   texts are (see dialog.c). */
 
 /* A dialog whose box is not on the screen yet, and which sets what it
    sets in the main data: Dialog of vc.h. The low byte of what it returns
@@ -127,8 +129,8 @@ static const u8 CODE AllIn_S[] = "\\*.*";
 #define Box_C 16                        /* the number of the colour of a box */
 #define BoxCu_C 18                      /* and of a line that is typed into */
 
-/* Errors of DOS, and the one that Intr21 makes of a drive that is not
-   ready. */
+/* Errors of DOS, and the one that a function of sys.h answers with when
+   a drive was not ready and the user gave up. */
 #define ERR_NO_PATH   0x03
 #define ERR_NO_ACCESS 0x05
 #define ERR_CURRENT   0x10
@@ -145,17 +147,11 @@ static const u8 CODE AllIn_S[] = "\\*.*";
 #define HIGH(pair) ((u16)((pair) >> 16))
 #define PAIR(high, low) ((u32)(high) << 16 | (low))
 
-/* The byte at an address, the segment that the main data is in, and a
-   number where DOS takes one in DX: DS goes with it. */
+/* The byte at an address, and the segment that the main data is in. */
 #define AT(segment, offset) ((u8 __far *)PAIR(segment, offset))
 #define MAIN_DATA() HIGH((u32)(const void __far *)md.TmpBuf)
-#define NUMBER(value) AT(MAIN_DATA(), value)
-/* What DOS returned in DX. */
-#define DX_OF(regs) ((u16)(u32)(regs).name)
 
 #define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
-
-#define CALL(regs) Intr21((struct DosRegs STACK *)&(regs))
 
 /* The title of the boxes, as the offset of the text in the assembly:
    Copy, Move, or Rename once a file is being renamed. */
@@ -611,7 +607,6 @@ close:
 static u16 C20_00(u16 fits)
 {
     struct Box box;
-    struct DosRegs regs;
     u32 left, free;
     struct Answer opened, moved, asked;
     struct Device device;
@@ -994,7 +989,6 @@ full:
         goto open;
     if (attr.value == ERR_NOT_READY)
         goto forget;
-    regs.name = md.TmpErr;
     part = md.TmpErr;
     if (part[1] == ':')
         part += 2;
@@ -1005,8 +999,8 @@ full:
             part[-1] = 0;
     *part = 0;
     for (;;) {
-        regs.ax = 0x3900;
-        if (CALL(regs) && regs.ax == ERR_NOT_READY)
+        asked = DirMake(md.TmpErr);
+        if (asked.failed && asked.value == ERR_NOT_READY)
             goto forget;
         count = LenName;
         end = (u8 *)C00_End(md.TmpErr, (u16 STACK *)&count);
@@ -1067,7 +1061,6 @@ close:
 static u16 C30_00(u16 across, u16 fits)
 {
     struct Box box;
-    struct DosRegs regs;
     struct FileAttr attr, there;
     struct Answer marked, asked;
     u16 result, error, i;
@@ -1117,10 +1110,9 @@ make:
         goto failed;
     if (ChgDisk(CpDest))
         goto stop;
-    regs.name = CpDest;
-    regs.ax = 0x3900;
-    if (CALL(regs)) {
-        if (regs.ax == ERR_NOT_READY)
+    asked = DirMake(CpDest);
+    if (asked.failed) {
+        if (asked.value == ERR_NOT_READY)
             goto stop;
         there = FileAttributes(CpDest);
         error = there.value;
@@ -1144,13 +1136,12 @@ make:
     if (CopyMov != 0) {
         if (ChgDisk(CpSrc))
             goto stop;
-        regs.name = CpSrc;
-        regs.ax = 0x3A00;
-        if (!CALL(regs))
+        asked = DirRemove(CpSrc);
+        if (!asked.failed)
             goto removed;
-        if (regs.ax == ERR_NOT_READY)
+        if (asked.value == ERR_NOT_READY)
             goto stop;
-        if (regs.ax != ERR_NO_ACCESS && regs.ax != ERR_CURRENT)
+        if (asked.value != ERR_NO_ACCESS && asked.value != ERR_CURRENT)
             goto nothing;
     }
     ResWin(box.begin, box.size, box.saved);
@@ -1166,24 +1157,21 @@ walk:
             (struct Box STACK *)&box);
     if (ChgDisk(CpSrc))
         goto stop;
-    regs.name = CpSrc;
-    regs.ax = 0x3A00;
-    if (CALL(regs)) {
-        if (regs.ax == ERR_NOT_READY)
+    asked = DirRemove(CpSrc);
+    if (asked.failed) {
+        if (asked.value == ERR_NOT_READY)
             goto stop;
-        if (regs.ax == ERR_NO_ACCESS) {
+        if (asked.value == ERR_NO_ACCESS) {
             /* Is anything left in it? Its own two entries are. */
             for (end = CpSrc; *end != 0; end++)
                 ;
             for (i = 0; i < sizeof AllIn_S; i++)
                 end[i] = AllIn_S[i];
-            regs.cx = 0x37;
-            regs.ax = 0x4E00;
-            error = CALL(regs);
+            asked = FindFirst(CpSrc, 0x37);
             *end = 0;
-            if (!error)
+            if (!asked.failed)
                 goto nothing;
-            if (regs.ax == ERR_NOT_READY)
+            if (asked.value == ERR_NOT_READY)
                 goto stop;
         }
         Ask(OFFSET(CntDi_B), OFFSET(Move0_S));
@@ -1402,7 +1390,6 @@ struct Copied F45_01(u16 panel, u16 command, u16 directories, u16 files)
    the program goes to X2, if there is such a directory. */
 static void F36_04(void)
 {
-    struct DosRegs regs;
     const u8 *rest;
     u8 *to;
     u16 length, i;
@@ -1424,9 +1411,7 @@ static void F36_04(void)
     to = NEAR(MvzLine(CpInpt, md.ToFile, LenStr + 1));
     for (i = 0; i < LenPath; i++)
         to[i] = rest[i];
-    regs.name = CpInpt + 2;
-    regs.ax = 0x3B00;
-    CALL(regs);
+    DirChange(CpInpt + 2);
 F36_05:
     for (i = 0; i < LenStr + 1; i++)
         md.CrnPath[i] = md.ToFile[i];
@@ -1566,7 +1551,7 @@ u16 F35_61(u16 answer, u16 place)
         NormStr(md.TmpBuf);
         pair = *(u16 *)md.TmpBuf;
         if (pair >> 8 == ':') {
-            SelDrv((u8)(UpCase(pair) - 'A'));
+            DriveSelect((u8)(UpCase(pair) - 'A'));
             if (SetPth())
                 left = 1;
         }
@@ -1577,7 +1562,7 @@ u16 F35_61(u16 answer, u16 place)
     pair = kept[0];
     for (i = 0; i < LenPath; i++)
         md.DosPth[i] = kept[i];
-    SelDrv((u8)(pair - 'A'));
+    DriveSelect((u8)(pair - 'A'));
     if (left)
         return 1;
     end = NEAR(MvzLine(line, md.TmpBuf, LenName));

@@ -1646,7 +1646,7 @@ For one function, in this order:
    `portable_c-scenarios`. No golden changes.
 
 The calls of DOS, by the value in AH or AX. "Asked" is a call through
-`Intr21` or the `CALL` of `copy.c`, "bare" one through `Int21d` or
+`Intr21` or the `CALL` that `copy.c` had, "bare" one through `Int21d` or
 `Int21e`: the function has to be of the same kind, and where a service
 is called both ways the bare function says so in its name.
 
@@ -1970,6 +1970,42 @@ and `setup.c` met:
   wants a short path: QEMU's socket is in it, and a path of more than
   107 characters is refused, "AF_UNIX path too long". `build/tmp` does;
   a directory two levels further down did not.
+
+What `copy.c` added to that, which went over a family of calls at a
+time, a commit each:
+
+- What a register held that a line reads without having looked at the
+  flag is read from the assembly, not from the structure of registers
+  that the C had. The structure may never have been given that member,
+  and then the C went on with what its stack held: CX where `C20_00`
+  asks for the time of a source that is a device. Or the C worked a
+  value out beside the structure where the assembly changes the
+  register: the attributes of a target that is appended to, `AND` and
+  `OR` on CX there. The place then says what the assembly has, and the
+  commit says that the portable C had something else.
+- The other answers are like the time and the date in that: `kind` of
+  `FileDevice` is 0 if DOS would not say, where the original reads DX
+  as it was, the address of the name; `free` and `sector` of
+  `DriveSpace` are 0 where it reads BX and CX as they were, a handle
+  and a count. `place` of `FileSeek` needs nothing, being the two words
+  that DOS left.
+- While some calls of a function still have the structure, a call that
+  has gone no longer sets it for them. What a call that stays takes,
+  the name and the handle, is set in front of it, where it was set
+  once for a row of calls; and what a line behind it reads of a
+  register that the call does not answer in, too. The structure goes
+  with the last of them, and the build stops for it if it is left.
+- A register that went through a call which does not take it to one
+  that does, the attributes of a source directory from 4300h through
+  39h to 4301h, is the answer of the first call, read at the third.
+- A file gives back fewer bytes for a call that answers with more than
+  four bytes, which come back through a pointer to room in the
+  caller's frame: `FileAttributes`, `FileDevice`, `FileSeek`,
+  `FileTime`, `DriveSpace`.
+- Each family was built, held to the data and to the host check, and
+  copied as a build, by the note on testing a build that is a copy;
+  the scenarios then ran on the copies side by side while the next
+  family was made.
 
 ## Work by several agents
 
