@@ -579,10 +579,11 @@ thing to say, the same place of the loop from every return, which is
 the end of a command in the assembly, a jump: they return nothing. Two
 are gone. And three return a number that is one: `Timer` of
 `system.c`, the BIOS's count of timer ticks, the compiler's `__U4M`,
-and `Dos35` of `main.c`, an address as DOS has it. Three numbers of 16
-bits that had a second thing or a flag above the first went the same
-way: how the editor was left, and in the main loop where the program
-goes on after a command and what the mouse asks for.
+and `Dos35` of `main.c`, an address as DOS has it, which is `Vector` of
+`dos.c` since. Three numbers of 16 bits that had a second thing or a
+flag above the first went the same way: how the editor was left, and
+in the main loop where the program goes on after a command and what
+the mouse asks for.
 
 The lines that say something of registers still, and why:
 

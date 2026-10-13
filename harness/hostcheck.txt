@@ -36,7 +36,7 @@ input.c       to-number 2, to-pointer 1
 keys.c        to-number 11, to-pointer 28
 keys_t.c      clean
 line.c        clean
-main.c        to-number 30, to-pointer 23, function 2, interrupt 1, data_seg 2, aborts 1
+main.c        to-number 30, to-pointer 21, function 2, interrupt 1, data_seg 2, aborts 1
 main_t.c      clean
 mask.c        clean
 memory.c      to-number 11, to-pointer 27, function 1

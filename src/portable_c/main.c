@@ -94,11 +94,10 @@ enum {
    a click on the line `line` is the first one there, 1 if it is the
    second, in time, and 0 if the button went up somewhere else.
 
-   TstDrv is 1 if there is a drive of the letter. SelDrv is the call of
-   DOS that makes a drive the current one, 0 for A:, and Int21d any call
-   of DOS that the assembly made without Intr21; DosTime asks DOS for the
-   time of day, the hours and minutes in one word. Int10 calls the
-   BIOS for the screen.
+   TstDrv is 1 if there is a drive of the letter. What the file asks of
+   the system it asks by the functions of sys.h, but for the drive that
+   a unit goes by, in ErrRdy: Int21d is any call of DOS that the assembly
+   made without Intr21.
 
    MakeIni writes into MenuBuf what the setup file holds, and SaveSet
    writes that file: both of vc.h. ReDir reads what a panel shows,
@@ -156,10 +155,7 @@ struct MainDat md;
 #define INI_CMN(field) \
     (3 + 2 * WCBini + OFFSET_IN(struct MainDat, field))
 
-#define DOS_SET_VECTOR 0x2500           /* DOS: an interrupt to DS:DX */
-#define DOS_PATH       0x4700           /* the current directory of a
-                                           drive, to DS:SI */
-#define DOS_UNIT       0x440F           /* which drive a unit is that
+#define DOS_UNIT       0x440F           /* DOS: which drive a unit is that
                                            stands for several */
 
 /* What a panel shows, written to the screen buffer: PutFls of the
@@ -193,26 +189,17 @@ static u16 Init46(u16 c)
    the right panel, and only the row is used. */
 static u16 Init40(void)
 {
-    struct BiosRegs regs;
     const u8 __far *tail;
     u8 *to;
-    u16 row, line, bottom, count, i, c;
+    u16 page, row, line, bottom, count, i, c;
 
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.dx = 0;
-    regs.ax = 0x0F00;                   /* which page is shown */
-    Int10((struct BiosRegs STACK *)&regs);
-    regs.ax = 0x0300 | regs.ax & 0xFF;  /* where the cursor is */
-    Int10((struct BiosRegs STACK *)&regs);
-    row = regs.dx >> 8;
+    page = ScreenState().page;
+    row = CursorWhere(page).place >> 8;
     if (md.KeyBar != 0) {
         line = (u8)(md.Lines - 1);
         if (row >= line) {
             row = (u8)(line - 1);
-            regs.dx = regs.dx & 0xFF | row << 8;
-            regs.ax = 0x0E0A;           /* a line feed: the screen scrolls */
-            Int10((struct BiosRegs STACK *)&regs);
+            ScreenType('\n', page, 0);  /* a line feed: the screen scrolls */
         }
     }
     /* Init41 */
@@ -308,7 +295,6 @@ static void Init90(u16 panel)
    before a command gets them, but BP, which this does not change. */
 static void Init50(void)
 {
-    struct DosRegs regs;
     struct WCBdef __far *wcb;
     u16 panel, size, drive, keep, failed, letter, length, same, i;
 
@@ -376,7 +362,7 @@ Init53:
                     drive = letter;
                 letter = (u8)(letter - 'A');    /* Init61 */
                 size = size & 0xFF00 | letter;
-                SelDrv(size);
+                DriveSelect(letter);
                 goto Init52;
             }
         }
@@ -425,14 +411,8 @@ Init70:
         letter = (u8)(letter - ('A' - 1));
         size = size & 0xFF00 | letter;
         if (!Fantom(letter)) {
-            regs.ax = DOS_PATH | letter;
-            regs.bx = 0;
-            regs.cx = drive;
-            regs.name = (const u8 __far *)wcb + size;   /* DL, and DS */
-            regs.si = (u16)(u32)(wcb->WinPath + 3);
-            regs.di = 0;
             md.BlocEr = 1;
-            failed = Intr21((struct DosRegs STACK *)&regs);
+            failed = DirCurrent(letter, wcb->WinPath + 3).failed;
             md.BlocEr = 0;
             if (!failed)
                 drive = 0;
@@ -833,7 +813,7 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
                 r->si = (u16)md.CrnPath + i;
                 r->di = (u16)md.DosPth + i;
                 if (!same && md.FlagCD != 0) {
-                    moment = DosTime();
+                    moment = TimeOfDay();
                     time = moment.clock;
                     hundredths = (u8)(moment.seconds + md.DelayTm[0]);
                     seconds = moment.seconds >> 8;
@@ -1420,47 +1400,21 @@ void Quit(void)
     ResUser(0, line << 8 | 80);
 }
 
-/* Have DOS send an interrupt somewhere. */
-static void SetVect(u16 number, const u8 __far *to)
-{
-    struct DosRegs regs;
-
-    regs.ax = DOS_SET_VECTOR | number;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.name = to;
-    regs.si = 0;
-    regs.di = 0;
-    Int21d((struct DosRegs STACK *)&regs);
-}
-
-/* Where an interrupt goes, as DOS says: the offset in the low word. The
-   low byte of `call` is the number of the interrupt. */
-static u32 Dos35(u16 call)
-{
-    struct DosRegs regs;
-
-    regs.ax = 0x3500 | call & 0xFF;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.name = (const u8 __far *)&md;
-    regs.si = 0;
-    regs.di = 0;
-    Int21d((struct DosRegs STACK *)&regs);
-    return (u32)regs.es << 16 | regs.bx;
-}
+/* The two interrupts that the program takes. */
+#define INT_BREAK 0x1B                  /* Ctrl-Break */
+#define INT_ERROR 0x24                  /* DOS's critical error */
 
 /* Give Ctrl-Break back to whoever had it. */
 void RstVc1(void)
 {
-    SetVect(0x1B, (const u8 __far *)md.BrkVct);
+    SetVector(INT_BREAK, md.BrkVct);
 }
 
 /* Give the critical error of DOS and Ctrl-Break back to whoever had
    them. */
 void RestVct(void)
 {
-    SetVect(0x24, (const u8 __far *)md.ErrVct);
+    SetVector(INT_ERROR, md.ErrVct);
     RstVc1();
 }
 
@@ -1578,13 +1532,13 @@ void __interrupt __far FatErr(struct Saved r)
    Returns the offset of that routine, CtrlC of resident.c. */
 u16 HookVct(void)
 {
-    const u8 __far *routine = (const u8 __far *)(void __far *)CtrlC;
+    u32 routine = (u32)(void __far *)CtrlC;
 
-    md.ErrVct = Dos35(0x3524);
-    md.BrkVct = Dos35(0x351B);
-    SetVect(0x24, (const u8 __far *)(void __far *)FatErr);
-    SetVect(0x1B, routine);
-    return (u16)(u32)routine;
+    md.ErrVct = Vector(INT_ERROR);
+    md.BrkVct = Vector(INT_BREAK);
+    SetVector(INT_ERROR, (u32)(void __far *)FatErr);
+    SetVector(INT_BREAK, routine);
+    return (u16)routine;
 }
 
 /* Leave the program: the screen as DOS had it, with the cursor on the
