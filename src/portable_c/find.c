@@ -80,9 +80,7 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
 
    PgUp and PgDn move the cursor of a list a page, `rows` lines: they
    return the cursor and the first line shown. Scroll moves a window of
-   the screen by a line.
-   Int16 calls the BIOS for the keyboard: `none` of what it returns is 1
-   if the zero flag was set. Help00 is the help,
+   the screen by a line. Help00 is the help,
    which is C, as is DirFunc, of vc.h.
 
    HidCur puts the cursor below the screen. SavWin keeps what the
@@ -92,10 +90,7 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
    width that the low byte of `size` has for the box: the cell `cell`
    between the characters of `ends`; it returns the place a row below.
 
-   Int21d calls DOS as Intr21 does, with the registers of `regs` and
-   their answer there, but not through Intr21: DOS's box for a drive
-   that is not ready is not looked for, and an error is not asked about.
-   Int2F calls the multiplex interrupt, and returns AX and BX. */
+   What is asked of the system is asked through sys.h. */
 void Help00(void);                                      /* help.c */
 
 /* C routines of other files that vc.h does not have. */
@@ -139,7 +134,8 @@ extern const u8 __far FnFl7_S[];
 /* What the size column says for a directory. */
 static const u8 CODE SubDir[7] = "SUB-DIR";
 
-/* Errors of Intr21. */
+/* The error of a call that the user gave up, when a device was not
+   ready. */
 #define ERR_NOT_READY 0x53
 
 /* A place on the screen `rows` and `columns` from another, each within
@@ -493,11 +489,11 @@ static u16 FndBack(void)
         if (key != 0) {
             key = KEY_MOUSE << 8 | key & 0xFF;
         } else {
-            if (Int16(0x100).none) {
+            if (KeyWaiting().none) {
                 go = 1;
                 break;
             }
-            key = Int16(0).key;
+            key = KeyRead();
             if (key == 0 || key == 0x2E03 || key == 0x011B) {
                 go = 0;
                 break;
@@ -541,13 +537,12 @@ static u16 FndBack(void)
    a key, by an error, or because the memory is full. */
 u16 FindFil(u16 attributes)
 {
-    struct DosRegs regs;
     struct DateText date;
     struct TimeText time;
     const u8 __far *from;
     u8 *end, *to, *name;
     u16 length, suffix, handle, room, chunk, segment, count, found, i;
-    struct Answer opened;
+    struct Answer entry, opened, read;
     u8 c, kind;
 
     if (!(attributes & ATTR_DIRECTORY))
@@ -585,16 +580,16 @@ next:
         return 0x100;
     if (ChgDisk(md.TmpBuf))
         return 0x100;
-    regs.ax = 0x4F00;
     if (!(FND->FndDir & DIR_BEGUN)) {
         FND->FndDir |= DIR_BEGUN;
-        regs.cx = 0x37;
-        regs.ax = 0x4E00;
+        SetDTA();
+        entry = FindFirst(md.TmpBuf, 0x37);
+    } else {
+        SetDTA();
+        entry = FindNext();
     }
-    SetDTA();
-    regs.name = md.TmpBuf;
-    if (Intr21((struct DosRegs STACK *)&regs)) {
-        if (regs.ax == ERR_NOT_READY)
+    if (entry.failed) {
+        if (entry.value == ERR_NOT_READY)
             return 0x100;
         /* FnFl50: no more files here. On to the directories. */
         *(u8 *)CutPath(md.TmpBuf) = 0;
@@ -634,30 +629,21 @@ next:
             /* FnFl46 */
             if (!FndBack())
                 goto stopped;
-            regs.ax = 0x3F00;
-            regs.bx = handle;
-            regs.cx = chunk;
-            regs.name = (const u8 __far *)((u32)segment << 16);
-            if (Intr21((struct DosRegs STACK *)&regs))
+            read = FileRead(handle, (u8 __far *)((u32)segment << 16),
+                            chunk);
+            if (read.failed)
                 goto stopped;
-            count = regs.ax;
+            count = read.value;
             if (V82_00(segment, 0, count).found != 0x100) {
                 found = 1;
                 break;
             }
             if (count < chunk)
                 break;
-            regs.ax = 0x4201;
-            regs.bx = handle;
-            regs.cx = 0xFFFF;
-            regs.name = (const u8 __far *)((u32)segment << 16 | (u16)-80);
-            Intr21((struct DosRegs STACK *)&regs);
+            FileSeek(handle, 1, (u32)-80L);
         }
         /* FnFl49 */
-        regs.ax = 0x3E00;
-        regs.bx = handle;
-        regs.name = md.TmpBuf;
-        Intr21((struct DosRegs STACK *)&regs);
+        FileClose(handle);
         if (!found)
             goto next;
     }
@@ -721,10 +707,7 @@ next:
 
 stopped:
     /* FnFl48 */
-    regs.ax = 0x3E00;
-    regs.bx = handle;
-    regs.name = md.TmpBuf;
-    Intr21((struct DosRegs STACK *)&regs);
+    FileClose(handle);
     return 0x100;
 }
 
@@ -751,9 +734,6 @@ static const u8 CODE Find6_S[] =
 /* Whether a file is shown in hex: ViTxHex of the viewer, which the
    search reads files with. */
 #define ViTxHex md.TmpBuf[216]
-
-/* DX of a call of DOS, where it is not the offset of a name. */
-#define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
 #define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
 
@@ -802,7 +782,6 @@ static struct Searched Shows(u16 panel)
 struct Searched F67_00(void)
 {
     struct LineArgs line;
-    struct DosRegs regs;
     struct WCBdef __far *wcb;
     const u8 __far *from;
     u8 __far *to;
@@ -814,7 +793,8 @@ struct Searched F67_00(void)
     u16 color, row, count, answer, first, drive, cell, i, number, panel;
     u16 key, mode, room;
     struct Buttons chosen;
-    struct MuxRegs mux;
+    struct Answer fixed;
+    struct Device remote;
     struct Mouse pointer;
 
     HidCur();
@@ -909,19 +889,13 @@ again:
                 md.TmpErr[0] = (u8)drive;
                 FND->FndDrv++;
                 drive = (u8)(drive - 'A');
-                mux = Int2F(0x150B, 0, drive);
-                if (mux.bx != 0xADAD || mux.ax == 0) {
+                if (!DriveCd(drive)) {
                     /* F67_11: no CD-ROM */
-                    regs.name = md.TmpErr;
-                    regs.bx = drive + 1;
-                    regs.cx = drive;
-                    regs.ax = 0x4409;
-                    if (!Int21d((struct DosRegs STACK *)&regs)
-                        && (DX_OF(regs) & 0x1000))
+                    remote = DriveRemote(drive + 1);
+                    if (!remote.failed && (remote.kind & 0x1000))
                         break;
-                    regs.ax = 0x4408;
-                    if (!Int21d((struct DosRegs STACK *)&regs)
-                        && (u8)regs.ax == 1)
+                    fixed = DriveFixed(drive + 1);
+                    if (!fixed.failed && (u8)fixed.value == 1)
                         break;
                 }
                 /* F67_13 */
@@ -944,11 +918,7 @@ again:
         count = LenPath + 13;
         if (*rest != '\\') {
             *end++ = '\\';
-            regs.name = md.TmpBuf;
-            DX_OF(regs) = (u8)(drive - ('A' - 1));
-            regs.si = (u16)end;
-            regs.ax = 0x4700;
-            if (Intr21((struct DosRegs STACK *)&regs))
+            if (DirCurrent(drive - ('A' - 1), end).failed)
                 goto found;
             while (count != 0) {
                 count--;
@@ -1049,13 +1019,9 @@ close:
     while (*from == ' ');
     if (ChgDisk(NEAR(from)))
         return To(TO_FUNC04);
-    regs.name = from;
-    regs.ax = 0x3B00;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (DirChange(from).failed)
         return To(TO_FUNC04);
-    DX_OF(regs) = (u8)(*from - 'A');
-    regs.ax = 0x0E00;
-    Int21d((struct DosRegs STACK *)&regs);
+    DriveSelect(*from - 'A');
     /* The panel that gets the directory: the current one, or the other
        if that one shows no files. Its list is emptied, but for the name
        of the file, where the cursor is to be when it is read. */
@@ -1079,9 +1045,7 @@ close:
         to[12] = 0;
         NormStr(to);
     }
-    regs.ax = 0x1900;
-    Int21d((struct DosRegs STACK *)&regs);
-    if ((u8)((u8)regs.ax + 'A') != md.DosPth[0])
+    if ((u8)(DriveCurrent() + 'A') != md.DosPth[0])
         return To(TO_FNCEX1);
     return Shows(panel);
 }

@@ -428,6 +428,11 @@ are added here as they go.
 | `Aexec0`, `view.c` | BIOS 03h, the shape of the cursor | BL: the column that the box begins in | BL 0 |
 | `Aexec0`, `view.c` | DOS 4Ah, the block of the memory made shorter, 4B00h, the viewer run, and 4Ah twice, the block made longer | 4Ah: DX as the code or DOS before left it, the address of the viewer's name in the C translation; the third time AL the low byte of the error of the second, 8. 4Ah the first time and 4B00h: CX, SI and DI as the code before left them, 0 in the C translation | 4Ah: AL and DX 0. CX, SI and DI as they come |
 | `F34_11`, `view.c` | DOS 3Fh and 3Eh, the extension file read and closed, and 4Eh, the viewer looked for | 3Eh: CX and DS:DX the count and the buffer still. 3Fh and 4Eh: SI and DI, and for 4Eh BX, as the code before left them, 0 in the C translation | 3Eh: CX and DX 0. SI, DI and BX as they come |
+| `FindFil`, `find.c` | DOS 4Fh, the next file | CX as the code before left it, and DS:DX on the path | CX and DX 0 |
+| `FindFil`, `find.c` | DOS 4201h, 80 bytes gone back in a file that is searched | DS: the segment that the file is read to | DS on the main data |
+| `FindFil`, `find.c` | DOS 3Eh, a file that was searched closed | CX and DX as the calls before left them, the address of `TmpBuf` in DX in the C translation | CX and DX 0 |
+| `F67_00`, `find.c` | DOS 4409h and 4408h, a drive asked whether it is of a network and whether its disk can be taken out | CX: the drive, 0 for A:. DX: the address of the path for 4409h, and for 4408h what 4409h left there | CX as it comes, DX 0 |
+| `F67_00`, `find.c` | DOS 0Eh and 19h behind Go to, a drive made the current one and the current one asked for | DS: the segment of the list for 0Eh and of the panel for 19h, of the list for both in the C translation. DL of 19h: the drive still | DS on the main data. DL 0 for 19h |
 
 What is known to read such a register, and where the portable C will
 hand it something else when the file goes over:
@@ -435,7 +440,11 @@ hand it something else when the file goes over:
 - AL of DOS 4Eh, the first file of a search. DOS's APPEND, where it is
   installed, goes by it. `FindFirst` hands over 0, as the original does
   at most places; at three it has a leftover there, the number of the
-  drive and 5Ch in `read.c` and 2 in `treebox.c`.
+  drive and 5Ch in `read.c` and 2 in `treebox.c`. At two more the
+  original has one where the C translation already handed over 0, so
+  nothing changed there when the file went over: what the keys left in
+  `FindFil` of `find.c`, and a character of the extension file in
+  `F34_11` of `view.c`.
 - AL of BIOS 01h, the shape of the cursor. Some BIOSes of the time are
   said to want the video mode there. `CursorShape` hands over 0, as the
   original does where an input line sets the shape, by `ChgCur` and
