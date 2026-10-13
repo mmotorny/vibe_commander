@@ -33,7 +33,10 @@ not-ready
 banner
 diskette-command
 quick
+comspec
 device
+user-menu
+user-menu-run
 command-line
 history-drives
 enter
@@ -68,10 +71,16 @@ view-parts
 view-keys
 view-window
 view-search
+view-commands
 editor-hex
+editor-long
+editor-save
 editor-words
+editor-full
+editor-keys
 editor-hex-keys
 editor-search
+editor-buffer
 editor-dirinfo
 find
 delete

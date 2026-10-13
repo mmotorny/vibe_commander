@@ -2803,6 +2803,10 @@ So ten of the fourteen are the editor's, 1 to 4, and none of those is
 the second copy's doing by what shows; 6 and 7 wait for the user's
 word, and may have the driver's blindness in them besides.
 
+Since C1 the nine of 1, 2 and 3 pass, by one mend, and are on the
+record; 4 is no fault of the program's and waits for the user: "C1,
+the editor" below.
+
 **A second copy, which the driver does not know.** In six scenarios
 the program is started a second time from the command line of the
 first, and QEMU's log has its code at 00100010h and at 001DA1A0h:
@@ -4172,7 +4176,9 @@ What the pieces behind this one should know:
    nothing catches: garbage on a screen, or a program that stops. The
    debug build's checks catch what goes through the macros. The pieces
    of the convergence will meet these; how many there are is what is
-   least known here.
+   least known here. C1 met one, a step of -160 in a word of 16 bits
+   added to a pointer into the screen buffer, which was nine of the
+   fourteen scenarios that failed: "C1, the editor".
 2. A far pointer stepped past its segment's end, and what lies behind
    an object: the same.
 3. The critical error inside the extender. The trial saw the handler
@@ -5508,6 +5514,158 @@ two in `dos32.c` says what was seen.
   function of `dos32.c` by itself, in ten seconds; a page wants a step
   in `STEPS`. `build/portable_c/dos.obj` has to be built for the 16-bit
   half.
+
+### C1, the editor: nine of the ten pass, and one is the user's
+
+The first piece of the convergence took the ten scenarios that H3 has
+as the editor's, four families by the look of the first screen that
+differs. They are two causes. One was in the program and is mended:
+nine scenarios pass with it and are on the record, which has 154 of
+159. The other is how much memory the program has, which is no fault
+of a statement and is the user's to decide: `editor-big`.
+
+| | Cause | Scenarios | What became of it |
+|---|---|---|---|
+| 1 | A step of FF60h, 160 back, added to a pointer into the screen buffer: `T71_00` of `edit.c` | `editor-long`, `editor-full`, `editor-buffer`; `user-menu-run`, `user-menu`, `comspec`, `view-commands`, `editor-save`; `editor-keys`: H3's families 1, 2 and 3 | Mended, the 16-bit program the same bytes |
+| 2 | The editor has room for 641,824 bytes where the original has it for 345,840 and the portable C of 16 bits for 291,360: the 640 KB of the program's own, 2 of what the session took | `editor-big`: H3's family 4 | Open, for the user: see below |
+
+**Cause 1, `T71_00`.** The routine moves the rows of the editor's or
+the viewer's window by one in the screen buffer, before the BIOS
+scrolls the screen: `place` is where the first row goes to and `step`
+the way from one row to the next, 160 to move them up and -160 to move
+them down, in a word of 16 bits, so FF60h. It said
+
+    u16 *from = (u16 *)((u8 *)to + step);
+    ...
+    from = (u16 *)((u8 *)from + step);
+    to = (u16 *)((u8 *)to + step);
+
+| | What the statement means |
+|---|---|
+| In 16 bits | `to` is a near pointer, an offset of 16 bits in the main data, and FF60h added to it wraps round: 160 bytes back, the row above |
+| In 32 bits, as it was | The pointer has 32 bits and nothing wraps: 65,376 bytes on. The first row is read from there, and every row behind it is written 65,376 bytes further on than the one before |
+| As it is mended | `MD_POINTER(MD_PLACE(to) + step)`: the sum is made in the place, a number that the word cuts to 16 bits, where it wraps round as on DOS. `to` is `BasAdr` of a place and so in `ScrBuf` of the main data, which is what `MD_PLACE` takes. On DOS the two words are the two casts and the code is what it was |
+
+It is 1 of "What could go wrong" and what P4's finder says that it
+cannot see: no arithmetic at the place, a variable of 16 bits that
+holds a number below 0 as one above 32,767.
+
+What it did, by the numbers of the program as it is linked: `ScrBuf`
+is at 2448h of the main data, the 640 KB begin 0F6E0h behind `md`,
+and the text of the editor and of the viewer, at `ViewSeg`, is 12BD0h
+behind it, behind the two panels.
+
+- A window of 23 rows, a file without help below it: the last row is
+  at 32A8h of the main data, and FF60h on from there is 638h of the
+  text. Seen, in the program before the mend: `Shift+F4` on the
+  bench's `command.com`, `Enter`, `F4`, and the editor shows at 638h
+  of the text, where the file has zeros, the 160 bytes that the file
+  has at 10598h, FF60h on: "of memory.", "If this error persists".
+  The mended program shows the zeros. The row that the window got in
+  place of the one above it was what the memory has at 638h of the
+  text, which is zeros where the text is shorter: H3's family 1, rows
+  that hold zeros. How each of its four rows came to be where it is
+  was not followed.
+- A window of 13 rows, the menu file or an extension file with the
+  help below: the last row is at 2C68h, and FF60h on is 8 bytes in
+  front of the text. So Enter, which moves the rows below the cursor
+  down, wrote 152 bytes of what lies 64K on, zeros, over the start of
+  the text, the line that had just been ended with it: the editor
+  found no second line and stayed in the first. That is family 2, and
+  3, which begins with Enter.
+- The rows behind the first went 65,376 bytes further each. With
+  Enter in the first row of a window of 23 rows that is twenty rows
+  written, the eleventh and those behind it beyond the end of the
+  program, which is 0AF6FFh behind `md`: into memory that the extender
+  had not given it, where a second copy of the program is loaded.
+  Nothing was seen to come of that.
+
+What leaned on the same body, and whether it touched scenarios that
+pass: the viewer, which calls `T71_00` with -160 for Up where the
+window moves down by a line (`V05_02` of `view.c`). The BIOS scrolls
+the screen and the viewer writes the new first row, so the screen was
+right; the screen buffer was not moved, its last row got what lies
+64K on, and 160 bytes at 638h of the text that the viewer had loaded
+were written over. The scenarios of the viewer passed with that, so
+none of them shows that part of the text again after Up or puts the
+window on the screen from the buffer after it; which of the two it is
+for each was not looked up. They are judged by the mended routine now,
+and no scenario was written for it.
+
+Its like elsewhere, looked for by reading and by `grep`:
+
+- A number written below 0 and made one of 16 bits: `(u16)-160` twice
+  in `edit.c` and `(u16)-(2 * 80)` in `view.c`, the three calls of
+  `T71_00`; and `(u16)-(int)sizeof(struct DIRENT)` in `treebox.c`,
+  which is held against a difference and added to nothing. The other
+  windows that the BIOS scrolls, of the panels, the tree's box, the
+  help and the file search, write their rows anew and move nothing in
+  the buffer.
+- `edit.c` was read whole for a number of 16 bits that may have
+  wrapped round and is added to a pointer. `T51_30`, which copies the
+  text down from addresses made with offsets of 0FFEFh and more, goes
+  through `AT` for each piece of 0FF00h bytes and steps no further
+  than 0EFh; `T54_00`, whose offset goes below 0 and is put right by
+  taking a lower segment, hands the number to `AT`; `T50_00`, `T72_00`
+  and the keys step a pointer up by a count, or back by one that has
+  no sign. Nothing else was found.
+- `(u8 __far *)wcb + file` of `files.c`, `copy.c` and `commands.c`
+  adds an offset in a panel to the panel, which is its segment's
+  beginning; `ENTRY` does the same with the cut. `screen = (u16
+  *)((u8 *)screen + count)` of `dialog.c` adds twice a column.
+
+**Cause 2, `editor-big`: open, for the user.** The scenario makes a
+file of 381,338 bytes, "within 64K of what the editor has room for",
+and has the editor say that it is too large. The editor's room is
+`EdSpace`, the paragraphs between `ViewSeg` and the end of the memory
+that the program got at its start, `MAIN_SEG + FreMem2 - ViewSeg`.
+What the editor shows as free with the bench's `command.com` of
+87,772 bytes loaded, and so the room:
+
+| Program | Free | Room |
+|---|---|---|
+| The original | 258,068 | 345,840 |
+| The C translation | 204,516 | 292,288 |
+| The portable C of 16 bits | 203,588 | 291,360 |
+| The portable C of 32 bits | 554,052 | 641,824 |
+
+So the file is too large for three and fits the fourth, which opens
+it, where the original shows its box. Nothing else is in it: with
+`OWN_PARAGRAPHS` of `dos32.c` at 5000h, 320 KB, tried and taken back,
+the scenario passes whole. The figure is of the kind that
+"Scenarios" of `CLAUDE.md` leaves out of a comparison, one that
+follows the size of the program, and the count of free bytes in the
+editor's status line is left out already; but here it decides what
+the program does. The ways that there seem to be, none of them taken:
+
+| Way | For | Against |
+|---|---|---|
+| The scenario makes a file that no build has room for, eight times `command.com`, 702,176 bytes, in place of four times and `country.sys` | It tests what its title says, on every build, and nothing is declared | The file is no longer within 64K of the room of any build, which is what the scenario was written to try: whether the lengths are held against one another as numbers of 32 bits. The golden of the original is recorded anew, of a changed scenario. Drive C: of the bench has to hold it |
+| The scenario stays, and a second one has the larger file | Both are tried | The first still fails for this build and wants a patch or to be left out for it |
+| A patch of the scenario for this build: the editor opens the file | Says what is so | A deviation: the program does otherwise than the original with the same file, for memory alone. It is the other way round from 3 of what is open, the second copy that has memory to run: there the program of 32 bits does again what the original does, and here it leaves it |
+| The program's own memory made as short as DOS leaves the 16-bit program | The scenario passes as it is | A number chosen to make a test pass; and it is gone with step 2, when the memory is the extender's |
+
+For the piece that takes it: nothing of `editor-big` behind its step
+28 is known to pass but by the trial with 320 KB.
+
+For the pieces behind this one:
+
+- Nine of the fourteen were one statement. A family by the look of
+  the first screen is not a cause: three looks here were one write
+  64K off, which showed as rows of zeros, as a line that did not end
+  and as a cursor in a wrong column, by where the window's last row
+  happened to be.
+- How it was found, in the order that paid: the editor's file read
+  for what `TODO.md` names, a number that has wrapped round added to a
+  pointer; the place mended and the ten run, `python3
+  harness/compare.py build/portable_c32/VC.EXE NAME --first`, nine of
+  which passed; then the proof, the text shown in hex by both programs
+  after one Enter, held against the file on the bench's floppy. The
+  program before the mend was kept beside the build for that, in a
+  directory named as its tree is, `build/c1/old/portable_c32/`, which
+  the harness takes for the same tree.
+- A wild write shows where it happens to land, and may show nowhere:
+  the viewer's was in every scenario that goes up a line.
 
 ## The portable C in 32 bits: what a trial on the bench showed
 

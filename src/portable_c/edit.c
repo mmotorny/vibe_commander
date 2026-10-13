@@ -795,7 +795,7 @@ struct Cleared T70_00(u16 line)
 void T71_00(u16 function, u16 place, u16 step)
 {
     u16 *to = BasAdr(place);
-    u16 *from = (u16 *)((u8 *)to + step);
+    u16 *from = (u16 *)MD_POINTER(MD_PLACE(to) + step);
     u16 count = (u8)(ed.EdSizeY - function) - 1;
     u16 cells, column;
 
@@ -807,8 +807,10 @@ void T71_00(u16 function, u16 place, u16 step)
         cells = count & 0xFF00 | ed.EdSizeX;
         for (column = 0; column != cells; column++)
             to[column] = from[column];
-        from = (u16 *)((u8 *)from + step);
-        to = (u16 *)((u8 *)to + step);
+        /* The step is added to the place, where one of FF60h goes 160
+           back: added to the pointer it would go that far on. */
+        from = (u16 *)MD_POINTER(MD_PLACE(from) + step);
+        to = (u16 *)MD_POINTER(MD_PLACE(to) + step);
     } while (--count);
     Scroll(function >> 8 == 7, Color(Back_C),
            ed.EdBase + ((function & 0xFF) << 8),

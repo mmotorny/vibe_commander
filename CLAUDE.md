@@ -2463,6 +2463,29 @@ in "The portable C".
   - A second copy of the program, started from the command line of
     the first, is loaded behind it, at 001DA1A0h on the bench. The
     driver of the tests knows the first copy's place alone.
+  - A number of 16 bits that stands for one below 0, FF60h for 160
+    back, and is added to a pointer goes that far on in a flat
+    memory, and nothing at the place says so: `T71_00` of `edit.c`,
+    which moves the rows of a window in the screen buffer, was nine
+    of the fourteen scenarios that the program failed at first. The
+    sum is made in the number and the pointer of that: for a pointer
+    into the main data `MD_POINTER(MD_PLACE(to) + step)`, for one
+    into a segment `AT` with the sum as its offset. On DOS that is
+    the code it was, and the file the same bytes.
+  - Such a write shows by where it lands, or not at all. That one
+    made three kinds of screen, by how many rows the editor's window
+    had, and none in the viewer, which made it at every line that it
+    went up. Scenarios that fail alike by the look of their first
+    screen are not thereby of one cause, nor those that fail
+    otherwise of several: mend the first and run them all, `python3
+    harness/compare.py build/portable_c32/VC.EXE NAME --first`, a few
+    seconds each and as many side by side as there are.
+  - To see what a mend changed in the memory, keep the program of
+    before beside the build in a directory named as its tree is,
+    `build/NAME/portable_c32/VC.EXE` with its `VC.MAP`: the harness
+    takes it for the same tree, and `harness/show.py --program` shows
+    the two side by side. The editor's F4 is a view of the memory at
+    `ViewSeg` in hex.
 
 ### Moving a file to the system's functions
 

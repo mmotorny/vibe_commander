@@ -675,15 +675,15 @@ the number. No test holds the table.
 | Pairs of `#pragma pack` | 7 |
 | `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 752, 106, 262, 92 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
-| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,403 bytes, of which the extender's stub is 27,536 |
-| Its code, and what the file has of its data | 132,735 and 104,567 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,290 bytes |
-| The addresses in it that the extender sets when it loads it | 5,292 |
+| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,431 bytes, of which the extender's stub is 27,536 |
+| Its code, and what the file has of its data | 132,814 and 104,567 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,369 bytes |
+| The addresses in it that the extender sets when it loads it | 5,298 |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c32-data` holds them | 643 and 555 |
 | Its stack | 16,384 bytes |
 | How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,172 and 16,428 bytes |
 | How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,368 and 2,347 bytes |
-| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 400,875 bytes, 223,764 of them code |
+| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 400,911 bytes, 223,844 of them code |
 | Inline assembly of `dos32.c`, which the program of 32 bits has in place of that of `dos.c` | 98 instructions in 13 pieces |
 
 <!-- The end of the figures. -->
