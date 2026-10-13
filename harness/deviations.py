@@ -541,6 +541,32 @@ class Declared:
     # taken through them: for a tree that has no setup program.
     no_setup: str = None
 
+    def also(self, **more):
+        """What a tree is declared to do that does all of this and
+        `more`, named as the fields above are: what another build of this
+        tree's source is declared to do, which is what this one is with
+        what the two show otherwise added. A scenario, a step or a rule
+        of `more` is added to those of its kind, and takes the place of
+        one that is there under the same name; where a field goes by
+        scenarios and then by steps, the steps of a scenario are added
+        to those that it has. Nothing is taken away so: a build that is
+        to be taken through what this one is not, or without a rule of
+        this one, wants that written."""
+        merged = {}
+        for name, value in more.items():
+            had = getattr(self, name)
+            if name in ("left_out_of", "in_place_in"):
+                merged[name] = {**had, **{
+                    scenario: {**had.get(scenario, {}), **steps}
+                    for scenario, steps in value.items()}}
+            elif isinstance(had, dict):
+                merged[name] = {**had, **value}
+            elif isinstance(had, tuple):
+                merged[name] = had + tuple(value)
+            else:
+                merged[name] = value
+        return replace(self, **merged)
+
     def taken(self, steps, name=None):
         """How the tree is taken through `steps`, those of the scenario
         `name`: of each step that it is taken through, its place in
@@ -841,6 +867,42 @@ TREES = {
         },
     ),
 }
+
+
+# A tree of the harness may be another build of a tree's source: the
+# program of 32 bits, build/portable_c32/VC.EXE, is the portable C,
+# src/portable_c/, compiled and linked for a flat memory (TODO.md, "The
+# portable C in 32 bits: the plan"). Such a build is a tree of its own
+# here, under the name of its directory in build/, so that it can be
+# declared to show something otherwise than the build whose source it
+# shares; and it has no source and no DEVIATIONS.md of its own. Tree ->
+# the tree whose source it is built from.
+SOURCE = {"portable_c32": "portable_c"}
+
+# What such a build is declared to do is what the tree of its source is,
+# with what the two are declared to show otherwise added (Declared.also):
+# its entry is made of the other's and repeats nothing of it. A scenario
+# that it is to show otherwise has a patch of its own, a file of
+# harness/goldens/ under the build's name, which then stands in the
+# place of the patch that the tree of its source has for that scenario,
+# if it has one (goldens.patch_path); every other patch of that tree is
+# the build's too. Either says which entry of the source's DEVIATIONS.md
+# declares it.
+#
+# The program of 32 bits is declared to show nothing otherwise than the
+# portable C of 16 bits. What it will have to be declared for is the
+# user's to decide when the work gets there (TODO.md, the plan, "Open,
+# for the user"): what a second copy of the program does once it has the
+# memory to run, in second-copy, start-memory and ended, and what the
+# program can do when DOS ends it by another program's hand, in ended.
+TREES["portable_c32"] = TREES["portable_c"].also()
+
+
+def source(tree):
+    """The tree whose source the tree `tree` is built from, by the name
+    of its directory in src/: the tree itself, but for another build of
+    a tree's source (SOURCE)."""
+    return SOURCE.get(tree, tree)
 
 
 def ruled(screen, rule):

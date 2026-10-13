@@ -175,7 +175,8 @@ TOGETHER = min(4, os.cpu_count() or 1)
 
 # The trees that may have patches, and what each is called in the first
 # line of one.
-TREES = {"portable_c": "The portable C"}
+TREES = {"portable_c": "The portable C",
+         "portable_c32": "The portable C as a program of 32 bits"}
 
 # What a header has until its author has filled it in.
 TO_WRITE = "TO BE WRITTEN"
@@ -256,10 +257,37 @@ def path(name):
     return DIRECTORY / f"{name}.txt"
 
 
+def own_patch_path(name, tree):
+    """Where a patch of the tree `tree` for the scenario `name` is
+    written: a file of the tree's own."""
+    return DIRECTORY / tree / f"{name}.patch"
+
+
 def patch_path(name, tree):
     """Where the patch of the tree `tree` for the scenario `name` is, if
-    it has one."""
-    return DIRECTORY / tree / f"{name}.patch"
+    it has one: its own file. A tree that is another build of a tree's
+    source (deviations.SOURCE) and has no file of its own for the
+    scenario has that tree's."""
+    own = own_patch_path(name, tree)
+    source = deviations.source(tree)
+    if source == tree or own.exists():
+        return own
+    return patch_path(name, source)
+
+
+def patches(tree):
+    """The files of patches that the tree `tree` has, by patch_path():
+    those of its own directory, and for another build of a tree's source
+    those of that tree for the scenarios that it has none of its own
+    for. Whatever else lies in those directories is among them."""
+    found, source = {}, tree
+    while True:
+        directory = DIRECTORY / source
+        for file in sorted(directory.glob("*")) if directory.is_dir() else []:
+            found.setdefault(file.name, file)
+        if source == deviations.source(source):
+            return sorted(found.values(), key=lambda file: file.name)
+        source = deviations.source(source)
 
 
 def shown(file):
@@ -473,7 +501,8 @@ def read_header(header, tree):
     numbers = why = None
     for number, line in enumerate(header):
         match = re.fullmatch(
-            rf"Deviation: (\d+(?:, \d+)*) of src/{tree}/DEVIATIONS\.md", line)
+            rf"Deviation: (\d+(?:, \d+)*) of "
+            rf"src/{deviations.source(tree)}/DEVIATIONS\.md", line)
         if match:
             numbers = tuple(int(word) for word in match[1].split(", "))
         if line.startswith("Why: "):
@@ -502,7 +531,8 @@ def read_patch(file, tree):
     if numbers is None:
         raise wrong(
             "its header is not filled in. It wants a line \"Deviation: N "
-            f"of src/{tree}/DEVIATIONS.md\", N the number of the entry "
+            f"of src/{deviations.source(tree)}/DEVIATIONS.md\", N the "
+            "number of the entry "
             "that declares what the patch says, or several, \"1, 7\"; and "
             "\"Why: \" with a sentence on what is otherwise here. A patch "
             "is the statement of whoever declared the deviation, who has "
@@ -770,7 +800,8 @@ def to_do(patch, golden, apart, within):
     paragraphs += [
         ("  - If the golden was meant to change, the patch is made again "
          "from a run and read again: python3 harness/goldens.py patch "
-         f"--tree {tree} {name}. That keeps its header and says of every "
+         f"--tree {patch.file.parent.name} {name}. That keeps its header "
+         "and says of every "
          "row whether it states what the patch stated before, on a row "
          "of the original that is otherwise now, or states something "
          "else. The rows of the second kind are read against "
@@ -797,7 +828,7 @@ def write_patch(patch, golden):
     out.append("Deviation: "
                + (", ".join(str(number) for number in patch.deviations)
                   or TO_WRITE)
-               + f" of src/{golden.tree}/DEVIATIONS.md")
+               + f" of src/{deviations.source(golden.tree)}/DEVIATIONS.md")
     out += textwrap.wrap(f"Why: {patch.why}", width=78,
                          break_on_hyphens=False)
     for key, screen in patch.screens.items():
@@ -1060,8 +1091,10 @@ def from_run(name, program, benches):
     the build shows otherwise than the original's golden as the rules of
     the tree leave it, and every file that it leaves otherwise. The
     header is that of the patch that was there, or one to be filled in.
-    Returns the lines to print: what was written, for its author to
-    read."""
+    For a tree that is another build of a tree's source, the patch is
+    written as that build's own, and the one that was there may be the
+    other tree's (patch_path). Returns the lines to print: what was
+    written, for its author to read."""
     tree = program.tree
     scenario = scenarios.of(name, tree)
     golden = read(name, tree, patched=False)
@@ -1069,15 +1102,15 @@ def from_run(name, program, benches):
         raise Misfit(f"{shown(path(name))} was derived for other steps "
                      "than the scenario has now: derive it again first, "
                      f"goldens.py derive {name}")
-    file = patch_path(name, tree)
+    had, file = patch_path(name, tree), own_patch_path(name, tree)
     numbers = why = old = None
-    if file.exists():
-        lines = file.read_text(encoding="utf-8").split("\n")
+    if had.exists():
+        lines = had.read_text(encoding="utf-8").split("\n")
         numbers, why = read_header(
             lines[:next((at for at, line in enumerate(lines)
                          if line.startswith("== ")), len(lines))], tree)
         try:
-            old = read_patch(file, tree)
+            old = read_patch(had, tree)
         except Misfit:
             pass                  # not filled in, or not a patch: no
                                   # statement to hold the new one against
@@ -1123,9 +1156,9 @@ def from_run(name, program, benches):
                 + (", with the steps that are left out for it left out"
                    if len(golden.places) < len(read_original(name).steps)
                    else "") + ": there is nothing to patch"
-                + (f". {shown(file)} is there and says otherwise: the "
+                + (f". {shown(had)} is there and says otherwise: the "
                    "test fails for it. Take it out if the deviation is "
-                   "gone" if file.exists() else "")]
+                   "gone" if had.exists() else "")]
     write_patch(patch, golden)
     return [f"{name}: {shown(file)} written from a run of {tree}, "
             f"{patch.count()} line{'s' if patch.count() > 1 else ''} "

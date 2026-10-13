@@ -39,6 +39,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 import deps
+import deviations
 import dos
 import driver
 from dos import BOOT_TIME, FatImage, Machine, MachineError, boot_floppy, \
@@ -110,8 +111,10 @@ class Program:
     listing: Path = field(default=None, compare=False)
     # Of the C translation, the linker's map: where its stack is.
     linked: Path = field(default=None, compare=False)
-    # Of a C tree, which one: the name of its directory in src/ and in
-    # build/, "c" or "portable_c". None for the original. A tree may be
+    # Of a C tree, which one: the name of its directory in build/, "c",
+    # "portable_c", or "portable_c32" for the portable C built for 32
+    # bits, which is a tree of its own to the harness with the source of
+    # another (deviations.SOURCE). None for the original. A tree may be
     # declared to behave otherwise than the original (see deviations.py),
     # and is then held against what is declared for it.
     tree: str = field(default=None, compare=False)
@@ -127,8 +130,16 @@ class Program:
             # The translation has no assembly of its own to list: its main
             # data is laid out as the original's, and what the driver
             # watches there is where the original has it.
+            # The tree is the directory that the file is in, or the one
+            # above that if it is named as a tree is and this one is
+            # not: the program of 32 bits for finding a fault is in a
+            # directory of that tree's, build/portable_c32/debug.
+            above = path.resolve().parents
+            tree = next((directory.name for directory in above[:2]
+                         if directory.name in deviations.TREES),
+                        above[0].name)
             return cls(path.name.upper(), contents, LISTING,
-                       path.with_suffix(".MAP"), path.resolve().parent.name)
+                       path.with_suffix(".MAP"), tree)
         listing = path.with_suffix(".LST")
         if not listing.exists():
             # A copy of the original has the listing of the original.

@@ -1351,6 +1351,34 @@ RENAMED = {
     },
 }
 
+# The portable C built for 32 bits is the same source but for the file of
+# the system's functions, dos32.c where the program of 16 bits has dos.c:
+# what is gone from the one is gone from the other, and so are the
+# entries by which DOS comes into a program of 16 bits, which are of
+# dos.c.
+GONE["portable_c32"] = {
+    **GONE["portable_c"],
+    "FatErr": "the entry of DOS's critical error, an interrupt function "
+              "of dos.c: the program of 32 bits takes the error through "
+              "its extender, at DeviceEntry of dos32.c, which is static, "
+              "as the function that shows the box is, FtErr1 of main.c, "
+              "and the map that this reads has no static name",
+    **dict.fromkeys(
+        ("Exit01", "Exit05_"),
+        "where DOS goes on when it has ended the program by another "
+        "program's hand, of dos.c: under an extender DOS goes back to "
+        "the program that started this one through the extender's part "
+        "of real mode, and nothing of this program runs. What it is to "
+        "do about that is not decided (TODO.md, the plan for 32 bits, "
+        "\"Open, for the user\", 4)"),
+}
+RENAMED["portable_c32"] = {
+    **RENAMED["portable_c"],
+    "Alloc0": ("Start_", "where the program is entered, by the extender "
+               "and not by DOS: Start of dos32.c, which calls Main as "
+               "Alloc0 of dos.c does"),
+}
+
 
 def check_original(listing, ran, batches):
     """Report on the assembly that `batches` say has been replaced;
@@ -1601,8 +1629,7 @@ def check_declared(tree, names):
                       f"behind the other: {', '.join(some)}")
     patched = {}
     entries = deviation_entries(tree)
-    directory = goldens.DIRECTORY / tree
-    for file in sorted(directory.glob("*")) if directory.is_dir() else []:
+    for file in goldens.patches(tree):
         name = file.stem
         if file.suffix != ".patch" or name not in names:
             passed = False
@@ -1615,7 +1642,8 @@ def check_declared(tree, names):
             if f"`{name}`" not in entries.get(number, ""):
                 passed = False
                 print(f"  {goldens.shown(file)} says that it is of "
-                      f"deviation {number}, and src/{tree}/DEVIATIONS.md "
+                      f"deviation {number}, and "
+                      f"src/{deviations.source(tree)}/DEVIATIONS.md "
                       + ("does not name the scenario there, as "
                          f"`{name}`" if number in entries else
                          "has no such entry"))
@@ -1687,8 +1715,9 @@ def check_declared(tree, names):
 
 def deviation_entries(tree):
     """The entries of the tree's DEVIATIONS.md, number -> text: each
-    from its heading, "### 7. ...", to the next."""
-    file = deps.ROOT / "src" / tree / "DEVIATIONS.md"
+    from its heading, "### 7. ...", to the next. A tree that is another
+    build of a tree's source has that tree's."""
+    file = deps.ROOT / "src" / deviations.source(tree) / "DEVIATIONS.md"
     if not file.exists():
         return {}
     parts = re.split(r"^### (\d+)\. ", file.read_text(encoding="utf-8"),
