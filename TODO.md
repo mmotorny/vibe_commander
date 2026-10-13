@@ -248,7 +248,7 @@ file. Whoever moves a file takes it out of the table:
 | 1 | `copy.c` 60 | 60 |
 | 2 | `resident.c` 34, of which 11 stay | 34 |
 | 3 | `dirfunc.c` 15, `read.c` 10, `usermenu.c` 10, `treebox.c` 8, `drive.c` 5, `setup.c` 4 | 52 |
-| 5 | `blank.c` 15, `main.c` 9, `enter.c` 7, `commands.c` 7, `keys.c` 3, `bars.c` 1, `menu.c` 1 | 43 |
+| 5 | `commands.c` 5 and `main.c` 1, which stay for now: see below | 6 |
 
 Then, when no file is left that calls them: `Intr21` and `Intr21f` of
 `system.c` with `DosTime` and `SelDrv`, and in `dos.c` `Int21f`,
@@ -266,6 +266,21 @@ that it is for:
   DOS's lists, for how it looks for memory and for the memory of other
   programs; and the PSP that `Alloc0` asks for. `TakeDos`, which reads
   two vectors and sets one, has `Vector` and `SetVector` for that.
+- The drive that a unit goes by, which `ErrRdy` of `main.c` sets when
+  it has asked for another drive in place of one that is not ready: it
+  is of the drive B: that shares the unit of A:, as `Fantom` is.
+
+And what stays on `Int10` because the functions do not say all of it:
+
+- EGA lines, `F69_00` of `commands.c`, five calls between which the
+  registers go as the BIOS leaves them. Four of them are what
+  `ScreenFont`, twice, `ScreenSetMode` and `ScreenSmallFont` ask. The
+  fifth is the call that has the BIOS print every line of such a screen
+  at Print Screen, 12h with 20h in BL, for which there is no function:
+  it goes or stays with the command, above. When the registers go, the
+  command no longer takes what the main loop has in CX, the high byte
+  of which it hands to the first call, and its prototype in `vc.h`
+  changes.
 
 What the header does not have yet, and why:
 

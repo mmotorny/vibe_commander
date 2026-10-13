@@ -58,8 +58,7 @@
    buttons of the mouse that are down and where the mouse is, or `place`
    as it was if there is no mouse. InWind is not 0 if a
    place is outside a window. AsmSeg returns the segment of the program's
-   constants. Int16 calls the BIOS for the keyboard, with AX as it takes
-   it.
+   constants.
 
    Of the C routines in vc.h, PutKey shows a key bar, if there is one;
    PtMnu1 writes the menu bar with an item marked, 0 for none, whether or
@@ -737,7 +736,7 @@ F39_85:                                 /* Exit */
             /* A command of the function keys: with Shift or Ctrl held
                down, or the right or the middle button of the mouse, the
                command that the key has with it. */
-            held = Int16(0x200 | table).key & 0xFF;
+            held = KeysHeld();
             if (held & 4)
                 table = 6;
             else if (held & 3)

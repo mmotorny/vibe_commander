@@ -629,21 +629,21 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 185,380 bytes |
-| as a multiple of the original's 65,090 bytes | 2.85 |
-| below 3 times the original's, where the scenarios' test fails | 9,890 bytes |
-| more than the C translation's 133,056 bytes | 52,324 bytes |
+| `VC.EXE` | 184,846 bytes |
+| as a multiple of the original's 65,090 bytes | 2.84 |
+| below 3 times the original's, where the scenarios' test fails | 10,424 bytes |
+| more than the C translation's 133,056 bytes | 51,790 bytes |
 | The relocations in its header, which DOS applies | 979 |
-| What it keeps of the memory while a command runs: the program and its panels | 195,232 bytes |
-| What DOS has for a command then, on the bench of the tests | 230,304 bytes |
-| The code segment `CTEXT` ends at | DE76h, 4,490 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | B805h, 14,331 bytes below the limit, F000h |
+| What it keeps of the memory while a command runs: the program and its panels | 194,688 bytes |
+| What DOS has for a command then, on the bench of the tests | 230,848 bytes |
+| The code segment `CTEXT` ends at | DE71h, 4,495 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | B5F0h, 14,864 bytes below the limit, F000h |
 | Inline assembly | 70 instructions in 11 pieces: 37 in 7 of `dos.c`, 33 in 4 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 763, 62, 374, 94 |
-| Calls that still hand registers to an interrupt, which are to go through `sys.h`, as `tools/calls.py` counts them | 197, in 17 files |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 755, 62, 349, 94 |
+| Calls that still hand registers to an interrupt, which are to go through `sys.h`, as `tools/calls.py` counts them | 160, in 12 files |
 
 <!-- The end of the figures. -->
 

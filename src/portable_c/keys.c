@@ -37,11 +37,9 @@ u16 StrLen(const u8 __far *text);                       /* string.c */
    off; ResUser writes what DOS
    has shown, which the panels cover, to the screen buffer, for a window
    given like Window's; InvVar makes of a byte of the main data 1 if it is
-   0, and 0 otherwise. SelDrv is the call of DOS that makes a drive the
-   current one, 0 for A:, which the assembly makes without Intr21. SetPth,
-   which asks DOS for the current directory, is in vc.h, and so are SavMous
-   and CurMous, of the mouse, and the bars and the prompt, which are C:
-   PutMnu, ClsLine, PutPrm. */
+   0, and 0 otherwise. SetPth, which asks DOS for the current directory,
+   is in vc.h, and so are SavMous and CurMous, of the mouse, and the bars
+   and the prompt, which are C: PutMnu, ClsLine, PutPrm. */
 
 /* The dialog that asks for a mask, the box that says no file is like it,
    and what ^I stands for in both: constants of keys_t.c, which
@@ -66,8 +64,8 @@ extern const u8 __far Inv_S[];          /* "Invert" */
 #define MOUSE_PASSED  2
 #define MOUSE_SELECTS 4
 
-#define DOS_CHDIR 0x3B00                /* DOS: make a directory current */
-#define ERR_PATH  3                     /* its error: there is no such */
+#define ERR_PATH  3                     /* DOS's error where a directory is
+                                           made current: there is no such */
 
 /* What a panel shows, written to the screen buffer: PutFls of the
    original, which goes on in what writes the tree or the Info for a
@@ -750,7 +748,7 @@ void F20_02(u16 panel)
 {
     struct WCBdef __far *other = PANEL(md.WCBsec);
     const struct WCBdef __far *current;
-    struct DosRegs regs;
+    struct Answer changed;
     u16 whole = (u16)md.Lines << 8 | 80;
     u16 length, i;
 
@@ -767,12 +765,9 @@ void F20_02(u16 panel)
         HidCur();
         Window(0, whole);
         if (Fantom((u8)(other->WinPath[0] - ('A' - 1))) == 0) {
-            regs.ax = DOS_CHDIR;
-            regs.bx = regs.cx = regs.si = regs.di = 0;
-            regs.name = other->WinPath;
-            if (!Intr21((struct DosRegs STACK *)&regs)
-                || regs.ax == ERR_PATH) {
-                SelDrv((u8)(other->WinPath[0] - 'A'));
+            changed = DirChange(other->WinPath);
+            if (!changed.failed || changed.value == ERR_PATH) {
+                DriveSelect((u8)(other->WinPath[0] - 'A'));
                 SetPth();
                 goto same;
             }
@@ -783,7 +778,7 @@ void F20_02(u16 panel)
         md.DosPth[3] = 0;
         md.PathEr = 1;
         other->ChgFlg = 1;
-        SelDrv((u8)(other->WinPath[0] - 'A'));
+        DriveSelect((u8)(other->WinPath[0] - 'A'));
     } else if (md.PathEr != 0) {
         HidCur();
         Window(0, whole);

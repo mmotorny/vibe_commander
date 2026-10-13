@@ -14,11 +14,8 @@
 #define Menu_C  7                       /* the menu bar */
 #define MnCur_C 8                       /* the menu that is open */
 
-/* Routines of the rest of the program that this file calls: all are C,
-   of vc.h.
-
-   Int16 calls the BIOS for the keyboard, with `ax` as INT 16h takes it,
-   and returns AX as it comes back. */
+/* Of the system this file asks which of Shift, Ctrl and Alt are held:
+   KeysHeld of sys.h. */
 
 /* Which names the key bar shows: for each of the bars that the program
    has, and for none of Shift, Ctrl and Alt held, Shift, Ctrl and Alt, a
@@ -174,7 +171,7 @@ void PutKey(u16 bar)
         md.BarPrev = 0xFF;
         return;
     }
-    keys = Int16(0x200).key;
+    keys = KeysHeld();
     PutKey0(bar, keys & 8 ? 3 : keys & 4 ? 2 : keys & 3 ? 1 : 0);
 }
 

@@ -447,6 +447,7 @@ are added here as they go.
 | `Init50`, `main.c` | DOS 47h, the current directory of the drive that was chosen | AL: the drive, 1 for A:. DH: the rows of the screen. CL: the letter of the drive | AL and DH 0, CX as it comes |
 | `F21_10`, `enter.c` | DOS 3Bh, the directory of the tree made current | CX: 37h, of the call that looked for the directory, where it did | CX 0 |
 | `M02_10`, `commands.c` | DOS 3Bh, the directory of a panel made current | AL: the drive, 1 for A: | AL 0 |
+| `F39_00`, `menu.c` | the BIOS's 02h for the keyboard, the keys that are held | AL: 2, the menu that the command is of | AL 0 |
 
 What is known to read such a register, and where the portable C will
 hand it something else when the file goes over:
