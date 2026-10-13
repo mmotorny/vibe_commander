@@ -92,11 +92,16 @@ BOOTED = b"BOOTED"
 # is 59 million instructions, and directories that scenarios make have a
 # time of 12:01 where they should have 12:00.
 CLOCK_SHIFT = 8
+# How many instructions that makes a second of the machine's clock.
+INSTRUCTIONS = 10 ** 9 >> CLOCK_SHIFT
 
 # How long the harness waits, in seconds, before it takes something for
 # stuck. These are for what hangs, and are long on purpose: a machine that
 # many tests share is slow, and must not look like one that hangs. A QEMU
-# that has ended is noticed at once, whatever these say.
+# that has ended is noticed at once, whatever these say. They are of the
+# host's clock, and so follow how busy the host is; the time that a step
+# of a scenario has does not, since it is of the machine's clock as well:
+# see Machine.wait_for_end.
 START_TIME = 60     # QEMU, to open the socket it is spoken to through
 LOAD_TIME = 120     # a saved state, to be loaded
 SAVE_TIME = 120     # a state, to be saved
@@ -445,7 +450,10 @@ class Machine:
 
     def _reply(self):
         while True:
-            line = self._channel.readline()
+            try:
+                line = self._channel.readline()
+            except OSError:
+                line = ""               # QEMU has gone, and its socket
             if not line:
                 raise MachineError("the machine stopped: it was reset, or "
                                    "QEMU ended")
@@ -543,30 +551,69 @@ class Machine:
         """What the guest has written to its debug console so far."""
         return self._written.read_bytes() if self._written.exists() else b""
 
+    def executed(self):
+        """How many instructions the machine has executed, as QEMU
+        counts them for its clock (see CLOCK_SHIFT): INSTRUCTIONS of them
+        are a second of that clock, and a machine that is halted has its
+        clock go on without any. Asking changes nothing in the machine,
+        and it may be running."""
+        return self._command("query-replay")["icount"]
+
     def wait_for_end(self, limit, enough=None):
         """Wait until the machine has ended, as it does when the guest
         resets it, and return True. Raises MachineError if the guest
-        writes nothing to its debug console for `limit` seconds: the
-        machine is then paused, for its screen to be looked at.
+        writes nothing to its debug console for `limit` seconds, of the
+        host's clock and of its own: the machine is then paused, for its
+        screen to be looked at.
+
+        The host's clock alone would not do: how long the host takes for
+        a second of the machine follows how busy the host is, and what
+        the guest was waited for would then follow that. So when the
+        host's seconds are over, the guest is given up only if it has
+        also executed as many seconds of its own clock since it last
+        wrote, INSTRUCTIONS for each, or has executed nothing at all for
+        as long: a machine that has had less than its time has been kept
+        from running, and is waited for. What it has executed is asked
+        of QEMU once a second while nothing is written, and counted from
+        the first time it is asked.
 
         `enough`, if it is given, is asked every time the guest has
         written something more: when it answers true the machine is
         paused where it is, and this returns False."""
+        every = min(1, limit / 2)       # how often QEMU is asked
         size, since = -1, time.monotonic()
+        # When QEMU was last asked; what the machine had executed when
+        # it was first asked since the guest wrote, and has now; and
+        # when that last changed.
+        asked = first = count = moved = None
         while self._qemu.poll() is None:
             now = self._written.stat().st_size \
                 if self._written.exists() else 0
+            clock = time.monotonic()
             if now != size:
-                size, since = now, time.monotonic()
+                size, since = now, clock
+                asked, first = clock, None
                 if enough and enough():
                     try:
                         self.pause()
                     except MachineError:
                         pass      # it has ended by itself meanwhile
                     return False
-            elif time.monotonic() - since > limit:
-                self.pause()
-                raise MachineError(f"nothing for {limit} s")
+            elif clock - asked >= every:
+                asked = clock
+                try:
+                    has = self.executed()
+                except MachineError:
+                    has = count   # it has ended meanwhile
+                if first is None or has != count:
+                    count, moved = has, clock
+                if first is None:
+                    first = has
+                if clock - since > limit and first is not None \
+                        and (count - first >= limit * INSTRUCTIONS
+                             or clock - moved > limit):
+                    self.pause()
+                    raise MachineError(f"nothing for {limit} s")
             try:
                 self._qemu.wait(0.01)
             except subprocess.TimeoutExpired:

@@ -188,17 +188,15 @@ RECORDS = {"portable_c32": Path(__file__).resolve().parent / "pass32.txt"}
 # How long a step may take in a scenario that is not on a tree's record,
 # in seconds, where one that is has scenarios.STEP_TIME: such a scenario
 # is expected to fail, and a program that hangs in it is waited for
-# this long at every one. The longest that the driver writes nothing in
-# a scenario that passes was 14 seconds on a machine by itself, in one
-# scenario, 5 in another and under a second in the rest. A scenario cut
-# short by this that would have passed is reported as stopped, and stays
-# off the record until it is run with more time: --limit. A scenario
-# that has the driver wait on purpose, Wait*ticks in a step, gets twice
-# the longest such wait besides: while the program of 32 bits idles, a
-# second of the machine was seen to take most of one here, and the 71
-# of blank-timed more than 60. See short_step().
+# this long at every one. They are seconds of the host's clock and of
+# the machine's own, both, as there, and a scenario that has the driver
+# wait has the seconds of its wait besides (see scenarios.run). The
+# longest that the driver writes nothing in a scenario without one is 34
+# seconds of the machine's clock, in mouse-edit, which are a third of a
+# second of the host's by itself. A scenario cut short by this that
+# would have passed is reported as stopped, and stays off the record
+# until it is run with more time: --limit.
 SHORT_STEP = 60
-TICKS = 1193180 / 65536           # of the machine's timer, in a second
 
 
 @dataclass(frozen=True)
@@ -1778,15 +1776,6 @@ def check_place(program, outcomes):
     return not elsewhere
 
 
-def short_step(name, tree, limit):
-    """How many seconds a step may take in the scenario `name` of the
-    tree `tree`, where it is not on the tree's record: `limit`, and
-    twice the longest wait that a step of it asks the driver for."""
-    waits = [int(ticks) for step in scenarios.of(name, tree).steps
-             for ticks in re.findall(r"\bWait\*(\d+)", step)]
-    return limit + 2 * max(waits, default=0) / TICKS
-
-
 def recorded(file):
     """The record of the file `file`: the names of the scenarios that it
     has, in its order. They are behind the first empty line; what is in
@@ -2170,7 +2159,7 @@ def main():
     on_record = recorded(record) if record else names
     failed, outcomes = compare.compare(
         names, translation, trace=True, stack=True, first=bool(record),
-        limits={name: short_step(name, tree, args.limit) for name in names
+        limits={name: args.limit for name in names
                 if name not in on_record})
     if record:
         failed = not check_record(translation, names, outcomes,

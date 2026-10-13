@@ -204,7 +204,11 @@ out again (show.py --changes is how):
     "a:", is asked for by DOS itself, which takes any key.
   - A step that the program does not get through fails after the five
     minutes of STEP_TIME, with the screen it stopped on. To try steps
-    out, give show.py or reach.py a shorter limit: "--limit 10".
+    out, give show.py or reach.py a shorter limit: "--limit 10". The
+    minutes are the host's and the machine's own, both: on a host that
+    is busy with other tests a program that hangs is waited for until
+    its machine has had five minutes of its own clock, and a program
+    that is only slow there is not given up.
   - The program run from its own command line, "d:\\vc\\vc", is a second
     copy of whichever program is tested, and what follows the name is a
     command that the copy runs before it shows its panels; F10 and Enter
@@ -1484,17 +1488,19 @@ from dos import MachineError
 # How long the driver may write nothing before the program counts as
 # stuck, in seconds: the longest a step may take. It is long on purpose:
 # it is there for a program that hangs, and a machine that many tests
-# share must not look like one.
+# share must not look like one. For that it is seconds of the host's
+# clock and of the machine's own, both: a machine that the host has not
+# given that much time to run is waited for, however long the host takes
+# (see dos.Machine.wait_for_end). The step of blank-timed that waits
+# 1,300 ticks is 81 seconds of the machine's clock, the longest of any
+# scenario; mouse-edit has one of 34 and copy-full one of 27, and no
+# other has more than 11. The program of 32 bits takes the host 35
+# seconds for those 81 by itself, where the 16-bit one takes 8, and by
+# the host's clock alone that step was given up on a host with a load of
+# 25 to 40, three agents' suites at once, time and again.
 STEP_TIME = 300
-# A step that has the driver wait, Wait*ticks, has as many seconds more
-# for each second of the machine's that it waits. The program goes round
-# idling for all of that time, and a second of the machine then takes
-# the host as long as it is loaded: while the program of 32 bits idles,
-# with its extender and the driver's reads above the megabyte at every
-# round, the 71 seconds of blank-timed took 60 seconds on a host by
-# itself, 150 beside one other run, and more than the 300 of STEP_TIME
-# in a suite on a host with a load of 25, three times running.
-WAIT_TIME = 10
+# A step that has the driver wait, Wait*ticks, has the seconds that it
+# waits besides.
 TICKS = 1193180 / 65536           # of the machine's timer, in a second
 
 
@@ -7267,8 +7273,10 @@ def run(scenario, program, bench, trace=False, blinking=False,
     much of its stack the program never used is recorded (see
     driver.stack_left). `limit` is for how many seconds the driver may
     write nothing before the program counts as stuck: STEP_TIME for a
-    test, and less where steps are tried out (see show.py). A scenario
-    that has the driver wait has more, by its longest wait: WAIT_TIME.
+    test, and less where steps are tried out (see show.py). They are
+    seconds of the host's clock and of the machine's own, both, as
+    STEP_TIME has it, and a scenario that has the driver wait has the
+    seconds of its longest wait besides.
 
     `until`, if it is given, is asked of every screen as the driver
     writes it, with its number, 0 for the start, and the screen: when it
@@ -7294,7 +7302,7 @@ def run(scenario, program, bench, trace=False, blinking=False,
     script = driver.script(scenario.steps, known, blinking)
     waits = [int(ticks) for step in scenario.steps
              for ticks in re.findall(r"\bWait\*(\d+)", step)]
-    limit = round(limit + WAIT_TIME * max(waits, default=0) / TICKS)
+    limit = round(limit + max(waits, default=0) / TICKS)
     with dos.workdir() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None

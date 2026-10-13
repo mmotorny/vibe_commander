@@ -1621,7 +1621,14 @@ BIOS's timer ticks, and writes out both states of what blinks.
 
 Nothing waits without a limit. A program that hangs fails its scenario
 when the driver has written nothing for five minutes, with the screen it
-got stuck on, and one that resets its machine fails at once. Nothing
+got stuck on, and one that resets its machine fails at once. The five
+minutes are of the computer's clock and of the machine's own, both: when
+the computer's are over, the harness asks QEMU how many instructions the
+machine has executed since the driver last wrote, and gives the program
+up only if those are five minutes of the machine's clock too, or if it
+executes nothing at all. So a machine that the computer has given little
+time is waited for, and a step takes as long as it takes there; a step
+that has the driver wait has the seconds of its wait besides. Nothing
 keeps runs of the harness apart: several checkouts may run their machines
 on one computer at once, and each only gets slower.
 
