@@ -15,8 +15,11 @@
 ;                many idle calls it saw; what DOS says of how the
 ;                program ended, AH 4Dh, 0009 for ended by AH 4Ch with 9;
 ;                DOS's largest free block, in paragraphs; the KB above
-;                the megabyte, INT 15h function 88h; and the machine's
-;                status word, whose lowest bit is clear in real mode
+;                the megabyte, INT 15h function 88h; the machine's
+;                status word, whose lowest bit is clear in real mode;
+;                and whether DOS looks for Ctrl-C at every call, AX
+;                3300h, 0001 if it does: the bench has it on, and the
+;                program switches it off while it runs
 ;   from the     every interrupt of real mode that does not go where it
 ;   third on     went before the program was run: its number, and where
 ;                it goes now
@@ -28,7 +31,9 @@
 ;       build/trial32/ended.com '"ver" Enter' '"d:\vc\t" Enter' q
 ;
 ; The steps behind it are typed at DOS's prompt, to see what the machine
-; still does.
+; still does. The program of the portable C is run the same way, as it
+; stands at its first screen: --extra VC/T.EXE=build/portable_c32/VC.EXE,
+; or build/portable_c/VC.EXE for the one of 16 bits, and no step for it.
 ;
 ; The word behind the letters SKIP in the file is how many idle calls of
 ; the other program it lets by before it has DOS end that one: 0 as it
@@ -108,6 +113,10 @@ Back:	pop	dx
 	mov	dx,ax
 	call	Hex4
 	smsw	dx
+	call	Hex4
+	mov	ax,3300h
+	int	21h
+	xor	dh,dh
 	call	Hex4
 	call	NewLine
 	xor	si,si			; The vectors that are others now
