@@ -2500,7 +2500,7 @@ and H1 are started at once by the session.
 |---|---|---|---|---|---|---|
 | P1, the words in one place. Done: see below | `vc.h` gets the macros of the addresses once, with two bodies: `AT`, `WORD_AT`, `OFFSET`, `PANEL`, `MAIN_SEG`, `NEAR`, `MD_PLACE`, `MD_POINTER`, `TRELIST`; the files lose their own. The classes P, M, V, G and R whole | `vc.h`, `tables.h` for `LAID_OUT`, and the tops of 23 files | 46 definitions out of 23 files, 17 lines by hand | Nothing; lands first and alone, D1 and H1 start beside it | The 16-bit `VC.EXE` is the same bytes; the host check falls to some 310; `whole.py` still links | A file's own `OFFSET` meant something else: `dos.c`'s does, and keeps its own under another name. And nothing runs the second bodies before M1: a mistake in them is found there |
 | P2a, places of the main data: the lists, the tree, the command line | N in `treebox.c`, `tree.c`, `enter.c`, `usermenu.c`, `cmdline.c`, `place.c`, `info.c`, `extfile.c`, `drive.c`, `input.c`, `panel.c`, `files.c`, `read.c` | Those files | 97 places, 59 by hand | P1; beside P2b, P3, P4, S | The same bytes; those files clean in the host check | A number that is no place of the main data: `(u16)(u32)file` is the offset in a panel |
-| P2b, the same: the viewer, the editor, a copy, the menus | N in `view.c`, `edit.c`, `copy.c`, `menu.c`, `help.c`, `find.c`, `stcolor.c`, `sthelp.c`, `window.c`, `bars.c`, `dirfunc.c` | Those files, but the lines that S1 has in `view.c` | 66 places | P1; beside the others | The same | `EditBuf`, `CpSrc`: names that are places of the main data by a macro |
+| P2b, the same: the viewer, the editor, a copy, the menus. Done: see below | N in `view.c`, `edit.c`, `copy.c`, `menu.c`, `help.c`, `find.c`, `stcolor.c`, `sthelp.c`, `window.c`, `bars.c`, `dirfunc.c` | Those files, but the lines that S1 has in `view.c` | 66 places | P1; beside the others | The same | `EditBuf`, `CpSrc`: names that are places of the main data by a macro |
 | P3, the tables read as what they are | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
 | P4, arithmetic | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
 | S1, the PSP and a program run | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
@@ -2723,6 +2723,82 @@ And what each should know besides:
   through `PSP_EXIT` and `PSP_ENV`, all of `DOS_AT`; `main.c` has
   `DOS_AT` for the command tail and for the header of the device in
   `FatErr`.
+
+### P2b, the viewer, the editor, a copy, the menus: done, and what a later piece should know
+
+The eleven files of the row say `MD_PLACE`, `MD_POINTER`, `NEAR` and
+once `OFFSET_IN_SEG` where they cast between a pointer and a number,
+in four commits, each of which left `build/portable_c/VC.EXE` the same
+bytes. The host check counted 65 places in them when the piece began,
+the 66th, of `bars.c`, having gone with P1; it counts one, which is
+S1's, and has ten of the files clean. `casts.py` has no place of N in
+any of them. All eleven compile under `wcc386` with warnings as errors,
+by the command of "The build".
+
+| Files | Places | What they were |
+|---|---|---|
+| `window.c`, `menu.c`, `find.c`, `help.c`, `stcolor.c`, `sthelp.c` | 20 | The buffer that a window is kept in and put back from: `SavWin` and `ResWin` take it as a place and make the pointer, and their callers hand them `WinBuf`, `ErrBuf` and `ErrBuf1`. And two of the help's text, where a line is behind `HlpInfo`, both in `HelpBuf` |
+| `copy.c`, `dirfunc.c` | 14 | The two names of a copy in `TmpBuf`, by the file's own `CpSrc` and `CpDest`; `CpBgNam`, a word of `TmpBuf` that holds where the source's name begins; the directory at `TreAdr`; the line in `DosBuf` that `F35_61` hands to `InSt10`. Six are DX as DOS left it, which the original goes on with, the address of a name: its place in the main data, in both memories the number that it is today |
+| `edit.c` | 13 | `EditBuf`, which is `MenuBuf`, handed on with `MAIN_SEG` as a segment and an offset, and two pointers into it held against one another as numbers; the end of a name in `TmpBuf`; a window's buffer. And the two below that are no place of the main data |
+| `view.c` | 17 | The words of `TmpBuf` where PgDn notes the lines of the next screen; `MenuBuf`, read on in by a search; a command of an extension file or a menu file, which `F34_30` and `F34_40` take and answer as a place of `MenuBuf`; the buffers of a box |
+
+What each place points into was read before it was wrapped, as P1 has
+it, and none of them is the text of the viewer or of the editor. That
+text is in a segment of its own in both files and is numbers
+throughout: a segment and an offset, or a count of bytes from its
+beginning (`OFFSET_OF` and `AddressOf` of `edit.c`), made a pointer by
+`AT` or `TEXT` and nowhere cast. What a copy reads a file into is the
+same, segments from `ViewSeg` on. So nothing of those was wrapped, and
+nothing of them is left to wrap.
+
+Two places are no place of the main data, and have the word that is
+theirs:
+
+- `edit.c`, in `T72_00`: `(u16 *)(u16)(u32)cell`, a cell of the screen
+  buffer that `HexByt` returns far, kept near. `NEAR`, as P1 said.
+- `edit.c`, where the editor's help is written below its window:
+  `(u16)(u32)line.line`, a far pointer into the tables that `CntLine`
+  has stepped to the next text, taken for its offset there and handed
+  to `T76_00` with the tables' segment. It is of the class T, and
+  `MD_PLACE` of it would be a number that means nothing. It is
+  `OFFSET_IN_SEG(code, line.line)`, `code` being what `AsmSeg` answered
+  and what the pointer was made with: the same bytes, and in a flat
+  memory the offset that `OFFSET` gives of a table.
+
+Left, and whose:
+
+- `view.c`, `Aexec0`: `md.EPB.CmdLine = (u32)MAIN_SEG << 16 |
+  (u16)(md.TmpBuf + 100)`, the tail of the command line in the block
+  that a viewer of the user's is run with, a far pointer of real mode.
+  It is S1's, with `ProgramRun`, and the one place that the host check
+  has in these files.
+
+What a later piece should know:
+
+- P2a: `F34_30` and `F34_40` of `view.c` take a place of `MenuBuf` and
+  answer with one, and make the pointer themselves; `usermenu.c` hands
+  the first `(u16)text`, which is `MD_PLACE(text)`. `InSt10` takes the
+  line that is typed into as a place of the main data: `copy.c` hands
+  it `MD_PLACE(line)`, and `cmdline.c` and `treebox.c` hand it
+  `(u16)(md.MenuBuf + SPEED)`.
+- P3: `SavWin` and `ResWin` make the pointer with `MD_POINTER`, so what
+  `DialBox` puts into `struct Box` as `saved`, a word of a box's
+  header, has to be a place of the main data and nothing else. It is:
+  every such word of the tables says `MD_AT`. `InSt10` is in
+  `dialog.c` and still casts what it is handed.
+- P4: no line of this piece is a sum or a comparison that it was not
+  before. `MD_PLACE` gives a number of 16 bits in both builds, and the
+  places that are taken from one another or held against one another
+  are put into a word of 16 bits or cut to one where they stand:
+  `starts` of `view.c`, `cursor` and `i` in `T26_00`, `count` in
+  `T00_00` of `edit.c`, `(u16)(MD_PLACE(NEAR(text)) -
+  MD_PLACE(hd.HlpInfo))` of `help.c`. `MD_PLACE(md.TmpBuf) - 2` in the
+  viewer's PgDn is a place two below the buffer, in `LowTab`, and is
+  stepped up before it is written through.
+- M1 and the convergence: the six places of DX as DOS left it rest on
+  the main data being laid out as it is, which step 1 keeps. They are
+  reached only where DOS refuses to say what a handle is or when a
+  file was written; whether a scenario gets there was not looked up.
 
 ### What could go wrong
 
