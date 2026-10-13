@@ -317,14 +317,20 @@ u16 MnMn40(u16 colors, u16 place, u16 item, u16 size, u16 table)
    `*state` is the button chosen, and in its high byte the key bar, with
    80h for buttons that are a field of a dialog: there Home and End go to
    the first and the last field. Returns the key, which is Enter for the
-   letter of a button and for a click on the button chosen, and 1 in the
-   high word if the buttons have dealt with it: the carry flag of the
-   assembly. */
-static u32 MnMn11(u16 key, u16 place, u16 STACK *state, u16 table, u16 code)
+   letter of a button and for a click on the button chosen, and whether
+   the buttons have dealt with it: the carry flag of the assembly. */
+struct ButtonKey {
+    u16 key;
+    u16 taken;                          /* 1 if the buttons have dealt with
+                                           the key */
+};
+static struct ButtonKey MnMn11(u16 key, u16 place, u16 STACK *state,
+                               u16 table, u16 code)
 {
+    struct ButtonKey pressed;
     const u8 __far *button;
     u16 chosen = *state;
-    u16 carry = 1;
+    u16 taken = 1;
     u16 item, low, count, buttons, mouse, column, look, now, begin, size;
     const u16 *screen;
     struct Mouse pointer;
@@ -431,10 +437,12 @@ MnMn22:
     chosen = item - table >> 1;
     key = KEY_ENTER;
 MnMn23:
-    carry = 0;
+    taken = 0;
 MnMn16:
     *state = chosen;
-    return key | (u32)carry << 16;
+    pressed.key = key;
+    pressed.taken = taken;
+    return pressed;
 }
 
 /* MnMn10, for a menu that is not MinMnu's: see MnMn11. `item` is what
@@ -444,13 +452,13 @@ MnMn16:
 struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table)
 {
     struct Taken taken;
-    u32 pair;
+    struct ButtonKey pressed;
 
     (void)size;
-    pair = MnMn11(key, place, (u16 STACK *)&item, table, AsmSeg());
-    taken.key = LOW(pair);
+    pressed = MnMn11(key, place, (u16 STACK *)&item, table, AsmSeg());
+    taken.key = pressed.key;
     taken.button = (u8)item;
-    taken.taken = (u8)HIGH(pair);
+    taken.taken = (u8)pressed.taken;
     return taken;
 }
 
@@ -469,15 +477,15 @@ struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
     const u8 __far *color = AT(code, colors);
     u16 state = (keys & 0xFF) << 8 | item & 0xFF;
     u16 key;
-    u32 pair;
+    struct ButtonKey pressed;
 
     HidCur();
     for (;;) {
         MnMn40((u16)color[0] << 8 | color[1], begin, state, size, control);
         key = Input(state >> 8 & 0x7F);
-        pair = MnMn11(key, begin, (u16 STACK *)&state, control, code);
-        key = LOW(pair);
-        if (HIGH(pair) != 0)
+        pressed = MnMn11(key, begin, (u16 STACK *)&state, control, code);
+        key = pressed.key;
+        if (pressed.taken != 0)
             continue;
         if (key >> 8 != KEY_MOUSE)
             MnMn40((u16)color[0] << 8 | color[2], begin, state, size,
@@ -489,13 +497,32 @@ struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
     return buttons;
 }
 
+/* What a field of a dialog returns when a key is not for it: the key,
+   and what the field holds then, for Dialog to keep. A line that is
+   typed into, InpStr; a group of lines, Select; a box to tick, FlipFl.
+   The buttons have theirs in vc.h, with MinMnu. */
+struct Typed {
+    u16 key;
+    u16 cursor;                         /* the column of the cursor */
+};
+struct Chosen {
+    u16 key;
+    u16 lines;                          /* the line chosen, and in the high
+                                           byte the line of the cursor */
+};
+struct Ticked {
+    u16 key;
+    u16 value;                          /* not 0 if the box is ticked */
+};
+
 /* A line to type into: `text`, in the main data, of `length` characters
    at the most, at `place`, in the colour with the number `color`, the
    cursor in the column `cursor`. Takes keys until one is not for the
-   line. Returns that key, and in the high word the column of the cursor. */
-static u32 InpStr(u16 place, u8 *text, u16 cursor, u16 length, u16 color,
-                  u16 bar)
+   line. Returns that key, and the column of the cursor. */
+static struct Typed InpStr(u16 place, u8 *text, u16 cursor, u16 length,
+                           u16 color, u16 bar)
 {
+    struct Typed typed;
     u16 key, low, buttons, mouse, column, end, count;
     const u8 *from;
     struct Mouse pointer;
@@ -568,15 +595,18 @@ InSt04:
         cursor = EdLin(key, text, cursor, length).cursor;
     }
 InSt08:
-    return key | (u32)cursor << 16;
+    typed.key = key;
+    typed.cursor = cursor;
+    return typed;
 }
 
 /* A group of `total` lines at `place`, of which one is chosen: `lines`
    has the line chosen and in its high byte the line of the cursor. Takes
    keys until one is not for the group, and returns it, and the two lines
-   in the high word. */
-static u32 Select(u16 place, u16 bar, u16 total, u16 lines)
+   as they are then. */
+static struct Chosen Select(u16 place, u16 bar, u16 total, u16 lines)
 {
+    struct Chosen answer;
     u16 chosen = lines & 0xFF;
     u16 cursor = lines >> 8;
     u16 key = 0;
@@ -666,14 +696,17 @@ Slct07:                                 /* choose the line of the cursor */
     goto Slct01;
 
 Slct13:
-    return key | (u32)(cursor << 8 | chosen) << 16;
+    answer.key = key;
+    answer.lines = cursor << 8 | chosen;
+    return answer;
 }
 
 /* A box to tick at `place`, which is ticked if `value` is not 0. Space
-   and a click change it; any other key is returned, and in the high word
-   the value. */
-static u32 FlipFl(u16 place, u16 bar, u16 value)
+   and a click change it; any other key is returned, and the value as it
+   is then. */
+static struct Ticked FlipFl(u16 place, u16 bar, u16 value)
 {
+    struct Ticked ticked;
     u16 key, buttons;
     u8 *cell;
     struct Mouse pointer;
@@ -708,7 +741,9 @@ static u32 FlipFl(u16 place, u16 bar, u16 value)
             while (GetMous(0).buttons != 0)
                 ;
     }
-    return key | (u32)value << 16;
+    ticked.key = key;
+    ticked.value = value;
+    return ticked;
 }
 
 /* Where the buttons of a dialog begin: `place` is where the box begins
@@ -759,6 +794,9 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     u16 *screen;
     struct Box where;
     u32 pair;
+    struct Typed typed;
+    struct Chosen chosen;
+    struct Ticked ticked;
     struct Buttons menu;
     struct Mouse pointer;
     u16 first = box + sizeof(struct BOXHD);
@@ -840,25 +878,27 @@ Dial31:                                 /* the field of the cursor has the keys 
     if (type == FIELD_INPUT) {
         control = WORD(field->mCtrl);
         text = INPUT(control);
-        pair = InpStr(place, text + 3, *(u16 *)text, control & 0xFF,
-                      colors[1], head->bKeyBar);
-        *(u16 *)text = HIGH(pair);
+        typed = InpStr(place, text + 3, *(u16 *)text, control & 0xFF,
+                       colors[1], head->bKeyBar);
+        *(u16 *)text = typed.cursor;
+        key = typed.key;
     } else if (type == FIELD_SELECT) {
-        pair = Select(place, head->bKeyBar, WORD(field->mCtrl) & 0xFF,
-                      MDW(field->mPoint));
-        MDW(field->mPoint) = HIGH(pair);
+        chosen = Select(place, head->bKeyBar, WORD(field->mCtrl) & 0xFF,
+                        MDW(field->mPoint));
+        MDW(field->mPoint) = chosen.lines;
+        key = chosen.key;
     } else if (type == FIELD_FLIP) {
-        pair = FlipFl(place, head->bKeyBar, MD(field->mPoint));
-        MD(field->mPoint) = (u8)HIGH(pair);
+        ticked = FlipFl(place, head->bKeyBar, MD(field->mPoint));
+        MD(field->mPoint) = (u8)ticked.value;
+        key = ticked.key;
     } else if (type == FIELD_BUTTONS) {
         menu = MinMnu(WORD(field->mCtrl), Dial18(place, begin & 0xFF),
                       MnMn60(WORD(field->mCtrl), code), WORD(head->pDiBox),
                       head->bKeyBar | 0x80, MD(field->mPoint));
         MD(field->mPoint) = (u8)menu.chosen;
-        pair = menu.key;
+        key = menu.key;
     } else
-        pair = (begin & 0xFF) << 8 | type;
-    key = LOW(pair);
+        key = (begin & 0xFF) << 8 | type;
     if (key >> 8 == KEY_MOUSE)
         goto Dial40;
     if (key >> 8 == 0)                  /* Case takes none without a scan code */
