@@ -24,7 +24,19 @@ and pack; and the calls that still hand registers to an interrupt, which
 tools/calls.py counts. The words __far, FAR, STACK and CODE are counted
 by the host check, harness/hostcheck.py, whose function is called here;
 the other things that only Open Watcom reads, by their kinds, are that
-test's to count, and its table is in TODO.md. What is worked out:
+test's to count, and its table is in TODO.md.
+
+Those rows are of the program of 16 bits, which is the one that the
+tests judge. Behind them come the rows of the program of 32 bits,
+build/portable_c32/VC.EXE, which the build links of the same source
+(TODO.md, "The portable C in 32 bits: the plan"): what the harness's
+reader of such a file, harness/le.py, finds in it, the length of the
+file and of the extender's stub in it, its code and its data, the
+addresses that the extender sets, the stack; how much room the layout
+that it rests on has left, as the test of that works it out,
+harness/layoutcheck.py; the length of the same program compiled for
+finding a fault; and the inline assembly of dos32.c, which only that
+program has. What is worked out:
 
   - What the program keeps while a command runs: what DOS loads of the
     file, which is the file less its header, and the 256 bytes of the PSP
@@ -59,6 +71,7 @@ sys.path.insert(0, str(ROOT / "harness"))
 import calls  # noqa: E402  (of tools/, next to this)
 import coverage  # noqa: E402  (of harness/, not the package of that name)
 import hostcheck  # noqa: E402
+import layoutcheck  # noqa: E402
 import ported  # noqa: E402
 
 README = ROOT / "README.md"
@@ -90,10 +103,10 @@ def code(path):
     return re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
 
 
-# The functions of dos.c for a program of 32 bits, which is not built
-# yet: the figures are of the program that is, so this file is not read
-# for them. The test portable_c-host reads it, and its count of the
-# words has it.
+# The functions of dos.c for the program of 32 bits. The figures that
+# are counted in the source are of the program of 16 bits, so this file
+# is not read for them, but for a row of its own. The test
+# portable_c-host reads it, and its count of the words has it.
 NOT_BUILT = ("dos32.c",)
 
 
@@ -131,6 +144,54 @@ def panel(texts):
     WCBdef to."""
     match = re.search(r"LAID_OUT\(WCBdef, (\w+)\)", texts["vc.h"])
     return int(match[1], 0)
+
+
+def flat():
+    """The rows of the program of 32 bits."""
+    directory = BUILD / "portable_c32"
+    check = layoutcheck.Check((directory / "VC.EXE").read_bytes(),
+                              directory / "VC.MAP")
+    check.all()
+    program = check.program
+    instructions, data = program.objects
+    bottom, top = coverage.flat_stack(program, check.map)
+    debug = layoutcheck.Check(
+        (directory / "debug" / "VC.EXE").read_bytes(),
+        directory / "debug" / "VC.MAP").program
+    pieces = inline_assembly({name: code(SOURCE / name)
+                              for name in NOT_BUILT})
+    room = check.room
+    return [
+        ("The program of 32 bits, `build/portable_c32/VC.EXE`",
+         f"{number(len(program.contents))} bytes, of which the extender's "
+         f"stub is {number(program.stub)}"),
+        ("Its code, and what the file has of its data",
+         f"{number(instructions.size)} and {number(data.held)} bytes"),
+        ("What it has of the memory above the megabyte when it is "
+         "loaded: its code and its data, with what has no value",
+         f"{number(instructions.size + data.size)} bytes"),
+        ("The addresses in it that the extender sets when it loads it",
+         number(len(program.relocations))),
+        ("Its stack", f"{number(top - bottom)} bytes"),
+        ("How far its tables may grow, in front of `Title_S` and behind "
+         "it, before the offset of one wraps round, as the test "
+         "`portable_c32-layout` holds them",
+         f"{number(room['in front of Title_S'])} and "
+         f"{number(room['behind Title_S'])} bytes"),
+        ("How much more may stand between `Title_S` and the main data, "
+         "and between the main data and the end of `IniSave`, by the "
+         "same test",
+         f"{number(room['between Title_S and the main data'])} and "
+         f"{number(room['behind IniSave'])} bytes"),
+        ("The same program compiled for finding a fault, "
+         "`build/portable_c32/debug/VC.EXE`",
+         f"{number(len(debug.contents))} bytes, "
+         f"{number(debug.objects[0].size)} of them code"),
+        ("Inline assembly of `dos32.c`, which the program of 32 bits has "
+         "in place of that of `dos.c`",
+         f"{sum(piece[2] for piece in pieces)} instructions in "
+         f"{len(pieces)} pieces"),
+    ]
 
 
 def table():
@@ -214,6 +275,7 @@ def table():
         "through `sys.h`, as `tools/calls.py` counts them",
         f"{number(total)}, in {len(left)} files" if total else "none"))
 
+    rows += flat()
     return (["| What | Figure |", "|---|---|"]
             + [f"| {what} | {figure} |" for what, figure in rows])
 

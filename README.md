@@ -675,6 +675,15 @@ the number. No test holds the table.
 | Pairs of `#pragma pack` | 7 |
 | `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 752, 106, 262, 92 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
+| The program of 32 bits, `build/portable_c32/VC.EXE` | 302,699 bytes, of which the extender's stub is 27,536 |
+| Its code, and what the file has of its data | 130,211 and 104,527 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 235,332 bytes |
+| The addresses in it that the extender sets when it loads it | 5,216 |
+| Its stack | 16,384 bytes |
+| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,180 and 16,408 bytes |
+| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,408 and 2,347 bytes |
+| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 396,155 bytes, 220,278 of them code |
+| Inline assembly of `dos32.c`, which the program of 32 bits has in place of that of `dos.c` | 45 instructions in 9 pieces |
 
 <!-- The end of the figures. -->
 
@@ -688,6 +697,12 @@ words in the last line are counted by the test `portable_c-host`,
 which prints them in its summary, each place where the word stands in
 the code; what else that test counts of what only Open Watcom reads,
 by kinds, is in its own table, in `TODO.md`.
+
+The rows from "The program of 32 bits" on are of [that
+program](#the-program-of-32-bits), which is built of the same source:
+what the harness's reader of such a file finds in it, and how much room
+the layout that it rests on has left, as the test `portable_c32-layout`
+works it out. Every row above them is of the 16-bit program.
 
 ### Staying in the memory whole
 
