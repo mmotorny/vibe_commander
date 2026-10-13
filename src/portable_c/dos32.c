@@ -23,8 +23,11 @@
  *     and writing take a count of 32 bits so.
  *   - A call of DOS that the extender does not know goes over with its
  *     registers as they are, and the address in them means nothing
- *     there. Those have to be made in real mode with a block below the
- *     megabyte, and are not here yet: see the end of this file.
+ *     there: what goes by a file control block, AH 13h and 29h, the
+ *     country, 38h, and the full path of a name, 60h. Those are made in
+ *     real mode, by the extender's service for that, with what DOS
+ *     reads and writes in a block below the megabyte that the program
+ *     asks for when it starts.
  *   - Four calls that it translates it brings back with the AX that it
  *     was called with where they did not fail, and not with what DOS
  *     left there, which is what sys.h has an answer be: the search of a
@@ -49,7 +52,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 81 of the 98, six of them in real mode; the 17 that are not made
+ * 86 of the 98, eleven of them in real mode; the 12 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -205,13 +208,23 @@ static void MouseState(u32 eax, struct MouseAt *state);
  */
 
 /* The block below the megabyte, by its segment in real mode: Start asks
-   for it. It has room for a name or a path, and for the record of a
-   search. */
+   for it. A call that is made in real mode has there what DOS reads and
+   writes at an address, each thing at a place of its own:
+
+     LOW_NAME     a name or a path, 128 bytes
+     LOW_RECORD   the record of a search, 43 bytes
+     LOW_SECOND   128 bytes that DOS writes a path to
+     LOW_FCB      a file control block, 44 bytes with what an extended
+                  one has in front
+     LOW_COUNTRY  what DOS tells of the country, 34 bytes */
 static u16 LowSeg = 0;
 
-#define LOW_NAME   0                    /* 128 bytes */
-#define LOW_RECORD 128                  /* 64 bytes */
-#define LOW_SIZE   192
+#define LOW_NAME    0
+#define LOW_RECORD  128
+#define LOW_SECOND  192
+#define LOW_FCB     320
+#define LOW_COUNTRY 368
+#define LOW_SIZE    416
 #define LOW(place) ((u8 *)(((u32)LowSeg << 4) + (place)))
 
 #define DPMI_SEGMENT_BASE 0x0006        /* where the segment of the
@@ -223,6 +236,9 @@ static u16 LowSeg = 0;
                                            which, CX words of the stack to
                                            take along, ES:EDI the
                                            registers */
+#define DPMI_REAL_CALL 0x0301           /* a routine of real mode that
+                                           returns far, at the CS:IP of
+                                           the registers: the same */
 #define FLAG_CARRY 1
 
 /* The extender, asked for the service `ax` with these registers, and
@@ -242,9 +258,11 @@ static u16 Extender(struct DosRegs *regs, u16 ax, u32 ebx, u32 ecx, u32 edx,
 }
 
 /* An interrupt made in real mode, with the registers of `regs` and their
-   answer there, and with DS and ES on the block below the megabyte.
-   Returns the flags as the interrupt leaves them. */
-static u16 Real(struct DosRegs *regs, u16 number)
+   answer there, and with DS and ES on the block below the megabyte; or,
+   if `routine` is not 0, a routine of real mode called far at that
+   address, its segment above its offset. On a stack of the extender's.
+   Returns the flags as it leaves them. */
+static u16 Real(struct DosRegs *regs, u16 number, u32 routine)
 {
     struct RealRegs real;
     struct DosRegs asked;
@@ -260,7 +278,10 @@ static u16 Real(struct DosRegs *regs, u16 number)
     real.ds = real.es = LowSeg;
     real.fs = real.gs = 0;
     real.sp = real.ss = 0;
-    Extender(&asked, DPMI_REAL_INT, number, 0, 0, &real);
+    real.ip = (u16)routine;
+    real.cs = (u16)(routine >> 16);
+    Extender(&asked, routine ? DPMI_REAL_CALL : DPMI_REAL_INT, number, 0, 0,
+             &real);
     regs->eax = real.eax;
     regs->ebx = real.ebx;
     regs->ecx = real.ecx;
@@ -275,7 +296,7 @@ static u16 Call(struct DosRegs *regs)
 {
     if (!regs->low)
         return (u16)Dos(regs);
-    return Real(regs, 0x21) & FLAG_CARRY ? 0xFFFF : 0;
+    return Real(regs, 0x21, 0) & FLAG_CARRY ? 0xFFFF : 0;
 }
 
 /* The BIOS for the screen, with these registers, which come back in
@@ -564,6 +585,62 @@ struct Device FileDevice(u16 handle)
     device.failed = asked.failed;
     device.kind = (u16)regs.edx;
     return device;
+}
+
+/* In real mode: the extender does not know the call. The name is at
+   DS:SI and the path goes to ES:DI, 128 bytes that DOS has in the block
+   below the megabyte: the program's go there first and come back
+   afterwards, so that what DOS leaves of them is what the program had
+   there, failed or not. */
+#define PATH_SIZE 128
+
+struct Answer FileTrueName(const u8 FAR *name, u8 FAR *to)
+{
+    struct DosRegs regs;
+    struct Answer asked;
+
+    NameLow(name);
+    Bytes(LOW(LOW_SECOND), to, PATH_SIZE);
+    SetLow(&regs, 0x6000, 0, 0, 0);
+    regs.esi = LOW_NAME;
+    regs.edi = LOW_SECOND;
+    asked = Ask(&regs, 0);
+    Bytes(to, LOW(LOW_SECOND), PATH_SIZE);
+    return asked;
+}
+
+/* Files by a file control block, in real mode: the extender knows
+   neither call. AH 29h, with the name at DS:SI and the block at ES:DI,
+   of which DOS writes what an unopened one has, 16 bytes, and reads
+   what `how` has it keep: so the program's go down first and come back
+   afterwards. And AH 13h, with the block at DS:DX, 37 bytes and 7 in
+   front of them where it is an extended one, which is what the program
+   hands over. */
+#define FCB_UNOPENED 16
+#define FCB_EXTENDED 44
+
+u16 FcbParse(const u8 FAR *name, u8 FAR *fcb, u16 how)
+{
+    struct DosRegs regs;
+    u16 value;
+
+    NameLow(name);
+    Bytes(LOW(LOW_FCB), fcb, FCB_UNOPENED);
+    SetLow(&regs, 0x2900 | how & 0xFF, 0, 0, 0);
+    regs.esi = LOW_NAME;
+    regs.edi = LOW_FCB;
+    value = Tell(&regs).value;
+    Bytes(fcb, LOW(LOW_FCB), FCB_UNOPENED);
+    return value;
+}
+
+struct Answer FcbDelete(const u8 FAR *fcb, u16 flagged)
+{
+    struct DosRegs regs;
+
+    Bytes(LOW(LOW_FCB), fcb, FCB_EXTENDED);
+    SetLow(&regs, 0x1300, 0, 0, LOW_FCB);
+    return Ask(&regs, flagged);
 }
 
 /* Directories. The search and the current directory are asked in real
@@ -971,7 +1048,7 @@ void MemSetUpper(u16 on)
     Tell(&regs);
 }
 
-/* The time, the system itself. */
+/* The time, the country, the system itself. */
 
 struct Time TimeOfDay(void)
 {
@@ -983,6 +1060,44 @@ struct Time TimeOfDay(void)
     time.clock = (u16)regs.ecx;
     time.seconds = (u16)regs.edx;
     return time;
+}
+
+/* The country, AH 38h, in real mode: the extender passes the call on
+   and does not know that it takes an address. DOS writes 34 bytes at
+   DS:DX, or fewer: the program's go down first and come back
+   afterwards, so that it has what DOS wrote and, of the rest, what it
+   had. Among them is the address of DOS's routine for capitals, which
+   is one of real mode. */
+#define COUNTRY_SIZE 34
+#define COUNTRY_CAPITALS 18
+
+static u32 Capitals = 0;
+
+void CountryInfo(struct CNTRY FAR *to)
+{
+    struct DosRegs regs;
+    u8 *low = LOW(LOW_COUNTRY);
+
+    Bytes(low, (const u8 *)to, COUNTRY_SIZE);
+    SetLow(&regs, 0x3800, 0, 0, LOW_COUNTRY);
+    Tell(&regs);
+    Bytes((u8 *)to, low, COUNTRY_SIZE);
+    Capitals = *(const u32 *)(low + COUNTRY_CAPITALS);
+}
+
+/* DOS's routine is called far in real mode, by the extender's service
+   for that, with the letter in AL and back there. Until the country has
+   been asked for there is no routine, and the letter comes back as it
+   went. */
+u16 CaseMap(u16 letter)
+{
+    struct DosRegs regs;
+
+    if (Capitals == 0)
+        return letter;
+    SetLow(&regs, letter, 0, 0, 0);
+    Real(&regs, 0, Capitals);
+    return (u16)regs.eax;
 }
 
 struct SysVersion SystemVersion(void)
@@ -1329,7 +1444,7 @@ void IntOn(void)
 }
 
 /*
- * The 17 functions of sys.h that are not made here yet. Each does
+ * The 12 functions of sys.h that are not made here yet. Each does
  * nothing, and answers as a system does that failed or does not know
  * the question; none of them calls DOS, since a call that the extender
  * does not translate has DOS write wherever the registers happen to
@@ -1338,9 +1453,8 @@ void IntOn(void)
  *
  *   - through the block below the megabyte and a call in real mode, as
  *     the search of a directory is made above, with more room in the
- *     block: FileTrueName, FcbParse, FcbDelete, CountryInfo, CaseMap,
- *     ProgramRun and ProgramRunBare; and ShellRun, by a stretch of code
- *     of real mode there;
+ *     block: ProgramRun and ProgramRunBare; and ShellRun, by a stretch
+ *     of code of real mode there;
  *   - what DOS and the BIOS enter of the program, the critical error,
  *     Ctrl-Break and Ctrl-C, which are taken through the extender here
  *     and arrive at routines of protected mode: the seven that note,
@@ -1361,38 +1475,6 @@ static struct Answer NotMade(u16 error)
     answer.value = error;
     answer.failed = 1;
     return answer;
-}
-
-struct Answer FileTrueName(const u8 FAR *name, u8 FAR *to)
-{
-    (void)name;
-    (void)to;
-    return NotMade(ERR_NO_FUNCTION);
-}
-
-u16 FcbParse(const u8 FAR *name, u8 FAR *fcb, u16 how)
-{
-    (void)name;
-    (void)fcb;
-    (void)how;
-    return 0xFF;
-}
-
-struct Answer FcbDelete(const u8 FAR *fcb, u16 flagged)
-{
-    (void)fcb;
-    (void)flagged;
-    return NotMade(ERR_NO_FUNCTION);
-}
-
-void CountryInfo(struct CNTRY FAR *to)
-{
-    (void)to;
-}
-
-u16 CaseMap(u16 letter)
-{
-    return letter;
 }
 
 struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail)

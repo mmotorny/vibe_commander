@@ -845,9 +845,6 @@ static void Keyboard(void)
     Line();
 }
 
-TEXT(Mask_S, "TOY?.DAT");
-TEXT(Toy1_S, "TOY1.DAT");
-TEXT(Lower_S, "hello.txt");
 
 /* What the toy has the system tell it when DOS has ended it: nothing.
    Nobody ends the toy. */
@@ -863,6 +860,104 @@ static u16 Fail(u16 how, u16 error, const u8 FAR *device)
     (void)error;
     (void)device;
     return DEVICE_FAIL;
+}
+
+TEXT(Mask_S, "TOY?.DAT");
+TEXT(Toy1_S, "TOY1.DAT");
+TEXT(Lower_S, "hello.txt");
+TEXT(Dots_S, "..\\WORK\\.\\hello.txt");
+TEXT(NoDrive_S, "Q:X.DAT");
+TEXT(Drive_S, "C:TOY?.DAT");
+TEXT(Star_S, "*.*");
+
+/* The calls of DOS that the extender does not know: the full path of a
+   name, the files by a file control block, the country and its
+   capitals. Each buffer is filled first, so that what DOS leaves of it
+   shows too. */
+static void Older(void)
+{
+    struct Answer asked;
+    u8 *fcb = SMALL + 128;
+    u16 at;
+
+    for (at = 0; at < 128; at++)
+        SMALL[at] = '#';
+    SMALL[127] = 0;
+    ANSWER("FileTrueName", FileTrueName(Hello_S, SMALL));
+    Quoted(SMALL, 20);
+    ANSWER("lower case:", FileTrueName(Lower_S, SMALL));
+    Quoted(SMALL, 20);
+    Line();
+    ANSWER("with dots:", FileTrueName(Dots_S, SMALL));
+    Quoted(SMALL, 20);
+    ANSWER("no such directory:", FileTrueName(NoDir_S, SMALL));
+    Quoted(SMALL, 20);
+    Line();
+    for (at = 0; at < 127; at++)
+        SMALL[at] = '#';
+    ANSWER("no such drive:", FileTrueName(NoDrive_S, SMALL));
+    Quoted(SMALL, 20);
+    SAY("and its end "); Quoted(SMALL + 120, 8);
+    Line();
+    asked = FileCreate(Toy1_S, 0);
+    FileClose(asked.value);
+    asked = FileCreate(Toy2_S, 0);
+    FileClose(asked.value);
+    for (at = 0; at < 48; at++)
+        fcb[at] = '#';
+    SAY("FcbParse "); H4(FcbParse(Mask_S, fcb, 1));
+    H2(fcb[0]); Quoted(fcb + 1, 11);
+    for (at = 12; at < 20; at++)
+        H2(fcb[at]);
+    Line();
+    SAY("a name: "); H4(FcbParse(Hello_S, fcb, 1));
+    H2(fcb[0]); Quoted(fcb + 1, 11);
+    SAY("with a drive: "); H4(FcbParse(Drive_S, fcb, 1));
+    H2(fcb[0]); Quoted(fcb + 1, 11);
+    Line();
+    SAY("a drive that there is not: "); H4(FcbParse(NoDrive_S, fcb, 1));
+    H2(fcb[0]); Quoted(fcb + 1, 11);
+    fcb[0] = 2;
+    SAY("its own drive kept: "); H4(FcbParse(Star_S, fcb, 2));
+    H2(fcb[0]); Quoted(fcb + 1, 11);
+    Line();
+    for (at = 0; at < 48; at++)
+        fcb[at] = 0;
+    FcbParse(Mask_S, fcb, 1);
+    ANSWER("FcbDelete", FcbDelete(fcb, 0));
+    ATTR("FileAttributes of one:", FileAttributes(Toy2_S));
+    ANSWER("FcbDelete again:", FcbDelete(fcb, 0));
+    Line();
+    ANSWER("FcbDelete with the flag:", FcbDelete(fcb, 1));
+    /* An extended one, as the program deletes: with the attributes of
+       what is to be deleted in front. */
+    asked = FileCreate(Toy1_S, 0);
+    FileClose(asked.value);
+    fcb[0] = 0xFF;
+    fcb[6] = 0x26;
+    fcb[7] = 0;
+    FcbParse(Mask_S, fcb + 7, 2);
+    ANSWER("an extended one:", FcbDelete(fcb, 0));
+    ATTR("FileAttributes:", FileAttributes(Toy1_S));
+    Line();
+    FileDelete(Toy1_S);
+    FileDelete(Toy2_S);
+    /* The country: 34 bytes as DOS has them, of which the structure has
+       32, and the two behind it are the first of the search's record. */
+    for (at = 0; at < 34; at++)
+        ((u8 *)&md.Country)[at] = '#';
+    CountryInfo(&md.Country);
+    SAY("CountryInfo "); H4(md.Country.DateFmt);
+    Quoted(md.Country.Sep1000, 2); Quoted(md.Country.DecimalSep, 2);
+    Quoted(md.Country.DateSep, 2); Quoted(md.Country.TimeSep, 2);
+    Line();
+    for (at = 0; at < 34; at++)
+        Digits(((const u8 *)&md.Country)[at], 2);
+    Line();
+    SAY("CaseMap "); H4(CaseMap(0x1200 | 'a')); H4(CaseMap(0x84));
+    H4(CaseMap(0xA0)); H4(CaseMap(0x3481)); H4(CaseMap(0xE0));
+    H4(CaseMap(0xFF)); H4(CaseMap(0x7F));
+    Line();
 }
 
 /* What a block of the memory is answered with, behind its name: the
@@ -988,44 +1083,7 @@ static void Memory(void)
    by its first line. */
 static void Later(void)
 {
-    struct Answer asked;
-    u16 at;
-
     SAY("Not made in dos32.c yet:");
-    Line();
-    for (at = 0; at < 200; at++)
-        SMALL[at] = 0;
-    ANSWER("FileTrueName", FileTrueName(Hello_S, SMALL));
-    Quoted(SMALL, 64);
-    ANSWER("FileTrueName, lower case:", FileTrueName(Lower_S, SMALL));
-    Quoted(SMALL, 64);
-    Line();
-    asked = FileCreate(Toy1_S, 0);
-    FileClose(asked.value);
-    asked = FileCreate(Toy2_S, 0);
-    FileClose(asked.value);
-    SAY("FcbParse "); H4(FcbParse(Mask_S, SMALL + 128, 1));
-    H2(SMALL[128]); Quoted(SMALL + 129, 11);
-    SAY("FcbParse, a name: "); H4(FcbParse(Hello_S, SMALL + 128, 1));
-    H2(SMALL[128]); Quoted(SMALL + 129, 11);
-    Line();
-    FcbParse(Mask_S, SMALL + 128, 1);
-    ANSWER("FcbDelete", FcbDelete(SMALL + 128, 0));
-    ATTR("FileAttributes of one:", FileAttributes(Toy2_S));
-    ANSWER("FcbDelete again:", FcbDelete(SMALL + 128, 0));
-    Line();
-    ANSWER("FcbDelete with the flag:", FcbDelete(SMALL + 128, 1));
-    FileDelete(Toy1_S);
-    FileDelete(Toy2_S);
-    Line();
-    for (at = 0; at < sizeof md.Country; at++)
-        ((u8 *)&md.Country)[at] = 0;
-    CountryInfo(&md.Country);
-    SAY("CountryInfo "); H4(md.Country.DateFmt);
-    Quoted(md.Country.Sep1000, 2); Quoted(md.Country.DecimalSep, 2);
-    Quoted(md.Country.DateSep, 2); Quoted(md.Country.TimeSep, 2);
-    SAY("CaseMap "); H4(CaseMap(0x1200 | 'a')); H4(CaseMap(0x84));
-    H4(CaseMap(0xA0)); H4(CaseMap(0x3481));
     Line();
     /* What the system enters of the program, noted, taken and given
        back in the order in which the program asks for that. Nothing
@@ -1091,6 +1149,8 @@ void Main(void)
     Keyboard();
     Page(0);
     Memory();
+    Page(0);
+    Older();
     Page(0);
     Later();
     Page(0);

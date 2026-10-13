@@ -4765,6 +4765,51 @@ environment, and behind the environment's end the two bytes and the
 path of the program's own file, `D:\VC\VC.EXE` in both. The page is
 the same in both, line for line.
 
+**The functions through real mode: done.** 86 of the 98 are made, 12
+do nothing. New are `FileTrueName`, `FcbParse`, `FcbDelete`,
+`CountryInfo` and `CaseMap`. The block below the megabyte is 416 bytes
+now, with a place of its own for each thing that DOS reads or writes
+at an address (`LOW_` of `dos32.c`).
+
+| Function | The call | What goes down and comes up |
+|---|---|---|
+| `FileTrueName` | 60h, DS:SI the name, ES:DI the path. With the program's errors | The name down; 128 bytes of the program's buffer down and up |
+| `FcbParse` | 29h, DS:SI the name, ES:DI the block. Bare | The name down; the 16 bytes of an unopened block down and up, since `how` can have DOS keep what the block has |
+| `FcbDelete` | 13h, DS:DX the block. With the program's errors, and with `flagged` as D1 has it for 36h | 44 bytes down: an extended block, which is what the program hands over. Nothing up: the function takes the block as one that it does not write |
+| `CountryInfo` | 38h, DS:DX. Bare | 34 bytes down and up |
+| `CaseMap` | DOS's routine, by DPMI 0301h, AL there and back | Nothing |
+
+Down first and up afterwards, wherever DOS writes: the program then
+has what DOS wrote and, of the rest, what it had, as when DOS writes
+into its buffer itself. It shows at once: FreeDOS writes 24 of the 34
+bytes of the country and leaves the path alone where 60h fails, and
+the toy, which fills each buffer first, prints the same in both.
+
+`Real` of `dos32.c` is the one call of real mode: an interrupt by DPMI
+0300h, or a routine called far by 0301h, with DS and ES on the block
+and on a stack of the extender's. `Extender` takes the registers of a
+service as `Dos` takes DOS's, so a service that answers in CX and DX
+can be asked.
+
+`CaseMap` answers with the letter as it came until `CountryInfo` has
+been asked. `dos.c` calls whatever its four bytes hold then, which are
+zeros: the toy of 16 bits ended in "Invalid Opcode" when it was asked
+so, and is not asked so any more. The program asks for the country
+first, in `IniData`.
+
+`CaseMap` costs a call of real mode by 0301h, some 700 instructions
+by the trial's figure for 0300h. The program asks it 128 times as it
+starts, for its table of small letters, and then for a letter beyond
+ASCII that is typed or compared.
+
+The toy has a page for these behind a step `n`: the full path of a
+name, in small letters, with dots, in a directory that is not there
+and on a drive that there is not; a mask and a name made a file
+control block, with a drive, with a drive that there is not and with
+the block's own drive kept; files deleted by a mask, twice, with the
+flag, and by an extended block; the country as its 34 bytes; and
+seven letters made capitals. The same in both, for both countries.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")
