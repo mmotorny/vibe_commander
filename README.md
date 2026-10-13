@@ -1468,7 +1468,10 @@ with code in it that it has run, and the program has its code right
 behind its stack: a push is many times slower there than elsewhere, which
 is a third of the time of a scenario with dialogs or more. The translation
 has its texts behind its stack, more than a page of them, and does not
-depend on where it is loaded.
+depend on where it is loaded. The program of 32 bits has its stack
+among its data above the megabyte, where the linker put it, and the
+test of its layout holds that nothing which a scenario writes shares a
+page with code.
 `python3 harness/place.py` says where the stacks of the original and of
 the translation end on each bench.
 
@@ -1566,6 +1569,33 @@ idle interrupt from DOS's by where the call comes from: the memory of the
 program that DOS has as the current one, and that has that name. None of this is measured
 in time, and a busy computer makes a run slower, not different.
 
+[The program of 32 bits](#the-program-of-32-bits) is driven by the same
+driver, and is not changed for it either. Its idle call comes through
+the extender, from the extender's part of real mode, which lies in the
+block of the program that DOS has as the current one: the driver knows
+the call as it knows any. But the program's data is above the megabyte,
+where a program of real mode cannot read. So the script tells the
+driver three addresses of the machine's memory, of the two variables
+and of the stack, which `harness/driver.py` works out from the
+program's file, the linker's map and the place where the extender puts
+the program on the bench (`BENCH` of `harness/le.py`); and the driver
+reads there with the BIOS's service for moving a block of the memory,
+INT 15h with 87h, every time the program comes round. That is a part of
+the driver that only such a script switches on, by an event in front of
+its first key, so the original goes through the instructions that it
+went through before the driver had it: every golden was derived again
+to see that, and none changed. A scenario may start the program a
+second time from the command line of the first. The extender loads
+that copy right behind the first, the script has the addresses of
+three copies, each started by the one before, and the driver finds out
+which of them idles by counting the programs of that name along DOS's
+blocks of memory. From QEMU's log of the code that ran, the scenarios'
+test holds that the program, and every copy of it, was where the
+driver was told. A machine's second takes more of the computer's time
+while this program idles than while the one of 16 bits does, for the
+way through the extender and the block moves at every round; nothing
+that a scenario shows differs for it.
+
 Where time is what the program goes by, it is the machine's, and the
 machine's clock is counted in the instructions that the machine executes,
 256 nanoseconds for each (QEMU's `-icount`): the timer's ticks, the time
@@ -1606,7 +1636,12 @@ not in the memory quite as it is in its file: the program adds the segment
 it is loaded at to the words that its relocation table names, and the file
 is held against the log with those words as the program has them where
 it is. For the portable C it is DOS that adds it, by the table in the
-header of the file, and the same holds.
+header of the file, and the same holds. The program of 32 bits is a
+linear executable behind its stub, and the extender puts an address
+into every place of it that names something when it loads it:
+`harness/le.py` makes of the file what the memory then holds, with the
+first object where it is on the bench, and the log is held against
+that, as far as it is code.
 
 The reserved room is listed in `harness/bytecheck.py`, with the offset and
 length of each piece and a note of what the original has there.
