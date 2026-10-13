@@ -191,6 +191,20 @@ These held while `src/c/` was made, and they say what it is.
   from, is not DOS's alone. Where that is in doubt, it is asked. Any
   other deviation, a fix of a bug of the original included, is asked
   first.
+- What the user has decided of the features that were in doubt, on 14
+  October 2026: Quick execute commands goes, the setting and the way
+  through INT 2Eh; EGA lines goes, the command that gives the screen 43
+  or 50 rows by a font of the BIOS, and the rows of the screen are to
+  come from the system later; the drive B: that shares the floppy drive
+  with A: stays, with its prompt and its setting, for as long as DOS is
+  a target. A setup file made from the defaults has zeros where the
+  original has 64 bytes of whatever lay behind its table: that stands.
+  Where the program of 32 bits does again what the original does and the
+  portable C of 16 bits could not, a second copy that has the memory to
+  run a command, it is held to the original's golden, and the deviation
+  says only what still differs. When DOS ends the program by another's
+  hand, the program of 32 bits is to be told as the 16-bit one is, by a
+  small routine of real mode that the system's functions keep for it.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
