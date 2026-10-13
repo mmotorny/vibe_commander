@@ -563,14 +563,16 @@ of the five among them that are called through a table.
 A function that hands back two things, where the assembly has two
 registers or a register and the carry flag, returns them in the C
 translation as the halves of one number of 32 bits, which the caller
-takes apart. In the portable C the functions that files of every kind
-call return a structure with members named for what they are:
-`GetMous` the buttons and the place of the mouse, `OpenFil` what DOS
-answered and whether that is an error, `EdLin` the cursor and whether
-anything changed, and so on; and so do those inside the editor, 31 of
-114 in all. A call that still took such a number apart would not
-compile. The others, the commands and what is inside a few more files,
-are still to do (see `TODO.md`).
+takes apart. In the portable C such a function returns a structure
+with members named for what they are: `GetMous` the buttons and the
+place of the mouse, `OpenFil` what DOS answered and whether that is an
+error, `EdLin` the cursor and whether anything changed, and so on. A
+call that still took such a number apart would not compile. 41 of 114
+are done: those that files of every kind call, those inside the
+editor, and those that another file keeps to itself and that are no
+commands, two of which had less than two things to return and have no
+structure. The others, the commands and what they hand back to the
+main loop, are still to do (see `TODO.md`).
 
 The lines that say something of registers still, and why:
 

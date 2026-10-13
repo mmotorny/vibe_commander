@@ -1360,6 +1360,26 @@ in "The portable C".
   - Two functions that make a structure in the same way are one piece
     of code under two names in the listing: `EndsAt` and `Done`,
     `NoEnd` and `Failed` of `edit.c`.
+- What the ten met that a file kept to itself:
+  - Not every such function has two things to return: read every
+    `return` of one before it gets a structure. `F36_04` of `copy.c`
+    returned the same place of the loop from each, with nothing above
+    it: it is the end of a command in the assembly, a jump. It returns
+    nothing now, its caller says where the command goes on, and
+    `return F36_04();` left as it was is refused. `MenuItem` of
+    `usermenu.c` put into a number what `FndItem` returns as a
+    structure: it is gone.
+  - Where the calls that set a shared variable return structures of
+    their own, each with the thing that a line behind them read, the
+    variable goes, and that line: each branch of `Dialog` sets the key
+    itself. Nothing but reading holds that every branch does, since
+    the key is set earlier in the function and `clang` has nothing to
+    say.
+  - That an old call is refused can be tried: put it back in a copy of
+    the file and compile the copy. Define `LOW` and `HIGH` in the copy
+    first. A file loses them with its last number, and then the
+    compiler refuses the macro it does not know, whatever the function
+    returns.
 - A build can be tested while the tree goes on changing: copy
   `build/portable_c/VC.EXE`, `VC.MAP` and the object files elsewhere
   in `build/`, and run `harness/datacheck.py` (at once: it reads the
