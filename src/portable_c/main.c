@@ -25,14 +25,14 @@
  * and leaves them to the loop in its turn, and so to the next command.
  * Some of that is read: the mouse hands its commands where the cursor is
  * to go; a key that goes on to the command line is taken there from AX;
- * EGA lines hands the BIOS what CX holds; and Rename, with Shift or
- * without a panel of files, goes by BX and DX as they come (F35_50 of
- * copy.c). So the registers are a structure here, `r`, which Loop and
- * Command keep as the original has them wherever a command reads one:
- * where the code below sets a field of `r` that nothing here reads, that
- * is why. Func05 loads BX, with a number that is not 0, so a command that
- * goes back to the loop there or before leaves nothing in BX and DX that
- * Rename could tell; the cursor's keys go back behind it, at Func07.
+ * and Rename, with Shift or without a panel of files, goes by BX and DX
+ * as they come (F35_50 of copy.c). So the registers are a structure
+ * here, `r`, which Loop and Command keep as the original has them
+ * wherever a command reads one: where the code below sets a field of `r`
+ * that nothing here reads, that is why. Func05 loads BX, with a number
+ * that is not 0, so a command that goes back to the loop there or before
+ * leaves nothing in BX and DX that Rename could tell; the cursor's keys
+ * go back behind it, at Func07.
  */
 #include "vc.h"
 
@@ -1239,8 +1239,7 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
 
     /* The commands of the menus, commands.c. Those of a panel's menu
        take the item, and so do the editors of the menu file and the
-       extension files, to mark their menu; EGA lines hands the BIOS what
-       CX holds, which by its key is what the loop left there. */
+       extension files, to mark their menu. */
     case CMD_M01_00: return MnuEnd(M01_00(panel, r->cx), r);
     case CMD_M03_00: return MnuEnd(M03_00(panel, r->cx), r);
     case CMD_M06_00: return MnuEnd(M06_00(panel, r->cx), r);
@@ -1252,7 +1251,7 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_M41_00: return MnuEnd(M41_00(), r);
     case CMD_M42_00: return MnuEnd(M42_00(panel), r);
     case CMD_M49_00: return MnuEnd(M49_00(panel), r);
-    case CMD_F69_00: return MnuEnd(F69_00(r->cx), r);
+    case CMD_F69_00: return MnuEnd(F69_00(), r);
     case CMD_M53_00: return MnuEnd(M53_00(r->cx), r);
     case CMD_M60_00: return MnuEnd(M60_00(), r);
     case CMD_M61_00: return MnuEnd(M61_00(), r);

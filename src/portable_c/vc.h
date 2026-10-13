@@ -983,7 +983,7 @@ u16 M16_10(u16 panel);
 u16 M21_00(void);
 u16 M41_00(void);
 u16 M42_00(u16 panel);
-u16 F69_00(u16 item);
+u16 F69_00(void);
 u16 M49_00(u16 panel);
 u16 M60_00(void);
 u16 M61_00(void);

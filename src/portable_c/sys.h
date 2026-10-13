@@ -452,6 +452,10 @@ struct Font ScreenFont(void);
    EGA's screen and 50 of a VGA's. */
 void ScreenSmallFont(void);
 
+/* Have the Print Screen key of such a display print every row that the
+   screen has: the BIOS's own routine for the key prints 25. */
+void ScreenPrintAll(void);
+
 /* How far into the memory of the display the page begins that is shown,
    in bytes. And where the cells of the screen are from now on, for
    ScreenPut and ScreenGet: those of the display that the mode `mode` is

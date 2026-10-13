@@ -439,6 +439,7 @@ are added here as they go.
 | `ErrRdy`, `main.c` | DOS 440Fh, the drive of the box made the one that its unit goes by | BH the row of the box, CX the letter of the drive, DX the size of the box | BH and DX 0, CX as it comes |
 | `F21_10`, `enter.c` | DOS 3Bh, the directory of the tree made current | CX: 37h, of the call that looked for the directory, where it did | CX 0 |
 | `M02_10`, `commands.c` | DOS 3Bh, the directory of a panel made current | AL: the drive, 1 for A: | AL 0 |
+| `F69_00`, `commands.c` | EGA lines: BIOS 1130h, the font asked about; 00h, the mode set; 1112h, the small font loaded; 12h with 20h in BL, Print Screen told of the rows; and 1130h again | 1130h the first time: CH what the main loop has there, the number of the item where the command is chosen from the menu, and DX the last row of the screen and 80, of the screen put back as DOS had it. 00h, 1112h and 12h: CX and DX as the BIOS left them at the call before, the height of the font and its last row from 1130h. 12h: AL as 1112h left it. 1130h the second time: CX and DH as the calls before left them (see below) | CH and DX 0 the first time. CX and DX 0 at 00h, 1112h and 12h, and AL 0 at 12h. CX 16 and DH 0 the second time |
 | `F39_00`, `menu.c` | the BIOS's 02h for the keyboard, the keys that are held | AL: 2, the menu that the command is of | AL 0 |
 | `DirFunc`, `dirfunc.c` | DOS 4Eh and 4Fh, the first file and the next, in both of its searches | 4Eh: AL the last character of the directory's path. 4Fh: DS:DX on the mask, of the call for the first file, and CX 37h of that call or what a count has come down to since | AL 0 for 4Eh, CX and DX 0 for 4Fh |
 | `F38_40`, `dirfunc.c` | DOS 41h, a file deleted that was read-only | CX 20h, of the call that set its attributes | CX 0 |
@@ -473,8 +474,8 @@ are added here as they go.
 | `SetStat`, `resident.c` | DOS 5801h and 5803h, how DOS looks for memory | CX and DX as the code before left them | CX as it comes, DX 0 |
 | `Alloc0`, `resident.c` | DOS 30h, the version, and 4Ah, the block of the program made shorter | 30h: AL as taking the check sum of the file left it, which the portable C does not take. 4Ah: AL the minor number of the version; CX and DX how much of itself the original then moves, in bytes and in paragraphs | AL 0 at both, CX as it comes and DX 0 at 4Ah |
 
-What is known to read such a register, and where the portable C will
-hand it something else when the file goes over:
+What is known to read such a register, and what the portable C hands
+it:
 
 - AL of DOS 4Eh, the first file of a search. DOS's APPEND, where it is
   installed, goes by it. `FindFirst` hands over 0, as the original does
@@ -496,6 +497,13 @@ hand it something else when the file goes over:
   `commands.c` asks for the height and 0 in DL where it and `IniData`
   ask for the rows, and leftovers in the other of the two each time,
   which it does not read then.
+- BL of BIOS 1112h, the small font loaded, which says where the font
+  goes among those that the display keeps. The original does not set it
+  for the call: it has 0 there from clearing the command line, at the
+  start of the command, if the mouse driver and the BIOS leave BX as
+  they find it at their calls between, as they are to.
+  `ScreenSmallFont` hands over 0. The C translation set BX to 0 at the
+  first of the BIOS's calls and kept it as the BIOS left it.
 
 Nothing else that the functions leave out is known to be read by a DOS
 or a BIOS.
@@ -649,7 +657,4 @@ the Options menu begin, the commands of the Commands menu, and the keys
 that choose an item in an open menu, which have Alt+F5 no more and the
 items of the Commands menu below Memory info a place further up; and of
 the key bar the names of the keys, without "Memory", and the two rows
-that had it for F5 with Alt. One thing follows from an item's place
-that no screen shows: EGA lines, chosen from the menu, hands the BIOS
-the number of its item in a register that the BIOS does not take, and
-that is 6 where the original has 7.
+that had it for F5 with Alt.

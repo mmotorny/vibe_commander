@@ -57,8 +57,7 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
    Window's, and ResWin what a box covers, from where it was kept.
    AsmSeg returns the segment of the program's constants. ScrOffs asks
    the BIOS where in the memory of the screen the page begins that is
-   shown. Int10 calls the BIOS for the screen, which EGA lines still
-   does with registers, and SaveSet writes the setup to its file. */
+   shown, and SaveSet writes the setup to its file. */
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what
@@ -400,19 +399,17 @@ static u16 M60_02(u16 panel)
 /* Alt-F9: the screen with as many lines as an EGA or a VGA has for the
    small font, or with 25 again. The BIOS is asked how high the font is,
    the mode is set anew, which makes it 25 lines, and if the font was 14
-   lines or more the small one is loaded; then the BIOS is asked how many
-   lines that makes. What is on the screen moves up if it gets shorter,
-   so that its last lines stay, and the command line with it; a screen
-   that gets longer has empty lines below.
+   lines or more the small one is loaded, and the Print Screen key is
+   told to print all the rows; then the BIOS is asked how many lines
+   that makes. What is on the screen moves up if it gets shorter, so
+   that its last lines stay, and the command line with it; a screen that
+   gets longer has empty lines below.
 
-   The registers go from one call of the BIOS to the next as it leaves
-   them, as in the assembly: BL, which says where the font is loaded, is
-   0 from the first call and is not set again. CX and DX begin as the
-   assembly has them, with the high byte of `item` and with the size of
-   the window that Quit has put back; the BIOS takes neither. */
-u16 F69_00(u16 item)
+   Of the height the low byte counts, as in the assembly. A BIOS that
+   does not know the question about the font is taken to have one of 16
+   lines, so the small one is loaded, and 25 rows afterwards. */
+u16 F69_00(void)
 {
-    struct BiosRegs regs;
     u16 height, rows, lines, was, less, count, cell, i;
     const u16 *from;
     u16 *to;
@@ -425,28 +422,14 @@ u16 F69_00(u16 item)
     CurMous(0);
     md.BarPrev = 0xFF;
     md.ScrPage = 0;
-    regs.ax = 0x1130;                   /* about the font */
-    regs.bx = 0;
-    regs.cx = item & 0xFF00 | 16;
-    regs.dx = (u16)(u8)(md.Lines - 1) << 8 | 80;
-    Int10((struct BiosRegs STACK *)&regs);
-    height = regs.cx;
-    regs.ax = md.ScrMod;                /* set the mode */
-    Int10((struct BiosRegs STACK *)&regs);
+    height = ScreenFont().height;
+    ScreenSetMode(md.ScrMod);
     if ((u8)height >= 14) {
-        regs.ax = 0x1112;               /* the font of 8 lines */
-        Int10((struct BiosRegs STACK *)&regs);
-        regs.ax = 0x1200 | regs.ax & 0xFF;      /* a routine to print the */
-        regs.bx = regs.bx & 0xFF00 | 0x20;      /* screen that knows of it */
-        Int10((struct BiosRegs STACK *)&regs);
+        ScreenSmallFont();
+        ScreenPrintAll();
     }
-    /* F69_03 */
-    regs.dx &= 0xFF00;
-    regs.bx &= 0xFF;
-    regs.ax = 0x1130;
-    Int10((struct BiosRegs STACK *)&regs);
-    lines = 25;
-    rows = regs.dx & 0xFF;              /* the last row */
+    lines = 25;                         /* F69_03 */
+    rows = ScreenFont().last;           /* the last row */
     if (rows != 0) {
         rows = (u8)(rows + 1);
         lines = MaxLins;
