@@ -58,6 +58,21 @@ HOLDS(u8_has_8_bits, sizeof(u8) == 1 && (u8)-1 == 0xFF);
 HOLDS(u16_has_16_bits, sizeof(u16) == 2);
 HOLDS(u32_has_32_bits, sizeof(u32) == 4);
 
+/* The low byte of a number is the first of it in the memory, as it is
+   on DOS, and the code counts on that all over. The main data, DOS's
+   structures, the screen and the files that the program keeps hold
+   words, which it reads and writes as numbers, through the structures
+   below and through pointers; PUT16 writes one so; and a number of 32
+   bits that is an address or a size is taken for its two words. So
+   nothing compiles for a machine that is not known to have it so. The
+   two that Open Watcom compiles for here have, the 8086 and the 386;
+   gcc and clang say which it is. Of another compiler nothing is known
+   here: say how it tells. */
+#if !defined(__I86__) && !defined(__386__) \
+    && !(defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
+#error The code takes the low byte of a number to be the first: see vc.h
+#endif
+
 /* The words by which the code says what segment a thing is in. They are
    Open Watcom's, and mean something where the memory is in segments. A
    compiler for a machine that has all of its memory at one address
