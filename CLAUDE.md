@@ -2563,6 +2563,22 @@ in "The portable C".
     (`TODO.md`, "C2"): not by who ran whom, since FreeCOM names itself
     as the one that ran it, at 16h of its PSP, also when a program has
     run it for one command.
+  - The time that a step has before the program counts as stuck is
+    of the host's clock and of the machine's own, both
+    (`Machine.wait_for_end` of `harness/dos.py`): a step that is given
+    up on a busy host has also had that many seconds of the machine's
+    clock, counted in instructions, and is no slow machine. A step
+    that has the driver wait has the seconds of its wait besides.
+  - While the program of 32 bits idles, a second of the machine costs
+    the host four times what it costs for the 16-bit one. QEMU pays
+    some ten microseconds for every change of the processor's mode,
+    thirteen at a round, and as much again for a block of the
+    extender's that it translates anew at every interrupt, since
+    DOS/32A writes the interrupt's number into an `INT` of its own.
+    `TODO.md`, "T, the time of a wait", has the measurements and why
+    nothing in the program mends it. Such a thing is measured on a
+    host by itself or counted, in instructions, flushes and blocks:
+    the processor time of a QEMU follows the load as well.
   - The extender takes all of the memory above the megabyte while the
     program runs, and a command of the program is told that there is
     none: the scenario `command` fails for that and is off the record,

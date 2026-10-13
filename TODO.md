@@ -2038,7 +2038,8 @@ What the work met, for whoever takes the next thing out:
   the whole suite run again, with the others still testing, it passed
   in 332. "Piece H3" has why a machine's second is long while this
   program idles; the 300 seconds that a step has are near what that
-  one step takes on a machine as busy as that.
+  one step takes on a machine as busy as that. Mended since, and the
+  cause found: "T, the time of a wait" in the plan for the 32 bits.
 
 ### The tall screen: untested in the portable C until a system gives it rows
 
@@ -2417,7 +2418,8 @@ a second of the machine takes most of one of the host's while this
 program idles, and the 71 of that wait more than 60 on a machine by
 itself, which a machine with six times its processors' work makes more
 than the 300 that a step has. The limit is one that a test holds a
-build to, and was left as it is.
+build to, and was left as it is. It is mended since, and was no limit
+of that kind: "T, the time of a wait" in the plan for the 32 bits.
 
 **Open.**
 
@@ -3232,7 +3234,8 @@ checkout's `build/tmp` by itself; no `TMPDIR` is wanted.
   test says so by what it prints.
 - The time of a step. A scenario of the record has 300 seconds, as
   those of every tree have. One that is not has 60, `SHORT_STEP`, and
-  twice its longest `Wait*ticks` besides: a program that hangs in a
+  twice its longest `Wait*ticks` besides, until "T, the time of a
+  wait" gave every scenario its wait once: a program that hangs in a
   scenario that is expected to fail is waited for that long. That
   cannot fail the test for a slow machine, since such a scenario is not
   held to pass; what it can do is keep a scenario that would pass off
@@ -3312,6 +3315,11 @@ checkout's `build/tmp` by itself; no `TMPDIR` is wanted.
   several agents"), seen when `editor-big` was declared, and not
   mended: `STEP_TIME` of `harness/scenarios.py` is the same for a step
   that waits 71 of the machine's seconds as for one that waits none.
+  Mended since: "T, the time of a wait" below has what a round of
+  idling costs the host and why, which is not the block moves but the
+  processor's mode changed thirteen times a round, and what a step's
+  time is counted in now. `short_step` is gone with it: a wait has its
+  own seconds for every scenario, in `scenarios.run`.
 
 The 14 that fail, by cause as far as the first screen that differs
 tells it: nothing behind that screen is known of any of them, and no
@@ -3661,6 +3669,7 @@ and H1 are started at once by the session.
 | R1, `resident.c` renamed | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
 | C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
+| T, the time of a wait. Done: see "T, the time of a wait" below | Why a wait costs the host four times as much for the program of 32 bits, and what the time that a step has is counted in | `harness/dos.py`, `harness/scenarios.py`, `harness/ported.py` | 60 lines | H3; beside the convergence | The goldens derived again are as they are; a machine that hangs is given up and one that is kept from running is not; the whole suite | A program that hangs on a busy host is waited for until its machine has had its time |
 | W, the switch. Half done: see "W, the switch" below, which has what waits and for what | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
 | Z1, the 16-bit build goes | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
 | Z2, the words go | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
@@ -4731,7 +4740,9 @@ What the pieces behind this one should know:
    sixth more than the original to a step, and a scenario that shows
    the time done by fifty seconds past. If the 32-bit program takes
    more, the driver can read the two variables less often; if that
-   does not do, the rule is the user's.
+   does not do, the rule is the user's. What a round of idling costs
+   the host, which is another thing than the machine's time, is in "T,
+   the time of a wait".
 5. The goldens when the driver changes: H2. None changed, and the
    original goes through the driver by the instructions that it went
    by: see "Piece H2, the driver".
@@ -6524,7 +6535,8 @@ test held the record of 155 to be what passes, no more and no fewer.
 What would mend it is not this piece's and was not tried: fewer instructions
 at an idle round of the driver for a flat program, or more time for a
 step that waits by `Wait*`, as a scenario that is not on the record
-already has (`short_step` of `harness/ported.py`).
+already has (`short_step` of `harness/ported.py`). Mended since, in
+another way than either: "T, the time of a wait" below.
 
 Quick execute commands is out since ("The portable C: without Quick
 execute commands"): `LOW_SHELL` and `LOW_KEPT` were 48 bytes of the
@@ -6632,7 +6644,8 @@ What decided:
   Why a second of the machine costs the host so much while this
   program idles was not looked into: the extender's way to real mode
   and back and the BIOS's block move at every round, by the look of
-  it.
+  it. It has been since, and the stopgap is replaced: "T, the time of
+  a wait" below.
 
 What is not held: a copy that lies in front of the one that ran it in
 DOS's memory, which the bench does not make; a program of the script's
@@ -6876,6 +6889,186 @@ to stand side by side for a while behind it.
 - A patch that two builds are held to says in its reason what is so of
   each: `ended` did not, and nothing fails for a reason.
 
+### T, the time of a wait: done, and what a later piece should know
+
+A step that has the driver wait was given up under load for the program
+of 32 bits alone: `blank-timed`, at its step of 1,300 ticks, in the
+suites of several agents (the notes of H3, E and C2 above, and one
+each under "The portable C: what EGA lines has left" and "The portable
+C: without Quick execute commands"). This piece was to find out why
+such a wait costs the host so much more for that program, whether the
+program can be mended, and what the time that a step has should be
+counted in. In short: it is the processor's mode, changed thirteen
+times at every round of idling, which QEMU pays for at each change;
+nothing in the program mends that without asking DOS less; and a step's
+time is now the host's and the machine's own, both.
+
+**What was measured.** `blank-timed`, its step "Wait*1300 x", on this
+computer by itself, a load of 1 to 2 on four processors, each program
+twice. The step is 81 seconds of the machine's clock, 316.5 million
+instructions, the same for every program to the third figure: the
+machine's clock is counted in instructions (`CLOCK_SHIFT` of
+`harness/dos.py`), so what differs is what the host pays for one.
+
+| Program | The step, seconds of the host | Rounds of idling, by the driver's INT 28h | Instructions a round | The host's microseconds a round | Blocks that QEMU translated again | Times that QEMU flushed its table of addresses |
+|---|---|---|---|---|---|---|
+| The original | 9.1 | 268,581 | 1,178 | 34 | 2,592 | 88 |
+| The C translation | 8.2 | not counted | | | 2,893 | 204 |
+| The portable C, 16 bits | 8.2 | 237,516 | 1,333 | 35 | 281 | 176 |
+| The portable C, 32 bits | 31.1 and 35.2 | 117,806 | 2,687 | 264 | 678,858 | 1,595,868 |
+| The same, the driver told no place of `AutoTim`, so that it reads nothing above the megabyte | 29.3 | 130,270 | 2,430 | 215 to 225 | 742,922 | 1,489,112 |
+| A trial: the keyboard, the mouse and the idle call made by DPMI 0300h | 20.7 and 21.0 | 86,328 | 3,666 | 242 | 53,111 | 1,183,260 |
+| The same, and the time of day | 19.9 | 85,598 | 3,698 | 232 | 915 | 1,171,418 |
+| The same, and the BIOS for the screen | 19.5 and 19.7 | 85,557 | 3,699 | 229 | 187 | 1,170,931 |
+
+Under load it takes what the load makes of that: the scenario was 192
+seconds for the program of 32 bits beside eight other machines, a load
+of 17, where it is 36 by itself, and the others saw 136 to 403.
+
+**Why.** A round of idling is the same calls in both programs, as the
+original makes them: the BIOS for the keyboard, the mouse driver, DOS's
+idle call, and DOS for the time of day while the blanker's minute runs.
+By QEMU's log of interrupts (`-d int`, which has those made in
+protected mode), the program of 32 bits made 718,034 in that step, at
+`cb6b20a`, for 125,373 rounds: INT 16h 322,870, INT 33h 197,112, INT
+28h 125,373, INT 21h 71,356 and INT 10h 634. That is 5.7 a round, and
+the extender takes each to real mode and back, two changes of the
+processor's mode; the driver's read of `AutoTim` by the BIOS's block
+move is two more: 13.5 a round, which is what QEMU's own count of its
+flushes comes to. Three things then cost, and a fit of the eight rows
+to them says roughly how much:
+
+| | A round of the program of 32 bits | Of its 264 microseconds |
+|---|---|---|
+| Its instructions, at what one costs the host in the 16-bit program, 26 nanoseconds | 2,687 | 70 |
+| The changes of mode. At each, QEMU throws away what it has worked out of the machine's addresses and of where its translated code is, and works it out again | 13.5, some 10 microseconds each | 130 |
+| The extender's own code, changed. Where it passes an interrupt to real mode, DOS/32A writes the number into an `INT` instruction of its own, 25FC:176A on the bench, and executes that; QEMU translates the block again every time, the one block 717,342 times of the 719,160 that it translated in the step | 5.7, some 11 microseconds each | 63 |
+
+So half is the switch itself, a quarter is the extender writing its
+own code, and a quarter is instructions, of which the program of 32
+bits has twice as many a round. On a processor none of this is much:
+it is QEMU's way of emulating that makes a change of mode cost what
+400 instructions do.
+
+The driver is not the cause, as C2 found by holding the old against the
+new: with nothing read above the megabyte a round is 215 to 225
+microseconds for 264, and the program then goes round more often in the
+same wait, so that the step is 29 seconds for 31.
+
+**No mend in the program.** What costs is one change of mode for each
+interrupt, and the interrupts are the original's: fewer of them is the
+program asking DOS and the BIOS less, which is a deviation. The one
+thing that the program could do otherwise is the way to real mode.
+DPMI 0300h does not go through the `INT` that the extender writes, and
+the three trials above made the calls of a round by it, `Real` of
+`dos32.c` in place of the instruction (not kept; four functions
+changed in the first, six in the last). The blocks translated again go, and the step is 20 seconds
+for 31. But a round is then 229 to 242 microseconds for 264, a tenth
+less: the service costs 250 instructions more for each call, a round
+is 3,700 instructions for 2,687, and the program goes round 66 times a
+tick where it goes 91 (the 16-bit program 183, the original 207). Most
+of what the trial saves, it saves by making the idle call a quarter
+less often by the machine's clock. That was not taken, and nothing of
+the program was changed. What real mode sees would differ besides: by
+the extender's own way the registers are the program's as they happen
+to be, with DS 0001h and ES 0, on its stack at 30C7:01F4; by 0300h
+they are what is asked and zeros, with DS and ES on the program's
+block below the megabyte, at 30C7:01FA. The first trial passed every
+scenario of the record, 153, so it is there to be had if a wait is
+ever to cost less: it is the user's to want.
+
+What the harness could do: the driver could read `AutoTim` and `Clock`
+less often than at every round, which "What could go wrong", 4, names
+for the time of day. It would take a sixth off a round's cost at the
+most, and change when every step of that program ends. Not done.
+
+**The time that a step has.** `STEP_TIME` was 300 seconds of the host's
+clock in which the driver writes nothing. C2's stopgap gave a scenario
+ten seconds more for each second of its longest wait, 1,014 for
+`blank-timed`, and H3 had given a scenario that is not on the record
+twice its wait. Both are numbers of the host's clock, which a busier
+host outruns, and the first has a program that hangs in such a
+scenario waited for 17 minutes at every step. They are replaced by one
+rule, in `Machine.wait_for_end` of `harness/dos.py`: when the host's
+seconds are over, the program is given up only if the machine has also
+executed as many seconds of its own clock since the driver last wrote,
+3,906,250 instructions for each, or has executed nothing at all for
+as long. QEMU says what the machine has executed (`query-replay` over
+QMP, `Machine.executed`); it is asked once a second while nothing is
+written, so a step that ends within a second asks nothing. A scenario
+that waits has the seconds of its longest wait besides, once
+(`scenarios.run`); `WAIT_TIME` and `short_step` are gone.
+
+Why both clocks and not the machine's alone: a step may be many seconds
+of the machine's clock and none of the host's, 34 in `mouse-edit` in a
+third of a second, and `--limit 10` of `show.py` would give that up.
+With both, nothing that ended in time before is given up now, and a
+program that hangs on a host by itself is found when it was. What it
+costs: on a busy host a program that hangs is waited for until its
+machine has had its time, which is the point, and is long where the
+machine is slow anyway. A second of the host's is, on this computer by
+itself: 59 of the machine's for a program in a loop of one instruction;
+10 for the 16-bit program idling and 2.6 for that of 32 bits; 1.25 for
+a machine that is halted with interrupts on, whose clock runs on at 715
+seconds a second and which executes 375 instructions a tick; and none
+for one halted with them off, which is what "nothing at all" is for.
+
+What the longest steps are, in the machine's seconds, by a run of all
+scenarios of the program of 32 bits with QEMU asked at every write:
+`blank-timed` 81, `mouse-edit` 34, `copy-full` 27, `find` 11,
+`view-search` and `editor-full` 9, `enter-many` 7, and every other
+under 5, which is what the program takes to start. The 300 are not
+near, and since these are counted in instructions they are the same on
+any host.
+
+What decided:
+
+- `python3 harness/goldens.py derive`: `git status` of
+  `harness/goldens/` clean. And once more with QEMU asked at every turn
+  of the wait, a hundred times a second, 27,763 times in the 167
+  scenarios: clean again, the lists of what ran among them. Asking
+  changes nothing in the machine.
+- Three machines that hang, each a program of four bytes run as the
+  program by `harness/trial32/run.py --limit 6`: a loop, given up after
+  6.1 seconds; halted with interrupts on, 6.1; halted with them off,
+  7.1.
+- A machine that is kept from running: `blank-timed` of the 16-bit
+  program with its QEMU stopped for fifteen sixteenths of the time and
+  a limit of 20 seconds, 91 with the wait. It passed in 145 seconds.
+  With the host's clock alone deciding it was "stopped after step 4,
+  Wait*1300 x: the program did not come to wait for a key within 91
+  s", which is the failure that the three agents saw.
+- The whole suite, when the piece landed.
+
+For whoever goes on:
+
+- The limits of `harness/dos.py` for a machine that boots, loads a
+  saved state or saves one, `BOOT_TIME` and its like, are still of the
+  host's clock alone. None was seen to fail under the loads of that
+  day. `Machine.executed` is there for them.
+- A connection to QEMU may be reset while it is asked something, when
+  the machine ends at that moment: `_reply` takes that for a machine
+  that has ended. It showed in the first run that asked QEMU at every
+  write, which is when a machine ends.
+- How the cost was found, since the tools were not kept: a script that
+  replaced `Machine.wait_for_end` and noted, at every write of the
+  driver, the host's time, the processor time of the QEMU process from
+  `/proc`, and what the machine had executed; QEMU's `info jit` by
+  `human-monitor-command` for its counts of blocks invalidated and of
+  flushes; and QEMU's logs written to a FIFO that a thread counts, so
+  that nothing is kept of gigabytes: `-d in_asm` by the first address
+  of each block, which named the one block at once, `-d int` by the
+  vector and the place, and `-d exec` for the driver's handler of INT
+  28h, 2381:0463 on the bench whatever the program, which is always
+  entered from QEMU's loop and so always logged. `perf` is not let
+  look at a process on this computer.
+- Processor time is not the measure to trust under load: the same step
+  was 33 seconds of it at a load of 2 and 54 at a load of 12. Measure
+  on a host by itself, or count.
+- Two machines at a time, `--together 2`, take all scenarios of the
+  program of 32 bits in 128 seconds on a host by itself, and derive
+  every golden in 140.
+
 ## The program of 32 bits: what differs from the original, for the user
 
 Collected by the piece W on 13 October 2026, at `1eb233c`, from what the
@@ -6942,7 +7135,10 @@ the program shows any of these, and no scenario does.
 
 **Not a difference of the program.** A wait costs more of the host's
 time while the program of 32 bits idles, `blank-timed` above all: that
-is the bench's, another piece has it, and no screen differs for it. The
+is the bench's, and no screen differs for it. "T, the time of a wait"
+in the plan has what it costs and why, the processor's mode changed
+thirteen times at every round of idling, and that nothing in the
+program mends it without asking DOS less. The
 stack is 16,384 bytes where 16 bits has 4,096, and a critical error
 goes 512 bytes deeper on it: the test holds half of it free as for
 every tree, and H3 saw 14,790 bytes left at the least. Hosts that the
