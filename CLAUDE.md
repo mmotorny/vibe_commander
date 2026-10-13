@@ -1363,11 +1363,12 @@ in "The portable C".
   is declared in `src/portable_c/DEVIATIONS.md` and then, for the
   harness, in three tables that each fail the test for an entry that
   no longer applies:
-  - `TREES` of `harness/deviations.py`: the scenarios that it changes,
-    each with what changes; those that are not run for the tree; and a
-    step that is left out of every scenario for it, where the keys
-    choose something that is gone. A program knows its tree by the
-    directory of the build that its file is in.
+  - `TREES` of `harness/deviations.py`: the scenarios that are not run
+    for the tree; a step that is left out of every scenario for it,
+    where the keys choose something that is gone, or steps of one
+    scenario; and a rule for what is otherwise on many screens. A
+    program knows its tree by the directory of the build that its file
+    is in.
   - `DECLARED` of `harness/datacheck.py`: a table of the program that
     differs, as the places where it departs from the original's, each
     with the bytes that the tree has there or none for bytes left out.
@@ -1376,16 +1377,63 @@ in "The portable C".
     a constant that the tree no longer has and that `REVIEWED` lists.
   - `GONE` of `harness/ported.py`: a function of a batch that the tree
     no longer has.
-  Then the goldens: build, and `python3 harness/compare.py
-  build/portable_c/VC.EXE` says which scenarios differ from the
-  original's goldens, which is the list to declare, each looked at.
-  `python3 harness/goldens.py record --tree portable_c` records those
-  that are declared, and refuses any other; `python3 harness/goldens.py
-  changes --tree portable_c` prints of every screen the rows that
-  differ from the original's golden, which is how to read them: a
-  change that was not meant shows there as a row that the declaration
-  does not explain. A scenario whose steps choose what is gone needs
-  the step left out, not a golden of the keys going astray.
+  Then the scenarios: build, and `python3 harness/compare.py
+  build/portable_c/VC.EXE` says which differ from the original's
+  goldens, which is the list to declare, each looked at. A scenario
+  whose steps choose what is gone needs the step left out, not a patch
+  of the keys going astray; one that then shows every screen as the
+  original does after the same step needs nothing more. What a
+  scenario shows otherwise is its patch, the next note.
+- How a patch is made and what it is, since a deviation is held by one
+  (`harness/goldens/portable_c/NAME.patch`; the top of
+  `harness/goldens.py` has the form and why it is no unified diff):
+  - `python3 harness/goldens.py patch --tree portable_c NAME` takes the
+    build through the scenario and writes every row that differs from
+    the original's golden, the original's row behind a `-` and the
+    build's behind a `+`, and prints them with the cells marked. That
+    is what the build did. It is a patch when whoever declared the
+    deviation has read every row against the entry of `DEVIATIONS.md`,
+    has written the entry's number and a sentence of why into the
+    header, and commits it; a header that is not filled in fails the
+    test, and so does one that names an entry which does not name the
+    scenario. A row that the declaration does not explain is a change
+    that was not meant.
+  - The test reads every patch before it runs anything, and holds it
+    to the golden row for row. What it then says is one of two things,
+    and they are told apart by their first lines. "does not fit ...
+    Nothing was run": the original's golden is otherwise than the
+    patch has it, which says nothing of the program; the message has
+    both rows with the cells marked, and whether the golden moved in
+    cells that the patch changes or only around them. "differs from
+    the original with NAME.patch", with rows called "the patch": the
+    patch fits and the program shows otherwise than it says, which is
+    the program's to mend.
+  - When goldens have been derived again on purpose, as for a change
+    of the bench or of a scenario's steps, every patch on a row that
+    came out otherwise fails in the first way, and is made again by
+    the same command. It keeps the header and says how the new patch
+    stands to the one that was there: the rows that expect the same
+    in the same cells on a row of the original that is otherwise now,
+    which need no second reading, and by name those that say something
+    else, are new or are gone, which are read like a new patch. With
+    all of them made again, `git diff` of the directory is the reading
+    list.
+  - A scenario where only steps are left out has no patch: it is held
+    against the original's golden without the screens of those steps,
+    `left_out` and `left_out_of` of `TREES`, and `python3
+    harness/goldens.py changes --tree portable_c` lists them next to
+    what each patch says. Four of the sixteen goldens of the tree's
+    own that there were needed nothing else.
+  - A patch is of rows, and a row that differs in one cell is in it
+    whole, with its colours: 293 rows where the whole files had 9,050.
+    The cell in the middle of the screen whose colours are exchanged is
+    the mouse's pointer, which a program that has ended does not show:
+    `lost` has it as a row of its own.
+  - A rule of one tree is `rules` of its entry in `TREES`, in the form
+    of `DEVIATIONS` there, made to every screen of a golden when it is
+    read for that tree and before its patch: the rows of a patch are
+    then the golden's as the rules leave them. None is there yet; the
+    program's name is the first that wants one.
 - The portable C is one program, and the notes above on the part that
   stays in the memory, on `tools/mkexe.c` and on string literals and
   static variables are of the C translation alone. In the portable C DS
@@ -1733,8 +1781,8 @@ in "The portable C".
     every step of the work. `ended` prints DS:DX as the program leaves
     them, and `IGNORED` of `harness/deviations.py` has the two words
     left out for the line that only the portable C prints. Look for
-    such a figure in every golden of the tree's own before it is
-    recorded: it passes today and fails for the next agent.
+    such a figure in every patch before it is committed: it passes
+    today and fails for the next agent.
   - What leaned on the watch and stays: the entry of INT 21h for the
     program's own call, with nothing of the watch in it; the prompt
     between two commands, which the original writes where the watch

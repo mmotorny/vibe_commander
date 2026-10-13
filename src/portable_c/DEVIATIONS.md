@@ -10,10 +10,18 @@ and every deviation is declared here, before anything else says so:
 - why,
 - and which scenarios show it.
 
-A scenario that a deviation changes gets a golden of its own, recorded from
-the portable C and read by whoever records it. Such a golden is kept apart
-from those of the original and says where it is from: it shows that nothing
-has changed since it was recorded, not that anything is right.
+What a scenario is expected to show where a deviation changes it is the
+original's golden with the declared difference made to it, and nothing that
+was recorded from the portable C. The difference is made in one of three
+ways. Steps that choose what is gone are left out, with their screens. What
+is otherwise on many screens is a rule of the comparison. And the rows that
+one scenario shows otherwise are its patch: a file of those rows, each as
+the original's golden has it and as the portable C is expected to show it,
+with the entry here that it is of and why. A patch is written by whoever
+declares the deviation, is kept apart from the goldens of the original, and
+is made to the golden each time that is read, so the golden derived again
+gives the expectation again. A patch that no longer fits its golden fails
+the tests: that is looked at, and the patch is not made again to fit.
 
 A feature that only made sense on DOS is removed, not kept as a setting
 that does nothing, and such a removal is declared here and made without
@@ -25,12 +33,18 @@ What the C translation, `src/c/`, already does otherwise than the original
 is no deviation of this tree: it is in `harness/deviations.py`, and the
 portable C began with it.
 
-What the harness goes by of this, the scenarios that a deviation changes
-and those that are not run, is in `harness/deviations.py`, under `TREES`;
-the goldens of the portable C's own are in `harness/goldens/portable_c/`,
-recorded by `python3 harness/goldens.py record --tree portable_c`, and
-`python3 harness/goldens.py changes --tree portable_c` prints how each
-differs from the original's.
+What the harness goes by of this, the steps that are left out, the rules
+and the scenarios that are not run, is in `harness/deviations.py`, under
+`TREES`. The patches are in `harness/goldens/portable_c/`, `NAME.patch` for
+the scenario `NAME`, and the top of `harness/goldens.py` says how one is
+written. `python3 harness/goldens.py changes --tree portable_c` prints what
+each says, with the cells that differ marked. `python3 harness/goldens.py
+patch --tree portable_c NAME` writes one from a run of the build, which is
+where its rows come from and not what makes them right: its author reads
+every row against the entry here, fills in the header and commits it, and
+the tests then hold the program to the patch, not to another run. A patch
+names the entries here that it is of, and each of those entries has to name
+the scenario: the test `portable_c-scenarios` fails otherwise.
 
 ## The deviations
 
@@ -158,8 +172,9 @@ disk-efficient, as long as it's functionally equivalent"; and the option
 "in the new tree goes away. It's going to be a pattern for a lot of
 features that only made sense on DOS."
 
-**Which scenarios show it.** Each of these is held against a golden of the
-portable C's own:
+**Which scenarios show it.** Each of these is held against the original's
+golden with what its row says made to it: by its patch, or, where the row
+says that every screen is as the original's, by the steps left out alone:
 
 | Scenario | What changes in it |
 |---|---|
@@ -179,7 +194,7 @@ scenario for the portable C: there it would enter the setup (see 8).
 | Scenario | Why |
 |---|---|
 | `memory` | It switches Memory allocation off, for the Info panel to show the other number, and shows the menu without the mark |
-| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." What the program hands on is held by `handed-on` instead, which sees the same with one copy, by a program that puts itself behind it. The C translation passes that against the original's golden; the portable C, which hands on more, has a golden of its own there: see 7 |
+| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." What the program hands on is held by `handed-on` instead, which sees the same with one copy, by a program that puts itself behind it. The C translation passes that against the original's golden; the portable C, which hands on more, has a patch there: see 7 |
 
 **In the data.** The test `portable_c-data` holds five tables of the menus
 against the original's with this difference declared for each, in
@@ -659,8 +674,10 @@ own to see such a program or to get it out again. A system that the
 program is carried to has both, and gives a program's memory back when
 it ends.
 
-**Which scenarios show it.** Each of these is held against a golden of
-the portable C's own:
+**Which scenarios show it.** Each of these is held against the
+original's golden with what its row says made to it: by its patch, or,
+where the row says that every screen is as the original's, by the steps
+left out alone:
 
 | Scenario | What changes in it |
 |---|---|
@@ -672,7 +689,8 @@ the portable C's own:
 | `mouse-drag-lists` | The last nine steps are left out: a program that stays in the memory, and a button of the mouse moved in the map. Every screen before is as the original's |
 
 And `menu` and `ended`, which the first deviation changes too: their
-rows there say all that differs in them.
+rows there say all that differs in them, and the patch of each names
+both entries.
 
 A step that passes through the map on the way to something else is
 left out of its scenario for the portable C, with the steps that leave
@@ -849,9 +867,9 @@ saves it.
 No scenario has a drive that is not ready while the setup is open, a
 `VC=` in the environment, or a look at the history.
 
-The Options menu shows in three scenarios that have a golden of the
-portable C's own for the first deviation already, `clock`, `clock-russia`
-and `menu`: their rows there say what differs.
+The Options menu shows in three scenarios that have a patch for the
+first deviation already, `clock`, `clock-russia` and `menu`: their rows
+there say what differs, and their patches name this entry too.
 
 **In the data.** The test `portable_c-data` holds four tables of the
 menus against the original's with this difference declared for each, in
@@ -902,8 +920,8 @@ screen of 50 lines over what DOS has shown, with the panels off: the
 first row there is the second line of the program's banner, and its
 first cell, the C of Copyright, is a space in the original from the
 way out of the colours on, and when the setup has been left. The
-scenario is held against a golden of the portable C's own, which
-differs from the original's in that one cell, on its last two screens.
+scenario is held against the original's golden with a patch, which
+says that one cell otherwise, on its last two screens.
 The other scenarios of the setup that are on 50 lines end before the
 screen is put back from what was kept, or have the panels over the
 corner when it is; all the rest are on a screen of 25 lines, where the

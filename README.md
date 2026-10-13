@@ -226,7 +226,7 @@ portable C](#the-portable-c)).
 | `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
 | `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
-| `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against what it did itself, recorded in `harness/goldens/portable_c/` |
+| `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against the same with that difference made to it, by the patches of `harness/goldens/portable_c/` |
 | `docs/` | Pictures for this README |
 
 ## Building
@@ -919,7 +919,7 @@ the key bar, its code and its data. What the main data kept of it keeps
 its bytes, and a byte of the setup that switched it is kept as it is
 found, so the setup file is the original's. The scenarios that showed
 such a thing are not run for the portable C, or are run without the
-steps that went there, against a golden of the portable C's own:
+steps that went there, against the original's golden without them:
 `DEVIATIONS.md` has each.
 
 | | What | What it was for |
@@ -1011,7 +1011,7 @@ eight take three minutes and forty seconds.
 | `asm-bytes` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
 | `c-data` | Every text, box, dialog and table of the translation that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
 | `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, called near or far as each returns, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
-| `portable_c-data`, `portable_c-arith`, `portable_c-scenarios` | The same three checks of the portable C, `build/portable_c/`: what is said of the translation in the rows above and below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A table that is declared to differ is held against the original's with that difference made to it. A text, box, dialog or table of the setup program, which has `St` in front of its name in this tree, is held against the bytes of the original's `VCSETUP.COM` in the same way. A scenario that is declared to change is held against a golden of the portable C's own, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original, and names the others. Its file is held to no multiple of the original's size: the test says how long it is, and holds it to what the machine of the tests asks of its layout |
+| `portable_c-data`, `portable_c-arith`, `portable_c-scenarios` | The same three checks of the portable C, `build/portable_c/`: what is said of the translation in the rows above and below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A table that is declared to differ is held against the original's with that difference made to it. A text, box, dialog or table of the setup program, which has `St` in front of its name in this tree, is held against the bytes of the original's `VCSETUP.COM` in the same way. A scenario that is declared to change is held against the original's golden with that difference made to it, the steps that are left out and the rows of its patch, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original's golden as it is, and names the others. A patch that does not fit its golden, or that names no entry of `DEVIATIONS.md` which names its scenario, fails the test. Its file is held to no multiple of the original's size: the test says how long it is, and holds it to what the machine of the tests asks of its layout |
 | `portable_c-host` | The source of the portable C as another compiler reads it: `harness/hostcheck.py` has gcc read every file of `src/portable_c/` for a machine of 64 bits, as strict C of 1999, and counts by kind what gcc refuses, a pointer cast to a number of 16 or 32 bits, a number made a pointer, a structure that is not as long as on DOS, and what only Open Watcom reads, an interrupt function, inline assembly, a `#pragma` of its own. `harness/hostcheck.txt` has what was counted last, of every file, and the test fails where a file has another count of any kind: more, and a clean file that is clean no more, and fewer too, so that the record is always what is so, and what a change did to it shows in the commit. `python3 harness/hostcheck.py --record` writes the record anew, `--show` lists the places of a file or of a kind, and `--macros` says which macros make the casts. Nothing is compiled or run for it. It is skipped where there is no gcc |
 | `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 
@@ -1069,26 +1069,61 @@ golden that was derived with a number still in it need not be derived
 again.
 
 What the portable C is declared to do otherwise than the original is
-another matter, since the original cannot be made to show it. A scenario
-that such a deviation changes has a golden of that tree's own, in
-`harness/goldens/portable_c/`, recorded from the tree as it is built
-and read by whoever records it:
+another matter, since the original cannot be made to show it. The
+portable C is held against the original's goldens there too, with the
+declared difference made to a golden each time it is read for that
+tree, and written nowhere: the steps that the tree is not taken through
+are left out with their screens; what is otherwise on many screens is a
+rule of the comparison, for that tree alone; and the rows that one
+scenario shows otherwise are its patch, `NAME.patch` in
+`harness/goldens/portable_c/`. A patch says of each such row what the
+original's golden has and what the portable C is expected to show, one
+above the other, by the screen's line in the golden and the number of
+the row:
+
+```
+Deviation: 7 of src/portable_c/DEVIATIONS.md
+Why: the key bar with Alt held has no name for F5, where the original
+has Memory
+
+== 13: Alt+F10
+row 23
+-|1Left   2Right  3View.. 4Edit.. 5Memory 6DirSiz ...| 07x1 30x6 ...
++|1Left   2Right  3View.. 4Edit.. 5       6DirSiz ...| 07x1 30x6 ...
+```
+
+It is exact: it is made to the golden only where every row with `-` is
+what the golden has, and otherwise the test fails before anything is
+run, with the patch, the screen, the row and both lines. That happens
+when the original's golden has been derived again and come out
+otherwise, or when the scenario has other steps, and is a failure to
+look at: a patch is not made again to make it go away. The top of
+`harness/goldens.py` has the whole form, with the cursor, the cells
+that blink and the disks, and says why it is not a unified diff.
 
 ```sh
-python3 harness/goldens.py record --tree portable_c [SCENARIO...]
+python3 harness/goldens.py patch --tree portable_c SCENARIO...
 python3 harness/goldens.py changes --tree portable_c [SCENARIO...]
 ```
 
-The second prints how each such golden differs from the original's, of
-every screen the rows that do. A golden of that kind says in its first
-line where it is from. It is no measure of the program: it shows that
-nothing has changed since it was recorded. Which scenarios have one,
-which are not run for the tree at all, which step is left out of every
-scenario for it, and which steps of one scenario, where they pass
-through something that the tree has no more, is in
+The first is how the rows of a patch are got: it takes the build
+through the scenario and writes every row that differs from the
+original's golden, under a header to be filled in. What it writes is
+what the build did. It becomes a patch when its author has read every
+row against the entry of `src/portable_c/DEVIATIONS.md` that declares
+it, has named that entry and the reason in the header, and has
+committed it: a statement of what the program is to show, which the
+tests then hold the program to, not another run. A row that the
+declaration does not explain is a change that was not meant. The
+second prints what each patch says, the rows with the cells that differ
+marked, and the steps that are left out. Which steps are left out of
+every scenario for the tree, which of one scenario, where they pass
+through something that the tree has no more, which rules it has and
+which scenarios are not run for it at all is in
 `harness/deviations.py`, under `TREES`, as
-`src/portable_c/DEVIATIONS.md` declares it; a scenario cannot be
-recorded for a tree that is not declared to change it.
+`src/portable_c/DEVIATIONS.md` declares it; a patch names the entries
+of that file which it is of, and the test fails for an entry that does
+not name the scenario.
 
 Two more deviations show on no screen, and are listed in the same file.
 When the original tries again to load itself after a command, it stores a

@@ -1088,9 +1088,12 @@ is the first, and the form of the others:
     brings the code. That commit also lists the routines in
     ported.SETUP_BATCHES, with what no scenario reaches and what of them
     is not carried over. Where the portable C is later declared to do
-    otherwise than the original's setup program, the scenario goes to
-    `changed` there, as for the main program, and gets a golden of the
-    tree's own, `goldens.py record --tree portable_c NAME`.
+    otherwise than the original's setup program, the scenario gets a
+    patch of the original's golden, as for the main program: the rows
+    that are expected otherwise, written by `goldens.py patch --tree
+    portable_c NAME` from a run, read against the declaration and
+    committed with the entry of DEVIATIONS.md and the reason in its
+    header (see the top of goldens.py). setup-lines has one.
 
 What has been found out about driving the setup program, on the bench
 with the original:

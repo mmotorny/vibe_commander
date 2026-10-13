@@ -356,8 +356,8 @@ batch, with what no scenario reaches.
 | B, the colours. Done | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6; and `ShadCol`, taken out of `Shadow` of `screen.c`, which 0b left as it is. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
 | C, the help. Done | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
 | D, what is left of S1 and of leaving. Done | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | 80 instructions, 74 of them the main program's routine | Six, 100 steps, see "Piece D" below: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and F1 from the other pieces' screens. A setup saved whose file is missing is A's, `setup-missing-saved` | 0b; A, B and C for three of the scenarios |
-| E1, the program's own call of DOS goes | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; `ended` has its golden of the tree's own recorded again, for the registers that the program leaves | A to D |
-| E2, three settings go | `stopts.c`, `stopts_t.c`: Memory allocation and TSR manager out of S2, Screen output out of S3; entries 1, 5 and 7 of `DEVIATIONS.md`, which say that the setup program still shows them | Small | The scenarios of A that show the two dialogs get goldens of the portable C's own, read with `goldens.py changes` | A |
+| E1, the program's own call of DOS goes | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; the patch of `ended` is written again and read, `goldens.py patch --tree portable_c ended`, for the registers that the program leaves | A to D |
+| E2, three settings go | `stopts.c`, `stopts_t.c`: Memory allocation and TSR manager out of S2, Screen output out of S3; entries 1, 5 and 7 of `DEVIATIONS.md`, which say that the setup program still shows them | Small | The scenarios of A that show the two dialogs get patches of the original's goldens, `goldens.py patch --tree portable_c NAME`, each read row by row against the entries before it is committed | A |
 
 While 0b is made, A, B and C can write their scenarios and derive the
 goldens, which needs the original alone. A scenario that the portable C
@@ -801,11 +801,11 @@ last.
 | Setup is no program of its own: no banner, no word on the version of DOS or on the memory, no command line, nothing run from DOS without the main program, no "Error reading data from the help file." | No scenario: the banner is sent nowhere when a golden is derived |
 | What DOS has shown has no line of a command that started setup, behind setup and afterwards: the row is empty, and the screen moves as the original's. And the history has no such command | Every scenario of setup, on the rows that `harness/deviations.py` has as spaces; the history in none |
 | The program takes what was saved whatever its setup has for TSR manager, where the original's running copy is asked only with that on. And with E1 the program's own call of DOS is gone | `asked`, `handed-on`, `ended` |
-| The Options menu has two lines more, at its bottom | `clock`, `clock-russia`, `menu`, which have goldens of the portable C's own already and got them recorded again |
+| The Options menu has two lines more, at its bottom | `clock`, `clock-russia`, `menu`, which are held by patches of the original's goldens, of entries 1 and 8 |
 | With E2: no Memory allocation and no TSR manager in S2, no Screen output in S3 | The scenarios of piece A that show the two dialogs |
 | The program's box for a critical error of DOS while setup is open, where the original's setup program leaves the error to DOS's own words. And setup's calls for files are asked with the program's errors, where the original's setup program calls DOS itself: a drive that is not ready has the program's box, a call given up there is the error 53h, and DOS is asked what was wrong behind a call that failed | No scenario |
 | The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. **This waits for the user's word**: it was met while 0b was made, and is not among the seven things decided | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
-| The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | `setup-lines`, with a golden of the portable C's own for the corner: one cell, on two screens |
+| The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | `setup-lines`, with a patch of the original's golden for the corner: one cell, on two screens |
 | The directory of the setup file is the one that the program has, made by the main program's rule: in capitals, and with a backslash behind whatever `VC=` names, where the setup program adds none behind a colon | No scenario: the bench has no `VC=` |
 
 ### The bugs of the original that stay
@@ -827,7 +827,7 @@ on the bench.
   it is fixed on the user's word of 13 October 2026, entry 9 of
   `DEVIATIONS.md`, and the key bar of setup is the main program's
   routine with setup's tables. D's scenario of 50 lines shows the
-  corner, and gets a golden of the portable C's own for it.
+  corner, and has a patch of the original's golden for it.
 - `Err2`, behind Ok in S0, is to fill `SrcIni` with FFh, so that the
   defaults count as a change and are offered for saving. It does so by
   `REP STOSB` with CX as it happens to be, which is 0 on every way
@@ -1281,7 +1281,8 @@ public: a static function is not found there, and the test ends with
   DOS had shown back and draws the key bar, whose 81st cell the
   original writes into the top left corner and the portable C does not
   (entry 9 of `DEVIATIONS.md`). A scenario that leaves the list on 50
-  lines is one of that deviation, with a golden of the tree's own.
+  lines is one of that deviation, with a patch of the original's
+  golden for the corner, as `setup-lines` has.
 - A monochrome display is not on the bench. The three instructions for
   it are translated as they read: "Monochrome" for the name of the
   display, and the second colour of each pair of a palette, in
@@ -1337,10 +1338,10 @@ own, which was recorded while F6 was a place-holder, came out the same
 with the list of colours behind that key, cell for cell: `python3
 harness/goldens.py changes --tree portable_c setup-lines` has one cell
 on each of the last two screens, the corner, and no other row.
-That golden is to become a patch of one cell on two screens, applied
-to the original's golden, once the harness holds a deviation by a patch
-(`CLAUDE.md`, "The portable C"): it landed as a golden of the tree's
-own, like the fifteen others of that kind.
+It landed as a golden of the tree's own, like the fifteen others of
+that kind, and is a patch of the original's golden now, as they are:
+`harness/goldens/portable_c/setup-lines.patch`, one cell on two
+screens.
 
 **A seventh that went.** `setup-save-new`, a setup saved without a
 setup file, was written here while piece A had the same thing in hand,
@@ -1414,7 +1415,8 @@ its own: piece C has written it, `StHlpLine`.
   gets to Clock by five times Down, `setup-left-handed` clicks a line
   of each of the two dialogs by its place, and `setup-help-screens`
   shows both under the help. Each then wants its steps looked at again
-  and a golden of the portable C's own, read with `goldens.py changes`,
+  and a patch of the original's golden, written by `goldens.py patch
+  --tree portable_c NAME` and read row by row before it is committed,
   as the scenarios of A do.
 - The line "There was an error while saving the setup file" is held by
   no scenario, as above: whoever changes where it is written has to
@@ -1606,9 +1608,9 @@ left open:
   for every tree and every golden. What that scenario holds of the
   entry of INT 21h, `New21`, the flags that a call is handed on with
   and the caller's stack left alone, `handed-on` holds with one copy,
-  against a golden of the portable C's own since the watch on DOS has
-  gone from it: three calls that the original deals with are handed on
-  like any other there. INT 27h the portable C does not take.
+  against the original's golden with a patch since the watch on DOS
+  has gone from it: three calls that the original deals with are handed
+  on like any other there. INT 27h the portable C does not take.
 - The file is longer than it has to be: the README has how long,
   under "The figures", and the scenarios' test holds the portable C to
   no multiple of the original's size any more. The main data's zeros
@@ -2478,9 +2480,10 @@ the user's, and this is here as what was proposed, no more:
   the design of step 3 has settled. Two things keep this from being a
   trap. A replay that meets another question than was recorded fails,
   it does not pass on a wrong answer, so a stale trace is noticed and
-  says that the bench is wanted. And a trace is a golden of the tree's
-  own, in the sense of `CLAUDE.md`: it shows that nothing has changed
-  since it was recorded, and what made it right was the bench.
+  says that the bench is wanted. And a trace is what a golden of the
+  tree's own was before a deviation was held by a patch: it shows that
+  nothing has changed since it was recorded, and what made it right was
+  the bench.
 - The sanitizers and the coverage are of the build of this computer,
   another compiler's of the same source, in a memory laid out
   otherwise. A fault that only the layout of DOS makes they do not
@@ -2589,6 +2592,51 @@ So, of the design:
     where it looks today only at where each function begins. Half a
     day, an estimate. It says which blocks ran, not which way a branch
     went.
+
+## A deviation held by a patch: done, and what comes behind it
+
+Done: what the portable C is expected to show where a deviation changes
+a scenario is the original's golden with the declared difference made
+to it when it is read (`CLAUDE.md`, "The portable C"; the top of
+`harness/goldens.py` for the form of a patch, and the notes of
+`CLAUDE.md` for how one is made and read). The sixteen goldens of the
+tree's own are gone: twelve are patches, 293 rows where the files had
+9,050, and four needed nothing but their steps left out. `changed` of
+`deviations.TREES` is gone with them: a scenario has a patch if the
+file is there, and the header of the patch has the entry and the
+reason.
+
+What the next pieces meet:
+
+- The bench's right panel, with every golden derived again. Every patch
+  on a row that comes out otherwise then fails before anything is run,
+  "does not fit ... Nothing was run", with both rows and the cells
+  marked. `python3 harness/goldens.py patch --tree portable_c NAME...`
+  makes each again from a run, keeps its header, and says which rows
+  expect the same in the same cells on a row of the original that is
+  otherwise now and which say something else, are new or are gone:
+  the second kind is what has to be read. `start-memory`, `lost` and
+  the menus over the right panel will have such rows, since what they
+  uncover or show of that panel is another thing then.
+- The program's name, a rule of the portable C alone: `rules` of
+  `TREES["portable_c"]`, in the form of `DEVIATIONS`, made to a golden
+  when it is read for that tree and before its patch. That form puts a
+  text over the cells that a group matches and no more: a name that is
+  shorter than the original's in a line that is centred moves the
+  cells around it, and wants either a pattern whose group is the whole
+  of what moves, with the text as long, or `deviations.expected` taught
+  a second kind of rule. A patch that is on a row which a rule changes
+  has that row as the rule leaves it, so the patches of such rows fail
+  when the rule comes, in the first way, and are made again.
+- A rule that leaves cells out for one tree, should that be built (the
+  next section): the comment at `rules` of `deviations.Declared` says
+  how it would be written.
+
+What no scenario has yet, and was tried by hand only: a patch with a
+line for a cell that blinks, and one with lines for the disks. Both
+were made to a golden and held against a run in a trial; no committed
+patch has either, since no deviation so far changes what blinks or
+what is left on a disk.
 
 ## Leaving a part of the screen out of the comparison: future work
 
