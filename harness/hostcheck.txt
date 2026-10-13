@@ -25,7 +25,7 @@ drive.c       to-number 2
 edit.c        clean
 edit_t.c      clean
 enter.c       clean
-extfile.c     to-number 2, to-pointer 1
+extfile.c     clean
 files.c       to-number 1
 find.c        clean
 find_t.c      clean
@@ -67,7 +67,7 @@ tables.h      clean
 tree.c        clean
 treebox.c     clean
 treebox_t.c   clean
-usermenu.c    to-number 9, to-pointer 5
+usermenu.c    clean
 vc.h          interrupt 1, aborts 4
 view.c        to-number 1
 view_t.c      clean

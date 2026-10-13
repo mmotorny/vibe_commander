@@ -293,7 +293,7 @@ FiLs20:
    together have 998 bytes. */
 u16 Run_00(u16 text, u16 view)
 {
-    const u8 *from = (const u8 *)text;  /* SI */
+    const u8 *from = MD_POINTER(text);  /* SI */
     u8 *to = md.DosBuf;                 /* DI */
     const u8 __far *name;
     const u8 *more;
@@ -419,7 +419,7 @@ Run_18:                                 /* the name of the file */
     if (view != 0) {
         name = CutPath(md.ViewFil);
         more = md.ViewFil;
-        for (c = (u16)(u32)name - (u16)md.ViewFil; c != 0; c--) {
+        for (c = MD_PLACE(NEAR(name)) - MD_PLACE(md.ViewFil); c != 0; c--) {
             *to++ = *more++;
             if (to >= COMMANDS_END)
                 goto Run_30;
@@ -494,7 +494,7 @@ u16 F32_00(u16 main)
     for (i = 0; i < 13; i++)
         md.TmpBuf[i] = Menu_F[i];
     F42_10();
-    include = (u16)md.TmpBuf;
+    include = MD_PLACE(md.TmpBuf);
     if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);
@@ -511,7 +511,7 @@ F42_00:                                 /* Shift+F2 */
 F32_01:                                 /* the main menu */
     MainFil(md.TmpBuf, Menu_F);
 F32_02:
-    include = (u16)md.TmpBuf;
+    include = MD_PLACE(md.TmpBuf);
     if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);
@@ -531,11 +531,11 @@ F32_05:                                 /* read it */
     if (read.failed)
         goto F32_04;
     md.MenuBuf[read.value] = EOF_CHAR;
-    include = (u16)md.MenuBuf;
+    include = MD_PLACE(md.MenuBuf);
     item = FndItem(md.MenuBuf);
     if (item.end)
         goto F32_03;
-    text = (const u8 *)item.at;
+    text = MD_POINTER(item.at);
 
     /* The keys of its lines, how wide they are, and how wide the widest
        line behind them is. */
@@ -616,7 +616,7 @@ F32_16:
     item = FndItem(text);
     if (item.end)
         goto F32_18;
-    text = (const u8 *)item.at;
+    text = MD_POINTER(item.at);
     goto F32_10;
 
 F32_18:                                 /* the box */
@@ -633,7 +633,7 @@ F32_18:                                 /* the box */
         | (u8)((size - 1 & 0xFF) >> 1);
     if (begin >> 8 > limit)
         begin = limit << 8 | begin & 0xFF;
-    SavWin(begin, size, (u16)md.WinBuf);
+    SavWin(begin, size, MD_PLACE(md.WinBuf));
     c = Color(Hist_C) << 8;
     MinBox(begin, size, c);
     MvsBw(BasAdr((begin + 0x100 & 0xFF00) | 34), User_S, 11, c);
@@ -643,7 +643,7 @@ F32_18:                                 /* the box */
     to = begin + 0x205;
     text = md.MenuBuf;
 F32_22:
-    text = (const u8 *)FndItem(text).at;
+    text = MD_POINTER(FndItem(text).at);
     screen = BasAdr(to);
     if (*key != 0) {
         i = 0;
@@ -773,7 +773,7 @@ F32_50:                                 /* Enter: the commands of the line */
     text = md.MenuBuf;
     i = (u8)(row + 1);
 F32_51:
-    text = (const u8 *)FndItem(text).at;
+    text = MD_POINTER(FndItem(text).at);
 F32_52:
     answer = WORD_AT(text);
     text += 2;
@@ -790,22 +790,25 @@ F32_53:
     answer = 0;
 
 F32_55:                                 /* Esc, and the box goes */
-    ResWin(begin, size, (u16)md.WinBuf);
+    ResWin(begin, size, MD_PLACE(md.WinBuf));
     Window(begin, size);
     if (answer != 0) {
         md.MenuFl = 0;
         return 0;
     }
-    found = F34_30((u16)text);
+    found = F34_30(MD_PLACE(text));
     command = found.at;
     if (found.none)
         goto F32_57;
     named = F34_40(command, 0);
     command = named.at;
-    key = 0;
+    /* BP, which was on the keys, is 0 from here on, and Run_00 takes it
+       for whether a file is being viewed: so it is the place 0 of the
+       main data, not a pointer to nothing, which has no place. */
+    key = (u16 *)MD_POINTER(0);
     if (named.file)
         goto F32_02;                    /* another menu */
 F32_57:
     md.MenuFl = md.AutoMnu;
-    return Run_00(command, (u16)key);
+    return Run_00(command, MD_PLACE(key));
 }

@@ -20,12 +20,14 @@
 /* A line ends with a carriage return and a line feed, in either order. */
 #define IS_CRLF(pair) ((pair) == 0x0D0A || (pair) == 0x0A0D)
 
-/* Where FndItem stopped, and whether that is the end of the file. */
+/* Where FndItem stopped, and whether that is the end of the file. The
+   file is in the main data, in MenuBuf, whoever asks: the place is one
+   of the main data. */
 static struct Entry Found(u16 end, const u8 __far *file)
 {
     struct Entry entry;
 
-    entry.at = (u16)(u32)file;
+    entry.at = MD_PLACE(NEAR(file));
     entry.end = end;
     return entry;
 }
@@ -94,7 +96,7 @@ u16 FindExt(const u8 __far *name)
     for (;;) {
         if (item.end != 0)
             return 0;
-        file = (const u8 *)item.at;
+        file = MD_POINTER(item.at);
         wanted = md.TmpErr;             /* FnEx05 */
         count = 3;
         for (;;) {
@@ -131,7 +133,7 @@ u16 FindExt(const u8 __far *name)
             if ((pair & 0xFF) == EOF_CHAR)
                 return 0;
             if ((pair & 0xFF) == ':')
-                return (u16)file;
+                return MD_PLACE(file);
         }
         continue;
 FnEx12:
