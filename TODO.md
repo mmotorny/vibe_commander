@@ -3671,7 +3671,7 @@ and H1 are started at once by the session.
 | T, the time of a wait. Done: see "T, the time of a wait" below | Why a wait costs the host four times as much for the program of 32 bits, and what the time that a step has is counted in | `harness/dos.py`, `harness/scenarios.py`, `harness/ported.py` | 60 lines | H3; beside the convergence | The goldens derived again are as they are; a machine that hangs is given up and one that is kept from running is not; the whole suite | A program that hangs on a busy host is waited for until its machine has had its time |
 | W, the switch. Done, with Z1 as one piece and without a name for the 16-bit build: see "W and Z1" below | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
 | Z1, the 16-bit build goes. Done, but for the first bodies in `vc.h`, which go with the words, and for the README; and `dos32.c` keeps its name: see "W and Z1" below | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
-| Z2, the words go. Next: the third stage of "W and Z1" below | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
+| Z2, the words go. Done: the third and fourth stages of "W and Z1" below | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
 
 The order:
 
@@ -7039,73 +7039,79 @@ that place is `sys.h`, with `dos.c` behind it". The session was told.
   that nothing reads: `build/portable_c32/`, and `arith.obj`, `dos.obj`
   and their listings in `build/portable_c/`.
 
-**What is left of the piece**, in order, each a commit or a few. The
-first two stages are on `main`, at `7e73258`; what follows is for a
-fresh agent, from here. The line numbers are those of `7e73258`.
+**What is left of the piece** is its fifth stage, the documents. The
+first two stages are on `main` at `7e73258`, and the third and the
+fourth, Z2, in the three commits that follow "Write down how step 2 of
+the road is divided": "Take the words of the 16-bit compiler out of the
+portable C", "Have the host check and the figures follow the words" and
+"Join the lines that the words had broken".
 
-**Before anything: the checks, and one trap.** `sha256sum
-build/portable_c/VC.EXE build/portable_c/debug/VC.EXE` is
-`a02a28c6...a4f945` and `3c2acbdf...eee1a9` at `7e73258`; the whole
-suite is `ctest --test-dir build -j8`, four and a half minutes, eleven
-tests; `python3 harness/goldens.py derive` leaves `harness/goldens/`
-clean. The trap is of the build: an object is compiled again when its
-file, a header, or the compiler's command has changed (`compiled.txt`),
-and for nothing else. A change to `CMakeLists.txt` that changes how the
-portable C is linked, and not how it is compiled, links again by
-itself; one that is to compile every file again and does not change
-the command, does not: `rm -rf build/portable_c` then.
+**The checks, and one trap.** `sha256sum build/portable_c/VC.EXE
+build/portable_c/debug/VC.EXE` is `a02a28c6...a4f945` and
+`3c2acbdf...eee1a9`, at `7e73258` and behind each of the three commits
+of Z2; the whole suite is `ctest --test-dir build -j8`, four and a half
+minutes, eleven tests; `python3 harness/goldens.py derive` leaves
+`harness/goldens/` clean. The trap is of the build: an object is
+compiled again when its file, a header, or the compiler's command has
+changed (`compiled.txt`), and for nothing else. A change to
+`CMakeLists.txt` that changes how the portable C is linked, and not how
+it is compiled, links again by itself; one that is to compile every
+file again and does not change the command, does not: `rm -rf
+build/portable_c` then.
 
-3. **The words' 16-bit bodies (Z2).** Only what was of the 16-bit build
-   goes; nothing of step 2 of the road goes in.
-   - `vc.h` is the one file with `__I86__`, at six places: line 44, the
-     types of the numbers; 71, the `#error` that asks for a machine
-     whose low byte is first, which names `__I86__` among those that
-     are; 83, `CODE`, `STACK`, `FAR` and `__far`, defined away in the
-     second half; 100, `OFFSET_IN`, with `<stddef.h>` in the second;
-     127, `LenStk`, 1000h and 4000h; and 1409 to 1548, the words of the
-     addresses, whose second bodies are below. `TEXT_FAR` is at 461 to
-     463, by another condition, and stands in seven declarations of
-     `vc.h` and in no file of code.
-   - The words in the code, as the host check counts them at
-     `7e73258`: `__far` in 722 places, `FAR` in 68, `STACK` in 246,
-     `CODE` in 92. `view.c` has `__far` in a macro of its own, `WORD_AT`
-     at line 153. They are nothing to `wcc386` already, so taking them
-     out is to leave `VC.EXE` byte for byte as it is, release and
-     debug: that is the check, and the row Z2 of the table has it.
-     `__near` stands nowhere in the code.
-   - `#pragma aux`: 17 lines, and none is of the 16-bit build alone, so
-     none goes. Twelve are of `dos32.c`: eleven pieces of inline
-     assembly for 32 bits (`Dos`, `Dpmi`, `Video`, `Keyboard`,
-     `Multiplex`, `DosIdle`, `MouseDriver`, `MouseState`, `StackNow`,
-     `Selectors`, `Entered`) and the registers of `Arrived`. Five say
-     `aborts`, that a function does not return: `Alloc9` of
-     `resident.c` (line 326), `Round` of `main.c` (1583), and `AlocEr`,
-     `Exit00` and `Main` in `vc.h` (452, 453, 561). `wcc386` reads all
-     seventeen. Whether the five could go is another matter than this
-     piece's: without one the compiler writes a return behind the call,
-     which changes the bytes, and what rests on Open Watcom is to
-     shrink by a decision, not by the way.
-   - The two intrinsic functions, `_disable` and `_enable`, are of
-     `dos32.c` (line 95) and are read. `__interrupt`, `__loadds`,
-     `__declspec(naked)` and `_asm` stand in `dos32.c` alone, for 32
-     bits, and stay. The two `#pragma data_seg`, of `main.c` and
-     `stack.c`, give the main data and the stack their classes, which
-     the flat link goes by: they stay. So do the seven pairs of
-     `#pragma pack`.
-   - `harness/trial32/sys.c` has lines for the 16-bit toy that is gone:
-     two `#ifdef __I86__` around a `#pragma data_seg`, a first body of
-     `MACHINE` with `__far`, and `CODE` in `TEXT`. `harness/drivercheck.py`
-     builds that toy and has to say "Nothing wrong" afterwards, and
-     `python3 harness/trial32/asked.py` to print 28 screens.
-   - `CMakeLists.txt` says of `-i=` that `vc.h` has `offsetof` of
-     `<stddef.h>` "where the compiler is not the one for 16 bits".
-   - The comments of the tree that speak of `dos.c`, of far and near
-     and of the two builds are read with the words: `grep -n
-     "dos\.c\|16 bits\|far \|medium" src/portable_c/*.[ch]`.
+3. **The words' 16-bit bodies (Z2): done.** What it did, and what
+   whoever goes on should know:
+   - `__far`, `FAR`, `STACK`, `CODE` and `TEXT_FAR` are in no file of
+     `src/portable_c/` and `vc.h` defines none of them; `__near`,
+     `__loadds` and `__interrupt` stood nowhere. `vc.h` has no
+     `__I86__`: `u32` is an int, `LenStk` 4000h, `OFFSET_IN` is
+     `(u16)offsetof(type, field)`, and each word of the addresses has
+     its one body, below, the second of before word for word. Nothing
+     of step 2 of the road went in.
+   - The words were nothing to `wcc386`, since `vc.h` defined them
+     away, so that taking them out leaves the bytes was certain. Three
+     things besides were not, and the same two hashes held them: some
+     130 casts `(struct Where STACK *)&where`, which are the pointer
+     that the address is already and went, where the compiler would
+     have refused a type that changes; sixteen that made a far pointer
+     of a near one of the same type, `(u16 __far *)BasAdr(...)`,
+     `(const u8 __far * STACK *)&text`; and `STACK_C`, by which
+     `stack.c` kept `vc.h` from declaring its array far. Two casts of
+     that form stay, `*(u8 *)&text->first` of `format.c`, which write
+     one byte of a word. Sixteen lines that went on in a second for the
+     length of the words were joined, and the build for finding a fault
+     is the same bytes for that too: its file has no numbers of lines.
+   - A script did it, file by file, and is not kept: a word goes with
+     the space behind it; a comment or a backslash that ended a line in
+     a column keeps the column; a line that went on inside a
+     parenthesis, under what followed it, stands there again. What it
+     got wrong was read in the diff: a comment's column on a line that
+     had only moved, seven times.
+   - The 17 `#pragma aux` and the two intrinsic functions stay, as the
+     plan had it: twelve of `dos32.c`, and the five that say `aborts`.
+     So do `__declspec(naked)` and `_asm` of `dos32.c`, the two
+     `#pragma data_seg` and the seven pairs of `#pragma pack`.
+   - The comments went with the words. Those of far and near pointers,
+     of the three groups and of `DS` say what is so in a flat memory:
+     the tops of `vc.h`, `tables.h`, `stack.c`, `string.c`, the main
+     data in `main.c`, `AsmSeg` of `misc.c`. `dos.c` is `dos32.c`
+     wherever the file of the system's functions is meant. `dos32.c`
+     itself pointed to `dos.c` in eighteen places, for the reason of a
+     thing or for "as it does": each says the thing now, or says "the
+     program of 16 bits" where that is history which explains what is
+     there. The two that leaned on a comment of `dos.c` have what it
+     said: why a program run gets the bytes of the main data at 5Ch and
+     6Ch, and where DOS goes on when the program is ended, `Exit01` and
+     `Exit05` of the original.
+   - `harness/trial32/sys.c` has no line for 16 bits either;
+     `harness/drivercheck.py` says "Nothing wrong" and
+     `harness/trial32/asked.py` prints its 28 screens. `casts.py`
+     there still names `dos.c` and a line with `__far` among what it
+     sorts: it is the trial's tool, and finds neither.
 
-   **The words of the addresses when that is done**, each with its one
-   body, which is the second of today word for word (`vc.h`, from the
-   `#else` behind line 1409 to line 1548). They are the megabyte of step 1, and what step 2 takes down:
+   **The words of the addresses**, each with its one body (`vc.h`,
+   "The words of the addresses"). They are the megabyte of step 1, and
+   what step 2 takes down:
 
        ARENA                    ((u8 *)&md - 0x10000L)
        MAIN_SEG                 0x1000
@@ -7127,46 +7133,55 @@ the command, does not: `rm -rf build/portable_c` then.
                                  - (const u8 *)&md))
        MD_POINTER(place)        ((u8 *)&md + (u16)(place))
 
-   Behind the block and of one body already: `TRELIST`, which is
-   `MD_PLACE` of a field of the tree's buffer (1554), and `ENTRY`
-   (1560), which cuts what it is handed to 16 bits. `TEXT(segment)` of
-   `view.c` is `AT(segment, 0)`. `CODE`, `STACK`, `FAR`, `TEXT_FAR` and
-   `__far` are gone from the source then, `OFFSET_IN` is
-   `(u16)offsetof(type, field)`, and `LenStk` is 4000h.
+   Behind the block: `TRELIST`, which is `MD_PLACE` of a field of the
+   tree's buffer, and `ENTRY`, which cuts what it is handed to 16 bits.
+   `TEXT(segment)` of `view.c` is `AT(segment, 0)`.
 
-4. **The checks that read the source.**
-   - `harness/hostcheck.py` and `harness/hostcheck.txt`: the record
-     falls with stage 3 and is written anew there, `--record`, in the
-     commit that moves it. Its counts of `__far`, `FAR`, `STACK` and
-     `CODE` are a function that `tools/figures.py` calls for a row of
-     the README's table (`segment_words`, `SEGMENT_WORDS`): with the
-     words gone the row says four times nothing, and goes, from the
-     script, from the README's paragraph behind the table, and from the
-     note of `CLAUDE.md` on the figures. What the script and its top
-     say of "what only Open Watcom takes" is read again then.
-   - `harness/int16.py`: `ONE_BUILD` (line 174, with the account of it
-     at 88 and its use at 986) names `arith.c`, `dos.c` and `dos32.c`,
-     the files that were of one build alone and are not read. Two of
-     them are gone, and `dos32.c` is a file of the program like any
-     other now. What the test is for, with one build left: it finds
-     where a line means another number with an int of 32 bits than it
-     meant with one of 16, which is where the program of 32 bits can
-     do otherwise than the original that it was translated from, and
-     step 2 widens variables on purpose in exactly such places. So it
-     is thought to stay through step 2, with its record, and to read
-     `dos32.c`; whoever takes the stage says so or says why not, in
-     its top and in the README's row. Reading `dos32.c` will name
-     places, each of which wants its cast or its reason
-     (`CLAUDE.md`, the note on `portable_c-int16`).
-     `harness/int16check.c` is what it holds itself against.
-   - `tools/calls.py`: its text was brought up; it leaves out `dos.c`
-     and `dos32.c` by name, the first for the C translation.
-   - `harness/trial32/casts.py` and `added.py` go by the host check and
-     by `int16.py`: run each once after the two.
+4. **The checks that read the source: done.**
+   - `harness/int16.py` knew what is written in a word of the addresses
+     by where `__I86__` was not defined. It knows the words by their
+     names now, `WORDS` there, and what is written in the `#define` of
+     one is no place. **A word that step 2 adds to `vc.h`, or a body
+     that it changes, is read by that list**: a new word that shifts or
+     takes one address from another is a place at every use until its
+     name is there, 209 of them when the list was empty. It reads
+     `dos32.c` like any file, `ONE_BUILD` being gone, and found one
+     place in it, `OwnSet`, which has its reason. Its top says what the
+     test is for with one build left: the code was written and judged
+     with an int of 16 bits and is compiled with one of 32, a place is
+     where the program can do otherwise than what it was translated
+     from by the int alone, and it is where step 2 widens; the plan of
+     the flat memory makes it the finder of the widths (N0).
+     A place is known by the text of its line, so the one line of the
+     record that had `__far` in it, `StHelp` of `sthelp.c`, was a place
+     gone and a place new, and its reason was carried over by hand.
+   - `harness/hostcheck.py`: the record did not move, since the words
+     were never in it, only in the summary. The function that counted
+     them is gone, with the row of the README's table that
+     `tools/figures.py` made of it and the kind `loadds`; one of those
+     words written again is what gcc refuses, a place of the kind
+     `other`. `interrupt` stays a kind: the compiler for 32 bits takes
+     the word, and `dos32.c` does without. "The portable C: what
+     another compiler says of it", above, has the kinds and counts as
+     they stand and what each waits for.
+   - `tools/calls.py` needed nothing. `harness/trial32/casts.py` and
+     `added.py` run as they did: 39 places of `dos32.c`, 160 places.
 
 5. **The documents.** Each says what is so now, once; what was true of
    the 16-bit build alone goes, or is kept as a sentence of history
    where it explains something that is still there.
+   - Z2 mended four sentences of the README that the words made
+     untrue, and no more: the one behind the table of the figures, two
+     of "What rests on Open Watcom, for the portable C" (which still
+     speaks of the interrupt functions of `dos.c` behind them), and
+     the row of `portable_c-int16`. And the note of `CLAUDE.md` on the
+     figures. The line numbers below are those of `7e73258`, a few off
+     since.
+   - The notes of `CLAUDE.md` name `__far`, `STACK`, `FAR`, `CODE` or
+     `TEXT_FAR` on 21 lines, as what the portable C is written in:
+     "Notes on the portable C" on `TEXT_FAR`, on a pointer to a local
+     variable that "wants `STACK`", on the audit with clang "with the
+     words of Open Watcom defined away". Each is history now.
    - `README.md`. The names that are no more stand on lines 278, 281,
      1112, 1113, 1133, 1146, 1150, 1152, 1177, 1216, 1221, 1229, 1232
      to 1234, 1406, 1752 and 1753: `build/portable_c32/`,

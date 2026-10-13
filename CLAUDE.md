@@ -1921,6 +1921,13 @@ in "The portable C".
     with `i` the function's own, changed nowhere else in the loop and
     no label in it. A loop of another shape, `i += 3` or a second
     condition, is not known, and its places want a reason.
+  - What is written in a word of the addresses of `vc.h` is no place,
+    and the finder knows those words by their names, `WORDS` of the
+    script: a word that is added there, with a shift or a difference
+    of two addresses in it, is a place at every use until its name is
+    in that list. And `dos32.c` is read like any file: it was written
+    for an int of 32 bits, so the reason of a place there says that
+    the number is meant as it is.
   - It needs clang, any that gives the account of a file that the
     finder was written for: it holds itself against
     `harness/int16check.c` first, lines with the kinds that are to be
