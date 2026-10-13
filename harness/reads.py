@@ -40,10 +40,23 @@ program has none of them, and what REVIEWED has for them is not held
 against it; nor is what it has for a table of the setup's in a file
 that both programs have, SETUP_PLACES.
 
-    reads.py BUILD_DIR          every place, with the bytes read there:
+    reads.py BUILD_DIR [SOURCE_DIR]
+                                every place, with the bytes read there:
                                 build/c for the C translation, whose
                                 files are src/c, build/portable_c for
-                                the portable C
+                                the portable C; and with the directory
+                                of its files, src/portable_c, a build
+                                that is named otherwise, as
+                                build/portable_c32 is, the portable C as
+                                a flat program of 32 bits
+
+Nothing here is of 16 bits in kind: the places are found in the text of
+the source, which is one for both kinds of program, and a count is of
+bytes of a text or of a table of bytes, which are the same in both. What
+differs is which file of the system's functions the program is built of,
+SYSTEM_FILE, and how long an object with pointers in it is, a box or a
+dialog, of which no place reads a count of bytes: it is handed on by its
+offset and read as it is laid out.
 """
 import re
 import sys
@@ -79,6 +92,13 @@ SETUP_FILES = ("stmain.c", "stopts.c", "stcolor.c", "sthelp.c")
 # the entries of REVIEWED for them are none for such a tree either.
 SETUP_PLACES = (("bars.c", "StKeyB_T"), ("bars.c", "StKeyC_T"),
                 ("bars.c", "StKey_S"))
+
+# The file of the system's functions, of which a tree may have two, one
+# for each kind of program that it is built as: whether the program is a
+# flat one of 32 bits -> the file. The other is no part of the program:
+# it is not read, and what REVIEWED has for it is not held against the
+# program.
+SYSTEM_FILE = {False: "dos.c", True: "dos32.c"}
 
 # Places that are not known by their form: (file, name) -> (what is read,
 # how that is known). A number is a count of bytes from the start of the
@@ -216,6 +236,11 @@ REVIEWED = {
                                       "zero"),
     **{("resident.c", text): (ZERO, "OutStr0 writes it as far as its zero")
        for text in ("NoRun_S", "FnFil_S", "BadFl_S", "Retr_S", "Aloc_S")},
+    ("dos32.c", "Shell_T"): (OWN, "ShellRun copies it whole, by its "
+                                  "size"),
+    ("dos32.c", "NoStart_S"): (35, "DOS writes it as far as its dollar "
+                                   "sign, which is its last byte but the "
+                                   "zero"),
     ("start.c", "NcEnv"): (OWN, "compared at its size"),
     ("start.c", "TempEnv"): (OWN, "compared at its size"),
     ("start.c", "Comsp"): (OWN, "compared at its size"),
@@ -357,12 +382,14 @@ def _form(statement, name, sizes):
     return None
 
 
-def places(source, objects, variables=()):
+def places(source, objects, variables=(), flat=False):
     """Every place where a file of code in the directory `source` names
     one of `objects`, a list of (file, name, address, length) as
     datacheck.Translation has them: (file, line, name, the file of the
     object, its length, what is read there, how that is known).
-    `variables` are names among them that are no constants."""
+    `variables` are names among them that are no constants. `flat` is
+    whether the program is a flat one of 32 bits, for which of
+    SYSTEM_FILE is read."""
     by_name = defaultdict(list)
     for module, name, _, length in objects:
         if name not in variables:
@@ -371,7 +398,8 @@ def places(source, objects, variables=()):
     pattern = re.compile(r"\b(" + "|".join(map(re.escape, names)) + r")\b")
     found = []
     for path in sorted(source.glob("*.c")):
-        if path.name.endswith("_t.c"):
+        if path.name.endswith("_t.c") \
+                or path.name == SYSTEM_FILE[not flat]:
             continue
         text = re.sub(r"/\*.*?\*/",
                       lambda match: re.sub(r"[^\n]", " ", match[0]),
@@ -449,17 +477,17 @@ GONE = {
 }
 
 
-def check(source, objects, contents, variables=()):
+def check(source, objects, contents, variables=(), flat=False):
     """What is wrong with how the code in the directory `source` reads
     the constants: a list of lines. `contents` gives the bytes of an
-    object by its address and length."""
+    object by its address and length. `flat` as for places()."""
     wrong = []
     used = set()
     gone = GONE.get(Path(source).name, {})
     where = {(module, name): address
              for module, name, address, _ in objects}
     for file, line, name, module, length, read, how in places(
-            source, objects, variables):
+            source, objects, variables, flat):
         used.add((file, name))
         if read is None:
             wrong.append(f"{file}:{line}: how much of {name} is read here "
@@ -475,7 +503,8 @@ def check(source, objects, contents, variables=()):
                          f"at {file}:{line}, and has none: write it with "
                          f"what the original has behind it, as far as the "
                          f"zero")
-    listed = set(REVIEWED)
+    listed = {(file, name) for file, name in REVIEWED
+              if file != SYSTEM_FILE[not flat]}
     if deviations.declared(Path(source).name).no_setup:
         listed = {(file, name) for file, name in listed
                   if file not in SETUP_FILES
@@ -498,15 +527,19 @@ def check(source, objects, contents, variables=()):
 
 def main():
     import datacheck
-    translation = datacheck.Translation(Path(sys.argv[1]))
+    if len(sys.argv) not in (2, 3):
+        sys.exit(__doc__)
+    translation = datacheck.translated(Path(sys.argv[1]),
+                                       *map(Path, sys.argv[2:]))
+    flat = isinstance(translation, datacheck.Flat)
     variables = translation.variables | set(
         VARIABLES.get(translation.source.name, {}))
     for file, line, name, module, length, read, how in places(
-            translation.source, translation.objects, variables):
+            translation.source, translation.objects, variables, flat):
         print(f"{file + ':' + str(line):18} {name:11} {length:4} of "
               f"{module:13} {read}{'' if how == 'by its form' else ': ' + how}")
     for line in check(translation.source, translation.objects,
-                      translation.bytes, variables):
+                      translation.bytes, variables, flat):
         print("WRONG   ", line)
 
 

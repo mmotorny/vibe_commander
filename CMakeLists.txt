@@ -661,3 +661,13 @@ foreach(tree portable_c32 portable_c32-debug)
                 --stub ${open_watcom_SOURCE_DIR}/binw/dos32a.exe
                 ${c_dir}/VC.EXE ${c_dir}/VC.MAP)
 endforeach()
+# The texts and tables of the program of 32 bits against the original's,
+# by their names, as those of a program of 16 bits are held, and field by
+# field where an object has a word that names something: that is a
+# pointer of four bytes there. See harness/datacheck.py. It is the source
+# of the portable C, so the tables of that test which say what the
+# portable C has otherwise are its own.
+add_test(NAME portable_c32-data
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
+            --quiet --source ${CMAKE_SOURCE_DIR}/src/portable_c
+            ${layout_dir} ${CMAKE_BINARY_DIR}/portable_c32)

@@ -58,6 +58,46 @@ names and that has no zero byte within itself, unless COUNTED, or
 SETUP_COUNTED for a thing of the setup program, says of the word that
 names it how many bytes are read of the text there.
 
+A tree may be built as a flat program of 32 bits as well, as the portable
+C is, build/portable_c32/ (TODO.md, "The portable C in 32 bits: the
+plan"): the same source and so the same objects, and the same tables here
+say what is otherwise. But a word that names something is a pointer in C,
+and a pointer is four bytes there, with whatever stands behind it that
+much further on: a box, a dialog and a table of pointers are longer than
+the original's and cannot be held against it byte for byte. They are held
+field for field. Which fields of an object are pointers, its declaration
+says, in the source: BOX, BOX1, BOX2 and DIALOG of tables.h, each with
+its count, an array of pointers, or an array of structures of nothing but
+pointers; every other object is bytes. The object is then read as the
+original lays it out, each pointer as the word that it is there, and
+held against the original's by the rules above, with every offset that a
+message or a table of this file has counted so. Of such a word:
+
+  - Where the original names something, the pointer has to be an address
+    that the extender sets, a relocation of the file, and what that names
+    has to be where the program has the thing of that name, with the same
+    distance from it. A number there names nothing in a flat memory,
+    whatever number it is.
+  - Where the original has a number, or a tree is to have one for what
+    the original names, a place of the main data or the number of a
+    command or of a routine, the pointer has to be no address: its low
+    half is held against the number, and its high half has to be 0, the
+    program reading 16 bits of it (NUMBER_OF of vc.h).
+  - An address anywhere else in an object, in bytes or across two fields,
+    fails: the declaration was read wrong, or the object is not laid out
+    as tables.h has it.
+
+What such a program is made of is read in three places. The bytes and
+the relocations are the file's, behind the extender's stub, as le.py
+reads it: that is what is loaded, and the linker has left nothing to be
+worked out. Where an object is, the linker's map says, static ones too.
+How long it is, neither says: the compiler rounds what a file has of a
+segment up to four bytes, so the last object of a file ends up to three
+bytes before the first of the next begins. Its object file says, as for
+a program of 16 bits; of an object file of 32 bits the segments and the
+symbols are read here and nothing else. Which kind of program a
+directory holds, its VC.EXE says.
+
 Exits with status 0 if every object that was compared is as the original,
 and 1 otherwise, with the object and the offset of the first byte or word
 that differs.
@@ -73,6 +113,7 @@ from pathlib import Path
 from bytecheck import REGIONS
 import coverage
 import deviations
+import le
 import reads
 
 COM_ORIGIN = 0x100          # where a .COM file is loaded, and the PSP ends
@@ -80,6 +121,10 @@ COM_ORIGIN = 0x100          # where a .COM file is loaded, and the PSP ends
 # Records of an object file (OMF).
 LNAMES, SEGDEF, GRPDEF, EXTDEF, LEXTDEF = 0x96, 0x98, 0x9A, 0x8C, 0xB4
 PUBDEF, LPUBDEF, LEDATA, FIXUPP = 0x90, 0xB6, 0xA0, 0x9C
+# The same with lengths and offsets of 32 bits, as the compiler for a flat
+# program writes them. What its segments hold and the addresses in that
+# have such forms too, A1h and 9Dh, and are not read here: see the top.
+SEGDEF32, PUBDEF32, LPUBDEF32 = 0x99, 0x91, 0xB7
 OFFSET16 = 1                # the kind of a relocation: a 16-bit offset
 TO_SEGMENT, TO_GROUP, TO_EXTERNAL = 0, 1, 2
 
@@ -154,6 +199,35 @@ OWN_OF = {
                      "which the portable C has not",
     },
 }
+
+# As OWN_OF, for the constants that a tree has only where it is built as
+# a flat program of 32 bits: tree -> name -> why. Such a program has
+# another file of the system's functions, dos32.c for dos.c
+# (reads.SYSTEM_FILE), and that file has constants of its own. They are
+# not compared, and a program of 16 bits is not held to have them.
+OWN_OF_FLAT = {
+    "portable_c": {
+        "Shell_T": "the instructions that dos32.c puts below the megabyte "
+                   "to hand the shell a command in real mode, INT 2Eh "
+                   "with the stack kept round it: the program of 16 bits "
+                   "has them as code, Int2E of dos.c, and so has the "
+                   "original",
+        "NoStart_S": "what dos32.c says where the extender has no memory "
+                     "below the megabyte for it: the words of the "
+                     "original's Aloc_S, which the tree has in resident.c "
+                     "and which is held there, in a copy that ends as DOS "
+                     "takes a text and not as the original's does",
+    },
+}
+
+# The variables of the file of the system's functions, those of them that
+# have a value, are not compared and are not listed by name: what that
+# file keeps of the system for itself, a selector, a vector that it took,
+# where the PSP is. The original asks DOS in its instructions and has no
+# data of the kind; a name there that is one of the original's as well
+# would be held against whatever that is.
+SYSTEM_VARIABLE = ("a variable of the file of the system's functions, "
+                   "which keeps there what it knows of the system")
 
 # The tables of the menus' commands. Where the original has the address
 # of a command there, the translation has the number of the command: the
@@ -475,7 +549,8 @@ def commands(source):
 
 class ObjectFile:
     """An object file: its segments, its symbols, what its segments hold
-    and which words of that the linker has yet to fill in."""
+    and which words of that the linker has yet to fill in. Of one of 32
+    bits, its segments and its symbols alone."""
 
     def __init__(self, path):
         self.names = [None]         # numbered from 1, like all that follows
@@ -507,10 +582,11 @@ class ObjectFile:
                 self.names.append(
                     record[at + 1:at + 1 + record[at]].decode("latin-1"))
                 at += 1 + record[at]
-        elif kind == SEGDEF:
+        elif kind in (SEGDEF, SEGDEF32):
             at = 4 if record[0] >> 5 == 0 else 1    # absolute: an address
-            length = struct.unpack_from("<H", record, at)[0]
-            name, at = self._index(record, at + 2)
+            wide = "<I" if kind == SEGDEF32 else "<H"
+            length = struct.unpack_from(wide, record, at)[0]
+            name, at = self._index(record, at + struct.calcsize(wide))
             cls, at = self._index(record, at)
             self.segments.append((self.names[name], self.names[cls], length))
         elif kind == GRPDEF:
@@ -521,7 +597,8 @@ class ObjectFile:
                 name = record[at + 1:at + 1 + record[at]].decode("latin-1")
                 _, at = self._index(record, at + 1 + record[at])
                 self.externals.append(name)
-        elif kind in (PUBDEF, LPUBDEF):
+        elif kind in (PUBDEF, LPUBDEF, PUBDEF32, LPUBDEF32):
+            wide = "<I" if kind in (PUBDEF32, LPUBDEF32) else "<H"
             _, at = self._index(record, 0)
             segment, at = self._index(record, at)
             if segment == 0:
@@ -529,8 +606,8 @@ class ObjectFile:
             while at < len(record):
                 name = record[at + 1:at + 1 + record[at]].decode("latin-1")
                 at += 1 + record[at]
-                offset = struct.unpack_from("<H", record, at)[0]
-                _, at = self._index(record, at + 2)
+                offset = struct.unpack_from(wide, record, at)[0]
+                _, at = self._index(record, at + struct.calcsize(wide))
                 self.symbols.append((name, segment, offset))
         elif kind == LEDATA:
             segment, at = self._index(record, 0)
@@ -757,8 +834,10 @@ class Translation:
         # What is no constant, though it has contents: the variables of
         # the C code that have a value in the file. The compiler has them
         # in a segment of their own, _DATA, and R_DATA for those of the
-        # part that stays in the memory.
+        # part that stays in the memory. `written` has them with the file
+        # that each is of.
         self.variables = set()
+        self.written = set()
 
         # The C code: an object of it is a symbol of a segment that is
         # no code, or one in the code that has an underscore in front, as
@@ -787,6 +866,7 @@ class Translation:
                     continue
                 if compiled.segments[segment][0].endswith("_DATA"):
                     self.variables.add(name.lstrip("_"))
+                    self.written.add((f"{module}.c", name.lstrip("_")))
                 end = min(there for there in offsets[segment]
                           if there > offset)
                 self.objects.append((f"{module}.c", name.lstrip("_"),
@@ -803,6 +883,367 @@ class Translation:
             if start <= address < start + length:
                 return start + length
         return None
+
+    def view(self, address, length):
+        """The object as it is held against the original's: its bytes,
+        since a word that names something is a word here as there."""
+        return View(self.bytes(address, length))
+
+    def seen(self, address, length):
+        """How many bytes of the original's layout the object is."""
+        return length
+
+    def variable(self, name):
+        """What a word has that holds the place of the tree's variable
+        `name`: its offset in the group that it is read through."""
+        return [offset for offset, _ in self.named.get(name, [])]
+
+    def said(self, value):
+        """A word that names something, for a message; and `where`, the
+        same for where the tree has the thing that it is to name."""
+        return f"{value:04X}h"
+
+    where = said
+
+
+class View:
+    """An object of a tree as it is held against the original's: `bytes`,
+    in the original's layout. For a program of 16 bits those are the
+    object's own bytes and `pointers` is None: a word that names
+    something is the offset of that, a number like any other. For a flat
+    program `pointers` has every word of them that is a pointer in the
+    tree: where it is here -> the place that it names, for an address
+    that the extender sets, or None for one that holds a number, whose
+    low half the bytes have then. `real` is where each byte of them is
+    in the object itself."""
+
+    def __init__(self, contents, pointers=None, real=None):
+        self.bytes = contents
+        self.pointers = pointers
+        self.real = real
+
+    def spot(self, name, at):
+        """The place `at` of the object `name`, for a message: counted
+        as the original lays the object out, and as the tree has it
+        where that is another number."""
+        if self.real is None or self.real[at] == at:
+            return f"{name}+{at}"
+        return f"{name}+{at}, which is +{self.real[at]} of it as it is here"
+
+
+# The shapes of an object that has pointers, by the word of its
+# declaration: what stands in front of each of its `count` repeats, the
+# repeat, and what stands behind the last, each a row of fields, the
+# number of bytes that a field is or POINTER. They are the structures of
+# tables.h: a box is BOX_HEAD, 8 bytes, its texts, a BOXTX of 4 bytes
+# each, and its lines; a dialog is a BOXHD, which begins with the word
+# that names its box, its fields, each a BOXMN, which ends with the word
+# that names its buttons or holds a number, and a byte 0.
+POINTER = "pointer"
+POINTER_SIZE = 4
+SHAPES = {
+    "BOX": ((8,), (POINTER,), ()),
+    "BOX1": ((8 + 4,), (POINTER,), ()),
+    "BOX2": ((8 + 2 * 4,), (POINTER,), ()),
+    "DIALOG": ((POINTER, 8), (9, POINTER), (1,)),
+    # An array of pointers, or of structures of nothing else: as many as
+    # the object is long.
+    "pointers": ((), (POINTER,), ()),
+}
+
+
+def declared_shapes(path):
+    """What the C file `path` declares with pointers in it, at the top
+    of the file: name -> (the word of SHAPES, the count that the
+    declaration has, or None where it has none). A declaration begins
+    its line, as every one of the tree does."""
+    text = re.sub(r"/\*.*?\*/", lambda match: re.sub(r"[^\n]", " ", match[0]),
+                  path.read_text(), flags=re.S)
+    shapes = {}
+    for match in re.finditer(
+            r"^(?:static\s+)?const\s+(BOX[12]?|DIALOG)\s*\(\s*(\w+)\s*\)"
+            r"\s*(\w+)\s*[=;]", text, flags=re.M):
+        if not match[2].isdigit():
+            raise Problem(f"{path.name}: {match[3]} is declared "
+                          f"{match[1]}({match[2]}), with a count that is "
+                          "no number")
+        shapes[match[3]] = (match[1], int(match[2]))
+    # An array of pointers: `const u16 * const Menu_T[6]`.
+    for match in re.finditer(
+            r"^(?:static\s+)?(?:const\s+)?\w+(?:\s+\w+)*\s*\*\s*"
+            r"(?:const\s+)?(?:\w+\s+)*?(\w+)\s*\[[^\]]*\]\s*[=;]", text,
+            flags=re.M):
+        shapes[match[1]] = ("pointers", None)
+    # A structure that is declared with the object, or an array of such:
+    # StPagTab of stcolor_t.c. One of nothing but pointers is known.
+    for match in re.finditer(
+            r"^(?:static\s+)?const\s+struct\s*{([^{}]*)}\s*(\w+)\s*"
+            r"(?:\[[^\]]*\])?\s*=", text, flags=re.M):
+        members = [member for member in match[1].split(";")
+                   if member.strip()]
+        if all("*" in member for member in members):
+            shapes[match[2]] = ("pointers", None)
+        elif any("*" in member for member in members):
+            raise Problem(f"{path.name}: {match[2]} is a structure with "
+                          "pointers and other things in it, which "
+                          f"{Path(__file__).name} has no shape for: see "
+                          "SHAPES there")
+    return shapes
+
+
+def laid_out(shape, count, length):
+    """The fields of an object of `length` bytes that is declared as
+    `shape` with `count`, one behind the other as SHAPES has them: each
+    the number of its bytes, or POINTER."""
+    first, repeat, last = SHAPES[shape]
+    size = sum(POINTER_SIZE if field == POINTER else field
+               for field in repeat)
+    fixed = sum(POINTER_SIZE if field == POINTER else field
+                for field in first + last)
+    if count is None:
+        count, left = divmod(length - fixed, size)
+        if left:
+            raise Problem(f"is declared as pointers and is {length} bytes, "
+                          f"which is no number of pointers of "
+                          f"{POINTER_SIZE} bytes")
+    elif fixed + count * size != length:
+        raise Problem(f"is declared {shape}({count}), which is "
+                      f"{fixed + count * size} bytes where a word that "
+                      f"names something is {POINTER_SIZE}, as tables.h has "
+                      f"it, and the object is {length} bytes: the compiler "
+                      f"has laid it out otherwise")
+    return [*first, *repeat * count, *last]
+
+
+class Flat:
+    """The translation as a flat program of 32 bits: the bytes of its
+    objects as the file has them, where its objects are, counted from
+    where the first object of the file begins in the memory (a place of
+    le.py), which of their fields are pointers, and what each of those
+    names. `program` is the file as le.py has read it."""
+
+    def __init__(self, directory, source, program):
+        self.source = source or source_of(directory)
+        self.program = program
+        self.image = program.image()
+        linked = le.Map(directory / "VC.MAP")
+        # What an address that the extender sets names: where it is ->
+        # the place.
+        self.names = {}
+        for place, one in program.relocated().items():
+            if not one.address:
+                raise Problem("the program has a selector in it, the "
+                              "segment of something, which no flat "
+                              "program of the tree is to have")
+            self.names[place] = (program.objects[one.target - 1].place
+                                 + one.target_offset)
+        self.relocated = sorted(self.names)
+        # name -> [(the place of what has that name, 0)]: what a pointer
+        # has that names it, as Translation.named. A function is `Name_`
+        # in such a map, and data `_Name`.
+        self.named = defaultdict(list)
+        self.objects = []           # (module, name, place, length)
+        self.variables = set()      # as Translation has them, and
+        self.written = set()        # with the file of each
+        self.shapes = {}            # place -> (as declared, its fields),
+                                    # or what is wrong with that
+        modules = defaultdict(list)
+        for symbol in linked.symbols:
+            place = program.place(symbol.first, symbol.offset)
+            modules[symbol.module].append((symbol.name, place))
+            self.named[symbol.name.lstrip("_")].append((place, 0))
+        if not modules:
+            raise Problem("the linker's map lists no symbols")
+        if "_md" not in linked.public:
+            raise Problem("the linker's map has no main data, _md")
+        self.main = program.place(*linked.public["_md"])
+        self.data = sorted((place, name.lstrip("_"))
+                           for symbols in modules.values()
+                           for name, place in symbols
+                           if name.startswith("_"))
+
+        # The C code: an object of it is a symbol of a segment that is
+        # neither code nor without a value, nor the main data or the
+        # stack, each a segment of a class of its own. It is as long as
+        # its object file says, and laid out as its declaration says.
+        for module, symbols in modules.items():
+            compiled = ObjectFile(directory / f"{module}.obj")
+            offsets = defaultdict(list)
+            for name, segment, offset in compiled.symbols:
+                offsets[segment].append(offset)
+            for segment in offsets:
+                offsets[segment].append(compiled.segments[segment][2])
+            where = dict(symbols)
+            begins = {}
+            declared = None
+            for name, segment, offset in compiled.symbols:
+                # What a file has of a segment is one piece of it.
+                if begins.setdefault(segment, where[name] - offset) \
+                        != where[name] - offset:
+                    raise Problem(f"{module}.obj and the linker's map do "
+                                  f"not have {name} at one distance from "
+                                  f"the other symbols of its segment")
+                segment_name, kind, _ = compiled.segments[segment]
+                if kind in ("CODE", "BSS", "MAIN", "STACK") \
+                        or segment_name.endswith("_BSS"):
+                    continue
+                if segment_name.endswith("_DATA"):
+                    self.variables.add(name.lstrip("_"))
+                    self.written.add((f"{module}.c", name.lstrip("_")))
+                end = min(there for there in offsets[segment]
+                          if there > offset)
+                place, length = where[name], end - offset
+                name = name.lstrip("_")
+                self.objects.append((f"{module}.c", name, place, length))
+                if declared is None:
+                    declared = declared_shapes(self.source / f"{module}.c")
+                self.shapes[place] = self._shape(declared.get(name), place,
+                                                 length)
+        self.objects.sort(key=lambda found: (found[0], found[2]))
+
+    def _shape(self, declared, place, length):
+        """How the object at `place` is laid out: what its declaration
+        is, for a message, and its fields, or a Problem that says why it
+        is not laid out so."""
+        try:
+            if declared is None:
+                fields, shape = [length] if length else [], None
+            else:
+                shape, count = declared
+                fields = laid_out(shape, count, length)
+                if count is not None:
+                    shape = f"{shape}({count})"
+                else:
+                    shape = f"{fields.count(POINTER)} pointers"
+            # An address of the file that is not a pointer of the
+            # declaration: in bytes, or across the end of a field.
+            pointers, at = set(), place
+            for field in fields:
+                if field == POINTER:
+                    pointers.add(at)
+                at += POINTER_SIZE if field == POINTER else field
+            first = bisect.bisect_left(self.relocated,
+                                       place - POINTER_SIZE + 1)
+            for there in self.relocated[first:]:
+                if there >= place + length:
+                    break
+                if there not in pointers:
+                    raise Problem(
+                        f"has an address at +{there - place} of its "
+                        f"{length} bytes, that of "
+                        f"{self.what(self.names[there])}, where its "
+                        f"declaration has "
+                        + ("no pointer: it is taken for bytes, and "
+                           f"{Path(__file__).name} reads a declaration "
+                           "with pointers by SHAPES" if shape is None else
+                           f"none, {shape}"))
+            return shape, fields
+        except Problem as problem:
+            return problem
+
+    def bytes(self, address, length):
+        return self.image[address:address + length]
+
+    def end_of(self, address):
+        """Where the object ends that has `address` in it, or None."""
+        for _, _, start, length in self.objects:
+            if start <= address < start + length:
+                return start + length
+        return None
+
+    def view(self, address, length):
+        """The object at `address` as the original lays it out: each
+        pointer of it as two bytes, the number that it holds, or zeros
+        for an address that the extender sets, which `pointers` of the
+        view has. See View."""
+        found = self.shapes[address]
+        if isinstance(found, Problem):
+            raise found
+        contents, pointers, real = bytearray(), {}, []
+        at = address
+        for field in found[1]:
+            if field != POINTER:
+                real += range(at - address, at - address + field)
+                contents += self.image[at:at + field]
+                at += field
+                continue
+            real += [at - address] * 2
+            value, = struct.unpack_from("<I", self.image, at)
+            if at in self.names:
+                pointers[len(contents)] = self.names[at]
+                value = 0
+            elif value > 0xFFFF:
+                raise Problem(
+                    f"has at +{at - address}, as it is here, a pointer "
+                    f"that is no address which the extender sets and "
+                    f"holds {value:08X}h: a number in the place of what a "
+                    f"word names is one of 16 bits, and the program reads "
+                    f"no more of it")
+            else:
+                pointers[len(contents)] = None
+            contents += struct.pack("<H", value)
+            at += POINTER_SIZE
+        return View(bytes(contents), pointers, real)
+
+    def seen(self, address, length):
+        """How many bytes of the original's layout the object is: its
+        own, less what each pointer is longer than a word."""
+        found = self.shapes[address]
+        if isinstance(found, Problem):
+            return length
+        return length - found[1].count(POINTER) * (POINTER_SIZE - 2)
+
+    def shape(self, address):
+        """The declaration that the object at `address` is laid out by,
+        and how many pointers it has: None and 0 for bytes."""
+        found = self.shapes[address]
+        if isinstance(found, Problem):
+            return None, 0
+        return found[0], found[1].count(POINTER)
+
+    def variable(self, name):
+        """What a word has that holds the place of the tree's variable
+        `name`: how far it is behind where the main data begins, as
+        MD_PLACE of vc.h counts it, for one within 64K of that."""
+        return [place - self.main for place, _ in self.named.get(name, [])
+                if 0 <= place - self.main <= 0xFFFF]
+
+    def what(self, place):
+        """What is at `place`, by the linker's map: the nearest name of
+        data in front, and how far behind it."""
+        at = bisect.bisect_right(self.data, (place, "\x7f"))
+        if not at:
+            return f"the place {place:X}h, in front of every name"
+        there, name = self.data[at - 1]
+        return name + (f"+{place - there}" if place != there else "")
+
+    def said(self, place):
+        """An address that names something, for a message: what is
+        there, and where that is."""
+        return f"the address of {self.what(place)}, {self.where(place)}"
+
+    def where(self, place):
+        """A place as the linker's map counts it, an object's number and
+        an offset in it."""
+        for found in self.program.objects:
+            if found.place <= place <= found.place + found.size:
+                return f"{found.number:04x}:{place - found.place:08x}"
+        return f"{place:X}h from where the program begins"
+
+
+def translated(directory, source=None):
+    """The translation in `directory`, of whichever kind its file is: a
+    flat program of 32 bits is one that le.py takes."""
+    try:
+        program = le.Linear((directory / "VC.EXE").read_bytes())
+    except le.Unknown as unknown:
+        # A flat program that the reader does not read is none of 16
+        # bits for that: its map says which it is.
+        if le.Map(directory / "VC.MAP").flat:
+            raise Problem(f"{directory / 'VC.EXE'}: {unknown}")
+        return Translation(directory, source)
+    return Flat(directory, source, program)
+
 
 
 def whose(name, original, setup):
@@ -887,8 +1328,23 @@ def compare(original, translation, name, there, address, length,
     same, or a line that says where they are not. `otherwise` is what the
     object is declared to have otherwise than the original's, as DECLARED
     has it: it is held against the original's with that done to it.
-    `original` is the program of the original that has the object."""
-    ours = translation.bytes(address, length)
+    `original` is the program of the original that has the object.
+
+    The object is held as the original lays it out, View: of a flat
+    program its pointers are words there, and of each it is known whether
+    it is an address that the extender sets."""
+    try:
+        view = translation.view(address, length)
+    except Problem as problem:
+        return f"{name} {problem}"
+    ours, pointers = view.bytes, view.pointers
+    length = len(ours)
+
+    def address_at(at):
+        """What the pointer at `at` names, where it is an address of a
+        flat program, or None."""
+        return pointers.get(at) if pointers else None
+
     origin = origins(length, otherwise)
     last = held(length, otherwise) - 1
     theirs = original.image[there - COM_ORIGIN:there - COM_ORIGIN + last + 1]
@@ -897,8 +1353,14 @@ def compare(original, translation, name, there, address, length,
     at = 0
     while at < length:
         if isinstance(origin[at], bytes):
+            if address_at(at) is not None:
+                return (f"{view.spot(name, at)}: the translation has "
+                        f"{translation.said(address_at(at))}, and is "
+                        f"declared to have {origin[at][0]:02X}h there, a "
+                        "number")
             if ours[at] != origin[at][0]:
-                return (f"{name}+{at}: the translation has {ours[at]:02X}h, "
+                return (f"{view.spot(name, at)}: the translation has "
+                        f"{ours[at]:02X}h, "
                         f"and is declared to have {origin[at][0]:02X}h "
                         "there")
             at += 1
@@ -906,14 +1368,23 @@ def compare(original, translation, name, there, address, length,
         here = origin[at]
         named = original.named.get(there + here)
         if named is None or at + 2 > length or origin[at + 1] != here + 1:
+            if address_at(at) is not None:
+                return (f"{view.spot(name, at)}: the translation has "
+                        f"{translation.said(address_at(at))}, where the "
+                        f"original has a number and names nothing, "
+                        f"{theirs[here]:02X}h its low byte")
             if ours[at] != theirs[here]:
-                return (f"{name}+{at}: the translation has {ours[at]:02X}h, "
-                        f"the original {theirs[here]:02X}h")
+                return (f"{view.spot(name, at)}: the translation has "
+                        f"{ours[at]:02X}h, the original {theirs[here]:02X}h")
             at += 1
             continue
         word = struct.unpack_from("<H", ours, at)[0]
         names, behind = original.name_of(named)
         said = names[0] + (f"+{behind}" if behind else "")
+        # How the word is written out in a message: a number, unless it
+        # is held against where the tree has something, `placed`.
+        show = "{:04X}h".format
+        placed = False
         how, label, _ = NAMED_OTHERWISE.get(
             (name, at),
             SETUP_NAMED_OTHERWISE.get((name, at), ("", None, None)))
@@ -924,6 +1395,7 @@ def compare(original, translation, name, there, address, length,
             wanted = [offset
                       for offset, _ in translation.named.get(label, [])]
             instead = f"where it has {label}"
+            placed = True
         elif how == "is":
             wanted = [label]
             instead = "the number that it is to have"
@@ -938,9 +1410,8 @@ def compare(original, translation, name, there, address, length,
             # name of the main data, which is what the setup program's
             # variables are while the setup is open.
             wanted = [offset + behind & 0xFFFF
-                      for candidate in names for offset, _
-                      in translation.named.get(original.prefix + candidate,
-                                               [])]
+                      for candidate in names for offset
+                      in translation.variable(original.prefix + candidate)]
             wanted = wanted or [original.fields[candidate] + behind & 0xFFFF
                                 for candidate in names
                                 if candidate in original.fields]
@@ -954,23 +1425,47 @@ def compare(original, translation, name, there, address, length,
             instead = (f"the number of the command {said} in "
                        f"{translation.source.name}/vc.h")
         else:
-            groups = {offset + behind & 0xFFFF: group
+            groups = {offset + behind & 0xFFFF if pointers is None
+                      else offset + behind: group
                       for candidate in names
                       for offset, group
                       in known(original, translation, candidate)}
             wanted = list(groups)
             instead = f"where it has {said}"
+            placed = True
             if not wanted:
-                return (f"{name}+{at}: the original names {said} there, "
+                return (f"{view.spot(name, at)}: the original names {said} "
+                        f"there, "
                         f"which the translation has not by that name"
                         + (f", {original.prefix}{names[0]}, nor as the "
                            f"main program's {names[0]} with the setup "
                            f"program's bytes" if original.prefix else "")
                         + f": see NAMED_OTHERWISE in {Path(__file__).name}")
+        # In a flat program a word that is held against where the tree
+        # has something is an address that the extender sets, and no
+        # other word is one.
+        if pointers is not None and placed:
+            if address_at(at) is None:
+                return (f"{view.spot(name, at)}: the translation has the "
+                        f"number {word:04X}h, "
+                        + ("in a word that could name something"
+                           if at in pointers else "in a word of 16 bits")
+                        + f", and no address that the extender sets: the "
+                        f"original names {said} there, and it is to be "
+                        f"{instead}")
+            word, show = address_at(at), translation.where
+        elif address_at(at) is not None:
+            return (f"{view.spot(name, at)}: the translation has "
+                    f"{translation.said(address_at(at))}, where it is to "
+                    f"have a number, {instead}, "
+                    f"{' or '.join(map(show, wanted)) or 'none'}: the "
+                    f"original names {said} there")
         if word not in wanted:
-            return (f"{name}+{at}: the translation has {word:04X}h, which "
+            return (f"{view.spot(name, at)}: the translation has "
+                    f"{translation.said(word) if placed else show(word)}, "
+                    f"which "
                     f"is not {instead}, "
-                    f"{' or '.join(f'{w:04X}h' for w in wanted) or 'nowhere'}"
+                    f"{' or '.join(map(show, wanted)) or 'nowhere'}"
                     f": the original names {said} there")
         # A text that is named so is read as far as a zero byte, and has
         # to have that within itself: behind it the translation has other
@@ -983,19 +1478,169 @@ def compare(original, translation, name, there, address, length,
             if counted:
                 read = counted[0]
                 if end is not None and end - text < read:
-                    return (f"{name}+{at}: names {said}, of which {read} "
+                    return (f"{view.spot(name, at)}: names {said}, of which "
+                            f"{read} "
                             f"bytes are read there by COUNTED, and it is "
                             f"{end - text} bytes. Write it that long, "
                             f"with what the original has behind it")
             elif end is not None and \
                     0 not in translation.bytes(text, end - text):
-                return (f"{name}+{at}: names {said}, a text without a "
+                return (f"{view.spot(name, at)}: names {said}, a text "
+                        f"without a "
                         f"zero byte of its own: what reads it goes on into "
                         f"what follows it, which is not what follows it in "
                         f"the original. Write it as far as the zero that "
                         f"the original has behind it")
         at += 2
     return None
+
+
+def check(layout, directory, source=None, quiet=True, say=print):
+    """Hold the translation in `directory` against the original in
+    `layout`, as the top says, and `say` what is found, a line at a
+    time: every object that was compared unless `quiet`, the counts, and
+    what differs. Returns what differs, a list of lines, and the counts:
+    the objects that are as the original and their bytes, and of a flat
+    program the pointers in them, how many of those are addresses that
+    the extender sets, and the bytes as the original lays them out."""
+    original = Original(layout)
+    translation = translated(directory, source)
+    # The setup program, for a tree that has it in itself.
+    original.fields = original.members(MAIN_DATA)
+    setup = None
+    if not deviations.declared(translation.source.name).no_setup:
+        setup = Original(layout, SETUP_PROGRAM, SETUP_PREFIX)
+        setup.fields = original.fields
+
+    flat = isinstance(translation, Flat)
+    declared = DECLARED.get(translation.source.name, {})
+    gone = GONE.get(translation.source.name, {})
+    variables = reads.VARIABLES.get(translation.source.name, {})
+    failed = []
+    count = bytes_held = 0
+    of_setup = bytes_of_setup = 0
+    own = OWN | OWN_OF.get(translation.source.name, {})
+    if flat:
+        own |= OWN_OF_FLAT.get(translation.source.name, {})
+    # Of a flat program: the objects that are laid out by a declaration
+    # with pointers, the pointers in them, how many of those are
+    # addresses, and the bytes of all objects as the original lays them
+    # out.
+    shaped = words = addresses = bytes_seen = 0
+    stale = (set(DIFFERENT) | set(ELSEWHERE) | set(own) | set(declared)
+             | set(variables) | set(SETUP_ELSEWHERE if setup else ())) \
+        - set(gone)
+    used = set()
+    for module, name, address, length in translation.objects:
+        stale.discard(name)
+        if name in gone:
+            failed.append(f"{module}: {name} is listed in "
+                          f"{Path(__file__).name} as gone from "
+                          f"{translation.source.name}")
+        if module == reads.SYSTEM_FILE[flat] \
+                and (module, name) in translation.written:
+            if not quiet:
+                say(f"  {module:12} {name:11} {length:4}  not "
+                    f"compared: {SYSTEM_VARIABLE}")
+            continue
+        if name in own or name in variables:
+            if not quiet:
+                say(f"  {module:12} {name:11} {length:4}  not "
+                    f"compared: {own.get(name) or variables[name]}")
+            continue
+        found = whose(name, original, setup)
+        if isinstance(found, str):
+            failed.append(f"{module}: {found}")
+            continue
+        program, label, behind = found
+        there = program.labels[label] + behind
+        why, otherwise = declared.get(name, (None, ()))
+        seen = translation.seen(address, length)
+        if program.reserved(there, held(seen, otherwise)):
+            if not quiet:
+                say(f"  {module:12} {name:11} {length:4}  not compared: "
+                    "in the room reserved for what only the shipped "
+                    "binary has")
+            continue
+        difference = compare(program, translation, name, there, address,
+                             length, otherwise)
+        used |= {key for key in (*NAMED_OTHERWISE, *COUNTED,
+                                 *SETUP_NAMED_OTHERWISE, *SETUP_COUNTED)
+                 if key[0] == name}
+        if name in DIFFERENT:
+            if difference is None:
+                failed.append(f"{module}: {name} is as the original, and "
+                              "listed as different")
+            elif not quiet:
+                say(f"  {module:12} {name:11} {length:4}  different: "
+                    f"{DIFFERENT[name]}")
+            continue
+        if difference is not None:
+            failed.append(f"{module}: {difference}")
+            continue
+        count += 1
+        bytes_held += length
+        if program is setup:
+            of_setup += 1
+            bytes_of_setup += length
+        if flat:
+            shape, pointers = translation.shape(address)
+            shaped += shape is not None
+            words += pointers
+            addresses += sum(named is not None for named in
+                             translation.view(address, length)
+                             .pointers.values())
+            bytes_seen += seen
+        if not quiet:
+            whole = program.extent(label) - behind
+            note = "" if seen == whole else (
+                f"  {seen} of {whole} bytes" if seen < whole else
+                "  with what follows it")
+            if flat and shape:
+                note = f"  {shape}, {seen} bytes of the original's" + note
+            if program is setup:
+                note += f"  {label} of {SETUP_PROGRAM}" \
+                    + (f"+{behind}" if behind else "")
+            elif label != name or behind:
+                note += f"  {label}" + (f"+{behind}" if behind else "")
+            # A second object of the name, a file's own copy of a text,
+            # may end before the first place that is declared.
+            if why and origins(seen, otherwise) != list(range(seen)):
+                note += f"  but for what is declared: {why}"
+            say(f"  {module:12} {name:11} {length:4}  {there:04X}h{note}")
+    for name in sorted(stale):
+        failed.append(f"{name} is listed in {Path(__file__).name}, and the "
+                      "C code has no constant of that name")
+    # An object is compared as long as it is. Where the code reads more
+    # of it, the object has to be that long: see reads.py.
+    failed += reads.check(translation.source, translation.objects,
+                          translation.bytes,
+                          translation.variables | set(variables), flat)
+    listed = set(NAMED_OTHERWISE) | set(COUNTED)
+    if setup:
+        listed |= set(SETUP_NAMED_OTHERWISE) | set(SETUP_COUNTED)
+    for name, at in sorted(listed - used):
+        failed.append(f"{name}+{at} is listed in {Path(__file__).name}, "
+                      "and the translation has no object of that name")
+
+    say(f"{count} objects of the C code, {bytes_held} bytes, are as the "
+        "original" + (f", {len(declared)} of them but for what "
+                      f"src/{translation.source.name}/DEVIATIONS.md "
+                      "declares" if declared else ""))
+    if setup:
+        say(f"{of_setup} of them, {bytes_of_setup} bytes, are the "
+            "original's setup program's")
+    if flat:
+        say(f"{shaped} of them are boxes, dialogs and tables of pointers "
+            f"by their declarations, with {words} words that are "
+            f"pointers of {POINTER_SIZE} bytes, {addresses} of them "
+            f"addresses that the extender sets: {bytes_seen} bytes as "
+            "the original lays them out")
+    for line in failed:
+        say(f"DIFFERS  {line}")
+    return failed, {"objects": count, "bytes": bytes_held,
+                    "pointers": words, "addresses": addresses,
+                    "as the original": bytes_seen}
 
 
 def main():
@@ -1007,7 +1652,8 @@ def main():
                              "and the same of VCSETUP")
     parser.add_argument("translation", type=Path,
                         help="the directory of the translation: VC.EXE, "
-                             "VC.MAP and the object files")
+                             "VC.MAP and the object files, of a program "
+                             "of 16 bits or of a flat one of 32")
     parser.add_argument("--source", type=Path, metavar="DIRECTORY",
                         help="the directory of its C files: by default "
                              "the one of src/ that has the name of the "
@@ -1017,112 +1663,10 @@ def main():
     args = parser.parse_args()
 
     try:
-        original = Original(args.layout)
-        translation = Translation(args.translation, args.source)
-        # The setup program, for a tree that has it in itself.
-        original.fields = original.members(MAIN_DATA)
-        setup = None
-        if not deviations.declared(translation.source.name).no_setup:
-            setup = Original(args.layout, SETUP_PROGRAM, SETUP_PREFIX)
-            setup.fields = original.fields
-    except Problem as problem:
+        failed, _ = check(args.layout, args.translation, args.source,
+                          args.quiet)
+    except (Problem, le.Unknown) as problem:
         sys.exit(f"datacheck: {problem}")
-
-    declared = DECLARED.get(translation.source.name, {})
-    gone = GONE.get(translation.source.name, {})
-    variables = reads.VARIABLES.get(translation.source.name, {})
-    failed = []
-    count = bytes_held = 0
-    of_setup = bytes_of_setup = 0
-    own = OWN | OWN_OF.get(translation.source.name, {})
-    stale = (set(DIFFERENT) | set(ELSEWHERE) | set(own) | set(declared)
-             | set(variables) | set(SETUP_ELSEWHERE if setup else ())) \
-        - set(gone)
-    used = set()
-    for module, name, address, length in translation.objects:
-        stale.discard(name)
-        if name in gone:
-            failed.append(f"{module}: {name} is listed in "
-                          f"{Path(__file__).name} as gone from "
-                          f"{translation.source.name}")
-        if name in own or name in variables:
-            if not args.quiet:
-                print(f"  {module:12} {name:11} {length:4}  not "
-                      f"compared: {own.get(name) or variables[name]}")
-            continue
-        found = whose(name, original, setup)
-        if isinstance(found, str):
-            failed.append(f"{module}: {found}")
-            continue
-        program, label, behind = found
-        there = program.labels[label] + behind
-        why, otherwise = declared.get(name, (None, ()))
-        if program.reserved(there, held(length, otherwise)):
-            if not args.quiet:
-                print(f"  {module:12} {name:11} {length:4}  not compared: "
-                      "in the room reserved for what only the shipped "
-                      "binary has")
-            continue
-        difference = compare(program, translation, name, there, address,
-                             length, otherwise)
-        used |= {key for key in (*NAMED_OTHERWISE, *COUNTED,
-                                 *SETUP_NAMED_OTHERWISE, *SETUP_COUNTED)
-                 if key[0] == name}
-        if name in DIFFERENT:
-            if difference is None:
-                failed.append(f"{module}: {name} is as the original, and "
-                              "listed as different")
-            elif not args.quiet:
-                print(f"  {module:12} {name:11} {length:4}  different: "
-                      f"{DIFFERENT[name]}")
-            continue
-        if difference is not None:
-            failed.append(f"{module}: {difference}")
-            continue
-        count += 1
-        bytes_held += length
-        if program is setup:
-            of_setup += 1
-            bytes_of_setup += length
-        if not args.quiet:
-            whole = program.extent(label) - behind
-            note = "" if length == whole else (
-                f"  {length} of {whole} bytes" if length < whole else
-                "  with what follows it")
-            if program is setup:
-                note += f"  {label} of {SETUP_PROGRAM}" \
-                    + (f"+{behind}" if behind else "")
-            elif label != name or behind:
-                note += f"  {label}" + (f"+{behind}" if behind else "")
-            # A second object of the name, a file's own copy of a text,
-            # may end before the first place that is declared.
-            if why and origins(length, otherwise) != list(range(length)):
-                note += f"  but for what is declared: {why}"
-            print(f"  {module:12} {name:11} {length:4}  {there:04X}h{note}")
-    for name in sorted(stale):
-        failed.append(f"{name} is listed in {Path(__file__).name}, and the "
-                      "C code has no constant of that name")
-    # An object is compared as long as it is. Where the code reads more
-    # of it, the object has to be that long: see reads.py.
-    failed += reads.check(translation.source, translation.objects,
-                          translation.bytes,
-                          translation.variables | set(variables))
-    listed = set(NAMED_OTHERWISE) | set(COUNTED)
-    if setup:
-        listed |= set(SETUP_NAMED_OTHERWISE) | set(SETUP_COUNTED)
-    for name, at in sorted(listed - used):
-        failed.append(f"{name}+{at} is listed in {Path(__file__).name}, "
-                      "and the translation has no object of that name")
-
-    print(f"{count} objects of the C code, {bytes_held} bytes, are as the "
-          "original" + (f", {len(declared)} of them but for what "
-                        f"src/{translation.source.name}/DEVIATIONS.md "
-                        "declares" if declared else ""))
-    if setup:
-        print(f"{of_setup} of them, {bytes_of_setup} bytes, are the "
-              "original's setup program's")
-    for line in failed:
-        print(f"DIFFERS  {line}")
     sys.exit(1 if failed else 0)
 
 
