@@ -1918,6 +1918,12 @@ waiting for the user between its steps.
   that it is ready; at its turn it does `git pull --rebase`, settles what
   the others changed keeping what both sides added, builds, passes the
   tests once more, and pushes. Nothing else lands meanwhile.
+- An agent whose work changes only `src/portable_c/`, or what is the
+  portable C's alone in the harness, runs the tests of the portable C,
+  `ctest --test-dir build -R portable_c`, and not those of the frozen
+  trees, which cannot change by it. A change to what the trees share, the
+  harness, the build or a tool, wants the whole suite. The session runs
+  the whole suite on `main` itself, after what has landed.
 - Two agents have made the same thing under one name with different
   arguments, and git saw no conflict in it. After a rebase, look at
   everything the others added that names what is yours.
