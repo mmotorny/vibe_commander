@@ -1977,8 +1977,12 @@ DOS and is not behind it yet.
   registers for the program that started this one. Since the piece S3
   of the plan for the 32 bits the two entries are `dos.c`'s, with the
   registers, behind `ProgramEndedTake` and `ProgramEndedGive` of
-  `sys.h`, and `Exit02` is the function of the program that is called
-  there. The program's own call of DOS was here too, with its entry of
+  `sys.h`, and `Exit02` was the function of the program that was called
+  there, until the program of 32 bits had to do the same and could call
+  nothing: now the program says beforehand what DOS is to be told,
+  `ProgramEndedBreakCheck`, `Exit05` tells it, and `Exit02` is a line
+  of `Exit00` ("E, the end by another's hand" of the plan for the 32
+  bits). The program's own call of DOS was here too, with its entry of
   INT 21h, `New21` and `Int21`, and `PutVector` of `dos.c`, which wrote
   into the machine's table of interrupts: they went when the setup
   program had been ported, as said above under what the map of the
@@ -2083,7 +2087,7 @@ To be asked when the work reaches them, and not before.
 | | What | When, and what is thought of it |
 |---|---|---|
 | 3 | What deviation 1 says, the program staying in the memory whole, once the program is above the megabyte and a second copy has the memory to run again. That moves toward the original. `second-copy`, `start-memory` and `ended` have patches that say a second copy has none | At W, with the three scenarios as the 32-bit build shows them. Thought: declared as it is found, where the difference is of memory alone, and the three patches made anew and read |
-| 4 | What the 32-bit program can do when DOS ends it by another program's hand. The 16-bit program has its say first, through its PSP, and leaves registers for the program that started it: `ended` prints them. Under an extender DOS would seem to go back to that program through the extender's own part of real mode, with nothing of the program run. That is from reading and was not tried | The piece that meets it, D2 or M1, tries it first and reports, and the user is asked with what was seen. Thought: declared, and `ended` not run for the portable C; `TakeEnd`, `Exit01` and `Exit05` go with the 16-bit build. **Tried by D2**: nothing of the program runs, but the extender takes itself out and leaves every interrupt of real mode as it found it; what is not put back is that DOS looks for Ctrl-C at every call, and whoever ended the program sees DOS's registers. "Piece D2" below has the table and the ways that there seem to be |
+| 4 | What the 32-bit program can do when DOS ends it by another program's hand. The 16-bit program has its say first, through its PSP, and leaves registers for the program that started it: `ended` prints them. Under an extender DOS would seem to go back to that program through the extender's own part of real mode, with nothing of the program run. That is from reading and was not tried | The piece that meets it, D2 or M1, tries it first and reports, and the user is asked with what was seen. Thought: declared, and `ended` not run for the portable C; `TakeEnd`, `Exit01` and `Exit05` go with the 16-bit build. **Tried by D2**: nothing of the program runs, but the extender takes itself out and leaves every interrupt of real mode as it found it; what is not put back is that DOS looks for Ctrl-C at every call, and whoever ended the program sees DOS's registers. "Piece D2" below has the table and the ways that there seem to be. **Decided on 13 October 2026**, the second of those ways: the program of 32 bits is told as the 16-bit one is, by a small routine of real mode that the system's functions keep for it (`CLAUDE.md`, "The portable C"). **Done**: "E, the end by another's hand" below; `ended` passes for both programs with the one patch |
 | 8 | That the 16-bit build may go, which the road keeps for the user | Before Z1, when both builds pass every scenario from one source |
 
 ### The strategy
@@ -2247,6 +2251,9 @@ with `IntOn`, which asks nobody. And 98 since S3: `MemOwn` and
 `ProgramEndedTake` and `ProgramEndedGive`, which are of the PSP and
 ask DOS nothing; and `ShellRun`, which goes through real mode as the
 seven of the second kind do, by a routine there and not by a service.
+And 99 since the end by another's hand was made for 32 bits:
+`ProgramEndedBreakCheck`, by which the program says what DOS is to be
+told of Ctrl-C then, where it had a function of its own called.
 
 | Kind | Functions | Which |
 |---|---|---|
@@ -2797,7 +2804,7 @@ place: see below.
 | 4 | The editor opened where the original does not open it | `editor-big` | After step 28, `F4`, row 0: `Edit: b  Line 1  Col 1` and the editor's screen, where the original shows the panels | No |
 | 5 | What the machine's memory is said to be while a command runs from the program | `command` | After step 7, `Ctrl+o`, rows 15 and 17: `mem` of DOS says 15,360K of extended memory, in all and free, for 15,232K, and 16,384K of memory in all for 16,256K, 128K more of each. What the extender makes of the memory: not looked into. If it is a figure that follows what the program is and not what it does, `harness/deviations.py` leaves such out, which is asked first | No |
 | 6 | A second copy of the program: the patches of the 16-bit build say that it has no memory to run, and here it has. 3 of what is open for the user | `second-copy`, `start-memory` | After step 6, `Ctrl+o`, row 15: `C:\WORK>d:\vc\vc ver` and what follows it, where the patch expects an empty row. `start-memory` after step 12, `Ctrl+o`, row 18: an empty row where the original has `C:\WORK>d:\vc\vc k` | Both |
-| 7 | The program ended by another's hand. 4 of what is open for the user, which D2 tried and wrote down | `ended` | After step 40, `Ctrl+o`, row 0: of the six words that the scenario prints of the registers left for the program that started this one, `2222 1111 EEF6 436D FF75 0202` for the patch's `2222 1111 EE4F #### 0000 0202` | Yes |
+| 7 | The program ended by another's hand. 4 of what is open for the user, which D2 tried and wrote down. **Mended by E**, below: `ended` passes and is on the record | `ended` | After step 40, `Ctrl+o`, row 0: of the six words that the scenario prints of the registers left for the program that started this one, `2222 1111 EEF6 436D FF75 0202` for the patch's `2222 1111 EE4F #### 0000 0202` | Yes |
 
 So ten of the fourteen are the editor's, 1 to 4, and none of those is
 the second copy's doing by what shows; 6 and 7 wait for the user's
@@ -3116,7 +3123,8 @@ and H1 are started at once by the session.
 | S2, what DOS enters. Done: see below | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
 | S3, the entry, the end, Quick execute. Done: see below | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
 | D1, `dos32.c`: what goes straight through. Done: see "Piece D1" below | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
-| D2, `dos32.c`: the rest. Done but for the two functions that wait for the user: see "Piece D2" below | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
+| D2, `dos32.c`: the rest. Done: see "Piece D2" below; the two functions that waited for the user are E's | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
+| E, the end by another's hand. Done: see below | On the user's word of 13 October 2026: the program of 32 bits has DOS told of Ctrl-C when DOS ends it, by a routine of real mode below the megabyte that the PSP names. `sys.h` has the program say what is to be put back, a value, where it handed a function over | `sys.h`, `dos.c`, `dos32.c`, `resident.c`; the toy | 8 instructions, 3 functions for 2 | D2, H3 | `harness/trial32/ended.asm` shows the same row of registers for both programs, and `BREAK` on; `ended` on the record; the whole suite | A DOS or an extender's host that the bench has not |
 | B1, the objects. Done: see below | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt`, `tools/refused.cmake` | 50 lines | P1 | The build | Little |
 | B2, the program. Done: see "B2, the program" below | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
 | H1, the reader. Done: see "Piece H1, the reader" below | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
@@ -5125,7 +5133,9 @@ both trees.
 not are `ProgramEndedTake` and `ProgramEndedGive`: what a program of 32
 bits can do when DOS ends it by another's hand was tried, as 4 of what
 is open for the user asks, and is reported in the last part below; the
-two do nothing until that is decided. The toy of the two builds,
+two do nothing until that is decided. (They are made since: the
+user decided for the second of the three ways of the last part, and "E,
+the end by another's hand" behind this section has it.) The toy of the two builds,
 `python3 harness/trial32/both.py`, writes the same for every function,
 28 screens for 27 steps, for both countries; its last page has the two
 that are left, which write the same too, since nobody ends the toy.
@@ -5492,7 +5502,8 @@ to be, for the user:
 | The extender left in place until the program's function has run | Not looked at: the extender takes the call in real mode before DOS, and nothing here is asked first | |
 
 Until it is decided `told` is never called, and the comment at the
-two in `dos32.c` says what was seen.
+two in `dos32.c` says what was seen. (Decided since, for the second
+way, and made: the section behind this one.)
 
 **For M1 and those behind it**, of the whole piece:
 
@@ -5756,6 +5767,213 @@ For the pieces behind this one:
   the harness takes for the same tree.
 - A wild write shows where it happens to land, and may show nowhere:
   the viewer's was in every scenario that goes up a line.
+
+### E, the end by another's hand: done, and what a later piece should know
+
+On the user's word of 13 October 2026 (`CLAUDE.md`, "The portable C"),
+which is the second of D2's three ways: when DOS ends the program of 32
+bits by another program's hand, DOS is told of Ctrl-C again as the
+program found it, and the program that did it goes on with the
+registers that the 16-bit program leaves it, by a small routine of real
+mode that `dos32.c` keeps. `sys.h` has 99 functions where it had 98,
+and `dos32.c` makes all of them. `ended` passes for the program of 32
+bits with the patch that the portable C has, and is on the record.
+
+**The shape of `sys.h`, and why.** The program handed the system a
+function, `ProgramEndedTake(told)`, which the system called when DOS
+had ended the program. A program of 32 bits cannot be called then: the
+extender is gone before DOS goes on, and the program's memory with it.
+So what the header says is otherwise now, for both builds: the program
+says beforehand what it has changed of the system that the system does
+not put back by itself, as a value, and the system puts that back.
+
+| Function | What it is | In `dos.c` | In `dos32.c` |
+|---|---|---|---|
+| `ProgramEndedBreakCheck(on)` | Whether the system is to look for Ctrl-C at every call when it has ended the program, as `SetBreakCheck` takes it. Said whenever the program has noted that anew, before `Take` or after | Kept in a byte, `EndedBreak` | Kept in a byte, and written into the block below the megabyte, where the routine reads it |
+| `ProgramEndedTake()` | From now on the system puts that back when it has ended the program by another's hand, before the program that started this one goes on | The PSP's address at 0Ah kept in `Vect22`, and `Exit01` written there, as it was | The same address kept, the routine and what it reads copied into the block, and the routine's address written there |
+| `ProgramEndedGive()` | No more: said before the program ends itself | `Vect22` written back | The address written back |
+
+Why a value for both, and not a function where one can be called and a
+value where not: a header that takes both says two things, and each
+file would honour one of them. A function of the program's that the
+system calls with the program gone is a promise that only one of the
+two files can keep; a value both keep in full, and `sys.h` says one
+thing. It is also what a later system can keep: what has to be done
+when a program is ended from outside is done where little of the
+program can be relied on.
+
+Why three functions and not two, with the value handed to `Take`: the
+original reads `BreakFl` where DOS has ended it, so what is put back
+is what `SetBrk` noted last, after every command. The program has to
+say it again each time, and the start takes its end behind `SetBrk`
+and not in it. With one function for both, either the start would take
+its end two calls of DOS early, or the value would be stale for two
+calls of DOS after every command. As it is, `SetBrk` says the value in
+the line behind the one that notes it, `TakeEnd` takes where the
+original's `TakeDos` did, and no call of DOS is made for either, in
+either build.
+
+**The program's side.** `resident.c` alone: `SetBrk` has one line
+more, `ProgramEndedBreakCheck(md.BreakFl)`, behind the line that notes
+it; `Exit02`, which was the function handed over and one line long, is
+that line in `Exit00`; `TakeEnd` calls `ProgramEndedTake()`.
+
+**16 bits.** `Exit05` of `dos.c` tells DOS itself, `SetBreakCheck` with
+what the program said, where it called the program's function, which
+did the same; DL for the program that started this one is that value,
+and `BreakTold`, the byte in which `SetBreakCheck` kept what it told
+DOS last, is gone. `Take` takes once and `Give` gives once, by
+`Vect22`, which is 0 while nothing is taken: the toy takes twice.
+`VC.EXE` is 197,084 bytes, 14 longer. What DOS is asked, in which
+order and with which registers is as it was: entry 6 of
+`DEVIATIONS.md` has the row under `Exit00` and `Exit05` now, with the
+same registers.
+
+**32 bits.** Eight instructions of real mode, 28 bytes, `Ended_T` of
+`dos32.c`, written as their bytes with the instruction beside each,
+since the compiler writes for a segment of 32 bits. They are copied to
+`LOW_ENDED` of the block below the megabyte, which is 560 bytes for
+that where it was 512, and read three things behind them there,
+through CS: `LOW_WAS`, where the PSP had DOS go on; `LOW_PSP`, the
+PSP's segment; `LOW_BREAK`, what the program said of Ctrl-C.
+
+    push ax
+    mov  ax,3301h
+    mov  dl,cs:[LOW_BREAK]
+    int  21h
+    pop  ax
+    mov  es,cs:[LOW_PSP]
+    cmp  word ptr cs:[LOW_WAS+2],0
+    jmp  dword ptr cs:[LOW_WAS]
+
+That is `Exit01` and `Exit05` of `dos.c`: DOS told, AX kept, DL what
+DOS was told, ES on the ended program's PSP, the flags those of the
+segment that the program goes on in compared with 0, every other
+register as it came. DOS has freed the block by then, and its bytes
+are still there, as the program's own are where `Exit01` runs. The
+extender is out of INT 21h by then, so the call goes to DOS; where a
+first copy of the program runs underneath, through that copy's
+extender, which passes it on.
+
+The build has nothing new: no tool, no step, no line of
+`CMakeLists.txt`. The bytes were read back once with `ndisasm -b16`.
+`harness/datacheck.py` and `harness/reads.py` have an entry each for
+the table, as they have for `Shell_T`.
+
+**What was seen.** `harness/trial32/ended.asm`, which prints the break
+state itself now, as the last word of its second row, against each
+program as it stands at its first screen:
+
+| | 16 bits | 32 bits, before | 32 bits, now |
+|---|---|---|---|
+| AX, CX, SI, DX, DS, ES, the flags | `4B00 2222 1111 0201 25E6 26F1 0202` | `4B00 2222 1111 0271 25E6 25E6 0202` | `4B00 2222 1111 0201 25E6 26F1 0202` |
+| `break` typed at DOS's prompt behind it | on | off | on |
+| Interrupts of real mode that go elsewhere than before | 1Bh and 22h, into the ended program | 22h, to the parent's own call | 22h, into the block, `3391:0200` |
+| DOS's end code, its largest block, the memory above the megabyte, the mode | `0009 7898 3B80 0010` | the same | the same |
+
+DX in the parent is what the parent had there when it ran the program,
+with the low byte made the break state: `ended.asm` has its name at
+0271h, so 0201h, and `p.com` of the scenario at 01A8h, so 0101h, in
+both programs. D2 took the 02DFh, 0271h and 0260h of its three runs
+for DOS's own: they were the toy's own DX as the toy was edited.
+
+The scenario: `python3 harness/compare.py build/portable_c32/VC.EXE
+ended` passes with `harness/goldens/portable_c/ended.patch`, 45
+screens and the disks, both rows of registers `2222 1111 EE4F ####
+0000 0202`; so does the program of 16 bits, as before. No patch of the
+32-bit tree's own, and no word of `DEVIATIONS.md` for the registers:
+they are the same.
+
+The toy, `python3 harness/trial32/both.py`: 29 screens for 28 steps,
+the same in both builds and for both countries, and none of its pages
+is of "what is not made" any more. Its last page takes the end twice
+and gives it back twice, and writes whether the PSP names another
+address or the one that it had; then it takes the end once more and
+ends so, with `ProgramEnd` and no `Give`. DOS then goes on in the
+routine of either build, as when another program ends the toy, and the
+last step types `break` at DOS's prompt: "BREAK is on" in both, where
+the toy had switched it off.
+
+**What is not the same in 32 bits, and cannot be.**
+
+- Ctrl-Break, INT 1Bh. The program of 16 bits, like the original,
+  never gives it back when DOS ends it, and it goes into memory that
+  is free from then on. The extender gives back every interrupt that
+  the program took through it before DOS sees the call. Making that
+  the same would be to break the machine on purpose.
+- Where INT 22h goes afterwards, which DOS sets from the PSP: into the
+  block, where it goes into the ended program in 16 bits. Both are
+  memory that DOS has freed, and DOS sets the interrupt anew when it
+  next runs a program.
+- What DOS is handed at that 3301h in the registers that the call does
+  not read: DH, DS and the others are as they came from the program
+  that started this one, which is what the original hands DOS there;
+  the 16-bit portable C has DH 0 and DS on the main data. For W, with
+  the rest of what entry 6 of `DEVIATIONS.md` is to say of 32 bits.
+
+**A second copy.** Each copy has a PSP and a block of its own, with
+its own routine and its own three things behind it, and neither reads
+or writes the other's. In `ended` the copy that DOS ends is the second:
+its routine tells DOS what it found when it started, which is what the
+first copy had put back before it ran the command, on; the first copy
+then notes that behind the command, as it does behind every command.
+Before this piece the second copy left it off, the first noted off,
+and put off back when it left: `BREAK` was off for good.
+
+**What `ended` does not show, for W.** The scenario passes with the
+16-bit program's patch, whose reason says that the second copy has no
+memory to run a command. In 32 bits it has: at `"p" Space "t" Enter`
+the second copy runs `t.com`, which stays in the memory, 448 bytes,
+and is not released when DOS ends the copy, since the portable C keeps
+no list of such programs (`DEVIATIONS.md`, 7). Seen with `mem /c`
+typed behind the scenario's steps: a line `T 448` between the first
+copy and its `COMMAND`, and 170K for the largest program where 364K
+are free; the 16-bit program has no such line. `p.com` clears the
+screen, so no screen of the scenario differs. The row of `ended` in
+entry 1's table, and the patch's reason, say what is so of 16 bits
+only: W has them to write for the program of 32 bits, by the user's
+word that the deviation says only what still differs.
+
+**Not tried.**
+
+- Any DOS but the bench's FreeDOS, and the extender under a host of its
+  own kind: with EMM386 or in a DOS box of Windows the extender goes
+  another way into protected mode, and whether it then sees the call
+  that ends the program in real mode, and takes itself out before DOS
+  goes on, was not seen. The bench has neither.
+- A program that DOS ends while a critical error's box is up, or
+  inside a call of real mode: the routine reads nothing of the
+  program, so it does what it does; what the extender does there is
+  the question.
+
+**The scenarios' test under load, a flaw of the harness.** While this
+piece was tested, four other agents' suites ran on the machine, with a
+load of 17 to 38. The test of the program of 32 bits then took 886 and
+978 seconds where it takes 194, and each time, and in the run of
+`--record` between them, it stopped `blank-timed` at its step of 1,300
+ticks, which did not end within the 300 seconds that a step has: "on
+the record, and fails". The program as it was before this piece, kept
+as `build/p32-base/portable_c32/VC.EXE` and run beside the new one,
+stopped at the same step the same way, so it is not this piece's; and
+by itself, with a load of 17, the scenario passed in 103 seconds. H3
+wrote that a machine's second is long while this program idles: with
+the machine that busy, the 71 seconds of that step are longer than the
+limit. Every other scenario of the record passed in all three runs,
+`ended` among them. So the record was not written by `--record`, which
+writes nothing while a scenario of the record fails: `ended` was put
+into `harness/pass32.txt` by hand, at its place in the order of the
+scenarios, which is the line that `--record` would have added. When
+the piece landed, behind C1, the whole suite passed, fourteen tests of
+fourteen, with a load of 22 to 31: `blank-timed` ended in time, and the
+test held the record of 155 to be what passes, no more and no fewer.
+What would mend it is not this piece's and was not tried: fewer instructions
+at an idle round of the driver for a flat program, or more time for a
+step that waits by `Wait*`, as a scenario that is not on the record
+already has (`short_step` of `harness/ported.py`).
+
+For whoever takes Quick execute out: `LOW_SHELL` and `LOW_KEPT` are 48
+bytes of the block in front of `LOW_ENDED`; the places behind them can
+move down, since `Ended_T` is written by their names.
 
 ## The portable C in 32 bits: what a trial on the bench showed
 

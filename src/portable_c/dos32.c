@@ -60,9 +60,8 @@
  *
  * The program begins here too, at Start, where the extender enters it.
  *
- * The file has three parts: the functions of sys.h that are made here,
- * 96 of the 98, fourteen of them in real mode; the 2 that are not,
- * which do nothing and say why; and the start of the program.
+ * The file has two parts: the functions of sys.h, fourteen of them made
+ * in real mode, and the start of the program.
  */
 #include "vc.h"
 
@@ -233,7 +232,10 @@ static void MouseState(u32 eax, struct MouseAt *state);
                   names, 16 bytes each
      LOW_SHELL    instructions of real mode around the shell's
                   interrupt, and the four bytes in which they keep the
-                  stack */
+                  stack
+     LOW_ENDED    instructions of real mode for where DOS goes on when
+                  it has ended the program by another's hand, and the
+                  seven bytes that they read: see ProgramEndedTake */
 static u16 LowSeg = 0;
 
 #define LOW_NAME    0
@@ -246,7 +248,11 @@ static u16 LowSeg = 0;
 #define LOW_FCB2    448
 #define LOW_SHELL   464
 #define LOW_KEPT    496
-#define LOW_SIZE    512
+#define LOW_ENDED   512
+#define LOW_WAS     544
+#define LOW_PSP     548
+#define LOW_BREAK   550
+#define LOW_SIZE    560
 #define LOW(place) ((u8 *)(((u32)LowSeg << 4) + (place)))
 
 #define DPMI_SEGMENT_BASE 0x0006        /* where the segment of the
@@ -1855,39 +1861,101 @@ void IntOn(void)
     _enable();
 }
 
-/*
- * The 2 functions of sys.h that are not made here: the two for the
- * system ending the program. Each does nothing, and what they are to do
- * is the user's to decide.
- */
+/* The program ended by another's hand. DOS then goes on at the address
+   that the program's PSP has at 0Ah, in the program that started this
+   one, and while the program has taken its end, the PSP names a routine
+   there instead, as in dos.c, where that is Exit01: read it there.
 
-/* The program ended by another's hand: nobody is told. dos.c has the
-   PSP name a routine of its own for where DOS goes on when the program
-   has ended, which calls `told` and then goes on where DOS would have,
-   in the program that started this one, with registers that the
-   original leaves for it.
+   Here the routine cannot be the program's code. The program that DOS
+   ends is the extender's: the extender has INT 21h of real mode while
+   the program runs, sees the call that ends it, and takes itself out
+   before DOS does anything, the interrupts with it that the program has
+   taken through it, and the memory above the megabyte that the program
+   is in (tried with the toy harness/trial32/ended.asm, which has DOS
+   end the program at an idle call as the scenario `ended` does). Where
+   DOS goes on, the machine is in real mode and nothing of the program
+   can run.
 
-   Here the program that DOS ends is the extender's. It was tried, with
-   the toy harness/trial32/ended.asm, which has DOS end the program at
-   an idle call as the scenario `ended` does: the extender has INT 21h
-   of real mode while the program runs, sees the call that ends it, and
-   takes itself out before DOS does anything, the interrupts with it
-   that the program has taken through it. DOS then goes on in the
-   program that started this one, where the PSP says, with what DOS
-   leaves in the registers. Nothing of the program runs, and by then
-   nothing of it could in protected mode. So `told` is never called,
-   and what the program would put back there is left as it is: DOS goes
-   on looking for Ctrl-C as the program set it. What is to be done
-   about that is open (TODO.md, "The portable C in 32 bits: the plan",
-   what is open, 4, and the piece D2). */
+   So the routine is eight instructions of real mode in the block below
+   the megabyte, written here as their bytes: the compiler writes for a
+   segment of 32 bits, and what it writes means something else in one
+   of 16. DOS has freed the block by then, with the rest of the
+   program's memory, and its bytes are still there, as those of the
+   program are where Exit01 runs. It does what Exit01 and Exit05 of
+   dos.c do, on the stack of the program that started this one: DOS is
+   told to look for Ctrl-C as the program has said, AX 3301h, with AX
+   kept around it; ES is put on the segment of this program's PSP; the
+   flags are made those of the segment that the program goes on in
+   compared with 0, by the last instruction that sets any; and it goes
+   on where the PSP said before. DL is what DOS was told of Ctrl-C, and
+   every other register is as it came. What it reads is behind it in
+   the block, through CS: where the PSP had DOS go on, the PSP's
+   segment, and what the program has said of Ctrl-C.
 
-void ProgramEndedTake(ProgramEndedFn *told)
+   What is not as in 16 bits afterwards is the extender's doing and
+   cannot be: Ctrl-Break, INT 1Bh, goes where it went before the program
+   was started, where the program of 16 bits leaves it going into
+   memory that is free. And INT 22h, which DOS sets from the PSP, names
+   the block where it names the program in 16 bits.
+
+   A second copy of the program has a PSP and a block of its own, and
+   neither copy reads or writes the other's. */
+#define PSP_GOES_ON 0x0A                /* where DOS goes on when the
+                                           program has ended */
+
+/* A place of the block as the two bytes of an instruction's address. */
+#define LO(place) ((place) & 0xFF)
+#define HI(place) ((place) >> 8)
+
+static const u8 Ended_T[] = {
+    0x50,                                       /* push ax */
+    0xB8, 0x01, 0x33,                           /* mov ax,3301h */
+    0x2E, 0x8A, 0x16, LO(LOW_BREAK), HI(LOW_BREAK),
+                                                /* mov dl,cs:[LOW_BREAK] */
+    0xCD, 0x21,                                 /* int 21h */
+    0x58,                                       /* pop ax */
+    0x2E, 0x8E, 0x06, LO(LOW_PSP), HI(LOW_PSP), /* mov es,cs:[LOW_PSP] */
+    0x2E, 0x83, 0x3E, LO(LOW_WAS + 2), HI(LOW_WAS + 2), 0,
+                                                /* cmp word ptr
+                                                   cs:[LOW_WAS+2],0 */
+    0x2E, 0xFF, 0x2E, LO(LOW_WAS), HI(LOW_WAS)  /* jmp dword ptr
+                                                   cs:[LOW_WAS] */
+};
+
+/* Where the PSP has DOS go on. */
+#define GOES_ON (*(u32 *)(Psp + PSP_GOES_ON))
+
+/* Where the PSP had DOS go on before the program took its end, and 0
+   while the program has not taken it; and what the program has said
+   that DOS is to be told of Ctrl-C, which the routine has in the block
+   from the moment that it is said. */
+static u32 EndedWas = 0;
+static u8 EndedBreak = 0;
+
+void ProgramEndedBreakCheck(u16 on)
 {
-    (void)told;
+    EndedBreak = (u8)on;
+    *LOW(LOW_BREAK) = EndedBreak;
+}
+
+void ProgramEndedTake(void)
+{
+    if (EndedWas == 0) {
+        EndedWas = GOES_ON;
+        Bytes(LOW(LOW_ENDED), Ended_T, sizeof Ended_T);
+        *(u32 *)LOW(LOW_WAS) = EndedWas;
+        *(u16 *)LOW(LOW_PSP) = (u16)((u32)Psp >> 4);
+        *LOW(LOW_BREAK) = EndedBreak;
+        GOES_ON = (u32)LowSeg << 16 | LOW_ENDED;
+    }
 }
 
 void ProgramEndedGive(void)
 {
+    if (EndedWas != 0) {
+        GOES_ON = EndedWas;
+        EndedWas = 0;
+    }
 }
 
 /*

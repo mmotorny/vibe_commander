@@ -387,7 +387,9 @@ const u8 FAR *ProgramEnvironment(void);
  * program takes each, and what it has taken it may give back to whoever
  * had it before, which is what Note is for: Note first, Take, and Give
  * when another program is to have it as this one found it. The last of
- * them is the system ending the program.
+ * them is the system ending the program, with which it does not come to
+ * the program at all: for that the program says beforehand what is to
+ * be done.
  */
 
 /* A device that does not do what the system wants of it, while the
@@ -448,18 +450,24 @@ void CtrlCTake(void);
 /* The program ended by another's hand. DOS ends whatever program it has
    as the current one when it is told to, by a program that this one has
    run and that has stayed in the memory, say, and with no word to the
-   program. Once the program has taken that, it is told, by a function
-   of this kind: the system calls it when it has ended the program,
-   before the program that started this one goes on. The function puts
-   back what the program has changed of the system and the system does
-   not put back by itself, and returns. It may ask what the program asks
-   when it leaves by itself, and nothing else; and it is entered on a
-   stack that is not the program's.
+   program: nothing of the program is asked then, and where the program
+   runs under a DOS extender nothing of it could be, since the extender
+   is gone by then and the program's memory with it. So the program
+   says beforehand what it has changed of the system that the system
+   does not put back by itself. Once the program has taken its end, the
+   system puts that back when it has ended the program, and then the
+   program that started this one goes on. It is one thing:
 
-   Take, and Give before the program ends itself: then nobody is told,
-   and the program does for itself what the function would. */
-typedef void ProgramEndedFn(void);
-void ProgramEndedTake(ProgramEndedFn *told);
+     ProgramEndedBreakCheck   whether the system is then to look for
+                              Ctrl-C whatever it is asked, 1 or 0, as
+                              SetBreakCheck takes it: what the program
+                              found. Said whenever the program has
+                              found it anew, before Take or after
+
+   Take, and Give before the program ends itself: then nothing is put
+   back, and the program does that for itself. */
+void ProgramEndedBreakCheck(u16 on);
+void ProgramEndedTake(void);
 void ProgramEndedGive(void);
 
 /*

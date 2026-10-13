@@ -48,10 +48,13 @@
    critical error, where the toy is asked from inside a call of DOS and
    a step of the script ends there; Ctrl-Break and Ctrl-C.
 
-   The last page asks the functions that dos32.c does not make
-   (both.py, NOT_MADE): the two for the program ended by another's
-   hand, which do nothing there. harness/trial32/ended.asm has DOS end
-   a program so. */
+   The last page is of the program ended by another's hand: its end
+   taken and given back, with what the PSP names meanwhile, and taken
+   once more and left so where the toy ends. DOS then goes on where it
+   does when another program has it end this one, and the step behind
+   the toy's last asks the shell what DOS has been told of Ctrl-C there.
+   harness/trial32/ended.asm has DOS end a program by another's hand,
+   and prints the registers that it gets back. */
 #include "vc.h"
 
 /* The main data, which the functions keep two things in: ErrDat and
@@ -995,12 +998,6 @@ static void Second(void)
     ProgramEnd(5);
 }
 
-/* What the toy has the system tell it when DOS has ended it: nothing.
-   Nobody ends the toy. */
-static void Told(void)
-{
-}
-
 TEXT(Mask_S, "TOY?.DAT");
 TEXT(Toy1_S, "TOY1.DAT");
 TEXT(Lower_S, "hello.txt");
@@ -1367,18 +1364,40 @@ static void Breaks(void)
     Line();
 }
 
-/* The functions that dos32.c does not make yet: both.py knows the page
-   by its first line. */
-static void Later(void)
+/* The program ended by another's hand. The system has the PSP name a
+   routine of its own for where DOS goes on, at 0Ah, while the program
+   has taken its end: the address there is read, and whether it is
+   another or as it was is written, since the address itself follows
+   the build. Taking twice takes once, and so does giving back.
+
+   Then the end is taken once more and left so, with DOS to be told to
+   look for Ctrl-C at every call, which Breaks above has switched off:
+   Main ends the toy without giving its end back, DOS goes on in the
+   system's routine as if another program had ended the toy, and the
+   shell is asked afterwards, by the last step of the script, what DOS
+   does. */
+static void Ended(void)
 {
-    SAY("Not made in dos32.c yet:");
+    const u32 FAR *goes = (const u32 FAR *)(ProgramTail() - 0x81 + 0x0A);
+    u32 was = *goes, taken;
+
+    SAY("The program ended by another's hand, what the PSP names:");
     Line();
-    /* The end of the toy by another's hand, taken and given back: in 16
-       bits the PSP names a routine of dos.c meanwhile, and the toy ends
-       as it did, behind this, into the program that started it. */
-    ProgramEndedTake(Told);
+    ProgramEndedBreakCheck(0);
+    ProgramEndedTake();
+    taken = *goes;
+    SAY("taken, another "); H2(taken != was);
+    ProgramEndedBreakCheck(1);
+    ProgramEndedTake();
+    SAY("taken again, the same "); H2(*goes == taken);
     ProgramEndedGive();
-    SAY("ProgramEnded taken, given back");
+    SAY("given back, as it was "); H2(*goes == was);
+    ProgramEndedGive();
+    SAY("given back again "); H2(*goes == was);
+    Line();
+    ProgramEndedTake();
+    SAY("taken and left so, the same as before "); H2(*goes == taken);
+    SAY("BreakCheck "); H4(BreakCheck());
     Line();
 }
 
@@ -1427,13 +1446,14 @@ void Main(void)
     Page(0);
     Breaks();
     Page(0);
-    Later();
+    Ended();
     Page(0);
-    /* The toy ends as the program does: it gives Ctrl-Break back, and
-       leaves the critical error and Ctrl-C taken, which DOS puts back
-       by itself in 16 bits and ProgramEnd of dos32.c in 32. An
-       interrupt that is left taken there has the extender write a
-       warning under the last line. */
+    /* The toy ends as the program does, but for its end, which it has
+       left taken (see Ended): it gives Ctrl-Break back, and leaves the
+       critical error and Ctrl-C taken, which DOS puts back by itself
+       in 16 bits and ProgramEnd of dos32.c in 32. An interrupt that is
+       left taken there has the extender write a warning under the last
+       line. */
     CtrlBreakGive();
     SAY("ProgramEnd 7");
     Line();

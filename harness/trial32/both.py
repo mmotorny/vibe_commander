@@ -12,16 +12,12 @@ Each is run by run.py, on a bench of its own, as VC.EXE; what run.py
 prints of their screens is held one against the other, line for line.
 
 A line that differs is printed as both have it, under the step whose
-screen it is of. Two kinds of difference do not fail:
-
-  - On the page that begins with NOT_MADE, the functions that dos32.c
-    does not make yet.
-  - A line that EXPECTED names: where DOS/32A answers otherwise than
-    DOS and dos32.c does not hide it. Each entry says what differs and
-    why, and is a difference in the program too, for the pieces of the
-    plan that follow (TODO.md, "The portable C in 32 bits").
-
-Both kinds are counted and, with --show, printed.
+screen it is of. One kind of difference does not fail: a line that
+EXPECTED names, where DOS/32A answers otherwise than DOS and dos32.c
+does not hide it. Each entry says what differs and why, and is a
+difference in the program too, for the pieces of the plan that follow
+(TODO.md, "The portable C in 32 bits"). They are counted and, with
+--show, printed.
 
 Anything else is a mistake of dos32.c, or a finding. It ends with 1 if
 there is any, and also when an entry of EXPECTED no longer differs, so
@@ -40,17 +36,15 @@ HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
 OUT = ROOT / "build" / "trial32"
 
-# The steps of the script, one behind each page of the toy but the last:
-# keys with and without Shift, Ctrl and Alt, a key of the cursor, a
-# button of the mouse.
+# The steps of the script, one behind each page of the toy: keys with
+# and without Shift, Ctrl and Alt, a key of the cursor, a button of the
+# mouse. The last is typed at DOS's prompt, when the toy has ended with
+# its end left taken: the shell says what DOS has been told of Ctrl-C by
+# the routine that DOS goes on in then.
 STEPS = ["a", "F5", "Shift+F6", "Alt+F1", "Ctrl+o", "Up", "Tab",
          "Click@3,5", "Ins", "m", "n", "p", "2", "3", "o",
          "r", "f", "x", "f", "f", "d", "f", "f", "Ctrl+Break", "Ctrl+c",
-         "l", "q"]
-
-# The first line, behind the one that says what turned the page, of the
-# page of the functions that dos32.c does not make yet.
-NOT_MADE = "Not made in dos32.c yet:"
+         "l", "q", '"break" Enter']
 
 # Where the two are known to differ, and why: the text that the line of
 # the 16-bit toy begins with or holds, and the reason.
@@ -92,8 +86,7 @@ def main():
     parser.add_argument("--country", default="us", choices=["us", "ru"])
     parser.add_argument("--show", action="store_true",
                         help="print every screen of the 16-bit toy, and "
-                             "also what differs as expected and on the "
-                             "page of what is not made yet")
+                             "also what differs as expected")
     parser.add_argument("--keep", action="store_true",
                         help="keep what the driver wrote and the disks, "
                              "as build/trial32/sys-16.out and sys-32.out "
@@ -102,7 +95,7 @@ def main():
 
     old = screens("16", args.country, args.keep)
     new = screens("32", args.country, args.keep)
-    wrong = later = 0
+    wrong = 0
     met = set()
     for number, (was, now) in enumerate(zip(old, new)):
         step = (["the start"] + STEPS)[number]
@@ -110,7 +103,6 @@ def main():
             print(f"== {number}: {step}")
             for line in was:
                 print("  |" + line)
-        not_made = len(was) > 1 and was[1] == NOT_MADE
         rows = max(len(was), len(now))
         for row in range(rows):
             first = was[row] if row < len(was) else ""
@@ -118,12 +110,7 @@ def main():
             if first == second:
                 continue
             known = [text for text in EXPECTED if text in first]
-            if not_made and row > 0:
-                later += 1
-                if not args.show:
-                    continue
-                kind = "not made yet"
-            elif known:
+            if known:
                 met.update(known)
                 if not args.show:
                     continue
@@ -139,8 +126,7 @@ def main():
             wrong += 1
             print(f"expected to differ, and does not: {text!r}")
     print(f"{len(STEPS) + 1} screens; {wrong} lines differ that should "
-          f"not, {len(met)} of {len(EXPECTED)} differ as expected, and "
-          f"{later} are of what dos32.c does not make yet")
+          f"not, and {len(met)} of {len(EXPECTED)} differ as expected")
     sys.exit(1 if wrong else 0)
 
 

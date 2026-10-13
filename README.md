@@ -661,29 +661,29 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,070 bytes |
+| `VC.EXE` | 197,084 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 64,014 bytes |
+| more than the C translation's 133,056 bytes | 64,028 bytes |
 | The relocations in its header, which DOS applies | 1,033 |
-| What it keeps of the memory while a command runs: the program and its panels | 206,688 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,848 bytes |
-| The code segment `CTEXT` ends at | D0F3h, 7,949 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C74Ch, 10,420 bytes below the limit, F000h |
+| What it keeps of the memory while a command runs: the program and its panels | 206,704 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,832 bytes |
+| The code segment `CTEXT` ends at | D0E9h, 7,959 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C76Ah, 10,390 bytes below the limit, F000h |
 | Inline assembly | 55 instructions in 9 pieces: 55 in 9 of `dos.c` |
 | Lines of `#pragma aux` | 17, of which 6 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
 | `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 752, 106, 262, 92 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
-| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,431 bytes, of which the extender's stub is 27,536 |
-| Its code, and what the file has of its data | 132,814 and 104,567 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,369 bytes |
-| The addresses in it that the extender sets when it loads it | 5,298 |
+| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,587 bytes, of which the extender's stub is 27,536 |
+| Its code, and what the file has of its data | 133,025 and 104,603 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,616 bytes |
+| The addresses in it that the extender sets when it loads it | 5,316 |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c32-data` holds them | 643 and 555 |
 | Its stack | 16,384 bytes |
-| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,172 and 16,428 bytes |
-| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,368 and 2,347 bytes |
-| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 400,911 bytes, 223,844 of them code |
+| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,184 and 16,388 bytes |
+| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,332 and 2,347 bytes |
+| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 401,071 bytes, 224,088 of them code |
 | Inline assembly of `dos32.c`, which the program of 32 bits has in place of that of `dos.c` | 98 instructions in 13 pieces |
 
 <!-- The end of the figures. -->
@@ -882,7 +882,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 98 functions
+In the portable C that place is `src/portable_c/sys.h`: 99 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
 has the file clean. `dos.c` is those functions for DOS on a PC, and the
@@ -900,7 +900,7 @@ file beside it.
 | Memory: a block taken, given back, made another size, where the system looks for one, and the program's own block made as long as the program | 6 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
 | Other programs: one run, with what it is told behind its name; a command handed to the shell that this one was started from; this one ended, on an old DOS too; what this one was told when it was started, and its environment | 7 |
-| What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again; the program told when the system has ended it, taken and given back | 10 |
+| What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again; what the system is to put back when it has ended the program, said, taken and given back | 11 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
 | The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, the font of an EGA and what Print Screen prints of its rows, where the cells are and the cells themselves | 17 |
@@ -953,11 +953,16 @@ name, DOS's number for what is wrong and whether DOS can try again, and
 hands DOS what it answers. The fourth thing that DOS enters is where it
 goes on when it has ended the program, by another program's hand: the
 PSP names a routine of `dos.c` for that, `Exit01`, while the program
-has taken its end, and that calls the function which the program
-handed over, `Exit02` of `resident.c`, which has DOS look for Ctrl-C as
-it did; then the program that started this one goes on, with the
+has taken its end. The program is not asked there. It says beforehand
+what it has changed of DOS that DOS does not put back by itself, which
+is one thing, whether DOS looks for Ctrl-C at every call
+(`ProgramEndedBreakCheck`, which `SetBrk` of `resident.c` says whenever
+it has noted that), and the routine has DOS look for it as the program
+said; then the program that started this one goes on, with the
 registers that the original leaves for it, which are `dos.c`'s to
-leave.
+leave. The header has it so, as a value and not as a function of the
+program's to be called, because [the program of 32
+bits](#the-program-of-32-bits) cannot be called there: see below.
 
 Not in the header, and in `dos.c` all the same, is what only DOS on a
 PC has: where DOS enters the program, `Alloc0`, which asks DOS where
@@ -1148,11 +1153,23 @@ have how many such words there are.
 The test `portable_c32-scenarios` takes it through the scenarios of the
 portable C, and holds it to a record of those that it passes,
 `harness/pass32.txt`, which has most of them and not yet all:
-[Testing](#testing) says how. `dos32.c` has 96 of the 98 functions of
-`sys.h`; the two that it has not are those by which the program is told
-that DOS has ended it by another program's hand, which do nothing
-there. By hand it is started on the bench of the tests as any program
-is:
+[Testing](#testing) says how. `dos32.c` has every function of `sys.h`.
+
+When DOS ends the program by another program's hand, nothing of a
+program of 32 bits can run: the extender sees the call in real mode and
+takes itself out first, with the memory above the megabyte that the
+program is in. So where the PSP has DOS go on then is eight
+instructions of real mode that `dos32.c` keeps in its block below the
+megabyte, written there as their bytes, `Ended_T`: they have DOS look
+for Ctrl-C as the program has said, leave the registers that `Exit05`
+of `dos.c` leaves, and go on where the PSP said before. The scenario
+`ended` shows the same registers for both programs. One thing is left
+otherwise, by the extender: Ctrl-Break goes where it went before the
+program was started, where the program of 16 bits, like the original,
+leaves it going into memory that is free.
+
+By hand the program is started on the bench of the tests as any
+program is:
 
 ```sh
 mkdir -p build/tmp

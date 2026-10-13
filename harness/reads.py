@@ -238,6 +238,8 @@ REVIEWED = {
        for text in ("NoRun_S", "FnFil_S", "BadFl_S", "Retr_S", "Aloc_S")},
     ("dos32.c", "Shell_T"): (OWN, "ShellRun copies it whole, by its "
                                   "size"),
+    ("dos32.c", "Ended_T"): (OWN, "ProgramEndedTake copies it whole, by "
+                                  "its size"),
     ("dos32.c", "NoStart_S"): (35, "DOS writes it as far as its dollar "
                                    "sign, which is its last byte but the "
                                    "zero"),

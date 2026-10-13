@@ -22,9 +22,10 @@
  * The interrupts that the program takes arrive here as well, DOS's
  * critical error, Ctrl-Break and Ctrl-C, at interrupt functions of the
  * compiler; and so does DOS when it has ended the program, at one more.
- * What the program does about the first and the last is the program's: a
- * function of its own that it hands over, and that is called from here
- * as any function is.
+ * What the program does about the first is the program's: a function of
+ * its own that it hands over, and that is called from here as any
+ * function is. About the last it does nothing: DOS is told there what
+ * the program has said beforehand.
  *
  * The file has two parts: the functions of sys.h, and behind them what
  * is of DOS alone and no part of sys.h, where the PSP is and where DOS
@@ -813,11 +814,7 @@ struct SysVersion SystemTrueVersion(void)
 }
 
 /* Ctrl-C, AX 3300h and 3301h: DL is 1 if DOS looks for it at every
-   call. What DOS was last told is kept: where DOS has ended the
-   program, Exit05 below, the program that started it goes on with that
-   in DL, as the original leaves it there from this call. */
-static u8 BreakTold;
-
+   call. */
 u16 BreakCheck(void)
 {
     struct DosRegs regs;
@@ -832,7 +829,6 @@ void SetBreakCheck(u16 on)
 {
     struct DosRegs regs;
 
-    BreakTold = (u8)on;
     regs.ax = 0x3301;
     regs.name = NUMBER(on & 0xFF);
     Tell(REGS(regs));
@@ -1116,11 +1112,13 @@ void CtrlCTake(void)
    still in it, on the stack of the program that started this one. DOS
    is not asked for any of this: the PSP is read and written. */
 
-/* Where the PSP had DOS go on before the program took that. */
+/* Where the PSP had DOS go on before the program took that, and 0
+   while the program has not taken it. */
 static u32 Vect22;
 
-/* The function that the program has handed ProgramEndedTake. */
-static ProgramEndedFn *EndedTell;
+/* What the program has said that DOS is to be told of Ctrl-C then:
+   ProgramEndedBreakCheck. */
+static u8 EndedBreak;
 
 /* The flags, as an instruction of arithmetic leaves them: the assembly
    goes on in the program that started this one with the flags as its
@@ -1172,16 +1170,17 @@ static u16 Taken(u16 a, u16 b)
 }
 
 /* Where DOS goes on when it has ended the program, Exit01, and the
-   interrupt function that it goes on in, Exit05: the program is told,
-   by the function that it handed over, and then the program that
+   interrupt function that it goes on in, Exit05: DOS is told to look
+   for Ctrl-C as the program has said, which is what the original's
+   Exit02 does there with nothing to release, and then the program that
    started this one goes on where it would have, with the stack as it
    is, and with the registers and the flags as the assembly leaves its
    own where it has taken no interrupt, without what is gone (see
    DEVIATIONS.md): ES on the segment of this program's PSP, and in DL
-   what DOS was last told of Ctrl-C, which is what the program's
-   function tells it. The others are as they came, DS and the high byte
-   of DX among them, where the original that has taken INT 21h and INT
-   27h leaves the address that the second went to before. The flags are
+   what DOS was just told of Ctrl-C, which the original has there from
+   that call. The others are as they came, DS and the high byte of DX
+   among them, where the original that has taken INT 21h and INT 27h
+   leaves the address that the second went to before. The flags are
    those of the segment that the program goes on in, compared with 0.
 
    That is done by four instructions of assembly, room on the stack for
@@ -1212,24 +1211,33 @@ void __interrupt __far Exit05(struct Saved r, struct Frame on)
 {
     u16 segment = (u16)(Vect22 >> 16);
 
-    EndedTell();
+    SetBreakCheck(EndedBreak);
     r.es = PspSeg;
-    r.dx = r.dx & 0xFF00 | BreakTold;
+    r.dx = r.dx & 0xFF00 | EndedBreak;
     on.flags = on.flags & ~FLAGS_RESULT | Taken(segment, 0);
     on.ip = (u16)Vect22;
     on.cs = segment;
 }
 
-void ProgramEndedTake(ProgramEndedFn *told)
+void ProgramEndedBreakCheck(u16 on)
 {
-    EndedTell = told;
-    Vect22 = PSP_ADDRESS(PSP_GOES_ON);
-    PSP_ADDRESS(PSP_GOES_ON) = HANDLER(Exit01);
+    EndedBreak = (u8)on;
+}
+
+void ProgramEndedTake(void)
+{
+    if (Vect22 == 0) {
+        Vect22 = PSP_ADDRESS(PSP_GOES_ON);
+        PSP_ADDRESS(PSP_GOES_ON) = HANDLER(Exit01);
+    }
 }
 
 void ProgramEndedGive(void)
 {
-    PSP_ADDRESS(PSP_GOES_ON) = Vect22;
+    if (Vect22 != 0) {
+        PSP_ADDRESS(PSP_GOES_ON) = Vect22;
+        Vect22 = 0;
+    }
 }
 
 /* The console: AH 6, with the character in DL, and AH 9. */

@@ -20,10 +20,9 @@
  *
  * The second is the commands: Exec runs those that the command line
  * holds, DosBuf, by COMMAND.COM or by handing them to the shell that the
- * program was started from; and what the program does when it leaves,
- * or when DOS has ended it. The system calls Exit02 then, on the stack
- * of the program that started this one: nothing there takes the stack
- * to be the program's own.
+ * program was started from; and what the program does when it leaves.
+ * Where DOS ends it by another's hand, nothing of it is entered: the
+ * system puts back what the program has said beforehand, SetBrk.
  *
  * The original has a third here, which takes INT 21h, DOS's own
  * interrupt, while the program runs and while a command runs from it.
@@ -121,21 +120,23 @@ static u16 NotFind(const u8 *text, const u8 __far *name)
 }
 
 /* Note whether DOS looks for Ctrl-C at every call, have it not do so,
-   and take Ctrl-C: when the program starts, and after every command. */
+   and take Ctrl-C: when the program starts, and after every command.
+   What was noted is what DOS is to be told again if it ends the program
+   by another's hand, and the system is told that at once, since the
+   program is not asked then: see TakeEnd. */
 void SetBrk(void)
 {
     md.BreakFl = (u8)BreakCheck();
+    ProgramEndedBreakCheck(md.BreakFl);
     SetBreakCheck(0);
     CtrlCTake();
 }
 
-/* What the program puts back when it leaves, and when DOS has ended
-   it: DOS looks for Ctrl-C as it did. The system calls this where DOS
-   has ended the program (see ProgramEndedTake of sys.h), on the stack
-   of the program that started this one, and Exit00 where the program
-   leaves by itself. What the program that started this one then goes
-   on with, the registers that the scenario ended shows, is the
-   system's: Exit05 of dos.c.
+/* Leave the program with `code`: the system is told that the program
+   ends itself, so that the program that started this one goes on where
+   it would have, the PSP's address for that being as it was; DOS looks
+   for Ctrl-C as it did, which is what the program puts back when it
+   leaves, Exit02 of the original; and DOS ends this one.
 
    The original first releases the programs that have stayed in the
    memory since it was started, by the list that its watch on DOS keeps,
@@ -143,26 +144,25 @@ void SetBrk(void)
    watch; the portable C keeps no such list and takes neither interrupt
    (see DEVIATIONS.md). What a command has left in the memory stays there
    when the program leaves. */
-static void Exit02(void)
-{
-    SetBreakCheck(md.BreakFl);          /* Exit01 */
-}
-
-/* Leave the program with `code`: the system is told that the program
-   ends itself, so that the program that started this one goes on where
-   it would have, the PSP's address for that being as it was; and DOS
-   ends this one. */
 void Exit00(u16 code)
 {
     ProgramEndedGive();
-    Exit02();
+    SetBreakCheck(md.BreakFl);          /* Exit02 */
     ProgramEnd(code);                   /* Exit04 */
 }
 
-/* Have the program be told when DOS ends it: when the program has
-   started. On DOS the system has the PSP name a routine of its own for
-   that, Exit01 of dos.c, which calls Exit02. This was TakeDos while it
-   took INT 21h as well.
+/* Take the program's end: when the program has started. From now on,
+   if DOS ends the program by another's hand, the system has DOS look
+   for Ctrl-C as it did before the program that started this one goes
+   on, as SetBrk has last said: what Exit00 does where the program
+   leaves by itself. The original's Exit02 is both, entered from the
+   PSP at Exit01 where DOS has ended the program; here nothing of the
+   program is entered then, and the registers that the program which
+   started this one goes on with, which the scenario ended shows, are
+   the system's to leave. On DOS the system has the PSP name a routine
+   of its own for that: Exit01 of dos.c, and in the program of 32 bits
+   a few instructions of real mode that dos32.c keeps below the
+   megabyte. This was TakeDos while it took INT 21h as well.
 
    The original takes INT 21h here too, and INT 27h with it, if its
    setup has it know of the programs that stay in the memory, TSR manager
@@ -172,7 +172,7 @@ void Exit00(u16 code)
    setup in itself (see DEVIATIONS.md), and takes neither. */
 void TakeEnd(void)
 {
-    ProgramEndedTake(Exit02);
+    ProgramEndedTake();
 }
 
 /* No memory: say so and leave. `bx` is what the assembly has in BX

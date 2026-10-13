@@ -1450,11 +1450,12 @@ GONE["portable_c32"] = {
     **dict.fromkeys(
         ("Exit01", "Exit05_"),
         "where DOS goes on when it has ended the program by another "
-        "program's hand, of dos.c: under an extender DOS goes back to "
-        "the program that started this one through the extender's part "
-        "of real mode, and nothing of this program runs. What it is to "
-        "do about that is not decided (TODO.md, the plan for 32 bits, "
-        "\"Open, for the user\", 4)"),
+        "program's hand, of dos.c: under an extender nothing of the "
+        "program can run then, and DOS goes on in a few instructions "
+        "of real mode that dos32.c keeps below the megabyte, Ended_T "
+        "there, which are bytes of a table and no function. That they "
+        "ran is held by what the scenario ended shows of the "
+        "registers"),
 }
 RENAMED["portable_c32"] = {
     **RENAMED["portable_c"],

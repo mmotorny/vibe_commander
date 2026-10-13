@@ -2568,7 +2568,7 @@ is called both ways the bare function says so in its name.
 | INT 2Eh, COMMAND.COM's own | | `ShellRun(command)`, which comes back: the stack is kept and put back around the interrupt in `dos.c` |
 | 4Ch | bare | `ProgramEnd(code)` |
 | INT 20h, entered at the start of the PSP | | `ProgramEndOld()`, for a DOS before 3 |
-| The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake(told)` and `ProgramEndedGive()`: the PSP names `Exit01` of `dos.c` between the two, which calls `told` when DOS has ended the program |
+| The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake()` and `ProgramEndedGive()`: the PSP names `Exit01` of `dos.c` between the two, which has DOS told what the program has said beforehand, `ProgramEndedBreakCheck(on)`, when DOS has ended the program. It called a function of the program's, `told`, until the program of 32 bits had to do the same |
 | 51h | bare | No function of `sys.h`: the entry of the program, `Alloc0` of `dos.c`, asks where the PSP is, as the first thing that DOS is asked, by `ProgramPrefix`, static there. What is read in the PSP is `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
 | 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
 | 56h | asked | `FileRename(from, to)` |
@@ -2932,8 +2932,9 @@ function is added:
   them, in `SetStat` and at the entry. The row says what the original
   has, and the commit what the portable C had.
 - A function of `dos.c` may be entered on a stack that is not the
-  program's: `Exit02` is, from `Exit05`, when DOS has ended the
-  program, and asks by three of them. All of `dos.c` reaches its
+  program's: `SetBreakCheck` is, from `Exit05`, when DOS has ended the
+  program, as `Exit02` of `resident.c` was while `Exit05` called that.
+  All of `dos.c` reaches its
   registers through `STACK` pointers, so that works; it takes a few
   words more of the other program's stack than a structure in the
   caller did.
@@ -3057,11 +3058,29 @@ the 32 bits):
 - A register that the program that started this one is left with when
   DOS has ended the program is `dos.c`'s to leave, and it may be what a
   call of the program's left there: DL is what DOS was last told of
-  Ctrl-C. `dos.c` keeps that where it tells DOS, in `SetBreakCheck`, and
-  reads nothing of the program's for it.
+  Ctrl-C. `dos.c` has that from the program, which says it beforehand,
+  `ProgramEndedBreakCheck`, and reads nothing of the program's for it.
 - A function that is handed over and is static in its file is compiled
-  far and called through the pointer far, as `FtErr1` is: `Exit02` of
-  `resident.c` is called so by `Exit05`, and by its name from `Exit00`.
+  far and called through the pointer far, as `FtErr1` is.
+- What the system does when it has ended the program cannot be a
+  function of the program's that is called then: under an extender the
+  program is gone before DOS goes on, and nothing of it can run. So the
+  program says beforehand what is to be put back, a value, each time
+  that it has noted it anew (`SetBrk`), and each file of the system's
+  functions puts it back in its own way: `Exit05` of `dos.c` by the
+  function that tells DOS, `dos32.c` by eight instructions of real mode
+  in its block below the megabyte, `Ended_T`. A thing that a system may
+  have to do with the program gone is asked of the program as a value,
+  not as a function.
+- Instructions of real mode in `dos32.c` are bytes in a table, with the
+  instruction beside each as a comment, and the places that they read
+  behind them in the block, read through CS: the compiler writes for a
+  segment of 32 bits. `ndisasm -b16` reads the bytes back; what holds
+  them is the bench: `harness/trial32/ended.asm` run against the
+  program, which prints the registers that it gets back and whether
+  DOS looks for Ctrl-C again, the scenario `ended`, and the toy of
+  `both.py`, which ends with its end left taken so that DOS goes on in
+  the routine of either build.
 - `_asm` in a function that is static and naked: the function is near,
   `ret` is a near return, and the call of it is near. `seg` of a
   variable of the program's data is the segment of its group, `DGROUP`,

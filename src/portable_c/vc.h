@@ -423,7 +423,8 @@ extern u8 __far Stack[];
 /* What the program knows of DOS around it, resident.c. Of its routines
    there, Alloc3 is what the program does first: it looks at the version
    of DOS and keeps no more of the memory than it is.
-   TakeEnd has the program be told when DOS ends it. SetBrk
+   TakeEnd has the system put back what SetBrk has changed if DOS ends
+   the program. SetBrk
    notes whether DOS looks for Ctrl-C at every call, has it not do so,
    and takes Ctrl-C, so that nothing happens for it. Exec runs the
    commands of DosBuf. AlocEr

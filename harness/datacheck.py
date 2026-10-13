@@ -212,6 +212,11 @@ OWN_OF_FLAT = {
                    "with the stack kept round it: the program of 16 bits "
                    "has them as code, Int2E of dos.c, and so has the "
                    "original",
+        "Ended_T": "the instructions that dos32.c puts below the megabyte "
+                   "for where DOS goes on when it has ended the program "
+                   "by another's hand, in real mode: the program of 16 "
+                   "bits has them as code, Exit01 and Exit05 of dos.c, "
+                   "and the original as its Exit01 and Exit02",
         "NoStart_S": "what dos32.c says where the extender has no memory "
                      "below the megabyte for it: the words of the "
                      "original's Aloc_S, which the tree has in resident.c "
