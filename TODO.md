@@ -306,8 +306,9 @@ one byte of `StOpen` more.
   file is read or written and while the box S0 shows it: whatever else
   looks for a file of the program while setup is open, the help file,
   finds the directory there (`MainFil` of `string.c`).
-- The pages of the help, up to 8,155 bytes: `TreeBuf` of the main data
-  is 12.3 KB and free while setup is open, since a panel that shows
+- The pages of the help, up to 8,155 bytes, are in `TreeBuf` of the
+  main data (`StHelpBuf` of `sthelp.c`), which is 12.3 KB and free
+  while setup is open, since a panel that shows
   the tree reads it anew when setup has been left, as after a command
   (`ReDir` of `read.c`, with `ChgFlg` set by `IniData`); and so is
   `InfBuf`, 1.4 KB. `HelpBuf` is the main program's help, 3,000 bytes,
@@ -351,7 +352,7 @@ batch, with what no scenario reaches.
 | 0b, setup entered and left. Done | `stmain.c`, `stmain_t.c`; the item of the menu in `menu.c`, `commands_t.c`, `main.c`, `vc.h`, with its tables declared in `harness/datacheck.py`; the three places that are told of setup, in `bars.c` with the bars' tables, `dialog.c` and `input.c`; entry 8 of `src/portable_c/DEVIATIONS.md`. Of the assembly: the file read and checked, S0, `Main00`, `Main40`, S7 with `Default`, `Exit` | 776 instructions carried over, of 934 in its routines, all of `Dialog` among them | 5: `setup-menu`, `setup-defaults`, `setup-missing`, `setup-damaged`, `setup-cancel`, 98 steps, which run 558 of the 776; the scenarios of A and B run 196 more, the fields of `Dialog` and the mouse's rows on 50 lines; 22 are listed as out of reach, 13 of them until a later piece has its scenario | 0a |
 | A, the options | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | Seven, 311 steps, see "Piece A" below. As planned: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
 | B, the colours | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6; and `ShadCol`, taken out of `Shadow` of `screen.c`, which 0b left as it is. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
-| C, the help | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
+| C, the help. Done | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
 | D, what is left of S1 and of leaving | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | About 100 instructions | About 3: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and, once A is there, a setup saved whose file is missing | 0b; A for the last |
 | E1, the program's own call of DOS goes | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; `ended` has its golden of the tree's own recorded again, for the registers that the program leaves | A to D |
 | E2, three settings go | `stopts.c`, `stopts_t.c`: Memory allocation and TSR manager out of S2, Screen output out of S3; entries 1, 5 and 7 of `DEVIATIONS.md`, which say that the setup program still shows them | Small | The scenarios of A that show the two dialogs get goldens of the portable C's own, read with `goldens.py changes` | A |
@@ -508,16 +509,12 @@ for it, "The setup program": read both first.
     writes for a setup file that could not be written.
   - A, or D with A's dialogs: three of `Exit` for a setup saved whose
     file is not there, which takes a setting changed without a file.
-  - C: nothing any more. One of `Dialog` was listed, the beep of a box
-    that has the flag for it, which the box "Help contents is not
-    available" alone has, and C's scenarios of the original run it,
-    `setup-help-pages` and `setup-help-file`: what ran in the original
-    is of every scenario, also of one that the portable C is not taken
-    through yet. The five instructions that call `RdHelp` when the
-    setup program starts are listed as not carried over. If the pages
-    are read when setup is entered, the call goes into `StSetup` where
-    the original has it, in front of `StFile`, and the five come off
-    that list.
+  - C: nothing, and C is done. The beep of a box that has the flag
+    for it, in `Dialog`, which the box "Help contents is not
+    available" alone has, runs in `setup-help-pages` and
+    `setup-help-file`. The five instructions that call `RdHelp` when
+    the setup program starts are carried over: `StSetup` calls
+    `StRdHelp` where the original has the call, in front of `StFile`.
 - **Scenarios** may start the setup program more than once and may
   look at what DOS has shown afterwards: the portable C leaves an
   empty row where the original has the line of the command, and moves
@@ -765,7 +762,6 @@ last.
 | The Options menu has a line more | `clock`, `clock-russia`, `menu`, which have goldens of the portable C's own already and got them recorded again |
 | With E2: no Memory allocation and no TSR manager in S2, no Screen output in S3 | The scenarios of piece A that show the two dialogs |
 | The program's box for a critical error of DOS while setup is open, where the original's setup program leaves the error to DOS's own words. And setup's calls for files are asked with the program's errors, where the original's setup program calls DOS itself: a drive that is not ready has the program's box, a call given up there is the error 53h, and DOS is asked what was wrong behind a call that failed | No scenario |
-| The pages of the help read when they are asked for, if piece C does not read them all when setup is entered | No scenario |
 | The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. **This waits for the user's word**: it was met while 0b was made, and is not among the seven things decided | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
 | The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | None yet: D's scenario of 50 lines, with a golden of the portable C's own for the corner |
 | The directory of the setup file is the one that the program has, made by the main program's rule: in capitals, and with a backslash behind whatever `VC=` names, where the setup program adds none behind a colon | No scenario: the bench has no `VC=` |
@@ -810,12 +806,22 @@ on the bench.
 - A file that could not be written is said in a line on what DOS has
   shown, which the panels of a running copy cover at once, and the
   running copy takes the settings all the same.
+- `DeCode`, which takes the mark off what `RdHelp` has read, takes a
+  count of 0 for one of 65,536: a help file whose index says that it
+  has no text, or whose 62nd page is where its 55th is, has the setup
+  program write over all of its segment, itself included. The portable
+  C has it as it is, in the one `DeCode` of `help.c`, over the segment
+  of the main data. No scenario has such a file.
 
-### Piece C, the help: what its scenarios showed
+### Piece C, the help: done, and what a later piece should know
 
-The scenarios are there and their goldens derived, each twice with the
-same result; the code is not. Until it is, the six are in `not_run` of
-`TREES["portable_c"]`.
+The help of the setup is in the tree: `sthelp.c` and `sthelp_t.c`,
+called from `StSetup`, which reads the pages, and from `Input`, for F1
+while the setup is open. Five of its six scenarios pass, each screen
+the original's, and `setup-delay-help` waits in `not_run` of
+`TREES["portable_c"]` for piece A's dialog: see "What is left" below.
+The code passed them as it was written, with nothing changed but where
+the pages are kept.
 
 | Scenario | Steps | What it has |
 |---|---|---|
@@ -912,19 +918,24 @@ them: the first for more than the length, see the walk below.
   itself. The top of `harness/scenarios.py` has what that means for a
   step.
 
-**Not settled.**
+**Decided, and what follows from it.**
 
-- "Error reading data from the help file." The setup program prints it
-  through DOS when it starts and cannot read the file, and goes on. "The
-  deviations to declare" below lists it among what the one program has
-  not; the user would see it, and it has a place, where setup is
-  entered and reads its pages. No scenario can hold it either way: the
-  step that starts the original sends what it prints nowhere, since
-  the banner has texts that the source has not. Printed when setup is
-  entered, it shows on what DOS has shown, behind the menu, in the
-  portable C alone, and `setup-help-file` then wants either a golden of
-  the tree's own or the line left out of the comparison: both are
-  asked first.
+- "Error reading data from the help file." is dropped, on the
+  session's word, as the first row of "The deviations to declare" has
+  it: setup is no program of its own, with no banner and nothing of
+  what the setup program said when it started, which the user approved
+  with the plan. The setup program prints that line through DOS when it
+  starts and cannot read the file, and goes on. `StRdHelp` prints
+  nothing: where the original goes to `RdHlp2`, it closes the file if
+  one is open and returns. A help file that cannot be read shows from
+  then on as it does in the original, F1 giving what the memory of the
+  pages gives. `setup-help-file` needs no golden of its own for the
+  line: the step that starts the original sends what it prints
+  nowhere, so its golden has none either. The entry of
+  `src/portable_c/DEVIATIONS.md` for that row is piece 0b's, and has
+  this line in it. In the batch of `harness/ported.py` the three
+  instructions that print, 113Dh to 1142h of `VCSETUP.LST`, are
+  `not_carried`, with that reason.
 - What leaving setup has to do for the main program's help: nothing,
   if setup's pages are not in `HelpBuf` of the main data, which has no
   room for them anyway. The main program's help keeps nothing between
@@ -932,38 +943,57 @@ them: the first for more than the length, see the walk below.
   `Help` puts `HlpPage` back as it found it. `HelpBuf` of the main
   data also holds what the viewer and the editor last looked for.
 
-**Where the work stands, for whoever goes on with it.** Done and
-committed: the six scenarios, their goldens, the notes at the top of
-`harness/scenarios.py`. Not begun: `sthelp_t.c` and `sthelp.c`. Next,
-in this order:
+**What is there.**
 
-1. `src/portable_c/sthelp_t.c`, what `Dialog` and `MinMnu` take by its
-   offset: `StHlEr1_S`, `StHlpMn_D` (6, 20, 0), `StHlpEr_P`, a `BOX(3)`
-   kept at `MD_AT(ErrBuf)` with the lines `Help_S`, `StHlEr1_S` and
-   `StOkMn_S`, and `StHlpEr_B`, key bar 2, flags 2, its button at 326h
-   with `MD_AT(TmpErr)` and `OkMn_D`. `Help_S`, `OkMn_D` and `HlpMn_P`
-   are the main program's, the same bytes, and are not written twice.
-   `StOkMn_S`, " Ok ", and `StOk_S`, "[ Ok ]", stand in `VCSETUP.ASM`
-   among what is piece A's, and the help reads both: whichever of the
-   two pieces lands first defines them, not static, and the other
-   declares them.
-2. `src/portable_c/sthelp.c`, with `help.c` as the model, which is
-   not changed: `StRdHelp`, `StHelp`, `StHlpLine`, and `SeekDsk`,
-   `ReadDsk` and `DeCode` as static functions of its own. Constants
-   that only code reads are `static const u8 CODE` there: `StHelp_F`,
-   the name with the version behind it as `help.c` has `Help_F`,
-   `StHlpEr_S`, `StHelp_P`, `StEmpty_S`. The table of keys `Help_T` is
-   a `switch`. The window is kept at `md.ErrBuf`, which is the setup
-   program's `BoxBuf` (`NAMED_OTHERWISE` of `harness/datacheck.py`).
-   The pages want 20FDh bytes, DF03h to the end of the segment, in
-   memory that piece 0b names, with the first word 0 before anything
-   is read; the walk of `Help` is done in numbers of 16 bits that
-   begin at DF05h, so that it goes round where the original's does.
-3. When 0b has landed: the two calls, `StRdHelp` where setup is
-   entered and `StHelp` where `Input` has F1 with setup open; the file
-   in `add_portable_c` of `CMakeLists.txt`, second code segment; the
-   scenarios out of `not_run`; the batch in `SETUP_BATCHES` of
-   `harness/ported.py`, with the `STC` of `SeekDsk` as `unreached`.
+- `sthelp_t.c` has what `Dialog` and `MinMnu` take by its offset:
+  `StHlEr1_S`, `StHlpMn_D`, `StHlpEr_P` and `StHlpEr_B`. `Help_S`,
+  `OkMn_D` and `HlpMn_P` are the main program's, the same bytes, and
+  are not written twice. It also has `StOkMn_S`, " Ok ", and `StOk_S`,
+  "[ Ok ]", not static: they stand in `VCSETUP.ASM` among what is
+  piece A's, and the help reads both. Whichever of the two pieces
+  lands second takes its own definitions out and declares the other's.
+- `sthelp.c` has `StRdHelp`, `StHelp`, `StHlpLine`, and `SeekDsk` and
+  `ReadDsk` as static functions of its own, with `help.c` as the
+  model: the setup program's two differ from the main program's, which
+  take the handle from the main data. `DeCode` is the main program's,
+  of `help.c`, which the setup program has word for word: it is not
+  static there, `vc.h` declares it, and the batch does not list it, as
+  `harness/ported.py` has it for such a routine. It takes a near
+  pointer, which the pages have, being in the main data. `Help_T` is a
+  `switch`. The
+  window is kept at `md.ErrBuf`, the setup program's `BoxBuf`; the test
+  of the data is told so for `StHlpEr_P` in `SETUP_NAMED_OTHERWISE`,
+  and of two constants in `REVIEWED` of `harness/reads.py`.
+- The pages are in `TreeBuf` of the main data, 20FDh bytes of it,
+  `StHelpBuf`: as long as from where the original has `HelpBuf` to the
+  end of its segment, so that every address which `StHelp` can come to
+  in looking for a page is a place in them. A line of `HOLDS` says
+  that they fit. Nothing else may use `TreeBuf` while setup is open.
+- `StSetup` calls `StRdHelp` in front of `StFile`, where the original
+  has the call: `NcPath` is the directory of the program there, which
+  `MainFil` makes the name of the help file with, at `md.TmpBuf`.
+  `StRdHelp` asks for the file with the program's errors, `FileOpen`,
+  `FileSeek`, `FileRead`, `FileClose`, by decision 7: its row is in
+  entry 6 of `DEVIATIONS.md`. It clears all of the pages' room first,
+  and says nothing if it cannot read the file: see above. `StOpen` is
+  still 0 then, so a critical error there has the main program's box
+  as the setup file's has.
+- `DeCode` with a count of 0 goes through 65,536 bytes, in the original
+  as here: a help file whose index says that it has no text, or whose
+  62nd page is where its 55th is, has the original write over itself.
+  Here that is all of the segment of the main data, from the place in
+  `TreeBuf` round to it again; no scenario does it. "The bugs of the
+  original that stay" has it.
+- The batch in `SETUP_BATCHES` of `harness/ported.py`: the routines
+  `RdHelp`, `Help`, `HlpLine`, `SeekDsk` and `ReadDsk`, the functions
+  `StRdHelp` and `StHelp`; out of reach the `STC` of `SeekDsk`, 1482h;
+  not carried over the three instructions that print the line. All
+  the rest runs in the original, and both functions run in the tree.
+
+**What is left.** `setup-delay-help` passes when piece A's dialog and
+the help are both in the tree. It is in `not_run` with a reason of its
+own, and comes out with whichever of the two lands second: that piece
+runs it, and it has to pass as it is.
 
 **For piece D.** F1 from the screens of A and B is not in these
 scenarios, which keep to the menu and to the box of F8 so as to need no

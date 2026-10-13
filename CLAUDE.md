@@ -1865,6 +1865,32 @@ in "The portable C".
   - The calls of DOS and the BIOS that setup makes have rows in entry
     6 of `DEVIATIONS.md` like any others, read from the setup
     program's assembly: a piece adds the rows of its calls.
+- What the help of the setup program met, the first of its pieces to
+  have code, before the setup could be entered:
+  - Every C file of `src/portable_c/` is in the next build, by its
+    being there: a file that is written and not finished stops the
+    build for whoever builds next, and a test that is running reads
+    the tree in its first seconds. Compile a new file by itself first,
+    with the command of the note on the trial of an old line above.
+  - Code that nothing calls yet can still be tried: in a copy of the
+    tree, made and built as `harness/notice.py` makes its own, with a
+    few lines that call it from somewhere the main program gets to, F1
+    of `Input` for the help, and `harness/show.py --program` on the
+    copy's `VC.EXE`. What it draws is held by eye, or by a few lines of
+    Python, against what `harness/show.py --setup` prints of the
+    original for the same steps. The copy is not kept.
+  - A routine of the setup program that walks through memory with
+    addresses of 16 bits may go by where its buffer is in the
+    original's one segment, not only by how long it is: the carry of
+    an addition is a test there. The translation then counts in
+    numbers of 16 bits from the original's address, and has that
+    address as a number with where it comes from: `StHelp` of
+    `sthelp.c`.
+  - Where the original reads memory that it has put nothing into, a
+    buffer behind a read that failed, what it shows on the bench is by
+    what was there. The translation has zeros there, the scenario says
+    in a comment that the original's screen is of that kind, and the
+    plan has it among what was found.
 
 ### Moving a file to the system's functions
 

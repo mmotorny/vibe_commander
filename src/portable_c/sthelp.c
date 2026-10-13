@@ -1,0 +1,491 @@
+/*
+ * The help of the setup: its pages read from the help file when the
+ * setup is entered, and one of them in a window, with the keys and the
+ * mouse that move its text.
+ *
+ * Translated from VCSTHLP.INC, of the original's setup program, whose
+ * tables are in sthelp_t.c. It is another help than the main program's,
+ * help.c: one page in a window with the button Ok, no index to choose
+ * from, and the pages all in the memory. A routine here has the name of
+ * the assembly with St in front, as everything of the setup program has.
+ *
+ * The help file is the main program's, VC.HLP in the program's
+ * directory, and help.c says how it is laid out. The setup's pages are
+ * seven that follow one another in it, from the 55th line of the index
+ * on. StRdHelp reads the index, for where the first of them is and where
+ * the page behind the last, and then what lies between the two as one
+ * piece, or as much of it as there is room for. StHelp finds a page in
+ * that piece by going from entry to entry, by the 26 bytes in front of
+ * each text, which say how long it is: the pages are numbered from 1 by
+ * where they lie, and the index is not asked again.
+ *
+ * The room. The original reads into HelpBuf, the end of its data, as far
+ * as FEE0h of its one segment, below its stack. HelpBuf is at DF03h in
+ * the program that was shipped: 100h, the 24,278 bytes of its file, and
+ * 7F2Dh of data that the file does not hold. The first word there is how
+ * many bytes were read, so the pages have 8,155 bytes, and the seven of
+ * the help file that was shipped are 8,628: the sixth and the seventh,
+ * Country info and Exit, do not fit, and "Help contents is not
+ * available" is what F1 says for them. To show the same, this goes by
+ * the same two numbers. It goes by where HelpBuf is, and not only by the
+ * length, because the original looks for a page with addresses of 16
+ * bits, which go round at the end of the segment: see StHelp.
+ *
+ * Which page: the menu of the setup and its dialogs say in HlpPage, by
+ * the number of the page, from 1; FFh says that the help is on the
+ * screen already.
+ */
+#include "vc.h"
+
+/* C routines of other files that vc.h does not have. */
+u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
+                 u16 color);                            /* screen.c */
+u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
+
+/* The tables: of help_t.c, which the setup program has byte for byte,
+   the title of the window and the numbers of the colours of the button;
+   of sthelp_t.c the button, for MinMnu, and the box that says there is
+   no such page, which Dialog takes by its offset; and of the setup's
+   other tables the text of the button as the window has it. */
+extern const u8 __far Help_S[];         /* " Help " */
+extern const u8 __far HlpMn_P[];
+extern const u8 __far StHlpMn_D[];      /* Ok */
+extern const u8 __far StHlpEr_B[];      /* "Help contents is not available" */
+extern const u8 __far StOk_S[];         /* "[ Ok ]" */
+
+#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
+
+#define Help_C  27                      /* the colours of the help: its text, */
+#define HlpBo_C 28                      /* bold, */
+#define HlpRe_C 29                      /* reversed, */
+#define HlpUn_C 30                      /* and underlined */
+
+#define BegHlp  55                      /* the first page of the setup, as
+                                           the index counts, from 1, */
+#define NumHlp  7                       /* and how many it has */
+
+/* The name of the help file, and behind it what its header has from the
+   ninth byte on. They are one text because MainFil takes 13 bytes for a
+   name: the first six of the second are copied with the first, as they
+   are in the assembly. */
+static const u8 CODE StHelp_F[] = "VC.HLP\0VC 4.05 Help";
+#define HlpHead 7                       /* where in it the second begins */
+#define LenHead 13                      /* and its length, with its end */
+
+/* The colours of a line of the help, for NgLine, and the line that it is
+   to put in for ^I: none. */
+static const u8 CODE StHelp_P[] = { Help_C, HlpRe_C, HlpBo_C, HlpUn_C };
+static const u8 CODE StEmpty_S[] = "";
+
+#pragma pack(push, 1)
+
+/* The 26 bytes in front of the text of an entry of the help file:
+   HlpData of the assembly. The text is behind them, HlpInfo there. */
+struct StHlpData {
+    u16 HlpMode;                        /* 0 - the index */
+    u16 HlpSize;                        /* the length of its text */
+    u16 HlpLins;                        /* its lines, with the title */
+    u16 Reserved1;
+    u16 HlpBkLn;
+    u16 HlpOffsLo;                      /* where the index is in the file */
+    u16 HlpOffsHi;
+    u16 HlpFrst;                        /* the first line shown: the window
+                                           keeps it here */
+    u16 HlpCur;
+    u8  Reserved2[8];
+};
+
+#pragma pack(pop)
+
+LAID_OUT(StHlpData, 26);
+
+#define HlpInfo sizeof(struct StHlpData)
+
+/* Where the original has HelpBuf in its segment, and where what it reads
+   into it ends: see the top. What is here in place of HelpBuf is as long
+   as from there to the end of that segment, so that every address which
+   the original can come to in looking for a page is a place in it. */
+#define HELPBUF 0xDF03
+#define LIMIT   0xFEE0
+#define LEN_BUF (0x10000UL - HELPBUF)
+
+#define LINE        0xC4                /* a single line */
+#define LEFT_RIGHT  0xC7B6              /* where one meets the frame, on the
+                                           left and on the right */
+#define WIDTH       62                  /* the columns of a line of text */
+
+/* The window: where it begins, the row in the high byte, and from there
+   its title and the lines of the text. */
+#define BEGIN       0x204
+#define AT_TITLE    0x205
+#define AT_TEXT     0x405
+
+/* Where the pages are: in place of HelpBuf of the original, LEN_BUF bytes
+   that are the setup's for as long as it is open. They are in TreeBuf of
+   the main data, the list of a tree, which nothing uses meanwhile: a
+   panel that shows the tree reads it anew when the setup has been left,
+   as after a command. */
+HOLDS(the_pages_of_the_help_fit_TreeBuf,
+      LEN_BUF <= sizeof ((struct MainDat *)0)->TreeBuf);
+
+static u8 *StHelpBuf(void)
+{
+    return md.TreeBuf;
+}
+
+/* Go to a place in the help file. Not 0 if DOS would not, or went
+   elsewhere. */
+static u16 SeekDsk(u16 handle, u32 place)
+{
+    struct FilePlace sought = FileSeek(handle, 0, place);
+
+    if (sought.failed)
+        return 1;
+    return sought.place != place;
+}
+
+/* Read `count` bytes of the help file. Not 0 if DOS would not, or read
+   fewer. */
+static u16 ReadDsk(u16 handle, u8 __far *to, u16 count)
+{
+    struct Answer read = FileRead(handle, to, count);
+
+    if (read.failed)
+        return 1;
+    return read.value != count;
+}
+
+/* Read the setup's pages of the help file, when the setup is entered:
+   into StHelpBuf, how many bytes of them in its first word and the pages
+   behind that. If that fails, the setup goes on without them, and
+   nothing is said: the original's setup program, which reads them when
+   it starts, prints a line through DOS then, HlpEr_S of the assembly,
+   "Error reading data from the help file.", and the setup of the one
+   program has none of what that program printed at its start (see
+   DEVIATIONS.md). From there on the two are the same: F1 shows what
+   this memory then gives.
+
+   The index is read into the same memory first, and is still there if
+   something then fails: the first word is its mode in that case, 0 for a
+   real one, which StHelp takes for the length of the pages. The
+   original leaves what its memory held where it has read nothing; here
+   that is zeros, so that what F1 then shows does not hang on what was
+   in the memory before. */
+void StRdHelp(void)
+{
+    u8 *buffer = StHelpBuf();
+    struct StHlpData *index = (struct StHlpData *)buffer;
+    struct Answer answer;
+    u16 handle, count, lines, i;
+    u32 first, between;
+
+    for (i = 0; i < (u16)LEN_BUF; i++)
+        buffer[i] = 0;
+    MainFil(md.TmpBuf, StHelp_F);
+    answer = FileOpen(md.TmpBuf, 0x40);
+    if (answer.failed)
+        return;
+    handle = answer.value;
+    if (SeekDsk(handle, 8) || ReadDsk(handle, buffer + 16, LenHead))
+        goto RdHlp1;                    /* the header: */
+    for (i = 0; i < LenHead; i++)       /* is it a help file of this */
+        if (buffer[16 + i] != StHelp_F[HlpHead + i])    /* version? */
+            goto RdHlp1;
+    if (SeekDsk(handle, 0x194)          /* where the index is */
+        || ReadDsk(handle, (u8 *)&index->HlpOffsLo, 4))
+        goto RdHlp1;
+    DeCode((u8 *)&index->HlpOffsLo, 4);
+    if (SeekDsk(handle, (u32)index->HlpOffsHi << 16 | index->HlpOffsLo)
+        || ReadDsk(handle, buffer, HlpInfo))
+        goto RdHlp1;                    /* what the index begins with, */
+    DeCode(buffer, HlpInfo);
+    count = index->HlpSize;             /* and its text, if it fits */
+    if ((u16)(LIMIT - HELPBUF) < count)
+        goto RdHlp1;
+    if (ReadDsk(handle, buffer + HlpInfo, count))
+        goto RdHlp1;
+    DeCode(buffer + HlpInfo, count);
+    if (index->HlpMode != 0)
+        goto RdHlp1;
+    lines = index->HlpLins;             /* has it pages for the setup? */
+    if (lines <= BegHlp - 1)
+        goto RdHlp1;
+    lines -= BegHlp - 1;
+    /* Six bytes for every line of the index, of which the last four are
+       where its page is in the file. */
+    first = *(u32 *)(buffer + HlpInfo + 2 + 6 * (BegHlp - 1));
+    if (SeekDsk(handle, first))
+        goto RdHlp1;
+    /* As much as there is room for: or, if the index has a page behind
+       the setup's and that is nearer, as far as there. */
+    count = LIMIT - (HELPBUF + 2);
+    if (lines > NumHlp) {
+        between = *(u32 *)(buffer + HlpInfo + 2
+                           + 6 * (BegHlp - 1 + NumHlp)) - first;
+        if (between >> 16 == 0 && count > (u16)between)
+            count = (u16)between;
+    }
+    answer = FileRead(handle, buffer + 2, count);
+    if (answer.failed)
+        goto RdHlp1;
+    *(u16 *)buffer = answer.value;
+    /* The mark comes off as many bytes as were asked for, read or not. */
+    DeCode(buffer + 2, count);
+
+RdHlp1:                                 /* read or not, the file is closed */
+    FileClose(handle);
+}
+
+/* Write a line of text into the window at a row and a column, over
+   spaces: HlpLine of the assembly. Returns where the text of the next
+   line begins. */
+static const u8 __far *StHlpLine(u16 place, const u8 __far *text)
+{
+    struct LineArgs line;
+    u16 cell = Color(StHelp_P[0]) << 8 | ' ';
+    u16 i;
+
+    line.screen = BasAdr(place);
+    for (i = 0; i < WIDTH; i++)
+        line.screen[i] = cell;
+    md.TmpErr[1] = 0;
+    md.TmpErr[101] = 0;
+    line.value = WIDTH;
+    line.line = text;
+    line.colors = StHelp_P;
+    line.include = StEmpty_S;
+    NgLine((struct LineArgs STACK *)&line);
+    return line.line;
+}
+
+/* The help of the setup, for F1: the page that HlpPage names in a
+   window, until a key or the mouse closes it; or a box that says there
+   is no such page, with a beep. While it is shown F1 does nothing.
+
+   The page is looked for as the original looks for it, with addresses
+   of 16 bits that begin where the original has its pages, HELPBUF + 2:
+   whether an entry ends beyond what was read, and whether adding the 26
+   bytes in front of a text or its length went round at 64 KB. Where
+   what was read ends is added up without such a look. With the pages
+   read that is all the same; behind a read that failed, where the first
+   word is no length, it decides what shows. */
+void StHelp(void)
+{
+    u8 __far *buffer = StHelpBuf();
+    struct StHlpData __far *entry;      /* BP: the page */
+    const u8 __far *lines;              /* its text, with the title */
+    const u8 __far *text;
+    u16 place = GetCur();
+    u16 page = md.HlpPage;
+    u16 size = (u16)(u8)(md.Lines - 3) << 8 | 74;
+    u16 first;                          /* DI: the first line to show */
+    u16 at, next, end, count, shown, moved, color, key, where, held;
+    u16 buttons, mouse, third, last;
+    u16 *screen, *bottom;
+    struct Mouse pointer;
+
+    HidCur();
+    if (page == 0xFF)
+        goto Help41;
+
+    /* The page: as many entries on as its number says, none of them
+       beyond what was read. No page, 0, is one of 65536. */
+    count = page;
+    end = HELPBUF + 2 + *(u16 __far *)buffer;
+    next = HELPBUF + 2;
+    do {
+        at = next;
+        next = at + HlpInfo;
+        if (next < at || next > end)
+            goto Help02;
+        entry = (struct StHlpData __far *)(buffer + (at - HELPBUF));
+        if ((u16)(next + entry->HlpSize) < next)
+            goto Help02;
+        next += entry->HlpSize;
+        if (next > end)
+            goto Help02;
+    } while (--count);
+    if (entry->HlpMode != 0)
+        goto Help04;
+
+Help02:                                 /* there is none */
+    Dialog(OFFSET(StHlpEr_B), 0, 0, 0, MAIN_SEG);
+    goto Help41;
+
+Help04:                                 /* the window */
+    lines = (const u8 __far *)entry + HlpInfo;
+    SavWin(BEGIN, size, (u16)md.ErrBuf);
+    color = Color(Help_C) << 8;
+    MinBox(BEGIN, size, color);
+    screen = BasAdr(BEGIN);
+    MvsBw(screen + 80 + 33, Help_S, 6, color);
+    bottom = BasAdr(BEGIN + (size & 0xFF00) - 0x500);
+    MvsBw(bottom + 80 + 33, StOk_S, 6, color);
+    BoxLine(bottom, color | LINE, LEFT_RIGHT, 3, 64);
+    BoxLine(screen + 3 * 80, color | LINE, LEFT_RIGHT, 3, 64);
+    StHlpLine(BEGIN + AT_TITLE, lines);
+    Window(BEGIN, size);
+    md.WinMous = 0;
+    md.MousEnt = 0;
+    md.HlpPage = 0xFF;
+    ((u16 *)&md.MousTim)[1] = 0xFFFF;
+    entry->HlpFrst = 0xFFF0;            /* nothing is shown yet */
+    first = 0;
+
+Help10:                                 /* the text from the line `first` */
+    shown = entry->HlpFrst;
+    entry->HlpFrst = first;
+    moved = first - shown;
+    if (moved != 0) {
+        /* Where that line begins: behind the title and the lines before
+           it, each of which ends in a zero byte. The end of a line is
+           looked for in FF00h bytes and the low byte of the count of
+           lines, and taken to be there if it is not. */
+        text = lines;
+        count = entry->HlpFrst + 1;
+        do {
+            key = 0xFF00 | count & 0xFF;
+            do
+                key--;
+            while (*text++ != 0 && key != 0);
+        } while (--count);
+        where = BEGIN + AT_TEXT;
+        count = (u8)((size >> 8) - 9);
+        do {
+            /* Behind the text there are only empty lines. */
+            if ((u16)(text - lines) >= entry->HlpSize)
+                text--;
+            text = StHlpLine(where, text);
+            where += 0x100;
+        } while (--count);
+        /* On the screen: all of them, or the screen moved by a line and
+           the one that is new. */
+        where = BEGIN + AT_TEXT;
+        count = (u8)(md.Lines - 12);
+        if (moved == 1 || moved == 0xFFFF) {
+            key = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
+            Scroll(key >> 8 == 7, Color(Help_C), where,
+                   ((count - 1 & 0xFF) << 8 | WIDTH - 1) + where);
+            where += key << 8;
+            count = 1;
+        }
+        Window(where, count << 8 | WIDTH);
+    }
+
+Help20:                                 /* a key */
+    pointer = GetMous(0);
+    if (pointer.buttons != 0)
+        goto Help22;
+    md.WinMous = 0;
+    md.MousEnt = 0;
+    key = MinMnu(OFFSET(StHlpMn_D), BEGIN + (size & 0xFF00) - 0x400 + 13,
+                 0x130, OFFSET(HlpMn_P), 2, 0).key;
+    if (key >> 8 == 0xFC)
+        goto Help21;
+    first = entry->HlpFrst;
+    /* Help_T of the assembly, for Case, which takes no key without a
+       scan code. */
+    if (key >> 8 == 0)
+        goto Help20;
+    if ((key & 0xFF) == 0x0D || (key & 0xFF) == 0x1B)
+        goto Help40;                    /* Enter, Esc */
+    if ((key & 0xFF) != 0)
+        goto Help20;
+    switch (key >> 8) {
+    case 0x48: goto Help30;             /* Up */
+    case 0x50: goto Help32;             /* Down */
+    case 0x47: goto Help35;             /* Home */
+    case 0x4F:                          /* End */
+        first = entry->HlpLins;
+        count = (u16)(signed char)(md.Lines - 11);
+        goto Help34;
+    case 0x49:                          /* PgUp */
+        if (first == 0)
+            goto Help10;
+        count = (u16)(signed char)(md.Lines - 13);
+        goto Help34;
+    case 0x51:                          /* PgDn */
+        count = (u16)(signed char)(md.Lines - 12);
+        last = entry->HlpLins - 1;
+        if (last < count)
+            goto Help10;
+        last -= count;
+        if (first >= last)
+            goto Help10;
+        first += count - 1;
+        if (first > last)
+            first = last;
+        goto Help10;
+    case 0x44: goto Help40;             /* F10 */
+    }
+    goto Help20;
+
+Help21:                                 /* the mouse */
+    pointer = GetMous(0);
+Help22:
+    buttons = pointer.buttons;
+    mouse = pointer.place;
+    ClrKbd();
+    held = mouse;
+    if (buttons & 4) {                  /* the middle button, until it is */
+        TypMous('x');                   /* let go: closes, unless another */
+        do {                            /* is down too */
+            pointer = GetMous(mouse);
+            buttons = pointer.buttons;
+            mouse = pointer.place;
+            ClrKbd();
+        } while (buttons & 4);
+        TypMous(0);
+        if ((buttons & 3) == 0)
+            goto Help40;
+    }
+    if (InWind(mouse, BEGIN + 0x404, size - 0x90A) && md.WinMous == 0) {
+        /* Not where the text is, and the button did not go down there:
+           the left one closes when it is let go outside the window. */
+        if ((buttons & 1) == 0)
+            goto Help20;
+        pointer = GetMous(mouse);
+        if (pointer.buttons != 0)
+            goto Help22;
+        if (!InWind(held, BEGIN, size - 0x102))
+            goto Help20;
+        goto Help40;
+    }
+    /* In the upper third of the text, or above it: up; in the lower
+       third or below it: down. */
+    md.WinMous |= 1;
+    first = entry->HlpFrst;
+    third = (u8)((u16)(signed char)((size >> 8) - 9) / 3);
+    if ((u8)(mouse >> 8) < (u8)((BEGIN >> 8) + 4 + third))
+        goto Help30;
+    if ((u8)(mouse >> 8) >= (u8)((BEGIN >> 8) + (size >> 8) - 5 - third))
+        goto Help32;
+    goto Help20;
+
+Help30:                                 /* Up */
+    if (first != 0)
+        first--;
+    goto Help10;
+
+Help32:                                 /* Down */
+    if ((u16)((u16)(signed char)(md.Lines - 11) + first) < entry->HlpLins)
+        first++;
+    goto Help10;
+
+Help34:                                 /* back by `count` lines, */
+    if (first >= count) {
+        first -= count;
+        goto Help10;
+    }
+Help35:                                 /* or to the first: Home */
+    first = 0;
+    goto Help10;
+
+Help40:                                 /* Esc */
+    ResWin(BEGIN, size, (u16)md.ErrBuf);
+    Window(BEGIN, size);
+
+Help41:
+    md.HlpPage = (u8)page;
+    Cursor(place);
+}

@@ -268,6 +268,12 @@ SETUP_NAMED_OTHERWISE = {
                        "is kept in the setup program's BoxBuf, which is "
                        "as long as its WinBuf and lies behind it: the "
                        "main data has ErrBuf there"),
+    # The help of the setup program.
+    ("StHlpEr_P", 6): ("field", "ErrBuf",
+                       "what the box of the setup's help covers is kept "
+                       "in BoxBuf, which the main data has not: its "
+                       "ErrBuf is as long, and is where the main "
+                       "program's boxes of errors are kept"),
 }
 
 # Words of an object that name a text which is not read as far as a zero

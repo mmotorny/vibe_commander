@@ -634,19 +634,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 187,516 bytes |
-| as a multiple of the original's 65,090 bytes | 2.88 |
-| more than the C translation's 133,056 bytes | 54,460 bytes |
-| The relocations in its header, which DOS applies | 942 |
-| What it keeps of the memory while a command runs: the program and its panels | 197,504 bytes |
-| What DOS has for a command then, on the bench of the tests | 228,032 bytes |
-| The code segment `CTEXT` ends at | D3EEh, 7,186 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | ACC4h, 17,212 bytes below the limit, F000h |
+| `VC.EXE` | 189,472 bytes |
+| as a multiple of the original's 65,090 bytes | 2.91 |
+| more than the C translation's 133,056 bytes | 56,416 bytes |
+| The relocations in its header, which DOS applies | 960 |
+| What it keeps of the memory while a command runs: the program and its panels | 199,392 bytes |
+| What DOS has for a command then, on the bench of the tests | 226,144 bytes |
+| The code segment `CTEXT` ends at | D3F1h, 7,183 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | B3C6h, 15,418 bytes below the limit, F000h |
 | Inline assembly | 57 instructions in 10 pieces: 37 in 7 of `dos.c`, 20 in 3 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
-| Pairs of `#pragma pack` | 6 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 714, 62, 256, 93 |
+| Pairs of `#pragma pack` | 7 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 736, 62, 257, 96 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -950,8 +950,10 @@ Its files have names that begin with `st`, and its routines and tables
 have `St` in front of the names that they have in the assembly, where
 many are the main program's names too. `stmain.c` has the setup
 entered and left, its file, its menu and the setup that the program
-has without a file; `stmain_t.c` its tables. What both programs have is
-there once: the boxes, the dialogs, the bars and the mouse are the main
+has without a file; `stmain_t.c` its tables. `sthelp.c` has its help,
+with `sthelp_t.c`: the seven pages that the help file has for the
+setup, read when the setup is entered, and the page of where the user
+is in a window, for F1. What both programs have is there once: the boxes, the dialogs, the bars and the mouse are the main
 program's, and the three routines that the setup program has otherwise
 go by a variable that says the setup is open, `StOpen`: `PutKey0`,
 which has the setup's key bars then, `Dialog`, and `Input`, where F1 is
@@ -960,9 +962,10 @@ own is the main data here, in buffers that the main program makes anew
 after a command anyway.
 
 Of the menu's nine items two do something so far, Set default
-configuration and Exit: the Configuration, Screen and Mouse, the Panel
-options, the three palettes, the Country info and the help are to come,
-each in a file of its own, and so is the mouse at the menu. `TODO.md`
+configuration and Exit, and F1 is the help: the Configuration, Screen
+and Mouse, the Panel options, the three palettes and the Country info
+are to come, each in a file of its own, and so is the mouse at the
+menu. `TODO.md`
 has the plan, "The setup program in the portable C", with what each
 piece brings and what is declared for it.
 

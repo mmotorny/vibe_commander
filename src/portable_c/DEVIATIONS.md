@@ -465,6 +465,7 @@ it went.
 | `IniData`, `start.c` | DOS 19h, the current drive; BIOS 12h and 1130h, an EGA and its font | 19h: BX and CX as the calls before left them. 12h: AL the drive, as DOS answered; CX and DX as left. 1130h: BL and CX as 12h answered, the memory of the EGA and its switches (see below); DH as left |  | BX and CX as they come at 19h. AL, CX and DX 0 at 12h. BL and DH 0 and CX 16 at 1130h |
 | `IniData`, `start.c` | DOS 3306h and 30h, the version | 30h: BX what 3306h left in AX. CX and DX of both as the calls before left them |  | BX and CX as they come, DX 0 |
 | `IniData` with `CurNl`, `start.c` | The colour that DOS writes in: BIOS 0Fh and 03h, the page and the cursor, twice; 0Eh, a carriage return or a line feed typed, three times; 08h, the cell at the cursor, twice; DOS 06h, a space written; BIOS 09h, the cell written back | 0Eh: BL what DOS left when it was asked for its version, the low byte of AX from 3306h or BL from 30h; the BIOS takes a colour there only where the screen is graphics. 06h: AL the character at the cursor, as 08h answered; DH the row of the cursor; BX and CX as the BIOS left them. AL of 0Fh, 03h and 08h as the call before left it. CX and DX of the BIOS's calls the shape of the cursor and where it is, as 03h answered, with the space in DL from 06h on |  | BL 0 at 0Eh. AL and DH 0 at 06h, BX and CX as they come. AL 0 at 0Fh, 03h and 08h, and 0 in whichever of BL, CX and DX a call of the BIOS does not take |
+| `StRdHelp`, `sthelp.c` | DOS 3Dh, 3Fh and 3Eh, the pages of the setup's help read from the help file | 3Dh: BX, SI and DI as finding the directory and copying the name left them, CX 0, of that copy. 3Fh, five times: AL the low byte of the place in the file that was just gone to, or of what was worked out since, the room for the index or the bytes between two pages. 3Eh: AL as the call before left it, the low byte of what was read where all went well; CX and DS:DX the count and the buffer still, or what the look at the header left |  | BX, SI and DI as they come at 3Dh. AL 0 at 3Fh and 3Eh; CX and DX 0 at 3Eh |
 | `StDefault`, `stmain.c` | DOS 19h, the current drive, for the panels that the setup makes without a setup file | AL as the code before left it: what DOS answered about the setup file, or 0, the answer of the box that asks |  | AL 0 |
 | `StInit15`, `stmain.c` | DOS 3Dh, 3Fh and 3Eh, the setup file read | 3Dh: BX, CX, SI and DI as the help file read and the name copied left them. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  | BX, CX, SI and DI as they come at 3Dh. AL 0 at 3Fh and 3Eh; CX and DX 0 at 3Eh |
 | `StExit`, `stmain.c` | BIOS 01h, the cursor in its shape again; DOS 4300h, 3Ch, 40h and 3Eh, the setup file written; 09h, the line that says it could not be | 01h: DX the rows of the screen and 80, of the screen put back. 4300h: BX the sum of the file. 3Ch: AL as 4300h left it, or 0 for a file that is not there; BX the sum still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still. 09h: AL, BX and CX as the calls before left them |  | DX 0 at 01h. AL 0 at 3Ch, 40h, 3Eh and 09h; BX as it comes at 4300h and 3Ch; CX and DX 0 at 3Eh; BX and CX as they come at 09h |
@@ -766,8 +767,12 @@ of it.
   and no banner: the program has started already. The directory is the
   one that the program has, which it makes by its own rule: in capitals,
   and with a backslash behind whatever `VC=` names, where the setup
-  program adds none behind a colon. The help file is not read when the
-  setup is entered.
+  program adds none behind a colon. The pages of the help are read from
+  the help file there, as the setup program reads them when it starts,
+  and nothing is said if they cannot be: "Error reading data from the
+  help file." is among what the setup program wrote through DOS at its
+  start, and is not shown. F1 then says, as in the original, that the
+  help is not available.
 - The setup file is asked for as the rest of the program asks for its
   files, with the program's errors (see `sys.h`): a drive that is not
   ready has the program's box, a call that was given up there is the
@@ -793,8 +798,7 @@ of it.
 - While the setup program is being translated (`TODO.md`, "The setup
   program in the portable C: the plan"), what its menu leads to is not
   all there: an item whose screen is still to come waits for a key and
-  goes back to the menu, the mouse does nothing at the menu, and F1 is
-  no key.
+  goes back to the menu, and the mouse does nothing at the menu.
 
 **Why.** The user's decision, on 12 October 2026: the setup program is
 ported into the portable C "so that there is one program", reached by an
@@ -821,7 +825,12 @@ that has the command in the original, behind the setup and afterwards
 for as long as it is on the screen, is empty in the portable C: the
 golden is derived with spaces there. The scenarios `setup-menu`,
 `setup-defaults`, `setup-missing`, `setup-damaged` and `setup-cancel`
-pass so; `setup` is not run until the screens that it shows are there.
+pass so, and those of the help, `setup-help`, `setup-help-pages`,
+`setup-help-mouse`, `setup-help-file` and `setup-help-lines`; `setup` is
+not run until the screens that it shows are there. `setup-help-file`
+has a help file that cannot be read, twice: the line that the original
+prints then is not in its golden, since the step that starts the setup
+program sends what it prints nowhere.
 
 No scenario shows the 64 bytes. `setup-defaults` saves a setup that was
 made by Set default configuration, starts the program anew with it and

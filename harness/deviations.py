@@ -344,13 +344,14 @@ TREES = {
             "setup-colors-palettes": _NO_SETUP_YET,
             "setup-colors-own": _NO_SETUP_YET,
             "setup-colors-lines": _NO_SETUP_YET,
-            # The help of the setup program, F1.
-            "setup-help": _NO_SETUP_YET,
-            "setup-help-pages": _NO_SETUP_YET,
-            "setup-help-mouse": _NO_SETUP_YET,
-            "setup-help-file": _NO_SETUP_YET,
-            "setup-delay-help": _NO_SETUP_YET,
-            "setup-help-lines": _NO_SETUP_YET,
+            # The help of the setup program, F1, is there. This one shows
+            # it over a dialog of the options, piece A, and goes with
+            # the commit that brings the second of the two.
+            "setup-delay-help":
+                "it shows the help of the setup over its Panel options, "
+                "and the portable C has the help and not yet that "
+                "dialog: what the scenario shows of it is still to be "
+                "translated",
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "

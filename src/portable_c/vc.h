@@ -626,9 +626,8 @@ void StUser(u16 first, u16 rows);
 /* What the items of the setup's menu do, each of which returns when its
    screen has been left: the Configuration, Screen and Mouse, the Panel
    options and the Country info, of stopts.c; the three palettes, of
-   stcolor.c; and the help of the setup, for F1, of sthelp.c. Until its
-   file is there, each is a routine of stmain.c that does nothing: see
-   "What is still to come" there. */
+   stcolor.c. Until its file is there, each is a routine of stmain.c
+   that does nothing: see "What is still to come" there. */
 void StF02_00(void);
 void StF03_00(void);
 void StF04_00(void);
@@ -636,6 +635,10 @@ void StF05_00(void);
 void StF06_00(void);
 void StF07_00(void);
 void StF09_00(void);
+/* The help of the setup, of sthelp.c: its pages read from the help file,
+   when the setup is entered, and the page that HlpPage names shown, for
+   F1. */
+void StRdHelp(void);
 void StHelp(void);
 
 /* What is of DOS on a PC alone, and no part of sys.h: where an interrupt
@@ -1183,6 +1186,12 @@ u16 DirFunc(void);                                      /* dirfunc.c */
    one, as out of date. Returns what DOS answered, and whether that is an
    error. */
 struct Answer DelTr0(const u8 *path);
+
+/* Takes the mark off `count` bytes that were read from the help file,
+   in the main data; a count of 0 is one of 65536. The help of the setup,
+   sthelp.c, calls it too: the setup program has the routine word for
+   word. See help.c. */
+void DeCode(u8 *at, u16 count);
 
 /* The boxes and the dialogs, which the assembly describes: `box`,
    `include`, `table`, `control` and `colors` are offsets in its code

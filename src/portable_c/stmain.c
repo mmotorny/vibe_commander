@@ -137,16 +137,15 @@ static const u8 CODE StStErr_S[49] =
     "There was an error while saving the setup file\r\n$";
 
 /*---------------- What is still to come ----------------
-   What the items of the menu do, and the help: each is a routine of the
-   file that vc.h names for it, which is not there yet. Until it is, the
+   What the items of the menu do: each is a routine of the file that
+   vc.h names for it, which is not there yet. Until it is, the
    routine is here. The commit that brings a file takes its routines out
    of here, and nothing else of this file changes for it.
 
    An item is a screen that the next key leaves, whichever key, with
    nothing shown: so the item and Esc pressed in one step leave the menu
    on the screen as they do when the screen is there, with the cursor on
-   that item, and the scenarios of the menu hold either way. The help is
-   nothing: F1 is no key. */
+   that item, and the scenarios of the menu hold either way. */
 
 /* The screen of an item that is still to come. */
 static void StToCome(void)
@@ -165,9 +164,6 @@ void StF09_00(void) { StToCome(); }
 void StF05_00(void) { StToCome(); }
 void StF06_00(void) { StToCome(); }
 void StF07_00(void) { StToCome(); }
-
-/* sthelp.c: the help of the setup, for the page HlpPage. */
-void StHelp(void) { }
 
 /*------------- What DOS had on the screen -------------*/
 
@@ -525,13 +521,14 @@ static void StExit(void)
    goes to the next row, as when the command is ended with Enter.
 
    Then what the setup program does when it starts, from where it reads
-   the setup file: the file, with the box that says so if it is missing
-   or wrong, Ok to go on with what the program has without a file and
-   Exit, Esc or F10 to leave; the copy that tells in the end whether
-   anything has changed; the cursor's row and shape; the screen kept as
-   DOS's; and the mouse set up anew, which puts its pointer in the
-   middle of the screen. The main program puts it back when the setup
-   has been left, where SavMous noted it.
+   its files: the pages of its help, StRdHelp of sthelp.c; the setup
+   file, with the box that says so if it is missing or wrong, Ok to go
+   on with what the program has without a file and Exit, Esc or F10 to
+   leave; the copy that tells in the end whether anything has changed;
+   the cursor's row and shape; the screen kept as DOS's; and the mouse
+   set up anew, which puts its pointer in the middle of the screen. The
+   main program puts it back when the setup has been left, where SavMous
+   noted it.
 
    Ported as it is: with Ok in that box the original is to take the
    setup for changed, so that what the program has without a file is
@@ -560,6 +557,7 @@ void StSetup(void)
     for (i = 0; i < CmnIni; i++)
         sd.Aside[i] = ((u8 *)&md)[i];
 
+    StRdHelp();                         /* the pages of the help */
     name = StFile();                    /* Init15 */
     StInit15();
     for (i = 0; i < CmnIni; i++)        /* Init20: Save source VC.INI */

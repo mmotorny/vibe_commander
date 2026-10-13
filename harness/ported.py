@@ -1174,11 +1174,6 @@ SETUP_BATCHES = [
         },
         not_carried={
             **dict.fromkeys(
-                (0x01BE, 0x01BF, 0x01C0, 0x01C3, 0x01C4),
-                "the help file read when the setup program starts, "
-                "RdHelp: of the help of the setup, sthelp.c, which is "
-                "still to come and says when its pages are read"),
-            **dict.fromkeys(
                 (0x0228, 0x022B, 0x022D, 0x0231, 0x0233, 0x0236, 0x0238,
                  0x0239, 0x023C, 0x023E, 0x0242, 0x0246, 0x0249, 0x024B,
                  0x024D, 0x0250, 0x0252),
@@ -1243,6 +1238,30 @@ SETUP_BATCHES = [
                 "what the setup program has Ctrl-C and Ctrl-Break go to, "
                 "a routine that only returns: the one program has its "
                 "own, CtrlC of resident.c",
+        },
+    ),
+    Batch(
+        title="The setup program: its help, the pages read from the help "
+              "file and one of them in a window",
+        source="sthelp.c",
+        # RdHelp alone calls SeekDsk and ReadDsk. DeCode, which it calls
+        # too, is the main program's word for word, and DeCode of help.c
+        # serves both: the batch of the main program's help holds it.
+        routines=("RdHelp", "Help", "HlpLine", "SeekDsk", "ReadDsk"),
+        functions=("StRdHelp", "StHelp"),
+        unreached={
+            0x1482: "SeekDsk, for DOS having gone to another place of the "
+                    "help file than it was asked for: it does not",
+        },
+        not_carried={
+            **dict.fromkeys(
+                (0x113D, 0x1140, 0x1142),
+                "RdHlp2, the line that the setup program prints through "
+                "DOS when it starts and cannot read the help file, "
+                "\"Error reading data from the help file.\": the setup "
+                "of the one program says nothing of what a program of "
+                "its own said at its start (src/portable_c/"
+                "DEVIATIONS.md)"),
         },
     ),
 ]

@@ -151,8 +151,10 @@ static const u8 CODE Empty_S[] = "";
 #define SHOWN() ((u16)(signed char)(md.Lines - 12))
 
 /* Take the mark off `count` bytes that were read from the file. A count
-   of 0 is one of 65536. */
-static void DeCode(u8 *at, u16 count)
+   of 0 is one of 65536. Not static: the help of the setup, sthelp.c,
+   calls it for its own pages, as the setup program has the routine word
+   for word. */
+void DeCode(u8 *at, u16 count)
 {
     do
         *at++ ^= 0x1A;

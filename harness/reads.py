@@ -248,6 +248,10 @@ REVIEWED = {
     ("view.c", "EdFl_S"): (ZERO, "an include line, and a title"),
     ("view.c", "RunEr_S"): (ZERO, "an include line"),
     ("view.c", "Run1_S"): (ZERO, "an include line"),
+    # The help of the setup program.
+    ("sthelp.c", "StHelp_F"): (20, "13 bytes from the seventh on, the "
+                                   "header of the help file"),
+    ("sthelp.c", "StHelp_P"): (4, "the colours of a line: any of four"),
 }
 
 _NUMBER = {"LenPath": 68, "LenStr": 64}
