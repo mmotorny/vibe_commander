@@ -675,7 +675,6 @@ the number. No test holds the table.
 | Lines of `#pragma aux` | 17, of which 5 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 722, 68, 246, 92 |
 | Calls outside the file of the system's functions that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -683,10 +682,8 @@ the number. No test holds the table.
 The rows of the file are what the harness's reader of a flat program
 of 32 bits finds in it, `harness/le.py`, and how much room the layout
 that it rests on has left, as the test `portable_c-layout` works it
-out. The four words in the row of `__far` are counted by the test
-`portable_c-host`, which prints them in its summary, each place where
-the word stands in the code; what else that test counts of what only
-Open Watcom reads, by kinds, is in its own table, in `TODO.md`.
+out. What the test `portable_c-host` counts of what only Open Watcom
+reads, by kinds, is in its own table, in `TODO.md`.
 
 While the portable C was a program of 16 bits, the table had what it
 kept of DOS's memory while a command ran, and what that left a command

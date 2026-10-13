@@ -28,10 +28,9 @@ length of the same program compiled for finding a fault. What is
 counted, in src/portable_c/, comments left out: inline assembly, by its
 pieces and instructions, and the lines of #pragma aux and pack; and the
 calls that still hand registers to an interrupt, which tools/calls.py
-counts. The words __far, FAR, STACK and CODE are counted by the host
-check, harness/hostcheck.py, whose function is called here; the other
-things that only Open Watcom reads, by their kinds, are that test's to
-count, and its table is in TODO.md.
+counts. The other things that only Open Watcom reads, by their kinds,
+are the host check's to count, harness/hostcheck.py, and its table is
+in TODO.md.
 
 The portable C was a program of 16 bits until the tests came to judge
 it as one of 32, and the table then had what such a program keeps of
@@ -187,15 +186,6 @@ def table():
                  str(sum(len(re.findall(r"^#pragma pack\(push", text,
                                         flags=re.M))
                          for text in texts.values()))))
-    # The words that say what segment a thing is in, as the host check
-    # counts them and prints them in its summary: one count, its own.
-    places = hostcheck.segment_words(SOURCE)
-    rows.append((
-        ", ".join(f"`{word}`" for word in hostcheck.SEGMENT_WORDS)
-        + ", as the test `portable_c-host` counts them: each place where "
-        "the word stands in the code",
-        ", ".join(number(places[word])
-                  for word in hostcheck.SEGMENT_WORDS)))
     # What asks the system by handing registers to an interrupt, or
     # reads the machine's memory at a fixed address, and not through
     # sys.h: tools/calls.py counts it, by file. There is to be none.

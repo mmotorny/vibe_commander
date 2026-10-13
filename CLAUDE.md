@@ -1940,14 +1940,9 @@ in "The portable C".
   these notes: say the thing without the number, or point to the
   table. A figure that is history, what a step cost when it was made,
   stays where it tells that, and a commit message keeps its own. A new
-  figure is a row of the table, added in the script. Three things the
-  script does not measure but takes: what the bench has for the
-  program, its panels and a command together, 425,536 bytes, seen once
-  on the Info panel as its top says; that the block of the panels is
-  two panels of 256 files for a command; and the counts of `__far`,
-  `STACK` and `CODE`, which are the host check's, by its function.
-  What else that test counts is in its own table in `TODO.md`, which
-  its `--record` flow goes with, and is not copied.
+  figure is a row of the table, added in the script. What the test
+  `portable_c-host` counts is in its own table in `TODO.md`, which its
+  `--record` flow goes with, and is not copied.
 - What taking out the first feature that a user sees met, the map of
   the memory with the watch on DOS that it rested on
   (`src/portable_c/DEVIATIONS.md`, 7):

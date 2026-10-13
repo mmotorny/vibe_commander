@@ -1636,52 +1636,47 @@ the help file is the distribution's.
 The portable C is built by one compiler, for DOS. The test
 `portable_c-host` counts how far its source is from what another takes:
 `harness/hostcheck.py` has gcc read every file for a machine of 64
-bits, where a pointer is no segment and offset and fits no number of 32
-bits, and counts each place that gcc refuses and each that only Open
+bits and counts each place that gcc refuses and each that only Open
 Watcom reads. `harness/hostcheck.txt` has the counts of every file, and
 the test holds the tree to them, so the record is always what is so:
 the top of the script says how. This is what the kinds are waiting
-for, with the counts of when it was written, but for the three kinds
-that lost places when the entry of INT 21h went, and the two that lost
-one when Quick execute commands did, which are as they stand since;
-the test prints them all as they stand.
+for, with the counts of 13 October 2026, when the words of the 16-bit
+compiler had gone from the source; the test prints them as they stand.
 
-1,033 places in 38 of the 58 files, the three headers among them.
-Twenty files are clean: the twelve of tables, `sys.h`, and `blank.c`,
-`digits.c`, `line.c`, `mask.c`, `mouse.c`, `screen.c` and `string.c`.
-The first count was 1,391, with two files of tables clean. 307 of what
-went were the offset of a field worked out from a pointer at 0, `MD_AT`
-of `tables.h` above all, which no pointer was meant by: they are
-written as `offsetof` is now, `OFFSET_IN` of `vc.h`. 64 went with the
-map of the memory and the watch on DOS that it rested on, `memory.c`,
-its tables and half of `resident.c` (`src/portable_c/DEVIATIONS.md`,
-7). And 13 came, on balance, with the functions of the system:
-`dos.c` makes a segment and an offset of a pointer for DOS, and the
-files that ask through it make fewer pointers of numbers.
+65 places in 5 of the 65 files. Sixty files are clean. All that gcc
+refuses is in `dos32.c`, the system's functions for DOS; `main.c`,
+`resident.c`, `stack.c` and `vc.h` each have a line or a few that only
+this compiler reads. The first count, of the program of 16 bits, was
+1,391, with two files of tables clean.
 
 | Kind | Places | Files | What it is | What it waits for |
 |---|---|---|---|---|
-| `to-number` | 595 | 33 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets: see below |
-| `to-pointer` | 390 | 28 | A number of 16 or 32 bits made a pointer | The same. Where the address is the machine's, the screen in `window.c` and DOS's routine for capitals in `dos.c`, the system interface |
-| `layout` | 2 | 1 | `BOXHD` and `BOXMN` of `tables.h`, the header and a field of a dialog, are not as long as on DOS: each holds a pointer, which is a word there | Tables that are not held to the original's bytes where a pointer is no word: `LAID_OUT` for DOS alone, when the routines that read them take pointers |
-| `function` | 5 | 2 | The address of a function kept as that of data, for a vector of an interrupt, and once the other way, the call into the PSP | The system interface |
-| `interrupt` | 5 | 3 | `__interrupt`, where a function is declared or defined: `CtrlC` and `Exit05` of `resident.c`, `FatErr` of `main.c` | The system interface: what DOS enters is of DOS, and goes to a file that only the build for DOS has |
-| `loadds` | 3 | 1 | `__loadds`: `Alloc0` and `Exec2E` of `resident.c` | The same |
-| `naked`, `asm` | 3, 3 | 2 | The function of `dos.c` that is its `_asm`, `Exit01`, and two of `dos32.c`, `DeviceEntry` and `NothingEntry`. `Int2E` was a fourth, and went with Quick execute commands | The same |
-| `asm-pragma` | 7 | 1 | The seven pieces of inline assembly of `dos.c`, a `#pragma aux` each | The same: `dos.c` is the side of that interface which is DOS |
-| `registers` | 4 | 3 | A `#pragma aux` that names registers: `__U4M` and `__U4D` of `arith.c`, `CaseMapFn` of `dos.c` and of `dos32.c`. That of `Int2E` went with Quick execute commands | The same for the last. `arith.c` is Open Watcom's own, and another compiler's build leaves the file out |
-| `intrinsic` | 1 | 1 | `_disable` and `_enable` of `dos.c` | The system interface |
-| `data_seg` | 4 | 2 | The segment of the main data, in `main.c`, and of the stack, `stack.c` | A program that does not take the main data to be at offset 0 of its segment, which the tables and `MAIN_SEG` do; and a stack that the system gives |
-| `aborts` | 8 | 3 | A `#pragma aux` that says a function does not return | Nothing: another compiler passes over the line. Four are in `vc.h`, which is not clean for them and for the `__interrupt` of `CtrlC`. A word of `vc.h` could say it to every compiler in its own way |
+| `to-number` | 15 | 1 | A pointer cast to a number of 32 bits, which does not hold it on a machine of 64: `dos32.c` hands DOS and the extender addresses in registers | Nothing in the common code. The layer, steps 3 to 6 of the road: `dos32.c` is the side of it that is DOS |
+| `to-pointer` | 24 | 1 | A number of 32 bits made a pointer, in `dos32.c`: an address of the machine, or one that DOS or the extender answered with | The same |
+| `naked`, `asm` | 2, 2 | 1 | The two functions of `dos32.c` that are their `_asm`, `DeviceEntry` and `NothingEntry` | The same |
+| `asm-pragma` | 11 | 1 | The eleven pieces of inline assembly of `dos32.c`, a `#pragma aux` each | The same |
+| `registers` | 1 | 1 | The `#pragma aux` of `Arrived` in `dos32.c`, which names its registers | The same |
+| `intrinsic` | 1 | 1 | `_disable` and `_enable` of `dos32.c` | The same |
+| `data_seg` | 4 | 2 | The segment of the main data, in `main.c`, and of the stack, `stack.c`: a line in front of each and one behind | For the first, a program that counts nothing from where the main data begins, which the words of the addresses do until step 2 of the road has taken them down; for the second, a stack that the system gives |
+| `aborts` | 5 | 3 | A `#pragma aux` that says a function does not return: `Alloc9` of `resident.c`, `Round` of `main.c`, and `AlocEr`, `Exit00` and `Main` in `vc.h` | Nothing: another compiler passes over the line. A word of `vc.h` could say it to every compiler, which the plan of the flat memory has in F9 |
 
-The script knows three kinds more, which have no place now:
-`inconstant`, a length that gcc cannot work out when it compiles, which
-two of those offsets were; `undeclared`, a function that nothing
-declares or defines; and `other`, what gcc says that the script does
-not know.
+The script knows six kinds more, which have no place now: `layout`, a
+structure that is not as long as the program takes it to be; `inconstant`,
+a length that gcc cannot work out when it compiles; `function`, the
+address of a function kept as that of data; `undeclared`, a function
+that nothing declares or defines; `interrupt`, a function declared
+`__interrupt`, which the compiler for 32 bits takes too and `dos32.c`
+does without; and `other`, what gcc says that the script does not
+know. The kind `loadds` went from the script with the words of the
+16-bit compiler, `__far`, `FAR`, `STACK` and `CODE`, which it counted
+in its summary while `vc.h` took them for nothing: one of those that
+is written again is what gcc refuses, and a place of the kind `other`.
 
-Most of the two casts are a few macros, and
-`python3 harness/hostcheck.py --macros` counts them as they stand:
+What follows is of the program of 16 bits, and is kept for what it says
+of where the places were.
+
+Most of the two casts were a few macros, which
+`python3 harness/hostcheck.py --macros` counts as they stand:
 
 - `OFFSET`, 208, which 17 files define each for itself: a box, a dialog
   or a text of the tables handed on as its offset in their segment, to
@@ -1702,8 +1697,8 @@ Most of the two casts are a few macros, and
   `name` of `struct DosRegs`, which only `dos.c` does now; a far
   pointer made of a segment and an offset by a shift.
 
-Since the words of the addresses are in `vc.h` with a second body for
-a memory without segments ("The portable C in 32 bits: the plan", P1),
+Since the words of the addresses are in `vc.h` with a body for a
+memory without segments ("The portable C in 32 bits: the plan", P1),
 gcc reads that body, which casts nothing: `OFFSET`, `AT`, `PANEL`,
 `MAIN_SEG`, `NEAR` and `TRELIST` make no place any more, no file
 defines one of them for itself, and `layout` has none either, the two

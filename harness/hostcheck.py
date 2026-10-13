@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Hold the source of the portable C against a compiler of this computer.
 
-The portable C, src/portable_c/, is built by Open Watcom for DOS and
-judged there. How far its source is from a program that another
-compiler would take, for a machine whose memory is not in segments, no
+The portable C, src/portable_c/, is built by Open Watcom for DOS, as a
+program of 32 bits, and judged there. How far its source is from a
+program that another compiler would take, for another machine, no
 build for DOS says. This does: it has gcc read every file of the tree
 for a machine of 64 bits, as strict C of 1999, and counts what gcc
 refuses. Nothing is compiled, linked or run; it takes a second or two.
@@ -16,18 +16,17 @@ What is counted, a place at a time, each of a kind (KINDS below):
     DOS has it.
   - What only Open Watcom reads, which is counted here, by the word, in
     the source without its comments and its strings: an interrupt
-    function, `__loadds`, `__declspec(naked)`, a block of `_asm`, and a
-    `#pragma` that is this compiler's. Each is then taken out of gcc's
-    sight, so that it can read the rest of the file: the three words by
-    a macro that makes nothing of them (OWN below), an `_asm` block by
-    blanks, and such a `#pragma` gcc passes over by itself. Nothing
-    else is hidden.
+    function, `__declspec(naked)`, a block of `_asm`, and a `#pragma`
+    that is this compiler's. Each is then taken out of gcc's sight, so
+    that it can read the rest of the file: the two words by a macro
+    that makes nothing of them (OWN below), an `_asm` block by blanks,
+    and such a `#pragma` gcc passes over by itself. Nothing else is
+    hidden.
 
-The words of Open Watcom that say what segment a thing is in, `__far`,
-CODE and STACK, and FAR, which is `__far` for the pointers of sys.h, are
-no errors: vc.h takes them for nothing where the
-memory has no segments, as a build for such a machine will. The summary
-says how many there are.
+The words of Open Watcom that said what segment a thing is in, `__far`
+and the three that vc.h had for them, went from the source with the
+program of 16 bits, and `__loadds` with them: one that is written again
+is what gcc refuses, and a place of the kind `other`.
 
 A place is counted for the file that it is written in, and what a macro
 makes is written where the macro is used: DOS_AT of vc.h made a
@@ -36,14 +35,14 @@ each, while there was one. What is wrong in a header itself is counted once, for
 however many files read it. A file with no place of any kind is clean.
 
 The words of the addresses in vc.h, AT, OFFSET, PANEL, MAIN_SEG, NEAR,
-MD_PLACE, MD_POINTER and their like, have a body for a memory without
-segments, and that is the one gcc reads here: it casts nothing. So a
-segment and an offset that go through those words are not counted, and
-what is counted of the two casts is what does not go through them: a
-cast that is written out, a macro of a file, and what is DOS's. That
-the second bodies compile says nothing of whether a place is right
-there: a word of a table read as a number of 16 bits through AT is not,
-and gcc has nothing to say of it.
+MD_PLACE, MD_POINTER and their like, are written for a memory without
+segments and cast no pointer to a number. So a segment and an offset
+that go through those words are not counted, and what is counted of
+the two casts is what does not go through them: a cast that is written
+out, a macro of a file, and what is DOS's. That the words compile for
+this machine says nothing of whether a place is right on it: they hold
+a megabyte of segments in the memory, and gcc has nothing to say of
+what a number means there.
 
 What was counted last is kept in harness/hostcheck.txt, of every file,
 and the test `portable_c-host` of the build fails when a file has
@@ -120,7 +119,7 @@ AT_ITS_USE = "-ftrack-macro-expansion=0"
 
 # What Open Watcom alone reads and the code is not to be read without:
 # counted here by the word, and made nothing of for gcc.
-OWN = ["-D__interrupt=", "-D__loadds=", "-D__declspec(x)="]
+OWN = ["-D__interrupt=", "-D__declspec(x)="]
 
 # The kinds, in the order of the summary: the name that the record has
 # for each, and what it is. TODO.md says what each waits for.
@@ -132,7 +131,6 @@ KINDS = [
     ("function", "a pointer to a function kept as one to data, or back"),
     ("undeclared", "a function that nothing declares or defines"),
     ("interrupt", "__interrupt: a function that an interrupt enters"),
-    ("loadds", "__loadds: a function that loads DS when it is entered"),
     ("naked", "__declspec(naked): a function that is its assembly"),
     ("asm", "a block of _asm"),
     ("asm-pragma", "a #pragma aux that is instructions"),
@@ -158,11 +156,6 @@ SAYS = [
 
 # The kinds that macros make most of: see --macros.
 CASTS = ["to-number", "to-pointer", "function"]
-
-# The words that vc.h takes for nothing on a machine without segments.
-# FAR is its own, for the pointers of sys.h, and is __far where there
-# are segments.
-SEGMENT_WORDS = ["__far", "FAR", "STACK", "CODE"]
 
 
 def bare(text, strings):
@@ -207,7 +200,6 @@ def own(name, text):
         return text.count("\n", 0, position) + 1
 
     for word, kind in ((r"\b__interrupt\b", "interrupt"),
-                       (r"\b__loadds\b", "loadds"),
                        (r"\b__declspec\s*\(\s*naked\s*\)", "naked")):
         for found in re.finditer(word, code):
             places.append((name, line_of(found.start()), kind, ""))
@@ -409,20 +401,7 @@ def recorded():
     return table, with_gcc
 
 
-def segment_words(source):
-    """How often each of SEGMENT_WORDS stands in the tree `source`, in
-    the code, where it is not being defined. tools/figures.py writes
-    these into the README's table."""
-    words = Counter()
-    for path in sorted(source.glob("*.[ch]")):
-        code = bare(path.read_text(encoding="latin-1"), True)
-        for word in SEGMENT_WORDS:
-            words[word] += (len(re.findall(rf"\b{word}\b", code))
-                            - len(re.findall(rf"#define {word}\b", code)))
-    return words
-
-
-def summary(table, source, said):
+def summary(table, said):
     """What is printed of a run."""
     clean = sum(1 for kinds in table.values() if not kinds)
     lines = [f"{said}, as {' '.join(OPTIONS[3:5])}",
@@ -437,10 +416,6 @@ def summary(table, source, said):
             lines.append(f"{name:<12}{number:>7}{files:>7}  {what}")
     dirty = len(table) - clean
     lines.append(f"{'all':<12}{total:>7}{dirty:>7}")
-    words = segment_words(source)
-    lines += ["", "Taken for nothing where the memory has no segments: "
-              + ", ".join(f"{word} in {words[word]} places"
-                          for word in SEGMENT_WORDS)]
     return "\n".join(lines)
 
 
@@ -520,7 +495,7 @@ def main():
                 print("         which do not add up: a macro makes some "
                       "of these in a header itself")
         return
-    print(summary(table, arguments.source, said))
+    print(summary(table, said))
     if arguments.record:
         RECORD.write_text(written(table, said))
         print(f"\nWritten to {RECORD.relative_to(ROOT)}.")
