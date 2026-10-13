@@ -553,10 +553,18 @@ value in the registers that the assembly called it with, by a
 own for the linker; there is no assembly left to call it, and in the
 portable C such a function is called as the compiler calls any other,
 under the name that the compiler gives it: 329 functions, and the type
-of the five among them that are called through a table. What a function
-takes and returns is as it was, so one that hands back two things still
-has them as the halves of one number; making those what they mean, a
-structure or two functions, is the next step there (see `TODO.md`).
+of the five among them that are called through a table.
+
+A function that hands back two things, where the assembly has two
+registers or a register and the carry flag, returns them in the C
+translation as the halves of one number of 32 bits, which the caller
+takes apart. In the portable C the functions that files of every kind
+call return a structure with members named for what they are:
+`GetMous` the buttons and the place of the mouse, `OpenFil` what DOS
+answered and whether that is an error, `EdLin` the cursor and whether
+anything changed, and so on, 22 of 114. A call that still took such a
+number apart would not compile. The others, the commands and what is
+inside the editor and a few more files, are still to do (see `TODO.md`).
 
 The lines that say something of registers still, and why:
 
@@ -592,7 +600,7 @@ in any other. What still has its name from a `#pragma aux`:
 | `TrnMain`, as the part that stays names it for its address | An object there, a function where it is defined | 1 |
 
 That leaves 83 lines of `#pragma aux` in the portable C where the C
-translation has 863. Its `VC.EXE` is 133,472 bytes, 416 more than the
+translation has 863. Its `VC.EXE` is 133,504 bytes, 448 more than the
 C translation's: no effort went into the size, and a function that
 saves the registers it uses by the compiler's rule comes out a little
 longer here and a little shorter there.

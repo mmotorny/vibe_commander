@@ -6,46 +6,44 @@ Things that are known and not done. Standing instructions are in
 ## The portable C: two things in one number
 
 The functions of `src/portable_c/` have lost the registers that the
-assembly called them in (see the README, "The portable C"). What they
-take and return has not changed, and that is the half of the work that
-is left: where the assembly handed back two registers, or a register
-and a flag, the C translation returns one number of 32 bits with a
-thing in each half, and the caller takes it apart with shifts and
-casts. 114 functions return such a number. A few of them are numbers:
-`Timer`, the product and the quotient of `arith.c`, an address as DOS
-has it. The others are to return what they mean, a structure as a rule,
-and every caller to read that.
+assembly called them in (see the README, "The portable C"). Where the
+assembly handed back two registers, or a register and a flag, the C
+translation returns one number of 32 bits with a thing in each half, and
+the caller takes it apart with shifts and casts. 114 functions did. The
+22 that files of several kinds call return a structure now, with members
+named for what they are: the mouse, the keyboard and the BIOS, the time,
+a page of a list, what is selected, DOS's answer to a call that may
+fail, a line that is typed into, a key, the buttons, the entries and the
+commands of an extension file, and the search of the viewer.
 
-It divides, by who calls what:
+92 are left, and `python3 tools/pairs.py` lists them as they stand, by
+file, with the files that call each:
 
-- First, by one agent, what nearly every file calls, since it changes
-  lines everywhere: `GetMous` (45 calls in 15 files), `Int16` (21 in
-  9), `OpenFil` (17 in 8), `EdLin`, `Int10m`, `PgUp` and `PgDn`,
-  `DosTime`, `TotSel`, `DelTr0`, `MinMnu` and `MnMn10`, `Int2F`,
-  `Input0`, `FndItem`, `SaveSet`.
-- Then side by side, each with files that the others leave alone:
-  - the commands and the loop: what a command returns, a place of the
-    loop with a byte and a panel, in `keys.c`, `enter.c` and the
-    commands of `view.c`, and `CmdEnd` of `main.c`, which takes it
-    apart; with them `F00_50`, `F77_00` of `cmdline.c`, `F39_00` of
-    `menu.c`, `F67_00` of `find.c`, `F35_01` and `F45_01` of `copy.c`,
-    `Init11` of `start.c`, which all come back to `main.c`;
-  - the editor, `edit.c`: ten functions that only it calls, but for one
-    call of `T70_00` in `view.c`;
-  - the rest of `view.c`: `V82_00`, `F34_30`, `F34_40`, with their
-    calls in `edit.c`, `find.c` and `usermenu.c`;
-  - what a file keeps to itself: `dialog.c`, `copy.c`, `dirfunc.c`,
-    `extfile.c`, `usermenu.c`, `read.c`.
-  `vc.h` has the declarations in blocks by file, so each changes its
-  own block. `main.c` is the one file that two of them meet in: the
-  commands' agent has `Command` and `CmdEnd`, and `F35_90` there goes
-  with `copy.c`.
-- `python3 tools/pairs.py` lists them as they stand: every function
-  defined `u32`, by its file, with the files that call it and how
-  often.
+- 68, the commands and the loop: what a command returns, a place of
+  the loop with a byte and a panel, in `keys.c` (32), `enter.c` (19)
+  and `view.c` (11), which `CmdEnd` of `main.c` takes apart; and what
+  comes back to `main.c` besides: `F77_00` of `cmdline.c`, `F39_00` of
+  `menu.c`, `F67_00` of `find.c`, `F35_01` and `F45_01` of `copy.c`;
+  with them `ChgAdr` of `place.c`, which only `keys.c` calls. One piece
+  of work: every one of them meets `Command` and `CmdEnd`.
+- 9, the editor, `edit.c`, which nothing else calls.
+- 10 that a file keeps to itself, or nearly: `dialog.c` (4),
+  `dirfunc.c` (2, of which `dialog.c` calls `M30_60`), `read.c` (2, of
+  which `dirfunc.c` calls `GetVol`), `F36_04` of `copy.c`, `MenuItem`
+  of `usermenu.c`.
+- 2 of the seam between the two parts of the program, `Init11` of
+  `start.c` and `TrnMain` of `main.c`, which go with that.
+- 3 that are numbers and stay: `Timer`, `__U4M`, and `Dos35` of
+  `main.c`, an address as DOS has it.
+
+The three kinds divide among agents as they stand: the editor and the
+ten are of files that the commands' agent leaves alone but for
+`copy.c`, where `F36_04` is next to `F35_01`; give that file to one of
+the two. What was the fourth, the rest of `view.c`, is done.
 
 `CLAUDE.md`, "Notes on the portable C", has how such a function is
-written so that a call that was not changed does not compile.
+written so that a call that was not changed does not compile, and what
+went wrong on the way.
 
 ## The last of the assembly
 

@@ -1290,6 +1290,39 @@ in "The portable C".
   the two as a `u16`, which every old caller still compiles against,
   and reads as the low word.
 
+- What retyping the first 22 of those functions met, each of which
+  the compiler took without a word:
+  - A variable that several calls share, `pair` as a rule, is split
+    when one of the calls returns a structure. Every call but one took
+    its number apart on the next lines; `Dialog` did not: four branches
+    set `pair` and one line behind them all read it. The branch whose
+    call got a variable of its own no longer set `pair`, and the line
+    read what was there before. Look at every read of the old variable
+    that is left, not only at those behind the call that changed.
+  - A call may take apart what the call before returned, in its own
+    arguments: `pair = F34_40(HIGH(pair), 1)`. With two variables that
+    is the first one's member, and the second one's compiles as well.
+  - `clang` finds the first of the two as a variable that may be read
+    before it is set, by the audit of the note above, when nothing set
+    the variable earlier in the function; neither it nor the compiler
+    finds the second. Both were found by reading every changed line.
+  - A file may have a structure of the name already: `struct Mouse` of
+    `menu.c`, which is `struct MenuMouse` now. That one the compiler
+    says.
+  - `Function(arguments).member` is taken, and reads well where only
+    one of the two things is wanted. A call that ignores what is
+    returned needs no change, and compiles.
+  - A structure of two words comes back as the number did, in DX:AX:
+    the program is a few bytes longer for the functions that make one,
+    `Changed` and `Unchanged` of `input.c` in place of two macros.
+  - Open Watcom does say "has been referenced but never assigned a
+    value", W200, for a variable that nothing sets at all.
+- A build can be tested while the tree goes on changing: copy
+  `build/portable_c/VC.EXE`, `VC.MAP` and the object files elsewhere
+  in `build/`, and run `harness/datacheck.py` (at once: it reads the
+  source), `harness/arithcheck.py` and `harness/ported.py` on the copy.
+  The commit has to be made when the copy is.
+
 ## Work by several agents
 
 Work that can be divided is done by several agents at a time, without
