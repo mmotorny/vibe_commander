@@ -16,11 +16,10 @@ extern const u8 Help_S[];               /* " Help " */
 extern const u8 OkMn_D[];
 
 /* The button Ok as a line of a box, and as the window of a page has it
-   below its text. The setup program has the two among the tables of its
-   dialogs, in VCSETUP.ASM, and its help reads both; they are here until
-   those tables are, and then go there. */
-const u8 StOkMn_S[] = " Ok ";
-const u8 StOk_S[] = "[ Ok ]";
+   below its text, which sthelp.c names. The setup program has the two
+   among the tables of its dialogs, in VCSETUP.ASM, and its help reads
+   both: they are of stopts_t.c. */
+extern const u8 StOkMn_S[];             /* " Ok " */
 
 static const u8 StHlEr1_S[] = "Help contents is not available";
 

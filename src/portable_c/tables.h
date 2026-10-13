@@ -124,6 +124,10 @@ struct BOXTX {
                                            dialog whose line for it is
                                            two rows further down, */
 #define SUB_F35_61 4                    /* and for one where it is not */
+#define SUB_StF04_10 5                  /* StF04_10 of stopts.c, of the
+                                           setup: whether the delay of
+                                           the tree that was typed is
+                                           one */
 
 /* The header of a dialog: BOXHD of the assembly. */
 struct BOXHD {

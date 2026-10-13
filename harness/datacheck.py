@@ -274,6 +274,15 @@ SETUP_NAMED_OTHERWISE = {
                        "in BoxBuf, which the main data has not: its "
                        "ErrBuf is as long, and is where the main "
                        "program's boxes of errors are kept"),
+    ("StNoTim_P", 6): ("field", "ErrBuf",
+                       "what the box \"Illegal format of\" covers, over "
+                       "Panel options, which has WinBuf: in the setup "
+                       "program's BoxBuf, the main data's ErrBuf"),
+    ("StPanOp_B", 4): ("is", 5,
+                       "the routine that Panel options names for Enter, "
+                       "F04_10, is a number, SUB_StF04_10 of "
+                       "src/portable_c/tables.h, by which Dialog calls "
+                       "the function"),
 }
 
 # Words of an object that name a text which is not read as far as a zero
