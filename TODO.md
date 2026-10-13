@@ -2590,6 +2590,61 @@ So, of the design:
     day, an estimate. It says which blocks ran, not which way a branch
     went.
 
+## Leaving a part of the screen out of the comparison: future work
+
+Recorded on the user's word of 13 October 2026, as an idea for later. It
+is not built, and nothing needs it today.
+
+What it is. A golden stays what it is, every cell of every screen that
+the original showed: it is the only witness of the original, and
+recording the whole screen costs nothing. What changes is the
+comparison, for one tree: a named part of the screen is left out of it,
+"what the Info panel shows", "what DOS had shown behind the panels",
+where that part cannot be what the original's is and is on many screens
+that are about something else. It is the same thing that
+`harness/deviations.py` does today for single figures, the count of free
+memory and the clock, made larger. It is not a golden that records
+less.
+
+What raised it. Giving the portable C its own name touched the top rows
+of the Info panel, which the distribution has on the right, on some
+2,000 screens of scenarios that have nothing to do with it. That case
+was settled otherwise: the bench now starts every scenario with a panel
+of files on the right ("Scenarios" in `CLAUDE.md`), which takes the
+part off those screens and leaves every cell that remains compared.
+Where a part can be taken off the screen by how the bench is set up,
+that is the better way.
+
+Where it will be wanted. Where a part cannot be configured away: above
+all the first build that is not for DOS, in which what DOS had shown
+behind the panels is not there at all, and whatever of the Info panel a
+system does not have, a label of a drive, the size of a disk as DOS
+counts it, differs wherever the panel shows.
+
+What it has to be, if it is built:
+
+- Declared, for one tree, by the name of the part and the reason, in
+  `src/portable_c/DEVIATIONS.md` like any other difference.
+- By the part, not by a rectangle. A menu or a box drawn over the part
+  is not left out with it: only the cells that show the part are. That
+  takes knowing which cells those are on a screen where something
+  covers some of them; one way is to leave out a cell only where the
+  golden has, at that place, what the part has there when nothing covers
+  it.
+- Every part that is left out is still compared whole in at least one
+  scenario that is about it, and the test says so if none is.
+
+What it costs. The comparison of whole screens notices harm in places
+that nobody was looking at: a count that was wrong in the editor showed
+only in a status line drawn elsewhere on the screen (the note on
+`T75_00` in `CLAUDE.md`). Inside a part that is left out, that is given
+up. So a part is left out when nothing else will do, and as small as
+will do.
+
+For whoever designs it: the rules of `harness/deviations.py` that
+belong to one tree should be able to say "these cells are not compared"
+as well as "expect this in their place".
+
 ## The last of the assembly
 
 Done: the C translation has no assembly file, and its build runs no
