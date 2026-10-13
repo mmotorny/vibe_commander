@@ -428,16 +428,21 @@ Main32:                                 /* Enter */
 
    Then the program gets its setup. With Save it keeps what was edited,
    but for four bytes: which panel is the current one, whether the other
-   is switched off, and TSR manager are as they were when the setup was
-   entered, and Memory allocation stays so for LoadFl, with what was
-   edited in LoadRes, which is what LoadFl becomes when the setup has
-   been left, as after a command. That is what the original's setup
-   program does to a main program that is running, by a call of DOS that
-   the main program answers with the address of its setup (INT 21h with
-   AX 2B02h, CX 'VC' and DX 'OM'): the original's main program answers
-   only if its setup has TSR manager on, and here the program takes the
-   setup whatever that is. Without Save the program has its setup back
-   as it was.
+   is switched off, and the byte of TSR manager are as they were when the
+   setup was entered, and the byte of Memory allocation stays so for
+   LoadFl, with the setup file's in LoadRes, which is what LoadFl becomes
+   when the setup has been left, as after a command. That is what the
+   original's setup program does to a main program that is running, by a
+   call of DOS that the main program answers with the address of its
+   setup (INT 21h with AX 2B02h, CX 'VC' and DX 'OM'): the original's
+   main program answers only if its setup has TSR manager on, and here
+   the program takes the setup whatever that is. Without Save the program
+   has its setup back as it was.
+
+   Neither of the two bytes is a setting here: the setup shows no
+   Memory allocation and no TSR manager, and nothing goes by either
+   byte but the highest bit of LoadFl, which is no part of the setup
+   (see vc.h). Both are in the file as they were read from it.
 
    Ported as they are:
      - Cancel in the box leaves the setup as Save does, without saving:

@@ -1366,9 +1366,10 @@ in "The portable C".
   - `TREES` of `harness/deviations.py`: the scenarios that are not run
     for the tree; a step that is left out of every scenario for it,
     where the keys choose something that is gone, or steps of one
-    scenario; and a rule for what is otherwise on many screens. A
-    program knows its tree by the directory of the build that its file
-    is in.
+    scenario; a step that the tree is taken through in place of
+    another, in every scenario or in one; and a rule for what is
+    otherwise on many screens. A program knows its tree by the
+    directory of the build that its file is in.
   - `DECLARED` of `harness/datacheck.py`: a table of the program that
     differs, as the places where it departs from the original's, each
     with the bytes that the tree has there or none for bytes left out.
@@ -1798,6 +1799,58 @@ in "The portable C".
     on the stack for a second return address: `Int21` returned to
     whoever called, and `New21` jumped to it without the three
     instructions that made the room. `Exit01` still has them.
+- What taking three settings out of two dialogs of the setup met,
+  Memory allocation, TSR manager and Screen output
+  (`src/portable_c/DEVIATIONS.md`, 1, 7 and 5; `TODO.md`, "Piece E2"):
+  - A field of a dialog names the four fields that the keys go to from
+    it, by their numbers, and a group by a flag whether on its first
+    line or its last (`LINK_` of `dialog.c`). With a field gone every
+    field behind it has another number, and its neighbours may be
+    others: write down where each field stands now, and each of its
+    four links from that, by the rule that the original's follow, not
+    by taking one from every number. The data's test holds what is
+    declared, which is what was written, and says nothing of a link
+    that leads to the wrong field: only a scenario that goes that way
+    does, as a cursor on another row.
+  - A box with two groups side by side has one text for each row, both
+    halves in it. A line taken out of the right half makes every text
+    below it another, of the left half that it had and the right half
+    of a line further down. Such a text keeps its name, and is declared
+    in `DECLARED` of `harness/datacheck.py` without the bytes from the
+    end of its left half to where that right half begins in the
+    original, a stretch that runs on through the objects that follow:
+    the test then holds the right half against the original's too, and
+    the entry is two numbers. `_lines` there makes the entries, and
+    `_field` those of a dialog's fields.
+  - Steps that get to a line of such a dialog are others for the tree,
+    and the same keys mean what they did elsewhere in the scenario:
+    `in_place_in` of `deviations.TREES` has, for a scenario, steps of
+    the original that follow one another and the tree's step for each,
+    or None. Give a step with enough of those around it that the
+    scenario has them once; a step that is alone is put in wherever it
+    is, which is right for a click. `python3 harness/goldens.py
+    changes --tree portable_c NAME` says of each screen which step the
+    tree was taken through.
+  - The mouse pointer exchanges the colours of the cell that it is on,
+    and the setup puts it in the middle of the screen: lines that move
+    under it are in the patch for that cell too, on the row that it is
+    on and on the row that the text went to.
+  - A patch of a dialog whose lines have moved is the same eleven rows
+    on every screen that shows it, hundreds of lines. They were read
+    by a script as well as by eye: it made of each screen of the
+    original's golden what the declaration says, the rows of the right
+    half moved and the cursor with them, held that against the golden
+    with its patch (`goldens.read(name)` and `goldens.read(name,
+    tree)`, screen for screen by `places`), and printed what was left,
+    which is then little enough to read: the pointer's cell, the
+    cursors that are on another field, the disks.
+  - While a test runs, the next build can be tried beside it without
+    touching `build/portable_c`: copy its object files into a
+    directory of `build/` that is called `portable_c`, compile the
+    files that have changed into it by their lines of
+    `build/CMakeFiles/portable_c.dir/build.make`, and link by the line
+    of the linker there with the paths changed. `harness/show.py
+    --program` and `harness/datacheck.py` with `--source` take it.
 - The setup program, step 0 of the road, has its plan in `TODO.md`,
   "The setup program in the portable C: the plan": what the program is,
   what the portable C has of it already, how it becomes a part of the

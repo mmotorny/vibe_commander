@@ -70,7 +70,11 @@ static const u8 CODE StDelay_T[] = { 40, 20, 5, 3, 1, 0 };
    If the key bar was on and is off now, its row is what DOS had shown
    there again, from the copy of the screen that the setup was entered
    with. Whatever the dialog was answered with: only Ok changes
-   anything. */
+   anything.
+
+   The assembly's has two boxes more, Memory allocation and TSR manager,
+   for two bytes of the setup that the portable C does not go by (see
+   DEVIATIONS.md): they are left as the setup has them. */
 void StF02_00(void)
 {
     u8 bar = md.KeyBar;
@@ -85,16 +89,17 @@ void StF02_00(void)
     md.BarPrev = 0xFF;
 }
 
-/* Screen and Mouse. The palette, the minutes until the screen is
-   blanked and Screen output are chosen from groups, which the dialog
-   has at TmpBuf, TmpBuf+2 and TmpBuf+4, each with the line of its cursor
-   behind it. The group of the minutes leaves 0 to 5. The boxes to tick
-   and the characters of the screen saver the dialog sets itself.
+/* Screen and Mouse. The palette and the minutes until the screen is
+   blanked are chosen from groups, which the dialog has at TmpBuf and
+   TmpBuf+2, each with the line of its cursor behind it. The group of
+   the minutes leaves 0 to 5. The boxes to tick and the characters of
+   the screen saver the dialog sets itself.
 
-   The assembly then calls SetSnow, whatever the answer, which finds out
-   whether to wait for a display that shows snow: the portable C has no
-   such wait (see DEVIATIONS.md), and nothing here goes by Screen
-   output. */
+   The assembly has a third group, Screen output, at TmpBuf+4, for the
+   byte Snow mode of the setup, and then calls SetSnow, whatever the
+   answer, which finds out whether to wait for a display that shows
+   snow. The portable C has no such wait and no such group (see
+   DEVIATIONS.md): the byte is left as the setup has it. */
 void StF03_00(void)
 {
     u8 delay;
@@ -105,13 +110,10 @@ void StF03_00(void)
         ;
     md.TmpBuf[2] = delay;
     md.TmpBuf[3] = delay;
-    md.TmpBuf[4] = md.SnowMod;
-    md.TmpBuf[5] = md.SnowMod;
     if ((u8)Dialog(OFFSET(StScrn_B), 0, 0, 0, MAIN_SEG) != 0)
         return;
     md.ColTyp = md.TmpBuf[0];
     md.BlDelay = StDelay_T[md.TmpBuf[2]];
-    md.SnowMod = md.TmpBuf[4];
 }
 
 /* Panel options. The delay of the tree is written for the dialog's line

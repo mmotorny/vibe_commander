@@ -132,12 +132,27 @@ it.
   see 8.
 - The byte of the setup file that held the switch is kept as it is found
   and written back as it was; the program does not go by it. A setup file
-  of the original is one of the portable C and the other way round. The
-  original's setup program, `VCSETUP`, still shows the switch and writes
-  the byte, and so will the setup of the portable C, which is that
-  program (see 8), until the setting is taken out there.
+  of the original is one of the portable C and the other way round.
+- The setup has no box for it either. The original's setup program,
+  `VCSETUP`, has the switch in its Configuration as well, the first of
+  three boxes of Execute options, and writes the byte. In the setup of
+  the portable C, which is that program (see 8), the box is gone: Quick
+  execute commands stands in its place, a row further up, and with TSR
+  manager gone from below that (see 7) it is the one line of Execute
+  options. The Keyboard options stand two rows further up for the two,
+  and the box of the dialog is as tall as it was, since its left half
+  is: the last two rows of its right half are empty. The boxes go to
+  each other as they stand now: Down from Show logical drive B: is Quick
+  execute commands, Right from a box of the left half is the box on its
+  row or else the one above that row, and Left from one of the right
+  half the box on its row. The setup writes the byte into the setup file
+  as it read it, and Set default configuration makes it 1, as the
+  original's does.
 - The original's help file, which the portable C reads, still has its
-  page on Memory allocation; no item of the menu leads there.
+  page on Memory allocation; no item of the menu leads there. And the
+  page of the Configuration that the setup shows for F1 still has its
+  paragraph on the box, between those on Show logical drive B: and on
+  Quick execute commands: the help file is the distribution's.
 - It is an `.EXE` file, with the main data in it, which DOS loads and
   relocates. A DOS before 3 is left through the INT 20h of the
   PSP, as the original leaves it, by a call instead of a return; the
@@ -182,10 +197,20 @@ says that every screen is as the original's, by the steps left out alone:
 | `quick` | The step that switches Memory allocation off before the last command is left out; every screen is as the original's after the same step |
 | `second-copy` | The second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work |
 | `start-memory` | The second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with its Info, not the first copy's |
+| `setup-config` | The Configuration of the setup where it shows: without Memory allocation, and by 7 without TSR manager. In the right half of its box, Quick execute commands is a row further up, the frame of Execute options ends below it, the Keyboard options are two rows further up, and the last two rows are empty. The two steps that untick Memory allocation and TSR manager are left out; Quick execute commands is ticked where the cursor is when it comes down from the left half, by Space where the original goes down a line first. Left from Clear keyboard buffer is Error sound, the box of its row, where the original has Show logical drive B: there. And the setup file that is saved has the two bytes as it had them, 1 and 1, where the original's has 0 and 0, with another sum for that: three bytes of the file |
+| `setup-config-mouse` | The Configuration so. The click on Quick execute commands is a row further up and those on Alt alone selects menu two rows, and the mouse pointer with them. Every box is ticked as in the original, and the setup file that is saved is the original's |
+| `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The Configuration so, where each shows it; under the help of `setup-help-screens` nothing of its right half shows. In the Configuration the steps are the original's, since none goes into its right half. All but `setup-missing-saved` show Screen and Mouse too, which is otherwise by 5 |
 | `ended` | The program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. And by 7: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. And by 8, with no interrupt of DOS's taken: DX has in its low byte what DOS was last told of Ctrl-C and is as it came above that, which is what the original leaves there where its setup has TSR manager off; and DS is as it came, on the program that started the copy, a segment that follows the size of the program and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
 
 A step that switches Memory allocation, "F9 o m", is left out of every
 scenario for the portable C: there it would enter the setup (see 8).
+
+On every screen that shows one of the two dialogs with the mouse pointer
+where the setup put it, in the middle of the screen, the pointer is over
+a line that has moved: the cell whose colours it exchanges holds another
+character, and the cell that the original has there is two rows further
+up, or five in Screen and Mouse, in the colours of its line. The patches
+have both.
 
 **Not run for the portable C:**
 
@@ -198,7 +223,17 @@ scenario for the portable C: there it would enter the setup (see 8).
 against the original's with this difference declared for each, in
 `DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages of
 their help, the size of the Options menu, its commands, and the item that
-Shift-F9 chooses in it.
+Shift-F9 chooses in it. And of the setup's Configuration, for this and for
+7 together, the dialog, `StConf_B`, which is held against the original's
+without the two fields and with the fields that each of the others goes
+to and the rows of those that have moved as they are now; and eleven
+lines of its box, `StCnf02_S` to `StCnf12_S`. A line of that box is one
+text for the two halves: each of the nine that have something on the
+right is held against the original's line of that name as far as its left
+half goes and from there against the right half of the original's line
+that stands there now, and the two that have nothing there against their
+left halves, with spaces declared behind. The box itself, `StConf_P`, is
+the original's.
 
 ### 2. No buffer of TopView or DESQview in place of the screen
 
@@ -357,10 +392,29 @@ program reads no port any more. The byte of the main data that said
 whether to wait, `Snow`, keeps its place and is neither set nor read.
 Snow mode is a byte of the setup that is kept as it is found and written
 back as it was, 2 in a setup made of the defaults: a setup file of the
-original is one of the portable C and the other way round, and the
-original's setup program still shows the choice and writes the byte, as
-the setup of the portable C will, which is that program (see 8), until
-the setting is taken out there.
+original is one of the portable C and the other way round.
+
+The setup has no choice for it either. The original's setup program has
+it in Screen and Mouse, the group Screen output at the top of the right
+half of the box, and writes the byte. In the setup of the portable C,
+which is that program (see 8), the group is gone: the Other options,
+Zooming boxes and the line of the screen saver's characters, stand in its
+place, five rows further up, and the Mouse options below them. The box
+is as tall as it was, since its left half is, and the right half is
+empty from there down. The fields go to each other as they stand now:
+Right from Screen colors is Zooming boxes, and from Screen blank delay
+Left-handed mouse, the last of the right half, which ends above that
+group; Up from Zooming boxes, the first of the right half now, is the
+last line of Screen blank delay, as it was from Screen output; and Left
+from Zooming boxes and from the line of characters is Screen colors, on
+its first line, where the original has Screen blank delay to the left of
+both. The setup writes the byte into the setup file as it read it, Set
+default configuration makes it 2, as the original's does, and nothing is
+done about the display when the dialog is left, where the original's
+setup program tests it anew. The page of the help that the setup shows
+for Screen and Mouse still has its paragraph on Screen output, between
+those on Screen blank delay and on Zooming boxes: the help file is the
+distribution's.
 
 One thing is left of it, because more than the snow may rest on it: when
 a window has been put on the screen, or the screen has been read, the
@@ -374,15 +428,41 @@ the program is carried to has a display's memory that may be written
 only while the beam is elsewhere, and a wait that is timed by reading a
 port has nothing to read there.
 
-**Which scenarios show it.** None. The bench has a VGA. `start-setup`
+**Which scenarios show it.** That the program does not wait, none. The
+bench has a VGA. `start-setup`
 has a setup with Snow mode 0, so the original tests the display there,
 and finds nothing: QEMU's VGA turns the bit over every time it is read,
 so the instruction that sets the program to waiting, and the 20 of
 `Window` and `MovScr` that wait, ran in no scenario and are listed as
 out of reach in `harness/ported.py`. In that scenario the portable C
 does not test, shows the same screens and leaves the same setup file,
-with the byte as it found it. Every scenario is held against the golden
-that it was held against before.
+with the byte as it found it.
+
+That the setup has no Screen output, these, each held against the
+original's golden with what its row says made to it, by its patch and by
+the steps that `harness/deviations.py` has for it:
+
+| Scenario | What changes in it |
+|---|---|
+| `setup-screen` | Screen and Mouse of the setup where it shows: without Screen output. In the right half of its box the Other options and the Mouse options are five rows further up, and the rows below them are empty. The two steps that choose a line of Screen output, by Space and by a click, are left out. The others get to the same fields by the keys that lead there now: Right from Screen colors is Zooming boxes at once, where the original goes down through Screen output; Up from Zooming boxes is the last line of Screen blank delay, where the cursor then is, and from there Right and Up is the line of characters; Left from that line is Screen colors, where the original's cursor is on Screen blank delay, and 20 minutes is three lines further down from there; the line is three times Tab from the first field, and Zooming boxes twice Up from Left-handed mouse. The clicks on the right half are five rows further up, and the mouse pointer with them. And the setup file that is saved has the byte as it had it, 2, where the original's has 1, Asynchronized access, with another sum for that: two bytes of the file |
+| `setup-options-russia`, `setup-help-screens` | Screen and Mouse so, where each shows it; under the help of `setup-help-screens` nothing of its right half shows. The line of characters is three times Tab from the first field. The setup file that `setup-options-russia` saves is the original's |
+| `setup-left-handed` | Screen and Mouse so. The click on Left-handed mouse is five rows further up, and the mouse pointer is there, on the dialog and on the menu behind it. The setup file that is saved is the original's |
+| `setup`, `setup-delay-file`, `setup-clock` | Screen and Mouse so, where each shows it. The steps are the original's |
+
+`setup`, `setup-clock`, `setup-left-handed` and `setup-help-screens` show
+the Configuration too, which is otherwise by 1 and 7: the patch of each
+names the three entries. Where the mouse pointer is in the middle of the
+screen, it is over a line that has moved: see 1.
+
+**In the data.** The test `portable_c-data` holds the dialog, `StScrn_B`,
+against the original's with this declared, in `DECLARED` of
+`harness/datacheck.py`: without the field of Screen output, and with the
+fields that each of the others goes to and the rows of those that have
+moved as they are now; and twelve lines of its box, `StScr01_S` to
+`StScr12_S`, each against the original's line of that name as far as its
+left half goes, and from there against the right half of the original's
+line that stands there now, five further down, or with spaces declared
+where there is none. The box itself, `StScrn_P`, is the original's.
 
 ### 6. DOS and the BIOS are handed nothing that they are not asked
 
@@ -643,12 +723,20 @@ watch.
 - The byte of the setup that switched the watch, `ChkTSR`, is kept as it
   is found and written back as it was, 1 in a setup made of the
   defaults; the program does not go by it. A setup file of the original
-  is one of the portable C and the other way round. The original's
-  setup program still shows TSR manager and writes the byte, and so will
-  the setup of the portable C, which is that program (see 8), until the
-  setting is taken out there.
+  is one of the portable C and the other way round.
+- The setup has no box for it. The original's setup program has TSR
+  manager in its Configuration, the last of three boxes of Execute
+  options, and writes the byte. In the setup of the portable C, which
+  is that program (see 8), the box is gone, with that of Memory
+  allocation: 1 says how the dialog stands without the two. The setup
+  writes the byte into the setup file as it read it, and Set default
+  configuration makes it 1, as the original's does. When the setup is
+  left with Save, the program keeps the byte that it had, as the
+  original's running program does.
 - The original's help file, which the portable C reads, still has its
-  pages on the map; no key and no item of a menu leads there.
+  pages on the map; no key and no item of a menu leads there. And the
+  page of the Configuration that the setup shows for F1 still has its
+  paragraph on TSR manager, behind that on Quick execute commands.
 
 Gone are `memory.c` and `memory_t.c`, all of the map; and of
 `resident.c` the list, `Counter` and `PrgList`, the records and what
@@ -688,7 +776,12 @@ left out alone:
 
 And `menu` and `ended`, which the first deviation changes too: their
 rows there say all that differs in them, and the patch of each names
-both entries.
+both entries. So it is with the scenarios that show the Configuration of
+the setup, which is without TSR manager and without Memory allocation:
+`setup-config`, where the step that unticks TSR manager is left out and
+the byte is 1 in the setup file that is saved, `setup-config-mouse`,
+`setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed` and
+`setup-help-screens`. Their rows are in 1.
 
 A step that passes through the map on the way to something else is
 left out of its scenario for the portable C, with the steps that leave
@@ -793,7 +886,11 @@ of it.
   cursor goes on to the next row, which moves the screen up if that row
   was the last. Nothing is noted in the history. The program keeps the
   two interrupts that it has taken.
-- Then the setup is on the screen as the original's setup program is.
+- Then the setup is on the screen as the original's setup program is,
+  but for three settings of what the program has no more, which its
+  dialogs do not have: Memory allocation and TSR manager in the
+  Configuration (see 1 and 7), and Screen output in Screen and Mouse
+  (see 5).
   There is no word on the version of DOS or on the memory, no mode set
   and no banner: the program has started already. The directory is the
   one that the program has, which it makes by its own rule: in capitals,
@@ -886,7 +983,13 @@ pass so, and those of the help, `setup-help`, `setup-help-pages`,
 `setup-help-mouse`, `setup-help-file` and `setup-help-lines`; and so do
 `setup` and those of the option dialogs, from `setup-config` to
 `setup-missing-saved`, and `setup-delay-help`, which has the help over
-one of them. `setup-help-file`
+one of them, and those of what crosses the screens, `setup-mouse`,
+`setup-save-fails`, `setup-clock`, `setup-left-handed` and
+`setup-help-screens`. Ten of them show the Configuration or Screen and
+Mouse, which are without three settings here: each of those has a patch
+of the original's golden besides, and six are taken through other steps
+where a line has moved, by 1, 5 and 7, whose tables name them.
+`setup-help-file`
 has a help file that cannot be read, twice: the line that the original
 prints then is not in its golden, since the step that starts the setup
 program sends what it prints nowhere.

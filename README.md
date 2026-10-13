@@ -634,14 +634,14 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,212 bytes |
+| `VC.EXE` | 196,998 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 64,156 bytes |
+| more than the C translation's 133,056 bytes | 63,942 bytes |
 | The relocations in its header, which DOS applies | 1,029 |
-| What it keeps of the memory while a command runs: the program and its panels | 206,848 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,688 bytes |
+| What it keeps of the memory while a command runs: the program and its panels | 206,640 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,896 bytes |
 | The code segment `CTEXT` ends at | D322h, 7,390 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C543h, 10,941 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C534h, 10,956 bytes below the limit, F000h |
 | Inline assembly | 49 instructions in 9 pieces: 37 in 7 of `dos.c`, 12 in 2 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
@@ -993,10 +993,12 @@ picture asks for a shadow that is not the one set, is `ShadCol` of
 Screen and Mouse, the Panel options, with the delay of the tree that
 is typed there and the box for one that is none, and the Country info,
 whose lines are written as the country has them before the box is
-shown. `stopts_t.c` has their tables. Memory allocation, TSR manager
-and Screen output are still to be seen in the first two, as the
-original's setup program has them, and set nothing that the portable C
-goes by: they are to go.
+shown. `stopts_t.c` has their tables. The first two are without three
+settings that the original's setup program has there, Memory
+allocation, TSR manager and Screen output, which are of what the
+portable C has no more: what stood below them in a box stands further
+up, and their bytes of the setup file are kept as they are found
+(`src/portable_c/DEVIATIONS.md`, 1, 5 and 7).
 
 All nine items of the menu do what the original's do, and F1 is the
 help. The mouse at the menu is the main program's routine for a list in

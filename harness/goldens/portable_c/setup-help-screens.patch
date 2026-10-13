@@ -1,0 +1,150 @@
+The portable C in the scenario setup-help-screens: what it is expected to show
+otherwise than the original. A patch of
+harness/goldens/setup-help-screens.txt, see harness/goldens.py: a line with -
+is the golden's, a line with + is what is expected in its place.
+Deviation: 1, 5, 7 of src/portable_c/DEVIATIONS.md
+Why: the Configuration of the setup has no Memory allocation and no TSR
+manager: Execute options is one line, Quick execute commands, and the Keyboard
+options stand two rows further up, with the last two rows of the right half
+empty; and Screen and Mouse of the setup has no Screen output: the Other
+options and the Mouse options stand five rows further up, where that group
+was, with the right half empty below them, where the line of characters is the
+fourth field, three times Tab from the first. Under the help the two boxes
+show nothing of their right halves. The mouse pointer exchanges the colours of
+the cell that it is on, the middle of the screen where nothing has moved it:
+the lines have moved under it, and it stays
+
+== 2: F2
+rows 5-15
+-|    ║  │  [ ] Auto menus           │  │  [x] Memory allocation         │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Path prompt          │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Key bar              │  │  [x] TSR manager               │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [ ] Menu bar visible     │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Full screen          │  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx39 3Ex16 3Fx22 0Fx2
+-|    ║  │  [ ] Clock                │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Confirmation on quit │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Error sound          │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
+-|    ║  │  [ ] Auto save setup      │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [ ] Show logical drive B:│  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  └───────────────────────────┘  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Auto menus           │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Path prompt          │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Key bar              │  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx39 3Ex16 3Fx22 0Fx2
++|    ║  │  [ ] Menu bar visible     │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Full screen          │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Clock                │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Confirmation on quit │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Error sound          │  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
++|    ║  │  [ ] Auto save setup      │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Show logical drive B:│                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  └───────────────────────────┘                                      ║     | 07x1 3Fx77 0Fx2
+
+== 4: Esc
+rows 5-15
+-|    ║  │  [ ] Auto menus           │  │  [x] Memory allocation         │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Path prompt          │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Key bar              │  │  [x] TSR manager               │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [ ] Menu bar visible     │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Full screen          │  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx39 3Ex16 3Fx22 0Fx2
+-|    ║  │  [ ] Clock                │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Confirmation on quit │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [x] Error sound          │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
+-|    ║  │  [ ] Auto save setup      │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  │  [ ] Show logical drive B:│  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
+-|    ║  └───────────────────────────┘  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Auto menus           │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Path prompt          │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Key bar              │  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx39 3Ex16 3Fx22 0Fx2
++|    ║  │  [ ] Menu bar visible     │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Full screen          │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Clock                │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Confirmation on quit │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Error sound          │  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
++|    ║  │  [ ] Auto save setup      │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Show logical drive B:│                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  └───────────────────────────┘                                      ║     | 07x1 3Fx77 0Fx2
+
+== 6: F3
+rows 4-15
+-|         ║  ┌ Screen colors ──────┐  ┌ Screen output ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) Black & White  │  │  ( ) Synchronized access    │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  (•) Color          │  │  ( ) Asynchronized access   │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Laptop         │  │  (•) Auto detect            │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  └─────────────────────┘  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  ┌ Screen blank delay ─┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex18 3Fx7 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) 40 minutes     │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) 20 minutes     │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
+-|         ║  │  (•)  5 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
+-|         ║  │  ( )  3 minutes     │  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( )  1 minute      │  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Off            │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  ┌ Screen colors ──────┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
++|         ║  │  ( ) Black & White  │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•) Color          │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
++|         ║  │  ( ) Laptop         │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  └─────────────────────┘  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
++|         ║  ┌ Screen blank delay ─┐  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx8 3Ex18 3Fx42 0Fx2 07x4
++|         ║  │  ( ) 40 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) 20 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•)  5 minutes     │                                   ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
++|         ║  │  ( )  3 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( )  1 minute      │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) Off            │                                   ║         | 07x6 3Fx68 0Fx2 07x4
+
+== 7: Tab Tab Tab Tab
+rows 4-15
+-|         ║  ┌ Screen colors ──────┐  ┌ Screen output ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) Black & White  │  │  ( ) Synchronized access    │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  (•) Color          │  │  ( ) Asynchronized access   │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Laptop         │  │  (•) Auto detect            │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  └─────────────────────┘  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  ┌ Screen blank delay ─┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex18 3Fx7 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) 40 minutes     │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) 20 minutes     │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
+-|         ║  │  (•)  5 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
+-|         ║  │  ( )  3 minutes     │  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( )  1 minute      │  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Off            │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  ┌ Screen colors ──────┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
++|         ║  │  ( ) Black & White  │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•) Color          │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
++|         ║  │  ( ) Laptop         │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  └─────────────────────┘  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
++|         ║  ┌ Screen blank delay ─┐  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx8 3Ex18 3Fx42 0Fx2 07x4
++|         ║  │  ( ) 40 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) 20 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•)  5 minutes     │                                   ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
++|         ║  │  ( )  3 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( )  1 minute      │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) Off            │                                   ║         | 07x6 3Fx68 0Fx2 07x4
+-cursor 60 11 lines 6 7 mode 3
++cursor 60 6 lines 6 7 mode 3
+
+== 9: Esc
+rows 4-15
+-|         ║  ┌ Screen colors ──────┐  ┌ Screen output ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) Black & White  │  │  ( ) Synchronized access    │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  (•) Color          │  │  ( ) Asynchronized access   │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Laptop         │  │  (•) Auto detect            │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  └─────────────────────┘  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  ┌ Screen blank delay ─┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex18 3Fx7 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( ) 40 minutes     │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) 20 minutes     │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
+-|         ║  │  (•)  5 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
+-|         ║  │  ( )  3 minutes     │  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
+-|         ║  │  ( )  1 minute      │  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx68 0Fx2 07x4
+-|         ║  │  ( ) Off            │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  ┌ Screen colors ──────┐  ┌ Other options ──────────────┐  ║         | 07x6 3Fx8 3Ex13 3Fx12 3Ex13 3Fx22 0Fx2 07x4
++|         ║  │  ( ) Black & White  │  │  [x] Zooming boxes          │  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•) Color          │  │  Screen saver chars: ·∙•♦☼  │  ║         | 07x6 3Fx54 0Fx5 3Fx9 0Fx2 07x4
++|         ║  │  ( ) Laptop         │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  └─────────────────────┘  ┌ Mouse options ──────────────┐  ║         | 07x6 3Fx33 3Ex13 3Fx22 0Fx2 07x4
++|         ║  ┌ Screen blank delay ─┐  │  [ ] Left-handed mouse      │  ║         | 07x6 3Fx8 3Ex18 3Fx42 0Fx2 07x4
++|         ║  │  ( ) 40 minutes     │  └─────────────────────────────┘  ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) 20 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  (•)  5 minutes     │                                   ║         | 07x6 3Fx34 48x1 3Fx33 0Fx2 07x4
++|         ║  │  ( )  3 minutes     │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( )  1 minute      │                                   ║         | 07x6 3Fx68 0Fx2 07x4
++|         ║  │  ( ) Off            │                                   ║         | 07x6 3Fx68 0Fx2 07x4
+-cursor 60 11 lines 6 7 mode 3
++cursor 60 6 lines 6 7 mode 3

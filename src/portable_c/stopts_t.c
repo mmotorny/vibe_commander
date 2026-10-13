@@ -13,10 +13,16 @@
  * characters of CP866. \030 and \031 are the arrows up and down, \020
  * and \021 those to the right and to the left.
  *
- * Three settings here are of what the portable C has no more, Memory
- * allocation, TSR manager and Screen output: the dialogs show them and
- * set their bytes of the setup, which nothing goes by (see
- * DEVIATIONS.md).
+ * Three settings of the setup program are not here, since they are of
+ * what the portable C has no more: Memory allocation and TSR manager of
+ * the Configuration, and Screen output of Screen and Mouse (see
+ * DEVIATIONS.md). Their lines and their fields are gone from the two
+ * dialogs, and what stood below them in the right half of a box stands
+ * further up: a line of such a box is one text for the two groups that
+ * are side by side, so its left half is the assembly's of that name and
+ * its right half that of a line further down, or spaces where the right
+ * half of the box has nothing left. The fields go to each other as they
+ * stand now. Their bytes of the setup are kept as they are found.
  */
 #include "tables.h"
 
@@ -32,41 +38,43 @@ extern const u8 OkMn_D[];
    them: of each its width and its column, up to a width of 0. */
 static const u8 StOk_D[3];
 
-/* The Configuration: 18 boxes to tick, and Ok and Cancel. */
+/* The Configuration: 16 boxes to tick, and Ok and Cancel. The setup
+   program has 18: Memory allocation above Quick execute commands and TSR
+   manager below it. Without them the group has one line, and the
+   Keyboard options stand two rows further up, which leaves the last two
+   rows of the right half empty. */
 static const u8 StCnf00_S[] = " Configuration ";
 static const u8 StCnf01_S[] =
     " \332 ^bGeneral options^b \377\212\304\277  \332 ^bExecute options"
     "^b \377\217\304\277 ";
 static const u8 StCnf02_S[] =
-    " \263  [ ] Auto menus\377\013\263  \263  [ ] Memory allocation\377"
-    "\011\263 ";
-static const u8 StCnf03_S[] =
-    " \263  [ ] Path prompt\377\012\263  \263  [ ] Quick execute comman"
+    " \263  [ ] Auto menus\377\013\263  \263  [ ] Quick execute comman"
     "ds\377\004\263 ";
+static const u8 StCnf03_S[] =
+    " \263  [ ] Path prompt\377\012\263  \300\377\240\304\331 ";
 static const u8 StCnf04_S[] =
-    " \263  [ ] Key bar\377\016\263  \263  [ ] TSR manager\377\017\263 ";
-static const u8 StCnf05_S[] =
-    " \263  [ ] Menu bar visible\377\005\263  \300\377\240\304\331 ";
-static const u8 StCnf06_S[] =
-    " \263  [ ] Full screen\377\012\263  \332 ^bKeyboard options^b \377"
+    " \263  [ ] Key bar\377\016\263  \332 ^bKeyboard options^b \377"
     "\216\304\277 ";
-static const u8 StCnf07_S[] =
-    " \263  [ ] Clock\377\020\263  \263  [ ] Alt alone selects menu\377"
-    "\004\263 ";
-static const u8 StCnf08_S[] =
-    " \263  [ ] Confirmation on quit \263  \263  [ ] Esc toggles screen"
+static const u8 StCnf05_S[] =
+    " \263  [ ] Menu bar visible\377\005\263  \263  [ ] Alt alone sele"
+    "cts menu\377\004\263 ";
+static const u8 StCnf06_S[] =
+    " \263  [ ] Full screen\377\012\263  \263  [ ] Esc toggles screen"
     " on/off \263 ";
-static const u8 StCnf09_S[] =
-    " \263  [ ] Error sound\377\012\263  \263  [ ] Alternative viewer"
+static const u8 StCnf07_S[] =
+    " \263  [ ] Clock\377\020\263  \263  [ ] Alternative viewer\377"
+    "\010\263 ";
+static const u8 StCnf08_S[] =
+    " \263  [ ] Confirmation on quit \263  \263  [ ] Alternative editor"
     "\377\010\263 ";
-static const u8 StCnf10_S[] =
-    " \263  [ ] Auto save setup\377\006\263  \263  [ ] Alternative edit"
-    "or\377\010\263 ";
-static const u8 StCnf11_S[] =
-    " \263  [ ] Show logical drive B:\263  \263  [ ] Clear keyboard buf"
+static const u8 StCnf09_S[] =
+    " \263  [ ] Error sound\377\012\263  \263  [ ] Clear keyboard buf"
     "fer\377\005\263 ";
-static const u8 StCnf12_S[] =
-    " \300\377\233\304\331  \300\377\240\304\331 ";
+static const u8 StCnf10_S[] =
+    " \263  [ ] Auto save setup\377\006\263  \300\377\240\304\331 ";
+static const u8 StCnf11_S[] =
+    " \263  [ ] Show logical drive B:\263\377\045";
+static const u8 StCnf12_S[] = " \300\377\233\304\331\377\045";
 static const u8 StCnf13_S[] =
     "Press ^r Space ^r to change an option, ^r \030 ^r and ^r \031 ^r";
 static const u8 StCnf14_S[] = "to move between options";
@@ -91,19 +99,23 @@ static const BOX(17) StConf_P = {
         StCnf12_S, StCnf13_S, StCnf14_S, 0, StOkCn_S
     }
 };
-const DIALOG(19) StConf_B = {
+/* A field keeps the place in TmpBuf that the setup program gives it,
+   the buttons too: the two places of the boxes that are gone are not
+   used. */
+const DIALOG(17) StConf_B = {
     { &StConf_P, 0x228, 0, 1, 4, 1, 0 },
     {
         /* General options: Auto menus, Path prompt, Key bar, Menu bar
            visible, Full screen, Clock, Confirmation on quit, Error
-           sound, Auto save setup, Show logical drive B: */
-        { 3, 18, 1, 0, 10, 0x30A, MD_AT(TmpBuf[0]),
+           sound, Auto save setup, Show logical drive B:. Right of each
+           is the box on its row, or else the one above that row. */
+        { 3, 16, 1, 0, 10, 0x30A, MD_AT(TmpBuf[0]),
           NUMBER(MD_AT(AutoMnu)) },
-        { 3, 0, 2, 1, 11, 0x40A, MD_AT(TmpBuf[1]),
+        { 3, 0, 2, 1, 10, 0x40A, MD_AT(TmpBuf[1]),
           NUMBER(MD_AT(Prompt)) },
-        { 3, 1, 3, 2, 12, 0x50A, MD_AT(TmpBuf[2]),
+        { 3, 1, 3, 2, 10, 0x50A, MD_AT(TmpBuf[2]),
           NUMBER(MD_AT(KeyBar)) },
-        { 3, 2, 4, 3, 12, 0x60A, MD_AT(TmpBuf[3]),
+        { 3, 2, 4, 3, 11, 0x60A, MD_AT(TmpBuf[3]),
           NUMBER(MD_AT(MenuVs)) },
         { 3, 3, 5, 4, 12, 0x70A, MD_AT(TmpBuf[4]),
           NUMBER(MD_AT(FulScr)) },
@@ -113,72 +125,61 @@ const DIALOG(19) StConf_B = {
           NUMBER(MD_AT(QuitAck)) },
         { 3, 6, 8, 7, 15, 0xA0A, MD_AT(TmpBuf[7]),
           NUMBER(MD_AT(ErrSnd)) },
-        { 3, 7, 9, 8, 16, 0xB0A, MD_AT(TmpBuf[8]),
+        { 3, 7, 9, 8, 15, 0xB0A, MD_AT(TmpBuf[8]),
           NUMBER(MD_AT(AutoSav)) },
-        { 3, 8, 10, 9, 17, 0xC0A, MD_AT(TmpBuf[9]),
+        { 3, 8, 10, 9, 15, 0xC0A, MD_AT(TmpBuf[9]),
           NUMBER(MD_AT(DriveB)) },
-        /* Execute options: Memory allocation, Quick execute commands,
-           TSR manager */
-        { 3, 9, 11, 0, 10, 0x329, MD_AT(TmpBuf[10]),
-          NUMBER(MD_AT(LoadFl)) },
-        { 3, 10, 12, 1, 11, 0x429, MD_AT(TmpBuf[11]),
+        /* Execute options: Quick execute commands */
+        { 3, 9, 11, 0, 10, 0x329, MD_AT(TmpBuf[11]),
           NUMBER(MD_AT(ExecTyp)) },
-        { 3, 11, 13, 2, 12, 0x529, MD_AT(TmpBuf[12]),
-          NUMBER(MD_AT(ChkTSR)) },
         /* Keyboard options: Alt alone selects menu, Esc toggles screen
            on/off, Alternative viewer, Alternative editor, Clear keyboard
            buffer */
-        { 3, 12, 14, 5, 13, 0x829, MD_AT(TmpBuf[13]),
+        { 3, 10, 12, 3, 11, 0x629, MD_AT(TmpBuf[13]),
           NUMBER(MD_AT(AltBar)) },
-        { 3, 13, 15, 6, 14, 0x929, MD_AT(TmpBuf[14]),
+        { 3, 11, 13, 4, 12, 0x729, MD_AT(TmpBuf[14]),
           NUMBER(MD_AT(EscBar)) },
-        { 3, 14, 16, 7, 15, 0xA29, MD_AT(TmpBuf[15]),
+        { 3, 12, 14, 5, 13, 0x829, MD_AT(TmpBuf[15]),
           NUMBER(MD_AT(AltView)) },
-        { 3, 15, 17, 8, 16, 0xB29, MD_AT(TmpBuf[16]),
+        { 3, 13, 15, 6, 14, 0x929, MD_AT(TmpBuf[16]),
           NUMBER(MD_AT(AltEdit)) },
-        { 3, 16, 18, 9, 17, 0xC29, MD_AT(TmpBuf[17]),
+        { 3, 14, 16, 7, 15, 0xA29, MD_AT(TmpBuf[17]),
           NUMBER(MD_AT(ClrBuf)) },
         /* Ok, Cancel */
-        { 4, 17, 0, 17, 18, 0x111E, MD_AT(TmpBuf[18]), StOkCn_D }
+        { 4, 15, 0, 15, 16, 0x111E, MD_AT(TmpBuf[18]), StOkCn_D }
     },
     0
 };
 
-/* Screen and Mouse: three groups, two boxes to tick and a line of five
-   characters. */
+/* Screen and Mouse: two groups, two boxes to tick and a line of five
+   characters. The setup program has a third group, Screen output, at the
+   top of the right half. Without it the Other options and the Mouse
+   options stand five rows further up, which leaves the right half empty
+   from there down. */
 static const u8 StScr00_S[] = " Screen and Mouse ";
 static const u8 StScr01_S[] =
-    " \332 ^bScreen colors^b \377\206\304\277  \332 ^bScreen output^b "
+    " \332 ^bScreen colors^b \377\206\304\277  \332 ^bOther options^b "
     "\377\216\304\277 ";
 static const u8 StScr02_S[] =
-    " \263  ( ) Black & White  \263  \263  ( ) Synchronized access\377"
-    "\004\263 ";
-static const u8 StScr03_S[] =
-    " \263  ( ) Color\377\012\263  \263  ( ) Asynchronized access\377"
-    "\003\263 ";
-static const u8 StScr04_S[] =
-    " \263  ( ) Laptop\377\011\263  \263  ( ) Auto detect\377\014\263 ";
-static const u8 StScr05_S[] =
-    " \300\377\225\304\331  \300\377\235\304\331 ";
-static const u8 StScr06_S[] =
-    " \332 ^bScreen blank delay^b \304\277  \332 ^bOther options^b \377"
-    "\216\304\277 ";
-static const u8 StScr07_S[] =
-    " \263  ( ) 40 minutes\377\005\263  \263  [ ] Zooming boxes\377\012"
+    " \263  ( ) Black & White  \263  \263  [ ] Zooming boxes\377\012"
     "\263 ";
-static const u8 StScr08_S[] =
-    " \263  ( ) 20 minutes\377\005\263  \263  Screen saver chars:\377"
-    "\010\263 ";
-static const u8 StScr09_S[] =
-    " \263  ( )  5 minutes\377\005\263  \300\377\235\304\331 ";
-static const u8 StScr10_S[] =
-    " \263  ( )  3 minutes\377\005\263  \332 ^bMouse options^b \377\216"
-    "\304\277 ";
-static const u8 StScr11_S[] =
-    " \263  ( )  1 minute\377\006\263  \263  [ ] Left-handed mouse\377"
-    "\006\263 ";
-static const u8 StScr12_S[] =
-    " \263  ( ) Off\377\014\263  \300\377\235\304\331 ";
+static const u8 StScr03_S[] =
+    " \263  ( ) Color\377\012\263  \263  Screen saver chars:\377\010"
+    "\263 ";
+static const u8 StScr04_S[] =
+    " \263  ( ) Laptop\377\011\263  \300\377\235\304\331 ";
+static const u8 StScr05_S[] =
+    " \300\377\225\304\331  \332 ^bMouse options^b \377\216\304\277 ";
+static const u8 StScr06_S[] =
+    " \332 ^bScreen blank delay^b \304\277  \263  [ ] Left-handed mouse"
+    "\377\006\263 ";
+static const u8 StScr07_S[] =
+    " \263  ( ) 40 minutes\377\005\263  \300\377\235\304\331 ";
+static const u8 StScr08_S[] = " \263  ( ) 20 minutes\377\005\263\377\042";
+static const u8 StScr09_S[] = " \263  ( )  5 minutes\377\005\263\377\042";
+static const u8 StScr10_S[] = " \263  ( )  3 minutes\377\005\263\377\042";
+static const u8 StScr11_S[] = " \263  ( )  1 minute\377\006\263\377\042";
+static const u8 StScr12_S[] = " \263  ( ) Off\377\014\263\377\042";
 static const u8 StScr13_S[] = " \300\377\225\304\331\377\042";
 static const u8 StScr14_S[] =
     "Press ^r Space ^r to change an option, ^r \030 ^r and ^r \031 ^r";
@@ -188,7 +189,9 @@ static const u8 StScr15_S[] = "to move between options";
    TmpBuf. The line is typed into the setup itself, the five characters
    of the screen saver at StarTab. The minutes of the second group, from
    its first line down, are StDelay_T of stopts.c, which stands here in
-   the assembly, behind the dialog. */
+   the assembly, behind the dialog. A field keeps the place in TmpBuf
+   that the setup program gives it: the two bytes of the group that is
+   gone are not used. */
 static const BOX(18) StScrn_P = {
     { Conf_C, CnfRe_C, CnfBo_C, 0 },
     18, 0,
@@ -199,23 +202,28 @@ static const BOX(18) StScrn_P = {
         StScr12_S, StScr13_S, StScr14_S, StScr15_S, 0, StOkCn_S
     }
 };
-const DIALOG(7) StScrn_B = {
+const DIALOG(6) StScrn_B = {
     { &StScrn_P, 0x228, 0, 1, 4, 2, 0 },
     {
-        /* Screen colors, Screen blank delay, Screen output */
-        { 2, 6, 0x81, 0, 0x82, 0x30A, MD_AT(TmpBuf[0]), NUMBER(3) },
-        { 2, 0xC0, 6, 1, 3, 0x80A, MD_AT(TmpBuf[2]), NUMBER(6) },
-        { 2, 0xC1, 3, 0x80, 2, 0x323, MD_AT(TmpBuf[4]), NUMBER(3) },
-        /* Zooming boxes */
-        { 3, 0xC2, 4, 0x81, 3, 0x823, MD_AT(TmpBuf[6]),
+        /* Screen colors, with Zooming boxes to its right, and Screen
+           blank delay, with Left-handed mouse, the last of the right
+           half, which ends above it. Up from the first group are the
+           buttons, and down from the second. */
+        { 2, 5, 0x81, 0, 2, 0x30A, MD_AT(TmpBuf[0]), NUMBER(3) },
+        { 2, 0xC0, 5, 1, 4, 0x80A, MD_AT(TmpBuf[2]), NUMBER(6) },
+        /* Zooming boxes: above it, as above the right half in the setup
+           program, the last line of the second group; to its left the
+           first group, on its first line */
+        { 3, 0xC1, 3, 0x80, 2, 0x323, MD_AT(TmpBuf[6]),
           NUMBER(MD_AT(ZoomWin)) },
         /* Screen saver chars */
-        { 1, 3, 5, 0x81, 4, 0x936, MD_AT(StarTab), NUMBER(5) },
-        /* Left-handed mouse */
-        { 3, 4, 6, 0x81, 5, 0xC23, MD_AT(TmpBuf[7]),
+        { 1, 2, 4, 0x80, 3, 0x436, MD_AT(StarTab), NUMBER(5) },
+        /* Left-handed mouse: to its left the second group, on its first
+           line */
+        { 3, 3, 5, 0x81, 4, 0x723, MD_AT(TmpBuf[7]),
           NUMBER(MD_AT(LftMous)) },
         /* Ok, Cancel */
-        { 4, 5, 0x80, 6, 6, 0x121E, MD_AT(TmpBuf[9]), StOkCn_D }
+        { 4, 4, 0x80, 5, 5, 0x121E, MD_AT(TmpBuf[9]), StOkCn_D }
     },
     0
 };

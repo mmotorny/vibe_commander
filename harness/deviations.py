@@ -377,6 +377,13 @@ _NO_CALL = ("it shows the program asked for its data by another "
 _FDAPM = '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter'
 _NO_SETUP_YET = ("the portable C has no setup yet: what the scenario "
                  "shows of it is still to be translated")
+# The two dialogs of the setup that three settings have gone from in the
+# portable C, and what stands where in them now: see in_place_in below.
+_THREE_TABS = ("the line of the screen saver's characters is the fourth "
+               "field of Screen and Mouse, with Screen output gone: three "
+               "times Tab from the first")
+_LEFT_HANDED = ("Left-handed mouse is five rows further up in Screen and "
+                "Mouse, where Screen output has gone from above it")
 
 TREES = {
     # The C translation is the main program and nothing else.
@@ -456,6 +463,87 @@ TREES = {
                             "the setup is no program of its own in the "
                             "portable C, and no command starts it: it is "
                             "an item of the Options menu, More setup..."),
+        },
+        # The setup has no setting for what the program has no more:
+        # the Configuration is without Memory allocation and TSR
+        # manager, and Screen and Mouse without Screen output
+        # (DEVIATIONS.md, 1, 7 and 5). What stood below them in the
+        # right half of each box stands further up, and the fields go
+        # to each other as they stand: a scenario gets to the same
+        # setting by fewer keys or by a click further up, and a step
+        # that set one of the three is left out. The rows that then
+        # differ are in the scenario's patch.
+        in_place_in={
+            "setup-config": {
+                ("Down", "Space", "Down Space", "Down Space"):
+                    (("Down", None, "Space", None),
+                     "below the last box of the left half is Quick "
+                     "execute commands, the one box of Execute options "
+                     "now: it is ticked where the cursor is, and Memory "
+                     "allocation above it and TSR manager below it are "
+                     "not there to be unticked"),
+            },
+            "setup-config-mouse": {
+                ("Click@42,6",):
+                    (("Click@42,5",),
+                     "Quick execute commands is a row further up, where "
+                     "Memory allocation was"),
+                ("Click@42,10",):
+                    (("Click@42,8",),
+                     "Alt alone selects menu is two rows further up, "
+                     "with the other Keyboard options"),
+            },
+            "setup-screen": {
+                ("Right", "Space", "Left", "Right Down Down Down", "Space",
+                 "Up", "Down Down"):
+                    (("Right", None, "Left", "Right", "Space", "Up",
+                      "Right Up"),
+                     "right of Screen colors is Zooming boxes, where "
+                     "Screen output was, which is not there to have "
+                     "Synchronized access chosen or to be gone down "
+                     "through; above Zooming boxes, the first of the "
+                     "right half now, is the last line of Screen blank "
+                     "delay, as it was above Screen output, and from "
+                     "there the line of characters is right, at "
+                     "Left-handed mouse, and up"),
+                ("Left Left", "Down Space"):
+                    (("Left Left", "Down Down Down Down Space"),
+                     "left of the line of characters is Screen colors, "
+                     "which it stands beside now, and 20 minutes is "
+                     "three lines further down from there than from the "
+                     "first line of Screen blank delay"),
+                ("Tab Tab Tab Tab",): (("Tab Tab Tab",), _THREE_TABS),
+                ("Click@45,6",):
+                    ((None,),
+                     "Asynchronized access of Screen output, which is "
+                     "not there to be clicked"),
+                ("Click@45,10",):
+                    (("Click@45,5",),
+                     "Zooming boxes is five rows further up, where "
+                     "Screen output has gone from above it"),
+                ("Click@62,11",): (("Click@62,6",),
+                                   "the line of characters is five rows "
+                                   "further up, as Zooming boxes is"),
+                ("Click@60,11",): (("Click@60,6",), "the same line"),
+                ("Click@64,11",): (("Click@64,6",), "the same line"),
+                ("Click@45,14",): (("Click@45,9",), _LEFT_HANDED),
+                ("Up Up Up",):
+                    (("Up Up",),
+                     "above Left-handed mouse are the line of "
+                     "characters and Zooming boxes, and no Screen "
+                     "output above that: Left from Zooming boxes is "
+                     "Screen colors, as it was from Screen output"),
+            },
+            "setup-options-russia": {
+                ('Tab Tab Tab Tab Alt+RightShift "abcde"',):
+                    (('Tab Tab Tab Alt+RightShift "abcde"',), _THREE_TABS),
+            },
+            "setup-left-handed": {
+                ("Click@45,14",): (("Click@45,9",), _LEFT_HANDED),
+            },
+            "setup-help-screens": {
+                ("Tab Tab Tab Tab",): (("Tab Tab Tab",), _THREE_TABS),
+            },
         },
     ),
 }

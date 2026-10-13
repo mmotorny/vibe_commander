@@ -33,7 +33,7 @@ first.
 | 1 | The item of the Options menu | ` More setup...`, the last, behind ` Save setup` and a line across the menu of its own, chosen by M, which is free since Memory allocation went; F1 on it shows the index of the help, which has no page for it. No item moves for it, and the box is two rows taller. This is the user's word of 13 October 2026: on the 12th it was ` seTup...` behind ` Editors...`, chosen by T, and was made so first, with every item below it a place further down |
 | 2 | What is on the screen behind setup | What DOS has shown, with the panels off, as when the original was run from the program's command line. So whole screens are held against the original's goldens |
 | 3 | What setup edits | The setup file, as the original: it reads `VC.INI` when it is entered and shows that, and the program takes what was saved when setup is left |
-| 4 | The three settings of what the portable C has no more, Memory allocation, TSR manager and Screen output | Shown, doing nothing, while the dialogs are translated and held against the original's goldens, and taken out by piece E2. "A feature that only made sense on DOS is removed, not kept as a setting that does nothing" waits for that piece here: taken out from the start, the Configuration and Screen and Mouse would never be held against the original |
+| 4 | The three settings of what the portable C has no more, Memory allocation, TSR manager and Screen output | Shown, doing nothing, while the dialogs were translated and held against the original's goldens, and taken out by piece E2, which is done. "A feature that only made sense on DOS is removed, not kept as a setting that does nothing" waited for that piece here: taken out from the start, the Configuration and Screen and Mouse would never have been held against the original |
 | 5 | The limit of the file's size, three times the original `VC.COM`'s, which the scenarios' test holds a build to | Dropped for the portable C: the test no longer holds it to a multiple of the original's size, and piece 0a has taken the check out for that tree. It stays for the C translation, which is frozen. The compiler is asked for small code already, `-os`; builds for release and for debugging are a matter for the 32-bit program. The two other limits, of the program's data and of where a code segment ends, are the machine's and stay: see "What could go wrong" |
 | 6 | `asked` and `handed-on`, once the program's own call of DOS is gone with piece E1 | Not run for the portable C, which has nothing left for them to show; they stay for the C translation |
 | 7 | A critical error of DOS while setup is open, as when the setup file is on a drive that is not ready | The program's own box, since its handler of INT 24h is in place then; the original's setup program has none and leaves the error to DOS's own words. And setup asks for its files as the rest of the program does, through the functions of `sys.h` that ask with the program's errors: none with Bare in its name is added for it. No scenario shows either |
@@ -358,7 +358,7 @@ batch, with what no scenario reaches.
 | C, the help. Done | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
 | D, what is left of S1 and of leaving. Done | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | 80 instructions, 74 of them the main program's routine | Six, 100 steps, see "Piece D" below: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and F1 from the other pieces' screens. A setup saved whose file is missing is A's, `setup-missing-saved` | 0b; A, B and C for three of the scenarios |
 | E1, the program's own call of DOS goes. Done | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; the patch of `ended` is written again and read, `goldens.py patch --tree portable_c ended`, for the registers that the program leaves. See "Piece E1" below | A to D |
-| E2, three settings go | `stopts.c`, `stopts_t.c`: Memory allocation and TSR manager out of S2, Screen output out of S3; entries 1, 5 and 7 of `DEVIATIONS.md`, which say that the setup program still shows them | Small | The scenarios of A that show the two dialogs get patches of the original's goldens, `goldens.py patch --tree portable_c NAME`, each read row by row against the entries before it is committed | A |
+| E2, three settings go. Done | `stopts.c`, `stopts_t.c`: Memory allocation and TSR manager out of S2, Screen output out of S3; entries 1, 5 and 7 of `DEVIATIONS.md`, which said that the setup program still shows them; the two dialogs and their lines declared in `harness/datacheck.py` | The two dialogs and 23 lines of their boxes, and `StF03_00`: three fields gone, and seven lines of the right halves | None new. Ten scenarios that show the two dialogs have patches of the original's goldens, and six of them other steps where a line has moved, see "Piece E2" below | A |
 
 While 0b is made, A, B and C can write their scenarios and derive the
 goldens, which needs the original alone. A scenario that the portable C
@@ -373,8 +373,8 @@ program has 134 and 3,358 for twelve times the code: nearly every
 instruction here is a key or a button of the mouse, and little of it is
 something that other scenarios pass through anyway. With 0a to D done
 there are 33 of 889 steps, and none waits in `not_run`. E1 has taken
-the program's own call out since. What is still to come is E2, which
-takes three settings out.
+the program's own call out since, and E2 the three settings: the
+setup program is in the portable C whole.
 
 **What 0a made of the harness.** The nine things that it was to
 change, each as it is now, and what came out otherwise than planned.
@@ -806,7 +806,7 @@ for the portable C, and `ended` has its patch made again.
 | What DOS has shown has no line of a command that started setup, behind setup and afterwards: the row is empty, and the screen moves as the original's. And the history has no such command | Every scenario of setup, on the rows that `harness/deviations.py` has as spaces; the history in none |
 | The program takes what was saved whatever its setup has for TSR manager, where the original's running copy is asked only with that on. And with E1 the program's own call of DOS is gone | `asked`, `handed-on`, `ended` |
 | The Options menu has two lines more, at its bottom | `clock`, `clock-russia`, `menu`, which are held by patches of the original's goldens, of entries 1 and 8 |
-| With E2: no Memory allocation and no TSR manager in S2, no Screen output in S3 | The scenarios of piece A that show the two dialogs |
+| No Memory allocation and no TSR manager in S2, no Screen output in S3: entries 1, 7 and 5, since E2 | Ten scenarios, of A, D and 0a, that show the two dialogs: see "Piece E2" below |
 | The program's box for a critical error of DOS while setup is open, where the original's setup program leaves the error to DOS's own words. And setup's calls for files are asked with the program's errors, where the original's setup program calls DOS itself: a drive that is not ready has the program's box, a call given up there is the error 53h, and DOS is asked what was wrong behind a call that failed | No scenario |
 | The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. **This waits for the user's word**: it was met while 0b was made, and is not among the seven things decided | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
 | The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | `setup-lines`, with a patch of the original's golden for the corner: one cell, on two screens |
@@ -1415,14 +1415,13 @@ its own: piece C has written it, `StHlpLine`.
 
 **For a later piece.**
 
-- E2, which takes Memory allocation and TSR manager out of the
+- E2, which took Memory allocation and TSR manager out of the
   Configuration and Screen output out of Screen and Mouse: `setup-clock`
   gets to Clock by five times Down, `setup-left-handed` clicks a line
   of each of the two dialogs by its place, and `setup-help-screens`
-  shows both under the help. Each then wants its steps looked at again
-  and a patch of the original's golden, written by `goldens.py patch
-  --tree portable_c NAME` and read row by row before it is committed,
-  as the scenarios of A do.
+  shows both under the help. Each has a patch of the original's golden
+  since, and the last two another step each for the portable C: see
+  "Piece E2" below.
 - The line "There was an error while saving the setup file" is held by
   no scenario, as above: whoever changes where it is written has to
   look at it by hand, `harness/show.py --program` with the steps of
@@ -1489,6 +1488,135 @@ For whoever goes on:
   as a command, saves its file and is answered by nobody: DOS takes
   the call for its own AH 2Bh, a date to set, and refuses it. No
   scenario does that; the bench has no `VCSETUP.COM` next to a C tree.
+
+### Piece E2, the three settings: done, and what a later piece should know
+
+The Configuration of the setup has no Memory allocation and no TSR
+manager, and Screen and Mouse no Screen output: entries 1, 7 and 5 of
+`src/portable_c/DEVIATIONS.md` say so, each for its setting. Their
+bytes of the setup file are kept as they are found.
+
+**The two dialogs as they are now.** What stood below a line that went
+stands further up in the right half of its box, and the box is as tall
+as it was, since its left half is:
+
+    ╔═══════════════════════════ Configuration ═══════════════════════════╗
+    ║  ┌ General options ──────────┐  ┌ Execute options ───────────────┐  ║
+    ║  │  [ ] Auto menus           │  │  [ ] Quick execute commands    │  ║
+    ║  │  [x] Path prompt          │  └────────────────────────────────┘  ║
+    ║  │  [x] Key bar              │  ┌ Keyboard options ──────────────┐  ║
+    ║  │  [ ] Menu bar visible     │  │  [x] Alt alone selects menu    │  ║
+    ║  │  [x] Full screen          │  │  [x] Esc toggles screen on/off │  ║
+    ║  │  [ ] Clock                │  │  [x] Alternative viewer        │  ║
+    ║  │  [x] Confirmation on quit │  │  [ ] Alternative editor        │  ║
+    ║  │  [x] Error sound          │  │  [x] Clear keyboard buffer     │  ║
+    ║  │  [ ] Auto save setup      │  └────────────────────────────────┘  ║
+    ║  │  [ ] Show logical drive B:│                                      ║
+    ║  └───────────────────────────┘                                      ║
+
+    ╔═════════════════════ Screen and Mouse ═════════════════════╗
+    ║  ┌ Screen colors ──────┐  ┌ Other options ──────────────┐  ║
+    ║  │  ( ) Black & White  │  │  [x] Zooming boxes          │  ║
+    ║  │  (•) Color          │  │  Screen saver chars: ·∙•♦☼  │  ║
+    ║  │  ( ) Laptop         │  └─────────────────────────────┘  ║
+    ║  └─────────────────────┘  ┌ Mouse options ──────────────┐  ║
+    ║  ┌ Screen blank delay ─┐  │  [ ] Left-handed mouse      │  ║
+    ║  │  ( ) 40 minutes     │  └─────────────────────────────┘  ║
+    ║  │  ( ) 20 minutes     │                                   ║
+    ║  │  (•)  5 minutes     │                                   ║
+    ║  │  ( )  3 minutes     │                                   ║
+    ║  │  ( )  1 minute      │                                   ║
+    ║  │  ( ) Off            │                                   ║
+    ║  └─────────────────────┘                                   ║
+
+That is the lines taken out and nothing arranged anew.
+
+**Open, for the user.**
+
+- The layout. Both right halves are shorter than the left ones now, and
+  Screen and Mouse has six empty rows there. Whether the groups are to
+  be aligned at the bottom, or the two dialogs arranged anew, waits for
+  the user's word, and for what is decided on Quick execute commands
+  and on Show logical drive B:, which would change the Configuration
+  once more; either would be new rows in the same patches.
+- The volume of the ten patches. Every screen that shows one of the
+  dialogs repeats the rows of its right half, 11 or 12, so the ten are
+  several times all the patches that were there before. A rule of the
+  tree that lays a region of the screen out anew, the rows of one half
+  of a box moved and spaces below, would say it once, where a rule
+  today puts a text over the cells of one line: the neighbour of
+  "Leaving a part of the screen out of the comparison: future work"
+  below, and not built.
+
+**The fields.** A field of a dialog names the fields that Up, Down,
+Left and Right go to, by their numbers, so every field behind one that
+went has another number and those around it other neighbours. They go
+by what the original's do: down a half and then to the buttons, and
+sideways to the field on the same row, or else the one above that row.
+In Screen and Mouse a field of the right half that has the first group
+beside it now goes there to its left, where it had the second.
+
+**The scenarios.** Ten show one of the dialogs or both, and each has a
+patch: the rows of the right half on every screen that shows the
+dialog, 11 or 12 to a screen, which is most of the 1,834 lines that the
+ten have. Six are taken through other steps for the portable C, by
+`in_place_in` of `deviations.TREES`, which was made for this: a step
+for a step, or None for one that set what is gone.
+
+| Scenario | Entries | Its patch, in lines expected otherwise | Steps for the portable C |
+|---|---|---|---|
+| `setup` | 1, 5, 7 | 34, on 3 screens | The original's |
+| `setup-config` | 1, 7 | 550, on 49 screens, the setup file among them | Two left out, Memory allocation and TSR manager unticked; one other, Space for Down and Space |
+| `setup-config-mouse` | 1, 7 | 302, on 27 screens | Five clicks a row or two further up |
+| `setup-screen` | 5 | 723, on 58 screens, the setup file among them | Two left out, a line of Screen output chosen by Space and by a click; twelve others |
+| `setup-options-russia` | 5 | 37, on 3 screens | One: a Tab less |
+| `setup-delay-file` | 5 | 12, on 1 screen | The original's |
+| `setup-missing-saved` | 1, 7 | 22, on 2 screens | The original's |
+| `setup-clock` | 1, 5, 7 | 56, on 5 screens | The original's |
+| `setup-left-handed` | 1, 5, 7 | 38, on 4 screens | One: the click on Left-handed mouse five rows further up |
+| `setup-help-screens` | 1, 5, 7 | 60, on 5 screens | One: a Tab less |
+
+None is not run: no scenario's whole point was one of the three. Every
+other scenario of the setup is held as it was.
+
+**How the patches were read.** Not row by row alone: there are too many
+that say the same. `build/` had a script for it, which is not kept:
+it made of each screen of the original's golden what the declaration
+says, the right half of the box with its rows moved as above and
+spaces below, and the cursor moved with its row, and held that against
+the golden with its patch. What was left over was read by eye, and is
+all that the headers of the patches say besides the rows: the cell of
+the mouse pointer, which stays where it is while the lines move under
+it, on 106 screens; five of the 45 cursors, which are on another field,
+where Left or Up goes elsewhere now, the other 40 having moved with
+their rows; and the setup file of the two scenarios that untick or
+choose one of the three and save. The
+bytes of those two files were held against the original's, by the
+script of the notes on the harness: 1AFh and 1C0h, Memory allocation
+and TSR manager, 1 where the original has 0, and 1BAh, Snow mode, 2
+where it has 1, each with the sum behind it.
+
+**In the data.** `StConf_B` and `StScrn_B` are declared without their
+fields and with the links and rows of the others, by `_field` of
+`harness/datacheck.py`. A line of a box is one text for both halves, so
+23 lines are declared too, by `_lines`: a line whose right half is that
+of a line further down is held against the original's line of its name
+with the bytes between the two halves left out, which holds the right
+half against the original's as well, and nothing is spelled out there
+but two numbers. The boxes are the original's, since they name the
+same lines.
+
+**What stays of the three.** The bytes: `LoadFl`, `ChkTSR` and
+`SnowMod` of the main data, with their defaults in `start.c` and in
+`StPalets` of `stmain_t.c`, so a setup made of the defaults is the
+original's. The handing over when the setup is left with Save
+(`StExit` of `stmain.c`) is as the original's setup program does it:
+the program keeps its `ChkTSR`, and takes the setup file's `LoadFl` by
+way of `LoadRes`. Neither is read as a setting; `LoadFl` and `LoadRes`
+are still what carries the bit for a command that is not to be shown.
+And the help: the pages of the Configuration and of Screen and Mouse
+that the setup shows for F1 have their paragraphs on the three, since
+the help file is the distribution's.
 
 ## The portable C: what another compiler says of it
 
@@ -2693,10 +2821,11 @@ What the next pieces meet:
   how it would be written.
 
 What no scenario has yet, and was tried by hand only: a patch with a
-line for a cell that blinks, and one with lines for the disks. Both
-were made to a golden and held against a run in a trial; no committed
-patch has either, since no deviation so far changes what blinks or
-what is left on a disk.
+line for a cell that blinks. It was made to a golden and held against a
+run in a trial; no committed patch has one, since no deviation so far
+changes what blinks. Lines for the disks, which were tried in the same
+way, two patches have since: `setup-config` and `setup-screen`, for the
+setup file that each saves.
 
 ## Leaving a part of the screen out of the comparison: future work
 

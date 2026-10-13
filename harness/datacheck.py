@@ -184,6 +184,54 @@ _NO_MAP = ("the portable C has no map of the memory, Alt+F5, Memory info "
 _SETUP = ("the portable C has the setup program in itself, the last item "
           "of its Options menu, More setup..., behind Save setup and a "
           "line across the menu: ")
+_NO_SETTINGS = ("the setup of the portable C has no setting for what the "
+                "program has no more, Memory allocation and TSR manager "
+                "of the Configuration and Screen output of Screen and "
+                "Mouse, and what stood below them in the right half of "
+                "the box stands further up: ")
+
+
+def _field(number, links=None, place=None):
+    """What a field of a dialog of the setup is declared to have
+    otherwise, as an entry of DECLARED has it. `number` is the field's
+    in the original's dialog, whose fields are 11 bytes each behind a
+    header of 10. With `links`, the four fields that Up, Down, Left and
+    Right go to from it, as the tree numbers them; with `place` too,
+    where it is in its box, the row in the high byte. With neither, the
+    field is left out."""
+    at = 10 + 11 * number
+    if links is None:
+        return (at, 11, b"")
+    if place is None:
+        return (at + 1, 4, bytes(links))
+    return (at + 1, 6, bytes(links) + struct.pack("<H", place))
+
+
+def _lines(group, halves, blanks, spaces):
+    """What the lines of a box of the setup are declared to have
+    otherwise, as entries of DECLARED. A line of such a box is one text
+    for the two groups that stand side by side. `halves` are the lines
+    whose right half is that of a line further down: (the number of the
+    line, where its right half begins, the number of the line that has
+    the right half now, how many bytes of the original lie between the
+    two halves), and those bytes are left out, so the right half is held
+    against the original's too. `blanks` are the lines whose right half
+    is spaces, with the two between the halves: (the number of the line,
+    where its left half ends, how many bytes the original has from there
+    to the zero), and the tree has the mark for `spaces` spaces there."""
+    return {
+        **{f"St{group}{line:02}_S": (
+            _NO_SETTINGS + f"the right half of this line is that of the "
+            f"original's {group}{from_:02}_S", ((where, count, b""),))
+           for line, where, from_, count in halves},
+        **{f"St{group}{line:02}_S": (
+            _NO_SETTINGS + "the right half of this line is spaces, "
+            f"{spaces} with those between the halves",
+            ((where, count, bytes((0xFF, spaces))),))
+           for line, where, count in blanks},
+    }
+
+
 DECLARED = {
     "portable_c": {
         "Menu3_T": (_NO_MAP + "the command of that item is left out, "
@@ -231,6 +279,58 @@ DECLARED = {
                    '"Memory", Main, Label and Rescan, have a number less',
                    ((21, 1, b"\x1E"), (33, 1, b"\x1F"), (44, 1, b"\x00"),
                     (54, 1, b"\x00"), (181, 1, b"\x20"))),
+        # The Configuration of the setup. Execute options has one line,
+        # Quick execute commands, where Memory allocation was, and the
+        # Keyboard options are two rows further up.
+        **_lines("Cnf",
+                 ((2, 23, 3, 53), (3, 24, 5, 106), (4, 20, 6, 83),
+                  (5, 29, 7, 78), (6, 24, 8, 113), (7, 18, 9, 126),
+                  (8, 32, 10, 118), (9, 24, 11, 120), (10, 28, 12, 103)),
+                 ((11, 30, 34), (12, 6, 8)), 37),
+        "StConf_B": (_NO_SETTINGS + "the fields of Memory allocation and "
+                     "TSR manager, the 11th and the 13th, are left out, "
+                     "and the fields go to each other as they stand now, "
+                     "16 boxes and the buttons: a box of the left half "
+                     "has to its right the box on its row or else the "
+                     "one above that row, and a box of the right half "
+                     "is on a row further up, with the box of its row "
+                     "to its left",
+                     (_field(0, (16, 1, 0, 10)), _field(1, (0, 2, 1, 10)),
+                      _field(2, (1, 3, 2, 10)), _field(3, (2, 4, 3, 11)),
+                      _field(8, (7, 9, 8, 15)), _field(9, (8, 10, 9, 15)),
+                      _field(10),
+                      _field(11, (9, 11, 0, 10), 0x329),
+                      _field(12),
+                      _field(13, (10, 12, 3, 11), 0x629),
+                      _field(14, (11, 13, 4, 12), 0x729),
+                      _field(15, (12, 14, 5, 13), 0x829),
+                      _field(16, (13, 15, 6, 14), 0x929),
+                      _field(17, (14, 16, 7, 15), 0xA29),
+                      _field(18, (15, 0, 15, 16)))),
+        # Screen and Mouse of the setup. The Other options and the Mouse
+        # options are five rows further up, where Screen output was.
+        **_lines("Scr",
+                 ((1, 27, 6, 220), (2, 26, 7, 217), (3, 18, 8, 216),
+                  (4, 19, 9, 215), (5, 8, 10, 214), (6, 30, 11, 225),
+                  (7, 23, 12, 221)),
+                 ((8, 21, 28), (9, 21, 8), (10, 21, 27), (11, 20, 30),
+                  (12, 14, 8)), 34),
+        "StScrn_B": (_NO_SETTINGS + "the field of Screen output, the "
+                     "third, is left out, and the fields go to each "
+                     "other as they stand now, five and the buttons: "
+                     "Screen colors has Zooming boxes to its right and "
+                     "Screen blank delay has Left-handed mouse, the last "
+                     "of the right half; above Zooming boxes, which is "
+                     "the first of the right half now, is the last line "
+                     "of Screen blank delay, and to its left and to that "
+                     "of the line below it is Screen colors, on its "
+                     "first line",
+                     (_field(0, (5, 0x81, 0, 2)), _field(1, (0xC0, 5, 1, 4)),
+                      _field(2),
+                      _field(3, (0xC1, 3, 0x80, 2), 0x323),
+                      _field(4, (2, 4, 0x80, 3), 0x436),
+                      _field(5, (3, 5, 0x81, 4), 0x723),
+                      _field(6, (4, 0x80, 5, 5)))),
     },
 }
 

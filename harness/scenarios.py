@@ -1093,6 +1093,29 @@ is the first, and the form of the others:
     portable_c NAME` from a run, read against the declaration and
     committed with the entry of DEVIATIONS.md and the reason in its
     header (see the top of goldens.py). setup-lines has one.
+  - The two dialogs that a tree has otherwise. The Configuration and
+    Screen and Mouse of the portable C are without three settings of
+    what that program has no more, Memory allocation, TSR manager and
+    Screen output (DEVIATIONS.md, 1, 7 and 5), and what stood below them
+    in the right half of each box stands further up: the Keyboard
+    options by two rows, Quick execute commands by one, and the Other
+    options and the Mouse options by five. A scenario is still written
+    with the steps of the original, and shows either dialog as the
+    original has it. For the portable C it then wants two things. A
+    patch, for every screen that shows the dialog: the rows of the
+    right half, and the cell of the mouse pointer where that is over a
+    line that has moved. And, if a step goes into the right half, the
+    tree's step for it in `in_place_in` of deviations.TREES, with None
+    for a step that sets one of the three: a click further up, fewer
+    Tabs or Downs, since the fields are fewer. From a box of the left
+    half of the Configuration, Right is the box on its row or the one
+    above that row, and Down from the last is Quick execute commands;
+    in Screen and Mouse, Right from Screen colors is Zooming boxes, Up
+    from there the last line of Screen blank delay, Right from that
+    group Left-handed mouse, and Left from the line of characters
+    Screen colors. Steps that stay in the left half, or go to the
+    buttons, are the same for both. setup-config and setup-screen have
+    every such step.
 
 What has been found out about driving the setup program, on the bench
 with the original:
