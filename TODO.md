@@ -95,7 +95,7 @@ left open:
   of `passed-on` takes as an interrupt of its own and that of
   `handed-on` cannot get behind: where the program hands that on is a
   variable, not a word that its code names.
-- The file is 184,876 bytes, 2.84 times the original's, where the
+- The file is 184,836 bytes, 2.84 times the original's, where the
   scenarios' test fails at 3: some 10 KB are left. The main data's
   zeros are 62.6 KB of it. They are in the file because the main data
   has to be at offset 0 of a segment, the linker starts a segment on a

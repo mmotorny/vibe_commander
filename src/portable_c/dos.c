@@ -189,9 +189,7 @@ struct Keys Int16(u16 ax)
 /* The multiplex interrupt, by which resident programs are asked: its
    call with these registers. Returns AX and BX as it leaves them. The
    program asks the CD-ROM extensions whether a drive is
-   theirs (AX 150Bh), and tells Windows, or whatever else shares the
-   machine among programs, that it can do without the rest of its turn
-   (1680h), which leaves AL as it is if nobody listens. */
+   theirs (AX 150Bh). */
 struct MuxRegs Int2F(u16 ax, u16 bx, u16 cx)
 {
     u32 pair = Multiplex(ax, bx, cx);

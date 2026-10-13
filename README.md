@@ -680,11 +680,11 @@ local variable, and a constant of a code file is still `CODE`, in the
 code segment: with 12 KB less of main data all four could be one, which
 `TODO.md` has, with what stands in its way and what it waits on.
 
-`VC.EXE` of the portable C is 184,876 bytes, 51,820 more than the C
+`VC.EXE` of the portable C is 184,836 bytes, 51,780 more than the C
 translation's: the main data is in the file, the header has the
 relocations that DOS applies, 977 of them, and the part that stayed in
 the memory, with its copies and its second `dos.c`, is gone. While a
-command runs it keeps 194,720 bytes of the memory, the program and its
+command runs it keeps 194,688 bytes of the memory, the program and its
 panels, where the C translation keeps 19,728 and the original 12,704.
 
 What rests on Open Watcom, for the portable C. Of what the code is
@@ -738,6 +738,7 @@ original's.
 |---|---|---|
 | 2 | `TopView` and `TopScr` of `dos.c`, the inline assembly `VideoBuffer`, their calls in `IniData` of `start.c` and in `Window` | Drawing into the buffer that TopView or DESQview shows in place of the display's memory, and telling them what has changed there |
 | 3 | `DvPause` of `dos.c`, the inline assembly `DesqviewPause`, its call in `LeaveTm` of `blank.c`, the call of DOS in `IniData` that asked for DESQview, and the two places that went by the answer, in `Input0` and in the editor's loop of keys | Giving the rest of the program's turn to the other programs of DESQview, and leaving Alt and the keyboard's buffer to it |
+| 4 | The call of INT 2Fh with AX 1680h in `LeaveTm` | Giving the rest of the program's turn to Windows, or to whatever else ran programs of DOS as guests. The call of INT 28h, DOS's own word that the program is idle, stays |
 
 ## Testing
 

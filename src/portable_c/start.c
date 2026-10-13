@@ -742,7 +742,6 @@ void IniData(void)
     md.BlocEr = 0;
     md.TstEGA = 0;
     md.WinMous = 0;
-    md.WinLeav = 0;
     md.HstAdr = (u16)md.HstBuf;
     md.BarPrev = 0xFF;
     regs.ax = 0x1900;                   /* DosChg */

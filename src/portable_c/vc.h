@@ -220,7 +220,9 @@ struct MainDat {
     u8  DesqVie;                        /* Running under DESQVIEW: of
                                            the original. Not set or read
                                            here */
-    u8  WinLeav;                        /* Leave time under Windows */
+    u8  WinLeav;                        /* Leave time under Windows: of
+                                           the original. Not set or read
+                                           here */
     u8  CrntCol;                        /* Color which DOS currently uses */
     u8  Quote;                          /* Quote next character */
     u8  BarPrev;                        /* Previous Key Bar */
@@ -1227,8 +1229,8 @@ void MinBox(u16 begin, u16 size, u16 color);
 u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
 void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
 /* The screen blanker, which comes back when a key is pressed or the mouse
-   moved, and the word to DOS and to what shares the machine that the
-   program is idle: see each in blank.c. */
+   moved, and the word to DOS that the program is idle: see each in
+   blank.c. */
 void Blank(void);
 void LeaveTm(void);
 /* Small ones: see each in misc.c. PgUp and PgDn return where a list is

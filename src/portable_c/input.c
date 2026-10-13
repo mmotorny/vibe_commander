@@ -54,7 +54,7 @@
    window. Beep sounds, if the setup has errors do so.
 
    Blank blanks the screen until a key is pressed or the mouse moved, and
-   LeaveTm tells DOS and what runs beside it that the program is idle.
+   LeaveTm tells DOS that the program is idle.
  */
 
 /* C routines of other files that vc.h does not have. */

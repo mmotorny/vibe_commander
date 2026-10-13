@@ -40,14 +40,11 @@
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-/* Tell DOS, and whatever shares the machine among programs, that the
-   program has nothing to do at the moment. Windows is asked until it has
-   once not answered: WinLeav is 1 from then on. */
+/* Tell DOS that the program has nothing to do at the moment. The
+   original tells Windows too, and DESQview: see DEVIATIONS.md. */
 void LeaveTm(void)
 {
     Int28();
-    if (md.WinLeav == 0 && (Int2F(0x1680, 0, 0).ax & 0xFF) == 0x80)
-        md.WinLeav = 1;
 }
 
 /* A random number below `limit`, which is 255 at the most: the high word

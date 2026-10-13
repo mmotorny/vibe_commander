@@ -139,9 +139,9 @@ it.
   later.
 
 What it costs in memory. While a command runs the portable C keeps
-194,720 bytes, the program and its panels, where the original keeps
+194,688 bytes, the program and its panels, where the original keeps
 12,704 and the C translation 19,728. On the bench of the tests DOS has
-230,816 bytes for a command run from the portable C, 412,848 for one run
+230,848 bytes for a command run from the portable C, 412,848 for one run
 from the original as it is distributed, and 405,824 for one run from the
 C translation. That is enough for every command of the scenarios but
 those of a second copy of the program: the bench has 500,128 bytes from
@@ -274,3 +274,42 @@ ran in no scenario and are listed as out of reach in
 and in the editor, always went the way that the portable C now goes
 without testing. Every scenario is held against the golden that it was
 held against before.
+
+### 4. The program does not give its turn to Windows
+
+**What the original does.** Every time it goes round waiting for a key,
+also while the screen is blanked, it says that it is idle in two ways.
+It calls INT 28h, DOS's own word for that, in which the programs that
+stay in the memory do their work. And it calls the multiplex interrupt,
+INT 2Fh, with AX 1680h, by which a program of DOS gives up the rest of
+its turn to whatever shares the machine among programs: Windows from
+3.0 on, in its 386 enhanced mode, and what answers the same call, OS/2
+and others. Where nothing answers, the call comes back with 80h still
+in AL, and the program does not make it again until it has run a
+command.
+
+**What the portable C does.** It calls INT 28h and no more. The byte of
+the main data that said that nothing answers, `WinLeav`, keeps its place
+and is neither set nor read. `Int2F` of `dos.c` stays, for the search of
+files, which asks the CD-ROM extensions whether a drive is theirs.
+
+In a window of such a system the portable C built for DOS thus takes
+all of its turn while it waits, unless that system knows a program to
+be idle by INT 28h or by how it asks for keys, as some do.
+
+**Why.** It only made sense on DOS, next to a system that ran programs
+of DOS as guests and could not tell by itself that one of them was
+waiting. A system that the program is carried to is asked for the next
+key and has the program wait for it; what the program says of being idle
+it says in one place, which is the call of INT 28h today. That call
+stays: DOS's own resident programs live on it, and the tests take it for
+the program waiting for a key.
+
+**Which scenarios show it.** None. On the bench nothing answers the
+call, and the original makes it once when it starts and once after every
+command, and goes on as if it had not; unless FDAPM answers it, a
+program of FreeDOS that `memory-map`, `mouse-memory` and
+`mouse-drag-lists` have stay in the memory, which halts the processor
+until the next interrupt for a program that says it is idle, by INT 28h
+as well. That was not looked into: no screen can show it, and every
+scenario is held against the golden that it was held against before.
