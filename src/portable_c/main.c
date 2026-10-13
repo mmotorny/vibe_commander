@@ -95,9 +95,7 @@ enum {
    second, in time, and 0 if the button went up somewhere else.
 
    TstDrv is 1 if there is a drive of the letter. What the file asks of
-   the system it asks by the functions of sys.h, but for the drive that
-   a unit goes by, in ErrRdy: Int21d is any call of DOS that the assembly
-   made without Intr21.
+   the system it asks by the functions of sys.h.
 
    MakeIni writes into MenuBuf what the setup file holds, and SaveSet
    writes that file: both of vc.h. ReDir reads what a panel shows,
@@ -154,9 +152,6 @@ struct MainDat md;
     (3 + (number) * WCBini + OFFSET_IN(struct WCBdef, field))
 #define INI_CMN(field) \
     (3 + 2 * WCBini + OFFSET_IN(struct MainDat, field))
-
-#define DOS_UNIT       0x440F           /* DOS: which drive a unit is that
-                                           stands for several */
 
 /* What a panel shows, written to the screen buffer: PutFls of the
    original, which goes on in what writes the tree or the Info for a
@@ -1311,7 +1306,6 @@ static u16 MainLoop(void)
    for two, as one floppy drive does for A: and B:. */
 u16 ErrRdy(u16 letter)
 {
-    struct DosRegs regs;
     struct Box where;
     struct Mouse mouse;
     u16 *cell;
@@ -1377,13 +1371,7 @@ ErRdy7:
     HidCur();
     ResWin(where.begin, where.size, where.saved);
     Window(where.begin, where.size);
-    regs.ax = DOS_UNIT;
-    regs.bx = where.begin & 0xFF00 | (u8)(drive - ('A' - 1));
-    regs.cx = drive;
-    regs.name = (const u8 __far *)&md + where.size;
-    regs.si = 0;
-    regs.di = 0;
-    Int21d((struct DosRegs STACK *)&regs);
+    DriveSetLetter(drive - ('A' - 1));
     return letter & 0xFF00 | drive;
 }
 

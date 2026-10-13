@@ -28,9 +28,8 @@
 
    TstDrv is 1 if DOS has a drive of the letter in the low byte of
    `letter`. ErrRdy, which says that a drive is not ready and asks for
-   another, is C, of vc.h. Int21d calls DOS as Intr21 does, with the
-   registers of `regs` and their answer there, but not through Intr21,
-   where the assembly called DOS itself. */
+   another, is C, of vc.h. What the system is asked, it is asked by the
+   functions of sys.h. */
 
 /* A C routine of another file that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
@@ -52,9 +51,6 @@ static const u8 CODE Left_S[4] = "left";
 static const u8 CODE Rght_S[5] = "right";
 static const u8 CODE Driv_S[7] = " drive:";
 
-/* DX of a call of DOS that is no pointer: see CLAUDE.md. */
-#define DX_OF(regs) (*(u16 STACK *)&(regs).name)
-
 /* The letters of the drives that the box offers. */
 #define DRIVES (md.TmpBuf)
 
@@ -64,7 +60,6 @@ static const u8 CODE Driv_S[7] = " drive:";
 u16 F62_01(u16 panel, u16 item)
 {
     struct WCBdef __far *wcb = PANEL(panel);
-    struct DosRegs regs;
     struct Answer asked;
     struct Mouse pointer;
     u16 __far *next;
@@ -78,10 +73,6 @@ u16 F62_01(u16 panel, u16 item)
     u16 wide, letter, unit, active, place, right, color, c, i, key;
     u16 state, look, mouse, at, index;
 
-    regs.cx = item;
-    regs.name = md.TmpBuf;
-    regs.si = 0;
-    regs.di = 0;
     HidCur();
     PutMnu(item);
     count = 0;
@@ -92,11 +83,10 @@ u16 F62_01(u16 panel, u16 item)
            that the drive goes by now. */
         if (letter <= 'B' && md.DriveB == 0) {
             unit = letter - ('A' - 1);
-            regs.ax = 0x440E;
-            regs.bx = (3 - unit) << 8 | unit;
+            asked = DriveLetter(unit);
             active = 0;
-            if (!Int21d((struct DosRegs STACK *)&regs))
-                active = regs.ax & 0xFF;
+            if (!asked.failed)
+                active = asked.value & 0xFF;
             if (active == 3 - unit)
                 continue;
         }
@@ -306,11 +296,7 @@ F62_41:                                 /* the drive, and where it is */
         return 0;
     HidCur();
     unit = (u8)(letter - ('A' - 1));
-    regs.ax = 0x440F;
-    regs.bx = letter << 8 | unit;
-    regs.name = (const u8 __far *)wcb;
-    DX_OF(regs) = size & 0xFF00 | unit;
-    Int21d((struct DosRegs STACK *)&regs);
+    DriveSetLetter(unit);
     md.BlocEr = 1;
     asked = DirCurrent(unit, wcb->WinPath + 3);
     if (!asked.failed) {
