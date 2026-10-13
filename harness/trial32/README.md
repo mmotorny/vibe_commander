@@ -70,6 +70,7 @@ the finding: see `csover.c`.
 |---|---|
 | `toy.h`, `lib.c` | What the toys share: the interrupts as inline assembly, texts and numbers onto the screen, the entry without a C library, the stack |
 | `build.sh` | How a toy is built |
+| `ran.py` | Which functions of a flat program ran on the bench, in the order in which each first did, by QEMU's log of the code (`run.py --trace`), the program's file and the linker's map: where a program stops that does not get to its first screen. Its top says what the order is and is not |
 | `quiet.py` | Switches DOS/32A's banner off in a file that has it for its stub; `build.sh` runs it |
 | `run.py` | Runs toys on the bench and prints the screens |
 | `entry.c` | Does it run, and what is the program handed: registers, segments, the extender's DPMI, what the extender says of itself, the privilege level |
