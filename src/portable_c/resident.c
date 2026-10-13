@@ -88,25 +88,10 @@ extern const u8 __far Vers_S[];
 /* Where a routine is, as an address for DOS and for a return. */
 #define ROUTINE(function) ((const u8 __far *)(void __far *)(function))
 
-#define DOS_DRIVE    0x1900             /* the current drive, to AL */
-#define DOS_VECTOR   0x2500             /* an interrupt, AL, to DS:DX */
-#define DOS_VERSION  0x3000             /* which DOS it is, to AL and AH */
-#define DOS_BREAK    0x3300             /* whether DOS looks for Ctrl-C at
-                                           every call, to DL, and with AL 1
-                                           from DL */
-#define DOS_PATH     0x4700             /* the current directory of the
-                                           drive in DL, to DS:SI */
-#define DOS_RESIZE   0x4A00             /* make the block in ES BX
-                                           paragraphs long */
-#define DOS_EXEC     0x4B00             /* run the program at DS:DX, with
-                                           what ES:BX says */
-#define DOS_EXIT     0x4C00             /* end the program, with AL */
-#define DOS_STRATEGY 0x5800             /* how DOS looks for memory: AL 0
-                                           to ask, 1 to say, 2 and 3 the
-                                           same for whether the upper
-                                           memory is in the chain */
-#define DOS_PSP_OLD  0x5100             /* the current program, to BX: as
-                                           6200h, and of DOS 2 too */
+/* The interrupts that the program takes here: DOS's own, for the
+   program's call, and Ctrl-C of DOS. */
+#define INT_DOS    0x21
+#define INT_CTRL_C 0x23
 
 #define FLAG_CARRY     0x0001
 #define FLAG_PARITY    0x0004
@@ -138,9 +123,6 @@ extern const u8 __far Vers_S[];
 struct Frame {
     u16 ip, cs, flags;
 };
-
-/* DX of a call of DOS that is no address. */
-#define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
 /*----------------------- The flags -----------------------
    The assembly goes on in the program that started this one, when DOS
@@ -297,14 +279,9 @@ void __interrupt __far Int21(struct Saved r, struct Frame back)
    text of no characters is written as its zero byte. */
 static u16 OutStr(const u8 __far *text, u16 bx)
 {
-    struct BiosRegs regs;
-
-    do {
-        regs.ax = 0x0E00 | *text++;
-        regs.bx = bx & 0xFF00 | 7;
-        regs.cx = regs.dx = 0;
-        Int10(&regs);
-    } while (*text != 0);
+    do
+        ScreenType(*text++, bx >> 8, 7);
+    while (*text != 0);
     return (u16)(u32)text;
 }
 
@@ -331,7 +308,7 @@ static u16 NotFind(const u8 *text, const u8 __far *name)
     OutStr(name, EPB_WAS);
     OutStr0(Retr_S, EPB_WAS);
     for (;;) {
-        u8 key = (u8)Int16(0).key;
+        u8 key = (u8)KeyRead();
 
         if (key == 0x0D)
             return 0;
@@ -344,18 +321,9 @@ static u16 NotFind(const u8 *text, const u8 __far *name)
    and take Ctrl-C: when the program starts, and after every command. */
 void SetBrk(void)
 {
-    struct DosRegs regs;
-
-    regs.name = 0;
-    regs.ax = DOS_BREAK;
-    Int21e(&regs);
-    md.BreakFl = (u8)DX_OF(regs);
-    DX_OF(regs) = 0;
-    regs.ax = DOS_BREAK + 1;
-    Int21e(&regs);
-    regs.name = ROUTINE(CtrlC);
-    regs.ax = DOS_VECTOR + 0x23;
-    Int21e(&regs);
+    md.BreakFl = (u8)BreakCheck();
+    SetBreakCheck(0);
+    SetVector(INT_CTRL_C, (u32)ROUTINE(CtrlC));
 }
 
 /* Leave: have DOS look for Ctrl-C as it did, and give INT 21h back.
@@ -377,22 +345,13 @@ void SetBrk(void)
    goes on in, compared with 0. */
 static void Exit02(u16 code, struct Saved STACK *r, u16 STACK *flags)
 {
-    struct DosRegs regs;
-
     r->es = PspSeg;                     /* Exit01 */
-    regs.name = 0;
-    DX_OF(regs) = md.BreakFl;
-    regs.ax = DOS_BREAK + 1;
-    Int21e(&regs);
-    regs.name = (const u8 __far *)Vect21;       /* Exit03 */
-    regs.ax = DOS_VECTOR + 0x21;
-    Int21e(&regs);
+    SetBreakCheck(md.BreakFl);
+    SetVector(INT_DOS, Vect21);         /* Exit03 */
     r->ds = (u16)(Vect21 >> 16);
     r->dx = (u16)Vect21;
-    if ((u16)(Vect22 >> 16) == 0) {     /* Exit04 */
-        regs.ax = DOS_EXIT | code & 0xFF;
-        Int21e(&regs);
-    }
+    if ((u16)(Vect22 >> 16) == 0)       /* Exit04 */
+        ProgramEnd(code);
     *flags = *flags & ~FLAGS_RESULT | Taken((u16)(Vect22 >> 16), 0);
 }
 
@@ -452,24 +411,10 @@ void __interrupt __far Exit05(struct Saved r, struct Frame on)
    that byte of the setup is. */
 void TakeDos(void)
 {
-    struct DosRegs regs;
-    /* The segment of the table of vectors. Written as a constant, the
-       compiler takes a far pointer into segment 0 for a near one. */
-    volatile u16 table = 0;
-
     Vect22 = PSP_EXIT;
     PSP_EXIT = (u32)ROUTINE(Exit01);
-    regs.ax = 0x3521;                   /* where an interrupt goes */
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.name = (const u8 __far *)&md;
-    regs.si = 0;
-    regs.di = 0;
-    Int21d(&regs);
-    Vect21 = (u32)regs.es << 16 | regs.bx;
-    IntOff();
-    *(u32 __far *)AT(table, 4 * 0x21) = (u32)ROUTINE(New21);
-    IntOn();
+    Vect21 = Vector(INT_DOS);
+    PutVector(INT_DOS, (u32)ROUTINE(New21));
 }
 
 /* No memory: say so and leave. `bx` is what the assembly has in BX
@@ -533,20 +478,16 @@ __declspec(naked) static void Int2E(const u8 *command)
    command. */
 static void Exec02(u16 behind)
 {
-    struct DosRegs regs;
-    struct BiosRegs bios;
+    struct Answer ran;
     const u8 __far *name;
     u8 *command, *before, *end, *to;
-    u16 count, failed;
+    u16 count, bx;
     u8 drive;
 
     for (;;) {
         if (behind)
             goto Exec07;
-        regs.name = 0;
-        DX_OF(regs) = md.BreakFl;
-        regs.ax = DOS_BREAK + 1;
-        Int21e(&regs);
+        SetBreakCheck(md.BreakFl);
         command = (u8 *)md.BatAdr;
         before = command - 4;
         for (end = command; *end++ != 0; )
@@ -576,15 +517,11 @@ static void Exec02(u16 behind)
                 name = (const u8 __far *)Command;
             } else {
                 name = AT(PSP_ENV, md.ComSpec);
-                regs.name = name;
-                regs.bx = (u16)&md.EPB;
-                regs.es = MAIN_SEG;
-                regs.ax = DOS_EXEC;
-                failed = Int21e(&regs);
+                ran = ProgramRunBare(name, &md.EPB);
                 SetBrk();
-                if (!failed)
+                if (!ran.failed)
                     break;
-                if (regs.ax > 3) {
+                if (ran.value > 3) {
                     OutStr0(NoRun_S, EPB_WAS);
                     return;
                 }
@@ -607,30 +544,22 @@ static void Exec02(u16 behind)
         to = PromptLine;
         *to++ = 0x0D;
         *to++ = 0x0A;
-        regs.ax = DOS_DRIVE;
-        Int21e(&regs);
-        drive = (u8)regs.ax;
+        drive = (u8)DriveCurrent();
         *to++ = drive + 'A';
         if (md.Prompt != 0) {
             *to++ = ':';
             *to++ = '\\';
-            regs.name = AT(MAIN_SEG, (u8)(drive + 1));
-            regs.si = (u16)to;
-            regs.ax = DOS_PATH;
-            Int21e(&regs);
+            DirCurrentBare(drive + 1, to);
             while (*to != 0)
                 to++;
         }
         *to++ = '>';                    /* Exec09 */
         *to = 0;
-        OutStr0(PromptLine, WAS(md.BatAdr));
-        OutStr0((const u8 *)md.BatAdr, WAS(md.BatAdr));
-        bios.ax = 0x0E0D;
-        bios.bx = WAS(md.BatAdr);
-        bios.cx = bios.dx = 0;
-        Int10(&bios);
-        bios.ax = 0x0E0A;
-        Int10(&bios);
+        bx = WAS(md.BatAdr);
+        OutStr0(PromptLine, bx);
+        OutStr0((const u8 *)md.BatAdr, bx);
+        ScreenType(0x0D, bx >> 8, bx);
+        ScreenType(0x0A, bx >> 8, bx);
     }
 }
 
@@ -687,26 +616,17 @@ static void __loadds Exec2E(void)
    portable C does not do (see DEVIATIONS.md). */
 static void SetStat(void)
 {
-    struct DosRegs regs;
-
-    regs.ax = DOS_STRATEGY + 1;
-    regs.bx = 0;
-    Int21e(&regs);
-    regs.ax = DOS_STRATEGY + 3;
-    regs.bx = 0;
-    Int21e(&regs);
+    MemSetSearch(0);
+    MemSetUpper(0);
 }
 
 /* No memory when the program begins: say so and end. */
 static void Alloc9(void)
 {
-    struct DosRegs regs;
-
     OutStr0(Aloc_S, RESPARS_WAS);       /* BX: the paragraphs of the part
                                            of the original that stays */
     SetStat();
-    regs.ax = DOS_EXIT + 1;
-    Int21e(&regs);
+    ProgramEnd(1);
 }
 #pragma aux Alloc9 aborts
 
@@ -745,28 +665,23 @@ static void Alloc9(void)
    linker writes it. */
 void __loadds Alloc0(void)
 {
-    struct DosRegs regs;
+    struct SysVersion system;
     u32 end = (u32)(void __far *)Stack;
+    u16 length;
 
     IntOn();                            /* for the direction flag, which
                                            the compiler wants clear */
-    regs.ax = DOS_PSP_OLD;
-    Int21e(&regs);
-    PspSeg = regs.bx;
-    regs.ax = DOS_VERSION;              /* Check DOS version */
-    Int21e(&regs);
-    if ((u8)regs.ax < 3)                /* Alloc4 */
+    PspSeg = ProgramPrefix();
+    system = SystemVersion();           /* Check DOS version */
+    if ((u8)system.version < 3)         /* Alloc4 */
         ((void (__far *)(void))AT(PspSeg, 0))();
-    if (((regs.ax & 0xFF) << 8 | regs.ax >> 8) < 0x314) {
-        OutStr(Vers_S, regs.bx);        /* BX: as DOS answered */
-        regs.ax = DOS_EXIT + 2;
-        Int21e(&regs);
+    if (((system.version & 0xFF) << 8 | system.version >> 8) < 0x314) {
+        OutStr(Vers_S, system.other);   /* BX: as DOS answered */
+        ProgramEnd(2);
     }
-    regs.bx = (u16)(end >> 16) + (((u16)end + LenStk + 15) >> 4)
-              - PspSeg;                 /* Alloc5 */
-    regs.es = PspSeg;
-    regs.ax = DOS_RESIZE;
-    if (Int21e(&regs))
+    length = (u16)(end >> 16) + (((u16)end + LenStk + 15) >> 4)
+             - PspSeg;                  /* Alloc5 */
+    if (MemResize(PspSeg, length).failed)
         Alloc9();
     SetStat();                          /* Alloc7 */
     Main();

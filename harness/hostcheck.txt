@@ -19,7 +19,7 @@ dialog.c      to-number 18, to-pointer 45
 digits.c      clean
 dirfunc.c     to-number 93, to-pointer 33
 dirfunc_t.c   clean
-dos.c         to-number 54, to-pointer 14, asm-pragma 7, registers 1, intrinsic 1
+dos.c         to-number 57, to-pointer 15, asm-pragma 7, registers 1, intrinsic 1
 drive.c       to-number 2, to-pointer 1
 edit.c        to-number 54, to-pointer 35
 edit_t.c      clean
@@ -45,7 +45,7 @@ mouse.c       clean
 panel.c       to-number 2, to-pointer 7
 place.c       to-number 7, to-pointer 5
 read.c        to-number 3, to-pointer 16
-resident.c    to-number 26, to-pointer 13, function 4, interrupt 5, loadds 3, naked 3, asm 3, registers 1, aborts 3
+resident.c    to-number 21, to-pointer 10, function 4, interrupt 5, loadds 3, naked 3, asm 3, registers 1, aborts 3
 screen.c      clean
 setup.c       to-number 1, to-pointer 2
 stack.c       data_seg 2

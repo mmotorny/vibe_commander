@@ -278,6 +278,15 @@ struct Block MemTake(u16 paragraphs);
 struct Answer MemGive(u16 block);
 struct Block MemResize(u16 block, u16 paragraphs);
 
+/* Where the system looks for a block that it is asked for: `how` is as
+   DOS has it, 0 for the lowest block that fits, which is how DOS looks
+   when it has started. And whether the upper memory, beyond the 640 KB
+   that every PC has, is among what it looks through: 1 or 0. Neither
+   answers, and a system that does not know the question goes on looking
+   as it did. */
+void MemSetSearch(u16 how);
+void MemSetUpper(u16 on);
+
 /*
  * The time, the country, the system itself. All Bare.
  */
@@ -335,6 +344,13 @@ struct Answer ProgramRunBare(const u8 FAR *name,
 /* End the program, with a number for whoever started it. Does not
    return. */
 void ProgramEnd(u16 code);
+
+/* What DOS keeps of the program in front of it, its PSP, by its segment:
+   256 bytes that have the command line which the program was started
+   with, the segment of its environment, where its memory ends, and where
+   the program that started it goes on when this one has ended. The
+   program's block of the memory is known by the same segment. */
+u16 ProgramPrefix(void);
 
 /*
  * The console: what the system writes where the screen has its cursor,

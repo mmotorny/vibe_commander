@@ -581,11 +581,11 @@ void MousAt(struct MouseAt STACK *state);
 void Int28(void);
 /* What is of DOS on a PC alone, and no part of sys.h: where an interrupt
    goes, as an address with the offset in the low word, and one made to
-   go somewhere; and the machine kept from interrupting the program. See
-   each in dos.c. */
+   go somewhere, by DOS or, for PutVector, in the machine's table itself;
+   and the machine let interrupt the program again. See each in dos.c. */
 u32 Vector(u16 number);
 void SetVector(u16 number, u32 to);
-void IntOff(void);
+void PutVector(u16 number, u32 to);
 void IntOn(void);
 
 /* The registers as an interrupt function of the compiler saves them on

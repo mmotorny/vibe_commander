@@ -665,6 +665,29 @@ struct Block MemResize(u16 block, u16 paragraphs)
     return Paragraphs(REGS(regs));
 }
 
+/* How DOS looks for memory, AX 5801h, and whether the upper memory is in
+   its chain of blocks, AX 5803h, which DOS has since its version 5: both
+   take what is set in BX. */
+void MemSetSearch(u16 how)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x5801;
+    regs.bx = how;
+    regs.name = NUMBER(0);
+    Tell(REGS(regs));
+}
+
+void MemSetUpper(u16 on)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x5803;
+    regs.bx = on;
+    regs.name = NUMBER(0);
+    Tell(REGS(regs));
+}
+
 /* The time, AH 2Ch: the hour and the minute come back in CX, the second
    and its hundredth in DX. */
 struct Time TimeOfDay(void)
@@ -759,7 +782,8 @@ void Idle(void)
 }
 
 /* Other programs: AX 4B00h, with the name at DS:DX and the block at
-   ES:BX, and AH 4Ch. */
+   ES:BX, AH 4Ch, and AH 51h, which answers in BX: as 62h, and of DOS 2
+   too. */
 
 struct Answer ProgramRun(const u8 FAR *name, const struct EPBs FAR *block)
 {
@@ -791,6 +815,16 @@ void ProgramEnd(u16 code)
     regs.ax = 0x4C00 | code & 0xFF;
     regs.name = NUMBER(0);
     Tell(REGS(regs));
+}
+
+u16 ProgramPrefix(void)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x5100;
+    regs.name = NUMBER(0);
+    Tell(REGS(regs));
+    return regs.bx;
 }
 
 /* The console: AH 6, with the character in DL, and AH 9. */
@@ -1169,12 +1203,25 @@ void SetVector(u16 number, u32 to)
     Tell(REGS(regs));
 }
 
-/* Keep the machine from interrupting the program, and let it again. */
-void IntOff(void)
+/* Have an interrupt go somewhere without asking DOS: the address is
+   written into the machine's table of them, which is at the bottom of
+   the memory, four bytes for each, with the machine kept from
+   interrupting meanwhile. The original takes DOS's own interrupt like
+   that. */
+void PutVector(u16 number, u32 to)
 {
+    /* The segment of the table. Written as a constant, the compiler
+       takes a far pointer into segment 0 for a near one. */
+    volatile u16 table = 0;
+
     _disable();
+    *(u32 __far *)((u32)table << 16 | (number & 0xFF) * 4) = to;
+    _enable();
 }
 
+/* Let the machine interrupt the program again, where something has
+   kept it from that; and the direction flag is clear afterwards, as the
+   compiler wants it. */
 void IntOn(void)
 {
     _enable();
