@@ -185,7 +185,7 @@ void PutInf(u16 panel)
             if (i == LF_CR || i == CR_LF)
                 break;
             text--;
-            if ((u16)text > (u16)md.InfBuf + md.InfoLen)
+            if (MD_PLACE(text) > MD_PLACE(md.InfBuf) + md.InfoLen)
                 break;
             if (room == 0)
                 continue;
@@ -200,7 +200,7 @@ void PutInf(u16 panel)
             cell += 2;
             room--;
         }
-        if ((u16)text > (u16)md.InfBuf + md.InfoLen)
+        if (MD_PLACE(text) > MD_PLACE(md.InfBuf) + md.InfoLen)
             break;
         screen += 80;
     } while (--lines);

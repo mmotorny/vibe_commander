@@ -233,7 +233,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
         if (md.DTA.FilName[0] == '.' && (attributes & ATTR_DIRECTORY)) {
             /* What the assembly reads as WinPath[3], with DS on the main
                data. */
-            if (md.ColTab[(u16)(u32)(wcb->WinPath + 3)] != 0) {
+            if (md.ColTab[OFFSET_IN_SEG(panel, wcb->WinPath + 3)] != 0) {
                 md.DTA.FilAttr &= 0xF9;
                 md.DTA.FilAttr &= 0x3F;
                 to = &ENTRY(wcb, DSKBUF)->AttrF;

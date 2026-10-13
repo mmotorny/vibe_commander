@@ -123,7 +123,7 @@ F62_06:
     begin = 5 << 8 | begin & 0xFF;
     size = (6 + 1) << 8 | size & 0xFF;
     begin = SftEGA(begin);
-    SavWin(begin, size, (u16)md.WinBuf);
+    SavWin(begin, size, MD_PLACE(md.WinBuf));
     color = Color(Box_C) << 8;
     MinBox(begin, size, color);
 
@@ -288,7 +288,7 @@ F62_36:                                 /* Enter */
 F62_37:                                 /* Esc */
     letter = 0;
 F62_40:
-    ResWin(begin, size, (u16)md.WinBuf);
+    ResWin(begin, size, MD_PLACE(md.WinBuf));
     Window(begin, size);
 
 F62_41:                                 /* the drive, and where it is */
