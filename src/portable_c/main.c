@@ -45,7 +45,9 @@ static void Exit(void);
 void RstVc1(void);
 
 
-/* Where the loop is entered: what Command returns. */
+/* Where the program goes on after a command, which is what Command
+   returns: a place of the loop, where Loop is entered, or the loop is
+   left. */
 enum {
     INIT40,                             /* find the command line on the
                                            screen, keep what DOS shows,
@@ -61,22 +63,13 @@ enum {
     FUNC07,                             /* wait for a key */
     FUNC12,                             /* go to the command of the key
                                            in AX */
-    LEAVE = 0x100                       /* not a place: leave the loop, for
-                                           what is in the low byte */
-};
-
-/* Why the loop is left: what MainLoop returns. */
-enum {
+    /* The rest are no places: the loop is left, for what each says, and
+       MainLoop returns it. They come last, END_INIT11 the first of them,
+       which MainLoop goes by. */
     END_INIT11,                         /* to start the program over */
     END_EXEC,                           /* to have the commands of DosBuf
                                            run first */
     END_EXIT                            /* to leave the program */
-};
-
-/* What Func21 returns besides a command. */
-enum {
-    AGAIN = 0x100                       /* not a place: go round, from the
-                                           entry in the low byte */
 };
 
 /* What is at an offset in a segment, and the offset of something that
@@ -448,10 +441,44 @@ Init70:
     }
 }
 
+/* What the mouse asks for at the panels, which is what Func21 returns:
+   a command, or nothing, and then the place where the loop goes round
+   from. */
+struct Asked {
+    u8  nothing;                        /* not 0 if no command is asked
+                                           for: the loop goes round, */
+    u8  entry;                          /* from this place of it */
+    u16 command;                        /* else the command, a CMD_ of
+                                           vc.h */
+};
+
+/* It asks for a command, */
+static struct Asked Asks(u16 command)
+{
+    struct Asked asked;
+
+    asked.nothing = 0;
+    asked.entry = 0;
+    asked.command = command;
+    return asked;
+}
+
+/* or for nothing, and the loop goes round from `entry`. */
+static struct Asked Nothing(u16 entry)
+{
+    struct Asked asked;
+
+    asked.nothing = 1;
+    asked.entry = (u8)entry;
+    asked.command = 0;
+    return asked;
+}
+
 /* What the mouse does at the panels, with a button down: `r->ax` is the
    buttons, `r->cx` where the mouse is, the row in the high byte, and
-   `r->ds` the current panel. Returns the command that the mouse asks
-   for, a CMD_ of vc.h, or AGAIN with the place of the loop.
+   `r->ds` the current panel. Returns what the mouse asks for, struct
+   Asked above: a command, a CMD_ of vc.h, or nothing, with the place
+   where the loop goes round from.
 
    A button in the top left corner switches the panels off and on when it
    comes up there; one on the top row is the menu bar's; one below the
@@ -465,7 +492,7 @@ Init70:
    Ported as they are: what DoublMo leaves in AX and CX is not handed on;
    where the program goes on then, at F00_60, at Func04 and at F21_10,
    both are set before they are read. */
-static u16 Func21(struct Regs STACK *r)
+static struct Asked Func21(struct Regs STACK *r)
 {
     struct WCBdef __far *wcb;
     struct Place place;
@@ -493,16 +520,16 @@ static u16 Func21(struct Regs STACK *r)
         r->bx = r->bx & 0xFF00 | look;  /* Func24 */
         TypMous(0);
         if (look == 0)
-            return AGAIN | FUNC07;
-        return CMD_F11_00;
+            return Nothing(FUNC07);
+        return Asks(CMD_F11_00);
     }
     if ((r->cx >> 8) == 0)              /* Func25: pull down menu */
-        return CMD_F39_00;
+        return Asks(CMD_F39_00);
     r->bx = BegBX(r->ds);               /* Func26 */
     r->dx = SizDX();
     r->dx = r->dx & 0xFF | (u16)(u8)((r->dx >> 8) + (r->bx >> 8)) << 8;
     if ((r->cx >> 8) >= (r->dx >> 8))
-        return AGAIN | FUNC07;
+        return Nothing(FUNC07);
     if ((r->cx & 0xFF) < 40) {          /* Change panel */
         r->ds = md.WCB1seg;
         if (md.Active == 0)
@@ -513,21 +540,21 @@ static u16 Func21(struct Regs STACK *r)
             goto Func30;
     }
     r->ds = md.WCBcrn;                  /* Func28 */
-    return CMD_F20_00;
+    return Asks(CMD_F20_00);
 
 Func30:
     wcb = PANEL(r->ds);
     if ((r->ax & 3) == 0 || wcb->Visible == 0)
-        return AGAIN | FUNC07;
+        return Nothing(FUNC07);
     if (wcb->WinTyp < 2)
         goto Func40;
     if (wcb->WinTyp != 2)
-        return AGAIN | FUNC07;
+        return Nothing(FUNC07);
     r->bx = BegBX(r->ds) + 0x0B01;      /* Edit 'dirinfo' */
     r->dx = SizDX() - 0x0C02;
     if (InWind(r->cx, r->bx, r->dx))
-        return AGAIN | FUNC07;
-    return CMD_F34_10;
+        return Nothing(FUNC07);
+    return Asks(CMD_F34_10);
 
 Func40:                                 /* Move the cursor */
     md.WinMous |= 1;
@@ -542,7 +569,7 @@ Func40:                                 /* Move the cursor */
     r->bx = BegBX(r->ds);
     column = r->cx & 0xFF;
     if (column < (r->bx & 0xFF) || column >= (u8)((r->bx & 0xFF) + 40))
-        return AGAIN | FUNC07;
+        return Nothing(FUNC07);
     r->bx += 0x100;
     if (wcb->WinTyp == 0)
         r->bx += 0x100;
@@ -550,7 +577,7 @@ Func40:                                 /* Move the cursor */
     r->cx = r->cx & 0xFF | (u16)(u8)(rows - (r->bx >> 8)) << 8;
     if (rows < r->bx >> 8) {            /* Func50: scroll up */
         r->si = r->di;
-        return CMD_F00_05;
+        return Asks(CMD_F00_05);
     }
     rows = r->cx >> 8;
     kind = wcb->WinTyp | wcb->BrfFul;
@@ -562,12 +589,12 @@ Func40:                                 /* Move the cursor */
         r->si = r->di + r->ax;
         if (r->si > r->dx)
             r->si = r->dx;
-        return CMD_F01_05;
+        return Asks(CMD_F01_05);
     }
     column = (u8)(column - (r->bx & 0xFF));     /* Set cursor position */
     r->cx = r->cx & 0xFF00 | column;
     if (column >= 39)
-        return AGAIN | FUNC07;
+        return Nothing(FUNC07);
     r->bx = r->bx & 0xFF00 | kind;
     if (kind == 0) {                    /* three columns of names */
         r->bx = r->bx & 0xFF00 | 13;
@@ -577,15 +604,15 @@ Func40:                                 /* Move the cursor */
         r->cx = rows << 8 | column;
     }
     if (column == 0)                    /* Func42 */
-        return AGAIN | FUNC07;
+        return Nothing(FUNC07);
     r->ax = (u16)(signed char)rows + r->di;
     r->si = r->ax;
     if (r->si > r->dx) {
         r->si = r->dx;
-        return CMD_F00_60;
+        return Asks(CMD_F00_60);
     }
     if (!(r->bp & 1))                   /* Func43 */
-        return CMD_F00_60;
+        return Asks(CMD_F00_60);
 
     r->cx = *(u16 *)md.TmpBuf;          /* Func60: double click */
     r->bx = BegBX(r->ds) + 1;
@@ -603,12 +630,12 @@ Func40:                                 /* Move the cursor */
     }
     answer = DoublMo(r->bx, r->dx, r->si);      /* Func61 */
     if (answer == 2)
-        return CMD_F00_60;
+        return Asks(CMD_F00_60);
     if (answer == 0)
-        return AGAIN | FUNC04;
+        return Nothing(FUNC04);
     r->ax &= 0xFF00;                    /* Func62 */
     TypMous(0);
-    return CMD_F21_10;
+    return Asks(CMD_F21_10);
 }
 
 /* The command of a key, a CMD_ of vc.h: the command line for a key that
@@ -716,7 +743,8 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
     const u8 *image;
     struct Time moment;
     struct Mouse mouse;
-    u16 i, length, same, time, seconds, hundredths, menu, key, where;
+    struct Asked asked;
+    u16 i, length, same, time, seconds, hundredths, menu, key;
 
     for (;;) {
         switch (entry) {
@@ -877,10 +905,10 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
         r->ax = mouse.buttons;
         r->cx = mouse.place;
     Mouse:
-        where = Func21(r);
-        if (!(where & AGAIN))
-            return where;
-        entry = where & 0xFF;
+        asked = Func21(r);
+        if (!asked.nothing)
+            return asked.command;
+        entry = asked.entry;
     }
 }
 
@@ -888,8 +916,8 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
    What the function of a command returns says where the program goes
    on. Each of these makes of it what the original has at the end of that
    family of commands, and returns the place of the loop, an entry of
-   Loop, or LEAVE with what is to be done outside it. Where the original
-   goes on in another command, so does this. */
+   Loop, or what the loop is left for, an END_. Where the original goes
+   on in another command, so does this. */
 
 /* Open the file ViewFil and show it in the viewer, or in the editor if
    `edit` is not 0: V00_00, V00_01 and V00_02 of the original, which are
@@ -984,9 +1012,9 @@ static u16 CmdEnd(struct Onward next, struct Regs STACK *r)
     case NEXT_M06_00:                   /* CmdM06 */
         return MnuEnd(M06_00(panel, item << 8 | item), r);
     case NEXT_INIT11:                   /* CmdIni */
-        return LEAVE | END_INIT11;
+        return END_INIT11;
     case NEXT_EXEC:                     /* CmdExe */
-        return LEAVE | END_EXEC;
+        return END_EXEC;
     case NEXT_VIEW:                     /* V00_00: with the Files menu
                                            marked, and in DL whether to
                                            edit */
@@ -996,7 +1024,7 @@ static u16 CmdEnd(struct Onward next, struct Regs STACK *r)
     case NEXT_DIRINFO:                  /* CmdV02 */
         return V00_03(2, 1, 0);
     default:                            /* NEXT_EXIT */
-        return LEAVE | END_EXIT;
+        return END_EXIT;
     }
 }
 
@@ -1086,7 +1114,7 @@ static u16 F39_01(u16 again, struct Regs STACK *r)
 /* Do a command: call its function, with what it reads of the registers,
    and go on by what that returns. Returns the place of the loop where the
    program goes on, with the registers as that place and the next command
-   get them, or LEAVE with why the loop is left.
+   get them, or what the loop is left for, an END_.
 
    `panel` is the panel that the command is for, which the original has
    in DS when it jumps to the command: the current panel, `r->ds`, but for
@@ -1285,8 +1313,8 @@ static u16 MainLoop(void)
     for (;;) {
         command = Loop(entry, r);
         entry = Command(command, r->ds, r);
-        if (entry & LEAVE)
-            return entry & 0xFF;
+        if (entry >= END_INIT11)        /* no place of the loop */
+            return entry;
     }
 }
 
