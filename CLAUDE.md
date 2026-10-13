@@ -1506,6 +1506,63 @@ in "The portable C".
   warnings wanted, `-Wuninitialized` the third, leaves the two
   variables that are known and nothing else; `_asm` is defined away
   like the other words.
+- What taking out four things met that the program did only for the PC
+  and for the programs around it, and that show on no screen: TopView,
+  DESQview, the turn given to Windows, and the wait for a display that
+  shows snow (`src/portable_c/DEVIATIONS.md`, 2 to 5).
+  - Such a removal wants nothing in the three tables of the harness, as
+    long as no function that a batch lists in `functions`, no constant
+    and no scenario goes or changes. What `harness/ported.py` lists as
+    out of reach are instructions of the original, which stay listed;
+    that list is also where to read that no scenario shows a thing: an
+    instruction of it that the bench cannot get to is there, with the
+    reason.
+  - A feature is found by the byte that the main data keeps of it, in
+    the assembly, `grep -a` over `src/asm` with all of its output, and
+    not by its routine: `DesqVie` was read in three places, of which
+    the pause in `LeaveTm` was one. The others were in `Input0` and in
+    the editor, where the program does something otherwise under
+    DESQview, and what it does without is what stays, unconditionally.
+    The byte keeps its place in `struct MainDat`, with "of the
+    original. Not set or read here" in its comment; a byte of the
+    setup, Snow mode, is "kept as it is found", and its default stays
+    in the table of `start.c`, so the setup file is the original's.
+  - An instruction that stands with the feature may do more than the
+    feature needs. `Window` and `MovScr` let the machine interrupt
+    again, `STI`, behind what they copy with interrupts off for a
+    display with snow, and do so whatever the display is; and DOS calls
+    `FatErr` with interrupts off, whose box is put on the screen
+    through `Window`. No scenario would have said whether the box
+    needs that. The `IntOn` stayed, once behind each copy, with a
+    comment that says why. Before one of a pair like that goes, look
+    for who comes there in the other state.
+  - Where a call of DOS or the BIOS goes, the registers that it left
+    for the next call go too: read what the next call takes. `IniData`
+    hands a structure of registers from call to call.
+  - `Exit05` of `resident.c` is no routine for INT 5: it is where DOS
+    goes on when it ends the program. The program does not take that
+    interrupt. What it does for Print Screen is one call of the BIOS in
+    EGA lines, `F69_00` of `commands.c`, which was taken out and put
+    back: it is a part of that command, and goes or stays with it
+    (`TODO.md`).
+  - A thing that is half of a command which shows is not of this kind,
+    however little of it shows: the command stays whole until it is
+    decided.
+  - The figures that follow the size of the file are set again with
+    every removal: the size, how much more that is than the C
+    translation's, the relocations and what the program keeps while a
+    command runs in the README, the size in `TODO.md`, and what the
+    program keeps and what DOS has for a command in `DEVIATIONS.md`.
+    What it keeps is the file less its header, and 256 bytes of PSP,
+    made whole paragraphs, and 13,536 bytes more for the panels and the
+    headers of the blocks; what DOS has for a command on the bench is
+    425,536 less that. The second can be seen: `python3 harness/show.py
+    --program build/portable_c/VC.EXE --last Tab` prints the Info panel
+    with its number, 72,496 more than that, COMMAND.COM not being
+    loaded yet.
+  - The builds were each tested as a copy while the next was made, by
+    the note above, two or three at a time: the scenarios' test took
+    five to six minutes each that way.
 
 ## Work by several agents
 

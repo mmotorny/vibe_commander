@@ -114,6 +114,10 @@ left open:
   cuts it to save it (`F21_40` of `src/portable_c/enter.c`). The limit
   has no reason any more; lifting it is a deviation for the user to
   decide.
+- Whether EGA lines stays, Alt-F9, is the user's to decide, and the
+  call in it that has the BIOS print every line of such a screen at
+  Print Screen (`F69_00` of `commands.c`, INT 10h, AH 12h, BL 20h)
+  belongs to that decision.
 - Names that say what no longer is: `resident.c`, of which nothing is
   resident; `FreMem2`, which is how many paragraphs it is from the main
   data to the end of the block of the panels and the viewer, so that
