@@ -80,6 +80,8 @@ the finding: see `csover.c`.
 | `timer.c` | What the extender has done to the timer's counter 0 |
 | `zero.c` | Is what the file does not hold zero at the entry, and where do the code and the data land |
 | `memory.c` | What memory there is, by DPMI 0500h, 0501h and 0100h and by INT 21h function 48h |
+| `blocks.c` | The extender's blocks, DPMI 0500h to 0503h, for the memory of the panels and the texts (`TODO.md`, "X, the extender's memory on the bench"): how much there is and the largest block that is given; where blocks are and what the extender keeps in front of each; a block made longer and shorter, in its place and not; one given back and taken again; what is in a block as it is given; a write behind the end of one. Steps of `f l a r x g z d h w q`, as its top has them. It asks DOS for its version in front of each and behind it, so that `calls.asm` shows whether DOS is asked anything between |
+| `second.c` | What a program run from this one finds of the extender's memory, with the largest block kept, made shorter or given back: a copy of the toy, the program of the portable C (`--extra VC.EXE=build/portable_c/VC.EXE`), `mem`, `above.asm`, and a copy that `ended.asm` has DOS end with a block kept (`--extra VC/ENDED.COM=build/trial32/ended.com --extra VC/T.EXE=build/trial32/second-d32.exe`). Steps of `k t 1 s Shift+s b f c p m a e q`, as its top has them. With all but so much kept, it is a machine of so little memory for the program that it runs |
 | `keys.c` | The idle call, keys with the shift state, the mouse: steps `a F5 Shift+F6 Alt+F1 Click@3,5 q`; with `--stack 0,512`, how much of the extender's stack of real mode the driver's work uses; with `--driver` and `--debug`, where the idle call comes from |
 | `wait.c` | A key waited for inside the BIOS: steps `a q` |
 | `auto.c` | What the driver reads of the program, above the megabyte: steps `a t b c q`, with the driver as it is and with `--driver build/trial32/DRIVERX.COM --lauto ADDRESS --lclock ADDRESS --clock 0`, the two addresses being those of the toy's first line |
@@ -97,6 +99,7 @@ the finding: see `csover.c`.
 | `copies.c` | A copy of the toy run from the toy through the shell, and one from that: each with an `AutoTim`, a `Clock` and a stack of its own, elsewhere above the megabyte. `harness/drivercheck.py` holds the driver to it; by hand, steps of `t c o r q`, as its top has them |
 | `above.asm` | Real mode: what a program that is run as a command is told of the memory above the megabyte, by INT 15h, the clock's memory, XMS and DPMI. Its top says how it is run |
 | `calls.asm` | Real mode: every call of DOS that a program makes, as DOS gets it, in order, with AX, BX, DS and ES: it takes INT 21h, runs the program, and writes the calls to a file when the program has ended. Entry 6 of `src/portable_c/DEVIATIONS.md` has what it showed of the two programs of the portable C. Its top says how it is run |
+| `listed.py` | Prints the calls that `calls.asm` wrote down, from the disk that `run.py --keep` kept |
 | `rmbench.asm` | Real mode: what the bench has for an extender, XMS, DPMI, EMS and memory |
 | `rmstart.asm` | Real mode: when DOS enters a program, to hold `start.c` against |
 | `rmcalls.asm` | Real mode: what a call costs, to hold `realcalls.c` against |
