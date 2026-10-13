@@ -634,19 +634,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 191,846 bytes |
-| as a multiple of the original's 65,090 bytes | 2.95 |
-| more than the C translation's 133,056 bytes | 58,790 bytes |
-| The relocations in its header, which DOS applies | 1,000 |
-| What it keeps of the memory while a command runs: the program and its panels | 201,616 bytes |
-| What DOS has for a command then, on the bench of the tests | 223,920 bytes |
-| The code segment `CTEXT` ends at | D3F7h, 7,177 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | BC6Bh, 13,205 bytes below the limit, F000h |
+| `VC.EXE` | 193,220 bytes |
+| as a multiple of the original's 65,090 bytes | 2.97 |
+| more than the C translation's 133,056 bytes | 60,164 bytes |
+| The relocations in its header, which DOS applies | 1,020 |
+| What it keeps of the memory while a command runs: the program and its panels | 202,912 bytes |
+| What DOS has for a command then, on the bench of the tests | 222,624 bytes |
+| The code segment `CTEXT` ends at | D413h, 7,149 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C159h, 11,943 bytes below the limit, F000h |
 | Inline assembly | 57 instructions in 10 pieces: 37 in 7 of `dos.c`, 20 in 3 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 761, 62, 259, 96 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 770, 62, 259, 96 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -963,9 +963,12 @@ after a command anyway.
 
 `stcolor.c` has the three palettes, Set Black & White palette, Set
 Color palette and Set Laptop palette: the list of the 39 colours of
-one, with the grid of the 256 colours beside it. The picture in which
-a colour of the list is chosen is still to come there. `stcolor_t.c`
-has its tables.
+one, with the grid of the 256 colours beside it, and the picture in
+which a colour of the list is chosen, one of four screens of the
+program painted in the palette. `stcolor_t.c` has its tables, the
+four screens among them. What a colour becomes in a shadow, which a
+picture asks for a shadow that is not the one set, is `ShadCol` of
+`screen.c`, for both programs.
 
 Of the menu's nine items five do something so far, the three palettes,
 Set default configuration and Exit, and F1 is the help: the

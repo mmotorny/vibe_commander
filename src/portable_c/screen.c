@@ -13,6 +13,7 @@
                                            are made */
 
 u8 *ColAddr(u16 number);
+u16 ShadCol(u16 color, u16 how);
 u16 *Shadow(u16 *cell);
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);
@@ -54,19 +55,29 @@ u16 Color(u16 number)
     return *IN_TABLE(number, palette);
 }
 
-/* Put a cell into the shadow of a box, by changing its colour, and return
-   the address of the next cell. The colour ShadFl says how: 0 leaves the
-   colour alone, 1 takes the background and the blinking off it and turns
-   its brightness round, and anything else makes it grey on black. */
+/* What the colour `color` of a cell becomes in the shadow of a box,
+   where the colour ShadFl is `how`: 0 leaves it alone, 1 takes the
+   background and the blinking off it and turns its brightness round,
+   and anything else makes it grey on black. The assembly of the main
+   program has this inside Shadow; that of the setup program has it as a
+   routine of its own, which the pictures of the setup's colours call
+   for a shadow that is not the one set: stcolor.c. */
+u16 ShadCol(u16 color, u16 how)
+{
+    if (how == 1)
+        return color & 0x8F ^ 8;
+    if (how != 0)
+        return 7;
+    return color;
+}
+
+/* Put a cell into the shadow of a box, by changing its colour as the
+   colour ShadFl says, and return the address of the next cell. */
 u16 *Shadow(u16 *cell)
 {
     u8 *attribute = (u8 *)cell + 1;
-    u16 how = Color(ShadFl);
 
-    if (how == 1)
-        *attribute = *attribute & 0x8F ^ 8;
-    else if (how != 0)
-        *attribute = 7;
+    *attribute = (u8)ShadCol(*attribute, Color(ShadFl));
     return cell + 1;
 }
 

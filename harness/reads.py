@@ -265,6 +265,10 @@ REVIEWED = {
     ("stcolor.c", "StColNm_P"): (1, "the colour of a colour's name, and "
                                     "of \"on\" with one put in: neither "
                                     "asks for another colour"),
+    ("stcolor.c", "StColPage"): (OWN, "by the item under the cursor, "
+                                      "which is one of the 39"),
+    ("stcolor.c", "StPagTab"): (OWN, "by the picture that StColPage has "
+                                     "for an item, 1 to 4"),
     **dict.fromkeys(
         (("stcolor.c", "StColMd_S"), ("stcolor.c", "StMonMd_S"),
          ("stcolor.c", "StBwPal_S"), ("stcolor.c", "StLapTp_S")),

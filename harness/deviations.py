@@ -336,13 +336,6 @@ TREES = {
             "setup-country": _NO_SETUP_YET,
             "setup-options-russia": _NO_SETUP_YET,
             "setup-delay-file": _NO_SETUP_YET,
-            # The colours, piece B.
-            "setup-colors-items": _NO_SETUP_YET,
-            "setup-colors-grid": _NO_SETUP_YET,
-            "setup-colors-mouse": _NO_SETUP_YET,
-            "setup-colors-palettes": _NO_SETUP_YET,
-            "setup-colors-own": _NO_SETUP_YET,
-            "setup-colors-lines": _NO_SETUP_YET,
             # The help of the setup program, F1, is there. This one shows
             # it over a dialog of the options, piece A, and goes with
             # the commit that brings the second of the two.

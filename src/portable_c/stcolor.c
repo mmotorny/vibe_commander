@@ -1,8 +1,7 @@
 /*
  * The colours of the setup: the list of the 39 colours of a palette, F5,
  * F6 and F7 of the setup's menu, and the picture in which the colour of
- * one of them is chosen from a grid of 16 by 16. The picture is not
- * here yet: Enter and a second click on a line do nothing.
+ * one of them is chosen from a grid of 16 by 16.
  *
  * Translated from VCSETUP.ASM of the original's setup program: F05_00 to
  * F07_57, F07_60 to F07_85 and Col00 to Col55. A function has St in front
@@ -36,14 +35,19 @@
 #include "vc.h"
 
 /* Of other files. ColAddr is where the colour table has a colour of the
-   palette that is set.
+   palette that is set, and ShadCol what a colour becomes in a shadow.
    MvsBw writes characters in a colour, the colour in the high byte. */
 u8 *ColAddr(u16 number);                                /* screen.c */
+u16 ShadCol(u16 color, u16 how);
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);
 
 /* The tables, of stcolor_t.c, in the segment that AsmSeg returns: see
-   there. */
+   there. A picture of StPagTab is two offsets in that segment. */
+struct Picture {
+    u16 page;                           /* 25 rows of 58 characters */
+    u16 colors;                         /* and which item colours which */
+};
 extern const u8 __far StColor_S[];      /* " Color Setup " */
 extern const u8 __far StMode_S[];       /* "Mode: " */
 extern const u8 __far StPalet_S[];      /* "Palette: " */
@@ -56,6 +60,8 @@ extern const u8 __far StOn_S[];         /* "on" and a colour */
 extern const u8 __far StColNm_S[];      /* the names of the colours */
 extern const u8 __far StColNm_P[];      /* the colour of such a name */
 extern const u8 __far StDfCol_B[];      /* "set default colors?" */
+extern const u8 __far StColPage[];      /* the picture of each item */
+extern const struct Picture __far StPagTab[];
 
 /* The setup without a setup file, of stmain_t.c: the default palettes
    first, as the colour table has them. */
@@ -65,6 +71,8 @@ extern const u8 __far StPalets[];
 #define sd (*(struct StData *)md.MenuBuf)
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
+#define AT(segment, offset) \
+    ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 
 #define Hist_C  23                      /* the colour of a list, */
 #define HstCu_C 24                      /* and of the line of its cursor */
@@ -72,8 +80,16 @@ extern const u8 __far StPalets[];
                                            item */
 #define LenColr 40                      /* the colours of a palette */
 
-#define CROSS 'x'                       /* the pointer while the middle
-                                           button leaves */
+/* In the colours of a picture: cells in a shadow, cells that blink, and
+   cells that are no item's. */
+#define SHADED 0x40
+#define BLINKS 0x80
+#define GREY   0xFF
+
+#define TICK 0xFB                       /* the pointer while the right
+                                           button takes a colour */
+#define CROSS 'x'                       /* and while the middle one
+                                           leaves */
 
 /* What the list knows besides its variables, which are the setup's
    (`sd`): ColCur, the item of the cursor; ColFrst, the first one shown,
@@ -342,6 +358,247 @@ static void StF07_53(void)
         md.ColTab[at + i * 6] = StPalets[at + i * 6];
 }
 
+/* Repaint the picture for the colour `color` of the item under the
+   cursor, which is not taken yet: the cells that are the item's, in that
+   colour, and of those the ones in a shadow as Shadow says; or for the
+   item Shadow itself, every cell in a shadow, in its own item's colour
+   as `color` shadows it. And show `color` on the right of the screen.
+   The rows of the picture from the first that has changed to the last
+   are put on the screen. Col30 of the assembly, where the colour has
+   changed. */
+static void StCol30(u16 color)
+{
+    const u8 __far *colors = AT(AsmSeg(),
+        StPagTab[StColPage[sd.ColCur] - 1].colors);
+    u16 *row = md.ScrBuf;
+    u16 __far *screen;
+    u16 rows, count, item, paint, changed;
+    u16 first = 0xFF, last = 0;
+
+    StF07_75(color);
+    for (rows = 25; rows != 0; rows--) {
+        screen = row;
+        changed = 0;
+        for (;;) {
+            count = *colors++;
+            if (count == 0)
+                break;
+            item = *colors++;
+            if ((u8)sd.ColCur == ShadFl) {
+                if (item == GREY || (item & SHADED) == 0) {
+                    screen += count;
+                    continue;
+                }
+                paint = ShadCol(Color(item & 0x3F), color);
+            } else {
+                if ((item & 0x3F) != (u8)sd.ColCur) {
+                    screen += count;
+                    continue;
+                }
+                paint = item & BLINKS | color;
+                if (item & SHADED)
+                    paint = ShadCol(paint, Color(ShadFl));
+            }
+            screen = MvsColr(screen, count, paint);
+            changed = 1;
+        }
+        if (changed) {
+            last = rows;
+            if (first == 0xFF)
+                first = rows;
+        }
+        row += 80;
+    }
+    if (first != 0xFF)
+        Window((u16)(u8)(25 - first) << 8,
+               (u16)(u8)(first - last + 1) << 8 | 58);
+}
+
+/* What the mouse has made of the picture, and the colour that the
+   cursor of the grid is to be on. */
+struct Chosen {
+    u16 what;
+    u16 color;
+};
+
+/* The mouse in the picture: Col11. The middle button leaves, once it is
+   let go, and the right one takes the colour, unless another button is
+   held then; the left one on a cell of the grid is that cell's colour,
+   where the cursor is on `color`. */
+static struct Chosen StCol11(u16 color)
+{
+    struct Mouse mouse = GetMous(0);
+    struct Chosen chosen;
+    u16 at;
+
+    chosen.what = WHAT_STAY;
+    chosen.color = color;
+    ClrKbd();
+    if (mouse.buttons & 4) {
+        TypMous(CROSS);
+        do {
+            mouse = GetMous(mouse.place);
+            ClrKbd();
+        } while (mouse.buttons & 4);
+        TypMous(0);
+        if ((mouse.buttons & 3) == 0) {
+            chosen.what = WHAT_LEAVE;
+            return chosen;
+        }
+    }
+    if (mouse.buttons & 2) {
+        TypMous(TICK);
+        do {
+            mouse = GetMous(mouse.place);
+            ClrKbd();
+        } while (mouse.buttons & 2);
+        TypMous(0);
+        if ((mouse.buttons & 5) == 0) {
+            chosen.what = WHAT_ENTER;
+            return chosen;
+        }
+    }
+    if ((mouse.buttons & 1) && !InWind(mouse.place, 0x043D, 0x1010)) {
+        at = mouse.place - 0x043D;
+        chosen.color = (u8)(at >> 8 << 4 | at & 0xFF);
+    }
+    return chosen;
+}
+
+/* The picture of the item under the cursor: Col00. The left 58 columns
+   of the screen show one of the four pictures of the program, in the
+   palette that is edited, which is the palette set for as long as the
+   picture is up; the clock and the key bar are off meanwhile, and the
+   row of the key bar is cleared beside the picture. The cursor moves
+   over the grid on the right, and the picture is painted in the colour
+   under it: Enter and the right button take that colour for the item,
+   Esc, F10 and the middle button do not. Then the screen is put back,
+   and the colour that the item has is shown on the right. */
+static void StCol00(void)
+{
+    u8 clock = md.Clock, bar = md.KeyBar, palette = md.ColTyp;
+    const struct Picture __far *picture;
+    const u8 __far *page;
+    const u8 __far *colors;
+    u16 *row;
+    u16 __far *screen;
+    u16 size, place, rows, count, item, paint, i;
+    u16 color, key, mouse;
+    struct Chosen chosen;
+
+    md.Clock = 0;
+    md.KeyBar = 0;
+    size = (u16)md.Lines << 8 | 58;
+    SavWin(0, size, (u16)md.WinBuf);
+    place = (u16)(u8)(md.Lines - 1) << 8 | 58;
+    row = BasAdr(place);
+    for (i = 0; i < 22; i++)
+        row[i] = (u16)sd.BackC << 8 | ' ';
+    Window(place, 0x0116);
+    if (md.Lines > 25) {
+        /* The rows below the picture, which a screen of more lines
+           has. */
+        row = BasAdr(0x1900);
+        for (rows = md.Lines - 25; rows != 0; rows--) {
+            for (i = 0; i < 58; i++)
+                row[i] = 0x0720;
+            row += 80;
+        }
+    }
+    md.ColTyp = (u8)list.palette;
+    picture = &StPagTab[StColPage[sd.ColCur] - 1];
+    page = AT(AsmSeg(), picture->page);
+    colors = AT(AsmSeg(), picture->colors);
+    row = md.ScrBuf;
+    for (rows = 25; rows != 0; rows--) {
+        screen = row;
+        for (;;) {
+            count = *colors++;
+            if (count == 0)
+                break;
+            item = *colors++;
+            if (item == GREY)
+                paint = 7;
+            else {
+                paint = item & BLINKS | Color(item & 0x3F);
+                if (item & SHADED)
+                    paint = ShadCol(paint, Color(ShadFl));
+            }
+            screen = MvsBw(screen, page, count, paint << 8);
+            page += count;
+        }
+        row += 80;
+    }
+    Window(0, size);
+
+    chosen.color = Color(sd.ColCur);
+    for (;;) {                          /* Col10 */
+        color = chosen.color;
+        chosen.what = WHAT_STAY;
+        mouse = GetMous(0).buttons != 0;
+        if (!mouse) {
+            key = Input(1);
+            mouse = key >> 8 == 0xFC;
+        }
+        if (mouse)
+            chosen = StCol11(color);
+        else
+            switch (key) {
+            case 0x4B00:                /* Left, and round the row */
+                chosen.color = color & 0x0F ? color - 1 : color | 0x0F;
+                break;
+            case 0x4D00:                /* Right, and round */
+                chosen.color = (u8)(color + 1);
+                if ((chosen.color & 0x0F) == 0)
+                    chosen.color = (u8)(chosen.color - 0x10);
+                break;
+            case 0x4800:                /* Up, and round the column */
+                chosen.color = (u8)(color - 0x10);
+                break;
+            case 0x5000:                /* Down, and round */
+                chosen.color = (u8)(color + 0x10);
+                break;
+            case 0x4700:                /* Home: the first of the row */
+                chosen.color = color & 0xF0;
+                break;
+            case 0x4F00:                /* End: the last */
+                chosen.color = color | 0x0F;
+                break;
+            case 0x4900:                /* PgUp: the first row */
+                chosen.color = color & 0x0F;
+                break;
+            case 0x5100:                /* PgDn: the last */
+                chosen.color = color | 0xF0;
+                break;
+            case 0x4200:                /* F8: the default colour */
+                chosen.color = StPalets[ColAddr(sd.ColCur) - md.ColTab];
+                break;
+            case 0x4400:                /* F10 */
+                chosen.what = WHAT_LEAVE;
+                break;
+            default:
+                if (key >> 8 == 0)
+                    break;
+                if ((u8)key == 0x0D)
+                    chosen.what = WHAT_ENTER;
+                else if ((u8)key == 0x1B)
+                    chosen.what = WHAT_LEAVE;
+            }
+        if (chosen.what != WHAT_STAY)
+            break;
+        if (chosen.color != color)
+            StCol30(chosen.color);
+    }
+    if (chosen.what == WHAT_ENTER)      /* Col50 */
+        *ColAddr(sd.ColCur) = (u8)color;
+    StF07_75(Color(sd.ColCur));         /* Col55 */
+    ResWin(0, size, (u16)md.WinBuf);
+    Window(0, size);
+    md.ColTyp = palette;
+    md.Clock = clock;
+    md.KeyBar = bar;
+}
+
 /* The mouse in the list: F07_30. The middle button leaves, once it is
    let go with no other held. A button on a line puts the cursor there,
    and a second click on the line is Enter; on a row below the last item,
@@ -518,7 +775,8 @@ static void StF07_01(const u8 __far *name, u16 palette)
             }
         if (what == WHAT_LEAVE)
             break;
-        /* WHAT_ENTER is the picture of the item, Col00: not here yet. */
+        if (what == WHAT_ENTER)
+            StCol00();
     }
 
     /* F07_57: the cursor as it was, and the screen as DOS left it. */

@@ -1271,16 +1271,29 @@ SETUP_BATCHES = [
         # list behind them as far as it is left, F07_57: the code of the
         # setup program up to F07_60, the first of the routines that it
         # calls. The menu calls three functions for it, one for each
-        # palette; the third, StF07_00 for Laptop, is of the next batch,
-        # which has the scenario that enters it.
+        # palette.
         routines=("F05_00", "F07_60", "F07_65", "F07_70", "F07_75",
                   "F07_80", "F07_85"),
-        functions=("StF05_00", "StF06_00"),
+        functions=("StF05_00", "StF06_00", "StF07_00"),
         unreached=dict.fromkeys(
             (0x07F2, 0x09C7, 0x0B39),
             "for a monochrome display, mode 7, which has \"Monochrome\" "
             "for its name and the second colour of each pair in a "
             "palette: the bench has a colour display"),
+    ),
+    Batch(
+        title="The setup program: the picture in which the colour of an "
+              "item of a palette is chosen",
+        source="stcolor.c",
+        # Col00 is the picture from where the list enters it to where it
+        # is left for the list, Col55, with the mouse in it and the cells
+        # painted anew for another colour: the code up to F08_00. Nothing
+        # but the list calls it, so it has no function that another file
+        # calls. ShadCol is what a colour becomes in a shadow, a routine
+        # that the setup program has by itself and the main program
+        # inside Shadow: the function is of screen.c, for both.
+        routines=("Col00..F08_00", "ShadCol"),
+        functions=("ShadCol",),
     ),
 ]
 

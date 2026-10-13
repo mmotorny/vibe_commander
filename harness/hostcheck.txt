@@ -50,7 +50,7 @@ screen.c      clean
 setup.c       to-number 1, to-pointer 2
 stack.c       data_seg 2
 start.c       to-number 7, to-pointer 15
-stcolor.c     to-number 2
+stcolor.c     to-number 4, to-pointer 3
 stcolor_t.c   clean
 sthelp.c      to-number 6
 sthelp_t.c    clean

@@ -353,7 +353,7 @@ batch, with what no scenario reaches.
 | 0a, the harness. Done | `harness/`: what the list below has; `tools/figures.py` and the README for the limit that goes. No file of the program | Some 800 lines with what is written for the pieces, where 200 were thought | One, `setup`: the setup program started, its menu, the Configuration with the key bar switched off, Screen and Mouse looked at, the setup saved and left, and the main program without its key bar | Nothing |
 | 0b, setup entered and left. Done | `stmain.c`, `stmain_t.c`; the item of the menu in `menu.c`, `commands_t.c`, `main.c`, `vc.h`, with its tables declared in `harness/datacheck.py`; the three places that are told of setup, in `bars.c` with the bars' tables, `dialog.c` and `input.c`; entry 8 of `src/portable_c/DEVIATIONS.md`. Of the assembly: the file read and checked, S0, `Main00`, `Main40`, S7 with `Default`, `Exit` | 776 instructions carried over, of 934 in its routines, all of `Dialog` among them | 5: `setup-menu`, `setup-defaults`, `setup-missing`, `setup-damaged`, `setup-cancel`, 98 steps, which run 558 of the 776; the scenarios of A and B run 196 more, the fields of `Dialog` and the mouse's rows on 50 lines; 22 are listed as out of reach, 13 of them until a later piece has its scenario | 0a |
 | A, the options | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | Seven, 311 steps, see "Piece A" below. As planned: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
-| B, the colours | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6; and `ShadCol`, taken out of `Shadow` of `screen.c`, which 0b left as it is. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
+| B, the colours. Done | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6; and `ShadCol`, taken out of `Shadow` of `screen.c`, which 0b left as it is. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
 | C, the help. Done | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
 | D, what is left of S1 and of leaving | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | About 100 instructions | About 3: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and, once A is there, a setup saved whose file is missing | 0b; A for the last |
 | E1, the program's own call of DOS goes | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; `ended` has its golden of the tree's own recorded again, for the registers that the program leaves | A to D |
@@ -1078,8 +1078,7 @@ and "Do you wish to save the current setup?" (no page either).
 
 Seven, of 226 steps, all of the bench of the United States: the list
 and the picture look at no country. The portable C is taken through
-`setup-colors`; the other six, which enter a picture, are in `not_run`
-of `harness/deviations.py` until the picture is there.
+all of them, and passes.
 
 | Scenario | Steps | What it has |
 |---|---|---|
@@ -1127,33 +1126,31 @@ is, seen in the goldens:
   program is on row 23 before and on row 24 after, as behind any
   command. `setup-colors-own` ends on such a screen, as `setup` does.
 
-### Piece B, the colours: where the work is, for whoever goes on
+### Piece B, the colours: done, and what a later piece should know
 
-Kept up with every commit, so that a fresh agent can go on from it.
+The list of a palette's colours and the picture in which one is chosen
+are in the portable C, behind F5, F6 and F7 of the setup's menu, and
+the seven scenarios above pass, each screen the original's. Nothing of
+it is declared as a deviation but two calls of the BIOS in entry 6 of
+`src/portable_c/DEVIATIONS.md`, each with a register that the call does
+not take.
 
-**Done.** The scenarios, pushed. The harness's two tables for the
-setup program's words, `SETUP_NAMED_OTHERWISE` and `SETUP_COUNTED`. The
-tables, `stcolor_t.c`, written by a script from the assembly's bytes
-and held by the data's test, 25 objects.
-
-**The code, `stcolor.c`.** One file for both screens, in the second
-code segment (its name is in `add_portable_c` of `CMakeLists.txt`). The
-decision that the brief asked for is at its top: what the list knows
-is not handed from function to function. The variables of the
-assembly, `ColCur`, `ColFrst`, `ColNum`, `BackC`, `HistC` and `HstCuC`,
-are the fields of `struct StData` that 0b has for them, and what the
-assembly has in the registers BX, DX and BP, the box and the palette,
-is `list`, a static variable of the file: it is six bytes of `DGROUP`,
-no function is entered twice at a time, and a pointer to a local
-structure would have to be a `STACK` pointer, which is Open Watcom's.
-SI and DI, the cursor and the first line on their way to `F07_10`, are
-that function's arguments. Every label that the
-assembly jumps to with a new cursor is a function that works the
-cursor out and calls `StF07_10`, the one place that moves it; a jump
-back to where a screen waits for a key is a return to the loop of
-`StF07_01` (the list) or `StCol00` (the picture); and what a key or
-the mouse makes of a screen besides is what the function returns, a
-`WHAT_`. The two tables of keys are `switch` statements.
+**The code, `stcolor.c`**, with the tables in `stcolor_t.c`. One file
+for both screens, in the second code segment. What the list knows is
+not handed from function to function. The variables of the assembly,
+`ColCur`, `ColFrst`, `ColNum`, `BackC`, `HistC` and `HstCuC`, are the
+fields of `struct StData` that 0b has for them, and what the assembly
+has in the registers BX, DX and BP through every jump, the box and the
+palette, is `list`, a static variable of the file: six bytes of
+`DGROUP` besides the one of `StOpen`, since no function is entered
+twice at a time and a pointer to a local structure would have to be a
+`STACK` pointer, which is Open Watcom's. Every label that the assembly
+jumps to with a new cursor is a function that works the cursor out and
+calls `StF07_10`, the one place that moves it; a jump back to where a
+screen waits for a key is a return to the loop of `StF07_01` (the
+list) or `StCol00` (the picture); and what a key or the mouse makes of
+a screen besides is what the function returns, a `WHAT_`. The two
+tables of keys are `switch` statements.
 
 | Function | Of the assembly |
 |---|---|
@@ -1169,47 +1166,49 @@ the mouse makes of a screen besides is what the function returns, a
 | `StCol00` | `Col00` to `Col10`, the keys of `ColSt_T`, `Col50`, `Col55` |
 | `StCol11` | `Col11` to `Col19`, the mouse |
 | `StCol30` | `Col30` to `Col40` |
-| `ShadCol` of `screen.c` | `ShadCol`, split out of `Shadow` there |
+| `ShadCol` of `screen.c` | `ShadCol`, split out of `Shadow` there, which calls it |
 
-**Tried, before 0b.** With a hook that was not kept, a key of the main
-program that put what DOS had shown on the screen and called the three
-entries for F5, F6 and F7, the build was taken through the steps of six
-of the seven scenarios (not `setup-colors-own`, which needs the real
-menu) and its screens held against the goldens: every screen of the
-list and of the picture was the original's cell for cell and cursor for
-cursor, the mouse included, but for the names on the key bar, which
-were the main program's, and for the pointer of the mouse on 50 lines
-before the first click. So the code is believed right, and what is left
-is fitting it to 0b. The pointer: the original's setup program resets
-the mouse driver when it starts, which puts the pointer in the middle
-of the screen, row 12 of 25 lines and row 25 of 50, wherever the main
-program had it. Setup entered from the menu has to do the same, or
-`setup-colors-lines` shows the pointer on row 12 in its steps 2 to 5,
-and any scenario that moves the mouse before it enters setup shows it
-where it was left. That is 0b's entry, not this piece's.
+**How it was made, and what that showed.** The code was written and
+tried before 0b was there, with a hook that was not kept: a key of the
+main program that put what DOS had shown on the screen and called the
+three entries. Six of the seven scenarios' steps were held against the
+goldens so, and every screen of the list and of the picture was the
+original's. Connected to 0b, all seven passed at the first run, and
+nothing of the code had to change but the three places where it had
+stood in for what 0b brings:
 
-**Where it stands.** The list is connected to 0b's menu and
-`setup-colors` is switched on and passes; its batch is in
-`SETUP_BATCHES`. What was fitted to 0b: the way out of the list puts
-what DOS had shown back by `StUser`; the default colours are read from
-`StPalets` of `stmain_t.c`, and `Palets` of `start.c` is static as it
-was; the six variables of the assembly are the fields of `struct
-StData` that 0b has for them, `sd.ColCur` and the others, so that
-`list` is the box and the palette alone, six bytes of `DGROUP`. The
-picture is the next commit, with the other six scenarios, the routines
-`Col00..F08_00` and `ShadCol`, and `StF07_00`, which the scenario of
-the Laptop palette runs. `functions` of a batch are those that other
-files call, which the link map has as public: the static ones are not
-named there.
+- The way out of the list, `F07_57`, puts back what DOS had shown by
+  `StUser(0, md.Lines)`, which has the 50th row.
+- F8, in the list and in the picture, reads the default colours from
+  `StPalets` of `stmain_t.c`, the palettes that the object begins
+  with. `Palets` of `start.c` is static, as it was.
+- The six variables are 0b's fields, as above.
 
-**What is to be declared with the code.**
+The key bars, 2 for the list and 1 for the picture, are `Input`'s, by
+the number that it is called with and `StOpen`; so is F1, with the page
+4 in `HlpPage`, which the box of F8 changes and the list sets again.
+The pointer of the mouse in the middle of the screen from setup's
+first screen on, which `setup-colors-lines` shows, is 0b's entry: it
+resets the mouse driver as the original does.
+
+**The batches**, two in `SETUP_BATCHES` of `harness/ported.py`: the
+list, routines `F05_00`, `F07_60`, `F07_65`, `F07_70`, `F07_75`,
+`F07_80`, `F07_85`, and the picture, `Col00..F08_00` and `ShadCol`.
+Three instructions are out of reach, 07F2h, 09C7h and 0B39h of
+`VCSETUP.LST`, which are for a monochrome display. `functions` of a
+batch are those that other files call, which the link map has as
+public: a static function is not found there, and the test ends with
+"the link map has no function" for one.
+
+**What is declared with the code.**
 
 - `harness/reads.py`, `REVIEWED`, for `stcolor.c`: `StColrs_S` and
   `StColNm_S` (texts counted by their zeros, by an item below 39 and a
   colour below 18), `StColNm_P` (1: a colour's name has no markup that
   asks for another colour), `StColPage` (by the item under the cursor),
-  `StPagTab` (by the picture of `StColPage`, 1 to 4), and `StPalets`
-  (240, the six palettes that it begins with).
+  `StPagTab` (by the picture of `StColPage`, 1 to 4), `StPalets` (240,
+  the six palettes that it begins with), and the four names of a
+  display or a palette, read as far as their zeros.
 - `DEVIATIONS.md`, entry 6, two places where the BIOS is called with a
   register that the call does not take: in `StF07_10`, the BIOS's 06h
   and 07h by which the lines move, BL is the column of the lines, 8, in
@@ -1220,6 +1219,20 @@ named there.
   all three. AL of that call is one of the four registers that the
   entry says something is known to read, the video mode for some
   BIOSes: the original has no mode there either.
+
+**For a later piece.**
+
+- D, or whoever shows the corner on 50 lines: `setup-colors-lines` ends
+  inside the list, on purpose. Leaving the list there puts all of what
+  DOS had shown back and draws the key bar, whose 81st cell the
+  original writes into the top left corner and the portable C does not
+  (entry 9 of `DEVIATIONS.md`). A scenario that leaves the list on 50
+  lines is one of that deviation, with a golden of the tree's own.
+- A monochrome display is not on the bench. The three instructions for
+  it are translated as they read: "Monochrome" for the name of the
+  display, and the second colour of each pair of a palette, in
+  `StF07_10` and in F8 of the list. The picture reads its colours
+  through `ColAddr`, which knows.
 
 **Traps met.**
 
