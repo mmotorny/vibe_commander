@@ -253,6 +253,11 @@ NAMED_OTHERWISE = {
 # names that a tree has them under. A tree that has no setup program has
 # none of these objects, and no entry is held against it.
 SETUP_NAMED_OTHERWISE = {
+    ("StDfCol_P", 6): ("field", "ErrBuf",
+                       "what the box of F8 in the list of colours covers "
+                       "is kept in the setup program's BoxBuf, which is "
+                       "as long as its WinBuf and lies behind it: the "
+                       "main data has ErrBuf there"),
 }
 
 # Words of an object that name a text which is not read as far as a zero
@@ -264,6 +269,10 @@ SETUP_NAMED_OTHERWISE = {
 COUNTED = {
 }
 SETUP_COUNTED = {
+    **{("StPagTab", picture * 4): (
+        25 * 58, "a picture of the colours is 25 rows of 58 characters, "
+                 "which StCol00 of stcolor.c copies by those counts")
+       for picture in range(4)},
 }
 
 
