@@ -107,8 +107,6 @@ SCREEN = COLUMNS * ROWS * 2 + 5
 
 NAME = 8                          # bytes of a program's name, as DOS has it
 COM_ORIGIN = 0x100                # where a .COM file is loaded
-EXE_HEADER = 0x20                 # of the translation's VC.EXE, see
-                                  # tools/mkexe.c
 
 # Names for the keys of a US keyboard, as written in scenarios, and what
 # QEMU calls them. Letters, digits and F1-F12 name themselves.
@@ -199,15 +197,36 @@ def facts(program, stack=False):
     found = Facts(name[:NAME].ljust(NAME, b"\0"),
                   symbol(r"^ *AutoTim [ .]*([0-9A-F]+) +DWord"),
                   symbol(r"^ *Clock [ .]*([0-9A-F]+) +Byte"))
+    if program.linked and not coverage.made_by_mkexe(code):
+        # The driver reads the two at those places of the segment that DS
+        # is on when the program idles: the main data has to begin there.
+        if coverage.link_map(program.linked).get("_md") != (0, 0):
+            raise RuntimeError(
+                f"the main data of {program.filename} is not at offset 0 "
+                "of the program's data, where the driver of the tests "
+                "takes it to be: see md in src/portable_c/main.c")
     if stack:
         if program.linked:
             bottom, top = coverage.stack(program.linked)
+            at = bottom + coverage.origin(code)
+            if not coverage.made_by_mkexe(code):
+                # The driver finds the stack by its place in the segment
+                # that SS is on, which the header of the file names.
+                bottom -= 16 * struct.unpack_from("<H", code,
+                                                  coverage.EXE_SS)[0]
+                top -= 16 * struct.unpack_from("<H", code,
+                                               coverage.EXE_SS)[0]
         else:
             bottom = symbol(r"^DataSav [ .]*Byte\[\d+\] +([0-9A-F]+)h")
             top = symbol(r"^VcStack [ .]*L Near +([0-9A-F]+)h")
-        at = bottom - COM_ORIGIN + (EXE_HEADER if code[:2] == b"MZ" else 0)
+            at = bottom - COM_ORIGIN
         found = replace(found, stack=bottom, stack_size=top - bottom,
                         stack_loaded=code[at:at + top - bottom])
+        if len(found.stack_loaded) != top - bottom:
+            raise RuntimeError(
+                f"the stack of {program.filename} is not in its file, and "
+                "what it holds when the program has been loaded is not "
+                "known")
     return found
 
 

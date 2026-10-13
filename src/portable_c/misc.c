@@ -1,54 +1,22 @@
 /*
  * Small routines that many parts of the program share and that belong to
  * none of them: the end of a line, a switch turned over, a sum of bytes,
- * and a page up or down in a list; and where the parts of the program
- * are in the memory.
+ * and a page up or down in a list; and where the program's tables are
+ * in the memory.
  *
  * Translated from VCSUB1.INC.
  */
 #include "vc.h"
 
-/* In the part of the program that stays in the memory: the segment that
-   the part which goes is counted from, and how many paragraphs behind
-   it that part begins. */
-extern const u8 __far RunPar[];
-extern const u8 __far TrnPrW[];
-#pragma aux RunPar "*"
-#pragma aux TrnPrW "*"
-
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-#define WORD_AT(segment, offset) \
-    (*(const u16 __far *)((u32)(segment) << 16 | (u16)(offset)))
-
-/* The segment of the program's constants. The original is one segment,
+/* The segment of the program's tables. The original is one segment,
    and has its texts and tables at offsets in it, which its code reads
    through CS. Here they are a group of their own, and what is known by
    its offset, a box, a dialog, a text of one, is read at that offset in
-   this segment: the segment of any of them, a number that is set when
-   the program is loaded. */
+   this segment: the segment of any of them, a number that DOS sets when
+   it loads the program. */
 u16 AsmSeg(void)
 {
     return (u16)((u32)(const void __far *)Title_S >> 16);
-}
-
-/* The segment of the part of the program that stays in the memory while
-   a command runs. It begins with the PSP and ends with the stack, so it
-   is the segment of anything that is on the stack: SS. */
-u16 ResSeg(void)
-{
-    u16 here;
-
-    return (u16)((u32)(void __far *)&here >> 16);
-}
-
-/* The segment of the block of memory that this code is in: the part of
-   the program that the original gives back to DOS while a command runs,
-   and loads again. */
-u16 MemRun(void)
-{
-    u16 stays = ResSeg();
-
-    return WORD_AT(stays, OFFSET(RunPar)) + WORD_AT(stays, OFFSET(TrnPrW));
 }
 
 /* Is `word` the two bytes that end a line, in either order? */

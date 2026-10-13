@@ -1,28 +1,23 @@
 /*
- * The part of the program that stays in the memory while a command runs.
+ * The program and DOS around it: where the program begins and where it
+ * ends, the commands of DOS that it runs, and its watch on DOS.
  *
- * It begins with the PSP and is one segment, as the program was when it
- * was a .COM file: the room of the PSP, the code here, the data behind
- * it, which is of this file too, and the stack at the end. The compiler
- * has the code and the data in one group for that, by two options of
- * the build, -nd=R and -g=R_GROUP. DS is that segment in every
- * function of this file, where vc.h says that DS is the main data: the
- * main data is not in the memory while a command runs, and neither is
- * the C code of the rest of the program. So nothing here uses `md` or
- * calls a function of another file but those of dos.c, of which the
- * build compiles a second copy into this part (see RESIDENT in vc.h).
+ * In the original, and in the C translation after it, this is the part
+ * of the program that stays in the memory while a command runs, which
+ * the file has its name from: one segment with the PSP, a stack and
+ * copies of the setup and the panels, which gives the rest of the
+ * program up for the command and loads it again afterwards. The portable
+ * C stays in the memory whole (see DEVIATIONS.md), and this is a file
+ * of it like any other: DS is on the program's data, md is the main
+ * data, and its variables are variables.
  *
  * Three things are here. The program begins here, at Alloc0: DOS enters
  * it there.
  *
- * The second is the outermost loop of the program, Stay:
- * it calls the part that goes, which comes back with commands to run or to
- * leave; it runs the commands, Exec, by COMMAND.COM or by the interrupt
- * that COMMAND.COM has for that, and calls it again. The original gives
- * the other part up for the commands, if it is set up so, and brings it
- * back by running its own file as a second copy; the portable C keeps
- * all of itself in the memory (see DEVIATIONS.md), so the part that goes
- * does not go, and has that name from the original.
+ * The second is the commands: Exec runs those that the command line
+ * holds, DosBuf, by COMMAND.COM or by the interrupt that COMMAND.COM has
+ * for that; and what the program does when it leaves, or when DOS ends
+ * it.
  *
  * The third is the program's watch on DOS. While the program runs, and
  * while a command runs from it, every call of DOS comes by New21: it notes
@@ -30,176 +25,68 @@
  * call for that or by INT 27h, it writes down who it is and which
  * interrupts it has taken, in a record behind the program's memory. With
  * those records the map of the memory, Alt+F5, lists the programs, and
- * Release takes one out again.
+ * Release takes one out again. These routines are entered from other
+ * programs, on their stacks: nothing here takes the stack to be the
+ * program's own, and a pointer to a local variable is declared STACK,
+ * as everywhere.
  */
 #include "vc.h"
 
-/* Where the PSP is, the 256 bytes that DOS keeps of a program in front
-   of it: this part begins with them, and the file is the program as it
-   lies in the memory, so it begins with room for them, which
-   tools/mkexe.c takes off. The room is of the code segment, the first of
-   the program, and has to be the first thing of that: this file is
-   linked first, and nothing of the code segment stands in front of this
-   line. That the compiler then writes it first rests on the compiler,
-   not on the language; tools/mkexe.c stops the build if it is not at 0.
-   It is the main data to the linker as well: see md in vc.h. */
-const u8 CODE Psp[0x100] = { 0 };
-#pragma aux Psp "*"
-
-#define LenStk  0x1000                  /* Stack size */
 #define LenCmd  124                     /* Length of command line */
 #define VcApiVr 42
 
 /*----------------------- The data -----------------------
-   The data of this part is of this file, in a group of the compiler's
-   that only this part has, R_GROUP (the option -nd=R of the build). The
-   code of this part is of the same group (the option -g=R_GROUP), and
-   is its first segment, so the group begins at the PSP: DS is on it, and
-   SS, and an offset here is one from the PSP. It lies behind the code in
-   the order of the compiler's segments: the constants, what has a value
-   when the program is loaded, and last what has none, which is the stack
-   and nothing else. tools/mkexe.c stops the build if that segment holds
-   anything more, or if anything stands behind the structure that the
-   file does not have as zeros.
-
    First the constants: the name that COMMAND.COM has when the
-   environment does not say, and what this part says for itself. */
+   environment does not say, and what the commands' code says for
+   itself. */
 const u8 Command[] = "COMMAND.COM";
-const u8 NoRun_S[] =
+static const u8 NoRun_S[] =
     "There is not enough memory to run this command\015\012";
-const u8 FnFil_S[] = "\015\012" "Can't find the file: ";
-const u8 Retr_S[] =
+static const u8 FnFil_S[] = "\015\012" "Can't find the file: ";
+static const u8 Retr_S[] =
     "\015\012" "Press ENTER to try again or ESC to abort\015\012";
-const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
-#pragma aux Command "*"
-#pragma aux NoRun_S "*"
-#pragma aux FnFil_S "*"
-#pragma aux Retr_S "*"
-#pragma aux Aloc_S "*"
+static const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
 
-/* The numbers that tools/mkexe.c writes into the file, each of which it
-   finds by its name in the linker's map. All are in paragraphs from the
-   PSP but the counts: how long the file is, ImgEnd; where the part that
-   goes begins, TrnPrW; how long this part is, ResPrW, and where the
-   file has nothing but zeros for it, DatPrW, which is where Stays
-   begins; where the linker's relocations are, RelTab, how many of them
-   are of the part that goes, RelCnt, and how many, behind those, of
-   this part, ResCnt. They are given a value here, 0, for the compiler
-   to put them where the file has contents. DatPrW is read by nothing
-   here: it said where the check sum of the file stops, and the portable
-   C takes none. */
-u16 ImgEnd = 0;
-u16 RelTab = 0;
-u16 RelCnt = 0;
-u16 TrnPrW = 0;
-u16 ResPrW = 0;
-u16 DatPrW = 0;
-u16 ResCnt = 0;
-#pragma aux ImgEnd "*"
-#pragma aux RelTab "*"
-#pragma aux RelCnt "*"
-#pragma aux TrnPrW "*"
-#pragma aux ResPrW "*"
-#pragma aux DatPrW "*"
-#pragma aux ResCnt "*"
+/* The segment of the PSP, the 256 bytes that DOS keeps of a program in
+   front of it: the command tail is there, the segment of the
+   environment, where the memory ends, and where DOS goes on when the
+   program has ended. The original is a .COM file and has all its
+   segment registers there. */
+u16 PspSeg;
 
-/* The segment that the part that goes runs in, which is so many
-   paragraphs below its block of memory as that part begins behind the
-   PSP in the file, TrnPrW. The original has two things more here, for
-   loading that part again after a command: the check sum of the
-   program's file as it was loaded, ChkFile, and the command tail by
-   which a second copy of the program knows that it is one, OvlPrm. */
-u16 RunPar = 0;
-#pragma aux RunPar "*"
-
-/* What this part keeps: struct Stays of vc.h, which says what is in it.
-   Of ComnIni only as much is there as the main data has before DosLin.
-   It is one structure for the order of its members, which the compiler
-   keeps of nothing else; so they have no names of their own to the
-   linker, and are named here as the assembly names them. It is all
-   zeros in the file, and written out as that: without a value it would
-   be of the segment that is to hold the stack alone. It is the last
-   that has a value, so that this part is nothing but zeros from here
-   on. */
-struct Stays Stays = { { 0 } };
-#pragma aux Stays "*"
-#define IntTab  Stays.IntTab
-#define SavePtr Stays.SavePtr
-#define Vect22  Stays.Vect22
-#define Vect27  Stays.Vect27
-#define Counter Stays.Counter
-#define PrgList Stays.PrgList
-#define NameBuf Stays.NameBuf
-#define WCB1sav Stays.WCB1sav
-#define WCB2sav Stays.WCB2sav
-#define ComnIni (*(struct MainDat *)Stays.ComnIni)
-
-/* The stack, which is the end of this part: the header of the file names
-   it, so the program is on it from its first instruction. The original
-   has 100h bytes of it. Compiled code uses more than the assembly did,
-   so the C has sixteen times that, and its use needs no care.
-   It is an object of its own, not the last member of Stays, for the name:
-   by that tools/mkexe.c and the tests find where it begins, and it ends
-   where its segment does, R_BSS, of which it is all.
-
-   That it is the end rests on this compiler and not on the language.
-   Open Watcom has what is given no value in a segment of its own behind
-   what is given one, and this is the one object of the file without:
-   C promises no order of two objects. tools/mkexe.c stops the build
-   where that does not hold. For another compiler the stack would have
-   to be put last by what that one has for it, a section that its
-   linker is told to place behind the others, and tools/mkexe.c and
-   harness/coverage.py told the name of that in place of R_BSS; or it
-   goes into Stays as the last member, which the language does keep
-   in its place, and the two are told how long it is some other way
-   than by a name in the map. */
-u8 DataSav[LenStk];
-#pragma aux DataSav "*"
+/* What the watch keeps: the interrupts as they were when a program was
+   last run, with what the BIOS keeps at 40h:A8h; the name of that
+   program; and the programs that have stayed in the memory, how many
+   and each by the segment of its record. Then where INT 22h and INT 27h
+   went before the program took them. */
+static u32 IntTab[256];
+static u32 SavePtr;
+static u8 NameBuf[12];
+u16 Counter;
+u16 PrgList[MaxProg];
+static u32 Vect22;
+static u32 Vect27;
 
 /* Where INT 21h went before the program took it. This one is of the
    code's segment, not of the data: New21 passes a call of DOS on with
-   no register to find the data by, and CS is all that it has. It is
-   given a value, 0, which it needs for nothing else: the compiler
-   writes what has none in front of what has one, in the code segment
-   too, and this would stand where the PSP's room is to. */
-u32 CODE Vect21 = 0;
-#pragma aux Vect21 "*"
+   no register to find the data by, and CS is all that it has. */
+static u32 CODE Vect21;
 
-/* Where the part that goes is entered, when the program starts and when
-   it has run a command: TrnMain of main.c, which vc.h declares as
-   the function that it is, and which is named here as an object, for
-   its address. And a text of that part, which is where the file has it
-   when the program begins. */
-extern const u8 __far TrnMain_s[];
+/* A text of main_t.c, for a DOS that is too old. */
 extern const u8 __far Vers_S[];
-#pragma aux TrnMain_s "TrnMain_c"
 
-/* The segment of something of the part that goes, as the linker has it:
-   in paragraphs from the PSP. Every other word of the program that
-   holds a segment has the place of the program added when that is
-   loaded. This one is of the part that stays and names the part that
-   goes, which is somewhere else after every command: tools/mkexe.c
-   leaves it as it is, and what uses it adds where that part is: RunPar,
-   or the PSP when the program begins and the part is where the file has
-   it. That the high word of a far pointer is that number is this
-   compiler's and its linker's doing, not the language's. */
-#define TRN_SEG(object) ((u16)((u32)(const void __far *)(object) >> 16))
-
-/* The PSP, which this segment begins with: where the program goes on
-   when DOS has ended it, and the segment of its environment. */
-#define PSP_EXIT (*(u32 __near *)0x0A)
-#define PSP_ENV  (*(u16 __near *)0x2C)
-
-/* This segment, as a number: DS. */
-#define RES_SEG ((u16)((u32)(void __far *)&Counter >> 16))
+/* The PSP: where the program goes on when DOS has ended it, and the
+   segment of its environment. */
+#define PSP_EXIT (*(u32 __far *)AT(PspSeg, 0x0A))
+#define PSP_ENV  (*(u16 __far *)AT(PspSeg, 0x2C))
 
 #define AT(segment, offset) \
     ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 #define WORD_AT(segment, offset) (*(u16 __far *)AT(segment, offset))
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
-#define DOS_END      0x0000             /* DOS: end the program, the old
-                                           way */
+/* Where a routine is, as an address for DOS and for a return. */
+#define ROUTINE(function) ((const u8 __far *)(void __far *)(function))
+
 #define DOS_DRIVE    0x1900             /* the current drive, to AL */
 #define DOS_VECTOR   0x2500             /* an interrupt, AL, to DS:DX */
 #define DOS_VERSION  0x3000             /* which DOS it is, to AL and AH */
@@ -208,21 +95,20 @@ extern const u8 __far Vers_S[];
                                            from DL */
 #define DOS_PATH     0x4700             /* the current directory of the
                                            drive in DL, to DS:SI */
-#define DOS_ALLOC    0x4800             /* a block of BX paragraphs, to AX */
 #define DOS_FREE     0x4900             /* free the block in ES */
 #define DOS_RESIZE   0x4A00             /* make the block in ES BX
                                            paragraphs long */
 #define DOS_EXEC     0x4B00             /* run the program at DS:DX, with
                                            what ES:BX says */
 #define DOS_EXIT     0x4C00             /* end the program, with AL */
-#define DOS_CODE     0x4D00             /* what the last program ended
-                                           with, to AX */
 #define DOS_LISTS    0x5200             /* where DOS keeps its lists, to
                                            ES:BX */
 #define DOS_STRATEGY 0x5800             /* how DOS looks for memory: AL 0
                                            to ask, 1 to say, 2 and 3 the
                                            same for whether the upper
                                            memory is in the chain */
+#define DOS_PSP_OLD  0x5100             /* the current program, to BX: as
+                                           6200h, and of DOS 2 too */
 #define DOS_PSP      0x6200             /* the current program, to BX */
 
 #define SAVE_PTR 0x4A8                  /* where the BIOS keeps the address
@@ -244,11 +130,13 @@ extern const u8 __far Vers_S[];
 
 /* Where things are in the original, as it was shipped: what its
    registers hold when it calls the BIOS with them unset, and the BIOS
-   takes them for a page of the screen and a colour. ComnIni is at 25E5h
-   there and laid out as here; the part that stays is 31Ah paragraphs. */
+   takes them for a page of the screen and a colour. What the original
+   keeps of the main data while a command runs, ComnIni, is at 25E5h
+   there and laid out as the main data is; the part of it that stays in
+   the memory is 31Ah paragraphs. */
 #define COMNINI_WAS 0x25E5
-#define WAS(address) ((u16)(address) - (u16)&ComnIni + COMNINI_WAS)
-#define EPB_WAS     WAS(&ComnIni.EPB)
+#define WAS(address) ((u16)(address) - (u16)&md + COMNINI_WAS)
+#define EPB_WAS     WAS(&md.EPB)
 #define RESPARS_WAS 0x031A
 
 /* A record of a program that has stayed in the memory, in a segment of
@@ -272,15 +160,8 @@ struct Frame {
 /* DX of a call of DOS that is no address. */
 #define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
-/* What the map of the memory calls, of the part that goes: far, with
-   DS anywhere, as SetBrk is. Every register is kept but AX. */
-void __far __loadds Release(u16 record);
-#pragma aux Release "*" parm [ax] modify exact [ax]
-
 static u16 GetStat(void);
 static void SetStat(u16 state);
-static void Stay(void);
-#pragma aux Stay aborts
 
 /*----------------------- The flags -----------------------
    The assembly goes on in DOS, and in the program that started this
@@ -503,7 +384,7 @@ static u16 AddProg(struct Saved STACK *r)
    Take the program whose record is in the segment `record` out of the
    memory: give the interrupts that it took back to who had them before,
    and free every block of memory that is its own. */
-void __far __loadds Release(u16 record)
+void Release(u16 record)
 {
     volatile u16 table = 0;
     struct DosRegs regs;
@@ -608,7 +489,6 @@ static void SetStat(u16 state)
 void __interrupt __far CtrlC(void)
 {
 }
-#pragma aux CtrlC "*"
 
 void __interrupt __far Int21(struct Saved r, struct Frame on,
                              struct Frame back);
@@ -634,8 +514,8 @@ void __interrupt __far Int27(struct Saved r, struct Frame on);
    ES that it loads, and jumps with BP still pushed (tried, with this
    compiler). And the flags that the handler before is entered with are
    those of these comparisons, which C cannot promise of anything. The
-   old address is read through CS: the data of this part is of the
-   segment that its code is in. */
+   old address is read through CS, which is why it is a variable of the
+   code's segment. */
 __declspec(naked) void __far New21(void)
 {
     _asm {
@@ -660,7 +540,6 @@ __declspec(naked) void __far New21(void)
         jmp Int21
     }
 }
-#pragma aux New21 "*"
 
 /* INT 27h arrives here. The program deals with every one, and the
    assembly took of the caller's stack for each as well. */
@@ -673,7 +552,6 @@ __declspec(naked) void __far New27(void)
         jmp Int27
     }
 }
-#pragma aux New27 "*"
 
 /* Go on in the handler at `handler`. */
 static void Old(struct Frame STACK *on, u32 handler)
@@ -694,9 +572,15 @@ static void Left(struct Frame STACK *on, u16 result)
    ends instead (4Ch) when the list is full, and a block of memory given
    back (49h) takes the program that it was off the list. And another
    program asks for this one's data, the program's own call (AH 2Bh, CX
-   'VC', DX 'OM'): it gets in ES:BX what is kept of the first panel for
-   AL 0, of the second for 1 and of the main data for anything else, and
-   the number of this interface in AH.
+   'VC', DX 'OM'): it gets in ES:BX the first panel for AL 0, the second
+   for 1 and the main data for anything else, and the number of this
+   interface in AH. The original hands out what it keeps of the three
+   while a command runs, copies in the part of it that stays in the
+   memory: of the main data what it has before DosLin, of a panel what
+   it has before ExtBuf and behind that 13 bytes of every file. Here it
+   is the panel and the main data themselves, which begin as those
+   copies do; the files of a panel are where a panel has them, 24 bytes
+   each (see DEVIATIONS.md).
 
    The flags that DOS is entered with, as the assembly leaves them. For
    a program run: those of the zero byte that ends its name, compared
@@ -756,16 +640,17 @@ void __interrupt __far Int21(struct Saved r, struct Frame on,
         if (which == 0x80)
             flags |= FLAG_OVERFLOW;
         back.flags = flags;
-        r.es = RES_SEG;
+        r.bx = 0;
         if (which < 1)
-            r.bx = (u16)WCB1sav;
+            r.es = md.WCB1seg;
         else if (which == 1)
-            r.bx = (u16)WCB2sav;
-        else
-            r.bx = (u16)&ComnIni;
+            r.es = md.WCB2seg;
+        else {
+            r.es = MAIN_SEG;
+            r.bx = (u16)&md;
+        }
         r.ax = VcApiVr * 0x100;
-        on.ip = OFFSET(CtrlC);
-        on.cs = RES_SEG;
+        Old(&on, (u32)ROUTINE(CtrlC));
         return;
     }
     Old(&on, Vect21);
@@ -813,7 +698,7 @@ static u16 OutStr(const u8 __far *text, u16 bx)
     return (u16)(u32)text;
 }
 
-/* The same for a text of this segment.
+/* The same for a text of the program's data.
 
    Ported as it is: the assembly sets no page where it writes these and
    the commands, and hands the BIOS whatever BH holds, half of an
@@ -846,25 +731,22 @@ static u16 NotFind(const u8 *text, const u8 __far *name)
 }
 
 /* Note whether DOS looks for Ctrl-C at every call, have it not do so,
-   and take Ctrl-C: when the program starts, and after every command.
-   The code that starts the program calls this through a far pointer,
-   with DS anywhere. */
-void __far __loadds SetBrk(void)
+   and take Ctrl-C: when the program starts, and after every command. */
+void SetBrk(void)
 {
     struct DosRegs regs;
 
     regs.name = 0;
     regs.ax = DOS_BREAK;
     Int21e(&regs);
-    ComnIni.BreakFl = (u8)DX_OF(regs);
+    md.BreakFl = (u8)DX_OF(regs);
     DX_OF(regs) = 0;
     regs.ax = DOS_BREAK + 1;
     Int21e(&regs);
-    regs.name = AT(RES_SEG, OFFSET(CtrlC));
+    regs.name = ROUTINE(CtrlC);
     regs.ax = DOS_VECTOR + 0x23;
     Int21e(&regs);
 }
-#pragma aux SetBrk "*" modify exact [ax dx]
 
 /* Leave: have DOS look for Ctrl-C as it did, release the programs that
    have stayed in the memory, and give INT 21h and INT 27h back. Then end
@@ -876,8 +758,9 @@ void __far __loadds SetBrk(void)
 
    `r` and `flags` are the registers and the flags that this was entered
    with, and they are left as the assembly leaves its own, for the
-   program that this returns to when DOS has ended this one: ES on this
-   segment; CX 0, the count of the programs run down; SI twice the
+   program that this returns to when DOS has ended this one: ES on the
+   segment of this program's PSP; CX 0, the count of the programs run
+   down; SI twice the
    length of the list when the last program was released, and DS on its
    record, if there was one; DS:DX the address that INT 27h went to
    before, which DOS was told last, if the program had taken the
@@ -891,10 +774,10 @@ static void Exit02(u16 code, struct Saved STACK *r, u16 STACK *flags)
     struct DosRegs regs;
     u16 count;
 
-    r->es = RES_SEG;                    /* Exit01 */
-    r->dx = r->dx & 0xFF00 | ComnIni.BreakFl;
+    r->es = PspSeg;                     /* Exit01 */
+    r->dx = r->dx & 0xFF00 | md.BreakFl;
     regs.name = 0;
-    DX_OF(regs) = ComnIni.BreakFl;
+    DX_OF(regs) = md.BreakFl;
     regs.ax = DOS_BREAK + 1;
     Int21e(&regs);
     for (count = Counter; count; count--) {
@@ -906,7 +789,7 @@ static void Exit02(u16 code, struct Saved STACK *r, u16 STACK *flags)
         Release(r->ds);
     }
     r->cx = 0;
-    if (ComnIni.ChkTSR != 0) {          /* Exit03 */
+    if (md.ChkTSR != 0) {               /* Exit03 */
         regs.name = (const u8 __far *)Vect21;
         regs.ax = DOS_VECTOR + 0x21;
         Int21e(&regs);
@@ -926,7 +809,7 @@ static void Exit02(u16 code, struct Saved STACK *r, u16 STACK *flags)
 /* Leave the program with `code`: the PSP gets back the address at which
    the program that started this one goes on, and DOS ends this one.
    Nobody gets the registers that Exit02 leaves. */
-static void Exit00(u16 code)
+void Exit00(u16 code)
 {
     struct Saved r;
     u16 flags;
@@ -935,7 +818,6 @@ static void Exit00(u16 code)
     Vect22 &= 0xFFFF;
     Exit02(code, &r, &flags);
 }
-#pragma aux Exit00 aborts
 
 /* While the program runs, its PSP names Exit01 as the place to go on
    when the program has ended: so if DOS ends it, by whatever means, DOS
@@ -958,7 +840,6 @@ __declspec(naked) void __far Exit01(void)
         jmp Exit05
     }
 }
-#pragma aux Exit01 "*"
 
 void __interrupt __far Exit05(struct Saved r, struct Frame on)
 {
@@ -967,14 +848,46 @@ void __interrupt __far Exit05(struct Saved r, struct Frame on)
     on.cs = (u16)(Vect22 >> 16);
 }
 
+/* Have the program go on in Exit01 when DOS ends it, and, if it is set
+   up to know of the programs that stay in the memory, take DOS's own
+   interrupts, 21h and 27h: when the program has started. */
+void TakeDos(void)
+{
+    struct DosRegs regs;
+    /* The segment of the table of vectors. Written as a constant, the
+       compiler takes a far pointer into segment 0 for a near one. */
+    volatile u16 table = 0;
+
+    Vect22 = PSP_EXIT;
+    PSP_EXIT = (u32)ROUTINE(Exit01);
+    if (md.ChkTSR == 0)
+        return;
+    regs.ax = 0x3521;                   /* where an interrupt goes */
+    regs.bx = 0;
+    regs.cx = 0;
+    regs.name = (const u8 __far *)&md;
+    regs.si = 0;
+    regs.di = 0;
+    Int21d(&regs);
+    Vect21 = (u32)regs.es << 16 | regs.bx;
+    IntOff();
+    *(u32 __far *)AT(table, 4 * 0x21) = (u32)ROUTINE(New21);
+    IntOn();
+    regs.ax = 0x3527;
+    Int21d(&regs);
+    Vect27 = (u32)regs.es << 16 | regs.bx;
+    regs.ax = DOS_VECTOR + 0x27;        /* have one go somewhere */
+    regs.name = ROUTINE(New27);
+    Int21d(&regs);
+}
+
 /* No memory: say so and leave. `bx` is what the assembly has in BX
    where it jumps here, a number of DOS's or an address. */
-static void AlocEr(u16 bx)
+void AlocEr(u16 bx)
 {
     OutStr0(Aloc_S, bx);
     Exit00(1);
 }
-#pragma aux AlocEr aborts
 
 /* COMMAND.COM's interrupt for a command: `command` is its length, its
    text and a carriage return. It comes back with nothing as it was but
@@ -982,14 +895,14 @@ static void AlocEr(u16 bx)
    is the one place where the program has to set its stack by hand, and
    it goes on in Exec2E, on a stack that is empty again.
 
-   Why this is assembly, all nine instructions of it: no compiled
-   instruction can run before SS, SP and DS are set, since any of them
-   may use the stack or the data; they are set from CS, which is this
-   segment and all that is left; and the function that called cannot be
-   gone back into, with its place on the stack lost, so the jump is of
-   it too. Interrupts are off meanwhile and the direction flag is clear
-   afterwards, as the compiler has it. */
-static void Exec2E(void);
+   Why this is assembly, all eight instructions of it: no compiled
+   instruction can run before SS and SP are set, since any of them may
+   use the stack; and the function that called cannot be gone back
+   into, with its place on the stack lost, so the jump is of it too.
+   Interrupts are off meanwhile and the direction flag is clear
+   afterwards, as the compiler has it. Exec2E finds DS itself, as a
+   function that is entered from elsewhere does. */
+static void __loadds Exec2E(void);
 #pragma aux Exec2E aborts
 
 __declspec(naked) static void Int2E(const u8 *command)
@@ -999,11 +912,10 @@ __declspec(naked) static void Int2E(const u8 *command)
     _asm {
         int 2Eh
         cli
-        mov ax,cs
+        mov ax,seg Stack
         mov ss,ax
-        mov sp,offset DataSav + LenStk
+        mov sp,offset Stack + LenStk
         sti
-        mov ds,ax
         cld
         jmp Exec2E
     }
@@ -1041,25 +953,25 @@ static void Exec02(u16 behind)
         if (behind)
             goto Exec07;
         regs.name = 0;
-        DX_OF(regs) = ComnIni.BreakFl;
+        DX_OF(regs) = md.BreakFl;
         regs.ax = DOS_BREAK + 1;
         Int21e(&regs);
-        command = (u8 *)ComnIni.BatAdr;
+        command = (u8 *)md.BatAdr;
         before = command - 4;
         for (end = command; *end++ != 0; )
             ;
-        ComnIni.BatAdr = (u16)end;
+        md.BatAdr = (u16)end;
         for (end = command, count = LenCmd; count; count--)
             if (*end++ == 0)
                 break;
         end--;
         *end = 0x0D;
-        if (ComnIni.ExecTyp != 0) {
+        if (md.ExecTyp != 0) {
             before += 3;
             *before = (u8)(end - 1 - before);
-            if (ComnIni.DosChg[1] != 0) {
-                ComnIni.BatPoin = (u16)before;
-                Int2E(ComnIni.DosChg);
+            if (md.DosChg[1] != 0) {
+                md.BatPoin = (u16)before;
+                Int2E(md.DosChg);
             }
             Int2E(before);              /* Exec03 */
         }
@@ -1067,15 +979,15 @@ static void Exec02(u16 behind)
         before[1] = '/';
         before[2] = 'C';
         before[3] = ' ';
-        ComnIni.EPB.CmdLine = (u32)RES_SEG << 16 | (u16)before;
+        md.EPB.CmdLine = (u32)MAIN_SEG << 16 | (u16)before;
         for (;;) {                      /* Exec05 */
-            if (ComnIni.ComSpec == 0) {
+            if (md.ComSpec == 0) {
                 name = (const u8 __far *)Command;
             } else {
-                name = AT(PSP_ENV, ComnIni.ComSpec);
+                name = AT(PSP_ENV, md.ComSpec);
                 regs.name = name;
-                regs.bx = (u16)&ComnIni.EPB;
-                regs.es = RES_SEG;
+                regs.bx = (u16)&md.EPB;
+                regs.es = MAIN_SEG;
                 regs.ax = DOS_EXEC;
                 failed = Int21e(&regs);
                 SetBrk();
@@ -1091,11 +1003,11 @@ static void Exec02(u16 behind)
         }
     Exec07:
         behind = 0;
-        command = (u8 *)ComnIni.BatAdr;
+        command = (u8 *)md.BatAdr;
         if (*command == 0)
             return;
         if (*command == '@') {
-            ComnIni.BatAdr++;
+            md.BatAdr++;
             continue;
         }
         /* Exec08: the prompt, made where the interrupts are noted when a
@@ -1108,10 +1020,10 @@ static void Exec02(u16 behind)
         Int21e(&regs);
         drive = (u8)regs.ax;
         *to++ = drive + 'A';
-        if (ComnIni.Prompt != 0) {
+        if (md.Prompt != 0) {
             *to++ = ':';
             *to++ = '\\';
-            regs.name = AT(RES_SEG, (u8)(drive + 1));
+            regs.name = AT(MAIN_SEG, (u8)(drive + 1));
             regs.si = (u16)to;
             regs.ax = DOS_PATH;
             Int21e(&regs);
@@ -1120,10 +1032,10 @@ static void Exec02(u16 behind)
         }
         *to++ = '>';                    /* Exec09 */
         *to = 0;
-        OutStr0((const u8 *)IntTab, WAS(ComnIni.BatAdr));
-        OutStr0((const u8 *)ComnIni.BatAdr, WAS(ComnIni.BatAdr));
+        OutStr0((const u8 *)IntTab, WAS(md.BatAdr));
+        OutStr0((const u8 *)md.BatAdr, WAS(md.BatAdr));
         bios.ax = 0x0E0D;
-        bios.bx = WAS(ComnIni.BatAdr);
+        bios.bx = WAS(md.BatAdr);
         bios.cx = bios.dx = 0;
         Int10(&bios);
         bios.ax = 0x0E0A;
@@ -1131,125 +1043,47 @@ static void Exec02(u16 behind)
     }
 }
 
-/*---------------- Relocate the transit part -------------
-   The part that goes is where DOS has loaded it with the rest of the
-   file, in the block that RunPar goes with. The linker's relocations
-   for it are behind it, where tools/mkexe.c has put them: each is the
-   place of a word that holds a segment, as the linker counts them, from
-   the PSP, and so is what the word holds. RunPar is what a segment of
-   the file has become. DOS does not do this, by the header that
-   tools/mkexe.c gives the file: the original loads that part itself,
-   time after time, and so did the C translation. */
-static void Reloc(void)
-{
-    const u16 __far *entry = (const u16 __far *)AT(RunPar + RelTab, 0);
-    u16 count;
-
-    for (count = RelCnt; count; count--) {
-        u16 offset = *entry++;
-        u16 segment = *entry++;
-
-        *(u16 __far *)AT(RunPar + segment, offset) += RunPar;
-    }
-}
-
 /* The commands are done: LoadFl is as the setup has it again, without
    the bit that said not to show a command.
 
-   The original does more here, Exec10: if the part that goes was given
-   up for the commands, it asks DOS for a block of memory and runs the
-   program's own file as a second copy, which moves its part there and
+   The original does more here, Exec10: if it gave most of itself up
+   for the commands, it asks DOS for a block of memory and runs the
+   program's own file as a second copy, which moves its code there and
    ends; it holds the check sum of that file against its own, and says
    "Bad or missing" with the name of the file and asks whether to try
    again when the file is not there or is another. None of that is in
    the portable C, which gives nothing up (see DEVIATIONS.md). */
 static void Exec10(void)
 {
-    ComnIni.LoadFl = ComnIni.LoadRes;
+    md.LoadFl = md.LoadRes;
 }
 
-/* Run the commands of DosBuf, which the part that goes has left in what
-   it keeps here of the main data, ComnIni. The original first gives
-   that part up, its block of memory freed, if the program is set up so:
-   LoadFl. */
-static void Exec(void)
+/* Run the commands of DosBuf. The original first gives up all of itself
+   but the part that this is of, if the program is set up so. With the
+   commands handed to COMMAND.COM's own interrupt, this does not return:
+   the program goes on in Exec2E. */
+void Exec(void)
 {
-    ComnIni.BatAdr = (u16)ComnIni.DosBuf;       /* Exec01 */
+    md.BatAdr = (u16)md.DosBuf;         /* Exec01 */
     Exec02(0);
     Exec10();
-}
-
-/*--------------------- The outermost loop ---------------------
-   The part that goes is called far, at TrnMain, in the segment that
-   the linker has for that and RunPar make, with something that is not 0
-   when the program has just been
-   loaded, and comes back when it has something for this part to do: a
-   number in AX, the low word. With no memory for the main data it has
-   in DX, the high word, the paragraphs that DOS had, as Init11 of
-   start.c returns them: what the assembly has in BX there. It is a
-   function of C, TrnMain of main.c, which has DS elsewhere meanwhile
-   and puts it back. Where to call is kept in memory, TrnAdr, and Stay
-   and Stay11 have no variables: that was needed while the part came
-   back through the assembly, with no register as it was, BP among them,
-   which the compiler takes to be kept whatever is said. */
-typedef u32 __far Transit(u16 first);
-#pragma aux Transit parm [ax] value [dx ax] \
-                    modify exact [ax bx cx dx si di es]
-
-#define TO_EXEC  0x100                  /* run the commands of DosBuf */
-#define TO_ALLOC 0x200                  /* there is no memory for the main
-                                           data: say so and leave */
-                                        /* less: leave, with that for DOS */
-
-#define TrnAdr (*(Transit * __near *)&Stays.TrnAdr)
-
-static void Go(u32 back)
-{
-    u16 what = (u16)back;
-
-    if (what == TO_EXEC)
-        Exec();
-    else if (what == TO_ALLOC)
-        AlocEr((u16)(back >> 16));
-    else
-        Exit00(what);
-}
-
-/* Call the part that goes, where it sets itself up after a command,
-   Init11 of the original, and do what it comes back with: for ever. */
-static void Stay11(void)
-{
-    for (;;) {
-        TrnAdr = (Transit *)AT(RunPar + TRN_SEG(TrnMain_s),
-                               OFFSET(TrnMain_s));
-        Go(TrnAdr(0));
-    }
-}
-#pragma aux Stay11 aborts
-
-/* The same from the start of the program, where that part reads the
-   setup first: Init00 of the original. */
-static void Stay(void)
-{
-    TrnAdr = (Transit *)AT(RunPar + TRN_SEG(TrnMain_s), OFFSET(TrnMain_s));
-    Go(TrnAdr(1));
-    Stay11();
 }
 
 /* Behind INT 2Eh, on an empty stack. If that was the command of DosChg,
    which changes the drive, the command itself is next, at BatPoin. Else
    a command of DosBuf has been run: on with those that follow it, and
-   then as Exec and Stay go on. */
-static void Exec2E(void)
+   then as the program goes on behind Exec, which cannot be returned
+   to: Again of main.c. */
+static void __loadds Exec2E(void)
 {
-    if (ComnIni.DosChg[1] != 0) {
-        ComnIni.DosChg[1] = 0;
-        Int2E((const u8 *)ComnIni.BatPoin);
+    if (md.DosChg[1] != 0) {
+        md.DosChg[1] = 0;
+        Int2E((const u8 *)md.BatPoin);
     }
     SetBrk();                           /* SetBrk0 */
     Exec02(1);
     Exec10();
-    Stay11();
+    Again();
 }
 
 /*---------------------- The entry ----------------------*/
@@ -1260,98 +1094,72 @@ static void Alloc9(void)
     struct DosRegs regs;
 
     OutStr0(Aloc_S, RESPARS_WAS);       /* BX: the paragraphs of the part
-                                           that stays */
+                                           of the original that stays */
     SetStat(0);
     regs.ax = DOS_EXIT + 1;
     Int21e(&regs);
 }
 #pragma aux Alloc9 aborts
 
-/* The program begins here: DOS has loaded the file and enters it with DS
-   on the PSP, which is this segment, and with the stack that the header
-   of the file names, which is this part's own (see tools/mkexe.c). The
-   file is the program as it lies in the memory, so the part that goes
-   is where it will run, a paragraph behind this one.
+/* The program begins here: DOS has loaded the file, set the words of it
+   that hold a segment, and enters this on the stack that the header of
+   the file names, with DS on the PSP. It is told to load DS for itself,
+   as a function is that is entered from elsewhere, and then asks DOS
+   where the PSP is.
 
-   The compiled code of this part names its segment, the PSP's, in a few
-   places: the linker's relocations for that are applied first, and
-   until then nothing here calls what needs them. DOS has to be 3.20 at
-   the least. The block of memory that DOS has given the program is made
-   as long as the file, and of the part that goes a block of its own, by
-   writing the header that DOS keeps in front of one. Then that part is
-   relocated, and Stay calls it.
+   DOS has to be 3.20 at the least. DOS has given the program all of the
+   memory: its block is made as long as the program is, which ends where
+   its stack does (see stack.c), and the rest is asked for again when the
+   panels are made, Init11 of start.c. Then Main of main.c is the
+   program.
 
    Ported as it is: how DOS looks for memory is set to what it is when
    DOS starts, the lowest block that fits and no upper memory, whatever
    it was.
 
-   Not in the portable C, which does not load itself again after a
-   command (see DEVIATIONS.md): the original first takes the check sum
-   of its file as it is loaded, to know the file again; and if its
-   command tail is the one that it gives a second copy of itself, it is
-   that copy, which moves its part that goes into the block that the
-   first copy has for it, leaves its check sum there, and ends.
+   Not as the original, which is a .COM file (see DEVIATIONS.md): a DOS
+   before 3 is left through the INT 20h that every PSP begins with,
+   entered by a far call, where the original returns there. DOS wants CS
+   on the PSP when a program ends that way, and nothing else of this
+   program is in that segment. And the call that says where the PSP is
+   is one of DOS 2 and later.
 
-   Not in the C, of either tree: the original cannot always make its
-   block as long as it needs, since its file is shorter than the program
-   in the memory, and then asks for a block elsewhere for the part that
-   goes. The translation's block holds all of the file, and making it as
-   long as the file cannot fail but with DOS's chain of blocks
-   destroyed, where asking for another fails as well. So that way is
-   left out, and the program ends as the original does when both
-   fail. */
-void Alloc0(void)
+   Not in the portable C, which does not load itself again after a
+   command: the original first takes the check sum of its file as it is
+   loaded, to know the file again; and if its command tail is the one
+   that it gives a second copy of itself, it is that copy, which moves
+   its code into the block that the first copy has for it, leaves its
+   check sum there, and ends. It also moves most of itself up when it
+   starts, to lay the data of its part that stays over the code that
+   has run, and applies its own relocations: the C translation's file
+   is laid out for that by a tool, where the portable C's is as the
+   linker writes it. */
+void __loadds Alloc0(void)
 {
     struct DosRegs regs;
-    u16 psp = RES_SEG;
-    u16 i, block, rest;
-    u8 __far *header;
-    u8 kind;
+    u32 end = (u32)(void __far *)Stack;
 
     IntOn();                            /* for the direction flag, which
                                            the compiler wants clear */
-    {
-        const u16 __far *entry =
-            (const u16 __far *)AT(psp + RelTab, RelCnt * 4);
-
-        for (i = ResCnt; i; i--) {
-            *(u16 *)*entry += psp;
-            entry += 2;
-        }
-    }
+    regs.ax = DOS_PSP_OLD;
+    Int21e(&regs);
+    PspSeg = regs.bx;
     regs.ax = DOS_VERSION;              /* Check DOS version */
     Int21e(&regs);
-    if ((u8)regs.ax < 3) {
-        regs.ax = DOS_END;              /* Alloc4 */
-        Int21e(&regs);
-    }
+    if ((u8)regs.ax < 3)                /* Alloc4 */
+        ((void (__far *)(void))AT(PspSeg, 0))();
     if (((regs.ax & 0xFF) << 8 | regs.ax >> 8) < 0x314) {
-        OutStr(AT(psp + TRN_SEG(Vers_S), OFFSET(Vers_S)),
-               regs.bx);                /* BX: as DOS answered */
+        OutStr(Vers_S, regs.bx);        /* BX: as DOS answered */
         regs.ax = DOS_EXIT + 2;
         Int21e(&regs);
     }
-    regs.bx = ResPrW + (ImgEnd - TrnPrW) + 1;   /* Alloc5 */
-    regs.es = psp;
+    regs.bx = (u16)(end >> 16) + (((u16)end + LenStk + 15) >> 4)
+              - PspSeg;                 /* Alloc5 */
+    regs.es = PspSeg;
     regs.ax = DOS_RESIZE;
     if (Int21e(&regs))
         Alloc9();
-    block = psp + ResPrW + 1;           /* Alloc6 */
-    IntOff();
-    /* Split into resident and transit parts */
-    header = AT(psp - 1, 0);
-    kind = header[0];
-    header[0] = 'M';
-    rest = *(u16 __far *)(header + 3) - ResPrW - 1;
-    *(u16 __far *)(header + 3) = ResPrW;
-    header = AT(block - 1, 0);
-    header[0] = kind;
-    *(u16 __far *)(header + 1) = psp;
-    *(u16 __far *)(header + 3) = rest;
-    IntOn();
-    RunPar = block - TrnPrW;            /* Alloc7 */
-    SetStat(0);
-    Reloc();
-    Stay();
+    SetStat(0);                         /* Alloc7 */
+    Main();
 }
-#pragma aux Alloc0 "*" aborts
+#pragma aux Alloc0 aborts

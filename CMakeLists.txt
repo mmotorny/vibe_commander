@@ -125,11 +125,13 @@ add_custom_target(shareware-relocations ALL DEPENDS ${layout_dir}/VC.OBJ)
 # *.c files, compiled and linked into one program, VC.EXE, in a directory
 # of the build that has the tree's name. Nothing of either is assembled:
 # the assembler above builds the original, for the tests to hold the trees
-# against, and the driver of the tests. See vc.h of a tree and tools/mkexe.c
-# for how the program is laid out and what that asks of the C.
+# against, and the driver of the tests.
 #
-# Both are built by add_c_tree, below, and how they are built is said
-# there once. What may differ between them is what its caller names.
+# The C translation is built by add_c_tree: it is two parts, one that
+# stays in the memory while a command runs and one that is given up and
+# loaded again, as the original is, and tools/mkexe.c lays its file out
+# for that. See vc.h of that tree and tools/mkexe.c. The portable C is one
+# program, which the linker writes: add_portable_c, further down.
 
 # mkexe turns the linker's output into the program that is run.
 add_executable(mkexe tools/mkexe.c)
@@ -290,19 +292,96 @@ function(add_c_tree tree description model)
     add_custom_target(${tree} ALL DEPENDS ${c_dir}/VC.EXE)
 endfunction()
 
-# The trees, each with its model and the files of its second code segment.
+# add_portable_c(<file of the second segment>...) builds src/portable_c/
+# into build/portable_c/VC.EXE, with the linker's map VC.MAP and the
+# object files next to it, as the target portable_c.
+#
+# The portable C is one program, and the linker writes its file: DOS
+# loads it, sets the words of it that hold a segment and starts it at
+# Alloc0 of resident.c, on the stack that the file's header names. It is
+# compiled in the medium model: a function is far by the compiler's own
+# rule, and needs no word of this compiler to say so.
+function(add_portable_c)
+    set(tree portable_c)
+    set(source_dir ${CMAKE_SOURCE_DIR}/src/${tree})
+    set(c_dir ${CMAKE_BINARY_DIR}/${tree})
+    # Every C file of the tree is part of the program: a new one needs no
+    # mention here. The build looks again each time it runs.
+    file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
+         ${source_dir}/*.c)
+    # The compiled code is more than one segment holds, so it has two:
+    # CTEXT, and CTEXT2 for the files that the caller names. Functions of
+    # different files call each other far, so a file may be in either. A
+    # segment holds F000h bytes, not 64K, for the machine of the tests:
+    # the test portable_c-scenarios says why, and fails when one is
+    # fuller (check_layout of harness/ported.py). Name another file here
+    # then.
+    set(c_second ${ARGN})
+
+    # The data of the program is three segments, because it is more than
+    # one holds. The main data and the variables of the C files are the
+    # compiler's own group, DGROUP, which DS is on. The tables, the files
+    # whose names end in _t, and the stack, stack.c, do not fit there
+    # beside the main data, and are each a group of its own, by an
+    # option of Open Watcom that gives the data of a file one: -nd=T
+    # makes T_GROUP of the tables and -nd=S makes S_GROUP of the stack
+    # (see the README, "What rests on Open Watcom").
+    file(MAKE_DIRECTORY ${c_dir})
+    set(c_compiled "")
+    foreach(source ${c_files})
+        string(REGEX REPLACE "\\.c$" "" object ${source})
+        if(source MATCHES "_t\\.c$")
+            c_compile(${tree} m ${source} ${object} CTEXT CCODE -nd=T)
+        elseif(source STREQUAL "stack.c")
+            c_compile(${tree} m ${source} ${object} CTEXT CCODE -nd=S)
+        elseif(source IN_LIST c_second)
+            c_compile(${tree} m ${source} ${object} CTEXT2 CCODE)
+        else()
+            c_compile(${tree} m ${source} ${object} CTEXT CCODE)
+        endif()
+        list(APPEND c_compiled ${c_dir}/${object}.obj)
+    endforeach()
+
+    # The program is linked of the compiled code alone, with a link map
+    # next to it. The order of the segments is said here, by their
+    # classes: the main data, which main.c has in a segment and a class
+    # of its own, MAIN, so that it is the first thing of DGROUP and of
+    # the program, at offset 0 of the segment that DS is on, as the code
+    # takes it to be; the rest of DGROUP; the code; the tables; and last
+    # the stack, where the program ends, which is how it knows its
+    # length (Alloc0 of resident.c). The tables stand between the code
+    # and the stack: the machine of the tests is many times slower at a
+    # write to a page of the memory that has code which it has run, and
+    # a push is a write. The directive is Open Watcom's, and its help
+    # does not list it for DOS.
+    list(JOIN c_compiled "," compiled)
+    add_custom_command(
+        OUTPUT ${c_dir}/VC.EXE ${c_dir}/VC.MAP
+        COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
+                name ${c_dir}/VC.EXE
+                order clname MAIN clname DATA clname BSS
+                      clname CCODE segment CTEXT segment CTEXT2
+                      clname FAR_DATA clname STACK
+                file ${compiled}
+                option map=${c_dir}/VC.MAP,start=Alloc0_,static
+        DEPENDS ${c_compiled}
+        COMMENT "Linking the portable C"
+        VERBATIM)
+    # The program as it is shipped.
+    add_custom_target(${tree} ALL DEPENDS ${c_dir}/VC.EXE)
+endfunction()
+
+# The trees, each with the files of its second code segment.
 #
 # The C translation is compiled in the small model: its functions are far
 # where a #pragma aux of theirs says so, which every function has that
 # another file calls, with the registers that the assembly called it in.
-# The portable C is compiled in the medium model: a function is far by
-# the compiler's own rule, and needs no word of this compiler to say so.
 set(c_trees c portable_c)
 add_c_tree(c "the C translation" s
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c view.c
     window.c)
-add_c_tree(portable_c "the portable C" m
+add_portable_c(
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c view.c
     window.c)

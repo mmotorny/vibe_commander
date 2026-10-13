@@ -1797,13 +1797,15 @@ static void Aexec0(u16 edit)
         tail[12] = md.LftMous;
         tail[13] = 1;
     }
-    /* The main data and the panels keep their memory, and the viewer as
-       much as it needs at the least. */
+    /* The panels keep their memory, and the viewer as much as it needs
+       at the least: the block that both are in is made that long. In
+       the original it begins with the main data. */
     regs.ax = 0x4A00;
-    regs.bx = md.ViewSeg - MAIN_SEG + ((MinView - 1) >> 4) + 1;
+    regs.bx = md.ViewSeg - md.MemSeg + ((MinView - 1) >> 4) + 1;
     regs.cx = regs.si = regs.di = 0;
     regs.name = md.TmpBuf;
-    Int21d((struct DosRegs STACK *)&regs);
+    regs.es = md.MemSeg;
+    Int21e((struct DosRegs STACK *)&regs);
     md.EPB.CmdLine = (u32)MAIN_SEG << 16 | (u16)(md.TmpBuf + 100);
     LetLin(md.TmpBuf);
     regs.ax = 0x4B00;
@@ -1816,9 +1818,11 @@ static void Aexec0(u16 edit)
     regs.ax = 0x4A00;
     regs.bx = 0xFFFF;
     regs.name = md.TmpBuf;
-    Int21d((struct DosRegs STACK *)&regs);
+    regs.es = md.MemSeg;
+    Int21e((struct DosRegs STACK *)&regs);
     regs.ax = 0x4A00 | regs.ax & 0xFF;
-    Int21d((struct DosRegs STACK *)&regs);
+    regs.es = md.MemSeg;
+    Int21e((struct DosRegs STACK *)&regs);
     HidCur();
     SavMous();
     IniMous();

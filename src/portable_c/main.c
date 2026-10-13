@@ -9,11 +9,11 @@
  * program falls into it; it jumps to the command of a key, which is no
  * routine either, and the command jumps back into it at one of several
  * places, or on into another command. Here the loop is two functions and
- * a third that has them take turns, MainLoop, which TrnMain calls, at
- * the end of this file, when it has started the program: that is what
- * the part of the program that stays in the memory calls, and where the
- * loop comes back to when the program ends, or starts over for a command
- * of DOS. Loop is entered at a place,
+ * a third that has them take turns, MainLoop, which Main calls, at
+ * the end of this file, when it has started the program: that is the
+ * program from when DOS has loaded it, and where the loop comes back
+ * to when the program ends, or starts over for a command of DOS. Loop
+ * is entered at a place,
  * the numbers below, and returns the command that a key or the mouse
  * asks for: Func12 has the keys. Command calls the function of that
  * command (see "The commands" in vc.h), and returns the place of the loop
@@ -68,9 +68,8 @@ enum {
 /* Why the loop is left: what MainLoop returns. */
 enum {
     END_INIT11,                         /* to start the program over */
-    END_EXEC,                           /* to have the part of the program
-                                           that stays in the memory run
-                                           the commands of DosBuf first */
+    END_EXEC,                           /* to have the commands of DosBuf
+                                           run first */
     END_EXIT                            /* to leave the program */
 };
 
@@ -113,9 +112,7 @@ enum {
    keeping the cursor and the marks if `keep` is not 0: not 0 if it could
    not be read.
 
-   AsmSeg returns the segment of the program's constants and ResSeg the
-   segment of the part of the program that stays in the memory while a
-   command runs, where the stack is. */
+   AsmSeg returns the segment of the program's tables. */
 
 /* Routines of other files that are C. PutFls writes a panel of files,
    PutTre the tree and PutInf, of vc.h, the Info. */
@@ -126,19 +123,31 @@ void PutTre(u16 panel);                                 /* tree.c */
 u16 StrLen(const u8 __far *text);                       /* string.c */
 const u8 __far *FndLet(const u8 __far *text);
 
-/* What the assembly has that this reads or names: the scan codes of Alt
-   with a digit or a letter, which begin the speed search; the routine
-   that DOS calls for a critical error; and, in the part that stays in
-   the memory, the routine for Ctrl-Break, which only returns, and the
-   copy of the first panel that is kept while a command runs, of struct
-   Stays there. And of main_t.c the box that says a drive is not
-   ready, which DialBox takes by its offset. */
+/* What this reads or names of other files: the scan codes of Alt with a
+   digit or a letter, which begin the speed search; of main_t.c the box
+   that says a drive is not ready, which DialBox takes by its offset;
+   and of setup.c the setup as it was last saved or found. */
 extern const u8 __far AltSr_T[];
 extern const u8 __far Menu_T[];
 extern const u8 __far NoRd_P[];
-extern const u8 __far CtrlC[];
-#pragma aux CtrlC "*"
-#define WCB1sav STAYS(WCB1sav)
+extern u8 IniSave[];
+
+/* The main data: one structure, which is all that the original has in
+   the block of memory that it asks DOS for and has DS on. Here it is an
+   object of the program, in the segment that the compiler has for the
+   program's data and that DS is on, and the first thing of that
+   segment, at offset 0, as the original has it in its block: the line
+   in front of it names a segment of the compiler's group for it alone,
+   of a class of its own, and the linker's command has that class first
+   (see CMakeLists.txt). The first is the compiler's and the second the
+   linker's, not the language's; the tests stop where it is not at 0
+   (harness/coverage.py).
+
+   It is first in the program's file, too, 62 KB of nothing: the file
+   is the program as it lies in the memory. */
+#pragma data_seg("MAINDATA", "MAIN")
+struct MainDat md;
+#pragma data_seg()
 
 #define ALT_KEYS 38                     /* the length of AltSr_T */
 
@@ -146,9 +155,9 @@ extern const u8 __far CtrlC[];
                                            for the mouse */
 
 /* Where the setup file has a field of a panel and one of the main data
-   (see WCBini and CmnIni in vc.h). The program keeps the file that it
-   has written last, or found when it started, where the copy of the
-   first panel is kept while a command runs: IniSave. */
+   (see WCBini and CmnIni in vc.h). The program keeps the setup as the
+   loop last found it, IniSave of setup.c; the original keeps that where
+   it has the copy of the first panel while a command runs. */
 #define INI_WCB(number, field) \
     (3 + (number) * WCBini + (u16)(u32)&((struct WCBdef __far *)0)->field)
 #define INI_CMN(field) \
@@ -233,7 +242,7 @@ static u16 Init40(void)
     if (md.LoadRes != 0xFF)
         return 0;
     md.LoadRes = 0;
-    tail = FndLet(AT(ResSeg(), 0x81));
+    tail = FndLet(AT(PspSeg, 0x81));
     if (Init46(*tail))
         return 0;
     to = md.DosBuf;
@@ -746,7 +755,7 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
                not count: they are taken over first. */
             MakeIni();
             image = md.MenuBuf;
-            saved = AT(ResSeg(), OFFSET(WCB1sav));
+            saved = IniSave;
             if (*(u16 __far *)saved == 0x5656) {        /* 'VV' */
                 for (i = 0; i < LenPath; i++) {
                     saved[INI_WCB(0, WinPath) + i] =
@@ -773,7 +782,7 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
             for (i = 0; i < INI_LEN; i++)       /* Func06 */
                 saved[i] = image[i];
             r->si = (u16)md.MenuBuf + INI_LEN;
-            r->di = OFFSET(WCB1sav) + INI_LEN;
+            r->di = (u16)IniSave + INI_LEN;
             /* fall through */
         case FUNC07:
             Cursor1();
@@ -1439,8 +1448,7 @@ void RestVct(void)
 
 /*--------------------- Fatal error ---------------------
    What main_t.c has for it: the texts and the two boxes, with
-   Retry and Abort or with Ok alone, which go to Dialog by their offsets.
-   And the word that says where DS will be on the main data, SecDat. */
+   Retry and Abort or with Ok alone, which go to Dialog by their offsets. */
 extern const u8 __far Err_S[];
 extern const u8 __far OnDr_S[];
 extern const u8 __far OnDv_S[];
@@ -1448,7 +1456,6 @@ extern const u8 __far Errs_S[];
 extern const u8 __far FatEr_S[];
 extern const u8 __far FtEr1_B[];
 extern const u8 __far FtEr2_B[];
-extern u16 __near SecDat;
 
 /* What DOS is answered for a critical error. */
 #define ERR_RETRY 1
@@ -1538,43 +1545,32 @@ FtErr5:
     return answer;
 }
 
-/* Put DS on the main data. An interrupt function is entered with DS
-   anywhere, and the compiler puts it on its own group, that of the
-   constants, where SecDat is: the segment of the main data, which
-   the program asks DOS for when it starts and after every command. C
-   has no words for loading a segment register, and the compiler takes
-   none for an argument: this is the one instruction. TrnMain, at the
-   end of this file, has it too, to put DS there when the program has
-   asked for the main data, and back where it was. */
-static void DataSeg(u16 segment);
-#pragma aux DataSeg = "mov ds,ax" parm [ax] modify exact []
-
 /* INT 24h: what DOS calls for a critical error, with the error in AX and
    DI and the device at BP:SI, on the stack of whoever called DOS, which
    is the program's. It answers in AL, and every other register comes
-   back as it was. */
+   back as it was. An interrupt function is entered with DS anywhere,
+   and the compiler has it load DS with the program's data. */
 void __interrupt __far FatErr(struct Saved r)
 {
-    DataSeg(SecDat);
     r.ax = FtErr1(r.ax, r.di, AT(r.bp, r.si));
 }
 
 /* Take the critical error of DOS, for FatErr, and
    Ctrl-Break, for a routine that only returns, and note who had them.
-   Returns where that routine is in the part of the program that stays in
-   the memory. */
+   Returns the offset of that routine, CtrlC of resident.c. */
 u16 HookVct(void)
 {
+    const u8 __far *routine = (const u8 __far *)(void __far *)CtrlC;
+
     md.ErrVct = Dos35(0x3524);
     md.BrkVct = Dos35(0x351B);
     SetVect(0x24, (const u8 __far *)(void __far *)FatErr);
-    SetVect(0x1B, AT(ResSeg(), OFFSET(CtrlC)));
-    return OFFSET(CtrlC);
+    SetVect(0x1B, routine);
+    return (u16)(u32)routine;
 }
 
 /* Leave the program: the screen as DOS had it, with the cursor on the
-   line above the command line. The part of the program that stays in
-   the memory ends the program.
+   line above the command line. Exit00 of resident.c ends the program.
 
    Ported as it is: of the two interrupts that the program has taken,
    only Ctrl-Break is given back here. DOS itself puts the critical error
@@ -1589,49 +1585,66 @@ static void Exit(void)
     Cursor((u16)(u8)(md.DosLin - 1) << 8);
 }
 
-/* What the part of the program that stays in the memory is to do when
-   this part comes back to it: see Go of resident.c. Anything less is to
-   leave, with that for DOS. */
-#define STAY_EXEC  0x100                /* run the commands of DosBuf */
-#define STAY_ALLOC 0x200                /* there is no memory for the main
-                                           data: say so and leave */
+/* The loop, time after time: the program finds out about the machine,
+   IniData, as it does after every command, and the main loop runs,
+   until the program is to end or has commands of DOS to run, which
+   Enter has left in DosBuf; with nothing to run after all it starts
+   over at once. For the commands DOS gets the memory behind the panels
+   back, and the program takes it again when they are done: if there is
+   too little then, it says so and leaves, as it does when it starts.
 
-/* The part of the program that goes while a command runs, all of it: the
-   part that stays calls this when the program has been loaded, with
-   `first`, and again whenever it has run a command, and this returns
-   when there is something for that part to do. In the original that
-   part jumps here, to Init00 or to Init11, and is jumped back to.
-
-   The program is started, at Init11 after a command, where the setup
-   need not be read again; the main loop runs, until the program is to
-   end or has commands of DOS to run, which Enter has left in DosBuf; and
-   with nothing to run after all it starts over at once.
-
-   DS is not on the main data when this is called, and there is none
-   until Init11 has asked DOS for it: DS is put there then, and back
-   where it was before this returns, by DataSeg above. The main data may
-   be given back to DOS by then, as Enter does before a command runs. */
-u32 TrnMain(u16 first)
+   In the original the part of it that stays in the memory while a
+   command runs has this loop, Stay there: it jumps to the rest of the
+   program, at Init11, and is jumped back to with something to do. */
+static void Round(void)
 {
-    u16 stays = ResSeg();
-    u32 data;
+    struct Answer memory;
     u16 end;
 
-    if (first)
-        Init00(stays);
     for (;;) {
-        data = Init11(stays, MemRun());
-        if ((u16)data == 0)             /* AlocEr */
-            return data & 0xFFFF0000UL | STAY_ALLOC;
-        DataSeg((u16)data);             /* IniOk */
-        IniData();
+        IniData();                      /* IniOk */
         end = MainLoop();
-        if (end == END_EXIT)
+        if (end == END_EXIT) {
             Exit();
-        DataSeg(stays);
-        if (end == END_EXEC)            /* CmdExe */
-            return STAY_EXEC;
-        if (end == END_EXIT)
-            return 0;                   /* Exit00 */
+            Exit00(0);
+        }
+        if (end == END_EXEC) {          /* CmdExe */
+            GiveMem();
+            Exec();
+            memory = TakeMem();
+            if (memory.failed)
+                AlocEr(memory.value);
+        }
     }                                   /* CmdIni */
+}
+#pragma aux Round aborts
+
+/* The program, from when DOS has loaded it: Alloc0 of resident.c
+   calls this, and it does not return. The setup is read, Init00, and
+   the memory of the panels asked for, Init11; with too little of it the
+   program says so and leaves. */
+void Main(void)
+{
+    struct Answer memory;
+
+    Init00();
+    memory = Init11();
+    if (memory.failed)                  /* AlocEr */
+        AlocEr(memory.value);
+    Round();
+}
+
+/* Where the program goes on when commands have been run by the
+   interrupt that COMMAND.COM has for them: that comes back with the
+   stack lost, so the commands were finished on a stack that was set
+   anew, and Round cannot be returned into (see Exec2E of resident.c).
+   The rest is as behind any commands. */
+void Again(void)
+{
+    struct Answer memory;
+
+    memory = TakeMem();
+    if (memory.failed)
+        AlocEr(memory.value);
+    Round();
 }

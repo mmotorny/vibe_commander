@@ -36,7 +36,7 @@ import re
 import sys
 from pathlib import Path
 
-EXE_HEADER = 0x20           # of the translation's file: see tools/mkexe.c
+import coverage
 STACK = 0x100               # of the model, and where a call begins in it
 ENTERED = 0xC0
 AX, CX, DX, BX, SP, BP, SI, DI = range(8)
@@ -425,7 +425,7 @@ def main():
         sys.exit("arithcheck: the linker's map has no CTEXT, or not both "
                  "routines")
     begin, size = segment
-    at = begin - 0x100 + EXE_HEADER
+    at = begin + coverage.origin(image)
     code = image[at:at + size]
     # The addresses of the map count the segment's paragraph and offset:
     # in the code they are offsets from the paragraph.

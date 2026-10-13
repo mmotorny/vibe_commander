@@ -1199,10 +1199,11 @@ What the work on `src/portable_c/` has written down for whoever goes on
 with it. Like the notes above they are notes, not rules; the rules are
 in "The portable C".
 
-- The two C trees are built by one function of `CMakeLists.txt`,
-  `add_c_tree`, which takes the tree's name, its model and the files of
-  its second code segment: the notes above say `port_c_second` and
-  `c_second` for that list, which is the end of each tree's call now.
+- The C translation is built by `add_c_tree` of `CMakeLists.txt`,
+  which takes the tree's name, its model and the files of its second
+  code segment: the notes above say `port_c_second` and `c_second` for
+  that list, which is the end of the call now. The portable C is built
+  by `add_portable_c`, which takes that list too.
   The harness takes the tree where it had `src/c` written in:
   `datacheck.py` and `reads.py` go by the name of the build's directory,
   `notice.py` by the file it is given, `play.py` has `--tree`. The
@@ -1216,8 +1217,7 @@ in "The portable C".
   segment; a `__near` in their `#pragma aux` is taken without a word and
   the program links, and returns near to a far call. `_asm` takes the
   name of a function for a far place: `jmp Exec2E` in `Int2E` of
-  `resident.c` is a far jump there, with a relocation of the part that
-  stays.
+  `resident.c` is a far jump there.
 - What the compiler does with a function that has no `#pragma aux`,
   read in the listings: the arguments come in AX, DX, BX and CX in
   their order, a far pointer in two of them, and what does not fit
@@ -1261,21 +1261,13 @@ in "The portable C".
   is stale when they go: look at what stood in front of each line
   taken out.
 - What still has registers in a `#pragma aux`, and stays so until the
-  thing itself changes: the inline assembly of `dos.c` and `DataSeg`;
-  `__U4M` and `__U4D`, whose registers are the compiler's; `CaseMapFn`,
-  DOS's routine; and the seam between the two parts of the program,
-  `TrnMain`, `Transit`, `Release`, `SetBrk`, `ReleaseFn`, `StaysFn`,
-  with `Int2E`. The functions of `dos.c` have a `#pragma aux` for the
-  name alone, `DOS_NAME`, since the file is compiled twice. All of the
-  seam goes when the program stays in the memory whole.
+  thing itself changes: the inline assembly of `dos.c`; `__U4M` and
+  `__U4D`, whose registers are the compiler's; `CaseMapFn`, DOS's
+  routine; and `Int2E`, whose command is in SI.
 - An object has the compiler's name in the map, `_Name`, where the C
   translation takes the underscore off with `#pragma aux Name "*"`:
-  `harness/datacheck.py` knew an object by either. The names that a
-  `#pragma aux` still fixes are those that `tools/mkexe.c`, the
-  linker's command and `harness/coverage.py` look for, all of the part
-  that stays in the memory, with the other part's declarations of
-  them: a declaration that has lost its line while the definition has
-  not is an undefined reference at the linker. A text that code reads
+  `harness/datacheck.py` knew an object by either, and no name of the
+  portable C comes from a `#pragma aux` any more. A text that code reads
   as a far object and a file of constants names by a near word is
   declared `TEXT_FAR` in `vc.h`, which is `__far` but in a file that
   has `tables.h`.
@@ -1316,6 +1308,57 @@ in "The portable C".
   change that was not meant shows there as a row that the declaration
   does not explain. A scenario whose steps choose what is gone needs
   the step left out, not a golden of the keys going astray.
+- The portable C is one program, and the notes above on the part that
+  stays in the memory, on `tools/mkexe.c` and on string literals and
+  static variables are of the C translation alone. In the portable C DS
+  is on the compiler's group, `DGROUP`, in every function, an interrupt
+  function and a `__loadds` one included, since that is what the
+  compiler loads; a file may have variables and strings, which are of
+  that group; and `md` is a variable of `main.c`. The README has the
+  layout, under "Staying in the memory whole". What making it so met:
+  - `#pragma data_seg("NAME", "CLASS")` makes a segment of that name and
+    class and puts it into the group that the file's data is of:
+    `DGROUP`, or with `-nd=S` the group `S_GROUP`, and then under the
+    name `SNAME`. An object written behind the line is of that segment.
+    Nothing gives a segment an alignment: it is that of a word.
+  - The linker takes a segment of the class `STACK` for the stack and
+    has the file's header name its end, with SS on the paragraph that
+    the segment begins in, which is the stack's group if it is one.
+    Without such a segment the header has SS and SP 0, and the program
+    would start on a stack laid over its own first bytes.
+  - A group is as long as from its first segment to its last, whatever
+    lies between, and the linker stops at 64K: the stack and the tables
+    cannot be of `DGROUP` beside the main data, each is a group.
+  - The file holds the program up to the last byte that has a value,
+    with zeros for what has none in front of that: the main data, which
+    has to be first, is 62.6 KB of zeros in the file. The linker's
+    `segaddr`, which starts a class on a paragraph that the command
+    names, breaks that: it wrote all of what followed into the file and
+    a header that asked DOS for a megabyte.
+  - A variable declared `CODE` and `static` has the compiler's name for
+    data, and the data's test takes it for a constant of the original's
+    name: `VARIABLES` of `harness/reads.py` has `Vect21`.
+  - A text of the original's name may be a function's in another file:
+    `Command`, "COMMAND.COM", and `Command` of `main.c`. It is declared
+    in the file that reads it, not in `vc.h`.
+  - DOS loads a program into the largest block that it has, not into
+    the first that fits: COMMAND.COM, 73 KB on the bench, goes behind a
+    program that has stayed, and the gap that an earlier one left in
+    front of it is not used again. And FreeDOS's COMMAND.COM keeps its
+    73 KB while a program runs from it. The bench has 500,128 bytes
+    from where the program is loaded.
+  - The program reads its panels in a block that it has just given back
+    to DOS, to move them to the largest block that DOS then has
+    (`TakeMem` of `start.c`): DOS writes nothing into a block that it
+    is given back, and has it as the start of the largest if it lies in
+    front of it.
+  - What the tests know of a program's file they get from
+    `harness/coverage.py`: `made_by_mkexe` tells the C translation's
+    file from one that the linker wrote, by its header, and `origin` is
+    what to add to an address of the linker's map for the place in the
+    file. The limits that `tools/mkexe.c` holds the C translation's
+    build to, for QEMU, `check_layout` of `harness/ported.py` holds the
+    portable C to, at the start of the scenarios' test.
 
 - What retyping the first 22 of those functions met, each of which
   the compiler took without a word:

@@ -207,8 +207,12 @@ class Declared:
         return tuple(step for step in steps if step not in self.left_out)
 
 
-_MAP = ("the map of the memory has the program with a block more, its "
-        "code, and with INT 24h among its interrupts")
+_MAP = ("the map of the memory has the program with a block more, and "
+        "with INT 24h among its interrupts")
+_HOLE = ("; and where a program has stayed, the memory in front of it, "
+         "which the panels have left, is a stretch of free memory more")
+_NO_ROOM = ("the second copy has no memory to run a command: each copy "
+            "keeps all of itself")
 
 TREES = {
     # The portable C stays in the memory whole while a command runs, and
@@ -218,6 +222,12 @@ TREES = {
             "memory": "it switches Memory allocation off and shows the "
                       "menu without its mark: the portable C has no such "
                       "option",
+            "passed-on": "it has a program stay in the memory between "
+                         "two copies and runs commands from the second: "
+                         "with all of each copy kept, the machine of the "
+                         "tests has no memory for the second copy behind "
+                         "that program. handed-on sees the same with one "
+                         "copy",
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "
@@ -233,14 +243,17 @@ TREES = {
             "clock-russia": "the Options menu, a line shorter",
             "menu": "the Options menu, a line shorter",
             "menu-items": _MAP,
-            "memory-map": _MAP + "; Memory allocation is not switched off "
-                          "for a second look at it",
+            "memory-map": _MAP + _HOLE + "; Memory allocation is not "
+                          "switched off for a second look at the map",
             "memory-map-russia": _MAP,
-            "stay": _MAP,
-            "passed-on": "Memory allocation is not switched off in the "
-                         "second copy, which stays whole as it is",
-            "ended": _MAP,
-            "mouse-memory": _MAP,
+            "stay": _MAP + _HOLE,
+            "second-copy": _NO_ROOM,
+            "start-memory": _NO_ROOM + ", so the command that was to "
+                            "leave it without memory for its data does "
+                            "not run, and the copy is still there",
+            "ended": _MAP + "; " + _NO_ROOM + ", so no program has stayed "
+                     "from it when DOS ends it",
+            "mouse-memory": _MAP + _HOLE,
             "mouse-middle": _MAP,
             "mouse-drag-lists": _MAP,
         },

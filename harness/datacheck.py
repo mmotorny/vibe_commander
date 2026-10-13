@@ -52,10 +52,10 @@ from collections import defaultdict
 from pathlib import Path
 
 from bytecheck import REGIONS
+import coverage
 import reads
 
 COM_ORIGIN = 0x100          # where a .COM file is loaded, and the PSP ends
-EXE_HEADER = 0x20           # of the translation's file: see tools/mkexe.c
 
 # Records of an object file (OMF).
 LNAMES, SEGDEF, GRPDEF, EXTDEF, LEXTDEF = 0x96, 0x98, 0x9A, 0x8C, 0xB4
@@ -112,6 +112,25 @@ COMMAND_TABLES = {"Menu1_T", "Menu2_T", "Menu3_T", "Menu4_T", "MenuS_T",
 # are meant to be otherwise: name -> why. Each is still compared, and has to
 # differ: an entry that no longer applies fails the test.
 DIFFERENT = {
+}
+
+# Entries of ELSEWHERE and OWN that one tree has no constant for: tree ->
+# name -> why. Each has to be gone from the tree.
+_ONE_PROGRAM = ("the portable C is one program, which the linker lays out "
+                "and DOS loads: ")
+GONE = {
+    "portable_c": {
+        "TrnBeg": _ONE_PROGRAM + "it has no part of its own that it makes "
+                  "a block of memory of",
+        "Stays": _ONE_PROGRAM + "what the watch on DOS keeps is variables "
+                 "of resident.c, and it keeps no copies of the setup and "
+                 "the panels",
+        **dict.fromkeys(
+            ("ImgEnd", "RelTab", "RelCnt", "TrnPrW", "ResPrW", "DatPrW",
+             "ResCnt"),
+            _ONE_PROGRAM + "no tool writes numbers of its layout into "
+            "it"),
+    },
 }
 
 # Objects of one tree that are declared to be otherwise than the
@@ -469,6 +488,10 @@ class Translation:
                     continue
                 if compiled.segments[segment][0].endswith("_BSS"):
                     continue
+                # Nor are the main data and the stack of the portable C,
+                # each a segment of a class of its own.
+                if compiled.segments[segment][1] in ("MAIN", "STACK"):
+                    continue
                 if compiled.segments[segment][0].endswith("_DATA"):
                     self.variables.add(name.lstrip("_"))
                 end = min(there for there in offsets[segment]
@@ -478,7 +501,7 @@ class Translation:
         self.objects.sort(key=lambda found: (found[0], found[2]))
 
     def bytes(self, address, length):
-        at = address - COM_ORIGIN + EXE_HEADER
+        at = address + coverage.origin(self.image)
         return self.image[at:at + length]
 
     def end_of(self, address):
@@ -602,16 +625,23 @@ def main():
         sys.exit(f"datacheck: {problem}")
 
     declared = DECLARED.get(translation.source.name, {})
+    gone = GONE.get(translation.source.name, {})
+    variables = reads.VARIABLES.get(translation.source.name, {})
     failed = []
     count = bytes_held = 0
-    stale = set(DIFFERENT) | set(ELSEWHERE) | set(OWN) | set(declared)
+    stale = (set(DIFFERENT) | set(ELSEWHERE) | set(OWN) | set(declared)
+             | set(variables)) - set(gone)
     used = set()
     for module, name, address, length in translation.objects:
         stale.discard(name)
-        if name in OWN:
+        if name in gone:
+            failed.append(f"{module}: {name} is listed in "
+                          f"{Path(__file__).name} as gone from "
+                          f"{translation.source.name}")
+        if name in OWN or name in variables:
             if not args.quiet:
                 print(f"  {module:12} {name:11} {length:4}  not "
-                      f"compared: {OWN[name]}")
+                      f"compared: {OWN.get(name) or variables[name]}")
             continue
         label, behind = ELSEWHERE.get(name, (name, 0))
         if original.kinds.get(label) != "data":
@@ -659,7 +689,8 @@ def main():
     # An object is compared as long as it is. Where the code reads more
     # of it, the object has to be that long: see reads.py.
     failed += reads.check(translation.source, translation.objects,
-                          translation.bytes, translation.variables)
+                          translation.bytes,
+                          translation.variables | set(variables))
     for name, at in sorted(set(NAMED_OTHERWISE) - used):
         failed.append(f"{name}+{at} is listed in {Path(__file__).name}, "
                       "and the translation has no object of that name")

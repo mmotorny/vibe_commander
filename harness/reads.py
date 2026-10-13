@@ -328,6 +328,18 @@ def places(source, objects, variables=()):
     return found
 
 
+# Variables of one tree that the compiler has where it has constants, in a
+# code segment, and under a name of the original: tree -> name -> why.
+# They are not compared, and what the code reads of them is not looked at.
+VARIABLES = {
+    "portable_c": {
+        "Vect21": "where INT 21h went before the program took it: a "
+                  "variable, in the segment of the code for the entry of "
+                  "that interrupt to read it through CS. The C translation "
+                  "has it under a name that is not the compiler's for data",
+    },
+}
+
 # Entries of REVIEWED that one tree has no constant for, since it is
 # declared to do without what read it (src/<tree>/DEVIATIONS.md): tree ->
 # (file, name) -> why. Each has to be gone from the tree.
@@ -387,13 +399,14 @@ def check(source, objects, contents, variables=()):
 def main():
     import datacheck
     translation = datacheck.Translation(Path(sys.argv[1]))
+    variables = translation.variables | set(
+        VARIABLES.get(translation.source.name, {}))
     for file, line, name, module, length, read, how in places(
-            translation.source, translation.objects,
-            translation.variables):
+            translation.source, translation.objects, variables):
         print(f"{file + ':' + str(line):18} {name:11} {length:4} of "
               f"{module:13} {read}{'' if how == 'by its form' else ': ' + how}")
     for line in check(translation.source, translation.objects,
-                      translation.bytes, translation.variables):
+                      translation.bytes, variables):
         print("WRONG   ", line)
 
 

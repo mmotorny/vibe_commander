@@ -9,12 +9,12 @@
  * can run by its name, any other file by the command that the extension
  * file of its directory has for files of its kind.
  *
- * A command is run by the part of the program that stays in the memory,
- * resident.c: F21_31 saves there what the program needs to start over
- * afterwards, the setup, the command and what the panels show, gives the
- * main data back to DOS, and returns NEXT_EXEC, or NEXT_INIT11 if there
- * is nothing to run after all. The main loop leaves for that: the
- * program does not come back here, it starts over.
+ * A command is run by Exec of resident.c: F21_31 makes the program ready
+ * for that, the interrupts given back, the panels cut down to what is
+ * kept of them while a command runs and the screen as DOS left it, and
+ * returns NEXT_EXEC, or NEXT_INIT11 if there is nothing to run after
+ * all. The main loop leaves for that: the program does not come back
+ * here, it starts over.
  *
  * These are commands, as in keys.c: functions that get the panel which
  * the original has in DS and return where the program goes on.
@@ -24,12 +24,11 @@
 /* The commands are declared in vc.h, see "The commands" there, and so is
    F21_30, which other files call too. */
 
-/* ResSeg is the segment of the part of the program that stays in the
-   memory while a command runs. It and what else is called of the rest
-   of the program are of vc.h: HidCur and Cursor1 for the cursor, Int10,
-   the BIOS for the screen, Int21d, DOS as it is where the assembly did
-   not go through Intr21, and Fantom, SetDTA, Intr21, SetPth, UpCase,
-   RestVct, SavMous, CurMous, Quit and Window. */
+/* What is called of the rest of the program is of vc.h: HidCur and
+   Cursor1 for the cursor, Int10, the BIOS for the screen, Int21d, DOS as
+   it is where the assembly did not go through Intr21, and Fantom,
+   SetDTA, Intr21, SetPth, UpCase, RestVct, SavMous, CurMous, Quit and
+   Window. */
 
 /* C routines of other files that vc.h does not have. TstExe is 1 for a
    name that DOS can run: com, exe or bat. TrCr10 finds the current
@@ -41,59 +40,53 @@ void TrCr10(void);                                      /* tree.c */
 u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 
 /* The dialog that asks whether to quit, and the name of the program for
-   it: constants of keys_t.c. And where the part of the
-   program that stays in the memory keeps the main data and the two
-   panels while a command runs: of struct Stays there. */
+   it: constants of keys_t.c. */
 extern const u8 __far Quit_B[];
 extern const u8 __far Name_S[];
-#define ComnIni STAYS(ComnIni)
-#define WCB1sav STAYS(WCB1sav)
-#define WCB2sav STAYS(WCB2sav)
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-#define AT(segment, offset) ((u8 __far *)((u32)(segment) << 16 | (offset)))
 
 #define LenCmd 124                      /* Length of command line */
 
-/* How much of the main data and of a panel is kept while a command runs:
-   CmnSave and WCBsave of the assembly. Of a file in a panel's list its
-   name and its attributes are kept, 13 bytes. */
-#define CmnSave ((u16)&((struct MainDat *)0)->DosLin)
-#define WCBsave ((u16)&((struct WCBdef *)0)->ExtBuf)
 
-/* Where ComnIni is in the original, 25E5h. The assembly has that in BX
-   when it has the BIOS write the end of a line, where the BIOS takes the
-   page of the screen and a colour. */
+/* Where the original has what it keeps of the main data while a command
+   runs, ComnIni: 25E5h. The assembly has that in BX when it has the BIOS
+   write the end of a line, where the BIOS takes the page of the screen
+   and a colour. */
 #define COMNINI_WAS 0x25E5
 
 #define DOS_FIND_FIRST 0x4E00           /* DOS: the first file of a name */
 #define DOS_CHDIR      0x3B00           /* make a directory current */
-#define DOS_FREE       0x4900           /* give a block of memory back */
 #define DOS_DRIVE      0x1900           /* which drive is current */
 
 static const u8 CODE CDir_S[] = "\\";
 
 static u32 F23_02(u16 panel, u16 address);
 
-/* Save a panel for the time that a command runs, at `to` in the part of
-   the program that stays in the memory: the start of its segment, with
-   its kind, its path and where its cursor is, and of each file in its
-   list the name and the attributes.
+/* Cut the list of a panel down to what is kept of it while a command
+   runs: F21_40.
 
    No more than MinFls files are kept. Of a longer list the last ones are
    dropped, and if the cursor is on one of those, its file is put into the
    last place that is kept; the first file shown, if it is not kept either,
    into the place before. Both lose the marks of being selected. The list
    is read again when the command is done, and these two are looked for
-   in it by their names. */
-static void F21_40(u16 panel, u8 __far *to)
+   in it by their names.
+
+   The original does this to save the panel: it gives its main data and
+   its panels back to DOS for the command, and keeps of a panel the
+   start of its segment and of each of so many files the name and the
+   attributes, in the part of it that stays in the memory. The portable
+   C keeps the panel where it is, and has no need of the limit; the
+   list is cut all the same, so that what a command leaves selected is
+   what the original leaves (see DEVIATIONS.md). */
+static void F21_40(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
-    const u8 __far *from;
     struct FILENT __far *file;
     u16 end = wcb->EndBuf;
     u16 limit = DSKBUF + MinFls * sizeof(struct FILENT);
-    u16 place, first, count, i;
+    u16 place, first;
 
     if (end > limit) {
         end = limit;
@@ -115,91 +108,70 @@ static void F21_40(u16 panel, u8 __far *to)
             *ENTRY(wcb, place) = *file;
         }
     }
-    from = (const u8 __far *)wcb;
-    for (i = 0; i < WCBsave; i++)
-        *to++ = *from++;
-    count = (end - DSKBUF) / sizeof(struct FILENT);
-    for (place = DSKBUF; count != 0; count--) {
-        file = ENTRY(wcb, place);
-        for (i = 0; i < 12; i++)
-            *to++ = file->NameF[i];
-        *to++ = file->AttrF;
-        place += sizeof(struct FILENT);
-    }
 }
 
-/* Hand over to the part of the program that stays in the memory, to run
-   what the command line holds: F21_31, where the program also comes when
-   it has started and read its setup, to start over from what is saved
-   here.
+/* Make the program ready for what the command line holds to be run:
+   F21_31, where the program also comes when it has started and read its
+   setup with a command to run.
 
-   The vectors go back to their owners, the setup, the command and the
-   panels are saved in the part that stays, the screen is as DOS left it
-   but for the prompt, and the main data is given back to DOS. What is
-   read afterwards is the copy in the part that stays: with no command in
-   it the program only starts over, NEXT_INIT11; else that part is told the
-   drive, to make it the current one first if it is not the one the
-   program began on, and runs the commands, NEXT_EXEC. */
+   The vectors go back to their owners, the panels are cut down to what
+   is kept of them, and the screen is as DOS left it but for the prompt.
+   With no command the program only starts over, NEXT_INIT11; else
+   DosChg gets the drive, for it to be made the current one first if it
+   is not the one the program began on, and the commands are run,
+   NEXT_EXEC: Exec of resident.c, which the loop's end in main.c calls.
+
+   The original saves the setup, the command and the panels here, in the
+   part of it that stays in the memory, and gives the main data back to
+   DOS; what it reads from then on is the copy. */
 u32 F21_31(void)
 {
-    struct MainDat __far *saved;
     struct DosRegs regs;
     struct BiosRegs bios;
-    u8 __far *to;
-    const u8 *from;
-    u16 stays = ResSeg();
-    u16 i, drive;
+    u16 drive;
 
     RestVct();
     SavMous();
-    to = AT(stays, OFFSET(ComnIni));
-    from = (const u8 *)&md;
-    for (i = 0; i < CmnSave; i++)
-        *to++ = *from++;
-    F21_40(md.WCB1seg, AT(stays, OFFSET(WCB1sav)));
-    F21_40(md.WCB2seg, AT(stays, OFFSET(WCB2sav)));
+    F21_40(md.WCB1seg);
+    F21_40(md.WCB2seg);
     Quit();
     if (!(md.LoadFl & 0x80))
         PutPrm(MAIN_SEG);               /* Quit leaves DS on the main data */
     Window(0, (u16)md.Lines << 8 | 80);
     Cursor1();
-    regs.ax = DOS_FREE;                 /* ES is on the main data */
-    regs.bx = regs.cx = regs.si = regs.di = 0;
-    regs.name = (const u8 *)&md;
-    Int21d((struct DosRegs STACK *)&regs);
     CurMous(0);
 
-    saved = (struct MainDat __far *)AT(stays, OFFSET(ComnIni));
-    if (saved->DosBuf[0] == 0) {
-        saved->LoadFl = saved->LoadRes;
+    if (md.DosBuf[0] == 0) {
+        md.LoadFl = md.LoadRes;
         return NEXT_INIT11;
     }
     bios.ax = 0x0E0D;
     bios.bx = COMNINI_WAS;
     bios.cx = bios.dx = 0;
     Int10((struct BiosRegs STACK *)&bios);
-    if (!(saved->LoadFl & 0x80)) {
+    if (!(md.LoadFl & 0x80)) {
         bios.ax = 0x0E0A;
         bios.bx = COMNINI_WAS;
         Int10((struct BiosRegs STACK *)&bios);
     }
     regs.ax = DOS_DRIVE;
+    regs.bx = regs.cx = regs.si = regs.di = 0;
+    regs.name = (const u8 *)&md;
     Int21d((struct DosRegs STACK *)&regs);
     drive = regs.ax & 0xFF;
-    if (drive != saved->DosChg[0])
+    if (drive != md.DosChg[0])
         drive = (u8)(drive + 'A');
     else
         drive = 0;
-    saved->DosChg[0] = 2;               /* the length of "A:" */
-    saved->DosChg[1] = (u8)drive;
-    saved->DosChg[2] = ':';
-    saved->DosChg[3] = 0x0D;
+    md.DosChg[0] = 2;                   /* the length of "A:" */
+    md.DosChg[1] = (u8)drive;
+    md.DosChg[2] = ':';
+    md.DosChg[3] = 0x0D;
     return NEXT_EXEC;
 }
 
-/* Have the part of the program that stays in the memory run what the
-   command line holds, DosBuf, which may be several commands, each with
-   its zero byte: F21_30. LoadRes keeps the byte of the setup that
+/* Have what the command line holds run, DosBuf, which may be several
+   commands, each with its zero byte: F21_30. LoadRes keeps the byte of the setup that
    LoadFl is while the command runs, without the bit that says not to
    show the command.
 

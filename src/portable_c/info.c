@@ -81,10 +81,13 @@ void PutInf(u16 panel)
     Number(md.TmpErr + 1, i >> 12, i << 4, NUM_SEPARATED);
     line.include = PtIn2_S;
     PUT(PtIn1_S);
-    /* The memory that is free with all of the program loaded. The
-       original shows another number, FreMem1, where it is set up to
-       give most of itself up for a command. */
-    i = md.FreMem2;
+    /* The memory that a command has: all that the program has for its
+       panels and the viewer but the panels, and the paragraph of the
+       header that DOS puts where a block begins. The original gives
+       its main data back for a command too, and shows the block that
+       held all three; and another number, FreMem1, where it is set up
+       to give most of itself up. */
+    i = MAIN_SEG + md.FreMem2 - md.MemSeg - 2 * PANEL_PARAS - 1;
     Number(md.TmpErr + 1, i >> 12, i << 4, NUM_SEPARATED);
     line.include = PtIn3_S;
     PUT(PtIn1_S);

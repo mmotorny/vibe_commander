@@ -9,15 +9,16 @@
  *
  * In C such a thing is a constant like any other, written with the names
  * of what it names, in a file of nothing else: help_t.c has those of
- * help.c. The compiler puts a constant into its group of data, DGROUP,
- * so a pointer in it is the offset of what it names in that group: the
- * word that the assembly has there, counted from another place. A file
- * of constants holds no code, and a file of code no constant of this
- * kind: the code has DS on the main data, not on that group, and would
- * read a constant that it names in the wrong segment, without a
- * warning. It declares what it uses as `extern const u8 __far`, and so
- * reads it in the right one. tools/mkexe.c stops the build for an
- * object file that holds both.
+ * help.c. The build compiles such a file with an option that gives its
+ * data a group of its own, T_GROUP (-nd=T, see CMakeLists.txt), so a
+ * pointer in it is the offset of what it names in that group: the word
+ * that the assembly has there, counted from another place. They are not
+ * in the group that DS is on because they do not fit there beside the
+ * main data. So a file of tables holds no code, and a file of code no
+ * constant of this kind: with DS elsewhere it would read a constant
+ * that it names in the wrong segment, without a warning. It declares
+ * what it uses as `extern const u8 __far`, and so reads it in the right
+ * one, and AsmSeg of misc.c is that segment.
  *
  * A constant that only its own file names is static, and one that code
  * or another file names is not. Either has the name that it has in the

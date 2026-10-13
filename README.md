@@ -224,8 +224,8 @@ portable C](#the-portable-c)).
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
 | `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
-| `tools/` | `mkexe.c` makes the `VC.EXE` of a C tree out of what the linker produces; `pairs.py` lists the functions of the portable C that still return two things as one number |
-| `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, each as the other is, and registers the tests |
+| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `pairs.py` lists the functions of the portable C that still return two things as one number |
+| `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against what it did itself, recorded in `harness/goldens/portable_c/` |
 | `docs/` | Pictures for this README |
 
@@ -264,9 +264,11 @@ download of 150 MB. Open Watcom provides tools for Linux and macOS on x86-64
 and ARM and for Windows on x86-64; the build has been run on Linux x86-64
 only.
 
-The portable C is built the same way, by the same lines of
-`CMakeLists.txt`, from `src/portable_c/` into `build/portable_c/`:
-`VC.EXE`, the linker's map and the listings.
+The portable C is built by the same compiler, from `src/portable_c/`
+into `build/portable_c/`: `VC.EXE`, the linker's map and the listings.
+The linker writes its `VC.EXE`; `tools/mkexe.c`, which lays out the C
+translation's, has no hand in it (see [The portable
+C](#the-portable-c)).
 
 ### Changes to the source
 
@@ -533,13 +535,13 @@ functions in `src/c/dos.c`: `IN` for a port of the machine, `CLI`, and
 `src/portable_c/` began as a copy of the C translation. What changes
 there first is how the program is written, toward C that any compiler
 takes, and what follows says where it has left the C translation so far.
-Everything above, of the layout of the file and of what rests on Open
-Watcom, holds for it but where this says otherwise. Where it behaves
-otherwise than the original, that is declared in
+Where it behaves otherwise than the original, that is declared in
 `src/portable_c/DEVIATIONS.md`, which has one entry so far: [it stays in
-the memory whole](#staying-in-the-memory-whole) while a command runs. In
-every scenario that this does not change it is held against the
-original's golden, as the C translation is.
+the memory whole](#staying-in-the-memory-whole) while a command runs,
+and so is one program, which the linker writes, where the C translation
+is two parts laid out by a tool. In every scenario that this does not
+change it is held against the original's golden, as the C translation
+is.
 
 It is compiled in the medium model, the option `-mm`, where the C
 translation has the small one: a function that another file calls is far
@@ -547,9 +549,7 @@ because the compiler makes it so, and a static one near, and no
 `#pragma aux` is needed to say which. The compiler then calls its two
 routines for arithmetic on 32 bits far as well, so those of
 `src/portable_c/arith.c` are far, and a file of either code segment may
-multiply and divide such numbers. In the part that stays in the memory
-one jump of the inline assembly is far for it: from the nine
-instructions of INT 2Eh to the function that goes on behind them.
+multiply and divide such numbers.
 
 The registers are gone from its functions. In the C translation a
 function that another file calls takes its arguments and returns its
@@ -567,69 +567,59 @@ takes apart. In the portable C such a function returns a structure
 with members named for what they are: `GetMous` the buttons and the
 place of the mouse, `OpenFil` what DOS answered and whether that is an
 error, `EdLin` the cursor and whether anything changed, and so on. A
-call that still took such a number apart would not compile. 90 of 114
+call that still took such a number apart would not compile. 92 of 114
 are done: those that files of every kind call, those inside the
-editor, those that another file keeps to itself, and the commands with
+editor, those that another file keeps to itself, the commands with
 what else comes back to the main loop: a command of the keys returns
 the place of the loop where the program goes on, and the panel and the
-item of the menu where that place takes them. Three of the 90 had less
-than two things to return and have no structure. Of the others, 19 are
-the commands of `src/portable_c/enter.c`, which return such a place as
-a number still, 2 go with the two parts of the program, and 3 are
-numbers and stay (see `TODO.md`).
+item of the menu where that place takes them; and the two where one
+part of the program called the other, which went with the two parts.
+Three of the 92 had less than two things to return and have no
+structure. Of the others, 19 are the commands of
+`src/portable_c/enter.c`, which return such a place as a number still,
+and 3 are numbers and stay (see `TODO.md`).
 
 The lines that say something of registers still, and why:
 
 | What | Where | How many |
 |---|---|---|
-| Inline assembly: the instruction and the registers it takes and leaves | `src/portable_c/dos.c`, and `DataSeg` of `main.c` | 10 |
+| Inline assembly: the instruction and the registers it takes and leaves | `src/portable_c/dos.c` | 9 |
 | The compiler's own routines for arithmetic on 32 bits, which it calls with registers of its choosing | `__U4M`, `__U4D` of `arith.c` | 2 |
 | DOS's routine for capitals, which is no function of the program: called through a pointer, with the letter in AL | `CaseMapFn` of `dos.c` | 1 |
-| Where the part that stays in the memory calls the rest of the program, and the rest calls it, through far pointers made when the program runs: the two sides are compiled apart and agree by these lines | `TrnMain` of `vc.h`, `Transit`, `Release`, `SetBrk` of `resident.c`, `ReleaseFn` of `memory.c`, `StaysFn` of `start.c` | 6 |
 | The command for COMMAND.COM's INT 2Eh, in SI as the interrupt takes it, for a function that is inline assembly | `Int2E` of `resident.c` | 1 |
 
-The two functions of `resident.c` among those are `__loadds` besides:
-they are entered with DS anywhere and load it themselves. An interrupt
-function has no such line, since the compiler saves every register for
-it. Seven more lines say that a function does not return, `aborts`,
-one of them with its name.
-
-The names are the compiler's as well. In the C translation a constant
-that another file names has a `#pragma aux` wherever it is defined or
-declared, which takes off the underscore that the compiler puts in
-front: the assembly named it so. `harness/datacheck.py` knows an object
-with the underscore or without, so in the portable C those lines are
-gone too, 361 of them, and with them the three by which a file of
-constants had a second, near name for a text that code names far:
-`src/portable_c/vc.h` declares those texts near in such a file and far
-in any other. What still has its name from a `#pragma aux`:
-
-| What | Why | How many |
-|---|---|---|
-| The functions of `src/portable_c/dos.c` | The file is compiled twice, once into each part of the program, and two copies of a function need two names | 16 |
-| What the part that stays in the memory defines, and `TrnBeg`, where the other part begins | `tools/mkexe.c`, the linker's command and the tests find them in the linker's map by these names, and the other part declares those that it reads | 35, for 24 names |
-| `md`, the main data | It is named as the room of the PSP, which the linker has at offset 0 | 1 |
-| `TrnMain`, as the part that stays names it for its address | An object there, a function where it is defined | 1 |
-
-That leaves 80 lines of `#pragma aux` in the portable C where the C
-translation has 863. Its `VC.EXE` is 132,368 bytes, 688 fewer than the
-C translation's: no effort went into the size. A function that saves
-the registers it uses by the compiler's rule comes out a little longer
-here and a little shorter there, 448 bytes more in all; the structures
-that the commands return are 48 more; the editor is 304 bytes shorter
-for a function that is called where a macro was written out; and what
-loaded the program again after a command, which is gone, was 880
-bytes.
+Eight more lines say that a function does not return, `aborts`, which
+makes 21 lines of `#pragma aux` in the portable C where the C
+translation has 863. None of them gives anything a name but the two of
+`arith.c`, whose names are the compiler's to choose. In the C
+translation a constant that another file names has a `#pragma aux`
+wherever it is defined or declared, which takes off the underscore that
+the compiler puts in front: the assembly named it so.
+`harness/datacheck.py` knows an object with the underscore or without,
+so in the portable C those lines are gone, 361 of them, and with them
+the three by which a file of constants had a second, near name for a
+text that code names far: `src/portable_c/vc.h` declares those texts
+near in such a file and far in any other. What was left beyond that
+while the tree was still two parts, 80 lines in all, the names of what
+the part that stays in the memory defined, of a second copy of `dos.c`
+and of the main data, and the registers where one part called the
+other, went with the two parts.
 
 ### Staying in the memory whole
 
-The original gives most of itself up while a command runs, if its
-Options menu has Memory allocation switched on, as it is distributed:
-a small part stays, runs the command, and loads the rest again from the
-program's file. The portable C does not. It keeps its code in the
-memory, as the original does with the switch off, and the switch is
-gone: the first of the features that only made sense on DOS, which this
-tree is to lose one by one. `src/portable_c/DEVIATIONS.md` has what the
+The original is two parts. One stays in the memory while a command
+runs, with the stack and a copy of the setup and of what the panels
+show; the other, the code and the main data, is given back to DOS for
+the command, and made again afterwards: the main data of the copy, and
+the code, if the Options menu has Memory allocation switched on, by
+loading it from the program's file. The C translation is laid out for
+that, by `tools/mkexe.c`, and most of what [rests on Open
+Watcom](#what-rests-on-open-watcom) there is the two parts held
+together.
+
+The portable C stays in the memory whole, and is one program: the first
+of the features that only made sense on DOS to go from this tree, which
+is to lose them one by one. `src/portable_c/DEVIATIONS.md` has what the
 original does, what the portable C does, why, and the scenarios that
 show it.
 
@@ -638,21 +628,97 @@ What went, and what each thing was for:
 | What | What it was for |
 |---|---|
 | The line Memory allocation of the Options menu, its command `M73_00`, its page of the menu's help, and Shift with Enter | The switch, and the same turned round for one command |
-| In `Exec` of `resident.c`, the block of the code given back to DOS before a command | So that a command had the memory of the code |
-| `Exec10` of `resident.c`, but for its first line: a block asked for, the program's file run as a second copy, its check sum held against the first copy's, and "Bad or missing", with another try or the end of the program | Loading the code again after a command |
-| In `Alloc0`, the entry: the check sum of the file as it is loaded, `ChkFile`, with `AllocS`; and the second copy, which knows itself by its command tail, `OvlPrm`, moves its code into the first copy's block, `MovPars`, and ends | The same, from the side of the file that is loaded |
-| `OvlPth`, where the environment has the path of the program's file | Which file to run for that |
-| `FreMem1`, and the call of DOS that found it | What the Info panel showed for free memory with the switch on: what a command gets when the code is given up |
-| In the map of the memory, the block of the code listed as free | A command would find it free |
+| The block of the code given back to DOS before a command; `Exec10`, which asked for a block, ran the program's file as a second copy, held its check sum against the first copy's and said "Bad or missing"; in the entry, the check sum of the file, and the second copy, which knew itself by its command tail and moved its code into the first copy's block; `OvlPth`, where the environment has the program's file | Giving the code up and loading it again |
+| `FreMem1`, and the call of DOS that found it | What the Info panel showed for free memory with the switch on |
+| The main data given back to DOS in `F21_31`, and asked for again in `Init11`; `WCB1sav`, `WCB2sav` and `ComnIni`, 12.5 KB, with `F21_40` writing a panel there and `Expand` making one of it; `Init00` reading the setup to where that copy is, with no main data yet | Giving the data up and making it again of a copy |
+| `struct Stays`, the group `R_GROUP` and the options `-nd=R -g=R_GROUP`; `Psp`, the room of the PSP at the start of the file; DS on the PSP in `resident.c`, and `md` named to the linker as `Psp` | The part that stays as one segment with the PSP, as a `.COM` file is |
+| `dos.c` compiled a second time, with other names | That part could not call what was not in the memory |
+| `TrnMain` called through a pointer, `Stay`, `Go`, `Stay11`, `TrnAdr`, `TRN_SEG`, `RunPar`; `SetBrk` and `Release` called through pointers and `__loadds`; `ResSeg` and `MemRun`; `STAYS` and the far pointers made of that part's segment in `start.c`, `enter.c`, `memory.c` and `main.c` | One part calling the other, wherever that was after a command |
+| `SecDat` and `DataSeg`, the instruction `MOV DS,AX` | Finding the main data where DOS calls the program, and at the seam |
+| `Reloc`, the relocations of the part that stays applied in the entry, `TrnBeg`, the block of the other part made by writing the header that DOS keeps in front of one, and the seven words that `tools/mkexe.c` wrote into the file | A file that the program loads and relocates itself, time after time |
+| `tools/mkexe.c`, for this tree, with what it checked | Laying that file out, and holding it to what the code took for granted |
 
-What stays of the two parts, for the next step: the program is still
-laid out and built as two, the part that the original keeps and the
-part that it gives up, with everything between them that
-[What rests on Open Watcom](#what-rests-on-open-watcom) lists, and the
-main data is still given back to DOS for a command and made again
-afterwards of what the first part has kept of it. Nothing of that is
-needed by a program that stays whole, and `TODO.md` has it as what
-comes next.
+What stays, because a user or another program sees it, in `resident.c`
+as before but as a file like any other: the commands run through
+COMMAND.COM or its INT 2Eh, with their texts; the watch on DOS, which
+notes the programs that stay in the memory and releases them, with its
+entry of INT 21h that takes nothing of the caller's stack for a call
+that it passes on; DOS's critical error and Ctrl-Break; the interrupts
+taken and given back, also where DOS ends the program by itself; and
+the program's own call, by which a setup program reads and writes its
+setup. Where one of these could not stay as the original has it,
+`DEVIATIONS.md` says what differs.
+
+How the program is laid out now. The linker writes `VC.EXE`, DOS loads
+it and sets the words of it that hold a segment, and it starts at
+`Alloc0` of `resident.c` on the stack that the file's header names. Its
+data is three segments, because it is more than one holds, 62.6 KB of
+main data, 8.9 KB of tables and 4 KB of stack:
+
+- The compiler's own group, `DGROUP`, which DS is on in every function:
+  the main data, `md`, a variable of `main.c` now, and the variables of
+  the other files, which a file may have now. The main data is the
+  first thing of that group, at offset 0, since much of the program
+  takes it to be there: the tables name a place in it by its offset in
+  the structure, and a routine that is handed the main data's segment
+  for a panel's reads the main data as if it were one. That puts it at
+  the start of the file, 62.6 KB of zeros that the C translation's file
+  has not.
+- The tables, the files whose names end in `_t`, which code reads
+  through far pointers as before, in a group of their own.
+- The stack, `stack.c`, in a group of its own and last, so the program
+  ends where its stack does, which is how it knows its length.
+
+The memory of the panels and the viewer is a block that the program
+asks DOS for; for a command it gives back all of that but the panels.
+So the main data, the tables and the stack are still reached in three
+ways, `md` and near pointers, `__far`, and `STACK` for a pointer to a
+local variable, and a constant of a code file is still `CODE`, in the
+code segment: with 12 KB less of main data all four could be one, which
+`TODO.md` has, with what stands in its way and what it waits on.
+
+`VC.EXE` of the portable C is 185,006 bytes, 51,950 more than the C
+translation's: the main data is in the file, the header has the
+relocations that DOS applies, 977 of them, and the part that stayed in
+the memory, with its copies and its second `dos.c`, is gone. While a
+command runs it keeps 194,848 bytes of the memory, the program and its
+panels, where the C translation keeps 19,728 and the original 12,704.
+
+What rests on Open Watcom, for the portable C. Of what the code is
+written in, the first table above: `__far` in 690 places, `STACK` in
+481, `CODE` in 96; `#pragma aux` in 21 lines; `#pragma pack(1)` in 7
+pairs; the five `__interrupt` functions; two `__loadds` functions,
+`Alloc0`, where DOS enters the program, and `Exec2E`, where it goes on
+behind INT 2Eh; the four `__declspec(naked)` functions; the three
+intrinsic functions; the two routines for arithmetic; and, new,
+`#pragma data_seg` in two places, for the main data and for the stack.
+Of what cannot be seen in the code, the seventeen places of the second
+table, seven are left, most in another form, and two are new, 3 and 7
+here:
+
+| | What is relied on | Where it is done | What holds it |
+|---|---|---|---|
+| 1 | The option `-nd=NAME` gives the data of a file a group of its own: `T_GROUP` for the tables, in which a word that names a text is its offset, and `S_GROUP` for the stack | `CMakeLists.txt`, for `src/portable_c/*_t.c` and `stack.c` | `portable_c-data` holds such a word against the offset in the group; every scenario |
+| 2 | The linker's `order` directive, which its help does not list for DOS: the order of the classes | `CMakeLists.txt`, the linker's command | the checks of 3, 4 and 5 |
+| 3 | `#pragma data_seg` makes a segment of the compiler's group, of the class that it names: the main data is of a class of its own, which the linker's command has first, and so is at offset 0 of `DGROUP` and of the program | `src/portable_c/main.c` | the tests refuse a program whose `md` is not at 0 (`facts` of `harness/driver.py`) |
+| 4 | In a file compiled with `-nd=S` the same line makes a segment of the class `STACK` outside `DGROUP`; the linker takes a segment of that class for the stack and names its end in the file's header; given a value, zeros, it is in the file; and the linker's command has it last, so the program ends there | `src/portable_c/stack.c`, `Alloc0` of `resident.c` | `portable_c-scenarios` fails if the stack is not the last of the program, or not in the file |
+| 5 | No code is within 4K of the stack, the tables being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 2; the files of the second code segment in `CMakeLists.txt` | `portable_c-scenarios` reads the linker's map, where `tools/mkexe.c` stopped the build |
+| 6 | The segment of a far pointer made of a near one is DS, `MAIN_SEG` | `src/portable_c/vc.h` | every scenario |
+| 7 | The segment of a far pointer to an object of a group is the group's, and `seg` and `offset` in `_asm` are those of the group too: so the stack that `Int2E` sets is the one that the file's header names, and a table is read at its offset in `AsmSeg` | `src/portable_c/resident.c`, `misc.c` | the scenarios of INT 2Eh, `quick`; every scenario |
+| 8 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with `DGROUP`, as a `__loadds` function does | `src/portable_c/vc.h`, `main.c`, `resident.c` | the scenarios of the critical error and of the programs that stay |
+| 9 | `_enable` is `STI` and `CLD`: the first call of the program, `IntOn`, clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/portable_c/resident.c`, `Alloc0` | every scenario |
+
+Gone are 2, 4 to 7, 9, 10, 12, 15 and 17 of that table, and with 15 the
+rule that a file of code may have no variable and no string: nothing
+checks the object files of the portable C, and nothing has to.
+
+Inline assembly, for the portable C: 79 instructions in 13 pieces. The
+nine of `dos.c` are as in the table above, 46 instructions. `DataSeg` of
+`main.c` is gone. `New21`, `New27` and `Exit01` of `resident.c` are as
+they were, 17, 4 and 4. `Int2E` is 8, where it was 9: `INT 2Eh`, `CLI`,
+`MOV AX` with the segment of the stack, `MOV SS,AX`, `MOV SP`, `STI`,
+`CLD` and the jump; it no longer loads DS, which the function that it
+jumps to does for itself.
 
 ## Testing
 
@@ -943,7 +1009,8 @@ instruction at the address it has in the original. The translation's code is
 not in the memory quite as it is in its file: the program adds the segment
 it is loaded at to the words that its relocation table names, and the file
 is held against the log with those words as the program has them where
-it is.
+it is. For the portable C it is DOS that adds it, by the table in the
+header of the file, and the same holds.
 
 The reserved room is listed in `harness/bytecheck.py`, with the offset and
 length of each piece and a note of what the original has there.

@@ -438,7 +438,7 @@ cursor 0 127 lines 6 7 mode 3
 |║     ║   2381     2     9,776   DRIVER.COM     16 28 33                 ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   25E6     3##########   VC.EXE         1B 21 22 23 24 27        ║   y ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx74 03x2 1Bx1
-|║     ║                                                                  ║     ║| 1Bx3 3Fx27 48x1 3Fx46 03x2 1Bx1
+|║     ║   ####################   free memory                             ║     ║| 1Bx3 3Fx27 48x1 3Fx46 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 3Fx74 03x2 1Bx1

@@ -72,16 +72,13 @@ LAID_OUT(MemLine, 7 + 12 + 1 + MaxVect);
    calls are C, of vc.h, and so is Int21d, by which DOS is asked for the
    map without Intr21, as in the original: see Dos5802 to Dos2523 below.
 
-   ResSeg returns the segment of the part of the program that stays in
-   the memory while a command runs in the original, where Counter,
-   PrgList and Command are: of vc.h. Release, of that part
-   (resident.c), releases a program that has stayed in the memory:
-   `record` is what PrgList has of it. It is called far, at its offset in
-   that part's segment, and loads its own DS. */
-typedef void __far ReleaseFn(u16 record);
-#pragma aux ReleaseFn parm [ax] modify exact [ax]
-extern const u8 __far Release[];
-#pragma aux Release "*"
+   Counter, PrgList and CtrlC are of resident.c, by vc.h: the number of
+   programs that have stayed in the memory and for each the segment
+   where its vectors are noted, and the routine for Ctrl-C. Release, of
+   that file too, releases a program that has stayed: `record` is what
+   PrgList has of it. And the name of the command processor is there,
+   which main.c has a function of the same name as. */
+extern const u8 Command[];
 
 /* C routines of other files that vc.h does not have. MvsBw writes `count`
    characters to the screen buffer in the colour in the high byte of
@@ -92,16 +89,9 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
 u16 HexDec(u16 number);                                 /* format.c */
 
 /* The buttons of the map and their colours, of memory_t.c, which
-   MinMnu takes by their offsets; and what the part of the program that
-   stays has for the map: the number of programs that have stayed too
-   and for each the segment where its vectors are noted, of struct Stays
-   there, and the name of the command processor. */
+   MinMnu takes by their offsets. */
 extern const u8 __far Memo1_P[];
 extern const u8 __far Memo_D[];
-extern const u8 __far Command[];
-#pragma aux Command "*"
-#define Counter STAYS(Counter)
-#define PrgList STAYS(PrgList)
 
 /* What a program that has stayed is noted with, in a segment of its own:
    the segment of the program, its name, the number of vectors it took
@@ -299,25 +289,26 @@ static u16 Dos4452(void)
     return regs.ax & 0xFF;
 }
 
-/* Give Ctrl-C of DOS, interrupt 23h, to the routine at `routine` in the
-   part of the program that stays in the memory. */
-static void Dos2523(u16 routine)
+/* Give Ctrl-C of DOS, interrupt 23h, to the program's routine for it. */
+static void Dos2523(void)
 {
     struct DosRegs regs;
 
-    regs.name = AT(ResSeg(), routine);
+    regs.name = (const u8 __far *)(void __far *)CtrlC;
     regs.ax = 0x2523;
     Int21d((struct DosRegs STACK *)&regs);
 }
 
 /* MCB analisis: list the blocks of DOS in BlkList. Before the first
    stands the place where DOS itself begins, and the first block, which
-   DOS has for its own data, is given to that. The block of the program
-   itself that goes while a command runs, its main data, is listed as
-   free. The original lists a second one so if it is set up to give its
-   code up as well, Memory allocation: all that is not the part that
-   stays. The list ends with where the memory ends, as a block that
-   nobody has, and a word 0. */
+   DOS has for its own data, is given to that. What the program itself
+   gives back to DOS while a command runs is listed as free: of its
+   block for the panels and the viewer all but the panels, as GiveMem of
+   start.c leaves it, which is as if a block began behind them, with
+   the header that DOS will put there. The original lists as free what
+   it gives back: its main data with the panels, and its code as well if
+   it is set up so, Memory allocation. The list ends with where the
+   memory ends, as a block that nobody has, and a word 0. */
 static void F65_01(void)
 {
     u16 *list = BlkList;
@@ -334,6 +325,10 @@ static void F65_01(void)
     for (;;) {
         *list++ = block;
         *list++ = owner;
+        if (block == md.MemSeg) {
+            *list++ = block + 2 * PANEL_PARAS + 1;
+            *list++ = 0;
+        }
         next = header + WORD_AT(header, 3) + 1;
         last = *AT(header, 0) != 'M';
         header = next;
@@ -341,8 +336,6 @@ static void F65_01(void)
         if (last)
             break;
         owner = WORD_AT(header, 1);
-        if (block == MAIN_SEG)
-            owner = 0;
     }
     *list++ = block;
     *list++ = 0;
@@ -438,9 +431,9 @@ static void F65_05(void)
             goto F65_30;
         }
         /* Releasable program */
-        programs = WORD_AT(ResSeg(), OFFSET(Counter));
+        programs = Counter;
         for (i = 0; i < programs; i++) {
-            program = WORD_AT(ResSeg(), OFFSET(PrgList) + 2 * i);
+            program = PrgList[i];
             if (address == WORD_AT(program, PRG_PSP)) {
                 line->flags |= CAN_GO;
                 line->hooked = *AT(program, PRG_VECTORS);
@@ -483,7 +476,7 @@ static void F65_05(void)
         } else {
             if ((u8)md.VerDOS >= 4 || address != WORD_AT(address, 0x16))
                 goto F65_24;
-            name = AT(ResSeg(), OFFSET(Command));
+            name = (const u8 __far *)Command;
         }
         name = CutPath(name);
         if (*name != 0) {
@@ -853,7 +846,7 @@ F65_74:
     /* ErrBuf says of every vector whether a program that stays has it. */
     for (i = 0; i < 256; i++)
         ((u8 *)md.ErrBuf)[i] = 0;
-    programs = WORD_AT(ResSeg(), OFFSET(Counter));
+    programs = Counter;
     if (programs == 0) {
         first = (u16)md.ErrBuf + 256;   /* what the assembly has in DI */
         goto F65_40;
@@ -862,7 +855,7 @@ F65_74:
     CurMous(0);
     RestVct();                          /* Restore vectors */
     do {                                /* Release, the last first */
-        program = WORD_AT(ResSeg(), OFFSET(PrgList) + 2 * (programs - 1));
+        program = PrgList[programs - 1];
         for (line = MemList; ; line++) {
             if (line->address == 0)
                 goto F65_82;
@@ -878,13 +871,14 @@ F65_74:
                     break;
                 }
         if (release)
-            ((ReleaseFn *)((u32)ResSeg() << 16 | OFFSET(Release)))(program);
+            Release(program);
         else
             for (i = 0; i < n; i++)
                 ((u8 *)md.ErrBuf)[*AT(program, PRG_VECTOR(i))] = 1;
 F65_82: ;
     } while (--programs);
-    Dos2523(HookVct());                 /* Set vectors */
+    HookVct();                          /* Set vectors */
+    Dos2523();
     IniMous();                          /* Restore mouse */
 
 F65_83:                                 /* Exit */

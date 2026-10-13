@@ -40,6 +40,14 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 #define ARCHIVE     0x20                /* the attribute of a file that
                                            has changed */
 
+/* The setup as the main loop last found it, the bytes that the file
+   would hold: by it the loop tells whether the setup has changed and is
+   to be saved (Func05 in main.c). Without the letters V at its start it
+   is none, as when the program has just started or come back from a
+   command. The original keeps it in the part of it that stays in the
+   memory while a command runs, where the copy of a panel is then. */
+u8 IniSave[INI_LEN];
+
 /* What the file holds of a panel, to `to`. The mask of the panel and its
    path are filled with zeros behind their ends first, in the panel
    itself. Returns where the next bytes go. */

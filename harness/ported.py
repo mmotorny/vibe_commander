@@ -62,7 +62,7 @@ from dataclasses import dataclass, field, replace
 import compare
 import coverage
 import deviations
-from driver import COM_ORIGIN, EXE_HEADER
+from driver import COM_ORIGIN
 import goldens
 import scenarios
 import setups
@@ -71,6 +71,14 @@ import setups
 # How large the translation may grow, as a multiple of the original's size.
 # The aim is to stay well below; this is where growth must have gone wrong.
 SIZE_LIMIT = 3
+
+# Where a segment of compiled code may end at the most, counted from where
+# its segment register points, and how far code has to be from the stack:
+# both for the machine of the tests, not for the program. tools/mkexe.c
+# holds the C translation to them when it is built, and says why at its
+# top; check_layout() holds a program that the linker wrote.
+CODE_END = 0xF000
+PAGE = 0x1000
 
 # How much of its stack the translation must leave untouched in every
 # scenario: one part in this many, half of it. The stack is made long enough
@@ -1067,6 +1075,18 @@ GONE = {
 }
 
 
+# Functions of the batches that a tree has under another name: tree ->
+# function -> the name that its link map has for it, and why.
+RENAMED = {
+    "portable_c": {
+        "TrnMain_c": ("Main_", "the program from when DOS has loaded it: "
+                      "the original's part that stays in the memory "
+                      "jumps to the rest of it there, which is no other "
+                      "part in the portable C"),
+    },
+}
+
+
 def check_original(listing, ran):
     """Report on the assembly that has been replaced; return success.
 
@@ -1107,12 +1127,20 @@ def linked_as(symbols, name):
     raise KeyError(f"the link map has no function {name}")
 
 
-def check_translation(link_map, executed, tree):
+def check_translation(link_map, executed, tree, origin):
     """Report on the C functions that replace it; return success. `tree`
-    is the tree that is checked: what GONE has for it is to be gone."""
+    is the tree that is checked: what GONE has for it is to be gone.
+    `origin` is where the file has what the map has at 0, as
+    coverage.origin() says it."""
     symbols = coverage.link_map(link_map)
     gone = GONE.get(tree, {})
+    renamed = RENAMED.get(tree, {})
     passed = True
+    for name in sorted(set(renamed) - {name for batch in BATCHES
+                                       for name in batch.functions}):
+        passed = False
+        print(f"  listed as renamed in {tree}, and no function of a "
+              f"batch: {name}")
     for name in sorted(set(gone) - {name for batch in BATCHES
                                     for name in batch.functions}):
         passed = False
@@ -1130,9 +1158,18 @@ def check_translation(link_map, executed, tree):
                     print(f"  listed as gone from {tree}, but linked: "
                           f"{name}")
                 continue
+            if name in renamed:
+                if name in symbols:
+                    passed = False
+                    print(f"  listed as renamed in {tree}, but linked: "
+                          f"{name}")
+                    continue
+                print(f"  in {tree} {name} is {renamed[name][0]}: "
+                      f"{renamed[name][1]}")
+                name = renamed[name][0]
             segment, offset = linked_as(symbols, name)
             start = segment * 16 + offset
-            if start - COM_ORIGIN + EXE_HEADER not in executed:
+            if start + origin not in executed:
                 passed = False
                 print(f"  not executed in the translation: {name}")
         print(f"{batch.title}: {len(batch.functions)} C functions of "
@@ -1161,6 +1198,59 @@ def check_stack(link_map, names, runs):
             print(f"  too little of the stack left: {left[name]} bytes in "
                   f"{name}")
     return left[least] >= limit
+
+
+def check_layout(program):
+    """Report on how `program`, a build of a C tree, is laid out, as far
+    as the machine of the tests cares; return success. For a file that
+    tools/mkexe.c made that tool has seen to it.
+
+    Between the end of a segment and its beginning a near call goes the
+    short way, around the end of the 64K, and the linker makes such
+    calls of the far calls between two files of a segment. QEMU, as of
+    11.1, leaves the wrapping out where the call and the place it would
+    go to without wrapping are in one 4K page, and goes on 64K off: so
+    no segment of code may reach into the last 4K of its 64K. And QEMU
+    is many times slower at a write to a page that has code which it has
+    run, and a push is a write: so no code within 4K of the stack."""
+    if coverage.made_by_mkexe(program.contents):
+        return True
+    found = coverage.segments(program.linked)
+    bottom, top = coverage.stack(program.linked)
+    passed = True
+    code = [(name, at * 16 + offset, offset, size)
+            for name, kind, at, offset, size in found
+            if kind == "CCODE" and size]
+    if not code:
+        print(f"  {program.linked} lists no segment of compiled code")
+        return False
+    for name, begin, offset, size in code:
+        if offset + size > CODE_END:
+            passed = False
+            print(f"  segment {name} ends at {offset + size:X}h, and "
+                  f"compiled code may not reach beyond {CODE_END:X}h: a "
+                  "call from there to the beginning of the segment goes "
+                  "around the end of its 64K, which the machine of the "
+                  "tests gets wrong. Have a file compiled into another "
+                  "segment: see add_portable_c in CMakeLists.txt")
+        if begin < top + PAGE and begin + size > bottom - PAGE:
+            passed = False
+            print(f"  segment {name} has code within 4K of the stack, "
+                  "which makes the machine of the tests many times "
+                  "slower: have the tables stand between the two, by the "
+                  "linker's command in CMakeLists.txt")
+    end = max(at * 16 + offset + size for _, _, at, offset, size in found)
+    if top != end:
+        passed = False
+        print("  the stack is not the last of the program, which takes "
+              "itself to end where its stack does (Alloc0 of "
+              "src/portable_c/resident.c): see the linker's command in "
+              "CMakeLists.txt")
+    print("The layout: " + ", ".join(
+        f"{name} ends at {offset + size:X}h" for name, _, offset, size in code)
+        + f"; the limit is {CODE_END:X}h, no code is within 4K of the "
+        "stack, and the stack is the last of the program")
+    return passed
 
 
 def check_declared(tree, names):
@@ -1261,6 +1351,8 @@ def main():
           f"times the original's {len(original.contents)}; the limit is "
           f"{SIZE_LIMIT} times")
 
+    if not check_layout(translation):
+        sys.exit(1)
     names = scenarios.names(translation.tree)
     failed, runs = compare.compare(names, translation, trace=True,
                                    stack=True)
@@ -1273,7 +1365,8 @@ def main():
         in_translation.update(run.executed)
     passed = check_original(coverage.Listing(args.listing), in_original)
     passed = check_translation(args.link_map, in_translation,
-                               translation.tree) and passed
+                               translation.tree,
+                               coverage.origin(translation.contents)) and passed
     passed = check_stack(args.link_map, names, runs) and passed
     passed = check_declared(translation.tree, names) and passed
     passed = check_comparison(names[0], runs[0], translation) and passed

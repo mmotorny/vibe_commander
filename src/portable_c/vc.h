@@ -1,22 +1,31 @@
 /*
  * Volkov Commander in C: what its parts share.
  *
- * The program was translated from assembly a few routines at a time, with
- * both halves running as one program all the while. So the C code lives
- * in the world the assembly built, which is not the one a C compiler
- * assumes:
+ * The program was translated from assembly a few routines at a time, and
+ * the portable C began as a copy of that translation. So the C code still
+ * has much of the world that the assembly built, which is not the one a C
+ * compiler assumes:
  *
- *   - DS points at the main data segment, a block that the program
- *     allocates when it starts. It holds one struct MainDat and nothing
- *     else, so C code has no static data of its own.
- *   - Constants sit in the code segment, as they do in the assembly.
- *     Declare them CODE. String literals are not available, but to give
- *     such a constant its contents. The tables that the program names
- *     by their offsets, boxes and dialogs with their texts, are in files
- *     of their own: see tables.h.
+ *   - DS points at the program's data, the compiler's group, in every
+ *     function: the main data, one struct MainDat, md, which is the
+ *     first thing there, and the few variables that files have of their
+ *     own. A near pointer is an offset there, and md is at offset 0, so
+ *     a place in the main data is its offset in the structure, as the
+ *     original has it.
+ *   - Constants sit in the code segment, as they do in the assembly:
+ *     those declared CODE. The tables that the program names by their
+ *     offsets, boxes and dialogs with their texts, are in files of
+ *     their own, and in a segment of their own: see tables.h.
  *   - The stack is in a third segment. A pointer to a local variable must
  *     be declared STACK.
- *   - Each file panel has a segment to itself, reached by far pointers.
+ *   - Each file panel has a segment to itself, reached by far pointers,
+ *     in a block of the memory that the program asks DOS for.
+ *
+ * The main data, the tables and the stack are three segments because
+ * they are more than one holds: 62.6 KB, 8.9 KB and 4 KB. The original
+ * has the main data in a block that it asks DOS for and gives back
+ * while a command runs; here it is of the program, which stays in the
+ * memory whole (see DEVIATIONS.md).
  *
  * Routines keep the names they have in the assembly source, and data keeps
  * its layout: the structures below are those of the original's VC.ASM, in
@@ -49,6 +58,8 @@ typedef unsigned long  u32;
 #define LenPath 68                      /* Length of path name */
 #define MinFls  256                     /* Minimum files in window */
 #define MinTree 768                     /* Minimum tree size */
+#define LenStk  0x1000                  /* Stack size: the original has
+                                           100h */
 #define MaxLins 50                      /* Maximum screen lines */
 #define NmbStrs 32                      /* Number of stars */
 
@@ -227,8 +238,13 @@ struct MainDat {
     u16 WCB1seg;
     u16 WCB2seg;
     u16 ViewSeg;
-    u16 FreMem1;                        /* not set here */
-    u16 FreMem2;
+    u16 MemSeg;                         /* The block of the memory that
+                                           the panels and the viewer are
+                                           in. The original has a number
+                                           for the Info here, FreMem1 */
+    u16 FreMem2;                        /* How many paragraphs it is from
+                                           the main data to the end of
+                                           that block */
     u16 Memorys;
     u16 HstAdr;
     u16 TreAdr;
@@ -304,71 +320,51 @@ LAID_OUT(FILENT, 0x18);
 LAID_OUT(MainDat, 0xF48B);
 LAID_OUT(WCBdef, 0x1A62);
 
-/* The main data segment, which DS points at: a block of the memory that
-   the program asks DOS for, and so no object of the program's but a
-   layout at offset 0 of DS. To the compiler it is an object like any
-   other, of which it takes near addresses and makes far ones with DS.
-   To the linker it has to be at offset 0 of something, and is named as
-   what the program has there: Psp of resident.c, the room of the PSP.
-   That rests on this compiler and its linker, which takes the offset
-   of an object in the group that the object is of. A layout at the
-   number 0 will not do, (*(struct MainDat __near *)0): the compiler
-   makes a far pointer of an address that is a number with the segment
-   0, not with DS, where a text of the main data is handed to a
-   function that takes a far one. */
-extern struct MainDat __near md;
-#pragma aux md "Psp"
+/* The main data, which is the first thing of the segment that DS points
+   at: main.c has the object, and says how it comes to be first. Much
+   of the program takes it to be at offset 0 there: the tables name a
+   place in it by the offset in the structure, and where a routine is
+   handed the main data's segment in place of a panel's, it reads the
+   main data as if it were one. */
+extern struct MainDat md;
 
-/* What the part of the program that stays in the memory while a command
-   runs keeps there (resident.c), in the order of the original: the
-   interrupts as they were when a program was last run, with what the
-   BIOS keeps at 40h:A8h behind them; where INT 22h and INT 27h went
-   before the program took them; where that part calls the rest of the
-   program, a far address; the programs that have stayed in the memory,
-   each by the segment of its record; the name of the program run last;
-   and what is kept of the two panels and of the main data while a
-   command runs: of a panel what a WCBdef has before ExtBuf and of each
-   file of its list the first 13 bytes, of the main data what it has
-   before DosLin. The setup file is read across the three, so they stand
-   one behind the other.
-
-   resident.c has the structure itself, and DS on it. The rest of the
-   program reaches it through far pointers: the segment is that of the
-   stack, and STAYS is the place of a member, of which a file takes the
-   offset as of any object that it names. */
-#define MaxProg 18                      /* Maximal resident quantaty */
-#define STAYS_WCB \
-    ((u16)(u32)&((struct WCBdef __far *)0)->ExtBuf + 13 * MinFls)
-#define STAYS_CMN ((u16)&((struct MainDat *)0)->DosLin)
-
-#pragma pack(push, 1)
-struct Stays {
-    u32 IntTab[256];
-    u32 SavePtr;
-    u32 Vect22;
-    u32 Vect27;
-    u32 TrnAdr;
-    u16 Counter;
-    u16 PrgList[MaxProg];
-    u8  NameBuf[12];
-    u8  WCB1sav[STAYS_WCB];
-    u8  WCB2sav[STAYS_WCB];
-    u8  ComnIni[STAYS_CMN];
-};
-#pragma pack(pop)
-
-#ifndef RESIDENT
-extern struct Stays __far Stays;
-#pragma aux Stays "*"
-#define STAYS(member) (&Stays.member)
+/* The stack, of stack.c: LenStk bytes in a segment of their own, the
+   last of the program. */
+#ifndef STACK_C
+extern u8 __far Stack[];
 #endif
+
+/* What the program knows of DOS around it, resident.c: the segment of
+   its PSP; the programs that have stayed in the memory since it was
+   started, how many and each by the segment of its record, for the map
+   of the memory. Of its routines there, Alloc0 is where the program
+   begins. TakeDos has the program go on in Exit01 when DOS ends it, and
+   takes INT 21h and INT 27h if it is to know of programs that stay.
+   SetBrk notes whether DOS looks for Ctrl-C at every call, has it not
+   do so, and takes Ctrl-C, for CtrlC, which only returns. Exec runs the
+   commands of DosBuf. Release takes a program that has stayed out of
+   the memory, by its record. AlocEr says that there is no memory and
+   leaves, with `bx` for what the original has in BX there, and Exit00
+   leaves with what DOS is to be told. */
+#define MaxProg 18                      /* Maximal resident quantaty */
+extern u16 PspSeg;
+extern u16 Counter;
+extern u16 PrgList[MaxProg];
+void TakeDos(void);
+void SetBrk(void);
+void __interrupt __far CtrlC(void);
+void Exec(void);
+void Release(u16 record);
+void AlocEr(u16 bx);
+void Exit00(u16 code);
+#pragma aux AlocEr aborts
+#pragma aux Exit00 aborts
 
 /* Texts that the code of more than one file shows: the first two are
    constants of main_t.c, the third is one of treebox_t.c. They are in
-   the group of the constants, and code reads them as far objects, so
-   naming one costs a relocation. A file of constants, which is one that
-   has tables.h and this by that, names them as lines of its boxes, by
-   near words: there they are near. */
+   the segment of the tables, and code reads them as far objects. A file
+   of tables, which is one that has tables.h and this by that, names
+   them as lines of its boxes, by near words: there they are near. */
 #ifdef TABLES_H
 #define TEXT_FAR
 #else
@@ -429,9 +425,9 @@ enum {
 };
 u16 FncCall(u16 attributes);
 /* RestVct gives the vectors of the critical error and of Ctrl-Break back
-   to whoever had them, and HookVct takes them again: it returns where
-   its routine for Ctrl-Break is, in the part of the program that stays
-   in the memory. Quit puts back what DOS had on the screen before the
+   to whoever had them, and HookVct takes them again: it returns the
+   offset of its routine for Ctrl-Break, CtrlC of resident.c. Quit puts
+   back what DOS had on the screen before the
    program drew over it, but for the line of the key bar, which is blank
    if there is one. ErrRdy says that the disk of a drive cannot be read
    and asks for another drive: it returns the letter in the low byte, or
@@ -440,26 +436,6 @@ void RestVct(void);
 u16 HookVct(void);
 void Quit(void);
 u16 ErrRdy(u16 letter);
-/* The start of the program, start.c. Init00 reads the setup, when the
-   program has been loaded, and Init11 asks DOS for the main data, when it
-   has, and after every command: `stays` is the segment of the part of
-   the program that stays in the memory while a command runs, and `block`
-   that of the block of memory that the rest is in. Init11 returns the
-   segment of the main data, or 0 if there is too little memory, and then
-   in the high word how many paragraphs there were. Neither has DS on the
-   main data. IniData, which has, makes the main data of what that part
-   has kept, and finds out about the machine. TrnMain of main.c is what
-   the part that stays calls, with something that is not 0 when the
-   program has just been loaded: it calls these and the main loop, and
-   returns what that part is to do, in the low word: 100h to run the
-   commands of DosBuf, 200h to say that there is no memory and leave,
-   with the paragraphs in the high word, and less to leave, with that
-   for DOS. See Go of resident.c. */
-void Init00(u16 stays);
-u32 Init11(u16 stays, u16 block);
-void IniData(void);
-u32 TrnMain(u16 first);
-#pragma aux TrnMain "*_c" __far parm [ax] value [dx ax] modify exact [ax dx]
 /* Read what a panel shows, keeping the cursor of a list of files and
    what is selected in it if `keep` is not 0: not 0 if it could not be
    read. See read.c. */
@@ -486,6 +462,33 @@ struct Label GetVol(u8 *volume);
 u16 MakeIni(void);
 struct Answer SaveSet(void);
 
+/* How many paragraphs a panel takes that has room for the fewest files.
+   The two panels are what the program keeps of its block of memory
+   while a command runs. */
+#define PANEL_PARAS (((sizeof(struct WCBdef) - 1) >> 4) + 1)
+
+/* The start of the program, start.c. Init00 reads the setup, when the
+   program has been loaded, and Init11 then asks DOS for the memory of
+   the panels and the viewer, all that there is, and makes the panels:
+   it answers with how many paragraphs there were, and whether that is
+   too few. IniData finds out about the machine, then and after every
+   command. GiveMem gives all of that memory but the panels back to DOS,
+   for a command, and TakeMem takes it again afterwards, and answers as
+   Init11 does. Main of main.c is the program from when DOS has loaded it:
+   Alloc0 of resident.c calls it, and it does not return. Again of
+   main.c is where the program goes on when commands have been run on a
+   stack that was set anew, behind COMMAND.COM's own interrupt for
+   them. */
+void Init00(void);
+struct Answer Init11(void);
+void IniData(void);
+void GiveMem(void);
+struct Answer TakeMem(void);
+void Main(void);
+void Again(void);
+#pragma aux Main aborts
+#pragma aux Again aborts
+
 /* What the setup file holds: three letters V, of each panel what a
    WCBdef has before CurAdr, of the main data what it has before LoadRes,
    and the sum of all these bytes. */
@@ -497,18 +500,10 @@ struct Answer SaveSet(void);
    dos.c, which has every software interrupt of the C code and what each
    is for. Nothing else calls one.
 
-   The part of the program that stays in the memory while a command runs
-   (resident.c) cannot call them: they are of the part that goes, and
-   not in the memory then. So the build compiles dos.c a second time, into
-   that part, with RESIDENT defined as it is for resident.c: the names of
-   the second copy end otherwise, and resident.c calls those. That is all
-   that the #pragma aux of each says here, the name that the linker has
-   for it: two copies of one function cannot have one name. */
-#ifdef RESIDENT
-#define DOS_NAME "*_r"
-#else
-#define DOS_NAME "*_c"
-#endif
+   The original keeps a part of itself in the memory while a command
+   runs, which calls DOS too and cannot call what is not there then:
+   the C translation compiles dos.c twice for that. Here it is compiled
+   once. */
 struct MouseAt {                        /* what the mouse driver says: */
     u16 buttons;                        /* the buttons held, the left one 1,
                                            the right one 2, the middle 4 */
@@ -541,22 +536,6 @@ void IntOff(void);
 void IntOn(void);
 void Int28(void);
 void DvPause(void);
-#pragma aux Int21d  DOS_NAME
-#pragma aux Int21f  DOS_NAME
-#pragma aux Int21e  DOS_NAME
-#pragma aux Int10   DOS_NAME
-#pragma aux TopView DOS_NAME
-#pragma aux TopScr  DOS_NAME
-#pragma aux Int16   DOS_NAME
-#pragma aux Int2F   DOS_NAME
-#pragma aux Int33   DOS_NAME
-#pragma aux MousAt  DOS_NAME
-#pragma aux CaseMap DOS_NAME
-#pragma aux InPort  DOS_NAME
-#pragma aux IntOff  DOS_NAME
-#pragma aux IntOn   DOS_NAME
-#pragma aux Int28   DOS_NAME
-#pragma aux DvPause DOS_NAME
 
 /* The registers as an interrupt function of the compiler saves them on
    the stack and puts them back: its first parameter. */
@@ -737,11 +716,10 @@ enum {
                                            panel that it has put there for
                                            the menu's routines */
     NEXT_POP_FUNC05,
-    NEXT_INIT11,                        /* start over from what F21_30 has
-                                           saved in the part of the program
-                                           that stays in the memory */
-    NEXT_EXEC,                          /* and first have that part run
-                                           the commands saved there */
+    NEXT_INIT11,                        /* start over as after a command:
+                                           F21_30 has left the panels */
+    NEXT_EXEC,                          /* and first have the commands of
+                                           DosBuf run */
     NEXT_VIEW,                          /* V00_00: the viewer on the file
                                            ViewFil */
     NEXT_EDIT,                          /* the same with 1 in DL: the
@@ -1037,12 +1015,10 @@ u16 F32_00(u16 main);
 u16 F62_01(u16 panel, u16 item);
 struct Picked F39_00(u16 again, u16 panel);
 
-/* Save the setup, the command line and the panels in the part of the
-   program that stays in the memory, and give up the main data, for that
-   part to run what the command line holds: returns NEXT_EXEC, or
-   NEXT_INIT11 if there is nothing to run, for the command to return in
-   its turn. See
-   enter.c. */
+/* Make the program ready for what the command line holds to be run: the
+   interrupts given back, the screen as DOS left it. Returns NEXT_EXEC,
+   or NEXT_INIT11 if there is nothing to run, for the command to return
+   in its turn. See enter.c. */
 u32 F21_30(void);
 /* The commands of a line of an extension file or a menu file, in
    MenuBuf: F34_30 looks for the next one from `text`, and F34_40 at
@@ -1244,14 +1220,10 @@ void Blank(void);
 void LeaveTm(void);
 /* Small ones: see each in misc.c. PgUp and PgDn return where a list is
    after a page up or down. AsmSeg is the
-   segment of the program's constants, the texts and tables of the files
-   whose names end in _t, where what is known by its offset is read;
-   ResSeg that of the part of the program that stays in the memory while
-   a command runs, where the stack is; and MemRun that of the part that
-   goes then, which this code is of. None of the three needs DS. */
+   segment of the program's tables, the texts, boxes and dialogs of the
+   files whose names end in _t, where what is known by its offset is
+   read. */
 u16 AsmSeg(void);
-u16 ResSeg(void);
-u16 MemRun(void);
 u16 IsCrLf(u16 word);
 u16 InvVar(u8 __far *variable);
 u16 ChkSum(const u8 *data, u16 length);
@@ -1263,7 +1235,8 @@ struct Paged PgUp(u16 cursor, u16 first, u16 rows);
 struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 
 /* The segment of the main data, as a number: this compiler makes a far
-   pointer of a near one with DS, and that is not read anywhere else. */
+   pointer of a near one with DS, and that is not read anywhere else. It
+   is the segment of all that DS is on. */
 #define MAIN_SEG ((u16)((u32)(void __far *)&md >> 16))
 
 /* The panel that a file entry belongs to. */

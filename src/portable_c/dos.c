@@ -11,7 +11,7 @@
  * No other file calls DOS, the BIOS or the mouse driver: the rest of the
  * program calls these functions in plain C. What other inline assembly
  * there is, is where interrupts arrive and where COMMAND.COM's is called,
- * in resident.c, and one instruction of main.c. The ports of the machine
+ * in resident.c. The ports of the machine
  * and its interrupt flag are here too.
  * They need no assembly, the compiler has intrinsic functions for them, but
  * they are the machine all the same.
@@ -172,9 +172,9 @@ u16 Int21f(struct DosRegs STACK *regs, u16 carry)
 }
 
 /* The same as Int21d with ES as `regs` has it: for the calls of DOS that
-   take a block of the memory there which is not the main data. The
-   program makes the block that its code is in another size like this
-   (AH 4Ah) when it starts. */
+   take a block of the memory there. The program makes the block that it
+   is in another size like this (AH 4Ah) when it starts, and that of its
+   panels around a command. */
 u16 Int21e(struct DosRegs STACK *regs)
 {
     return Dos(regs, 0);

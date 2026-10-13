@@ -24,6 +24,11 @@ time of the attributes, the label of a drive. The other two had less
 than two things: `F36_04` of `copy.c` returns nothing, and `MenuItem`
 of `usermenu.c` is gone.
 
+The two of the seam between the two parts of the program are gone with
+the seam: `Init11` of `start.c` answers how much memory there was and
+whether that is too little, as `TakeMem` does, and `TrnMain` of `main.c`
+is `Main`, which does not return.
+
 So do the commands and what else comes back to the main loop, 49
 functions, all but those of `enter.c`:
 
@@ -46,7 +51,7 @@ functions, all but those of `enter.c`:
   menu bar, `F39_00` of `menu.c`: the menu, the item, the table of the
   commands and what was held down, `struct Picked`.
 
-24 are left, and `python3 tools/pairs.py` lists them as they stand, by
+22 are left, and `python3 tools/pairs.py` lists them as they stand, by
 file, with the files that call each:
 
 - 19, the commands of `enter.c`: Enter, the directory changed, the
@@ -60,10 +65,8 @@ file, with the files that call each:
   `OfEnter`, the declarations in `vc.h` and its comment at `struct
   Onward` are all that changes outside `enter.c`, and a call left as it
   is does not compile either way. `F27_07` and `F27_06` there return
-  one place from every return. This waits for the work below, "one
-  program", which changes that file.
-- 2 of the seam between the two parts of the program, `Init11` of
-  `start.c` and `TrnMain` of `main.c`, which go with that.
+  one place from every return. This waited for the work below, "one
+  program", which changed that file, and can go on.
 - 3 that are numbers and stay: `Timer`, `__U4M`, and `Dos35` of
   `main.c`, an address as DOS has it.
 
@@ -80,52 +83,133 @@ went wrong on the way.
 ## The portable C: one program
 
 The portable C stays in the memory whole while a command runs
-(`src/portable_c/DEVIATIONS.md`, the first entry). So far that is a
-change of what it does, and the least one: it never gives up its code,
-never loads itself again, and has no Memory allocation in its Options
-menu. It is still laid out, built and written as the two parts that the
-original is, one that stays and one that goes, and that is what is left:
+(`src/portable_c/DEVIATIONS.md`, the first entry), and is one program:
+the linker writes its file, DOS loads and relocates it, its main data is
+a variable, and it has no part that stays, no copy of anything and no
+tool that lays it out (the README, "Staying in the memory whole", has
+what went and what is left of what rests on Open Watcom). What that has
+left open:
 
-- The main data is still given back to DOS for a command and asked for
-  again afterwards, and made of what the first part keeps of it
-  meanwhile: `F21_31` and `F21_40` of `src/portable_c/enter.c`, `Init11`
-  and `Expand` of `start.c`, and `WCB1sav`, `WCB2sav` and `ComnIni` of
-  `struct Stays`. A program that stays whole keeps its main data and its
-  panels where they are, in a block that it makes shorter for the
-  command, as `src/portable_c/view.c` already does around a viewer or an
-  editor of the user's. What is then to be settled, since each can be
-  seen: the map of the memory, which lists the main data as free
-  because a command finds it free; the Info panel's free memory; what
-  the program's own call of DOS, AH 2Bh with 'VC' and 'OM', hands a
-  setup program, which today is those three copies, of a panel its
-  files as 13 bytes each; the 256 files of a panel that are kept across
-  a command; and where the main data goes when a program has stayed in
-  the memory behind it.
-- The two parts themselves: `resident.c` with its own group, its own
-  copy of `dos.c`, DS on the PSP and the far pointers made at run time
-  between it and the rest, `TrnMain`, `SetBrk`, `Release`, `TRN_SEG`,
-  `ResSeg`, `MemRun`, `AsmSeg`; the block of the code made by writing
-  the header that DOS keeps in front of one, in `Alloc0`; the linker's
-  relocations applied by the program, `Reloc`; and `tools/mkexe.c`,
-  which lays the file out for all that and holds it. With one program
-  the linker can write the file, DOS relocate it, and most of the
-  seventeen places of the README's "What rests on Open Watcom" go. What
-  has to stay, in one program: the interrupt functions, and the entry
-  of INT 21h that takes nothing of its caller's stack for a call that
-  it passes on.
-- The memory model, when the program is one: whether its data can be
-  one group with DS on it and the stack in it, so that `STACK`, `CODE`
-  and the far pointers to constants go. The main data is 62.6 KB, the
-  constants 8.9 KB and the stack 4 KB, 11 KB more than a segment holds;
-  the tree of directories has 12 KB of the main data.
+- The memory model. The program's data is three segments, each reached
+  in its own way: the compiler's group with the main data, which DS is
+  on; the tables, `__far` through `AsmSeg`; and the stack, for which a
+  pointer to a local variable is `STACK`, in 481 places. A constant of a
+  code file is `CODE`, in the code segment, in 96. With one group that
+  DS and SS are both on, all of that is plain C. It is not in hand: it
+  waits on the decision whether 16-bit DOS stays a target, since in a
+  flat build of 32 bits these qualifiers fall away by themselves. What
+  was found out about getting there, should it be done:
+  - It does not fit: the main data is 62,603 bytes, the variables of
+    `resident.c` and the saved setup 1,764, the tables 8,909 and the
+    stack 4,096, 77 KB in a segment of 64. Some 13 KB of the main data
+    have to leave it for far arrays of their own. The cheapest are not
+    the tree of directories, `TreeBuf`, 12.3 KB with some 110 places
+    that read it by near addresses kept in `TreAdr` and its like, but
+    `UserScr`, 7,840 bytes that four places name, which makes room for
+    the stack, and `ErrBuf1`, 7,392 that five name, three of them words
+    of tables, which with it makes room for the tables.
+  - The main data can stay where it is, at offset 0 and at the start of
+    the file, with the tables and the stack behind it in the group: its
+    zeros are in the file already. Much of the program takes it to be
+    at 0: the tables, which name a place in it by `MD_AT`, the offset
+    in the structure, 199 times; the routines that are handed
+    `MAIN_SEG` for a panel and read the main data as one,
+    `PANEL(MAIN_SEG)` by way of `BegBX`, `PutPrm`, `ClsLine`, `M60_02`,
+    which run at every command; three calls of DOS whose DX is made of
+    `&md` and a number, in `start.c` and `main.c`; and the driver of
+    the tests, which reads `AutoTim` and `Clock` at the original's
+    offsets from DS.
+  - A buffer taken out of the middle of the main data moves what stands
+    behind it, and the tables name `WinBuf` 40 times, `ErrBuf` 27 and
+    `ErrBuf1` and `HelpBuf` by numbers that the data's test holds
+    against the original's. The test would have to be told: a word that
+    the original has as a place of the main data behind the buffer,
+    and the portable C has as that less the buffer's length.
+  - The stack in the group wants SS on the group when the program
+    starts, and the linker has SS on the stack's own segment unless that
+    is the first thing of the group, where the main data is: so some
+    seven instructions at the entry, as every C library has them and as
+    `Int2E` has them behind INT 2Eh, in place of `__loadds`. And the
+    tables, or something else that is no code, have to stand between
+    the stack and the code, for QEMU.
+  - The program is entered on stacks that are not its own, where SS is
+    not DS whatever the model, and a pointer to a local variable stays
+    `STACK`, or far. The watch on DOS always is: `New21`, `Int21`,
+    `Int27`, `Exit05` and what they call in `resident.c`, with `Int21e`
+    and `Int10` of `dos.c`; that is two files, which could keep the
+    word while the rest loses it. But the critical error is entered so
+    too, when DOS has one while a viewer or an editor of the user's
+    runs: `view.c` runs those with INT 24h still the program's, as the
+    original does, so `FatErr` and everything that a box with its
+    dialog, its keys, the mouse and the help calls then runs on the
+    other program's stack. No scenario has that. Before `STACK` can go
+    from those files, either `FatErr` goes over to the program's own
+    stack when it finds itself on another, which is assembly, with the
+    place that DOS keeps of the program's stack in its PSP, or the
+    program gives INT 24h back for such a program, which is a
+    deviation to ask for.
+  - Then the qualifiers go from the rest: `STACK` can be defined as
+    nothing first, in all files but those two, and taken out of its 481
+    places when no other work has them in hand.
+- Memory, on DOS. The program keeps 195 KB while a command runs. On the
+  bench a second copy of it starts and has no memory to run a command,
+  and behind a program that has stayed in the memory it does not start:
+  `second-copy`, `start-memory` and `ended` have goldens of the portable
+  C's own that show that, and `passed-on` is not run. Whether that is
+  what "functionally equivalent" allows is the user's to say. What
+  would give the memory back without giving the program up again: the
+  buffers of the main data that are rebuilt after a command anyway, 57
+  KB of screens, boxes, the help and the tree, in the block that DOS
+  gets back, which is the same work as the first item, done for all of
+  them.
+- `passed-on` is not run for the portable C, for want of memory on the
+  bench: FreeDOS's COMMAND.COM keeps 73 KB while a program runs from it,
+  having no XMS driver to swap itself out to, and the bench is the same
+  for every tree and every golden. What that scenario holds of the
+  entry of INT 21h, `New21`, the flags that a call is handed on with
+  and the caller's stack left alone, `handed-on` holds with one copy.
+  What it does not see is INT 27h on its way to DOS, which the watcher
+  of `passed-on` takes as an interrupt of its own and that of
+  `handed-on` cannot get behind: where the program hands that on is a
+  variable, not a word that its code names.
+- The file is 185,006 bytes, 2.84 times the original's, where the
+  scenarios' test fails at 3: some 10 KB are left. The main data's
+  zeros are 62.6 KB of it. They are in the file because the main data
+  has to be at offset 0 of a segment, the linker starts a segment on a
+  paragraph only where the file starts, and nothing of C gives a
+  segment an alignment. Tried: the linker's `segaddr`, which starts a
+  class on a paragraph that the command names, and then writes what
+  follows as if it had contents and a header that asks for a megabyte.
+  Not tried: linking twice, the second time with the stack at the
+  paragraph that the first shows free behind the tables, and the main
+  data behind the stack, which is 4,096 bytes and so ends on one.
+- No scenario has the program without memory for the viewer's 8,000
+  bytes after a command, where it says "Program too big to fit in
+  memory" and leaves (`TakeMem` of `src/portable_c/start.c`, `Round` of
+  `main.c`), nor a DOS before 3.20, which the bench is not.
+- A panel is still cut down to 256 files for a command, as the original
+  cuts it to save it (`F21_40` of `src/portable_c/enter.c`). The limit
+  has no reason any more; lifting it is a deviation for the user to
+  decide.
+- Names that say what no longer is: `resident.c`, of which nothing is
+  resident; `FreMem2`, which is how many paragraphs it is from the main
+  data to the end of the block of the panels and the viewer, so that
+  the eight places that add it to the main data's segment for where the
+  memory ends still do; `Init11`, `Exec10`, `F21_40` and `Alloc0`, which
+  do less than in the original. They were left for the tables of the
+  harness, which name the functions of both trees by one list, and for
+  the files that other work has in hand.
 
 What the items below say of the part that stays in the memory, under
 "Known and not dealt with", they say of the C translation, `src/c/`.
-Of the portable C these no longer hold: it has no second copy and no
-check sum, so nothing of "The entry of the program" that concerns
-those, and it cannot fail to load itself again for want of memory,
-which "Where the size of the translation becomes other behaviour"
-has.
+Of the portable C these no longer hold: what is said of the second
+copy, of the check sum and of the second way of the entry; the five
+places "Where the part that stays in the memory is not as the
+original", of which the first, the stack that the watch takes of
+whoever calls DOS, holds for the portable C as it is written there;
+"Where the size of the translation becomes other behaviour", which is
+the second item above now; and "How the part that stays in the memory
+is laid out by C".
 
 ## The last of the assembly
 

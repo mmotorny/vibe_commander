@@ -19,6 +19,10 @@ is in the file, once that is done. So a block is held against the file as
 it is and against the file with those words as they are at the place in
 question: a function that begins by loading a segment, as an interrupt
 function of the compiler does, is known for what it is.
+
+The portable C's file is an .EXE as the linker writes it, which DOS
+relocates by the table in its header: the same holds of it, with that
+table. Which of the two a file is, its header says: see origin().
 """
 import bisect
 import re
@@ -45,6 +49,36 @@ FAR_CALL, FAR_JUMP = 0x9A, 0xEA
 EXE_HEADER = 0x20
 COM_ORIGIN = 0x100
 EXE_TABLE, EXE_COUNT, EXE_STAYING = "RelTab", "RelCnt", "ResCnt"
+
+# The header of an .EXE file: the number of its relocations, its length
+# in paragraphs, the stack's segment and the code's as DOS is to set them,
+# counted from where the file's contents are loaded, and where the
+# relocations are, each the offset and the segment of a word.
+EXE_RELOCATIONS, EXE_PARAGRAPHS, EXE_SS, EXE_CS, EXE_TABLE_AT = \
+    0x06, 0x08, 0x0E, 0x16, 0x18
+# What tools/mkexe.c writes for the code's segment: 10h paragraphs below
+# the file's contents, the PSP.
+EXE_AT_PSP = 0xFFF0
+
+
+def made_by_mkexe(contents):
+    """Whether the .EXE file `contents` is one that tools/mkexe.c made,
+    the C translation's, and not one as the linker writes it: it starts
+    in the segment of its PSP."""
+    return struct.unpack_from("<H", contents, EXE_CS)[0] == EXE_AT_PSP
+
+
+def origin(contents):
+    """Where in the .EXE file `contents` the byte is that the linker's map
+    has at 0000:0000, which is also where the words that hold a segment
+    count from: add it to an address of the map for the place in the
+    file. The map of a file that tools/mkexe.c made counts from the PSP,
+    100h before the file's contents, so this is below 0 for it; that of
+    one as the linker writes it counts from the contents, behind the
+    header."""
+    if made_by_mkexe(contents):
+        return EXE_HEADER - COM_ORIGIN
+    return struct.unpack_from("<H", contents, EXE_PARAGRAPHS)[0] * 16
 
 _LINE = re.compile(r"0x([0-9a-f]{8}):  ((?:[0-9a-f]{2} )*[0-9a-f]{2})"
                    r"(?:  +(\S.*))?$")
@@ -80,7 +114,14 @@ def relocated(contents, linked=None):
     at `linked`. None of them for a file that is no .EXE, the original."""
     if contents[:2] != b"MZ":
         return ()
-    in_file = EXE_HEADER - COM_ORIGIN       # from the segment to the file
+    in_file = origin(contents)              # from the segment to the file
+    if not made_by_mkexe(contents):
+        # As the linker writes the file: the table of its header.
+        count, table = (struct.unpack_from("<H", contents, at)[0]
+                        for at in (EXE_RELOCATIONS, EXE_TABLE_AT))
+        return tuple(segment * 16 + offset + in_file
+                     for offset, segment in struct.iter_unpack(
+                         "<HH", contents[table:table + count * 4]))
     symbols = link_map(linked)
     table, count, staying = (
         struct.unpack_from("<H", contents, symbols[name][0] * 16
@@ -96,7 +137,7 @@ def _loaded(contents, words, base):
     """`contents` as the program has it in the memory when the byte at
     offset 0 of the file is at address `base`: with its segment added to
     each of `words`. None if the program cannot be there."""
-    segment, odd = divmod(base + EXE_HEADER - COM_ORIGIN, 16)
+    segment, odd = divmod(base + origin(contents), 16)
     if odd or segment < 0:
         return None
     there = bytearray(contents)
@@ -318,18 +359,35 @@ def link_map(path):
     return symbols
 
 
-# The translation's stack, as its link map names it: an array of
-# src/c/resident.c, and the segment that the compiler has it in, of which it
-# is all. See tools/mkexe.c, which stops the build if it is not.
-STACK = ("DataSav", "R_BSS")
+# The stack of a C tree, as its link map names it: an array, and the
+# segment that the compiler has it in, of which it is all. The C
+# translation's is of src/c/resident.c; see tools/mkexe.c, which stops the
+# build if it is not all of that segment. The portable C's is of
+# src/portable_c/stack.c.
+STACKS = (("DataSav", "R_BSS"), ("_Stack", "SSTACK"))
+
+
+def segments(path):
+    """Read a wlink map: its segments, each as name, class, where it
+    begins, as the paragraph and the offset that the map has, and how
+    long it is."""
+    found = []
+    with open(path) as text:
+        for line in text:
+            match = re.match(r"(\w+) +(\w+) +(\w+) +([0-9a-f]{4}):"
+                             r"([0-9a-f]{4}) +([0-9a-f]{8})$", line)
+            if match:
+                found.append((match[1], match[2], int(match[4], 16),
+                              int(match[5], 16), int(match[6], 16)))
+    return found
 
 
 def stack(path):
-    """Where the translation's stack begins and ends, by the wlink map at
-    `path`: two offsets from where the program is loaded, which is where
-    its stack segment is."""
-    array, segment = STACK
-    at, offset = link_map(path)[array]
+    """Where the stack of a C tree begins and ends, by the wlink map at
+    `path`: two addresses as the map counts them (see origin())."""
+    symbols = link_map(path)
+    array, segment = next(names for names in STACKS if names[0] in symbols)
+    at, offset = symbols[array]
     bottom = at * 16 + offset
     with open(path) as text:
         for line in text:
