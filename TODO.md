@@ -6208,10 +6208,22 @@ estimate:
    memory. The sanitizer of undefined behaviour stops at a shift by
    too much, at a sum with a sign that does not fit, and at a number
    read or written at an address that is not even, which
-   `harness/hostcheck.py` says at its top that it cannot see;
-   arithmetic that counts on an int of 16 bits it does not find, and 8
-   below is for that. The memory sanitizer stops at a value that is
-   used and was
+   `harness/hostcheck.py` says at its top that it cannot see. For
+   arithmetic it has two groups besides, which are no undefined
+   behaviour and are switched on by name: `-fsanitize=integer`, which
+   stops where a number without a sign wraps round, and
+   `-fsanitize=implicit-conversion`, which stops where a number loses
+   bits or changes its sign as it is put into a narrower type. Under
+   the steps of the scenarios those say every place where a number
+   does wrap or is cut, which is the reading list for step 2 of the
+   road, what is to stay 16 bits and what is to be widened: a place
+   that the program counts on stops like one that is a fault, so it
+   is a list to read and not a test. What none of them finds is
+   wrapping that is missing: a number that wrapped round at 16 bits
+   on DOS and, in an int of 32, no longer does. Nothing overflows
+   there, the result is another, and only a comparison says so: the
+   scenarios, and 8 below. The memory sanitizer stops at a value that
+   is used and was
    never set: `SetStat` and the entry handed DOS a `name` that nothing
    had set, DS and DX as the stack had them (`CLAUDE.md`, "Moving a
    file to the system's functions"), and the audit with clang's
