@@ -195,7 +195,10 @@ These held while `src/c/` was made, and they say what it is.
   October 2026: Quick execute commands goes, the setting and the way
   through INT 2Eh; EGA lines goes, the command that gives the screen 43
   or 50 rows by a font of the BIOS, and the rows of the screen are to
-  come from the system later; the drive B: that shares the floppy drive
+  come from the system later: until a system gives the program a screen
+  of another size, the scenarios that went to a tall screen by that
+  command are not run for the portable C, and what they alone tested is
+  listed as untested; the drive B: that shares the floppy drive
   with A: stays, with its prompt and its setting, for as long as DOS is
   a target. A setup file made from the defaults has zeros where the
   original has 64 bytes of whatever lay behind its table: that stands.
