@@ -45,10 +45,8 @@ that both programs have, SETUP_PLACES.
                                 build/c for the C translation, whose
                                 files are src/c, build/portable_c for
                                 the portable C; and with the directory
-                                of its files, src/portable_c, a build
-                                that is named otherwise, as
-                                build/portable_c32 is, the portable C as
-                                a flat program of 32 bits
+                                of its files, a build that is named
+                                otherwise than its tree
 
 Nothing here is of 16 bits in kind: the places are found in the text of
 the source, which is one for both kinds of program, and a count is of

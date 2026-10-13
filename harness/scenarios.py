@@ -548,9 +548,9 @@ out again (show.py --changes is how):
     a:\\freedos\\bin\\country.sys behind them are 381,338. The files
     of C:\\STAMPS have no bytes behind their sizes: the editor opens
     night.dat as an empty text, and has no room for noon.dat.
-    The program of 32 bits has its text in 640 KB of its own, room for
-    641,824 bytes: the 381,338 fit it, and editor-big is not run for it
-    (deviations.TREES, "portable_c32"); noon.dat it refuses. A scenario
+    The portable C, a program of 32 bits, has its text in 640 KB of its
+    own, room for 641,824 bytes: the 381,338 fit it, and editor-big is
+    not run for it (deviations.TREES); noon.dat it refuses. A scenario
     that is to fill the editor's memory, or to have a file too large
     for it, needs more than that for that program.
   - The floppy of the bench has no SETUP.BAT.

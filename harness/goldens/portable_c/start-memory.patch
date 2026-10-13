@@ -3,13 +3,17 @@ otherwise than the original. A patch of harness/goldens/start-memory.txt, see
 harness/goldens.py: a line with - is the golden's, a line with + is what is
 expected in its place.
 Deviation: 1, 14 of src/portable_c/DEVIATIONS.md
-Why: the second copy has no memory to run a command: each copy keeps all of
-itself, so the command that was to leave it without memory for its data does
-not run, and the copy is still there. And the Advanced options have no Quick
-execute commands: Clear keyboard buffer and what is below it in the box stand
-a row further up, the cursor with them where it is on that box, the box is a
-row shorter, and the two rows that its last row and the shadow below it were
-on show what is behind the box, the upper one in the shadow
+Why: the second copy runs the command that was to leave it without memory for
+its data, as the original's does, and is still there afterwards, where the
+original's has said "Program too big to fit in memory" and ended: it keeps all
+of itself above the megabyte, the memory of its panels and of the viewer too,
+and needs none of DOS's to come back. The panels of the last three screens are
+the copy's, with the mini status that the first copy's have not, and what the
+command line shows of the copy is a row shorter. And the Advanced options have
+no Quick execute commands: Clear keyboard buffer and what is below it in the
+box stand a row further up, the cursor with them where it is on that box, the
+box is a row shorter, and the two rows that its last row and the shadow below
+it were on show what is behind the box, the upper one in the shadow
 
 == 1: F9 o o
 rows 12-21
@@ -69,9 +73,15 @@ rows 20-22
 +|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 
 == 12: Ctrl+o
-row 21
+rows 18-21
+-|C:\WORK>d:\vc\vc k                                                              | 07x80
+-|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
 -|Program too big to fit in memory                                                | 07x80
-+|There is not enough memory to run this command                                  | 07x80
++|                                                                                | 07x80
++|C:\WORK>d:\vc\vc k                                                              | 07x80
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
 
 == 13: Ctrl+o
 rows 20-22

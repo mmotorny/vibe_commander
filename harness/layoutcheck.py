@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""Hold the program of 32 bits to the layout that it rests on.
+"""Hold the portable C, a program of 32 bits, to the layout that it rests
+on.
 
     python3 harness/layoutcheck.py [--stub DOS32A.EXE] VC.EXE VC.MAP
 
-The portable C as a flat program, build/portable_c32/VC.EXE, keeps the
-memory of the program of 16 bits inside its own: a segment and an offset
+The portable C is a flat program, build/portable_c/VC.EXE, and keeps the
+memory of a program of 16 bits inside its own: a segment and an offset
 are still numbers of 16 bits in it, counted from 64K below the main
 data, and a table is still known by its offset among the tables ("The
 words of the addresses" in src/portable_c/vc.h). The words that make
 pointers of those numbers take things for granted about where the linker
 has put what, and say so at each; nothing in the program looks. This
 does, in the file that the linker wrote and in its map of it, as le.py
-reads them: the tests `portable_c32-layout` and
-`portable_c32-debug-layout` of the build, one for each of the two
+reads them: the tests `portable_c-layout` and
+`portable_c-debug-layout` of the build, one for each of the two
 programs. It runs no machine and takes no time. A link that breaks one
 of these gives a program that reads and writes somewhere else, with no
 word said: the order of the linker's command in CMakeLists.txt is what

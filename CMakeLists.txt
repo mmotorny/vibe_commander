@@ -138,7 +138,8 @@ add_custom_target(shareware-relocations ALL DEPENDS ${layout_objects})
 # stays in the memory while a command runs and one that is given up and
 # loaded again, as the original is, and tools/mkexe.c lays its file out
 # for that. See vc.h of that tree and tools/mkexe.c. The portable C is one
-# program, which the linker writes: add_portable_c, further down.
+# program, a flat one of 32 bits that the linker writes and an extender
+# starts: add_portable_c, further down.
 
 # mkexe turns the linker's output into the program that is run.
 add_executable(mkexe tools/mkexe.c)
@@ -146,8 +147,8 @@ set_target_properties(mkexe PROPERTIES
     C_STANDARD 99
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
-# stub switches off the banner of the extender in the program of 32 bits
-# that the linker wrote: see add_portable_c32, further down.
+# stub switches off the banner of the extender in the portable C as the
+# linker wrote it: see add_portable_c, further down.
 add_executable(stub tools/stub.c)
 set_target_properties(stub PROPERTIES
     C_STANDARD 99
@@ -314,101 +315,16 @@ function(add_c_tree tree description model)
     add_custom_target(${tree} ALL DEPENDS ${c_dir}/VC.EXE)
 endfunction()
 
-# add_portable_c(<file of the second segment>...) builds src/portable_c/
-# into build/portable_c/VC.EXE, with the linker's map VC.MAP and the
-# object files next to it, as the target portable_c.
-#
-# The portable C is one program, and the linker writes its file: DOS
-# loads it, sets the words of it that hold a segment and starts it at
-# Alloc0 of dos.c, on the stack that the file's header names. It is
-# compiled in the medium model: a function is far by the compiler's own
-# rule, and needs no word of this compiler to say so.
-function(add_portable_c)
-    set(tree portable_c)
-    set(source_dir ${CMAKE_SOURCE_DIR}/src/${tree})
-    set(c_dir ${CMAKE_BINARY_DIR}/${tree})
-    # Every C file of the tree is part of the program: a new one needs no
-    # mention here. The build looks again each time it runs.
-    file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
-         ${source_dir}/*.c)
-    # But dos32.c, which is the functions of dos.c for a program of 32
-    # bits and no part of this one: add_portable_c32, further down,
-    # compiles it.
-    list(REMOVE_ITEM c_files ${portable_c_32_alone})
-    # The compiled code is more than one segment holds, so it has two:
-    # CTEXT, and CTEXT2 for the files that the caller names. Functions of
-    # different files call each other far, so a file may be in either. A
-    # segment holds F000h bytes, not 64K, for the machine of the tests:
-    # the test portable_c-scenarios says why, and fails when one is
-    # fuller (check_layout of harness/ported.py). Name another file here
-    # then.
-    set(c_second ${ARGN})
-
-    # The data of the program is three segments, because it is more than
-    # one holds. The main data and the variables of the C files are the
-    # compiler's own group, DGROUP, which DS is on. The tables, the files
-    # whose names end in _t, and the stack, stack.c, do not fit there
-    # beside the main data, and are each a group of its own, by an
-    # option of Open Watcom that gives the data of a file one: -nd=T
-    # makes T_GROUP of the tables and -nd=S makes S_GROUP of the stack
-    # (see the README, "What rests on Open Watcom").
-    file(MAKE_DIRECTORY ${c_dir})
-    set(c_compiled "")
-    foreach(source ${c_files})
-        string(REGEX REPLACE "\\.c$" "" object ${source})
-        if(source MATCHES "_t\\.c$")
-            c_compile(${tree} m ${source} ${object} CTEXT CCODE -nd=T)
-        elseif(source STREQUAL "stack.c")
-            c_compile(${tree} m ${source} ${object} CTEXT CCODE -nd=S)
-        elseif(source IN_LIST c_second)
-            c_compile(${tree} m ${source} ${object} CTEXT2 CCODE)
-        else()
-            c_compile(${tree} m ${source} ${object} CTEXT CCODE)
-        endif()
-        list(APPEND c_compiled ${c_dir}/${object}.obj)
-    endforeach()
-
-    # The program is linked of the compiled code alone, with a link map
-    # next to it. The order of the segments is said here, by their
-    # classes: the main data, which main.c has in a segment and a class
-    # of its own, MAIN, so that it is the first thing of DGROUP and of
-    # the program, at offset 0 of the segment that DS is on, as the code
-    # takes it to be; the rest of DGROUP; the code; the tables; and last
-    # the stack, where the program ends, which is how it knows its
-    # length (MemOwn of dos.c). The tables stand between the code
-    # and the stack: the machine of the tests is many times slower at a
-    # write to a page of the memory that has code which it has run, and
-    # a push is a write. The directive is Open Watcom's, and its help
-    # does not list it for DOS.
-    list(JOIN c_compiled "," compiled)
-    add_custom_command(
-        OUTPUT ${c_dir}/VC.EXE ${c_dir}/VC.MAP
-        COMMAND ${watcom} ${watcom_bin}/wlink option quiet format dos
-                name ${c_dir}/VC.EXE
-                order clname MAIN clname DATA clname BSS
-                      clname CCODE segment CTEXT segment CTEXT2
-                      clname FAR_DATA clname STACK
-                file ${compiled}
-                option map=${c_dir}/VC.MAP,start=Alloc0_,static
-        DEPENDS ${c_compiled}
-        COMMENT "Linking the portable C"
-        VERBATIM)
-    # The program as it is shipped.
-    add_custom_target(${tree} ALL DEPENDS ${c_dir}/VC.EXE)
-endfunction()
-
-# add_portable_c32(<target> <directory> <option>...) builds src/portable_c/
-# a second time, as a flat program of 32 bits that the extender DOS/32A
-# starts: step 1 of the portable C's road (TODO.md, "The portable C in 32
-# bits: the plan"). It is <directory>/VC.EXE, with the linker's map VC.MAP
-# and the objects and their listings next to it, as the target <target>.
-# Every build makes it, so the source is held to both compilers: a line
-# that only the one for 16 bits takes stops the build here.
+# add_portable_c(<target> <directory> <option>...) builds src/portable_c/
+# as a flat program of 32 bits that the extender DOS/32A starts: step 1
+# of the portable C's road (TODO.md, "The portable C in 32 bits: the
+# plan"). It is <directory>/VC.EXE, with the linker's map VC.MAP and the
+# objects and their listings next to it, as the target <target>.
 #
 # The options are the caller's where the two programs of the plan differ,
 # the one that is shipped and the one for finding a fault: each is a call
 # of this function with a target and a directory of its own.
-function(add_portable_c32 target directory)
+function(add_portable_c target directory)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
@@ -435,10 +351,20 @@ function(add_portable_c32 target directory)
     #        16 bits, as any other compiler has it
     # -fr    no file of the errors beside what the compiler writes out:
     #        it would be build/<file>.err, which is where the compiler
-    #        for 16 bits leaves its own of the same file
+    #        for 16 bits leaves its own of a file of the same name
     set(compile ${watcom} ${watcom_bin}/wcc386 -q -3r -mf -s -zl -zls
         -wx -we ${ARGN} -i=${open_watcom_SOURCE_DIR}/h -fr)
     file(MAKE_DIRECTORY ${directory})
+    # A file is compiled again when a header of the tree has changed, and
+    # when the command that compiles it has: the command is written into
+    # a file of the directory, which is written anew only when it says
+    # something else, and every object is made to follow that file. The
+    # build would not see it otherwise, and an object that another
+    # compiler left under the same name, as the one for 16 bits did in
+    # build/portable_c/ while the portable C was a program of 16 bits,
+    # would be linked as it is.
+    file(GENERATE OUTPUT ${directory}/compiled.txt
+         CONTENT "${compile}\n")
     set(c_compiled "")
     foreach(source ${c_files})
         string(REGEX REPLACE "\\.c$" "" object ${source})
@@ -459,7 +385,8 @@ function(add_portable_c32 target directory)
             BYPRODUCTS ${directory}/${object}.lst
             DEPENDS ${source_dir}/${source} ${source_dir}/vc.h
                     ${source_dir}/tables.h ${source_dir}/sys.h
-            COMMENT "Compiling portable_c/${source} for 32 bits (${target})"
+                    ${directory}/compiled.txt
+            COMMENT "Compiling portable_c/${source} (${target})"
             VERBATIM)
         list(APPEND c_compiled ${directory}/${object}.obj)
     endforeach()
@@ -529,19 +456,22 @@ function(add_portable_c32 target directory)
                 option stub=${extender}
         COMMAND stub ${directory}/VC.EXE
         DEPENDS stub ${c_compiled} ${extender}
-        COMMENT "Linking the portable C for 32 bits (${target})"
+        COMMENT "Linking the portable C (${target})"
         VERBATIM)
     add_custom_target(${target} ALL DEPENDS ${directory}/VC.EXE)
 endfunction()
 
-# The trees, each with the files of its second code segment.
+# The trees.
 #
 # The C translation is compiled in the small model: its functions are far
 # where a #pragma aux of theirs says so, which every function has that
 # another file calls, with the registers that the assembly called it in.
+# The files named are those of its second code segment.
 #
-# The portable C is compiled twice, for 16 bits and for 32, and three of
-# its files are of one of the two alone. Each goes with its build.
+# The portable C was compiled twice, for 16 bits and for 32, until the
+# tests came to judge the program of 32 bits (TODO.md, "The portable C in
+# 32 bits: the plan"), and three of its files are of one of the two
+# alone. Those of 16 bits are compiled by nothing now.
 #   arith.c   the two routines that the compiler for 16 bits calls to
 #             multiply and to divide numbers of 32 bits; the one for 32
 #             bits calls nothing for that
@@ -549,29 +479,24 @@ endfunction()
 #   dos32.c   the same functions for a flat program under the extender
 set(portable_c_16_alone arith.c dos.c)
 set(portable_c_32_alone dos32.c)
-set(c_trees c portable_c)
 add_c_tree(c "the C translation" s
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c view.c
     window.c)
-add_portable_c(
-    blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
-    main.c menu.c misc.c mouse.c setup.c start.c stcolor.c sthelp.c
-    stmain.c stopts.c system.c view.c window.c)
-# For 32 bits, two programs of every build:
-#   portable_c32/VC.EXE         the program: -os, small code, and nothing
-#                               for a debugger, as the one for 16 bits is
-#                               compiled. It is what a test judges.
-#   portable_c32/debug/VC.EXE   the same source for finding a fault, run
-#                               by hand: -od, as it is written, with
-#                               nothing moved or left out; -d2, so that
-#                               its listings have the lines of the source;
-#                               and CHECKED defined, for the words of the
-#                               addresses to look at what they are handed.
-#                               Nothing reads CHECKED yet: see TODO.md,
-#                               the piece B2 of the plan for the 32 bits.
-add_portable_c32(portable_c32 ${CMAKE_BINARY_DIR}/portable_c32 -os)
-add_portable_c32(portable_c32-debug ${CMAKE_BINARY_DIR}/portable_c32/debug
+# Of the portable C, two programs of every build:
+#   portable_c/VC.EXE         the program: -os, small code, and nothing
+#                             for a debugger. It is what is shipped and
+#                             what a test judges.
+#   portable_c/debug/VC.EXE   the same source for finding a fault, run by
+#                             hand: -od, as it is written, with nothing
+#                             moved or left out; -d2, so that its listings
+#                             have the lines of the source; and CHECKED
+#                             defined, for the words of the addresses to
+#                             look at what they are handed. Nothing reads
+#                             CHECKED yet: see TODO.md, the piece B2 of
+#                             the plan for the 32 bits.
+add_portable_c(portable_c ${CMAKE_BINARY_DIR}/portable_c -os)
+add_portable_c(portable_c-debug ${CMAKE_BINARY_DIR}/portable_c/debug
     -od -d2 -dCHECKED)
 
 # --- Tests --------------------------------------------------------------------
@@ -599,21 +524,31 @@ add_custom_target(driver ALL DEPENDS ${CMAKE_BINARY_DIR}/DRIVER.COM)
 add_test(NAME asm-bytes
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/bytecheck.py
             ${layout_dir}/VC.COM ${layout_dir}/VCSETUP.COM)
-# Each C tree has the same three tests, named by the tree they judge.
-foreach(tree ${c_trees})
-    set(c_dir ${CMAKE_BINARY_DIR}/${tree})
-    # The texts and tables of the tree against the original's, by their
-    # names: see harness/datacheck.py.
+# The C trees have the same tests, named by the tree they judge.
+#
+# The texts and tables of a tree against the original's, by their names:
+# see harness/datacheck.py. Of the portable C, a flat program, field by
+# field where an object has a word that names something: that is a
+# pointer of four bytes there.
+foreach(tree c portable_c)
     add_test(NAME ${tree}-data
         COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
                 --quiet --source ${CMAKE_SOURCE_DIR}/src/${tree}
-                ${layout_dir} ${c_dir})
-    # The two routines that the compiler calls for arithmetic on 32 bits,
-    # against Python's: see harness/arithcheck.py. No scenario divides by
-    # more than 16 bits.
-    add_test(NAME ${tree}-arith
-        COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/arithcheck.py
-                ${c_dir})
+                ${layout_dir} ${CMAKE_BINARY_DIR}/${tree})
+endforeach()
+# The two routines that the compiler for 16 bits calls for arithmetic on
+# 32 bits, against Python's: see harness/arithcheck.py. No scenario
+# divides by more than 16 bits. The portable C has neither: its compiler
+# multiplies and divides such numbers by itself.
+add_test(NAME c-arith
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/arithcheck.py
+            ${CMAKE_BINARY_DIR}/c)
+# A tree through every scenario, against the goldens of the original with
+# what is declared for the tree made to them, and what ran of it: see
+# harness/ported.py. The program for finding a fault, in debug, is run by
+# hand and is in no test of the machine.
+foreach(tree c portable_c)
+    set(c_dir ${CMAKE_BINARY_DIR}/${tree})
     add_test(NAME ${tree}-scenarios
         COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
                 ${c_dir}/VC.EXE ${c_dir}/VC.MAP ${layout_dir}/VC.LST)
@@ -646,12 +581,12 @@ add_test(NAME harness-le
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/lecheck.py
             --watcom ${open_watcom_SOURCE_DIR} --tools ${watcom_bin}
             --out ${CMAKE_BINARY_DIR}/lecheck)
-# The two programs of 32 bits, each against the layout that it rests on:
-# where the linker has put the tables, the main data, the stack and what
-# has no value, by the file and the linker's map of it, and that its stub
-# is DOS/32A's with the banner switched off. See harness/layoutcheck.py.
-# It runs no machine.
-foreach(tree portable_c32 portable_c32-debug)
+# The two programs of the portable C, each against the layout that it
+# rests on: where the linker has put the tables, the main data, the stack
+# and what has no value, by the file and the linker's map of it, and that
+# its stub is DOS/32A's with the banner switched off. See
+# harness/layoutcheck.py. It runs no machine.
+foreach(tree portable_c portable_c-debug)
     # Each under the name of its target, and the second in the directory
     # debug of the first.
     string(REPLACE "-" "/" c_dir ${tree})
@@ -661,27 +596,3 @@ foreach(tree portable_c32 portable_c32-debug)
                 --stub ${open_watcom_SOURCE_DIR}/binw/dos32a.exe
                 ${c_dir}/VC.EXE ${c_dir}/VC.MAP)
 endforeach()
-# The texts and tables of the program of 32 bits against the original's,
-# by their names, as those of a program of 16 bits are held, and field by
-# field where an object has a word that names something: that is a
-# pointer of four bytes there. See harness/datacheck.py. It is the source
-# of the portable C, so the tables of that test which say what the
-# portable C has otherwise are its own.
-add_test(NAME portable_c32-data
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/datacheck.py
-            --quiet --source ${CMAKE_SOURCE_DIR}/src/portable_c
-            ${layout_dir} ${CMAKE_BINARY_DIR}/portable_c32)
-# The program of 32 bits through the scenarios, as the C trees above go
-# through them, by the same harness/ported.py. It is the portable C built
-# another way, and a tree of its own to the harness, portable_c32. It is
-# not held to pass every scenario, as those are, but to a record of the
-# ones that it passes, harness/pass32.txt: the test fails for a scenario
-# of the record that fails and for one that passes and is not there, and
-# `python3 harness/ported.py --record build/portable_c32/VC.EXE` writes
-# the record anew. The program for finding a fault, in debug, is run by
-# hand and is in no test of the machine.
-add_test(NAME portable_c32-scenarios
-    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/ported.py
-            ${CMAKE_BINARY_DIR}/portable_c32/VC.EXE
-            ${CMAKE_BINARY_DIR}/portable_c32/VC.MAP ${layout_dir}/VC.LST)
-set_tests_properties(portable_c32-scenarios PROPERTIES TIMEOUT 3600)

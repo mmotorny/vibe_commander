@@ -5,9 +5,9 @@ screen stops, and by which way it got there.
 
     mkdir -p build/tmp
     TMPDIR=$PWD/build/tmp python3 harness/trial32/run.py \\
-        --trace $PWD/build/tmp/trace build/portable_c32/VC.EXE
+        --trace $PWD/build/tmp/trace build/portable_c/VC.EXE
     python3 harness/trial32/ran.py build/tmp/trace \\
-        build/portable_c32/VC.EXE build/portable_c32/VC.MAP
+        build/portable_c/VC.EXE build/portable_c/VC.MAP
 
 run.py has QEMU write a log of the code that it ran, and this reads the
 log by the harness's reader of the file and of the linker's map
@@ -30,7 +30,7 @@ What that order is, and is not:
     of the function before, and the map has no name for them: the lines
     by which Round of main.c goes to AlocEr stand behind Exit, and are
     listed as Exit, from 76h in. The listing of the file says which,
-    build/portable_c32/<file>.lst.
+    build/portable_c/<file>.lst.
   - The compiler gives every function that does nothing the address of
     the next instruction, so several names of the map are one place:
     of dos32.c's functions that have nothing to do there, several are

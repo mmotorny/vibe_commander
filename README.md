@@ -645,9 +645,9 @@ other, went with the two parts.
 
 What can be measured of the portable C, or counted in its source, and
 changes with every step of the work, is written here and nowhere else:
-how long its file is, how much of the memory it keeps, how near its
-code segments are to where the scenarios' test lets one end, and how
-much of it only Open Watcom takes. No test holds the length of its
+how long its file is, what it has of the memory, how much room the
+layout that it rests on has left, and how much of it only Open Watcom
+takes. No test holds the length of its
 file to anything: only the C translation's is held, to three times the
 original's. `python3 tools/figures.py --write` puts the
 table here, of the build in `build/` and of `src/portable_c/`, and is
@@ -660,49 +660,39 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 196,330 bytes |
-| as a multiple of the original's 65,090 bytes | 3.02 |
-| more than the C translation's 133,056 bytes | 63,274 bytes |
-| The relocations in its header, which DOS applies | 1,029 |
-| What it keeps of the memory while a command runs: the program and its panels | 205,968 bytes |
-| What DOS has for a command then, on the bench of the tests | 219,568 bytes |
-| The code segment `CTEXT` ends at | D091h, 8,047 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C54Dh, 10,931 bytes below the limit, F000h |
-| Inline assembly | 41 instructions in 8 pieces: 41 in 8 of `dos.c` |
-| Lines of `#pragma aux` | 16, of which 6 say that a function does not return |
-| Intrinsic functions | 2: `_disable`, `_enable` |
-| Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 751, 103, 262, 92 |
-| Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
-| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,095 bytes, of which the extender's stub is 27,536 |
+| `VC.EXE` | 307,095 bytes, of which the extender's stub is 27,536 |
+| as a multiple of the original's 65,090 bytes | 4.72 |
+| more than the C translation's 133,056 bytes | 174,039 bytes |
 | Its code, and what the file has of its data | 132,207 and 104,411 bytes |
 | What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 892,606 bytes |
 | The addresses in it that the extender sets when it loads it | 5,274 |
-| The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c32-data` holds them | 640 and 554 |
+| The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
-| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,232 and 16,516 bytes |
+| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c-layout` holds them | 24,232 and 16,516 bytes |
 | How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,460 and 2,347 bytes |
-| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 400,587 bytes, 222,838 of them code |
-| Inline assembly of `dos32.c`, which the program of 32 bits has in place of that of `dos.c` | 98 instructions in 13 pieces |
+| The same program compiled for finding a fault, `build/portable_c/debug/VC.EXE` | 400,587 bytes, 222,838 of them code |
+| Inline assembly | 98 instructions in 13 pieces: 98 in 13 of `dos32.c` |
+| Lines of `#pragma aux` | 17, of which 5 say that a function does not return |
+| Intrinsic functions | 2: `_disable`, `_enable` |
+| Pairs of `#pragma pack` | 7 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 751, 103, 262, 92 |
+| Calls outside the file of the system's functions that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
 
-What the program keeps while a command runs is worked out, of the
-length of its file and of two panels; what DOS has for a command is
-that taken from what the bench of the tests has, which was seen once
-on the Info panel, while that of the portable C said how much memory
-is free: the top of `tools/figures.py` says how, and how it is seen
-again by the original's. The three
-words in the last line are counted by the test `portable_c-host`,
-which prints them in its summary, each place where the word stands in
-the code; what else that test counts of what only Open Watcom reads,
-by kinds, is in its own table, in `TODO.md`.
+The rows of the file are what the harness's reader of a flat program
+of 32 bits finds in it, `harness/le.py`, and how much room the layout
+that it rests on has left, as the test `portable_c-layout` works it
+out. The four words in the row of `__far` are counted by the test
+`portable_c-host`, which prints them in its summary, each place where
+the word stands in the code; what else that test counts of what only
+Open Watcom reads, by kinds, is in its own table, in `TODO.md`.
 
-The rows from "The program of 32 bits" on are of [that
-program](#the-program-of-32-bits), which is built of the same source:
-what the harness's reader of such a file finds in it, and how much room
-the layout that it rests on has left, as the test `portable_c32-layout`
-works it out. Every row above them is of the 16-bit program.
+While the portable C was a program of 16 bits, the table had what it
+kept of DOS's memory while a command ran, and what that left a command
+on the bench of the tests. Neither follows from the file of a program
+that an extender loads above the megabyte, and the table has them no
+more.
 
 ### Staying in the memory whole
 

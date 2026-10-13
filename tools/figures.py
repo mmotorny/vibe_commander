@@ -16,55 +16,32 @@ is history, what a step cost when it was made, stays where it tells that.
 
 No test holds the table: one that is a commit stale is no failure.
 
-What is measured, of build/portable_c/VC.EXE and its link map: the length
-of the file, the relocations in its header, where its segments of code
-end. What is counted, in src/portable_c/, comments left out: inline
-assembly, by its pieces and instructions, and the lines of #pragma aux
-and pack; and the calls that still hand registers to an interrupt, which
-tools/calls.py counts. The words __far, FAR, STACK and CODE are counted
-by the host check, harness/hostcheck.py, whose function is called here;
-the other things that only Open Watcom reads, by their kinds, are that
-test's to count, and its table is in TODO.md.
-
-Those rows are of the program of 16 bits, which is the one that the
-tests judge. Behind them come the rows of the program of 32 bits,
-build/portable_c32/VC.EXE, which the build links of the same source
-(TODO.md, "The portable C in 32 bits: the plan"): what the harness's
-reader of such a file, harness/le.py, finds in it, the length of the
-file and of the extender's stub in it, its code and its data, the
+What is measured, of build/portable_c/VC.EXE and its link map: what the
+harness's reader of such a file, harness/le.py, finds in it, the length
+of the file and of the extender's stub in it, its code and its data, the
 addresses that the extender sets, the stack; how many words of its
 tables are pointers where the original has a word of 16 bits, and how
 many of those are such addresses, as the test of its data counts them,
 harness/datacheck.py; how much room the layout that it rests on has
-left, as the test of that works it out, harness/layoutcheck.py; the
-length of the same program compiled for
-finding a fault; and the inline assembly of dos32.c, which only that
-program has. What is worked out:
+left, as the test of that works it out, harness/layoutcheck.py; and the
+length of the same program compiled for finding a fault. What is
+counted, in src/portable_c/, comments left out: inline assembly, by its
+pieces and instructions, and the lines of #pragma aux and pack; and the
+calls that still hand registers to an interrupt, which tools/calls.py
+counts. The words __far, FAR, STACK and CODE are counted by the host
+check, harness/hostcheck.py, whose function is called here; the other
+things that only Open Watcom reads, by their kinds, are that test's to
+count, and its table is in TODO.md.
 
-  - What the program keeps while a command runs: what DOS loads of the
-    file, which is the file less its header, and the 256 bytes of the PSP
-    in front, made whole paragraphs; and two panels of 256 files, each
-    made whole paragraphs, which is what the block of the panels is cut
-    down to for a command (struct WCBdef of vc.h).
-  - What DOS has for a command on the bench of the tests: BENCH less
-    that. BENCH is not worked out but was seen, once, while the Info
-    panel of the portable C still said how much memory is free: with
-    COMMAND.COM not loaded yet, which is 72,496 more than a command
-    gets, and what the program kept then added to that. The portable C
-    has no such line any more (src/portable_c/DEVIATIONS.md, 11). The
-    original has, and its figure is of the same bench: `python3
-    harness/show.py --last Ctrl+l` prints its first screen with the
-    Info panel switched on, 485,344 Bytes Free, which is 59,808 more
-    than BENCH: the 72,496, less the 12,704 that the original keeps
-    while a command runs, and a paragraph. If the bench changes, see
-    that again, and BENCH is as much more or less as it is; if the
-    program comes to keep something besides its file and its panels,
-    that is to be added above.
+The portable C was a program of 16 bits until the tests came to judge
+it as one of 32, and the table then had what such a program keeps of
+DOS's memory while a command runs and what that leaves a command on the
+bench, worked out from the length of its file. Neither follows from the
+file of a program that an extender loads above the megabyte: what a
+command finds of the memory then is what the scenario `command` shows.
 """
 import argparse
-import math
 import re
-import struct
 import sys
 from pathlib import Path
 
@@ -76,7 +53,6 @@ import coverage  # noqa: E402  (of harness/, not the package of that name)
 import datacheck  # noqa: E402
 import hostcheck  # noqa: E402
 import layoutcheck  # noqa: E402
-import ported  # noqa: E402
 
 README = ROOT / "README.md"
 SOURCE = ROOT / "src" / "portable_c"
@@ -86,20 +62,9 @@ BEGIN = ("<!-- The figures: written by `python3 tools/figures.py --write`, "
          "not by hand. -->")
 END = "<!-- The end of the figures. -->"
 
-# What the bench has for the program, its panels and a command together,
-# in bytes: see above.
-BENCH = 425_536
-PARAGRAPH = 16
-PSP = 256
-
 
 def number(value):
     return f"{value:,}"
-
-
-def whole(length):
-    """`length` made whole paragraphs."""
-    return math.ceil(length / PARAGRAPH) * PARAGRAPH
 
 
 def code(path):
@@ -107,11 +72,11 @@ def code(path):
     return re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
 
 
-# The functions of dos.c for the program of 32 bits. The figures that
-# are counted in the source are of the program of 16 bits, so this file
-# is not read for them, but for a row of its own. The test
-# portable_c-host reads it, and its count of the words has it.
-NOT_BUILT = ("dos32.c",)
+# The files that the program is not built of: those of the 16-bit build
+# that the portable C had, which nothing compiles. They are not read
+# for what is counted in the source. The test portable_c-host reads
+# them, and its count of the words has them.
+NOT_BUILT = ("arith.c", "dos.c")
 
 
 def sources():
@@ -143,16 +108,13 @@ def inline_assembly(texts):
     return pieces
 
 
-def panel(texts):
-    """How long a panel of 256 files is: what LAID_OUT holds struct
-    WCBdef to."""
-    match = re.search(r"LAID_OUT\(WCBdef, (\w+)\)", texts["vc.h"])
-    return int(match[1], 0)
+def table():
+    """The table, as lines of Markdown."""
+    directory = BUILD / "portable_c"
+    original = len((BUILD / "shareware-layout" / "VC.COM").read_bytes())
+    translation = len((BUILD / "c" / "VC.EXE").read_bytes())
+    texts = sources()
 
-
-def flat():
-    """The rows of the program of 32 bits."""
-    directory = BUILD / "portable_c32"
     check = layoutcheck.Check((directory / "VC.EXE").read_bytes(),
                               directory / "VC.MAP")
     check.all()
@@ -162,16 +124,20 @@ def flat():
     debug = layoutcheck.Check(
         (directory / "debug" / "VC.EXE").read_bytes(),
         directory / "debug" / "VC.MAP").program
-    pieces = inline_assembly({name: code(SOURCE / name)
-                              for name in NOT_BUILT})
     room = check.room
     # The test of the data, for what it counts: it says nothing here.
     _, tables = datacheck.check(BUILD / "shareware-layout", directory,
                                 SOURCE, say=lambda line: None)
-    return [
-        ("The program of 32 bits, `build/portable_c32/VC.EXE`",
-         f"{number(len(program.contents))} bytes, of which the extender's "
-         f"stub is {number(program.stub)}"),
+    size = len(program.contents)
+
+    rows = [
+        ("`VC.EXE`",
+         f"{number(size)} bytes, of which the extender's stub is "
+         f"{number(program.stub)}"),
+        (f"as a multiple of the original's {number(original)} bytes",
+         f"{size / original:.2f}"),
+        (f"more than the C translation's {number(translation)} bytes",
+         f"{number(size - translation)} bytes"),
         ("Its code, and what the file has of its data",
          f"{number(instructions.size)} and {number(data.held)} bytes"),
         ("What it has of the memory above the megabyte when it is "
@@ -182,13 +148,13 @@ def flat():
         ("The words of its boxes, dialogs and tables that are pointers, "
          "four bytes where the original has a word of two; and how many "
          "of them are among those addresses, the others holding a "
-         "number: as the test `portable_c32-data` holds them",
+         "number: as the test `portable_c-data` holds them",
          f"{number(tables['pointers'])} and "
          f"{number(tables['addresses'])}"),
         ("Its stack", f"{number(top - bottom)} bytes"),
         ("How far its tables may grow, in front of `Title_S` and behind "
          "it, before the offset of one wraps round, as the test "
-         "`portable_c32-layout` holds them",
+         "`portable_c-layout` holds them",
          f"{number(room['in front of Title_S'])} and "
          f"{number(room['behind Title_S'])} bytes"),
         ("How much more may stand between `Title_S` and the main data, "
@@ -197,49 +163,10 @@ def flat():
          f"{number(room['between Title_S and the main data'])} and "
          f"{number(room['behind IniSave'])} bytes"),
         ("The same program compiled for finding a fault, "
-         "`build/portable_c32/debug/VC.EXE`",
+         "`build/portable_c/debug/VC.EXE`",
          f"{number(len(debug.contents))} bytes, "
          f"{number(debug.objects[0].size)} of them code"),
-        ("Inline assembly of `dos32.c`, which the program of 32 bits has "
-         "in place of that of `dos.c`",
-         f"{sum(piece[2] for piece in pieces)} instructions in "
-         f"{len(pieces)} pieces"),
     ]
-
-
-def table():
-    """The table, as lines of Markdown."""
-    program = (BUILD / "portable_c" / "VC.EXE").read_bytes()
-    linked = BUILD / "portable_c" / "VC.MAP"
-    original = len((BUILD / "shareware-layout" / "VC.COM").read_bytes())
-    translation = len((BUILD / "c" / "VC.EXE").read_bytes())
-    texts = sources()
-
-    size = len(program)
-    last, pages, relocations, header = struct.unpack_from("<4H", program, 2)
-    loaded = (pages - 1) * 512 + (last or 512) - header * PARAGRAPH
-    kept = whole(loaded + PSP) + 2 * whole(panel(texts))
-
-    rows = [
-        ("`VC.EXE`", f"{number(size)} bytes"),
-        (f"as a multiple of the original's {number(original)} bytes",
-         f"{size / original:.2f}"),
-        (f"more than the C translation's {number(translation)} bytes",
-         f"{number(size - translation)} bytes"),
-        ("The relocations in its header, which DOS applies",
-         number(relocations)),
-        ("What it keeps of the memory while a command runs: the program "
-         "and its panels", f"{number(kept)} bytes"),
-        ("What DOS has for a command then, on the bench of the tests",
-         f"{number(BENCH - kept)} bytes"),
-    ]
-    for name, kind, _, offset, length in coverage.segments(linked):
-        if kind == "CCODE" and length:
-            end = offset + length
-            rows.append((
-                f"The code segment `{name}` ends at",
-                f"{end:04X}h, {number(ported.CODE_END - end)} bytes below "
-                f"the limit, {ported.CODE_END:04X}h"))
 
     pieces = inline_assembly(texts)
     by_file = {}
@@ -263,7 +190,8 @@ def table():
                   for name in found.split(",")]
     rows.append(("Intrinsic functions",
                  f"{len(intrinsics)}: "
-                 + ", ".join(f"`{name}`" for name in intrinsics)))
+                 + ", ".join(f"`{name}`" for name in intrinsics)
+                 if intrinsics else "none"))
     rows.append(("Pairs of `#pragma pack`",
                  str(sum(len(re.findall(r"^#pragma pack\(push", text,
                                         flags=re.M))
@@ -283,12 +211,12 @@ def table():
     left = calls.count(SOURCE)
     total = sum(sum(counts) for _, counts in left)
     rows.append((
-        "Calls outside `dos.c` that hand registers to an interrupt, or "
-        "name a fixed address of the machine, where everything is to go "
-        "through `sys.h`, as `tools/calls.py` counts them",
+        "Calls outside the file of the system's functions that hand "
+        "registers to an interrupt, or name a fixed address of the "
+        "machine, where everything is to go through `sys.h`, as "
+        "`tools/calls.py` counts them",
         f"{number(total)}, in {len(left)} files" if total else "none"))
 
-    rows += flat()
     return (["| What | Figure |", "|---|---|"]
             + [f"| {what} | {figure} |" for what, figure in rows])
 

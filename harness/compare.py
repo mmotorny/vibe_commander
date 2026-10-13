@@ -89,20 +89,6 @@ class Outcome:
         where, lines = self.departs[0]
         return where, lines[:3 if lines[0].startswith("row ") else 1]
 
-    @property
-    def cause(self):
-        """The one line of `first` by which scenarios that fail alike
-        are known: the first row that differs and what the build showed
-        there, or what else was otherwise, or why it stopped. None for a
-        scenario that passed."""
-        if self.passed:
-            return None
-        lines = self.first[1]
-        if self.stopped or not lines[0].startswith("row "):
-            return lines[0]
-        # "row 16  original   |...|" and "        this build |...|".
-        return f"{lines[0][:6].rstrip()}, {lines[1].strip()}"
-
 
 def compare(names, program, trace=False, together=None, stack=False,
             limits=None, first=False):

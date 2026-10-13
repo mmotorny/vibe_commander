@@ -23,7 +23,7 @@
 ;
 ;   build.sh above com
 ;   run.py --extra VC/ABOVE.COM=build/trial32/above.com \
-;       build/portable_c32/VC.EXE '"d:\vc\above" Enter' Ctrl+o
+;       build/portable_c/VC.EXE '"d:\vc\above" Enter' Ctrl+o
 ;
 ; and with --himem for a machine that has an XMS driver, where MEM typed
 ; behind it says how much of that memory a command is left.

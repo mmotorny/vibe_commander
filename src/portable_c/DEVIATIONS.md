@@ -37,10 +37,7 @@ What the harness goes by of this, the steps that are left out, the rules
 and the scenarios that are not run, is in `harness/deviations.py`, under
 `TREES`. The patches are in `harness/goldens/portable_c/`, `NAME.patch` for
 the scenario `NAME`, and the top of `harness/goldens.py` says how one is
-written; the program of 32 bits has those, and in
-`harness/goldens/portable_c32/` its own for the scenarios that it is to
-show otherwise than the program of 16 bits, each in the place of the
-other. `python3 harness/goldens.py changes --tree portable_c` prints what
+written. `python3 harness/goldens.py changes --tree portable_c` prints what
 each says, with the cells that differ marked. `python3 harness/goldens.py
 patch --tree portable_c NAME` writes one from a run of the build, which is
 where its rows come from and not what makes them right: its author reads
@@ -302,10 +299,11 @@ C").
 **Which scenarios show it.** Each of these is held against the original's
 golden with what its row says made to it: by its patch, or, where the row
 says that every screen is as the original's, by the steps left out alone.
-A row is of both programs unless it says of which; where the program of
-32 bits is to show other rows than the program of 16 bits, it has a
-patch of its own, in `harness/goldens/portable_c32/`, with those rows
-and no others:
+The portable C is the program of 32 bits, and a row is of it. What a
+row says of the program of 16 bits is of the build that the portable C
+was until the tests came to judge the one of 32, on 13 October 2026:
+that build is gone, and its patches with it, where the program of 32
+bits had one of its own in their place:
 
 | Scenario | What changes in it |
 |---|---|
@@ -1670,9 +1668,9 @@ commands, has a number less (see 8).
 
 ### 13. The editor of the program of 32 bits has room for a larger file
 
-This is of one build of the portable C alone: the program of 32 bits,
-`build/portable_c32/VC.EXE`. The program of 16 bits that is built of
-the same source does here what the original does.
+This is of the portable C as the program of 32 bits that it is,
+`build/portable_c/VC.EXE`. As a program of 16 bits, which it was built
+as until 13 October 2026, it did here what the original does.
 
 **What the original does.** The editor has the whole of a text in the
 memory. Its room is what lies behind the lists of the two panels, as
@@ -1725,10 +1723,9 @@ removal of something that only made sense on DOS, and was asked first.
 and in the same 64K, and has the editor refuse it, view it from the
 box, and refuse it once more. The program of 32 bits opens the file at
 the first of those steps. The scenario is not run for that program:
-`TREES["portable_c32"]` of `harness/deviations.py`, which is what the
-portable C is declared to do with this added. It is run for the program
-of 16 bits and for the C translation, and held against the original's
-golden as it is. No patch and no rule is of this entry.
+`not_run` of `TREES["portable_c"]` of `harness/deviations.py`. It is run
+for the C translation, and held against the original's golden as it is.
+No patch and no rule is of this entry.
 
 What the scenario has behind that file is not run for the program of 32
 bits either, and some of it no other scenario has: a file that is

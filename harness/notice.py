@@ -16,12 +16,7 @@ branch from a wrong one, and one of them should be made to.
 The change is one piece of text in FILE, a file of src/portable_c/, the
 portable C, or of src/c/, the C translation, replaced by another: the
 tree that the file is of is the one that is built and run. The text has
-to be there exactly once. The portable C is built two ways of one
-source, and --build portable_c32 has its program of 32 bits built and
-run in place of the one of 16:
-
-    notice.py --build portable_c32 src/portable_c/string.c \
-        "c == ':' || " "" --routine CutPath
+to be there exactly once.
 
 With --routine only those scenarios are run in which the original ran that
 procedure of the assembly; the others cannot notice. Without, all are.
@@ -44,9 +39,7 @@ from concurrent.futures import ThreadPoolExecutor
 import compare
 import coverage
 import deps
-import deviations
 import goldens
-import ported
 import scenarios
 import setups
 from dos import MachineError
@@ -86,11 +79,10 @@ def copy_translation():
 
 
 def build(tree):
-    """Build the tree `tree` of COPY, or the build of a tree's source
-    that has that name (deviations.SOURCE); return its program, or None
-    with what the build said printed. The target of the build and the
-    directory of the program have the name, by which the harness knows
-    what is declared for the program."""
+    """Build the tree `tree` of COPY; return its program, or None with
+    what the build said printed. The target of the build and the
+    directory of the program have the tree's name, by which the harness
+    knows what is declared for the program."""
     fetched = BUILD / "_deps"
     steps = [
         ["cmake", "-S", COPY, "-B", COPY_BUILD,
@@ -126,18 +118,8 @@ def scenarios_running(routines, tree):
 
 def with_goldens(tree):
     """The scenarios that the tree `tree` is taken through and that have
-    a golden to be held against; the others of them are named. Of a
-    build that is held to a record of the scenarios that it passes
-    (ported.RECORDS), those of the record: another differs from its
-    golden whatever is changed."""
+    a golden to be held against; the others of them are named."""
     names = scenarios.names(tree)
-    if tree in ported.RECORDS:
-        passes = ported.recorded(ported.RECORDS[tree])
-        for name in names:
-            if name not in passes:
-                print(f"{name} is not on the record of {tree} and is left "
-                      "out", file=sys.stderr)
-        names = [name for name in names if name in passes]
     for name in names:
         if not goldens.derived(name):
             print(f"{name} has no golden yet and is left out",
@@ -185,11 +167,6 @@ def main():
                                      "directory")
     parser.add_argument("old", help="the text to replace")
     parser.add_argument("new", help="what to put in its place")
-    parser.add_argument("--build", metavar="NAME",
-                        help="the build of the file's tree to make and "
-                             "run, where that is not the tree's own: "
-                             "portable_c32, the portable C as a program "
-                             "of 32 bits")
     parser.add_argument("--routine", action="append", default=[],
                         metavar="NAME",
                         help="run only the scenarios in which the original "
@@ -203,9 +180,7 @@ def main():
     if len(parts) != 3 or parts[0] != "src" or parts[1] not in TREES:
         sys.exit(f"{args.file} is not a file of src/portable_c/ or of "
                  "src/c/")
-    tree = args.build or parts[1]
-    if deviations.source(tree) != parts[1] or tree not in deviations.TREES:
-        sys.exit(f"{tree} is no build of src/{parts[1]}/")
+    tree = parts[1]
     names = scenarios_running(args.routine, tree) if args.routine \
         else with_goldens(tree)
     if not names:

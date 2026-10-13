@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Say where the stacks of the original and of the C trees end in the
-memory of the test bench, and where the driver of the tests would put them.
+"""Say where the stacks of the original and of the C translation end in
+the memory of the test bench, and where the driver of the tests would put
+them.
 
 QEMU translates the code that the machine runs, a page of 4,096 bytes at
 a time, and has to look at every write to a page with code that it has
@@ -14,13 +15,17 @@ clock counted in instructions it is most of a scenario's time.
 Where DOS loads the program follows from what is loaded before it, and
 the driver of the tests can keep some memory more than it needs:
 setups.PLACE, in paragraphs of 16 bytes, for each country's bench. This
-prints, for each bench, where the stack of the original and of each C
-tree ends in its page, and the PLACE that would end the original's
-stack on a page. The original is the one to go by: it does not change.
+prints, for each bench, where the stack of the original and of the C
+translation ends in its page, and the PLACE that would end the
+original's stack on a page. The original is the one to go by: it does
+not change.
 
-    place.py                    the original, the C translation and the
-                                portable C
-    place.py portable_c         the original and that tree
+    place.py                    the original and the C translation
+
+This is of programs of 16 bits, whose stack is where DOS loads them. The
+portable C is a flat program of 32 bits: its stack is where the linker
+put it above the megabyte, whatever DOS does, and the rule that it
+answers to is harness/layoutcheck.py's.
 
 Needs the project built.
 """
@@ -32,8 +37,8 @@ import scenarios
 import setups
 
 PAGE = 4096
-# The C trees, by the names of their directories in build/.
-TREES = {"c": "the C translation", "portable_c": "the portable C"}
+# The C trees of 16 bits, by the names of their directories in build/.
+TREES = {"c": "the C translation"}
 
 
 def stack_end(program, bench):

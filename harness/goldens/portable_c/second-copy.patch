@@ -2,28 +2,11 @@ The portable C in the scenario second-copy: what it is expected to show
 otherwise than the original. A patch of harness/goldens/second-copy.txt, see
 harness/goldens.py: a line with - is the golden's, a line with + is what is
 expected in its place.
-Deviation: 1, 10 of src/portable_c/DEVIATIONS.md
-Why: the second copy has no memory to run a command: each copy keeps all of
-itself. And by 10, the box of F10 names the program in its title and in its
-question, by a name that is two letters shorter: the box is two cells
-narrower, a cell on either side, and its shadow ends a cell further left
-
-== 6: Ctrl+o
-rows 15-21
--|C:\WORK>d:\vc\vc ver○/r                                                         | 07x80
--|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
--|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
--|                                                                                | 07x80
--|FreeCom version 0.86 - WATCOMC - XMS_Swap [Dec 30 2024 22:10:51]                | 07x80
--|DOS version 7.10                                                                | 07x80
--|FreeDOS kernel 2043 (build 2043 OEM:0xfd) [compiled May 13 2021]                | 07x80
-+|                                                                                | 07x80
-+|                                                                                | 07x80
-+|                                                                                | 07x80
-+|C:\WORK>d:\vc\vc ver○/r                                                         | 07x80
-+|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
-+|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
-+|There is not enough memory to run this command                                  | 07x80
+Deviation: 10 of src/portable_c/DEVIATIONS.md
+Why: the box of F10 names the program in its title and in its question, by a
+name that is two letters shorter: the box is two cells narrower, a cell on
+either side, and its shadow ends a cell further left. Nothing else: the second
+copy has the memory to run its command, as the original's has
 
 == 8: F10
 rows 5-11

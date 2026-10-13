@@ -111,7 +111,7 @@ scripts that read and compile it and run nothing. One is here for the
 pieces of that plan to start from, and what each printed that day is in
 the plan. The second, `whole.py`, asked whether the tree links as a
 flat program and how long that is: the project's build links that
-program now, `build/portable_c32/VC.EXE`, `python3 harness/le.py` with
+program now, `build/portable_c/VC.EXE`, `python3 harness/le.py` with
 the file and its map prints what the script printed of it, but for how
 many bytes of the file its relocations take, and the script is gone.
 The third, which asked where the program can tell an

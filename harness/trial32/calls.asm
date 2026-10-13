@@ -23,7 +23,7 @@
 ; the root of the drive; the steps go to the program, and the last has
 ; to leave it:
 ;
-;   run.py --name VC.COM --extra VC.EXE=build/portable_c32/VC.EXE \
+;   run.py --name VC.COM --extra VC.EXE=build/portable_c/VC.EXE \
 ;       --keep build/trial32/calls build/trial32/calls.com \
 ;       '"ver" Enter' 'F10 Enter'
 ;

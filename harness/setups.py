@@ -109,14 +109,12 @@ class Program:
     # driver of the tests reads there where the program keeps what it
     # watches. Two programs are the same if their files are.
     listing: Path = field(default=None, compare=False)
-    # Of the C translation, the linker's map: where its stack is.
+    # Of a C tree, the linker's map: where its stack is.
     linked: Path = field(default=None, compare=False)
-    # Of a C tree, which one: the name of its directory in build/, "c",
-    # "portable_c", or "portable_c32" for the portable C built for 32
-    # bits, which is a tree of its own to the harness with the source of
-    # another (deviations.SOURCE). None for the original. A tree may be
-    # declared to behave otherwise than the original (see deviations.py),
-    # and is then held against what is declared for it.
+    # Of a C tree, which one: the name of its directory in build/, "c"
+    # or "portable_c". None for the original. A tree may be declared to
+    # behave otherwise than the original (see deviations.py), and is
+    # then held against what is declared for it.
     tree: str = field(default=None, compare=False)
 
     @classmethod
@@ -132,8 +130,8 @@ class Program:
             # watches there is where the original has it.
             # The tree is the directory that the file is in, or the one
             # above that if it is named as a tree is and this one is
-            # not: the program of 32 bits for finding a fault is in a
-            # directory of that tree's, build/portable_c32/debug.
+            # not: the portable C for finding a fault is in a directory
+            # of that tree's, build/portable_c/debug.
             above = path.resolve().parents
             tree = next((directory.name for directory in above[:2]
                          if directory.name in deviations.TREES),

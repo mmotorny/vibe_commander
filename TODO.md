@@ -2554,7 +2554,8 @@ which of them counted it.
   guessed at three to six more. The first is P1; D1 and H1 start beside
   it.
 - Nothing is past return before the last piece, which deletes the
-  16-bit build and is the user's to release.
+  16-bit build and is the user's to release. The user released it on 13
+  October 2026, with the switch, in one piece: "W and Z1" below.
 
 ### Taken by the session, on 13 October 2026
 
@@ -3673,7 +3674,7 @@ and H1 are started at once by the session.
 | C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
 | L, a program that has stayed in the memory, when the program is left. Tried, and dropped on the user's word of 13 October 2026: see "L, a program that has stayed in the memory" below | A program that a command has left in the memory was to be at work when the program of 32 bits has been left, as behind the one of 16 bits. The mend took two bits of the extender's settings, the three interrupts given back in real mode too, and a routine of real mode at every end of the program, and left such a program without INT 21h: it is in no commit. What is kept is the scenario, what was read of the extender, and the mend in words | The scenario `stay-left`; this plan | A scenario | E | `stay-left` for the original, the C translation and the program of 16 bits; the program of 32 bits failed it and is held to it by a patch of its own since the difference was declared | What was open, 10 of that table, is decided: declared as it is |
 | T, the time of a wait. Done: see "T, the time of a wait" below | Why a wait costs the host four times as much for the program of 32 bits, and what the time that a step has is counted in | `harness/dos.py`, `harness/scenarios.py`, `harness/ported.py` | 60 lines | H3; beside the convergence | The goldens derived again are as they are; a machine that hangs is given up and one that is kept from running is not; the whole suite | A program that hangs on a busy host is waited for until its machine has had its time |
-| W, the switch. Half done: see "W, the switch" below, which has what waits and for what | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
+| W, the switch. Done, with Z1 as one piece and without a name for the 16-bit build: see "W and Z1" below | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
 | Z1, the 16-bit build goes | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
 | Z2, the words go | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
 
@@ -6937,6 +6938,85 @@ to stand side by side for a while behind it.
   were made by the line at its top and compared by AX.
 - A patch that two builds are held to says in its reason what is so of
   each: `ended` did not, and nothing fails for a reason.
+
+### W and Z1, the switch and the end of the 16-bit build: the switch is made, and what is left of the piece
+
+On the user's word of 13 October 2026 the switch and the end of the
+16-bit build are one piece (`CLAUDE.md`, "The portable C", step 1 of
+the road), as the section above thought best: the program of 32 bits
+took the names, and the 16-bit build went in the same piece, with no
+name invented for it. Made from `038d8e6`, in five stages, of which the
+first is done and is what this section says; the other four are at its
+end, with what each has to do. The 16-bit program is built by nothing
+since, and its files are still in the tree.
+
+**What is called what now.**
+
+| | Before | Now |
+|---|---|---|
+| The program | `build/portable_c/VC.EXE`, 16 bits, by `wcc` and `add_portable_c`; `build/portable_c32/VC.EXE` and `debug/VC.EXE` there, by `wcc386` and `add_portable_c32` | `build/portable_c/VC.EXE` and `build/portable_c/debug/VC.EXE`, by `wcc386` with DOS/32A and `add_portable_c`. They are the files that were in `build/portable_c32/`, byte for byte: the SHA-256 of each is what it was |
+| The targets | `portable_c`, `portable_c32`, `portable_c32-debug` | `portable_c`, `portable_c-debug` |
+| The tree, to the harness | `portable_c`, the 16-bit program; `portable_c32`, "another build of a tree's source", with `deviations.SOURCE`, `Declared.also()` and `unpatched` | `portable_c`, the one tree, by the name of its directory in `build/` as before. `SOURCE`, `source()`, `also()` and `unpatched` are gone, with `goldens.own_patch_path` |
+| What is declared | `TREES["portable_c"]`, and `TREES["portable_c32"]` made of it with `editor-big` not run | `TREES["portable_c"]`, with `editor-big` among what is not run |
+| The patches | `harness/goldens/portable_c/`, and `harness/goldens/portable_c32/` for the scenarios that the program of 32 bits shows otherwise | `harness/goldens/portable_c/` alone. The patches of the 32-bit build's own took the places of the tree's or were added to them |
+| The record | `harness/pass32.txt`, with `ported.RECORDS`, `check_record`, `--record`, `--limit` and `SHORT_STEP` | None: the test holds the tree to every scenario that it is taken through, as the 16-bit test did. `compare.py` keeps `--first` and `--limit`, for a scenario by hand |
+| The tests | `portable_c-data`, `-arith`, `-scenarios` of the 16-bit program; `portable_c32-data`, `-scenarios`, `-layout`, `-debug-layout` | `portable_c-data`, `portable_c-scenarios`, `portable_c-layout`, `portable_c-debug-layout`. `portable_c-host`, `portable_c-int16` and `harness-le` as they were, and `asm-bytes`, `c-data`, `c-arith`, `c-scenarios` untouched |
+| `GONE` and `RENAMED` of `ported.py` | The tree's, and the build's made of them | The tree's, with what was the build's in them: `Exit01` and `Exit05` gone, `FatErr` as `DeviceEntry`, `Alloc0` as `Start` |
+| `tools/figures.py` | The rows of the 16-bit file, then those of the program of 32 bits | One program. What a program of 16 bits keeps of DOS's memory while a command runs, and what that leaves a command on the bench, are no rows any more: neither follows from the file of a program that is loaded above the megabyte |
+| `harness/notice.py` | `--build portable_c32` | Gone: the tree's build is that program |
+| `harness/place.py` | The original and both C trees | The original and the C translation: it is of programs of 16 bits |
+
+**What each thing that the two sets of tests held is held by now**, the
+table of the section above read again: every scenario, what ran of the
+original and of the C, the stack, the comparison itself and what is
+declared, by `portable_c-scenarios`; the layout by that test and by
+`portable_c-layout`; the tables by `portable_c-data`; `__U4M` and
+`__U4D` by nothing, the program having neither. Which C functions ran
+is asked of every scenario again, as of a tree without a record.
+
+**Where the plan and the code disagreed.**
+
+- The plan had the 16-bit build keep a name beside the program of 32
+  bits after the switch. It has none: see above.
+- An object that the compiler for 16 bits left in `build/portable_c/`
+  has the name of the one that `wcc386` is to write there, and the
+  build did not see that the command had changed: it would have linked
+  the old objects. Every object of the portable C follows a file now,
+  `compiled.txt` of its directory, which the configuration writes anew
+  only when the compiler's command is another. So a checkout that is
+  pulled across this piece builds without being cleaned. What it keeps
+  that nothing reads: `build/portable_c32/`, and `arith.obj`, `dos.obj`
+  and their listings in `build/portable_c/`.
+
+**What is left of the piece**, in order, each a commit or a few:
+
+2. The 16-bit build goes (Z1): `dos.c` and `arith.c` of `src/portable_c`,
+   which nothing compiles; what `CMakeLists.txt` still says of two builds;
+   what the harness has for a program of 16 bits as the linker writes
+   it, which only the portable C was, the limits of `check_layout` among
+   it; `harness/trial32/both.py`, which holds `dos32.c` against a file
+   that is gone then. Whether `dos32.c` keeps its name is said there.
+3. The words' 16-bit bodies (Z2): every `#ifdef __I86__` of
+   `src/portable_c`, the first bodies of the words of the addresses in
+   `vc.h`, `__far`, `__near`, `FAR`, `STACK`, `CODE`, `TEXT_FAR`,
+   `__loadds`, `__interrupt`, and whatever `#pragma aux` and inline
+   assembly only the 16-bit build read. The program's bytes are held
+   against those of before, `sha256sum build/portable_c/VC.EXE`; where
+   they change, the scenarios judge. `harness/trial32/sys.c` has such
+   lines too, for the 16-bit toy that is gone. Nothing of step 2 of the
+   road goes in.
+4. The checks that read the source: `harness/hostcheck.py` and its
+   record; `harness/int16.py`, whose `ONE_BUILD` still names the two
+   files of the 16-bit build and leaves `dos32.c` out, and whose point, what
+   an int of 16 bits and one of 32 make differently of the same line,
+   is to be said anew with one build left; `tools/figures.py`, the row
+   of the four words; `tools/calls.py`.
+5. The documents: the README, which is written of two programs
+   throughout and names tests, targets and directories that are no
+   more; `src/portable_c/DEVIATIONS.md`, with its parts "The program of
+   32 bits"; this plan; and the notes of `CLAUDE.md` where one now
+   misleads. Until then the README's table of figures is the one thing
+   there that is of the program as it is, written by the script.
 
 ### T, the time of a wait: done, and what a later piece should know
 

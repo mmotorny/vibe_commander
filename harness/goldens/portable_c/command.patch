@@ -1,0 +1,19 @@
+The portable C in the scenario command: what it is expected to show otherwise
+than the original. A patch of harness/goldens/command.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 1 of src/portable_c/DEVIATIONS.md
+Why: a command of the portable C finds no memory above the megabyte, since the
+extender holds all of it while the program is in the memory, and answers for
+the BIOS: `mem` is told that there is none, and goes by the two bytes of the
+clock's memory then, which have 128K more than the BIOS tells a command of the
+original. So much more are the extended memory in all, what is used of it, and
+the total memory
+
+== 7: Ctrl+o
+row 15
+-|Extended (XMS)     15,232K    15,232K         0K                                | 07x80
++|Extended (XMS)     15,360K    15,360K         0K                                | 07x80
+row 17
+-|Total memory       16,256K    ######K       ###K                                | 07x80
++|Total memory       16,384K    ######K       ###K                                | 07x80

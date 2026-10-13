@@ -58,10 +58,9 @@ names and that has no zero byte within itself, unless COUNTED, or
 SETUP_COUNTED for a thing of the setup program, says of the word that
 names it how many bytes are read of the text there.
 
-A tree may be built as a flat program of 32 bits as well, as the portable
-C is, build/portable_c32/ (TODO.md, "The portable C in 32 bits: the
-plan"): the same source and so the same objects, and the same tables here
-say what is otherwise. But a word that names something is a pointer in C,
+A tree may be built as a flat program of 32 bits, as the portable C is,
+build/portable_c/ (TODO.md, "The portable C in 32 bits: the plan"). A
+word that names something is a pointer in C,
 and a pointer is four bytes there, with whatever stands behind it that
 much further on: a box, a dialog and a table of pointers are longer than
 the original's and cannot be held against it byte for byte. They are held

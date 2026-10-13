@@ -540,40 +540,6 @@ class Declared:
     # (scenarios.Scenario.setup), whichever there are, or None if it is
     # taken through them: for a tree that has no setup program.
     no_setup: str = None
-    # Scenarios that the tree, another build of a tree's source (SOURCE),
-    # is held against the original's golden for with no patch, although
-    # the tree of its source has one: scenario -> why. For a scenario in
-    # which the build does again what the original does and that tree
-    # cannot. One that the build still shows otherwise in some row has
-    # a patch of its own instead, with those rows alone, which stands in
-    # the place of the other tree's by being there.
-    unpatched: dict = field(default_factory=dict)
-
-    def also(self, **more):
-        """What a tree is declared to do that does all of this and
-        `more`, named as the fields above are: what another build of this
-        tree's source is declared to do, which is what this one is with
-        what the two show otherwise added. A scenario, a step or a rule
-        of `more` is added to those of its kind, and takes the place of
-        one that is there under the same name; where a field goes by
-        scenarios and then by steps, the steps of a scenario are added
-        to those that it has. Nothing is taken away so: a build that is
-        to be taken through what this one is not, or without a rule of
-        this one, wants that written."""
-        merged = {}
-        for name, value in more.items():
-            had = getattr(self, name)
-            if name in ("left_out_of", "in_place_in"):
-                merged[name] = {**had, **{
-                    scenario: {**had.get(scenario, {}), **steps}
-                    for scenario, steps in value.items()}}
-            elif isinstance(had, dict):
-                merged[name] = {**had, **value}
-            elif isinstance(had, tuple):
-                merged[name] = had + tuple(value)
-            else:
-                merged[name] = value
-        return replace(self, **merged)
 
     def taken(self, steps, name=None):
         """How the tree is taken through `steps`, those of the scenario
@@ -683,7 +649,9 @@ TREES = {
     # way that a scenario has to a screen of more than 25 rows. And it
     # has no Quick execute commands: every command is run by a
     # COMMAND.COM of its own, and neither the Advanced options nor the
-    # setup's Configuration has the setting.
+    # setup's Configuration has the setting. And it is a flat program of
+    # 32 bits, whose editor has room for a file that the original's has
+    # none for.
     "portable_c": Declared(
         not_run={
             "quick": "it switches Quick execute commands on and runs "
@@ -698,10 +666,7 @@ TREES = {
                          "hands on of the calls of DOS that pass it, by a "
                          "program that stays in the memory between the two "
                          "copies: the portable C does not take INT 21h, "
-                         "and no call of DOS passes it. Nor has the "
-                         "machine of the tests the memory for a second "
-                         "copy behind that program, with all of each copy "
-                         "kept",
+                         "and no call of DOS passes it",
             "memory-map": _NO_MAP,
             "memory-map-russia": _NO_MAP,
             "mouse-memory": _NO_MAP,
@@ -723,6 +688,17 @@ TREES = {
                                   "list of colours with room for all 39",
             "setup-help-lines": _NO_LINES + ". It shows the setup's help "
                                 "in a window of 38 lines",
+            # The editor has room for a file that the original's has
+            # none for, on the user's word of 13 October 2026
+            # (DEVIATIONS.md, 13). What the scenario alone tested is
+            # listed in TODO.md, "The editor's room: untested in the
+            # program of 32 bits".
+            "editor-big": "it has the editor refuse a file of 381,338 "
+                          "bytes, which the original's editor has no room "
+                          "for and the editor of the portable C has, in "
+                          "the 640 KB of its own that its text lies in: "
+                          "the portable C opens the file where the "
+                          "original shows its box",
             # The scenarios of the setup program, until the tree has the
             # code that each shows: an entry goes with the commit that
             # makes its scenario pass (TODO.md, "The setup program in the
@@ -987,68 +963,6 @@ TREES = {
         },
     ),
 }
-
-
-# A tree of the harness may be another build of a tree's source: the
-# program of 32 bits, build/portable_c32/VC.EXE, is the portable C,
-# src/portable_c/, compiled and linked for a flat memory (TODO.md, "The
-# portable C in 32 bits: the plan"). Such a build is a tree of its own
-# here, under the name of its directory in build/, so that it can be
-# declared to show something otherwise than the build whose source it
-# shares; and it has no source and no DEVIATIONS.md of its own. Tree ->
-# the tree whose source it is built from.
-SOURCE = {"portable_c32": "portable_c"}
-
-# What such a build is declared to do is what the tree of its source is,
-# with what the two are declared to show otherwise added (Declared.also):
-# its entry is made of the other's and repeats nothing of it. A scenario
-# that it is to show otherwise has a patch of its own, a file of
-# harness/goldens/ under the build's name, which then stands in the
-# place of the patch that the tree of its source has for that scenario,
-# if it has one (goldens.patch_path); every other patch of that tree is
-# the build's too. Either says which entry of the source's DEVIATIONS.md
-# declares it.
-#
-# The program of 32 bits is declared to do one thing otherwise than the
-# portable C of 16 bits, on the user's word of 13 October 2026: its
-# editor has room for a file that the original's has none for
-# (DEVIATIONS.md, "The editor of the program of 32 bits has room for a
-# larger file"), and the scenario that has the editor refuse such a file
-# is not run for it. What that scenario alone tested is listed in
-# TODO.md, "The editor's room: untested in the program of 32 bits".
-#
-# And it shows two scenarios otherwise than the portable C of 16 bits,
-# by patches of its own: a second copy of it has the memory to run a
-# command, which one of the 16-bit program has not, and where it does
-# again what the original does, it is held to the original's golden,
-# its patch saying only what still differs: second-copy and
-# start-memory (src/portable_c/DEVIATIONS.md, 1). Where such a build
-# shows the original's golden as the rules leave it, and the tree of
-# its source has a patch, the build says so in `unpatched` of its
-# entry, the scenario and why. Nothing does today.
-#
-# What is said here for the build alone is held as what is said for a
-# tree is (ported.check_declared), and besides: a scenario that is not
-# run for the build by an entry here has to be one that the tree of its
-# source is taken through, or the entry says nothing. Nothing holds that
-# the build still does otherwise in such a scenario: that would take
-# running it.
-TREES["portable_c32"] = TREES["portable_c"].also(
-    not_run={
-        "editor-big": "it has the editor refuse a file of 381,338 bytes, "
-                      "which the original's editor has no room for and "
-                      "the editor of the program of 32 bits has, in the "
-                      "640 KB of its own that its text lies in: that "
-                      "program opens the file where the original shows "
-                      "its box",
-    })
-
-
-def source(tree):
-    """The tree whose source the tree `tree` is built from, by the name
-    of its directory in src/: the tree itself, but for another build of
-    a tree's source (SOURCE)."""
-    return SOURCE.get(tree, tree)
 
 
 def ruled(screen, rule):
