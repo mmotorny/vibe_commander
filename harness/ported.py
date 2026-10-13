@@ -111,20 +111,8 @@ import setups
 # is held to none, on the user's word of 12 October 2026: the setup
 # program goes into it, which the original has as a file of its own, and
 # nothing else goes by how long the file is. What the machine of the
-# tests asks of its layout, check_layout() holds it to as before.
+# tests asks of its layout, check_layout() holds it to.
 SIZE_LIMIT = {"c": 3}
-
-# Where a segment of compiled code may end at the most, counted from where
-# its segment register points, and how far code has to be from the stack:
-# both for the machine of the tests, not for the program, and both of a
-# program of 16 bits. tools/mkexe.c holds the C translation to them when
-# it is built, and says why at its top; check_layout() holds a program
-# of 16 bits that the linker wrote, which the portable C was until it
-# became a flat program. A flat program has one segment of code, in which
-# no call goes round the end of 64K, and is held to what
-# harness/layoutcheck.py says of its layout.
-CODE_END = 0xF000
-PAGE = 0x1000
 
 # How much of its stack the translation must leave untouched in every
 # scenario: one part in this many, half of it. The stack is made long enough
@@ -1561,72 +1549,26 @@ def check_stack(program, outcomes):
 
 def check_layout(program):
     """Report on how `program`, a build of a C tree, is laid out, as far
-    as the machine of the tests cares; return success. For a file that
-    tools/mkexe.c made that tool has seen to it.
+    as the machine of the tests and the program itself care; return
+    success.
 
-    Between the end of a segment and its beginning a near call goes the
-    short way, around the end of the 64K, and the linker makes such
-    calls of the far calls between two files of a segment. QEMU, as of
-    11.1, leaves the wrapping out where the call and the place it would
-    go to without wrapping are in one 4K page, and goes on 64K off: so
-    no segment of code may reach into the last 4K of its 64K. And QEMU
-    is many times slower at a write to a page that has code which it has
-    run, and a push is a write: so no code within 4K of the stack."""
-    if le.linear(program.contents):
-        return check_flat_layout(program)
-    if coverage.made_by_mkexe(program.contents):
+    For a program of 16 bits, the C translation, tools/mkexe.c has seen
+    to it when the file was built, and says why at its top: no segment
+    of code reaches into the last 4K of its 64K, where QEMU gets a near
+    call wrong that goes round the end of the segment, and no code
+    stands within 4K of the stack, QEMU being many times slower at a
+    write to a page that has code which it has run.
+
+    Of a flat program of 32 bits, the portable C, the first is gone with
+    the segments of 64K. The second is there in another form: nothing
+    that a scenario writes lies in a page of 4K that has code, of the
+    stack the part that check_stack() lets a scenario use. That, and
+    what the words of the program's addresses take for granted of where
+    the linker has put things, is harness/layoutcheck.py's to say and to
+    hold, which this asks: the test of the layout does the same without
+    a machine, and holds the stub of the file besides."""
+    if not le.linear(program.contents):
         return True
-    found = coverage.segments(program.linked)
-    bottom, top = coverage.stack(program.linked)
-    passed = True
-    code = [(name, at * 16 + offset, offset, size)
-            for name, kind, at, offset, size in found
-            if kind == "CCODE" and size]
-    if not code:
-        print(f"  {program.linked} lists no segment of compiled code")
-        return False
-    for name, begin, offset, size in code:
-        if offset + size > CODE_END:
-            passed = False
-            print(f"  segment {name} ends at {offset + size:X}h, and "
-                  f"compiled code may not reach beyond {CODE_END:X}h: a "
-                  "call from there to the beginning of the segment goes "
-                  "around the end of its 64K, which the machine of the "
-                  "tests gets wrong. Have a file compiled into another "
-                  "segment: see add_portable_c in CMakeLists.txt")
-        if begin < top + PAGE and begin + size > bottom - PAGE:
-            passed = False
-            print(f"  segment {name} has code within 4K of the stack, "
-                  "which makes the machine of the tests many times "
-                  "slower: have the tables stand between the two, by the "
-                  "linker's command in CMakeLists.txt")
-    end = max(at * 16 + offset + size for _, _, at, offset, size in found)
-    if top != end:
-        passed = False
-        print("  the stack is not the last of the program, which takes "
-              "itself to end where its stack does (MemOwn of "
-              "src/portable_c/dos.c): see the linker's command in "
-              "CMakeLists.txt")
-    print("The layout: " + ", ".join(
-        f"{name} ends at {offset + size:X}h" for name, _, offset, size in code)
-        + f"; the limit is {CODE_END:X}h, no code is within 4K of the "
-        "stack, and the stack is the last of the program")
-    return passed
-
-
-def check_flat_layout(program):
-    """Report on how `program`, a flat program of 32 bits, is laid out;
-    return success. What its layout has to be, for the words of the
-    program's addresses and for the machine of the tests, and why, is
-    harness/layoutcheck.py's to say and to hold, which this asks: the
-    test of the layout does the same without a machine, and holds the
-    stub of the file besides.
-
-    Of the two limits that a program of 16 bits is held to, the first
-    is gone with the segments of 64K. The second is there in another
-    form: nothing that a scenario writes lies in a page of 4K that has
-    code, of the stack the part that check_stack() lets a scenario
-    use."""
     check = layoutcheck.Check(program.contents, program.linked)
     passed = check.all()
     for problem in check.problems:

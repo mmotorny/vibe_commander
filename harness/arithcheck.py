@@ -2,8 +2,9 @@
 """Hold the arithmetic that the compiler calls for against Python's.
 
 For a product or a quotient of numbers of 32 bits the compiled code calls
-two routines, __U4M and __U4D, which are functions of arith.c in a C
-tree, src/c/ or src/portable_c/. No
+two routines, __U4M and __U4D, where it is compiled for 16 bits: they
+are functions of arith.c in the C translation, src/c/. The portable C is
+compiled for 32 bits and has neither. No
 scenario shows a wrong one for what it is, and of the division the
 scenarios run little: nothing divides by more than 16 bits. So the two
 are run here, as the bytes that they are in the linked program, on a
@@ -11,8 +12,9 @@ model of the 8086 that knows the instructions they are made of, with
 many pairs of numbers, and what comes back is held against what Python
 makes of the same numbers: the product in DX:AX, the quotient in DX:AX
 and the remainder in CX:BX. The compiler calls them near in the model
-that the C translation is compiled in, and far in that of the portable
-C: which it is, each routine says by how it returns.
+that the C translation is compiled in, and far in the medium model, in
+which the portable C was compiled while it was a program of 16 bits:
+which it is, each routine says by how it returns.
 
 It also fails if a routine changes a register that it is to keep, BX and
 CX among them for __U4M, if it writes to the stack of its caller or
@@ -400,8 +402,8 @@ def main():
     parser = argparse.ArgumentParser(
         description=__doc__, formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument("translation", type=Path,
-                        help="the directory of a C tree's build, build/c "
-                             "or build/portable_c: VC.EXE, VC.MAP")
+                        help="the directory of the build of a C tree of "
+                             "16 bits, build/c: VC.EXE, VC.MAP")
     parser.add_argument("--pairs", type=int, default=4000, metavar="N",
                         help="how many random pairs of numbers, besides "
                              "those at the edges (4000)")

@@ -1,24 +1,27 @@
 /* The functions of the portable C's sys.h, each asked and what it
    answers written onto the screen: the toy by which dos32.c, the
-   functions for the program of 32 bits, is held against dos.c, those of
-   the program of 16 bits. It is one source built both ways (build.sh):
+   functions of the program, a flat one of 32 bits, was held against
+   dos.c, those of the program of 16 bits that the portable C was
+   before. It was one source built both ways, and is built one way now
+   (build.sh):
 
-     sys-16.exe   by wcc, with the dos.obj and the stack.obj that the
-                  project's build has made for the program;
      sys-32.exe   by wcc386, with src/portable_c/dos32.c and stack.c, and
                   DOS/32A for its stub.
 
-   The two have to write the same on the bench, a screen for a screen:
-   both.py runs them there and says where they do not. What is asked is
-   what the program asks, and what it could: a call that fails, a file
-   that is not there, a drive that there is not, a count of none.
+   The two had to write the same on the bench, a screen for a screen,
+   and did when the 16-bit build went; asked.py runs the one that is
+   left and prints its pages. What is asked is what the program asks,
+   and what it could: a call that fails, a file that is not there, a
+   drive that there is not, a count of none. What is said below of 16
+   bits is of then, and the lines that only that build read are left
+   for the piece that takes such lines out of the tree.
 
    It writes a page at a time and then waits as the program waits, with
    the idle call, a look at the mouse and a look for a key, so each page
    is the screen of one step of a script, and the next page begins with
    what turned it: the key as KeyWaiting and KeyRead had it and what
    KeysHeld said then, or where the mouse was when a button went down.
-   The steps are both.py's STEPS, one behind each page but the last.
+   The steps are asked.py's STEPS, one behind each page but the last.
 
    An item is a name and what was answered, in hex: of a struct Answer
    the value and, behind a slash, whether it failed. What turns out

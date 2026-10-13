@@ -78,7 +78,7 @@ driver takes as they are: 4 dots to the right for 4, 2 dots down for 4,
 where a cell is 8 dots each way. From one place to the next with a button
 down the pointer goes the same way, by steps of 4, without the corner.
 
-A flat program of 32 bits, as the portable C is to be, has its data above
+A flat program of 32 bits, as the portable C is, has its data above
 the megabyte, and is in the machine's memory where its extender puts it.
 What the driver reads of it, it reads at addresses of the machine's
 memory, which are worked out here: from the file and the linker's map,
@@ -237,25 +237,10 @@ def facts(program, stack=False):
         return flat_facts(name, flat, le.Map(program.linked),
                           ("_md", auto_time), ("_md", clock), stack)
     found = Facts(name, auto_time, clock)
-    if program.linked and not coverage.made_by_mkexe(code):
-        # The driver reads the two at those places of the segment that DS
-        # is on when the program idles: the main data has to begin there.
-        if coverage.link_map(program.linked).get("_md") != (0, 0):
-            raise RuntimeError(
-                f"the main data of {program.filename} is not at offset 0 "
-                "of the program's data, where the driver of the tests "
-                "takes it to be: see md in src/portable_c/main.c")
     if stack:
         if program.linked:
             bottom, top = coverage.stack(program.linked)
             at = bottom + coverage.origin(code)
-            if not coverage.made_by_mkexe(code):
-                # The driver finds the stack by its place in the segment
-                # that SS is on, which the header of the file names.
-                bottom -= 16 * struct.unpack_from("<H", code,
-                                                  coverage.EXE_SS)[0]
-                top -= 16 * struct.unpack_from("<H", code,
-                                               coverage.EXE_SS)[0]
         else:
             bottom = symbol(r"^DataSav [ .]*Byte\[\d+\] +([0-9A-F]+)h")
             top = symbol(r"^VcStack [ .]*L Near +([0-9A-F]+)h")

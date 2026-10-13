@@ -49,8 +49,8 @@ that both programs have, SETUP_PLACES.
                                 otherwise than its tree
 
 Nothing here is of 16 bits in kind: the places are found in the text of
-the source, which is one for both kinds of program, and a count is of
-bytes of a text or of a table of bytes, which are the same in both. What
+the source, and a count is of bytes of a text or of a table of bytes,
+which are the same in a program of 16 bits and in a flat one of 32. What
 differs is which file of the system's functions the program is built of,
 SYSTEM_FILE, and how long an object with pointers in it is, a box or a
 dialog, of which no place reads a count of bytes: it is handed on by its
@@ -91,10 +91,10 @@ SETUP_FILES = ("stmain.c", "stopts.c", "stcolor.c", "sthelp.c")
 SETUP_PLACES = (("bars.c", "StKeyB_T"), ("bars.c", "StKeyC_T"),
                 ("bars.c", "StKey_S"))
 
-# The file of the system's functions, of which a tree may have two, one
-# for each kind of program that it is built as: whether the program is a
-# flat one of 32 bits -> the file. The other is no part of the program:
-# it is not read, and what REVIEWED has for it is not held against the
+# The file of the system's functions, by the kind of program that a
+# tree is: whether the program is a flat one of 32 bits -> the file. A
+# tree has one of the two, the C translation dos.c and the portable C
+# dos32.c, and what REVIEWED has for the other is not held against the
 # program.
 SYSTEM_FILE = {False: "dos.c", True: "dos32.c"}
 
@@ -380,14 +380,12 @@ def _form(statement, name, sizes):
     return None
 
 
-def places(source, objects, variables=(), flat=False):
+def places(source, objects, variables=()):
     """Every place where a file of code in the directory `source` names
     one of `objects`, a list of (file, name, address, length) as
     datacheck.Translation has them: (file, line, name, the file of the
     object, its length, what is read there, how that is known).
-    `variables` are names among them that are no constants. `flat` is
-    whether the program is a flat one of 32 bits, for which of
-    SYSTEM_FILE is read."""
+    `variables` are names among them that are no constants."""
     by_name = defaultdict(list)
     for module, name, _, length in objects:
         if name not in variables:
@@ -396,8 +394,7 @@ def places(source, objects, variables=(), flat=False):
     pattern = re.compile(r"\b(" + "|".join(map(re.escape, names)) + r")\b")
     found = []
     for path in sorted(source.glob("*.c")):
-        if path.name.endswith("_t.c") \
-                or path.name == SYSTEM_FILE[not flat]:
+        if path.name.endswith("_t.c"):
             continue
         text = re.sub(r"/\*.*?\*/",
                       lambda match: re.sub(r"[^\n]", " ", match[0]),
@@ -478,14 +475,15 @@ GONE = {
 def check(source, objects, contents, variables=(), flat=False):
     """What is wrong with how the code in the directory `source` reads
     the constants: a list of lines. `contents` gives the bytes of an
-    object by its address and length. `flat` as for places()."""
+    object by its address and length. `flat` is whether the program
+    is a flat one of 32 bits, for which of SYSTEM_FILE is the tree's."""
     wrong = []
     used = set()
     gone = GONE.get(Path(source).name, {})
     where = {(module, name): address
              for module, name, address, _ in objects}
     for file, line, name, module, length, read, how in places(
-            source, objects, variables, flat):
+            source, objects, variables):
         used.add((file, name))
         if read is None:
             wrong.append(f"{file}:{line}: how much of {name} is read here "
@@ -533,7 +531,7 @@ def main():
     variables = translation.variables | set(
         VARIABLES.get(translation.source.name, {}))
     for file, line, name, module, length, read, how in places(
-            translation.source, translation.objects, variables, flat):
+            translation.source, translation.objects, variables):
         print(f"{file + ':' + str(line):18} {name:11} {length:4} of "
               f"{module:13} {read}{'' if how == 'by its form' else ': ' + how}")
     for line in check(translation.source, translation.objects,

@@ -3675,8 +3675,8 @@ and H1 are started at once by the session.
 | L, a program that has stayed in the memory, when the program is left. Tried, and dropped on the user's word of 13 October 2026: see "L, a program that has stayed in the memory" below | A program that a command has left in the memory was to be at work when the program of 32 bits has been left, as behind the one of 16 bits. The mend took two bits of the extender's settings, the three interrupts given back in real mode too, and a routine of real mode at every end of the program, and left such a program without INT 21h: it is in no commit. What is kept is the scenario, what was read of the extender, and the mend in words | The scenario `stay-left`; this plan | A scenario | E | `stay-left` for the original, the C translation and the program of 16 bits; the program of 32 bits failed it and is held to it by a patch of its own since the difference was declared | What was open, 10 of that table, is decided: declared as it is |
 | T, the time of a wait. Done: see "T, the time of a wait" below | Why a wait costs the host four times as much for the program of 32 bits, and what the time that a step has is counted in | `harness/dos.py`, `harness/scenarios.py`, `harness/ported.py` | 60 lines | H3; beside the convergence | The goldens derived again are as they are; a machine that hangs is given up and one that is kept from running is not; the whole suite | A program that hangs on a busy host is waited for until its machine has had its time |
 | W, the switch. Done, with Z1 as one piece and without a name for the 16-bit build: see "W and Z1" below | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
-| Z1, the 16-bit build goes | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
-| Z2, the words go | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
+| Z1, the 16-bit build goes. Done, but for the first bodies in `vc.h`, which go with the words, and for the README; and `dos32.c` keeps its name: see "W and Z1" below | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
+| Z2, the words go. Next: the third stage of "W and Z1" below | `__far`, `FAR`, `STACK`, `CODE` out of the source, by a script | Every file | 1,210 places | Z1 | The 32-bit `VC.EXE` is the same bytes | |
 
 The order:
 
@@ -6939,16 +6939,15 @@ to stand side by side for a while behind it.
 - A patch that two builds are held to says in its reason what is so of
   each: `ended` did not, and nothing fails for a reason.
 
-### W and Z1, the switch and the end of the 16-bit build: the switch is made, and what is left of the piece
+### W and Z1, the switch and the end of the 16-bit build: done, and what is left of the piece
 
 On the user's word of 13 October 2026 the switch and the end of the
 16-bit build are one piece (`CLAUDE.md`, "The portable C", step 1 of
 the road), as the section above thought best: the program of 32 bits
 took the names, and the 16-bit build went in the same piece, with no
 name invented for it. Made from `038d8e6`, in five stages, of which the
-first is done and is what this section says; the other four are at its
-end, with what each has to do. The 16-bit program is built by nothing
-since, and its files are still in the tree.
+first two are done and are what this section says; the other three are
+at its end, with what each has to do.
 
 **What is called what now.**
 
@@ -6962,6 +6961,7 @@ since, and its files are still in the tree.
 | The record | `harness/pass32.txt`, with `ported.RECORDS`, `check_record`, `--record`, `--limit` and `SHORT_STEP` | None: the test holds the tree to every scenario that it is taken through, as the 16-bit test did. `compare.py` keeps `--first` and `--limit`, for a scenario by hand |
 | The tests | `portable_c-data`, `-arith`, `-scenarios` of the 16-bit program; `portable_c32-data`, `-scenarios`, `-layout`, `-debug-layout` | `portable_c-data`, `portable_c-scenarios`, `portable_c-layout`, `portable_c-debug-layout`. `portable_c-host`, `portable_c-int16` and `harness-le` as they were, and `asm-bytes`, `c-data`, `c-arith`, `c-scenarios` untouched |
 | `GONE` and `RENAMED` of `ported.py` | The tree's, and the build's made of them | The tree's, with what was the build's in them: `Exit01` and `Exit05` gone, `FatErr` as `DeviceEntry`, `Alloc0` as `Start` |
+| `OWN_OF_FLAT` of `datacheck.py` | `Ended_T` and `NoStart_S`, of `dos32.c` | In `OWN_OF` |
 | `tools/figures.py` | The rows of the 16-bit file, then those of the program of 32 bits | One program. What a program of 16 bits keeps of DOS's memory while a command runs, and what that leaves a command on the bench, are no rows any more: neither follows from the file of a program that is loaded above the megabyte |
 | `harness/notice.py` | `--build portable_c32` | Gone: the tree's build is that program |
 | `harness/place.py` | The original and both C trees | The original and the C translation: it is of programs of 16 bits |
@@ -6974,10 +6974,65 @@ declared, by `portable_c-scenarios`; the layout by that test and by
 `__U4D` by nothing, the program having neither. Which C functions ran
 is asked of every scenario again, as of a tree without a record.
 
+**What went with the 16-bit build.**
+
+- `src/portable_c/dos.c`, the system's functions for DOS in 16 bits,
+  and `src/portable_c/arith.c`, the compiler's two helpers, with the
+  test `portable_c-arith`. `harness/arithcheck.py` stays, for `c-arith`.
+- Of `CMakeLists.txt`: the function that built the 16-bit program, with
+  its three groups of data, its two code segments and its list of the
+  files of the second; the lists of the files that were of one build
+  alone; and what `c_compile` had for a tree with a `sys.h`.
+- Of the harness, what was there for a program of 16 bits as the linker
+  writes it, which only the portable C was: the limits of
+  `ported.check_layout` (`CODE_END`, `PAGE`: a code segment below F000h,
+  no code within 4K of the stack, the stack last); in `coverage.py`,
+  `made_by_mkexe`, the header's table of relocations and the second of
+  `STACKS`; in `driver.py`, the main data at offset 0 of the segment
+  that DS is on and the stack by the header's SS; in `datacheck.py`, the
+  classes `MAIN` and `STACK` of an object file of 16 bits; in
+  `reads.py`, the file of the system's functions that a program is not
+  built of. A program of 16 bits is the C translation's now, a file that
+  `tools/mkexe.c` made, and nothing else.
+- `harness/trial32/both.py`, which held `dos32.c` against `dos.c`
+  function for function, and `build.sh sys 16`. What is kept of it is
+  `harness/trial32/asked.py`: it builds the toy `sys.c` with `dos32.c`,
+  runs it through the same steps and prints its 28 pages, for holding a
+  change to `dos32.c` against what the toy printed before. Nothing
+  judges those pages any more. `casts.py` and `added.py` are of the
+  source and stay.
+- Nothing of `tools/`: `mkexe.c` is the C translation's and `stub.c`
+  the flat program's. The 16-bit link of the portable C used no tool.
+
+**`dos32.c` keeps its name.** The plan had it become `dos.c` (the row
+Z1). It does not, for three reasons:
+
+- The harness has tables that are one for both C trees and go by the
+  name of a file, and the C translation has a `dos.c`, another file:
+  `REVIEWED` of `harness/reads.py`, where an entry for a file that does
+  not name its constant fails the test, tells the two apart today by
+  their names alone (`SYSTEM_FILE`). With one name the tables would
+  have to be told which tree an entry is of, which is the work that the
+  row R1 has for `resident.c`.
+- The notes of `CLAUDE.md`, this document and the history say `dos.c`
+  for the file of 16 bits and `dos32.c` for this one, some hundreds of
+  times. With the names as they are, each of those still says which
+  file it means.
+- Step 6 of the road names the files of the system's functions anew,
+  `_dos.c` and `_posix.c` beside common headers. A rename now is made
+  twice.
+
+What reads wrongly for it: the rule of `CLAUDE.md` that says "Today
+that place is `sys.h`, with `dos.c` behind it". The session was told.
+
 **Where the plan and the code disagreed.**
 
 - The plan had the 16-bit build keep a name beside the program of 32
   bits after the switch. It has none: see above.
+- The plan's row Z1 has "the first bodies in `vc.h`" go with the build;
+  they go with the words, in the stage below, so that the deletion of
+  two files and of a build is one commit and the change to every file
+  of the tree another.
 - An object that the compiler for 16 bits left in `build/portable_c/`
   has the name of the one that `wcc386` is to write there, and the
   build did not see that the command had changed: it would have linked
@@ -6990,12 +7045,6 @@ is asked of every scenario again, as of a tree without a record.
 
 **What is left of the piece**, in order, each a commit or a few:
 
-2. The 16-bit build goes (Z1): `dos.c` and `arith.c` of `src/portable_c`,
-   which nothing compiles; what `CMakeLists.txt` still says of two builds;
-   what the harness has for a program of 16 bits as the linker writes
-   it, which only the portable C was, the limits of `check_layout` among
-   it; `harness/trial32/both.py`, which holds `dos32.c` against a file
-   that is gone then. Whether `dos32.c` keeps its name is said there.
 3. The words' 16-bit bodies (Z2): every `#ifdef __I86__` of
    `src/portable_c`, the first bodies of the words of the addresses in
    `vc.h`, `__far`, `__near`, `FAR`, `STACK`, `CODE`, `TEXT_FAR`,

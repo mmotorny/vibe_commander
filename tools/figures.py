@@ -72,19 +72,10 @@ def code(path):
     return re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
 
 
-# The files that the program is not built of: those of the 16-bit build
-# that the portable C had, which nothing compiles. They are not read
-# for what is counted in the source. The test portable_c-host reads
-# them, and its count of the words has them.
-NOT_BUILT = ("arith.c", "dos.c")
-
-
 def sources():
-    """The files of the portable C that the program is built of, as
-    name -> text without comments."""
+    """The files of the portable C, as name -> text without comments."""
     return {path.name: code(path)
-            for path in sorted(SOURCE.glob("*.[ch]"))
-            if path.name not in NOT_BUILT}
+            for path in sorted(SOURCE.glob("*.[ch]"))}
 
 
 def inline_assembly(texts):

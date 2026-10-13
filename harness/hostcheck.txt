@@ -5,7 +5,6 @@ says what the kinds are. Not to be edited: the test portable_c-host
 holds the tree to it, and `python3 harness/hostcheck.py --record`
 writes it anew.
 
-arith.c       registers 2
 bars.c        clean
 bars_t.c      clean
 blank.c       clean
@@ -19,7 +18,6 @@ dialog.c      clean
 digits.c      clean
 dirfunc.c     clean
 dirfunc_t.c   clean
-dos.c         to-number 28, to-pointer 22, function 5, interrupt 4, loadds 1, naked 1, asm 1, asm-pragma 7, registers 1, intrinsic 1, aborts 1
 dos32.c       to-number 15, to-pointer 24, naked 2, asm 2, asm-pragma 11, registers 1, intrinsic 1
 drive.c       clean
 edit.c        clean

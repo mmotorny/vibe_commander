@@ -196,21 +196,12 @@ OWN_OF = {
                      "based on, where the original has the line across "
                      "the panel and below it two lines on the memory, "
                      "which the portable C has not",
-    },
-}
-
-# As OWN_OF, for the constants that a tree has only where it is built as
-# a flat program of 32 bits: tree -> name -> why. Such a program has
-# another file of the system's functions, dos32.c for dos.c
-# (reads.SYSTEM_FILE), and that file has constants of its own. They are
-# not compared, and a program of 16 bits is not held to have them.
-OWN_OF_FLAT = {
-    "portable_c": {
+        # Of dos32.c, the file of the system's functions of a flat
+        # program under an extender, which has constants of its own.
         "Ended_T": "the instructions that dos32.c puts below the megabyte "
                    "for where DOS goes on when it has ended the program "
-                   "by another's hand, in real mode: the program of 16 "
-                   "bits has them as code, Exit01 and Exit05 of dos.c, "
-                   "and the original as its Exit01 and Exit02",
+                   "by another's hand, in real mode: the original has "
+                   "them as code, its Exit01 and Exit02",
         "NoStart_S": "what dos32.c says where the extender has no memory "
                      "below the megabyte for it: the words of the "
                      "original's Aloc_S, which the tree has in resident.c "
@@ -857,7 +848,8 @@ def source_of(directory):
 
 
 class Translation:
-    """The translation: the bytes of its file, and where its objects are.
+    """The translation as a program of 16 bits, which the C translation
+    is: the bytes of its file, and where its objects are.
     `source` is the directory of its C files; without one, it is the
     directory of src/ that has the name of `directory`."""
 
@@ -921,10 +913,6 @@ class Translation:
                 if code and not re.match(r"_[A-Za-z0-9]", name):
                     continue
                 if compiled.segments[segment][0].endswith("_BSS"):
-                    continue
-                # Nor are the main data and the stack of the portable C,
-                # each a segment of a class of its own.
-                if compiled.segments[segment][1] in ("MAIN", "STACK"):
                     continue
                 if compiled.segments[segment][0].endswith("_DATA"):
                     self.variables.add(name.lstrip("_"))
@@ -1582,8 +1570,6 @@ def check(layout, directory, source=None, quiet=True, say=print):
     count = bytes_held = 0
     of_setup = bytes_of_setup = 0
     own = OWN | OWN_OF.get(translation.source.name, {})
-    if flat:
-        own |= OWN_OF_FLAT.get(translation.source.name, {})
     # Of a flat program: the objects that are laid out by a declaration
     # with pointers, the pointers in them, how many of those are
     # addresses, and the bytes of all objects as the original lays them

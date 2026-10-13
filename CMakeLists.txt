@@ -155,15 +155,17 @@ set_target_properties(stub PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tools)
 
 # c_compile(<tree> <model> <source> <object> <segment> <class>
-# [<option>...]) compiles a file of src/<tree>/ into
-# build/<tree>/<object>.obj, with a listing next to it.
+# [<option>...]) compiles a file of src/<tree>/ for 16 bits into
+# build/<tree>/<object>.obj, with a listing next to it. It is how the C
+# translation is compiled; the portable C was, while it was a program of
+# 16 bits.
 function(c_compile tree model source object text class)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/${tree})
     set(c_dir ${CMAKE_BINARY_DIR}/${tree})
     # -0     code for the 8086, like the original
     # -ms    the model that the tree is compiled in, which its caller
-    # -mm    names: near data in both, and a function near with -ms
-    #        unless it says otherwise, far with -mm unless it is static
+    #        names: near data, and a function near unless it says
+    #        otherwise
     # -os    favour small code
     # -s     no checks for stack overflow, which need the C library
     # -zu    the stack is not in the data segment
@@ -178,12 +180,7 @@ function(c_compile tree model source object text class)
     # listing: that is where to read which registers a function saves and
     # how much stack it takes.
     # A file is compiled again when a header of its tree has changed:
-    # vc.h and tables.h, which both trees have, and sys.h, which the
-    # portable C has and vc.h includes there.
-    set(headers "")
-    if(EXISTS ${source_dir}/sys.h)
-        set(headers ${source_dir}/sys.h)
-    endif()
+    # vc.h and tables.h.
     add_custom_command(
         OUTPUT ${c_dir}/${object}.obj
         COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -m${model} -os -s -zu -zl -zls
@@ -196,7 +193,6 @@ function(c_compile tree model source object text class)
         DEPENDS ${source_dir}/${source}
                 ${source_dir}/vc.h
                 ${source_dir}/tables.h
-                ${headers}
         COMMENT "Compiling ${tree}/${source} (${text})"
         VERBATIM)
 endfunction()
@@ -229,8 +225,8 @@ function(add_c_tree tree description model)
     # routines that the compiler calls for arithmetic on 32 bits, __U4M
     # and __U4D of arith.c, are in CTEXT. With the model s the compiler
     # calls them near: a file that needs them stays in CTEXT then, or the
-    # linker says that it cannot reach them. With the model m it calls
-    # them far, from either segment. A segment holds F000h bytes, not 64K:
+    # linker says that it cannot reach them. A segment holds F000h bytes,
+    # not 64K:
     # tools/mkexe.c says why, and stops the build when one is fuller. Name
     # another file to the function then.
     set(c_second ${ARGN})
@@ -328,19 +324,16 @@ function(add_portable_c target directory)
     set(source_dir ${CMAKE_SOURCE_DIR}/src/portable_c)
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
-    # A file that is named and is not there has left its name behind.
-    foreach(source ${portable_c_16_alone} ${portable_c_32_alone})
-        if(NOT source IN_LIST c_files)
-            message(FATAL_ERROR
-                "src/portable_c/${source} is named in CMakeLists.txt and is "
-                "not there: take its name out")
-        endif()
-    endforeach()
-    list(REMOVE_ITEM c_files ${portable_c_16_alone})
-    # The files in the order of their names, and dos32.c behind them all,
-    # whatever its name: the linker's command, below, says why.
-    list(REMOVE_ITEM c_files ${portable_c_32_alone})
-    list(APPEND c_files ${portable_c_32_alone})
+    # The files in the order of their names, and dos32.c, the file of
+    # the system's functions, behind them all: the linker's command,
+    # below, says why.
+    if(NOT dos32.c IN_LIST c_files)
+        message(FATAL_ERROR
+            "src/portable_c/dos32.c is named in CMakeLists.txt and is not "
+            "there: the file that is to be linked last has another name")
+    endif()
+    list(REMOVE_ITEM c_files dos32.c)
+    list(APPEND c_files dos32.c)
     # -3r    code for the 386, with arguments in registers
     # -mf    the flat model: one segment of code and one of data, and a
     #        pointer is an offset of 32 bits
@@ -351,7 +344,8 @@ function(add_portable_c target directory)
     #        16 bits, as any other compiler has it
     # -fr    no file of the errors beside what the compiler writes out:
     #        it would be build/<file>.err, which is where the compiler
-    #        for 16 bits leaves its own of a file of the same name
+    #        for 16 bits leaves its own of a file of the same name, of
+    #        the C translation
     set(compile ${watcom} ${watcom_bin}/wcc386 -q -3r -mf -s -zl -zls
         -wx -we ${ARGN} -i=${open_watcom_SOURCE_DIR}/h -fr)
     file(MAKE_DIRECTORY ${directory})
@@ -468,17 +462,8 @@ endfunction()
 # another file calls, with the registers that the assembly called it in.
 # The files named are those of its second code segment.
 #
-# The portable C was compiled twice, for 16 bits and for 32, until the
-# tests came to judge the program of 32 bits (TODO.md, "The portable C in
-# 32 bits: the plan"), and three of its files are of one of the two
-# alone. Those of 16 bits are compiled by nothing now.
-#   arith.c   the two routines that the compiler for 16 bits calls to
-#             multiply and to divide numbers of 32 bits; the one for 32
-#             bits calls nothing for that
-#   dos.c     the system's functions, sys.h, for DOS in 16 bits
-#   dos32.c   the same functions for a flat program under the extender
-set(portable_c_16_alone arith.c dos.c)
-set(portable_c_32_alone dos32.c)
+# The portable C is compiled for 32 bits, in the flat model, with no
+# file named but the one that is linked last: add_portable_c says which.
 add_c_tree(c "the C translation" s
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c memory.c menu.c misc.c mouse.c setup.c start.c system.c view.c

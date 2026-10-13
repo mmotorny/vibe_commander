@@ -2646,6 +2646,42 @@ in "The portable C".
   - `harness/notice.py --build portable_c32` tries a change on the
     program of 32 bits, through the scenarios of its record.
 
+- The portable C is the program of 32 bits, and that alone, since the
+  switch (`TODO.md`, "W and Z1, the switch and the end of the 16-bit
+  build"). What the notes above and below say of two builds is of
+  before, and is read so:
+  - `build/portable_c/VC.EXE` is the program that was
+    `build/portable_c32/VC.EXE`, with `debug/` in it, and the tree
+    `portable_c` of the harness is that program. There is no tree
+    `portable_c32`, no `SOURCE` in `harness/deviations.py`, no
+    directory of patches but `harness/goldens/portable_c/`, and no
+    record: `harness/pass32.txt` and `ported.py --record` are gone, and
+    the test `portable_c-scenarios` holds the program to every scenario
+    that it is taken through. The tests of the layout and of the data
+    are `portable_c-layout`, `portable_c-debug-layout` and
+    `portable_c-data`; `harness/notice.py` has no `--build`.
+  - The 16-bit build is gone, with `dos.c` and `arith.c` of
+    `src/portable_c`, the test `portable_c-arith`, the medium model,
+    the two code segments with their limit, and
+    `harness/trial32/both.py`. Where a note has "the same bytes of
+    `build/portable_c/VC.EXE`" for a check, the file meant was the
+    16-bit one; the check itself holds of the program that there is,
+    by `sha256sum` before and after.
+  - The file of the system's functions is `dos32.c`, which keeps its
+    name: the C translation has a `dos.c`, and the tables of the
+    harness that are one for both trees tell the two files apart by
+    their names (`SYSTEM_FILE` of `harness/reads.py`).
+  - The build compiles a file again when the compiler's command has
+    changed, by a file that the configuration writes into the build's
+    directory, `compiled.txt`, and every object follows: without it an
+    object that another compiler had left under the same name was
+    linked as it was. A custom command of the build does not notice
+    by itself that it has changed.
+  - A piece that takes a name of the harness away, a tree, a
+    directory, a test, looks for it in `harness/trial32/` too, whose
+    scripts and toys have the commands that run them in their
+    comments.
+
 ### Moving a file to the system's functions
 
 What the program asks of the system it asks through

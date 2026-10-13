@@ -6,10 +6,8 @@
 #   build.sh hello d32|cw            hello.c with Open Watcom's C library
 #   build.sh NAME com                NAME.asm as NAME.com, for real mode
 #   build.sh driver                  DRIVERX.ASM as DRIVERX.COM
-#   build.sh sys 16                  sys.c as sys-16.exe, with the dos.c
-#                                    of the portable C as the build made it
-#   build.sh sys 32                  as sys-32.exe, with its dos32.c and
-#                                    DOS/32A
+#   build.sh sys 32                  sys.c as sys-32.exe, with the
+#                                    dos32.c of the portable C and DOS/32A
 #
 # It needs the project built once, for the compiler and the assembler
 # that the build fetches, and uses Open Watcom's tools for Linux on
@@ -36,29 +34,15 @@ if [ "$kind" = com ]; then
     exit
 fi
 
-# The toy of the portable C's sys.h, which is built both ways of the
-# tree's own files (see sys.c). In 16 bits it is linked with what the
-# project's build compiled for the program: the functions, dos.obj, the
-# stack, and the two routines for arithmetic on 32 bits; with the options
-# and the order of segments that CMakeLists.txt has for the program. In
-# 32 bits the tree's files are compiled here, as the plan of TODO.md has
+# The toy of the portable C's sys.h, which is built of the tree's own
+# files (see sys.c): they are compiled here, as the plan of TODO.md has
 # them compiled; the compiler's own headers are named for stddef.h, which
-# vc.h reads there.
+# vc.h reads. It was built for 16 bits too, as sys-16.exe, with the dos.c
+# that the portable C had while it was a program of 16 bits.
 if [ "$name" = sys ]; then
     tree=$root/src/portable_c
-    made=$root/build/portable_c
     exe=$out/sys-$kind.exe
     case $kind in
-    16)
-        "$bin/wcc" -q -0 -mm -os -s -zu -zl -zls -wx -we -nt=CTEXT \
-            -nc=CCODE -i="$tree" -fo="$out/sys16.obj" "$here/sys.c"
-        "$bin/wlink" option quiet format dos name "$exe" \
-            order clname MAIN clname DATA clname BSS \
-                  clname CCODE segment CTEXT segment CTEXT2 \
-                  clname FAR_DATA clname STACK \
-            file "$out/sys16.obj" file "$made/dos.obj" \
-            file "$made/arith.obj" file "$made/stack.obj" \
-            option map="$out/sys-16.map" option start=Alloc0_;;
     32)
         files=""
         for source in "$here/sys.c" "$tree/dos32.c" "$tree/stack.c"; do
@@ -73,7 +57,7 @@ if [ "$name" = sys ]; then
             option map="$out/sys-32.map" \
             order clname CODE clname DATA clname STACK clname BSS
         python3 "$here/quiet.py" "$exe";;
-    *) echo "build.sh: sys 16 or sys 32, not $kind" >&2; exit 1;;
+    *) echo "build.sh: sys 32, not $kind" >&2; exit 1;;
     esac
     ls -l "$exe"
     exit
