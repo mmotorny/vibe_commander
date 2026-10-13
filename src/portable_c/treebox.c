@@ -132,22 +132,17 @@ static const u8 CODE Empty_S[] = "";
    0. */
 u16 ReadTre(void)
 {
-    struct DosRegs regs;
     struct LineArgs line;
     struct Box box;
     struct DIRENT *entry;               /* DI: where the next one goes */
     u8 *end = md.TreeBuf + sizeof md.TreeBuf;           /* BP */
     u8 *text;
-    struct Answer opened;
-    u16 count, done, failed, error, size, i;
+    struct Answer opened, moved, found;
+    struct FileAttr had;
+    u16 count, done, first, error, size, i;
 
     box.begin = 0;
     box.size = 0;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.si = 0;
-    regs.di = 0;
-    regs.name = md.MenuBuf;
 
     if (Fantom((u8)(md.DosPth[0] - ('A' - 1))))
         goto RdTr01;
@@ -168,17 +163,12 @@ RdTr01:                                 /* no disk: the root alone */
     goto RdTr40;
 
 RdTr02:                                 /* the file */
-    regs.ax = 0x3F00 | opened.value & 0xFF;
-    regs.bx = opened.value;
-    regs.cx = sizeof md.TreeBuf;
-    regs.name = md.TreeBuf;
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    done = regs.ax;
-    regs.ax = 0x3E00 | done & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    moved = FileRead(opened.value, md.TreeBuf, sizeof md.TreeBuf);
+    if (FileClose(opened.value).failed)
         goto RdTr01;
-    if (failed)
+    if (moved.failed)
         goto RdTr01;
+    done = moved.value;
     if (done >= sizeof md.TreeBuf)      /* longer than there is room for */
         goto RdTr10;
     for (i = 0; i < 5; i++)
@@ -227,22 +217,23 @@ RdTr11:                                 /* one more: with five, a box that
         goto RdTr15;
 
 RdTr14:                                 /* the next entry of the directory */
-    regs.ax = 0x4F00;
+    first = 0;
     goto RdTr16;
 
 RdTr15:                                 /* the first */
     SetDTA();
-    regs.name = SCANNED;
-    regs.cx = 0x37;
-    regs.ax = 0x4E00;
+    first = 1;
 
 RdTr16:
     error = READ_STOPPED;
     if (TstBrk())
         goto RdTr18;
-    regs.ax |= 2;
-    if (Intr21((struct DosRegs STACK *)&regs)) {
-        if (regs.ax != 0x53)
+    if (first)
+        found = FindFirst(SCANNED, 0x37);
+    else
+        found = FindNext();
+    if (found.failed) {
+        if (found.value != 0x53)
             goto RdTr22;
         error = READ_NO_DISK;
         goto RdTr18;
@@ -329,9 +320,7 @@ RdTr26:
     if (TREE->TreeErr != READ_FULL)
         goto RdTr40;
     if (TREE->TreeLen < 5) {            /* too few for a file */
-        regs.ax = 0x4100;
-        regs.name = Tree_F;
-        Intr21((struct DosRegs STACK *)&regs);
+        FileDelete(Tree_F);
         goto RdTr40;
     }
     if (TstBrk())
@@ -346,31 +335,22 @@ RdTr26:
     count <<= 4;
     *(u16 *)(u16)(TRELIST + count) = ChkSum((const u8 *)TRELIST, count);
     size = count + 11;
-    regs.ax = 0x4300;                   /* with the attributes it has */
-    regs.bx = size;
-    regs.cx = count;
-    regs.name = Tree_F;
-    if (Intr21((struct DosRegs STACK *)&regs)) {
-        if (regs.ax != 2)
+    had = FileAttributes(Tree_F);       /* with the attributes it has */
+    if (had.failed) {
+        if (had.value != 2)
             goto RdTr37;
-        regs.cx = 0;
+        had.attributes = 0;
     }
-    regs.cx |= 0x20;
     md.BlocEr = 1;
-    regs.ax = 0x3C00 | regs.ax & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs)) {
-        if (regs.ax == 5)
+    opened = FileCreate(Tree_F, had.attributes | 0x20);
+    if (opened.failed) {
+        if (opened.value == 5)
             Beep();
         goto RdTr37;
     }
-    regs.cx = size;
-    regs.bx = regs.ax;
-    regs.name = md.TreeBuf;
-    regs.ax = 0x4000 | regs.ax & 0xFF;
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    done = regs.ax;
-    regs.ax = 0x3E00 | done & 0xFF;
-    if (!Intr21((struct DosRegs STACK *)&regs) && !failed && done != size)
+    moved = FileWrite(opened.value, md.TreeBuf, size);
+    if (!FileClose(opened.value).failed && !moved.failed
+        && moved.value != size)
         Beep();
 
 RdTr37:
