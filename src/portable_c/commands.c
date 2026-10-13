@@ -364,8 +364,7 @@ u16 M42_00(u16 panel)
     if (FilePan(panel)) {
         *(u16 *)md.TmpBuf = PANEL(panel)->WinPath[0];
         PutMnu(3);
-        DialBox(0x528, OFFSET(DiSiz_P), 0, MAIN_SEG,
-                &where);
+        DialBox(0x528, OFFSET(DiSiz_P), 0, MAIN_SEG, &where);
         Window(where.begin, where.size);
         DirSize(panel);
         M16_20(panel);

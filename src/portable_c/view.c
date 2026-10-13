@@ -187,8 +187,7 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open)
     include = OFFSET(ViFl_S);
     if ((u8)edit != 0)
         include = OFFSET(EdFl_S);
-    DialBox(0x528, OFFSET(RdFil_P), include, MAIN_SEG,
-            &open->box);
+    DialBox(0x528, OFFSET(RdFil_P), include, MAIN_SEG, &open->box);
     Window(open->box.begin, open->box.size);
     if (ChgDisk(md.ViewFil))
         goto none;
@@ -1741,8 +1740,7 @@ static void Aexec0(u16 edit)
     box = OFFSET(Viewr_P);
     if (edit != 0)
         box = OFFSET(Editr_P);
-    DialBox(0x528, box, MD_PLACE(md.TmpBuf), MAIN_SEG,
-            &where);
+    DialBox(0x528, box, MD_PLACE(md.TmpBuf), MAIN_SEG, &where);
     Window(where.begin, where.size);
     *(u16 *)(md.TmpBuf + 95) = where.begin;
     *(u16 *)(md.TmpBuf + 97) = where.size;

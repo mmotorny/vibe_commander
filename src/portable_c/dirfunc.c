@@ -216,8 +216,7 @@ u16 F38_40(u16 attributes)
     u16 answer, error, report, count;
 
     if (!(attributes & ATTR_DIRECTORY)) {
-        OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(Empty_S),
-                &box);
+        OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(Empty_S), &box);
         if (ChgDisk(md.TmpBuf))
             goto stop;
         asked = FileDelete(md.TmpBuf);
@@ -258,8 +257,7 @@ u16 F38_40(u16 attributes)
     }
 
     /* F38_50 */
-    OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S),
-            &box);
+    OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S), &box);
     if (ChgDisk(md.TmpBuf))
         goto stop;
     removed = F38_60();
@@ -294,8 +292,7 @@ u16 F38_40(u16 attributes)
         answer = DirFunc();
         if (answer >> 8)
             goto out;
-        OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S),
-                &box);
+        OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S), &box);
         removed = F38_60();
         if (removed.failed != 0) {
             if (removed.value == ERR_NOT_READY)
@@ -394,8 +391,7 @@ static u16 F38_70(void)
     name = NEAR(CutPath(md.TmpBuf));
     if ((u8)FcbParse(name, fcb + 7, 2) != 1)
         return NOT_DONE;
-    OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(DelFs_S),
-            &box);
+    OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(DelFs_S), &box);
     if (ChgDisk(md.TmpBuf))
         goto stop;
     *back = 0;

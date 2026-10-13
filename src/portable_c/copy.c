@@ -1145,8 +1145,7 @@ walk:
         return result;
 
     md.SftErr = 0;
-    OncZoom(0x528, OFFSET(DelDr_P), OFFSET(Move0_S),
-            &box);
+    OncZoom(0x528, OFFSET(DelDr_P), OFFSET(Move0_S), &box);
     if (ChgDisk(CpSrc))
         goto stop;
     asked = DirRemove(CpSrc);

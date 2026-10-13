@@ -320,8 +320,7 @@ static void StMain00(void)
 
 Main00:
     PutKey(0);
-    DialBox(0x528, OFFSET(StMain_P), 0, MAIN_SEG,
-            &where);
+    DialBox(0x528, OFFSET(StMain_P), 0, MAIN_SEG, &where);
     Window(where.begin, where.size);
     item = sd.MnItem;
     last = (u8)((where.size >> 8) - 6); /* the item Exit */

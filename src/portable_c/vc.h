@@ -1161,8 +1161,7 @@ void DeCode(u8 *at, u16 count);
    `include`, `table`, `control` and `colors` are offsets in its code
    segment, and `segment` is where what a box shows and a dialog sets is,
    MAIN_SEG for the main data. See each in dialog.c. */
-void DialBox(u16 place, u16 box, u16 include, u16 segment,
-             struct Box *where);
+void DialBox(u16 place, u16 box, u16 include, u16 segment, struct Box *where);
 u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment);
 void InSt10(u16 place, u16 text, u16 length, u16 color);
 struct Buttons {                        /* what MinMnu returns: */

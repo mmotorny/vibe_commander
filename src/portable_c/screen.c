@@ -15,8 +15,7 @@
 u8 *ColAddr(u16 number);
 u16 ShadCol(u16 color, u16 how);
 u16 *Shadow(u16 *cell);
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color);
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count, u16 color);
 
 /* Color, BasAdr, MvsColr and MovDz0 are in vc.h. */
 
@@ -86,8 +85,7 @@ u16 *Shadow(u16 *cell)
    of 0 is one of 65536. This is MvsBwc in the assembly, where the
    characters are in the code segment, and MvsBwe, where they are with the
    screen buffer. */
-u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
-           u16 color)
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count, u16 color)
 {
     color &= 0xFF00;
     do

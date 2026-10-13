@@ -162,8 +162,7 @@ static void DiBx30(const struct BOXTX *entry, u8 *to, u16 segment)
 
    The lines of the box are words that name their texts, one behind the
    other behind the texts that it puts in: `line` is at one of them. */
-void DialBox(u16 place, u16 box, u16 include, u16 segment,
-             struct Box *where)
+void DialBox(u16 place, u16 box, u16 include, u16 segment, struct Box *where)
 {
     u16 code = AsmSeg();
     const struct BOXTOP *head
@@ -848,8 +847,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     if (head->bFlags & BOX_ERROR)
         begin += (u16)md.SftErr << 8;
     if (!(head->bFlags & BOX_THERE)) {
-        DialBox(begin, NAMED(head->pDiBox), include, segment,
-                &where);
+        DialBox(begin, NAMED(head->pDiBox), include, segment, &where);
         begin = where.begin;
         size = where.size;
         saved = where.saved;
