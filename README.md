@@ -1413,7 +1413,9 @@ what the scenarios of the setup program have run of it.
 
 `python3 harness/notice.py FILE OLD NEW` makes one change to a copy of a
 C tree, the one that `FILE` is of, builds it, and says which scenario
-notices, or that none does.
+notices, or that none does. With `--build portable_c32` it is the
+program of 32 bits that is built of the portable C and run, through the
+scenarios of its record.
 That an instruction ran in the original does not mean that a screen shows
 what it is for; this is how to find out, for a branch whose effect cannot be
 pointed to in a golden.
