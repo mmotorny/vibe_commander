@@ -2618,9 +2618,11 @@ waiting for the user between its steps.
   the time stamp of a file it has made, does so within the first minute of
   its machine. The machine's clock is counted in the instructions it
   executes, and a C tree takes more of them than the original to get to
-  the same step: up to a sixth more. The first screen is at about ten
+  the same step: up to a sixth more. The first screen is at about five
   seconds past the minute, so such a scenario is done showing the time
-  by about fifty seconds past in the original.
+  by about fifty seconds past in the original. A scenario that switches
+  the Info panel on takes some five seconds more, once, when the panel
+  is first drawn.
 - A figure on the screen that follows the time of day or the size of the
   program, such as the clock or a count of free memory, is left out of
   the comparison, in `harness/deviations.py`. The exception is a scenario
