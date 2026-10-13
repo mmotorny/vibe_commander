@@ -58,8 +58,8 @@
    HidCur puts the cursor below the screen. ClrKbd empties the keyboard
    buffer if the setup has it so. SavWin keeps what the screen buffer has
    where a window is to be, ResWin puts it back. GetMous returns the
-   buttons of the mouse that are down, and in the high word where the mouse
-   is, or `place` as it was if there is no mouse. InWind is not 0 if a
+   buttons of the mouse that are down and where the mouse is, or `place`
+   as it was if there is no mouse. InWind is not 0 if a
    place is outside a window. AsmSeg returns the segment of the program's
    constants. Int16 calls the BIOS for the keyboard, with AX as it takes
    it.
@@ -216,8 +216,8 @@ static const struct KeyTab CODE KeyTab[] = {
 };
 #define KEYS (sizeof KeyTab / sizeof KeyTab[0])
 
-/* What the mouse says. */
-struct Mouse {
+/* What the mouse says, for the menu bar. */
+struct MenuMouse {
     u16 now;                            /* the buttons that are down */
     u16 before;                         /* and those that were, last time */
     u16 place;                          /* where it is, the row in the high
@@ -227,14 +227,14 @@ struct Mouse {
 /* Ask the mouse, and keep its buttons for the next time. `state` is what
    comes back for its place if there is none: the assembly has the menu
    and the item there. */
-static void F40_40(u16 state, struct Mouse STACK *mouse)
+static void F40_40(u16 state, struct MenuMouse STACK *mouse)
 {
-    u32 pair = GetMous(state);
+    struct Mouse pointer = GetMous(state);
 
-    mouse->now = LOW(pair);
+    mouse->now = pointer.buttons;
     mouse->before = MnuMous;
     MnuMous = (u8)mouse->now;
-    mouse->place = HIGH(pair);
+    mouse->place = pointer.place;
 }
 
 /* The menu whose name on the bar is at a column, or 0: each has the two
@@ -484,7 +484,7 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
 u32 F39_00(u16 again, u16 panel)
 {
     const u8 __far *names = AT(AsmSeg(), OFFSET(PtMnu_S));
-    struct Mouse mouse;
+    struct MenuMouse mouse;
     u16 menu, item;                     /* CL and CH */
     u16 begin = 0, size = 0x150;        /* of the open menu: BX and DX */
     u16 key, to, i, count, hit, table, held;
@@ -502,7 +502,7 @@ u32 F39_00(u16 again, u16 panel)
     PutKey(1);
 
 F39_02:
-    F40_40(item << 8 | menu, (struct Mouse STACK *)&mouse);
+    F40_40(item << 8 | menu, (struct MenuMouse STACK *)&mouse);
     if (mouse.now != 0 && mouse.place >> 8 == 0) {
         menu = F40_50(mouse.place, names);
         if (menu == 0) {
@@ -512,7 +512,7 @@ F39_02:
             item = 0;
             do {
                 do {                    /* F39_03 */
-                    F40_40(item << 8 | menu, (struct Mouse STACK *)&mouse);
+                    F40_40(item << 8 | menu, (struct MenuMouse STACK *)&mouse);
                     if (mouse.now == 0)
                         goto F39_85;
                     ClrKbd();
@@ -528,7 +528,7 @@ F39_07:
 F39_10:
     /* The page of the help for F1, and then the mouse or a key. */
     md.HlpPage = MnuHlp[MnuTab[menu - 1].help + (item == 0xFF ? 0 : item)];
-    F40_40(item << 8 | menu, (struct Mouse STACK *)&mouse);
+    F40_40(item << 8 | menu, (struct MenuMouse STACK *)&mouse);
     if (mouse.now != 0) {
         ClrKbd();
         if (mouse.place >> 8 != 0) {    /* F39_17: below the bar */
@@ -738,7 +738,7 @@ F39_85:                                 /* Exit */
             /* A command of the function keys: with Shift or Ctrl held
                down, or the right or the middle button of the mouse, the
                command that the key has with it. */
-            held = LOW(Int16(0x200 | table)) & 0xFF;
+            held = Int16(0x200 | table).key & 0xFF;
             if (held & 4)
                 table = 6;
             else if (held & 3)

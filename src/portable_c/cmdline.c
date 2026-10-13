@@ -43,7 +43,6 @@
 /* C routines of other files that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
-u32 TotSel(u16 panel);                                  /* files.c */
 u16 F32_70(u16 begin, u16 size);                        /* usermenu.c */
 
 /* The mask that stands behind the name of a directory in the command
@@ -114,13 +113,13 @@ u16 F80_00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;
-    u32 selected;
+    struct Selected selected;
     u16 any, at, length, used, column, i, c;
 
     if (!FilePan(panel))
         return 0;
     selected = TotSel(panel);
-    any = HIGH(selected) | LOW(selected);
+    any = selected.files | selected.directories;
     at = wcb->CurAdr;
     if (any == 0) {
         if (at >= wcb->EndBuf)
@@ -305,7 +304,7 @@ F68_04:
 F68_07:                                 /* the cursor */
     F68_30(HstCu_C, begin, row, size);
 F68_08:
-    if (LOW(GetMous(0)))
+    if (GetMous(0).buttons)
         goto F68_11;
     md.MousEnt = 0;
     key = Input(1);

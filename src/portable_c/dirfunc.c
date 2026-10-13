@@ -74,7 +74,6 @@ const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number); /* digits.c */
 void NormStr(u8 __far *text);                           /* string.c */
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
-u32 TotSel(u16 panel);                                  /* files.c */
 void PutFls(u16 panel);                                 /* panel.c */
 void PutTre(u16 panel);                                 /* tree.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
@@ -1007,7 +1006,7 @@ u16 F38_00(u16 panel)
     const struct WCBdef __far *wcb = PANEL(panel);
     const struct FILENT __far *file;
     u8 *end;
-    u32 selected;
+    struct Selected selected;
     u16 box, include, i;
 
     DEL_ALL = 0;
@@ -1035,14 +1034,15 @@ u16 F38_00(u16 panel)
     }
     /* F38_04 */
     selected = TotSel(panel);
-    if (selected != 0 && md.OneFile == 0) {
-        FilDir(md.TmpBuf, LOW(selected), HIGH(selected));
+    if ((selected.directories != 0 || selected.files != 0)
+        && md.OneFile == 0) {
+        FilDir(md.TmpBuf, selected.directories, selected.files);
         for (i = 0; i < LenPath; i++)
             md.TmpBuf[100 + i] = wcb->WinPath[i];
         box = OFFSET(DelSe_B);
         /* None of its lines has ^I: the assembly hands over what it
            has there, the number of files selected. */
-        include = HIGH(selected);
+        include = selected.files;
     } else {
         /* F38_06 */
         if (wcb->CurAdr >= wcb->EndBuf)
@@ -1159,12 +1159,14 @@ u16 M30_00(u16 panel)
     const struct FILENT __far *file;
     struct DateText date;
     struct TimeText time;
+    struct Selected selected;
     u8 *end;
     u16 i, bits, attributes;
 
     if (!FilePan(panel))
         return TO_FUNC04;
-    if (TotSel(panel) == 0) {
+    selected = TotSel(panel);
+    if (selected.directories == 0 && selected.files == 0) {
         /* M30_03 */
         if (wcb->CurAdr >= wcb->EndBuf)
             return TO_FUNC04;
@@ -1389,6 +1391,7 @@ u16 FncSel(void)
     u16 panel = md.WCBcrn;
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file;
+    struct Selected selected;
     u16 address, answer, lines, number, begin, i;
 
     md.ZoomOne = 0;
@@ -1400,7 +1403,8 @@ u16 FncSel(void)
          address += sizeof(struct FILENT))
         ENTRY(wcb, address)->AttrF &= 0x7F;
     address = wcb->CurAdr;
-    if (TotSel(panel) == 0)
+    selected = TotSel(panel);
+    if (selected.directories == 0 && selected.files == 0)
         goto one;
     for (address = DSKBUF; address < wcb->EndBuf;
          address += sizeof(struct FILENT)) {

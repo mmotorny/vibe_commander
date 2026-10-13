@@ -208,7 +208,7 @@ u32 F21_30(void)
     u8 small;
 
     md.LoadRes = md.LoadFl & 0x7F;
-    if (Int16(0x200 | md.LoadRes) & 3) {
+    if (Int16(0x200 | md.LoadRes).key & 3) {
         small = md.LoadFl;
         md.LoadFl &= 0x7F;
         InvVar(&md.LoadFl);

@@ -100,8 +100,8 @@
    MinBox draws a box with a shadow there, growing if windows are to zoom,
    in the colour in the high byte of `color`.
 
-   GetMous returns the buttons of the mouse that are down, and in the high
-   word where the mouse is, or `place` as it was if there is no mouse.
+   GetMous returns the buttons of the mouse that are down and where the
+   mouse is, or `place` as it was if there is no mouse.
    TypMous gives the mouse pointer the look of a character, or its own for
    0. InWind is not 0 if a place is outside a window.
 
@@ -327,13 +327,13 @@ static u32 MnMn11(u16 key, u16 place, u16 STACK *state, u16 table, u16 code)
     u16 carry = 1;
     u16 item, low, count, buttons, mouse, column, look, now, begin, size;
     const u16 *screen;
-    u32 pair;
+    struct Mouse pointer;
 
     if (key >> 8 == KEY_MOUSE) {
         for (;;) {                      /* MnMn11 */
-            pair = GetMous(0);
-            buttons = LOW(pair);
-            mouse = HIGH(pair);
+            pointer = GetMous(0);
+            buttons = pointer.buttons;
+            mouse = pointer.place;
             key = KEY_MOUSE << 8 | buttons;
             if (buttons == 0)
                 goto MnMn16;
@@ -361,10 +361,10 @@ MnMn13:
         size = 0x100 | button[0];
         look = 0;
         for (;;) {                      /* MnMn14 */
-            pair = GetMous(0);
-            if (LOW(pair) == 0)
+            pointer = GetMous(0);
+            if (pointer.buttons == 0)
                 break;
-            now = InWind(HIGH(pair), begin, size) ? 0 : TICK;
+            now = InWind(pointer.place, begin, size) ? 0 : TICK;
             if (now == look)
                 continue;
             look = now;
@@ -491,7 +491,7 @@ static u32 InpStr(u16 place, u8 *text, u16 cursor, u16 length, u16 color,
 {
     u16 key, low, buttons, mouse, column, end, count;
     const u8 *from;
-    u32 pair;
+    struct Mouse pointer;
 
     for (;;) {                          /* InSt01 */
         InSt10(place, (u16)text, length, color << 8);
@@ -499,9 +499,9 @@ static u32 InpStr(u16 place, u8 *text, u16 cursor, u16 length, u16 color,
         key = Input(bar);
         if (key >> 8 == KEY_MOUSE) {
             for (;;) {                  /* InSt05 */
-                pair = GetMous(0);
-                buttons = LOW(pair);
-                mouse = HIGH(pair);
+                pointer = GetMous(0);
+                buttons = pointer.buttons;
+                mouse = pointer.place;
                 key = KEY_MOUSE << 8 | buttons;
                 if (buttons == 0)
                     break;
@@ -574,20 +574,20 @@ static u32 Select(u16 place, u16 bar, u16 total, u16 lines)
     u16 cursor = lines >> 8;
     u16 key = 0;
     u16 low, buttons, mouse, row;
-    u32 pair;
+    struct Mouse pointer;
 
 Slct01:
     Cursor(place + (cursor << 8));
     if ((key & 0xFF) != 0)              /* until the mouse is let go */
-        while (LOW(GetMous(0)) != 0)
+        while (GetMous(0).buttons != 0)
             ;
 Slct03:
     key = Input(bar);
     if (key >> 8 == KEY_MOUSE) {
         for (;;) {                      /* Slct04 */
-            pair = GetMous(0);
-            buttons = LOW(pair);
-            mouse = HIGH(pair);
+            pointer = GetMous(0);
+            buttons = pointer.buttons;
+            mouse = pointer.place;
             key = KEY_MOUSE << 8 | buttons;
             if (buttons == 0)
                 goto Slct03;
@@ -669,7 +669,7 @@ static u32 FlipFl(u16 place, u16 bar, u16 value)
 {
     u16 key, buttons;
     u8 *cell;
-    u32 pair;
+    struct Mouse pointer;
 
     value &= 0xFF;
     Cursor(place);
@@ -678,15 +678,15 @@ static u32 FlipFl(u16 place, u16 bar, u16 value)
         if (key != 0x3920) {
             if (key >> 8 != KEY_MOUSE)
                 break;
-            pair = GetMous(0);
-            buttons = LOW(pair);
+            pointer = GetMous(0);
+            buttons = pointer.buttons;
             key = KEY_MOUSE << 8 | buttons;
             if (buttons == 0)
                 continue;
             ClrKbd();
             if (buttons != 1)
                 break;
-            if (InWind(HIGH(pair), place - 1, 0x100 | Slct20(place - 1)))
+            if (InWind(pointer.place, place - 1, 0x100 | Slct20(place - 1)))
                 break;
         }
         cell = (u8 *)BasAdr(place);
@@ -698,7 +698,7 @@ static u32 FlipFl(u16 place, u16 bar, u16 value)
             value = 0;
         Window(place, 0x101);
         if ((key & 0xFF) != ' ')        /* until the mouse is let go */
-            while (LOW(GetMous(0)) != 0)
+            while (GetMous(0).buttons != 0)
                 ;
     }
     return key | (u32)value << 16;
@@ -752,6 +752,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     u16 *screen;
     struct Box where;
     u32 pair;
+    struct Mouse pointer;
     u16 first = box + sizeof(struct BOXHD);
     u16 size = include;
     u16 shape, key, item, cursor, type, place, control, count, link, value;
@@ -923,9 +924,9 @@ Dial31:                                 /* the field of the cursor has the keys 
 Dial40:                                 /* the mouse */
     look = 0;
     for (;;) {                          /* Dial41 */
-        pair = GetMous(0);
-        buttons = LOW(pair);
-        mouse = HIGH(pair);
+        pointer = GetMous(0);
+        buttons = pointer.buttons;
+        mouse = pointer.place;
         if (buttons == 0)
             break;
         if (buttons != 1) {

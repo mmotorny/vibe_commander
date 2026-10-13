@@ -677,7 +677,7 @@ void IniData(void)
         else                            /* on the same line */
             OutStr1(Retr2_S + 2, bios.bx >> 8);
         do                              /* Init16 */
-            key = (u16)Int16(0);
+            key = Int16(0).key;
         while ((key & 0xFF) != '\r');
         bios.ax = md.ScrMod;
         Int10((struct BiosRegs STACK *)&bios);

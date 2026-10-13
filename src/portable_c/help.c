@@ -74,10 +74,10 @@ void Help00(void);
    buffer has where a window is to be, ResWin puts it back; MinBox draws a
    box with a shadow there, growing if windows are to zoom. Int10m calls
    the BIOS for the screen, with the mouse pointer out of the way, and
-   returns CX as the BIOS left it in the high word.
+   returns the corners of the window as the BIOS left them.
 
-   GetMous returns the buttons of the mouse that are down, and in the high
-   word where the mouse is, or `place` as it was if there is no mouse.
+   GetMous returns the buttons of the mouse that are down and where the
+   mouse is, or `place` as it was if there is no mouse.
    TypMous gives the mouse pointer the look of a character, or its own for
    0. InWind is not 0 if a place is outside a window. DoublMo is asked
    about a click on the line `line` of a list: 2 for the first click on
@@ -85,7 +85,7 @@ void Help00(void);
    empties the keyboard buffer if the setup has it so.
 
    PgUp and PgDn turn a list by a page of `lines`: they return the line of
-   the cursor, and in the high word the first line shown. */
+   the cursor and the first line shown. */
 
 /* C routines of other files that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
@@ -291,6 +291,8 @@ static void Help05(void)
     u16 *screen;
     u16 color, place, moved, count, key, buttons, mouse, held, third;
     u32 pair;
+    struct Paged paged;
+    struct Mouse pointer;
 
     SavWin(BEGIN, size, (u16)md.ErrBuf1);
     color = Color(Help_C) << 8;
@@ -359,10 +361,9 @@ Help10:                                 /* the cursor within the window */
             count = SHOWN();
             if (moved == 1 || moved == 0xFFFF) {
                 key = moved == 1 ? 0x600 | count - 1 & 0xFF : 0x700;
-                place = (u16)(Int10m(
+                place = Int10m(
                     key & 0xFF00 | 1, Color(Help_C) << 8 | place & 0xFF,
-                    place, ((count - 1 & 0xFF) << 8 | WIDTH - 1) + place)
-                    >> 16);
+                    place, ((count - 1 & 0xFF) << 8 | WIDTH - 1) + place).upper;
                 place += key << 8;
                 count = 1;
             }
@@ -376,7 +377,7 @@ Help10:                                 /* the cursor within the window */
     }
 
 Help25:                                 /* a key */
-    if (LOW(GetMous(item)) != 0)
+    if (GetMous(item).buttons != 0)
         goto Help30;
     md.WinMous = 0;
     md.MousEnt = 0;
@@ -414,32 +415,32 @@ Help25:                                 /* a key */
             cursor--;
         goto Help10;
     case 0x49:                          /* PgUp */
-        pair = PgUp(hd.HlpCur, hd.HlpFrst, SHOWN());
-        cursor = LOW(pair);
-        first = HIGH(pair);
+        paged = PgUp(hd.HlpCur, hd.HlpFrst, SHOWN());
+        cursor = paged.cursor;
+        first = paged.first;
         goto Help10;
     case 0x51:                          /* PgDn */
-        pair = PgDn(hd.HlpCur, hd.HlpFrst, SHOWN(), hd.HlpLins);
-        cursor = LOW(pair);
-        first = HIGH(pair);
+        paged = PgDn(hd.HlpCur, hd.HlpFrst, SHOWN(), hd.HlpLins);
+        cursor = paged.cursor;
+        first = paged.first;
         goto Help10;
     case 0x44: goto Help66;             /* F10 */
     }
     goto Help25;
 
 Help30:                                 /* the mouse */
-    pair = GetMous(item);
-    buttons = LOW(pair);
-    mouse = HIGH(pair);
+    pointer = GetMous(item);
+    buttons = pointer.buttons;
+    mouse = pointer.place;
 Help31:
     ClrKbd();
     held = mouse;
     if (buttons & 4) {                  /* the middle button, until it is */
         TypMous('x');                   /* let go: leaves, unless another */
         do {                            /* is down too */
-            pair = GetMous(mouse);
-            buttons = LOW(pair);
-            mouse = HIGH(pair);
+            pointer = GetMous(mouse);
+            buttons = pointer.buttons;
+            mouse = pointer.place;
             ClrKbd();
         } while (buttons & 4);
         TypMous(0);
@@ -453,9 +454,9 @@ Help31:
                let go outside the window. */
             if ((buttons & 1) == 0)
                 goto Help25;
-            pair = GetMous(mouse);
-            buttons = LOW(pair);
-            mouse = HIGH(pair);
+            pointer = GetMous(mouse);
+            buttons = pointer.buttons;
+            mouse = pointer.place;
             if (buttons != 0)
                 goto Help31;
             if (!InWind(held, BEGIN, size - 0x102))

@@ -95,8 +95,8 @@ enum {
    covered, ResUser what DOS has shown, for a window given like Window's,
    and SavScr takes the screen into the screen buffer.
 
-   GetMous returns the buttons of the mouse that are down, and in the high
-   word where the mouse is, or `place` as it was if there is no mouse.
+   GetMous returns the buttons of the mouse that are down and where the
+   mouse is, or `place` as it was if there is no mouse.
    TypMous gives the mouse pointer the look of a character, or its own for
    0. InWind is not 0 if a place is outside a window. DoublMo answers 2 if
    a click on the line `line` is the first one there, 1 if it is the
@@ -105,7 +105,7 @@ enum {
    TstDrv is 1 if there is a drive of the letter. SelDrv is the call of
    DOS that makes a drive the current one, 0 for A:, and Int21d any call
    of DOS that the assembly made without Intr21; DosTime asks DOS for the
-   time of day, the hours and minutes in the low word. Int10 calls the
+   time of day, the hours and minutes in one word. Int10 calls the
    BIOS for the screen.
 
    MakeIni writes into MenuBuf what the setup file holds, and SaveSet
@@ -460,7 +460,7 @@ static u16 Func21(struct Regs STACK *r)
 {
     struct WCBdef __far *wcb;
     struct Place place;
-    u32 pair;
+    struct Mouse mouse;
     u16 look, lines, rows, column, kind, answer;
 
     ClrKbd();
@@ -469,9 +469,9 @@ static u16 Func21(struct Regs STACK *r)
     if (r->cx < 2) {                    /* Panels on/off */
         look = 0;
         for (;;) {                      /* Func22 */
-            pair = GetMous(r->cx);
-            r->ax = (u16)pair;
-            r->cx = (u16)(pair >> 16);
+            mouse = GetMous(r->cx);
+            r->ax = mouse.buttons;
+            r->cx = mouse.place;
             if (r->ax == 0)
                 break;
             r->ax = r->cx < 2 ? 0xFE : 0;
@@ -705,7 +705,8 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
     u8 __far *saved;
     const u8 __far *keys;
     const u8 *image;
-    u32 pair;
+    struct Time moment;
+    struct Mouse mouse;
     u16 i, length, same, time, seconds, hundredths, menu, key, where;
 
     for (;;) {
@@ -795,10 +796,10 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
                 r->si = (u16)md.CrnPath + i;
                 r->di = (u16)md.DosPth + i;
                 if (!same && md.FlagCD != 0) {
-                    pair = DosTime();
-                    time = (u16)pair;
-                    hundredths = (u8)((u16)(pair >> 16) + md.DelayTm[0]);
-                    seconds = (u16)(pair >> 24);
+                    moment = DosTime();
+                    time = moment.clock;
+                    hundredths = (u8)(moment.seconds + md.DelayTm[0]);
+                    seconds = moment.seconds >> 8;
                     if (hundredths >= 100) {
                         hundredths -= 100;
                         seconds = (u8)(seconds + 1);
@@ -825,9 +826,9 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
             r->ax = 0x3C00;             /* F2, for the menu that comes up
                                            by itself */
             if (menu == 0) {
-                pair = GetMous(r->cx);
-                r->ax = (u16)pair;
-                r->cx = (u16)(pair >> 16);
+                mouse = GetMous(r->cx);
+                r->ax = mouse.buttons;
+                r->cx = mouse.place;
                 if (r->ax != 0)
                     goto Mouse;
                 md.WinMous = 0;
@@ -863,9 +864,9 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
         }
 
     Func20:                             /* Mouse support */
-        pair = GetMous(r->cx);
-        r->ax = (u16)pair;
-        r->cx = (u16)(pair >> 16);
+        mouse = GetMous(r->cx);
+        r->ax = mouse.buttons;
+        r->cx = mouse.place;
     Mouse:
         where = Func21(r);
         if (!(where & AGAIN))
@@ -1290,7 +1291,7 @@ u16 ErrRdy(u16 letter)
 {
     struct DosRegs regs;
     struct Box where;
-    u32 pair;
+    struct Mouse mouse;
     u16 *cell;
     u16 drive, key, c, buttons, place, look, shown, last;
 
@@ -1328,11 +1329,11 @@ u16 ErrRdy(u16 letter)
         last = 0;
         shown = 0;
         for (;;) {                      /* ErRdy3 */
-            pair = GetMous(place);
-            buttons = (u16)pair;
+            mouse = GetMous(place);
+            buttons = mouse.buttons;
             if (buttons == 0)
                 break;
-            place = (u16)(pair >> 16);
+            place = mouse.place;
             look = buttons == 1 ? 0 : buttons == 2 ? 0xFB : 'x';
             last = buttons;             /* ErRdy4 */
             if (look == shown)

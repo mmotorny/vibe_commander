@@ -44,7 +44,7 @@ void ClrKbd(void)
 {
     if (md.ClrBuf == 0)
         return;
-    while ((u16)(Int16(0x100) >> 16) == 0)
+    while (Int16(0x100).none == 0)
         Int16(0);
 }
 
@@ -55,14 +55,14 @@ void ClrKbd(void)
 u16 TstBrk(void)
 {
     u16 pressed = 0;
-    u32 pair;
+    struct Keys keys;
     u16 key;
 
     for (;;) {
-        pair = Int16(0x100);
-        if ((u16)(pair >> 16) != 0)
+        keys = Int16(0x100);
+        if (keys.none != 0)
             break;
-        key = (u16)pair;
+        key = keys.key;
         if (key != 0 && key != KEY_CTRL_C && key != KEY_ESC
             && key != KEY_F10)
             break;
@@ -188,17 +188,19 @@ u16 Intr21(struct DosRegs STACK *regs)
     return Intr21f(regs, 0);
 }
 
-/* The time of day as DOS has it: the hour in the highest byte of the low
-   word and the minute below it, and in the high word the second and the
-   hundredth of one. */
-u32 DosTime(void)
+/* The time of day as DOS has it: the hour and the minute, and the second
+   and the hundredth of one. */
+struct Time DosTime(void)
 {
     struct DosRegs regs;
+    struct Time time;
 
     regs.name = (const u8 __far *)&md;
     regs.ax = 0x2C00;
     Int21d((struct DosRegs STACK *)&regs);
-    return (u32)DX_OF(regs) << 16 | regs.cx;
+    time.clock = regs.cx;
+    time.seconds = DX_OF(regs);
+    return time;
 }
 
 /* Open a file, `mode` as DOS takes it in AL. Where DOS says that others

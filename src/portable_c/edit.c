@@ -133,8 +133,8 @@ u16 T80_00(void);
    and a column; ChgCur gives it the editor's shape and returns the one it
    had, which CurShp gives it back. ClrKbd empties the keyboard buffer, if
    the setup has it so. GetMous returns the buttons of the mouse that are down
-   and in the high word where it is; what it is given comes back there if
-   there is no mouse. InWind is not 0 if that is outside a window. AsmSeg
+   and where it is; what it is given comes back for that if there is no
+   mouse. InWind is not 0 if that is outside a window. AsmSeg
    is the segment of the program's constants. */
 
 /* C routines of other files that vc.h does not have. */
@@ -2383,18 +2383,18 @@ shown:
    it does, until a key leaves the editor. */
 static void T00_19(void)
 {
-    u32 mouse;
+    struct Mouse mouse;
     u16 key, bar;
 
     for (;;) {
         T00_20();
         for (;;) {                      /* T00_70 */
             mouse = GetMous(0);
-            if (LOW(mouse) == 0) {
+            if (mouse.buttons == 0) {
                 md.WinMous = 0;
                 break;
             }
-            if (T00_71(HIGH(mouse)))
+            if (T00_71(mouse.place))
                 goto again;
         }
         bar = 10;                       /* T00_80 */

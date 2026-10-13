@@ -20,8 +20,8 @@
    box with a shadow there. SftEGA moves a place down on a screen of more
    than 25 lines, by half of what it has more.
 
-   GetMous returns the buttons of the mouse that are down, and in the high
-   word where the mouse is, or `place` as it was if there is no mouse.
+   GetMous returns the buttons of the mouse that are down and where the
+   mouse is, or `place` as it was if there is no mouse.
    TypMous gives the mouse pointer the look of a character, or its own for
    0. InWind is not 0 if a place is outside a window. PutMnu and Input
    are C, of vc.h.
@@ -65,7 +65,7 @@ u16 F62_01(u16 panel, u16 item)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct DosRegs regs;
-    u32 pair;
+    struct Mouse pointer;
     u16 __far *next;
     u16 *screen;
     u16 *first;                         /* DI: where the first letter is */
@@ -183,14 +183,14 @@ F62_15:                                 /* the cursor */
 
     /* The mouse, while a button of it is down: the cursor goes to the
        letter it is on. */
-    pair = GetMous(0);
-    if (LOW(pair) == 0)
+    pointer = GetMous(0);
+    if (pointer.buttons == 0)
         goto F62_30;
     state = 0;
     look = 0;
 F62_21:
-    state = state & 0x80 | LOW(pair) & 0xFF;
-    mouse = HIGH(pair);
+    state = state & 0x80 | pointer.buttons & 0xFF;
+    mouse = pointer.place;
     c = 'x';
     if (state & 4)
         goto F62_27;
@@ -229,8 +229,8 @@ F62_27:
         look = c;
         TypMous(c);
     }
-    pair = GetMous(mouse);
-    if (LOW(pair) != 0)
+    pointer = GetMous(mouse);
+    if (pointer.buttons != 0)
         goto F62_21;
     TypMous(0);
     if (state & 4)
@@ -239,8 +239,8 @@ F62_27:
         goto F62_36;
     if (look != 0)
         goto F62_36;
-    pair = GetMous(mouse);
-    if (InWind(HIGH(pair), begin, size - 0x102))
+    pointer = GetMous(mouse);
+    if (InWind(pointer.place, begin, size - 0x102))
         goto F62_37;
 
 F62_30:                                 /* a key */

@@ -482,14 +482,25 @@ struct MouseAt {                        /* what the mouse driver says: */
                                            the right one 2, the middle 4 */
     u16 x, y;                           /* where the pointer is, in dots */
 };
+struct Keys {                           /* what the BIOS says of the keyboard: */
+    u16 key;                            /* AX as it leaves it: a key, the
+                                           scan code in the high byte, or
+                                           the keys among Shift, Ctrl and
+                                           Alt that are held */
+    u16 none;                           /* 1 if it leaves the zero flag
+                                           set: no key waits */
+};
+struct MuxRegs {                        /* what the multiplex interrupt */
+    u16 ax, bx;                         /* answers in: these registers */
+};
 u16 Int21d(struct DosRegs STACK *regs);
 u16 Int21f(struct DosRegs STACK *regs, u16 carry);
 u16 Int21e(struct DosRegs STACK *regs);
 void Int10(struct BiosRegs STACK *regs);
 void TopView(u16 __far *cells, u16 count);
 u16 __far *TopScr(u16 __far *screen);
-u32 Int16(u16 ax);
-u32 Int2F(u16 ax, u16 bx, u16 cx);
+struct Keys Int16(u16 ax);
+struct MuxRegs Int2F(u16 ax, u16 bx, u16 cx);
 u16 Int33(u16 ax, u16 bx, u16 cx, u16 dx);
 void MousAt(struct MouseAt STACK *state);
 u16 CaseMap(u16 letter);
@@ -572,6 +583,11 @@ void SetMask(u16 panel);                                /* files.c */
 void Sort(u16 panel);
 u16 FnFile(u16 panel, const u8 __far *name);
 u16 NearFl(u16 panel, const u8 __far *name, u16 end);
+struct Selected {                       /* what is selected in a panel: */
+    u16 directories;                    /* how many directories, */
+    u16 files;                          /* and how many files */
+};
+struct Selected TotSel(u16 panel);
 u16 BegBX(u16 panel);                                   /* place.c */
 u16 SizDX(void);
 u16 LnsAX(void);
@@ -991,6 +1007,12 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
    and ChgDisk for that of the drive that a path of the main data names:
    not 0 if the user would not put it in. SelDrv makes a drive the
    current one, 0 for A:. */
+struct Time {                           /* the time of day, as DOS has it: */
+    u16 clock;                          /* the hour in the high byte and
+                                           the minute in the low one */
+    u16 seconds;                        /* the second in the high byte and
+                                           the hundredth in the low one */
+};
 u32 Timer(void);
 void ClrKbd(void);
 u16 TstBrk(void);
@@ -1001,20 +1023,27 @@ u16 TstDrv(u16 letter);
 void SelDrv(u16 drive);
 u16 Intr21(struct DosRegs STACK *regs);
 u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
-u32 DosTime(void);
+struct Time DosTime(void);
 u32 OpenFil(const u8 __far *name, u16 mode);
 u16 SetPth(void);
 u16 Fantom(u16 drive);
 u16 ChgDisk(const u8 *path);
-/* The mouse: see each in mouse.c. GetMous returns the buttons in the low
-   word and the place in the high one, InWind is not 0 for a place
+/* The mouse: see each in mouse.c. GetMous says which buttons are held
+   and where the pointer is, InWind is not 0 for a place
    outside a window, and DoublMo is 2 to go on, 1 for a second click and 0
    for one that was let go elsewhere. */
+struct Mouse {
+    u16 buttons;                        /* those that are held: the left
+                                           one 1, the right one 2, the
+                                           middle one 4 */
+    u16 place;                          /* the cell that the pointer is
+                                           on, the row in the high byte */
+};
 void IniMous(void);
 void TypMous(u16 pointer);
 void SavMous(void);
 void CurMous(u16 show);
-u32 GetMous(u16 place);
+struct Mouse GetMous(u16 place);
 u16 DoublMo(u16 begin, u16 size, u16 cursor);
 u16 InWind(u16 where, u16 begin, u16 size);
 /* The screen, its cursor, and windows of the screen buffer: see each in
@@ -1025,6 +1054,12 @@ struct VideoMode {                      /* for ChkMode: as the BIOS says, */
                                            columns */
     u16 bx;                             /* the page, in the high byte */
 };
+struct Corners {                        /* for Int10m: of a window that the
+                                           BIOS scrolls, as it leaves them, */
+    u16 lower;                          /* the lower right one, DX there, */
+    u16 upper;                          /* and the upper left one, CX: the
+                                           row in the high byte of each */
+};
 u16 ChkMode(struct VideoMode STACK *mode);
 void Cursor(u16 place);
 void Cursor1(void);
@@ -1032,7 +1067,7 @@ u16 ChgCur(void);
 void CurShp(u16 shape);
 u16 GetCur(void);
 void HidCur(void);
-u32 Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
+struct Corners Int10m(u16 ax, u16 bx, u16 cx, u16 dx);
 u16 ScrOffs(void);
 u16 SftEGA(u16 place);
 void SavWin(u16 begin, u16 size, u16 buffer);
@@ -1052,8 +1087,8 @@ void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
    program is idle: see each in blank.c. */
 void Blank(void);
 void LeaveTm(void);
-/* Small ones: see each in misc.c. PgUp and PgDn return the cursor in the
-   low word and the first line shown in the high one. AsmSeg is the
+/* Small ones: see each in misc.c. PgUp and PgDn return where a list is
+   after a page up or down. AsmSeg is the
    segment of the program's constants, the texts and tables of the files
    whose names end in _t, where what is known by its offset is read;
    ResSeg that of the part of the program that stays in the memory while
@@ -1065,8 +1100,12 @@ u16 MemRun(void);
 u16 IsCrLf(u16 word);
 u16 InvVar(u8 __far *variable);
 u16 ChkSum(const u8 *data, u16 length);
-u32 PgUp(u16 cursor, u16 first, u16 rows);
-u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
+struct Paged {
+    u16 cursor;                         /* the line that the cursor is on */
+    u16 first;                          /* the first line shown */
+};
+struct Paged PgUp(u16 cursor, u16 first, u16 rows);
+struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 
 /* The segment of the main data, as a number: this compiler makes a far
    pointer of a near one with DS, and that is not read anywhere else. */

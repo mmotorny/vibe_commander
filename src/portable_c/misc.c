@@ -80,10 +80,11 @@ u16 ChkSum(const u8 *data, u16 length)
    of the line the cursor is on and `first` that of the first line shown.
    The list moves by a line less than show, or as far as it goes, and the
    cursor stays in what shows; with the top of the list showing, the
-   cursor goes there. Returns the cursor in the low word and the first
-   line in the high one. */
-u32 PgUp(u16 cursor, u16 first, u16 rows)
+   cursor goes there. Returns the cursor and the first line then. */
+struct Paged PgUp(u16 cursor, u16 first, u16 rows)
 {
+    struct Paged paged;
+
     if (first == 0)
         cursor = 0;
     else {
@@ -93,15 +94,18 @@ u32 PgUp(u16 cursor, u16 first, u16 rows)
         if (cursor > rows)
             cursor = rows;
     }
-    return (u32)first << 16 | cursor;
+    paged.cursor = cursor;
+    paged.first = first;
+    return paged;
 }
 
 /* A page down in such a list of `lines` lines. The list moves by a line
    less than show, no further than to where its last lines fill the
    window, and the cursor stays in what shows; with the end of the list
    showing, the cursor goes to the last line. */
-u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines)
+struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines)
 {
+    struct Paged paged;
     u16 last = lines >= rows ? lines - rows : 0;
     u16 next;
 
@@ -114,5 +118,7 @@ u32 PgDn(u16 cursor, u16 first, u16 rows, u16 lines)
         if (cursor < first)
             cursor = first;
     }
-    return (u32)first << 16 | cursor;
+    paged.cursor = cursor;
+    paged.first = first;
+    return paged;
 }

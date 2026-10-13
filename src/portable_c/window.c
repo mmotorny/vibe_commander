@@ -133,11 +133,12 @@ void HidCur(void)
 
 /* Call the BIOS for the screen with the mouse pointer hidden, which it
    would move along with the rest: the program does so to scroll a
-   window. Returns DX in the low word and CX in the high one, as the
-   BIOS leaves them. */
-u32 Int10m(u16 ax, u16 bx, u16 cx, u16 dx)
+   window. Returns the corners of the window, CX and DX, as the BIOS
+   leaves them. */
+struct Corners Int10m(u16 ax, u16 bx, u16 cx, u16 dx)
 {
     struct BiosRegs regs;
+    struct Corners corners;
 
     regs.ax = ax;
     regs.bx = bx;
@@ -146,7 +147,9 @@ u32 Int10m(u16 ax, u16 bx, u16 cx, u16 dx)
     CurMous(0);
     Int10((struct BiosRegs STACK *)&regs);
     CurMous(1);
-    return (u32)regs.cx << 16 | regs.dx;
+    corners.lower = regs.dx;
+    corners.upper = regs.cx;
+    return corners;
 }
 
 /* Note where in the display's memory the page that is shown begins: at

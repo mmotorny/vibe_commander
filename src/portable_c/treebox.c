@@ -36,8 +36,8 @@ u16 ChTree(u16 column);
    there, growing if windows are to zoom. Int10m calls the BIOS for the
    screen, with the mouse pointer out of the way.
 
-   GetMous returns the buttons of the mouse that are down, and in the high
-   word where the mouse is, or `place` as it was if there is no mouse.
+   GetMous returns the buttons of the mouse that are down and where the
+   mouse is, or `place` as it was if there is no mouse.
    TypMous gives the mouse pointer the look of a character, or its own for
    0. InWind is not 0 if a place is outside a window. DoublMo is asked
    about a click on the line `line` of a list: 2 for the first click on
@@ -45,7 +45,7 @@ u16 ChTree(u16 column);
    empties the keyboard buffer if the setup has it so.
 
    PgUp and PgDn turn a list by a page of `lines`: they return the line of
-   the cursor, and in the high word the first line shown.
+   the cursor and the first line shown.
 
    ChkSum adds up `length` bytes at `at` in the main data. OncZoom
    puts the box on the screen that the assembly describes at `box`, an
@@ -426,7 +426,8 @@ u16 ChTree(u16 column)
     u16 state, mouse, held;             /* SI, CX and BP for the mouse */
     u16 moved, scroll, lines, place, count, cell, look, n, i;
     u16 *screen;
-    u32 pair;
+    struct Paged paged;
+    struct Mouse pointer;
 
     HidCur();
     SavWin(begin, size, (u16)md.WinBuf);
@@ -540,7 +541,7 @@ ChTr20:                                 /* the speed search, and a key */
     Cursor(place + *(u16 *)(md.MenuBuf + SPEED - 2));
     cursor = NUMBER(md.TreAdr);
     first = NUMBER(md.TreFrst);
-    if (LOW(GetMous(0)) != 0)
+    if (GetMous(0).buttons != 0)
         goto ChTr60;
     md.MousEnt = 0;
     md.WinMous = 0;
@@ -555,17 +556,17 @@ ChTr20:                                 /* the speed search, and a key */
             case 0x48: goto ChTr35;
             case 0x50: goto ChTr37;
             case 0x49:                  /* PgUp */
-                pair = PgUp(cursor, first,
-                            (u16)(signed char)((size >> 8) - 8));
-                cursor = LOW(pair);
-                first = HIGH(pair);
+                paged = PgUp(cursor, first,
+                             (u16)(signed char)((size >> 8) - 8));
+                cursor = paged.cursor;
+                first = paged.first;
                 goto ChTr10;
             case 0x51:                  /* PgDn */
-                pair = PgDn(cursor, first,
-                            (u16)(signed char)((size >> 8) - 8),
-                            TREE->TreeLen);
-                cursor = LOW(pair);
-                first = HIGH(pair);
+                paged = PgDn(cursor, first,
+                             (u16)(signed char)((size >> 8) - 8),
+                             TREE->TreeLen);
+                cursor = paged.cursor;
+                first = paged.first;
                 goto ChTr10;
             case 0x47:                  /* Home */
                 cursor = 0;
@@ -637,17 +638,17 @@ ChTr60:                                 /* the mouse, while a button is
     mouse = TREE->TreeLen;
     held = cursor;
 ChTr61:
-    pair = GetMous(mouse);
-    mouse = HIGH(pair);
-    if (LOW(pair) == 0)
+    pointer = GetMous(mouse);
+    mouse = pointer.place;
+    if (pointer.buttons == 0)
         goto ChTr65;
     held = mouse;
     ClrKbd();
     look = 'x';                         /* the middle button alone */
-    if (LOW(pair) & 3)
+    if (pointer.buttons & 3)
         look = 0;
     n = state;
-    state = look << 8 | LOW(pair);
+    state = look << 8 | pointer.buttons;
     if (look != n >> 8)
         TypMous(look);
     if ((state & 3) == 0)

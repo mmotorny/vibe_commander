@@ -41,15 +41,15 @@
    C, of vc.h.
 
    Int16 calls the BIOS for the keyboard, with `ax` as INT 16h takes it: it
-   returns AX as it comes back, and 1 in the high word if the zero flag was
-   set, which says for function 1 that no key waits. Function 0 takes the
-   key that waits. DosTime asks DOS for the time: the hours and the minutes
-   in the two bytes of the low word, the seconds and their hundredths in
-   those of the high one. Timer returns the BIOS's count of timer ticks.
+   returns AX as it comes back, and whether the zero flag was set, which
+   says for function 1 that no key waits. Function 0 takes the key that
+   waits. DosTime asks DOS for the time: the hours and the minutes in the
+   two bytes of one word, the seconds and their hundredths in those of
+   another. Timer returns the BIOS's count of timer ticks.
 
-   GetMous returns the buttons of the mouse that are down, and in the high
-   word where the mouse is, the row in the high byte, or `place` as it was
-   if there is no mouse. TypMous gives the mouse pointer the look of a
+   GetMous returns the buttons of the mouse that are down and where the
+   mouse is, the row in the high byte, or `place` as it was if there is
+   no mouse. TypMous gives the mouse pointer the look of a
    character, or its own for 0. InWind is not 0 if a place is outside a
    window. Beep sounds, if the setup has errors do so.
 
@@ -97,24 +97,26 @@ u32 Input0(u16 bar)
     u16 BlHigh, BlLow = 0;              /* when to blank the screen */
     u32 AltTime;                        /* the ticks one round before */
     u32 pair, now;
+    struct Time moment;
+    struct Mouse seen;
     u16 key, time, flags, was, hour, minute, mouse, i;
     u16 separator, suffix = 0;
     u16 column, held, buttons, look, shown, tracking, outside;
     u16 *screen;
 
     bar &= 0xFF;
-    if (HIGH(Int16(0x100)) == 0) {
-        key = (u16)Int16(0);
+    if (Int16(0x100).none == 0) {
+        key = Int16(0).key;
         goto Inpt41;
     }
 Inpt02:
-    key = KEY_MOUSE | LOW(GetMous(0));
+    key = KEY_MOUSE | GetMous(0).buttons;
     if ((key & 0xFF) != 0)
         goto Inpt41;
     AltTime = Timer();
     for (i = 0; i < CLOCK_CELLS; i++)
         ClkBuf[i] = CLOCK_AT[i];
-    KbdFlgs = LOW(Int16(0x200)) & 0xFF;
+    KbdFlgs = Int16(0x200).key & 0xFF;
     AltLock = 0;
 Inpt03:
     ClkFlag = 0;
@@ -125,9 +127,9 @@ Inpt04:
        does not read. */
     BlHigh = 0xFFFF;
     if (md.BlDelay != 0) {
-        pair = DosTime();
-        BlLow = HIGH(pair);
-        time = LOW(pair);
+        moment = DosTime();
+        BlLow = moment.seconds;
+        time = moment.clock;
         minute = (time + md.BlDelay) & 0xFF;
         hour = time >> 8;
         if (minute >= 60) {
@@ -140,24 +142,24 @@ Inpt10:
     PutKey(bar);
     LeaveTm();
     if (md.BlDelay != 0) {
-        pair = DosTime();
-        time = LOW(pair);
+        moment = DosTime();
+        time = moment.clock;
         /* Past midnight an hour of 24 or more is the hour 0. */
         if (time >> 8 == 0 && BlHigh >> 8 >= 24)
             BlHigh &= 0xFF;
-        if (time > BlHigh || time == BlHigh && HIGH(pair) >= BlLow) {
+        if (time > BlHigh || time == BlHigh && moment.seconds >= BlLow) {
 Inpt12:
             Blank();
             Window(0, md.Lines << 8 | 80);
-            while (LOW(GetMous(0)) != 0)
+            while (GetMous(0).buttons != 0)
                 ;
             goto Inpt03;
         }
     }
     if (md.Clock != 0) {                /* Inpt20 */
         screen = CLOCK_AT + 1;
-        pair = DosTime();
-        time = LOW(pair);
+        moment = DosTime();
+        time = moment.clock;
         hour = time >> 8;
         if (md.Country.TimeFmt == 0) {
             screen--;
@@ -167,7 +169,7 @@ Inpt12:
                 hour = 12;
         }
         separator = ' ';
-        if ((HIGH(pair) & 0xFF) >= 50)
+        if ((moment.seconds & 0xFF) >= 50)
             separator = md.Country.TimeSep[0];
         if (separator != ClkFlag) {
             ClkFlag = separator;
@@ -187,22 +189,22 @@ Inpt12:
     key = KEY_TIMER;                    /* Inpt30 */
     if ((u16)md.AutoTim != 0xFFFF) {
         /* AutoTim has the hours and the minutes in its low word. */
-        pair = DosTime();
-        time = LOW(pair);
+        moment = DosTime();
+        time = moment.clock;
         if (time > (u16)md.AutoTim
             || time == (u16)md.AutoTim
-               && HIGH(pair) >= (u16)(md.AutoTim >> 16))
+               && moment.seconds >= (u16)(md.AutoTim >> 16))
             goto Inpt40;
     }
     Rnd();                              /* Inpt31 */
-    if (HIGH(Int16(0x100)) == 0) {
-        key = (u16)Int16(0);
+    if (Int16(0x100).none == 0) {
+        key = Int16(0).key;
         goto Inpt40;
     }
-    key = KEY_MOUSE | LOW(GetMous(0));  /* Inpt33 */
+    key = KEY_MOUSE | GetMous(0).buttons;  /* Inpt33 */
     if ((key & 0xFF) != 0)
         goto Inpt40;
-    flags = LOW(Int16(0x200)) & 0xFF;
+    flags = Int16(0x200).key & 0xFF;
     was = KbdFlgs;
     KbdFlgs = flags;
     if (md.DesqVie == 0 && md.AltBar != 0) {
@@ -236,7 +238,7 @@ Inpt12:
     /* The mouse in the top right corner blanks the screen at once, when
        it has been elsewhere since; in the bottom right corner it keeps
        the screen from being blanked. */
-    mouse = HIGH(GetMous(0));
+    mouse = GetMous(0).place;
     if (InWind(mouse, 78, 0x102))
         BlMouse = 1;
     else if (BlMouse != 0)
@@ -260,9 +262,9 @@ Inpt41:
        right one with Alt. The bar shows what the keys are then, the
        pointer has a check mark while it is on the key, and the key is
        pressed when the button is let go there. */
-    pair = GetMous(0);
-    buttons = LOW(pair);
-    mouse = HIGH(pair);
+    seen = GetMous(0);
+    buttons = seen.buttons;
+    mouse = seen.place;
     key = KEY_MOUSE | buttons;
     if ((u8)((mouse >> 8) + 1) != md.Lines)
         return key;
@@ -308,9 +310,9 @@ Inpt41:
         }
         PutKey0(bar, i);                /* Inpt54 */
         held = buttons;
-        pair = GetMous(0);
-        buttons = LOW(pair);
-        mouse = HIGH(pair);
+        seen = GetMous(0);
+        buttons = seen.buttons;
+        mouse = seen.place;
         if (!tracking) {
             /* A key without a name is none: the click is the caller's. */
             if ((*BasAdr((mouse & 0xFF00)

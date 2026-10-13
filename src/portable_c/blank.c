@@ -46,7 +46,7 @@
 void LeaveTm(void)
 {
     Int28();
-    if (md.WinLeav == 0 && (LOW(Int2F(0x1680, 0, 0)) & 0xFF) == 0x80)
+    if (md.WinLeav == 0 && (Int2F(0x1680, 0, 0).ax & 0xFF) == 0x80)
         md.WinLeav = 1;
     if (md.DesqVie != 0)
         DvPause();
@@ -98,7 +98,7 @@ void Blank(void)
 {
     struct BiosRegs regs;
     struct STAR *star;
-    u32 pair;
+    struct Mouse pointer;
     u16 shape, cursor;                  /* the cursor's, to put it back */
     u16 mouse;                          /* where the mouse is, last seen */
     u16 held;                           /* Shift, Ctrl, Alt and the locks */
@@ -128,8 +128,8 @@ void Blank(void)
         md.Stars[i].StarMod = 0;
         md.Stars[i].StarPos = 0;
     }
-    mouse = HIGH(GetMous(0));
-    held = LOW(Int16(0x200)) & 0xFF;
+    mouse = GetMous(0).place;
+    held = Int16(0x200).key & 0xFF;
 
     for (;;) {
         /* Blnk01: a star comes out. */
@@ -199,21 +199,21 @@ void Blank(void)
 
         /* Blnk10: until the timer ticks. */
         for (;;) {
-            if (HIGH(Int16(0x100)) == 0) {
+            if (Int16(0x100).none == 0) {
                 Int16(0);                       /* Blnk13 */
                 goto wake;
             }
-            now = LOW(Int16(0x200)) & 0xFF;
+            now = Int16(0x200).key & 0xFF;
             i = held & 0xF0 ^ now;
             held = now;
             if (i != 0)
                 goto wake;
-            pair = GetMous(0);
-            if (LOW(pair) != 0)
+            pointer = GetMous(0);
+            if (pointer.buttons != 0)
                 goto wake;
-            if (!InWind(HIGH(pair), CORNER_BEGIN, CORNER_SIZE))
-                mouse = HIGH(pair);
-            if (HIGH(pair) != mouse)            /* Blnk11 */
+            if (!InWind(pointer.place, CORNER_BEGIN, CORNER_SIZE))
+                mouse = pointer.place;
+            if (pointer.place != mouse)            /* Blnk11 */
                 goto wake;
             now = LOW(Timer());
             if (now != ticks)

@@ -837,7 +837,7 @@ static u16 NotFind(const u8 *text, const u8 __far *name)
     OutStr(name, EPB_WAS);
     OutStr0(Retr_S, EPB_WAS);
     for (;;) {
-        u8 key = (u8)Int16(0);
+        u8 key = (u8)Int16(0).key;
 
         if (key == 0x0D)
             return 0;

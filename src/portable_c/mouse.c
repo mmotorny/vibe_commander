@@ -72,14 +72,14 @@ void CurMous(u16 show)
         Int33((show & 0xFF) == 0 ? 2 : 1, 0, 0, 0);
 }
 
-/* Where the mouse is and which of its buttons are held: the buttons in
-   the low word, the left one 1, the right one 2 and the middle one 4,
-   the first two the other way round for a left hand, and the place in
-   the high word. Without a mouse no button is held and the place is
-   `place` as it came. */
-u32 GetMous(u16 place)
+/* Where the mouse is and which of its buttons are held: the left one 1,
+   the right one 2 and the middle one 4, the first two the other way
+   round for a left hand. Without a mouse no button is held and the place
+   is `place` as it came. */
+struct Mouse GetMous(u16 place)
 {
     struct MouseAt at;
+    struct Mouse mouse;
     u16 buttons = 0;
 
     if (md.Mouse != 0) {
@@ -89,7 +89,9 @@ u32 GetMous(u16 place)
         if (md.LftMous != 0)
             buttons = buttons & 4 | buttons >> 1 & 1 | buttons << 1 & 2;
     }
-    return (u32)place << 16 | buttons & 7;
+    mouse.buttons = buttons & 7;
+    mouse.place = place;
+    return mouse;
 }
 
 /* A button has been pressed on something that a second click takes, at
@@ -109,15 +111,16 @@ u32 GetMous(u16 place)
    when the next second ends. */
 u16 DoublMo(u16 begin, u16 size, u16 cursor)
 {
-    u32 pair;
+    struct Time time;
+    struct Mouse click;
     u16 hours, seconds, pointer;
 
     if (md.MousEnt != 0)
         return 2;
     md.MousEnt = 1;
-    pair = DosTime();
-    hours = (u16)pair;
-    seconds = (u16)(pair >> 16);
+    time = DosTime();
+    hours = time.clock;
+    seconds = time.seconds;
     if ((u16)(md.MousTim >> 16) != 0xFFFF && cursor == md.MousPos
         && (hours < (u16)(md.MousTim >> 16)
             || hours == (u16)(md.MousTim >> 16)
@@ -127,13 +130,13 @@ u16 DoublMo(u16 begin, u16 size, u16 cursor)
            with it as the place for a mouse that is not there. */
         hours &= 0xFF;
         do {
-            pair = GetMous(hours);
-            pointer = InWind((u16)(pair >> 16), begin, size) ? 0 : TICK;
+            click = GetMous(hours);
+            pointer = InWind(click.place, begin, size) ? 0 : TICK;
             if (pointer != hours >> 8) {
                 hours = hours & 0xFF | pointer << 8;
                 TypMous(pointer);
             }
-        } while ((u16)pair & 7);
+        } while (click.buttons & 7);
         return hours >> 8 != 0;
     }
     seconds = ADD_LOW(seconds, MoDelay);

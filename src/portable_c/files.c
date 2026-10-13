@@ -17,8 +17,6 @@
 #define SIZE_FILENT sizeof(struct FILENT)
 
 u16 TstExe(const u8 __far *name);
-u32 TotSel(u16 panel);
-
 /* SetMask, Sort, FnFile and NearFl are in vc.h. */
 
 /* The extensions of programs. Names in a list are in small letters. */
@@ -310,11 +308,12 @@ u16 NearFl(u16 panel, const u8 __far *name, u16 end)
     }
 }
 
-/* Count what is selected of the files that a panel shows: the files in
-   the high word, the directories in the low one. */
-u32 TotSel(u16 panel)
+/* Count what is selected of the files that a panel shows: the files, and
+   the directories. */
+struct Selected TotSel(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
+    struct Selected selected;
     u16 files = 0;
     u16 directories = 0;
     u16 file;
@@ -329,5 +328,7 @@ u32 TotSel(u16 panel)
                 files++;
         }
     }
-    return (u32)files << 16 | directories;
+    selected.directories = directories;
+    selected.files = files;
+    return selected;
 }

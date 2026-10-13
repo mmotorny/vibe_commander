@@ -101,8 +101,8 @@ u32 V82_00(u16 segment, u16 at, u16 count);
 
    ClrKbd empties the keyboard buffer if the setup has it so; the bars and
    the key that is waited for are C, in vc.h. GetMous returns the buttons
-   of the mouse that are down, and in the high word where the mouse is, or
-   `place` as it was if there is no mouse. InWind is not 0 if a place is
+   of the mouse that are down and where the mouse is, or `place` as it
+   was if there is no mouse. InWind is not 0 if a place is
    outside a window. ChgDisk asks for the disk of a drive that shares the
    floppy drive with another, and is not 0 if the user would not change it.
    ResWin puts back what a box covers. AsmSeg returns the segment of the
@@ -837,6 +837,7 @@ void V00_10(u16 handle)
     struct Box box;
     struct DosRegs regs;
     u32 pair, rest, position;
+    struct Mouse pointer;
     u16 count, key, bar, step, column, at, end, number, begin, size;
     u16 starts, panel, length, behind, in_file, result, edge;
     u16 mouse = 0;
@@ -883,9 +884,9 @@ V00_22:
     V30_00(segment);
 
 V00_30:                                 /* the mouse */
-    pair = GetMous(mouse);
-    mouse = HIGH(pair);
-    if (LOW(pair) == 0) {
+    pointer = GetMous(mouse);
+    mouse = pointer.place;
+    if (pointer.buttons == 0) {
         md.WinMous = 0;
         goto V00_40;
     }

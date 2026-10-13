@@ -174,7 +174,7 @@ void PutKey(u16 bar)
         md.BarPrev = 0xFF;
         return;
     }
-    keys = (u16)Int16(0x200);
+    keys = Int16(0x200).key;
     PutKey0(bar, keys & 8 ? 3 : keys & 4 ? 2 : keys & 3 ? 1 : 0);
 }
 

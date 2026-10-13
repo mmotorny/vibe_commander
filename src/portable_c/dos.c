@@ -211,27 +211,35 @@ u16 __far *TopScr(u16 __far *screen)
 }
 
 /* The BIOS, for the keyboard: its call with AX. Returns AX as the BIOS
-   leaves it, and above it 1 if the zero flag is set then. The program
+   leaves it, and whether the zero flag is set then. The program
    has it take a key, waiting for one (AH 0), say whether a key waits
    and which, the zero flag set if none does (1), and say which of
    Shift, Ctrl and Alt are held (2, and 12h). */
-u32 Int16(u16 ax)
+struct Keys Int16(u16 ax)
 {
     u32 pair = Keyboard(ax);
     u16 flags = (u16)(pair >> 16);
+    struct Keys keys;
 
-    return (u32)(flags >> 6 & 1) << 16 | (u16)pair;
+    keys.key = (u16)pair;
+    keys.none = flags >> 6 & 1;
+    return keys;
 }
 
 /* The multiplex interrupt, by which resident programs are asked: its
-   call with these registers. Returns AX in the low word and BX in the
-   high one. The program asks the CD-ROM extensions whether a drive is
+   call with these registers. Returns AX and BX as it leaves them. The
+   program asks the CD-ROM extensions whether a drive is
    theirs (AX 150Bh), and tells Windows, or whatever else shares the
    machine among programs, that it can do without the rest of its turn
    (1680h), which leaves AL as it is if nobody listens. */
-u32 Int2F(u16 ax, u16 bx, u16 cx)
+struct MuxRegs Int2F(u16 ax, u16 bx, u16 cx)
 {
-    return Multiplex(ax, bx, cx);
+    u32 pair = Multiplex(ax, bx, cx);
+    struct MuxRegs regs;
+
+    regs.ax = (u16)pair;
+    regs.bx = (u16)(pair >> 16);
+    return regs;
 }
 
 /* Tell DOS that the program is idle: the interrupt that DOS itself

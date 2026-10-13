@@ -71,19 +71,18 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
 
-   GetMous returns the buttons of the mouse in the low word and where it is
-   in the high one, the row in its high byte; without a mouse that is
-   `place` as it came. ClrKbd empties the keyboard buffer, if the setup
+   GetMous returns the buttons of the mouse and where it is, the row in
+   the high byte; without a mouse that is `place` as it came. ClrKbd empties the keyboard buffer, if the setup
    says so, and TypMous sets the character that the mouse pointer is.
    InWind is not 0 if a place is outside a window. DoublMo returns 2 for a
    click that may be the first of two, 1 for the second of two on the line
    `line`, and 0 for a second one that was let go elsewhere.
 
    PgUp and PgDn move the cursor of a list a page, `rows` lines: they
-   return the cursor in the low word and the first line shown in the high
-   one. Int10m calls the BIOS for the screen, and returns CX as that
-   leaves it in the high word. Int16 calls the BIOS for the keyboard: the high word of
-   what it returns is 1 if the zero flag was set. Help00 is the help,
+   return the cursor and the first line shown. Int10m calls the BIOS for
+   the screen, and returns the corners of the window as that leaves them.
+   Int16 calls the BIOS for the keyboard: `none` of what it returns is 1
+   if the zero flag was set. Help00 is the help,
    which is C, as is DirFunc, of vc.h.
 
    HidCur puts the cursor below the screen. SavWin keeps what the
@@ -96,8 +95,7 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
    Int21d calls DOS as Intr21 does, with the registers of `regs` and
    their answer there, but not through Intr21: DOS's box for a drive
    that is not ready is not looked for, and an error is not asked about.
-   Int2F calls the multiplex interrupt, and returns AX in the low word
-   and BX in the high one. */
+   Int2F calls the multiplex interrupt, and returns AX and BX. */
 void Help00(void);                                      /* help.c */
 
 /* C routines of other files that vc.h does not have. */
@@ -235,22 +233,22 @@ static void FndStat(void)
    `*line`, and a second click on that line is Enter. */
 static u16 FnMv00(u16 at, u16 place, u16 size, u16 STACK *line)
 {
-    u32 mouse;
+    struct Mouse mouse;
     u16 buttons, was, last, target, clicks;
 
     mouse = GetMous(at);
     for (;;) {
         /* FnMv01 */
-        buttons = (u16)mouse;
-        at = (u16)(mouse >> 16);
+        buttons = mouse.buttons;
+        at = mouse.place;
         ClrKbd();
         was = at;
         if (buttons & 4) {
             TypMous('x');
             do {
                 mouse = GetMous(at);
-                buttons = (u16)mouse;
-                at = (u16)(mouse >> 16);
+                buttons = mouse.buttons;
+                at = mouse.place;
                 ClrKbd();
             } while (buttons & 4);
             TypMous(0);
@@ -271,7 +269,7 @@ static u16 FnMv00(u16 at, u16 place, u16 size, u16 STACK *line)
         if (!(buttons & 1))
             return ASK_NOTHING;
         mouse = GetMous(at);
-        if ((u16)mouse != 0)
+        if (mouse.buttons != 0)
             continue;
         if (InWind(was, place, size - 0x102))
             return ASK_ESC;
@@ -335,7 +333,7 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
     u16 first = FND->FndFrst;
     u16 ask, rows, old, wasLine, wasFirst, moved, count, at, number;
     u16 scroll, color;
-    u32 paged;
+    struct Paged paged;
 
     if ((key >> 8) == KEY_MOUSE)
         ask = FnMv00(mode, place, size, (u16 STACK *)&line);
@@ -368,13 +366,13 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
         break;
     case ASK_PGUP:
         paged = PgUp(line, first, rows);
-        line = (u16)paged;
-        first = (u16)(paged >> 16);
+        line = paged.cursor;
+        first = paged.first;
         break;
     case ASK_PGDN:
         paged = PgDn(line, first, rows, FND->FndNumb);
-        line = (u16)paged;
-        first = (u16)(paged >> 16);
+        line = paged.cursor;
+        first = paged.first;
         break;
     }
 
@@ -418,9 +416,9 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
             scroll = 0x600 | (rows - 1) & 0xFF;
             if (moved != 1)
                 scroll = 0x700;
-            at = (u16)(Int10m(scroll & 0xFF00 | 1,
-                              Color(Conf_C) << 8 | at & 0xFF, at,
-                              (((rows - 1) & 0xFF) << 8 | 63) + at) >> 16);
+            at = Int10m(scroll & 0xFF00 | 1,
+                        Color(Conf_C) << 8 | at & 0xFF, at,
+                        (((rows - 1) & 0xFF) << 8 | 63) + at).upper;
             at += (scroll & 0xFF) << 8;
             rows = 1;
         }
@@ -485,22 +483,23 @@ static u16 FndStuf(void)
 static u16 FndBack(void)
 {
     u32 answer;
+    struct Mouse pointer;
     u16 key, mode, place, size, menu, item, go;
 
     for (;;) {
         /* The place of the mouse, if there is one, gets to FndMove as
            the high byte of `mode`, where nothing reads it. */
-        answer = GetMous(0);
-        key = (u16)answer;
-        mode = (u16)(answer >> 16);
+        pointer = GetMous(0);
+        key = pointer.buttons;
+        mode = pointer.place;
         if (key != 0) {
             key = KEY_MOUSE << 8 | key & 0xFF;
         } else {
-            if (Int16(0x100) >> 16) {
+            if (Int16(0x100).none) {
                 go = 1;
                 break;
             }
-            key = (u16)Int16(0);
+            key = Int16(0).key;
             if (key == 0 || key == 0x2E03 || key == 0x011B) {
                 go = 0;
                 break;
@@ -798,6 +797,8 @@ u32 F67_00(void)
     u16 color, row, count, answer, first, drive, cell, i, number, panel;
     u16 key, mode, room;
     u32 pair;
+    struct MuxRegs mux;
+    struct Mouse pointer;
 
     HidCur();
     PutMnu(3);
@@ -891,8 +892,8 @@ again:
                 md.TmpErr[0] = (u8)drive;
                 FND->FndDrv++;
                 drive = (u8)(drive - 'A');
-                pair = Int2F(0x150B, 0, drive);
-                if (HIGH(pair) != 0xADAD || LOW(pair) == 0) {
+                mux = Int2F(0x150B, 0, drive);
+                if (mux.bx != 0xADAD || mux.ax == 0) {
                     /* F67_11: no CD-ROM */
                     regs.name = md.TmpErr;
                     regs.bx = drive + 1;
@@ -987,9 +988,9 @@ found:
     do {
         /* F67_21: a key for the menu, and then for the list. With a
            button of the mouse down, the list alone. */
-        pair = GetMous(0);
-        key = LOW(pair);
-        mode = HIGH(pair);
+        pointer = GetMous(0);
+        key = pointer.buttons;
+        mode = pointer.place;
         if (key != 0) {
             key = KEY_MOUSE << 8 | key & 0xFF;
         } else {

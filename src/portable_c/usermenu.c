@@ -41,8 +41,8 @@ u16 Run_00(u16 text, u16 view);
    SftEGA moves a place down on a screen of more than 25 lines, by half of
    what it has more.
 
-   GetMous returns the buttons of the mouse that are down, and in the high
-   word where the mouse is, or `place` as it was if there is no mouse.
+   GetMous returns the buttons of the mouse that are down and where the
+   mouse is, or `place` as it was if there is no mouse.
    TypMous gives the mouse pointer the look of a character, or its own for
    0. InWind is not 0 if a place is outside a window. DoublMo is asked
    about a click on the line `line` of a list: 2 for the first click on
@@ -76,7 +76,6 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);
-u32 TotSel(u16 panel);                                  /* files.c */
 void Help00(void);                                      /* help.c */
 
 /* What keys_t.c has of the menu: the name of the menu file, which
@@ -156,15 +155,15 @@ static void F32_60(u16 color, u16 begin, u16 row, u16 keys, u16 size)
    has the look of an x. */
 u16 F32_70(u16 begin, u16 size)
 {
-    u32 pair;
+    struct Mouse pointer;
     u16 buttons, look, last = 0, mouse = 0, line, answer;
 
 F32_71:
-    pair = GetMous(mouse);
-    buttons = LOW(pair);
+    pointer = GetMous(mouse);
+    buttons = pointer.buttons;
     if (buttons == 0)
         goto F32_74;
-    mouse = HIGH(pair);
+    mouse = pointer.place;
     ClrKbd();
     look = 'x';
     if (buttons & 3)
@@ -218,7 +217,7 @@ static u16 FileLst(void)
     struct WCBdef __far *wcb;
     struct FILENT __far *file;
     u8 __far *end;
-    u32 selected;
+    struct Selected selected;
     u16 i, handle, any, at, length;
 
     end = MvzLine(LIST_NAME, md.TempDir, LenPath);
@@ -247,7 +246,7 @@ FiLs03:
     if (!FilePan(md.WCBcrn))
         goto FiLs18;
     selected = TotSel(md.WCBcrn);
-    any = HIGH(selected) | LOW(selected);
+    any = selected.files | selected.directories;
     if (any == 0) {
         if (wcb->CurAdr >= wcb->EndBuf)
             goto FiLs18;
@@ -728,7 +727,7 @@ F32_29:
 F32_30:                                 /* the cursor */
     F32_60(HstCu_C, begin, row, keys, size);
 F32_31:
-    if (LOW(GetMous(0)))
+    if (GetMous(0).buttons)
         goto F32_45;
     md.MousEnt = 0;
     pair = Input0(1);

@@ -571,6 +571,8 @@ void F65_00(void)
     u16 programs, program, release;
     u16 *screen;
     u32 pair;
+    struct Paged paged;
+    struct Mouse pointer;
 
     HidCur();
     md.HlpPage = 30;
@@ -666,9 +668,9 @@ F65_40:                                 /* Test parameters */
             if (moved == 1 || moved == 0xFFFF) {
                 if (moved == 0xFFFF)
                     key = 0x700;
-                place = (u16)(Int10m(
+                place = Int10m(
                     key & 0xFF00 | 1, Color(Memo_P[0]) << 8 | place & 0xFF,
-                    place, ((u16)(u8)(rows - 1) << 8 | 63) + place) >> 16);
+                    place, ((u16)(u8)(rows - 1) << 8 | 63) + place).upper;
                 place += (key & 0xFF) << 8;
                 n = 0x100;
             }
@@ -678,8 +680,8 @@ F65_40:                                 /* Test parameters */
     }
 
 F65_48:                                 /* Input */
-    pair = GetMous(mouse);
-    if (LOW(pair) != 0)
+    pointer = GetMous(mouse);
+    if (pointer.buttons != 0)
         goto Mous01;
     md.WinMous = 0;
     md.MousEnt = 0;
@@ -709,15 +711,15 @@ F65_49:
         cursor = MemEnd(cursor) - 1;
         goto F65_40;
     case 0x4900:                        /* PgUp */
-        pair = PgUp(cursor, first, (u16)(signed char)(u8)((size >> 8) - 9));
-        cursor = LOW(pair);
-        first = HIGH(pair);
+        paged = PgUp(cursor, first, (u16)(signed char)(u8)((size >> 8) - 9));
+        cursor = paged.cursor;
+        first = paged.first;
         goto F65_40;
     case 0x5100:                        /* PgDn */
-        pair = PgDn(cursor, first, (u16)(signed char)(u8)((size >> 8) - 9),
-                    MemEnd(cursor));
-        cursor = LOW(pair);
-        first = HIGH(pair);
+        paged = PgDn(cursor, first, (u16)(signed char)(u8)((size >> 8) - 9),
+                     MemEnd(cursor));
+        cursor = paged.cursor;
+        first = paged.first;
         goto F65_40;
     case 0x5200:                        /* Ins */
         line = MemAddr(cursor);
@@ -753,19 +755,19 @@ F65_49:
     goto F65_48;
 
 Mous00:                                 /* Mouse support */
-    pair = GetMous(mouse);
+    pointer = GetMous(mouse);
 Mous01:
-    buttons = LOW(pair);
-    mouse = HIGH(pair);
+    buttons = pointer.buttons;
+    mouse = pointer.place;
     ClrKbd();
     pressed = mouse;
     if (buttons & 4) {
         /* The middle button leaves, unless another is down with it. */
         TypMous('x');
         do {
-            pair = GetMous(mouse);
-            buttons = LOW(pair);
-            mouse = HIGH(pair);
+            pointer = GetMous(mouse);
+            buttons = pointer.buttons;
+            mouse = pointer.place;
             ClrKbd();
         } while (buttons & 4);
         TypMous(0);
@@ -792,8 +794,8 @@ Mous01:
                 0x118))
         goto F65_49;                    /* on the buttons */
     /* Let go outside the window, it leaves. */
-    pair = GetMous(mouse);
-    if (LOW(pair) != 0)
+    pointer = GetMous(mouse);
+    if (pointer.buttons != 0)
         goto Mous01;
     mouse = pressed;
     if (InWind(mouse, begin, size - 0x102))

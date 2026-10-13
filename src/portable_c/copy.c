@@ -78,16 +78,14 @@ u16 F35_61(u16 answer, u16 place);
    is the number of the answer, 0 for the first, and 0FFh for Esc. */
 #define Ask(box, include) Dialog(box, include, 0, 0, MAIN_SEG)
 
-/* C routines of other files that vc.h does not have. TotSel returns the
-   number of selected files in the high word and of selected directories
-   in the low one; FilDir writes "2 files", or what else such numbers
-   make, and returns the address behind its zero byte; ChTree has a
-   directory chosen from the tree, in a box that begins in a column, and
-   returns 0 if one was, with its path in TmpBuf. */
+/* C routines of other files that vc.h does not have. FilDir writes
+   "2 files", or what else the numbers of TotSel make, and returns the
+   address behind its zero byte; ChTree has a directory chosen from the
+   tree, in a box that begins in a column, and returns 0 if one was, with
+   its path in TmpBuf. */
 const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 void NormStr(u8 __far *text);
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);       /* mask.c */
-u32 TotSel(u16 panel);                                  /* files.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
 u16 ChTree(u16 column);                                 /* treebox.c */
 
@@ -1475,7 +1473,7 @@ u32 F35_01(u16 panel, u16 command, u16 directories, u16 files)
     const u8 __far *from;
     const u8 *name, *typed;
     u8 *to, *end;
-    u32 pair;
+    struct Selected selected;
     u16 length, i;
 
     command &= 0xFF;
@@ -1492,9 +1490,9 @@ u32 F35_01(u16 panel, u16 command, u16 directories, u16 files)
         directories = 0;
         files = 0;
         if (md.OneFile == 0) {
-            pair = TotSel(panel);
-            directories = LOW(pair);
-            files = HIGH(pair);
+            selected = TotSel(panel);
+            directories = selected.directories;
+            files = selected.files;
         }
         if ((directories | files) == 0
             && (wcb->CurAdr >= wcb->EndBuf

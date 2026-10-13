@@ -49,7 +49,7 @@ u16 StrLen(const u8 __far *text);                       /* string.c */
 
    HidCur puts the cursor below the screen and Cursor1 on the command line;
    Int10m calls the BIOS with the mouse cursor off, and hands back what
-   that leaves in DX, in the low word, and in CX; ResUser writes what DOS
+   that leaves in DX and in CX, the corners of the window; ResUser writes what DOS
    has shown, which the panels cover, to the screen buffer, for a window
    given like Window's; InvVar makes of a byte of the main data 1 if it is
    0, and 0 otherwise. SelDrv is the call of DOS that makes a drive the
@@ -124,7 +124,8 @@ u32 F00_50(u16 panel, u16 cursor, u16 first)
     u32 was = ChgAdr(panel, cursor, first);
     u16 was_cursor = (u16)was;
     u16 was_first = (u16)(was >> 16);
-    u32 now, window, left;
+    u32 now, left;
+    struct Corners window;
     u16 step, moved, how, begin, corner, bottom;
 
     CorPar(panel);
@@ -177,9 +178,9 @@ u32 F00_50(u16 panel, u16 cursor, u16 first)
                         corner, bottom);
         /* The line that has come in, the first or the last of the
            window, with the corners as the BIOS has left them. */
-        corner = (u16)(window >> 16);
+        corner = window.upper;
         if (how != 7)
-            corner = (u16)window & 0xFF00 | corner & 0xFF;
+            corner = window.lower & 0xFF00 | corner & 0xFF;
         Window(corner, 0x126);
         left = LEFT(corner, 0x126);
     }
