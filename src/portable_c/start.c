@@ -197,15 +197,9 @@ static u8 __far *MvzTxt(u8 __far *to, const u8 __far *from)
    is OutStr of resident.c, which the assembly called there. */
 static void OutStr1(const u8 __far *text, u16 page)
 {
-    struct BiosRegs regs;
-
-    regs.cx = 0;
-    regs.dx = 0;
-    do {
-        regs.ax = 0x0E00 | *text++;
-        regs.bx = page << 8 | 7;
-        Int10((struct BiosRegs STACK *)&regs);
-    } while (*text != 0);
+    do
+        ScreenType(*text++, page, 7);
+    while (*text != 0);
 }
 
 /* Write to `to` the directory that the environment `env` names with
@@ -306,8 +300,6 @@ static u16 ReadOne(const u8 __far *path, u8 __far *end,
    to IMAGE, and the three are as the program was loaded. */
 void Init00(void)
 {
-    struct DosRegs regs;
-    struct BiosRegs bios;
     struct VideoMode mode;
     u8 *image = IMAGE;
     struct WCBdef *first = (struct WCBdef *)(image + 3);
@@ -347,47 +339,25 @@ void Init00(void)
         ((u8 *)first)[i] = DefWCB[i];
     for (; i < WCBini; i++)
         ((u8 *)first)[i] = 0;
-    regs.ax = 0x1900;                   /* the current drive */
-    regs.bx = wrong;
-    regs.cx = 0;
-    regs.name = (const u8 __far *)&md;
-    regs.si = 0;
-    regs.di = 0;
-    Int21d((struct DosRegs STACK *)&regs);
-    drive = regs.ax & 0xFF;
+    drive = DriveCurrent();
     first->WinPath[0] = (u8)(drive + 'A');
     first->WinPath[1] = ':';
     first->WinPath[2] = '\\';
     first->WinPath[3] = 0;
-    regs.ax = 0x4700;                   /* its current directory */
-    regs.name = AT(MAIN_SEG, drive + 1);
-    regs.si = (u16)&first->WinPath[3];
-    Int21d((struct DosRegs STACK *)&regs);
+    DirCurrentBare(drive + 1, &first->WinPath[3]);
     for (i = 0; i < WCBini; i++)
         ((u8 *)second)[i] = ((u8 *)first)[i];
     first->Visible = 0;
 
 Init04:                                 /* Output Report */
-    mode.ax = 0;
-    mode.bx = wrong;
-    if (!ChkMode((struct VideoMode STACK *)&mode)) {
-        bios.ax = 3;                    /* 80 columns, in colour */
-        bios.bx = mode.bx;
-        bios.cx = 0;
-        bios.dx = 0;
-        Int10((struct BiosRegs STACK *)&bios);
-    }
+    mode.bx = 0;
+    if (!ChkMode((struct VideoMode STACK *)&mode))
+        ScreenSetMode(3);               /* 80 columns, in colour */
     to = MvzTxt(md.ExtMain, AT(code, OFFSET(Title_S) + 2));     /* Init05 */
     to = MvzTxt(to, Suff_S);
     to = MvzTxt(to, Copyr_S);
     MvzTxt(to, CrLf_S);
-    regs.ax = 0x0900;                   /* a text, as far as its $ */
-    regs.bx = mode.bx;
-    regs.cx = 0;
-    regs.name = md.ExtMain;
-    regs.si = 0;
-    regs.di = 0;
-    Int21d((struct DosRegs STACK *)&regs);
+    ConsoleText(md.ExtMain);            /* as far as its $ */
     if (wrong)                          /* Error in INI file */
         OutStr1(NoIni_S, mode.bx >> 8);
 
@@ -440,25 +410,15 @@ static void Memory(u16 segment, u16 size)
    here as many as it is from the main data to the end of the block. */
 struct Answer Init11(void)
 {
-    struct DosRegs regs;
     struct Answer answer;
     struct WCBdef __far *wcb;
     const u8 *from = IMAGE + 3;
     u16 largest, segment, panel, i;
 
-    regs.ax = 0x4800;                   /* a block of the memory: of all
+    largest = MemTake(0xFFFF).largest;  /* a block of the memory: of all
                                            of it, which DOS refuses, and
                                            says how large one can be */
-    regs.bx = 0xFFFF;
-    regs.cx = 0;
-    regs.name = (const u8 __far *)&md;
-    regs.si = 0;
-    regs.di = 0;
-    Int21d((struct DosRegs STACK *)&regs);
-    largest = regs.bx;
-    regs.ax = 0x4800 | regs.ax & 0xFF;
-    Int21d((struct DosRegs STACK *)&regs);
-    segment = regs.ax;
+    segment = MemTake(largest).value;
     answer.value = largest;
     answer.failed = (u16)(VIEW_PARAS + 2 * PANEL_PARAS) > largest;
     if (answer.failed)
@@ -489,7 +449,6 @@ struct Answer Init11(void)
    in DEVIATIONS.md what follows from the difference. */
 void GiveMem(void)
 {
-    struct DosRegs regs;
     u16 first = md.WCB1seg, second = md.WCB2seg;
     u16 behind, i;
     const u8 __far *from;
@@ -511,12 +470,7 @@ void GiveMem(void)
             md.WCB2seg = behind;
     }
     md.ViewSeg = behind + PANEL_PARAS;
-    regs.ax = 0x4A00;                   /* make a block another size */
-    regs.bx = md.ViewSeg - md.MemSeg;
-    regs.cx = regs.si = regs.di = 0;
-    regs.name = (const u8 __far *)&md;
-    regs.es = md.MemSeg;
-    Int21e((struct DosRegs STACK *)&regs);
+    MemResize(md.MemSeg, md.ViewSeg - md.MemSeg);
 }
 
 /* Take all the memory that there is again, when the commands have been
@@ -533,26 +487,16 @@ void GiveMem(void)
    that nothing has been given since. */
 struct Answer TakeMem(void)
 {
-    struct DosRegs regs;
     struct Answer answer;
     u16 kept = md.ViewSeg - md.MemSeg;
     u16 largest, segment, i;
     const u8 __far *from;
     u8 __far *to;
 
-    regs.ax = 0x4900;                   /* give a block back */
-    regs.bx = regs.cx = regs.si = regs.di = 0;
-    regs.name = (const u8 __far *)&md;
-    regs.es = md.MemSeg;
-    Int21e((struct DosRegs STACK *)&regs);
-    regs.ax = 0x4800;                   /* the largest block, asked for
+    MemGive(md.MemSeg);
+    largest = MemTake(0xFFFF).largest;  /* the largest block, asked for
                                            as Init11 asks */
-    regs.bx = 0xFFFF;
-    Int21d((struct DosRegs STACK *)&regs);
-    largest = regs.bx;
-    regs.ax = 0x4800 | regs.ax & 0xFF;
-    Int21d((struct DosRegs STACK *)&regs);
-    segment = regs.ax;
+    segment = MemTake(largest).value;
     answer.value = largest;
     answer.failed = (u16)(VIEW_PARAS + kept) > largest;
     if (answer.failed)
@@ -572,16 +516,16 @@ struct Answer TakeMem(void)
     return answer;
 }
 
-/* Where the cursor is, into `regs`; and if it is below the last line
-   that the program counts, put it at the start of that line. */
-static void CurNl(struct BiosRegs STACK *regs)
+/* If the cursor is below the last line that the program counts, put it
+   at the start of that line. Returns the page that is shown, which the
+   BIOS is asked for first: the assembly goes on with it in BH. */
+static u16 CurNl(void)
 {
-    regs->ax = 0x0F00 | regs->ax & 0xFF;
-    Int10(regs);
-    regs->ax = 0x0300 | regs->ax & 0xFF;
-    Int10(regs);
-    if (regs->dx >> 8 >= md.Lines)
+    u16 page = ScreenState().page;
+
+    if (CursorWhere(page).place >> 8 >= md.Lines)
         Cursor((u16)(u8)(md.Lines - 1) << 8);
+    return page;
 }
 
 /* The setup is there, and the panels. Fill in the rest of the main
@@ -616,64 +560,47 @@ static void CurNl(struct BiosRegs STACK *regs)
        fed a line, so the screen scrolls once. */
 void IniData(void)
 {
-    struct DosRegs regs;
-    struct BiosRegs bios;
     struct VideoMode mode;
+    struct Screen screen;
+    struct SysVersion system;
     const u8 __far *env;
-    u16 i, c, key, at, lines, rows, version, other, cell;
+    u16 i, c, at, lines, rows, page, shape, cell;
 
-    bios.ax = HookVct();                /* Set Error Vectors */
+    HookVct();                          /* Set Error Vectors */
 
-    mode.ax = bios.ax;                  /* Set Display Segment */
-    mode.bx = md.FreMem2;
-    bios.cx = 0;
-    bios.dx = 0;
+    mode.bx = 0;                        /* Set Display Segment */
     if (ChkMode((struct VideoMode STACK *)&mode)) {
-        bios.ax = mode.ax;
-        bios.bx = mode.bx;
+        screen.mode = mode.ax & 0xFF;
+        screen.page = mode.bx >> 8;
     } else {
-        bios.ax = 0x0100 | mode.ax & 0xFF;      /* no cursor */
-        bios.bx = mode.bx & 0xFF00 | mode.ax >> 8;
-        bios.cx = 0x2000;
-        Int10((struct BiosRegs STACK *)&bios);
-        OutStr1(Retrn_S, bios.bx >> 8);
-        if ((bios.bx & 0xFF) < 80)
-            OutStr1(Retr2_S, bios.bx >> 8);
+        page = mode.bx >> 8;
+        CursorShape(0x2000);            /* no cursor */
+        OutStr1(Retrn_S, page);
+        if (mode.ax >> 8 < 80)
+            OutStr1(Retr2_S, page);
         else                            /* on the same line */
-            OutStr1(Retr2_S + 2, bios.bx >> 8);
-        do                              /* Init16 */
-            key = Int16(0).key;
-        while ((key & 0xFF) != '\r');
-        bios.ax = md.ScrMod;
-        Int10((struct BiosRegs STACK *)&bios);
-        bios.ax = 0x0F00 | bios.ax & 0xFF;
-        Int10((struct BiosRegs STACK *)&bios);
-        bios.ax &= 0xFF7F;
+            OutStr1(Retr2_S + 2, page);
+        while ((KeyRead() & 0xFF) != '\r')      /* Init16 */
+            ;
+        ScreenSetMode(md.ScrMod);
+        screen = ScreenState();
+        screen.mode &= 0x7F;
     }
-    md.ScrMod = (u8)bios.ax;            /* Init17 */
-    md.ScrPage = (u8)(bios.bx >> 8);
+    md.ScrMod = (u8)screen.mode;        /* Init17 */
+    md.ScrPage = (u8)screen.page;
 
     /* Correct cursor size. */
-    bios.ax = 0x0300 | bios.ax & 0xFF;
-    Int10((struct BiosRegs STACK *)&bios);
-    if (bios.cx >> 8 > 0x0F)
-        bios.cx = 0x0607;
-    if (bios.cx == 0x0067)              /* Init18 */
-        bios.cx = 0x0607;
-    if (md.ScrMod == 7 && bios.cx == 0x0607)    /* Init19 */
-        bios.cx = 0x0B0C;
-    bios.ax = 0x0100 | bios.ax & 0xFF;  /* Init20 */
-    Int10((struct BiosRegs STACK *)&bios);
+    shape = CursorWhere(screen.page).shape;
+    if (shape >> 8 > 0x0F)
+        shape = 0x0607;
+    if (shape == 0x0067)                /* Init18 */
+        shape = 0x0607;
+    if (md.ScrMod == 7 && shape == 0x0607)      /* Init19 */
+        shape = 0x0B0C;
+    CursorShape(shape);                 /* Init20 */
 
     /* Initialize data segment. */
     CountryInfo(&md.Country);           /* Country */
-    regs.bx = bios.bx;                  /* the registers of the calls of
-                                           DOS further down, as the
-                                           assembly has them from here */
-    regs.cx = bios.cx;
-    regs.name = (const u8 *)&md.Country;
-    regs.si = 0;
-    regs.di = 0;
     for (i = 0; i < 128; i++) {         /* Lower case table */
         md.LowTab[i] = (u8)(0x80 + i);
         md.TmpBuf[i] = (u8)CaseMap(0x80 + i);
@@ -720,21 +647,12 @@ void IniData(void)
     md.WinMous = 0;
     md.HstAdr = (u16)md.HstBuf;
     md.BarPrev = 0xFF;
-    regs.ax = 0x1900;                   /* DosChg */
-    Int21d((struct DosRegs STACK *)&regs);
-    md.DosChg[0] = (u8)regs.ax;
-    bios.ax = 0x1200 | regs.ax & 0xFF;  /* TstEGA */
-    bios.bx = 0xFF10;
-    Int10((struct BiosRegs STACK *)&bios);
-    if (bios.bx != 0xFF10)
+    md.DosChg[0] = (u8)DriveCurrent();  /* DosChg */
+    if (ScreenEga())                    /* TstEGA */
         md.TstEGA = 1;
     lines = 25;                         /* Init29: Lines */
-    bios.dx &= 0xFF00;
     if (md.TstEGA != 0) {
-        bios.bx &= 0x00FF;
-        bios.ax = 0x1130;
-        Int10((struct BiosRegs STACK *)&bios);
-        rows = bios.dx & 0xFF;
+        rows = ScreenFont().last;
         if (rows != 0) {
             rows = (u8)(rows + 1);
             lines = rows;
@@ -746,23 +664,14 @@ void IniData(void)
     ScrOffs();                          /* Init34: where the cells of
                                            the screen are, for the mode
                                            and the page that is shown */
-    regs.ax = 0x3306;                   /* VerDOS: the version that DOS
+    system = SystemTrueVersion();       /* VerDOS: the version that DOS
                                            has, whatever it says to a
                                            program that asks otherwise */
-    regs.bx = 0;
-    Int21d((struct DosRegs STACK *)&regs);
-    version = regs.bx;
-    other = regs.ax;
-    if (version == 0) {
-        regs.ax = 0x3000;
-        regs.bx = other;
-        Int21d((struct DosRegs STACK *)&regs);
-        version = regs.ax;
-        other = regs.bx;
-    }
-    if (version == 4 && other >> 8 == 0xFF)     /* Init36 */
-        version = 0x0104;
-    md.VerDOS = version;                /* Init37 */
+    if (system.version == 0)
+        system = SystemVersion();
+    if (system.version == 4 && system.other >> 8 == 0xFF)       /* Init36 */
+        system.version = 0x0104;
+    md.VerDOS = system.version;         /* Init37 */
     PANEL(md.WCB1seg)->ChgFlg = 1;      /* WCBseg */
     PANEL(md.WCB2seg)->ChgFlg = 1;
     md.WCBcrn = md.WCB1seg;
@@ -772,29 +681,19 @@ void IniData(void)
         md.WCBsec = md.WCB1seg;
     }
 
-    /* Set DOS color. */
-    CurNl((struct BiosRegs STACK *)&bios);
-    bios.ax = 0x0E0D;
-    Int10((struct BiosRegs STACK *)&bios);
-    bios.ax = 0x0E0A;
-    Int10((struct BiosRegs STACK *)&bios);
-    CurNl((struct BiosRegs STACK *)&bios);
-    bios.ax = 0x0800 | bios.ax & 0xFF;  /* the character at the cursor */
-    Int10((struct BiosRegs STACK *)&bios);
-    cell = bios.ax;
-    regs.ax = 0x0600 | cell & 0xFF;     /* DOS writes a space there */
-    regs.bx = bios.bx;
-    regs.cx = bios.cx;
-    bios.dx = bios.dx & 0xFF00 | ' ';
-    regs.name = (const u8 __far *)&md + bios.dx;
-    Int21d((struct DosRegs STACK *)&regs);
-    bios.ax = 0x0E0D;
-    Int10((struct BiosRegs STACK *)&bios);
-    bios.ax = 0x0800 | bios.ax & 0xFF;  /* and its colour is DOS's */
-    Int10((struct BiosRegs STACK *)&bios);
-    md.CrntCol = (u8)(bios.ax >> 8);
-    bios.ax = 0x0900 | cell & 0xFF;     /* what was there before */
-    bios.bx = bios.bx & 0xFF00 | cell >> 8;
-    bios.cx = 1;
-    Int10((struct BiosRegs STACK *)&bios);
+    /* Set DOS color. The carriage returns and the line feed are typed
+       with no colour, which the BIOS takes only where the screen is
+       graphics: the assembly has in BL there what DOS left when it was
+       asked for its version. */
+    page = CurNl();
+    ScreenType('\r', page, 0);
+    ScreenType('\n', page, 0);
+    page = CurNl();
+    cell = ScreenCell(page);            /* the character at the cursor */
+    ConsoleChar(' ');                   /* DOS writes a space there */
+    ScreenType('\r', page, 0);
+    md.CrntCol = (u8)(ScreenCell(page) >> 8);   /* and its colour is
+                                                   DOS's */
+    ScreenFill(page, cell & 0xFF, cell >> 8, 1);        /* what was there
+                                                           before */
 }

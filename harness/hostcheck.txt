@@ -51,7 +51,7 @@ resident.c    to-number 28, to-pointer 30, function 6, interrupt 7, loadds 3, na
 screen.c      clean
 setup.c       to-number 1, to-pointer 2
 stack.c       data_seg 2
-start.c       to-number 9, to-pointer 16
+start.c       to-number 7, to-pointer 15
 string.c      clean
 sys.h         clean
 system.c      to-number 2

@@ -1911,6 +1911,17 @@ What making the first files so met:
   can be copied and tested as the note on copies above has it, while
   the next file is moved: `harness/ported.py` with the copy's `VC.EXE`
   and `VC.MAP` and the original's listing.
+- Where the C kept the registers of the BIOS and those of DOS in two
+  structures, as `IniData` of `start.c` did, what it handed on in a
+  register that a call does not take was not always the original's: BL
+  of the carriage returns that `IniData` types was what the BIOS had
+  answered about an EGA, and in the assembly it is what DOS answered
+  about its version. The row of the deviation says what the original
+  has there, read from the assembly, not from the C. And a leftover may
+  be something that no function hands back, so that it cannot be handed
+  on even where the function takes it, as `ScreenType` takes a colour:
+  it is dropped like any other, with its row, if the service does not
+  read it, and the BIOS reads no colour there on a screen of text.
 
 ## Work by several agents
 

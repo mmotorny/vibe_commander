@@ -246,7 +246,7 @@ file. Whoever moves a file takes it out of the table:
 | Piece | Files, with the calls left in each | Calls |
 |---|---|---|
 | 1 | `copy.c` 60 | 60 |
-| 2 | `start.c` 31, `resident.c` 34, of which 11 stay | 65 |
+| 2 | `resident.c` 34, of which 11 stay | 34 |
 | 3 | `dirfunc.c` 15, `read.c` 10, `usermenu.c` 10, `treebox.c` 8, `drive.c` 5, `setup.c` 4 | 52 |
 | 5 | `blank.c` 15, `main.c` 9, `enter.c` 7, `commands.c` 7, `keys.c` 3, `bars.c` 1, `menu.c` 1 | 43 |
 
@@ -281,10 +281,11 @@ What the header does not have yet, and why:
   then `dos.c`'s own, between its entry and the functions that are
   asked with the program's errors, and `BlocEr` stays the program's.
   What has to be kept: the order in which DOS is asked, which is both
-  vectors read and then both set in `HookVct`; that the watch names
-  `CtrlC` too; and that `HookVct` hands back the offset of `CtrlC`,
-  which the start of the program has in AX at its next call of the
-  BIOS.
+  vectors read and then both set in `HookVct`; and that the watch names
+  `CtrlC` too. `HookVct` still hands back the offset of `CtrlC`, which
+  the start of the program had in AX at its next call of the BIOS:
+  nothing takes it now, since that call is `ScreenState`, in `ChkMode`,
+  and `IniData` has gone over, so it may return nothing.
 - The start of the program on DOS, `Alloc0` of `resident.c`: the PSP
   and the block of the program made its own size. It is of DOS alone
   and will be `dos.c`'s.
