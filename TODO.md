@@ -1072,6 +1072,19 @@ than it is would pass.
   - Of a device that gives its bytes in several calls of DOS to a
     piece, the room left in the memory is counted down by the last
     call only. By reading: the bench has no such device.
+  - Where DOS will not tell the date and the time of a file that it has
+    just opened, the copying goes on with CX and DX as they are, and
+    the target is given that for a time and a date when it is closed.
+    For a source that is a device they are what comparing the two names
+    left and the address of the name; for a target that is appended to,
+    its attributes as they are kept, or the 20h given to one that was
+    read-only, and the address of the name. By reading: no scenario has
+    DOS refuse that, and none could tell, since the one device that is
+    a source, `nul` in `copy`, gives nothing to write. The translation
+    had something else in CX at both places, what its stack held and
+    the attributes as DOS answered them, until the assembly was read
+    again for the portable C, call by call, and `C20_00` of
+    `src/c/copy.c` mended.
 - The functions of `src/c/copy.c` are on the stack when DOS brings up
   its box for a critical error during a copy, a copy to the floppy A:
   for one. No scenario has that.

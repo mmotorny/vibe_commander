@@ -687,6 +687,9 @@ static u16 C20_00(u16 fits)
         goto unopened;
     CpHndl1 = LOW(opened);
     regs.bx = LOW(opened);
+    /* CX is what comparing the two names left, here and, for a device,
+       where DOS is asked for the date and the time below. */
+    regs.cx = count;
     regs.ax = 0x4400;
     CALL(regs);
     info = DX_OF(regs);
@@ -713,6 +716,11 @@ static u16 C20_00(u16 fits)
         regs.ax = 0x4200;
         CALL(regs);
     }
+    /* Where DOS will not tell the date and the time, the assembly goes on
+       with DX and CX as they are, and so does this: for a file both are
+       0, of the place just gone to; for a device they are the address of
+       the name and what comparing the two names left, which nothing has
+       set again. */
     regs.ax = 0x5700;
     CALL(regs);
     CpDate = DX_OF(regs);
@@ -859,7 +867,11 @@ append:
         error = regs.ax;
         goto no_target;
     }
-    CpAttr = regs.cx & 0x27 | 0x20;
+    /* The assembly masks the attributes in CX and keeps them from there:
+       they stay in it, or the 20h that a read-only file is given below,
+       as far as where DOS is asked for the date and the time. */
+    regs.cx = regs.cx & 0x27 | 0x20;
+    CpAttr = regs.cx;
     opened = OpenFil(CpDest, 0x12);
     if (HIGH(opened)) {
         error = LOW(opened);
@@ -882,6 +894,8 @@ append:
     FncChg = 1;
     CpHndl2 = LOW(opened);
     regs.bx = LOW(opened);
+    /* DX and CX as they are, again, where DOS will not tell: the address
+       of the name, and the attributes as they were last kept or set. */
     regs.ax = 0x5700;
     CALL(regs);
     CpDate = DX_OF(regs);
