@@ -264,16 +264,13 @@ static void C50_00(void)
         PathLin(CpDest);
 }
 
-/* Give the file with the handle in `regs` the date and the time of the
-   source, unless it is the first part of a file that did not fit. */
-static void SetDate(struct DosRegs STACK *regs)
+/* Give the file of a handle the date and the time of the source, unless
+   it is the first part of a file that did not fit. */
+static void SetDate(u16 handle)
 {
     if (SplitFl == 1)
         return;
-    regs->name = NUMBER(CpDate);
-    regs->cx = CpTime;
-    regs->ax = 0x5701;
-    Intr21(regs);
+    FileSetTime(handle, CpTime, CpDate);
 }
 
 /* Show how far the copying has got: of the row of cells that C20_00 has
@@ -336,13 +333,13 @@ static void PerCent(void)
    is found out for the first file and kept in CpCase for the others. */
 static u16 C00_01(void)
 {
-    struct DosRegs regs;
     struct WCBdef __far *other;
     const u8 *from = md.ToFile;
     const u8 *end;
     u8 *name, *part, *to;
     struct Answer opened;
     struct Device device;
+    struct FileAttr attr;
     u16 count, i, kind, info;
     u8 c;
 
@@ -393,15 +390,14 @@ static u16 C00_01(void)
             }
         } else if (opened.value == ERR_NOT_READY)
             return 0;
-        regs.name = CpDest;
-        regs.ax = 0x4300;
-        if (CALL(regs)) {
-            if (regs.ax == ERR_NOT_READY)
+        attr = FileAttributes(CpDest);
+        if (attr.failed) {
+            if (attr.value == ERR_NOT_READY)
                 return 0;
             kind = 1;
         } else {
             kind = 3;
-            if (regs.cx & ATTR_DIRECTORY)
+            if (attr.attributes & ATTR_DIRECTORY)
                 kind = 2;
         }
     }
@@ -493,6 +489,8 @@ static u16 C10_00(u16 STACK *fits)
 {
     struct Box box;
     struct DosRegs regs;
+    struct FileAttr attr;
+    struct Answer asked;
     u16 result, answer, error, report;
 
     CopyMov = 3;
@@ -516,24 +514,24 @@ static u16 C10_00(u16 STACK *fits)
         CopyMov = 2;
         goto copy;
     }
-    regs.name = CpDest;
-    regs.ax = 0x4300;
-    if (CALL(regs)) {
-        error = regs.ax;
+    attr = FileAttributes(CpDest);
+    if (attr.failed) {
+        error = attr.value;
         goto failed;
     }
-    if (regs.cx & ATTR_DIRECTORY)
+    if (attr.attributes & ATTR_DIRECTORY)
         goto failed;
     if (CpAll == 0) {
         answer = (u8)Ask(OFFSET(OvrCo_B), OFFSET(Ren0_S));
         if (answer == 2) {
-            *fits = regs.cx;
+            *fits = attr.attributes;
             goto copy;
         }
         if (answer > 2)
             goto nothing;
         CpAll = (u8)answer;
     }
+    regs.name = CpDest;
     regs.ax = 0x4100;
     if (CALL(regs)) {
         error = regs.ax;
@@ -542,11 +540,9 @@ static u16 C10_00(u16 STACK *fits)
         C50_00();
         if ((u8)Ask(OFFSET(Prot_B), F35_40()) != 0)
             goto nothing;
-        regs.name = CpDest;
-        regs.cx = 0x20;
-        regs.ax = 0x4301;
-        if (CALL(regs)) {
-            error = regs.ax;
+        asked = FileSetAttributes(CpDest, 0x20);
+        if (asked.failed) {
+            error = asked.value;
             goto undeleted;
         }
         FncChg = 1;
@@ -622,8 +618,10 @@ static u16 C20_00(u16 fits)
     struct Box box;
     struct DosRegs regs;
     u32 left, free;
-    struct Answer opened, moved;
+    struct Answer opened, moved, asked;
     struct Device device;
+    struct FileAttr attr;
+    struct FileStamp stamp;
     struct Space space;
     u16 result, error, report, answer, info, attributes;
     u16 segment, offset, count, got, i;
@@ -665,29 +663,32 @@ static u16 C20_00(u16 fits)
        and for the target. */
     if (device.failed)
         info = (u16)CpSrc;
-    regs.bx = CpHndl1;
     if ((info & 0x81) == 0x81)
         goto no_source;
     CpDev1 = (u8)(info & 0x80);
     CpSize = 0xFFFFFFFF;
     CpAttr = 0x20;
-    regs.name = CpSrc;
     if (CpDev1 == 0) {
-        regs.ax = 0x4300;
-        if (CALL(regs)) {
-            error = regs.ax;
+        attr = FileAttributes(CpSrc);
+        if (attr.failed) {
+            error = attr.value;
             goto unopened;
         }
-        CpAttr = regs.cx & 0x27 | 0x20;
+        CpAttr = attr.attributes & 0x27 | 0x20;
         CpSize = FileSeek(CpHndl1, 2, 0).place;
         FileSeek(CpHndl1, 0, 0);
-        regs.cx = 0;
-        regs.name = NUMBER(0);
     }
-    regs.ax = 0x5700;
-    CALL(regs);
-    CpDate = DX_OF(regs);
-    CpTime = regs.cx;
+    stamp = FileTime(CpHndl1);
+    if (stamp.failed && CpDev1 != 0) {
+        /* The assembly goes on with CX and DX as they are, which DOS has
+           not set then. For a file both are 0, of the place just gone
+           to, as FileTime has them; for a device they are what comparing
+           the two names left and the address of the name. */
+        stamp.time = count;
+        stamp.date = (u16)CpSrc;
+    }
+    CpDate = stamp.date;
+    CpTime = stamp.time;
     CpRead = 0;
     CpWrite = 0;
     CpHndl2 = 0;
@@ -742,7 +743,6 @@ target:
         goto write;
 open:
     C50_00();
-    regs.name = CpDest;
     if (CpDev2 != 0) {
         opened = OpenFil(CpDest, 0x11);
         error = opened.value;
@@ -750,14 +750,13 @@ open:
             goto no_target;
         goto opened;
     }
-    regs.ax = 0x4300;
-    if (CALL(regs)) {
-        error = regs.ax;
+    attr = FileAttributes(CpDest);
+    if (attr.failed) {
+        error = attr.value;
         if (error > ERR_NO_PATH)
             goto no_target;
         goto create;
     }
-    attributes = regs.cx;
     if (CpAll == 0) {
         if (CopyMov == 3)
             goto append;
@@ -769,17 +768,17 @@ open:
         }
         CpAll |= (u8)answer;
     }
-    if (attributes & 1) {
+    if (attr.attributes & 1) {
         if ((u8)Ask(OFFSET(Prot_B), F35_40()) != 0)
             goto skip;
-        regs.cx = 0x20;
-        regs.ax = 0x4301;
-        if (CALL(regs)) {
-            error = regs.ax;
+        asked = FileSetAttributes(CpDest, 0x20);
+        if (asked.failed) {
+            error = asked.value;
             goto undeleted;
         }
         FncChg = 1;
     }
+    regs.name = CpDest;
     regs.ax = 0x4100;
     if (CALL(regs)) {
         error = regs.ax;
@@ -817,13 +816,13 @@ skip:
     goto close_source;
 
 append:
-    regs.name = CpDest;
-    regs.ax = 0x4300;
-    if (CALL(regs)) {
-        error = regs.ax;
+    attr = FileAttributes(CpDest);
+    if (attr.failed) {
+        error = attr.value;
         goto no_target;
     }
-    CpAttr = regs.cx & 0x27 | 0x20;
+    CpAttr = attr.attributes & 0x27 | 0x20;
+    attributes = CpAttr;
     opened = OpenFil(CpDest, 0x12);
     if (opened.failed) {
         error = opened.value;
@@ -831,10 +830,10 @@ append:
             goto no_target;
         if ((u8)Ask(OFFSET(Prot_B), F35_40()) != 0)
             goto skip;
-        regs.cx = 0x20;
-        regs.ax = 0x4301;
-        if (CALL(regs)) {
-            error = regs.ax;
+        attributes = 0x20;
+        asked = FileSetAttributes(CpDest, attributes);
+        if (asked.failed) {
+            error = asked.value;
             goto no_target;
         }
         FncChg = 1;
@@ -845,11 +844,15 @@ append:
     }
     FncChg = 1;
     CpHndl2 = opened.value;
-    regs.bx = opened.value;
-    regs.ax = 0x5700;
-    CALL(regs);
-    CpDate = DX_OF(regs);
-    CpTime = regs.cx;
+    stamp = FileTime(CpHndl2);
+    if (stamp.failed) {
+        /* CX and DX as they are, again: the attributes that were last
+           kept or set, and the address of the name. */
+        stamp.time = attributes;
+        stamp.date = (u16)CpDest;
+    }
+    CpDate = stamp.date;
+    CpTime = stamp.time;
     left = FileSeek(CpHndl2, 2, 0).place;
     if (left != 0) {
         left--;
@@ -889,15 +892,12 @@ write:
     if (CpHndl1 != 0)
         goto read;
 
-    regs.bx = CpHndl2;
-    SetDate((struct DosRegs STACK *)&regs);
+    SetDate(CpHndl2);
     if (FileClose(CpHndl2).failed)
         goto stop;
     if (CpDev2 == 0) {
-        regs.name = CpDest;
-        regs.cx = CpAttr;
-        regs.ax = 0x4301;
-        if (CALL(regs) && regs.ax != ERR_NO_ACCESS)
+        asked = FileSetAttributes(CpDest, CpAttr);
+        if (asked.failed && asked.value != ERR_NO_ACCESS)
             goto stop;
     }
     if (CopyMov == 0)
@@ -915,14 +915,14 @@ write:
             goto done;
         if (answer > 1)
             goto stop;
-        regs.cx = 0x20;
-        regs.ax = 0x4301;
-        if (!CALL(regs)) {
+        asked = FileSetAttributes(CpSrc, 0x20);
+        error = asked.value;
+        if (!asked.failed) {
             regs.ax = 0x4100;
             if (!CALL(regs))
                 goto done;
+            error = regs.ax;
         }
-        error = regs.ax;
     }
     if (error == ERR_NOT_READY)
         goto stop;
@@ -962,33 +962,28 @@ full:
     CpWrite += got;
     PerCent();
     CpCont = (got >> 4) + segment;
-    regs.bx = CpHndl2;
-    SetDate((struct DosRegs STACK *)&regs);
+    SetDate(CpHndl2);
     /* Is anything in the file? */
     info = FileSeek(CpHndl2, 2, 0).place != 0;
     if (FileClose(CpHndl2).failed)
         goto forget;
-    regs.name = CpDest;
     if (info == 0) {
+        regs.name = CpDest;
         regs.ax = 0x4100;
         if (CALL(regs))
             goto terminate;
     } else {
-        regs.cx = CpAttr;
-        regs.ax = 0x4301;
-        if (CALL(regs) && regs.ax != ERR_NO_ACCESS)
+        asked = FileSetAttributes(CpDest, CpAttr);
+        if (asked.failed && asked.value != ERR_NO_ACCESS)
             goto forget;
     }
     if ((u8)Ask(OFFSET(Cont_B), F35_40()) != 1) {
         regs.name = CpDest;
         regs.ax = 0x4100;
-        if (CALL(regs) && regs.ax == ERR_NO_ACCESS) {
-            regs.cx = 0x20;
-            regs.ax = 0x4301;
-            if (!CALL(regs)) {
-                regs.ax = 0x4100;
-                CALL(regs);
-            }
+        if (CALL(regs) && regs.ax == ERR_NO_ACCESS
+            && !FileSetAttributes(CpDest, 0x20).failed) {
+            regs.ax = 0x4100;
+            CALL(regs);
         }
         goto forget;
     }
@@ -1006,12 +1001,12 @@ full:
     if (*part != '\\' || part <= md.TmpErr || part[-1] == ':')
         goto open;
     *part = 0;
-    regs.name = md.TmpErr;
-    regs.ax = 0x4300;
-    if (!CALL(regs))
+    attr = FileAttributes(md.TmpErr);
+    if (!attr.failed)
         goto open;
-    if (regs.ax == ERR_NOT_READY)
+    if (attr.value == ERR_NOT_READY)
         goto forget;
+    regs.name = md.TmpErr;
     part = md.TmpErr;
     if (part[1] == ':')
         part += 2;
@@ -1087,7 +1082,8 @@ static u16 C30_00(u16 across, u16 fits)
 {
     struct Box box;
     struct DosRegs regs;
-    struct Answer marked;
+    struct FileAttr attr, there;
+    struct Answer marked, asked;
     u16 result, error, i;
     u8 *end;
 
@@ -1131,9 +1127,9 @@ same:
 make:
     if (ChgDisk(CpSrc))
         goto stop;
-    regs.name = CpSrc;
-    regs.ax = 0x4300;
-    if (CALL(regs))
+    attr = FileAttributes(CpSrc);
+    error = attr.value;
+    if (attr.failed)
         goto failed;
     if (ChgDisk(CpDest))
         goto stop;
@@ -1142,16 +1138,17 @@ make:
     if (CALL(regs)) {
         if (regs.ax == ERR_NOT_READY)
             goto stop;
-        regs.ax = 0x4300;
-        if (CALL(regs))
+        there = FileAttributes(CpDest);
+        error = there.value;
+        if (there.failed)
             goto failed;
-        if (!(regs.cx & ATTR_DIRECTORY))
+        if (!(there.attributes & ATTR_DIRECTORY))
             goto unmade;
     } else {
         FncChg = 1;
-        regs.cx &= 0x27;
-        regs.ax = 0x4301;
-        if (CALL(regs))
+        asked = FileSetAttributes(CpDest, attr.attributes & 0x27);
+        error = asked.value;
+        if (asked.failed)
             goto failed;
         if (CpTree2 == 0) {
             CpTree2 = 1;
@@ -1220,7 +1217,7 @@ removed:
     goto close;
 
 failed:
-    if (regs.ax == ERR_NOT_READY)
+    if (error == ERR_NOT_READY)
         goto stop;
 unmade:
     Ask(OFFSET(MkErr_B), F35_40());
