@@ -62,10 +62,7 @@ static u16 FncMs1(u16 include);
    in the main data. ResWin puts back in the screen buffer what a box
    covers, and Window, which is in vc.h, shows it. ChgDisk asks for the
    disk of a drive that shares the floppy drive with another, and is not 0
-   if the user would not change it.
-
-   Intr21f is Intr21 with the carry flag set before DOS is called if
-   `carry` is not 0, and clear if it is. HidCur puts the cursor below the
+   if the user would not change it. HidCur puts the cursor below the
    screen. */
 
 /* C routines of other files that vc.h does not have. */
@@ -169,15 +166,12 @@ extern const u8 __far Tree_F[];
 
 #define BOX_PLACE 0x528                 /* where the boxes have their middle */
 
-/* Errors of DOS, and the one that Intr21 makes of a drive that is not
-   ready. */
+/* Errors of DOS, and the one that a call makes of a drive that is not
+   ready, where it is asked with the program's errors. */
 #define ERR_NO_PATH     0x03
 #define ERR_NO_ACCESS   0x05
 #define ERR_CURRENT_DIR 0x10
 #define ERR_NOT_READY   0x53
-
-/* DX of a call of DOS, where it is not the offset of a name. */
-#define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
 /* The offset in the main data of something there. */
 #define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
@@ -220,10 +214,10 @@ u16 F38_10(u16 answer)
    the command. */
 u16 F38_40(u16 attributes)
 {
-    struct DosRegs regs;
     struct Box box;
     u8 *end;
-    struct Answer removed, marked;
+    struct FileAttr had;
+    struct Answer asked, removed, marked;
     u16 answer, error, report, count;
 
     if (!(attributes & ATTR_DIRECTORY)) {
@@ -231,30 +225,32 @@ u16 F38_40(u16 attributes)
                 (struct Box STACK *)&box);
         if (ChgDisk(md.TmpBuf))
             goto stop;
-        regs.name = md.TmpBuf;
-        regs.ax = 0x4100;
-        if (!Intr21((struct DosRegs STACK *)&regs))
+        asked = FileDelete(md.TmpBuf);
+        if (!asked.failed)
             goto done;
-        if (regs.ax == ERR_NO_ACCESS) {
-            regs.ax = 0x4300;
-            if (!Intr21((struct DosRegs STACK *)&regs)) {
+        error = asked.value;
+        if (error == ERR_NO_ACCESS) {
+            had = FileAttributes(md.TmpBuf);
+            error = had.value;
+            if (!had.failed) {
                 /* What is reported if it is not read-only: not the error
                    of a drive that is not ready, whatever DOS left. */
-                regs.ax &= 0xFF00;
-                if (regs.cx & 1) {
+                error &= 0xFF00;
+                if (had.attributes & 1) {
                     answer = (u8)Dialog(OFFSET(RdOnl_B), OFFSET(Del_S),
                                         0, 0, MAIN_SEG);
                     if (answer == 1)
                         goto not_done;
                     if (answer > 1)
                         goto stop;
-                    regs.cx = 0x20;
-                    regs.ax = 0x4301;
-                    if (!Intr21((struct DosRegs STACK *)&regs)) {
+                    asked = FileSetAttributes(md.TmpBuf, 0x20);
+                    error = asked.value;
+                    if (!asked.failed) {
                         FNC_CHANGE = 1;
-                        regs.ax = 0x4100;
-                        if (!Intr21((struct DosRegs STACK *)&regs))
+                        asked = FileDelete(md.TmpBuf);
+                        if (!asked.failed)
                             goto done;
+                        error = asked.value;
                     }
                 }
             }
@@ -262,7 +258,6 @@ u16 F38_40(u16 attributes)
         /* F38_42 */
         for (count = 0; count < LenPath + 13; count++)
             md.TmpBuf[130 + count] = md.TmpBuf[count];
-        error = regs.ax;
         report = OFFSET(DelEr_B);
         goto failed;
     }
@@ -344,51 +339,30 @@ out:
     return answer;
 }
 
-/* What F38_60 returns: what DOS answered, and whether that is an
-   error. */
-static struct Answer DosSaid(u16 value, u16 failed)
-{
-    struct Answer answer;
-
-    answer.value = value;
-    answer.failed = failed;
-    return answer;
-}
-
 /* Remove the directory at TmpBuf. If it is the current one, its path is
    made a full one, in TmpBuf too, the directory above is made the
    current one of the current drive, and it is tried again. Returns what
    DOS answered, and whether that was an error. */
 static struct Answer F38_60(void)
 {
-    struct DosRegs regs;
+    struct Answer asked;
     u16 count;
 
-    regs.name = md.TmpBuf;
-    regs.ax = 0x3A00;
-    if (!Intr21((struct DosRegs STACK *)&regs))
-        return DosSaid(regs.ax, 0);
-    if (regs.ax != ERR_CURRENT_DIR)
-        return DosSaid(regs.ax, 1);
-    regs.si = (u16)md.TmpBuf;
-    regs.di = (u16)md.TmpErr;
-    regs.ax = 0x6000;
-    if (Intr21((struct DosRegs STACK *)&regs))
-        return DosSaid(regs.ax, 1);
+    asked = DirRemove(md.TmpBuf);
+    if (!asked.failed || asked.value != ERR_CURRENT_DIR)
+        return asked;
+    asked = FileTrueName(md.TmpBuf, md.TmpErr);
+    if (asked.failed)
+        return asked;
     for (count = 0; count < LenPath + 13; count++)
         md.TmpBuf[count] = md.TmpErr[count];
     md.TmpErr[0] = '.';
     md.TmpErr[1] = '.';
     md.TmpErr[2] = 0;
-    regs.name = md.TmpErr;
-    regs.ax = 0x3B00;
-    if (Intr21((struct DosRegs STACK *)&regs))
-        return DosSaid(regs.ax, 1);
-    regs.name = md.TmpBuf;
-    regs.ax = 0x3A00;
-    if (Intr21((struct DosRegs STACK *)&regs))
-        return DosSaid(regs.ax, 1);
-    return DosSaid(regs.ax, 0);
+    asked = DirChange(md.TmpErr);
+    if (asked.failed)
+        return asked;
+    return DirRemove(md.TmpBuf);
 }
 
 /* Delete the files that the mask at TmpBuf names, at one call of DOS:
@@ -739,9 +713,9 @@ u16 FncCall(u16 attributes)
    than it has. */
 u16 DirFunc(void)
 {
-    struct DosRegs regs;
+    struct Answer found;
     u8 *end, *name;
-    u16 count, length, answer, skip;
+    u16 count, length, answer, skip, first;
     u16 all = 1;
     u8 c;
 
@@ -763,15 +737,16 @@ u16 DirFunc(void)
     for (count = 0; count < 5; count++)
         end[count] = Mask_S[skip + count];
     SetDTA();
-    regs.cx = 0x37;
-    regs.ax = 0x4E00;
-    for (;;) {
+    for (first = 1; ; first = 0) {
         /* DiFu05 */
         if (ChgDisk(md.TmpBuf))
             return STOP;
-        regs.name = md.TmpBuf;
-        if (Intr21((struct DosRegs STACK *)&regs)) {
-            if (regs.ax == ERR_NOT_READY)
+        if (first)
+            found = FindFirst(md.TmpBuf, 0x37);
+        else
+            found = FindNext();
+        if (found.failed) {
+            if (found.value == ERR_NOT_READY)
                 return STOP;
             break;
         }
@@ -783,13 +758,12 @@ u16 DirFunc(void)
             if (TstBrk())
                 return STOP;
             /* The high byte goes as DOS left it: C00_00 keeps all of AX. */
-            answer = FncCall(regs.ax & 0xFF00 | md.DTA.FilAttr);
+            answer = FncCall(found.value & 0xFF00 | md.DTA.FilAttr);
             if (answer >> 8)
                 return STOP;
             if ((u8)answer == 0)
                 all = 0;
         }
-        regs.ax = 0x4F00;
     }
 
     /* DiFu07: the directory itself, in the one above */
@@ -813,11 +787,12 @@ u16 DirFunc(void)
         name[count] = Mask_S[1 + count];
     if (ChgDisk(md.TmpBuf))
         return STOP;
-    regs.cx = 0x37;
-    regs.ax = 0x4E00;
-    for (;;) {
-        regs.name = md.TmpBuf;
-        if (Intr21((struct DosRegs STACK *)&regs))
+    for (first = 1; ; first = 0) {
+        if (first)
+            found = FindFirst(md.TmpBuf, 0x37);
+        else
+            found = FindNext();
+        if (found.failed)
             return STOP;
         if (md.DTA.FilAttr & ATTR_DIRECTORY) {
             /* The name with the zero that ends it, 13 bytes at the
@@ -831,7 +806,6 @@ u16 DirFunc(void)
             if (count == length)
                 break;
         }
-        regs.ax = 0x4F00;
     }
     /* DiFu12 */
     name = NEAR(CutPath(md.TmpBuf));
@@ -909,7 +883,7 @@ struct Answer DelTr0(const u8 *path)
    without asking whether the list has room. */
 static u16 F47_01(u16 box)
 {
-    struct DosRegs regs;
+    struct Answer made;
     struct WCBdef __far *wcb;
     struct FILENT __far *entry;
     u8 *path = md.TmpBuf;
@@ -936,10 +910,9 @@ static u16 F47_01(u16 box)
     /* F47_02 */
     if (ChgDisk(path))
         return TO_FUNC04;
-    regs.name = path;
-    regs.ax = 0x3900;
-    if (Intr21((struct DosRegs STACK *)&regs)) {
-        if (regs.ax == ERR_NOT_READY)
+    made = DirMake(path);
+    if (made.failed) {
+        if (made.value == ERR_NOT_READY)
             return TO_FUNC04;
 failed:
         /* F47_03 */
@@ -1224,7 +1197,7 @@ set:
    line here, where the assembly left them what DX held. */
 u16 F54_00(void)
 {
-    struct DosRegs regs;
+    struct Answer made;
     u8 *end;
     u16 i;
 
@@ -1252,29 +1225,22 @@ u16 F54_00(void)
     end = NEAR(MvzLine(md.TmpBuf + 28, md.Volume, 12));
     for (i = 0; i < 12; i++)
         end[i] = ' ';
-    regs.name = md.TmpBuf + 20;
     if (md.TmpBuf[1] == 0) {
         if (md.Volume[0] == 0)
             return TO_FUNC04;
         if ((u8)Dialog(OFFSET(DelVo_B), 0, 0, 0, MAIN_SEG) != 0)
             return TO_FUNC04;
-        regs.ax = 0x1300;
-        Intr21f((struct DosRegs STACK *)&regs, 0);
+        FcbDelete(md.TmpBuf + 20, 0);
         return TO_FNCEXT;
     }
     /* F54_03 */
-    regs.ax = 0x1300 | ' ';
-    Intr21f((struct DosRegs STACK *)&regs, 0);
+    FcbDelete(md.TmpBuf + 20, 0);
     *(u16 *)(md.TmpBuf + 12) = *(u16 *)(md.TmpBuf + 11);
     *(u16 *)(md.TmpBuf + 10) = *(u16 *)(md.TmpBuf + 9);
     md.TmpBuf[9] = '.';
-    regs.name = md.TmpBuf;
-    regs.cx = 8;
-    regs.ax = 0x3C00;
-    if (!Intr21((struct DosRegs STACK *)&regs)) {
-        regs.bx = regs.ax;
-        regs.ax = 0x3E00;
-        Intr21((struct DosRegs STACK *)&regs);
+    made = FileCreate(md.TmpBuf, 8);
+    if (!made.failed) {
+        FileClose(made.value);
         return TO_FNCEXT;
     }
     /* F54_04 */
