@@ -869,35 +869,61 @@ def ran(setup=False, missing=None):
     return found
 
 
-def differences(golden, run, programs):
-    """Describe how a run departs from a golden, as text lines.
-
-    An empty list means it does not. `programs` as for disk_lines().
+def departures(golden, run, programs):
+    """How a run departs from a golden, piece by piece and in the order
+    of the scenario: of every screen that is otherwise, where it is,
+    "after step 2: F3", with the text lines that say how; and behind
+    them the disks, or that the golden is of other steps, under None.
+    Empty if the run does not depart. `programs` as for disk_lines().
     Where the golden was read for a tree and has a patch, a row that the
-    patch says is called the patch's, not the original's.
+    patch says is called the patch's, not the original's. Of a run that
+    was cut (scenarios.Run.cut), the screens that it has are held, and
+    no disks.
     """
-    report = []
+    found = []
     steps = ("the start",) + scenarios.of(golden.scenario, golden.tree).steps
     if list(steps) != golden.steps:
-        return ["the golden was derived for other steps than the scenario "
-                "has now: derive it again"]
-    made = golden.patch.made if golden.patch else {}
-    for number, step in enumerate(steps):
-        # Both are blanked, the golden's screen as well: one derived before
-        # a figure was left out of the comparison still holds it. The
-        # golden's is without what any tree leaves out, as it was
-        # derived, and the build's without what its own tree does.
-        place = golden.places[number] if golden.places else number
-        found = screen_differences(
-            deviations.compared(golden.screens[number]),
-            deviations.compared(run.screens[number], golden.tree),
-            made.get(place))
-        if found:
-            report += [f"--- after step {number}: {step}"
-                       + _in_golden(golden, number)] + found
-    report += disk_differences(
+        return [(None, ["the golden was derived for other steps than the "
+                        "scenario has now: derive it again"])]
+    for number, step in enumerate(steps[:len(run.screens)]):
+        lines = screen_departs(golden, number, run.screens[number])
+        if lines:
+            found.append((f"after step {number}: {step}"
+                          + _in_golden(golden, number), lines))
+    if run.cut:
+        return found
+    lines = disk_differences(
         golden.disks, disk_lines(run.disks, programs),
         golden.patch.files if golden.patch else ())
+    if lines:
+        found.append((None, lines))
+    return found
+
+
+def screen_departs(golden, number, screen):
+    """How `screen`, which a build showed after step `number` of the
+    scenario that `golden` is of, the start being 0, departs from the
+    golden's, as text lines: none if it does not."""
+    # Both are blanked, the golden's screen as well: one derived before
+    # a figure was left out of the comparison still holds it. The
+    # golden's is without what any tree leaves out, as it was derived,
+    # and the build's without what its own tree does.
+    made = golden.patch.made if golden.patch else {}
+    place = golden.places[number] if golden.places else number
+    return screen_differences(
+        deviations.compared(golden.screens[number]),
+        deviations.compared(screen, golden.tree), made.get(place))
+
+
+def differences(golden, run, programs):
+    """Describe how a run departs from a golden, as text lines: what
+    departures() finds, one piece behind the other.
+
+    An empty list means it does not.
+    """
+    report = []
+    for where, lines in departures(golden, run, programs):
+        report += ([f"--- {where}"] if where else []) + lines
     if any("the patch" in line.split("|")[0] for line in report):
         report += textwrap.wrap(
             f"What is called the patch's is what {shown(golden.patch.file)} "

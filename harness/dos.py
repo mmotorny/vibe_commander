@@ -543,17 +543,27 @@ class Machine:
         """What the guest has written to its debug console so far."""
         return self._written.read_bytes() if self._written.exists() else b""
 
-    def wait_for_end(self, limit):
+    def wait_for_end(self, limit, enough=None):
         """Wait until the machine has ended, as it does when the guest
-        resets it. Raises MachineError if the guest writes nothing to its
-        debug console for `limit` seconds: the machine is then paused, for
-        its screen to be looked at."""
+        resets it, and return True. Raises MachineError if the guest
+        writes nothing to its debug console for `limit` seconds: the
+        machine is then paused, for its screen to be looked at.
+
+        `enough`, if it is given, is asked every time the guest has
+        written something more: when it answers true the machine is
+        paused where it is, and this returns False."""
         size, since = -1, time.monotonic()
         while self._qemu.poll() is None:
             now = self._written.stat().st_size \
                 if self._written.exists() else 0
             if now != size:
                 size, since = now, time.monotonic()
+                if enough and enough():
+                    try:
+                        self.pause()
+                    except MachineError:
+                        pass      # it has ended by itself meanwhile
+                    return False
             elif time.monotonic() - since > limit:
                 self.pause()
                 raise MachineError(f"nothing for {limit} s")
@@ -561,6 +571,7 @@ class Machine:
                 self._qemu.wait(0.01)
             except subprocess.TimeoutExpired:
                 pass
+        return True
 
     def _keyboard(self):
         """Where the BIOS keyboard buffer is read and where it is filled."""

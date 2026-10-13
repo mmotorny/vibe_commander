@@ -1491,12 +1491,17 @@ class Run:
     # if the run was traced. Where the original was taken through a
     # scenario of the setup program, the file is that of its setup
     # program, and nothing is said of the main one.
-    executed: dict = field(default_factory=dict)
+    executed: dict = field(default_factory=coverage.Executed)
     # The fewest bytes of its stack that the program had never used, of
     # all the steps that ended with it waiting for a key; None if its stack
     # was not looked at. And the segment its stack was in.
     stack_left: int = None
     stack_segment: int = None
+    # The run was ended before the scenario was, on the word of whoever
+    # asked for it (`until` of run()): the screens are those up to there,
+    # and there are no disks, the machine having been stopped in the
+    # middle of whatever it was at.
+    cut: bool = False
 
 
 # From C:\WORK into C:\STAMPS, whose files have sizes and time stamps of
@@ -7214,7 +7219,7 @@ def of(name, tree=None):
 
 
 def run(scenario, program, bench, trace=False, blinking=False,
-        stack=False, limit=STEP_TIME):
+        stack=False, limit=STEP_TIME, until=None):
     """Run `scenario` on `program` (a setups.Program) and return the Run.
 
     `bench` is the setups.Bench for the scenario's country. The driver of
@@ -7231,6 +7236,14 @@ def run(scenario, program, bench, trace=False, blinking=False,
     driver.stack_left). `limit` is for how many seconds the driver may
     write nothing before the program counts as stuck: STEP_TIME for a
     test, and less where steps are tried out (see show.py).
+
+    `until`, if it is given, is asked of every screen as the driver
+    writes it, with its number, 0 for the start, and the screen: when it
+    answers true the run is ended there, and the Run is cut. That is for
+    a program of which only where it first goes wrong is wanted: what a
+    scenario's keys do in a program that is no longer where the scenario
+    takes it to be, says nothing, and may wait for a step's limit to
+    run out.
 
     In a scenario of the setup program the original, which is two
     programs, has the second next to it for the steps to start (see
@@ -7249,10 +7262,26 @@ def run(scenario, program, bench, trace=False, blinking=False,
     with dos.workdir() as workdir:
         workdir = Path(workdir)
         log = workdir / "trace.log" if trace else None
+        seen = 0
+
+        def enough():
+            """Whether `until` says so of a screen that it has not yet
+            been asked of."""
+            nonlocal seen
+            try:
+                done = driver.read(machine.written())[0]
+            except MachineError:
+                return False      # said when the run is read, below
+            for number in range(seen, len(done)):
+                seen = number + 1
+                if until(number, done[number].screen):
+                    return True
+            return False
+
         with bench.start(workdir, program, script, log, beside) as machine:
             machine.resume()
             try:
-                machine.wait_for_end(limit)
+                whole = machine.wait_for_end(limit, until and enough)
             except MachineError:
                 done = len(driver.read(machine.written())[0])
                 shown = "\n".join(machine.screen().lines())
@@ -7261,19 +7290,32 @@ def run(scenario, program, bench, trace=False, blinking=False,
                     f"come to wait for a key within {limit} s; it "
                     f"shows\n{shown}") from None
             done, ended = driver.read(machine.written())
+            if until and whole and not ended:
+                # The machine ended before its script did, as it does
+                # when the program has left and DOS goes on to switch it
+                # off: the last that the driver wrote may not have been
+                # looked at.
+                whole = not enough()
             disks = machine.disks
-        if not ended:
+        if not whole:
+            # Ended on the word of `until`, at the last screen that it
+            # was asked of.
+            done = done[:seen]
+            result = Run([step.screen for step in done], {}, cut=True)
+        elif not ended:
             raise MachineError(
                 f"after {_where(steps, len(done))}: the machine stopped: "
                 "it was reset, or QEMU ended")
-        if len(done) != len(steps):
+        elif len(done) != len(steps):
             raise MachineError(f"the driver wrote {len(done)} screens for "
                                f"{len(steps)} steps")
-        # The machine has been shut down: the disk images are complete.
-        codepage = setups.codepage(scenario.country)
-        result = Run([step.screen for step in done],
-                     {drive: fat.read_tree(path, codepage)
-                      for drive, path in disks.items()})
+        else:
+            # The machine has been shut down: the disk images are
+            # complete.
+            codepage = setups.codepage(scenario.country)
+            result = Run([step.screen for step in done],
+                         {drive: fat.read_tree(path, codepage)
+                          for drive, path in disks.items()})
         if trace and beside:
             # Two programs with routines of the same bytes ran here. What
             # ran of the main one is not looked for: every scenario of

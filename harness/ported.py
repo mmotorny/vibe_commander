@@ -1460,13 +1460,21 @@ def check_translation(link_map, executed, tree, origin, batches):
     return passed
 
 
-def check_stack(link_map, names, runs):
-    """Report on how much of its stack the translation left untouched;
-    return success."""
-    bottom, top = coverage.stack(link_map)
-    size = top - bottom
+def check_stack(program, outcomes):
+    """Report on how much of its stack `program`, a build of a C tree,
+    left untouched in the scenarios that it passed, of which `outcomes`
+    are the compare.Outcome; return success. A scenario that fails has
+    used its stack for what failed it, and says nothing here."""
+    size = coverage.stack_size(program.contents, program.linked)
     limit = size // STACK_LEFT
-    left = {name: run.stack_left for name, run in zip(names, runs)}
+    left = {outcome.name: outcome.run.stack_left for outcome in outcomes
+            if outcome.passed and outcome.run.stack_left is not None}
+    names = list(left)
+    if not left:
+        print(f"The stack: {size} bytes, of which 1/{STACK_LEFT}, {limit}, "
+              "are to be left untouched in every scenario that passes: "
+              "none passed with its stack looked at")
+        return True
     least = min(left, key=left.get)
     print(f"The stack: {left[least]} of its {size} bytes are left untouched "
           f"at the least, in {least}; the limit is 1/{STACK_LEFT} of it, "
@@ -1689,30 +1697,43 @@ def deviation_entries(tree):
             for number, text in zip(parts[1::2], parts[2::2])}
 
 
-def check_comparison(name, run, program):
+def check_comparison(outcomes, program):
     """Report on whether the comparison notices differences; return
     success.
 
-    `run` is that of `program` in scenario `name`. The character in the
-    top left corner of its first screen is changed, and then the first
-    entry of its drive C: is left out.
+    It is tried on the first scenario of `outcomes`, the
+    compare.Outcome of `program`, that the machine got through: the
+    character in the top left corner of its first screen is changed, and
+    then the first entry of its drive C: is left out, if the run was
+    not cut and has its disks.
     """
+    outcome = next((outcome for outcome in outcomes
+                    if outcome.run is not None), None)
+    if outcome is None:
+        print("The comparison: the machine got through no scenario, and "
+              "there is no run to try it on")
+        return True
+    name, run = outcome.name, outcome.run
     screen = run.screens[0]
     cells = bytearray(screen.cells)
     cells[0] ^= 1
-    entries = dict(run.disks["C"])
-    del entries[min(entries)]
     changes = {
         "a changed cell on the first screen": replace(
             run, screens=[replace(screen, cells=bytes(cells))]
             + run.screens[1:]),
-        "an entry missing from drive C:": replace(
-            run, disks={**run.disks, "C": entries}),
     }
+    if not run.cut:
+        entries = dict(run.disks["C"])
+        del entries[min(entries)]
+        changes["an entry missing from drive C:"] = replace(
+            run, disks={**run.disks, "C": entries})
     golden = goldens.read(name, program.tree)
+    # Reported is what is otherwise than in the run as it was: a
+    # scenario that fails is otherwise than its golden as it is.
+    before = goldens.differences(golden, run, {program.filename})
     passed = True
     for what, changed in changes.items():
-        if goldens.differences(golden, changed, {program.filename}):
+        if goldens.differences(golden, changed, {program.filename}) != before:
             print(f"The comparison: {what} of {name} is reported")
         else:
             passed = False
@@ -1746,14 +1767,15 @@ def main():
     if not check_layout(translation):
         sys.exit(1)
     names = scenarios.names(translation.tree)
-    failed, runs = compare.compare(names, translation, trace=True,
-                                   stack=True)
+    failed, outcomes = compare.compare(names, translation, trace=True,
+                                       stack=True)
     # What ran in the original is of every scenario, also of one that
     # the tree is not taken through: of VC.COM by the scenarios of the
     # main program, and of VCSETUP.COM by those of the setup program.
     in_translation = {}
-    for run in runs:
-        in_translation.update(run.executed)
+    for outcome in outcomes:
+        if outcome.run is not None:
+            in_translation.update(outcome.run.executed)
     batches = list(BATCHES)
     passed = check_original(coverage.Listing(args.listing), goldens.ran(),
                             BATCHES)
@@ -1767,9 +1789,9 @@ def main():
                                translation.tree,
                                coverage.origin(translation.contents),
                                batches) and passed
-    passed = check_stack(args.link_map, names, runs) and passed
+    passed = check_stack(translation, outcomes) and passed
     passed = check_declared(translation.tree, names) and passed
-    passed = check_comparison(names[0], runs[0], translation) and passed
+    passed = check_comparison(outcomes, translation) and passed
     sys.exit(failed or not passed or too_long)
 
 
