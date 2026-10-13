@@ -129,14 +129,11 @@ def table():
     last, pages, relocations, header = struct.unpack_from("<4H", program, 2)
     loaded = (pages - 1) * 512 + (last or 512) - header * PARAGRAPH
     kept = whole(loaded + PSP) + 2 * whole(panel(texts))
-    limit = ported.SIZE_LIMIT * original
 
     rows = [
         ("`VC.EXE`", f"{number(size)} bytes"),
         (f"as a multiple of the original's {number(original)} bytes",
          f"{size / original:.2f}"),
-        (f"below {ported.SIZE_LIMIT} times the original's, where the "
-         "scenarios' test fails", f"{number(limit - size)} bytes"),
         (f"more than the C translation's {number(translation)} bytes",
          f"{number(size - translation)} bytes"),
         ("The relocations in its header, which DOS applies",

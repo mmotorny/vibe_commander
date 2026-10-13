@@ -715,10 +715,10 @@ left open:
   against a golden of the portable C's own since the watch on DOS has
   gone from it: three calls that the original deals with are handed on
   like any other there. INT 27h the portable C does not take.
-- The file is close to three times the original's, where the
-  scenarios' test fails: the README has how much is left, under "The
-  figures". The main data's zeros are 62.6 KB of it, in the file
-  because the main data
+- The file is longer than it has to be: the README has how long,
+  under "The figures", and the scenarios' test holds the portable C to
+  no multiple of the original's size any more. The main data's zeros
+  are 62.6 KB of it, in the file because the main data
   has to be at offset 0 of a segment, the linker starts a segment on a
   paragraph only where the file starts, and nothing of C gives a
   segment an alignment. Tried: the linker's `segaddr`, which starts a

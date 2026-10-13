@@ -619,8 +619,10 @@ other, went with the two parts.
 What can be measured of the portable C, or counted in its source, and
 changes with every step of the work, is written here and nowhere else:
 how long its file is, how much of the memory it keeps, how near its
-code is to the limits that the tests hold it to, and how much of it
-only Open Watcom takes. `python3 tools/figures.py --write` puts the
+code segments are to where the scenarios' test lets one end, and how
+much of it only Open Watcom takes. No test holds the length of its
+file to anything: only the C translation's is held, to three times the
+original's. `python3 tools/figures.py --write` puts the
 table here, of the build in `build/` and of `src/portable_c/`, and is
 run when a piece of work lands; `python3 tools/figures.py --check` says
 whether the table is that of the build. The rest of this README,
@@ -633,7 +635,6 @@ the number. No test holds the table.
 |---|---|
 | `VC.EXE` | 176,420 bytes |
 | as a multiple of the original's 65,090 bytes | 2.71 |
-| below 3 times the original's, where the scenarios' test fails | 18,850 bytes |
 | more than the C translation's 133,056 bytes | 43,364 bytes |
 | The relocations in its header, which DOS applies | 929 |
 | What it keeps of the memory while a command runs: the program and its panels | 186,464 bytes |
@@ -953,7 +954,7 @@ eight take three minutes and forty seconds.
 | `asm-bytes` | `VC.COM` and `VCSETUP.COM` from `build/shareware-layout/` are as long as the originals, hold only filler in the reserved room, and are identical to the originals everywhere else |
 | `c-data` | Every text, box, dialog and table of the translation that has the name of one of the original holds the original's bytes; a word that holds an address has that of what the original names there. And none is shorter than what the code reads of it, which `harness/reads.py` finds: a name that is copied as 13 bytes is compared as 13. No machine is run for it |
 | `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, called near or far as each returns, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
-| `portable_c-data`, `portable_c-arith`, `portable_c-scenarios` | The same three checks of the portable C, `build/portable_c/`: what is said of the translation in the rows above and below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A table that is declared to differ is held against the original's with that difference made to it. A scenario that is declared to change is held against a golden of the portable C's own, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original, and names the others |
+| `portable_c-data`, `portable_c-arith`, `portable_c-scenarios` | The same three checks of the portable C, `build/portable_c/`: what is said of the translation in the rows above and below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A table that is declared to differ is held against the original's with that difference made to it. A scenario that is declared to change is held against a golden of the portable C's own, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original, and names the others. Its file is held to no multiple of the original's size: the test says how long it is, and holds it to what the machine of the tests asks of its layout |
 | `portable_c-host` | The source of the portable C as another compiler reads it: `harness/hostcheck.py` has gcc read every file of `src/portable_c/` for a machine of 64 bits, as strict C of 1999, and counts by kind what gcc refuses, a pointer cast to a number of 16 or 32 bits, a number made a pointer, a structure that is not as long as on DOS, and what only Open Watcom reads, an interrupt function, inline assembly, a `#pragma` of its own. `harness/hostcheck.txt` has what was counted last, of every file, and the test fails where a file has another count of any kind: more, and a clean file that is clean no more, and fewer too, so that the record is always what is so, and what a change did to it shows in the commit. `python3 harness/hostcheck.py --record` writes the record anew, `--show` lists the places of a file or of a kind, and `--macros` says which macros make the casts. Nothing is compiled or run for it. It is skipped where there is no gcc |
 | `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 

@@ -14,8 +14,8 @@ below, this also checks that
     some scenario, unless it is listed here with the reason why none gets
     there,
   - every C function that replaces them ran in the translation,
-  - the translation is no more than three times the size of the
-    original, and
+  - the C translation is no more than three times the size of the
+    original, which the portable C is not held to, and
   - the translation leaves half of its stack untouched in every scenario.
 
 Compiled code uses more of the stack than the assembly it replaces, so
@@ -68,9 +68,14 @@ import scenarios
 import setups
 
 
-# How large the translation may grow, as a multiple of the original's size.
-# The aim is to stay well below; this is where growth must have gone wrong.
-SIZE_LIMIT = 3
+# How large a tree's file may be, as a multiple of the original's size:
+# tree -> the multiple. The C translation was held to this while it was
+# made, as where growth must have gone wrong, and is still. The portable C
+# is held to none, on the user's word of 12 October 2026: the setup
+# program goes into it, which the original has as a file of its own, and
+# nothing else goes by how long the file is. What the machine of the
+# tests asks of its layout, check_layout() holds it to as before.
+SIZE_LIMIT = {"c": 3}
 
 # Where a segment of compiled code may end at the most, counted from where
 # its segment register points, and how far code has to be from the stack:
@@ -1368,10 +1373,12 @@ def main():
     original = setups.original_vc()
     translation = setups.Program.load(args.translation)
     size = len(translation.contents)
-    limit = SIZE_LIMIT * len(original.contents)
+    times = SIZE_LIMIT.get(translation.tree)
+    too_long = times is not None and size > times * len(original.contents)
     print(f"VC.EXE is {size} bytes, {size / len(original.contents):.2f} "
-          f"times the original's {len(original.contents)}; the limit is "
-          f"{SIZE_LIMIT} times")
+          f"times the original's {len(original.contents)}; "
+          + (f"the limit is {times} times" if times is not None else
+             f"{translation.tree} is held to no multiple of that"))
 
     if not check_layout(translation):
         sys.exit(1)
@@ -1392,7 +1399,7 @@ def main():
     passed = check_stack(args.link_map, names, runs) and passed
     passed = check_declared(translation.tree, names) and passed
     passed = check_comparison(names[0], runs[0], translation) and passed
-    sys.exit(failed or not passed or size > limit)
+    sys.exit(failed or not passed or too_long)
 
 
 if __name__ == "__main__":
