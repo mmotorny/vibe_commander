@@ -193,6 +193,22 @@ static u16 Mouse(u16 ax, u16 bx, u16 cx, u16 dx)
 #define NUMBER(value) POINTER(MAIN_SEG, value)
 #define DX_OF(regs)   OFFSET_OF((regs).name)
 
+/* The segment of the PSP, the 256 bytes that DOS keeps of a program in
+   front of it: the command tail is there, the segment of the
+   environment, where the memory ends, and where DOS goes on when the
+   program has ended. The original is a .COM file and has all its
+   segment registers there. Alloc0 of resident.c sets this when the
+   program begins, by ProgramPrefix, and reads the PSP itself for where
+   DOS goes on; vc.h declares both for it. */
+u16 PspSeg;
+
+#define PSP_MEMORY  0x02                /* the segment where the memory
+                                           that DOS has ends */
+#define PSP_ENVIRON 0x2C                /* the segment of the environment */
+#define PSP_TAIL    0x81                /* the command tail, behind its
+                                           count */
+#define PSP_WORD(offset) (*(const u16 __far *)POINTER(PspSeg, offset))
+
 #define ERR_NOT_READY 0x53              /* the error of a call that the
                                            user gave up, when a device was
                                            not ready */
@@ -681,6 +697,12 @@ struct Block MemResize(u16 block, u16 paragraphs)
     return Paragraphs(REGS(regs));
 }
 
+/* The memory ends where the PSP says: DOS is not asked. */
+u16 MemEnd(void)
+{
+    return PSP_WORD(PSP_MEMORY);
+}
+
 /* How DOS looks for memory, AX 5801h, and whether the upper memory is in
    its chain of blocks, AX 5803h, which DOS has since its version 5: both
    take what is set in BX. */
@@ -797,30 +819,43 @@ void Idle(void)
     DosIdle();
 }
 
-/* Other programs: AX 4B00h, with the name at DS:DX and the block at
-   ES:BX, AH 4Ch, and AH 51h, which answers in BX: as 62h, and of DOS 2
-   too. */
+/* Other programs: AX 4B00h, with the name at DS:DX and at ES:BX the
+   block that says what the program is run with; and AH 4Ch.
 
-struct Answer ProgramRun(const u8 FAR *name, const struct EPBs FAR *block)
+   The block is where the original has it and as the original has it,
+   EPB of the main data: no environment named, so that the program gets a
+   copy of this one's; the tail; and for the two file control blocks that
+   DOS copies into the new program's PSP the bytes at 5Ch and 6Ch of the
+   main data, where a program hands on those of its own PSP: the
+   original has ES on the main data when it fills the block in, once,
+   when it starts. Here the block is filled in at every run. Nothing
+   else reads it. */
+static void Run(struct DosRegs STACK *regs, const u8 FAR *name,
+                const u8 FAR *tail)
+{
+    md.EPB.EnvSeg = 0;
+    md.EPB.CmdLine = (u32)tail;
+    md.EPB.FCB1 = (u32)MAIN_SEG << 16 | 0x5C;
+    md.EPB.FCB2 = (u32)MAIN_SEG << 16 | 0x6C;
+    regs->ax = 0x4B00;
+    regs->bx = (u16)&md.EPB;
+    regs->name = name;
+    regs->es = MAIN_SEG;
+}
+
+struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail)
 {
     struct DosRegs regs;
 
-    regs.ax = 0x4B00;
-    regs.bx = OFFSET_OF(block);
-    regs.name = name;
-    regs.es = SEGMENT(block);
+    Run(REGS(regs), name, tail);
     return AskEs(REGS(regs), 0);
 }
 
-struct Answer ProgramRunBare(const u8 FAR *name,
-                             const struct EPBs FAR *block)
+struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
 {
     struct DosRegs regs;
 
-    regs.ax = 0x4B00;
-    regs.bx = OFFSET_OF(block);
-    regs.name = name;
-    regs.es = SEGMENT(block);
+    Run(REGS(regs), name, tail);
     return TellEs(REGS(regs));
 }
 
@@ -833,14 +868,18 @@ void ProgramEnd(u16 code)
     Tell(REGS(regs));
 }
 
-u16 ProgramPrefix(void)
-{
-    struct DosRegs regs;
+/* What the program was started with is in its PSP: the tail from 81h
+   on, behind the byte that counts it, and the segment of the
+   environment. DOS is not asked. */
 
-    regs.ax = 0x5100;
-    regs.name = NUMBER(0);
-    Tell(REGS(regs));
-    return regs.bx;
+const u8 FAR *ProgramTail(void)
+{
+    return POINTER(PspSeg, PSP_TAIL);
+}
+
+const u8 FAR *ProgramEnvironment(void)
+{
+    return POINTER(PSP_WORD(PSP_ENVIRON), 0);
 }
 
 /* The console: AH 6, with the character in DL, and AH 9. */
@@ -1137,6 +1176,19 @@ void SetVector(u16 number, u32 to)
     regs.ax = 0x2500 | number & 0xFF;
     regs.name = (const u8 __far *)to;
     Tell(REGS(regs));
+}
+
+/* Where the PSP is, its segment, as DOS says (AH 51h, which answers in
+   BX: as 62h, and of DOS 2 too). The program's block of the memory is
+   known by the same segment. */
+u16 ProgramPrefix(void)
+{
+    struct DosRegs regs;
+
+    regs.ax = 0x5100;
+    regs.name = NUMBER(0);
+    Tell(REGS(regs));
+    return regs.bx;
 }
 
 /* Let the machine interrupt the program again, where something has

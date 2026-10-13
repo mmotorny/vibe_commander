@@ -2294,9 +2294,9 @@ is called both ways the bare function says so in its name.
 | 47h | asked, bare | `DirCurrent(drive, to)`, `DirCurrentBare` |
 | 48h, 49h, 4Ah | bare | `MemTake(paragraphs)`, `MemGive(block)`, `MemResize(block, paragraphs)` |
 | 5801h, 5803h | bare | `MemSetSearch(how)`, `MemSetUpper(on)` |
-| 4B00h | asked, bare | `ProgramRun(name, block)`, `ProgramRunBare` |
+| 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is `dos.c`'s to make |
 | 4Ch | bare | `ProgramEnd(code)` |
-| 51h | bare | `ProgramPrefix()`, the segment of the PSP |
+| 51h | bare | `ProgramPrefix()`, the segment of the PSP: of `vc.h` and not of `sys.h`, for the entry of the program. What is read in the PSP is `MemEnd()`, `ProgramTail()` and `ProgramEnvironment()`, which ask DOS nothing |
 | 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
 | 56h | asked | `FileRename(from, to)` |
 | 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |
@@ -2382,9 +2382,10 @@ What a call hands back, and where the traps are:
   from comparing two characters, `C20_00` of `copy.c` from a
   subtraction.
 - A call that took something at ES takes a pointer: the new name of
-  `FileRename`, where `FileTrueName` writes, the block of `ProgramRun`,
-  the block of the memory of `MemGive` and `MemResize`. A near pointer
-  of the main data goes in as it is.
+  `FileRename`, where `FileTrueName` writes, the block of the memory of
+  `MemGive` and `MemResize`. A near pointer of the main data goes in as
+  it is. The block of `ProgramRun` was one such, and is `dos.c`'s own
+  now: see below, what the PSP and a program run met.
 - `DirCurrent` takes where the path goes as one pointer, where the
   call had the segment with DX and the offset in SI: `regs.name = wcb +
   drive` with `regs.si` on `WinPath + 3` is `DirCurrent(drive,
@@ -2679,6 +2680,42 @@ function is added:
   seconds, and from then on the source may be edited while the
   scenarios of both C trees run. The build may not change until they
   are done.
+
+What the PSP and a program run met, when what was 16 bits in kind left
+the header (`TODO.md`, the piece S1 of the plan for the 32 bits):
+
+- A shape of the header that only DOS in 16 bits has, a block of far
+  addresses, a segment to read at, becomes what is asked: the name and
+  the tail for a program run, the tail and the environment that this
+  one was started with, where the memory ends. What DOS takes besides
+  is made in `dos.c`, where the original has it and as it has it: the
+  block is `EPB` of the main data, which keeps its 14 bytes there since
+  the layout of the main data is held, filled in at every run, where
+  the original fills in all but the tail once, when it starts. DOS is
+  handed the registers and the bytes that it was handed.
+- Before a field of the main data is given to `dos.c` like that, look
+  for every line that names it: nothing else reads `EPB`. `EPB_WAS` of
+  `resident.c` is its address in the original, for a register that the
+  BIOS is handed, and reads no field.
+- A function of the header that answers with a pointer answers with a
+  `FAR` one, and what is read behind what it points at is said at its
+  declaration: the environment is read on behind its end, where DOS
+  has the path of the program's own file, as 68 bytes whatever the
+  path, by `MnPth0` of `start.c`. Another system has to have that many
+  bytes there.
+- A place of DOS's own that is kept as a number stays one: `ComSpec` of
+  the main data is where the name of the shell is in the environment,
+  and is added to what `ProgramEnvironment` answers.
+- What `dos.c` goes by that something else sets is said in `vc.h`, with
+  what is of DOS alone: `PspSeg`, which the entry of the program sets
+  by `ProgramPrefix`. The toy of `harness/trial32/sys.c` has an entry of
+  its own and sets it there. A function of `sys.h` is also a function
+  of `dos32.c`, made or not, which the build compiles for 32 bits with
+  the rest; and what is of DOS alone and outside `sys.h` is in no
+  `dos32.c`, so `harness/trial32/whole.py`, which links the tree for
+  32 bits, has each such name in a list of its own, `OUTSIDE`. `python3
+  harness/trial32/both.py` and `whole.py` take seconds and say whether
+  the three still fit.
 
 ## Work by several agents
 

@@ -1983,12 +1983,12 @@ DOS and is not behind it yet.
   through `sys.h` now, for the PSP, the version and the block of the
   program made its own size, and still knows what is of DOS: that a DOS
   before 3 is left through the first bytes of the PSP, by a far call,
-  and where the program ends in the memory. The PSP itself is read by
-  its offsets in three files: the place where DOS goes on and the
-  environment in `resident.c`, the environment and the end of the
-  memory in `start.c`, the command tail in `main.c`. All of that will be
-  `dos.c`'s, or the functions' of `sys.h` that say what is wanted of it:
-  the command line, the environment, the memory that there is.
+  and where the program ends in the memory. Of the PSP itself it reads
+  one thing more by its offset, with `TakeEnd` and `Exit00`: the place
+  where DOS goes on. The rest of what was read there in three files is
+  `dos.c`'s since the piece S1 of the plan for the 32 bits, behind
+  functions of `sys.h` that say what is wanted: `ProgramTail`,
+  `ProgramEnvironment` and `MemEnd`.
 - Quick execute, `Int2E` and `Exec2E` of `resident.c`: COMMAND.COM's
   own interrupt, called in assembly, with the stack set by hand behind
   it. It stays whole and where it is until it is decided (above).
@@ -2174,7 +2174,7 @@ written at it:
 | The same in the setup file | None: the file is three letters, of each panel what a `WCBdef` has before `CurAdr`, of the main data what it has before `LoadRes`, and a sum; no word of those is a segment or a place | The same file | The same file |
 | The copy of the screen, the boxes' and the help's buffers | Arrays of the main data, named by their offsets in 82 words of the tables | The same | Named by address |
 | The screen itself, the BIOS's data | Far pointers of `dos.c`, B800:0 and 40:6C | Flat addresses of `dos32.c`, B8000h and 46Ch | The same |
-| The PSP and the environment | Read by their offsets through `PspSeg`, in `resident.c`, `start.c` and `main.c` | Below the megabyte and outside the program's own: `sys.h` hands out the command tail and the environment, S1 | The same |
+| The PSP and the environment | Read by their offsets through `PspSeg`, in `resident.c`, `start.c` and `main.c`. Since S1 in `dos.c`, but for the place where DOS goes on, which is S3's | Below the megabyte and outside the program's own: `sys.h` hands out the command tail, the environment and where the memory ends, S1 | The same |
 
 What keeps its layout through step 1, and who holds it:
 
@@ -2229,21 +2229,24 @@ of registers differs, and a call through real mode has no likeness in
 16 bits. What they share is the order in which DOS is asked, which is
 behaviour and is carried over a function at a time.
 
-The 84 functions of `sys.h`, by what the trial found of DOS/32A:
+The 84 functions that `sys.h` had when this was written, by what the
+trial found of DOS/32A. It has 86 since S1: `ProgramPrefix` has left
+it, and `ProgramTail`, `ProgramEnvironment` and `MemEnd` have come,
+which read the PSP below the megabyte and ask DOS nothing.
 
 | Kind | Functions | Which |
 |---|---|---|
 | Straight through: no address, or one that the extender translates, with the program's pointer as it is. D1 found six of these to want real mode: `FileSetAttributes`, `FindRecord`, `FindFirst`, `FindNext`, `DirCurrent` and `DirCurrentBare`. See "Piece D1" | 71 | The files but `FileTrueName`, 16; the directories, 8; the drives, 8; `TimeOfDay`, the two versions, `BreakCheck`, `SetBreakCheck`, `Idle`; `ProgramEnd`; the console, 2; the keyboard, 4; the screen, 17, of which four read and write the display's memory and the BIOS's data at flat addresses; the mouse, 8; `Ticks` |
 | Through one block below the megabyte and a call in real mode, DPMI 0300h, or 0301h for a routine | 7 | `FcbParse` (29h), `FcbDelete` (13h), `CountryInfo` (38h), `CaseMap`, which calls the routine that 38h names, `FileTrueName` (60h), `ProgramRun` and `ProgramRunBare` (4Bh) |
-| Other in 32 bits | 6 | `MemTake`, `MemGive`, `MemResize`: the program's own 640 KB. `MemSetSearch`, `MemSetUpper`: passed to DOS as they are. `ProgramPrefix`: goes, S1 |
+| Other in 32 bits | 6 | `MemTake`, `MemGive`, `MemResize`: the program's own 640 KB. `MemSetSearch`, `MemSetUpper`: passed to DOS as they are. `ProgramPrefix`: gone from `sys.h` with S1, and from the common code with S3 |
 
 What is 16 bits in kind and changes shape for both builds, under the
 16-bit build first:
 
 | What | Today | After | Piece |
 |---|---|---|---|
-| `ProgramRun(name, block)` | `struct EPBs`: three far pointers of real mode, which `resident.c`, `start.c` and `view.c` make with `MAIN_SEG` | `ProgramRun(name, tail)`; the block is `dos.c`'s to make, with the two file control blocks where the original has them | S1 |
-| `ProgramPrefix()` and `PspSeg` | The PSP's segment, read at 0Ah, 2Ch, 02h and 81h in three files, 10 places | The command tail and the environment as pointers that `sys.h` answers with; the end of the memory as a number, if the Info still shows it then | S1 |
+| `ProgramRun(name, block)` | `struct EPBs`: three far pointers of real mode, which `resident.c`, `start.c` and `view.c` make with `MAIN_SEG` | `ProgramRun(name, tail)`; the block is `dos.c`'s to make, with the two file control blocks where the original has them | S1, done |
+| `ProgramPrefix()` and `PspSeg` | The PSP's segment, read at 0Ah, 2Ch, 02h and 81h in three files, 10 places | The command tail and the environment as pointers that `sys.h` answers with; the end of the memory as a number, if the Info still shows it then | S1, done for 2Ch, 02h and 81h: `ProgramEnvironment`, `MemEnd`, which the Info does show, and `ProgramTail`. 0Ah, and the two themselves, are S3's: see "S1, the PSP and a program run" |
 | `Vector`, `SetVector` of `vc.h`; `FatErr` of `main.c`, `CtrlC` of `resident.c` | The program takes INT 24h, 1Bh and 23h itself, with interrupt functions | Functions of `sys.h` that take and give back the critical error and Ctrl-Break, in the order of today's calls; the entries in `dos.c`, which call `FtErr1` of `main.c` as a plain function | S2 |
 | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` of `resident.c` | The entry of the program, what DOS does when it ends it, COMMAND.COM's interrupt with the stack set by hand | In `dos.c`. `Main` is called by the entry; leaving is `ProgramEnd` with what has to be done first; Quick execute is a function that comes back, the stack kept and put back around the interrupt | S3 |
 | The memory by segment and paragraph | `MemTake`, `MemGive`, `MemResize` | As they are, through step 1 | Step 2 |
@@ -2648,7 +2651,7 @@ and H1 are started at once by the session.
 | P2b, the same: the viewer, the editor, a copy, the menus. Done: see below | N in `view.c`, `edit.c`, `copy.c`, `menu.c`, `help.c`, `find.c`, `stcolor.c`, `sthelp.c`, `window.c`, `bars.c`, `dirfunc.c` | Those files, but the lines that S1 has in `view.c` | 66 places | P1; beside the others | The same | `EditBuf`, `CpSrc`: names that are places of the main data by a macro |
 | P3, the tables read as what they are. Done: see below | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
 | P4, arithmetic | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
-| S1, the PSP and a program run | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
+| S1, the PSP and a program run. Done: see below | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
 | S2, what DOS enters | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
 | S3, the entry, the end, Quick execute | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
 | D1, `dos32.c`: what goes straight through. Done: see "Piece D1" below | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
@@ -2750,7 +2753,7 @@ bits and plain in 32.
 | `MD_PLACE(pointer)` | A pointer into the main data | Its place there, a word | How far it is behind `&md` |
 | `MD_POINTER(place)` | A place of the main data | `u8 *` to it | `&md` and the place, cut to 16 bits first |
 | `TRELIST` | | Where the list of the tree begins, a place | One body, on `MD_PLACE` |
-| `DOS_AT(segment, offset)` | A segment of DOS's own and an offset: the PSP, the environment, the header of a device | A far pointer | None of its own: it is the cast in both, the host check counts it, and S1 to S3 take its 13 places away |
+| `DOS_AT(segment, offset)` | A segment of DOS's own and an offset: the PSP, the environment, the header of a device | A far pointer | None of its own: it is the cast in both, the host check counts it, and S1 to S3 take its 13 places away: S1 took eight, and five are left, one of S2 and four of S3 |
 
 What is otherwise than the plan had it:
 
@@ -3531,6 +3534,138 @@ For B1, B2 and the harness:
   STACK that the linker takes: 4,096 bytes, in the file.
 - `VC.EXE` of the 16-bit build is the same bytes as before the piece.
 
+### S1, the PSP and a program run: done, and what a later piece should know
+
+What was 16 bits in kind in the header for a program run and for the
+PSP is gone from it, and `dos.c` has it. `sys.h` has 86 functions,
+where it had 84:
+
+| Function | What it is | In `dos.c` | In `dos32.c` |
+|---|---|---|---|
+| `ProgramRun(name, tail)`, `ProgramRunBare(name, tail)` | A program run, with its command tail as DOS has one: a count, the characters, a carriage return. They took DOS's block of three far addresses, which three files made with `MAIN_SEG` | `Run` fills in the block, `EPB` of the main data, and names it to DOS at ES:BX | Not made: they fail with the error 1, as before. D2's |
+| `ProgramTail()` | What this program was told behind its name, as far as a carriage return | The PSP at 81h | Not made: a carriage return. D2's |
+| `ProgramEnvironment()` | The environment, and behind its end the path of the program's own file | Offset 0 of the segment that the PSP has at 2Ch | Not made: 71 zero bytes. D2's |
+| `MemEnd()` | The segment where the memory ends: the Info still shows it, as bytes | The word of the PSP at 02h | Not made: 0. D2's |
+| `ProgramPrefix()` | The segment of the PSP, as DOS says | In the last part, with what is of DOS alone, and declared in `vc.h` | None |
+
+The places, each as it was and as it is. That is the six of the block
+and six of the PSP that the row of the piece had:
+
+| File | Was | Is |
+|---|---|---|
+| `start.c`, `IniData` | `md.EPB.EnvSeg = 0`, and `FCB1` and `FCB2` on `MAIN_SEG` with 5Ch and 6Ch | Gone: `Run` of `dos.c` |
+| `resident.c`, `Exec02` | `md.EPB.CmdLine = (u32)MAIN_SEG << 16 \| (u16)before`, and `ProgramRunBare(name, &md.EPB)` | `ProgramRunBare(name, before)` |
+| `view.c`, `Aexec0` | `md.EPB.CmdLine = ...` on `md.TmpBuf + 100`, and `ProgramRun(md.TmpBuf, &md.EPB)` | `ProgramRun(md.TmpBuf, md.TmpBuf + 100)` |
+| `resident.c`, `Exec02` | `DOS_AT(PSP_ENV, md.ComSpec)` | `ProgramEnvironment() + md.ComSpec` |
+| `start.c`, `Init00` and `IniData` | `DOS_AT(PSP_WORD(PSP_ENVIRON), 0)`, twice | `ProgramEnvironment()` |
+| `start.c`, `IniData` | `md.Memorys = PSP_WORD(PSP_MEMORY)` | `md.Memorys = MemEnd()` |
+| `main.c`, `Init40` | `FndLet(DOS_AT(PspSeg, 0x81))` | `FndLet(ProgramTail())` |
+
+What decided: the whole suite, nine tests of nine, with `VC.EXE` 62
+bytes longer, 197,152; `python3 tools/calls.py` counts none; the host
+check's record is written anew, with `start.c` down to one place, a
+place of the main data, which is S3's; `python3
+harness/trial32/both.py` passes, and `whole.py` links.
+
+What DOS is handed at 4B00h is what it was handed, read in the listing
+of `dos.c`: AX, the name at DS:DX, ES:BX on `EPB` of the main data, and
+in the block no environment, the tail by the main data's segment and
+its offset, and the two file control blocks at 5Ch and 6Ch of the main
+data. CX, SI and DI are as they come, which entry 6 of `DEVIATIONS.md`
+has for both callers already; no row was added. No call of DOS was
+added, taken away or moved: the three new functions read the PSP and
+ask nothing, and they read it where the lines that they replace read
+it, the segment of the environment out of the PSP at every call.
+
+The block is filled in at every run, all four of its fields, where
+`IniData` filled in three of them once and the callers the tail.
+Between the start of the program and its first run of another the 14
+bytes of `EPB` are therefore zeros where they held three of the four.
+Nothing reads them: `EPB` lies behind what the setup file is an image
+of, and the one other line that names it, `EPB_WAS` of `resident.c`,
+takes its address, for what the original has in BX where it writes a
+text.
+
+What is otherwise than the plan had it:
+
+- `PspSeg` and `ProgramPrefix` have left `sys.h` and three files, not
+  the common code. `resident.c` goes by both still, in routines that
+  are S3's to move: `Alloc0` asks for the PSP, makes the program's
+  block shorter by it and leaves a DOS before 3 through it; `TakeEnd`
+  and `Exit00` write where DOS goes on, `PSP_EXIT`, at 0Ah; `Exit02`
+  leaves the segment in ES. So `PspSeg` is a variable of `dos.c` that
+  `Alloc0` sets, and `vc.h` declares it and `ProgramPrefix` with what
+  is of DOS alone, beside `Vector`, `SetVector` and `IntOn`. When S3
+  has those routines in `dos.c`, both are static there.
+- `info.c` had no place: it shows `Memorys` of the main data, which
+  `IniData` sets.
+- `struct EPBs` stays in `vc.h`: the main data has it, and its layout
+  is held.
+- Two tools of the trial went by the header as it was and were mended:
+  `harness/trial32/whole.py`, which links the build's objects of 32
+  bits with `dos32.c` since B1 and has what is of DOS alone in a list
+  of its own, `OUTSIDE`, where `ProgramPrefix` and `PspSeg` are now;
+  and the toy, `harness/trial32/sys.c`, whose entry for 16 bits now
+  sets `PspSeg`, and whose last page asks the three new functions.
+
+For S2 and S3:
+
+- `DOS_AT` has five places left. `FatErr` of `main.c` makes the address
+  of the device's header of what DOS has in BP:SI: S2's. `PSP_EXIT`
+  three times and the far call into the PSP in `Alloc0`, in
+  `resident.c`: S3's. With the last of them `DOS_AT` goes from `vc.h`.
+- `dos.c` has `POINTER(segment, offset)` for a far pointer of two
+  numbers and `PSP_WORD(offset)` for a word of the PSP; `PSP_EXIT`
+  wants the same for a number of 32 bits, written to.
+- A function that is added to `sys.h`, or that leaves it, is in six
+  places besides `dos.c`: `dos32.c`, made or as one that does nothing,
+  with the counts at its top and in front of its second part, 71 made
+  and 15 not; the README's table of the groups, and its 86; the table
+  of `CLAUDE.md`, "Moving a file to the system's functions"; `NAMED` of
+  `harness/reads.py`, if it takes a name; `OUTSIDE` of `whole.py`, if
+  it is of DOS alone and no function of `sys.h`; and the toy's last
+  page.
+- The toy for 16 bits is linked of `dos.obj` as the build made it, the
+  stack and the arithmetic, and nothing else of the program
+  (`harness/trial32/build.sh`). Whatever `dos.c` comes to call of the
+  program, `FtErr1` for S2, `Main` and what leaving does for S3, the
+  toy has to have under the same name, or its link fails. `both.py`
+  says so in ten seconds.
+- Behind `ProgramRunBare`, `Exec02` calls `SetBrk`, failed or not, which
+  asks DOS whether it looks for Ctrl-C, tells it not to and takes
+  INT 23h; `Aexec0` of `view.c` does none of that behind `ProgramRun`.
+  That is the original's, and S2 keeps it where it changes `SetBrk`.
+- The scenarios of both trees took 15 minutes with other agents
+  testing.
+
+For D2:
+
+- `Run` of `dos.c` is what a program run is told, in ten lines, and
+  the comment in front of it says why the file control blocks are what
+  they are. In 32 bits the name, the tail and the block go into the
+  block below the megabyte: the tail is `tail[0] + 2` bytes; the two
+  file control blocks are the bytes of the main data from 5Ch and from
+  6Ch, colours of the setup, which DOS copies into the PSP of the
+  program that it runs and by whose first bytes it says in AX whether
+  each names a drive that there is. How many bytes DOS takes of each
+  was not looked up: 16 is an unopened one.
+- The three that read the PSP want its address, which is below the
+  megabyte. In 16 bits the entry asks DOS for it, AH 51h, as the first
+  thing that it asks; `Start` of `dos32.c` is entered with ES on it, a
+  selector. S3 says what the entry asks and in which order.
+- `ProgramEnvironment` answers with a pointer that is read on behind
+  the end of the environment: `MnPth0` of `start.c` copies the path of
+  the program's own file from three bytes behind the last zero, as 68
+  bytes whatever the path. The environment's own segment, as it lies
+  below the megabyte, has that; a copy would have to have it too. And
+  `Exec02` adds `ComSpec` of the main data to the pointer, an offset
+  in the environment that `IniData` found.
+- The toy starts with no tail, so `ProgramTail` prints as an empty
+  one in both already; a tail wants `run.py` to start the toy with
+  one. `ProgramRun` and `ProgramRunBare` are not asked: they want a
+  program on the toy's disk to run and something that shows that it
+  ran with the tail.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")
@@ -4252,8 +4387,8 @@ And what hurts:
   DOS left AX where nothing failed, `flagged`, what `FileSeek` answers
   when it fails, the five functions with Bare in their names, the page
   and the colour of `ScreenType`, `FcbParse` and `FcbDelete`,
-  `ScreenMemory` and `ScreenPageStart`, `ProgramPrefix`, memory by the
-  segment. Each is one thing more that every implementation and every
+  `ScreenMemory` and `ScreenPageStart`, `ProgramPrefix`, which has left
+  the header since, memory by the segment. Each is one thing more that every implementation and every
   trace has to do as DOS does. Taking one out is a deviation, to be
   asked.
 - What the system keeps between two calls and no call names: the

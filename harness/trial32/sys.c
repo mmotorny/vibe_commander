@@ -41,10 +41,10 @@
    was not, 400h for the flag and anything else for ES.
 
    The last page asks the functions that dos32.c does not make yet
-   (both.py, NOT_MADE): there the two differ until it does. ProgramRun,
-   ProgramRunBare and ProgramPrefix are not asked at all: what they take
-   and answer is of 16 bits and changes first (TODO.md, "The portable C
-   in 32 bits: the plan", S1). */
+   (both.py, NOT_MADE): there the two differ until it does. ProgramRun
+   and ProgramRunBare are not asked at all: a program that the toy could
+   run, and what shows that it ran, come with the piece that makes them
+   (TODO.md, "The portable C in 32 bits: the plan", D2). */
 #include "vc.h"
 
 /* The main data, which the functions keep two things in: ErrDat and
@@ -845,6 +845,7 @@ static void Later(void)
 {
     struct Block block;
     struct Answer asked;
+    const u8 FAR *tail;
     u16 at, taken;
 
     SAY("Not made in dos32.c yet:");
@@ -905,6 +906,21 @@ static void Later(void)
     MemSetUpper(0);
     SAY("MemSetSearch, MemSetUpper");
     Line();
+    /* What the PSP says: where the memory ends, of which only that it
+       is plausible is written; the tail that the toy was started with,
+       as far as its carriage return; and the first text of its
+       environment. */
+    at = MemEnd();
+    SAY("MemEnd: at least 256 KB and no more than 640 ");
+    H2(at >= 0x4000 && at <= 0xA000);
+    tail = ProgramTail();
+    SAY("ProgramTail '");
+    for (at = 0; at < 20 && tail[at] != '\r'; at++)
+        Cell(tail[at] < ' ' ? '.' : tail[at]);
+    Cell('\'');
+    Line();
+    SAY("ProgramEnvironment "); Quoted(ProgramEnvironment(), 40);
+    Line();
 }
 
 /* The pages, a step of the script behind each. */
@@ -942,8 +958,9 @@ void Main(void)
    has given the program all of the memory: the function loads DS, and
    makes the program's block as long as the program is, which ends where
    its stack does, as Alloc0 of the program's resident.c does. So there
-   is memory to ask for. The PSP is asked for here and not through
-   sys.h, where it is about to go. */
+   is memory to ask for. The PSP is asked for here, since ProgramPrefix
+   of dos.c is no function of sys.h, and its segment is kept where
+   Alloc0 keeps it, for the functions that read the PSP. */
 #ifdef __I86__
 static u16 Prefix(void);
 #pragma aux Prefix = \
@@ -957,6 +974,7 @@ void __loadds Entry(void)
     u32 end = (u32)(void __far *)Stack;
     u16 prefix = Prefix();
 
+    PspSeg = prefix;
     MemResize(prefix,
               (u16)(end >> 16) + (((u16)end + LenStk + 15) >> 4) - prefix);
     Main();

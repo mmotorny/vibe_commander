@@ -662,19 +662,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,090 bytes |
+| `VC.EXE` | 197,152 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 64,034 bytes |
-| The relocations in its header, which DOS applies | 1,029 |
-| What it keeps of the memory while a command runs: the program and its panels | 206,736 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,800 bytes |
-| The code segment `CTEXT` ends at | D356h, 7,338 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C53Dh, 10,947 bytes below the limit, F000h |
+| more than the C translation's 133,056 bytes | 64,096 bytes |
+| The relocations in its header, which DOS applies | 1,030 |
+| What it keeps of the memory while a command runs: the program and its panels | 206,784 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,752 bytes |
+| The code segment `CTEXT` ends at | D359h, 7,335 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C57Bh, 10,885 bytes below the limit, F000h |
 | Inline assembly | 49 instructions in 9 pieces: 37 in 7 of `dos.c`, 12 in 2 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 757, 93, 262, 95 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 756, 101, 263, 95 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -861,7 +861,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 84 functions
+In the portable C that place is `src/portable_c/sys.h`: 86 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
 has the file clean. `dos.c` is those functions for DOS on a PC, and the
@@ -876,9 +876,9 @@ file beside it.
 | Files by a file control block: a mask deleted at one call, a label | 2 |
 | Directories: what is in one, made, removed, the current one | 8 |
 | Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
-| Memory: a block taken, given back, made another size, and where the system looks for one | 5 |
+| Memory: a block taken, given back, made another size, where the system looks for one, and where the memory ends | 6 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
-| Other programs: one run, this one ended, and what DOS keeps of this one | 4 |
+| Other programs: one run, with what it is told behind its name, and this one ended; what this one was told when it was started, and its environment | 5 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
 | The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, the font of an EGA and what Print Screen prints of its rows, where the cells are and the cells themselves | 17 |
@@ -921,13 +921,18 @@ there, and the portable C hands them 0. No screen shows that, and
 Not in the header, and in `dos.c` all the same, is what only DOS on a
 PC has: where an interrupt goes, as DOS says and as DOS is told, which
 the program takes for DOS's critical error and for Ctrl-Break and
-Ctrl-C; and the machine let interrupt again. `vc.h` declares those
-three. What DOS enters of the program is where it was, and is all that
-still knows an interrupt outside `dos.c`: `FatErr` of `main.c` for the
-critical error, and in `resident.c` the entry of the program, the entry
-of Ctrl-C, where DOS goes on when it ends the program, and the call of
-COMMAND.COM's own interrupt for Quick execute, each with what assembly
-it has. `TODO.md`
+Ctrl-C; the machine let interrupt again; and where the program's PSP
+is, which the entry of the program asks DOS for and keeps. `vc.h`
+declares those. What DOS enters of the program is where it was, and is
+all that still knows an interrupt outside `dos.c`: `FatErr` of `main.c`
+for the critical error, and in `resident.c` the entry of the program,
+the entry of Ctrl-C, where DOS goes on when it ends the program, and
+the call of COMMAND.COM's own interrupt for Quick execute, each with
+what assembly it has. Of the PSP those read one thing more themselves,
+the address at which DOS goes on when the program has ended; what else
+is read there, the command tail, the environment and where the memory
+ends, `dos.c` reads for the functions that answer with them, and it
+makes the block that DOS is told of a program to run. `TODO.md`
 says what is to become of them. The map of the memory and the watch on
 DOS, which were of DOS alone, [are gone](#what-a-user-sees-no-more).
 

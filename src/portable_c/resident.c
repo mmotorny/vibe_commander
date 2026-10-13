@@ -50,13 +50,6 @@ static const u8 Retr_S[] =
     "\015\012" "Press ENTER to try again or ESC to abort\015\012";
 static const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
 
-/* The segment of the PSP, the 256 bytes that DOS keeps of a program in
-   front of it: the command tail is there, the segment of the
-   environment, where the memory ends, and where DOS goes on when the
-   program has ended. The original is a .COM file and has all its
-   segment registers there. */
-u16 PspSeg;
-
 /* Where INT 22h went before the program took it: where the program that
    started this one goes on when this one has ended. */
 static u32 Vect22;
@@ -71,10 +64,9 @@ static u8 PromptLine[2 + 3 + 64 + 1 + 1];
 /* A text of main_t.c, for a DOS that is too old. */
 extern const u8 __far Vers_S[];
 
-/* The PSP: where the program goes on when DOS has ended it, and the
-   segment of its environment. */
+/* The PSP, by its segment, PspSeg of dos.c: where the program goes on
+   when DOS has ended it. */
 #define PSP_EXIT (*(u32 __far *)DOS_AT(PspSeg, 0x0A))
-#define PSP_ENV  (*(u16 __far *)DOS_AT(PspSeg, 0x2C))
 
 /* Where a routine is, as an address for DOS and for a return. */
 #define ROUTINE(function) ((const u8 __far *)(void __far *)(function))
@@ -398,13 +390,12 @@ static void Exec02(u16 behind)
         before[1] = '/';
         before[2] = 'C';
         before[3] = ' ';
-        md.EPB.CmdLine = (u32)MAIN_SEG << 16 | (u16)before;
         for (;;) {                      /* Exec05 */
             if (md.ComSpec == 0) {
                 name = (const u8 __far *)Command;
             } else {
-                name = DOS_AT(PSP_ENV, md.ComSpec);
-                ran = ProgramRunBare(name, &md.EPB);
+                name = ProgramEnvironment() + md.ComSpec;
+                ran = ProgramRunBare(name, before);
                 SetBrk();
                 if (!ran.failed)
                     break;

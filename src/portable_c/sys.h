@@ -63,10 +63,9 @@
 
 struct DTAs;                            /* what is known of a file that
                                            was found, */
-struct CNTRY;                           /* how a country writes numbers,
-                                           dates and times, */
-struct EPBs;                            /* and what a program is started
-                                           with: DOS's records, of vc.h */
+struct CNTRY;                           /* and how a country writes
+                                           numbers, dates and times:
+                                           DOS's records, of vc.h */
 
 /* What the system answered to something that may fail. */
 struct Answer {
@@ -278,6 +277,10 @@ struct Block MemTake(u16 paragraphs);
 struct Answer MemGive(u16 block);
 struct Block MemResize(u16 block, u16 paragraphs);
 
+/* Where the memory ends that the system has for programs: the segment
+   behind its last byte, which is how many paragraphs of it there are. */
+u16 MemEnd(void);
+
 /* Where the system looks for a block that it is asked for: `how` is as
    DOS has it, 0 for the lowest block that fits, which is how DOS looks
    when it has started. And whether the upper memory, beyond the 640 KB
@@ -335,22 +338,27 @@ void Idle(void);
  * program's errors.
  */
 
-/* Run the program in the file `name` and come back when it has ended,
-   with the command line and what else `block` names. */
-struct Answer ProgramRun(const u8 FAR *name, const struct EPBs FAR *block);
-struct Answer ProgramRunBare(const u8 FAR *name,
-                             const struct EPBs FAR *block);
+/* Run the program in the file `name` and come back when it has ended.
+   `tail` is what the program is told behind its name, its command tail
+   as DOS has one: a byte that counts the characters, the characters, and
+   a carriage return, which is not counted. The program gets the
+   environment that this one has. */
+struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail);
+struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail);
 
 /* End the program, with a number for whoever started it. Does not
    return. */
 void ProgramEnd(u16 code);
 
-/* What DOS keeps of the program in front of it, its PSP, by its segment:
-   256 bytes that have the command line which the program was started
-   with, the segment of its environment, where its memory ends, and where
-   the program that started it goes on when this one has ended. The
-   program's block of the memory is known by the same segment. */
-u16 ProgramPrefix(void);
+/* What this program was told behind its name when it was started, its
+   command tail: the characters, as far as a carriage return. */
+const u8 FAR *ProgramTail(void);
+
+/* The environment that this program was started with, as DOS has one:
+   texts, NAME=value, each ended by a zero byte, and one zero byte more
+   behind the last; then two bytes, and behind them the path of the
+   program's own file, ended by a zero byte. */
+const u8 FAR *ProgramEnvironment(void);
 
 /*
  * The console: what the system writes where the screen has its cursor,

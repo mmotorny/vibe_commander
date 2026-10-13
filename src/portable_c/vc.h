@@ -409,15 +409,14 @@ extern struct MainDat md;
 extern u8 __far Stack[];
 #endif
 
-/* What the program knows of DOS around it, resident.c: the segment of
-   its PSP. Of its routines there, Alloc0 is where the program begins.
+/* What the program knows of DOS around it, resident.c. Of its routines
+   there, Alloc0 is where the program begins.
    TakeEnd has the program go on in Exit01 when DOS ends it. SetBrk
    notes whether DOS looks for Ctrl-C at every call, has it not do so,
    and takes Ctrl-C, for CtrlC, which only returns. Exec runs the commands of DosBuf. AlocEr
    says that there is no memory and leaves, with `bx` for what the
    original has in BX there, and Exit00 leaves with what DOS is to be
    told. */
-extern u16 PspSeg;
 void TakeEnd(void);
 void SetBrk(void);
 void __interrupt __far CtrlC(void);
@@ -643,11 +642,15 @@ void StHelp(void);
 
 /* What is of DOS on a PC alone, and no part of sys.h: where an interrupt
    goes, as an address with the offset in the low word, and one made to
-   go somewhere, by DOS; and the machine let interrupt the program
-   again. See each in dos.c. */
+   go somewhere, by DOS; the machine let interrupt the program again;
+   and the segment of the program's PSP, as DOS says it and as Alloc0 of
+   resident.c keeps it when the program begins, for itself and for the
+   functions of sys.h that read the PSP. See each in dos.c. */
 u32 Vector(u16 number);
 void SetVector(u16 number, u32 to);
 void IntOn(void);
+u16 ProgramPrefix(void);
+extern u16 PspSeg;
 
 /* The registers as an interrupt function of the compiler saves them on
    the stack and puts them back: its first parameter. */

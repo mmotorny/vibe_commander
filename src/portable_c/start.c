@@ -40,11 +40,6 @@ extern const u8 __far Init_F[];
 extern const u8 __far Ext_F[];
 extern u8 IniSave[];
 
-/* The PSP: where memory that DOS has ends, and the environment. */
-#define PSP_MEMORY    0x02
-#define PSP_ENVIRON   0x2C
-#define PSP_WORD(offset) (*(const u16 __far *)DOS_AT(PspSeg, offset))
-
 #define MinView 8000                    /* Minimum view buffer size */
 
 /* How many paragraphs the viewer takes at the least. */
@@ -309,7 +304,7 @@ void Init00(void)
     struct WCBdef *first = (struct WCBdef *)(image + 3);
     struct WCBdef *second = (struct WCBdef *)(image + 3 + WCBini);
     u8 *path = md.TmpBuf;
-    const u8 __far *env = DOS_AT(PSP_WORD(PSP_ENVIRON), 0);
+    const u8 __far *env = ProgramEnvironment();
     u8 __far *end, __far *to;
     u16 code = AsmSeg();
     u16 length, sum, drive, wrong, i;
@@ -555,8 +550,9 @@ static u16 CurNl(void)
    Ported as they are:
      - The program handed to a command, by COMMAND.COM, gets its two
        FCBs at 5Ch and 6Ch of the main data, not of the PSP: ES is on
-       the main data when the block for running a program is filled
-       in.
+       the main data when the original fills in here the block for
+       running a program. That block is made where a program is run
+       now, by ProgramRun of sys.h: see Run of dos.c.
      - A cursor below the last line is put on it before the screen is
        fed a line, so the screen scrolls once. */
 void IniData(void)
@@ -607,14 +603,11 @@ void IniData(void)
             md.LowTab[c - 128] = (u8)(0x80 + i);
     }
     md.LoadFl &= 0x7F;
-    md.Memorys = PSP_WORD(PSP_MEMORY);
+    md.Memorys = MemEnd();
     IniSave[0] = 0;                     /* no setup is known to have been
                                            saved */
     md.DosBuf[0] = 0;
-    md.EPB.EnvSeg = 0;
-    md.EPB.FCB1 = (u32)MAIN_SEG << 16 | 0x5C;
-    md.EPB.FCB2 = (u32)MAIN_SEG << 16 | 0x6C;
-    env = DOS_AT(PSP_WORD(PSP_ENVIRON), 0);
+    env = ProgramEnvironment();
     at = 0;                             /* ComSpec */
     for (;;) {                          /* Init24 */
         if (env[at] == 0) {

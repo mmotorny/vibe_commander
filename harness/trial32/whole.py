@@ -12,9 +12,9 @@ those objects and of what the build does not make:
     leaves <file>.refused there and no object. Such a file is compiled
     here with its warnings, which the build takes for errors;
   - what the tree has of DOS outside sys.h, and so outside dos32.c: the
-    three functions that vc.h declares, and `__GETDS`, which an
-    interrupt function of the compiler's asks for. Each is written here
-    as a function that does nothing.
+    four functions that vc.h declares and the segment of the PSP, and
+    `__GETDS`, which an interrupt function of the compiler's asks for.
+    Each function is written here as one that does nothing.
 
 It has the build make the objects first, links them as build.sh links a
 toy, with DOS/32A for the stub, and prints what the file has: its
@@ -27,7 +27,7 @@ of the addresses of vc.h in their second bodies. Then it compiled the
 tree itself, and had every function of sys.h do nothing; since there
 is dos32.c, what it links is that. That the file links says nothing of
 whether the program would run: a place of the main data is still cast
-to 16 bits in many files, and thirteen functions of dos32.c are not
+to 16 bits in many files, and fifteen functions of dos32.c are not
 made.
 """
 import re
@@ -49,6 +49,8 @@ OUTSIDE = """#include "vc.h"
 u32 Vector(u16 number) { return number; }
 void SetVector(u16 number, u32 to) { }
 void IntOn(void) { }
+u16 ProgramPrefix(void) { return 0; }
+u16 PspSeg;
 void GetDs(void) { }
 #pragma aux GetDs "__GETDS"
 """

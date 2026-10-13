@@ -1760,9 +1760,8 @@ static void Aexec0(u16 edit)
        the original it begins with the main data. */
     MemResize(md.MemSeg,
               md.ViewSeg - md.MemSeg + ((MinView - 1) >> 4) + 1);
-    md.EPB.CmdLine = (u32)MAIN_SEG << 16 | (u16)(md.TmpBuf + 100);
     LetLin(md.TmpBuf);
-    ran = ProgramRun(md.TmpBuf, &md.EPB);
+    ran = ProgramRun(md.TmpBuf, md.TmpBuf + 100);
     error = ran.value;
     /* All the memory that there is, again: DOS says how much that is
        when it is asked for more. */

@@ -49,7 +49,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 71 of the 84, six of them in real mode; the 13 that are not made
+ * 71 of the 86, six of them in real mode; the 15 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -1022,7 +1022,7 @@ u32 Ticks(void)
 }
 
 /*
- * The 13 functions of sys.h that are not made here yet. Each does
+ * The 15 functions of sys.h that are not made here yet. Each does
  * nothing, and answers as a system does that failed or does not know
  * the question; none of them calls DOS, since a call that the extender
  * does not translate has DOS write wherever the registers happen to
@@ -1034,8 +1034,15 @@ u32 Ticks(void)
  *     block: FileTrueName, FcbParse, FcbDelete, CountryInfo, CaseMap,
  *     ProgramRun and ProgramRunBare;
  *   - other in 32 bits: MemTake, MemGive and MemResize, which hand out
- *     memory of the program's own; MemSetSearch and MemSetUpper; and
- *     ProgramPrefix, which goes.
+ *     memory of the program's own; MemSetSearch and MemSetUpper;
+ *   - out of the PSP, which is below the megabyte, once the start of
+ *     the program knows where that is: MemEnd, ProgramTail and
+ *     ProgramEnvironment.
+ *
+ * ProgramRun and ProgramRunBare take the name and the tail, and what
+ * else DOS is told of a program that it runs is theirs to make, in the
+ * block below the megabyte: see Run of dos.c for what that is, the two
+ * file control blocks above all, which are bytes of the main data.
  */
 
 #define ERR_NO_FUNCTION 1               /* DOS's error for a call that it
@@ -1116,22 +1123,37 @@ u16 CaseMap(u16 letter)
     return letter;
 }
 
-struct Answer ProgramRun(const u8 FAR *name, const struct EPBs FAR *block)
+struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail)
 {
     (void)name;
-    (void)block;
+    (void)tail;
     return NotMade(ERR_NO_FUNCTION);
 }
 
-struct Answer ProgramRunBare(const u8 FAR *name,
-                             const struct EPBs FAR *block)
+struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
 {
-    return ProgramRun(name, block);
+    return ProgramRun(name, tail);
 }
 
-u16 ProgramPrefix(void)
+/* No memory, a tail of no characters, and an environment of no texts
+   with no path of the program's file behind it: as many zero bytes as
+   the program reads there, the path being read as LenPath bytes. */
+static const u8 NoTail[] = "\r";
+static const u8 NoEnvironment[1 + 2 + LenPath] = { 0 };
+
+u16 MemEnd(void)
 {
     return 0;
+}
+
+const u8 FAR *ProgramTail(void)
+{
+    return NoTail;
+}
+
+const u8 FAR *ProgramEnvironment(void)
+{
+    return NoEnvironment;
 }
 
 /*

@@ -213,7 +213,7 @@ static u16 Init40(void)
     if (md.LoadRes != 0xFF)
         return 0;
     md.LoadRes = 0;
-    tail = FndLet(DOS_AT(PspSeg, 0x81));
+    tail = FndLet(ProgramTail());
     if (Init46(*tail))
         return 0;
     to = md.DosBuf;
