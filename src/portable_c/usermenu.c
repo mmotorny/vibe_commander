@@ -58,17 +58,9 @@ u16 Run_00(u16 text, u16 view);
    looks at whether a command is the name of a file of the kind that is
    being read, a menu here: then it has put the path of that file at
    TmpBuf. Both return a place, and whether there is no command, or
-   whether it is such a name. */
-
-/* FndItem of vc.h, which is C, for a place in the main data: where the
-   next line of a menu is that is neither empty, nor a comment, nor a
-   command, in the high word, and the low one not 0 if there is none. */
-static u32 MenuItem(u16 text)
-{
-    struct Entry item = FndItem((const u8 *)text);
-
-    return (u32)item.at << 16 | item.end;
-}
+   whether it is such a name. FndItem returns where the next line of a
+   menu is that is neither empty, nor a comment, nor a command, and
+   whether there is none, the end of the file. */
 
 /* C routines of other files that vc.h does not have. */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
@@ -90,9 +82,6 @@ extern const u8 __far List_F[];         /* "vc.lst" */
 extern const u8 __far Mask_S[];         /* "\*.*" */
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
 
 #define LenCmd 124                      /* Length of command line */
 
@@ -508,7 +497,7 @@ Run_30:                                 /* that is all of them */
 u16 F32_00(u16 main)
 {
     struct DosRegs regs;
-    u32 pair;
+    struct Entry item;
     struct Named named;
     struct Next found;
     struct Key pressed;
@@ -573,10 +562,10 @@ F32_05:                                 /* read it */
         goto F32_04;
     md.MenuBuf[count] = EOF_CHAR;
     include = (u16)md.MenuBuf;
-    pair = MenuItem((u16)md.MenuBuf);
-    if (LOW(pair))
+    item = FndItem(md.MenuBuf);
+    if (item.end)
         goto F32_03;
-    text = (const u8 *)HIGH(pair);
+    text = (const u8 *)item.at;
 
     /* The keys of its lines, how wide they are, and how wide the widest
        line behind them is. */
@@ -654,10 +643,10 @@ F32_16:
         goto F32_18;
     if ((u8)lines >= (u8)(md.Lines - 6))
         goto F32_18;
-    pair = MenuItem((u16)text);
-    if (LOW(pair))
+    item = FndItem(text);
+    if (item.end)
         goto F32_18;
-    text = (const u8 *)HIGH(pair);
+    text = (const u8 *)item.at;
     goto F32_10;
 
 F32_18:                                 /* the box */
@@ -684,7 +673,7 @@ F32_18:                                 /* the box */
     to = begin + 0x205;
     text = md.MenuBuf;
 F32_22:
-    text = (const u8 *)HIGH(MenuItem((u16)text));
+    text = (const u8 *)FndItem(text).at;
     screen = BasAdr(to);
     if (*key != 0) {
         i = 0;
@@ -814,7 +803,7 @@ F32_50:                                 /* Enter: the commands of the line */
     text = md.MenuBuf;
     i = (u8)(row + 1);
 F32_51:
-    text = (const u8 *)HIGH(MenuItem((u16)text));
+    text = (const u8 *)FndItem(text).at;
 F32_52:
     answer = WORD_AT(text);
     text += 2;

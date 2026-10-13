@@ -1426,13 +1426,14 @@ u32 F45_01(u16 panel, u16 command, u16 directories, u16 files)
 
 /* Copy or rename the directory of the tree that the cursor is on, once
    its new place is in ToFile, and take the current directory of DOS
-   along if it was that one or below it. Returns where to go on.
+   along if it was that one or below it. The command that calls it goes
+   on at GO_DONE.
 
    Ported as it is: the current directory counts as below the one that
    was renamed if its path begins with that one's, whether a name ends
    there or not. With DOCS renamed to X while DOCS2 is the current one,
    the program goes to X2, if there is such a directory. */
-static u32 F36_04(void)
+static void F36_04(void)
 {
     struct DosRegs regs;
     const u8 *rest;
@@ -1445,7 +1446,7 @@ static u32 F36_04(void)
     F35_70();
     md.ZoomOne = 0;
     if ((u8)C00_00(ATTR_DIRECTORY) == 0 || CopyMov == 0)
-        return GO_DONE;
+        return;
     length = 0;
     while (length < LenName - 1 && md.CrnPath[length] != 0)
         length++;
@@ -1462,7 +1463,6 @@ static u32 F36_04(void)
 F36_05:
     for (i = 0; i < LenStr + 1; i++)
         md.CrnPath[i] = md.ToFile[i];
-    return GO_DONE;
 }
 
 /* Copy or rename, as the 1 in the low byte of `command` says: F5 and F6,
@@ -1537,8 +1537,10 @@ F35_06:
         md.ToFile[i] = CpInpt[i];
     if (md.ToFile[0] == 0)
         return GO_PANELS;
-    if (PANEL(md.WCBcrn)->WinTyp == 1)
-        return F36_04();
+    if (PANEL(md.WCBcrn)->WinTyp == 1) {
+        F36_04();
+        return GO_DONE;
+    }
     F35_70();
     CpBgNam = (u16)CpSrc;
     return GO_SELECTED;
@@ -1563,7 +1565,8 @@ F36_03:
     for (i = 0; i < LenStr + 1; i++)
         md.ToFile[i] = CpInpt[i];
     CopyMov = 3;
-    return F36_04();
+    F36_04();
+    return GO_DONE;
 
 F36_01:
     Ask(OFFSET(MkErr_B), F35_40());
