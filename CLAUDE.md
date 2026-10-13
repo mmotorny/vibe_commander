@@ -151,12 +151,15 @@ These held while `src/c/` was made, and they say what it is.
      common headers, and macros that each platform defines in its own
      way.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
-  of 13 October 2026, since it no longer is what the original is: its
-  title is "Vibe Commander 0.1", it says "based on Volkov Commander 4.05"
-  wherever the original named its version, and its banner keeps the
-  author's copyright and adds the user's, "(C) 2026 Maksym Motorny", on
-  the same line. No line is added anywhere for it. The C translation
-  keeps the original's name.
+  of 13 October 2026, since it no longer is what the original is. It
+  names itself in the forms in which the original names itself, each in
+  its place: "The Vibe Commander, Version 0.1" where the original has
+  "The Volkov Commander, Version 4.05", "the Vibe Commander" and "Vibe
+  Commander" where it has the shorter ones. It says "based on Volkov
+  Commander 4.05" wherever the original named its version, and its
+  banner keeps the author's copyright and adds the user's, "(C) 2026
+  Maksym Motorny", on the same line. No line is added anywhere for it.
+  The C translation keeps the original's name.
 - Clang is where this is going, for the platforms it reaches and for its
   sanitizers and static checks. Open Watcom builds the program for DOS
   for as long as DOS is where it is judged. No other toolchain is taken
