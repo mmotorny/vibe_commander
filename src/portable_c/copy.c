@@ -622,8 +622,9 @@ static u16 C20_00(u16 fits)
     struct Box box;
     struct DosRegs regs;
     u32 left, free;
-    struct Answer opened;
+    struct Answer opened, moved;
     struct Device device;
+    struct Space space;
     u16 result, error, report, answer, info, attributes;
     u16 segment, offset, count, got, i;
     u16 *screen;
@@ -678,15 +679,10 @@ static u16 C20_00(u16 fits)
             goto unopened;
         }
         CpAttr = regs.cx & 0x27 | 0x20;
+        CpSize = FileSeek(CpHndl1, 2, 0).place;
+        FileSeek(CpHndl1, 0, 0);
         regs.cx = 0;
         regs.name = NUMBER(0);
-        regs.ax = 0x4202;
-        CALL(regs);
-        CpSize = PAIR(DX_OF(regs), regs.ax);
-        regs.cx = 0;
-        regs.name = NUMBER(0);
-        regs.ax = 0x4200;
-        CALL(regs);
     }
     regs.ax = 0x5700;
     CALL(regs);
@@ -713,13 +709,10 @@ read:
         do {
             got = 0;
             if (count != 0) {
-                regs.ax = 0x3F00;
-                regs.bx = CpHndl1;
-                regs.cx = count;
-                regs.name = AT(segment, offset);
-                if (CALL(regs))
+                moved = FileRead(CpHndl1, AT(segment, offset), count);
+                if (moved.failed)
                     goto terminate;
-                got = regs.ax;
+                got = moved.value;
             }
             CpRead += got;
             PerCent();
@@ -857,28 +850,14 @@ append:
     CALL(regs);
     CpDate = DX_OF(regs);
     CpTime = regs.cx;
-    regs.cx = 0;
-    regs.name = NUMBER(0);
-    regs.ax = 0x4202;
-    CALL(regs);
-    left = PAIR(DX_OF(regs), regs.ax);
+    left = FileSeek(CpHndl2, 2, 0).place;
     if (left != 0) {
         left--;
-        regs.name = NUMBER(LOW(left));
-        regs.cx = HIGH(left);
-        regs.ax = 0x4200;
-        CALL(regs);
-        regs.name = md.TmpErr;
-        regs.cx = 1;
-        regs.ax = 0x3F00;
-        if (CALL(regs))
+        FileSeek(CpHndl2, 0, left);
+        if (FileRead(CpHndl2, md.TmpErr, 1).failed)
             goto terminate;
-        if (md.TmpErr[0] == 0x1A) {
-            regs.name = NUMBER(LOW(left));
-            regs.cx = HIGH(left);
-            regs.ax = 0x4200;
-            CALL(regs);
-        }
+        if (md.TmpErr[0] == 0x1A)
+            FileSeek(CpHndl2, 0, left);
     }
 
 write:
@@ -895,13 +874,10 @@ write:
             count = LOW(left);
         got = 0;
         if (count != 0) {
-            regs.ax = 0x4000;
-            regs.bx = CpHndl2;
-            regs.cx = count;
-            regs.name = AT(segment, 0);
-            if (CALL(regs))
+            moved = FileWrite(CpHndl2, AT(segment, 0), count);
+            if (moved.failed)
                 goto terminate;
-            got = regs.ax;
+            got = moved.value;
             if (got == 0)
                 goto full;
         }
@@ -963,23 +939,24 @@ full:
     error = *(const u16 *)CpDest;
     if (error >> 8 != ':')
         error = md.DosPth[0];
-    regs.name = NUMBER((u8)(error - ('A' - 1)));
-    regs.ax = 0x3600;
     /* DOS leaves the carry flag as it finds it here: the assembly has it
        from taking 'A'-1 off the letter. */
-    Intr21f((struct DosRegs STACK *)&regs, (u8)error < 'A' - 1);
+    space = DriveSpace((u8)(error - ('A' - 1)), (u8)error < 'A' - 1);
+    if (space.failed) {
+        /* The assembly goes on with BX and CX as they are, which DOS has
+           not set then: the handle, and the size of the piece. */
+        space.free = CpHndl2;
+        space.sector = count;
+    }
     got = 0;
-    if (regs.ax != 0xFFFF) {
+    if (space.value != 0xFFFF) {
         /* The bytes of a cluster as 16 bits, times the clusters. */
-        free = (u32)(u16)(regs.ax * regs.cx) * regs.bx;
+        free = (u32)(u16)(space.value * space.sector) * space.free;
         if (HIGH(free) == 0 && LOW(free) < count) {
-            regs.cx = LOW(free);
-            regs.name = AT(segment, 0);
-            regs.bx = CpHndl2;
-            regs.ax = 0x4000;
-            if (CALL(regs))
+            moved = FileWrite(CpHndl2, AT(segment, 0), LOW(free));
+            if (moved.failed)
                 goto terminate;
-            got = regs.ax;
+            got = moved.value;
         }
     }
     CpWrite += got;
@@ -987,11 +964,8 @@ full:
     CpCont = (got >> 4) + segment;
     regs.bx = CpHndl2;
     SetDate((struct DosRegs STACK *)&regs);
-    regs.cx = 0;
-    regs.name = NUMBER(0);
-    regs.ax = 0x4202;
-    CALL(regs);
-    info = regs.ax | DX_OF(regs);
+    /* Is anything in the file? */
+    info = FileSeek(CpHndl2, 2, 0).place != 0;
     if (FileClose(CpHndl2).failed)
         goto forget;
     regs.name = CpDest;
