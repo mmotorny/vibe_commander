@@ -114,6 +114,12 @@ These held while `src/c/` was made, and they say what it is.
   word of 12 October 2026, so work for other operating systems may go in.
   It goes into `src/portable_c/` and nowhere else.
 - The road, on the user's word of 12 October 2026, in this order:
+  0. The setup program, `VCSETUP`, is ported into the portable C, so that
+     there is one program: setup is reached by an item of its Options
+     menu, and is judged by scenarios whose goldens are recorded from
+     the original setup program. The call by which the setup program
+     asked a running copy for its data goes then, with the last of the
+     watch on DOS. This comes before the 32 bits.
   1. The portable C becomes a 32-bit program for DOS, built by Open
      Watcom's 32-bit compiler with a DOS extender, and judged on the same
      bench by the same scenarios. When it passes them all, its 16-bit
