@@ -151,15 +151,17 @@ These held while `src/c/` was made, and they say what it is.
      common headers, and macros that each platform defines in its own
      way.
 - The program in the portable C is Vibe Commander 0.1, on the user's word
-  of 13 October 2026, since it no longer is what the original is. It
-  names itself in the forms in which the original names itself, each in
-  its place: "The Vibe Commander, Version 0.1" where the original has
-  "The Volkov Commander, Version 4.05", "the Vibe Commander" and "Vibe
-  Commander" where it has the shorter ones. It says "based on Volkov
-  Commander 4.05" wherever the original named its version, and its
-  banner keeps the author's copyright and adds the user's, "(C) 2026
-  Maksym Motorny", on the same line. No line is added anywhere for it.
-  The C translation keeps the original's name.
+  of 13 October 2026, since it no longer is what the original is. Its
+  title and the first line of its banner are "Vibe Commander 0.1", the
+  short form, and where the original names itself without a version it
+  is "Vibe Commander". It says "based on Volkov Commander 4.05", in the
+  same short form, wherever the original named its version: behind the
+  name in the banner, and in the Info panel on a line of its own
+  between the title and the line under it, where the two lines on the
+  memory, which mean nothing off DOS, are gone. The banner's second
+  line keeps the author's copyright and adds the user's, "(C) 2026
+  Maksym Motorny". No line is added anywhere for it. The C translation
+  keeps the original's name.
 - Clang is where this is going, for the platforms it reaches and for its
   sanitizers and static checks. Open Watcom builds the program for DOS
   for as long as DOS is where it is judged. No other toolchain is taken
@@ -2467,9 +2469,13 @@ waiting for the user between its steps.
 - A scenario starts from the program as its distribution configures it, on
   a machine of its own, and sets up whatever else it needs through the
   program's own menus. It does not rely on prepared configuration files.
-- The one thing the test bench changes is the clock, which is off. It has
-  the original switch the clock off in its menu and save its setup, and
-  gives every scenario the file that leaves.
+- The test bench changes two things, and gives every scenario the setup
+  file that the original saves after making them in its own menus. The
+  clock is off. And the panel on the right lists files, where the
+  distribution has the Info panel there, on the user's word of 13 October
+  2026: what the Info panel shows is of the machine and of the system,
+  and with it on every screen every difference there was a difference in
+  every scenario. A scenario that is about the Info panel switches it on.
 - A scenario that shows the time of day, with the clock switched on or in
   the time stamp of a file it has made, does so within the first minute of
   its machine. The machine's clock is counted in the instructions it
