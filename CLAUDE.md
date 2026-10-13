@@ -115,13 +115,6 @@ These held while `src/c/` was made, and they say what it is.
   word of 12 October 2026, so work for other operating systems may go in.
   It goes into `src/portable_c/` and nowhere else.
 - The road, on the user's word of 12 October 2026, in this order:
-  -. The program in the portable C is Vibe Commander 0.1, on the user's
-     word of 13 October 2026, since it no longer is what the original
-     is: its title is "Vibe Commander 0.1", it says "based on Volkov
-     Commander 4.05" wherever the original named its version, and its
-     banner keeps the author's copyright and adds the user's, "(C) 2026
-     Maksym Motorny", on the same line. No line is added anywhere for
-     it. The C translation keeps the original's name.
   0. The setup program, `VCSETUP`, is ported into the portable C, so that
      there is one program: setup is reached by an item of its Options
      menu, and is judged by scenarios whose goldens are recorded from
@@ -157,6 +150,13 @@ These held while `src/c/` was made, and they say what it is.
      layer, as Chromium has it: files `_dos.c` and `_posix.c` beside
      common headers, and macros that each platform defines in its own
      way.
+- The program in the portable C is Vibe Commander 0.1, on the user's word
+  of 13 October 2026, since it no longer is what the original is: its
+  title is "Vibe Commander 0.1", it says "based on Volkov Commander 4.05"
+  wherever the original named its version, and its banner keeps the
+  author's copyright and adds the user's, "(C) 2026 Maksym Motorny", on
+  the same line. No line is added anywhere for it. The C translation
+  keeps the original's name.
 - Clang is where this is going, for the platforms it reaches and for its
   sanitizers and static checks. Open Watcom builds the program for DOS
   for as long as DOS is where it is judged. No other toolchain is taken
