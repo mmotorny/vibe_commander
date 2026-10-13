@@ -3664,7 +3664,7 @@ and H1 are started at once by the session.
 | H2, the driver. Done: see "Piece H2, the driver" above | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
 | H3, the scenarios' test. Done: see "Piece H3, the scenarios' test" above | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
 | H4, the test of the data. Done: see "H4, the test of the data" above | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |
-| R1, `resident.c` renamed | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
+| R1, `resident.c` renamed: it becomes `exec.c`, with the fifth stage of "W and Z1" below, which has the places | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
 | C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
 | L, a program that has stayed in the memory, when the program is left. Tried, and dropped on the user's word of 13 October 2026: see "L, a program that has stayed in the memory" below | A program that a command has left in the memory was to be at work when the program of 32 bits has been left, as behind the one of 16 bits. The mend took two bits of the extender's settings, the three interrupts given back in real mode too, and a routine of real mode at every end of the program, and left such a program without INT 21h: it is in no commit. What is kept is the scenario, what was read of the extender, and the mend in words | The scenario `stay-left`; this plan | A scenario | E | `stay-left` for the original, the C translation and the program of 16 bits; the program of 32 bits failed it and is held to it by a patch of its own since the difference was declared | What was open, 10 of that table, is decided: declared as it is |
@@ -7170,6 +7170,48 @@ build/portable_c` then.
 5. **The documents.** Each says what is so now, once; what was true of
    the 16-bit build alone goes, or is kept as a sentence of history
    where it explains something that is still there.
+   - **R1 goes with this stage: `resident.c` of the portable C becomes
+     `exec.c`.** The name was proposed by the agent of Z2 and accepted
+     by the session: the largest part of the file is `Exec`, the
+     running of the commands, with `Exec02`, `Exec10`, `NotFind` and
+     `OutStr`, and around it what the program does first, `Alloc3`, and
+     when it leaves, `SetBrk`, `TakeEnd`, `Exit00` and `AlocEr`;
+     `start.c` and `main.c` are taken. The file has 371 lines. The C
+     translation's file keeps its name, so a place that means
+     `src/c/resident.c` stays. Where the name stands, as `grep -c
+     'resident\.c'` has it at the end of Z2:
+     - The three tables of the harness that know the file by its name
+       for both trees, and have to tell the trees apart or take the
+       name from the tree (the row R1 of the table of pieces has the
+       risk: an entry that still finds the old name in the C
+       translation and so passes with the portable C's dropped; hold
+       the counts of `reads.py` and of the batches against those of
+       before). `harness/ported.py`, five lines: `source="resident.c"`
+       of three batches (1012, 1033, 1057), the text "CtrlC of
+       resident.c" (1246), and line 26, which is of `src/c`.
+       `harness/reads.py`, five: the keys of `REVIEWED` at 232, 233 and
+       235, a comment at 409, and `BadFl_S` at 466, in the table of
+       what the portable C has no more. `harness/datacheck.py`, two
+       texts, at 207 and 245.
+     - `harness/deviations.py` (432) and `harness/coverage.py` (17, 65,
+       410) say `src/c/resident.c` and stay. `harness/le.py` (57) says
+       "two routines of resident.c" take the segment of something, of
+       the program of 32 bits: read whether that is still so.
+     - `CMakeLists.txt`, five lines, 215 to 276, all of `add_c_tree`,
+       the C translation's build: they stay. The portable C is built of
+       every C file that is in its directory, so `git mv` is all that
+       its build wants. `tools/mkexe.c`, six, is the C translation's
+       too.
+     - Comments of the tree, ten in seven files: `dos32.c` (1938),
+       `enter.c` (12, 127), `main.c` (1536), `main_t.c` (13), `start.c`
+       (196, 402), `stmain.c` (596), `vc.h` (395); and the top of the
+       file itself, which says what its name was for.
+     - The documents: `src/portable_c/DEVIATIONS.md` on 9 lines, the
+       README on 28, `CLAUDE.md` on 25, of which the notes of how the
+       translation was made are of `src/c/resident.c` and stay, and
+       this file on 87, most of them history.
+     The check is the row's: both programs the same bytes, and the
+     tests that read the source, `portable_c-data` above all.
    - Z2 mended four sentences of the README that the words made
      untrue, and no more: the one behind the table of the figures, two
      of "What rests on Open Watcom, for the portable C" (which still
