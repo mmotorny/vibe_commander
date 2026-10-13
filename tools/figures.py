@@ -84,10 +84,19 @@ def code(path):
     return re.sub(r"/\*.*?\*/", "", path.read_text(), flags=re.S)
 
 
+# The functions of dos.c for a program of 32 bits, which is not built
+# yet: the figures are of the program that is, so this file is not read
+# for them. The test portable_c-host reads it, and its count of the
+# words has it.
+NOT_BUILT = ("dos32.c",)
+
+
 def sources():
-    """The files of the portable C, as name -> text without comments."""
+    """The files of the portable C that the program is built of, as
+    name -> text without comments."""
     return {path.name: code(path)
-            for path in sorted(SOURCE.glob("*.[ch]"))}
+            for path in sorted(SOURCE.glob("*.[ch]"))
+            if path.name not in NOT_BUILT}
 
 
 def inline_assembly(texts):

@@ -24,7 +24,7 @@ over. This counts, by file, the calls of that kind:
 It goes by the text, outside comments: a call is one of those names in
 front of a parenthesis, where the line is not the function's own
 definition or its declaration. dos.c is left out, which is where they
-are. The portable C no longer declares the names of the first five
+are, and dos32.c, the same file for a program of 32 bits. The portable C no longer declares the names of the first five
 kinds, so the compiler refuses a call of one there; of the sixth nothing
 does, and this is what would show it. tools/figures.py writes the sum,
 and in how many files, into the README's table.
@@ -50,7 +50,7 @@ def count(tree):
     the counts in the order of KINDS, of the files that have any."""
     rows = []
     for path in sorted(tree.glob("*.c")):
-        if path.name == "dos.c":
+        if path.name in ("dos.c", "dos32.c"):
             continue
         text = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="latin-1"),
                       flags=re.S)

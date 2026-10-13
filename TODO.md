@@ -2506,7 +2506,7 @@ and H1 are started at once by the session.
 | S1, the PSP and a program run | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
 | S2, what DOS enters | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
 | S3, the entry, the end, Quick execute | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
-| D1, `dos32.c`: what goes straight through | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
+| D1, `dos32.c`: what goes straight through. Done: see "Piece D1" below | The entry without a library, the 71 functions, and a toy that asks each | `dos32.c`; `harness/trial32/` | Some 900 lines | Nothing; starts at once | The toy prints the same built both ways, on the bench | A service that the trial did not run: 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h |
 | D2, `dos32.c`: the rest | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
 | B1, the objects | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt` | 50 lines | P1 | The build | Little |
 | B2, the program | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
@@ -2807,6 +2807,123 @@ the 12th to 03:44 on the 13th. This is two and a half to three times
 as many, with one chain of six, so not less than a day of agents side
 by side before the first run; and what follows the first run is the
 part that the plan cannot count.
+
+### Piece D1, `dos32.c` straight through: done, and what a later piece should know
+
+`src/portable_c/dos32.c` has the 71 functions of `sys.h` that go
+through the extender as they are, the 13 others as functions that do
+nothing and say so, and the entry, `Start`. The toy that judges it is
+`harness/trial32/sys.c`, one source built both ways by
+`harness/trial32/build.sh sys 16` and `sys 32`: with the `dos.obj`,
+`stack.obj` and `arith.obj` that the project's build made for the
+program, and with `dos32.c` and `stack.c` compiled by `wcc386` and
+DOS/32A for the stub. `python3 harness/trial32/both.py` builds both,
+runs each on a bench and holds the screens one against the other; it
+takes ten seconds, ends with 1 for a line that differs and should not,
+and was run for both countries. Nothing of it is built or tested by
+the project's build.
+
+What the toy asks: every one of the 71, each also where it fails, a
+handle that is none, a file and a directory that are not there, a
+drive that there is not, a count of none, the low byte of an argument
+with something above it; 30,000 bytes written and read at one call; a
+search with other calls between two finds, with its record kept aside
+and put back, and with the record moved; the keys of ten steps as
+`KeyWaiting`, `KeyRead` and `KeysHeld` have them, and a button of the
+mouse. In 32 bits it also looks, before everything that it writes,
+whether ES is still on the data and the direction flag clear: they
+were, behind every call.
+
+What it showed, and what was done:
+
+| What | 16 bits, `dos.c` | 32 bits, as first written | Now |
+|---|---|---|---|
+| The carry flag set before a call that DOS leaves it at: `DriveSpace(3, 1)`, AH 36h | Comes back set: failed, with what 59h answers, 0 | Came back clear: the extender does not carry the program's flag through DOS. Not failed, AX 1 | `Ask` of `dos32.c` takes the flag for set afterwards if it was to be set before. The same in both. It sets no flag for DOS at all. `FcbDelete`, 13h, goes the same way when D2 makes it |
+| `failed` of a function that asks bare, where DOS reports an error | FFFFh: what SBB makes of the flag | 1 | FFFFh |
+| AX where the call did not fail, of 4301h, 47h, 4Eh and 4Fh: `FileSetAttributes`, `DirCurrent`, `DirCurrentBare`, `FindFirst`, `FindNext` | What DOS left: CX as it went for 4301h (1, 0), 0100h for 47h, 0 for 4Eh and 4Fh | The AX that the call was made with: 4301h, 4700h, 4E00h, 4F00h. DOS/32A translates these four and gives back its caller's EAX | Left so: no call that the extender translates brings DOS's AX back. `both.py` has the nine lines of it in `EXPECTED`, and fails when one of them no longer differs |
+
+Everything else is the same, line for line. So of the services that
+the trial had not run, these answer through DOS/32A as they do
+without: INT 21h 0Eh, 3300h, 3301h, 4400h, 440Fh, 5701h and 40h with a
+count of 0, which cuts the file off; INT 10h 00h, also with the bit
+that keeps the screen, 06h, 07h, 0Eh, 1112h and 12h with 20h; INT 16h
+00h and 01h; INT 33h 8 and 21h. A search goes on with its record put
+back or moved, as on DOS: the extender copies the record down before
+4Fh. The idle call, the keys and the mouse turned every page of both
+toys alike, shift states included.
+
+The third is where the 71 do not answer as `dos.c` does, and `sys.h`
+has `value` be what DOS left in AX also where nothing failed, since
+some callers go on with it: `DirFunc` of `dirfunc.c` hands the high
+byte of what a search answered on to the routine that it calls for
+each file. It can be had only by making those calls in real mode with
+a block below the megabyte, as the seven of D2 are made.
+
+What the toy cannot tell: AX of the other translated calls where they
+do not fail is the same in both on the bench, 3900h, 3A00h, 3B00h,
+4100h, 4300h, 5600h, which is also what the call was made with. So
+whether DOS/32A brings back DOS's AX there or its caller's does not
+show under FreeDOS, which leaves AX alone at those; under a DOS that
+does not, the two programs would differ in what `value` is.
+
+Decided on the way, for whoever goes on:
+
+- The entry is `Start` (`option start=Start_`): ES on the data, the
+  direction flag clear, then `Main`. It does not ask for the version of
+  DOS, give memory back or set how DOS looks for memory, which `Alloc0`
+  does for 16 bits: S3 says where those go.
+- A register that a call does not read is 0 in `dos32.c`, where `dos.c`
+  hands DOS what the stack happened to hold: with a translated call the
+  extender reads all 32 bits of a register that holds an address.
+- `Screen` of the main data holds in 32 bits what it holds in 16, the
+  segment of real mode above the offset; `ScreenPut` and `ScreenGet`
+  make the address of it. Nothing but the system's functions reads it.
+- `Ticks` keeps the machine from interrupting and lets it again, as
+  `dos.c` does, though a number of 32 bits is read at once: the
+  original lets the machine interrupt there, and something may count
+  on it.
+- The 13 that are not made call nothing: a call that the extender does
+  not translate has DOS write at whatever the registers point to in
+  real mode. `FileTrueName`, `FcbDelete`, `MemGive`, `ProgramRun` and
+  `ProgramRunBare` answer failed with the error 1, `MemTake` and
+  `MemResize` failed with 8 and no memory, `FcbParse` FFh, `CaseMap`
+  the letter, `ProgramPrefix` 0, and the rest nothing.
+- `Vector`, `SetVector` and `IntOn` of `dos.c` are no part of `sys.h`
+  and are not in `dos32.c`: S2 and S3 change them first.
+
+For D2:
+
+- The last page of the toy asks ten of the 13 already, and
+  `both.py` leaves that page out of what it fails for: it is known by
+  its first line, `NOT_MADE`. What `dos.c` answers there is the first
+  column of `both.py --show`. `ProgramRun`, `ProgramRunBare` and
+  `ProgramPrefix` are not asked: S1 changes what they take.
+- `MemTake(FFFFh)` answers with how much there is, which follows the
+  length of the program: the toy writes only that it is between 256
+  and 640 KB. The 16-bit toy makes its block as long as it is first,
+  as `Alloc0` does, in its own entry, and asks for its PSP itself, not
+  through `sys.h`.
+- On DOS in 16 bits the main data leaves 2.9 KB of the segment that DS
+  is on, so the toy has its texts in the code segment (`TEXT` and
+  `SAY` of `sys.c`) and its buffers in the main data, and takes the
+  address of no local variable. A page holds 25 rows: a `+` in the
+  last corner says that more was written than fits, and then a page
+  wants dividing.
+- A step of the script is what turns a page, and a page that is added
+  wants a step in `STEPS` of `both.py`.
+
+For B1, B2 and the harness:
+
+- `CMakeLists.txt` takes `dos32.c` out of the files of the 16-bit
+  program, which are all of `src/portable_c/*.c`; `tools/calls.py` and
+  `tools/figures.py` leave it out too (`NOT_BUILT`). The host check
+  reads it and has its row, and the README's count of `FAR` has its 31.
+- `build.sh` has the lines that compile and link for 32 bits, with the
+  plan's options. `-i` with the compiler's own headers is there for
+  `stddef.h`, until `vc.h` no longer reads it for `wcc386`.
+  `stack.c` compiles for 32 bits as it is, into a segment of the class
+  STACK that the linker takes: 4,096 bytes, in the file.
+- `VC.EXE` of the 16-bit build is the same bytes as before the piece.
 
 ## The portable C in 32 bits: what a trial on the bench showed
 

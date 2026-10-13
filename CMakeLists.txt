@@ -324,6 +324,10 @@ function(add_portable_c)
     # mention here. The build looks again each time it runs.
     file(GLOB c_files CONFIGURE_DEPENDS RELATIVE ${source_dir}
          ${source_dir}/*.c)
+    # But dos32.c, which is the functions of dos.c for a program of 32
+    # bits and no part of this one: nothing builds it yet but the toy
+    # that holds it against dos.c, harness/trial32/build.sh.
+    list(REMOVE_ITEM c_files dos32.c)
     # The compiled code is more than one segment holds, so it has two:
     # CTEXT, and CTEXT2 for the files that the caller names. Functions of
     # different files call each other far, so a file may be in either. A
