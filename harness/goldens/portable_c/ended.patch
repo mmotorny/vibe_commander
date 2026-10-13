@@ -3,16 +3,20 @@ than the original. A patch of harness/goldens/ended.txt, see
 harness/goldens.py: a line with - is the golden's, a line with + is what is
 expected in its place.
 Deviation: 1, 7, 8, 14 of src/portable_c/DEVIATIONS.md
-Why: the second copy has no memory to run a command: each copy keeps all of
-itself, so no program has stayed from it when DOS ends it; the registers that
-it leaves are those of a program that keeps no list of such programs and has
-taken neither INT 27h nor INT 21h, so DX is what the original's is where its
-setup has TSR manager off, and DS, which is left out, as it came; and the map
-of the memory is not looked at. And the Advanced options have no Quick execute
-commands: Clear keyboard buffer and what is below it in the box stand a row
-further up, the cursor with them where it is on that box, the box is a row
-shorter, and the two rows that its last row and the shadow below it were on
-show what is behind the box, the upper one in the shadow
+Why: the second copy of the program of 16 bits has no memory to run a command:
+each copy keeps all of itself, so no program has stayed from it when DOS ends
+it. The second copy of the program of 32 bits has the memory, and the program
+that it runs stays, also when DOS has ended the copy, which keeps no list of
+such programs to release: no screen shows that, since the program that started
+the copy clears the screen, and both are held to these rows. The registers
+that a copy leaves are those of a program that keeps no list of such programs
+and has taken neither INT 27h nor INT 21h, so DX is what the original's is
+where its setup has TSR manager off, and DS, which is left out, as it came;
+and the map of the memory is not looked at. And the Advanced options have no
+Quick execute commands: Clear keyboard buffer and what is below it in the box
+stand a row further up, the cursor with them where it is on that box, the box
+is a row shorter, and the two rows that its last row and the shadow below it
+were on show what is behind the box, the upper one in the shadow
 
 == 1: F9 o o
 rows 12-21
