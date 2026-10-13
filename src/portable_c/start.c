@@ -619,8 +619,9 @@ static void CurNl(struct BiosRegs STACK *regs)
    for COMSPEC=, and for VC= and TEMP=; the original also notes where
    the path of the program's own file is behind it, OvlPth, to load
    itself again after a command. Then the display: an EGA or VGA and its rows,
-   whether writing to it has to wait for the beam, where its memory is,
-   and whether TopView or DESQview shows a buffer in its place; the
+   whether writing to it has to wait for the beam, and where its memory
+   is; the original also asks whether TopView or DESQview shows a buffer
+   in its place, and draws into that. Whether DESQview runs; the
    version of DOS; and the colour in which DOS writes, found by having
    it write a space.
 
@@ -635,8 +636,6 @@ static void CurNl(struct BiosRegs STACK *regs)
        others: on the display it was written for, a CGA, the bit is set
        for all of the time that the beam returns to the top, which is
        longer than seven readings take either way.
-     - TopView's buffer is taken at the offset of the display's page,
-       whatever offset TopView answers with.
      - A cursor below the last line is put on it before the screen is
        fed a line, so the screen scrolls once. */
 void IniData(void)
@@ -645,7 +644,6 @@ void IniData(void)
     struct BiosRegs bios;
     struct VideoMode mode;
     const u8 __far *env;
-    u16 __far *shown;
     u16 i, c, key, at, lines, rows, snow, tries, count, segment, version,
         other, cell;
 
@@ -793,13 +791,10 @@ void IniData(void)
     segment = 0xB800;                   /* Screen Segment */
     if (md.ScrMod == 7)
         segment = 0xB000;
-    shown = TopScr((u16 __far *)AT(segment, ScrOffs()));   /* Init34 */
-    md.TopView = 0;
-    if ((u16)((u32)shown >> 16) != segment) {
-        md.TopView = 1;
-        md.Snow = 1;
-    }
-    *((u16 *)&md.Screen + 1) = (u16)((u32)shown >> 16);    /* Init35 */
+    ScrOffs();                          /* Init34: Screen is the memory
+                                           of the display, at the page
+                                           that is shown */
+    *((u16 *)&md.Screen + 1) = segment;
     regs.ax = 0x2B01;                   /* Check DESQview: a date that
                                            DOS refuses */
     regs.bx = segment;

@@ -95,7 +95,7 @@ left open:
   of `passed-on` takes as an interrupt of its own and that of
   `handed-on` cannot get behind: where the program hands that on is a
   variable, not a word that its code names.
-- The file is 185,058 bytes, 2.84 times the original's, where the
+- The file is 184,956 bytes, 2.84 times the original's, where the
   scenarios' test fails at 3: some 10 KB are left. The main data's
   zeros are 62.6 KB of it. They are in the file because the main data
   has to be at offset 0 of a segment, the linker starts a segment on a
@@ -1496,7 +1496,9 @@ than it is would pass.
   them; whether to mend any of it is not decided:
   - `Window` tells TopView or DESQview which cells of their buffer have
     changed with ES on the main data, where the call takes the segment
-    of the buffer. By reading: the bench runs neither.
+    of the buffer. By reading: the bench runs neither. The portable C
+    does not know of the two any more (`src/portable_c/DEVIATIONS.md`,
+    2), and has no such call.
   - `Window` copies whole rows when a window has more than one, whatever
     its columns are, and of a window of one row and no columns 65536
     cells. `SavWin`, `ResWin` and `ResUser` take a window of no rows for

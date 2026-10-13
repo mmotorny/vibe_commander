@@ -139,9 +139,9 @@ it.
   later.
 
 What it costs in memory. While a command runs the portable C keeps
-194,848 bytes, the program and its panels, where the original keeps
+194,800 bytes, the program and its panels, where the original keeps
 12,704 and the C translation 19,728. On the bench of the tests DOS has
-230,688 bytes for a command run from the portable C, 412,848 for one run
+230,736 bytes for a command run from the portable C, 412,848 for one run
 from the original as it is distributed, and 405,824 for one run from the
 C translation. That is enough for every command of the scenarios but
 those of a second copy of the program: the bench has 500,128 bytes from
@@ -192,3 +192,41 @@ against the original's with this difference declared for each, in
 `DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages of
 their help, the size of the Options menu, its commands, and the item that
 Shift-F9 chooses in it.
+
+### 2. No buffer of TopView or DESQview in place of the screen
+
+**What the original does.** When it starts, and again after every
+command, it asks whether a program stands between it and the display that
+shows a buffer of its own in place of the display's memory: TopView,
+IBM's program for running several programs of DOS side by side, and
+DESQview, which answers TopView's calls. The call is the BIOS's interrupt
+for the screen, INT 10h, with AH 0FEh and the address of the display's
+memory in ES:DI: such a program hands back the address of its buffer
+there, and the BIOS by itself leaves the address as it is. If the segment
+comes back as another, the program draws into that buffer and reads the
+screen from it, takes the display for one that shows no snow, and tells
+that program which cells have changed every time it has put a piece of
+its screen there (INT 10h, AH 0FFh, with the number of cells in CX and
+where they begin in DI). It tells it so with ES on its main data, where
+the call takes the segment of the buffer.
+
+**What the portable C does.** It makes neither call. Its screen is the
+memory of the display, at the page that the BIOS shows, whatever runs
+besides. `TopView` and `TopScr` of `dos.c` are gone, with the inline
+assembly that they were made of, `VideoBuffer`, three instructions. The
+byte of the main data that said whether such a buffer is drawn into,
+`TopView`, keeps its place and is neither set nor read.
+
+**Why.** It only made sense on DOS. TopView and DESQview shared a PC
+among programs each of which took the machine for its own, and a program
+that wrote to the display's memory, as this one does, was asked to write
+elsewhere. A system that the program is carried to has a way of its own
+to the screen, for which the program will have one place, and no such
+program in between to ask.
+
+**Which scenarios show it.** None. The bench runs neither TopView nor
+DESQview: the BIOS leaves the address as it is, and of the original the
+instructions that go by another address ran in no scenario, four that
+`harness/ported.py` lists as out of reach, in `Init34` and in `Window`.
+Every scenario is held against the golden that it was held against
+before.

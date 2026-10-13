@@ -536,12 +536,14 @@ functions in `src/c/dos.c`: `IN` for a port of the machine, `CLI`, and
 there first is how the program is written, toward C that any compiler
 takes, and what follows says where it has left the C translation so far.
 Where it behaves otherwise than the original, that is declared in
-`src/portable_c/DEVIATIONS.md`, which has one entry so far: [it stays in
+`src/portable_c/DEVIATIONS.md`. Its first entry is that [it stays in
 the memory whole](#staying-in-the-memory-whole) while a command runs,
 and so is one program, which the linker writes, where the C translation
-is two parts laid out by a tool. In every scenario that this does not
-change it is held against the original's golden, as the C translation
-is.
+is two parts laid out by a tool. The others are [what the program did
+for the PC and for the programs around it](#what-else-has-gone), which
+no scenario shows. In every scenario that a deviation does not change
+the portable C is held against the original's golden, as the C
+translation is.
 
 It is compiled in the medium model, the option `-mm`, where the C
 translation has the small one: a function that another file calls is far
@@ -584,13 +586,13 @@ The lines that say something of registers still, and why:
 
 | What | Where | How many |
 |---|---|---|
-| Inline assembly: the instruction and the registers it takes and leaves | `src/portable_c/dos.c` | 9 |
+| Inline assembly: the instruction and the registers it takes and leaves | `src/portable_c/dos.c` | 8 |
 | The compiler's own routines for arithmetic on 32 bits, which it calls with registers of its choosing | `__U4M`, `__U4D` of `arith.c` | 2 |
 | DOS's routine for capitals, which is no function of the program: called through a pointer, with the letter in AL | `CaseMapFn` of `dos.c` | 1 |
 | The command for COMMAND.COM's INT 2Eh, in SI as the interrupt takes it, for a function that is inline assembly | `Int2E` of `resident.c` | 1 |
 
 Eight more lines say that a function does not return, `aborts`, which
-makes 21 lines of `#pragma aux` in the portable C where the C
+makes 20 lines of `#pragma aux` in the portable C where the C
 translation has 863. None of them gives anything a name but the two of
 `arith.c`, whose names are the compiler's to choose. In the C
 translation a constant that another file names has a `#pragma aux`
@@ -678,16 +680,16 @@ local variable, and a constant of a code file is still `CODE`, in the
 code segment: with 12 KB less of main data all four could be one, which
 `TODO.md` has, with what stands in its way and what it waits on.
 
-`VC.EXE` of the portable C is 185,058 bytes, 52,002 more than the C
+`VC.EXE` of the portable C is 184,956 bytes, 51,900 more than the C
 translation's: the main data is in the file, the header has the
 relocations that DOS applies, 977 of them, and the part that stayed in
 the memory, with its copies and its second `dos.c`, is gone. While a
-command runs it keeps 194,848 bytes of the memory, the program and its
+command runs it keeps 194,800 bytes of the memory, the program and its
 panels, where the C translation keeps 19,728 and the original 12,704.
 
 What rests on Open Watcom, for the portable C. Of what the code is
 written in, the first table above: `__far` in 690 places, `STACK` in
-481, `CODE` in 96; `#pragma aux` in 21 lines; `#pragma pack(1)` in 7
+481, `CODE` in 96; `#pragma aux` in 20 lines; `#pragma pack(1)` in 7
 pairs; the five `__interrupt` functions; two `__loadds` functions,
 `Alloc0`, where DOS enters the program, and `Exec2E`, where it goes on
 behind INT 2Eh; the four `__declspec(naked)` functions; the three
@@ -713,13 +715,28 @@ Gone are 2, 4 to 7, 9, 10, 12, 15 and 17 of that table, and with 15 the
 rule that a file of code may have no variable and no string: nothing
 checks the object files of the portable C, and nothing has to.
 
-Inline assembly, for the portable C: 79 instructions in 13 pieces. The
-nine of `dos.c` are as in the table above, 46 instructions. `DataSeg` of
-`main.c` is gone. `New21`, `New27` and `Exit01` of `resident.c` are as
+Inline assembly, for the portable C: 76 instructions in 12 pieces.
+Eight of the nine of `dos.c` are as in the table above, 43 instructions;
+`VideoBuffer` is [gone](#what-else-has-gone). `DataSeg` of `main.c` is
+gone. `New21`, `New27` and `Exit01` of `resident.c` are as
 they were, 17, 4 and 4. `Int2E` is 8, where it was 9: `INT 2Eh`, `CLI`,
 `MOV AX` with the segment of the stack, `MOV SS,AX`, `MOV SP`, `STI`,
 `CLD` and the jump; it no longer loads DS, which the function that it
 jumps to does for itself.
+
+### What else has gone
+
+After the two parts, what the program did only because it ran on a PC
+under DOS, next to other programs of that time, and that no screen of
+a scenario shows. Each is an entry of `src/portable_c/DEVIATIONS.md`,
+by its number here, and is gone outright: the code, the calls, and
+what the main data kept of it, whose bytes stay where they are and are
+neither set nor read, since the layout of the main data is the
+original's.
+
+| | What | What it was for |
+|---|---|---|
+| 2 | `TopView` and `TopScr` of `dos.c`, the inline assembly `VideoBuffer`, their calls in `IniData` of `start.c` and in `Window` | Drawing into the buffer that TopView or DESQview shows in place of the display's memory, and telling them what has changed there |
 
 ## Testing
 

@@ -269,11 +269,11 @@ static void MovScr(u16 __far *to, const u16 __far *from, u16 rows, u16 snow)
    A window of one row is copied cell by cell, on a display that shows
    snow each cell when the display has just finished a line; one of more
    rows as whole rows of the screen, whatever its columns are. The mouse
-   pointer is hidden meanwhile. Under TopView or DESQview the copy goes
-   into their buffer, and they are told what has changed.
+   pointer is hidden meanwhile.
 
-   They are told so with ES on the main data, where the call wants the
-   segment of the buffer. Ported as it is. */
+   The original then tells TopView or DESQview what has changed, where
+   one of them shows a buffer in place of the display's memory. Not
+   here: see DEVIATIONS.md. */
 void Window(u16 begin, u16 size)
 {
     const u16 *from = BasAdr(begin);
@@ -282,18 +282,16 @@ void Window(u16 begin, u16 size)
     u16 segment = (u16)(md.Screen >> 16);
     u16 rows = size >> 8;
     u16 __far *to;
-    u16 count, left;
+    u16 left;
 
     CurMous(0);
     if (rows != 1) {
         from -= begin & 0xFF;
         offset -= (begin & 0xFF) << 1;
         MovScr(AT(segment, offset), from, rows, md.Snow);
-        count = rows * 80;
     } else {
-        count = size & 0xFF;
         to = AT(segment, offset);
-        left = count;
+        left = size & 0xFF;
         do {
             if (md.Snow == 0) {
                 while (InPort(CGA_STATUS) & 1)
@@ -306,8 +304,6 @@ void Window(u16 begin, u16 size)
             IntOn();
         } while (--left);
     }
-    if (md.TopView != 0)
-        TopView(AT(MAIN_SEG, offset), count);
     CurMous(1);
 }
 

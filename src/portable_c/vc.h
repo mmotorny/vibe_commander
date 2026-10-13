@@ -214,7 +214,9 @@ struct MainDat {
     u8  TstEGA;                         /* 1 if EGA or VGA present */
     u8  Lines;                          /* Number of lines on screen */
     u8  Snow;                           /* Snow on/off */
-    u8  TopView;                        /* TopView output */
+    u8  TopView;                        /* TopView output: of the
+                                           original. Not set or read
+                                           here */
     u8  DesqVie;                        /* Running under DESQVIEW */
     u8  WinLeav;                        /* Leave time under Windows */
     u8  CrntCol;                        /* Color which DOS currently uses */
@@ -524,8 +526,6 @@ u16 Int21d(struct DosRegs STACK *regs);
 u16 Int21f(struct DosRegs STACK *regs, u16 carry);
 u16 Int21e(struct DosRegs STACK *regs);
 void Int10(struct BiosRegs STACK *regs);
-void TopView(u16 __far *cells, u16 count);
-u16 __far *TopScr(u16 __far *screen);
 struct Keys Int16(u16 ax);
 struct MuxRegs Int2F(u16 ax, u16 bx, u16 cx);
 u16 Int33(u16 ax, u16 bx, u16 cx, u16 dx);

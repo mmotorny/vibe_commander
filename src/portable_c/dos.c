@@ -85,15 +85,6 @@ static void Video(u16 ax, u16 bx, u16 cx, u16 dx,
     "mov ss:[si+6],dx" \
     parm [ax] [bx] [cx] [dx] [si] modify exact [ax bx cx dx es]
 
-/* INT 10h with an address in ES:DI, and the address that is there
-   afterwards. */
-static u16 __far *VideoBuffer(u16 ax, u16 __far *cells, u16 count);
-#pragma aux VideoBuffer = \
-    "push bp" \
-    "int 10h" \
-    "pop bp" \
-    parm [ax] [es di] [cx] value [es di] modify exact [ax bx cx dx si di es]
-
 /* INT 16h, with AX as it leaves it and, above that, the flags. */
 static u32 Keyboard(u16 ax);
 #pragma aux Keyboard = \
@@ -192,22 +183,6 @@ u16 Int21e(struct DosRegs STACK *regs)
 void Int10(struct BiosRegs STACK *regs)
 {
     Video(regs->ax, regs->bx, regs->cx, regs->dx, regs);
-}
-
-/* Tell TopView or DESQview that `count` cells of the screen's buffer
-   have changed, from `cells` on (AH 0FFh): under them the program draws
-   into a buffer that they show. */
-void TopView(u16 __far *cells, u16 count)
-{
-    VideoBuffer(0xFF00, cells, count);
-}
-
-/* Ask TopView or DESQview where the buffer is that they show for the
-   display's memory at `screen` (AH 0FEh). The BIOS itself leaves the
-   address as it is: `screen` comes back where neither runs. */
-u16 __far *TopScr(u16 __far *screen)
-{
-    return VideoBuffer(0xFE00, screen, 0);
 }
 
 /* The BIOS, for the keyboard: its call with AX. Returns AX as the BIOS
