@@ -121,8 +121,14 @@ HOLDS(u32_has_32_bits, sizeof(u32) == 4);
 #define LenPath 68                      /* Length of path name */
 #define MinFls  256                     /* Minimum files in window */
 #define MinTree 768                     /* Minimum tree size */
-#define LenStk  0x1000                  /* Stack size: the original has
-                                           100h */
+/* Stack size: the original has 100h. A program of 32 bits has four
+   times that of the one of 16: it pushes a word of four bytes where
+   that pushes one of two, and keeps what it works with in such words. */
+#ifdef __I86__
+#define LenStk  0x1000
+#else
+#define LenStk  0x4000
+#endif
 #define MaxLins 50                      /* Maximum screen lines */
 #define NmbStrs 32                      /* Number of stars */
 
