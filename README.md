@@ -224,7 +224,7 @@ portable C](#the-portable-c)).
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
 | `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
-| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `pairs.py` lists the functions of the portable C that still return two things as one number |
+| `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against what it did itself, recorded in `harness/goldens/portable_c/` |
 | `docs/` | Pictures for this README |
@@ -575,7 +575,10 @@ thing to say, the same place of the loop from every return, which is
 the end of a command in the assembly, a jump: they return nothing. Two
 are gone. And three return a number that is one: `Timer` of
 `system.c`, the BIOS's count of timer ticks, the compiler's `__U4M`,
-and `Dos35` of `main.c`, an address as DOS has it.
+and `Dos35` of `main.c`, an address as DOS has it. Three numbers of 16
+bits that had a second thing or a flag above the first went the same
+way: how the editor was left, and in the main loop where the program
+goes on after a command and what the mouse asks for.
 
 The lines that say something of registers still, and why:
 
@@ -675,7 +678,7 @@ local variable, and a constant of a code file is still `CODE`, in the
 code segment: with 12 KB less of main data all four could be one, which
 `TODO.md` has, with what stands in its way and what it waits on.
 
-`VC.EXE` of the portable C is 185,006 bytes, 51,950 more than the C
+`VC.EXE` of the portable C is 185,058 bytes, 52,002 more than the C
 translation's: the main data is in the file, the header has the
 relocations that DOS applies, 977 of them, and the part that stayed in
 the memory, with its copies and its second `dos.c`, is gone. While a

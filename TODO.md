@@ -3,21 +3,6 @@
 Things that are known and not done. Standing instructions are in
 `CLAUDE.md`; this is the list of loose ends.
 
-## The portable C: two things in one number
-
-The functions of `src/portable_c/` have lost the registers that the
-assembly called them in (see the README, "The portable C"). Where the
-assembly handed back two registers, or a register and a flag, the C
-translation returns one number of 32 bits with a thing in each half, and
-the caller takes it apart with shifts and casts. 114 functions did, and
-none of the portable C does any more: the README has what they return
-instead, and `python3 tools/pairs.py` lists the three that return a
-number of 32 bits because they have one.
-
-`CLAUDE.md`, "Notes on the portable C", has how such a function is
-written so that a call that was not changed does not compile, and what
-went wrong on the way.
-
 ## The portable C: one program
 
 The portable C stays in the memory whole while a command runs
@@ -110,7 +95,7 @@ left open:
   of `passed-on` takes as an interrupt of its own and that of
   `handed-on` cannot get behind: where the program hands that on is a
   variable, not a word that its code names.
-- The file is 185,006 bytes, 2.84 times the original's, where the
+- The file is 185,058 bytes, 2.84 times the original's, where the
   scenarios' test fails at 3: some 10 KB are left. The main data's
   zeros are 62.6 KB of it. They are in the file because the main data
   has to be at offset 0 of a segment, the linker starts a segment on a

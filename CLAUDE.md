@@ -1271,11 +1271,12 @@ in "The portable C".
   as a far object and a file of constants names by a near word is
   declared `TEXT_FAR` in `vc.h`, which is `__far` but in a file that
   has `tables.h`.
-- A function that returned two things as one number of 32 bits is to
-  return what it means (`TODO.md` has the list and how it divides).
-  Change it so that a call which was not changed does not compile: a
-  structure returned by value does that, since no shift or cast takes
-  one apart, and costs nothing where it is two words. A value with a
+- A function that returned two things as one number of 32 bits returns
+  what it means: all of them do now, and the README has what became of
+  the 114. Whatever is retyped next is changed so that a call which was
+  not changed does not compile: a structure returned by value does
+  that, since no shift or cast takes one apart, and costs nothing
+  where it is two words. A value with a
   pointer for the second thing does too, by the count of arguments,
   but the pointer is to a local variable and wants `STACK`, which is
   this compiler's. What does not: the same function returning one of
@@ -1424,8 +1425,7 @@ in "The portable C".
     compiler refuses the macro it does not know, whatever the function
     returns.
 - What the commands met, and what else comes back to the main loop,
-  49 functions, with those of `enter.c` still to do (`TODO.md` has what
-  that takes):
+  49 functions, while those of `enter.c` were still to do:
   - What a command of the keys returns, `struct Onward` of `vc.h`, is
     two bytes and a word, four bytes, and comes back in DX:AX as the
     number did, the bytes where they were: `To` of `keys.c`, which
@@ -1452,8 +1452,9 @@ in "The portable C".
     a function of another file is a far call, with a relocation from
     the other code segment.
   - While one file still returns the number, what takes the structure
-    has a function that makes it of the number, `OfEnter` of `main.c`,
-    and the calls of that file go through it. An old call is refused
+    has a function that makes it of the number, as `OfEnter` of
+    `main.c` was, and the calls of that file go through it. An old call
+    is refused
     both ways then: a number where the structure is taken, and later a
     structure where `OfEnter` takes a number. Twelve lines put back as
     they were, one of each kind, were all refused, with the trial of
@@ -1461,9 +1462,36 @@ in "The portable C".
   - The variable that two calls of `Command` shared, `pair`, went, and
     each call has a variable of its structure: every read stood right
     behind its call there.
-  - `tools/pairs.py` goes by the type `u32`, so it does not list a
-    number of 16 bits with two things in it: `TODO.md` names those
-    that are known.
+  - A number of 16 bits may have two things in it as well, a thing in
+    each byte or a flag above something, and its type does not say so.
+    `grep -n '^\(static \)\?u32 \w*(' src/portable_c/*.c` lists the
+    functions that return 32 bits, which was all that `tools/pairs.py`
+    did, gone since: three, each a number, `Timer`, `__U4M` and `Dos35`.
+- What the last of them met, the commands of `enter.c` and three
+  numbers of 16 bits, `T00_00` of `edit.c` and `Command` and `Func21` of
+  `main.c`:
+  - A function that `vc.h` has among the commands may be none.
+    `F24_02` of `enter.c`, which Enter and the changes of directory
+    end in and the main loop calls for the file search, returned one
+    place from every return: it returns nothing, and `main.c` says the
+    place of the loop itself there, without `CmdEnd`.
+  - A flag above something is one thing or another, not two things.
+    Where the two are of a kind they are one enumeration: the places of
+    the loop and, behind them, what the loop is left for, the `END_` of
+    `main.c`, where `LEAVE` was. The numbers of the second kind are
+    others then, so look at whatever compares with them. Where they are
+    of two kinds, a command of `vc.h` or a place of the loop, it is a
+    structure with a member that says which: `struct Asked` there. An
+    old line is refused either way, the name of the flag being gone.
+  - A variable that the changed call shared with a call that stays a
+    number, `what` of `V00_03`, is there still, and a read of it that
+    was overlooked compiles: its three reads behind the editor's call
+    were each changed by hand, and read again.
+  - The trial of an old line, of the note above, is one command for a
+    copy of the file next to copies of the two headers, the compiler
+    being in `build/_deps/open_watcom-src`, which `WATCOM` is set to:
+    `binl64/wcc -q -0 -mm -os -s -zu -zl -zls -wx -we -fo=x.obj` and
+    the copy. Try the copy as it is first: it has to be taken.
 - A build can be tested while the tree goes on changing: copy
   `build/portable_c/VC.EXE`, `VC.MAP` and the object files elsewhere
   in `build/`, and run `harness/datacheck.py` (at once: it reads the
