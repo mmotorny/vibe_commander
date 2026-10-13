@@ -1346,6 +1346,22 @@ in "The portable C".
     `Changed` and `Unchanged` of `input.c` in place of two macros.
   - Open Watcom does say "has been referenced but never assigned a
     value", W200, for a variable that nothing sets at all.
+- What the nine of `edit.c` added to that:
+  - Where every call that sets a shared variable returns the same
+    structure, the variable keeps its name and takes the structure's
+    type, and neither of the two mistakes can be made: a read that was
+    not changed does not compile. `answer` of `T80_00` is set by three
+    functions and read behind them all, and the three return
+    `struct Answer`. Divide a variable only where its calls return
+    different things.
+  - A macro may make the number that such a function returns, and be
+    taken apart in more places than the function: `ADDRESS_OF` made
+    the address that `T62_00` returned, and 22 more. It went with the
+    function, and is `AddressOf` with `struct Address`. Called where
+    the macro was expanded, it made the program 304 bytes shorter.
+  - Two functions that make a structure in the same way are one piece
+    of code under two names in the listing: `EndsAt` and `Done`,
+    `NoEnd` and `Failed` of `edit.c`.
 - A build can be tested while the tree goes on changing: copy
   `build/portable_c/VC.EXE`, `VC.MAP` and the object files elsewhere
   in `build/`, and run `harness/datacheck.py` (at once: it reads the

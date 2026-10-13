@@ -88,6 +88,47 @@ struct Where {
 
 LAID_OUT(EdData, 138);
 
+/* The address of a byte of the text. One that AddressOf has made of an
+   offset in the text has an offset of less than 16. */
+struct Address {
+    u16 offset;
+    u16 segment;
+};
+
+/* What T53_10 returns: where a line ends. */
+struct Ending {
+    u16 at;                             /* behind the line: an offset in
+                                           the segment of the address that
+                                           was given; with none, the offset
+                                           that was given */
+    u16 none;                           /* 1 if the line does not end in
+                                           that segment, or the address is
+                                           at the end of the text or behind
+                                           it */
+};
+
+/* What Column, T57_00 and T57_01 return: how far characters of the line
+   buffer go, counted up to a column that is the limit. */
+struct Reached {
+    u16 column;                         /* the column that they end in; if
+                                           they reach the limit, the one
+                                           that the character begins in
+                                           which reaches it */
+    u16 left;                           /* how many of them were not
+                                           counted, because the limit was
+                                           reached: that character and
+                                           those behind it */
+};
+
+/* What T73_10 returns: the line that it has written, as Window takes a
+   part of the screen. */
+struct Drawn {
+    u16 begin;                          /* its row, in the high byte, and
+                                           its column */
+    u16 size;                           /* one row, and the columns of the
+                                           window */
+};
+
 #define ed (*(struct EdData *)(md.TmpBuf + 100))
 
 /* Which help the editor shows below its window: 1 for the menu file, 2
@@ -98,20 +139,20 @@ LAID_OUT(EdData, 138);
 void T50_00(void);
 void T51_00(void);
 u16 T53_00(struct Where STACK *where);
-u32 T53_10(u16 segment, u16 offset);
+struct Ending T53_10(u16 segment, u16 offset);
 u16 T54_00(struct Where STACK *where);
 u16 T55_00(u16 cursor);
 void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low);
-u32 T57_00(void);
-u32 T57_01(u16 limit);
+struct Reached T57_00(void);
+struct Reached T57_01(u16 limit);
 u16 T57_02(void);
-u32 T62_00(void);
+struct Address T62_00(void);
 u16 T63_01(u16 high, u16 low);
 u16 T64_00(const u8 __far *name, const u8 *text, u16 count);
 void T71_00(u16 function, u16 place, u16 step);
 void T72_00(u16 line, u16 segment, u16 from, u16 end);
 void T73_00(void);
-u32 T73_10(void);
+struct Drawn T73_10(void);
 void T74_00(void);
 void T75_00(u16 number, u16 *screen, u16 color);
 void T76_00(u16 place, u16 segment, u16 text, u16 colors);
@@ -212,47 +253,63 @@ static const u8 CODE MainExt_F[] = "VC.EXT";
 #define AT(segment, offset) ((u8 __far *)PAIR(segment, offset))
 #define MAIN_DATA() HIGH((u32)(const void __far *)md.TmpBuf)
 
-/* The offset in the text of the byte at an address, and the address of
-   the byte at an offset: its segment in the high word, and in the low one
-   what is left, less than 16. Of the offset 20 bits count. */
+/* The offset in the text of the byte at an address. */
 #define OFFSET_OF(segment, offset) \
     (((u32)(u16)((segment) - md.ViewSeg) << 4) + (offset))
-#define ADDRESS_OF(high, low) \
-    PAIR((u16)(((low) >> 4 | (high) << 12) + md.ViewSeg), (low) & 0x0F)
 
-/* The column that a number of characters of the line buffer end in, with
-   tabs to every eighth, in the low word; in the high one how many of the
-   characters were not counted, because the column `limit` was reached.
-   The column is then the one that the character begins in which reaches
-   it. */
-static u32 Column(u16 count, u16 limit)
+/* The address of the byte at an offset in the text: its segment, and for
+   the offset what is left, less than 16. Of the offset in the text 20
+   bits count. */
+static struct Address AddressOf(u32 place)
 {
+    struct Address address;
+    u16 high = HIGH(place);
+    u16 low = LOW(place);
+
+    address.segment = (low >> 4 | high << 12) + md.ViewSeg;
+    address.offset = low & 0x0F;
+    return address;
+}
+
+/* The column that `count` characters of the line buffer end in, with
+   tabs to every eighth, and how many of them were not counted, because
+   the column `limit` was reached: none, if it was not. */
+static struct Reached Column(u16 count, u16 limit)
+{
+    struct Reached reached;
     const u8 *text = EditBuf;
     u16 column = 0;
     u16 before;
 
+    reached.column = 0;
+    reached.left = 0;
     if (count == 0)
-        return 0;
+        return reached;
     do {
         before = column;
         if (*text++ == TAB)
             column |= 7;
         column++;
-        if (column >= limit)
-            return PAIR(count, before);
+        if (column >= limit) {
+            reached.column = before;
+            reached.left = count;
+            return reached;
+        }
     } while (--count);
-    return column;
+    reached.column = column;
+    return reached;
 }
 
 /* The column that the line in the buffer ends in, as far as the buffer
-   has it, but no further than the last that the editor goes to; and
-   T57_01, no further than `limit`. */
-u32 T57_00(void)
+   has it, but no further than the last that the editor goes to, and how
+   many of its characters are behind that; and T57_01, no further than
+   `limit`. */
+struct Reached T57_00(void)
 {
     return Column(ed.EdSizLn, LenEdit - 100);
 }
 
-u32 T57_01(u16 limit)
+struct Reached T57_01(u16 limit)
 {
     return Column(ed.EdSizLn, limit);
 }
@@ -263,15 +320,15 @@ u16 T57_02(void)
 {
     if (ed.EdTxHex != 0)
         return ed.EdCursr;
-    return LOW(Column(ed.EdCursr, 0xFFFF));
+    return Column(ed.EdCursr, 0xFFFF).column;
 }
 
-/* The address of the first line on the screen, the segment in the high
-   word. T60_00 and T61_00 of the assembly, which make an offset of an
-   address and an address of an offset, are OFFSET_OF and ADDRESS_OF. */
-u32 T62_00(void)
+/* The address of the first line on the screen. T60_00 and T61_00 of the
+   assembly, which make an offset of an address and an address of an
+   offset, are OFFSET_OF and AddressOf. */
+struct Address T62_00(void)
 {
-    return ADDRESS_OF(HIGH(ed.EdFirst), LOW(ed.EdFirst));
+    return AddressOf(ed.EdFirst);
 }
 
 /* Where an offset is in the text: 0 before its end, 1 at the end and 2
@@ -294,28 +351,29 @@ u16 T63_01(u16 high, u16 low)
    line. */
 void T50_00(void)
 {
-    u32 address, end;
+    struct Address address;
+    struct Ending end;
     const u8 __far *text;
     u16 count, size;
 
     if (ed.EdTxHex != 0)
         return;
-    address = ADDRESS_OF(HIGH(ed.EdOffst), LOW(ed.EdOffst));
-    text = AT(HIGH(address), LOW(address));
+    address = AddressOf(ed.EdOffst);
+    text = AT(address.segment, address.offset);
     for (count = 0; count < LenEdit - 100; count++)
         EditBuf[count] = text[count];
     ed.EdWhole = 1;
     size = 0;
     if (T63_01(HIGH(ed.EdOffst), LOW(ed.EdOffst)) == 0) {
-        end = T53_10(HIGH(address), LOW(address));
-        if (HIGH(end) == 0) {
-            size = LOW(end) - LOW(address);
+        end = T53_10(address.segment, address.offset);
+        if (!end.none) {
+            size = end.at - address.offset;
             if (size >= 2
                 && ENDS_LINE(*(const u16 __far *)
-                             AT(HIGH(address), LOW(end) - 2)))
+                             AT(address.segment, end.at - 2)))
                 size -= 2;
         }
-        if (HIGH(end) != 0 || size > LenEdit - 100) {
+        if (end.none || size > LenEdit - 100) {
             size = LenEdit - 100;
             ed.EdWhole = 0;
         }
@@ -371,7 +429,8 @@ static void T51_30(u16 from_segment, u16 from, u16 to_segment, u16 to,
    beyond the memory by itself is cut off. */
 void T51_00(void)
 {
-    u32 old, less, end, address, tail, source;
+    u32 old, less, end, tail;
+    struct Address address, source;
     const u8 *buffer;
     u8 __far *text;
     u16 size, more, grown, segment, offset, limit, count;
@@ -384,19 +443,18 @@ void T51_00(void)
     size = ed.EdSizLn;
     if (HIGH(old) != 0 || LOW(old) > size) {
         less = old - size;
-        address = ed.EdOffst + size;
-        address = ADDRESS_OF(HIGH(address), LOW(address));
-        source = ADDRESS_OF(HIGH(ed.EdEndBf), LOW(ed.EdEndBf));
-        T51_30(HIGH(source), LOW(source), HIGH(address), LOW(address),
-               ed.EdLen - ed.EdEndBf, 0);
+        address = AddressOf(ed.EdOffst + size);
+        source = AddressOf(ed.EdEndBf);
+        T51_30(source.segment, source.offset, address.segment,
+               address.offset, ed.EdLen - ed.EdEndBf, 0);
         ed.EdLen -= less;
     } else if (LOW(old) < size) {
         more = size - LOW(old);
         grown = more;
         end = ed.EdLen + more;
-        address = ADDRESS_OF(HIGH(end), LOW(end));
-        segment = HIGH(address);
-        offset = LOW(address);
+        address = AddressOf(end);
+        segment = address.segment;
+        offset = address.offset;
         limit = ed.EdSpace + md.ViewSeg;
         if (segment >= limit) {
             ed.EdScrn = 1;
@@ -413,27 +471,47 @@ void T51_00(void)
            offsets high enough to count down from by a piece. */
         tail = end - more;
         if (tail >= ed.EdEndBf) {
-            source = ADDRESS_OF(HIGH(tail), LOW(tail));
-            T51_30(HIGH(source) - 0x0FFF, LOW(source) + 0xFFF0 - 1,
+            source = AddressOf(tail);
+            T51_30(source.segment - 0x0FFF, source.offset + 0xFFF0 - 1,
                    segment - 0x0FFF, offset - 0x10 - 1,
                    tail - ed.EdEndBf, 1);
         }
         ed.EdLen += grown;
     }
-    address = ADDRESS_OF(HIGH(ed.EdOffst), LOW(ed.EdOffst));
-    text = AT(HIGH(address), LOW(address));
+    address = AddressOf(ed.EdOffst);
+    text = AT(address.segment, address.offset);
     buffer = EditBuf;
     for (count = ed.EdSizLn; count; count--)
         *text++ = *buffer++;
 }
 
+/* What T53_10 returns: a line that ends at an offset, or one that does
+   not, with the offset that T53_10 was given. */
+static struct Ending EndsAt(u16 offset)
+{
+    struct Ending ending;
+
+    ending.at = offset;
+    ending.none = 0;
+    return ending;
+}
+
+static struct Ending NoEnd(u16 start)
+{
+    struct Ending ending;
+
+    ending.at = start;
+    ending.none = 1;
+    return ending;
+}
+
 /* Where the line ends that the byte at an address is in, as an offset in
    the same segment: behind the two characters that end it, or where the
-   text ends; in hex mode behind its 16 bytes, or where the text ends. The
-   high word is 0 then. It is 1, with the offset that was given, if the
-   address is at the end of the text or behind it, or if the line does not
-   end in that segment. */
-u32 T53_10(u16 segment, u16 offset)
+   text ends; in hex mode behind its 16 bytes, or where the text ends.
+   There is no such place, and the offset that was given comes back, if
+   the address is at the end of the text or behind it, or if the line
+   does not end in that segment. */
+struct Ending T53_10(u16 segment, u16 offset)
 {
     u32 place = OFFSET_OF(segment, offset);
     u32 left;
@@ -441,15 +519,15 @@ u32 T53_10(u16 segment, u16 offset)
     u16 limit, word;
 
     if (T63_01(HIGH(place), LOW(place)))
-        return PAIR(1, start);
+        return NoEnd(start);
     if (ed.EdTxHex != 0) {
         offset = (offset | 0x0F) + 1;
         if (offset == 0)
-            return PAIR(1, start);
+            return NoEnd(start);
         place = OFFSET_OF(segment, offset);
         if (T63_01(HIGH(place), LOW(place)))
             offset -= LOW(place) - LOW(ed.EdLen);
-        return offset;
+        return EndsAt(offset);
     }
     /* As far as the text goes, or the segment. */
     left = ed.EdLen - place;
@@ -461,13 +539,13 @@ u32 T53_10(u16 segment, u16 offset)
         word = *(const u16 __far *)AT(segment, offset);
         offset += 2;
         if (offset <= limit && ENDS_LINE(word))
-            return offset;
+            return EndsAt(offset);
         offset--;
     }
     place = OFFSET_OF(segment, offset);
     if (T63_01(HIGH(place), LOW(place)))
-        return offset;
-    return PAIR(1, start);
+        return EndsAt(offset);
+    return NoEnd(start);
 }
 
 /* Go to the next line of the text. Returns 0, with `where` on it, or 1
@@ -482,7 +560,9 @@ u16 T53_00(struct Where STACK *where)
 {
     u16 segment = where->segment;
     u16 offset = where->offset;
-    u32 place, start, end, address;
+    u32 place, start;
+    struct Ending end;
+    struct Address address;
 
     if (where->line == 0xFFFF)
         return 1;
@@ -491,30 +571,30 @@ u16 T53_00(struct Where STACK *where)
         return 1;
     if (ed.EdTxHex != 0) {
         end = T53_10(segment, offset);
-        if (HIGH(end) != 0) {
-            address = ADDRESS_OF(HIGH(place), LOW(place));
-            segment = HIGH(address);
-            end = T53_10(segment, LOW(address));
+        if (end.none) {
+            address = AddressOf(place);
+            segment = address.segment;
+            end = T53_10(segment, address.offset);
         }
-        offset = LOW(end);
+        offset = end.at;
         if (offset & 0x0F)
             return 1;
     } else {
         start = place;
         for (;;) {
             end = T53_10(segment, offset);
-            if (HIGH(end) == 0)
+            if (!end.none)
                 break;
             place = OFFSET_OF(segment, offset);
-            address = ADDRESS_OF(HIGH(place), LOW(place));
-            segment = HIGH(address);
-            offset = LOW(address);
+            address = AddressOf(place);
+            segment = address.segment;
+            offset = address.offset;
             end = T53_10(segment, offset);
-            if (HIGH(end) == 0)
+            if (!end.none)
                 break;
             segment += PIECE_SEGMENTS;
         }
-        offset = LOW(end);
+        offset = end.at;
         place = OFFSET_OF(segment, offset);
         if (place - start <= 1)
             return 1;
@@ -542,7 +622,8 @@ u16 T54_00(struct Where STACK *where)
     struct Where line;
     u16 segment = where->segment;
     u16 offset = where->offset;
-    u32 place, from, next, address;
+    u32 place, from, next;
+    struct Address address;
     u16 found = 0, checked, pair, word, back;
 
     if (where->line == 0)
@@ -590,9 +671,9 @@ u16 T54_00(struct Where STACK *where)
     }
     from = OFFSET_OF(segment, offset);
     for (;;) {
-        address = ADDRESS_OF(HIGH(from), LOW(from));
-        line.segment = HIGH(address);
-        line.offset = LOW(address);
+        address = AddressOf(from);
+        line.segment = address.segment;
+        line.offset = address.offset;
         line.line = 0;
         T53_00((struct Where STACK *)&line);
         next = OFFSET_OF(line.segment, line.offset);
@@ -600,9 +681,9 @@ u16 T54_00(struct Where STACK *where)
             break;
         from = next;
     }
-    address = ADDRESS_OF(HIGH(from), LOW(from));
-    where->segment = HIGH(address);
-    where->offset = LOW(address);
+    address = AddressOf(from);
+    where->segment = address.segment;
+    where->offset = address.offset;
     where->line--;
     return 0;
 }
@@ -654,11 +735,11 @@ void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low)
     struct Where where;
     u32 place = PAIR(high, low);
     u32 target = PAIR(target_high, target_low);
-    u32 address = ADDRESS_OF(high, low);
+    struct Address address = AddressOf(place);
     u16 cursor, last;
 
-    where.segment = HIGH(address);
-    where.offset = LOW(address);
+    where.segment = address.segment;
+    where.offset = address.offset;
     where.line = line;
     for (;;) {
         ed.EdOffst = place;
@@ -672,7 +753,7 @@ void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low)
     T50_00();
     target -= ed.EdOffst;
     cursor = HIGH(target) != 0 ? 0xFFFF : LOW(target);
-    last = ed.EdSizLn - HIGH(T57_00());
+    last = ed.EdSizLn - T57_00().left;
     if (cursor > last)
         cursor = last;
     ed.EdCursr = cursor;
@@ -812,18 +893,19 @@ void T72_00(u16 line, u16 segment, u16 from, u16 end)
 }
 
 /* Write the line that the cursor is in to the screen buffer. Returns
-   where it is on the screen, and in the high word its size, one row.
+   where it is on the screen and its size, one row.
 
    As text it is the line buffer that is written. If the buffer does not
    hold the whole line and has fewer characters behind the cursor than
    the window has columns to the right of it, it is first put back into
    the text and filled again. A line of no characters is cleared and has
    no arrow in its first column. */
-u32 T73_10(void)
+struct Drawn T73_10(void)
 {
+    struct Drawn drawn;
     u16 line = ed.EdLine - ed.EdLin0;
     u16 place = ed.EdBase + (line << 8);
-    u32 address;
+    struct Address address;
     u16 from, end;
 
     if (ed.EdTxHex == 0) {
@@ -839,19 +921,21 @@ u32 T73_10(void)
         if (from < end)
             T72_00(line, MAIN_DATA(), from, end);
     } else {
-        address = ADDRESS_OF(HIGH(ed.EdOffst), LOW(ed.EdOffst));
-        end = LOW(T53_10(HIGH(address), LOW(address)));
-        T72_00(line, HIGH(address), LOW(address), end);
+        address = AddressOf(ed.EdOffst);
+        end = T53_10(address.segment, address.offset).at;
+        T72_00(line, address.segment, address.offset, end);
     }
-    return PAIR(0x100 | ed.EdSizeX, place);
+    drawn.begin = place;
+    drawn.size = 0x100 | ed.EdSizeX;
+    return drawn;
 }
 
 /* Write the line that the cursor is in, and show it. */
 void T73_00(void)
 {
-    u32 where = T73_10();
+    struct Drawn drawn = T73_10();
 
-    Window(LOW(where), HIGH(where));
+    Window(drawn.begin, drawn.size);
 }
 
 /* Put the name of the file into the status line, the first row of the
@@ -905,11 +989,30 @@ void T76_00(u16 place, u16 segment, u16 text, u16 colors)
     }
 }
 
+/* What T80_01, T80_02 and T80_03 return, as struct Answer of vc.h has
+   it: what was asked for, or an error. */
+static struct Answer Done(u16 value)
+{
+    struct Answer answer;
+
+    answer.value = value;
+    answer.failed = 0;
+    return answer;
+}
+
+static struct Answer Failed(u16 error)
+{
+    struct Answer answer;
+
+    answer.value = error;
+    answer.failed = 1;
+    return answer;
+}
+
 /* Ask DOS for the attributes of the file. Returns them, with Archive
-   set, and 0 in the high word; for a file that is not there, Archive
-   alone. Anything else that DOS says is an error: that, and 1 in the
-   high word. */
-static u32 T80_01(void)
+   set; for a file that is not there, Archive alone. Anything else that
+   DOS says is an error, and that is returned. */
+static struct Answer T80_01(void)
 {
     struct DosRegs regs;
 
@@ -917,10 +1020,10 @@ static u32 T80_01(void)
     regs.name = md.ViewFil;
     if (Intr21((struct DosRegs STACK *)&regs)) {
         if (regs.ax != ERR_NO_FILE)
-            return PAIR(1, regs.ax);
+            return Failed(regs.ax);
         regs.cx = 0;
     }
-    return regs.cx & 0x3F | 0x20;
+    return Done(regs.cx & 0x3F | 0x20);
 }
 
 /* The name of the file, as the box about a read-only file shows it. */
@@ -935,7 +1038,7 @@ static void T80_Name(void)
 }
 
 /* Write the file, with the attributes `attributes`. Returns 0, or the
-   error and 1 in the high word.
+   error.
 
    A read-only file is made writable first. The file is made anew, or
    emptied. If it is a device, nothing is done about attributes later; if
@@ -947,7 +1050,7 @@ static void T80_Name(void)
 
    The registers go from one call of DOS to the next as it leaves them,
    but for AL where DOS does not read it. */
-static u32 T80_02(u16 attributes)
+static struct Answer T80_02(u16 attributes)
 {
     struct DosRegs regs;
     u32 left;
@@ -959,12 +1062,12 @@ static u32 T80_02(u16 attributes)
         regs.cx = attributes & 0xFFFE;
         regs.ax = 0x4301;
         if (Intr21((struct DosRegs STACK *)&regs))
-            return PAIR(1, regs.ax);
+            return Failed(regs.ax);
         ed.EdWrite = 1;
     }
     regs.ax = 0x3C00;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return PAIR(1, regs.ax);
+        return Failed(regs.ax);
     ed.EdWrite = 1;
     regs.bx = regs.ax;
     regs.ax = 0x4400;
@@ -1000,30 +1103,30 @@ static u32 T80_02(u16 attributes)
 close:
     regs.ax = 0x3E00;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return PAIR(1, regs.ax);
+        return Failed(regs.ax);
     if (failed)
-        return PAIR(1, error);
+        return Failed(error);
     if (attributes == 0xFFFF)
-        return 0;
+        return Done(0);
     regs.cx = attributes;
     regs.name = md.ViewFil;
     regs.ax = 0x4301;
     if (Intr21((struct DosRegs STACK *)&regs)
         && regs.ax != ERR_NO_ACCESS)
-        return PAIR(1, regs.ax);
-    return 0;
+        return Failed(regs.ax);
+    return Done(0);
 }
 
-/* Delete the file. Returns 0, or the error and 1 in the high word. */
-static u32 T80_03(void)
+/* Delete the file. Returns 0, or the error. */
+static struct Answer T80_03(void)
 {
     struct DosRegs regs;
 
     regs.ax = 0x4100;
     regs.name = md.ViewFil;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return PAIR(1, regs.ax);
-    return 0;
+        return Failed(regs.ax);
+    return Done(0);
 }
 
 /* If the file that was saved is the main extension file, the one in the
@@ -1105,7 +1208,7 @@ static void T80_14(void)
 u16 T80_00(void)
 {
     struct Box box;
-    u32 answer;
+    struct Answer answer;
     u16 failed = 1;
 
     T51_00();
@@ -1116,25 +1219,25 @@ u16 T80_00(void)
     if (ChgDisk(md.ViewFil))
         goto done;
     answer = T80_01();
-    if (HIGH(answer) == 0) {
-        if (LOW(answer) & 1) {
+    if (!answer.failed) {
+        if (answer.value & 1) {
             T80_Name();
             if ((u8)Dialog(OFFSET(Prot_B), OFFSET(EdFl_S), 0, 0,
                            MAIN_SEG) != 0)
                 goto done;
         }
-        answer = T80_02(LOW(answer));
-        if (HIGH(answer) == 0) {
+        answer = T80_02(answer.value);
+        if (!answer.failed) {
             failed = 0;
             goto done;
         }
     }
-    if (LOW(answer) == ERR_DISK_FULL) {
+    if (answer.value == ERR_DISK_FULL) {
         answer = T80_03();
-        if (HIGH(answer) == 0)
+        if (!answer.failed)
             goto report;
     }
-    if (LOW(answer) == ERR_NOT_READY)
+    if (answer.value == ERR_NOT_READY)
         goto done;
 report:
     /* None of its lines has ^I: no include line. */
@@ -1149,10 +1252,10 @@ done:
 /* The line that the cursor is in, as T53_00 and T54_00 take one. */
 static void T60_10(struct Where STACK *where)
 {
-    u32 address = ADDRESS_OF(HIGH(ed.EdOffst), LOW(ed.EdOffst));
+    struct Address address = AddressOf(ed.EdOffst);
 
-    where->segment = HIGH(address);
-    where->offset = LOW(address);
+    where->segment = address.segment;
+    where->offset = address.offset;
     where->line = ed.EdLine;
 }
 
@@ -1169,7 +1272,7 @@ static void T60_20(const struct Where STACK *where)
 static void T14_12(u16 limit)
 {
     T50_00();
-    ed.EdCursr = ed.EdSizLn - HIGH(T57_01(limit));
+    ed.EdCursr = ed.EdSizLn - T57_01(limit).left;
 }
 
 /* End, where the line is one that the cursor has just come to: as text,
@@ -1177,7 +1280,8 @@ static void T14_12(u16 limit)
    in hex, to the last byte of the 16, or behind the last one there is. */
 static void T14_11(void)
 {
-    u32 address, end;
+    struct Address address;
+    struct Ending end;
     u16 cursor;
 
     if (ed.EdTxHex == 0) {
@@ -1185,10 +1289,10 @@ static void T14_11(void)
         return;
     }
     ed.EdHxCur = 0;                     /* T14_00 */
-    address = ADDRESS_OF(HIGH(ed.EdOffst), LOW(ed.EdOffst));
-    end = T53_10(HIGH(address), LOW(address));
-    cursor = LOW(end);
-    if (HIGH(end) == 0) {
+    address = AddressOf(ed.EdOffst);
+    end = T53_10(address.segment, address.offset);
+    cursor = end.at;
+    if (!end.none) {
         cursor &= 0x0F;
         if (cursor == 0) {
             cursor = 0x0F;
@@ -1209,7 +1313,7 @@ static void T14_00(void)
         T14_11();
         return;
     }
-    left = HIGH(T57_00());
+    left = T57_00().left;
     if (left == 0 && ed.EdSizLn != 0 && ed.EdWhole == 0) {
         T51_00();
         T14_11();
@@ -1222,7 +1326,7 @@ static void T14_00(void)
    to. */
 static void T08_01(void)
 {
-    u16 last = ed.EdSizLn - HIGH(T57_00());
+    u16 last = ed.EdSizLn - T57_00().left;
 
     if (last < ed.EdCursr)
         ed.EdCursr = last;
@@ -1326,8 +1430,8 @@ static void T01_03(u16 key)
 static void T01_10(u16 key)
 {
     u32 place = ed.EdOffst + ed.EdCursr;
-    u32 address = ADDRESS_OF(HIGH(place), LOW(place));
-    u8 __far *byte = AT(HIGH(address), LOW(address));
+    struct Address address = AddressOf(place);
+    u8 __far *byte = AT(address.segment, address.offset);
     u16 digit;
 
     if (ed.EdHexAs == 0) {
@@ -1343,8 +1447,8 @@ static void T01_10(u16 key)
     if (T63_01(HIGH(place), LOW(place)) != 0) {
         if (ed.EdHexAs == 0)
             *byte &= 0xF0;
-        if (LOW(address) >= 0x0F        /* T01_13 */
-            && (u16)(HIGH(address) - md.ViewSeg + 1) >= ed.EdSpace) {
+        if (address.offset >= 0x0F      /* T01_13 */
+            && (u16)(address.segment - md.ViewSeg + 1) >= ed.EdSpace) {
             Beep();
         } else {
             ed.EdLen++;                 /* T01_14 */
@@ -1457,7 +1561,8 @@ static void T05_00(void)
 static void T10_02(u16 down, u16 count)
 {
     struct Where where;
-    u32 address, end;
+    struct Address address;
+    struct Ending end;
     u16 failed, cursor;
 
     T51_00();
@@ -1480,11 +1585,11 @@ static void T10_02(u16 down, u16 count)
     }
     ed.EdCursr = ed.EdCol1;             /* T10_10 */
     ed.EdHxCur = ed.EdHex1;
-    address = ADDRESS_OF(HIGH(ed.EdOffst), LOW(ed.EdOffst));
-    end = T53_10(HIGH(address), LOW(address));
-    if (HIGH(end) == 0 && (LOW(end) & 0x0F) == 0)
+    address = AddressOf(ed.EdOffst);
+    end = T53_10(address.segment, address.offset);
+    if (!end.none && (end.at & 0x0F) == 0)
         return;
-    cursor = LOW(end) & 0x0F;           /* T10_11 */
+    cursor = end.at & 0x0F;             /* T10_11 */
     if (cursor > ed.EdCursr)
         return;
     ed.EdCursr = cursor;
@@ -1530,7 +1635,6 @@ static void T12_01(u16 down)
 static void T16_00(void)
 {
     struct Where where;
-    u32 address;
 
     if (ed.EdTxHex == 0) {
         T51_00();
@@ -1539,8 +1643,7 @@ static void T16_00(void)
             ;
         T60_20((struct Where STACK *)&where);
     } else {
-        address = ADDRESS_OF(HIGH(ed.EdLen), LOW(ed.EdLen));    /* T16_10 */
-        ed.EdLine = HIGH(address) - md.ViewSeg;
+        ed.EdLine = AddressOf(ed.EdLen).segment - md.ViewSeg;   /* T16_10 */
         ed.EdOffst = ed.EdLen & 0xFFFFFFF0UL;
     }
     T14_11();                           /* T16_11 */
@@ -1693,7 +1796,7 @@ static void T21_00(void)
     T51_00();
     T60_20((struct Where STACK *)&where);
     T50_00();
-    ed.EdCursr = ed.EdSizLn - HIGH(T57_00());
+    ed.EdCursr = ed.EdSizLn - T57_00().left;
     row = ed.EdLine + 1 - ed.EdLin0;
     if (row == 0) {
         ed.EdLin0 = ed.EdLine;
@@ -1813,7 +1916,8 @@ static void T26_00(void)
    narrower than the screen. */
 static void T30_00(void)
 {
-    u32 place, address;
+    u32 place;
+    struct Address address;
 
     if (ed.EdSizeX < 80)
         return;
@@ -1824,11 +1928,11 @@ static void T30_00(void)
     if (ed.EdTxHex != 0) {
         ed.EdHxCur = 0;
         place = ed.EdOffst + ed.EdCursr;
-        address = ADDRESS_OF(HIGH(place), LOW(place));
-        ed.EdCursr = LOW(address);
-        ed.EdLine = HIGH(address) - md.ViewSeg;
+        address = AddressOf(place);
+        ed.EdCursr = address.offset;
+        ed.EdLine = address.segment - md.ViewSeg;
         ed.EdLin0 = ed.EdLine;
-        ed.EdOffst = OFFSET_OF(HIGH(address), 0);
+        ed.EdOffst = OFFSET_OF(address.segment, 0);
     } else {
         place = ed.EdOffst + ed.EdCursr;        /* T30_10 */
         T56_00(0, 0, 0, HIGH(place), LOW(place));
@@ -1846,7 +1950,8 @@ static void T30_00(void)
 static void T32_00(void)
 {
     struct Box box;
-    u32 place, left, address;
+    u32 place, left;
+    struct Address address;
     struct Sought sought;
     u16 count;
 
@@ -1864,8 +1969,8 @@ static void T32_00(void)
         count = 0x8000;
         if (HIGH(left) == 0 && LOW(left) < count)
             count = LOW(left);
-        address = ADDRESS_OF(HIGH(place), LOW(place));  /* T32_02 */
-        sought = V82_00(HIGH(address), LOW(address), count);
+        address = AddressOf(place);     /* T32_02 */
+        sought = V82_00(address.segment, address.offset, count);
         if (sought.found < 0x100)
             break;
         if (count < SrchLen)
@@ -1874,13 +1979,12 @@ static void T32_00(void)
     }
     if (TstBrk())                       /* T32_05 */
         goto done;
-    place = OFFSET_OF(HIGH(address), sought.end);
+    place = OFFSET_OF(address.segment, sought.end);
     if (ed.EdTxHex != 0) {
         ed.EdHexAs = (u8)sought.found;
         ed.EdHxCur = 0;
         ed.EdOffst = place & 0xFFFFFFF0UL;
-        address = ADDRESS_OF(HIGH(place), LOW(place));
-        ed.EdLine = HIGH(address) - md.ViewSeg;
+        ed.EdLine = AddressOf(place).segment - md.ViewSeg;
         ed.EdCursr = LOW(place) & 0x0F;
     } else {
         T56_00(HIGH(ed.EdOffst), LOW(ed.EdOffst), ed.EdLine,   /* T32_06 */
@@ -2167,7 +2271,9 @@ static u16 T00_71(u16 mouse)
 static void T00_20(void)
 {
     struct Where where;
-    u32 address, place, end, free;
+    struct Address address;
+    struct Ending end;
+    u32 place, free;
     u16 column, first_column, first_line, line, old_column, old_line;
     u16 delta, row, count, size, segment, start, state, color, i;
     u16 *saved;
@@ -2220,8 +2326,8 @@ static void T00_20(void)
             count = delta;
             if (count <= row) {
                 address = T62_00();
-                where.segment = HIGH(address);
-                where.offset = LOW(address);
+                where.segment = address.segment;
+                where.offset = address.offset;
                 do                      /* T00_27 */
                     T53_00((struct Where STACK *)&where);
                 while (--count);
@@ -2234,8 +2340,8 @@ static void T00_20(void)
             if (count <= row) {
                 row = count;
                 address = T62_00();
-                where.segment = HIGH(address);
-                where.offset = LOW(address);
+                where.segment = address.segment;
+                where.offset = address.offset;
             }
         }
         count = row;                    /* T00_29 */
@@ -2279,8 +2385,8 @@ whole:
     count = ed.EdSizeY;
     row = 0;
     address = T62_00();
-    segment = HIGH(address);
-    start = LOW(address);
+    segment = address.segment;
+    start = address.offset;
     do {                                /* T00_41 */
         place = OFFSET_OF(segment, start);
         state = T63_01(HIGH(place), LOW(place));
@@ -2289,11 +2395,11 @@ whole:
                with the two characters. */
             if (place < 2)              /* T00_45 */
                 break;
-            address = ADDRESS_OF(HIGH(place - 2), LOW(place - 2));
+            address = AddressOf(place - 2);
             if (!ENDS_LINE(*(const u16 __far *)
-                           AT(HIGH(address), LOW(address))))
+                           AT(address.segment, address.offset)))
                 break;
-            T72_00(row, HIGH(address), LOW(address) + 2, 0);
+            T72_00(row, address.segment, address.offset + 2, 0);
             break;
         }
         if (state != 0) {
@@ -2304,12 +2410,12 @@ whole:
             break;
         }
         end = T53_10(segment, start);
-        if (HIGH(end) != 0) {
-            address = ADDRESS_OF(HIGH(place), LOW(place));
-            segment = HIGH(address);
-            start = LOW(address);
+        if (end.none) {
+            address = AddressOf(place);
+            segment = address.segment;
+            start = address.offset;
             end = T53_10(segment, start);
-            if (HIGH(end) != 0) {
+            if (end.none) {
                 /* A line that does not end within 64K: what the window
                    shows of it is at its start, and where it ends is
                    looked for a piece at a time. */
@@ -2317,13 +2423,13 @@ whole:
                 do {                    /* T00_42 */
                     segment += PIECE_SEGMENTS;
                     end = T53_10(segment, 0);
-                } while (HIGH(end) != 0);
-                start = LOW(end);
+                } while (end.none);
+                start = end.at;
                 goto next;
             }
         }
-        T72_00(row, segment, start, LOW(end));  /* T00_43 */
-        start = LOW(end);
+        T72_00(row, segment, start, end.at);    /* T00_43 */
+        start = end.at;
 next:
         row++;                          /* T00_44 */
     } while (--count);

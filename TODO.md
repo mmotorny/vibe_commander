@@ -14,9 +14,12 @@ the caller takes it apart with shifts and casts. 114 functions did. The
 named for what they are: the mouse, the keyboard and the BIOS, the time,
 a page of a list, what is selected, DOS's answer to a call that may
 fail, a line that is typed into, a key, the buttons, the entries and the
-commands of an extension file, and the search of the viewer.
+commands of an extension file, and the search of the viewer. So do the 9
+of the editor, `edit.c`, which nothing else calls: an address in the
+text, where a line ends, the column that characters reach, the line
+that was drawn, and DOS's answer again.
 
-92 are left, and `python3 tools/pairs.py` lists them as they stand, by
+83 are left, and `python3 tools/pairs.py` lists them as they stand, by
 file, with the files that call each:
 
 - 68, the commands and the loop: what a command returns, a place of
@@ -26,7 +29,6 @@ file, with the files that call each:
   `menu.c`, `F67_00` of `find.c`, `F35_01` and `F45_01` of `copy.c`;
   with them `ChgAdr` of `place.c`, which only `keys.c` calls. One piece
   of work: every one of them meets `Command` and `CmdEnd`.
-- 9, the editor, `edit.c`, which nothing else calls.
 - 10 that a file keeps to itself, or nearly: `dialog.c` (4),
   `dirfunc.c` (2, of which `dialog.c` calls `M30_60`), `read.c` (2, of
   which `dirfunc.c` calls `GetVol`), `F36_04` of `copy.c`, `MenuItem`
@@ -36,10 +38,10 @@ file, with the files that call each:
 - 3 that are numbers and stay: `Timer`, `__U4M`, and `Dos35` of
   `main.c`, an address as DOS has it.
 
-The three kinds divide among agents as they stand: the editor and the
-ten are of files that the commands' agent leaves alone but for
-`copy.c`, where `F36_04` is next to `F35_01`; give that file to one of
-the two. What was the fourth, the rest of `view.c`, is done.
+The kinds divide among agents as they stand: the ten are of files that
+the commands' agent leaves alone but for `copy.c`, where `F36_04` is
+next to `F35_01`; give that file to one of the two. The rest of
+`view.c` and the editor, which were kinds of their own, are done.
 
 `CLAUDE.md`, "Notes on the portable C", has how such a function is
 written so that a call that was not changed does not compile, and what

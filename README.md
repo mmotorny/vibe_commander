@@ -567,9 +567,10 @@ takes apart. In the portable C the functions that files of every kind
 call return a structure with members named for what they are:
 `GetMous` the buttons and the place of the mouse, `OpenFil` what DOS
 answered and whether that is an error, `EdLin` the cursor and whether
-anything changed, and so on, 22 of 114. A call that still took such a
-number apart would not compile. The others, the commands and what is
-inside the editor and a few more files, are still to do (see `TODO.md`).
+anything changed, and so on; and so do those inside the editor, 31 of
+114 in all. A call that still took such a number apart would not
+compile. The others, the commands and what is inside a few more files,
+are still to do (see `TODO.md`).
 
 The lines that say something of registers still, and why:
 
@@ -605,11 +606,13 @@ in any other. What still has its name from a `#pragma aux`:
 | `TrnMain`, as the part that stays names it for its address | An object there, a function where it is defined | 1 |
 
 That leaves 80 lines of `#pragma aux` in the portable C where the C
-translation has 863. Its `VC.EXE` is 132,624 bytes, 432 fewer than the
+translation has 863. Its `VC.EXE` is 132,320 bytes, 736 fewer than the
 C translation's: no effort went into the size. A function that saves
 the registers it uses by the compiler's rule comes out a little longer
-here and a little shorter there, 448 bytes more in all, and what loaded
-the program again after a command, which is gone, was 880 bytes.
+here and a little shorter there, 448 bytes more in all; the editor is
+304 bytes shorter for a function that is called where a macro was
+written out; and what loaded the program again after a command, which
+is gone, was 880 bytes.
 
 ### Staying in the memory whole
 
