@@ -41,6 +41,8 @@ import struct
 from collections import Counter
 from dataclasses import dataclass
 
+import le
+
 # Blocks shorter than this could match the program file by accident.
 MIN_BLOCK = 8
 # A place in memory counts as holding the program when this many blocks
@@ -365,14 +367,10 @@ def _is_data(text):
 
 def link_map(path):
     """Read a wlink map: public symbol -> (segment, offset), both counted
-    from where the program is loaded."""
-    symbols = {}
-    with open(path) as text:
-        for line in text:
-            match = re.match(r"([0-9a-f]{4}):([0-9a-f]{4})[*+]? +(\S+)$", line)
-            if match:
-                symbols[match[3]] = (int(match[1], 16), int(match[2], 16))
-    return symbols
+    from where the program is loaded. Of a flat program's map, which
+    le.py says more of, the two are an object's number and the offset in
+    that."""
+    return le.Map(path).public
 
 
 # The stack of a C tree, as its link map names it: an array, and the
@@ -387,15 +385,8 @@ def segments(path):
     """Read a wlink map: its segments, each as name, class, where it
     begins, as the paragraph and the offset that the map has, and how
     long it is."""
-    found = []
-    with open(path) as text:
-        for line in text:
-            match = re.match(r"(\w+) +(\w+) +(\w+) +([0-9a-f]{4}):"
-                             r"([0-9a-f]{4}) +([0-9a-f]{8})$", line)
-            if match:
-                found.append((match[1], match[2], int(match[4], 16),
-                              int(match[5], 16), int(match[6], 16)))
-    return found
+    return [(found.name, found.kind, found.first, found.offset, found.size)
+            for found in le.Map(path).segments]
 
 
 def stack(path):

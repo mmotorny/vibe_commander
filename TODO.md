@@ -2373,6 +2373,110 @@ The record: `harness/pass32.txt`, the names of the scenarios that the
 passes that is not in it, so that the record is what is so; a piece
 commits it with the change that made it grow.
 
+### Piece H1, the reader: done, and what a later piece should know
+
+`harness/le.py` reads the file of a flat program and the linker's map
+of it, and the test `harness-le` holds it to a toy that it builds,
+`harness/lecheck.py` with `harness/lecheck.c`. Nothing else of the
+harness knows a flat program yet. The top of `le.py` says what such a
+file is; this is what the pieces behind it start from.
+
+What it gives:
+
+| | |
+|---|---|
+| `le.Linear(contents)` | The file. `stub`, where the stub ends; `objects`, each with its `number`, its `size` in the memory, `at` and `held`, where its bytes are in the file and how many of them the file has, `place`, and `code`; `entry` and `stack`, each an object's number and an offset; `relocations` |
+| A place | The one way of counting that everything has in common: an offset from where the first object begins in the memory. `place(object, offset)` makes one of an address of the map; `in_file(object, offset)` says where that is in the file, or None for what the file does not hold |
+| `image()`, `image(base)` | The objects as they lie in the memory, from where the first begins: as the file has them, and with the address of the first object, as the extender leaves them. What the file does not hold is zeros, and so are the bytes between two objects, which are the extender's |
+| `relocated()` | Which bytes of the image differ in the memory from the file: place -> the relocation there, with its `length`, 4 for an address and 2 for a selector, and what it names, `target` and `target_offset` |
+| `le.BENCH` | Where the first object is on the bench of the tests, 00100010h |
+| `le.Map(path)` | The linker's map, of a flat program or of one of 16 bits: `segments`, each with `name`, `kind`, `group`, the two numbers of its address, `first` and `offset`, and `size`; `symbols`, every one with its `module`, `name`, the two numbers and its `mark`, static ones included; `public`, name -> the two numbers, without the static ones; `segment(name)`; `named(name, module)`; `flat` |
+| `le.Unknown` | Raised for a file that is no linear executable, or that has something the reader was not written for: a page that is not in the file as it is, a relocation of another kind than the two |
+| `python3 harness/le.py FILE [MAP]` | Prints what a file has, and where its segments are on the bench |
+
+Where the plan and the code differ:
+
+- It is some 370 lines with the map and what it says of itself, where
+  the plan had 150.
+- The map is read in `le.py`, and `coverage.link_map` and
+  `coverage.segments` read theirs through it: the text is the same for
+  both kinds of program but for the digits. They answer for the maps of
+  the 16-bit builds exactly what they answered, which was held for
+  every map of both trees. For a flat map the first number of an
+  address is an object's number, not a paragraph: what multiplies it by
+  16 is wrong for one. `coverage.stack`, `driver.facts` and
+  `ported.check_translation` and `check_layout` do, and
+  `coverage.origin` and `coverage.relocated` read the header of a
+  program of 16 bits: those are H2's and H3's to give a second form.
+  `datacheck.py` and `arithcheck.py` each
+  still read the lines of the 16-bit map by themselves; `le.Map` has
+  what `Translation` of `datacheck.py` reads there, modules and static
+  symbols included.
+- `harness/trial32/whole.py` keeps its own twenty lines: it counts the
+  records of the file by their length, which the reader does not give.
+
+What was seen, of the files that there are:
+
+- `whole.py`'s file, 277,132 bytes: the stub is its first 27,536; two
+  objects, the code, 121,807 bytes, and everything else, 92,712, each
+  as long as the map's segments in it add up to; the entry and the top
+  of the stack as the linker's summary has them. Its 4,440 records are
+  4,437 relocations: three addresses lie across the end of a page and
+  are in the file twice. 4,435 are addresses, 3,689 in the code that
+  name data, 186 in the code that name code, 555 in the data that name
+  data and 5 there that name code; 2 are selectors, in `Exit01` and
+  `Int2E` of `resident.c`, which go with S3. At every one of the
+  addresses the file has the offset of what is named.
+- The stub in a program is 32 bytes longer than `binw/dos32a.exe`, by
+  its header, which the linker writes anew; behind the header it is
+  that file byte for byte, and its header gives its length. The test
+  holds both.
+- An address in front of the object that it is counted from, as the
+  megabyte's beginning is 64K in front of the main data, is written by
+  the linker as an offset counted round 32 bits, FFFF00A0h for 64K in
+  front of A0h, and the extender puts the right address in. The reader
+  gives such an offset with its sign.
+- The pages of the file are not the pages of the memory. An object
+  begins where the one before ends, rounded up to 16 and 16 more, so
+  the data begin in the middle of a page of 4K of the memory. A limit
+  that is about pages, "nothing that is written lies in a page that
+  holds code", counts by the address, `le.BENCH` and the place.
+- A file may have more behind its pages than the header counts, as
+  debugging information would be; the reader takes it. That was not
+  tried with a file that has any.
+
+On the bench, where the reader cannot be held to anything by a test
+that runs no machine:
+
+| Toy | What it wrote | What the reader says |
+|---|---|---|
+| `zero.c` | code at 00100010, data at 00100524, the bytes that are not in the file at 00104530, the stack 00100530 to 00104530 | The same: `_TEXT`, `_DATA`, `_BSS` and `STACK` of its map, by `python3 harness/le.py` |
+| `auto.c` | `AutoTim` at 00100608 | The same |
+| `keys.c`, traced | 75 blocks ran in its code, 26 of them with an address in them | Each is the image's bytes with the first object at `le.BENCH` |
+| `lecheck.c`, the test's own | Where its code, a text, its table and what the file does not hold are; that all 4,096 entries of its table name what they should, the three among them that lie across the end of a page, with their sum; two addresses outside their object; two words that name code. Traced, 48 blocks, 30 with an address | The same five lines, and every block: `python3 harness/lecheck.py --screen` and `--trace`, as its top says |
+
+For H2: `_md` is at `le.BENCH + program.place(*linked.public["_md"])`,
+and `AutoTim` and `Clock` behind it by the original's listing as
+today. The stack is the segment `STACK` of the map, whose end
+`program.stack` is; what it holds when the program has been loaded is
+`program.image()` there, zeros where the file has nothing, which is
+what the bench had (`zero.c`).
+
+For H3: `coverage.executed` can take `program.image()` for the file and
+`program.image(base)` for the program at a place, with the places of
+`relocated()` for its words; what it answers is then counted in places,
+and a function of the map is at `program.place(*linked.public[name])`.
+The stub is not in the image, so nothing of the extender's counts as
+the program's. A block with a selector in it is not in the image as it
+ran: `relocated()` lists those two bytes, and the image has them as the
+file does. A file is known for a flat program by `le.Linear` taking
+it.
+
+For H4: `relocated()` has for every pointer of a table what it names,
+an object and an offset that may be below 0. The object files of
+`wcc386` have the records of 32 bits, 99h, 91h, A1h, 9Dh and B7h where
+`ObjectFile` of `datacheck.py` reads 98h, 90h, A0h, 9Ch and B6h.
+
 ### The pieces
 
 P and S change the program under the 16-bit build; D, B and H make the
@@ -2393,7 +2497,7 @@ and H1 are started at once by the session.
 | D2, `dos32.c`: the rest | The block below the megabyte, the 7 functions through real mode, the 640 KB, the three interrupts with a box drawn from inside the critical error, a program run, the end, Quick execute | `dos32.c`; the toys | Some 500 lines | S3 for the shapes; its toys can begin beside S | The toy; a toy of the critical error with Retry and with the phantom drive | See "What could go wrong", 3. The piece most likely to be more than one agent holds: the critical error can be cut off as a piece of its own |
 | B1, the objects | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt` | 50 lines | P1 | The build | Little |
 | B2, the program | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
-| H1, the reader | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
+| H1, the reader. Done: see "Piece H1, the reader" below | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
 | H2, the driver | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
 | H3, the scenarios' test | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
 | H4, the test of the data | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |

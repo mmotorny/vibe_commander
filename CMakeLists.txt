@@ -456,3 +456,11 @@ endforeach()
 add_test(NAME portable_c-host
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/hostcheck.py)
 set_tests_properties(portable_c-host PROPERTIES SKIP_RETURN_CODE 77)
+# The harness's reader of a flat program of 32 bits, its file and the
+# linker's map of it, against a toy that the test builds with the
+# compiler, the linker and the stub of the Open Watcom fetched above: see
+# harness/lecheck.py. It runs no machine.
+add_test(NAME harness-le
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/lecheck.py
+            --watcom ${open_watcom_SOURCE_DIR} --tools ${watcom_bin}
+            --out ${CMAKE_BINARY_DIR}/lecheck)
