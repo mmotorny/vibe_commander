@@ -446,6 +446,7 @@ are added here as they go.
 | `Init40`, `main.c` | BIOS 03h, where the cursor is, and 0Eh, a line feed typed | 03h: AL the mode, as 0Fh left it. 0Eh: CX the shape of the cursor and DX its place, as 03h left them, with the row that the program goes on with | AL 0 for 03h, CX and DX 0 for 0Eh |
 | `Init50`, `main.c` | DOS 47h, the current directory of the drive that was chosen | AL: the drive, 1 for A:. DH: the rows of the screen. CL: the letter of the drive | AL and DH 0, CX as it comes |
 | `F21_10`, `enter.c` | DOS 3Bh, the directory of the tree made current | CX: 37h, of the call that looked for the directory, where it did | CX 0 |
+| `M02_10`, `commands.c` | DOS 3Bh, the directory of a panel made current | AL: the drive, 1 for A: | AL 0 |
 
 What is known to read such a register, and where the portable C will
 hand it something else when the file goes over:

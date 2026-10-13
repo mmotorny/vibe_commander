@@ -54,12 +54,11 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
 
    HidCur puts the cursor below the screen. ResUser writes what DOS has shown, which
    the panels cover, to the screen buffer, for a window given like
-   Window's, and ResWin what a box covers, from where it was kept. SelDrv
-   is the call of DOS that makes a drive the current one, 0 for A:, which
-   the assembly makes without Intr21. AsmSeg returns the segment of the
-   program's constants. ScrOffs asks the BIOS where in the memory of the
-   screen the page begins that is shown. Int10 calls the BIOS for the
-   screen, and SaveSet writes the setup to its file. */
+   Window's, and ResWin what a box covers, from where it was kept.
+   AsmSeg returns the segment of the program's constants. ScrOffs asks
+   the BIOS where in the memory of the screen the page begins that is
+   shown. Int10 calls the BIOS for the screen, which EGA lines still
+   does with registers, and SaveSet writes the setup to its file. */
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what
@@ -97,9 +96,10 @@ extern const u8 __far SetEr_B[];        /* "There was an error while saving
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-#define DOS_CHDIR     0x3B00            /* DOS: make a directory current */
-#define ERR_PATH      3                 /* its error: there is no such */
-#define ERR_NOT_READY 0x53              /* Intr21's: a drive is not ready */
+#define ERR_PATH      3                 /* DOS's error where a directory is
+                                           made current: there is no such */
+#define ERR_NOT_READY 0x53              /* a drive is not ready, and the
+                                           user gave up */
 
 /* The minutes after which the screen is blanked, as the configuration
    offers them, from the first line of the group down. */
@@ -129,18 +129,16 @@ static void PtFs00(u16 panel)
 static u16 M02_10(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
-    struct DosRegs regs;
+    struct Answer changed;
     u16 drive = (u8)(wcb->WinPath[0] - ('A' - 1));
     u16 failed;
 
     if (Fantom(drive))
         return 1;
-    regs.ax = DOS_CHDIR | drive;
-    regs.bx = regs.cx = regs.si = regs.di = 0;
-    regs.name = wcb->WinPath;
-    if (Intr21((struct DosRegs STACK *)&regs) && regs.ax != ERR_PATH)
+    changed = DirChange(wcb->WinPath);
+    if (changed.failed && changed.value != ERR_PATH)
         return 1;
-    SelDrv((u8)(wcb->WinPath[0] - 'A'));
+    DriveSelect((u8)(wcb->WinPath[0] - 'A'));
     failed = SetPth();
     PutPrm(panel);
     return failed;
