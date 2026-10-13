@@ -1115,13 +1115,13 @@ V08_00:                                 /* PgDn */
     FIRST();
     /* Where the lines below begin goes to TmpBuf, a word for each: the
        last of them is the first line of the next screen. */
-    starts = (u16)md.TmpBuf - 2;
+    starts = MD_PLACE(md.TmpBuf) - 2;
     count = (VI->ViSize >> 8) - 2;
     do {
         if (NEXT())
             goto V08_06;
         starts += 2;
-        *(u16 *)starts = line.at;
+        *(u16 *)MD_POINTER(starts) = line.at;
     } while (--count);
     /* And a screen from there: where it is not full and the file ends,
        back by as many lines as it lacks. */
@@ -1138,10 +1138,10 @@ V08_03:
     if (starts < count)
         goto V00_30;
     starts -= count;
-    if (starts < (u16)md.TmpBuf)
+    if (starts < MD_PLACE(md.TmpBuf))
         goto V00_30;
 V08_05:
-    VI->ViFirst = *(u16 *)starts;
+    VI->ViFirst = *(u16 *)MD_POINTER(starts);
     goto V00_20;
 V08_06:                                 /* the part ends: the next one */
     V50_00(segment);
@@ -1254,8 +1254,8 @@ V15_04:                                 /* and on in the file, a piece of
         result = 2;
         goto V15_22;
     }
-    sought = V82_00(MAIN_SEG, (u16)md.MenuBuf, count);
-    behind = sought.end - (u16)md.MenuBuf;
+    sought = V82_00(MAIN_SEG, MD_PLACE(md.MenuBuf), count);
+    behind = sought.end - MD_PLACE(md.MenuBuf);
     panel = sought.found;
     in_file = 1;
     if (!(sought.found & 0x100))
@@ -1604,13 +1604,13 @@ static struct Next Next(u16 none, const u8 *at)
     struct Next next;
 
     next.none = none;
-    next.at = (u16)at;
+    next.at = MD_PLACE(at);
     return next;
 }
 
 struct Next F34_30(u16 text)
 {
-    const u8 *at = (const u8 *)text;
+    const u8 *at = MD_POINTER(text);
     u16 word;
 
     for (;;) {
@@ -1663,7 +1663,7 @@ struct Named F34_40(u16 text, u16 view)
     const u8 __far *suffix = AT(code, OFFSET(Menu_F) + 1);
     const u8 __far *from;
     u8 __far *to;
-    u8 *at = (u8 *)text;
+    u8 *at = MD_POINTER(text);
     u8 *end;
     u16 word, count;
     u8 c;
@@ -1696,15 +1696,15 @@ struct Named F34_40(u16 text, u16 view)
         if (c != *suffix)
             goto command;
     } while (--count);
-    if (F34_30((u16)end).none == 0)
+    if (F34_30(MD_PLACE(end)).none == 0)
         goto command;
     *end = 0;
-    if ((u16)(end - (u8 *)text) >= LenPath + 12)
+    if ((u16)(end - MD_POINTER(text)) >= LenPath + 12)
         goto command;
     to = md.TmpBuf;
-    if ((u16)(u32)CutPath((const u8 *)text) == text)
+    if (MD_PLACE(NEAR(CutPath(MD_POINTER(text)))) == text)
         to = (u8 __far *)CutPath(md.TmpBuf);
-    from = (const u8 *)text;
+    from = MD_POINTER(text);
     for (count = LenPath + 13; count != 0; count--)
         *to++ = *from++;
     named.file = 1;
@@ -1738,7 +1738,7 @@ static void Aexec0(u16 edit)
     box = OFFSET(Viewr_P);
     if (edit != 0)
         box = OFFSET(Editr_P);
-    DialBox(0x528, box, (u16)md.TmpBuf, MAIN_SEG,
+    DialBox(0x528, box, MD_PLACE(md.TmpBuf), MAIN_SEG,
             (struct Box STACK *)&where);
     Window(where.begin, where.size);
     *(u16 *)(md.TmpBuf + 95) = where.begin;
@@ -1782,7 +1782,7 @@ static void Aexec0(u16 edit)
         Dialog(OFFSET(RunEr_B), include, 0, 0, MAIN_SEG);
     }
     ResWin(*(u16 *)(md.TmpBuf + 95), *(u16 *)(md.TmpBuf + 97),
-           (u16)md.WinBuf);
+           MD_PLACE(md.WinBuf));
     Window(0, (u16)md.Lines << 8 | 80);
     CurShp(*(u16 *)(md.TmpBuf + 93));
     FncEx1();
@@ -1852,7 +1852,7 @@ static struct Onward F34_11(u16 how)
     named = F34_40(next.at, 1);
     if (named.file == 0) {
         command = named.at;
-        *(u8 *)command = ' ';
+        *MD_POINTER(command) = ' ';
         if (Run_00(command, 1))
             return F21_30();
         return To(NEXT_FUNC04);

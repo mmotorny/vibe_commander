@@ -69,6 +69,6 @@ treebox.c     to-number 4, to-pointer 3
 treebox_t.c   clean
 usermenu.c    to-number 9, to-pointer 5
 vc.h          interrupt 1, aborts 4
-view.c        to-number 10, to-pointer 8
+view.c        to-number 1
 view_t.c      clean
 window.c      clean
