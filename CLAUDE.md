@@ -1923,6 +1923,34 @@ What making the first files so met:
   it is dropped like any other, with its row, if the service does not
   read it, and the BIOS reads no colour there on a screen of text.
 
+What moving `blank.c`, `main.c`, `enter.c`, `commands.c`, `keys.c`,
+`bars.c` and `menu.c` met:
+
+- A file says at its top what it calls of the rest of the program,
+  "Int10 calls the BIOS for the screen", "SelDrv is the call of DOS
+  that makes a drive the current one", and has macros for the services,
+  `DOS_CHDIR`. Both are stale when the calls go, and nothing stops the
+  build for either: look for the old names in the file once more when
+  it compiles.
+- `SelDrv` and `DosTime` were `DriveSelect` and `TimeOfDay` under an
+  older name already: their callers change the name and drop nothing.
+- An argument may be there for a leftover alone. `F69_00` of
+  `commands.c`, EGA lines, takes what the main loop has in CX and hands
+  the BIOS its high byte in a call that takes nothing there. When that
+  goes the argument is not read, which stops the build, and has to go
+  too: from `vc.h`, from the call in `Command` of `main.c`, and from the
+  sentence at the top of `main.c` that says which registers the commands
+  read. EGA lines is still on `Int10` for that and for its call for
+  Print Screen: `TODO.md`.
+- Many runs of the scenarios at once fill `/tmp`, which is in the memory
+  and has a limit: with six checkouts testing, and one of them three
+  copies at a time, the scenarios' tests of all of them failed in the
+  same minute, the C translation's too, with "the machine stopped: it
+  was reset, or QEMU ended" or "Disk quota exceeded". That is the
+  machine and not the program. `TMPDIR` set to a directory in the
+  checkout's `build/` puts the disks of the machines there instead:
+  `TMPDIR=$PWD/build/tmp ctest --test-dir build`.
+
 ## Work by several agents
 
 Work that can be divided is done by several agents at a time, without
