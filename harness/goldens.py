@@ -50,7 +50,8 @@ golden is read for the tree (read), and written nowhere:
      (`rules` of deviations.TREES);
   2. the scenario's patch, if it has one;
   3. the screens of the steps that the tree is not taken through, left
-     out (`left_out` and `left_out_of` of deviations.TREES).
+     out (`left_out` and `left_out_of` of deviations.TREES, and what
+     `in_place_in` there has None for).
 
 A patch is a file of harness/goldens/TREE/, NAME.patch for the scenario
 NAME. It says which rows of the original's golden the tree is expected to

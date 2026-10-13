@@ -16,6 +16,9 @@ for that tree, and nothing else:
 
   - steps that the tree is not taken through are left out, with their
     screens: `left_out` and `left_out_of` of TREES;
+  - steps that get the tree to the same thing by other keys are put in
+    the place of the original's, one for one: `in_place_of` of TREES,
+    and `in_place_in` for those of one scenario;
   - a difference that is on many screens is a rule, of the form that
     DEVIATIONS has, for that tree alone: `rules` of TREES;
   - and what one scenario shows otherwise is a patch, a file of the rows
@@ -239,7 +242,9 @@ IGNORED = [
 # A scenario that a deviation changes is still held against what the
 # original did, with the declared difference made to it when the golden is
 # read for the tree (goldens.read): the steps that are left out here go,
-# with their screens; the rules of the tree are made to every screen; and
+# with their screens, and a step that the tree is taken through in place
+# of another is held against the screen of that one; the rules of the
+# tree are made to every screen; and
 # the rows that one scenario shows otherwise are its patch, a file of
 # harness/goldens/TREE/ that says of each such row what the original has
 # and what the tree is expected to have, with the deviation it is of and
@@ -298,26 +303,55 @@ class Declared:
     # is left out for it, which then mean another thing there: steps()
     # leaves out first and puts in afterwards.
     in_place_of: dict = field(default_factory=dict)
+    # Steps that the tree is taken through in place of others in one
+    # scenario: scenario -> steps of the original that follow one another
+    # there -> (the tree's step for each of them, or None for one that
+    # the tree is not taken through; why). For a place where the tree
+    # has other lines than the original, a dialog that a setting has
+    # gone from: the keys that get to a line, or the place of a click on
+    # it, are others there, and mean something else elsewhere in the
+    # same scenario, so the steps are known by those around them. The
+    # tree's steps are as many as the original's: each is held against
+    # the screen behind the original's step that it stands for, with
+    # what the scenario's patch says, and a step that set what the tree
+    # has no more is None, left out with its screen. They are put in
+    # wherever the scenario has the original's one behind the other,
+    # among the steps that left_out and left_out_of have left, and
+    # before those of in_place_of.
+    in_place_in: dict = field(default_factory=dict)
     # Why the tree is taken through no scenario of the setup program
     # (scenarios.Scenario.setup), whichever there are, or None if it is
     # taken through them: for a tree that has no setup program.
     no_setup: str = None
 
-    def kept(self, steps, name=None):
-        """Which of `steps`, those of the scenario `name`, the tree is
-        taken through: their places in `steps`, counted from 0."""
+    def taken(self, steps, name=None):
+        """How the tree is taken through `steps`, those of the scenario
+        `name`: of each step that it is taken through, its place in
+        `steps`, counted from 0, and the step as the tree is taken
+        through it."""
         places = [at for at, step in enumerate(steps)
                   if step not in self.left_out]
         for gone in self.left_out_of.get(name, {}):
             for at in reversed(found([steps[at] for at in places], gone)):
                 del places[at:at + len(gone)]
-        return places
+        instead = {}
+        for some, (others, _) in self.in_place_in.get(name, {}).items():
+            for at in found([steps[at] for at in places], some):
+                instead.update(zip(places[at:at + len(some)], others,
+                                   strict=True))
+        return [(at, instead.get(at) or
+                 self.in_place_of.get(steps[at], (steps[at],))[0])
+                for at in places if instead.get(at, "") is not None]
+
+    def kept(self, steps, name=None):
+        """Which of `steps`, those of the scenario `name`, the tree is
+        taken through: their places in `steps`, counted from 0."""
+        return [at for at, _ in self.taken(steps, name)]
 
     def steps(self, steps, name=None):
         """The steps of `steps`, those of the scenario `name`, that the
         tree is taken through, each as the tree is taken through it."""
-        return tuple(self.in_place_of.get(steps[at], (steps[at],))[0]
-                     for at in self.kept(steps, name))
+        return tuple(step for _, step in self.taken(steps, name))
 
 
 def found(steps, some):

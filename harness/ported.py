@@ -1568,6 +1568,27 @@ def check_declared(tree, names):
                 print(f"  left out of {name} for {tree}, and the scenario "
                       f"has no such steps one behind the other: "
                       f"{', '.join(some)}")
+    for name, others in declared.in_place_in.items():
+        if name not in names:
+            passed = False
+            print(f"  {tree} is declared to be taken through other steps "
+                  f"in {name}, which is not run for it")
+            continue
+        steps = [scenarios.SCENARIOS[name].steps[at] for at in
+                 replace(declared, in_place_in={}).kept(
+                     scenarios.SCENARIOS[name].steps, name)]
+        for some, (instead, _) in others.items():
+            if len(instead) != len(some):
+                passed = False
+                print(f"  {tree} is declared to be taken through "
+                      f"{len(instead)} steps in place of {len(some)} of "
+                      f"{name}: a step for each, or None, "
+                      f"{', '.join(some)}")
+            elif not deviations.found(steps, some):
+                passed = False
+                print(f"  {tree} is declared to be taken through other "
+                      f"steps in place of some that {name} has not one "
+                      f"behind the other: {', '.join(some)}")
     patched = {}
     entries = deviation_entries(tree)
     directory = goldens.DIRECTORY / tree
@@ -1623,6 +1644,14 @@ def check_declared(tree, names):
             f"{tree} is taken through {instead} in place of {step}: {why}",
             width=78, initial_indent="  ", subsequent_indent="    ",
             break_on_hyphens=False))
+    for name, others in declared.in_place_in.items():
+        for some, (instead, why) in others.items():
+            print(textwrap.fill(
+                f"in {name}, {tree} is taken through "
+                + ", ".join(step or "nothing" for step in instead)
+                + f" in place of {', '.join(some)}: {why}",
+                width=78, initial_indent="  ", subsequent_indent="    ",
+                break_on_hyphens=False))
     return passed
 
 
