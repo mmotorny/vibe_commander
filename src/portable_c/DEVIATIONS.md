@@ -797,10 +797,6 @@ of it.
   configuration, has zeros in the 64 bytes behind the path of each
   panel. A setup file that the setup saves of it differs from the
   original's in those bytes, twice 64 of the file's 511.
-- While the setup program is being translated (`TODO.md`, "The setup
-  program in the portable C: the plan"), one thing of its menu is not
-  there: the mouse does nothing at the menu. Every item of the menu has
-  its screen.
 
 **Why.** The user's decision, on 12 October 2026: the setup program is
 ported into the portable C "so that there is one program", reached by an

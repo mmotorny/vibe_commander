@@ -1131,9 +1131,13 @@ SETUP_BATCHES = [
         # the setup file, with the box for a file that is missing or
         # wrong and the menu behind it, as far as Main40. Dialog is the
         # setup program's copy of the main program's, which differs from
-        # it: its fields run in the scenarios of the options.
-        routines=("Init15", "Main40", "F08_00..F09_00", "Exit", "Default",
-                  "PutKey0", "Dialog"),
+        # it: its fields run in the scenarios of the options. Main50,
+        # the mouse at the menu, is the main program's F32_70 word for
+        # word under a name of its own, and the menu calls that: it is
+        # listed here because nothing but its text says that the two are
+        # one, and a routine that is listed has to have run whole.
+        routines=("Init15", "Main40", "Main50", "F08_00..F09_00", "Exit",
+                  "Default", "PutKey0", "Dialog"),
         functions=("StSetup", "StUser"),
         unreached={
             **dict.fromkeys(
@@ -1142,13 +1146,6 @@ SETUP_BATCHES = [
                 "driver that does not know the call which resets it "
                 "without the mouse, 21h, and is asked by call 0 instead: "
                 "the driver of the bench, CuteMouse, knows it"),
-            **dict.fromkeys(
-                (0x05A0, 0x05A3, 0x05A6, 0x05A8, 0x05AA, 0x05AD),
-                "Main30, the mouse at the menu: its routine, Main50, is "
-                "still to come, and a button does nothing there in the "
-                "portable C until then, so no scenario presses one. The "
-                "piece of the plan that brings Main50 takes this out "
-                "(TODO.md)"),
             **dict.fromkeys(
                 (0x104C, 0x104F, 0x1051),
                 "Exit5, a setup file that could not be written: no "

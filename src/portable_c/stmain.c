@@ -91,6 +91,12 @@
    Esc; PutKey shows a key bar, Input waits for a key. What the file asks
    of the system it asks by the functions of sys.h. */
 
+/* A C routine of another file that vc.h does not have: what the mouse
+   does in a list that is in a box, of usermenu.c. The setup program has
+   it for its menu under a name of its own, Main50, and word for word:
+   see StMain00. */
+u16 F32_70(u16 begin, u16 size);
+
 /* The tables of stmain_t.c that the code names, by their offsets in the
    segment that AsmSeg returns. */
 extern const u8 __far StPalets[];       /* the setup without a file */
@@ -304,12 +310,19 @@ static void StF08_00(void)
    its scan code, or, for Enter and Esc, a character with any; Case
    takes no key without a scan code.
 
-   The mouse at the menu, Main50 of the original, is still to come: a
-   button that is down does nothing here. */
+   The mouse is the main program's routine for a list in a box, F32_70
+   of usermenu.c, which the setup program has word for word as Main50:
+   a click on a line puts the cursor there, with either button, a second
+   click on the line enters an item, and the middle button, or the left
+   one let go outside the box, is Exit.
+
+   Ported as it is: the item that a second click enters is the one under
+   the cursor, not the one that was clicked. They are the same unless a
+   key has moved the cursor between the two clicks. */
 static void StMain00(void)
 {
     struct Box where;
-    u16 item, to, last, key;
+    u16 item, to, last, key, mouse;
 
 Main00:
     PutKey(0);
@@ -368,15 +381,23 @@ Main02:
     default:
         goto Main02;
     }
-    if (to == item)                     /* Main14 */
+Main14:
+    if (to == item)
         goto Main02;
     StMain40(Hist_C, item, where.begin, where.size);
     item = to;
     goto Main01;
 
 Main30:                                 /* Mouse */
-    goto Main02;
-
+    mouse = F32_70(where.begin, where.size);    /* Main50 */
+    if (mouse >> 8 < 1)
+        goto Main02;
+    if (mouse >> 8 == 1) {              /* a line: its number */
+        to = mouse & 0xFF;
+        goto Main14;
+    }
+    if (mouse >> 8 == 0x1C)             /* the second click on a line */
+        goto Main32;
 Main31:
     item = 0x40;                        /* Exit */
 Main32:                                 /* Enter */

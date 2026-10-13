@@ -1300,6 +1300,22 @@ with the original:
     it goes by what was saved at once: setup-missing-saved switches a
     panel off for that, the right one, since the left one is what
     covers the line of the command (see above).
+  - The mouse at the menu. The lines are rows 7 to 15 and columns 23
+    to 55, the box rows 5 to 17 and columns 19 to 59, with a margin
+    around the frame that is of the box, and the shadow, a row below
+    and two columns beside, is not. A click on a line puts the cursor
+    there, either button, and a button held and moved over the lines
+    takes it along. A second click on the line is Enter, on the item
+    under the cursor: with a key between the two clicks that has
+    moved the cursor, "Click@30,12" and "Down Click@30,12", that is
+    another item than the one clicked. A second click let go beside
+    its line chooses nothing and leaves nothing, wherever it comes
+    up. In the box and on no line a button does nothing. The left
+    button let go outside the box leaves, wherever it went down, a
+    line too; the right one does nothing there, and the middle one
+    leaves anywhere. A click as short as "*1" is over before the menu
+    looks. On 50 lines the box is rows 17 to 29, its lines 19 to 27.
+    See setup-mouse.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -6835,6 +6851,50 @@ SCENARIOS = {
             "Esc",                        # no: the panels
             "F9 o o",                     # nor is Alternative editor
             "Esc",
+        ),
+        setup=True),
+
+    # What is left of the menu and of leaving, and what crosses the
+    # screens of the setup program: piece D of the plan.
+    "setup-mouse": Scenario(
+        "The mouse at the menu of the setup program: a click on a line "
+        "puts the cursor there, with either button, and a second one "
+        "enters the item, which is the one under the cursor also when a "
+        "key has moved that meanwhile; a button held and moved takes the "
+        "cursor along; in the box and on no line it does nothing; and the "
+        "middle button, and the left one let go outside the box, leave",
+        steps=(
+            _SETUP,
+            "Click@30,9",                 # a line: the cursor is there
+            "RightClick@55,12",           # either button, in the last
+            "Click@23,7",                 # column of a line and the first
+            "Click@22,10",                # the frame: nothing
+            "Click@30,17",                # nor the row below it, which is
+                                          # of the box
+            "Click@30,8>30,13",           # held and moved: the cursor
+                                          # goes along
+            "RightClick@5,5",             # the right one beside the box:
+                                          # nothing
+            "Click@30,11*1",              # a button that is up again when
+                                          # the menu looks: nothing
+            "Click@30,12",                # Set Laptop palette,
+            "Down Click@30,12",           # the cursor moved on by a key,
+                                          # and the second click: the item
+                                          # under the cursor, reset all?
+            "Esc",                        # the cursor is on that item
+            "Click@30,10 Click@30,10>57,10",      # a second click let go
+                                          # beside its line chooses nothing,
+            "Click@30,14 Click@30,14>70,14",      # nor one let go outside
+                                          # the box, and that does not leave
+            "Click@30,15",                # Exit,
+            "Click@30,15",                # and again, in the next step
+            _SETUP,
+            "MiddleClick@40,12",          # the middle button leaves
+            _SETUP,
+            "RightClick@60,10",           # the shadow is not of the box:
+                                          # nothing for the right button,
+            "Click@30,9>60,10",           # and the left one let go there
+                                          # leaves, wherever it went down
         ),
         setup=True),
 

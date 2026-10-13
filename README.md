@@ -634,14 +634,14 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,460 bytes |
+| `VC.EXE` | 197,504 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 64,404 bytes |
-| The relocations in its header, which DOS applies | 1,034 |
-| What it keeps of the memory while a command runs: the program and its panels | 207,088 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,448 bytes |
+| more than the C translation's 133,056 bytes | 64,448 bytes |
+| The relocations in its header, which DOS applies | 1,035 |
+| What it keeps of the memory while a command runs: the program and its panels | 207,120 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,416 bytes |
 | The code segment `CTEXT` ends at | D410h, 7,152 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C53Bh, 10,949 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C567h, 10,905 bytes below the limit, F000h |
 | Inline assembly | 57 instructions in 10 pieces: 37 in 7 of `dos.c`, 20 in 3 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
@@ -981,9 +981,11 @@ original's setup program has them, and set nothing that the portable C
 goes by: they are to go.
 
 All nine items of the menu do what the original's do, and F1 is the
-help. The mouse at the menu is still to come. `TODO.md` has the plan,
-"The setup program in the portable C", with what each piece brings and
-what is declared for it.
+help. The mouse at the menu is the main program's routine for a list in
+a box, `F32_70` of `usermenu.c`, which the setup program has word for
+word under a name of its own. `TODO.md` has the plan, "The setup
+program in the portable C", with what each piece brings and what is
+declared for it.
 
 ## Testing
 
