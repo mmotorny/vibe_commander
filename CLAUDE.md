@@ -3305,6 +3305,50 @@ the 32 bits):
   runs, and takes itself out, with the interrupts that the program
   took through it. `harness/trial32/ended.asm` shows it.
 
+What a program that a command has left in the memory met, when the
+program of 32 bits is left: a mend that was made for it and dropped on
+the user's word of 13 October 2026, and what stays of it (`TODO.md`,
+the piece L of the plan for the 32 bits, which has the mend in words):
+
+- A setting of the extender that was "seen" to mend something on a
+  copy of the file is looked at on every screen of the run, the first
+  above all. A program that the extender does not load leaves DOS's
+  prompt, which takes the steps of a script as the program would: one
+  bit of the settings cleared was taken for a mend so, the user was
+  told that the mend was one bit, and what the steps had shown was
+  DOS. What it took then was two other bits, more of `dos32.c` and a
+  routine of real mode, and the user, told that, had it dropped.
+- What the extender does is read in its file where nothing describes
+  it. `binw/dos32a.exe` is not packed: `ndisasm -b16` of it, from where
+  its header has its two segments of code, kept in `build/` and not
+  committed, and nothing of the listing written down but what the
+  extender does, in words. The names of the options of its environment
+  variable, `DOS32A`, are in the file, and the code that takes each
+  sets a bit of the settings: that names the bits. The piece L has
+  what was read.
+- As it leaves, the extender puts all 256 interrupts of real mode back
+  as they were when the program started, with a line of warning for
+  each that was otherwise, by two bits of its settings; and whatever
+  its settings say, it has INT 1Bh, 1Ch, 21h, 23h, 24h and 2Fh go where
+  they went when it started, and INT 15h where it has taken that,
+  whoever has taken them since. And told to give INT 1Bh, 1Ch, 23h or
+  24h back in protected mode, it has the interrupt of real mode go
+  there too.
+- INT 21h of real mode is the extender's while the program runs. A
+  program that takes it meanwhile hands on to the extender, so nothing
+  in the program can leave it that interrupt when the extender has
+  gone.
+- The scenario `stay-left` shows all of it, and the program of 32 bits
+  fails it: it is off the record with `command`, and what becomes of
+  it is the user's (`TODO.md`, the plan, 10 of what is open). Its
+  second program finds the first by INT 2Fh, so where that one is lost
+  it prints dashes for all five, whatever else still goes to the
+  first.
+- A scenario that goes on at DOS's prompt when the program has been
+  left: with `"cls" Enter` as its last command, or the prompt that the
+  program leaves is written into a row of what the command before
+  printed.
+
 ## Work by several agents
 
 Work that can be divided is done by several agents at a time, without

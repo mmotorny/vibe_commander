@@ -23,10 +23,19 @@
  * in turn in a toy and the toy run (TODO.md, "The portable C in 32 bits:
  * what a trial on the bench showed", and harness/trial32/). With this
  * bit clear DOS/32A writes nothing as it starts and leaves the cursor
- * where it is; nothing else of what it does was seen to change. What
- * the other bit of that byte is, and the rest of the block, is not
- * known here beyond a guess that is written down there, and nothing of
- * it is changed.
+ * where it is; nothing else of what it does was seen to change.
+ *
+ * What the bit is was read since, for another matter, in the code of
+ * binw/dos32a.exe itself, where it takes the options of its environment
+ * variable, DOS32A, whose names are in the file: it is the bit that the
+ * option NOC clears, the banner and nothing else. The other bit that is
+ * set in that byte, bit 0, is whether that variable is read at all. The
+ * byte in front, 14h, has what the extender does when the program ends,
+ * the interrupts of real mode put back and a line of warning for each
+ * that was not as it was, and where the program is loaded. TODO.md has
+ * both bytes bit by bit, with how they were read: "L, a program that
+ * has stayed in the memory". Nothing of the block is changed but the
+ * banner's bit.
  *
  * The bit was found for the DOS/32A of that download, which answers
  * 090Ch when a program asks it for its version (INT 31h with EEFFh):
