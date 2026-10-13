@@ -131,7 +131,10 @@ These held while `src/c/` was made, and they say what it is.
      README says, as that licence asks, "This product uses DOS/32
      Advanced DOS Extender technology." This step follows the setup
      program without waiting for the user; the 16-bit build is not
-     deleted before the user has said so.
+     deleted before the user has said so. The user said so on 13
+     October 2026, with the last two differences of the program of 32
+     bits declared: the tests then judge that program as the portable
+     C, and the 16-bit build goes with the switch, in one piece.
   2. It uses what 32 bits give: one flat memory, with pointers where
      there were segments and offsets, and numbers and values of 32 bits.
      A variable is widened wherever wrapping round at 16 bits would be
@@ -213,6 +216,17 @@ These held while `src/c/` was made, and they say what it is.
   short for it, and the scenario that has the editor refuse such a
   file, `editor-big`, is not run for that program, with what it alone
   tested listed as untested.
+- What differs in the program of 32 bits from the original is decided
+  by the user one difference at a time, on the user's word of 13
+  October 2026: nothing gives leave to remove or break a feature of
+  the original for that program without asking. Decided so far, each
+  declared as it is and with no change of the program: what is inherent
+  in running under the extender and shows on no screen; that a command
+  finds no memory above the megabyte while the extender holds it; and
+  that a program of another's which has stayed in the memory, started
+  from this one, is cut off from its interrupts when this one is left,
+  with the extender's lines of warning on the screen. A mend of the
+  last was built and dropped on the user's word: `TODO.md` has it.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
