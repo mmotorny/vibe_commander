@@ -4,31 +4,31 @@ of the build that is laid out like the original,
 build/shareware-layout/VCSETUP.LST: those of a routine that the main
 program has word for word, of one that it has with another text, of one
 that it has not, and of the code that stands between procedures. And how
-many of each ran in recordings of trial.py, if any are named:
+many of each have run in the scenarios of the setup program, by what was
+recorded with their goldens (goldens.ran), with the routines that are not
+the main program's word for word one by one:
 
-    classes.py                      the counts
-    classes.py NAME...              and what ran in
-                                    build/trial-setup/goldens/NAME.ran
+    classes.py
 """
 import bisect
 import sys
+from pathlib import Path
 
 import procs
-import trial                    # puts the harness on the path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import coverage                 # noqa: E402
 import goldens                  # noqa: E402
+import setups                   # noqa: E402
 
 COM_ORIGIN = 0x100
 
 
 def main():
-    goldens.DIRECTORY = trial.GOLDENS
-    listing = coverage.Listing(trial.SETUP_LISTING)
+    listing = coverage.Listing(setups.SETUP_LISTING)
     main_program, setup = procs.procs(procs.MAIN), procs.procs(procs.SETUP)
-    ran = set()
-    for name in sys.argv[1:]:
-        ran |= goldens.read_ran(name)
+    ran = goldens.ran(setup=True, missing=[])
     ranges = {name: listing.procedures[name] for name in setup
               if name in listing.procedures}
     addresses = sorted(line.address for line in listing.lines)

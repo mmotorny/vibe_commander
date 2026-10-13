@@ -1726,8 +1726,50 @@ in "The portable C".
   what the portable C has of it already, how it becomes a part of the
   one program, the pieces of the work with the files of each, and how
   its scenarios are held against the original. Read it before any
-  piece of that work. `harness/trial-setup/` has the scripts of the
-  trial that the plan rests on, with a README of their own.
+  piece of that work. `harness/vcsetup/` has three scripts that hold
+  the setup program's assembly against the main program's, with a
+  README of their own: which routine is the main program's word for
+  word, and how another differs.
+- The harness judges the setup program, since the first piece of that
+  plan. What making it so met, and what the pieces go by:
+  - The original is two programs to the harness. A scenario is of one
+    of them, `setup=True` for the setup program's, and the top of
+    `harness/scenarios.py` says how such a scenario is written, started,
+    tried, derived, held and declared: read "The scenarios of the setup
+    program" there before writing one.
+  - Two programs of the original in one machine have routines of the
+    same bytes, and a trace cannot tell whose a block is that both
+    have: `coverage.executed` places a program only by blocks that the
+    other's file has not, `others`. Whatever runs a second program next
+    to the one under test has to say so there.
+  - A `.ran` next to a golden is of `VC.COM`, or of `VCSETUP.COM` for a
+    scenario of the setup program, under the same name. `goldens.ran`
+    keeps them apart; a tool that reads the lists of all scenarios by
+    itself mixes offsets of two files.
+  - The C translation is taken through no scenario of the setup
+    program, by their kind, `no_setup` of `deviations.TREES`: a piece
+    that adds one lists it for the portable C alone, which is the one
+    tree whose tests it runs.
+  - The test of the data has two originals, and knows a constant of the
+    setup program by `St` in front of its name. Its top says what a
+    word may hold that names a thing of the setup program: the tree's
+    `StX`, the main program's `X` where that is the same bytes, and for
+    a variable the place of the field of that name in the main data.
+    Where it says "the original names X there, which the translation
+    has not by that name", one of the three is missing, or the thing
+    is kept under another name and wants a line in `NAMED_OTHERWISE`.
+  - The test of the data can be tried before any code of a piece is
+    there: a copy of the tree with one file of constants more, built as
+    `harness/notice.py` builds its copy, `cmake -S` the copy with the
+    two `FETCHCONTENT_SOURCE_DIR_` of `build/_deps`, and
+    `harness/datacheck.py --source` the copy's `src/portable_c`. The
+    copy's build is in a directory called `portable_c`, as always.
+  - `python3 harness/goldens.py derive` derives all goldens again side
+    by side, in a minute and a half on four processors, where it took
+    them one behind the other. `git status` of `harness/goldens/` is
+    clean afterwards, and that is the proof that a change to the
+    harness has left the judging alone: it is cheap enough to do for
+    every such change.
 
 ### Moving a file to the system's functions
 

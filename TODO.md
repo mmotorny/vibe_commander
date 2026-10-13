@@ -11,10 +11,17 @@ Step 0 of the road (`CLAUDE.md`, "The portable C"): the setup program,
 of the one program, reached by an item of its Options menu and judged
 by scenarios whose goldens are recorded from the original
 `VCSETUP.COM`. This is the plan for it, made before any of it was
-translated, with the parts that could fail tried on the bench:
-`harness/trial-setup/` has the scripts of that trial, and its README
-says what each does. Where something below was seen on the bench it
-says so; the rest is from reading the assembly.
+translated, with the parts that could fail tried on the bench. Where
+something below was seen on the bench it says so; the rest is from
+reading the assembly.
+
+Piece 0a, the harness, is done: the harness judges the setup program,
+and `setup` is its first scenario. "What 0a made of the harness" says
+what the other pieces can rely on, and the top of
+`harness/scenarios.py` how a scenario of the setup program is written,
+derived and declared. Of the trial's scripts the three that hold the
+setup program's assembly against the main program's are kept, in
+`harness/vcsetup/`; what the others showed the harness does itself.
 
 Seven things were the user's to decide. They are decided, and stand
 first.
@@ -27,7 +34,7 @@ first.
 | 2 | What is on the screen behind setup | What DOS has shown, with the panels off, as when the original was run from the program's command line. So whole screens are held against the original's goldens |
 | 3 | What setup edits | The setup file, as the original: it reads `VC.INI` when it is entered and shows that, and the program takes what was saved when setup is left |
 | 4 | The three settings of what the portable C has no more, Memory allocation, TSR manager and Screen output | Shown, doing nothing, while the dialogs are translated and held against the original's goldens, and taken out by piece E2. "A feature that only made sense on DOS is removed, not kept as a setting that does nothing" waits for that piece here: taken out from the start, the Configuration and Screen and Mouse would never be held against the original |
-| 5 | The limit of the file's size, three times the original `VC.COM`'s, which the scenarios' test holds a build to | Dropped for the portable C: the test no longer holds it to a multiple of the original's size, and piece 0a takes the check out for that tree. It stays for the C translation, which is frozen. The compiler is asked for small code already, `-os`; builds for release and for debugging are a matter for the 32-bit program. The two other limits, of the program's data and of where a code segment ends, are the machine's and stay: see "What could go wrong" |
+| 5 | The limit of the file's size, three times the original `VC.COM`'s, which the scenarios' test holds a build to | Dropped for the portable C: the test no longer holds it to a multiple of the original's size, and piece 0a has taken the check out for that tree. It stays for the C translation, which is frozen. The compiler is asked for small code already, `-os`; builds for release and for debugging are a matter for the 32-bit program. The two other limits, of the program's data and of where a code segment ends, are the machine's and stay: see "What could go wrong" |
 | 6 | `asked` and `handed-on`, once the program's own call of DOS is gone with piece E1 | Not run for the portable C, which has nothing left for them to show; they stay for the C translation |
 | 7 | A critical error of DOS while setup is open, as when the setup file is on a drive that is not ready | The program's own box, since its handler of INT 24h is in place then; the original's setup program has none and leaves the error to DOS's own words. And setup asks for its files as the rest of the program does, through the functions of `sys.h` that ask with the program's errors: none with Bare in its name is added for it. No scenario shows either |
 
@@ -127,7 +134,8 @@ and DOS's call to end, with 0.
 ### What the portable C already has
 
 The routines were held against the main program's one by one, by the
-text of the assembly (`harness/trial-setup/procs.py`), and counted in
+text of the assembly (`harness/vcsetup/procs.py`, which also prints
+how a routine differs), and counted in
 the listing (`classes.py` there): 4,861 instructions, 10,423 bytes of
 code without the room reserved for what the binary has besides.
 
@@ -198,7 +206,7 @@ is to be written is some 1,900 instructions, where the main program has
 | S9: `RdHelp`, `Help`, `HlpLine` | 86, 297, 25 |
 | `PutKey0` with its bars, and what `Dialog` does otherwise | 65, about 30 |
 
-**The data.** 13,164 bytes in the source (`harness/trial-setup/data.py`
+**The data.** 13,164 bytes in the source (`harness/vcsetup/data.py`
 has the names). 36 objects have the text of one of the main program's,
 706 bytes, the default palettes among them, `Palets`. 34 have the name
 of one of the main program's and other contents: `Conf_P`, `Conf_B`,
@@ -294,7 +302,7 @@ batch, with what no scenario reaches.
 
 | Piece | Owns | Size | Scenarios | Needs |
 |---|---|---|---|---|
-| 0a, the harness | `harness/`: what the list below has; `tools/figures.py` and the README for the limit that goes. No file of the program | Some 200 lines | One: setup started, two or three screens, a setting changed, saved, left, as `harness/trial-setup/trial.py` records it | Nothing |
+| 0a, the harness. Done | `harness/`: what the list below has; `tools/figures.py` and the README for the limit that goes. No file of the program | Some 800 lines with what is written for the pieces, where 200 were thought | One, `setup`: the setup program started, its menu, the Configuration with the key bar switched off, Screen and Mouse looked at, the setup saved and left, and the main program without its key bar | Nothing |
 | 0b, setup entered and left | `stmain.c`, `stmain_t.c`; the item of the menu in `menu.c`, `commands_t.c`, `main.c`, `vc.h`, with its tables declared in `harness/datacheck.py`; the three places that are told of setup, in `bars.c` with the bars' tables, `dialog.c` and `input.c`; `ShadCol` in `screen.c`; the entry of `src/portable_c/DEVIATIONS.md`. Of the assembly: the file read and checked, S0, `Main00`, `Main40`, S7 with `Default`, `Exit` | About 300 instructions and the plumbing | 4 or 5: the menu by its keys and left unchanged; the defaults taken and saved, and what the program shows afterwards; a setup file that is missing, with Ok and with Exit; one that is damaged; changed and left with Cancel | 0a |
 | A, the options | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | About 6: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
 | B, the colours | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
@@ -305,51 +313,108 @@ batch, with what no scenario reaches.
 
 While 0b is made, A, B and C can write their scenarios and derive the
 goldens, which needs the original alone. A scenario that the portable C
-cannot pass yet is declared not run for it, in `TREES` of
-`harness/deviations.py`, and taken out of there by the commit that
-makes it pass.
+cannot pass yet is declared not run for it, in `not_run` of
+`TREES["portable_c"]` of `harness/deviations.py`, by its name, and
+taken out of there by the commit that makes it pass. Nothing is
+declared for the C translation: it is taken through no scenario of the
+setup program, by their kind.
 
 In all, some 22 scenarios and 600 steps, where the main program has 134
 and 3,358 for twelve times the code: nearly every instruction here is a
 key or a button of the mouse, and little of it is something that other
 scenarios pass through anyway.
 
-**What 0a changes in the harness.** `harness/trial-setup/trial.py` has
-the first, the third and the sixth as overrides, to start from.
+**What 0a made of the harness.** The nine things that it was to
+change, each as it is now, and what came out otherwise than planned.
 
-1. `setups.py`: a scenario of the setup program has the distribution's
-   `VCSETUP.COM` in D:\VC, for the original's run alone. The other
-   scenarios keep their disks, and their goldens.
-2. `scenarios.py`: `Scenario` says that it is of the setup program; a
-   run that is traced then takes what ran of `VCSETUP.COM`.
-3. `coverage.executed`: see "What ran" below.
-4. `goldens.py`: what ran of the setup program in such a scenario is
-   kept apart from what ran of the main program, which the batches of
-   the main program must not be given; both files of the original count
-   as the program under test in the list of the disks, where the
-   portable C has one.
-5. `deviations.py`: in `DEVIATIONS`, the line of the command that
-   started the original's setup program, which a build does not show;
-   in `Declared`, `in_place_of`, a step that a tree is taken through in
-   place of another, one for one; and the scenarios of the setup
-   program not run for the C translation, which has none.
-6. `driver.py`: for a scenario that shows the setup program's clock,
-   the script of the original's run names VCSETUP and has where its
-   `Clock` is, from `VCSETUP.LST`. `DRIVER.ASM` does not change.
-7. `ported.py`: batches of the setup program's routines against
-   `VCSETUP.LST`, each with what is out of reach, and one list more,
-   for what is not carried over: the instructions of the start that the
-   one program has no place for, each with the reason. `reach.py` and
-   `show.py` get a way to say that the setup program is meant.
-8. `datacheck.py` and `reads.py`: a second original, `VCSETUP.COM` with
-   its listing, for the constants of the files of setup, by the name
-   rule. This is the largest of them.
-9. `ported.py`: the portable C is no longer held to three times the
-   size of the original (5 above); the C translation is, as before.
-   With the check go the row of the README's figures that says how far
-   the file is below that limit, which `tools/figures.py` writes, and
-   what the README says of the limit where it speaks of the portable
-   C's tests.
+1. `setups.py`: for a scenario that says `setup=True` the original has
+   the distribution's `VCSETUP.COM` in D:\VC, written behind the files
+   that every disk has (`setups.beside`, `Bench.start`). No other
+   machine has it, and every golden that there was came out the same
+   when all were derived again.
+2. `scenarios.py`: `Scenario` has `setup`, and `setup_clock` for the
+   sixth of these. A traced run of the original in such a scenario
+   records what ran of `VCSETUP.COM`, and nothing of `VC.COM`.
+3. `coverage.executed` takes `others`, the files of the other programs
+   of the machine: see "What ran" below. It is given them where two
+   programs run, in the scenarios of the setup program, and nowhere
+   else.
+4. `goldens.py`: the `.ran` of a scenario of the setup program is of
+   `VCSETUP.COM`. It has the same name as any other, and `goldens.ran`
+   keeps the two kinds apart: of the main program's scenarios for the
+   batches of the main program, of the setup program's for its own.
+   Nothing else reads the lists of all scenarios. Both files of the
+   original are "the program under test" in the list of the disks.
+   And `goldens.py derive` takes the scenarios side by side now: all
+   of them are derived again in a minute and a half.
+5. `deviations.py`: the line of the command is in `DEVIATIONS`, as
+   spaces in a build; `Declared` has `in_place_of`, by which the
+   portable C is taken through `"F9 o t"` where the original has the
+   command, `SETUP_ITEM` and `SETUP_COMMAND` there, in every scenario;
+   and `no_setup`, by which the C translation is taken through no
+   scenario of the setup program, whichever there are. That is
+   otherwise than planned: they are not listed for it by name, so a
+   piece that adds one changes nothing for that tree, whose test it
+   does not run. For the portable C each is listed in `not_run` until
+   its code is there.
+6. `driver.py`: `setup_facts`, for a scenario that says
+   `setup_clock=True`. `DRIVER.ASM` has not changed. Seen on the bench
+   with the harness: the colon of the setup program's clock is recorded
+   as blinking with it, and not without, the same twice. In such a
+   scenario the original's main program is not watched: see the top of
+   `harness/scenarios.py` for what the scenario may then not do.
+7. `ported.py`: `SETUP_BATCHES`, held against `VCSETUP.LST` and against
+   what ran of `VCSETUP.COM`, for a tree that has the setup program; a
+   batch has `not_carried` besides `unreached`, for the instructions of
+   a routine that the one program has no place for. The list is empty,
+   with the form of a batch written out in front of it; the mechanism
+   was tried with a batch that is not kept. A routine that is the main
+   program's word for word is not listed there. `reach.py --setup` and
+   `show.py --setup` are there, and `harness/vcsetup/classes.py` counts
+   what has run by class.
+8. `datacheck.py`: a second original, `VCSETUP.COM` with its listing and
+   with `VCSETUP.OBJ`, which the build assembles now. It was less than
+   feared, and is done. An object `StX` of the portable C is held
+   against `X` of the setup program, if that program has data of that
+   name; no data of the main program has such a name. Four things that
+   the plan did not have:
+   - A word of the setup program that names a text or a table may hold
+     where the tree has `StX`, or else where it has the main program's
+     `X`, if that object is, as long as the tree has it, what the setup
+     program has there: 23 objects are the same bytes in both programs,
+     `Help_S`, `OkMn_D`, `SvSt0_S` to `SvSt3_S`, `Palets` among them,
+     and need not be written twice.
+   - A word that names a variable of the setup program, `DW WinBuf`,
+     the field that a box ticks, is an address in that program's one
+     segment. The tree's word is held against where it has a variable
+     `StX`, or else against the place of the field `X` in the main
+     data, as the main program's listing has the structure: `MD_AT(X)`
+     of `tables.h`.
+   - A variable that the main data has under another name wants an
+     entry in `NAMED_OTHERWISE`, with "field": the setup program's
+     `BoxBuf`, which the tree has in `ErrBuf`.
+   - The routine that a dialog names, `F04_10`, is a number there, as
+     in the main program: "is", in the same table.
+   All of it was tried on a copy of the tree with a box and a dialog of
+   the setup program written into it, right and with three things
+   wrong. `reads.py` needed nothing: it goes by the names that the C
+   has, and a function of setup's that reads a box by its offset goes
+   into `READERS` there.
+9. `ported.py`: the portable C is held to no multiple of the original's
+   size, and the C translation to three times, `SIZE_LIMIT`; the row is
+   gone from the README's figures.
+
+**What a piece does**, in this order:
+
+- Its scenarios, in the form of `setup`, tried with `show.py --setup`
+  and `reach.py --setup`, each derived twice and read, and listed in
+  `not_run` of `TREES["portable_c"]`: that can land before the code.
+- Its code and tables, with `St` in front of every name of the setup
+  program's. `python3 harness/datacheck.py build/shareware-layout
+  build/portable_c` names every constant of setup with "of VCSETUP",
+  and fails for one that it cannot place.
+- Its batch in `SETUP_BATCHES` of `harness/ported.py`, and its
+  scenarios out of `not_run`, in the commit that brings the code.
 
 ### How scenarios are written and held
 
@@ -381,26 +446,35 @@ paragraph.
   ran.
 - The clock switched on in S2 shows at once and blinks. For the driver
   to record both states, the script of the original's run has to name
-  the setup program: `harness/trial-setup/clock.py`. The portable C is
-  one program, and is watched as always.
+  the setup program: a scenario says `setup_clock=True` for that. The
+  portable C is one program, and is watched as always.
 - The mouse is as written at the top of `harness/scenarios.py`:
   `Click@30,9` on a line of S1 and again is Enter there, a right click
   in a dialog is Enter, the middle button at S1 is Exit.
 - A beep moves the screen up a line, as in the main program, since the
   cursor is hidden below the last row: the box "Help contents is not
-  available" does.
+  available" does. The line of the command is then on row 22, with the
+  key bar that was on the screen in the row below it, and stays so
+  when the box is closed; the window of a page of the help, opened
+  afterwards, had the screen as it was before the beep again.
+- The picture of S6 has a prompt of its own on row 23, `C:\DOS>`, and
+  a key bar of the main program below it: they are of the picture.
 - No scenario may show the clock for longer than the rule on the time
   of day allows, and none looks at what DOS has shown after setup, or
   at the history: see "The deviations to declare".
 
 A scenario is written with the steps of the original, and is one of
-`SCENARIOS` like any other. For the portable C the step that starts
-setup is another, the keys of the item of the menu, by `in_place_of`;
-every other step is the same, and every screen is held against the
-original's golden, the one after that step too. The command's line on
-row 23 is in `DEVIATIONS` of `harness/deviations.py`, so the golden is
-derived without it. That the portable C then shows the same cell for
-cell is what piece 0b has to prove: it is not seen yet.
+`SCENARIOS` like any other: the top of `harness/scenarios.py` has the
+form, with `setup` as the example. For the portable C the step that
+starts setup is another, the keys of the item of the menu, by
+`in_place_of`; every other step is the same, and every screen is held
+against the original's golden, the one after that step too. The
+command's line is in `DEVIATIONS` of `harness/deviations.py`, as
+spaces, so the golden is derived without it: it is known wherever it
+is the whole of a row. That the portable C then shows the same cell
+for cell is what piece 0b has to prove: it is not seen yet. Should it
+have to show something else on that row, the entry of `DEVIATIONS`
+is what changes, and that is asked first.
 
 ### What ran: the coverage, and its fix
 
@@ -411,16 +485,20 @@ program's, when both are in one trace: the two files have routines of
 the same bytes, in the same order, so blocks that ran in the main
 program agree on a place where the setup program never was. The
 original taken through dialogs and the help, with the setup program
-never started, had 1,003 bytes of `VCSETUP.COM` count as run
-(`harness/trial-setup/phantom.py`). The fix is one line, in `executed`
-of `trial.py` there: a block that the file of another program has too
-does not vote for where a program is. With it that run counts 0, and
+never started, had 1,003 bytes of `VCSETUP.COM` count as run. The fix
+is one line, in `coverage.executed` since 0a: a block that the file of
+another program has too, one of `others`, does not vote for where a
+program is. With it that run counts 0, and
 what really ran in the setup program's place still counts, the
 routines that both have included.
 
-The other way round is the same: what a scenario of the setup program
-is said to have run of `VC.COM` is not to be believed, and is kept out
-of what the batches of the main program go by.
+The other way round is the same, and is not relied on: what a scenario
+of the setup program runs of `VC.COM` is not recorded at all, and so
+is kept out of what the batches of the main program go by. That run
+counted the same 11,055 bytes of `VC.COM` with `VCSETUP.COM` given as
+the other program as without.
+
+`setup`, of nine screens, ran 4,095 bytes of `VCSETUP.COM`.
 
 With the fix, the nine screens of the trial ran 1,851 of the 4,861
 instructions: 855 of the 1,745 that are the main program's word for
@@ -507,9 +585,12 @@ on the bench.
   is the number of an item in the low six bits, with 40h for a cell
   that lies in a shadow and 80h for one that blinks, and FFh is plain
   grey.
-- **The data's test.** Until 0a's last item is done, 12 KB of tables
-  are held only by what the screens show, and `ColPage`, which picture
-  an item has, only by entering each of the 39.
+- **The data's test.** It holds the tables of setup against
+  `VCSETUP.COM` since 0a, by the names with `St` in front. A table
+  that the C has otherwise than the assembly, a `switch` for a table of
+  keys, is held by the screens alone, and `ColPage`, which picture an
+  item has, is held by the test only if it is written as the table
+  that the assembly has.
 - **The item of the menu.** A line put in above others moves them, and
   an item is known by its number in code as well as in tables: the
   ticks of the Options menu, `F39_58` of `menu.c`, the keys of an open
@@ -1259,8 +1340,11 @@ The changes, in the order to make them:
 
 ### The length of the file
 
-The scenarios' test fails a file longer than three times the
-original's 65,090 bytes: 195,270. `wcc386` was given the tree as it
+When this was tried, the scenarios' test failed a file longer than
+three times the original's 65,090 bytes: 195,270. It holds the portable
+C to no multiple of that since, on the user's word of 12 October 2026:
+see 5 of what is decided in "The setup program in the portable C: the
+plan". `wcc386` was given the tree as it
 was that day, with `-i` for the compiler's own headers, which `vc.h`
 includes `stddef.h` from: it took 40 of the 55 files, and those link to
 106,853 bytes of code, where the 16-bit build of the same day had
@@ -1282,8 +1366,8 @@ still a segment's number there, and memory is cut up by segments.
 
 With the stub's 27.5 KB, the tables, `dos.c`, the relocations of both
 and the main data out of the file, the program comes to somewhere
-between 185 and 200 KB: at the limit. The README's figures have what
-the file is today. A change to that limit is the user's to decide.
+between 185 and 200 KB: at what the limit was. The README's figures
+have what the file is today.
 
 ### What was not tried
 
