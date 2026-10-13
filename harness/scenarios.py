@@ -2813,6 +2813,42 @@ SCENARIOS = {
             "Enter",                      # eighteen programs released
         )),
 
+    "asked": Scenario(
+        "The program asked for its data by another program, as its "
+        "setup program asks it, by the call of DOS that is the "
+        "program's own: a program made in the editor, in hex, asks for "
+        "both panels and the main data and prints a byte of each, with "
+        "the left panel on one drive and on another",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",
+            '"a.com"',
+            "Enter",
+            "Enter",                      # a new file
+            "F4",                         # in hex
+            '"be000089f0b4"',             # for AL 0, 1 and 2: AH 2Bh,
+            '"2bb94356ba4d"',             # CX 'VC', DX 'OM', INT 21h;
+            '"4fcd2188e2b4"',             # then AH as a character, the
+            '"02cd21268a57"',             # number of the interface, 42,
+            '"14b402cd2146"',             # and the byte at ES:BX+20
+            '"83fe0372e0c3"',
+            "F2",
+            "Esc",
+            '"a" Enter',
+            "Ctrl+o",                     # *C*C*>: the drive of either
+            "Ctrl+o",                     # panel's path, and a colour
+            "Alt+F1",
+            "a",                          # the left panel on A:, not on
+                                          # D:, where the Info would say
+                                          # how much the program's file
+                                          # leaves free
+            '"c:\\work\\a" Enter',
+            "Ctrl+o",                     # *A*C*>
+            "Ctrl+o",
+        )),
+
     "passed-on": Scenario(
         "What the program takes of a call of DOS and what it hands on, "
         "seen by a program that stays in the memory between two copies "

@@ -627,7 +627,11 @@ Func40:                                 /* Move the cursor */
    the first kind has too, Tab, Enter and Esc, stood behind that key, so
    the keys are looked for first here. Case left SI behind the entry it
    had found, or on the table: no command reads it, and here it stays as
-   it is. */
+   it is.
+
+   The original's table has one key more, Alt+F5, the map of the memory,
+   which the portable C has not (see DEVIATIONS.md): here it is a key
+   that has no command. */
 static u16 Func12(u16 key)
 {
     if (key >> 8 == 0)
@@ -679,7 +683,6 @@ static u16 Func12(u16 key)
     case 0x6900: return CMD_F62_00;  /* Alt F2: change right drive */
     case 0x6A00: return CMD_F63_00;  /* Alt F3: internal viewer */
     case 0x6B00: return CMD_F64_00;  /* Alt F4: internal editor */
-    case 0x6C00: return CMD_F65_00;  /* Alt F5: memory info */
     case 0x6D00: return CMD_M42_00;  /* Alt F6: directory sizes */
     case 0x6E00: return CMD_F67_00;  /* Alt F7: file find */
     case 0x6F00: return CMD_F68_00;  /* Alt F8: history */
@@ -1228,11 +1231,6 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_F61_00: return F62_02(md.WCB1seg, 1, r);
     case CMD_F62_00: return F62_02(md.WCB2seg, 5, r);
     case CMD_F62_01: return F62_02(panel, r->cx & 0xFF, r);
-
-    /* The map of the memory, memory.c. */
-    case CMD_F65_00:
-        F65_00();
-        return FUNC04;
 
     /* The file search, find.c: Go to has the current directory be
        another, and the panel that it hands back show it. */

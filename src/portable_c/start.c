@@ -276,8 +276,7 @@ static u16 ReadOne(const u8 __far *path, u8 __far *end,
    its three letters V gives them too, and is said to be not correct.
    Then the banner. And the program takes the interrupts that it keeps
    while commands run: its end, which DOS finds in the PSP, Ctrl-Break,
-   and, if it is to know of programs that stay in the memory, DOS's
-   own, 21h and 27h.
+   and DOS's own, 21h, for the program's own call.
 
    The panels are not there yet, since the original asks DOS for their
    memory after the banner, and says after it that there is none. What
@@ -369,7 +368,6 @@ Init04:                                 /* Output Report */
     *to = 0x1A;                         /* Init10 */
 
     /* Initialize main data. */
-    Counter = 0;
     md.CrnPath[0] = 0;
     md.ViewFil[0] = 0;
     md.ToFile[0] = 0;

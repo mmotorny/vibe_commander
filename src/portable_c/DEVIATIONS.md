@@ -110,15 +110,8 @@ it.
   words.
 - The Info panel says how much memory a command has: all that is behind
   the panels.
-- The map of the memory lists as the program's what stays, the program
-  and its panels: three blocks with the environment, where the original
-  as it is distributed has two, and one interrupt more among those it
-  has taken, 24h, DOS's critical error, whose routine the original gives
-  up with its code. What is behind the panels is listed as free. When a
-  command has left a program in the memory, the panels have moved behind
-  it, and the memory in front of it, where they were, is free: a stretch
-  of free memory that the original's map has longer or not at all,
-  according to where the program stayed.
+- The map of the memory, which listed what stays as the program's, is
+  gone from the portable C since: see 7.
 - The program's own call hands out the main data and the panels
   themselves. They begin as the original's copies do: the setup, which
   is what the original's setup program reads and writes there, the
@@ -170,14 +163,12 @@ portable C's own:
 | Scenario | What changes in it |
 |---|---|
 | `lost` | The program's file is deleted by a command. The original asks for it, twice, and ends; the portable C is back at its panels, and the keys that answered the original are keys at the panels: a space into the command line, Enter, which runs it, and Esc, which switches the panels off |
-| `menu`, `clock`, `clock-russia` | The Options menu where it shows: a line shorter, without Memory allocation. In `menu`, Up from Save setup goes to the clock |
-| `memory-map`, `memory-map-russia`, `menu-items`, `mouse-memory`, `mouse-middle`, `mouse-drag-lists`, `stay`, `ended` | The line of the program in the map of the memory: three blocks where the original has two, and 24h among its interrupts |
-| `memory-map`, `mouse-memory`, `stay` | Besides: a line of free memory more where a program has stayed. In `memory-map` and `mouse-memory` the program is released again, and the memory in front of the panels and that behind them are two lines where the original has one; in `stay` two lines of free memory stand behind the program where the original has one: where the panels were, and where COMMAND.COM was, with the environment of the program that stayed between the two |
-| `memory-map` | Besides: the two steps that switch Memory allocation off and on again, around a second look at the map, are left out |
+| `clock`, `clock-russia` | The Options menu where it shows: a line shorter, without Memory allocation |
+| `menu` | The same, and Up from Save setup goes to the clock. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
 | `quick` | The step that switches Memory allocation off before the last command is left out; every screen is as the original's after the same step |
 | `second-copy` | The second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work |
 | `start-memory` | The second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with its Info, not the first copy's |
-| `ended` | The program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. So the copy has none to release when it is ended, and the register that says how many it had comes back as it went, 1111h for 0002h |
+| `ended` | The program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. And by 7: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. The portable C has where INT 21h went before, the entry of the first copy: an address in the program, which changes with every step of the work and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
 
 A step that switches Memory allocation, "F9 o m", is left out of every
 scenario for the portable C: there it would open the Options menu and
@@ -188,7 +179,7 @@ leave it open.
 | Scenario | Why |
 |---|---|
 | `memory` | It switches Memory allocation off, for the Info panel to show the other number, and shows the menu without the mark |
-| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." What the program hands on is held by `handed-on` instead, which sees the same with one copy, by a program that puts itself behind it; both C trees pass that against the original's golden |
+| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." What the program hands on is held by `handed-on` instead, which sees the same with one copy, by a program that puts itself behind it. The C translation passes that against the original's golden; the portable C, which hands on more, has a golden of its own there: see 7 |
 
 **In the data.** The test `portable_c-data` holds five tables of the menus
 against the original's with this difference declared for each, in
@@ -510,3 +501,145 @@ which the functions answer with or take by name.
 **Which scenarios show it.** None. FreeDOS and the bench's BIOS read none
 of these registers, APPEND is not installed there, and every scenario
 passes against the golden that it had.
+
+### 7. No map of the memory, and no watch on the programs that stay in it
+
+**What the original does.** Alt+F5, Memory info of the Commands menu,
+shows the map of the memory in a window: a line for DOS, for every
+program and for every stretch of free memory that DOS's chain of blocks
+has, with the segment that it begins at, the number of its blocks, its
+size, its name and the interrupts that point into it. The key bar has
+"Memory" for F5 while Alt is held, and the help a page for the map and
+one for the item of the menu.
+
+For the map the original keeps a watch on DOS, if its setup says so,
+which is "TSR manager" of the original's setup program and is on in the
+program as it is distributed. It takes INT 21h and INT 27h when it
+starts. Of every program that is run while it is in the memory (AH 4Bh)
+it notes the name and all the interrupts as they are then; and when a
+program stays in the memory, by DOS's call for that (AH 31h) or by INT
+27h, it makes the program's block longer and writes a record behind the
+program there: its PSP, its name, and every interrupt that has changed
+since the program was run, with where it went before. It keeps a list
+of up to 18 such programs. One more does not stay: the bell sounds, the
+interrupts are put back as they were, and DOS is told to end the
+program instead. A block of memory given back (AH 49h) takes its
+program off the list.
+
+In the map a program of that list has a mark. It can be selected, by
+Ins, Grey + and Grey - or by the right button of the mouse, and
+released, by Enter, by the button Release or by two clicks on its line:
+its interrupts go back to who had them before and its blocks are given
+back to DOS, with DOS told to look in the upper memory too for that
+moment. A program is released only if no program that came after it and
+stays has taken an interrupt that it took. When the program is left, or
+DOS ends it, it releases every program of its list first, and gives INT
+21h and INT 27h back.
+
+The same entry of INT 21h takes the program's own call (AH 2Bh, CX
+'VC', DX 'OM'), by which its setup program reads and writes its setup
+in the memory. With the watch switched off the original does not take
+INT 21h, and nothing answers that call.
+
+**What the portable C does.** It has no map of the memory and keeps no
+watch.
+
+- Alt+F5 is a key that has no command, and does nothing. The Commands
+  menu has no line "memory Info": it has twelve lines where the original
+  has thirteen, Directory sizes stands a row further up with what is
+  below it, and the box is a row shorter. The letter I chooses nothing
+  there, and Alt+F5 nothing in any open menu. The key bar has no name
+  for F5 while Alt is held.
+- The program does not take INT 27h, notes nothing of the programs that
+  are run, and writes no record: a program that stays in the memory
+  keeps the block that it asked for, as long as it asked. Any number of
+  them may stay, and none is ended for being one too many.
+- Nothing releases a program that has stayed. It is still in the memory
+  when the program is left, as it is when it was run from DOS's own
+  command line, and what gets it out again is whatever does there.
+- The program takes INT 21h all the same, for its own call, which
+  answers as before (see 1), and takes it whatever the setup has for
+  the watch. Every other call of DOS is handed on untouched, with no
+  register changed, nothing of the caller's stack used and the flags of
+  the comparison that told it from the program's own. That now holds
+  for a program run, one that stays and a block given back as well,
+  which the original hands on from its watch with other flags, having
+  used the caller's stack.
+- When DOS ends the program, it goes on in the program that started it
+  with the registers as the program leaves them, which are others: DS:DX
+  is where INT 21h went before, where the original has where INT 27h
+  went, and CX and SI are as they came, where the original has 0 in CX,
+  its count of programs run down, and in SI twice that count as it was
+  when the last was released.
+- The byte of the setup that switched the watch, `ChkTSR`, is kept as it
+  is found and written back as it was, 1 in a setup made of the
+  defaults; the program does not go by it. A setup file of the original
+  is one of the portable C and the other way round. The original's
+  setup program, which is not translated, still shows TSR manager and
+  writes the byte.
+- The original's help file, which the portable C reads, still has its
+  pages on the map; no key and no item of a menu leads there.
+
+Gone are `memory.c` and `memory_t.c`, all of the map; and of
+`resident.c` the list, `Counter` and `PrgList`, the records and what
+made and read them, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk` and
+`Release`, the entry of INT 27h, `New27`, with the interrupt function
+`Int27` behind it, the interrupts noted, `IntTab`, `SavePtr` and
+`NameBuf`, and `GetStat`, which noted how DOS looks for memory before a
+program was released. The entry of INT 21h, `New21`, is the three
+comparisons that know the program's own call and two jumps, and
+`Int21`, the interrupt function that it goes on in, answers that call
+and returns. What is left for two things that are not the map: `SetStat`
+with 0, by which the program has DOS look for memory in the lowest block
+first when it starts, as the original does; and the prompt that is
+written between two commands, which the original makes where its watch
+notes the interrupts and the portable C in a buffer of its own.
+
+**Why.** It only made sense on DOS. The map is of DOS's chain of blocks
+and of the table of interrupts of a PC, and a program that stays in the
+memory by taking an interrupt is a thing of DOS, which had no way of its
+own to see such a program or to get it out again. A system that the
+program is carried to has both, and gives a program's memory back when
+it ends.
+
+**Which scenarios show it.** Each of these is held against a golden of
+the portable C's own:
+
+| Scenario | What changes in it |
+|---|---|
+| `menu-items` | Memory info is not chosen from the Commands menu: the two steps that choose it and leave the map are left out. Every screen is as the original's after the same step |
+| `mouse-menu`, `mouse-drag-menu` | The Commands menu where it shows, a line shorter, without Memory info. In `mouse-menu` the click that is on a dark item of the original's menu, Compare directories, is on the line across the menu below that item: nothing is chosen either way, and the screen is the same |
+| `tree-choose` | The key bar with Alt held, twice, has no name for F5, where the original has Memory |
+| `handed-on` | The flags that three calls of DOS come on with from the program, to a program that has put itself behind it: a program run, 0002h for 0246h, one that stays, 0016h for 0202h, and a block given back, 0016h for 0002h and for 0006h. They are those of the call compared with the program's own, 2Bh, as for every other call, and with interrupts as the call found them, off. The other calls come on as from the original, and the stack as it was |
+| `mouse-middle` | The middle button is not pressed in the map of the memory: two steps are left out. Every screen is as the original's after the same step |
+| `mouse-drag-lists` | The last nine steps are left out: a program that stays in the memory, and a button of the mouse moved in the map. Every screen before is as the original's |
+
+And `menu` and `ended`, which the first deviation changes too: their
+rows there say all that differs in them.
+
+A step that passes through the map on the way to something else is
+left out of its scenario for the portable C, with the steps that leave
+the map again: there Alt+F5 would do nothing, and Esc or a click behind
+it would be a key at the panels. `harness/deviations.py` has them,
+scenario by scenario.
+
+**Not run for the portable C:**
+
+| Scenario | Why |
+|---|---|
+| `memory-map`, `memory-map-russia` | They show the map of the memory: its lines, its cursor and its numbers, and a program that stays selected and released there |
+| `mouse-memory` | It is the mouse in the map of the memory |
+| `stay` | It has programs stay in the memory, by INT 27h and by DOS's call, to be listed in the map, released there, counted to the 18 that the list holds and beyond, and released when the program is left. What it has besides, a program that asks the program for its data by the program's own call, is a scenario of its own now, `asked`, which the original, the C translation and the portable C are all taken through; the portable C passes it against the original's golden |
+
+**In the data.** The test `portable_c-data` holds eight tables against
+the original's with this difference declared for each, in `DECLARED` of
+`harness/datacheck.py`: of the menus their lines, the pages of their
+help, the size of the Commands menu and where the lines and the pages of
+the Options menu begin, the commands of the Commands menu, and the keys
+that choose an item in an open menu, which have Alt+F5 no more and the
+items of the Commands menu below Memory info a place further up; and of
+the key bar the names of the keys, without "Memory", and the two rows
+that had it for F5 with Alt. One thing follows from an item's place
+that no screen shows: EGA lines, chosen from the menu, hands the BIOS
+the number of its item in a register that the BIOS does not take, and
+that is 6 where the original has 7.

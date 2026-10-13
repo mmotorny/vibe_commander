@@ -932,19 +932,19 @@ cursor 0 127 lines 6 7 mode 3
 |║    Name    │    N┌───────────────────────────────┐                           ║| 1Bx5 1Ex8 1Bx1 1Ex5 30x33 1Bx28
 |║..          │     │ Tree                  Alt-F10 │                          ◄║| 1Bx19 30x1 0Fx1 0Ex1 0Fx29 30x1 06x2 3Ex4 1Bx20 1Ex1 1Bx1
 |║DOCS        │     │ Volume label          Ctrl-F4 │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║SRC         │     │ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
-|║readme   txt│     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
-|║hello    txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║notes    doc│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║data     bin│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║run      bat│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
-|║empty    dat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
-|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+|║SRC         │     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
+|║readme   txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║hello    txt│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║notes    doc│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║data     bin│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+|║run      bat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║empty    dat│     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
+|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x21 47x1 30x11 03x2 1Bx26
 |║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
 |║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
+|║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
 |║            │            │            ║║                                      ║| 1Bx80
@@ -1044,19 +1044,19 @@ cursor 0 127 lines 6 7 mode 3
 |║    Name    │   Si┌───────────────────────────────┐                           ║| 1Bx5 1Ex8 1Bx1 1Ex5 30x33 1Bx28
 |║..          │►UP--│ Tree                  Alt-F10 │     ▐                    ◄║| 1Bx19 30x1 0Fx1 0Ex1 0Fx29 30x1 06x2 1Ex4 1Bx20 1Ex1 1Bx1
 |║DOCS        │►SUB-│ Volume label          Ctrl-F4 │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║SRC         │►SUB-│ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
-|║readme   txt│     │ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║hello    txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║notes    doc│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║data     bin│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║run      bat│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
-|║empty    dat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
-|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+|║SRC         │►SUB-│ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║readme   txt│     │ Find file             Alt-F7  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║hello    txt│     │ History               Alt-F8  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║notes    doc│     │ EGA lines             Alt-F9  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║data     bin│     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
+|║run      bat│     │ Swap panels           Ctrl-U  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║empty    dat│     │ Panels on/off         Ctrl-O  │                           ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
+|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x21 47x1 30x11 03x2 1Bx26
 |║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
 |║            │         │        │      ║║                                      ║| 1Bx21 03x33 1Bx26
+|║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
 |║            │         │        │      ║║                                      ║| 1Bx80
@@ -1128,7 +1128,6 @@ cursor 0 127 lines 6 7 mode 3
 |Copyright (C) 1991-┌───────────────────────────────┐                            | 07x19 30x33 07x28
 |                   │ Tree                  Alt-F10 │                            | 07x19 30x1 0Fx1 0Ex1 0Fx29 30x1 0Fx2 07x26
 |                   │ Volume label          Ctrl-F4 │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
-|                   │ memory Info           Alt-F5  │                            | 07x19 30x1 3Fx8 3Ex1 3Fx22 30x1 0Fx2 07x26
 |                   │-Directory sizes       Alt-F6  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
 |                   │ Find file             Alt-F7  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
 |                   │ History               Alt-F8  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
@@ -1136,11 +1135,12 @@ cursor 0 127 lines 6 7 mode 3
 |                   │ ───────────────────────────── │                            | 07x19 30x33 0Fx2 07x26
 |                   │-Swap panels           Ctrl-U  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
 |                   │ Panels on/off         Ctrl-O  │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
-|                   │-Compare directories   Ctrl-C  │                            | 07x19 30x1 33x1 30x19 47x1 30x11 0Fx2 07x26
-|                   │ ───────────────────────────── │                            | 07x19 30x33 0Fx2 07x26
+|                   │-Compare directories   Ctrl-C  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
+|                   │ ───────────────────────────── │                            | 07x19 30x21 47x1 30x11 0Fx2 07x26
 |                   │ Menu file edit                │                            | 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 0Fx2 07x26
 |                   └───────────────────────────────┘                            | 07x19 30x33 0Fx2 07x26
 |                                                                                | 07x21 0Fx33 07x26
+|                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -1352,19 +1352,19 @@ cursor 0 127 lines 6 7 mode 3
 |║    Name    │   Si┌───────────────────────────────┐ │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex5 30x33 1Ex1 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
 |║..          │►UP--│ Tree                  Alt-F10 │ │            │            ║| 1Bx19 30x1 0Fx1 0Ex1 0Fx29 30x1 03x2 1Bx26
 |║DOCS        │►SUB-│ Volume label          Ctrl-F4 │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║SRC         │►SUB-│ memory Info           Alt-F5  │d│            │            ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
-|║readme   txt│     │ Directory sizes       Alt-F6  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║hello    txt│     │ Find file             Alt-F7  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║notes    doc│     │ History               Alt-F8  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║data     bin│     │ EGA lines             Alt-F9  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║run      bat│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
-|║empty    dat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │ Panels on/off         Ctrl-O  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx18 48x1 3Fx10 30x1 03x2 1Bx26
-|║            │     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+|║SRC         │►SUB-│ Directory sizes       Alt-F6  │d│            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║readme   txt│     │ Find file             Alt-F7  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║hello    txt│     │ History               Alt-F8  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║notes    doc│     │ EGA lines             Alt-F9  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║data     bin│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+|║run      bat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║empty    dat│     │ Panels on/off         Ctrl-O  │ │            │            ║| 1Bx1 30x19 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|║            │     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x21 47x1 30x11 03x2 1Bx26
 |║            │     │ Menu file edit                │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |║            │     └───────────────────────────────┘ │            │            ║| 1Bx19 30x33 03x2 1Bx26
 |║            │         │        │      ║║            │            │            ║| 1Bx21 03x33 1Bx26
+|║            │         │        │      ║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx80
 |║            │         │        │      ║║            │            │            ║| 1Bx80
@@ -1408,19 +1408,19 @@ cursor 0 127 lines 6 7 mode 3
 |Copyright (C) 1991-┌───────────────────────────────┐ │    Name    │    Name    ║| 07x19 30x33 1Ex1 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
 |                   │ Tree                  Alt-F10 │ │            │            ║| 07x19 30x1 0Fx1 0Ex1 0Fx29 30x1 08x1 03x1 1Bx26
 |                   │ Volume label          Ctrl-F4 │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|                   │ memory Info           Alt-F5  │d│            │            ║| 07x19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
-|                   │ Directory sizes       Alt-F6  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+|                   │ Directory sizes       Alt-F6  │d│            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |                   │ Find file             Alt-F7  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |                   │ History               Alt-F8  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |                   │ EGA lines             Alt-F9  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |                   │ ───────────────────────────── │ │            │            ║| 07x19 30x33 03x2 1Bx26
 |                   │ Swap panels           Ctrl-U  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |                   │ Panels on/off         Ctrl-O  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-|                   │-Compare directories   Ctrl-C  │ │            │            ║| 07x19 30x1 33x1 30x19 47x1 30x11 03x2 1Bx26
-|                   │ ───────────────────────────── │ │            │            ║| 07x19 30x33 03x2 1Bx26
+|                   │-Compare directories   Ctrl-C  │ │            │            ║| 07x19 30x1 33x1 30x31 03x2 1Bx26
+|                   │ ───────────────────────────── │ │            │            ║| 07x19 30x21 47x1 30x11 03x2 1Bx26
 |                   │ Menu file edit                │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
 |                   └───────────────────────────────┘ │            │            ║| 07x19 30x33 03x2 1Bx26
 |                                        ║            │            │            ║| 07x21 0Fx19 03x14 1Bx26
+|                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40
 |                                        ║            │            │            ║| 07x40 1Bx40

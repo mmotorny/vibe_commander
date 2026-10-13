@@ -236,7 +236,9 @@ struct MainDat {
     u8  ClrBuf;                         /* Clear buffer flag */
     u8  Active;                         /* Active panel */
     u8  Ctrl_O;                         /* Visible status of unactive panel */
-    u8  ChkTSR;                         /* TSR manager */
+    u8  ChkTSR;                         /* TSR manager: of the original.
+                                           Here a byte of the setup that
+                                           is kept as it is found */
     u8  ChgTree;                        /* Auto rescan tree */
     u8  DriveB;                         /* Show logic drive B: in 1 floppy system */
     u8  DelayTm[2];                     /* Auto change dir delay time */
@@ -408,26 +410,19 @@ extern u8 __far Stack[];
 #endif
 
 /* What the program knows of DOS around it, resident.c: the segment of
-   its PSP; the programs that have stayed in the memory since it was
-   started, how many and each by the segment of its record, for the map
-   of the memory. Of its routines there, Alloc0 is where the program
-   begins. TakeDos has the program go on in Exit01 when DOS ends it, and
-   takes INT 21h and INT 27h if it is to know of programs that stay.
-   SetBrk notes whether DOS looks for Ctrl-C at every call, has it not
-   do so, and takes Ctrl-C, for CtrlC, which only returns. Exec runs the
-   commands of DosBuf. Release takes a program that has stayed out of
-   the memory, by its record. AlocEr says that there is no memory and
-   leaves, with `bx` for what the original has in BX there, and Exit00
-   leaves with what DOS is to be told. */
-#define MaxProg 18                      /* Maximal resident quantaty */
+   its PSP. Of its routines there, Alloc0 is where the program begins.
+   TakeDos has the program go on in Exit01 when DOS ends it, and takes
+   INT 21h, for the program's own call. SetBrk notes whether DOS looks
+   for Ctrl-C at every call, has it not do so, and takes Ctrl-C, for
+   CtrlC, which only returns. Exec runs the commands of DosBuf. AlocEr
+   says that there is no memory and leaves, with `bx` for what the
+   original has in BX there, and Exit00 leaves with what DOS is to be
+   told. */
 extern u16 PspSeg;
-extern u16 Counter;
-extern u16 PrgList[MaxProg];
 void TakeDos(void);
 void SetBrk(void);
 void __interrupt __far CtrlC(void);
 void Exec(void);
-void Release(u16 record);
 void AlocEr(u16 bx);
 void Exit00(u16 code);
 #pragma aux AlocEr aborts
@@ -718,7 +713,9 @@ enum {
     CMD_F21_10,                         /* Enter on the entry */
     CMD_F21_31,                         /* run the command in DosBuf */
     /* The other commands of the keys, in the order that the original's
-       table of the keys has them in: see Func12 of main.c. */
+       table of the keys has them in: see Func12 of main.c. The original
+       has one more, F65_00 behind F64_00, the map of the memory, Alt+F5,
+       which the portable C has not (see DEVIATIONS.md). */
     CMD_F00_00, CMD_F01_00, CMD_F02_00, CMD_F03_00, CMD_F04_00,
     CMD_F05_00, CMD_F06_00, CMD_F07_00, CMD_F08_00, CMD_F09_00,
     CMD_F10_00, CMD_F76_00, CMD_F21_00, CMD_F27_00, CMD_F74_00,
@@ -731,8 +728,8 @@ enum {
     CMD_F42_00, CMD_F43_00, CMD_F44_00, CMD_F45_00, CMD_F46_00,
     CMD_F47_00, CMD_F48_00, CMD_M75_00, CMD_F54_00, CMD_F55_00,
     CMD_F56_00, CMD_F58_00, CMD_F61_00, CMD_F62_00, CMD_F63_00,
-    CMD_F64_00, CMD_F65_00, CMD_M42_00, CMD_F67_00, CMD_F68_00,
-    CMD_F69_00, CMD_M41_00, CMD_F75_00,
+    CMD_F64_00, CMD_M42_00, CMD_F67_00, CMD_F68_00, CMD_F69_00,
+    CMD_M41_00, CMD_F75_00,
     /* Those that only the menus have, or have at a label of their own. */
     CMD_M01_00, CMD_M03_00, CMD_M06_00, CMD_M08_00, CMD_F17_01,
     CMD_M16_01, CMD_F62_01, CMD_M21_00, CMD_F76_01, CMD_M53_00,
@@ -1041,11 +1038,11 @@ struct Copied {                         /* what they return: */
 struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files);
 struct Copied F45_01(u16 panel, u16 command, u16 directories, u16 files);
 
-/* The file search, find.c; the map of the memory, memory.c; the command
-   line, cmdline.c: a key for it, Esc, the selected files and the path of
-   a panel put into it, the history in its box, and the speed search; the
-   user menu, usermenu.c, 1 for the main one; the box of the drives,
-   drive.c; and the menu bar, menu.c. See each there. */
+/* The file search, find.c; the command line, cmdline.c: a key for it,
+   Esc, the selected files and the path of a panel put into it, the
+   history in its box, and the speed search; the user menu, usermenu.c,
+   1 for the main one; the box of the drives, drive.c; and the menu bar,
+   menu.c. See each there. */
 struct Searched {                       /* what the file search returns: */
     u16 place;                          /* where the program goes on: a
                                            TO_ */
@@ -1072,7 +1069,6 @@ struct Picked {                         /* what the menu bar returns: */
                                            chosen */
 };
 struct Searched F67_00(void);
-void F65_00(void);
 void F73_00(u16 key);
 u16 F74_00(void);
 u16 F80_00(u16 panel);

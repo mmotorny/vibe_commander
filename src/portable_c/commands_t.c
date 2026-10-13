@@ -36,12 +36,13 @@ static const u8 SvSt_D[5];
    Files menu with Shift and with Ctrl held down. An entry is the number
    of a command, a CMD_ of vc.h, which F39_01 of main.c hands to
    Command, and 0 for a line across the menu. The original has the
-   address of the command's label there. The Options menu, Menu4_T, has
-   an item less than the original's: Memory allocation, behind the
-   clock (see DEVIATIONS.md). */
+   address of the command's label there. Two menus have an item less
+   than the original's (see DEVIATIONS.md): the Commands menu, Menu3_T,
+   Memory info, behind the volume label, and the Options menu, Menu4_T,
+   Memory allocation, behind the clock. */
 static const u16 Menu1_T[15];
 static const u16 Menu2_T[17];
-static const u16 Menu3_T[13];
+static const u16 Menu3_T[12];
 static const u16 Menu4_T[15];
 static const u16 MenuS_T[8];
 static const u16 MenuC_T[8];
@@ -88,10 +89,9 @@ static const u16 Menu2_T[17] = {
     CMD_F30_00                          /* Quit */
 };
 
-static const u16 Menu3_T[13] = {
+static const u16 Menu3_T[12] = {
     CMD_M41_00,                         /* Tree */
     CMD_F54_00,                         /* Volume label */
-    CMD_F65_00,                         /* Memory info */
     CMD_M42_00,                         /* Directory sizes */
     CMD_F67_00,                         /* Find file */
     CMD_F68_00,                         /* History */

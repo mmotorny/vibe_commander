@@ -39,15 +39,13 @@ line.c        clean
 main.c        to-number 30, to-pointer 21, function 2, interrupt 1, data_seg 2, aborts 1
 main_t.c      clean
 mask.c        clean
-memory.c      to-number 11, to-pointer 27, function 1
-memory_t.c    clean
 menu.c        to-number 8, to-pointer 6
 misc.c        to-number 1
 mouse.c       clean
 panel.c       to-number 2, to-pointer 7
 place.c       to-number 7, to-pointer 5
 read.c        to-number 3, to-pointer 16
-resident.c    to-number 28, to-pointer 30, function 6, interrupt 7, loadds 3, naked 4, asm 4, registers 1, aborts 3
+resident.c    to-number 26, to-pointer 13, function 4, interrupt 5, loadds 3, naked 3, asm 3, registers 1, aborts 3
 screen.c      clean
 setup.c       to-number 1, to-pointer 2
 stack.c       data_seg 2

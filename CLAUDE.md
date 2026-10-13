@@ -1618,6 +1618,57 @@ in "The portable C".
   `STACK` and `CODE`, which are the host check's, by its function.
   What else that test counts is in its own table in `TODO.md`, which
   its `--record` flow goes with, and is not copied.
+- What taking out the first feature that a user sees met, the map of
+  the memory with the watch on DOS that it rested on
+  (`src/portable_c/DEVIATIONS.md`, 7):
+  - A line taken out of a menu moves every item below it, and an item
+    is known by its number in more places than the tables that the
+    data's test holds: the items that a menu shows dark are numbers in
+    the code, `F39_58` of `menu.c`, and a command may be handed the
+    number of its item. The data's test said nothing of those. `python3
+    harness/goldens.py changes` did, as a minus in front of the wrong
+    line, in the one scenario that shows that menu with the panels off:
+    read every row of every screen that shows the menu, and `grep` the
+    code for the menu's number. The tables that change with a line are
+    in `DECLARED` of `harness/datacheck.py`, the eight of this one:
+    among them where the lines and the pages of the next menu begin,
+    two words of `MnuTab` that the test holds against a distance in the
+    original.
+  - A step that goes to the thing, with the steps that leave it again,
+    is left out of one scenario by `left_out_of` of `TREES`: steps that
+    follow one another there, since Esc is another key at the panels. A
+    scenario whose whole point is the thing is not run.
+  - What such a scenario had besides, which the tree still does and no
+    other scenario shows, becomes a scenario of its own, for the
+    original and both C trees: `asked`, which was a part of `stay`.
+    `python3 harness/goldens.py derive NAME` derives the golden of a new
+    scenario from the original in seconds, and both C trees have to
+    pass it. A function of a batch that no scenario of a tree runs any
+    more fails that tree's test, "not executed in the translation":
+    either it is gone, and listed in `GONE` of `harness/ported.py`, or
+    a scenario has to reach what is left of it.
+  - A scenario that shows the Info panel on D: shows how much the file
+    of the program under test leaves free there, which is another
+    number for every tree.
+  - What a program of a scenario prints of the registers may be an
+    address in the program, once the program leaves another thing
+    there than the original: it follows the layout and changes with
+    every step of the work. `ended` prints DS:DX as the program leaves
+    them, and `IGNORED` of `harness/deviations.py` has the two words
+    left out for the line that only the portable C prints. Look for
+    such a figure in every golden of the tree's own before it is
+    recorded: it passes today and fails for the next agent.
+  - What leaned on the watch and stays: the entry of INT 21h for the
+    program's own call, with nothing of the watch in it; the prompt
+    between two commands, which the original writes where the watch
+    notes the interrupts, `PromptLine` of `resident.c`; and `SetStat`
+    with 0 where the program begins. Read what a buffer or a routine of
+    the thing is used for elsewhere before it goes: `grep` its name in
+    the whole tree, the routine's and the buffer's.
+  - A handler that no longer goes on in another handler needs no room
+    on the stack for a second return address: `Int21` returns to
+    whoever called, and `New21` jumps to it without the three
+    instructions that made the room. `Exit01` still has them.
 
 ### Moving a file to the system's functions
 
@@ -1701,11 +1752,10 @@ the mouse hidden, is `Scroll` there.
 
 What is not in the table stays as it is, on `Int21d` and `Int21e`, and
 `struct DosRegs` stays in `vc.h` for it: what is of DOS alone and is
-likely to go, the map of the memory (`memory.c`, its `Dos5802` to
-`Dos2523`) and the watch on DOS in `resident.c` (`AddProg`, `Release`,
-`GetStat`, `SetStat`, the PSP in `Alloc0`), with the calls 51h, 52h,
-58h, 62h and 4452h, and 49h and 4Ah where the watch asks them for the
-memory of another program. So does the BIOS's 12h with 20h in BL, by
+likely to go, `SetStat` and the PSP in `Alloc0` of `resident.c`, with
+the calls 51h and 58h. The map of the memory and the watch on DOS,
+which were of that kind, with 52h, 62h and 4452h, are gone. So does the
+BIOS's 12h with 20h in BL, by
 which the program has the BIOS print a screen of more lines than 25:
 it is of the PC alone, as TopView, DESQview and the wait for snow
 were, which are gone.

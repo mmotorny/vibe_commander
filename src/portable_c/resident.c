@@ -1,6 +1,7 @@
 /*
  * The program and DOS around it: where the program begins and where it
- * ends, the commands of DOS that it runs, and its watch on DOS.
+ * ends, the commands of DOS that it runs, and the program's own call of
+ * DOS.
  *
  * In the original, and in the C translation after it, this is the part
  * of the program that stays in the memory while a command runs, which
@@ -19,16 +20,19 @@
  * for that; and what the program does when it leaves, or when DOS ends
  * it.
  *
- * The third is the program's watch on DOS. While the program runs, and
- * while a command runs from it, every call of DOS comes by New21: it notes
- * which program is being run, and when one stays in the memory, by DOS's
- * call for that or by INT 27h, it writes down who it is and which
- * interrupts it has taken, in a record behind the program's memory. With
- * those records the map of the memory, Alt+F5, lists the programs, and
- * Release takes one out again. These routines are entered from other
- * programs, on their stacks: nothing here takes the stack to be the
- * program's own, and a pointer to a local variable is declared STACK,
- * as everywhere.
+ * The third is the program's own call of DOS, by which another program
+ * asks it for its data, as the original's setup program does. For that
+ * the program takes INT 21h while it runs, and while a command runs from
+ * it: every call of DOS comes by New21, which passes on all but that
+ * one. The original has more there, its watch on DOS: it notes which
+ * program is being run, and when one stays in the memory, by DOS's call
+ * for that or by INT 27h, it writes down who it is and which interrupts
+ * it has taken; with those records the map of the memory, Alt+F5, lists
+ * the programs and releases them. The portable C has no such map and
+ * keeps no such watch (see DEVIATIONS.md). New21 and what it goes on in
+ * are entered from other programs, on their stacks: nothing there takes
+ * the stack to be the program's own, and a pointer to a local variable
+ * is declared STACK, as everywhere.
  */
 #include "vc.h"
 
@@ -39,7 +43,7 @@
    First the constants: the name that COMMAND.COM has when the
    environment does not say, and what the commands' code says for
    itself. */
-const u8 Command[] = "COMMAND.COM";
+static const u8 Command[] = "COMMAND.COM";
 static const u8 NoRun_S[] =
     "There is not enough memory to run this command\015\012";
 static const u8 FnFil_S[] = "\015\012" "Can't find the file: ";
@@ -54,18 +58,16 @@ static const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
    segment registers there. */
 u16 PspSeg;
 
-/* What the watch keeps: the interrupts as they were when a program was
-   last run, with what the BIOS keeps at 40h:A8h; the name of that
-   program; and the programs that have stayed in the memory, how many
-   and each by the segment of its record. Then where INT 22h and INT 27h
-   went before the program took them. */
-static u32 IntTab[256];
-static u32 SavePtr;
-static u8 NameBuf[12];
-u16 Counter;
-u16 PrgList[MaxProg];
+/* Where INT 22h went before the program took it: where the program that
+   started this one goes on when this one has ended. */
 static u32 Vect22;
-static u32 Vect27;
+
+/* The prompt that is written in front of a command which follows
+   another, with the path if the setup says so: Exec02 makes it here.
+   The original makes it where its watch notes the interrupts when a
+   program is run, IntTab. A drive, a path as long as DOS has one, 64
+   bytes with its zero, and five characters around them. */
+static u8 PromptLine[2 + 3 + 64 + 1 + 1];
 
 /* Where INT 21h went before the program took it. This one is of the
    code's segment, not of the data: New21 passes a call of DOS on with
@@ -82,7 +84,6 @@ extern const u8 __far Vers_S[];
 
 #define AT(segment, offset) \
     ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-#define WORD_AT(segment, offset) (*(u16 __far *)AT(segment, offset))
 
 /* Where a routine is, as an address for DOS and for a return. */
 #define ROUTINE(function) ((const u8 __far *)(void __far *)(function))
@@ -95,24 +96,17 @@ extern const u8 __far Vers_S[];
                                            from DL */
 #define DOS_PATH     0x4700             /* the current directory of the
                                            drive in DL, to DS:SI */
-#define DOS_FREE     0x4900             /* free the block in ES */
 #define DOS_RESIZE   0x4A00             /* make the block in ES BX
                                            paragraphs long */
 #define DOS_EXEC     0x4B00             /* run the program at DS:DX, with
                                            what ES:BX says */
 #define DOS_EXIT     0x4C00             /* end the program, with AL */
-#define DOS_LISTS    0x5200             /* where DOS keeps its lists, to
-                                           ES:BX */
 #define DOS_STRATEGY 0x5800             /* how DOS looks for memory: AL 0
                                            to ask, 1 to say, 2 and 3 the
                                            same for whether the upper
                                            memory is in the chain */
 #define DOS_PSP_OLD  0x5100             /* the current program, to BX: as
                                            6200h, and of DOS 2 too */
-#define DOS_PSP      0x6200             /* the current program, to BX */
-
-#define SAVE_PTR 0x4A8                  /* where the BIOS keeps the address
-                                           of its tables for the screen */
 
 #define FLAG_CARRY     0x0001
 #define FLAG_PARITY    0x0004
@@ -121,7 +115,6 @@ extern const u8 __far Vers_S[];
 #define FLAG_SIGN      0x0080
 #define FLAG_TRAP      0x0100
 #define FLAG_INTERRUPT 0x0200
-#define FLAG_DIRECTION 0x0400
 #define FLAG_OVERFLOW  0x0800
 
 /* The six that an instruction leaves of what it has worked out. */
@@ -139,17 +132,6 @@ extern const u8 __far Vers_S[];
 #define EPB_WAS     WAS(&md.EPB)
 #define RESPARS_WAS 0x031A
 
-/* A record of a program that has stayed in the memory, in a segment of
-   its own behind what the program keeps: the program's PSP, its name,
-   how many interrupts it has taken, then for each its number and where
-   it went before, five bytes, then what the BIOS had at SAVE_PTR, and
-   the sum of all these bytes. */
-#define REC_PSP     0
-#define REC_NAME    2
-#define REC_VECTORS 14
-#define REC_FIRST   15
-#define REC_PARAS   ((2 + 12 + 1 + 5 * 256 + 4 + 2 + 15) >> 4)
-
 /* The return address that an interrupt leaves on the stack, behind the
    registers that an interrupt function of the compiler saves there:
    struct Saved of vc.h. */
@@ -160,13 +142,11 @@ struct Frame {
 /* DX of a call of DOS that is no address. */
 #define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
-static u16 GetStat(void);
-static void SetStat(u16 state);
-
 /*----------------------- The flags -----------------------
-   The assembly goes on in DOS, and in the program that started this
-   one, with the flags as its last instruction of arithmetic left them.
-   These say what that is, so that the C can leave the same. */
+   The assembly goes on in the program that started this one, when DOS
+   has ended the program, with the flags as its last instruction of
+   arithmetic left them. These say what that is, so that the C can leave
+   the same. */
 
 /* What a result of 16 bits leaves of them: zero, sign, and parity, which
    is of its low byte. */
@@ -187,22 +167,7 @@ static u16 Result(u16 result)
     return flags;
 }
 
-/* ADD: `a` and `b` added. */
-static u16 Added(u16 a, u16 b)
-{
-    u16 sum = a + b;
-    u16 flags = Result(sum);
-
-    if (sum < a)
-        flags |= FLAG_CARRY;
-    if ((a ^ b ^ sum) & 0x10)
-        flags |= FLAG_AUX;
-    if ((a ^ sum) & (b ^ sum) & 0x8000)
-        flags |= FLAG_OVERFLOW;
-    return flags;
-}
-
-/* SUB and CMP: `b` taken from `a`. */
+/* CMP: `b` taken from `a`. */
 static u16 Taken(u16 a, u16 b)
 {
     u16 rest = a - b;
@@ -217,272 +182,7 @@ static u16 Taken(u16 a, u16 b)
     return flags;
 }
 
-/* SHL by one: `value` doubled. The processor leaves the auxiliary flag
-   undefined; it is clear here. */
-static u16 Doubled(u16 value)
-{
-    u16 twice = value << 1;
-    u16 flags = Result(twice);
-
-    if (value & 0x8000)
-        flags |= FLAG_CARRY;
-    if ((value ^ twice) & 0x8000)
-        flags |= FLAG_OVERFLOW;
-    return flags;
-}
-
-/*---------------------- Check sum ----------------------
-   Whether the record in the segment `record` is whole: 1 if its sum is
-   right. */
-static u16 ChkBlk(u16 record)
-{
-    const u8 __far *byte = AT(record, 0);
-    u16 length = (u16)byte[REC_VECTORS] * 5 + (2 + 12 + 1 + 4);
-    u16 sum = 0;
-
-    do
-        sum += *byte++;
-    while (--length);
-    return sum == *(const u16 __far *)byte;
-}
-
-/*------------------ Free memory block ------------------
-   Take off the list the program whose PSP is the block `block`, which is
-   being freed, and every record that is no longer whole. */
-static void FreeBlk(u16 block)
-{
-    u16 count = Counter, from, to = 0;
-
-    if (count == 0)
-        return;
-    for (from = 0; from < count; from++) {
-        u16 record = PrgList[from];
-
-        if (ChkBlk(record) && block != WORD_AT(record, REC_PSP))
-            PrgList[to++] = record;
-    }
-    Counter -= from - to;
-}
-
-/*------------- Save vectors & program name -------------
-   Note the interrupts as they are, and the name of the file `name`
-   without its path, for a program that DOS is about to run. Twelve
-   bytes are taken from where the name begins, however long it is. */
-static void ExeProg(const u8 __far *name)
-{
-    /* The segment of the table of vectors. Written as a constant, the
-       compiler takes a far pointer into segment 0 for a near one. */
-    volatile u16 table = 0;
-    const u32 __far *vector = (const u32 __far *)AT(table, 0);
-    const u8 __far *begin;
-    u16 i;
-
-    IntOff();
-    for (i = 0; i < 256; i++)
-        IntTab[i] = vector[i];
-    SavePtr = *(const u32 __far *)AT(table, SAVE_PTR);
-    IntOn();
-    for (begin = name; ; ) {
-        u8 c = *name++;
-
-        if (c == ':' || c == '\\')
-            begin = name;
-        else if (c == 0)
-            break;
-    }
-    for (i = 0; i < 12; i++)
-        NameBuf[i] = begin[i];
-}
-
-/*------------- Add resident program to list ------------
-   A program is about to stay in the memory with as many paragraphs as
-   `r` has in DX. Make its record behind them, with the interrupts that
-   have changed since it was run, and add the record's paragraphs to DX.
-   Returns the flags as the assembly leaves them, with interrupts let in
-   and the direction flag clear. The carry flag says that the program is
-   to end instead: the list is full, the bell sounds and the interrupts
-   are put back as they were, and the other flags are those of a
-   register cleared, XOR, of which the processor leaves the auxiliary
-   flag undefined: clear here. Or the paragraphs with the record's are
-   more than 16 bits hold. Without that the flags are those of the
-   addition that made them.
-
-   Ported as it is: if DOS will not make the program's block longer for
-   the record, the program stays without one and is not listed. The flags
-   are then those of the paragraphs asked for, as they were added up,
-   with the carry flag clear: DOS sets it and leaves the others, and the
-   assembly turns it over. */
-static u16 AddProg(struct Saved STACK *r)
-{
-    volatile u16 table = 0;
-    u32 __far *vector = (u32 __far *)AT(table, 0);
-    struct DosRegs regs;
-    struct BiosRegs bios;
-    u8 __far *record;
-    u8 __far *to;
-    const u8 __far *byte;
-    u16 psp, segment, i, changed, length, sum, more, flags;
-
-    IntOn();
-    if (Counter >= MaxProg) {
-        bios.ax = 0x0E07;
-        bios.bx = r->bx;
-        bios.cx = r->cx;
-        bios.dx = r->dx;
-        Int10(&bios);
-        IntOff();
-        for (i = 0; i < 256; i++)
-            vector[i] = IntTab[i];
-        *(u32 __far *)AT(table, SAVE_PTR) = SavePtr;
-        IntOn();
-        return FLAG_ZERO | FLAG_PARITY | FLAG_CARRY;
-    }
-    regs.ax = DOS_PSP;                  /* Get current PSP */
-    Int21e(&regs);
-    psp = regs.bx;
-    FreeBlk(psp);
-    regs.ax = DOS_RESIZE;
-    regs.bx = r->dx + REC_PARAS;
-    regs.es = psp;
-    if (Int21e(&regs))
-        return Added(r->dx, REC_PARAS) & ~FLAG_CARRY;
-    segment = psp + r->dx;
-    record = AT(segment, 0);
-    IntOff();
-    *(u16 __far *)record = psp;         /* PSP -> PrgSeg */
-    to = record + REC_NAME;
-    for (i = 0; i < 12; i++)            /* File name -> PrgSeg */
-        *to++ = NameBuf[i];
-    to++;
-    changed = 0;                        /* Changed vectors -> PrgSeg */
-    for (i = 0; i < 256; i++) {
-        if (IntTab[i] == vector[i] || i == 0x22)
-            continue;
-        *to++ = (u8)i;                  /* Save vector */
-        *(u32 __far *)to = IntTab[i];
-        to += 4;
-        changed++;
-    }
-    record[REC_VECTORS] = (u8)changed;
-    *(u32 __far *)to = SavePtr;         /* SAVE PTR -> PrgSeg */
-    to += 4;
-    length = (u16)(u32)to;              /* check sum -> PrgSeg */
-    sum = 0;
-    for (byte = record, i = length; i; i--)
-        sum += *byte++;
-    *(u16 __far *)to = sum;
-    PrgList[Counter] = segment;         /* Save PrgSeg */
-    Counter++;
-    IntOn();
-    more = ((length + 1) >> 4) + 1;     /* Add PrgSeg size */
-    flags = Added(r->dx, more);
-    r->dx += more;
-    return flags;
-}
-
-/*------------------- Release programs ------------------
-   Take the program whose record is in the segment `record` out of the
-   memory: give the interrupts that it took back to who had them before,
-   and free every block of memory that is its own. */
-void Release(u16 record)
-{
-    volatile u16 table = 0;
-    struct DosRegs regs;
-    const u8 __far *from;
-    u16 state, count, psp, header, next;
-    u8 last;
-
-    state = GetStat();
-    if (ChkBlk(record)) {               /* Check sum */
-        from = AT(record, REC_VECTORS); /* Restore vectors */
-        count = *from++;
-        IntOff();
-        for (; count; count--) {
-            u8 number = *from++;
-
-            *(u32 __far *)AT(table, 4 * (u16)number) =
-                *(const u32 __far *)from;
-            from += 4;
-        }
-        *(u32 __far *)AT(table, SAVE_PTR) = *(const u32 __far *)from;
-        IntOn();                      /* Restore SAVE PTR */
-        psp = WORD_AT(record, REC_PSP); /* Release blocks */
-        regs.ax = DOS_LISTS;
-        Int21e(&regs);
-        header = WORD_AT(regs.es, regs.bx - 2);
-        do {
-            if (psp == WORD_AT(header, 1)) {
-                regs.ax = DOS_FREE;
-                regs.es = header + 1;
-                Int21e(&regs);
-            }
-            next = header + 1 + WORD_AT(header, 3);
-            last = *AT(header, 0);
-            header = next;
-        } while (last == 'M');
-    }
-    SetStat(state);
-}
-
-/* Have DOS look for memory in the upper memory first, with that memory
-   in its chain of blocks. Returns how it looked before, for SetStat:
-   the strategy in the high byte and whether the upper memory was in the
-   chain in the low one, or 0FFFFh for a DOS that knows of neither. */
-static u16 GetStat(void)
-{
-    struct DosRegs regs;
-    u16 state;
-
-    regs.ax = DOS_STRATEGY + 2;
-    if (Int21e(&regs))
-        return 0xFFFF;
-    state = 0xFF00 | (u8)regs.ax;
-    regs.ax = DOS_STRATEGY;
-    Int21e(&regs);
-    state = (regs.ax & 0xFF) << 8 | (state & 0xFF);
-    regs.ax = DOS_STRATEGY + 3;
-    regs.bx = 1;
-    Int21e(&regs);
-    regs.ax = DOS_STRATEGY + 1;
-    regs.bx = 0x80;
-    Int21e(&regs);
-    return state;
-}
-
-/* Have DOS look for memory as it did before GetStat. */
-static void SetStat(u16 state)
-{
-    struct DosRegs regs;
-
-    if (state == 0xFFFF)
-        return;
-    regs.ax = DOS_STRATEGY + 1;
-    regs.bx = state >> 8;
-    Int21e(&regs);
-    regs.ax = DOS_STRATEGY + 3;
-    regs.bx = state & 0xFF;
-    Int21e(&regs);
-}
-
-/*----------------------- The interrupts -----------------------
-   An interrupt that the program has taken and deals with comes to four
-   instructions of assembly: room on the stack for one more return
-   address, with the flags as they are on top of it, and a jump to an
-   interrupt function of the compiler's. That function saves the
-   registers and finds DS, and has them as `r`, to read and to change;
-   `on` is the room, and `back` what the interrupt left on the stack, the
-   place it came from. It ends as every interrupt function does, by
-   taking `on` off the stack and going there, and that is how it goes on
-   in the handler that had the interrupt before: with the registers as
-   they are in `r`, the flags of `on`, and the stack as the interrupt
-   left it. To go back where the interrupt came from instead, it goes on
-   in CtrlC, which does nothing but return.
-
-   The flags of `on` are made what the assembly had when it jumped to
-   that handler: those of its last instruction of arithmetic, with
-   interrupts let in and the direction flag clear where it had done so.
-   Nothing that is known reads them there; they are the same all the
-   same. */
+/*----------------------- The interrupts -----------------------*/
 
 /* Ctrl-C of DOS and Ctrl-Break of the BIOS, while the program has them:
    nothing. */
@@ -490,194 +190,104 @@ void __interrupt __far CtrlC(void)
 {
 }
 
-void __interrupt __far Int21(struct Saved r, struct Frame on,
-                             struct Frame back);
-void __interrupt __far Int27(struct Saved r, struct Frame on);
+void __interrupt __far Int21(struct Saved r, struct Frame back);
 
 /* INT 21h arrives here, every call of DOS that any program makes while
-   this one is in the memory. Of nearly all of them the program wants
+   this one is in the memory. Of all but one of them the program wants
    nothing, and for those it takes nothing either: no register changed
    and not a byte of the caller's stack, which may be short. They go on
    in the handler that had the interrupt before, with the flags of the
-   comparison that sent them there, as in the assembly. Only the four
-   that the program deals with go on to Int21: AH 4Bh, 31h, 49h, and
-   2Bh with 'VC' in CX and 'OM' in DX.
+   comparison that sent them there, as in the assembly. Only the
+   program's own call goes on to Int21: AH 2Bh with 'VC' in CX and 'OM'
+   in DX.
 
-   Why this is assembly, thirteen instructions in front of the four that
-   every entry has: what the compiler makes saves registers before it
-   compares, on the caller's stack, and cannot jump to another handler
-   with the stack as it found it; a function without that, naked, is
-   given no instruction for a statement of C at all; an ordinary one
-   with the call in AX, nothing to change and the jump as a call that
-   does not return makes itself room on the stack, changes AL to
-   compare, reads the old address through the caller's DS or through an
-   ES that it loads, and jumps with BP still pushed (tried, with this
-   compiler). And the flags that the handler before is entered with are
-   those of these comparisons, which C cannot promise of anything. The
-   old address is read through CS, which is why it is a variable of the
-   code's segment. */
+   The original deals with three calls more, for its watch on the
+   programs that stay in the memory, which the portable C does not keep
+   (see DEVIATIONS.md): a program run, AH 4Bh, one that stays, 31h, and
+   a block of memory given back, 49h. Here they are passed on like any
+   other.
+
+   Why this is assembly, all eight instructions: what the compiler makes
+   saves registers before it compares, on the caller's stack, and cannot
+   jump to another handler with the stack as it found it; a function
+   without that, naked, is given no instruction for a statement of C at
+   all; an ordinary one with the call in AX, nothing to change and the
+   jump as a call that does not return makes itself room on the stack,
+   changes AL to compare, reads the old address through the caller's DS
+   or through an ES that it loads, and jumps with BP still pushed
+   (tried, with this compiler). And the flags that the handler before is
+   entered with are those of these comparisons, which C cannot promise
+   of anything. The old address is read through CS, which is why it is a
+   variable of the code's segment. */
 __declspec(naked) void __far New21(void)
 {
     _asm {
-        cmp ah,4Bh
-        je deal
-        cmp ah,31h
-        je deal
-        cmp ah,49h
-        je deal
         cmp ah,2Bh
         jne old
         cmp cx,5643h
         jne old
         cmp dx,4F4Dh
-        je deal
+        jne old
+        jmp Int21
     old:
         jmp dword ptr cs:Vect21
-    deal:
-        pushf
-        push ax
-        push ax
-        jmp Int21
     }
 }
 
-/* INT 27h arrives here. The program deals with every one, and the
-   assembly took of the caller's stack for each as well. */
-__declspec(naked) void __far New27(void)
-{
-    _asm {
-        pushf
-        push ax
-        push ax
-        jmp Int27
-    }
-}
+/* INT 21h, the one call that New21 does not pass on. Another program
+   asks for this one's data, the program's own call (AH 2Bh, CX 'VC', DX
+   'OM'): it gets in ES:BX the first panel for AL 0, the second for 1 and
+   the main data for anything else, and the number of this interface in
+   AH. An interrupt function of the compiler's saves the registers and
+   finds DS, and has them as `r`, to read and to change; `back` is what
+   the interrupt left on the stack, the place it came from and the flags
+   that it had, which the function returns to and with.
 
-/* Go on in the handler at `handler`. */
-static void Old(struct Frame STACK *on, u32 handler)
-{
-    on->ip = (u16)handler;
-    on->cs = (u16)(handler >> 16);
-}
+   The original hands out what it keeps of the three while a command
+   runs, copies in the part of it that stays in the memory: of the main
+   data what it has before DosLin, of a panel what it has before ExtBuf
+   and behind that 13 bytes of every file. Here it is the panel and the
+   main data themselves, which begin as those copies do; the files of a
+   panel are where a panel has them, 24 bytes each (see DEVIATIONS.md).
 
-/* Go on with what an instruction has left in the six flags, `result`,
-   and with the direction flag clear. */
-static void Left(struct Frame STACK *on, u16 result)
-{
-    on->flags = on->flags & ~(FLAGS_RESULT | FLAG_DIRECTION) | result;
-}
-
-/* INT 21h, the four calls that New21 does not pass on. A program run (AH
-   4Bh) is noted, one that stays in the memory (31h) gets its record, or
-   ends instead (4Ch) when the list is full, and a block of memory given
-   back (49h) takes the program that it was off the list. And another
-   program asks for this one's data, the program's own call (AH 2Bh, CX
-   'VC', DX 'OM'): it gets in ES:BX the first panel for AL 0, the second
-   for 1 and the main data for anything else, and the number of this
-   interface in AH. The original hands out what it keeps of the three
-   while a command runs, copies in the part of it that stays in the
-   memory: of the main data what it has before DosLin, of a panel what
-   it has before ExtBuf and behind that 13 bytes of every file. Here it
-   is the panel and the main data themselves, which begin as those
-   copies do; the files of a panel are where a panel has them, 24 bytes
-   each (see DEVIATIONS.md).
-
-   The flags that DOS is entered with, as the assembly leaves them. For
-   a program run: those of the zero byte that ends its name, compared
-   with zero, and interrupts let in. For one that stays: those that
-   AddProg returns. For a block given back: those of the count of the
-   list less the programs taken off it, or, with the list empty, of the
-   comparison that found AH to be 49h, equal; interrupts are still off.
-
-   Ported as it is: the program's own call returns with the flags as the
+   Ported as it is: the call returns with the flags as the original's
    handler has them, not as its caller had them. The carry flag is
    clear, which is the answer; interrupts are still off, as every
    interrupt begins; and the other flags are those of AL compared with
    1. */
-void __interrupt __far Int21(struct Saved r, struct Frame on,
-                             struct Frame back)
+void __interrupt __far Int21(struct Saved r, struct Frame back)
 {
-    u8 function = (u8)(r.ax >> 8);
+    u8 which = (u8)r.ax;                /* VCapi */
+    u8 less = which - 1;
+    u8 bits = less;
+    u16 flags = back.flags
+        & ~(FLAG_CARRY | FLAG_PARITY | FLAG_AUX | FLAG_ZERO | FLAG_SIGN
+            | FLAG_TRAP | FLAG_INTERRUPT | FLAG_OVERFLOW);
 
-    if (function == 0x4B) {
-        ExeProg(AT(r.ds, r.dx));
-        Left(&on, FLAG_ZERO | FLAG_PARITY);
-        on.flags |= FLAG_INTERRUPT;
-    } else if (function == 0x31) {
-        u16 flags = AddProg(&r);
-
-        if (flags & FLAG_CARRY)
-            r.ax = 0x4C00 | r.ax & 0xFF;
-        Left(&on, flags);
-        on.flags |= FLAG_INTERRUPT;
-    } else if (function == 0x49) {
-        u16 count = Counter;
-
-        FreeBlk(r.es);
-        if (count)
-            Left(&on, Taken(count, count - Counter));
-        else
-            Left(&on, FLAG_ZERO | FLAG_PARITY);
-    } else {
-        u8 which = (u8)r.ax;            /* VCapi */
-        u8 less = which - 1;
-        u8 bits = less;
-        u16 flags = back.flags
-            & ~(FLAG_CARRY | FLAG_PARITY | FLAG_AUX | FLAG_ZERO | FLAG_SIGN
-                | FLAG_TRAP | FLAG_INTERRUPT | FLAG_OVERFLOW);
-
-        bits ^= bits >> 4;
-        bits ^= bits >> 2;
-        bits ^= bits >> 1;
-        if (!(bits & 1))
-            flags |= FLAG_PARITY;
-        if (!(which & 0x0F))
-            flags |= FLAG_AUX;
-        if (less == 0)
-            flags |= FLAG_ZERO;
-        if (less & 0x80)
-            flags |= FLAG_SIGN;
-        if (which == 0x80)
-            flags |= FLAG_OVERFLOW;
-        back.flags = flags;
-        r.bx = 0;
-        if (which < 1)
-            r.es = md.WCB1seg;
-        else if (which == 1)
-            r.es = md.WCB2seg;
-        else {
-            r.es = MAIN_SEG;
-            r.bx = (u16)&md;
-        }
-        r.ax = VcApiVr * 0x100;
-        Old(&on, (u32)ROUTINE(CtrlC));
-        return;
+    bits ^= bits >> 4;
+    bits ^= bits >> 2;
+    bits ^= bits >> 1;
+    if (!(bits & 1))
+        flags |= FLAG_PARITY;
+    if (!(which & 0x0F))
+        flags |= FLAG_AUX;
+    if (less == 0)
+        flags |= FLAG_ZERO;
+    if (less & 0x80)
+        flags |= FLAG_SIGN;
+    if (which == 0x80)
+        flags |= FLAG_OVERFLOW;
+    back.flags = flags;
+    r.bx = 0;
+    if (which < 1)
+        r.es = md.WCB1seg;
+    else if (which == 1)
+        r.es = md.WCB2seg;
+    else {
+        r.es = MAIN_SEG;
+        r.bx = (u16)&md;
     }
-    Old(&on, Vect21);
-}
-
-/* INT 27h: a program stays in the memory, the old way, with the bytes
-   up to DX of its segment. It gets its record, or ends instead, by
-   function 0 of DOS, when the list is full. The handler before is
-   entered with interrupts let in and with the flags of the last shift
-   that makes bytes of the paragraphs again, DOS, where the program
-   ends, with those that AddProg returns. */
-void __interrupt __far Int27(struct Saved r, struct Frame on)
-{
-    u16 flags;
-
-    r.dx = (u16)(r.dx + 0x0F) >> 4;
-    flags = AddProg(&r);
-    if (flags & FLAG_CARRY) {
-        r.ax &= 0x00FF;
-        Old(&on, Vect21);
-    } else {
-        flags = Doubled(r.dx << 3);
-        r.dx <<= 4;
-        Old(&on, Vect27);
-    }
-    Left(&on, flags);
-    on.flags |= FLAG_INTERRUPT;
+    r.ax = VcApiVr * 0x100;
 }
 
 /*------------------- Execute commands ------------------*/
@@ -748,57 +358,37 @@ void SetBrk(void)
     Int21e(&regs);
 }
 
-/* Leave: have DOS look for Ctrl-C as it did, release the programs that
-   have stayed in the memory, and give INT 21h and INT 27h back. Then end
-   the program with `code`, unless DOS has ended it already and this is
-   where it went on: then return.
+/* Leave: have DOS look for Ctrl-C as it did, and give INT 21h back.
+   Then end the program with `code`, unless DOS has ended it already and
+   this is where it went on: then return.
 
-   The last program of the list is released as many times as the list is
-   long; releasing it takes it off the list, by New21 (see FreeBlk).
+   The original first releases the programs that have stayed in the
+   memory since it was started, by the list that its watch on DOS keeps,
+   and gives INT 27h back as well; the portable C keeps no such list and
+   does not take that interrupt (see DEVIATIONS.md). What a command has
+   left in the memory stays there when the program leaves.
 
    `r` and `flags` are the registers and the flags that this was entered
-   with, and they are left as the assembly leaves its own, for the
-   program that this returns to when DOS has ended this one: ES on the
-   segment of this program's PSP; CX 0, the count of the programs run
-   down; SI twice the
-   length of the list when the last program was released, and DS on its
-   record, if there was one; DS:DX the address that INT 27h went to
-   before, which DOS was told last, if the program had taken the
-   interrupts, and else DL as DOS was told to look for Ctrl-C. AX, BX,
-   DI and BP are as they came. The flags are those of the segment that
-   the program goes on in, compared with 0; the direction flag is clear
-   if a program was released, and interrupts are let in if its record
-   was whole. */
+   with, and they are left as the assembly leaves its own, without what
+   is gone, for the program that this returns to when DOS has ended this
+   one: ES on the segment of this program's PSP, and DS:DX the address
+   that INT 21h went to before, which DOS was told last. The others are
+   as they came. The flags are those of the segment that the program
+   goes on in, compared with 0. */
 static void Exit02(u16 code, struct Saved STACK *r, u16 STACK *flags)
 {
     struct DosRegs regs;
-    u16 count;
 
     r->es = PspSeg;                     /* Exit01 */
-    r->dx = r->dx & 0xFF00 | md.BreakFl;
     regs.name = 0;
     DX_OF(regs) = md.BreakFl;
     regs.ax = DOS_BREAK + 1;
     Int21e(&regs);
-    for (count = Counter; count; count--) {
-        r->si = Counter << 1;
-        r->ds = *(PrgList + Counter - 1);
-        *flags &= ~FLAG_DIRECTION;
-        if (ChkBlk(r->ds))
-            *flags |= FLAG_INTERRUPT;
-        Release(r->ds);
-    }
-    r->cx = 0;
-    if (md.ChkTSR != 0) {               /* Exit03 */
-        regs.name = (const u8 __far *)Vect21;
-        regs.ax = DOS_VECTOR + 0x21;
-        Int21e(&regs);
-        regs.name = (const u8 __far *)Vect27;
-        regs.ax = DOS_VECTOR + 0x27;
-        Int21e(&regs);
-        r->ds = (u16)(Vect27 >> 16);
-        r->dx = (u16)Vect27;
-    }
+    regs.name = (const u8 __far *)Vect21;       /* Exit03 */
+    regs.ax = DOS_VECTOR + 0x21;
+    Int21e(&regs);
+    r->ds = (u16)(Vect21 >> 16);
+    r->dx = (u16)Vect21;
     if ((u16)(Vect22 >> 16) == 0) {     /* Exit04 */
         regs.ax = DOS_EXIT | code & 0xFF;
         Int21e(&regs);
@@ -824,10 +414,14 @@ void Exit00(u16 code)
    goes on there, on the stack of the program that started this one, and
    what Exit02 does is done all the same. Then on to where that program
    goes on, with the stack as it is, and with the registers and the
-   flags as Exit02 leaves them. That is done as for an interrupt that
-   goes on in the handler before it, see New21: four instructions of
-   assembly for room on the stack, and an interrupt function that
-   returns into that room. The assembly took of that program's stack
+   flags as Exit02 leaves them. That is done by four instructions of
+   assembly, room on the stack for one more return address with the
+   flags as they are on top of it, and a jump to an interrupt function
+   of the compiler's: that saves the registers and finds DS, has them as
+   `r`, to read and to change, and the room as `on`, and ends as every
+   interrupt function does, by taking `on` off the stack and going
+   there, with the registers as they are in `r`, the flags of `on`, and
+   the stack as it was found. The assembly took of that program's stack
    here too. */
 void __interrupt __far Exit05(struct Saved r, struct Frame on);
 
@@ -848,9 +442,14 @@ void __interrupt __far Exit05(struct Saved r, struct Frame on)
     on.cs = (u16)(Vect22 >> 16);
 }
 
-/* Have the program go on in Exit01 when DOS ends it, and, if it is set
-   up to know of the programs that stay in the memory, take DOS's own
-   interrupts, 21h and 27h: when the program has started. */
+/* Have the program go on in Exit01 when DOS ends it, and take INT 21h,
+   for the program's own call: when the program has started.
+
+   The original takes INT 21h only if its setup has it know of the
+   programs that stay in the memory, TSR manager of its setup program,
+   as it has when it is distributed, and INT 27h with it. The portable C
+   keeps no such watch (see DEVIATIONS.md), and takes INT 21h whatever
+   that byte of the setup is. */
 void TakeDos(void)
 {
     struct DosRegs regs;
@@ -860,8 +459,6 @@ void TakeDos(void)
 
     Vect22 = PSP_EXIT;
     PSP_EXIT = (u32)ROUTINE(Exit01);
-    if (md.ChkTSR == 0)
-        return;
     regs.ax = 0x3521;                   /* where an interrupt goes */
     regs.bx = 0;
     regs.cx = 0;
@@ -873,12 +470,6 @@ void TakeDos(void)
     IntOff();
     *(u32 __far *)AT(table, 4 * 0x21) = (u32)ROUTINE(New21);
     IntOn();
-    regs.ax = 0x3527;
-    Int21d(&regs);
-    Vect27 = (u32)regs.es << 16 | regs.bx;
-    regs.ax = DOS_VECTOR + 0x27;        /* have one go somewhere */
-    regs.name = ROUTINE(New27);
-    Int21d(&regs);
 }
 
 /* No memory: say so and leave. `bx` is what the assembly has in BX
@@ -1010,10 +601,10 @@ static void Exec02(u16 behind)
             md.BatAdr++;
             continue;
         }
-        /* Exec08: the prompt, made where the interrupts are noted when a
-           program is run, and the command behind it. BX is the address
-           of the command, for the texts and for the end of the line. */
-        to = (u8 *)IntTab;
+        /* Exec08: the prompt, and the command behind it. BX is the
+           address of the command, for the texts and for the end of the
+           line. */
+        to = PromptLine;
         *to++ = 0x0D;
         *to++ = 0x0A;
         regs.ax = DOS_DRIVE;
@@ -1032,7 +623,7 @@ static void Exec02(u16 behind)
         }
         *to++ = '>';                    /* Exec09 */
         *to = 0;
-        OutStr0((const u8 *)IntTab, WAS(md.BatAdr));
+        OutStr0(PromptLine, WAS(md.BatAdr));
         OutStr0((const u8 *)md.BatAdr, WAS(md.BatAdr));
         bios.ax = 0x0E0D;
         bios.bx = WAS(md.BatAdr);
@@ -1088,6 +679,24 @@ static void __loadds Exec2E(void)
 
 /*---------------------- The entry ----------------------*/
 
+/* Have DOS look for memory as it does when it starts: the lowest block
+   that fits, and the upper memory not in its chain of blocks. This is
+   SetStat of the original with 0, which is how the entry calls it; the
+   original also notes how DOS looks, GetStat, and puts that back, around
+   the release of a program that has stayed in the memory, which the
+   portable C does not do (see DEVIATIONS.md). */
+static void SetStat(void)
+{
+    struct DosRegs regs;
+
+    regs.ax = DOS_STRATEGY + 1;
+    regs.bx = 0;
+    Int21e(&regs);
+    regs.ax = DOS_STRATEGY + 3;
+    regs.bx = 0;
+    Int21e(&regs);
+}
+
 /* No memory when the program begins: say so and end. */
 static void Alloc9(void)
 {
@@ -1095,7 +704,7 @@ static void Alloc9(void)
 
     OutStr0(Aloc_S, RESPARS_WAS);       /* BX: the paragraphs of the part
                                            of the original that stays */
-    SetStat(0);
+    SetStat();
     regs.ax = DOS_EXIT + 1;
     Int21e(&regs);
 }
@@ -1159,7 +768,7 @@ void __loadds Alloc0(void)
     regs.ax = DOS_RESIZE;
     if (Int21e(&regs))
         Alloc9();
-    SetStat(0);                         /* Alloc7 */
+    SetStat();                          /* Alloc7 */
     Main();
 }
 #pragma aux Alloc0 aborts

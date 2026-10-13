@@ -79,10 +79,13 @@ extern const u8 __far PtMnu_S[];
 /* The lines of the menus, one behind the other, each ended by a 0, and
    an empty one for a line across the menu. FFh and a number are that
    many spaces, ^ is written Ctrl- and @ Alt-. The first capital letter
-   of a line chooses it. The Options menu has a line less than the
-   original's, " Memory allocation" behind the clock, and so a page of
-   the help less in MnuHlp, a row less in MnuTab, and Save setup a place
-   further up in KeyTab: see DEVIATIONS.md. */
+   of a line chooses it. Two menus have a line less than the original's
+   (see DEVIATIONS.md): the Commands menu "memory Info" with Alt-F5
+   behind the volume label, and the Options menu " Memory allocation"
+   behind the clock. So each has a page of the help less in MnuHlp and a
+   row less in MnuTab, and in KeyTab Alt+F5 chooses nothing, the keys of
+   the Commands menu below it choose an item further up, and so does
+   Shift-F9, Save setup. */
 #define LEFT_S \
     " Brief\0" \
     " Full\0" \
@@ -120,7 +123,6 @@ extern const u8 __far PtMnu_S[];
 #define COMMANDS_S \
     "Tree\377\022@F10\0" \
     "Volume label\377\012^F4\0" \
-    "memory Info\377\013@F5\0" \
     "Directory sizes\377\007@F6\0" \
     "Find file\377\015@F7\0" \
     "History\377\017@F8\0" \
@@ -164,13 +166,13 @@ static const u8 CODE Ctrl_S[9] = "Ctrl-Alt-";
 static const u8 CODE MnuHlp[] = {
      7,  8,  8,  9, 10, 11,  0, 12, 12, 12, 12, 12,  0, 13, 14, 15,
     16,  0, 17, 18, 19, 20, 21, 22, 23,  0, 24,  0, 25, 25, 25, 25,  0, 26,
-    27, 28, 29, 30, 31, 32, 33, 34,  0, 35, 36, 37,  0, 38,
+    27, 28, 29, 31, 32, 33, 34,  0, 35, 36, 37,  0, 38,
     39, 40, 41, 42, 43, 44,  0, 45, 46, 47, 48, 49, 50, 51,  0, 53,
 };
 #define MnuHlp1 0                       /* where in it each kind begins */
 #define MnuHlp2 16
 #define MnuHlp3 34
-#define MnuHlp4 48
+#define MnuHlp4 47
 
 /* The five menus of the bar: where the box of each begins, the row in the
    high byte, its size likewise, with its frame and its shadow, where its
@@ -184,7 +186,7 @@ struct MnuTab {
 static const struct MnuTab CODE MnuTab[] = {
     { 0x102, 0x121B, MenuLn1, MnuHlp1 },        /* Left */
     { 0x10A, 0x141E, MenuLn2, MnuHlp2 },        /* Files */
-    { 0x113, 0x1023, MenuLn3, MnuHlp3 },        /* Commands */
+    { 0x113, 0x0F23, MenuLn3, MnuHlp3 },        /* Commands */
     { 0x11F, 0x1222, MenuLn4, MnuHlp4 },        /* Options */
     { 0x12A, 0x121B, MenuLn1, MnuHlp1 },        /* Right */
 };
@@ -205,12 +207,11 @@ static const struct KeyTab CODE KeyTab[] = {
     { 0x4000, 0x0602 }, { 0x4100, 0x0702 }, { 0x4200, 0x0802 },
     { 0x1E01, 0x0A02 }, { 0x4E2B, 0x0C02 }, { 0x4A2D, 0x0D02 },
     { 0x372A, 0x0E02 }, { 0x320D, 0x0F02 }, { 0x4400, 0x1102 },
-    { 0x7100, 0x0103 }, { 0x6100, 0x0203 }, { 0x6C00, 0x0303 },
-    { 0x6D00, 0x0403 }, { 0x6E00, 0x0503 }, { 0x6F00, 0x0603 },
-    { 0x7000, 0x0703 }, { 0x1615, 0x0903 }, { 0x180F, 0x0A03 },
-    { 0x2E03, 0x0B03 }, { 0x3002, 0x0904 }, { 0x5C00, 0x0F04 },
-    { 0x5F00, 0x0505 }, { 0x1312, 0x0D05 }, { 0x2106, 0x0E05 },
-    { 0x6900, 0x0F05 },
+    { 0x7100, 0x0103 }, { 0x6100, 0x0203 }, { 0x6D00, 0x0303 },
+    { 0x6E00, 0x0403 }, { 0x6F00, 0x0503 }, { 0x7000, 0x0603 },
+    { 0x1615, 0x0803 }, { 0x180F, 0x0903 }, { 0x2E03, 0x0A03 },
+    { 0x3002, 0x0904 }, { 0x5C00, 0x0F04 }, { 0x5F00, 0x0505 },
+    { 0x1312, 0x0D05 }, { 0x2106, 0x0E05 }, { 0x6900, 0x0F05 },
 };
 #define KEYS (sizeof KeyTab / sizeof KeyTab[0])
 
@@ -412,21 +413,26 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
             F40_30(14, menu, top, size);
             F40_30(15, menu, top, size);
         }
-    } else if (menu == 3) {             /* Commands */
+    } else if (menu == 3) {             /* Commands: Swap panels,
+                                           Directory sizes, Compare
+                                           directories and EGA lines,
+                                           each an item further up than
+                                           in the original, which has
+                                           Memory info above them */
         if (wcb->Visible == 0) {
-            F40_30(9, menu, top, size);
-            F40_30(4, menu, top, size);
-            F40_30(11, menu, top, size);
+            F40_30(8, menu, top, size);
+            F40_30(3, menu, top, size);
+            F40_30(10, menu, top, size);
         } else if (wcb->WinTyp != 0) {
-            F40_30(4, menu, top, size);
-            F40_30(11, menu, top, size);
+            F40_30(3, menu, top, size);
+            F40_30(10, menu, top, size);
         } else {
             other = PANEL(InvWCB(panel));
             if (other->Visible == 0 || other->WinTyp != 0)
-                F40_30(11, menu, top, size);
+                F40_30(10, menu, top, size);
         }
         if (md.TstEGA == 0)
-            F40_30(7, menu, top, size);
+            F40_30(6, menu, top, size);
     } else {                            /* Left / Right */
         panel = md.WCB1seg;
         if (menu != 1) {

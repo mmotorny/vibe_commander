@@ -148,6 +148,19 @@ IGNORED = [
     re.compile(r"║ . ([0-9A-F]{4}[ \d]{6}[ \d,]{10}) {3}free memory "),
     re.compile(r"║ . ([0-9A-F]{4})[ \d]{6}[ \d,]{10} {3}(?:FDAPM|T|U)\.COM "),
     re.compile(r"║ . [0-9A-F]{4}[ \d]{6}([ \d,]{10}) {3}VC\.(?:COM|EXE) "),
+    # A program that DOS has ended goes on in the program that started
+    # it with the registers as it leaves them, and p.com of the scenario
+    # ended prints six of them: CX, SI, DX and DS as how far they are
+    # from where INT 27h goes, ES and the flags. The original leaves in
+    # DS:DX where INT 27h went before it took that, and the line has 0000
+    # for both. The portable C does not take INT 27h (DEVIATIONS.md, 7)
+    # and leaves where INT 21h went before, which for the second copy of
+    # the scenario is the entry of the first: an address in the program,
+    # which follows its size and how it is laid out. The line is known by
+    # CX and SI as p.com sent them, 2222 and 1111, which only the
+    # portable C leaves as they came; the two words are left out, the
+    # others compared.
+    re.compile(r"^2222 1111 ([0-9A-F]{4} [0-9A-F]{4}) 0000 [0-9A-F]{4} +$"),
 ]
 
 # Deviations that show on no screen, and so change no golden. They are
@@ -232,16 +245,19 @@ def found(steps, some):
     return places
 
 
-_MAP = ("the map of the memory has the program with a block more, and "
-        "with INT 24h among its interrupts")
-_HOLE = ("; and where a program has stayed, the memory in front of it, "
-         "which the panels have left, is a stretch of free memory more")
 _NO_ROOM = ("the second copy has no memory to run a command: each copy "
             "keeps all of itself")
+_NO_MAP = ("it shows the map of the memory, Alt+F5, and the programs "
+           "that stay in the memory listed and released there: the "
+           "portable C has no such map and keeps no such list")
+_NO_LINE = ", without Memory info"
+_FDAPM = '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter'
 
 TREES = {
     # The portable C stays in the memory whole while a command runs, and
-    # has no Memory allocation in its Options menu.
+    # has no Memory allocation in its Options menu; and it has no map of
+    # the memory, Alt+F5, and no watch on the programs that stay in the
+    # memory.
     "portable_c": Declared(
         not_run={
             "memory": "it switches Memory allocation off and shows the "
@@ -253,11 +269,40 @@ TREES = {
                          "tests has no memory for the second copy behind "
                          "that program. handed-on sees the same with one "
                          "copy",
+            "memory-map": _NO_MAP,
+            "memory-map-russia": _NO_MAP,
+            "mouse-memory": _NO_MAP,
+            "stay": _NO_MAP + ". What it has besides, a program that asks "
+                    "the program for its data, asked has by itself",
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "
                       "menu of the portable C has no line that M chooses, "
                       "and stays open",
+        },
+        left_out_of={
+            "menu-items": {
+                ("F9 c i", "Esc"):
+                    "Memory info of the Commands menu, and the map left: "
+                    "the menu has no line that I chooses, and stays open",
+            },
+            "mouse-middle": {
+                ("Alt+F5", "MiddleClick@30,8"):
+                    "the map of the memory, and the middle button on a "
+                    "line of it: Alt+F5 is no key of the portable C",
+            },
+            "mouse-drag-lists": {
+                (_FDAPM, "Alt+F5", "Click@30,14>30,3*4",
+                 "Click@30,8>30,19*6", "RightClick@30,13>30,14>30,15",
+                 "Click@30,14 Click@30,14>30,10", "Click@30,4>47,20",
+                 "Alt+F5", "Click@30,4>30,1"):
+                    "a program that stays in the memory, and a button of "
+                    "the mouse moved in the map of the memory",
+            },
+            "ended": {
+                ("Alt+F5", "Esc"):
+                    "a look at the map of the memory, for what has stayed",
+            },
         },
         changed={
             "lost": "the program does not load itself again after a "
@@ -266,21 +311,34 @@ TREES = {
                      "last command",
             "clock": "the Options menu, a line shorter",
             "clock-russia": "the Options menu, a line shorter",
-            "menu": "the Options menu, a line shorter",
-            "menu-items": _MAP,
-            "memory-map": _MAP + _HOLE + "; Memory allocation is not "
-                          "switched off for a second look at the map",
-            "memory-map-russia": _MAP,
-            "stay": _MAP + _HOLE,
+            "menu": "the Options menu, a line shorter; and the Commands "
+                    "menu, a line shorter" + _NO_LINE,
+            "menu-items": "Memory info is not chosen from the Commands "
+                          "menu",
+            "mouse-menu": "the Commands menu, a line shorter" + _NO_LINE,
+            "mouse-drag-menu": "the Commands menu, a line shorter"
+                               + _NO_LINE,
+            "tree-choose": "the key bar with Alt held has no name for "
+                           "F5, where the original has Memory",
+            "handed-on": "the program hands on a program run, one that "
+                         "stays and a block given back like any other "
+                         "call of DOS, with the flags of the comparison "
+                         "that told them from its own call: it keeps no "
+                         "watch on the programs that stay in the memory",
             "second-copy": _NO_ROOM,
             "start-memory": _NO_ROOM + ", so the command that was to "
                             "leave it without memory for its data does "
                             "not run, and the copy is still there",
-            "ended": _MAP + "; " + _NO_ROOM + ", so no program has stayed "
-                     "from it when DOS ends it",
-            "mouse-memory": _MAP + _HOLE,
-            "mouse-middle": _MAP,
-            "mouse-drag-lists": _MAP,
+            "ended": _NO_ROOM + ", so no program has stayed from it when "
+                     "DOS ends it; the registers that it leaves are "
+                     "those of a program that keeps no list of such "
+                     "programs and has taken INT 21h alone; and the map "
+                     "of the memory is not looked at",
+            "mouse-middle": "the middle button is not pressed in the map "
+                            "of the memory",
+            "mouse-drag-lists": "no program stays in the memory, and no "
+                                "button is moved in the map of the "
+                                "memory",
         },
     ),
 }

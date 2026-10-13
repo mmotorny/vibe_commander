@@ -16,23 +16,28 @@ the top of the script says how. This is what the kinds are waiting
 for, with the counts of when it was written; the test prints them as
 they stand.
 
-1,084 places in 39 of the 59 files, the two headers among them. Twenty
-files are clean: the thirteen of tables, and `blank.c`, `digits.c`,
-`line.c`, `mask.c`, `mouse.c`, `screen.c` and `string.c`. The first
-count was 1,391, with two files of tables clean. The 307 that went
-were the offset of a field worked out from a pointer at 0, `MD_AT` of
-`tables.h` above all, which no pointer was meant by: they are written
-as `offsetof` is now, `OFFSET_IN` of `vc.h`.
+1,033 places in 38 of the 58 files, the three headers among them.
+Twenty files are clean: the twelve of tables, `sys.h`, and `blank.c`,
+`digits.c`, `line.c`, `mask.c`, `mouse.c`, `screen.c` and `string.c`.
+The first count was 1,391, with two files of tables clean. 307 of what
+went were the offset of a field worked out from a pointer at 0, `MD_AT`
+of `tables.h` above all, which no pointer was meant by: they are
+written as `offsetof` is now, `OFFSET_IN` of `vc.h`. 64 went with the
+map of the memory and the watch on DOS that it rested on, `memory.c`,
+its tables and half of `resident.c` (`src/portable_c/DEVIATIONS.md`,
+7). And 13 came, on balance, with the functions of the system:
+`dos.c` makes a segment and an offset of a pointer for DOS, and the
+files that ask through it make fewer pointers of numbers.
 
 | Kind | Places | Files | What it is | What it waits for |
 |---|---|---|---|---|
-| `to-number` | 593 | 34 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets: see below |
-| `to-pointer` | 436 | 30 | A number of 16 or 32 bits made a pointer | The same. Where the address is the machine's, the screen in `window.c` and DOS's routine for capitals in `dos.c`, the system interface |
+| `to-number` | 595 | 33 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets: see below |
+| `to-pointer` | 390 | 28 | A number of 16 or 32 bits made a pointer | The same. Where the address is the machine's, the screen in `window.c` and DOS's routine for capitals in `dos.c`, the system interface |
 | `layout` | 2 | 1 | `BOXHD` and `BOXMN` of `tables.h`, the header and a field of a dialog, are not as long as on DOS: each holds a pointer, which is a word there | Tables that are not held to the original's bytes where a pointer is no word: `LAID_OUT` for DOS alone, when the routines that read them take pointers |
-| `function` | 9 | 3 | The address of a function kept as that of data, for a vector of an interrupt, and once the other way, the call into the PSP | The system interface |
-| `interrupt` | 9 | 3 | `__interrupt`, where a function is declared or defined: `CtrlC`, `Int21`, `Int27` and `Exit05` of `resident.c`, `FatErr` of `main.c` | The system interface: what DOS enters is of DOS, and goes to a file that only the build for DOS has |
+| `function` | 6 | 2 | The address of a function kept as that of data, for a vector of an interrupt, and once the other way, the call into the PSP | The system interface |
+| `interrupt` | 7 | 3 | `__interrupt`, where a function is declared or defined: `CtrlC`, `Int21` and `Exit05` of `resident.c`, `FatErr` of `main.c` | The system interface: what DOS enters is of DOS, and goes to a file that only the build for DOS has |
 | `loadds` | 3 | 1 | `__loadds`: `Alloc0` and `Exec2E` of `resident.c` | The same |
-| `naked`, `asm` | 4, 4 | 1 | The four functions of `resident.c` that are their `_asm` | The same |
+| `naked`, `asm` | 3, 3 | 1 | The three functions of `resident.c` that are their `_asm`: `New21`, `Exit01` and `Int2E` | The same |
 | `asm-pragma` | 7 | 1 | The seven pieces of inline assembly of `dos.c`, a `#pragma aux` each | The same: `dos.c` is the side of that interface which is DOS |
 | `registers` | 4 | 3 | A `#pragma aux` that names registers: `__U4M` and `__U4D` of `arith.c`, `CaseMapFn` of `dos.c`, `Int2E` of `resident.c` | The same for the last two. `arith.c` is Open Watcom's own, and another compiler's build leaves the file out |
 | `intrinsic` | 1 | 1 | `_disable` and `_enable` of `dos.c` | The system interface |
@@ -143,10 +148,11 @@ left open:
     the stack and the code, for QEMU.
   - The program is entered on stacks that are not its own, where SS is
     not DS whatever the model, and a pointer to a local variable stays
-    `STACK`, or far. The watch on DOS always is: `New21`, `Int21`,
-    `Int27`, `Exit05` and what they call in `resident.c`, with `Int21e`
-    and `Int10` of `dos.c`; that is two files, which could keep the
-    word while the rest loses it. But the critical error is entered so
+    `STACK`, or far. What DOS and other programs enter always is:
+    `New21` and `Int21`, where the program's own call arrives, and
+    `Exit05`, where DOS goes on when it has ended the program, with
+    what they call in `resident.c` and `Int21e` of `dos.c`; that is two
+    files, which could keep the word while the rest loses it. But the critical error is entered so
     too, when DOS has one while a viewer or an editor of the user's
     runs: `view.c` runs those with INT 24h still the program's, as the
     original does, so `FatErr` and everything that a box with its
@@ -177,11 +183,10 @@ left open:
   having no XMS driver to swap itself out to, and the bench is the same
   for every tree and every golden. What that scenario holds of the
   entry of INT 21h, `New21`, the flags that a call is handed on with
-  and the caller's stack left alone, `handed-on` holds with one copy.
-  What it does not see is INT 27h on its way to DOS, which the watcher
-  of `passed-on` takes as an interrupt of its own and that of
-  `handed-on` cannot get behind: where the program hands that on is a
-  variable, not a word that its code names.
+  and the caller's stack left alone, `handed-on` holds with one copy,
+  against a golden of the portable C's own since the watch on DOS has
+  gone from it: three calls that the original deals with are handed on
+  like any other there. INT 27h the portable C does not take.
 - The file is close to three times the original's, where the
   scenarios' test fails: the README has how much is left, under "The
   figures". The main data's zeros are 62.6 KB of it, in the file
@@ -215,6 +220,49 @@ left open:
   harness, which name the functions of both trees by one list, and for
   the files that other work has in hand.
 
+## The portable C: what the map of the memory has left
+
+The map of the memory, Alt+F5, and the watch on the programs that stay
+in the memory are gone from the portable C
+(`src/portable_c/DEVIATIONS.md`, 7). What that has left open:
+
+- The program's own call (AH 2Bh, CX 'VC', DX 'OM'), by which the
+  original's setup program reads and writes the setup of a program that
+  is in the memory, is all that the entry of INT 21h is still there
+  for: `New21`, eight instructions of assembly that every call of DOS by
+  any program passes, the interrupt function `Int21`, `Vect21` in the
+  code segment, and the interrupt taken when the program starts and
+  given back when it leaves or DOS ends it. The setup program is not
+  translated, and no other program is known to make the call. It is a
+  thing of DOS as much as the watch was; whether it goes is the user's
+  to decide. With it would go the last reason for `handed-on` and for
+  `asked`.
+- The original takes INT 21h only if its setup has TSR manager on, and
+  the portable C, which has no such option, takes it always. A setup
+  with that byte 0 is one where the original cannot be asked for its
+  data and the portable C can.
+- When DOS ends the program, the program that started it gets DS:DX as
+  the portable C leaves them, where INT 21h went before, an address
+  that follows the layout of the program when that is a first copy's
+  entry: `ended` prints it, and `harness/deviations.py` leaves the two
+  words out of the comparison, for a line that only the portable C
+  prints. Nothing reads those registers but that scenario; they are left
+  as the assembly would leave them without what is gone, and could as
+  well be left alone.
+- `SetStat` is called with 0 where the program begins, as in the
+  original: DOS is told to look for memory in the lowest block first,
+  and not in the upper memory, whatever it did before, and is not told
+  otherwise again. It was not part of the map, and stays; it is a
+  thing of DOS's memory all the same.
+- In `mouse-menu` the click that tried a dark item of the Commands
+  menu, at a place of the screen, is on the line across the menu in the
+  portable C, whose menu is a line shorter: nothing is chosen either
+  way, and no scenario clicks a dark item of that menu for the portable
+  C. A dark item of the Files menu is tried by its key, in `menu`.
+- The original's help file, which the portable C reads, has its pages
+  on the map of the memory and on Memory allocation still. The file is
+  the original's; a help of the portable C's own is not in hand.
+
 What the items below say of the part that stays in the memory, under
 "Known and not dealt with", they say of the C translation, `src/c/`.
 Of the portable C these no longer hold: what is said of the second
@@ -245,7 +293,7 @@ file. Whoever moves a file takes it out of the table:
 
 | Piece | Files, with the calls left in each | Calls |
 |---|---|---|
-| 2 | `resident.c` 34, of which 11 stay | 34 |
+| 2 | `resident.c` 22, of which 3 stay | 22 |
 | 3 | `read.c` 2 and `drive.c` 2, which wait: see below | 4 |
 | 5 | `commands.c` 5 and `main.c` 1, which stay for now: see below | 6 |
 
@@ -283,13 +331,9 @@ What stays on the old calls, `Int21d` and `Int21e` with `struct
 DosRegs`, because it is of DOS alone and likely to go with the feature
 that it is for:
 
-- The map of the memory: `Dos5802`, `Dos5803`, `Dos52`, `Dos4452` and
-  `Dos2523` of `memory.c`, which are a call each already.
-- The watch on DOS in `resident.c`: `AddProg`, `Release`, `GetStat` and
-  `SetStat`, 10 calls, which ask for the PSP of whoever called DOS, for
-  DOS's lists, for how it looks for memory and for the memory of other
-  programs; and the PSP that `Alloc0` asks for. `TakeDos`, which reads
-  two vectors and sets one, has `Vector` and `SetVector` for that.
+- In `resident.c`: `SetStat`, two calls that say how DOS looks for
+  memory, and the PSP that `Alloc0` asks for. `TakeDos`, which reads a
+  vector and sets it, has `Vector` and `SetVector` for that.
 - The drive that a unit goes by, which `ErrRdy` of `main.c` sets when
   it has asked for another drive in place of one that is not ready: it
   is of the drive B: that shares the unit of A:, as `Fantom` is.
@@ -306,6 +350,10 @@ And what stays on `Int10` because the functions do not say all of it:
   of which it hands to the first call, and its prototype in `vc.h`
   changes.
 
+The map of the memory, `memory.c`, and the watch on DOS in
+`resident.c`, which were on this list with 15 calls, are gone from the
+portable C (`src/portable_c/DEVIATIONS.md`, 7).
+
 What the header does not have yet, and why:
 
 - DOS's critical error and Ctrl-Break. The program takes the two
@@ -320,8 +368,8 @@ What the header does not have yet, and why:
   then `dos.c`'s own, between its entry and the functions that are
   asked with the program's errors, and `BlocEr` stays the program's.
   What has to be kept: the order in which DOS is asked, which is both
-  vectors read and then both set in `HookVct`; and that the watch names
-  `CtrlC` too. `HookVct` still hands back the offset of `CtrlC`, which
+  vectors read and then both set in `HookVct`; and that `SetBrk` of
+  `resident.c` names `CtrlC` too, for DOS's Ctrl-C. `HookVct` still hands back the offset of `CtrlC`, which
   the start of the program had in AX at its next call of the BIOS:
   nothing takes it now, since that call is `ScreenState`, in `ChkMode`,
   and `IniData` has gone over, so it may return nothing.

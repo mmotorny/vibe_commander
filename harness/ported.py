@@ -1071,6 +1071,14 @@ GONE = {
     "portable_c": {
         "M73_00_c": "Memory allocation of the Options menu: the portable "
                     "C stays in the memory whole and has no such option",
+        "F65_00_c": "the map of the memory, Alt+F5: the portable C has "
+                    "no such map",
+        **dict.fromkeys(
+            ("New27", "Int27_", "Release"),
+            "of the watch on the programs that stay in the memory, which "
+            "the map of the memory lists and releases: the portable C "
+            "keeps no such watch, does not take INT 27h, and releases "
+            "nothing"),
     },
 }
 

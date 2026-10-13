@@ -38,14 +38,18 @@ static const u8 CODE KeyB_T[15][4] = {
     {18,  0,  0,  0},                   /* 14 */
 };
 
-/* The names of the ten keys in each row, as numbers of Key_S. */
+/* The names of the ten keys in each row, as numbers of Key_S. Alt with
+   F5 has none: the original has "Memory" there, in the rows 4 and 5,
+   for the map of the memory, which the portable C has not (see
+   DEVIATIONS.md). That name was the 30th of Key_S, and the three behind
+   it have a number less here than in the original. */
 static const u8 CODE KeyC_T[19][10] = {
     { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0},   /*  0 */
     { 1,  2,  3,  4,  5,  6,  7,  8,  9, 10},   /*  1 */
-    { 0, 31,  3,  4,  5,  6,  7,  8, 11, 12},   /*  2 */
-    {13, 14,  0, 32,  5,  6,  0,  8,  0,  0},   /*  3 */
-    {13, 14, 15, 16, 30, 17, 18, 19, 20, 21},   /*  4 */
-    {13, 14, 15, 16, 30, 17, 18, 19,  0, 21},   /*  5 */
+    { 0, 30,  3,  4,  5,  6,  7,  8, 11, 12},   /*  2 */
+    {13, 14,  0, 31,  5,  6,  0,  8,  0,  0},   /*  3 */
+    {13, 14, 15, 16,  0, 17, 18, 19, 20, 21},   /*  4 */
+    {13, 14, 15, 16,  0, 17, 18, 19,  0, 21},   /*  5 */
     { 1,  0,  0,  0,  0,  0,  0,  0,  0, 21},   /*  6 */
     { 1,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  7 */
     { 0,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  8 */
@@ -58,11 +62,11 @@ static const u8 CODE KeyC_T[19][10] = {
     { 1, 27,  0,  0,  0,  0, 26,  0,  0, 10},   /* 15 */
     { 0, 28,  0,  0,  0,  0, 26,  0,  0, 29},   /* 16 */
     { 0,  0,  0,  0,  0,  0,  0,  0,  0, 21},   /* 17 */
-    { 1, 33,  0,  0,  0,  0,  0,  0,  0, 10},   /* 18 */
+    { 1, 32,  0,  0,  0,  0,  0,  0,  0, 10},   /* 18 */
 };
 
 /* What a key does, in the six cells that the bar has for it. */
-static const u8 CODE Key_S[34][6] = {
+static const u8 CODE Key_S[33][6] = {
     {' ', ' ', ' ', ' ', ' ', ' '},     /*  0 */
     {'H', 'e', 'l', 'p', ' ', ' '},     /*  1 */
     {'M', 'e', 'n', 'u', ' ', ' '},     /*  2 */
@@ -93,10 +97,9 @@ static const u8 CODE Key_S[34][6] = {
     {'S', 'a', 'v', 'e', ' ', ' '},     /* 27 */
     {'S', 'a', 'v', 'e', '.', '.'},     /* 28 */
     {'Q', '&', 'S', 'a', 'v', 'e'},     /* 29 */
-    {'M', 'e', 'm', 'o', 'r', 'y'},     /* 30 */
-    {'M', 'a', 'i', 'n', ' ', ' '},     /* 31 */
-    {'L', 'a', 'b', 'e', 'l', ' '},     /* 32 */
-    {'R', 'e', 's', 'c', 'a', 'n'},     /* 33 */
+    {'M', 'a', 'i', 'n', ' ', ' '},     /* 30 */
+    {'L', 'a', 'b', 'e', 'l', ' '},     /* 31 */
+    {'R', 'e', 's', 'c', 'a', 'n'},     /* 32 */
 };
 
 /* The menu bar: the names of its five menus, each behind four spaces, and
