@@ -187,8 +187,35 @@ these, where it is of the program of 16 bits alone and the program of
   the count of what the program costs in memory, above, is the 16-bit
   program's: a command run from the program of 32 bits has of DOS's
   memory all but the extender's part. What it has of the memory above
-  the megabyte is not declared here: `TODO.md`, the plan, 9 of what is
-  open for the user.
+  the megabyte is the next point.
+- The memory above the megabyte, while a command runs. Of the program
+  of 32 bits alone, and declared as it is on the user's word of 13
+  October 2026. The original takes none of that memory, and the program
+  of 16 bits none: a command of either has all of it, 15,232K on the
+  bench by the BIOS, and with an XMS driver loaded 14,978K of them
+  free. The extender of the program of 32 bits takes all of it when it
+  starts, as it comes, and holds it while a command runs. Where no XMS
+  driver and no other memory manager is loaded, as on the bench, it has
+  INT 15h for that and answers a command in the BIOS's place: by
+  function 88h that there are 0K, and E801h and E820h it refuses. With
+  an XMS driver loaded, 0K are free to a command. So a command that
+  wants such memory for itself finds none: a program with another
+  extender, a cache, a RAM disk, which is from what a command is told
+  and was tried with none of them. A program that DOS/32A starts gets
+  memory all the same, since its extender asks the one that is in the
+  memory, and a second copy of the program is such a one. On the bench
+  the scenario `command` shows it in what FreeDOS's `mem` prints, run
+  as a command: told by the BIOS that there is no such memory, it goes
+  by the two bytes of the clock's memory, which say 15,360K, 128K more
+  than the BIOS tells a command of the original, since the BIOS keeps
+  that much at the top for itself. The extended memory in all and what
+  is used of it are that much more there, and the total memory; the
+  total that is used follows the same and is left out of the comparison
+  for following the size of the program. The extender can be told how
+  much to take, by four bytes of its settings, which was seen on a copy
+  of the file and is not done: `TODO.md`, "C2, a second copy in the
+  driver, and `command`", has what a command is told, call by call, and
+  what that setting would cost.
 - The block of the panels. The program of 32 bits has it of 640 KB that
   are its own, above the megabyte, which it hands out to itself as DOS
   hands out its memory; it makes the block shorter for a command and
@@ -228,8 +255,9 @@ these, where it is of the program of 16 bits alone and the program of
   on the bench, with the 512 bytes of the system's functions in a block
   of DOS's behind it. INT 21h of real mode goes to the extender for as
   long as the program is in the memory, so a call of DOS that another
-  program makes then passes the extender on its way; so does INT 15h,
-  of which `TODO.md` has more, 9 of what is open in the plan. When it
+  program makes then passes the extender on its way; so does INT 15h
+  where no memory manager is loaded, by which a command is told of the
+  memory above the megabyte: the point on that memory, above. When it
   starts, the extender sets the counter of the machine's timer anew, in
   its mode 3 where the BIOS has it in mode 2, and it keeps the line A20
   on. The program runs in protected mode at the highest privilege, with
@@ -265,7 +293,11 @@ as it is, what it wants of the machine and what the extender is in the
 machine while it runs among it. The user's word, "declare all five", on
 a list of what differs in that program (`TODO.md`, "The program of 32
 bits: what differs from the original, for the user", 6 to 10 there; the
-others of the five are in 6 and in 8).
+others of the five are in 6 and in 8). And the same day, when the last
+of that list had been put to them: that a command finds no memory above
+the megabyte while the extender holds it is declared as it is, with no
+change of the program (1 of that list, and `CLAUDE.md`, "The portable
+C").
 
 **Which scenarios show it.** Each of these is held against the original's
 golden with what its row says made to it: by its patch, or, where the row
@@ -282,6 +314,7 @@ and no others:
 | `menu` | The same. By 8: Up from the top of the menu, and PgDn, go to More setup, the last item, where the original has Save setup, and Up from there goes to Save setup, where the original goes on from that to Memory allocation. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
 | `second-copy` | In 16 bits: the second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work. In 32 bits: every screen is as the original's, the copy having run its command; its patch is of 10 alone |
 | `start-memory` | In 16 bits: the second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with the mini status that the first copy's have not. In 32 bits: the copy runs the command, as the original's does, which stays in the memory and leaves 75 KB of DOS's; the copy needs none of that to come back and says nothing, so the command line shows a row less of it, and it is still there afterwards, with the same three screens |
+| `command` | In 32 bits alone, by a patch of that program's own; the program of 16 bits shows every screen as the original's. Where `mem` is run as a command, two rows of what it prints: the extended memory, in all and used, 15,360K where the original has 15,232K, and the total memory, 16,384K where it has 16,256K. A command is told that there is no memory above the megabyte, and `mem` goes by the clock's memory, which has 128K more |
 | `setup-config` | The Configuration of the setup where it shows: without Memory allocation, by 7 without TSR manager and by 14 without Quick execute commands, so without Execute options. The row of the scenario in 14 says all that differs in it: of this entry, the step that unticks Memory allocation is left out, and the setup file that is saved has the byte as it had it, 1, where the original's has 0 |
 | `setup-config-mouse`, `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The Configuration so, where each shows it: their rows are in 14. All but `setup-config-mouse` and `setup-missing-saved` show Screen and Mouse too, which is otherwise by 5 |
 | `ended` | In 16 bits the program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. In 32 bits the copy has the memory and runs it, and it stays in the memory, 448 bytes, also when DOS has ended the copy, which by 7 keeps no list of such programs to release: no screen of the scenario shows that, since the program that started the copy clears the screen, and both programs are held to the one patch. And by 7, for both: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. And by 8, with no interrupt of DOS's taken: DX has in its low byte what DOS was last told of Ctrl-C and is as it came above that, which is what the original leaves there where its setup has TSR manager off; and DS is as it came, on the program that started the copy, a segment that follows the size of the program and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
@@ -846,11 +879,53 @@ watch.
 - Nothing releases a program that has stayed. It is still in the memory
   when the program is left, as it is when it was run from DOS's own
   command line, and what gets it out again is whatever does there.
-  That is so of the program of 16 bits; behind the program of 32 bits
-  such a program is in the memory still and has lost interrupts that
-  it took, by the extender, which is declared nowhere and is open, the
-  user's to decide: `TODO.md`, "The program of 32 bits: what differs
-  from the original, for the user", 2.
+  Behind the program of 16 bits it goes on working, as it does there.
+- Behind the program of 32 bits such a program keeps its memory and is
+  cut off from its interrupts, by the extender. Of that program alone,
+  and declared as it is on the user's word of 13 October 2026, with no
+  change of the program. As the program is left, its extender holds
+  the interrupts of real mode against what they were when the program
+  was started, writes a line onto the screen that is left for each
+  that is otherwise, "DOS/32A warning (9003): real mode interrupt
+  vector has been modified: INT 1Ch", and puts every one back. So the
+  program that stayed has none of its interrupts, which is the
+  original's, that gave each back as it released the program; and it
+  keeps its memory, which the original gave back to DOS, with the
+  extender's lines on the screen, which are of neither. And Ctrl-Break,
+  INT 1Bh, it has lost before, while the program of 32 bits still runs:
+  the program takes that interrupt through the extender behind every
+  command and gives it back in front of the next and at its end, and
+  the extender then has it go where it went when the extender started,
+  not to who has taken it since.
+  What is known of this, and how. Seen on the bench: in `stay-left`, a
+  program that stays with INT 1Bh, 1Ch, 21h, 2Fh and 60h taken, and a
+  second that asks by INT 2Fh who the first is and prints which of the
+  five go to it. Run from the program with the first in the memory, it
+  prints all but INT 1Bh; the program left, the screen has four lines
+  of the warning, for INT 1Ch, 21h, 2Fh and 60h; and at DOS's prompt it
+  prints two dashes for each of the five. Since it finds the first by
+  INT 2Fh, those dashes say only that INT 2Fh no longer goes there, and
+  nothing of the other four: that those are put back too is by the four
+  lines, and by the extender's code. And seen with FDAPM, which the
+  bench has: run from the program as `fdapm apmdos`, it leaves four
+  lines for INT 16h, 28h, 2Ah and 2Fh when the program is left, and
+  `fdapm stats` says then that none is resident, where behind the
+  program of 16 bits it finds it. Read in the extender's code, and
+  seen no further than that: that all 256 interrupts are put back
+  there, with the masks of the two interrupt controllers, and INT 1Bh,
+  1Ch, 21h, 23h, 24h and 2Fh whatever its settings say; that the mouse
+  driver is told there to call nobody, so that a program which has
+  stayed and has given the driver a routine of its own would lose
+  that, which is not among what was decided and is the user's still;
+  and that when DOS ends the program by another's hand that part of
+  the extender is not reached, so that no line is written and those
+  six alone are put back, with INT 15h where the extender has it. A
+  mend was built and dropped on the user's
+  word the same day: it left such a program at work but for INT 21h,
+  which the extender has while the program runs and which nothing of
+  the program can keep for another. `TODO.md`, "L, a program that has
+  stayed in the memory, when the program is left", has the mend in
+  words and what was read of the extender.
 - The program does not take INT 21h either, since. When the watch went
   the entry of that interrupt was kept for the program's own call,
   which the same entry takes, and handed every other call of DOS on
@@ -919,7 +994,7 @@ left out alone:
 | `tree-choose` | The key bar with Alt held, twice, has no name for F5, where the original has Memory |
 | `mouse-middle` | The middle button is not pressed in the map of the memory: two steps are left out. Every screen is as the original's after the same step |
 | `mouse-drag-lists` | The last nine steps are left out: a program that stays in the memory, and a button of the mouse moved in the map. Every screen before is as the original's |
-| `stay-left` | The program that has stayed in the memory with five interrupts, INT 1Bh, 1Ch, 21h, 2Fh and 60h, is not released when the program is left: at DOS's prompt the second program prints all five as still going to it, where the original has given every one back and it prints five times two dashes. The patch names 10 and 14 too, for the box of F10 and for the Advanced options. The program of 32 bits does not show that row, nor two screens before it, and fails the scenario: see above, at what is open |
+| `stay-left` | The program that has stayed in the memory with five interrupts, INT 1Bh, 1Ch, 21h, 2Fh and 60h, is not released when the program is left: at DOS's prompt the second program prints all five as still going to it, where the original has given every one back and it prints five times two dashes. The patch names 10 and 14 too, for the box of F10 and for the Advanced options. In 32 bits, by a patch of that program's own, which has those rows of 10 and 14 and three screens otherwise: with the first program in the memory and the program still running, the second prints two dashes for INT 1Bh and the numbers of the other four; when the program is left, four lines of the extender's warning stand above DOS's prompt, for INT 1Ch, 21h, 2Fh and 60h, with the prompt and the cursor two rows further down; and at DOS's prompt the second program prints five times two dashes, as behind the original, which says that INT 2Fh, by which it finds the first, goes there no more, with the four lines two rows further up |
 
 And `menu` and `ended`, which the first deviation changes too: their
 rows there say all that differs in them, and the patch of each names

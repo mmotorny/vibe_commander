@@ -2595,9 +2595,10 @@ in "The portable C".
     the processor time of a QEMU follows the load as well.
   - The extender takes all of the memory above the megabyte while the
     program runs, and a command of the program is told that there is
-    none: the scenario `command` fails for that and is off the record,
-    and whether it stays so is the user's (`TODO.md`, the plan, 9 of
-    what is open).
+    none: the scenario `command` shows that in what `mem` prints, and
+    is held by a patch of that build's own, the difference being
+    declared as it is on the user's word (entry 1 of `DEVIATIONS.md`;
+    `TODO.md`, the plan, 9 of what was open).
   - A number of 16 bits that stands for one below 0, FF60h for 160
     back, and is added to a pointer goes that far on in a flat
     memory, and nothing at the place says so: `T71_00` of `edit.c`,
@@ -3353,11 +3354,17 @@ the piece L of the plan for the 32 bits, which has the mend in words):
   in the program can leave it that interrupt when the extender has
   gone.
 - The scenario `stay-left` shows all of it, and the program of 32 bits
-  fails it: it is off the record with `command`, and what becomes of
-  it is the user's (`TODO.md`, the plan, 10 of what is open). Its
+  is held to what it shows there by a patch of its own, the difference
+  being declared as it is on the user's word (entry 7 of
+  `DEVIATIONS.md`; `TODO.md`, the plan, 10 of what was open). Its
   second program finds the first by INT 2Fh, so where that one is lost
   it prints dashes for all five, whatever else still goes to the
-  first.
+  first: such a row says less than it seems to, and the entry says
+  what is known by something else.
+- A patch that a build has of its own may lack a row that the tree's
+  patch has, where the build shows the original's row there:
+  `stay-left` at DOS's prompt. `goldens.py patch` says "gone" for it,
+  and the patch's reason says why.
 - A scenario that goes on at DOS's prompt when the program has been
   left: with `"cls" Enter` as its last command, or the prompt that the
   program leaves is written into a row of what the command before

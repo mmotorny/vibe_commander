@@ -2583,15 +2583,16 @@ To be asked when the work reaches them, and not before.
 What differs in the program of 32 bits from the original, declared or
 not, is in one list for the user, with the ways for each: "The program
 of 32 bits: what differs from the original, for the user", behind this
-plan. 9 below is its first row.
+plan. 9 below is its first row and 10 its second, and every row of it
+is decided: nothing of this table is open any more.
 
 | | What | When, and what is thought of it |
 |---|---|---|
 | 3 | What deviation 1 says, the program staying in the memory whole, once the program is above the megabyte and a second copy has the memory to run again. That moves toward the original. `second-copy`, `start-memory` and `ended` have patches that say a second copy has none | **Decided, on 13 October 2026** (`CLAUDE.md`, "The portable C"): where the program of 32 bits does again what the original does, it is held to the original's golden, and the deviation says only what still differs. Done by C2 for `second-copy` and `start-memory`, each with a patch of the 32-bit build's own; `ended` passes since E, with the 16-bit program's patch |
 | 4 | What the 32-bit program can do when DOS ends it by another program's hand. The 16-bit program has its say first, through its PSP, and leaves registers for the program that started it: `ended` prints them. Under an extender DOS would seem to go back to that program through the extender's own part of real mode, with nothing of the program run. That is from reading and was not tried | The piece that meets it, D2 or M1, tries it first and reports, and the user is asked with what was seen. Thought: declared, and `ended` not run for the portable C; `TakeEnd`, `Exit01` and `Exit05` go with the 16-bit build. **Tried by D2**: nothing of the program runs, but the extender takes itself out and leaves every interrupt of real mode as it found it; what is not put back is that DOS looks for Ctrl-C at every call, and whoever ended the program sees DOS's registers. "Piece D2" below has the table and the ways that there seem to be. **Decided on 13 October 2026**, the second of those ways: the program of 32 bits is told as the 16-bit one is, by a small routine of real mode that the system's functions keep for it (`CLAUDE.md`, "The portable C"). **Done**: "E, the end by another's hand" below; `ended` passes for both programs with the one patch |
-| 8 | That the 16-bit build may go, which the road keeps for the user | Before Z1, when both builds pass every scenario from one source |
-| 9 | Whether the program of 32 bits may take all of the memory above the megabyte while a command runs. Its extender does, as it comes: a command is told by the BIOS that there is none, and with an XMS driver none is free, where a command of the original or of the 16-bit program has all of it. A program with the same extender gets memory all the same, a second copy among them. `command` shows it in what `mem` prints, by 128K | Found by C2, which has the figures, and what the extender's setting for it does: "C2" below. Thought: the extender held to what the program and a copy of it need, by the build, which moves the program in the memory and wants the harness told; or declared as it is. The user's word of 13 October 2026: it stays open, to be decided before the 16-bit build goes, and `command` stays failing and off the record until then |
-| 10 | What becomes of a program that a command has left in the memory, with interrupts taken, when the program of 32 bits is left. Its extender puts every interrupt of real mode back as it was when the program started, and writes a line of warning for each: such a program keeps its memory and is cut off, where the original releases it and the program of 16 bits leaves it at work (entry 7 of `DEVIATIONS.md`). And Ctrl-Break it loses while the program still runs. `stay-left` shows it | Found by W, 2 of the list of what differs. The user's word of 13 October 2026 was first "mend it", on being told that it was one bit of the extender's settings; it was not, and told what the mend took and that it still left such a program without INT 21h, the user had it dropped the same day: "L, a program that has stayed in the memory" below has the mend in words and what was read of the extender. Open: declared as it is, or another mend. `stay-left` stays failing and off the record until then, and nothing is declared for it |
+| 8 | That the 16-bit build may go, which the road keeps for the user | Before Z1, when both builds pass every scenario from one source. **Decided, on 13 October 2026**, with 9 and 10 declared (`CLAUDE.md`, "The portable C", step 1 of the road): the tests then judge the program of 32 bits as the portable C, and the 16-bit build goes with the switch, in one piece |
+| 9 | Whether the program of 32 bits may take all of the memory above the megabyte while a command runs. Its extender does, as it comes: a command is told by the BIOS that there is none, and with an XMS driver none is free, where a command of the original or of the 16-bit program has all of it. A program with the same extender gets memory all the same, a second copy among them. `command` shows it in what `mem` prints, by 128K | Found by C2, which has the figures, and what the extender's setting for it does: "C2" below. Thought: the extender held to what the program and a copy of it need, by the build, which moves the program in the memory and wants the harness told; or declared as it is. The user's word of 13 October 2026 was first that it stays open, to be decided before the 16-bit build goes, with `command` failing and off the record until then. **Decided by the user, the same day**: declared as it is, with no change of the program (`CLAUDE.md`, "The portable C"). **Done**: a point of "The program of 32 bits" in entry 1 of `src/portable_c/DEVIATIONS.md`, "The memory above the megabyte, while a command runs", with the row of `command` there; and a patch of this build's own, `harness/goldens/portable_c32/command.patch`, two rows of what `mem` prints. `command` is on the record |
+| 10 | What becomes of a program that a command has left in the memory, with interrupts taken, when the program of 32 bits is left. Its extender puts every interrupt of real mode back as it was when the program started, and writes a line of warning for each: such a program keeps its memory and is cut off, where the original releases it and the program of 16 bits leaves it at work (entry 7 of `DEVIATIONS.md`). And Ctrl-Break it loses while the program still runs. `stay-left` shows it | Found by W, 2 of the list of what differs. The user's word of 13 October 2026 was first "mend it", on being told that it was one bit of the extender's settings; it was not, and told what the mend took and that it still left such a program without INT 21h, the user had it dropped the same day: "L, a program that has stayed in the memory" below has the mend in words and what was read of the extender. It was open then: declared as it is, or another mend, with `stay-left` failing and off the record. **Decided by the user, the same day**: declared as it is, with no change of the program (`CLAUDE.md`, "The portable C"). **Done**: a point of entry 7 of `src/portable_c/DEVIATIONS.md`, "Behind the program of 32 bits such a program keeps its memory and is cut off from its interrupts", with the row of `stay-left` there; and a patch of this build's own, `harness/goldens/portable_c32/stay-left.patch`, three screens of that and the rows that the 16-bit program's patch has for 10 and 14. `stay-left` is on the record, which is every scenario that this program is taken through, 155 of 155 |
 
 ### The strategy
 
@@ -3335,7 +3336,7 @@ place: see below.
 | 2 | The editor, where a line ends: the cursor is on line 1 at the column behind what was typed, where the original is on a line further down at column 1. Each has typed a line and Enter into a file of the program's own | `user-menu-run`, `user-menu`, `comspec`, `view-commands`, `editor-save` | After step 6, `"a:" Tab "all" Enter`, row 0: `Edit: vc.mnu  *  Line 1  Col 7` for `Line 2  Col 1`. The others at steps 47, 45, 29 and 23, in `vc.mnu`, `vcview.ext` and `D:\VC\vc.ext` | `comspec` alone, and it shows what the four without one show |
 | 3 | The editor, the cursor in a line: perhaps 2 again, since the step begins with Enter | `editor-keys` | After step 7, `Enter Up End Left Left Left Backspace Del`, rows 0 to 13: the status has `Col 157` for `Col 13`, and the cursor is at column 74 of row 1 for column 12 | No |
 | 4 | The editor opened where the original does not open it | `editor-big` | After step 28, `F4`, row 0: `Edit: b  Line 1  Col 1` and the editor's screen, where the original shows the panels | No |
-| 5 | What the machine's memory is said to be while a command runs from the program. Looked into by C2: the extender has all of the memory above the megabyte then, which is the user's, 9 of what is open | `command` | After step 7, `Ctrl+o`, rows 15 and 17: `mem` of DOS says 15,360K of extended memory, in all and free, for 15,232K, and 16,384K of memory in all for 16,256K, 128K more of each. What the extender makes of the memory: not looked into. If it is a figure that follows what the program is and not what it does, `harness/deviations.py` leaves such out, which is asked first | No |
+| 5 | What the machine's memory is said to be while a command runs from the program. Looked into by C2: the extender has all of the memory above the megabyte then, which was the user's, 9 of what was open, and is declared as it is since, with a patch of this build's own | `command` | After step 7, `Ctrl+o`, rows 15 and 17: `mem` of DOS says 15,360K of extended memory, in all and free, for 15,232K, and 16,384K of memory in all for 16,256K, 128K more of each. What the extender makes of the memory: not looked into. If it is a figure that follows what the program is and not what it does, `harness/deviations.py` leaves such out, which is asked first | No |
 | 6 | A second copy of the program: the patches of the 16-bit build say that it has no memory to run, and here it has. 3 of what is open for the user | `second-copy`, `start-memory` | After step 6, `Ctrl+o`, row 15: `C:\WORK>d:\vc\vc ver` and what follows it, where the patch expects an empty row. `start-memory` after step 12, `Ctrl+o`, row 18: an empty row where the original has `C:\WORK>d:\vc\vc k` | Both |
 | 7 | The program ended by another's hand. 4 of what is open for the user, which D2 tried and wrote down. **Mended by E**, below: `ended` passes and is on the record | `ended` | After step 40, `Ctrl+o`, row 0: of the six words that the scenario prints of the registers left for the program that started this one, `2222 1111 EEF6 436D FF75 0202` for the patch's `2222 1111 EE4F #### 0000 0202` | Yes |
 
@@ -3670,7 +3671,7 @@ and H1 are started at once by the session.
 | R1, `resident.c` renamed | The file of the portable C gets a name for what it is, what the program does first, the commands that it runs by DOS and what it does when it leaves: nothing of it is resident. The C translation's file keeps its name, so the three tables of the harness that know the file by it for both trees have to tell the trees apart, or take the name from the tree: `source="resident.c"` of three batches of `harness/ported.py`, with a text there that says `CtrlC of resident.c`; the keys of `REVIEWED` in `harness/reads.py`, seven entries, and one of the table there of what the portable C has no more; and a text of `harness/datacheck.py`. Then the comments of the tree, `CMakeLists.txt`, the README and the notes that name it | `git mv`, those three files of the harness, the comments | Small | The first run, M1; beside the convergence, which changes the file little | The same bytes of both programs, and the tests that read the source, `portable_c-data` above all | A table that still finds the old name in the C translation and so passes with the entry of the portable C dropped: hold the counts of `reads.py` and of the batches against those before |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
 | C1 to Cn, the convergence | The scenarios that fail, by family: one piece takes those of one cause | By what fails | Three to six pieces, a guess | M1, H3; side by side | The record grows and the 16-bit scenarios pass | See "What could go wrong", 1 and 2 |
-| L, a program that has stayed in the memory, when the program is left. Tried, and dropped on the user's word of 13 October 2026: see "L, a program that has stayed in the memory" below | A program that a command has left in the memory was to be at work when the program of 32 bits has been left, as behind the one of 16 bits. The mend took two bits of the extender's settings, the three interrupts given back in real mode too, and a routine of real mode at every end of the program, and left such a program without INT 21h: it is in no commit. What is kept is the scenario, what was read of the extender, and the mend in words | The scenario `stay-left`; this plan | A scenario | E | `stay-left` for the original, the C translation and the program of 16 bits; it fails for the program of 32 bits and is off the record | What is open: 10 of what is open for the user |
+| L, a program that has stayed in the memory, when the program is left. Tried, and dropped on the user's word of 13 October 2026: see "L, a program that has stayed in the memory" below | A program that a command has left in the memory was to be at work when the program of 32 bits has been left, as behind the one of 16 bits. The mend took two bits of the extender's settings, the three interrupts given back in real mode too, and a routine of real mode at every end of the program, and left such a program without INT 21h: it is in no commit. What is kept is the scenario, what was read of the extender, and the mend in words | The scenario `stay-left`; this plan | A scenario | E | `stay-left` for the original, the C translation and the program of 16 bits; the program of 32 bits failed it and is held to it by a patch of its own since the difference was declared | What was open, 10 of that table, is decided: declared as it is |
 | T, the time of a wait. Done: see "T, the time of a wait" below | Why a wait costs the host four times as much for the program of 32 bits, and what the time that a step has is counted in | `harness/dos.py`, `harness/scenarios.py`, `harness/ported.py` | 60 lines | H3; beside the convergence | The goldens derived again are as they are; a machine that hangs is given up and one that is kept from running is not; the whole suite | A program that hangs on a busy host is waited for until its machine has had its time |
 | W, the switch. Half done: see "W, the switch" below, which has what waits and for what | The tests of the portable C judge the 32-bit build, and the 16-bit one under another name beside it; entry 1 of `DEVIATIONS.md`, and what the others say of `ended`; the patches of `second-copy`, `start-memory`, `ended`; the README | `CMakeLists.txt`, the harness's names, `DEVIATIONS.md`, `README.md` | Small | Every scenario passes; H3, H4; the user's word on 3 and 4 above | Both builds pass everything from one source | |
 | Z1, the 16-bit build goes | `dos.c`, `arith.c` with its test, the first bodies in `vc.h`, the build's 16-bit half, what the README says rests on it; `dos32.c` becomes `dos.c` | Those | Small | The user's word | The 32-bit tests | |
@@ -6550,14 +6551,16 @@ down by that, `Ended_T` being written by their names. `LOW_ENDED` is
 at 464, and the block is 512 bytes again; the 560 and the address
 `3391:0200` above are of the block as it was when this was made.
 
-### C2, a second copy in the driver, and `command`: done but for what is the user's
+### C2, a second copy in the driver, and `command`: done, and what was the user's is decided
 
 Two things. The driver of the tests reads of a copy of the 32-bit
 program what is that copy's, and `second-copy` and `start-memory` are on
 the record for it, each with a patch of this build's own. And `command`
-is not on the record and nothing of it is left out: what `mem` shows
-there is a state of the machine that the extender makes, which is the
-user's to decide on, 9 of what is open.
+was not on the record and nothing of it is left out: what `mem` shows
+there is a state of the machine that the extender makes, which was the
+user's to decide on, 9 of what was open. Decided on 13 October 2026:
+declared as it is, and `command` is on the record with a patch of this
+build's own. The end of the part on `command`, below, has it.
 
 **The driver and a copy of the program.**
 
@@ -6677,7 +6680,8 @@ original's cell for cell, so each has a file of its own instead, with
 the rows that still differ; the top of `goldens.py` has both ways.
 
 **`command`: what `mem` says of the memory above the megabyte.** Not on
-the record, and nothing left out.
+the record when this was written, and nothing left out; declared since,
+and on the record: the end of this part.
 
 What the figure is. FreeDOS's `mem` (its source is in its package of
 the pinned image, `SOURCE/MEM/SOURCES.ZIP`, `check_xms` of `mem.c`)
@@ -6758,6 +6762,33 @@ held to what it needs, and to how much. The user's word of 13 October
 goes; `command` stays failing, for the 128K, and off the record until
 then.
 
+**Decided by the user, on 13 October 2026**, the same day and later:
+declared as it is, with no change of the program (`CLAUDE.md`, "The
+portable C"). What was done for it, and nothing else:
+
+- Entry 1 of `src/portable_c/DEVIATIONS.md`, "The program of 32 bits",
+  has a point of its own, "The memory above the megabyte, while a
+  command runs": what the original and the program of 16 bits leave a
+  command, what the extender leaves it and how a command is told, what
+  was seen and what is only from what a command is told, and that the
+  setting of the extender was seen on a copy and is not made. The
+  entry's reason has the user's word, and its table the row of
+  `command`.
+- `harness/goldens/portable_c32/command.patch`, made by `python3
+  harness/goldens.py patch --tree portable_c32 command` and read: one
+  screen, behind step 7, `Ctrl+o`, and two rows of it, 15 and 17, nine
+  cells. `Extended (XMS)` has 15,360K in all and used where the
+  original has 15,232K, and `Total memory` 16,384K where it has
+  16,256K: the clock's memory, 3C00h, in the place of the BIOS's
+  3B80h, and that with 1,024K. The total that is used, the next figure
+  of row 17, is left out of the comparison as it was. The program of
+  16 bits has no patch of the scenario, so there were no rows of
+  another entry to carry.
+- `command` is on the record, `harness/pass32.txt`.
+
+The extender takes all of the memory as before: `le.BENCH` and
+`behind()` stand as they are.
+
 And of the second copy, the same day: this work lands as it is, and no
 more goes into scenarios with more than one copy of the program unless
 the user asks.
@@ -6785,6 +6816,19 @@ Its row asks that every scenario pass first, and one does not,
 switch itself waits. This is what the row asks, what of it was done
 already or is done now, and exactly what is left. Made on 13 October
 2026, from `1eb233c`.
+
+**Since this was written**, the same day: the user decided 1 and 2 of
+the list of what differs, each declared as it is, and that the 16-bit
+build may go with the switch, in one piece (`CLAUDE.md`, "The portable
+C"). `command` and `stay-left` are declared, in entries 1 and 7 of
+`DEVIATIONS.md`, each with a patch of this build's own, and the record
+is every scenario that the program of 32 bits is taken through, 155 of
+155. So where the tables below say that the switch waits, for
+`command`, for `stay-left` or for the user's word on 8, and where they
+say 153 of the 155, they say what was so when W wrote them: the switch
+waits for nothing, and it is made as W thought best, at the end of this
+section, the program of 32 bits taking the names and the 16-bit build
+going in the same change.
 
 **What the row asks, and where each thing stands.**
 
@@ -7074,7 +7118,7 @@ For whoever goes on:
   program of 32 bits in 128 seconds on a host by itself, and derive
   every golden in 140.
 
-### L, a program that has stayed in the memory, when the program is left: tried, and dropped on the user's word
+### L, a program that has stayed in the memory, when the program is left: tried, dropped on the user's word, and declared as it is
 
 For 2 of "The program of 32 bits: what differs from the original, for
 the user" below: a program that a command has left in the memory, with
@@ -7096,6 +7140,11 @@ said so that it could be made again; and what is open. **Open, the
 user's:** whether the difference is declared as it is or mended some
 other way. Nothing is declared for it. `stay-left` fails for the
 program of 32 bits and is off its record, as `command` is.
+
+That was so when the piece ended. **Decided by the user since, on 13
+October 2026: declared as it is**, with no change of the program
+(`CLAUDE.md`, "The portable C"). "Declared", at the end of this
+section, has what was written and how the patch was read.
 
 **The way that was decided for is none.** The list had the mend as one
 bit, bit 4 of the byte 14h of the extender's settings, "seen once on a
@@ -7227,7 +7276,7 @@ and at DOS's prompt when the program has been left:
 |---|---|---|---|
 | The original, and the C translation | `1B 1C 21 2F 60` | Nothing | `-- -- -- -- --`: released |
 | 16 bits | the same | Nothing | `1B 1C 21 2F 60`, by `harness/goldens/portable_c/stay-left.patch` |
-| 32 bits, as it is | `-- 1C 21 2F 60` | Four lines of the extender's warning, for INT 1Ch, 21h, 2Fh and 60h | `-- -- -- -- --`. It fails, at the first of these screens |
+| 32 bits, as it is | `-- 1C 21 2F 60` | Four lines of the extender's warning, for INT 1Ch, 21h, 2Fh and 60h | `-- -- -- -- --`. It failed, at the first of these screens, while nothing was declared; since, it is held to these three by `harness/goldens/portable_c32/stay-left.patch` |
 | 32 bits with bits 2 and 3 of the byte 14h clear and nothing else changed: a copy of the file, run once when this was written | `-- 1C 21 2F 60` | Nothing | `-- -- -- -- --`: INT 2Fh is among the six, so nobody answers `q`, whatever else still goes to `t` |
 | 32 bits with the mend, as its piece saw it | `1B 1C 21 2F 60` | Nothing | `1B 1C -- 2F 60` |
 
@@ -7361,12 +7410,56 @@ sentence more in its comment, on what the banner's bit is.
 **The user's.**
 
 1. What becomes of 2 of the list: declared as it is, or another mend.
-   Its row there has the ways as they are known now.
+   Its row there has the ways as they are known now. **Decided**:
+   declared as it is, below.
 2. Whether the variable `DOS32A` is to be read at all: bit 0 of the
    byte 15h. Nothing was changed there; with that bit clear the
    program would go by its file alone.
 3. The mouse driver told to call nobody when the program ends itself,
-   by the extender: above. Written here so that it is not lost.
+   by the extender: above. Written here so that it is not lost. Entry
+   7 says it among what was read, and that it is not among what was
+   decided.
+
+**Declared**, on the user's word of 13 October 2026, by a piece of its
+own behind this one, which changed no source of a program:
+
+- Entry 7 of `src/portable_c/DEVIATIONS.md` has a point of its own,
+  "Behind the program of 32 bits such a program keeps its memory and
+  is cut off from its interrupts", where it had a sentence that this
+  was open: what the extender does as the program is left, what of
+  that is the original's (no interrupt) and what is not (the memory
+  kept, the lines on the screen), Ctrl-Break lost while the program
+  still runs, and what is known and how: seen in `stay-left` and with
+  FDAPM, read in the extender's code, with the mouse driver and the
+  end by another's hand among what was only read. The row of
+  `stay-left` in its table says what each program shows.
+- `harness/goldens/portable_c32/stay-left.patch`, made by `python3
+  harness/goldens.py patch --tree portable_c32 stay-left`, which takes
+  the header of the 16-bit program's patch and says how the rows stand
+  to that one: 28 lines as they were, the two screens of the Advanced
+  options (14) and the box of F10 (10); 11 new; 1 gone. The new ones,
+  each read against the table of the scenario above:
+
+  | Screen | Rows | What |
+  |---|---|---|
+  | 45, `Ctrl+o`, both answers of `q` | 22 | `-- 1C 21 2F 60` where the original has `1B 1C 21 2F 60`: Ctrl-Break lost while the program runs. `q` is the first command behind `t`, and in front of it the program gives Ctrl-Break back through the extender |
+  | 49, `Enter`, the program left | 20 to 24, and the cursor | Four lines of "DOS/32A warning (9003): real mode interrupt vector has been modified: INT 1Ch", 21h, 2Fh and 60h, in rows 20 to 23, and DOS's prompt in row 24 where the original has it in row 22, with the cursor |
+  | 50, `"q" Enter`, at DOS's prompt | 18 to 21 | The four lines, two rows further up. Rows 22 to 24 are the original's: the command, five times two dashes, the prompt |
+
+  Gone is the one row of 7 that the 16-bit program's patch has of its
+  own, row 23 of the last screen, `1B 1C 21 2F 60`: this program shows
+  the original's dashes there. So the patch has every row of the
+  tree's patch but that one, and the reason in its header says why
+  the row is not there. Nothing else differs on any of the 51 screens,
+  nor on the disks.
+- What `q` says at DOS's prompt is the same row as behind the
+  original, and says less: it finds `t` by INT 2Fh, which is put back,
+  so nobody answers and it prints dashes for all five whatever else
+  goes where. That the others are put back is by the four lines of
+  that run and by what was read. The entry says so, and the patch's
+  header.
+- `stay-left` is on the record with `command`: 155 of the 155
+  scenarios that the program of 32 bits is taken through.
 
 ## The program of 32 bits: what differs from the original, for the user
 
@@ -7390,8 +7483,8 @@ to them item by item, as the session that runs the work handed it on:
 
 | | Decided | What became of it |
 |---|---|---|
-| 1 | Open still, as 9 of what is open in the plan has it: to be decided before the 16-bit build goes | `command` fails and is off the record |
-| 2 | "Mend it", on being told that it was one bit of the extender's settings. It was not; and told what the mend took and what it still left, the user had it dropped, on the same day. **Open**: declared as it is, or another mend | The piece L, "L, a program that has stayed in the memory" above. With bit 4 of that byte clear the extender does not load the program, and what the row had as "seen once" was DOS's prompt. The mend that was made, which is in no commit, took two other bits of the settings, the program's three interrupts given back in real mode too, and a routine of real mode at every end of the program, and left a program that had taken INT 21h without it. Kept of it: the scenario `stay-left`, which the program of 32 bits fails and which is off the record; what was read of the extender; and the mend in words. Entry 7 says in a sentence that this is open, and nothing is declared. 10 of what is open in the plan. The row below is written anew, with the ways as they are known now |
+| 1 | First: open still, to be decided before the 16-bit build goes. Then, the same day: **declared as it is**, with no change of the program, the way (b) of its row | A point of "The program of 32 bits" in entry 1, with the row of `command`; `harness/goldens/portable_c32/command.patch`, two rows of what `mem` prints; `command` is on the record. "C2" above has it at the end of its part on `command` |
+| 2 | "Mend it", on being told that it was one bit of the extender's settings. It was not; and told what the mend took and what it still left, the user had it dropped, on the same day. Then, the same day still: **declared as it is**, with no change of the program, the way (a) of its row | The piece L, "L, a program that has stayed in the memory" above. With bit 4 of that byte clear the extender does not load the program, and what the row had as "seen once" was DOS's prompt. The mend that was made, which is in no commit, took two other bits of the settings, the program's three interrupts given back in real mode too, and a routine of real mode at every end of the program, and left a program that had taken INT 21h without it. Kept of it: the scenario `stay-left`, which the program of 32 bits fails and which is off the record; what was read of the extender; and the mend in words. Entry 7 said in a sentence that this was open; it has a point of its own since, with what is known and how, and the row of `stay-left` says what each program shows; `harness/goldens/portable_c32/stay-left.patch` holds the three screens, and `stay-left` is on the record: "Declared" at the end of L. 10 of what was open in the plan. The row below is written anew, with the ways as they were known when the mend was dropped |
 | 3, 4 | Decided before the list, and nothing more to decide | Entry 1 |
 | 5 | Decided before the list, entry 13. What goes untested waits for step 2 of the road, when the memory is the extender's: none of the three ways is taken now | "The editor's room: untested in the program of 32 bits" |
 | 6, 7, 8, 9, 10 | "Declare all five": what is inherent in running under an extender and shows on no screen is declared as it is | 6 and 7: two points of "The program of 32 bits" in entry 1. 9 and 10: "The program of 32 bits" in entry 6. Written by W. 8: a point of entry 8, written with the piece L when the mend of 2 had been dropped, of the program as it is: Ctrl-Break given back by the extender, and INT 22h into the block below the megabyte; the registers at the routine's call are 6's. Seen again for it with `harness/trial32/ended.asm`: `22 :3391 01D0` and no other interrupt behind the program of 32 bits, `1B` and `22` into the ended program behind that of 16 bits |
@@ -7414,8 +7507,8 @@ its mend was dropped, the one that L would.
 
 | | What | The original | 16 bits | 32 bits | A scenario shows it | Declared | The ways |
 |---|---|---|---|---|---|---|---|
-| 1 | The memory above the megabyte while a command runs | Takes none of it: a command has all, 15,232K by the BIOS on the bench, and 14,978K free with an XMS driver | The same | The extender has all of it, and INT 15h: a command is told 0 by 88h and refused at E801h and E820h, and with an XMS driver 0K are free. A program with DOS/32A gets memory all the same, a second copy among them; one with another extender, a cache or a RAM disk would find none, which is from reading and was not tried | `command`, in what `mem` prints: 128K more of extended and of total memory. It fails, and is off the record | No. Entry 1 says that it is not declared; 9 of what is open in the plan | (a) The extender held to what the program and one copy of it need, 2 MB, by four bytes of its settings in `tools/stub.c`: seen by C2 on a copy of the file, a command then has 12,930K by XMS and 13,184K by 88h. It costs: the program then runs at the top of the memory, so `le.BENCH` and `behind()` of the harness are found anew and the six scenarios with a second copy run again; a third copy has no room and the extender says so in its own words; and `command` still shows other figures, E801h and E820h being refused, which wants a patch of this build's own. Half a day. (b) Declared as it is, with a patch of `command` for the two rows. Small. (c) Left open until the 16-bit build is to go, `command` failing meanwhile, which is how it stands |
-| 2 | A program that stays in the memory and takes interrupts, run from the program, when the program is then left. Found by W: see below, and "L, a program that has stayed in the memory" above | Keeps a list of such programs and releases each when it is left: its memory is free and its interrupts are back. Seen: FDAPM, run from it as `fdapm apmdos`, is gone afterwards; and in `stay-left` none of five interrupts goes to the program any more | By entry 7 nothing is released: the program is in the memory afterwards and goes on working, as when it was run from DOS's command line. Seen: `fdapm stats` finds it; and in `stay-left` all five interrupts still go to it | The program stays in the memory, but the extender, as it leaves, puts every interrupt of real mode back to where it went when the program was started, and writes a line for each onto the screen that is left: four of "DOS/32A warning (9003): real mode interrupt vector has been modified: INT 16h", 28h, 2Ah and 2Fh behind FDAPM, and for INT 1Ch, 21h, 2Fh and 60h in `stay-left`. The resident program is cut off from its interrupts and keeps its memory: `fdapm stats` says that none is resident. And Ctrl-Break, INT 1Bh, it has lost before, while the program of 32 bits still runs: the program takes that interrupt through the extender behind every command and gives it back in front of the next, and the extender then has it go where it went when the extender started | `stay-left`, since L: this program fails it, at the three screens that show the above, and it is off the record | No. Entry 7 says "as it is when it was run from DOS's own command line" of the program of 16 bits, and in a sentence that what this build does is open | (a) Declared as it is: a point in entry 7, and a patch of `stay-left` of this build's own for its three screens. Small. What would be declared: such a program keeps its memory and none of its interrupts, which is the original's in the interrupts and not in the memory or in the lines on the screen; and it loses Ctrl-Break while the program still runs. No program is then left with a part of what it took. (b) The mend that was tried, and dropped by the user on 13 October 2026: L has it in words, some 150 lines, with a routine of real mode written as its bytes that DOS goes on in at every end of the program. It leaves such a program at work but for INT 21h, and INT 15h on a machine like the bench, which the extender has while the program runs and which nothing in the program can keep for another; L has three ways with that, of which the one that keeps such a program whole rests on the inside of one version of the extender. (c) The extender's settings alone, bits 2 and 3 of the byte 14h cleared in `tools/stub.c`: seen on a copy, with `stay-left`. No line is written, and the program that stayed keeps what it took but for INT 1Bh, 1Ch, 21h, 23h, 24h and 2Fh, and INT 15h on the bench, which the extender puts back whatever its settings say: FDAPM is still not found. That is neither the original's nor what entry 7 says, leaves a program with a part of its interrupts, and would be declared like (a). The one bit that this row had when it was put to the user, bit 4 of that byte, is no way: with it clear the extender does not load the program |
+| 1 | The memory above the megabyte while a command runs | Takes none of it: a command has all, 15,232K by the BIOS on the bench, and 14,978K free with an XMS driver | The same | The extender has all of it, and INT 15h: a command is told 0 by 88h and refused at E801h and E820h, and with an XMS driver 0K are free. A program with DOS/32A gets memory all the same, a second copy among them; one with another extender, a cache or a RAM disk would find none, which is from reading and was not tried | `command`, in what `mem` prints: 128K more of extended and of total memory. It failed and was off the record until this was declared; it is held by a patch of this build's own since | Yes, since the user decided for (b): entry 1, "The program of 32 bits", the point on the memory above the megabyte. 9 of what was open in the plan | (a) The extender held to what the program and one copy of it need, 2 MB, by four bytes of its settings in `tools/stub.c`: seen by C2 on a copy of the file, a command then has 12,930K by XMS and 13,184K by 88h. It costs: the program then runs at the top of the memory, so `le.BENCH` and `behind()` of the harness are found anew and the six scenarios with a second copy run again; a third copy has no room and the extender says so in its own words; and `command` still shows other figures, E801h and E820h being refused, which wants a patch of this build's own. Half a day. (b) Declared as it is, with a patch of `command` for the two rows. Small. (c) Left open until the 16-bit build is to go, `command` failing meanwhile, which is how it stands |
+| 2 | A program that stays in the memory and takes interrupts, run from the program, when the program is then left. Found by W: see below, and "L, a program that has stayed in the memory" above | Keeps a list of such programs and releases each when it is left: its memory is free and its interrupts are back. Seen: FDAPM, run from it as `fdapm apmdos`, is gone afterwards; and in `stay-left` none of five interrupts goes to the program any more | By entry 7 nothing is released: the program is in the memory afterwards and goes on working, as when it was run from DOS's command line. Seen: `fdapm stats` finds it; and in `stay-left` all five interrupts still go to it | The program stays in the memory, but the extender, as it leaves, puts every interrupt of real mode back to where it went when the program was started, and writes a line for each onto the screen that is left: four of "DOS/32A warning (9003): real mode interrupt vector has been modified: INT 16h", 28h, 2Ah and 2Fh behind FDAPM, and for INT 1Ch, 21h, 2Fh and 60h in `stay-left`. The resident program is cut off from its interrupts and keeps its memory: `fdapm stats` says that none is resident. And Ctrl-Break, INT 1Bh, it has lost before, while the program of 32 bits still runs: the program takes that interrupt through the extender behind every command and gives it back in front of the next, and the extender then has it go where it went when the extender started | `stay-left`, since L: this program failed it, at the three screens that show the above, and was off the record until this was declared; it is held to those three by a patch of this build's own since | Yes, since the user decided for (a): entry 7, the point "Behind the program of 32 bits such a program keeps its memory and is cut off from its interrupts". 10 of what was open in the plan | (a) Declared as it is: a point in entry 7, and a patch of `stay-left` of this build's own for its three screens. Small. What would be declared: such a program keeps its memory and none of its interrupts, which is the original's in the interrupts and not in the memory or in the lines on the screen; and it loses Ctrl-Break while the program still runs. No program is then left with a part of what it took. (b) The mend that was tried, and dropped by the user on 13 October 2026: L has it in words, some 150 lines, with a routine of real mode written as its bytes that DOS goes on in at every end of the program. It leaves such a program at work but for INT 21h, and INT 15h on a machine like the bench, which the extender has while the program runs and which nothing in the program can keep for another; L has three ways with that, of which the one that keeps such a program whole rests on the inside of one version of the extender. (c) The extender's settings alone, bits 2 and 3 of the byte 14h cleared in `tools/stub.c`: seen on a copy, with `stay-left`. No line is written, and the program that stayed keeps what it took but for INT 1Bh, 1Ch, 21h, 23h, 24h and 2Fh, and INT 15h on the bench, which the extender puts back whatever its settings say: FDAPM is still not found. That is neither the original's nor what entry 7 says, leaves a program with a part of its interrupts, and would be declared like (a). The one bit that this row had when it was put to the user, bit 4 of that byte, is no way: with it clear the extender does not load the program |
 | 3 | A second copy of the program, started from the first with a command to run | Runs the command. In `start-memory` the command stays in the memory with nearly all of DOS's, and the copy cannot get its data back: "Program too big to fit in memory", and it ends | Has no memory for the command and says so; in `start-memory` it is still there afterwards | Runs the command, as the original. In `start-memory` it needs none of DOS's memory to come back, says nothing and is still there | `second-copy`, which is the original's but for the name; `start-memory`, by a patch of this build's own | Yes: entry 1, "The program of 32 bits", on the user's word of 13 October 2026 that it is held to the original where it does again what the original does | Nothing to decide. What `start-memory` still shows otherwise follows from the memory being the program's own (5) |
 | 4 | `ended`: the program that the second copy leaves in the memory before DOS ends the copy | Runs it, and releases it when DOS ends the copy | Has no memory to run it | Runs it; it stays in the memory, 448 bytes, by entry 7 | No screen: the program that started the copy clears it. Seen by `mem /c` typed behind the steps | Yes: the row of `ended` in entry 1 | Nothing to decide |
 | 5 | The room of the editor, which is also what a copy reads into | 345,840 bytes on the bench: a file of 381,338 is refused with a box | 291,360 | 641,824, of the 640 KB of the program's own: it opens that file | `editor-big`, which is not run for this build. `editor-full` and `copy-big` pass and no longer get to their point: the editor is never full, and the file is read in one part | Yes: entry 13, on the user's word, which names the two scenarios too | Decided. What is still open is what goes untested, and each way is asked first: (a) `editor-big` run for this build with its five steps at the file left out, which was tried and passes, and tests again all but the box for a file that fits; small. (b) A scenario of its own with a file that no build has room for; a new golden. (c) `editor-full` and `copy-big` made longer; two goldens derived anew, every tree taken through more steps. W would take (a) now and leave (b) and (c) until step 2 of the road, when the memory is the extender's and every one of these numbers is another |
@@ -7526,7 +7619,10 @@ four lines on the screen, and the program of 16 bits leaves it at
 work, which is what entry 7 declares.
 
 **Whose these were, when the list was made.** The table at the top has
-what was decided since.
+what was decided since: all of it, with 1 and 2 declared. What is left
+for the user of what the pieces wrote down is not of this list: 2 and
+3 of "The user's" at the end of L, the extender's variable and the
+mouse driver.
 
 - The user's, and not decided then: 1, which is 9 of what is open in
   the plan; 2, which was new; the sentences of 6, 7, 8, 9 and 10, each

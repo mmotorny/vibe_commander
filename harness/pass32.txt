@@ -26,6 +26,7 @@ emptied
 editor
 palettes
 tree
+command
 command-edit
 lost
 quit
@@ -62,6 +63,7 @@ menu-items
 menu-held
 phantom
 ended
+stay-left
 tree-deep
 tree-box
 tree-choose
