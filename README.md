@@ -631,21 +631,21 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 177,158 bytes |
-| as a multiple of the original's 65,090 bytes | 2.72 |
-| below 3 times the original's, where the scenarios' test fails | 18,112 bytes |
-| more than the C translation's 133,056 bytes | 44,102 bytes |
-| The relocations in its header, which DOS applies | 930 |
-| What it keeps of the memory while a command runs: the program and its panels | 187,200 bytes |
-| What DOS has for a command then, on the bench of the tests | 238,336 bytes |
-| The code segment `CTEXT` ends at | D440h, 7,104 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | A6D2h, 18,734 bytes below the limit, F000h |
+| `VC.EXE` | 176,420 bytes |
+| as a multiple of the original's 65,090 bytes | 2.71 |
+| below 3 times the original's, where the scenarios' test fails | 18,850 bytes |
+| more than the C translation's 133,056 bytes | 43,364 bytes |
+| The relocations in its header, which DOS applies | 929 |
+| What it keeps of the memory while a command runs: the program and its panels | 186,464 bytes |
+| What DOS has for a command then, on the bench of the tests | 239,072 bytes |
+| The code segment `CTEXT` ends at | D292h, 7,534 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | A59Fh, 19,041 bytes below the limit, F000h |
 | Inline assembly | 57 instructions in 10 pieces: 37 in 7 of `dos.c`, 20 in 3 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 6 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 708, 62, 282, 86 |
-| Calls that still hand registers to an interrupt, which are to go through `sys.h`, as `tools/calls.py` counts them | 35, in 6 files |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 704, 62, 255, 86 |
+| Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
 
@@ -829,12 +829,14 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 80 functions
+In the portable C that place is `src/portable_c/sys.h`: 84 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
-has the file clean. `dos.c` is those functions for
-DOS on a PC, and the one file that is to know how DOS is asked. The same
-functions for another system will be another file beside it.
+has the file clean. `dos.c` is those functions for DOS on a PC, and the
+one file that knows how DOS is asked: no other file of the portable C
+has a structure of registers, the number of a service, or an interrupt
+that it calls. The same functions for another system will be another
+file beside it.
 
 | What | Functions |
 |---|---|
@@ -842,12 +844,12 @@ functions for another system will be another file beside it.
 | Files by a file control block: a mask deleted at one call, a label | 2 |
 | Directories: what is in one, made, removed, the current one | 8 |
 | Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
-| Memory: a block taken, given back, made another size | 3 |
+| Memory: a block taken, given back, made another size, and where the system looks for one | 5 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
-| Other programs: one run, and this one ended | 3 |
+| Other programs: one run, this one ended, and what DOS keeps of this one | 4 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
-| The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, the font of an EGA, where the cells are and the cells themselves | 16 |
+| The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, the font of an EGA and what Print Screen prints of its rows, where the cells are and the cells themselves | 17 |
 | The mouse: whether there is one, its pointer shown, placed and shaped, where it is | 8 |
 | The timer | 1 |
 
@@ -884,20 +886,26 @@ DOS: the original hands DOS and the BIOS whatever the code before left
 there, and the portable C hands them 0. No screen shows that, and
 `src/portable_c/DEVIATIONS.md` declares it, with every place.
 
-Not in the header is what only DOS has: where an interrupt goes, which
-the program takes for DOS's critical error, for Ctrl-Break and for its
-own call of DOS; and how DOS looks for memory, which it is told where
-the program begins. Those call DOS as before. The map of the memory
-and the watch on DOS, which were of that kind, [are
-gone](#what-a-user-sees-no-more).
+Not in the header, and in `dos.c` all the same, is what only DOS on a
+PC has: where an interrupt goes, by DOS or written into the machine's
+table, which the program takes for DOS's critical error, for Ctrl-Break
+and Ctrl-C and for its own call of DOS; and the machine let interrupt
+again. `vc.h` declares those four. What DOS enters of the program is
+where it was, and is all that still knows an interrupt outside `dos.c`:
+`FatErr` of `main.c` for the critical error, and in `resident.c` the
+entry of the program, the entries of INT 21h and of Ctrl-C, where DOS
+goes on when it ends the program, and the call of COMMAND.COM's own
+interrupt for Quick execute, each with what assembly it has. `TODO.md`
+says what is to become of them. The map of the memory and the watch on
+DOS, which were of DOS alone, [are gone](#what-a-user-sees-no-more).
 
-`system.c`, `window.c`, `mouse.c` and `input.c` ask the system through
-the header so far, with some callers in other files, 76 of the 348
-calls. The rest still hand registers to an interrupt, and `dos.c` keeps
-the functions for that until they have gone over: `TODO.md` has them by
-file, and `CLAUDE.md`, "Moving a file to the system's functions", how a
-file goes over. `python3 tools/calls.py` counts what is left, and [the
-figures](#the-figures) have the sum.
+Every file asks the system through the header: the 348 calls went over
+a file at a time, and the functions by which a structure of registers
+was handed to an interrupt are gone with the last of them. `CLAUDE.md`,
+"Moving a file to the system's functions", has what that met and how a
+function is added. `python3 tools/calls.py` counts such calls, none in
+the portable C and all of them in the C translation, and [the
+figures](#the-figures) say so.
 
 ### What a user sees no more
 

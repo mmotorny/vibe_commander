@@ -1713,15 +1713,18 @@ in "The portable C".
 
 ### Moving a file to the system's functions
 
-What the program asks of the system is to be asked through
+What the program asks of the system it asks through
 `src/portable_c/sys.h`, functions named for what is asked, with
 `dos.c` as their one file for DOS: read the top of `sys.h` before
-anything else. `system.c`, `window.c`, `mouse.c` and `input.c` went
-first, with a few callers elsewhere for what those four do not have.
-The other files still fill a `struct DosRegs` or a `struct BiosRegs`
-and hand it to an interrupt, `Intr21`, `Int21d`, `Int10`, and these
-notes are for whoever moves one of them. `python3 tools/calls.py`
-lists what is left, by file.
+anything else. Every file has gone over. None fills a `struct DosRegs`
+or a `struct BiosRegs` and hands it to an interrupt, as each did and as
+the C translation does: `Intr21`, `Int21d`, `Int10` and their like are
+gone from the tree, the two structures are `dos.c`'s own, and `python3
+tools/calls.py` counts no such call. These notes are what the move met.
+They are kept for whoever writes a call of the system anew, brings code
+over from the C translation, or adds a function to the interface: the
+steps and the table say how one call goes over, and the last notes how
+a function is added.
 
 For one function, in this order:
 
@@ -1769,21 +1772,23 @@ is called both ways the bare function says so in its name.
 | 440Eh, 440Fh | bare | `DriveLetter(drive)`, `DriveSetLetter(drive)` |
 | 47h | asked, bare | `DirCurrent(drive, to)`, `DirCurrentBare` |
 | 48h, 49h, 4Ah | bare | `MemTake(paragraphs)`, `MemGive(block)`, `MemResize(block, paragraphs)` |
+| 5801h, 5803h | bare | `MemSetSearch(how)`, `MemSetUpper(on)` |
 | 4B00h | asked, bare | `ProgramRun(name, block)`, `ProgramRunBare` |
 | 4Ch | bare | `ProgramEnd(code)` |
+| 51h | bare | `ProgramPrefix()`, the segment of the PSP |
 | 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
 | 56h | asked | `FileRename(from, to)` |
 | 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |
 | 60h | asked | `FileTrueName(name, to)` |
-| 25h, 35h | bare | `SetVector(number, to)`, `Vector(number)`, of `vc.h` and not of `sys.h` |
+| 25h, 35h | bare | `SetVector(number, to)`, `Vector(number)`, of `vc.h` and not of `sys.h`; `PutVector(number, to)` beside them writes the machine's table without DOS |
 
 The BIOS for the screen, `Int10`, by AH: 0Fh is `ScreenState()`, 0
 `ScreenSetMode(mode)`, 1 `CursorShape(shape)`, 2 `CursorTo(page,
 place)`, 3 `CursorWhere(page)`, 6 and 7 `ScreenScroll(down, lines,
 color, upper, lower)`, 8 `ScreenCell(page)`, 9 `ScreenFill(page,
 character, color, count)`, 0Eh `ScreenType(character, page, color)`, 12h
-with 10h in BL `ScreenEga()`, 1130h `ScreenFont()`, 1112h
-`ScreenSmallFont()`. For the keyboard, `Int16`: 0 is `KeyRead()`, 100h
+with 10h in BL `ScreenEga()` and with 20h there `ScreenPrintAll()`,
+1130h `ScreenFont()`, 1112h `ScreenSmallFont()`. For the keyboard, `Int16`: 0 is `KeyRead()`, 100h
 `KeyWaiting()`, 200h `KeysHeld()`, which is the low byte already. The
 mouse is done. `Int2F` with 150Bh is `DriveCd(drive)`, `Int28` is
 `Idle()`. `Timer`, `Beep`, `SetDTA`, `OpenFil` and the others of
@@ -1791,15 +1796,13 @@ mouse is done. `Int2F` with 150Bh is `DriveCd(drive)`, `Int28` is
 are called as before; `Int10m`, which scrolled a window by a line with
 the mouse hidden, is `Scroll` there.
 
-What is not in the table stays as it is, on `Int21d` and `Int21e`, and
-`struct DosRegs` stays in `vc.h` for it: what is of DOS alone and is
-likely to go, `SetStat` and the PSP in `Alloc0` of `resident.c`, with
-the calls 51h and 58h. The map of the memory and the watch on DOS,
-which were of that kind, with 52h, 62h and 4452h, are gone. So does the
-BIOS's 12h with 20h in BL, by
-which the program has the BIOS print a screen of more lines than 25:
-it is of the PC alone, as TopView, DESQview and the wait for snow
-were, which are gone.
+Nothing stays on the old calls. What the table lacked while the files
+went over got its functions with the last of them: 51h and 58h, which
+are of DOS alone, for the PSP that `Alloc0` asks for and for `SetStat`
+of `resident.c`; and the BIOS's 12h with 20h in BL, by which EGA lines
+has the BIOS print a screen of more lines than 25, which is of the PC
+alone and goes with that command if the command goes. The map of the
+memory and the watch on DOS, with 52h, 62h and 4452h, are gone.
 
 What a call hands back, and where the traps are:
 
@@ -1836,14 +1839,16 @@ What a call hands back, and where the traps are:
   left as a call answered, and that the next call does not take.
 - Before a leftover is dropped, be sure that the service does not read
   it, from what is written of DOS and of the BIOS, not from the bench
-  passing. Three are known to be read by something, and the entry says
+  passing. Four are known to be read by something, and the entry says
   what the functions do about each: AL of 4Eh, which DOS's APPEND goes
-  by, in `read.c` twice and in `treebox.c`; AL of the BIOS's call 1,
-  where some BIOSes want the video mode, in `IniData` and in `Blank`;
-  and CX and DL of 1130h, which a BIOS that does not know the call
-  leaves as they came, in `F69_00` and in `IniData`. One that you are
-  not sure of is not dropped: hand the work back with it, as "Work by
-  several agents" has it for a deviation, and the session asks.
+  by, a leftover at every search of the original; AL of the BIOS's
+  call 1, where some BIOSes want the video mode, in `IniData` and in
+  `Blank`; CX and DL of 1130h, which a BIOS that does not know the call
+  leaves as they came, in `F69_00` and in `IniData`; and BL of 1112h in
+  `F69_00`, which the call takes and the original does not set. One
+  that you are not sure of is not dropped: hand the work back with it,
+  as "Work by several agents" has it for a deviation, and the session
+  asks.
 - What the BIOS is asked in comes by name. The page that is shown goes
   from `ScreenState` to the calls that take one, where the assembly
   kept BH from the call before. `ScreenType` takes the page and the
@@ -2026,13 +2031,11 @@ What moving `blank.c`, `main.c`, `enter.c`, `commands.c`, `keys.c`,
 - `SelDrv` and `DosTime` were `DriveSelect` and `TimeOfDay` under an
   older name already: their callers change the name and drop nothing.
 - An argument may be there for a leftover alone. `F69_00` of
-  `commands.c`, EGA lines, takes what the main loop has in CX and hands
+  `commands.c`, EGA lines, took what the main loop has in CX and handed
   the BIOS its high byte in a call that takes nothing there. When that
-  goes the argument is not read, which stops the build, and has to go
-  too: from `vc.h`, from the call in `Command` of `main.c`, and from the
-  sentence at the top of `main.c` that says which registers the commands
-  read. EGA lines is still on `Int10` for that and for its call for
-  Print Screen: `TODO.md`.
+  went the argument was not read, which stops the build, and went too:
+  from `vc.h`, from the call in `Command` of `main.c`, and from the two
+  comments of `main.c` that said which registers the commands read.
 - Many runs of the scenarios at once filled `/tmp`, which is in the
   memory and has a limit: with six checkouts testing, and one of them
   three copies at a time, the scenarios' tests of all of them failed in
@@ -2107,6 +2110,53 @@ time, a commit each:
   copied as a build, by the note on testing a build that is a copy;
   the scenarios then ran on the copies side by side while the next
   family was made.
+
+What the last of it met, `resident.c`, the drive B:, EGA lines, the
+extension file of a directory and the old way taken out, and how a
+function is added:
+
+- A function that the interface lacks is declared in `sys.h`, in the
+  group of its kind, with a comment that says what is asked, what it
+  answers and what it answers when it fails, in DOS's values and with
+  no register in it; and written in `dos.c`, where the comment at the
+  head of its group says the service. If it takes a name, it goes into
+  `NAMED` of `harness/reads.py`. The README counts the functions by
+  group, under "The system in one place", and the table above gets its
+  row. What is of DOS alone and no part of the interface, where an
+  interrupt goes, is in the last part of `dos.c` and declared in `vc.h`.
+- A register that a service does take may be set by nothing in the
+  original: BL of the BIOS's 1112h in `F69_00` is 0 from a line of the
+  screen buffer cleared at the start of the command. Step 2 finds the
+  registers that a call does not take; read also, for each that it
+  takes, where the assembly sets it. A function sets what it is asked,
+  and such a place is declared among what is known to be read.
+- What a file handed over may be neither the original's nor nothing,
+  but the portable C's own: `regs.name = 0`, to have a number in DX,
+  put DS on 0 at calls that take no address, in `SetBrk` and `Exit02`;
+  and a `name` that was never set handed DOS DS and DX as the stack had
+  them, in `SetStat` and at the entry. The row says what the original
+  has, and the commit what the portable C had.
+- A function of `dos.c` may be entered on a stack that is not the
+  program's: `Exit02` is, from `Exit05`, when DOS has ended the
+  program, and asks by three of them. All of `dos.c` reaches its
+  registers through `STACK` pointers, so that works; it takes a few
+  words more of the other program's stack than a structure in the
+  caller did.
+- The table of entry 6 of `DEVIATIONS.md` is in the order of the files,
+  and in a file in the order of its routines: a row is put where it
+  belongs, not at the end. What the C translation handed over has a
+  column of its own, filled where it was something else than the
+  original's.
+- No file declares the names of the old way, so a call of one does not
+  compile. What `tools/calls.py` still watches in the portable C is its
+  last kind, a fixed address of the machine written outside `dos.c`,
+  and not where the segment comes from a variable, as it has to for
+  the table of interrupts: `PutVector` of `dos.c` is where that is.
+- The whole suite takes three minutes with `ctest --test-dir build
+  -j8`: the tests that read the source are done within the first ten
+  seconds, and from then on the source may be edited while the
+  scenarios of both C trees run. The build may not change until they
+  are done.
 
 ## Work by several agents
 

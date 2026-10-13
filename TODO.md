@@ -69,8 +69,8 @@ Most of the two casts are a few macros, and
 - 144 and 58 are written out where they are, in no macro: a place of
   the main data kept as a word, `(u16)md.WinBuf`, `md.HstAdr`,
   `md.BatAdr`; DX of a call of DOS that is no pointer, written into
-  `name` of `struct DosRegs`; a far pointer made of a segment and an
-  offset by a shift.
+  `name` of `struct DosRegs`, which only `dos.c` does now; a far
+  pointer made of a segment and an offset by a shift.
 
 What the test does not see, since gcc only reads the files:
 
@@ -151,8 +151,9 @@ left open:
     `STACK`, or far. What DOS and other programs enter always is:
     `New21` and `Int21`, where the program's own call arrives, and
     `Exit05`, where DOS goes on when it has ended the program, with
-    what they call in `resident.c` and `Int21e` of `dos.c`; that is two
-    files, which could keep the word while the rest loses it. But the critical error is entered so
+    what they call in `resident.c` and the functions of `dos.c` that
+    `Exit02` asks by; that is two files, which could keep the word while
+    the rest loses it. But the critical error is entered so
     too, when DOS has one while a viewer or an editor of the user's
     runs: `view.c` runs those with INT 24h still the program's, as the
     original does, so `FatErr` and everything that a box with its
@@ -246,8 +247,8 @@ left open:
   `delete-mask` and others type B: to get to a drive that refuses.
 - Whether EGA lines stays, Alt-F9, is the user's to decide, and the
   call in it that has the BIOS print every line of such a screen at
-  Print Screen (`F69_00` of `commands.c`, INT 10h, AH 12h, BL 20h)
-  belongs to that decision.
+  Print Screen (`F69_00` of `commands.c`, by `ScreenPrintAll` of
+  `sys.h`) belongs to that decision.
 - Names that say what no longer is: `resident.c`, of which nothing is
   resident; `FreMem2`, which is how many paragraphs it is from the main
   data to the end of the block of the panels and the viewer, so that
@@ -269,11 +270,14 @@ in the memory are gone from the portable C
   for: `New21`, eight instructions of assembly that every call of DOS by
   any program passes, the interrupt function `Int21`, `Vect21` in the
   code segment, and the interrupt taken when the program starts and
-  given back when it leaves or DOS ends it. The setup program is not
-  translated, and no other program is known to make the call. It is a
-  thing of DOS as much as the watch was; whether it goes is the user's
-  to decide. With it would go the last reason for `handed-on` and for
-  `asked`.
+  given back when it leaves or DOS ends it. No other program is known
+  to make the call. It is a thing of DOS as much as the watch was, and
+  it goes when the setup program has been ported into the portable C,
+  step 0 of the road in `CLAUDE.md`, "The portable C": there is one
+  program then, setup is an item of its Options menu, and nothing asks
+  a running copy for its data. `New21`, `Int21` and `Vect21` go with
+  the call, and the last reason for `handed-on` and for `asked`. Until
+  then the call stays as it is.
 - The original takes INT 21h only if its setup has TSR manager on, and
   the portable C, which has no such option, takes it always. A setup
   with that byte 0 is one where the original cannot be asked for its
@@ -313,99 +317,70 @@ is laid out by C".
 
 ## The portable C: the system's functions
 
-What the program asks of the system it is to ask through
+What the program asks of the system it asks through
 `src/portable_c/sys.h` (the README, "The system in one place"), and
-`dos.c` alone is to know how DOS is asked. `system.c`, `window.c`,
-`mouse.c` and `input.c` do, with a few callers elsewhere that were moved
-to try what those four have not: files by an FCB, a search through a
-directory, a file written and its date set in `dirfunc.c`, a file read
-bare and the country in `start.c`, the Ins key in `keys.c`. That is 76
-of 348 calls. `CLAUDE.md`, "Moving a file to the system's functions",
-has how a file goes over, with the table from DOS's services to the
-functions and what to look out for.
+`dos.c` alone knows how DOS is asked: the 348 calls that handed a
+structure of registers to an interrupt went over a file at a time, the
+last of them with `resident.c`, the drive B: that shares the unit of A:,
+EGA lines and the extension file of a directory, and the functions that
+took such a structure are gone, with the structure, which is `dos.c`'s
+own. `python3 tools/calls.py` counts none. `CLAUDE.md`, "Moving a file
+to the system's functions", has the table from DOS's services to the
+functions, what the work met, and how a function is added.
 
-What is left, as `python3 tools/calls.py` counted it when those had gone
-over, 272 calls, in five pieces of about the same size that share no
-file. Whoever moves a file takes it out of the table:
+`sys.h` is a seam for now and not the last word: its functions are
+shaped as DOS and the BIOS have things, and what follows is what is of
+DOS and is not behind it yet.
 
-| Piece | Files, with the calls left in each | Calls |
-|---|---|---|
-| 2 | `resident.c` 22, of which 3 stay | 22 |
-| 3 | `read.c` 2 and `drive.c` 2, which wait: see below | 4 |
-| 5 | `commands.c` 5 and `main.c` 1, which stay for now: see below | 6 |
-
-Of the third piece, `dirfunc.c`, `usermenu.c`, `treebox.c` and
-`setup.c` have gone over, and of the other two all but these:
-
-- `drive.c`, the two calls of `F62_01` that ask which letter a floppy
-  drive goes by, 440Eh, and give it the one that was chosen, 440Fh: they
-  are of the drive B: that shares the unit of A:, as `Fantom` is, and
-  stay as that does.
-
-Then, when no file is left that calls them: `Intr21` and `Intr21f` of
-`system.c` with `DosTime` and `SelDrv`, and in `dos.c` `Int21f`,
-`Int10`, `Int16`, `Int33`, `MousAt` and `Int28`, with `struct BiosRegs`,
-go; `calls.py` shows when.
-
-What stays on the old calls, `Int21d` and `Int21e` with `struct
-DosRegs`, because it is of DOS alone and likely to go with the feature
-that it is for:
-
-- In `resident.c`: `SetStat`, two calls that say how DOS looks for
-  memory, and the PSP that `Alloc0` asks for. `TakeDos`, which reads a
-  vector and sets it, has `Vector` and `SetVector` for that.
-- The drive that a unit goes by, which `ErrRdy` of `main.c` sets when
-  it has asked for another drive in place of one that is not ready: it
-  is of the drive B: that shares the unit of A:, as `Fantom` is.
-
-And what stays on `Int10` because the functions do not say all of it:
-
-- EGA lines, `F69_00` of `commands.c`, five calls between which the
-  registers go as the BIOS leaves them. Four of them are what
-  `ScreenFont`, twice, `ScreenSetMode` and `ScreenSmallFont` ask. The
-  fifth is the call that has the BIOS print every line of such a screen
-  at Print Screen, 12h with 20h in BL, for which there is no function:
-  it goes or stays with the command, above. When the registers go, the
-  command no longer takes what the main loop has in CX, the high byte
-  of which it hands to the first call, and its prototype in `vc.h`
-  changes.
-
-The map of the memory, `memory.c`, and the watch on DOS in
-`resident.c`, which were on this list with 15 calls, are gone from the
-portable C (`src/portable_c/DEVIATIONS.md`, 7).
-
-What the header does not have yet, and why:
-
-- DOS's critical error and Ctrl-Break. The program takes the two
-  interrupts itself, by `Vector` and `SetVector` of `dos.c`, which are
-  of DOS alone and declared in `vc.h`, and DOS enters `FatErr` of
+- DOS's critical error, Ctrl-Break and Ctrl-C. The program takes the
+  three interrupts itself, by `Vector` and `SetVector` of `dos.c`, which
+  are of DOS alone and declared in `vc.h`, and DOS enters `FatErr` of
   `main.c` and `CtrlC` of `resident.c`. They are to be something that
-  `dos.c` raises and the program answers: the two entries in `dos.c`,
-  with one function of the program called for a device that fails,
-  which is told the drive or the device, what is wrong and whether DOS
-  lets it try again, and answers whether to; and functions of `sys.h`
-  by which the program takes the two and gives them back. `ErrDat` is
-  then `dos.c`'s own, between its entry and the functions that are
-  asked with the program's errors, and `BlocEr` stays the program's.
-  What has to be kept: the order in which DOS is asked, which is both
-  vectors read and then both set in `HookVct`; and that `SetBrk` of
-  `resident.c` names `CtrlC` too, for DOS's Ctrl-C. `HookVct` still hands back the offset of `CtrlC`, which
-  the start of the program had in AX at its next call of the BIOS:
-  nothing takes it now, since that call is `ScreenState`, in `ChkMode`,
-  and `IniData` has gone over, so it may return nothing.
-- The start of the program on DOS, `Alloc0` of `resident.c`: the PSP
-  and the block of the program made its own size. It is of DOS alone
-  and will be `dos.c`'s.
+  `dos.c` raises and the program answers: the entries in `dos.c`, with
+  one function of the program called for a device that fails, which is
+  told the drive or the device, what is wrong and whether DOS lets it
+  try again, and answers whether to; and functions of `sys.h` by which
+  the program takes them and gives them back. `ErrDat` is then `dos.c`'s
+  own, between its entry and the functions that are asked with the
+  program's errors, and `BlocEr` stays the program's. What has to be
+  kept: the order in which DOS is asked, which is both vectors read and
+  then both set in `HookVct`; and that `SetBrk` of `resident.c` names
+  `CtrlC` too, for DOS's Ctrl-C.
+- The program's own call of DOS, and what DOS does when it ends the
+  program: `New21`, `Int21`, `Exit01` and `Exit05` of `resident.c`,
+  with `TakeDos`, which takes INT 21h by `Vector` and `PutVector` of
+  `dos.c` and has the PSP name `Exit01`, and `Exit02`, which gives the
+  interrupt back. They are entered by DOS and by other programs, with
+  what assembly that takes, and name the two interrupts by their
+  numbers. The call goes with the setup program ported, as said above
+  under what the map of the memory has left, and its entry with it.
+- The start of the program on DOS, `Alloc0` of `resident.c`. It asks
+  through `sys.h` now, for the PSP, the version and the block of the
+  program made its own size, and still knows what is of DOS: that a DOS
+  before 3 is left through the first bytes of the PSP, by a far call,
+  and where the program ends in the memory. The PSP itself is read by
+  its offsets in three files: the place where DOS goes on and the
+  environment in `resident.c`, the environment and the end of the
+  memory in `start.c`, the command tail in `main.c`. All of that will be
+  `dos.c`'s, or the functions' of `sys.h` that say what is wanted of it:
+  the command line, the environment, the memory that there is.
+- Quick execute, `Int2E` and `Exec2E` of `resident.c`: COMMAND.COM's
+  own interrupt, called in assembly, with the stack set by hand behind
+  it. It stays whole and where it is until it is decided (above).
+- `MemSetSearch` and `MemSetUpper`, by which `SetStat` has DOS look for
+  memory in the lowest block first when the program begins, and
+  `ScreenPrintAll`, by which EGA lines tells the Print Screen key of the
+  rows, are functions of `sys.h` that only a PC with DOS has a use for:
+  each goes with what it is for, if that goes.
 - `Scroll` of `window.c`, the original's `Int10m`, is the one routine of
   the program that was the BIOS called with any registers; it takes
   what it means now, and its seven callers were changed with it.
 
-How much it costs: `dos.c` is 2.6 KB longer for the 80 functions, and
-the callers that went over are 0.8 KB shorter. By that measure the
-calls that are left give back some 2 KB when they go, and the old
-functions another 0.3 KB, so the program ends about where it began.
-Until then it is nearer to three times the original's size, where the
-scenarios' test fails: the README's figures say how near.
+What it cost: `dos.c` was 2.6 KB longer for the first 80 functions, and
+the callers gave back what they had of registers as they went over. The
+last 35 calls, with the functions of the old way that went behind
+them, gave back 738 bytes. The README's figures say where the file
+stands.
 
 ## The last of the assembly
 

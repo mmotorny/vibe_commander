@@ -190,14 +190,16 @@ def table():
         "the word stands in the code",
         ", ".join(number(places[word])
                   for word in hostcheck.SEGMENT_WORDS)))
-    # What still asks the system by handing registers to an interrupt,
-    # and not through sys.h: tools/calls.py counts it, by file.
+    # What asks the system by handing registers to an interrupt, or
+    # reads the machine's memory at a fixed address, and not through
+    # sys.h: tools/calls.py counts it, by file. There is to be none.
     left = calls.count(SOURCE)
+    total = sum(sum(counts) for _, counts in left)
     rows.append((
-        "Calls that still hand registers to an interrupt, which are to "
-        "go through `sys.h`, as `tools/calls.py` counts them",
-        f"{number(sum(sum(counts) for _, counts in left))}, in "
-        f"{len(left)} files"))
+        "Calls outside `dos.c` that hand registers to an interrupt, or "
+        "name a fixed address of the machine, where everything is to go "
+        "through `sys.h`, as `tools/calls.py` counts them",
+        f"{number(total)}, in {len(left)} files" if total else "none"))
 
     return (["| What | Figure |", "|---|---|"]
             + [f"| {what} | {figure} |" for what, figure in rows])
