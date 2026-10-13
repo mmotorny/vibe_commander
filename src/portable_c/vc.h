@@ -458,23 +458,6 @@ extern const u8 TEXT_FAR Tree_S[];      /* the title of the tree */
    any segment of the program: FAR, at the top of this one. */
 #include "sys.h"
 
-/* The registers of a call of DOS, for the files that have not gone over
-   to sys.h yet. DS goes with DX: a pointer to what DOS takes there, a
-   name or a buffer, sets both. ES goes to DOS only by Int21e of dos.c:
-   otherwise DOS is called with it on the main data, and it is what DOS
-   leaves there, for the calls that answer with an address in ES:BX. */
-struct DosRegs {
-    u16 ax, bx, cx;
-    const u8 __far *name;               /* DX, and DS behind it */
-    u16 si, di;
-    u16 es;                             /* as DOS leaves it */
-};
-
-/* The registers of a call of the BIOS for the screen, for those files. */
-struct BiosRegs {
-    u16 ax, bx, cx, dx;
-};
-
 /* What goes through files, DirFunc, FncSel and FncMas, calls a routine
    for each of them: the one that FncAddr names. The assembly has the
    address of the routine there. The C has its number, one of these, in
@@ -491,15 +474,14 @@ enum {
 };
 u16 FncCall(u16 attributes);
 /* RestVct gives the vectors of the critical error and of Ctrl-Break back
-   to whoever had them, and HookVct takes them again: it returns the
-   offset of its routine for Ctrl-Break, CtrlC of resident.c. Quit puts
-   back what DOS had on the screen before the
-   program drew over it, but for the line of the key bar, which is blank
-   if there is one. ErrRdy says that the disk of a drive cannot be read
-   and asks for another drive: it returns the letter in the low byte, or
-   0 there for none. See each in main.c. */
+   to whoever had them, and HookVct takes them again, for FatErr and for
+   CtrlC of resident.c. Quit puts back what DOS had on the screen before
+   the program drew over it, but for the line of the key bar, which is
+   blank if there is one. ErrRdy says that the disk of a drive cannot be
+   read and asks for another drive: it returns the letter in the low
+   byte, or 0 there for none. See each in main.c. */
 void RestVct(void);
-u16 HookVct(void);
+void HookVct(void);
 void Quit(void);
 u16 ErrRdy(u16 letter);
 /* Read what a panel shows, keeping the cursor of a list of files and
@@ -562,23 +544,6 @@ void Again(void);
 #define CmnIni  OFFSET_IN(struct MainDat, LoadRes)
 #define INI_LEN (3 + 2 * WCBini + CmnIni + 2)
 
-/* DOS, the BIOS and the mouse driver as the C translation calls them, a
-   structure of registers handed to an interrupt: for the files that have
-   not gone over to sys.h yet, and for what is of DOS alone, the map of
-   the memory and the watch on DOS. See each in dos.c. Int16 answers as
-   KeyWaiting of sys.h does. */
-struct MuxRegs {                        /* what the multiplex interrupt */
-    u16 ax, bx;                         /* answers in: these registers */
-};
-u16 Int21d(struct DosRegs STACK *regs);
-u16 Int21f(struct DosRegs STACK *regs, u16 carry);
-u16 Int21e(struct DosRegs STACK *regs);
-void Int10(struct BiosRegs STACK *regs);
-struct Keys Int16(u16 ax);
-struct MuxRegs Int2F(u16 ax, u16 bx, u16 cx);
-u16 Int33(u16 ax, u16 bx, u16 cx, u16 dx);
-void MousAt(struct MouseAt STACK *state);
-void Int28(void);
 /* What is of DOS on a PC alone, and no part of sys.h: where an interrupt
    goes, as an address with the offset in the low word, and one made to
    go somewhere, by DOS or, for PutVector, in the machine's table itself;
@@ -1195,15 +1160,7 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
    current drive and directory, into DosPth, and is not 0 if that fails.
    Fantom asks for the disk of a drive that shares a floppy drive with
    another, 1 for A:, and ChgDisk for that of the drive that a path of
-   the main data names: not 0 if the user would not put it in.
-
-   And what the files have of it that have not gone over to sys.h yet.
-   Intr21 and Intr21f call DOS with the registers of `regs` and put AX,
-   BX, CX and DX back there, DX where the offset of `name` was; they are
-   not 0 if DOS set the carry flag: AX is its error then, or 53h for a
-   drive that is not ready. Intr21f has the carry flag set when DOS is
-   called, if `carry` is not 0. DosTime is TimeOfDay of sys.h, and
-   SelDrv is DriveSelect. */
+   the main data names: not 0 if the user would not put it in. */
 u32 Timer(void);
 void ClrKbd(void);
 u16 TstBrk(void);
@@ -1211,10 +1168,6 @@ void Beep(void);
 u16 UpCase(u16 letter);
 void SetDTA(void);
 u16 TstDrv(u16 letter);
-void SelDrv(u16 drive);
-u16 Intr21(struct DosRegs STACK *regs);
-u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
-struct Time DosTime(void);
 struct Answer OpenFil(const u8 __far *name, u16 mode);
 u16 SetPth(void);
 u16 Fantom(u16 drive);
@@ -1240,12 +1193,7 @@ u16 InWind(u16 where, u16 begin, u16 size);
 /* The screen, its cursor, and windows of the screen buffer: see each in
    window.c. A place has the row in its high byte, and a size the rows.
    `buffer` is an address in the main data. */
-struct VideoMode {                      /* for ChkMode: as the BIOS says, */
-    u16 ax;                             /* the mode, and above it the
-                                           columns */
-    u16 bx;                             /* the page, in the high byte */
-};
-u16 ChkMode(struct VideoMode STACK *mode);
+u16 ChkMode(struct Screen STACK *screen);
 void Cursor(u16 place);
 void Cursor1(void);
 u16 ChgCur(void);

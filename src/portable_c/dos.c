@@ -18,12 +18,28 @@
  * interrupt flag of the machine, for which the compiler has intrinsic
  * functions.
  *
- * The file has three parts: the functions of sys.h; then the calls as
- * the C translation has them, a structure of registers handed to an
- * interrupt, for the files of the program that have not gone over to
- * sys.h yet; and last what is of DOS alone and no part of sys.h.
+ * The file has two parts: the functions of sys.h, and behind them what
+ * is of DOS alone and no part of sys.h. A structure of registers, as the
+ * C translation hands one to an interrupt from every file, is known here
+ * and nowhere else.
  */
 #include "vc.h"
+
+/* The registers of a call of DOS. DS goes with DX: a pointer to what DOS
+   takes there, a name or a buffer, sets both. ES is what DOS is called
+   with, and what it leaves there, for the calls that answer with an
+   address in ES:BX. */
+struct DosRegs {
+    u16 ax, bx, cx;
+    const u8 __far *name;               /* DX, and DS behind it */
+    u16 si, di;
+    u16 es;
+};
+
+/* The registers of a call of the BIOS for the screen. */
+struct BiosRegs {
+    u16 ax, bx, cx, dx;
+};
 
 /* The compiler's own functions for the interrupt flag: an instruction
    each, put where they are called. */
@@ -1094,92 +1110,6 @@ u32 Ticks(void)
     ticks = *(const u32 __far *)0x0040006CUL;
     _enable();
     return ticks;
-}
-
-/*
- * The calls as the C translation has them, for the files that have not
- * gone over to sys.h: the registers of an interrupt in a structure, and
- * the interrupt. They go when the last of those files has.
- */
-
-/* DOS: any of its calls, with the registers of `regs` and their answer
-   there (see struct DosRegs in vc.h), and ES on the segment that DS is
-   on, the main data. Not 0 if DOS set the carry flag, which is clear
-   when DOS is called. The program calls DOS like this where it does not
-   look for the box of a drive that is not ready, and through Intr21 of
-   system.c where it does. */
-u16 Int21d(struct DosRegs STACK *regs)
-{
-    regs->es = MAIN_SEG;
-    return Call(regs, 0);
-}
-
-/* The same with the carry flag set when DOS is called, if `carry` is not
-   0: for a call of DOS that leaves the flag as it finds it. */
-u16 Int21f(struct DosRegs STACK *regs, u16 carry)
-{
-    regs->es = MAIN_SEG;
-    return Call(regs, carry);
-}
-
-/* The same as Int21d with ES as `regs` has it: for the calls of DOS that
-   take a block of the memory there. */
-u16 Int21e(struct DosRegs STACK *regs)
-{
-    return Call(regs, 0);
-}
-
-/* The BIOS, for the screen: its call with the registers of `regs`, which
-   come back there as the BIOS leaves them. */
-void Int10(struct BiosRegs STACK *regs)
-{
-    Display(regs);
-}
-
-/* The BIOS, for the keyboard: its call with AX. Returns AX as the BIOS
-   leaves it, and whether the zero flag is set then. */
-struct Keys Int16(u16 ax)
-{
-    u32 pair = Keys(ax);
-    struct Keys keys;
-
-    keys.key = (u16)pair;
-    keys.none = ((u16)(pair >> 16) & FLAG_ZERO) != 0;
-    return keys;
-}
-
-/* The multiplex interrupt, by which resident programs are asked: its
-   call with these registers. Returns AX and BX as it leaves them. The
-   program asks the CD-ROM extensions whether a drive is
-   theirs (AX 150Bh). */
-struct MuxRegs Int2F(u16 ax, u16 bx, u16 cx)
-{
-    u32 pair = Multiplex(ax, bx, cx);
-    struct MuxRegs regs;
-
-    regs.ax = (u16)pair;
-    regs.bx = (u16)(pair >> 16);
-    return regs;
-}
-
-/* Tell DOS that the program is idle: Idle, under its older name. */
-void Int28(void)
-{
-    DosIdle();
-}
-
-/* The mouse driver: its call with these registers. Returns AX as the
-   driver leaves it. */
-u16 Int33(u16 ax, u16 bx, u16 cx, u16 dx)
-{
-    return Mouse(ax, bx, cx, dx);
-}
-
-/* Ask the mouse driver where the pointer is and which buttons are held
-   (AX 3). */
-void MousAt(struct MouseAt STACK *state)
-{
-    MouseState(3, state);
 }
 
 /*

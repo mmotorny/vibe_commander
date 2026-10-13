@@ -8,9 +8,9 @@
  *
  * What the system is asked is in sys.h, and how DOS and the BIOS are
  * asked for it in dos.c; this is what the program makes of the answers.
- * Intr21 is here still, DOS called with a structure of registers and
- * the program's errors looked for, for the files that have not gone
- * over to sys.h.
+ * Intr21 of the original, DOS called with the program's errors looked
+ * for, is no routine here: it is in every function of sys.h that is
+ * asked so, in dos.c.
  */
 #include "vc.h"
 
@@ -25,9 +25,6 @@ extern const u8 __far Fant_B[];
 
 #define ERR_SHARED 0x20                 /* DOS's error: others have the file
                                            open in a way that forbids it */
-
-/* DX of a call of DOS that is no pointer: a drive. */
-#define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
 /* The timer's count of ticks since midnight. */
 u32 Timer(void)
@@ -109,64 +106,6 @@ u16 TstDrv(u16 letter)
     now = DriveCurrent();
     DriveSelect(was);
     return now == drive;
-}
-
-/* Make a drive the current one of DOS: 0 for A:, in the low byte of
-   `drive`. DriveSelect of sys.h, for the files that have not gone over
-   to it. */
-void SelDrv(u16 drive)
-{
-    DriveSelect(drive);
-}
-
-/* Call DOS where a drive may not be ready, with the carry flag set first
-   if `carry` is not 0: for the files that have not gone over to sys.h,
-   whose functions do the same in dos.c, AskEs there. When DOS asks what
-   to do about a drive, the
-   program's routine for that, ErrRdy, shows a box and notes in ErrDat
-   that it has; the call then counts as failed with the error 53h. An
-   error that DOS reports itself is asked about once more, and its
-   extended code is what comes back in AX: for that call AH is 59h and BX
-   0, and the other registers are as the first call left them, which they
-   are afterwards too. Not 0 for an error. */
-u16 Intr21f(struct DosRegs STACK *regs, u16 carry)
-{
-    u16 bx, cx, dx, es;
-
-    md.ErrDat = 0;
-    carry = Int21f(regs, carry);
-    if (md.ErrDat != 0) {
-        regs->ax = 0x53;
-        return 1;
-    }
-    if (carry == 0)
-        return 0;
-    bx = regs->bx;
-    cx = regs->cx;
-    dx = DX_OF(*regs);
-    es = regs->es;
-    regs->ax = regs->ax & 0xFF | 0x5900;
-    regs->bx = 0;
-    Int21d(regs);
-    regs->bx = bx;
-    regs->cx = cx;
-    DX_OF(*regs) = dx;
-    regs->es = es;
-    return 1;
-}
-
-/* The same for a call of DOS that sets the carry flag itself, which is
-   every one but those for an FCB. */
-u16 Intr21(struct DosRegs STACK *regs)
-{
-    return Intr21f(regs, 0);
-}
-
-/* The time of day: TimeOfDay of sys.h, for the files that have not gone
-   over to it. */
-struct Time DosTime(void)
-{
-    return TimeOfDay();
 }
 
 /* Open a file, `mode` as DOS takes it in AL. Where DOS says that others

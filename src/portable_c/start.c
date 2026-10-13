@@ -299,7 +299,7 @@ static u16 ReadOne(const u8 __far *path, u8 __far *end,
    to IMAGE, and the three are as the program was loaded. */
 void Init00(void)
 {
-    struct VideoMode mode;
+    struct Screen screen;
     u8 *image = IMAGE;
     struct WCBdef *first = (struct WCBdef *)(image + 3);
     struct WCBdef *second = (struct WCBdef *)(image + 3 + WCBini);
@@ -349,8 +349,7 @@ void Init00(void)
     first->Visible = 0;
 
 Init04:                                 /* Output Report */
-    mode.bx = 0;
-    if (!ChkMode((struct VideoMode STACK *)&mode))
+    if (!ChkMode((struct Screen STACK *)&screen))
         ScreenSetMode(3);               /* 80 columns, in colour */
     to = MvzTxt(md.ExtMain, AT(code, OFFSET(Title_S) + 2));     /* Init05 */
     to = MvzTxt(to, Suff_S);
@@ -358,7 +357,7 @@ Init04:                                 /* Output Report */
     MvzTxt(to, CrLf_S);
     ConsoleText(md.ExtMain);            /* as far as its $ */
     if (wrong)                          /* Error in INI file */
-        OutStr1(NoIni_S, mode.bx >> 8);
+        OutStr1(NoIni_S, screen.page);
 
     /* Init09: read main extension file, and end it. */
     to = md.ExtMain;
@@ -558,7 +557,6 @@ static u16 CurNl(void)
        fed a line, so the screen scrolls once. */
 void IniData(void)
 {
-    struct VideoMode mode;
     struct Screen screen;
     struct SysVersion system;
     const u8 __far *env;
@@ -566,18 +564,14 @@ void IniData(void)
 
     HookVct();                          /* Set Error Vectors */
 
-    mode.bx = 0;                        /* Set Display Segment */
-    if (ChkMode((struct VideoMode STACK *)&mode)) {
-        screen.mode = mode.ax & 0xFF;
-        screen.page = mode.bx >> 8;
-    } else {
-        page = mode.bx >> 8;
+    /* Set Display Segment */
+    if (!ChkMode((struct Screen STACK *)&screen)) {
         CursorShape(0x2000);            /* no cursor */
-        OutStr1(Retrn_S, page);
-        if (mode.ax >> 8 < 80)
-            OutStr1(Retr2_S, page);
+        OutStr1(Retrn_S, screen.page);
+        if (screen.columns < 80)
+            OutStr1(Retr2_S, screen.page);
         else                            /* on the same line */
-            OutStr1(Retr2_S + 2, page);
+            OutStr1(Retr2_S + 2, screen.page);
         while ((KeyRead() & 0xFF) != '\r')      /* Init16 */
             ;
         ScreenSetMode(md.ScrMod);

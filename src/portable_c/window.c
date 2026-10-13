@@ -15,21 +15,19 @@
 #include "vc.h"
 
 /* Can the program draw on the screen as it is: 80 columns, in mode 2, 3
-   or 7? Returns 1 if it can. `mode` comes with BX as the caller has it
-   and gets AX and BX as the BIOS leaves them, the mode without its
-   highest bit where there are 80 columns: the code that starts the
-   program goes on with the mode, the columns and the page. */
-u16 ChkMode(struct VideoMode STACK *mode)
+   or 7? Returns 1 if it can. `screen` gets how the screen is set, the
+   mode without its highest bit where there are 80 columns: the code
+   that starts the program goes on with the mode, the columns and the
+   page. */
+u16 ChkMode(struct Screen STACK *screen)
 {
-    struct Screen screen = ScreenState();
     u16 ok = 0;
 
-    if (screen.columns == 80) {
-        screen.mode &= 0x7F;
-        ok = screen.mode == 2 || screen.mode == 3 || screen.mode == 7;
+    *screen = ScreenState();
+    if (screen->columns == 80) {
+        screen->mode &= 0x7F;
+        ok = screen->mode == 2 || screen->mode == 3 || screen->mode == 7;
     }
-    mode->ax = screen.columns << 8 | screen.mode;
-    mode->bx = screen.page << 8 | mode->bx & 0xFF;
     return ok;
 }
 

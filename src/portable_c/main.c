@@ -1425,7 +1425,8 @@ extern const u8 __far FtEr2_B[];
    DOS is to do: try again, or have its call fail.
 
    Once a call has been let fail, ErrDat is set, and every error after
-   it fails without a box until whoever called DOS clears that: Intr21.
+   it fails without a box until a function of sys.h that is asked with
+   the program's errors clears that, as Intr21 of the original does.
    BlocEr does the same for those who want no box at all.
 
    The clock and the screen blanker are off while the box is up, and
@@ -1512,18 +1513,15 @@ void __interrupt __far FatErr(struct Saved r)
     r.ax = FtErr1(r.ax, r.di, AT(r.bp, r.si));
 }
 
-/* Take the critical error of DOS, for FatErr, and
-   Ctrl-Break, for a routine that only returns, and note who had them.
-   Returns the offset of that routine, CtrlC of resident.c. */
-u16 HookVct(void)
+/* Take the critical error of DOS, for FatErr, and Ctrl-Break, for a
+   routine that only returns, CtrlC of resident.c, and note who had
+   them. */
+void HookVct(void)
 {
-    u32 routine = (u32)(void __far *)CtrlC;
-
     md.ErrVct = Vector(INT_ERROR);
     md.BrkVct = Vector(INT_BREAK);
     SetVector(INT_ERROR, (u32)(void __far *)FatErr);
-    SetVector(INT_BREAK, routine);
-    return (u16)routine;
+    SetVector(INT_BREAK, (u32)(void __far *)CtrlC);
 }
 
 /* Leave the program: the screen as DOS had it, with the cursor on the

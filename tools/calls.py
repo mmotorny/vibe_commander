@@ -1,30 +1,33 @@
 #!/usr/bin/env python3
-"""List what a C tree still asks of the system by handing registers to
-an interrupt.
+"""List what a C tree asks of the system by handing registers to an
+interrupt.
 
-The portable C is to ask the system through the functions of its sys.h,
-which say what is asked and not how (see CLAUDE.md, "Moving a file to
-the system's functions"). A file that has not gone over fills a
-structure of registers and hands it to an interrupt, as the C
-translation does. This counts, by file, the calls that are left:
+The portable C asks the system through the functions of its sys.h, which
+say what is asked and not how (see CLAUDE.md, "Moving a file to the
+system's functions"), and its dos.c alone knows a register. The C
+translation fills a structure of registers and hands it to an interrupt
+from every file, and so did each file of the portable C until it went
+over. This counts, by file, the calls of that kind:
 
-    DOS      Intr21, Intr21f, Int21d, Int21e, Int21f, and CALL of copy.c
+    DOS      Intr21, Intr21f, Int21d, Int21e, Int21f, and CALL, which
+             copy.c of the C translation has for the first
     screen   Int10
     keys     Int16
     mouse    Int33, MousAt
-    other    Int2F, Int28, and DosTime and SelDrv of system.c, which are
-             a function of sys.h under an older name
+    other    Int2F, Int28, and DosTime and SelDrv of system.c
     memory   a fixed address of the machine, or the address of the
              display's memory, Screen of the main data
 
-    calls.py                    of src/portable_c
-    calls.py src/c              of another tree
+    calls.py                    of src/portable_c, which has none left
+    calls.py src/c              of the C translation, which has them all
 
 It goes by the text, outside comments: a call is one of those names in
 front of a parenthesis, where the line is not the function's own
 definition or its declaration. dos.c is left out, which is where they
-are. tools/figures.py writes the sum, and in how many files, into the
-README's table.
+are. The portable C no longer declares the names of the first five
+kinds, so the compiler refuses a call of one there; of the sixth nothing
+does, and this is what would show it. tools/figures.py writes the sum,
+and in how many files, into the README's table.
 """
 import re
 import sys
