@@ -27,14 +27,14 @@
  */
 #include "vc.h"
 
-u16 LnStr(const struct LineArgs STACK *args);
+u16 LnStr(const struct LineArgs *args);
 
 /* struct LineArgs, NgLine and CntLine are in vc.h. */
 
 /* The length of a text that is put into a line, as LnStr counts it: it
    looks at 80 characters, and a text without an end among them counts as
    79 long. */
-static u16 Included(const u8 __far *text)
+static u16 Included(const u8 *text)
 {
     u16 length = 0;
 
@@ -48,9 +48,9 @@ static u16 Included(const u8 __far *text)
 
    The count is kept as the assembly keeps it: what a run of characters or
    a text put in adds to it is added to its low byte only. */
-u16 LnStr(const struct LineArgs STACK *args)
+u16 LnStr(const struct LineArgs *args)
 {
-    const u8 __far *line = args->line;
+    const u8 *line = args->line;
     u16 length = 0;
     u16 first, second, more;
 
@@ -98,10 +98,10 @@ u16 LnStr(const struct LineArgs STACK *args)
    cells as the low byte of `args->value` says; what does not fit is left
    out. Moves `args->line` behind the line's end and `args->screen` behind
    what was written. */
-void NgLine(struct LineArgs STACK *args)
+void NgLine(struct LineArgs *args)
 {
-    const u8 __far *line = args->line;
-    const u8 __far *text;
+    const u8 *line = args->line;
+    const u8 *text;
     u16 *screen = args->screen;
     u16 room = args->value & 0xFF;
     u16 style = 0;                      /* which of the colours is on */
@@ -132,8 +132,8 @@ void NgLine(struct LineArgs STACK *args)
             if (c != '^') {
                 c = UpCase(c) & 0xFF;
                 if (c == 'V' || c == 'W' || c == 'I') {
-                    text = c == 'V' ? (const u8 __far *)(md.TmpErr + 1)
-                         : c == 'W' ? (const u8 __far *)(md.TmpErr + 101)
+                    text = c == 'V' ? md.TmpErr + 1
+                         : c == 'W' ? md.TmpErr + 101
                          : args->include;
                     while ((c = *text++) != 0)
                         PUT(c);
@@ -175,13 +175,13 @@ void NgLine(struct LineArgs STACK *args)
 /* Write a line to the screen buffer with its middle at the row and the
    column in `args->value`, the row in the high byte. Moves `args->line`
    behind the line's end. */
-void CntLine(struct LineArgs STACK *args)
+void CntLine(struct LineArgs *args)
 {
     struct LineArgs line = *args;
     u16 length = LnStr(args);
 
     line.screen = BasAdr(args->value) - (length + 1 >> 1);
     line.value = length;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     args->line = line.line;
 }

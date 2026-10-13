@@ -88,7 +88,7 @@
                                            left and on the right */
 
 /* A field of a dialog, by its offset. */
-#define FIELD(offset) ((const struct BOXMN __far *)AT(code, offset))
+#define FIELD(offset) ((const struct BOXMN *)AT(code, offset))
 
 /* A byte and a word of the main data, by their offsets. */
 #define MD(offset)  (*MD_POINTER(offset))
@@ -127,14 +127,14 @@ u16 F38_10(u16 answer);                                 /* dirfunc.c */
 u16 F35_61(u16 answer, u16 place);                      /* copy.c */
 
 /* C routines of other files that vc.h does not have. */
-u16 LnStr(const struct LineArgs STACK *args);           /* line.c */
-void NormStr(u8 __far *text);                           /* string.c */
+u16 LnStr(const struct LineArgs *args);                 /* line.c */
+void NormStr(u8 *text);                                 /* string.c */
 
 /* Copy a text that a box puts into its lines to where the lines have it,
    and write it as the box asks: `entry` is its four bytes in the box. */
-static void DiBx30(const struct BOXTX __far *entry, u8 *to, u16 segment)
+static void DiBx30(const struct BOXTX *entry, u8 *to, u16 segment)
 {
-    const u8 __far *from = AT(segment, entry->from);
+    const u8 *from = AT(segment, entry->from);
     u8 *text = to;
     u16 count = LenPath + 13;
     u16 mode;
@@ -163,14 +163,14 @@ static void DiBx30(const struct BOXTX __far *entry, u8 *to, u16 segment)
    The lines of the box are words that name their texts, one behind the
    other behind the texts that it puts in: `line` is at one of them. */
 void DialBox(u16 place, u16 box, u16 include, u16 segment,
-             struct Box STACK *where)
+             struct Box *where)
 {
     u16 code = AsmSeg();
-    const struct BOXTOP __far *head
-        = (const struct BOXTOP __far *)AT(code, box);
-    const struct BOXTX __far *put = (const struct BOXTX __far *)(head + 1);
-    const u8 * const __far *lines;
-    const u8 * const __far *line;
+    const struct BOXTOP *head
+        = (const struct BOXTOP *)AT(code, box);
+    const struct BOXTX *put = (const struct BOXTX *)(head + 1);
+    const u8 * const *lines;
+    const u8 * const *line;
     struct LineArgs args;
     u16 texts, count, width, length, size, begin, row;
     u16 *screen;
@@ -186,7 +186,7 @@ void DialBox(u16 place, u16 box, u16 include, u16 segment,
     }
 
     /* As wide as its longest line. */
-    lines = (const u8 * const __far *)(put + texts);
+    lines = (const u8 * const *)(put + texts);
     args.value = 0;
     args.screen = 0;
     args.colors = head->colors;
@@ -197,7 +197,7 @@ void DialBox(u16 place, u16 box, u16 include, u16 segment,
     do {
         if (*line != 0) {
             args.line = AT(code, NAMED(*line));
-            length = LnStr((struct LineArgs STACK *)&args);
+            length = LnStr(&args);
             if (length > width)
                 width = length;
         }
@@ -219,7 +219,7 @@ void DialBox(u16 place, u16 box, u16 include, u16 segment,
         if (*line != 0) {
             args.value = row;
             args.line = AT(code, NAMED(*line));
-            CntLine((struct LineArgs STACK *)&args);
+            CntLine(&args);
         } else {
             screen = BasAdr(row) - ((((size & 0xFF) - 1) & 0xFFFE) >> 1);
             BoxLine(screen, Color(head->colors[0]) << 8 | LINE, LEFT_RIGHT,
@@ -281,7 +281,7 @@ static u16 MnMn50(u16 table, u16 item, u16 code)
    last of them goes, and one row. */
 static u16 MnMn60(u16 table, u16 code)
 {
-    const u8 __far *button = AT(code, table);
+    const u8 *button = AT(code, table);
 
     do
         button += 2;
@@ -295,7 +295,7 @@ static u16 MnMn60(u16 table, u16 code)
 static u16 MnMn41(u16 number, u16 item, u16 table, u16 *screen, u16 code)
 {
     u16 color = Color(number);
-    const u8 __far *button;
+    const u8 *button;
     u16 count = item & 0xFF;
 
     count += count;
@@ -334,11 +334,11 @@ struct ButtonKey {
     u16 taken;                          /* 1 if the buttons have dealt with
                                            the key */
 };
-static struct ButtonKey MnMn11(u16 key, u16 place, u16 STACK *state,
+static struct ButtonKey MnMn11(u16 key, u16 place, u16 *state,
                                u16 table, u16 code)
 {
     struct ButtonKey pressed;
-    const u8 __far *button;
+    const u8 *button;
     u16 chosen = *state;
     u16 taken = 1;
     u16 item, low, count, buttons, mouse, column, look, now, begin, size;
@@ -465,7 +465,7 @@ struct Taken MnMn10(u16 key, u16 place, u16 item, u16 size, u16 table)
     struct ButtonKey pressed;
 
     (void)size;
-    pressed = MnMn11(key, place, (u16 STACK *)&item, table, AsmSeg());
+    pressed = MnMn11(key, place, &item, table, AsmSeg());
     taken.key = pressed.key;
     taken.button = (u8)item;
     taken.taken = (u8)pressed.taken;
@@ -484,7 +484,7 @@ struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
 {
     struct Buttons buttons;
     u16 code = AsmSeg();
-    const u8 __far *color = AT(code, colors);
+    const u8 *color = AT(code, colors);
     u16 state = (keys & 0xFF) << 8 | item & 0xFF;
     u16 key;
     struct ButtonKey pressed;
@@ -493,7 +493,7 @@ struct Buttons MinMnu(u16 control, u16 begin, u16 size, u16 colors, u16 keys,
     for (;;) {
         MnMn40((u16)color[0] << 8 | color[1], begin, state, size, control);
         key = Input(state >> 8 & 0x7F);
-        pressed = MnMn11(key, begin, (u16 STACK *)&state, control, code);
+        pressed = MnMn11(key, begin, &state, control, code);
         key = pressed.key;
         if (pressed.taken != 0)
             continue;
@@ -810,11 +810,11 @@ static u16 Dial85(u16 field, u16 code)
 u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
 {
     u16 code = AsmSeg();
-    const struct BOXHD __far *head = (const struct BOXHD __far *)AT(code, box);
-    const struct BOXMN __far *field;
-    const u8 __far *colors;
-    const u8 __far *from;
-    u8 __far *to;
+    const struct BOXHD *head = (const struct BOXHD *)AT(code, box);
+    const struct BOXMN *field;
+    const u8 *colors;
+    const u8 *from;
+    u8 *to;
     u8 *text;
     u16 *screen;
     struct Box where;
@@ -849,7 +849,7 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
         begin += (u16)md.SftErr << 8;
     if (!(head->bFlags & BOX_THERE)) {
         DialBox(begin, NAMED(head->pDiBox), include, segment,
-                (struct Box STACK *)&where);
+                &where);
         begin = where.begin;
         size = where.size;
         saved = where.saved;

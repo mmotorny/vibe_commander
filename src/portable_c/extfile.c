@@ -23,7 +23,7 @@
 /* Where FndItem stopped, and whether that is the end of the file. The
    file is in the main data, in MenuBuf, whoever asks: the place is one
    of the main data. */
-static struct Entry Found(u16 end, const u8 __far *file)
+static struct Entry Found(u16 end, const u8 *file)
 {
     struct Entry entry;
 
@@ -36,20 +36,20 @@ static struct Entry Found(u16 end, const u8 __far *file)
    the next one behind the line that `file` is in. At the end of the file
    the place returned is that of the byte 1Ah if an entry was looked for
    there, and one behind it if a line was being skipped. */
-static struct Entry Item(const u8 __far *file, u16 rest)
+static struct Entry Item(const u8 *file, u16 rest)
 {
     u16 pair, c;
 
     for (;;) {
         if (!rest) {
-            pair = *(const u16 __far *)file;
+            pair = *(const u16 *)file;
             c = pair & 0xFF;
             if (c != ' ' && c != '\t' && c != '\'' && !IS_CRLF(pair))
                 return Found(c == EOF_CHAR, file);
         }
         rest = 0;
         for (;;) {                      /* FndIt1: to the end of the line */
-            pair = *(const u16 __far *)file;
+            pair = *(const u16 *)file;
             if (IS_CRLF(pair)) {
                 file += 2;
                 break;
@@ -62,7 +62,7 @@ static struct Entry Item(const u8 __far *file, u16 rest)
 }
 
 /* The entry at `file`, or the first one behind it: see Item. */
-struct Entry FndItem(const u8 __far *file)
+struct Entry FndItem(const u8 *file)
 {
     return Item(file, 0);
 }
@@ -71,7 +71,7 @@ struct Entry FndItem(const u8 __far *file)
    and return where its command begins, behind the colon, as an offset in
    the main data; 0 if the file has no entry for it. The extension is
    left at TmpErr, three characters, with spaces for those it lacks. */
-u16 FindExt(const u8 __far *name)
+u16 FindExt(const u8 *name)
 {
     const u8 *file;
     const u8 *wanted;

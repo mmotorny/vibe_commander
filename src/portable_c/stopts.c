@@ -21,8 +21,8 @@
    returns where the digits end; FndLet returns what follows spaces and
    tabs. */
 u16 HexDec(u16 number);                                 /* format.c */
-const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number); /* digits.c */
-const u8 __far *FndLet(const u8 __far *text);           /* string.c */
+const u8 *TxtNum(const u8 *text, u16 *number); /* digits.c */
+const u8 *FndLet(const u8 *text);                       /* string.c */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -36,20 +36,20 @@ const u8 __far *FndLet(const u8 __far *text);           /* string.c */
 /* The dialogs, and the lines of Country info that are read and written
    here: of stopts_t.c, in the segment that AsmSeg returns, where Dialog
    reads them by their offsets. */
-extern const u8 __far StConf_B[];       /* the Configuration */
-extern const u8 __far StScrn_B[];       /* Screen and Mouse */
-extern const u8 __far StPanOp_B[];      /* Panel options */
-extern const u8 __far StNoTim_B[];      /* "Illegal format of auto change
+extern const u8 StConf_B[];             /* the Configuration */
+extern const u8 StScrn_B[];             /* Screen and Mouse */
+extern const u8 StPanOp_B[];            /* Panel options */
+extern const u8 StNoTim_B[];            /* "Illegal format of auto change
                                            dir time delay." */
-extern const u8 __far StInfo_B[];       /* Country info */
-extern u8 __far StInf02_S[];            /* its line of the time, the date
+extern const u8 StInfo_B[];             /* Country info */
+extern u8 StInf02_S[];                  /* its line of the time, the date
                                            and the number, */
-extern const u8 __far StInf05_S[];      /* the first 40 of its characters, */
-extern u8 __far StInf06_S[];            /* with their capitals */
-extern u8 __far StInf07_S[];            /* and their small letters, */
-extern const u8 __far StInf09_S[];      /* and the other 39 with a space, */
-extern u8 __far StInf10_S[];            /* with theirs */
-extern u8 __far StInf11_S[];
+extern const u8 StInf05_S[];            /* the first 40 of its characters, */
+extern u8 StInf06_S[];                  /* with their capitals */
+extern u8 StInf07_S[];                  /* and their small letters, */
+extern const u8 StInf09_S[];            /* and the other 39 with a space, */
+extern u8 StInf10_S[];                  /* with theirs */
+extern u8 StInf11_S[];
 
 #define PAGE_PANELS 3                   /* the page of the setup's help
                                            that Panel options has */
@@ -57,7 +57,7 @@ extern u8 __far StInf11_S[];
 /* The minutes after which the screen is blanked, as Screen and Mouse
    offers them, from the first line of the group down: Delay_T of the
    setup program, where it stands behind that dialog. */
-static const u8 CODE StDelay_T[] = { 40, 20, 5, 3, 1, 0 };
+static const u8 StDelay_T[] = { 40, 20, 5, 3, 1, 0 };
 
 /* The Configuration: all of it boxes to tick, which the dialog sets.
    If the key bar was on and is off now, its row is what DOS had shown
@@ -185,7 +185,7 @@ struct Checked StF04_10(u16 answer)
         return Accepted(answer);
     if (*text != separator) {
         from = text;
-        text = NEAR(TxtNum(from, (u16 STACK *)&number));
+        text = NEAR(TxtNum(from, &number));
         if (text == from || number > 99)
             goto refused;
         seconds = (u8)number;
@@ -202,7 +202,7 @@ struct Checked StF04_10(u16 answer)
     for (from = text; *from == '0'; from++)
         zeros++;
     from = text;
-    text = NEAR(TxtNum(from, (u16 STACK *)&number));
+    text = NEAR(TxtNum(from, &number));
     if (text == from)
         goto refused;
     if (*FndLet(text) != 0)
@@ -233,7 +233,7 @@ refused:
 }
 
 /* The capitals of 40 characters, */
-static void StF09_10(const u8 __far *from, u8 __far *to)
+static void StF09_10(const u8 *from, u8 *to)
 {
     u16 count = 40;
 
@@ -243,7 +243,7 @@ static void StF09_10(const u8 __far *from, u8 __far *to)
 }
 
 /* and their small letters. */
-static void StF09_20(const u8 __far *from, u8 __far *to)
+static void StF09_20(const u8 *from, u8 *to)
 {
     u16 count = 40;
 
@@ -262,8 +262,8 @@ static void StF09_20(const u8 __far *from, u8 __far *to)
 void StF09_00(void)
 {
     u16 code = AsmSeg();
-    u8 __far *info = AT(code, OFFSET(StInf02_S));
-    u8 __far *line;
+    u8 *info = AT(code, OFFSET(StInf02_S));
+    u8 *line;
     u8 separator, first, second, third;
     u16 count;
 

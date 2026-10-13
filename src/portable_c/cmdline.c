@@ -40,13 +40,13 @@
    PutMnu, PutKey, Input, EdLin, Search and DosCom are C, of vc.h. */
 
 /* C routines of other files that vc.h does not have. */
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);                            /* screen.c */
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);                                  /* screen.c */
 u16 F32_70(u16 begin, u16 size);                        /* usermenu.c */
 
 /* The mask that stands behind the name of a directory in the command
    line: the assembly's, which other C code has too. */
-extern const u8 __far Mask_S[];         /* "\*.*" */
+extern const u8 Mask_S[];               /* "\*.*" */
 
 #define LenCmd 124                      /* Length of command line */
 
@@ -55,23 +55,23 @@ extern const u8 __far Mask_S[];         /* "\*.*" */
 #define Hist_C  23                      /* the colour of the history */
 #define HstCu_C 24                      /* and of the line of its cursor */
 
-static const u8 CODE Hist_S[9] = " History ";
+static const u8 Hist_S[9] = " History ";
 
 /* The box of the speed search: its two colours, with the two bytes that
    follow them in the assembly, and its line. */
-static const u8 CODE AltSr_P[] = { Box_C, BoxCu_C, 0x78, 0x79 };
-static const u8 CODE AltSr_S[] = "Search: ^r\xFF\x0C^r";
+static const u8 AltSr_P[] = { Box_C, BoxCu_C, 0x78, 0x79 };
+static const u8 AltSr_S[] = "Search: ^r\xFF\x0C^r";
 
 /* The scan codes of Alt with a digit, a hyphen, an equals sign or a
    letter, as the assembly has them too, where the main loop reads
    them, and what each stands for in the speed search. */
-static const u8 CODE AltSr_T[38] = {
+static const u8 AltSr_T[38] = {
     0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,
     0x1E, 0x1F, 0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26,
     0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32
 };
-static const u8 CODE Ascii_T[38] = "1234567890-=qwertyuiopasdfghjklzxcvbnm";
+static const u8 Ascii_T[38] = "1234567890-=qwertyuiopasdfghjklzxcvbnm";
 
 /* Where the speed search keeps its text in MenuBuf, and in the word
    before it the column of its cursor. */
@@ -107,8 +107,8 @@ u16 F74_00(void)
    0 if the panel shows no files or has none to put there. */
 u16 F80_00(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    struct FILENT __far *file;
+    struct WCBdef *wcb = PANEL(panel);
+    struct FILENT *file;
     struct Selected selected;
     u16 any, at, length, used, column, i, c;
 
@@ -171,7 +171,7 @@ F80_10:
    one is not taken; and behind it the character `end`, if that is not 0
    and the text does not end in it. Draws the line and returns the column
    of the cursor. */
-static u16 F68_25(const u8 __far *text, u16 column, u16 scan, u16 end)
+static u16 F68_25(const u8 *text, u16 column, u16 scan, u16 end)
 {
     struct Edited edited;
     u16 c;
@@ -201,8 +201,8 @@ F68_27:
    the tree is on. `key` is the key, for its scan code. */
 void F82_01(u16 panel, u16 key)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    const u8 __far *path = wcb->WinPath;
+    struct WCBdef *wcb = PANEL(panel);
+    const u8 *path = wcb->WinPath;
 
     if (wcb->WinTyp > 1)
         return;
@@ -404,7 +404,7 @@ F68_20:                                 /* the box goes */
    `panel` or in the tree, and put the cursor there: F77_10. */
 static void F77_10(u16 key, u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u16 segment, at, first, begin, end, step, found;
 
     if (wcb->WinTyp == 0) {
@@ -453,7 +453,7 @@ struct SpeedKey F77_00(u16 key, u16 panel)
     line.line = AltSr_S;
     line.colors = AltSr_P;
     line.include = AltSr_S;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     Window(begin, size);
     *(u16 *)(md.MenuBuf + SPEED - 2) = 0;
     md.MenuBuf[SPEED] = 0;

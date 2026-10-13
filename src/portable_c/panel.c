@@ -25,18 +25,18 @@ u8 *FilDir(u8 *buffer, u16 directories, u16 files);
 /* PtPt10 is in vc.h. */
 
 /* The titles of the columns, in brief and in full. */
-static const u8 CODE Brief_S[] = {
+static const u8 Brief_S[] = {
     '^', 'r', 'N', 'a', 'm', 'e', 0xFF, 9, 'N', 'a', 'm', 'e', 0xFF, 9,
     'N', 'a', 'm', 'e', 0
 };
-static const u8 CODE Full_S[] = {
+static const u8 Full_S[] = {
     '^', 'r', 'N', 'a', 'm', 'e', 0xFF, 8, 'S', 'i', 'z', 'e', 0xFF, 5,
     'D', 'a', 't', 'e', 0xFF, 4, 'T', 'i', 'm', 'e', 0
 };
-static const u8 CODE Panel_P[] = {Back_C, Title_C};
+static const u8 Panel_P[] = {Back_C, Title_C};
 /* The columns of a panel in which a line separates two of its own: in
    brief, Brief_T in the assembly, and in full, Full_T. A 0 ends them. */
-static const u8 CODE Panel_T[2][4] = {{13, 26, 0, 0}, {13, 23, 32, 0}};
+static const u8 Panel_T[2][4] = {{13, 26, 0, 0}, {13, 23, 32, 0}};
 
 /* What stands for the path over a panel of another kind, and what follows
    the path of one that shows only programs. Tree_S is a constant of
@@ -45,21 +45,21 @@ static const u8 CODE Panel_T[2][4] = {{13, 26, 0, 0}, {13, 23, 32, 0}};
    PtPt10 copies 25 bytes for Progs, which has 7. Behind it here is what
    the original has behind it and so copies too, the two markers of
    directories in the size column. */
-static const u8 CODE Info_S[] = {' ', 'I', 'n', 'f', 'o', ' ', 0};
-static const u8 CODE Progs_S[25] = {
+static const u8 Info_S[] = {' ', 'I', 'n', 'f', 'o', ' ', 0};
+static const u8 Progs_S[25] = {
     ' ', 'P', 'r', 'o', 'g', 's', 0,
     0x10, 'U', 'P', '-', '-', 'D', 'I', 'R', 0x11,
     0x10, 'S', 'U', 'B', '-', 'D', 'I', 'R', 0x11
 };
-static const u8 CODE PutPt_P[] = {Back_C, Cursr_C};
+static const u8 PutPt_P[] = {Back_C, Cursr_C};
 
-static const u8 CODE BytIn_S[25] = {
+static const u8 BytIn_S[25] = {
     ' ', 'b', 'y', 't', 'e', 's', ' ', 'i', 'n', ' ', ' ', 's', 'e', 'l',
     'e', 'c', 't', 'e', 'd', ' ', 'f', 'i', 'l', 'e', 's'
 };
-static const u8 CODE PtFs_P[] = {Slct_C};
+static const u8 PtFs_P[] = {Slct_C};
 
-static const u8 CODE FilDi_S[24] = {
+static const u8 FilDi_S[24] = {
     ' ', 'f', 'i', 'l', 'e', 's', ' ', 'a', 'n', 'd', ' ', ' ', 'd', 'i',
     'r', 'e', 'c', 't', 'o', 'r', 'i', 'e', 's', 'y'
 };
@@ -90,7 +90,7 @@ static const u8 CODE FilDi_S[24] = {
    Nothing here has a line to include, and the assembly names none. */
 void Panel(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct LineArgs line;
     u16 place = BegBX(panel);
     u16 *screen = BasAdr(place);
@@ -112,10 +112,10 @@ void Panel(u16 panel)
         line.value = place;
         line.line = NameVer_S;
         line.colors = Panel_P;
-        CntLine((struct LineArgs STACK *)&line);
+        CntLine(&line);
         line.value = place + 0x100;
         line.line = BasedOn_S;
-        CntLine((struct LineArgs STACK *)&line);
+        CntLine(&line);
         screen = BoxLine(BasAdr(place) + (2 * 80 - 20), color | LINE,
                          LEFT_RIGHT, 0, 38);
         BoxLine(screen + 6 * 80, color | LINE, LEFT_RIGHT, 0, 38);
@@ -131,7 +131,7 @@ void Panel(u16 panel)
     else
         line.line = Brief_S;
     line.colors = Panel_P;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
 
     /* Panel8 in the assembly: a cell in each of the columns, and on to
        the next row. */
@@ -162,8 +162,8 @@ void Panel(u16 panel)
    only programs. Returns the address of the zero byte that ends it. */
 u8 *PtPt10(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    u8 __far *end = md.TmpErr + 1;
+    struct WCBdef *wcb = PANEL(panel);
+    u8 *end = md.TmpErr + 1;
 
     *end++ = ' ';
     end = MvzLine(end, wcb->WinPath, LenPath);
@@ -192,7 +192,7 @@ u8 *PtPt10(u16 panel)
    before it was shortened and of no more than the 32 or 33. */
 void PutPath(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct LineArgs line;
     u16 place = BegBX(panel);
     u16 limit, least, length;
@@ -228,7 +228,7 @@ void PutPath(u16 panel)
         line.colors = PutPt_P + 1;
     else
         line.colors = PutPt_P;
-    CntLine((struct LineArgs STACK *)&line);
+    CntLine(&line);
 }
 
 /* Write the files of a panel into it, from the first one it shows, each
@@ -245,10 +245,10 @@ void PutPath(u16 panel)
    its bytes in thousands, with a K. */
 void PutFls(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct LineArgs line;
-    const struct FILENT __far *file;
-    const u8 __far *name;
+    const struct FILENT *file;
+    const u8 *name;
     u16 *screen;
     u8 *text;
     const u8 *from;
@@ -382,7 +382,7 @@ void PutFls(u16 panel)
     line.value = ADD_LOW(place, 20);
     line.line = md.TmpBuf;
     line.colors = PtFs_P;
-    CntLine((struct LineArgs STACK *)&line);
+    CntLine(&line);
 }
 
 /* Show the cursor of a panel on the screen, if `set` is not 0, or take it
@@ -397,7 +397,7 @@ void PutFls(u16 panel)
    that piece is not given the colour of the rest. */
 void SetCur(u16 panel, u16 set)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct Place at;
     u16 *screen;
     u8 *mark;
@@ -406,7 +406,7 @@ void SetCur(u16 panel, u16 set)
 
     set &= 0xFF;
     color = set != 0 ? Cursr_C : Back_C;
-    AdrNum(panel, (struct Place STACK *)&at);
+    AdrNum(panel, &at);
     below = at.cursor - at.first;
     if (wcb->WinTyp > 1)
         return;

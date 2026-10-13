@@ -24,7 +24,7 @@
    panels on a display that is neither an EGA nor a VGA, the bar 0 with
    no name for Alt with F9, and that is what the bar 0 is here (see
    DEVIATIONS.md). */
-static const u8 CODE KeyB_T[15][4] = {
+static const u8 KeyB_T[15][4] = {
     { 1,  2,  3,  4},                   /*  0 */
     { 6,  0,  0,  0},                   /*  1 */
     { 7,  0,  0,  0},                   /*  2 */
@@ -50,7 +50,7 @@ static const u8 CODE KeyB_T[15][4] = {
    number less here than in the original for it. The original has a
    row more, the 5th, which is the 4th without "EGA Ln", for the bar 9:
    the rows behind it have a number less here, in KeyB_T. */
-static const u8 CODE KeyC_T[18][10] = {
+static const u8 KeyC_T[18][10] = {
     { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0},   /*  0 */
     { 1,  2,  3,  4,  5,  6,  7,  8,  9, 10},   /*  1 */
     { 0, 29,  3,  4,  5,  6,  7,  8, 11, 12},   /*  2 */
@@ -72,7 +72,7 @@ static const u8 CODE KeyC_T[18][10] = {
 };
 
 /* What a key does, in the six cells that the bar has for it. */
-static const u8 CODE Key_S[32][6] = {
+static const u8 Key_S[32][6] = {
     {' ', ' ', ' ', ' ', ' ', ' '},     /*  0 */
     {'H', 'e', 'l', 'p', ' ', ' '},     /*  1 */
     {'M', 'e', 'n', 'u', ' ', ' '},     /*  2 */
@@ -112,14 +112,14 @@ static const u8 CODE Key_S[32][6] = {
    is the same whichever of Shift, Ctrl and Alt is held: 0 is that of the
    setup's menu, 1 that of a dialog, 2 that of a palette and of the
    help, and 3 has Quit alone. */
-static const u8 CODE StKeyB_T[4][4] = {
+static const u8 StKeyB_T[4][4] = {
     {1, 0, 0, 0},                       /*  0 */
     {2, 0, 0, 0},                       /*  1 */
     {3, 0, 0, 0},                       /*  2 */
     {4, 0, 0, 0},                       /*  3 */
 };
 
-static const u8 CODE StKeyC_T[5][10] = {
+static const u8 StKeyC_T[5][10] = {
     { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0},   /*  0 */
     { 1,  2,  3,  4,  5,  6,  7,  8,  9, 10},   /*  1 */
     { 1,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  2 */
@@ -127,7 +127,7 @@ static const u8 CODE StKeyC_T[5][10] = {
     { 0,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  4 */
 };
 
-static const u8 CODE StKey_S[11][6] = {
+static const u8 StKey_S[11][6] = {
     {' ', ' ', ' ', ' ', ' ', ' '},     /*  0 */
     {'H', 'e', 'l', 'p', ' ', ' '},     /*  1 */
     {'C', 'o', 'n', 'f', 'i', 'g'},     /*  2 */
@@ -144,10 +144,10 @@ static const u8 CODE StKey_S[11][6] = {
 /* The menu bar: the names of its five menus, each behind four spaces, and
    spaces to the end of the row. It is a constant of bars_t.c, which
    the menu reads too. */
-extern const u8 __far PtMnu_S[];
+extern const u8 PtMnu_S[];
 /* Its colour, as NgLine takes the colours of a line. The line switches to
    no other, so the one is all that is read. */
-static const u8 CODE PtMnu_B[] = { Menu_C };
+static const u8 PtMnu_B[] = { Menu_C };
 
 /* Fill a row of the screen buffer with spaces in the colour that DOS
    writes in, and return the address of the row below: `place` has the row
@@ -252,7 +252,7 @@ void PtMnu1(u16 item)
     /* The line has no ^I, so the include line is not read: the assembly
        left there whatever its caller had in DX. */
     line.include = PtMnu_S;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     if (item != 0 && item <= 5) {
         /* The column is counted in a byte, as the assembly counts it. */
         do {

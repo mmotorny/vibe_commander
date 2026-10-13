@@ -29,7 +29,7 @@ void TrCr20(u16 lines);
 
 /* The colours of the tree in a panel: of a directory, of the one under
    the cursor, and of the current directory likewise. */
-static const u8 CODE PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
+static const u8 PutTr_P[] = {Back_C, Cursr_C, Slct_C, CurSl_C};
 
 #define TREE ((struct DIRTREE *)md.TreeBuf)
 
@@ -148,7 +148,7 @@ void PutTre(u16 panel)
 
    The entry behind the last one is looked at too, for whether it begins
    a level: that is whatever follows the list in TreeBuf. */
-void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors)
+void PutTree(u16 panel, u16 place, u16 size, const u8 *colors)
 {
     struct DIRENT *entry;
     u16 *screen, *cell;

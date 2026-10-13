@@ -340,8 +340,7 @@ function(add_portable_c target directory)
     # -s -zl -zls -wx -we   as in c_compile above: no check of the stack,
     #        no library, and every warning an error
     # -i=    the compiler's own headers, for one of them: vc.h has
-    #        offsetof of <stddef.h> where the compiler is not the one for
-    #        16 bits, as any other compiler has it
+    #        offsetof of <stddef.h>, as any other compiler has it
     # -fr    no file of the errors beside what the compiler writes out:
     #        it would be build/<file>.err, which is where the compiler
     #        for 16 bits leaves its own of a file of the same name, of

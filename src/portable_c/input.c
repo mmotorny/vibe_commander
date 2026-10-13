@@ -60,7 +60,7 @@ u16 HexDec(u16 number);                                 /* format.c */
 void Help00(void);                                      /* help.c */
 
 /* The characters that words end at. */
-static const u8 CODE CtEn_T[10] = {
+static const u8 CtEn_T[10] = {
     ' ', '+', ':', '.', ',', '>', '<', '|', '\\', '\t'
 };
 
@@ -553,7 +553,7 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key)
 {
     u8 *tried = md.MenuBuf + 208;
     u8 *typed = md.MenuBuf + 228;
-    const u8 __far *name;
+    const u8 *name;
     u16 from = at;
     u16 length, i;
 

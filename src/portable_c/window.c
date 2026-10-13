@@ -19,7 +19,7 @@
    mode without its highest bit where there are 80 columns: the code
    that starts the program goes on with the mode, the columns and the
    page. */
-u16 ChkMode(struct Screen STACK *screen)
+u16 ChkMode(struct Screen *screen)
 {
     u16 ok = 0;
 

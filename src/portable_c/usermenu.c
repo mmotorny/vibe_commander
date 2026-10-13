@@ -63,10 +63,10 @@ u16 Run_00(u16 text, u16 view);
    whether there is none, the end of the file. */
 
 /* C routines of other files that vc.h does not have. */
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);                            /* screen.c */
-const u8 __far *FndLet(const u8 __far *text);           /* string.c */
-u8 __far *MainFil(u8 __far *to, const u8 __far *name);
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);                                  /* screen.c */
+const u8 *FndLet(const u8 *text);                       /* string.c */
+u8 *MainFil(u8 *to, const u8 *name);
 void Help00(void);                                      /* help.c */
 
 /* What keys_t.c has of the menu: the name of the menu file, which
@@ -75,11 +75,11 @@ void Help00(void);                                      /* help.c */
    are copied with what follows them: that of the list file, which is
    there too, and the mask that stands behind the name of a directory in
    it. */
-extern const u8 __far Menu_F[];         /* "VC.MNU" */
-extern const u8 __far User_S[];         /* " User Menu " */
-extern const u8 __far UsrEr_B[];        /* "Could not find the menu file" */
-extern const u8 __far List_F[];         /* "vc.lst" */
-extern const u8 __far Mask_S[];         /* "\*.*" */
+extern const u8 Menu_F[];               /* "VC.MNU" */
+extern const u8 User_S[];               /* " User Menu " */
+extern const u8 UsrEr_B[];              /* "Could not find the menu file" */
+extern const u8 List_F[];               /* "vc.lst" */
+extern const u8 Mask_S[];               /* "\*.*" */
 
 #define LenCmd 124                      /* Length of command line */
 
@@ -103,7 +103,7 @@ extern const u8 __far Mask_S[];         /* "\*.*" */
 /* Where no more of a command is put into DosBuf. */
 #define COMMANDS_END (md.DosBuf + LenBat - 2)
 
-static const u8 CODE CrLf_S[] = { 13, 10 };
+static const u8 CrLf_S[] = { 13, 10 };
 
 /* The word at an address in the main data. */
 #define WORD_AT(address) (*(const u16 *)(address))
@@ -199,9 +199,9 @@ F32_77:
    files, the cursor is on "..", or DOS would not. */
 static u16 FileLst(void)
 {
-    struct WCBdef __far *wcb;
-    struct FILENT __far *file;
-    u8 __far *end;
+    struct WCBdef *wcb;
+    struct FILENT *file;
+    u8 *end;
     struct Selected selected;
     struct Answer asked;
     u16 i, handle, any, at, length;
@@ -295,9 +295,9 @@ u16 Run_00(u16 text, u16 view)
 {
     const u8 *from = MD_POINTER(text);  /* SI */
     u8 *to = md.DosBuf;                 /* DI */
-    const u8 __far *name;
+    const u8 *name;
     const u8 *more;
-    struct WCBdef __far *wcb;
+    struct WCBdef *wcb;
     u16 pair, c, left, to_dot, path, segment = MAIN_SEG;
 
     ListFlg = 0;

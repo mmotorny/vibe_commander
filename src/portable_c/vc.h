@@ -6,26 +6,23 @@
  * has much of the world that the assembly built, which is not the one a C
  * compiler assumes:
  *
- *   - DS points at the program's data, the compiler's group, in every
- *     function: the main data, one struct MainDat, md, which is the
- *     first thing there, and the few variables that files have of their
- *     own. A near pointer is an offset there, and md is at offset 0, so
- *     a place in the main data is its offset in the structure, as the
- *     original has it.
- *   - Constants sit in the code segment, as they do in the assembly:
- *     those declared CODE. The tables that the program names by their
- *     offsets, boxes and dialogs with their texts, are in files of
- *     their own, and in a segment of their own: see tables.h.
- *   - The stack is in a third segment. A pointer to a local variable must
- *     be declared STACK.
- *   - Each file panel has a segment to itself, reached by far pointers,
- *     in a block of the memory that the program asks DOS for.
+ *   - A place of the memory is kept in numbers of 16 bits wherever the
+ *     assembly kept it in registers: a segment, an offset in one. The
+ *     program is one of 32 bits, with all of its memory at one address
+ *     after another and no segments: the words of the addresses, at the
+ *     end of this file, make a pointer of such numbers and the numbers
+ *     of a pointer, and say what they take for granted.
+ *   - The main data is one struct MainDat, md, and a place in it is
+ *     kept as its offset in the structure, as the original has it.
+ *   - The tables that the program names by their offsets, boxes and
+ *     dialogs with their texts, are in files of their own: see
+ *     tables.h.
+ *   - Each file panel has a segment to itself, a number of paragraphs,
+ *     in a block of the memory that the program asks the system for.
  *
- * The main data, the tables and the stack are three segments because
- * they are more than one holds: 62.6 KB, 8.9 KB and 4 KB. The original
- * has the main data in a block that it asks DOS for and gives back
- * while a command runs; here it is of the program, which stays in the
- * memory whole (see DEVIATIONS.md).
+ * The original has the main data in a block that it asks DOS for and
+ * gives back while a command runs; here it is of the program, which
+ * stays in the memory whole (see DEVIATIONS.md).
  *
  * Routines keep the names they have in the assembly source, and data keeps
  * its layout: the structures below are those of the original's VC.ASM, in
@@ -34,18 +31,13 @@
 #ifndef VC_H
 #define VC_H
 
-/* Numbers of 8, 16 and 32 bits, whatever the compiler. A long has 32
-   bits for the 8086, where an int has 16: Open Watcom says with __I86__
-   that it compiles for that. Elsewhere a long may have 64, and an int
-   has 32. No header of a compiler names the types here: the build for
-   DOS has none. */
+/* Numbers of 8, 16 and 32 bits. An int has 32 bits for every compiler
+   that reads this, Open Watcom's for the 386 and the gcc and clang of
+   the checks, and a long may have 64. The lines below hold each to its
+   length. */
 typedef unsigned char  u8;
 typedef unsigned short u16;
-#ifdef __I86__
-typedef unsigned long  u32;
-#else
 typedef unsigned int   u32;
-#endif
 
 /* Fails to compile when something that the code counts on is not so:
    the name says what. It is the tag of a structure and no typedef, as
@@ -65,44 +57,18 @@ HOLDS(u32_has_32_bits, sizeof(u32) == 4);
    below and through pointers; PUT16 writes one so; and a number of 32
    bits that is an address or a size is taken for its two words. So
    nothing compiles for a machine that is not known to have it so. The
-   two that Open Watcom compiles for here have, the 8086 and the 386;
-   gcc and clang say which it is. Of another compiler nothing is known
-   here: say how it tells. */
-#if !defined(__I86__) && !defined(__386__) \
+   one that Open Watcom compiles for here has, the 386; gcc and clang
+   say which it is. Of another compiler nothing is known here: say how
+   it tells. */
+#if !defined(__386__) \
     && !(defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 #error The code takes the low byte of a number to be the first: see vc.h
 #endif
 
-/* The words by which the code says what segment a thing is in. They are
-   Open Watcom's, and mean something where the memory is in segments. A
-   compiler for a machine that has all of its memory at one address
-   after another takes them for nothing: a pointer is a pointer there.
-   Nothing else of Open Watcom's is defined away, an interrupt function
-   or a line of assembly: those are what the program has to lose before
-   another compiler takes it, and harness/hostcheck.py counts them. */
-#ifdef __I86__
-#define CODE  __based(__segname("_CODE"))   /* a constant, in the code segment */
-#define STACK __based(__segname("_STACK"))  /* a pointer to a local variable */
-#define FAR   __far                         /* a pointer of sys.h, which
-                                               reaches every segment */
-#else
-#define CODE
-#define STACK
-#define FAR
-#define __far
-#endif
-
-/* Where in a structure a field is, as a number: offsetof of <stddef.h>.
-   The build for DOS has no header of the compiler's, so what Open
-   Watcom's has for it is written out here: the address of the field in
-   a structure at 0. Another compiler takes that for no constant, and a
-   pointer there does not fit the number; it has the header. */
-#ifdef __I86__
-#define OFFSET_IN(type, field) ((u16)&((type *)0)->field)
-#else
+/* Where in a structure a field is, as a number: offsetof of <stddef.h>,
+   which is the one header of a compiler that the program has. */
 #include <stddef.h>
 #define OFFSET_IN(type, field) ((u16)offsetof(type, field))
-#endif
 
 /* Write a 16-bit value to a buffer of bytes, low byte first, and step the
    pointer past it. */
@@ -121,14 +87,11 @@ HOLDS(u32_has_32_bits, sizeof(u32) == 4);
 #define LenPath 68                      /* Length of path name */
 #define MinFls  256                     /* Minimum files in window */
 #define MinTree 768                     /* Minimum tree size */
-/* Stack size: the original has 100h. A program of 32 bits has four
-   times that of the one of 16: it pushes a word of four bytes where
-   that pushes one of two, and keeps what it works with in such words. */
-#ifdef __I86__
-#define LenStk  0x1000
-#else
+/* Stack size: the original has 100h, and the C translation 1000h. A
+   program of 32 bits has four times that: it pushes a word of four
+   bytes where one of 16 bits pushes one of two, and keeps what it works
+   with in such words. */
 #define LenStk  0x4000
-#endif
 #define MaxLins 50                      /* Maximum screen lines */
 #define NmbStrs 32                      /* Number of stars */
 
@@ -426,11 +389,8 @@ LAID_OUT(WCBdef, 0x1A62);
    main data as if it were one. */
 extern struct MainDat md;
 
-/* The stack, of stack.c: LenStk bytes in a segment of their own, the
-   last of the program. */
-#ifndef STACK_C
-extern u8 __far Stack[];
-#endif
+/* The stack, of stack.c: LenStk bytes in a segment of their own. */
+extern u8 Stack[];
 
 /* What the program knows of DOS around it, resident.c. Of its routines
    there, Alloc3 is what the program does first: it looks at the version
@@ -453,23 +413,17 @@ void Exit00(u16 code);
 #pragma aux Exit00 aborts
 
 /* Texts that the code of more than one file shows: the first three are
-   constants of main_t.c, the fourth is one of treebox_t.c. They are in
-   the segment of the tables, and code reads them as far objects. A file
-   of tables, which is one that has tables.h and this by that, names
-   them as lines of its boxes, by near words: there they are near. */
-#ifdef TABLES_H
-#define TEXT_FAR
-#else
-#define TEXT_FAR __far
-#endif
-extern const u8 TEXT_FAR Title_S[];     /* the program's name and version
+   constants of main_t.c and Var_S besides, and the last is one of
+   treebox_t.c. They are tables, and a file of tables names them as
+   lines of its boxes as well. */
+extern const u8 Title_S[];              /* the program's name and version
                                            and what it is based on, behind
                                            two bytes of markup */
-extern const u8 TEXT_FAR NameVer_S[];   /* its name and version alone */
-extern const u8 TEXT_FAR BasedOn_S[];   /* and what it is based on */
-extern const u8 TEXT_FAR Var_S[];       /* a line that is the text at
+extern const u8 NameVer_S[];            /* its name and version alone */
+extern const u8 BasedOn_S[];            /* and what it is based on */
+extern const u8 Var_S[];                /* a line that is the text at
                                            TmpErr+1 */
-extern const u8 TEXT_FAR Tree_S[];      /* the title of the tree */
+extern const u8 Tree_S[];               /* the title of the tree */
 
 /* The numbers of the colours of a panel, for Color. */
 #define Back_C  0                       /* what is neither of the others */
@@ -479,10 +433,9 @@ extern const u8 TEXT_FAR Tree_S[];      /* the title of the tree */
 #define Title_C 4                       /* the titles of the columns */
 
 /* What the program asks of the system that it runs on, sys.h: the
-   functions of dos.c by which it has files, directories, drives, memory,
-   the time, the keyboard, the screen, the mouse and the timer, and what
-   they answer with, struct Answer first. A pointer of that file reaches
-   any segment of the program: FAR, at the top of this one. */
+   functions of dos32.c by which it has files, directories, drives,
+   memory, the time, the keyboard, the screen, the mouse and the timer,
+   and what they answer with, struct Answer first. */
 #include "sys.h"
 
 /* What goes through files, DirFunc, FncSel and FncMas, calls a routine
@@ -550,8 +503,8 @@ struct Answer SaveSet(void);
    command. GiveMem gives all of that memory but the panels back to DOS,
    for a command, and TakeMem takes it again afterwards, and answers as
    Init11 does. Main of main.c is the program from when DOS has loaded it:
-   the system calls it where it enters the program, Alloc0 of dos.c, and
-   it does not return. */
+   the system calls it where it enters the program, Start of dos32.c,
+   and it does not return. */
 void Init00(void);
 struct Answer Init11(void);
 void IniData(void);
@@ -668,9 +621,9 @@ void StHelp(void);
 struct LineArgs {
     u16 value;                          /* AX or BX: see each routine */
     u16 *screen;                        /* DI: where in the screen buffer */
-    const u8 __far *line;               /* DS:SI */
-    const u8 __far *colors;             /* CS:BP: the numbers of four colours */
-    const u8 __far *include;            /* CS:DX */
+    const u8 *line;                     /* DS:SI */
+    const u8 *colors;                   /* CS:BP: the numbers of four colours */
+    const u8 *include;                  /* CS:DX */
 };
 
 /* What AdrNum hands back: the original has these in SI, DI, DX and
@@ -693,28 +646,28 @@ struct Place {
    the portable C does not. */
 u16 Color(u16 number);                  /* screen.c */
 u16 *BasAdr(u16 place);
-u16 __far *MvsColr(u16 __far *screen, u16 count, u16 color);
-u16 __far *MovDz0(u16 __far *screen, const u8 __far *text);
-u16 __far *HexByt(u16 __far *screen, u16 byte);         /* digits.c */
+u16 *MvsColr(u16 *screen, u16 count, u16 color);
+u16 *MovDz0(u16 *screen, const u8 *text);
+u16 *HexByt(u16 *screen, u16 byte);                     /* digits.c */
 u16 TstHex(u16 digit);
-void Convert(const u8 __far *name, u8 *buffer);         /* mask.c */
-u16 TstMas(const u8 __far *name, const u8 *mask);
-void NgLine(struct LineArgs STACK *args);               /* line.c */
-void CntLine(struct LineArgs STACK *args);
-u8 __far *AddFile(u8 __far *end);                       /* string.c */
-u8 __far *MvzLine(u8 __far *to, const u8 __far *from, u16 length);
+void Convert(const u8 *name, u8 *buffer);               /* mask.c */
+u16 TstMas(const u8 *name, const u8 *mask);
+void NgLine(struct LineArgs *args);                     /* line.c */
+void CntLine(struct LineArgs *args);
+u8 *AddFile(u8 *end);                                   /* string.c */
+u8 *MvzLine(u8 *to, const u8 *from, u16 length);
 u16 LowCase(u16 letter);
-const u8 __far *CutPath(const u8 __far *path);
-void PathLin(u8 __far *text);
-void LetLin(u8 __far *text);
-void ShrtLin(u8 __far *text, u16 limit);
+const u8 *CutPath(const u8 *path);
+void PathLin(u8 *text);
+void LetLin(u8 *text);
+void ShrtLin(u8 *text, u16 limit);
 u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode);    /* format.c */
-u16 *SzDtTm(const struct WCBdef __far *wcb, const struct FILENT __far *file,
+u16 *SzDtTm(const struct WCBdef *wcb, const struct FILENT *file,
             u16 *screen, u16 color);
 void SetMask(u16 panel);                                /* files.c */
 void Sort(u16 panel);
-u16 FnFile(u16 panel, const u8 __far *name);
-u16 NearFl(u16 panel, const u8 __far *name, u16 end);
+u16 FnFile(u16 panel, const u8 *name);
+u16 NearFl(u16 panel, const u8 *name, u16 end);
 struct Selected {                       /* what is selected in a panel: */
     u16 directories;                    /* how many directories, */
     u16 files;                          /* and how many files */
@@ -725,7 +678,7 @@ u16 SizDX(void);
 u16 LnsAX(void);
 u16 InvWCB(u16 panel);
 u16 FilePan(u16 panel);
-void AdrNum(u16 panel, struct Place STACK *place);
+void AdrNum(u16 panel, struct Place *place);
 void CorPar(u16 panel);
 struct Shown {                          /* what a panel shows, as addresses: */
     u16 cursor;                         /* the entry that the cursor is on, */
@@ -734,8 +687,8 @@ struct Shown {                          /* what a panel shows, as addresses: */
 struct Shown ChgAdr(u16 panel, u16 cursor, u16 first);
 u8 *PtPt10(u16 panel);                                  /* panel.c */
 /* The tree in a panel, tree.c: its colours are four numbers in the code,
-   which come as a far pointer. */
-void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors);
+   which come as a pointer. */
+void PutTree(u16 panel, u16 place, u16 size, const u8 *colors);
 void PutInf(u16 panel);                                 /* info.c */
 /* Where a box is on the screen, as DialBox says it: what the assembly
    has in BX, DX and SI then. */
@@ -933,20 +886,20 @@ struct Left {
 };
 struct Left F00_50(u16 panel, u16 cursor, u16 first);
 struct Onward F00_60(u16 panel, u16 cursor, u16 first, u16 buttons,
-                     struct Regs STACK *r);
-struct Onward F00_00(u16 panel, struct Regs STACK *r);
+                     struct Regs *r);
+struct Onward F00_00(u16 panel, struct Regs *r);
 struct Onward F00_05(u16 panel, u16 cursor, u16 first, u16 buttons,
-                     struct Regs STACK *r);
-struct Onward F01_00(u16 panel, struct Regs STACK *r);
+                     struct Regs *r);
+struct Onward F01_00(u16 panel, struct Regs *r);
 struct Onward F01_05(u16 panel, u16 cursor, u16 first, u16 last,
-                     u16 buttons, struct Regs STACK *r);
-struct Onward F02_00(u16 panel, struct Regs STACK *r);
-struct Onward F03_00(u16 panel, struct Regs STACK *r);
-struct Onward F04_00(u16 panel, struct Regs STACK *r);
-struct Onward F05_00(u16 panel, struct Regs STACK *r);
-struct Onward F06_00(u16 panel, struct Regs STACK *r);
-struct Onward F07_00(u16 panel, struct Regs STACK *r);
-struct Onward F08_00(u16 panel, struct Regs STACK *r);
+                     u16 buttons, struct Regs *r);
+struct Onward F02_00(u16 panel, struct Regs *r);
+struct Onward F03_00(u16 panel, struct Regs *r);
+struct Onward F04_00(u16 panel, struct Regs *r);
+struct Onward F05_00(u16 panel, struct Regs *r);
+struct Onward F06_00(u16 panel, struct Regs *r);
+struct Onward F07_00(u16 panel, struct Regs *r);
+struct Onward F08_00(u16 panel, struct Regs *r);
 struct Onward F76_00(u16 panel);
 struct Onward F76_01(u16 panel);
 struct Onward F09_00(u16 panel);
@@ -1020,7 +973,7 @@ struct Onward F64_00(u16 panel);
 struct Onward F33_00(u16 panel);
 struct Onward F34_00(u16 panel);
 struct Onward F34_10(u16 panel);
-u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open);
+u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open);
 void V00_10(u16 handle);
 void V13_00(void);
 void V13_01(u16 changed);
@@ -1209,7 +1162,7 @@ void DeCode(u8 *at, u16 count);
    segment, and `segment` is where what a box shows and a dialog sets is,
    MAIN_SEG for the main data. See each in dialog.c. */
 void DialBox(u16 place, u16 box, u16 include, u16 segment,
-             struct Box STACK *where);
+             struct Box *where);
 u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment);
 void InSt10(u16 place, u16 text, u16 length, u16 color);
 struct Buttons {                        /* what MinMnu returns: */
@@ -1247,8 +1200,8 @@ struct Entry {
                                            segment of the file */
     u16 end;                            /* 1 if the file ends there */
 };
-struct Entry FndItem(const u8 __far *file);
-u16 FindExt(const u8 __far *name);
+struct Entry FndItem(const u8 *file);
+u16 FindExt(const u8 *name);
 /* Waiting for a key, and a line that is typed into: see each in input.c.
    Input and Input0 return the key, the scan code in the high byte, where
    FCh says that the mouse did something; Input0 says besides whether
@@ -1290,7 +1243,7 @@ void Beep(void);
 u16 UpCase(u16 letter);
 void SetDTA(void);
 u16 TstDrv(u16 letter);
-struct Answer OpenFil(const u8 __far *name, u16 mode);
+struct Answer OpenFil(const u8 *name, u16 mode);
 u16 SetPth(void);
 u16 Fantom(u16 drive);
 u16 ChgDisk(const u8 *path);
@@ -1315,7 +1268,7 @@ u16 InWind(u16 where, u16 begin, u16 size);
 /* The screen, its cursor, and windows of the screen buffer: see each in
    window.c. A place has the row in its high byte, and a size the rows.
    `buffer` is an address in the main data. */
-u16 ChkMode(struct Screen STACK *screen);
+u16 ChkMode(struct Screen *screen);
 void Cursor(u16 place);
 void Cursor1(void);
 u16 ChgCur(void);
@@ -1336,7 +1289,7 @@ u16 *BoxLine(u16 *screen, u16 cell, u16 ends, u16 margin, u16 width);
 u16 *BoxDubl(u16 *screen, u16 color, u16 rows, u16 margin, u16 width);
 void MinBox(u16 begin, u16 size, u16 color);
 u16 StdLine(u16 place, u16 cell, u16 ends, u16 size);
-void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where);
+void OncZoom(u16 place, u16 box, u16 include, struct Box *where);
 /* The screen blanker, which comes back when a key is pressed or the mouse
    moved, and the word to DOS that the program is idle: see each in
    blank.c. */
@@ -1349,7 +1302,7 @@ void LeaveTm(void);
    read. */
 u16 AsmSeg(void);
 u16 IsCrLf(u16 word);
-u16 InvVar(u8 __far *variable);
+u16 InvVar(u8 *variable);
 u16 ChkSum(const u8 *data, u16 length);
 struct Paged {
     u16 cursor;                         /* the line that the cursor is on */
@@ -1367,23 +1320,16 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    and a number that is written out in a file is a place that has still
    to go through one of them, and harness/hostcheck.py counts it.
 
-   Each has two bodies. The first is for DOS in 16 bits, and is what
-   the files did before the words were here: a far pointer is a segment
-   and an offset in one number of 32 bits, and a near one is the offset
-   in the segment of the main data, which begins that segment.
-
-   The second is for a memory that is one address after another: a
-   program of 32 bits, and the gcc of the host check. It holds the
-   memory of the first inside the flat one, so that every number means
-   what it meant: a megabyte counted in paragraphs from ARENA, which is
-   64K below the main data. A segment `s` and an offset `o` are the
-   address ARENA + 16 * s + o there, as they are 16 * s + o on DOS. The
-   main data is then in the segment 1000h whatever its address, the
-   tables are known by offsets from 32K below Title_S, and a panel or
-   the viewer's text is in whatever paragraphs the system's functions
-   for the memory hand out. Nothing has run the second bodies: they
-   compile, and the rest is from reading. What each takes for granted is
-   said at it, and what all of them do:
+   The program has the memory of the original inside its own, which is
+   one address after another, so that every number means what it meant:
+   a megabyte counted in paragraphs from ARENA, which is 64K below the
+   main data. A segment `s` and an offset `o` are the address ARENA +
+   16 * s + o there, as they are 16 * s + o on DOS. The main data is
+   then in the segment 1000h whatever its address, the tables are known
+   by offsets from 32K below Title_S, and a panel or the viewer's text
+   is in whatever paragraphs the system's functions for the memory hand
+   out. What each word takes for granted is said at it, and what all of
+   them do:
 
      - Whatever is named by a segment lies between ARENA and a megabyte
        and 64K behind it, at an address that is ARENA and a number of
@@ -1394,69 +1340,18 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
        main data and 32K below Title_S. The language promises nothing
        of that. Open Watcom and gcc take it.
      - A pointer that such a word has made is stepped as a pointer. On
-       DOS a far pointer that is stepped past FFFFh begins its segment
-       again and a near one the main data; here it goes on, 64K further.
-       What wraps round has to do so in the number, before the word
-       makes the pointer: the words cut a segment and an offset to 16
-       bits each, as a register does.
+       DOS in 16 bits a pointer that is stepped past FFFFh begins its
+       segment again; here it goes on, 64K further. What wraps round
+       has to do so in the number, before the word makes the pointer:
+       the words cut a segment and an offset to 16 bits each, as a
+       register does.
      - Which of two pointers is the greater, and how far they are
-       apart, is said by their addresses. On DOS it is said by the
-       offsets of two far pointers alone, whatever their segments.
+       apart, is said by their addresses. In the original it is said
+       by two offsets alone, whatever their segments.
 
-   TODO.md, "The portable C in 32 bits: the plan", has the megabyte and
-   who takes it down again: the second bodies go when the numbers have
-   become pointers, the first with the build for 16 bits. */
-#ifdef __I86__
-
-/* The segment of the main data, as a number: this compiler makes a far
-   pointer of a near one with DS, and that is not read anywhere else. It
-   is the segment of all that DS is on. */
-#define MAIN_SEG ((u16)((u32)(void __far *)&md >> 16))
-
-/* What is at an offset in a segment: a far pointer to the byte. */
-#define AT(segment, offset) \
-    ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-
-/* The segment of a far pointer; and its offset, in the segment that it
-   was made with, which is named for the other body and not read. */
-#define SEG_OF(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))
-#define OFFSET_IN_SEG(segment, pointer) ((u16)(u32)(pointer))
-
-/* The panel in the segment `panel`: what the assembly has in DS where it
-   says WCBseg. */
-#define PANEL(panel) ((struct WCBdef __far *)((u32)(panel) << 16))
-
-/* The segment of the tables, by one of them: that of any, a number
-   that DOS sets when it loads the program. AsmSeg of misc.c answers
-   with it, by Title_S. */
-#define TABLES_BY(text) SEG_OF(text)
-
-/* A table as a number: the offset of a box, a dialog or a text in the
-   segment of the tables. The compiler makes of it the offset alone,
-   with no relocation. */
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
-/* What a word of a table names, as the same number: a box has such a
-   word for each of its lines and a dialog for its box and its buttons,
-   and tables.h has it as a pointer. In a file of tables a pointer is
-   the offset in their segment, so the word is the number already. The
-   pointer that it is here is a near one, which code would follow into
-   the main data: it is read for this number and never read through.
-   And the number in a word that holds one where it could name
-   something, NUMBER of tables.h. */
-#define NAMED(names) ((u16)(names))
-#define NUMBER_OF(names) ((u16)(names))
-
-/* A far pointer that is known to point into the main data, as a near
-   one: what MvzLine, AddFile and CutPath return. */
-#define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
-
-/* A place of the main data as a number, which is what a near pointer
-   is here; and the pointer to a place that is kept as a number. */
-#define MD_PLACE(pointer) ((u16)(pointer))
-#define MD_POINTER(place) ((u8 *)(place))
-
-#else
+   TODO.md, "The portable C in a flat memory: the plan", has who takes
+   the megabyte down again: the words go when the numbers have become
+   pointers. */
 
 /* Where the megabyte begins. It takes for granted that an address 64K
    below the main data can be formed and counted from. */
@@ -1466,7 +1361,7 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    that this is a constant, whatever the address of the main data is. It
    takes for granted that what is read in this segment behind the main
    data, up to its offset FFFFh, is what the linker has put behind
-   `md`, as it is on DOS. */
+   `md`. */
 #define MAIN_SEG 0x1000
 
 /* What is at an offset in a segment: a pointer to the byte. Both are
@@ -1474,7 +1369,7 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    means what it means on DOS. It takes for granted that the segment is
    one of the megabyte: the main data's, that of the tables, or one that
    the functions for the memory handed out. A segment of DOS's own, the
-   PSP's or the environment's, is not: those are read in dos.c alone. */
+   PSP's or the environment's, is not: those are read in dos32.c alone. */
 #define AT(segment, offset) \
     (ARENA + ((u32)(u16)(segment) << 4) + (u16)(offset))
 
@@ -1513,8 +1408,7 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    tables that are written to among them, lies from 32K below Title_S to
    32K less 16 bytes behind it: what does not gets an offset that has
    wrapped round, with no word said. And the compiler makes no constant
-   of it, where the first body is one: it cannot stand in the value of a
-   static object. */
+   of it: it cannot stand in the value of a static object. */
 #define OFFSET(object) \
     ((u16)((const u8 *)(object) - AT(TABLES_BY(Title_S), 0)))
 
@@ -1545,8 +1439,6 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #define MD_PLACE(pointer) ((u16)((const u8 *)(pointer) - (const u8 *)&md))
 #define MD_POINTER(place) ((u8 *)&md + (u16)(place))
 
-#endif
-
 /* Where in a panel's segment its list of files begins, DskBuf, and where
    in the main data the list of the tree's directories, TreeBuf.TreList.
    The assembly keeps places in both as addresses, not as numbers. */
@@ -1558,7 +1450,7 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
    DOS, where the offset of a pointer wraps round with it: `wcb` is
    where the panel's segment begins, PANEL of it, at every use. */
 #define ENTRY(wcb, address) \
-    ((struct FILENT __far *)((u8 __far *)(wcb) + (u16)(address)))
+    ((struct FILENT *)((u8 *)(wcb) + (u16)(address)))
 
 /* Bits of a file's attributes. The two highest are the program's own, in
    its lists of files. */

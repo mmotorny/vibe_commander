@@ -79,7 +79,7 @@ u16 InvWCB(u16 panel)
    answers in the carry flag. */
 u16 FilePan(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
 
     return wcb->Visible != 0 && wcb->WinTyp == 0;
 }
@@ -106,9 +106,9 @@ u16 FilePan(u16 panel)
             last--; \
     } while (0)
 
-void AdrNum(u16 panel, struct Place STACK *place)
+void AdrNum(u16 panel, struct Place *place)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u16 cursor, first, last, lines;
 
     PLACE(wcb, cursor, first, last, lines);
@@ -130,7 +130,7 @@ u16 NumAdr(u16 panel, u16 number)
    return those it had. */
 struct Shown ChgAdr(u16 panel, u16 cursor, u16 first)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct Shown was;
 
     if (wcb->WinTyp == 0) {
@@ -153,7 +153,7 @@ struct Shown ChgAdr(u16 panel, u16 cursor, u16 first)
    brief has three columns of lines. */
 void CorPar(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u16 cursor, first, last, lines, below;
 
     if (wcb->WinTyp > 1)

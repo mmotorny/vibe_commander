@@ -13,8 +13,7 @@
    left and prints its pages. What is asked is what the program asks,
    and what it could: a call that fails, a file that is not there, a
    drive that there is not, a count of none. What is said below of 16
-   bits is of then, and the lines that only that build read are left
-   for the piece that takes such lines out of the tree.
+   bits is of then.
 
    It writes a page at a time and then waits as the program waits, with
    the idle call, a look at the mouse and a look for a key, so each page
@@ -31,13 +30,13 @@
 
    The toy has no C library, as the program has none. It writes straight
    into the memory of the display, so that what the functions for the
-   screen do shows beside it. On DOS in 16 bits the main data fills the
-   segment that DS is on all but for 2.9 KB, so a text of the toy is a
-   constant of the code segment, CODE, by the macros below, and its
-   buffers are those of the main data; and a pointer to a local variable
-   would be one into another segment, the stack's, so there is none.
+   screen do shows beside it. It is written as the program of 16 bits
+   let it be written, where the main data filled the segment that DS was
+   on all but for 2.9 KB: a text of the toy is a constant, by the macros
+   below, its buffers are those of the main data, and it has no pointer
+   to a local variable, which was one into another segment there.
 
-   In 32 bits it also looks, before each thing that it writes, whether
+   It also looks, before each thing that it writes, whether
    ES is still on the data and the direction flag still clear, which the
    compiler takes them to be and an interrupt through the extender might
    not leave them: `strayed` and a number on the screen says that one
@@ -61,30 +60,17 @@
 #include "vc.h"
 
 /* The main data, which the functions keep two things in: ErrDat and
-   Screen. On DOS in 16 bits it is the first thing of the segment that
-   DS is on, as main.c of the program has it. */
-#ifdef __I86__
-#pragma data_seg("MAINDATA", "MAIN")
-#endif
+   Screen. */
 struct MainDat md;
-#ifdef __I86__
-#pragma data_seg()
-#endif
 
 /* A place of the machine's memory, by its segment and offset in real
    mode. */
-#ifdef __I86__
-#define MACHINE(type, segment, offset) \
-    ((type __far *)((u32)(segment) << 16 | (offset)))
-#else
 #define MACHINE(type, segment, offset) \
     ((type *)(((u32)(segment) << 4) + (offset)))
-#endif
 #define DISPLAY MACHINE(u16, 0xB800, 0)
 
-/* A text of the toy, in the code segment where the memory has segments;
-   and one written out. */
-#define TEXT(name, text) static const u8 CODE name[] = text
+/* A text of the toy; and one written out. */
+#define TEXT(name, text) static const u8 name[] = text
 #define SAY(text) { TEXT(said, text); Put(said); }
 
 /* The buffers. BIG is the copies of the screen that the main data has
@@ -95,7 +81,6 @@ struct MainDat md;
 
 static u16 Row, Col;
 
-#ifndef __I86__
 static u32 Strayed(void);
 #pragma aux Strayed = \
     "mov ax,es" \
@@ -110,7 +95,6 @@ static u32 Strayed(void);
     "pop es" \
     "cld" \
     value [eax] modify exact [eax edx]
-#endif
 
 static void Cell(u16 character)
 {
@@ -134,9 +118,8 @@ static void Digits(u32 value, u16 digits)
         Cell(hex[(u16)(value >> (digits << 2)) & 15]);
 }
 
-static void Put(const u8 FAR *text)
+static void Put(const u8 *text)
 {
-#ifndef __I86__
     u32 strayed = Strayed();
 
     if (strayed != 0) {
@@ -148,7 +131,6 @@ static void Put(const u8 FAR *text)
         Digits(strayed, 4);
         Cell(' ');
     }
-#endif
     while (*text != 0)
         Cell(*text++);
 }
@@ -183,7 +165,7 @@ static void Hex(u32 value, u16 digits)
 
 /* A text of the memory between quotes, as far as its zero byte or so
    many characters, with a dot for what is no character. */
-static void Quoted(const u8 FAR *text, u16 most)
+static void Quoted(const u8 *text, u16 most)
 {
     Cell('\'');
     for (; *text != 0 && most != 0; text++, most--)
@@ -193,7 +175,7 @@ static void Quoted(const u8 FAR *text, u16 most)
 }
 
 /* What a function answered, behind its name. */
-static void Answer(const u8 FAR *name, struct Answer answer)
+static void Answer(const u8 *name, struct Answer answer)
 {
     Put(name);
     Cell(' ');
@@ -204,7 +186,7 @@ static void Answer(const u8 FAR *name, struct Answer answer)
 
 #define ANSWER(name, call) { TEXT(said, name); Answer(said, call); }
 
-static void Copy(u8 *to, const u8 FAR *from, u16 count)
+static void Copy(u8 *to, const u8 *from, u16 count)
 {
     while (count-- != 0)
         *to++ = *from++;
@@ -384,7 +366,7 @@ static void System(void)
     Line();
 }
 
-static void Place(const u8 FAR *name, struct FilePlace place)
+static void Place(const u8 *name, struct FilePlace place)
 {
     Put(name);
     Cell(' ');
@@ -395,7 +377,7 @@ static void Place(const u8 FAR *name, struct FilePlace place)
 
 #define PLACE(name, call) { TEXT(said, name); Place(said, call); }
 
-static void Attr(const u8 FAR *name, struct FileAttr attr)
+static void Attr(const u8 *name, struct FileAttr attr)
 {
     Put(name);
     Cell(' ');
@@ -407,7 +389,7 @@ static void Attr(const u8 FAR *name, struct FileAttr attr)
 
 #define ATTR(name, call) { TEXT(said, name); Attr(said, call); }
 
-static void Stamp(const u8 FAR *name, struct FileStamp stamp)
+static void Stamp(const u8 *name, struct FileStamp stamp)
 {
     Put(name);
     Cell(' ');
@@ -558,7 +540,7 @@ static void Found(u16 stamped)
 
 /* A search to its end, each thing found written, and the error that
    ended it. */
-static void Listed(const u8 FAR *pattern, u16 attributes, u16 stamped)
+static void Listed(const u8 *pattern, u16 attributes, u16 stamped)
 {
     struct Answer found;
 
@@ -653,7 +635,7 @@ static void Finds(void)
 }
 
 /* A cursor written out, and cells of the screen. */
-static void Caret(const u8 FAR *name, u16 page)
+static void Caret(const u8 *name, u16 page)
 {
     struct CursorAt cursor;
 
@@ -764,7 +746,7 @@ static void Display(void)
 }
 
 /* The mouse. */
-static void Where(const u8 FAR *name)
+static void Where(const u8 *name)
 {
     struct MouseAt at;
 
@@ -825,7 +807,7 @@ static void Pointer(void)
 /* The keys that are held, and Ins taken for let go. */
 static void Keyboard(void)
 {
-    u8 FAR *held = MACHINE(u8, 0x40, 0x18);
+    u8 *held = MACHINE(u8, 0x40, 0x18);
 
     SAY("KeysHeld "); H2(KeysHeld());
     *held |= 0x80;
@@ -846,9 +828,9 @@ TEXT(No_S, "");
 
 /* The text of the environment that begins with `name`, behind that; or
    an empty one. */
-static const u8 FAR *Variable(const u8 FAR *name)
+static const u8 *Variable(const u8 *name)
 {
-    const u8 FAR *text = ProgramEnvironment();
+    const u8 *text = ProgramEnvironment();
     u16 at;
 
     while (*text != 0) {
@@ -864,9 +846,9 @@ static const u8 FAR *Variable(const u8 FAR *name)
 
 /* The path of the toy's own file, which DOS has behind the end of the
    environment. */
-static const u8 FAR *Self(void)
+static const u8 *Self(void)
 {
-    const u8 FAR *text = ProgramEnvironment();
+    const u8 *text = ProgramEnvironment();
 
     while (text[0] != 0 || text[1] != 0)
         text++;
@@ -875,8 +857,8 @@ static const u8 FAR *Self(void)
 
 /* A command tail made of three texts, in the small buffer from 128 on:
    a count, the characters, a carriage return. */
-static u8 *Tail(const u8 FAR *first, const u8 FAR *second,
-                const u8 FAR *third)
+static u8 *Tail(const u8 *first, const u8 *second,
+                const u8 *third)
 {
     u8 *tail = SMALL + 128;
     u16 count = 0;
@@ -898,7 +880,7 @@ static u8 *Tail(const u8 FAR *first, const u8 FAR *second,
    program's are. */
 static void Others(void)
 {
-    const u8 FAR *shell = Variable(Comspec_S);
+    const u8 *shell = Variable(Comspec_S);
     struct Answer asked;
     u16 at;
 
@@ -945,7 +927,7 @@ static void Copies(void)
    ends with 5. */
 static void Second(void)
 {
-    const u8 FAR *tail = ProgramTail();
+    const u8 *tail = ProgramTail();
     struct Block block;
     u16 at;
 
@@ -1076,7 +1058,7 @@ static void Older(void)
    error if it failed, and else how far what is answered is behind the
    block `from`. DOS leaves the block's segment in AX where it has made
    one longer or shorter. */
-static void Block(const u8 FAR *name, struct Block block, u16 from)
+static void Block(const u8 *name, struct Block block, u16 from)
 {
     Put(name);
     Cell(' ');
@@ -1098,7 +1080,7 @@ static void Block(const u8 FAR *name, struct Block block, u16 from)
 static void Memory(void)
 {
     struct Block block;
-    const u8 FAR *text;
+    const u8 *text;
     u16 all, first, second, third, at;
 
     block = MemTake(0xFFFF);
@@ -1111,10 +1093,10 @@ static void Memory(void)
     first = block.value;
     SAY("MemTake of all that: "); H4(block.failed);
     H2(block.largest == all);
-    *(u8 FAR *)AT(first, 0) = 0x12;
-    *(u8 FAR *)AT(first + all - 1, 15) = 0x34;
-    SAY("written at its ends: "); H2(*(const u8 FAR *)AT(first, 0));
-    H2(*(const u8 FAR *)AT(first + all - 1, 15));
+    *(u8 *)AT(first, 0) = 0x12;
+    *(u8 *)AT(first + all - 1, 15) = 0x34;
+    SAY("written at its ends: "); H2(*(const u8 *)AT(first, 0));
+    H2(*(const u8 *)AT(first + all - 1, 15));
     Line();
     /* DOS on the bench has a block or two free besides that one, lower
        in its memory, and how many and how long depends on the bench:
@@ -1158,7 +1140,7 @@ static void Memory(void)
     /* A block that is none: what is in front of it is the first
        paragraph of a block, written here. */
     for (at = 0; at < 16; at++)
-        *(u8 FAR *)AT(first, at) = 0;
+        *(u8 *)AT(first, at) = 0;
     ANSWER("MemGive of what is no block:", MemGive(first + 1));
     BLOCK("MemResize of it:", MemResize(first + 1, 1), first);
     Line();
@@ -1217,7 +1199,7 @@ static u16 Key(void)
    inside this, with the system in the middle of the call. */
 static u16 Asked;
 
-static u16 Device(u16 how, u16 error, const u8 FAR *device)
+static u16 Device(u16 how, u16 error, const u8 *device)
 {
     u16 key;
 
@@ -1354,7 +1336,7 @@ static void Breaks(void)
    does. */
 static void Ended(void)
 {
-    const u32 FAR *goes = (const u32 FAR *)(ProgramTail() - 0x81 + 0x0A);
+    const u32 *goes = (const u32 *)(ProgramTail() - 0x81 + 0x0A);
     u32 was = *goes, taken;
 
     SAY("The program ended by another's hand, what the PSP names:");
@@ -1379,11 +1361,9 @@ static void Ended(void)
 
 /* The pages, a step of the script behind each.
 
-   The toy is entered where the program is, at Alloc0 of dos.c in 16
-   bits and at Start of dos32.c in 32, each of which calls Main. The
-   first thing asked is what the program asks first, that it keep no
-   more of the memory than it is: in 16 bits there is none to ask for
-   otherwise. */
+   The toy is entered where the program is, at Start of dos32.c, which
+   calls Main. The first thing asked is what the program asks first,
+   that it keep no more of the memory than it is. */
 void Main(void)
 {
     Owned = MemOwn().failed;
@@ -1424,10 +1404,9 @@ void Main(void)
     Page(0);
     /* The toy ends as the program does, but for its end, which it has
        left taken (see Ended): it gives Ctrl-Break back, and leaves the
-       critical error and Ctrl-C taken, which DOS puts back by itself
-       in 16 bits and ProgramEnd of dos32.c in 32. An interrupt that is
-       left taken there has the extender write a warning under the last
-       line. */
+       critical error and Ctrl-C taken, which ProgramEnd of dos32.c
+       puts back. An interrupt that is left taken there has the extender
+       write a warning under the last line. */
     CtrlBreakGive();
     SAY("ProgramEnd 7");
     Line();

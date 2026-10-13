@@ -7,16 +7,16 @@
  * Translated from VCSUB1.INC and VCSUB3.INC.
  *
  * What the system is asked is in sys.h, and how DOS and the BIOS are
- * asked for it in dos.c; this is what the program makes of the answers.
+ * asked for it in dos32.c; this is what the program makes of the answers.
  * Intr21 of the original, DOS called with the program's errors looked
  * for, is no routine here: it is in every function of sys.h that is
- * asked so, in dos.c.
+ * asked so, in dos32.c.
  */
 #include "vc.h"
 
 /* The dialog that asks for the disk of a drive, a constant of
    system_t.c: Dialog takes it by its offset. */
-extern const u8 __far Fant_B[];
+extern const u8 Fant_B[];
 
 #define KEY_CTRL_C 0x2E03
 #define KEY_ESC    0x011B
@@ -111,7 +111,7 @@ u16 TstDrv(u16 letter)
    have the file open in a way that does not go with the mode, it is
    asked once more with what the mode says of sharing left out. Returns
    the handle, or the error. */
-struct Answer OpenFil(const u8 __far *name, u16 mode)
+struct Answer OpenFil(const u8 *name, u16 mode)
 {
     struct Answer opened = FileOpen(name, mode);
 

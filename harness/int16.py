@@ -2,9 +2,24 @@
 """Where the portable C can tell an int of 32 bits from one of 16.
 
 The portable C, src/portable_c/, was written for a compiler whose int
-has 16 bits, and is on its way to one whose int has 32 (TODO.md, "The
-portable C in 32 bits: the plan"). Its numbers are u8, u16 and u32, as
-wide in the one as in the other, so what it keeps is the same in both.
+has 16 bits, translated from assembly and judged so, and is built by
+one whose int has 32: the program of 16 bits is gone (TODO.md, "The
+portable C in 32 bits: the plan"). So "DOS" and "the two builds" below
+are the code as it was written and judged, with an int of 16 bits, and
+the code as it is compiled now. A place is where the program can do
+otherwise than what it was translated from by the int alone, and the
+record says of each why it does not.
+
+That is also where step 2 of the road widens (TODO.md, "The portable C
+in a flat memory: the plan"): a variable is to become wider wherever
+wrapping round at 16 bits would be unexpected, and what is found here
+is every number of 16 bits that is looked at before it is cut, with
+the reason why it stays within. The plan makes this the finder of the
+widths, and its record the start of theirs; until then the test stays
+as it is and the record is kept up.
+
+The numbers of the code are u8, u16 and u32, as wide for the one int as
+for the other, so what it keeps is the same in both.
 What it works out on the way is not. C makes an int of every number
 that is narrower than one before it adds, takes away, multiplies or
 shifts, and of two numbers of 16 bits without a sign that is
@@ -84,15 +99,16 @@ and is read again.
 out what is gone, and writes what is new without a reason: that is then
 written into the file by whoever has read the place, under its line.
 
-What is read: every file of code and of tables that both builds have.
-arith.c and dos.c are of the build for 16 bits alone and dos32.c of the
-other; none of the three is ever compiled for the other int. What a
-macro makes is a place where the macro is used. The words of the
-addresses in vc.h have a second body for a memory without segments
-(TODO.md, "P1, the words in one place"), which is what clang reads; it
-is of the 32 bits alone, and what is written in it is no place. What it
-is handed is read like anything else, and it cuts every number that it
-is handed to 16 bits, as the first body does by other means.
+What is read: every file of code and of tables. dos32.c, the system's
+functions, was written for an int of 32 bits and never compiled for
+another, so a place there has nothing to be the same as: its reason
+says that the number is meant as it is. What a macro makes is a place
+where the macro is used. The words of the addresses in vc.h, WORDS
+below, hold a megabyte of segments and offsets in a memory without
+segments (TODO.md, "P1, the words in one place"): they are of the 32
+bits alone, and what is written in one is no place. What a word is
+handed is read like anything else, and it cuts every number that it is
+handed to 16 bits.
 
 What it cannot see:
 
@@ -170,8 +186,12 @@ OPTIONS = ["--target=i386-pc-linux-gnu", "-x", "c", "-std=c99",
 OFFSETOF = ("-Doffsetof(type,field)="
             "sizeof(char[__builtin_offsetof(type,field)])")
 
-# The files that only one of the two builds has.
-ONE_BUILD = {"arith.c", "dos.c", "dos32.c"}
+# The words of the addresses, of vc.h: what is written in one is no
+# place. PLACE is of harness/int16check.c, which has it written as one
+# of them, to hold this to.
+WORDS = {"ARENA", "MAIN_SEG", "AT", "SEG_OF", "OFFSET_IN_SEG", "PANEL",
+         "TABLES_BY", "OFFSET", "NAMED", "NUMBER_OF", "NEAR", "MD_PLACE",
+         "MD_POINTER", "PLACE"}
 
 # The kinds, in the order of the summary: the name that the record has
 # for each, and what is done there with a number that the two builds may
@@ -408,28 +428,17 @@ class Lines:
         node["_at"] = at
 
 
-def only32(text):
-    """The lines of a file that only a compiler for 32 bits reads: what
-    stands where __I86__ is not defined."""
-    lines, nest = set(), []
+def in_words(text):
+    """The lines of a file that are the body of a word of the addresses:
+    of a #define of one of WORDS, with the lines that it goes on in."""
+    lines, inside = set(), False
     for number, line in enumerate(text.split("\n"), 1):
-        found = re.match(r"\s*#\s*(ifdef|ifndef|if|else|elif|endif)\b(.*)",
-                         line)
-        if not found:
-            if 32 in nest:
-                lines.add(number)
-            continue
-        word, rest = found.group(1), found.group(2).strip()
-        if word == "ifdef":
-            nest.append(16 if rest == "__I86__" else 0)
-        elif word == "ifndef":
-            nest.append(32 if rest == "__I86__" else 0)
-        elif word == "if":
-            nest.append(0)
-        elif word == "else" and nest and nest[-1]:
-            nest[-1] = 48 - nest[-1]
-        elif word == "endif" and nest:
-            nest.pop()
+        if not inside:
+            found = re.match(r"\s*#\s*define\s+(\w+)", line)
+            inside = bool(found) and found.group(1) in WORDS
+        if inside:
+            lines.add(number)
+            inside = line.rstrip().endswith("\\")
     return lines
 
 
@@ -440,7 +449,7 @@ class Finder:
         self.name = name
         self.sizes = sizes
         self.texts = {"<stdin>": text}
-        self.only32 = {}
+        self.words = {}
         self.enums = {}
         self.function = ""
         self.counted = {}               # a loop's variable: its bounds
@@ -458,18 +467,18 @@ class Finder:
                 self.texts[file] = ""
         return self.texts[file]
 
-    def flat_alone(self, written):
-        """Is this written where only the build for 32 bits reads?"""
+    def in_word(self, written):
+        """Is this written in a word of the addresses?"""
         file, line = written[0], written[1]
-        if file not in self.only32:
-            self.only32[file] = only32(self.text(file))
-        return line in self.only32[file]
+        if file not in self.words:
+            self.words[file] = in_words(self.text(file))
+        return line in self.words[file]
 
     def report(self, node, kind):
         used, begins, ends, end_used = node["_at"]
-        if (self.flat_alone(begins) and self.flat_alone(ends)
+        if (self.in_word(begins) and self.in_word(ends)
                 and used[:3] == end_used[:3]):
-            return                      # all of it one word's second body
+            return                      # all of it one word's body
         file = self.name if used[0] == "<stdin>" else Path(used[0]).name
         self.places.add((file, used[1], kind, self.function))
 
@@ -982,8 +991,7 @@ def read(command, source, name, text=None):
 def survey(command, source):
     """Every place of the tree, as (file, line, kind, function), and the
     names of the files that were read."""
-    names = sorted(path.name for path in source.glob("*.c")
-                   if path.name not in ONE_BUILD)
+    names = sorted(path.name for path in source.glob("*.c"))
     with ThreadPoolExecutor() as pool:
         results = list(pool.map(lambda name: read(command, source, name),
                                 names))

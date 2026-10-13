@@ -3,10 +3,11 @@
  * functions of sys.h for a program whose memory is one address after
  * another, compiled by Open Watcom's wcc386 in the flat model and
  * started by the DOS extender DOS/32A, which is the stub of its file.
- * dos.c is the same functions for the program of 16 bits, and the build
- * takes one of the two files. What is asked and in which order is the
- * same in both, a function at a time, since that is behaviour: read
- * dos.c beside this.
+ * It was written beside dos.c, the same functions for the program of 16
+ * bits that the portable C was before, and is the one file of them
+ * since that went. What is asked and in which order is what that file
+ * asked, a function at a time, since that is behaviour; where this says
+ * what the program of 16 bits did, that file did it.
  *
  * DOS, the BIOS and the mouse driver are of real mode, and the program
  * is not: it calls them by the same software interrupts, and the
@@ -53,10 +54,10 @@
  * begin at 0.
  *
  * Each interrupt is written once, as inline assembly, in a #pragma aux
- * of its own, as in dos.c. A register goes into the instruction with all
- * of its 32 bits, since the extender reads all of them where it
- * translates; of what comes back the program reads the low words, which
- * is what DOS and the BIOS answer in.
+ * of its own. A register goes into the instruction with all of its 32
+ * bits, since the extender reads all of them where it translates; of
+ * what comes back the program reads the low words, which is what DOS
+ * and the BIOS answer in.
  *
  * The program begins here too, at Start, where the extender enters it.
  *
@@ -105,8 +106,8 @@ void _enable(void);
    carry flag is set then. The pointer to `regs` waits on the stack
    meanwhile, where EBP is kept too. POP, MOV and XCHG leave the flags
    alone. The carry flag is not set first for the calls of DOS that
-   leave it as they find it, as dos.c sets it: the extender does not
-   hand it on. See Ask. */
+   leave it as they find it, as the program of 16 bits set it: the
+   extender does not hand it on. See Ask. */
 static u32 Dos(struct DosRegs *regs);
 #pragma aux Dos = \
     "push ebp" \
@@ -156,7 +157,7 @@ static u32 Dpmi(struct DosRegs *regs);
 
 /* INT 10h with EAX, EBX, ECX and EDX, whose low words go back into the
    four words at `regs` as the BIOS leaves them: more than a function can
-   return. EBP is kept around it, as dos.c keeps BP. */
+   return. EBP is kept around it, since a BIOS may lose it. */
 static void Video(u32 eax, u32 ebx, u32 ecx, u32 edx, struct BiosRegs *regs);
 #pragma aux Video = \
     "push ebp" \
@@ -339,8 +340,8 @@ static u16 Real(struct DosRegs *regs, u16 number, u32 routine)
 }
 
 /* DOS, with the registers of `regs` and their answer there. Not 0 if
-   DOS leaves the carry flag set: FFFFh, as in dos.c, which is what a
-   function that asks bare answers with for `failed`. */
+   DOS leaves the carry flag set: FFFFh, which is what a function that
+   asks bare answers with for `failed`. */
 static u16 Call(struct DosRegs *regs)
 {
     if (regs->low)
@@ -371,8 +372,8 @@ static u16 Mouse(u16 ax, u16 bx, u16 cx, u16 dx)
 
 /*
  * The functions of sys.h. What each is for is said there; here is how
- * DOS, the BIOS and the mouse driver are asked for it, which dos.c says
- * of each call and this does not say again.
+ * DOS, the BIOS and the mouse driver are asked for it. The service is
+ * the number that a function puts into EAX.
  */
 
 /* A pointer as the register that DOS takes it in. */
@@ -382,9 +383,9 @@ static u16 Mouse(u16 ax, u16 bx, u16 cx, u16 dx)
                                            user gave up, when a device was
                                            not ready */
 
-/* The registers of a call: these four, and 0 in the two others. dos.c
-   leaves a register that a call does not read as it happens to be, and
-   0 is what this hands DOS there. */
+/* The registers of a call: these four, and 0 in the two others. The
+   program of 16 bits left a register that a call does not read as it
+   happened to be, and 0 is what this hands DOS there. */
 static void Set(struct DosRegs *regs, u32 eax, u32 ebx, u32 ecx, u32 edx)
 {
     regs->eax = eax;
@@ -453,11 +454,11 @@ static struct Answer Tell(struct DosRegs *regs)
    `flagged` is not 0 where the original has the carry flag set when it
    calls, which it has at two calls that DOS leaves the flag at, 36h and
    13h: the flag is then set afterwards whatever DOS did, and the
-   original takes that for an error. dos.c sets the flag and lets DOS
-   leave it. Here that does not do: a flag that the program has set does
-   not come back set through the extender, as the toy showed of 36h. So
-   the flag counts as set afterwards if it was to be set before, which
-   is the same for a DOS that leaves it. */
+   original takes that for an error. The program of 16 bits set the flag
+   and let DOS leave it. Here that does not do: a flag that the program
+   has set does not come back set through the extender, as the toy
+   showed of 36h. So the flag counts as set afterwards if it was to be
+   set before, which is the same for a DOS that leaves it. */
 static struct Answer Ask(struct DosRegs *regs, u16 flagged)
 {
     u32 ebx, ecx, edx;
@@ -503,17 +504,17 @@ static struct Answer Handled(u16 ax, u16 handle, u32 edx, u16 count)
 
 /* Files. */
 
-struct Answer FileCreate(const u8 FAR *name, u16 attributes)
+struct Answer FileCreate(const u8 *name, u16 attributes)
 {
     return Named(0x3C00, name, attributes);
 }
 
-struct Answer FileOpen(const u8 FAR *name, u16 mode)
+struct Answer FileOpen(const u8 *name, u16 mode)
 {
     return Named(0x3D00 | mode & 0xFF, name, 0);
 }
 
-struct Answer FileOpenBare(const u8 FAR *name, u16 mode)
+struct Answer FileOpenBare(const u8 *name, u16 mode)
 {
     struct DosRegs regs;
 
@@ -534,12 +535,12 @@ struct Answer FileCloseBare(u16 handle)
     return Tell(&regs);
 }
 
-struct Answer FileRead(u16 handle, u8 FAR *to, u16 count)
+struct Answer FileRead(u16 handle, u8 *to, u16 count)
 {
     return Handled(0x3F00, handle, ADDRESS(to), count);
 }
 
-struct Answer FileReadBare(u16 handle, u8 FAR *to, u16 count)
+struct Answer FileReadBare(u16 handle, u8 *to, u16 count)
 {
     struct DosRegs regs;
 
@@ -547,7 +548,7 @@ struct Answer FileReadBare(u16 handle, u8 FAR *to, u16 count)
     return Tell(&regs);
 }
 
-struct Answer FileWrite(u16 handle, const u8 FAR *from, u16 count)
+struct Answer FileWrite(u16 handle, const u8 *from, u16 count)
 {
     return Handled(0x4000, handle, ADDRESS(from), count);
 }
@@ -563,14 +564,14 @@ struct FilePlace FileSeek(u16 handle, u16 from, u32 offset)
     return sought;
 }
 
-struct Answer FileDelete(const u8 FAR *name)
+struct Answer FileDelete(const u8 *name)
 {
     return Named(0x4100, name, 0);
 }
 
 /* The new name is at EDI, in the segment that ES is on, which is the
    program's as every segment is. */
-struct Answer FileRename(const u8 FAR *from, const u8 FAR *to)
+struct Answer FileRename(const u8 *from, const u8 *to)
 {
     struct DosRegs regs;
 
@@ -579,7 +580,7 @@ struct Answer FileRename(const u8 FAR *from, const u8 FAR *to)
     return Ask(&regs, 0);
 }
 
-struct FileAttr FileAttributes(const u8 FAR *name)
+struct FileAttr FileAttributes(const u8 *name)
 {
     struct DosRegs regs;
     struct Answer asked;
@@ -594,7 +595,7 @@ struct FileAttr FileAttributes(const u8 FAR *name)
 }
 
 /* In real mode, for what DOS leaves in AX. */
-struct Answer FileSetAttributes(const u8 FAR *name, u16 attributes)
+struct Answer FileSetAttributes(const u8 *name, u16 attributes)
 {
     struct DosRegs regs;
 
@@ -644,7 +645,7 @@ struct Device FileDevice(u16 handle)
    there, failed or not. */
 #define PATH_SIZE 128
 
-struct Answer FileTrueName(const u8 FAR *name, u8 FAR *to)
+struct Answer FileTrueName(const u8 *name, u8 *to)
 {
     struct DosRegs regs;
     struct Answer asked;
@@ -669,7 +670,7 @@ struct Answer FileTrueName(const u8 FAR *name, u8 FAR *to)
 #define FCB_UNOPENED 16
 #define FCB_EXTENDED 44
 
-u16 FcbParse(const u8 FAR *name, u8 FAR *fcb, u16 how)
+u16 FcbParse(const u8 *name, u8 *fcb, u16 how)
 {
     struct DosRegs regs;
     u16 value;
@@ -684,7 +685,7 @@ u16 FcbParse(const u8 FAR *name, u8 FAR *fcb, u16 how)
     return value;
 }
 
-struct Answer FcbDelete(const u8 FAR *fcb, u16 flagged)
+struct Answer FcbDelete(const u8 *fcb, u16 flagged)
 {
     struct DosRegs regs;
 
@@ -708,7 +709,7 @@ struct Answer FcbDelete(const u8 FAR *fcb, u16 flagged)
 
 static struct DTAs *Record = 0;
 
-void FindRecord(struct DTAs FAR *record)
+void FindRecord(struct DTAs *record)
 {
     struct DosRegs regs;
 
@@ -727,7 +728,7 @@ static struct Answer Searched(struct DosRegs *regs)
     return found;
 }
 
-struct Answer FindFirst(const u8 FAR *pattern, u16 attributes)
+struct Answer FindFirst(const u8 *pattern, u16 attributes)
 {
     struct DosRegs regs;
 
@@ -746,17 +747,17 @@ struct Answer FindNext(void)
     return Searched(&regs);
 }
 
-struct Answer DirMake(const u8 FAR *name)
+struct Answer DirMake(const u8 *name)
 {
     return Named(0x3900, name, 0);
 }
 
-struct Answer DirRemove(const u8 FAR *name)
+struct Answer DirRemove(const u8 *name)
 {
     return Named(0x3A00, name, 0);
 }
 
-struct Answer DirChange(const u8 FAR *name)
+struct Answer DirChange(const u8 *name)
 {
     return Named(0x3B00, name, 0);
 }
@@ -780,12 +781,12 @@ static struct Answer Current(u16 drive, u8 *to, u16 bare)
     return asked;
 }
 
-struct Answer DirCurrent(u16 drive, u8 FAR *to)
+struct Answer DirCurrent(u16 drive, u8 *to)
 {
     return Current(drive, to, 0);
 }
 
-struct Answer DirCurrentBare(u16 drive, u8 FAR *to)
+struct Answer DirCurrentBare(u16 drive, u8 *to)
 {
     return Current(drive, to, 1);
 }
@@ -1123,7 +1124,7 @@ struct Time TimeOfDay(void)
 
 static u32 Capitals = 0;
 
-void CountryInfo(struct CNTRY FAR *to)
+void CountryInfo(struct CNTRY *to)
 {
     struct DosRegs regs;
     u8 *low = LOW(LOW_COUNTRY);
@@ -1207,7 +1208,7 @@ void Idle(void)
    too (0204h), and is an address of protected mode, a selector and an
    offset of 32 bits: so it is kept here, and not in ErrVct and BrkVct of
    the main data, which have four bytes each. DOS is not asked, where
-   dos.c asks it AH 35h and 25h. */
+   the original asks it AH 35h and 25h. */
 
 #define INT_CTRL_BREAK 0x1B             /* the BIOS's, from the keyboard */
 #define INT_CTRL_C     0x23             /* DOS's, where it finds the key */
@@ -1274,8 +1275,8 @@ static DeviceErrorFn *DeviceAsk = 0;
    hands it on. `how` and `error` are AX and DI as DOS has them, and the
    header of the device is at BP:SI of real mode, `base` and `offset`.
    The program is asked, by the function that it handed over, with what
-   sys.h says that such a function takes, as FatErr of dos.c asks it;
-   what it answers goes back to DOS. Where the stack is free is kept
+   sys.h says that such a function takes; what it answers goes back to
+   DOS. Where the stack is free is kept
    around that, since the function may ask what sets it anew. */
 static u32 Arrived(u32 how, u32 error, u32 base, u32 offset)
 {
@@ -1432,12 +1433,12 @@ static void GiveAll(void)
 static const u8 *Psp = 0;
 static const u8 *Environment = 0;
 
-const u8 FAR *ProgramTail(void)
+const u8 *ProgramTail(void)
 {
     return Psp + PSP_TAIL;
 }
 
-const u8 FAR *ProgramEnvironment(void)
+const u8 *ProgramEnvironment(void)
 {
     return Environment;
 }
@@ -1450,11 +1451,12 @@ const u8 FAR *ProgramEnvironment(void)
    tail, of which DOS copies 128 bytes into the PSP of the program
    whatever its count, so 128 go down. The two file control blocks,
    which DOS copies there too, 16 bytes each: the bytes of the main data
-   at 5Ch and at 6Ch, as in dos.c, where Run says why. And the 14 bytes
-   that name them, with the environment.
+   at 5Ch and at 6Ch, where a program hands on those of its own PSP,
+   since the original has ES on the main data when it fills in what
+   names them. And the 14 bytes that name them, with the environment.
 
-   dos.c names no environment, and DOS then gives the program a copy of
-   this one's, which it finds through this program's PSP. Here the PSP
+   The original names no environment, and DOS then gives the program a
+   copy of this one's, which it finds through this program's PSP. Here the PSP
    has a selector of the extender's where DOS looks for the segment
    (see Start), so the environment is named, by its segment: the program
    gets a copy of it all the same. */
@@ -1503,7 +1505,7 @@ static void Run(struct DosRegs *regs, const u8 *name, const u8 *tail)
     SetLow(regs, 0x4B00, LOW_RUN, 0, LOW_NAME);
 }
 
-struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail)
+struct Answer ProgramRun(const u8 *name, const u8 *tail)
 {
     struct DosRegs regs;
     struct Answer ran;
@@ -1515,7 +1517,7 @@ struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail)
     return ran;
 }
 
-struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
+struct Answer ProgramRunBare(const u8 *name, const u8 *tail)
 {
     struct DosRegs regs;
     struct Answer ran;
@@ -1563,7 +1565,7 @@ void ConsoleChar(u16 character)
     Tell(&regs);
 }
 
-void ConsoleText(const u8 FAR *text)
+void ConsoleText(const u8 *text)
 {
     struct DosRegs regs;
 
@@ -1604,7 +1606,7 @@ void KeyForgetIns(void)
 /* The screen. The word of the BIOS's data that says where the page
    begins is at 44Eh, and the memory of the display at B0000h for the
    mode of one colour and at B8000h for the others. Where the cells are
-   is kept where the original keeps it and as dos.c keeps it, in Screen
+   is kept where the original keeps it and as it keeps it, in Screen
    of the main data: a segment of real mode above an offset. */
 
 struct Screen ScreenState(void)
@@ -1712,7 +1714,7 @@ void ScreenMemory(u16 mode, u16 start)
    real mode. */
 #define CELLS ((u16 *)((md.Screen >> 16 << 4) + (u16)md.Screen))
 
-void ScreenPut(u16 cell, const u16 FAR *from, u16 count)
+void ScreenPut(u16 cell, const u16 *from, u16 count)
 {
     u16 *to = CELLS + cell;
 
@@ -1720,7 +1722,7 @@ void ScreenPut(u16 cell, const u16 FAR *from, u16 count)
         *to++ = *from++;
 }
 
-void ScreenGet(u16 cell, u16 FAR *to, u16 count)
+void ScreenGet(u16 cell, u16 *to, u16 count)
 {
     const u16 *from = CELLS + cell;
 
@@ -1776,8 +1778,8 @@ void MousePointer(u16 keep, u16 turn)
 /* The timer: the BIOS's count of ticks since midnight, in its data at
    46Ch. A number of 32 bits is read at once here, and no tick can come
    between its halves; the machine is kept from interrupting all the
-   same, and let again, as dos.c has it, since that leaves it able to
-   interrupt wherever the program asks for the ticks. */
+   same, and let again, as the original has it, since that leaves it
+   able to interrupt wherever the program asks for the ticks. */
 u32 Ticks(void)
 {
     u32 ticks;
@@ -1788,8 +1790,8 @@ u32 Ticks(void)
     return ticks;
 }
 
-/* The interrupt flag set, by the compiler's own function for that,
-   as in dos.c. It is made though the routine that the critical error
+/* The interrupt flag set, by the compiler's own function for that.
+   It is made though the routine that the critical error
    is to arrive at is not: the program calls it behind everything that
    it puts on the screen, and the extender lets a program of protected
    mode set the flag. */
@@ -1801,7 +1803,8 @@ void IntOn(void)
 /* The program ended by another's hand. DOS then goes on at the address
    that the program's PSP has at 0Ah, in the program that started this
    one, and while the program has taken its end, the PSP names a routine
-   there instead, as in dos.c, where that is Exit01: read it there.
+   there instead. In the original that is a routine of the program's
+   own, Exit01, which goes on in Exit05.
 
    Here the routine cannot be the program's code. The program that DOS
    ends is the extender's: the extender has INT 21h of real mode while
@@ -1819,7 +1822,7 @@ void IntOn(void)
    of 16. DOS has freed the block by then, with the rest of the
    program's memory, and its bytes are still there, as those of the
    program are where Exit01 runs. It does what Exit01 and Exit05 of
-   dos.c do, on the stack of the program that started this one: DOS is
+   the original do, on the stack of the program that started this one: DOS is
    told to look for Ctrl-C as the program has said, AX 3301h, with AX
    kept around it; ES is put on the segment of this program's PSP; the
    flags are made those of the segment that the program goes on in

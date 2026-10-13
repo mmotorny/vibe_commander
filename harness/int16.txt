@@ -42,6 +42,12 @@ dirfunc.c, DirFunc: index
     | end[count] = Mask_S[skip + count];
     skip is 0 or 1, by the lines above, and count is below 5.
 
+dos32.c, OwnSet: widen
+    | u32 first = (u32)(Own + 15 - ARENA) >> 4;
+    Written for an int of 32 bits and meant so: how far Own is behind
+    ARENA, an address less an address, in the system's file. The line
+    below asks that its paragraphs fit 16 bits.
+
 drive.c, F62_01: compare
     | if (active == 3 - unit)
     unit is 1 or 2: the letter is A or B, by the lines above.
@@ -208,7 +214,7 @@ stcolor.c, StF07_53: index
     and i is below LenColr, 40.
 
 sthelp.c, StHelp: back
-    | entry = (struct StHlpData __far *)(buffer + (at - HELPBUF));
+    | entry = (struct StHlpData *)(buffer + (at - HELPBUF));
     at begins two behind HELPBUF and goes up: the loop is left where the
     next would have wrapped round.
 

@@ -38,20 +38,20 @@
 #include "vc.h"
 
 /* C routines of other files that vc.h does not have. */
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);                            /* screen.c */
-u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);                                  /* screen.c */
+u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
 
 /* The tables: of help_t.c, which the setup program has byte for byte,
    the title of the window and the numbers of the colours of the button;
    of sthelp_t.c the button, for MinMnu, and the box that says there is
    no such page, which Dialog takes by its offset; and of the setup's
    other tables the text of the button as the window has it. */
-extern const u8 __far Help_S[];         /* " Help " */
-extern const u8 __far HlpMn_P[];
-extern const u8 __far StHlpMn_D[];      /* Ok */
-extern const u8 __far StHlpEr_B[];      /* "Help contents is not available" */
-extern const u8 __far StOk_S[];         /* "[ Ok ]" */
+extern const u8 Help_S[];               /* " Help " */
+extern const u8 HlpMn_P[];
+extern const u8 StHlpMn_D[];            /* Ok */
+extern const u8 StHlpEr_B[];            /* "Help contents is not available" */
+extern const u8 StOk_S[];               /* "[ Ok ]" */
 
 #define Help_C  27                      /* the colours of the help: its text, */
 #define HlpBo_C 28                      /* bold, */
@@ -66,14 +66,14 @@ extern const u8 __far StOk_S[];         /* "[ Ok ]" */
    ninth byte on. They are one text because MainFil takes 13 bytes for a
    name: the first six of the second are copied with the first, as they
    are in the assembly. */
-static const u8 CODE StHelp_F[] = "VC.HLP\0VC 4.05 Help";
+static const u8 StHelp_F[] = "VC.HLP\0VC 4.05 Help";
 #define HlpHead 7                       /* where in it the second begins */
 #define LenHead 13                      /* and its length, with its end */
 
 /* The colours of a line of the help, for NgLine, and the line that it is
    to put in for ^I: none. */
-static const u8 CODE StHelp_P[] = { Help_C, HlpRe_C, HlpBo_C, HlpUn_C };
-static const u8 CODE StEmpty_S[] = "";
+static const u8 StHelp_P[] = { Help_C, HlpRe_C, HlpBo_C, HlpUn_C };
+static const u8 StEmpty_S[] = "";
 
 #pragma pack(push, 1)
 
@@ -144,7 +144,7 @@ static u16 SeekDsk(u16 handle, u32 place)
 
 /* Read `count` bytes of the help file. Not 0 if DOS would not, or read
    fewer. */
-static u16 ReadDsk(u16 handle, u8 __far *to, u16 count)
+static u16 ReadDsk(u16 handle, u8 *to, u16 count)
 {
     struct Answer read = FileRead(handle, to, count);
 
@@ -237,7 +237,7 @@ RdHlp1:                                 /* read or not, the file is closed */
 /* Write a line of text into the window at a row and a column, over
    spaces: HlpLine of the assembly. Returns where the text of the next
    line begins. */
-static const u8 __far *StHlpLine(u16 place, const u8 __far *text)
+static const u8 *StHlpLine(u16 place, const u8 *text)
 {
     struct LineArgs line;
     u16 cell = Color(StHelp_P[0]) << 8 | ' ';
@@ -252,7 +252,7 @@ static const u8 __far *StHlpLine(u16 place, const u8 __far *text)
     line.line = text;
     line.colors = StHelp_P;
     line.include = StEmpty_S;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     return line.line;
 }
 
@@ -269,10 +269,10 @@ static const u8 __far *StHlpLine(u16 place, const u8 __far *text)
    word is no length, it decides what shows. */
 void StHelp(void)
 {
-    u8 __far *buffer = StHelpBuf();
-    struct StHlpData __far *entry;      /* BP: the page */
-    const u8 __far *lines;              /* its text, with the title */
-    const u8 __far *text;
+    u8 *buffer = StHelpBuf();
+    struct StHlpData *entry;            /* BP: the page */
+    const u8 *lines;                    /* its text, with the title */
+    const u8 *text;
     u16 place = GetCur();
     u16 page = md.HlpPage;
     u16 size = (u16)(u8)(md.Lines - 3) << 8 | 74;
@@ -289,14 +289,14 @@ void StHelp(void)
     /* The page: as many entries on as its number says, none of them
        beyond what was read. No page, 0, is one of 65536. */
     count = page;
-    end = HELPBUF + 2 + *(u16 __far *)buffer;
+    end = HELPBUF + 2 + *(u16 *)buffer;
     next = HELPBUF + 2;
     do {
         at = next;
         next = at + HlpInfo;
         if (next < at || next > end)
             goto Help02;
-        entry = (struct StHlpData __far *)(buffer + (at - HELPBUF));
+        entry = (struct StHlpData *)(buffer + (at - HELPBUF));
         if ((u16)(next + entry->HlpSize) < next)
             goto Help02;
         next += entry->HlpSize;
@@ -311,7 +311,7 @@ Help02:                                 /* there is none */
     goto Help41;
 
 Help04:                                 /* the window */
-    lines = (const u8 __far *)entry + HlpInfo;
+    lines = (const u8 *)entry + HlpInfo;
     SavWin(BEGIN, size, MD_PLACE(md.ErrBuf));
     color = Color(Help_C) << 8;
     MinBox(BEGIN, size, color);

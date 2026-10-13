@@ -37,8 +37,8 @@
 #include "vc.h"
 
 /* The registers that go round the loop are struct Regs of vc.h. */
-static u16 CmdEnd(struct Onward next, struct Regs STACK *r);
-static u16 Command(u16 command, u16 panel, struct Regs STACK *r);
+static u16 CmdEnd(struct Onward next, struct Regs *r);
+static u16 Command(u16 command, u16 panel, struct Regs *r);
 u16 ErrRdy(u16 letter);
 static void Exit(void);
 /* Quit, RestVct and HookVct are in vc.h. */
@@ -104,8 +104,8 @@ void Panel(u16 panel);                                  /* panel.c */
 void PutPath(u16 panel);
 void PutFls(u16 panel);
 void PutTre(u16 panel);                                 /* tree.c */
-u16 StrLen(const u8 __far *text);                       /* string.c */
-const u8 __far *FndLet(const u8 __far *text);
+u16 StrLen(const u8 *text);                             /* string.c */
+const u8 *FndLet(const u8 *text);
 
 /* What this reads or names of other files: the scan codes of Alt with a
    digit or a letter, which begin the speed search; of main_t.c the box
@@ -113,24 +113,24 @@ const u8 __far *FndLet(const u8 __far *text);
    and of setup.c the setup as it was last saved or found. Menu_T, of
    commands_t.c, is a word for each table of a menu's commands that
    names it, a pointer there: see NAMED of vc.h. */
-extern const u8 __far AltSr_T[];
-extern const u16 * const __far Menu_T[];
-extern const u8 __far NoRd_P[];
+extern const u8 AltSr_T[];
+extern const u16 * const Menu_T[];
+extern const u8 NoRd_P[];
 extern u8 IniSave[];
 
 /* The main data: one structure, which is all that the original has in
    the block of memory that it asks DOS for and has DS on. Here it is an
-   object of the program, in the segment that the compiler has for the
-   program's data and that DS is on, and the first thing of that
-   segment, at offset 0, as the original has it in its block: the line
-   in front of it names a segment of the compiler's group for it alone,
-   of a class of its own, and the linker's command has that class first
-   (see CMakeLists.txt). The first is the compiler's and the second the
-   linker's, not the language's; the tests stop where it is not at 0
-   (harness/coverage.py).
+   object of the program. A place in it is a number of 16 bits counted
+   from where it begins, as the original has it in its block, and what
+   the linker puts in front of it and behind it is counted from there
+   too, by the words of the addresses of vc.h: the line in front of it
+   names a segment for it alone, of a class of its own, and the linker's
+   command says where that class stands (see CMakeLists.txt). The first
+   is the compiler's and the second the linker's, not the language's;
+   the test `portable_c-layout` holds the order.
 
-   It is first in the program's file, too, 62 KB of nothing: the file
-   is the program as it lies in the memory. */
+   It is in the program's file, 62 KB of nothing: a segment that is
+   named so has a value to the linker. */
 #pragma data_seg("MAINDATA", "MAIN")
 struct MainDat md;
 #pragma data_seg()
@@ -154,7 +154,7 @@ struct MainDat md;
    panel of that kind. */
 static void PtFs00(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
 
     if (wcb->WinTyp == 0)
         PutFls(panel);
@@ -180,7 +180,7 @@ static u16 Init46(u16 c)
    the right panel, and only the row is used. */
 static u16 Init40(void)
 {
-    const u8 __far *tail;
+    const u8 *tail;
     u8 *to;
     u16 page, row, line, bottom, count, i, c;
 
@@ -237,7 +237,7 @@ static u16 Init40(void)
    tree of the root alone, or an Info without figures. */
 static void Init90(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct DIRENT *root;
     u16 i;
 
@@ -286,7 +286,7 @@ static void Init90(u16 panel)
    before a command gets them, but BP, which this does not change. */
 static void Init50(void)
 {
-    struct WCBdef __far *wcb;
+    struct WCBdef *wcb;
     u16 panel, size, drive, keep, failed, letter, length, same, i;
 
     HidCur();
@@ -463,9 +463,9 @@ static struct Asked Nothing(u16 entry)
    Ported as they are: what DoublMo leaves in AX and CX is not handed on;
    where the program goes on then, at F00_60, at Func04 and at F21_10,
    both are set before they are read. */
-static struct Asked Func21(struct Regs STACK *r)
+static struct Asked Func21(struct Regs *r)
 {
-    struct WCBdef __far *wcb;
+    struct WCBdef *wcb;
     struct Place place;
     struct Mouse mouse;
     u16 look, lines, rows, column, kind, answer;
@@ -531,7 +531,7 @@ Func40:                                 /* Move the cursor */
     md.WinMous |= 1;
     *(u16 *)md.TmpBuf = r->cx;          /* TmpMous */
     r->bp = r->ax;
-    AdrNum(r->ds, (struct Place STACK *)&place);
+    AdrNum(r->ds, &place);
     r->si = place.cursor;
     r->di = place.first;
     r->dx = place.last;
@@ -708,11 +708,11 @@ static u16 Func12(u16 key)
 /* The main loop as far as a command: see the top of this file. `entry`
    is where it is entered and `r` the registers as they are there; it
    returns the command, with the registers as the command gets them. */
-static u16 Loop(u16 entry, struct Regs STACK *r)
+static u16 Loop(u16 entry, struct Regs *r)
 {
-    struct WCBdef __far *wcb;
-    u8 __far *saved;
-    const u8 __far *keys;
+    struct WCBdef *wcb;
+    u8 *saved;
+    const u8 *keys;
     const u8 *image;
     struct Time moment;
     struct Mouse mouse;
@@ -757,7 +757,7 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
             MakeIni();
             image = md.MenuBuf;
             saved = IniSave;
-            if (*(u16 __far *)saved == 0x5656) {        /* 'VV' */
+            if (*(u16 *)saved == 0x5656) {              /* 'VV' */
                 for (i = 0; i < LenPath; i++) {
                     saved[INI_WCB(0, WinPath) + i] =
                         image[INI_WCB(0, WinPath) + i];
@@ -912,7 +912,7 @@ static u16 V00_03(u16 menu, u16 edit, u16 whole)
     struct EditEnd end;
     u16 what;
 
-    what = V00_02(menu, edit, whole, (struct Open STACK *)&open);
+    what = V00_02(menu, edit, whole, &open);
     if (what == 0)
         return FUNC04;
     if (what == 1) {
@@ -932,7 +932,7 @@ static u16 V00_03(u16 menu, u16 edit, u16 whole)
 }
 
 /* After a command of the menus, of commands.c: MnuEnd. */
-static u16 MnuEnd(u16 answer, struct Regs STACK *r)
+static u16 MnuEnd(u16 answer, struct Regs *r)
 {
     switch (answer) {
     case MNU_FUNC04:
@@ -955,7 +955,7 @@ static u16 MnuEnd(u16 answer, struct Regs STACK *r)
    Func07 is the one place of the loop where the next command gets BX and
    DX as this one leaves them. Only the keys of the cursor go there, and
    they have put into `r` what the original leaves in the two. */
-static u16 CmdEnd(struct Onward next, struct Regs STACK *r)
+static u16 CmdEnd(struct Onward next, struct Regs *r)
 {
     u16 item = next.item;
     u16 panel = next.panel;
@@ -1048,7 +1048,7 @@ static u16 F35_90(struct Copied copied)
 /* The box of the drives for a panel, and the panel switched on if a
    drive was chosen: F62_01 of the original, where Alt-F1 and Alt-F2 go
    on. `item` is the menu to mark meanwhile. */
-static u16 F62_02(u16 panel, u16 item, struct Regs STACK *r)
+static u16 F62_02(u16 panel, u16 item, struct Regs *r)
 {
     if (F62_01(panel, item) == 0)
         return FUNC04;                  /* F62_46 */
@@ -1070,7 +1070,7 @@ static u16 F62_02(u16 panel, u16 item, struct Regs STACK *r)
    menu file and the extension files by CX, and a key that an item hands
    on to the command line is what AX holds. A command of the Left or the
    Right menu is for the panel of that menu. */
-static u16 F39_01(u16 again, struct Regs STACK *r)
+static u16 F39_01(u16 again, struct Regs *r)
 {
     struct Picked picked = F39_00(again, r->ds);
     u16 menu = picked.menu;
@@ -1088,9 +1088,9 @@ static u16 F39_01(u16 again, struct Regs STACK *r)
     r->di = menu == 5 ? md.WCB2seg : md.WCB1seg;
     if (table == 1)
         panel = r->di;
-    r->si = NAMED(*(const u16 * const __far *)
+    r->si = NAMED(*(const u16 * const *)
                   AT(code, OFFSET(Menu_T) + (table - 1) * sizeof *Menu_T));
-    return Command(*(const u16 __far *)AT(code, r->si + r->bx), panel, r);
+    return Command(*(const u16 *)AT(code, r->si + r->bx), panel, r);
 }
 
 /* Do a command: call its function, with what it reads of the registers,
@@ -1101,7 +1101,7 @@ static u16 F39_01(u16 again, struct Regs STACK *r)
    `panel` is the panel that the command is for, which the original has
    in DS when it jumps to the command: the current panel, `r->ds`, but for
    a command of the Left or the Right menu. */
-static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
+static u16 Command(u16 command, u16 panel, struct Regs *r)
 {
     struct SpeedKey ended;
     struct Searched searched;
@@ -1283,7 +1283,7 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
 static u16 MainLoop(void)
 {
     struct Regs regs;
-    struct Regs STACK *r = (struct Regs STACK *)&regs;
+    struct Regs *r = &regs;
     u16 entry = INIT40;
     u16 command;
 
@@ -1321,7 +1321,7 @@ u16 ErrRdy(u16 letter)
     *(u16 *)(md.TmpErr + 1) = (u16)(signed char)letter;
     drive = letter & 0xFF;
     PutKey(2);
-    DialBox(0x528, OFFSET(NoRd_P), 0, MAIN_SEG, (struct Box STACK *)&where);
+    DialBox(0x528, OFFSET(NoRd_P), 0, MAIN_SEG, &where);
     Window(where.begin, where.size);
     Cursor(where.begin + 0x42C);
     ClrKbd();
@@ -1410,13 +1410,13 @@ void RestVct(void)
 /*--------------------- Fatal error ---------------------
    What main_t.c has for it: the texts and the two boxes, with
    Retry and Abort or with Ok alone, which go to Dialog by their offsets. */
-extern const u8 __far Err_S[];
-extern const u8 __far OnDr_S[];
-extern const u8 __far OnDv_S[];
-extern const u8 __far Errs_S[];
-extern const u8 __far FatEr_S[];
-extern const u8 __far FtEr1_B[];
-extern const u8 __far FtEr2_B[];
+extern const u8 Err_S[];
+extern const u8 OnDr_S[];
+extern const u8 OnDv_S[];
+extern const u8 Errs_S[];
+extern const u8 FatEr_S[];
+extern const u8 FtEr1_B[];
+extern const u8 FtEr2_B[];
 
 /* A critical error of DOS, which the system asks the program about once
    HookVct has handed it this function: `how`, `code` and `device` are
@@ -1439,11 +1439,11 @@ extern const u8 __far FtEr2_B[];
    the original's setup program has no box and leaves the error to DOS's
    own words (see DEVIATIONS.md): its dialog and its key bar are not the
    setup's, and the setup draws its own key bar anew afterwards. */
-static u16 FtErr1(u16 how, u16 code, const u8 FAR *device)
+static u16 FtErr1(u16 how, u16 code, const u8 *device)
 {
     u16 assembly = AsmSeg();
-    const u8 __far *from;
-    const u8 __far *text;
+    const u8 *from;
+    const u8 *text;
     u8 *to = md.TmpErr + 1;
     u8 *name;
     u16 i, answer;
@@ -1523,7 +1523,7 @@ FtErr5:
    the first for FtErr1, and the second so that nothing happens. Both
    are noted before either is taken, as the original asks DOS. Where
    they arrive, FatErr and CtrlC of the original, is the system's:
-   dos.c. */
+   dos32.c. */
 void HookVct(void)
 {
     DeviceErrorNote();
@@ -1583,7 +1583,7 @@ static void Round(void)
 #pragma aux Round aborts
 
 /* The program, from when DOS has loaded it: the system calls this
-   where it enters the program, Alloc0 of dos.c, and it does not return.
+   where it enters the program, Start of dos32.c, and it does not return.
    The version of DOS is looked at and the memory that the program does
    not fill is let go, Alloc3; the setup is read, Init00, and the memory
    of the panels asked for, Init11; with too little of it the program

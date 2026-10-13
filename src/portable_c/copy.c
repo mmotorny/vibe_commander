@@ -85,9 +85,9 @@ u16 F35_61(u16 answer, u16 place);
    address behind its zero byte; ChTree has a directory chosen from the
    tree, in a box that begins in a column, and returns 0 if one was, with
    its path in TmpBuf. */
-const u8 __far *FndLet(const u8 __far *text);           /* string.c */
-void NormStr(u8 __far *text);
-u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);       /* mask.c */
+const u8 *FndLet(const u8 *text);                       /* string.c */
+void NormStr(u8 *text);
+u8 *UnConv(u8 *name, const u8 *buffer);                         /* mask.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
 u16 ChTree(u16 column);                                 /* treebox.c */
 
@@ -95,34 +95,34 @@ u16 ChTree(u16 column);                                 /* treebox.c */
    segment that the constants are in: those of copy_t.c, and some of
    deleting. Only the offsets are used here, but for the texts that the
    commands copy from there into what their dialogs show. */
-extern const u8 __far Copy0_S[];        /* " Copy " */
-extern const u8 __far Move0_S[];        /* " Move " */
-extern const u8 __far Ren0_S[];         /* " Rename " */
-extern const u8 __far RnMv_S[];         /* "Rename or move " */
-extern const u8 __far CopTo_S[];        /* "^V to" */
-extern const u8 __far CopFi_S[];        /* "Copying the file" */
-extern const u8 __far Copy1_B[];        /* the dialog of F5 and F6 */
-extern const u8 __far Copy2_B[];        /* and that of Shift-F5 and -F6 */
-extern const u8 __far Renam_B[];        /* "Rename ... to" */
-extern const u8 __far RenFi_P[];        /* "Renaming or moving the file" */
-extern const u8 __far CopFi_P[];        /* "Copying the file" */
-extern const u8 __far MovFi_P[];        /* "Moving the file" */
-extern const u8 __far CopDi_P[];        /* "Copying the directory" */
-extern const u8 __far MovDi_P[];        /* "Renaming or moving the directory" */
-extern const u8 __far DelDr_P[];        /* "Deleting the subdirectory" */
-extern const u8 __far OvrCo_B[];        /* "The following file exists" */
-extern const u8 __far Prot_B[];         /* "... is a read-only file" */
-extern const u8 __far Cont_B[];         /* "There isn't enough room to copy" */
-extern const u8 __far OpnEr_B[];        /* "Can't open the file" */
-extern const u8 __far Itslf_B[];        /* "You can't copy a file to itself" */
-extern const u8 __far RenEr_B[];        /* "Can't rename the file" */
-extern const u8 __far MkErr_B[];        /* "Can't create the directory" */
-extern const u8 __far DelEr_B[];        /* "Can't delete the file" */
-extern const u8 __far RdOnl_B[];        /* "... is marked read-only" */
-extern const u8 __far CntDi_B[];        /* "Can't delete the subdirectory" */
+extern const u8 Copy0_S[];              /* " Copy " */
+extern const u8 Move0_S[];              /* " Move " */
+extern const u8 Ren0_S[];               /* " Rename " */
+extern const u8 RnMv_S[];               /* "Rename or move " */
+extern const u8 CopTo_S[];              /* "^V to" */
+extern const u8 CopFi_S[];              /* "Copying the file" */
+extern const u8 Copy1_B[];              /* the dialog of F5 and F6 */
+extern const u8 Copy2_B[];              /* and that of Shift-F5 and -F6 */
+extern const u8 Renam_B[];              /* "Rename ... to" */
+extern const u8 RenFi_P[];              /* "Renaming or moving the file" */
+extern const u8 CopFi_P[];              /* "Copying the file" */
+extern const u8 MovFi_P[];              /* "Moving the file" */
+extern const u8 CopDi_P[];              /* "Copying the directory" */
+extern const u8 MovDi_P[];              /* "Renaming or moving the directory" */
+extern const u8 DelDr_P[];              /* "Deleting the subdirectory" */
+extern const u8 OvrCo_B[];              /* "The following file exists" */
+extern const u8 Prot_B[];               /* "... is a read-only file" */
+extern const u8 Cont_B[];               /* "There isn't enough room to copy" */
+extern const u8 OpnEr_B[];              /* "Can't open the file" */
+extern const u8 Itslf_B[];              /* "You can't copy a file to itself" */
+extern const u8 RenEr_B[];              /* "Can't rename the file" */
+extern const u8 MkErr_B[];              /* "Can't create the directory" */
+extern const u8 DelEr_B[];              /* "Can't delete the file" */
+extern const u8 RdOnl_B[];              /* "... is marked read-only" */
+extern const u8 CntDi_B[];              /* "Can't delete the subdirectory" */
 
 /* What is put behind a path to find everything in the directory. */
-static const u8 CODE AllIn_S[] = "\\*.*";
+static const u8 AllIn_S[] = "\\*.*";
 
 #define Box_C 16                        /* the number of the colour of a box */
 #define BoxCu_C 18                      /* and of a line that is typed into */
@@ -159,7 +159,7 @@ static u16 F35_40(void)
 /* Where the text at `text` ends, looked for in `count` bytes: the address
    behind its zero byte, or behind the bytes if there is none. `count` is
    then what was left to look at. */
-static const u8 *C00_End(const u8 *text, u16 STACK *count)
+static const u8 *C00_End(const u8 *text, u16 *count)
 {
     u16 left = *count;
     u8 c;
@@ -214,7 +214,7 @@ copy:
     NormStr(buffer);
     PathLin(buffer);
     count = LenName;
-    to = (u8 *)C00_End(buffer, (u16 STACK *)&count) - 2;
+    to = (u8 *)C00_End(buffer, &count) - 2;
     if (*to == '.')
         *to = 0;
 }
@@ -222,7 +222,7 @@ copy:
 /* Whether the source and the target are the same file: 1 if so. `left`
    gets what the assembly has in CX afterwards, the bytes of the target's
    path that were not compared: C10_00 hands that on. */
-static u16 C40_00(u16 STACK *left)
+static u16 C40_00(u16 *left)
 {
     const u8 *source = md.TmpErr, *target = md.TmpErr + 100;
     u16 count;
@@ -230,7 +230,7 @@ static u16 C40_00(u16 STACK *left)
     C40_05(CpSrc, md.TmpErr);
     C40_05(CpDest, md.TmpErr + 100);
     count = LenName;
-    count = (u16)(C00_End(target, (u16 STACK *)&count) - target);
+    count = (u16)(C00_End(target, &count) - target);
     do {
         count--;
         if (*source++ != *target++) {
@@ -321,7 +321,7 @@ static void PerCent(void)
    is found out for the first file and kept in CpCase for the others. */
 static u16 C00_01(void)
 {
-    struct WCBdef __far *other;
+    struct WCBdef *other;
     const u8 *from = md.ToFile;
     const u8 *end;
     u8 *name, *part, *to;
@@ -351,7 +351,7 @@ static u16 C00_01(void)
             goto mask;
     } while (c != 0);
     count = LenName;
-    end = C00_End(CpDest, (u16 STACK *)&count);
+    end = C00_End(CpDest, &count);
     to = (u8 *)end;
     other = PANEL(md.WCBsec);
     count = end - CpDest;
@@ -444,8 +444,8 @@ static struct Answer DelTree(const u8 *path)
    if neither name has a path. */
 static void C10_13(void)
 {
-    struct WCBdef __far *wcb = PANEL(md.WCBcrn);
-    u8 __far *entry;
+    struct WCBdef *wcb = PANEL(md.WCBcrn);
+    u8 *entry;
     u16 file, i;
 
     if (NEAR(CutPath(CpSrc)) != CpSrc || NEAR(CutPath(CpDest)) != CpDest)
@@ -453,7 +453,7 @@ static void C10_13(void)
     file = FnFile(md.WCBcrn, CpSrc);
     if (file >= wcb->EndBuf)
         return;
-    entry = (u8 __far *)wcb + file;
+    entry = (u8 *)wcb + file;
     for (i = 0; i < 12; i++)
         entry[i] = CpDest[i];
     entry[12] = 0;
@@ -473,7 +473,7 @@ static void C10_13(void)
    names left, 0 if the source's path only goes on where the target's
    ends; or, for a file to append to, the attributes of that file, 0 if
    it has none. C20_00 then says that it cannot open the file. */
-static u16 C10_00(u16 STACK *fits)
+static u16 C10_00(u16 *fits)
 {
     struct Box box;
     struct FileAttr attr;
@@ -481,7 +481,7 @@ static u16 C10_00(u16 STACK *fits)
     u16 result, answer, error, report;
 
     CopyMov = 3;
-    OncZoom(0x528, OFFSET(RenFi_P), 0, (struct Box STACK *)&box);
+    OncZoom(0x528, OFFSET(RenFi_P), 0, &box);
     error = 0;
     if (*fits == 0)
         goto failed;
@@ -616,7 +616,7 @@ static u16 C20_00(u16 fits)
     if (CopyMov != 0)
         report = OFFSET(MovFi_P);
     /* None of the lines of these boxes has ^I: no include line. */
-    OncZoom(0x428, report, 0, (struct Box STACK *)&box);
+    OncZoom(0x428, report, 0, &box);
     CpCntBg = box.begin + 0x605;
     CpCntSz = (u8)(box.size - 12);
     screen = BasAdr(CpCntBg);
@@ -627,7 +627,7 @@ static u16 C20_00(u16 fits)
     report = OFFSET(OpnEr_B);
     if (fits == 0)
         goto ask;
-    if (C40_00((u16 STACK *)&count)) {
+    if (C40_00(&count)) {
         report = OFFSET(Itslf_B);
         goto ask;
     }
@@ -995,7 +995,7 @@ full:
         if (asked.failed && asked.value == ERR_NOT_READY)
             goto forget;
         count = LenName;
-        end = (u8 *)C00_End(md.TmpErr, (u16 STACK *)&count);
+        end = (u8 *)C00_End(md.TmpErr, &count);
         if (*end == 0)
             goto open;
         end[-1] = '\\';
@@ -1063,10 +1063,10 @@ static u16 C30_00(u16 across, u16 fits)
     result = OFFSET(CopDi_P);
     if (CopyMov != 0)
         result = OFFSET(MovDi_P);
-    OncZoom(0x428, result, F35_40(), (struct Box STACK *)&box);
+    OncZoom(0x428, result, F35_40(), &box);
     if (fits == 0)
         goto unmade;
-    if (C40_00((u16 STACK *)&i))
+    if (C40_00(&i))
         goto same;
     if (CopyMov == 0 || across != 0)
         goto make;
@@ -1146,7 +1146,7 @@ walk:
 
     md.SftErr = 0;
     OncZoom(0x528, OFFSET(DelDr_P), OFFSET(Move0_S),
-            (struct Box STACK *)&box);
+            &box);
     if (ChgDisk(CpSrc))
         goto stop;
     asked = DirRemove(CpSrc);
@@ -1216,7 +1216,7 @@ u16 C00_00(u16 attributes)
     result = STOP;
     if (C00_01()) {
         fits = LenPath + 12;
-        C00_End(CpDest, (u16 STACK *)&fits);
+        C00_End(CpDest, &fits);
         rename = 0;
         if (CpDev2 == 0 && CopyMov != 2) {
             if (CopyMov > 2)
@@ -1232,7 +1232,7 @@ u16 C00_00(u16 attributes)
         else {
             result = COPY;
             if (rename)
-                result = C10_00((u16 STACK *)&fits);
+                result = C10_00(&fits);
             if (result == COPY)
                 result = C20_00(fits);
         }
@@ -1298,8 +1298,8 @@ static void F35_70(void)
    has not: after Shift-F6, or F6 with the panel switched off. */
 static u8 *F35_50(u16 panel, u16 directories, u16 files)
 {
-    const struct WCBdef __far *wcb;
-    const u8 __far *from;
+    const struct WCBdef *wcb;
+    const u8 *from;
     u8 *to;
     u16 other, title, words, length, i;
 
@@ -1418,8 +1418,8 @@ F36_05:
    where to go on. */
 struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files)
 {
-    const struct WCBdef __far *wcb = PANEL(panel);
-    const u8 __far *from;
+    const struct WCBdef *wcb = PANEL(panel);
+    const u8 *from;
     const u8 *name, *typed;
     u8 *to, *end;
     struct Selected selected;

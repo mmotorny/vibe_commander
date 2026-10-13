@@ -48,7 +48,7 @@ u16 ChTree(u16 column);                                 /* treebox.c */
 void DirSize(u16 panel);                                /* read.c */
 void TstInfo(u16 panel);
 void Help00(void);                                      /* help.c */
-u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
+u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -64,27 +64,27 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
    follows them: constants, most of them of commands_t.c, in the
    segment that AsmSeg returns, where DialBox and Dialog read them by
    their offsets. */
-extern const u8 __far Filt_B[];         /* the filter of a panel */
-extern const u8 __far DiSiz_P[];        /* "Scanning sizes of
+extern const u8 Filt_B[];               /* the filter of a panel */
+extern const u8 DiSiz_P[];              /* "Scanning sizes of
                                            subdirectories" */
-extern const u8 __far CmpDi_B[];        /* "The two directories appear to
+extern const u8 CmpDi_B[];              /* "The two directories appear to
                                            be identical." */
-extern const u8 __far Conf_B[];         /* the configuration */
-extern const u8 __far Chk1_S[];         /* what begins a box to tick in it, */
-extern const u8 __far Sets_B[];         /* the advanced options, */
-extern const u8 __far Chk2_S[];         /* and what begins one there */
-extern const u8 __far MnLoc_B[];        /* "Main, Local, Cancel" */
-extern const u8 __far User_S[];         /* " User Menu " */
-extern const u8 __far ExFl_S[];         /* " Extension File " */
-extern const u8 __far UsMnu_S[];        /* "user menu" */
-extern const u8 __far ExtFl_S[];        /* "extension file" */
-extern const u8 __far Menu_F[];         /* "VC.MNU" */
-extern const u8 __far Ext_F[];          /* "VC.EXT" */
-extern const u8 __far ViewE_F[];        /* "VCVIEW.EXT" */
-extern const u8 __far EditE_F[];        /* "VCEDIT.EXT" */
-extern const u8 __far SvSt_B[];         /* "Do you wish to save the current
+extern const u8 Conf_B[];               /* the configuration */
+extern const u8 Chk1_S[];               /* what begins a box to tick in it, */
+extern const u8 Sets_B[];               /* the advanced options, */
+extern const u8 Chk2_S[];               /* and what begins one there */
+extern const u8 MnLoc_B[];              /* "Main, Local, Cancel" */
+extern const u8 User_S[];               /* " User Menu " */
+extern const u8 ExFl_S[];               /* " Extension File " */
+extern const u8 UsMnu_S[];              /* "user menu" */
+extern const u8 ExtFl_S[];              /* "extension file" */
+extern const u8 Menu_F[];               /* "VC.MNU" */
+extern const u8 Ext_F[];                /* "VC.EXT" */
+extern const u8 ViewE_F[];              /* "VCVIEW.EXT" */
+extern const u8 EditE_F[];              /* "VCEDIT.EXT" */
+extern const u8 SvSt_B[];               /* "Do you wish to save the current
                                            setup?" */
-extern const u8 __far SetEr_B[];        /* "There was an error while saving
+extern const u8 SetEr_B[];              /* "There was an error while saving
                                            the setup file" */
 
 #define LOW(pair)  ((u16)(pair))
@@ -97,14 +97,14 @@ extern const u8 __far SetEr_B[];        /* "There was an error while saving
 
 /* The minutes after which the screen is blanked, as the configuration
    offers them, from the first line of the group down. */
-static const u8 CODE Delay_T[] = { 40, 20, 5, 3, 1, 0 };
+static const u8 Delay_T[] = { 40, 20, 5, 3, 1, 0 };
 
 /* What a panel shows, written to the screen buffer: PutFls of the
    original, which goes on in what writes the tree or the Info for a
    panel of that kind. */
 static void PtFs00(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
 
     if (wcb->WinTyp == 0)
         PutFls(panel);
@@ -122,7 +122,7 @@ static void PtFs00(u16 panel)
    is afterwards. */
 static u16 M02_10(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct Answer changed;
     u16 drive = (u8)(wcb->WinPath[0] - ('A' - 1));
     u16 failed;
@@ -144,15 +144,15 @@ static u16 M02_10(u16 panel)
    far as they are still in the list. */
 static void M16_20(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    const u8 __far *from;
+    struct WCBdef *wcb = PANEL(panel);
+    const u8 *from;
     u16 was = wcb->EndBuf;
     u16 cursor, first, found, i;
 
-    from = (const u8 __far *)wcb + wcb->CurAdr;
+    from = (const u8 *)wcb + wcb->CurAdr;
     for (i = 0; i < 13; i++)
         md.MenuBuf[i] = from[i];
-    from = (const u8 __far *)wcb + wcb->First;
+    from = (const u8 *)wcb + wcb->First;
     for (i = 0; i < 13; i++)
         md.MenuBuf[13 + i] = from[i];
     SetMask(panel);
@@ -212,7 +212,7 @@ static u16 M16_11(u16 panel)
    in order then. */
 u16 M01_01(u16 panel, u16 item)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u8 order = (u8)item;
     u8 was;
 
@@ -254,7 +254,7 @@ u16 M08_00(u16 panel, u16 item)
    the panel showed before. */
 u16 M03_00(u16 panel, u16 item)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u8 kind = (u8)(5 - (item >> 8));
     u16 other;
 
@@ -284,7 +284,7 @@ u16 M03_00(u16 panel, u16 item)
    the loop is Window for all of the screen and then Func04. */
 u16 M06_00(u16 panel, u16 item)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u16 current;
 
     if (wcb->Visible == 0)
@@ -326,7 +326,7 @@ u16 M16_00(u16 panel)
    files. */
 u16 M16_10(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
 
     if (!FilePan(panel))
         return MNU_FUNC04;
@@ -365,7 +365,7 @@ u16 M42_00(u16 panel)
         *(u16 *)md.TmpBuf = PANEL(panel)->WinPath[0];
         PutMnu(3);
         DialBox(0x528, OFFSET(DiSiz_P), 0, MAIN_SEG,
-                (struct Box STACK *)&where);
+                &where);
         Window(where.begin, where.size);
         DirSize(panel);
         M16_20(panel);
@@ -395,10 +395,10 @@ static u16 M60_02(u16 panel)
    one, and `marked` otherwise. */
 static u16 M49_10(u16 panel, u16 marked)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u16 other = InvWCB(panel);
-    struct FILENT __far *file;
-    const struct FILENT __far *its;
+    struct FILENT *file;
+    const struct FILENT *its;
     u16 address, found, i;
 
     for (address = DSKBUF; address < wcb->EndBuf;
@@ -491,7 +491,7 @@ u16 M61_00(void)
 static u16 M64_02(u16 item, u16 name, u16 title, u16 include, u16 page)
 {
     u16 code = AsmSeg();
-    const u8 __far *from;
+    const u8 *from;
     u16 answer, i;
 
     md.HlpPage = (u8)page;

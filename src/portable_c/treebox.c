@@ -53,7 +53,7 @@ u16 ChTree(u16 column);
    box since ZoomOne was cleared grows. */
 
 /* C routines of other files that vc.h does not have. */
-void FilZero(u8 __far *text, u16 length);               /* string.c */
+void FilZero(u8 *text, u16 length);                     /* string.c */
 void TreeCur(void);                                     /* tree.c */
 void TrCr20(u16 lines);
 
@@ -61,9 +61,9 @@ void TrCr20(u16 lines);
    file, which DelTr0 has too, and the boxes that are shown while the
    disk is read and while the file is written, which OncZoom takes by
    their offsets. */
-extern const u8 __far Tree_F[];         /* "\TREEINFO.NCD" */
-extern const u8 __far Tree_P[];         /* "Scanning the directory..." */
-extern const u8 __far TrSav_P[];        /* "Saving the directory..." */
+extern const u8 Tree_F[];               /* "\TREEINFO.NCD" */
+extern const u8 Tree_P[];               /* "Scanning the directory..." */
+extern const u8 TrSav_P[];              /* "Saving the directory..." */
 
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
@@ -92,19 +92,19 @@ extern const u8 __far TrSav_P[];        /* "Saving the directory..." */
 #define SCANNED (md.MenuBuf + 40)
 
 /* What a tree file begins with. */
-static const u8 CODE TreBeg[] = "PNCI";
+static const u8 TreBeg[] = "PNCI";
 
 /* The colours of the box that counts the directories read, and of the
    box in which one is chosen. */
-static const u8 CODE Scan_P[] = { Box_C, 0, 0, 0 };
-static const u8 CODE ChTr_P[] = { Conf_C, CnfRe_C, CnfBo_C, CnfUn_C };
+static const u8 Scan_P[] = { Box_C, 0, 0, 0 };
+static const u8 ChTr_P[] = { Conf_C, CnfRe_C, CnfBo_C, CnfUn_C };
 
-static const u8 CODE ChTr0_S[] = " Choose Directory ";
+static const u8 ChTr0_S[] = " Choose Directory ";
 /* Two lines, one behind the other: what the line of the path says until
    the tree is there, and the line of the speed search. */
-static const u8 CODE ChTr1_S[] =
+static const u8 ChTr1_S[] =
     "Reading directory tree...\0Speed search: ^r\xFF\x0C";
-static const u8 CODE Empty_S[] = "";
+static const u8 Empty_S[] = "";
 
 #define LINE        0xC4                /* a single line */
 #define LEFT_RIGHT  0xC7B6              /* where one meets the frame, on the
@@ -202,14 +202,14 @@ RdTr11:                                 /* one more: with five, a box that
     if (count >= 5) {
         if (count == 5) {
             *(u16 *)md.MenuBuf = (u16)(signed char)md.DosPth[0];
-            OncZoom(0x728, OFFSET(Tree_P), 0, (struct Box STACK *)&box);
+            OncZoom(0x728, OFFSET(Tree_P), 0, &box);
         }
         Number(md.MenuBuf, 0, count, NUM_SEPARATED);
         line.value = box.begin + 0x400 & 0xFF00 | 0x28;
         line.line = md.MenuBuf;
         line.colors = Scan_P;
         line.include = Empty_S;
-        CntLine((struct LineArgs STACK *)&line);
+        CntLine(&line);
         Window(box.begin + 0x400, 0x100 | box.size & 0xFF);
     }
     if (TREE->TreeLen == 1)
@@ -326,7 +326,7 @@ RdTr26:
         goto RdTr40;
 
     /* The file. */
-    OncZoom(0x728, OFFSET(TrSav_P), 0, (struct Box STACK *)&box);
+    OncZoom(0x728, OFFSET(TrSav_P), 0, &box);
     for (i = 0; i < 5; i++)
         md.TreeBuf[i] = TreBeg[i];
     count = TREE->TreeLen;
@@ -424,16 +424,16 @@ ChTr59:                                 /* the box, and the tree read */
     line.line = ChTr0_S;
     line.colors = ChTr_P;
     line.include = Empty_S;
-    CntLine((struct LineArgs STACK *)&line);
+    CntLine(&line);
     screen = BoxLine(BasAdr(begin + (size & 0xFF00) - 0x600),
                      color & 0xFF00 | LINE, LEFT_RIGHT, 3,
                      (u8)(size - 10));
     line.value = 38;
     line.screen = screen + 5;
     line.line = ChTr1_S;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     line.screen = screen + 5 + 80;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     Window(begin, size);
     md.CrnPath[0] = 0;
     ReadTre();

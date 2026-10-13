@@ -175,7 +175,7 @@ u16 StdLine(u16 place, u16 cell, u16 ends, u16 size)
    growing only if no box has since the program last waited for a key at
    the panels: `box` and `include` are as DialBox takes them, and where
    the box is comes back in `where`. */
-void OncZoom(u16 place, u16 box, u16 include, struct Box STACK *where)
+void OncZoom(u16 place, u16 box, u16 include, struct Box *where)
 {
     u8 zoom = md.ZoomWin;
 

@@ -27,20 +27,20 @@ struct TimeText {
 };
 
 u16 HexDec(u16 number);
-void PutDate(u16 date, struct DateText STACK *text);
-u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
-void PutTime(u16 time, struct TimeText STACK *text);
-u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
+void PutDate(u16 date, struct DateText *text);
+u8 *BufDate(const struct DateText *text, u8 *buffer);
+void PutTime(u16 time, struct TimeText *text);
+u8 *BufTime(const struct TimeText *text, u8 *buffer);
 
 /* Number and SzDtTm are in vc.h. */
 
-static const u32 CODE PowersOfTen[9] = {
+static const u32 PowersOfTen[9] = {
     1000000000UL, 100000000UL, 10000000UL, 1000000UL, 100000UL, 10000UL,
     1000UL, 100UL, 10UL
 };
 
 /* What the size column shows for a directory: the parent, and any other. */
-static const u8 CODE DirMarker[2][9] = {
+static const u8 DirMarker[2][9] = {
     {0x10, 'U', 'P', '-', '-', 'D', 'I', 'R', 0x11},
     {0x10, 'S', 'U', 'B', '-', 'D', 'I', 'R', 0x11}
 };
@@ -115,7 +115,7 @@ u8 *Number(u8 *buffer, u16 high, u16 low, u16 mode)
 /* Take a DOS date apart into `text`, in the country's order. Where the
    year does not come first, a leading zero of the first field becomes a
    space. */
-void PutDate(u16 date, struct DateText STACK *text)
+void PutDate(u16 date, struct DateText *text)
 {
     u16 day = HexDec(date & 0x1F);
     u16 month = HexDec(date >> 5 & 0x0F);
@@ -137,12 +137,12 @@ void PutDate(u16 date, struct DateText STACK *text)
         text->first = day;
     }
     if ((u8)text->first == '0')
-        *(u8 STACK *)&text->first = ' ';
+        *(u8 *)&text->first = ' ';
 }
 
 /* Write a date from PutDate() to `buffer`, with the century: 10 characters.
    Returns the address behind them. */
-u8 *BufDate(const struct DateText STACK *text, u8 *buffer)
+u8 *BufDate(const struct DateText *text, u8 *buffer)
 {
     if (md.Country.DateFmt > DATE_DMY)
         PUT16(buffer, text->century);
@@ -158,7 +158,7 @@ u8 *BufDate(const struct DateText STACK *text, u8 *buffer)
 
 /* Take a DOS time apart into `text`. A leading zero of the hour becomes a
    space. A country with a 12-hour clock gets a suffix, 'a' or 'p'. */
-void PutTime(u16 time, struct TimeText STACK *text)
+void PutTime(u16 time, struct TimeText *text)
 {
     u16 hour = time >> 11;
 
@@ -175,12 +175,12 @@ void PutTime(u16 time, struct TimeText STACK *text)
     }
     text->hour = HexDec(hour);
     if ((u8)text->hour == '0')
-        *(u8 STACK *)&text->hour = ' ';
+        *(u8 *)&text->hour = ' ';
 }
 
 /* Write a time from PutTime() to `buffer`, with seconds and the suffix:
    9 characters. Returns the address behind them. */
-u8 *BufTime(const struct TimeText STACK *text, u8 *buffer)
+u8 *BufTime(const struct TimeText *text, u8 *buffer)
 {
     PUT16(buffer, text->hour);
     *buffer++ = md.Country.TimeSep[0];
@@ -210,8 +210,8 @@ static u16 *PutPair(u16 *screen, u16 pair, u16 color)
    worked out. The assembly has the panel in DS, where the file is; here
    it is handed on, since a pointer to a file says which panel it is in
    only where it has a segment. A size of 10 digits shows as nine nines. */
-static u16 *PutSize(const struct WCBdef __far *wcb,
-                    const struct FILENT __far *file, u16 *screen, u16 color)
+static u16 *PutSize(const struct WCBdef *wcb,
+                    const struct FILENT *file, u16 *screen, u16 color)
 {
     u16 i, marker;
 
@@ -234,12 +234,12 @@ static u16 *PutSize(const struct WCBdef __far *wcb,
 }
 
 /* Put a file's date on the screen, without the century: 8 cells. */
-static u16 *PutDat0(const struct FILENT __far *file, u16 *screen, u16 color)
+static u16 *PutDat0(const struct FILENT *file, u16 *screen, u16 color)
 {
     struct DateText text;
     u16 separator = color & 0xFF00 | md.Country.DateSep[0];
 
-    PutDate(file->DateF, (struct DateText STACK *)&text);
+    PutDate(file->DateF, &text);
     screen = PutPair(screen, text.first, color);
     *screen++ = separator;
     screen = PutPair(screen, text.second, color);
@@ -249,12 +249,12 @@ static u16 *PutDat0(const struct FILENT __far *file, u16 *screen, u16 color)
 
 /* Put a file's time on the screen, without the seconds: 6 cells. The
    suffix of a 12-hour clock takes the place of a leading space. */
-static u16 *PutTim0(const struct FILENT __far *file, u16 *screen, u16 color)
+static u16 *PutTim0(const struct FILENT *file, u16 *screen, u16 color)
 {
     struct TimeText text;
 
     color &= 0xFF00;
-    PutTime(file->TimeF, (struct TimeText STACK *)&text);
+    PutTime(file->TimeF, &text);
     if (text.suffix == ' ')
         *screen++ = color | ' ';
     screen = PutPair(screen, text.hour, color);
@@ -273,7 +273,7 @@ static u16 *PutTim0(const struct FILENT __far *file, u16 *screen, u16 color)
 /* Put the size, date and time of a file of the panel `wcb` on the screen,
    each after a cell that separates the columns: 26 cells. Returns the
    address behind them. */
-u16 *SzDtTm(const struct WCBdef __far *wcb, const struct FILENT __far *file,
+u16 *SzDtTm(const struct WCBdef *wcb, const struct FILENT *file,
             u16 *screen, u16 color)
 {
     screen = PutGap(screen, color);

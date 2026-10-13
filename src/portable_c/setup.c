@@ -19,11 +19,11 @@
 /* AsmSeg, of vc.h, returns the segment of the program's constants: the
    name of the file is one of system_t.c, and the code that starts
    the program reads it there too. */
-extern const u8 __far Init_F[];
+extern const u8 Init_F[];
 
 /* C routines of other files that vc.h does not have. */
-void FilZero(u8 __far *text, u16 length);               /* string.c */
-u8 __far *MainFil(u8 __far *to, const u8 __far *name);
+void FilZero(u8 *text, u16 length);                     /* string.c */
+u8 *MainFil(u8 *to, const u8 *name);
 
 #define ERR_NO_FILE 2
 #define ARCHIVE     0x20                /* the attribute of a file that
@@ -42,8 +42,8 @@ u8 IniSave[INI_LEN];
    itself. Returns where the next bytes go. */
 static u8 *MkIni1(u8 *to, u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    const u8 __far *from = (const u8 __far *)wcb;
+    struct WCBdef *wcb = PANEL(panel);
+    const u8 *from = (const u8 *)wcb;
     u16 i;
 
     FilZero(wcb->DskMas, 13);

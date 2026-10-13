@@ -6,14 +6,14 @@
  */
 #include "vc.h"
 
-const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number);
+const u8 *TxtNum(const u8 *text, u16 *number);
 
 /* HexByt and TstHex are in vc.h. */
 
 /* Write the low byte of `byte` to the screen buffer as two hex digits,
    leaving the colours as they are, and return the address of the cell
    behind them. HexCod in the assembly is one digit of this. */
-u16 __far *HexByt(u16 __far *screen, u16 byte)
+u16 *HexByt(u16 *screen, u16 byte)
 {
     u16 shift = 4;
     u16 digit;
@@ -22,7 +22,7 @@ u16 __far *HexByt(u16 __far *screen, u16 byte)
         digit = (byte >> shift & 0x0F) + '0';
         if (digit > '9')
             digit += 'A' - '9' - 1;
-        *(u8 __far *)screen = (u8)digit;
+        *(u8 *)screen = (u8)digit;
         screen++;
         if (shift == 0)
             return screen;
@@ -52,7 +52,7 @@ u16 TstHex(u16 digit)
 /* Read a number in decimal digits from a text, store it at `number`, and
    return the address of what follows the digits: `text` itself, if it
    begins with none. A number too large for 16 bits is read as 0FFFFh. */
-const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number)
+const u8 *TxtNum(const u8 *text, u16 *number)
 {
     u16 value = 0;
     u16 digit;

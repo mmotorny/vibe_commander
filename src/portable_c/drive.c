@@ -32,8 +32,8 @@
    functions of sys.h. */
 
 /* A C routine of another file that vc.h does not have. */
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);                            /* screen.c */
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);                                  /* screen.c */
 
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
@@ -45,11 +45,11 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
 #define CHECK 0xFB                      /* the mouse pointer on what a
                                            click would choose */
 
-static const u8 CODE DrLe_S[14] = " Drive letter ";
-static const u8 CODE Choo_S[7] = "Choose ";
-static const u8 CODE Left_S[4] = "left";
-static const u8 CODE Rght_S[5] = "right";
-static const u8 CODE Driv_S[7] = " drive:";
+static const u8 DrLe_S[14] = " Drive letter ";
+static const u8 Choo_S[7] = "Choose ";
+static const u8 Left_S[4] = "left";
+static const u8 Rght_S[5] = "right";
+static const u8 Driv_S[7] = " drive:";
 
 /* The letters of the drives that the box offers. */
 #define DRIVES (md.TmpBuf)
@@ -59,10 +59,10 @@ static const u8 CODE Driv_S[7] = " drive:";
    the panel on the drive that is chosen. Returns 0 if none was. */
 u16 F62_01(u16 panel, u16 item)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct Answer asked;
     struct Mouse pointer;
-    u16 __far *next;
+    u16 *next;
     u16 *screen;
     u16 *first;                         /* DI: where the first letter is */
     u8 *cell;

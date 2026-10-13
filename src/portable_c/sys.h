@@ -5,9 +5,9 @@
  * program. Each thing that it asks is a function here, named for what is
  * asked, and nothing here says how the system is asked: no register, no
  * number of a service, no interrupt.
- * dos.c is these functions for DOS on a PC, and the only file that knows
- * those; the same functions for another system are another file beside
- * it.
+ * dos32.c is these functions for DOS on a PC, and the only file that
+ * knows those; the same functions for another system are another file
+ * beside it.
  *
  * What is asked for is still shaped as DOS and the BIOS of a PC have it,
  * since the rest of the program has those shapes in hundreds of places
@@ -50,15 +50,11 @@
  * callers go on with that. Where the system answers with something else
  * as well, that is a member with a name, and if the call failed it is 0
  * unless its function says otherwise: DOS leaves alone what it has
- * nothing to say in, and 0 is what dos.c hands it there. The original
+ * nothing to say in, and 0 is what dos32.c hands it there. The original
  * went on with whatever it had there itself, and a caller that goes by
  * that says what it was, where it reads the answer.
  *
- * A pointer here reaches anything that the program has, in whichever of
- * its segments: FAR, which is a word of the compiler's where the memory
- * is in segments and nothing where it is not. vc.h says which, where it
- * says so of the other such words, and includes this file; the types
- * u8, u16 and u32 are vc.h's too.
+ * vc.h includes this file, and the types u8, u16 and u32 are vc.h's.
  */
 #ifndef SYS_H
 #define SYS_H
@@ -87,13 +83,13 @@ struct Answer {
 
 /* Make a file with these attributes, or make the one that there is
    empty, and open it to write. Answers with the handle. */
-struct Answer FileCreate(const u8 FAR *name, u16 attributes);
+struct Answer FileCreate(const u8 *name, u16 attributes);
 
 /* Open a file: the low byte of `mode` is 0 to read, 1 to write and 2 for
    both, with what others may do meanwhile in its higher bits, as DOS has
    it. Answers with the handle. */
-struct Answer FileOpen(const u8 FAR *name, u16 mode);
-struct Answer FileOpenBare(const u8 FAR *name, u16 mode);
+struct Answer FileOpen(const u8 *name, u16 mode);
+struct Answer FileOpenBare(const u8 *name, u16 mode);
 
 /* Close a file. */
 struct Answer FileClose(u16 handle);
@@ -101,13 +97,13 @@ struct Answer FileCloseBare(u16 handle);
 
 /* Read up to `count` bytes of a file to `to`, from where the file is at.
    Answers with how many were read: fewer at the end of the file. */
-struct Answer FileRead(u16 handle, u8 FAR *to, u16 count);
-struct Answer FileReadBare(u16 handle, u8 FAR *to, u16 count);
+struct Answer FileRead(u16 handle, u8 *to, u16 count);
+struct Answer FileReadBare(u16 handle, u8 *to, u16 count);
 
 /* Write `count` bytes at `from` to a file, at where the file is at.
    Answers with how many were written: fewer on a disk that is full.
    None, 0, cuts the file off there. */
-struct Answer FileWrite(u16 handle, const u8 FAR *from, u16 count);
+struct Answer FileWrite(u16 handle, const u8 *from, u16 count);
 
 /* Go to a place of a file: `offset` bytes from its start (`from` 0),
    from where it is at (1) or from its end (2); with 1 and 2 the offset
@@ -123,11 +119,11 @@ struct FilePlace {
 struct FilePlace FileSeek(u16 handle, u16 from, u32 offset);
 
 /* Delete a file. */
-struct Answer FileDelete(const u8 FAR *name);
+struct Answer FileDelete(const u8 *name);
 
 /* Give a file or a directory another name, or another directory of the
    same drive. */
-struct Answer FileRename(const u8 FAR *from, const u8 FAR *to);
+struct Answer FileRename(const u8 *from, const u8 *to);
 
 /* The attributes of a file or a directory, and others set for it. If
    asking failed, `attributes` is 0. */
@@ -136,8 +132,8 @@ struct FileAttr {
     u16 failed;
     u16 attributes;
 };
-struct FileAttr FileAttributes(const u8 FAR *name);
-struct Answer FileSetAttributes(const u8 FAR *name, u16 attributes);
+struct FileAttr FileAttributes(const u8 *name);
+struct Answer FileSetAttributes(const u8 *name, u16 attributes);
 
 /* The date and the time that a file was last written at, as DOS packs
    them, and others set for it. If asking failed, both are 0. */
@@ -162,7 +158,7 @@ struct Device FileDevice(u16 handle);
 
 /* The full path of a name, with its drive and with nothing left in it
    to work out, to `to`, which has room for 128 bytes. */
-struct Answer FileTrueName(const u8 FAR *name, u8 FAR *to);
+struct Answer FileTrueName(const u8 *name, u8 *to);
 
 /*
  * Files by a file control block, DOS's older way, which the program
@@ -174,7 +170,7 @@ struct Answer FileTrueName(const u8 FAR *name, u8 FAR *to);
    `how` is as DOS takes it. Bare. Returns what DOS leaves in AX: 1 in
    the low byte if the name has * or ?, 0 if not, FFh for a drive that
    there is not. */
-u16 FcbParse(const u8 FAR *name, u8 FAR *fcb, u16 how);
+u16 FcbParse(const u8 *name, u8 *fcb, u16 how);
 
 /* Delete what the file control block at `fcb` names. Asked with the
    program's errors. The low byte of `value` is 0 if something was
@@ -185,7 +181,7 @@ u16 FcbParse(const u8 FAR *name, u8 FAR *fcb, u16 how);
    asks DOS which: that answer then comes back, with `failed`, in place
    of the call's. `flagged` is not 0 where the original has the flag set
    when it calls. */
-struct Answer FcbDelete(const u8 FAR *fcb, u16 flagged);
+struct Answer FcbDelete(const u8 *fcb, u16 flagged);
 
 /*
  * Directories. Asked with the program's errors, but for FindRecord and
@@ -194,27 +190,27 @@ struct Answer FcbDelete(const u8 FAR *fcb, u16 flagged);
 
 /* What is known of a file that was found is put at `record` from now
    on. */
-void FindRecord(struct DTAs FAR *record);
+void FindRecord(struct DTAs *record);
 
 /* Find the first file or directory that `pattern` names, a path whose
    last name may have * and ?, among those with no other attributes than
    `attributes`, or a label for 8; and the next one of the same search.
    What is found is at the record. The error at the end of the search is
    12h. */
-struct Answer FindFirst(const u8 FAR *pattern, u16 attributes);
+struct Answer FindFirst(const u8 *pattern, u16 attributes);
 struct Answer FindNext(void);
 
 /* Make a directory, remove one that is empty, make one the current one
    of its drive. */
-struct Answer DirMake(const u8 FAR *name);
-struct Answer DirRemove(const u8 FAR *name);
-struct Answer DirChange(const u8 FAR *name);
+struct Answer DirMake(const u8 *name);
+struct Answer DirRemove(const u8 *name);
+struct Answer DirChange(const u8 *name);
 
 /* The current directory of a drive, 1 for A: and 0 for the current one,
    in the low byte of `drive`: its path without the drive and the first
    backslash, to `to`, which has room for 64 bytes. */
-struct Answer DirCurrent(u16 drive, u8 FAR *to);
-struct Answer DirCurrentBare(u16 drive, u8 FAR *to);
+struct Answer DirCurrent(u16 drive, u8 *to);
+struct Answer DirCurrentBare(u16 drive, u8 *to);
 
 /*
  * Drives. Where it is not said otherwise a drive is 0 for A:, and only
@@ -310,7 +306,7 @@ struct Time {
 struct Time TimeOfDay(void);
 
 /* How the country writes numbers, dates and times, to `to`. */
-void CountryInfo(struct CNTRY FAR *to);
+void CountryInfo(struct CNTRY *to);
 
 /* The capital of a letter as the country has it: only letters beyond
    ASCII change. The low byte is the letter, and the high byte comes
@@ -349,8 +345,8 @@ void Idle(void);
    as DOS has one: a byte that counts the characters, the characters, and
    a carriage return, which is not counted. The program gets the
    environment that this one has. */
-struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail);
-struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail);
+struct Answer ProgramRun(const u8 *name, const u8 *tail);
+struct Answer ProgramRunBare(const u8 *name, const u8 *tail);
 
 /* End the program, with a number for whoever started it. Does not
    return. */
@@ -363,13 +359,13 @@ void ProgramEndOld(void);
 
 /* What this program was told behind its name when it was started, its
    command tail: the characters, as far as a carriage return. */
-const u8 FAR *ProgramTail(void);
+const u8 *ProgramTail(void);
 
 /* The environment that this program was started with, as DOS has one:
    texts, NAME=value, each ended by a zero byte, and one zero byte more
    behind the last; then two bytes, and behind them the path of the
    program's own file, ended by a zero byte. */
-const u8 FAR *ProgramEnvironment(void);
+const u8 *ProgramEnvironment(void);
 
 /*
  * What the system asks the program, and the keys that stop one.
@@ -407,7 +403,7 @@ const u8 FAR *ProgramEnvironment(void);
    else. It may be entered with the machine kept from interrupting the
    program (see IntOn), and on a stack that is not the program's, if a
    program that this one has run has left the question to it. */
-typedef u16 DeviceErrorFn(u16 how, u16 error, const u8 FAR *device);
+typedef u16 DeviceErrorFn(u16 how, u16 error, const u8 *device);
 #define DEVICE_RETRY 1
 #define DEVICE_FAIL  3
 
@@ -469,7 +465,7 @@ void ProgramEndedGive(void);
 
 /* Write a character; and a text, as far as its dollar sign. */
 void ConsoleChar(u16 character);
-void ConsoleText(const u8 FAR *text);
+void ConsoleText(const u8 *text);
 
 /*
  * The keyboard.
@@ -569,8 +565,8 @@ void ScreenMemory(u16 mode, u16 start);
 /* The cells of the screen themselves, 80 to a row: `count` of them from
    the cell `cell` on, written from `from` or read to `to`. The first
    cell is 0. ScreenMemory has to have said where they are. */
-void ScreenPut(u16 cell, const u16 FAR *from, u16 count);
-void ScreenGet(u16 cell, u16 FAR *to, u16 count);
+void ScreenPut(u16 cell, const u16 *from, u16 count);
+void ScreenGet(u16 cell, u16 *to, u16 count);
 
 /*
  * The mouse. It counts in dots, eight to a cell of the text screen.

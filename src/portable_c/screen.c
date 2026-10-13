@@ -15,8 +15,8 @@
 u8 *ColAddr(u16 number);
 u16 ShadCol(u16 color, u16 how);
 u16 *Shadow(u16 *cell);
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);
 
 /* Color, BasAdr, MvsColr and MovDz0 are in vc.h. */
 
@@ -86,8 +86,8 @@ u16 *Shadow(u16 *cell)
    of 0 is one of 65536. This is MvsBwc in the assembly, where the
    characters are in the code segment, and MvsBwe, where they are with the
    screen buffer. */
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color)
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color)
 {
     color &= 0xFF00;
     do
@@ -99,10 +99,10 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
 /* Give `count` cells of the screen buffer the colour in the low byte of
    `color`, and return the address of the cell behind them. A count of 0
    is one of 65536. */
-u16 __far *MvsColr(u16 __far *screen, u16 count, u16 color)
+u16 *MvsColr(u16 *screen, u16 count, u16 color)
 {
     do {
-        ((u8 __far *)screen)[1] = (u8)color;
+        ((u8 *)screen)[1] = (u8)color;
         screen++;
     } while (--count);
     return screen;
@@ -111,12 +111,12 @@ u16 __far *MvsColr(u16 __far *screen, u16 count, u16 color)
 /* Write a text to the screen buffer, leaving the colours as they are, and
    return the address of the cell behind it. MovDz in the assembly is this
    at a row and a column, which it makes an address of with BasAdr. */
-u16 __far *MovDz0(u16 __far *screen, const u8 __far *text)
+u16 *MovDz0(u16 *screen, const u8 *text)
 {
     u8 c;
 
     while ((c = *text++) != 0) {
-        *(u8 __far *)screen = c;
+        *(u8 *)screen = c;
         screen++;
     }
     return screen;

@@ -93,14 +93,14 @@ u16 F32_70(u16 begin, u16 size);
 
 /* The tables of stmain_t.c that the code names, by their offsets in the
    segment that AsmSeg returns. */
-extern const u8 __far StPalets[];       /* the setup without a file */
-extern const u8 __far StIniEr_B[];      /* the setup file is missing or
+extern const u8 StPalets[];             /* the setup without a file */
+extern const u8 StIniEr_B[];            /* the setup file is missing or
                                            wrong, */
-extern const u8 __far StNoFnd_S[];      /* with one of these for its */
-extern const u8 __far StNoIni_S[];      /* second line */
-extern const u8 __far StMain_P[];       /* the menu */
-extern const u8 __far StDeflt_B[];      /* "reset all options?" */
-extern const u8 __far StSvSt_B[];       /* "save the current setup?" */
+extern const u8 StNoFnd_S[];            /* with one of these for its */
+extern const u8 StNoIni_S[];            /* second line */
+extern const u8 StMain_P[];             /* the menu */
+extern const u8 StDeflt_B[];            /* "reset all options?" */
+extern const u8 StSvSt_B[];             /* "save the current setup?" */
 
 /* Not 0 while the setup is open: see vc.h. */
 u8 StOpen;
@@ -110,7 +110,7 @@ u8 StOpen;
    the drive A:, whose letter StDefault makes that of the current drive.
    The original copies as much from here as the file has of a panel,
    WCBini bytes, which is 64 more than this is: see StDefault. */
-static const u8 CODE StDefWCB[24] = {
+static const u8 StDefWCB[24] = {
     0,                                  /* WinTyp */
     0,                                  /* BrfFul */
     1,                                  /* Visible */
@@ -126,15 +126,15 @@ static const u8 CODE StDefWCB[24] = {
    behind the directory of the program: the name, and what follows it
    there, which is its zero byte, the name of the environment's variable
    and the start of a text that nothing reads. */
-static const u8 CODE StInit_F[13] = "VC.INI\0VC=\0So";
+static const u8 StInit_F[13] = "VC.INI\0VC=\0So";
 
 /* The page of the setup's help for each item of the menu. */
-static const u8 CODE StMainHlp[9] = { 1, 2, 3, 4, 4, 4, 5, 6, 7 };
+static const u8 StMainHlp[9] = { 1, 2, 3, 4, 4, 4, 5, 6, 7 };
 
 /* What is said, through DOS, when the setup file could not be written:
    the line ends as DOS's call for writing a text has it, with a dollar
    sign, and has no zero byte. */
-static const u8 CODE StStErr_S[49] =
+static const u8 StStErr_S[49] =
     "There was an error while saving the setup file\r\n$";
 
 /*------------- What DOS had on the screen -------------*/
@@ -195,7 +195,7 @@ void StUser(u16 first, u16 rows)
    saved. Here those 64 bytes are zeros (see DEVIATIONS.md). */
 static void StDefault(void)
 {
-    const u8 __far *from = AT(AsmSeg(), OFFSET(StPalets));
+    const u8 *from = AT(AsmSeg(), OFFSET(StPalets));
     u8 *first = (u8 *)WCB1;
     u8 *second = (u8 *)WCB2;
     u16 i;
@@ -321,7 +321,7 @@ static void StMain00(void)
 Main00:
     PutKey(0);
     DialBox(0x528, OFFSET(StMain_P), 0, MAIN_SEG,
-            (struct Box STACK *)&where);
+            &where);
     Window(where.begin, where.size);
     item = sd.MnItem;
     last = (u8)((where.size >> 8) - 6); /* the item Exit */

@@ -12,7 +12,7 @@
  * variables, and what it wants of DOS it asks through sys.h. Nothing of
  * it stays anywhere, and nothing that DOS enters is here: where the
  * program begins and where DOS goes on when it has ended the program
- * are the system's, in dos.c.
+ * are the system's, in dos32.c.
  *
  * Two things are here. The first is what the program does before
  * anything else, Alloc3: it looks at the version of DOS and keeps no more
@@ -60,7 +60,7 @@ static const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
 static u8 PromptLine[2 + 3 + 64 + 1 + 1];
 
 /* A text of main_t.c, for a DOS that is too old. */
-extern const u8 __far Vers_S[];
+extern const u8 Vers_S[];
 
 /* Where things are in the original, as it was shipped: what its
    registers hold when it calls the BIOS with them unset, and the BIOS
@@ -80,7 +80,7 @@ extern const u8 __far Vers_S[];
    on the page in the high byte of `bx`. A text of no characters is
    written as its zero byte. The assembly leaves SI where the text ends,
    and nothing goes on with that. */
-static void OutStr(const u8 __far *text, u16 bx)
+static void OutStr(const u8 *text, u16 bx)
 {
     do
         ScreenType(*text++, bx >> 8, 7);
@@ -97,14 +97,14 @@ static void OutStr(const u8 __far *text, u16 bx)
    write to the page that shows, whatever they are told. */
 static void OutStr0(const u8 *text, u16 bx)
 {
-    OutStr((const u8 __far *)text, bx);
+    OutStr(text, bx);
 }
 
 /* Say that the file `name` is missing, after `text`, and wait for Enter
    or Esc: 1 for Esc, to give up. The assembly has the address of
    ComnIni.EPB in BX where it calls, which DOS was to run the file
    with. */
-static u16 NotFind(const u8 *text, const u8 __far *name)
+static u16 NotFind(const u8 *text, const u8 *name)
 {
     OutStr0(text, EPB_WAS);
     OutStr(name, EPB_WAS);
@@ -160,9 +160,9 @@ void Exit00(u16 code)
    program is entered then, and the registers that the program which
    started this one goes on with, which the scenario ended shows, are
    the system's to leave. On DOS the system has the PSP name a routine
-   of its own for that: Exit01 of dos.c, and in the program of 32 bits
-   a few instructions of real mode that dos32.c keeps below the
-   megabyte. This was TakeDos while it took INT 21h as well.
+   of its own for that: a few instructions of real mode that dos32.c
+   keeps below the megabyte. This was TakeDos while it took INT 21h as
+   well.
 
    The original takes INT 21h here too, and INT 27h with it, if its
    setup has it know of the programs that stay in the memory, TSR manager
@@ -207,7 +207,7 @@ void AlocEr(u16 bx)
 static void Exec02(void)
 {
     struct Answer ran;
-    const u8 __far *name;
+    const u8 *name;
     u8 *command, *before, *end, *to;
     u16 count, bx;
     u8 drive;
@@ -230,7 +230,7 @@ static void Exec02(void)
         before[3] = ' ';
         for (;;) {                      /* Exec05 */
             if (md.ComSpec == 0) {
-                name = (const u8 __far *)Command;
+                name = Command;
             } else {
                 name = ProgramEnvironment() + md.ComSpec;
                 ran = ProgramRunBare(name, before);
@@ -329,7 +329,7 @@ static void Alloc9(void)
    system: Main of main.c calls this when the system has entered the
    program. It is the original's Alloc0 from its label Alloc3 on; what
    stands in front of that label there, and where DOS enters the
-   program, is the system's: Alloc0 of dos.c.
+   program, is the system's: Start of dos32.c.
 
    DOS has to be 3.20 at the least. DOS has given the program all of the
    memory: its block is made as long as the program is, MemOwn, and the

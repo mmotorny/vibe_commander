@@ -66,10 +66,10 @@ static u16 FncMs1(u16 include);
    screen. */
 
 /* C routines of other files that vc.h does not have. */
-const u8 __far *FndLet(const u8 __far *text);           /* string.c */
-const u8 __far *TxtNum(const u8 __far *text, u16 STACK *number); /* digits.c */
-void NormStr(u8 __far *text);                           /* string.c */
-u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
+const u8 *FndLet(const u8 *text);                       /* string.c */
+const u8 *TxtNum(const u8 *text, u16 *number); /* digits.c */
+void NormStr(u8 *text);                                 /* string.c */
+u8 *UnConv(u8 *name, const u8 *buffer);                     /* mask.c */
 void PutFls(u16 panel);                                 /* panel.c */
 void PutTre(u16 panel);                                 /* tree.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
@@ -82,51 +82,51 @@ struct TimeText {
     u8  unused;
     u8  suffix;
 };
-void PutDate(u16 date, struct DateText STACK *text);
-u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
-void PutTime(u16 time, struct TimeText STACK *text);
-u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
+void PutDate(u16 date, struct DateText *text);
+u8 *BufDate(const struct DateText *text, u8 *buffer);
+void PutTime(u16 time, struct TimeText *text);
+u8 *BufTime(const struct TimeText *text, u8 *buffer);
 
 /* Boxes and texts, constants of dirfunc_t.c but for Empty_S, which
    OncZoom and Dialog take by their offsets in the segment that the
    constants are in: only those are used here. */
-extern const u8 __far DelFl_P[];        /* "Deleting the file" */
-extern const u8 __far DelDr_P[];        /* "Deleting the subdirectory" */
-extern const u8 __far DelCo_B[];        /* "You are DELETING ... from" */
-extern const u8 __far RdOnl_B[];        /* "... is marked read-only." */
-extern const u8 __far NoEmp_B[];        /* "... is not empty." */
-extern const u8 __far DelEr_B[];        /* "Can't delete the file" */
-extern const u8 __far CntDi_B[];        /* "Can't delete the subdirectory" */
-extern const u8 __far StAtr_P[];        /* "Setting attributes:" */
-extern const u8 __far AtrEr_B[];        /* a line and the file's name */
-extern const u8 __far NoDat_B[];        /* "Illegal date or time." */
-extern const u8 __far PthEr_B[];        /* "Path too long" */
-extern const u8 __far Del_S[];          /* " Delete " */
-extern const u8 __far DelFs_S[];        /* "s" */
-extern const u8 __far Empty_S[];        /* nothing */
-extern const u8 __far NoFnd_S[];        /* "Can't find the file" */
-extern const u8 __far NoAtr_S[];        /* "Can't set attributes" */
+extern const u8 DelFl_P[];              /* "Deleting the file" */
+extern const u8 DelDr_P[];              /* "Deleting the subdirectory" */
+extern const u8 DelCo_B[];              /* "You are DELETING ... from" */
+extern const u8 RdOnl_B[];              /* "... is marked read-only." */
+extern const u8 NoEmp_B[];              /* "... is not empty." */
+extern const u8 DelEr_B[];              /* "Can't delete the file" */
+extern const u8 CntDi_B[];              /* "Can't delete the subdirectory" */
+extern const u8 StAtr_P[];              /* "Setting attributes:" */
+extern const u8 AtrEr_B[];              /* a line and the file's name */
+extern const u8 NoDat_B[];              /* "Illegal date or time." */
+extern const u8 PthEr_B[];              /* "Path too long" */
+extern const u8 Del_S[];                /* " Delete " */
+extern const u8 DelFs_S[];              /* "s" */
+extern const u8 Empty_S[];              /* nothing */
+extern const u8 NoFnd_S[];              /* "Can't find the file" */
+extern const u8 NoAtr_S[];              /* "Can't set attributes" */
 /* Those of the commands. DlWr4_S is copied with what follows it there,
    81 bytes in all. */
-extern const u8 __far MkDi1_B[];        /* "Create the directory", a path */
-extern const u8 __far MkDi2_B[];        /* the same, a name: in the tree */
-extern const u8 __far MkErr_B[];        /* "Can't create the directory" */
-extern const u8 __far CrDir_S[];        /* "Create the directory" */
-extern const u8 __far MkDir_S[];        /* " Make directory " */
-extern const u8 __far DelDi_B[];        /* "Do you wish to delete" a */
-extern const u8 __far Subdi_S[];        /* " the directory" */
-extern const u8 __far DelFi_B[];        /* "Do you wish to delete" a file */
-extern const u8 __far DelSe_B[];        /* "You have selected" */
-extern const u8 __far DlMas_B[];        /* "Delete the file:" */
-extern const u8 __far DlWrn_B[];        /* "WARNING!" */
-extern const u8 __far DlWr4_S[];        /* "in the current directory" */
-extern const u8 __far StAt1_B[];        /* the attributes of a file */
-extern const u8 __far StAt2_B[];        /* those to set and to clear */
-extern const u8 __far Attr8_S[];        /* " for" */
-extern const u8 __far Label_B[];        /* "Change volume label ... to" */
-extern const u8 __far DelVo_B[];        /* "Do you wish to delete" it */
-extern const u8 __far ErVol_B[];        /* "Could not set" it */
-extern const u8 __far NoFnc_B[];        /* "Can't find file" */
+extern const u8 MkDi1_B[];              /* "Create the directory", a path */
+extern const u8 MkDi2_B[];              /* the same, a name: in the tree */
+extern const u8 MkErr_B[];              /* "Can't create the directory" */
+extern const u8 CrDir_S[];              /* "Create the directory" */
+extern const u8 MkDir_S[];              /* " Make directory " */
+extern const u8 DelDi_B[];              /* "Do you wish to delete" a */
+extern const u8 Subdi_S[];              /* " the directory" */
+extern const u8 DelFi_B[];              /* "Do you wish to delete" a file */
+extern const u8 DelSe_B[];              /* "You have selected" */
+extern const u8 DlMas_B[];              /* "Delete the file:" */
+extern const u8 DlWrn_B[];              /* "WARNING!" */
+extern const u8 DlWr4_S[];              /* "in the current directory" */
+extern const u8 StAt1_B[];              /* the attributes of a file */
+extern const u8 StAt2_B[];              /* those to set and to clear */
+extern const u8 Attr8_S[];              /* " for" */
+extern const u8 Label_B[];              /* "Change volume label ... to" */
+extern const u8 DelVo_B[];              /* "Do you wish to delete" it */
+extern const u8 ErVol_B[];              /* "Could not set" it */
+extern const u8 NoFnc_B[];              /* "Can't find file" */
 
 /* What FncAddr can name, by the numbers of vc.h: a routine that is called
    with the attributes of a file in AL and answers in AX. The original
@@ -138,14 +138,14 @@ u16 C00_00(u16 attributes);
 u16 DiSi10(u16 attributes);
 u16 FindFil(u16 attributes);
 typedef u16 FncFn(u16 attributes);
-static FncFn * const CODE Fnc_T[] = {
+static FncFn * const Fnc_T[] = {
     C00_00, DiSi10, FindFil, F38_40, M30_50
 };
 
 /* Names in the assembly's code segment. Mask_S is \*.* and what follows
    it there, of which DirFunc copies a byte; Tree_F is \TREEINFO.NCD. */
-extern const u8 __far Mask_S[];
-extern const u8 __far Tree_F[];
+extern const u8 Mask_S[];
+extern const u8 Tree_F[];
 
 #define LenCmd 124                      /* Length of command line */
 
@@ -172,7 +172,7 @@ extern const u8 __far Tree_F[];
 #define ERR_NOT_READY   0x53
 
 /* Take a box off the screen. */
-static void Close(struct Box STACK *box)
+static void Close(struct Box *box)
 {
     ResWin(box->begin, box->size, box->saved);
     Window(box->begin, box->size);
@@ -217,7 +217,7 @@ u16 F38_40(u16 attributes)
 
     if (!(attributes & ATTR_DIRECTORY)) {
         OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(Empty_S),
-                (struct Box STACK *)&box);
+                &box);
         if (ChgDisk(md.TmpBuf))
             goto stop;
         asked = FileDelete(md.TmpBuf);
@@ -259,7 +259,7 @@ u16 F38_40(u16 attributes)
 
     /* F38_50 */
     OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S),
-            (struct Box STACK *)&box);
+            &box);
     if (ChgDisk(md.TmpBuf))
         goto stop;
     removed = F38_60();
@@ -279,7 +279,7 @@ u16 F38_40(u16 attributes)
                 DEL_ALL = 1;
         }
         /* F38_52 */
-        Close((struct Box STACK *)&box);
+        Close(&box);
         end = md.TmpBuf;
         for (count = LenPath + 13; count != 0; count--)
             if (*end++ == 0)
@@ -295,7 +295,7 @@ u16 F38_40(u16 attributes)
         if (answer >> 8)
             goto out;
         OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S),
-                (struct Box STACK *)&box);
+                &box);
         removed = F38_60();
         if (removed.failed != 0) {
             if (removed.value == ERR_NOT_READY)
@@ -328,7 +328,7 @@ not_done:
 stop:
     answer = STOP;
 close:
-    Close((struct Box STACK *)&box);
+    Close(&box);
 out:
     FNC_CHANGE |= (u8)answer;
     return answer;
@@ -395,7 +395,7 @@ static u16 F38_70(void)
     if ((u8)FcbParse(name, fcb + 7, 2) != 1)
         return NOT_DONE;
     OncZoom(BOX_PLACE, OFFSET(DelFl_P), OFFSET(DelFs_S),
-            (struct Box STACK *)&box);
+            &box);
     if (ChgDisk(md.TmpBuf))
         goto stop;
     *back = 0;
@@ -441,7 +441,7 @@ failed:
 stop:
     answer = STOP;
 close:
-    Close((struct Box STACK *)&box);
+    Close(&box);
     return answer;
 }
 
@@ -462,7 +462,7 @@ u16 M30_50(u16 attributes)
     if (attributes & ATTR_DIRECTORY)
         return DirFunc();
     /* None of its lines has ^I: no include line. */
-    OncZoom(BOX_PLACE, OFFSET(StAtr_P), 0, (struct Box STACK *)&box);
+    OncZoom(BOX_PLACE, OFFSET(StAtr_P), 0, &box);
     if (ChgDisk(md.TmpBuf))
         goto stop;
     had = FileAttributes(md.TmpBuf);
@@ -521,13 +521,13 @@ stop:
     answer = STOP;
 close:
     FNC_CHANGE |= (u8)answer;
-    Close((struct Box STACK *)&box);
+    Close(&box);
     return answer;
 }
 
 /* A number in a date or a time, and what follows the spaces behind it.
    Returns 0 if there is no digit. */
-static u16 Figure(const u8 * STACK *text, u16 STACK *number)
+static u16 Figure(const u8 **text, u16 *number)
 {
     const u8 *from = *text;
 
@@ -580,17 +580,17 @@ struct Checked M30_60(u16 answer)
     AttrTim = 0xFFFF;
     text = NEAR(FndLet(md.DosBuf + LenCmd + 10 + 3));
     if (*text != 0) {
-        if (!Figure((const u8 * STACK *)&text, (u16 STACK *)&month))
+        if (!Figure(&text, &month))
             goto refused;
         if (*text != md.Country.DateSep[0])
             goto refused;
         text = NEAR(FndLet(text + 1));
-        if (!Figure((const u8 * STACK *)&text, (u16 STACK *)&day))
+        if (!Figure(&text, &day))
             goto refused;
         if (*text != md.Country.DateSep[0])
             goto refused;
         text = NEAR(FndLet(text + 1));
-        if (!Figure((const u8 * STACK *)&text, (u16 STACK *)&year))
+        if (!Figure(&text, &year))
             goto refused;
         if (*text != 0)
             goto refused;
@@ -635,17 +635,17 @@ struct Checked M30_60(u16 answer)
     text = NEAR(FndLet(md.DosBuf + LenCmd + 10 + 100 + 3));
     if (*text == 0)
         return Accepted(0);
-    if (!Figure((const u8 * STACK *)&text, (u16 STACK *)&hours))
+    if (!Figure(&text, &hours))
         goto refused;
     if (*text == md.Country.TimeSep[0]) {
         text = NEAR(FndLet(text + 1));
-        if (!Figure((const u8 * STACK *)&text, (u16 STACK *)&minutes))
+        if (!Figure(&text, &minutes))
             goto refused;
         if (minutes >= 60)
             goto refused;
         if (*text == md.Country.TimeSep[0]) {
             text = NEAR(FndLet(text + 1));
-            if (!Figure((const u8 * STACK *)&text, (u16 STACK *)&seconds))
+            if (!Figure(&text, &seconds))
                 goto refused;
             if (seconds >= 60)
                 goto refused;
@@ -879,8 +879,8 @@ struct Answer DelTr0(const u8 *path)
 static u16 F47_01(u16 box)
 {
     struct Answer made;
-    struct WCBdef __far *wcb;
-    struct FILENT __far *entry;
+    struct WCBdef *wcb;
+    struct FILENT *entry;
     u8 *path = md.TmpBuf;
     u8 *name, *end;
     u16 i;
@@ -950,7 +950,7 @@ u16 F47_00(void)
    panel shows that. */
 u16 F37_00(u16 panel)
 {
-    const struct WCBdef __far *wcb = PANEL(panel);
+    const struct WCBdef *wcb = PANEL(panel);
 
     if (wcb->WinTyp == 1 && wcb->Visible != 0)
         return F47_01(OFFSET(MkDi2_B));
@@ -964,8 +964,8 @@ u16 F37_00(u16 panel)
    is off or shows neither files nor the tree, this is Shift-F8. */
 u16 F38_00(u16 panel)
 {
-    const struct WCBdef __far *wcb = PANEL(panel);
-    const struct FILENT __far *file;
+    const struct WCBdef *wcb = PANEL(panel);
+    const struct FILENT *file;
     u8 *end;
     struct Selected selected;
     u16 box, include, i;
@@ -1033,7 +1033,7 @@ u16 F38_00(u16 panel)
    there was none. */
 u16 F48_00(void)
 {
-    const u8 __far *from;
+    const u8 *from;
     u8 *name;
     u16 i, answer, include;
 
@@ -1116,8 +1116,8 @@ static u16 M30_82(const u8 *ticks)
    begins with where a number has one digit, and the name at 100. */
 u16 M30_00(u16 panel)
 {
-    const struct WCBdef __far *wcb = PANEL(panel);
-    const struct FILENT __far *file;
+    const struct WCBdef *wcb = PANEL(panel);
+    const struct FILENT *file;
     struct DateText date;
     struct TimeText time;
     struct Selected selected;
@@ -1140,17 +1140,17 @@ u16 M30_00(u16 panel)
             md.TmpBuf[1] = (attributes & 0x20) != 0;
             md.TmpBuf[2] = (attributes & 0x02) != 0;
             md.TmpBuf[3] = (attributes & 0x04) != 0;
-            PutDate(file->DateF, (struct DateText STACK *)&date);
+            PutDate(file->DateF, &date);
             end = md.TmpBuf + 15;
             if ((u8)date.first == ' ')
                 end--;
-            end = BufDate((struct DateText STACK *)&date, end);
+            end = BufDate(&date, end);
             *end = 0;
-            PutTime(file->TimeF, (struct TimeText STACK *)&time);
+            PutTime(file->TimeF, &time);
             end = md.TmpBuf + 30;
             if ((u8)time.hour == ' ')
                 end--;
-            end = BufTime((struct TimeText STACK *)&time, end);
+            end = BufTime(&time, end);
             if (time.suffix == ' ')
                 end--;
             *end = 0;
@@ -1345,8 +1345,8 @@ u16 FncExt(void)
 u16 FncSel(void)
 {
     u16 panel = md.WCBcrn;
-    struct WCBdef __far *wcb = PANEL(panel);
-    struct FILENT __far *file;
+    struct WCBdef *wcb = PANEL(panel);
+    struct FILENT *file;
     struct Selected selected;
     u16 address, answer, lines, number, begin, i;
 

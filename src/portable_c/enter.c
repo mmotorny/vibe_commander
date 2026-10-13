@@ -35,14 +35,14 @@
    directory in the tree again. Run_00 makes the commands of a line of an
    extension file, which begin at `text` in MenuBuf, and is 1 if there is
    one to run. */
-u16 TstExe(const u8 __far *name);                       /* files.c */
+u16 TstExe(const u8 *name);                             /* files.c */
 void TrCr10(void);                                      /* tree.c */
 u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 
 /* The dialog that asks whether to quit, and the name of the program for
    it: constants of keys_t.c. */
-extern const u8 __far Quit_B[];
-extern const u8 __far Name_S[];
+extern const u8 Quit_B[];
+extern const u8 Name_S[];
 
 #define LenCmd 124                      /* Length of command line */
 
@@ -53,7 +53,7 @@ extern const u8 __far Name_S[];
    and a colour: the high byte and the low one. */
 #define COMNINI_WAS 0x25E5
 
-static const u8 CODE CDir_S[] = "\\";
+static const u8 CDir_S[] = "\\";
 
 static struct Onward F23_02(u16 panel, u16 address);
 
@@ -89,8 +89,8 @@ static struct Onward To(u16 place)
    entered as a command is run, cuts it too: StSetup of stmain.c. */
 void F21_40(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    struct FILENT __far *file;
+    struct WCBdef *wcb = PANEL(panel);
+    struct FILENT *file;
     u16 end = wcb->EndBuf;
     u16 limit = DSKBUF + MinFls * sizeof(struct FILENT);
     u16 place, first;
@@ -239,9 +239,9 @@ struct Onward F21_25(void)
    LenExt. */
 struct Onward F21_10(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    const struct FILENT __far *file;
-    const u8 __far *from;
+    struct WCBdef *wcb = PANEL(panel);
+    const struct FILENT *file;
+    const u8 *from;
     struct Edited edited;
     u16 address, command, cursor, i;
     u8 c;
@@ -320,7 +320,7 @@ struct Onward F21_00(u16 panel)
    command returns NEXT_INIT50. */
 void F24_02(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u16 kind, find = 0;
 
     SetPth();
@@ -347,9 +347,9 @@ void F24_02(u16 panel)
    with it, 12 bytes of it whatever its length. */
 static struct Onward F23_02(u16 panel, u16 address)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    struct FILENT __far *file = ENTRY(wcb, address);
-    u8 __far *name;
+    struct WCBdef *wcb = PANEL(panel);
+    struct FILENT *file = ENTRY(wcb, address);
+    u8 *name;
     u16 i;
 
     HidCur();
@@ -362,7 +362,7 @@ static struct Onward F23_02(u16 panel, u16 address)
         wcb->First = DSKBUF + sizeof(struct FILENT);
         wcb->EndBuf = DSKBUF + sizeof(struct FILENT);
         ENTRY(wcb, DSKBUF + sizeof(struct FILENT))->NameF[0] = 0;
-        name = (u8 __far *)CutPath(wcb->WinPath);
+        name = (u8 *)CutPath(wcb->WinPath);
         file = ENTRY(wcb, DSKBUF);
         for (i = 0; i < 12; i++)
             file->NameF[i] = name[i];
@@ -380,7 +380,7 @@ static struct Onward F23_02(u16 panel, u16 address)
 /* ^PgUp: the directory above, if the list begins with it. */
 struct Onward F22_00(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
 
     if (ENTRY(wcb, DSKBUF)->NameF[0] != '.')
         return To(NEXT_FUNC05);
@@ -396,7 +396,7 @@ struct Onward F22_00(u16 panel)
 /* ^PgDn: the directory under the cursor. */
 struct Onward F23_00(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u16 address = wcb->CurAdr;
 
     if (!FilePan(panel))
@@ -411,7 +411,7 @@ struct Onward F23_00(u16 panel)
 /* Have DOS go to the directory `path`, and the panel show it from its
    start: F24_01, where the tree in its box comes in with the directory
    that was chosen, at TmpBuf. */
-static struct Onward ChDir(u16 panel, const u8 __far *path)
+static struct Onward ChDir(u16 panel, const u8 *path)
 {
     if (DirChange(path).failed)
         return To(NEXT_FUNC04);
@@ -522,8 +522,8 @@ struct Onward F26_00(void)
    and the cursor is at the start of the line, the name again. */
 struct Onward F27_00(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    const struct FILENT __far *file;
+    struct WCBdef *wcb = PANEL(panel);
+    const struct FILENT *file;
     const u8 *line, *entry, *found;
     u16 cursor = md.DosCol;
     u16 count, i;

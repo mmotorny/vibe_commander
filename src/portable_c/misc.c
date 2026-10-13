@@ -10,10 +10,9 @@
 
 /* The segment of the program's tables. The original is one segment,
    and has its texts and tables at offsets in it, which its code reads
-   through CS. Here they are a group of their own, and what is known by
-   its offset, a box, a dialog, a text of one, is read at that offset in
-   this segment: the segment of any of them, a number that DOS sets when
-   it loads the program. */
+   through CS. Here what is known by its offset, a box, a dialog, a text
+   of one, is read at that offset in this segment: a number that the
+   words of the addresses of vc.h make, by one of the tables. */
 u16 AsmSeg(void)
 {
     return TABLES_BY(Title_S);
@@ -27,7 +26,7 @@ u16 IsCrLf(u16 word)
 
 /* Turn a switch over: a byte that is 0 becomes 1, and any other 0.
    Returns what it is then. */
-u16 InvVar(u8 __far *variable)
+u16 InvVar(u8 *variable)
 {
     return *variable = *variable == 0;
 }

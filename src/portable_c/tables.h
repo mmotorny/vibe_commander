@@ -9,25 +9,18 @@
  *
  * In C such a thing is a constant like any other, written with the names
  * of what it names, in a file of nothing else: help_t.c has those of
- * help.c. The build compiles such a file with an option that gives its
- * data a group of its own, T_GROUP (-nd=T, see CMakeLists.txt), so a
- * pointer in it is the offset of what it names in that group: the word
- * that the assembly has there, counted from another place. They are not
- * in the group that DS is on because they do not fit there beside the
- * main data. So a file of tables holds no code, and a file of code no
- * constant of this kind: with DS elsewhere it would read a constant
- * that it names in the wrong segment, without a warning. It declares
- * what it uses as `extern const u8 __far`, and so reads it in the right
- * one, and AsmSeg of misc.c is that segment.
+ * help.c. A file of code declares what it uses of one as `extern const
+ * u8`, and hands the routines its place as the number that they take:
+ * OFFSET of vc.h, which counts from where AsmSeg of misc.c says that
+ * the tables begin.
  *
- * A word that names something is a pointer here, and as long as one: a
- * word on DOS, which is the original's layout, and four bytes in a
- * program of 32 bits, with whatever stands behind it that much further
- * on. So the routines that read a table read such a word as the pointer
- * that it is, by the structures below, step over it by its size, and
- * never read through it as it stands: on DOS it is a near pointer, which
- * code would follow into the main data. They ask NAMED of vc.h what it
- * names, and NUMBER_OF there where it holds a number.
+ * A word that names something is a pointer here, and as long as one:
+ * four bytes where the original has a word, with whatever stands behind
+ * it that much further on. So the routines that read a table read such
+ * a word as the pointer that it is, by the structures below, and step
+ * over it by its size. They do not read through it: they ask NAMED of
+ * vc.h what it names, as the number that those routines take, and
+ * NUMBER_OF there where it holds a number.
  *
  * A constant that only its own file names is static, and one that code
  * or another file names is not. Either has the name that it has in the

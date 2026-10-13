@@ -37,9 +37,9 @@ struct OldList {
     u16 first;                          /* and the first entry shown */
 };
 
-static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old);
+static void ReDr00(u16 panel, u16 keep, struct OldList *old);
 static void ReDr45(u16 panel);
-static void ReDr50(u16 panel, struct OldList STACK *old);
+static void ReDr50(u16 panel, struct OldList *old);
 static void RdInfo(u16 panel);
 u16 ReadTre(void);                                      /* treebox.c */
 void DirSize(u16 panel);
@@ -52,10 +52,10 @@ void TstInfo(u16 panel);
    copied with MvzLine, which takes what follows a text along, so they
    are constants of system_t.c, written there with what follows
    them in the original, and not texts of this file. */
-extern const u8 __far Mask_S[];
-extern const u8 __far Ext_F[];
+extern const u8 Mask_S[];
+extern const u8 Ext_F[];
 
-static const u8 CODE DrIn_F[] = "DIRINFO";
+static const u8 DrIn_F[] = "DIRINFO";
 
 #define SIZE_FILENT sizeof(struct FILENT)
 #define MinView 8000                    /* Minimum view buffer size */
@@ -94,12 +94,12 @@ static const u8 CODE DrIn_F[] = "DIRINFO";
    lies where the fourth character of the path lies in a panel, which is
    the 24th colour of the first palette: the assembly has DS on the main
    data there. */
-static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
+static void ReDr00(u16 panel, u16 keep, struct OldList *old)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    struct FILENT __far *entry;
-    u8 __far *to;
-    const u8 __far *from;
+    struct WCBdef *wcb = PANEL(panel);
+    struct FILENT *entry;
+    u8 *to;
+    const u8 *from;
     u16 top, other, size, count, i;
     u16 limit, file, number, retries;
     u16 oldCursor, oldFirst;
@@ -120,8 +120,8 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
             top = limit;
         md.ViewSeg = size + top;
         count = size << 4;
-        from = (const u8 __far *)PANEL(other);
-        to = (u8 __far *)PANEL(top);
+        from = (const u8 *)PANEL(other);
+        to = (u8 *)PANEL(top);
         for (i = count; i != 0; ) {     /* from its end: they overlap */
             i--;
             to[i] = from[i];
@@ -163,8 +163,8 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
                 oldFirst = size;
         }
     }
-    from = (const u8 __far *)wcb + DSKBUF;
-    to = (u8 __far *)PANEL(md.ViewSeg);
+    from = (const u8 *)wcb + DSKBUF;
+    to = (u8 *)PANEL(md.ViewSeg);
     for (i = 0; i < count; i++)
         to[i] = from[i];
     old->end = count;                   /* places in the old list from */
@@ -186,7 +186,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
             entry->NameF[0] = '.';
             entry->NameF[1] = '.';
             for (i = 2; i < SIZE_FILENT; i++)
-                ((u8 __far *)entry)[i] = 0;
+                ((u8 *)entry)[i] = 0;
             entry->AttrF = ATTR_DIRECTORY;
             entry->DateF = 0x182F;
             file += SIZE_FILENT;
@@ -282,7 +282,7 @@ ended:
 
     /* The extension file of the directory, or else the main one. */
     if (wcb->ChgFlg == 0) {
-        to = (u8 __far *)CutPath(md.TmpBuf);
+        to = (u8 *)CutPath(md.TmpBuf);
         MvzLine(to, Ext_F, LenPath);
         opened = OpenFil(md.TmpBuf, 0x40);
         answer = opened.value;
@@ -339,17 +339,17 @@ static void ReDr45(u16 panel)
    on, or on the nearest that are left, and what was selected stays
    selected. Without, only what Ctrl-M would select again is taken over,
    and by name alone: a file of that name in another directory gets it. */
-static void ReDr50(u16 panel, struct OldList STACK *old)
+static void ReDr50(u16 panel, struct OldList *old)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    u8 __far *to;
-    const u8 __far *from;
+    struct WCBdef *wcb = PANEL(panel);
+    u8 *to;
+    const u8 *from;
     u16 top, other, size, count, i;
     u16 attributes, found;
 
-    from = (const u8 __far *)PANEL(md.ViewSeg);
+    from = (const u8 *)PANEL(md.ViewSeg);
     for (i = 0; i < old->end; i += SIZE_FILENT) {
-        attributes = ((const struct FILENT __far *)(from + i))->AttrF & 0xC0;
+        attributes = ((const struct FILENT *)(from + i))->AttrF & 0xC0;
         if (attributes == 0)
             continue;
         if (old->keep == 0) {
@@ -382,8 +382,8 @@ static void ReDr50(u16 panel, struct OldList STACK *old)
     if (panel < other) {
         size = md.ViewSeg - other;
         count = size << 4;
-        from = (const u8 __far *)PANEL(other);
-        to = (u8 __far *)PANEL(top);
+        from = (const u8 *)PANEL(other);
+        to = (u8 *)PANEL(top);
         for (i = 0; i < count; i++)
             to[i] = from[i];
         if (other == md.WCB1seg)
@@ -417,7 +417,7 @@ static void ReDr50(u16 panel, struct OldList STACK *old)
    the label. */
 static void RdInfo(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct Space space;
     u16 drive, handle;
     struct Label label;
@@ -465,14 +465,14 @@ static void RdInfo(u16 panel)
    the original answers in the carry flag, which it makes of ChgFlg. */
 u16 ReDir(u16 panel, u16 keep)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct OldList old;
 
     wcb->ChgFlg = 1;
     if (wcb->WinTyp == 0) {
-        ReDr00(panel, keep, (struct OldList STACK *)&old);
+        ReDr00(panel, keep, &old);
         ReDr45(panel);
-        ReDr50(panel, (struct OldList STACK *)&old);
+        ReDr50(panel, &old);
     } else if (wcb->WinTyp == 1) {      /* ReDr01: the tree */
         if (!ReadTre())
             wcb->ChgFlg = 0;
@@ -558,22 +558,22 @@ struct Label GetVol(u8 *volume)
    and for every file calls what FncAddr names, here DiSi10. */
 void DirSize(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    struct FILENT __far *entry;
-    u8 __far *to;
+    struct WCBdef *wcb = PANEL(panel);
+    struct FILENT *entry;
+    u8 *to;
     u16 file, i;
 
     md.FncAddr = FNC_DISI10;
     to = MvzLine(md.TmpBuf, wcb->WinPath, LenPath);
     if (to[-1] != '\\')
-        *(u16 __far *)to = '\\';
+        *(u16 *)to = '\\';
     for (file = DSKBUF; file < wcb->EndFul; file += SIZE_FILENT) {
         entry = ENTRY(wcb, file);
         if (!(entry->AttrF & ATTR_DIRECTORY) || entry->NameF[0] == '.')
             continue;
         *(u16 *)(md.TmpBuf + 90) = 0;
         *(u16 *)(md.TmpBuf + 92) = 0;
-        to = (u8 __far *)CutPath(md.TmpBuf);
+        to = (u8 *)CutPath(md.TmpBuf);
         for (i = 0; i < 13; i++)
             to[i] = entry->NameF[i];
         if (FncCall(ATTR_DIRECTORY) >> 8)

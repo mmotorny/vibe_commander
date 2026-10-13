@@ -39,8 +39,8 @@
    MvsBw writes characters in a colour, the colour in the high byte. */
 u8 *ColAddr(u16 number);                                /* screen.c */
 u16 ShadCol(u16 color, u16 how);
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);
 
 /* The tables, of stcolor_t.c, in the segment that AsmSeg returns: see
    there. A picture of StPagTab is two words that name what it is made
@@ -50,24 +50,24 @@ struct Picture {
     const u8 *page;                     /* 25 rows of 58 characters */
     const u8 *colors;                   /* and which item colours which */
 };
-extern const u8 __far StColor_S[];      /* " Color Setup " */
-extern const u8 __far StMode_S[];       /* "Mode: " */
-extern const u8 __far StPalet_S[];      /* "Palette: " */
-extern const u8 __far StBwPal_S[];      /* the names of the palettes, */
-extern const u8 __far StLapTp_S[];
-extern const u8 __far StColMd_S[];      /* which is a display's too, */
-extern const u8 __far StMonMd_S[];      /* as "Monochrome" is */
-extern const u8 __far StColrs_S[];      /* the names of the 39 items */
-extern const u8 __far StOn_S[];         /* "on" and a colour */
-extern const u8 __far StColNm_S[];      /* the names of the colours */
-extern const u8 __far StColNm_P[];      /* the colour of such a name */
-extern const u8 __far StDfCol_B[];      /* "set default colors?" */
-extern const u8 __far StColPage[];      /* the picture of each item */
-extern const struct Picture __far StPagTab[];
+extern const u8 StColor_S[];            /* " Color Setup " */
+extern const u8 StMode_S[];             /* "Mode: " */
+extern const u8 StPalet_S[];            /* "Palette: " */
+extern const u8 StBwPal_S[];            /* the names of the palettes, */
+extern const u8 StLapTp_S[];
+extern const u8 StColMd_S[];            /* which is a display's too, */
+extern const u8 StMonMd_S[];            /* as "Monochrome" is */
+extern const u8 StColrs_S[];            /* the names of the 39 items */
+extern const u8 StOn_S[];               /* "on" and a colour */
+extern const u8 StColNm_S[];            /* the names of the colours */
+extern const u8 StColNm_P[];            /* the colour of such a name */
+extern const u8 StDfCol_B[];            /* "set default colors?" */
+extern const u8 StColPage[];            /* the picture of each item */
+extern const struct Picture StPagTab[];
 
 /* The setup without a setup file, of stmain_t.c: the default palettes
    first, as the colour table has them. */
-extern const u8 __far StPalets[];
+extern const u8 StPalets[];
 
 /* What the setup program has of its own: struct StData of vc.h. */
 #define sd (*(struct StData *)md.MenuBuf)
@@ -120,7 +120,7 @@ static u16 Lines(void)
 
 /* The text number `number` of texts that stand one behind the other,
    each with its zero: F07_66, and F07_65 for the names of the items. */
-static const u8 __far *StF07_66(const u8 __far *text, u16 number)
+static const u8 *StF07_66(const u8 *text, u16 number)
 {
     for (; number != 0; number--)
         while (*text++ != 0)
@@ -131,7 +131,7 @@ static const u8 __far *StF07_66(const u8 __far *text, u16 number)
 /* Write the name of an item into the screen buffer at `place`, behind a
    space and with spaces up to the width of the list. Returns the name
    behind it. */
-static const u8 __far *StF07_70(u16 place, const u8 __far *text)
+static const u8 *StF07_70(u16 place, const u8 *text)
 {
     u16 *screen = BasAdr(place);
     u16 room = (u8)(list.size - 12);
@@ -200,7 +200,7 @@ static void StF07_75(u16 color)
     line.line = StF07_66(StColNm_S, front);
     line.colors = StColNm_P;
     line.include = line.line;           /* no name has ^I in it */
-    CntLine((struct LineArgs STACK *)&line);
+    CntLine(&line);
     Window(0x153A, 0x0116);
     screen = BasAdr(0x163A);
     for (i = 0; i < 22; i++)
@@ -210,7 +210,7 @@ static void StF07_75(u16 color)
         line.line = StOn_S;
         line.colors = StColNm_P;
         line.include = StF07_66(StColNm_S, behind);
-        CntLine((struct LineArgs STACK *)&line);
+        CntLine(&line);
     }
     Window(0x163A, 0x0116);
     StF07_80();
@@ -231,7 +231,7 @@ static void StF07_10(u16 cursor, u16 first)
 {
     u16 lines = Lines();
     u16 moved, was, top, place, size, count, upper, lower;
-    const u8 __far *text;
+    const u8 *text;
 
     if (cursor < first)
         first = cursor;
@@ -366,10 +366,10 @@ static void StF07_53(void)
    changed. */
 static void StCol30(u16 color)
 {
-    const u8 __far *colors = AT(AsmSeg(),
+    const u8 *colors = AT(AsmSeg(),
         NAMED(StPagTab[StColPage[sd.ColCur] - 1].colors));
     u16 *row = md.ScrBuf;
-    u16 __far *screen;
+    u16 *screen;
     u16 rows, count, item, paint, changed;
     u16 first = 0xFF, last = 0;
 
@@ -475,11 +475,11 @@ static struct Chosen StCol11(u16 color)
 static void StCol00(void)
 {
     u8 clock = md.Clock, bar = md.KeyBar, palette = md.ColTyp;
-    const struct Picture __far *picture;
-    const u8 __far *page;
-    const u8 __far *colors;
+    const struct Picture *picture;
+    const u8 *page;
+    const u8 *colors;
     u16 *row;
-    u16 __far *screen;
+    u16 *screen;
     u16 size, place, rows, count, item, paint, i;
     u16 color, key, mouse;
     struct Chosen chosen;
@@ -667,10 +667,10 @@ static u16 StF07_30(void)
    the cursor has. It is cleared down to the key bar, or to the last row
    if there is none. Returns when the list is left: to the setup's
    menu. */
-static void StF07_01(const u8 __far *name, u16 palette)
+static void StF07_01(const u8 *name, u16 palette)
 {
-    const u8 __far *mode;
-    const u8 __far *text;
+    const u8 *mode;
+    const u8 *text;
     u16 *screen;
     u16 size, rows, i, cell, shape, key, what, mouse;
 

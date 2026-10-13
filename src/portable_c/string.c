@@ -4,24 +4,24 @@
  *
  * Translated from VCSUB1.INC.
  *
- * A text may be in any segment: the main data, a file panel, the code. So
- * these take far pointers, and where one hands back a place in a text it
- * was given, that is in the same segment.
+ * A text may be anywhere: in the main data, in a file panel, among the
+ * tables. These take pointers, and where one hands back a place in a
+ * text it was given, that is a pointer too.
  */
 #include "vc.h"
 
-void FilZero(u8 __far *text, u16 length);
-u16 StrLen(const u8 __far *text);
-const u8 __far *FndLet(const u8 __far *text);
-void NormStr(u8 __far *text);
-u8 __far *MainFil(u8 __far *to, const u8 __far *name);
+void FilZero(u8 *text, u16 length);
+u16 StrLen(const u8 *text);
+const u8 *FndLet(const u8 *text);
+void NormStr(u8 *text);
+u8 *MainFil(u8 *to, const u8 *name);
 
 /* AddFile, MvzLine, PathLin, LetLin and ShrtLin are in vc.h. The
-   original has a text at DS:SI or ES:DI, and here it is a far pointer. */
+   original has a text at DS:SI or ES:DI, and here it is a pointer. */
 
 /* End a path with a backslash, unless it has one: `end` is where the path
    ends. Returns where it ends then. Nothing is written behind it. */
-u8 __far *AddFile(u8 __far *end)
+u8 *AddFile(u8 *end)
 {
     if (end[-1] != '\\')
         *end++ = '\\';
@@ -33,7 +33,7 @@ u8 __far *AddFile(u8 __far *end)
 
    A text without an end among these bytes is taken to end with the last
    of them, and if there are no bytes at all, with the one before. */
-u8 __far *MvzLine(u8 __far *to, const u8 __far *from, u16 length)
+u8 *MvzLine(u8 *to, const u8 *from, u16 length)
 {
     u16 i;
 
@@ -46,7 +46,7 @@ u8 __far *MvzLine(u8 __far *to, const u8 __far *from, u16 length)
 }
 
 /* Fill what follows a text with zeros, in a field of `length` bytes. */
-void FilZero(u8 __far *text, u16 length)
+void FilZero(u8 *text, u16 length)
 {
     while (length) {
         length--;
@@ -58,7 +58,7 @@ void FilZero(u8 __far *text, u16 length)
 }
 
 /* The length of a text, with its zero byte. */
-u16 StrLen(const u8 __far *text)
+u16 StrLen(const u8 *text)
 {
     u16 length = 0;
 
@@ -81,7 +81,7 @@ u16 LowCase(u16 letter)
 }
 
 /* Skip spaces and tabs. Returns the address of what follows them. */
-const u8 __far *FndLet(const u8 __far *text)
+const u8 *FndLet(const u8 *text)
 {
     while (*text == ' ' || *text == '\t')
         text++;
@@ -89,9 +89,9 @@ const u8 __far *FndLet(const u8 __far *text)
 }
 
 /* The file name in a path: what follows its last backslash or colon. */
-const u8 __far *CutPath(const u8 __far *path)
+const u8 *CutPath(const u8 *path)
 {
-    const u8 __far *name = path;
+    const u8 *name = path;
     u8 c;
 
     while ((c = *path++) != 0)
@@ -101,10 +101,10 @@ const u8 __far *CutPath(const u8 __far *path)
 }
 
 /* Take the spaces off both ends of a text. */
-void NormStr(u8 __far *text)
+void NormStr(u8 *text)
 {
-    const u8 __far *from = text;
-    u8 __far *end;                      /* behind the last that is no space */
+    const u8 *from = text;
+    u8 *end;                            /* behind the last that is no space */
     u8 c;
 
     while (*from == ' ')
@@ -120,7 +120,7 @@ void NormStr(u8 __far *text)
 }
 
 /* Turn a text into capitals. */
-void PathLin(u8 __far *text)
+void PathLin(u8 *text)
 {
     u8 c;
 
@@ -132,12 +132,12 @@ void PathLin(u8 __far *text)
 
 /* Write a path the way the program shows one: in capitals, but for the
    file name, which is in small letters. */
-void LetLin(u8 __far *text)
+void LetLin(u8 *text)
 {
     u8 c;
 
     PathLin(text);
-    text = (u8 __far *)CutPath(text);
+    text = (u8 *)CutPath(text);
     do {
         c = (u8)LowCase(*text);
         *text++ = c;
@@ -152,9 +152,9 @@ void LetLin(u8 __far *text)
    them is taken to be 255 long. A limit too small for the drive, the
    backslash and the dots is not checked for: the count of what remains
    to be moved up then passes zero, and 64K are moved. */
-void ShrtLin(u8 __far *text, u16 limit)
+void ShrtLin(u8 *text, u16 limit)
 {
-    const u8 __far *from;
+    const u8 *from;
     u16 length = 0;
 
     while (length < 256 && text[length] != 0)
@@ -185,7 +185,7 @@ void ShrtLin(u8 __far *text, u16 limit)
 
 /* Make the path of a file that the program keeps in its own directory:
    NcPath, and the 13 bytes at `name`. Returns the address behind them. */
-u8 __far *MainFil(u8 __far *to, const u8 __far *name)
+u8 *MainFil(u8 *to, const u8 *name)
 {
     u16 i;
 

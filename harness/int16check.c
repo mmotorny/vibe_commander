@@ -25,14 +25,11 @@ extern u16 takes16(u16 number);
 extern u32 takes32(u32 number);
 extern u8 bytes[];
 
-/* A word with two bodies, as the words of the addresses in vc.h are:
-   what is written in the second is of the 32 bits alone and no place,
-   and what it is handed is read. */
-#ifdef __I86__
-#define PLACE(pointer) ((u16)(pointer))
-#else
-#define PLACE(pointer) ((u16)(((pointer) - bytes) >> 4))
-#endif
+/* A word as the words of the addresses in vc.h are, and named among
+   them in harness/int16.py: what is written in it is no place, and
+   what it is handed is read. */
+#define PLACE(pointer) \
+    ((u16)(((pointer) - bytes) >> 4))
 
 u16 same(u16 a, u16 b, u8 c, u8 d, u32 w, u8 *p, signed char s)
 {

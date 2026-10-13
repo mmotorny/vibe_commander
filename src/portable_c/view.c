@@ -74,9 +74,9 @@ struct Line {
     u16 entry;                          /* BX */
 };
 
-void V80_00(u16 include, struct Box STACK *where);
-u16 NextLin(u16 segment, struct Line STACK *line);
-u16 PrevLin(u16 segment, struct Line STACK *line);
+void V80_00(u16 include, struct Box *where);
+u16 NextLin(u16 segment, struct Line *line);
+u16 PrevLin(u16 segment, struct Line *line);
 u16 V20_00(u16 segment);
 void V25_00(void);
 u16 V30_00(u16 segment);
@@ -116,26 +116,26 @@ void Panel(u16 panel);                                  /* panel.c */
 void PutPath(u16 panel);
 void PutFls(u16 panel);
 void PutTre(u16 panel);                                 /* tree.c */
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);                            /* screen.c */
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);                                  /* screen.c */
 void T71_00(u16 function, u16 place, u16 step);         /* edit.c */
 
 /* Boxes, dialogs and texts of view_t.c, which DialBox and Dialog
    take by their offsets in the segment that AsmSeg returns. */
-extern const u8 __far ViFl_S[];         /* " View " */
-extern const u8 __far EdFl_S[];         /* " Edit " */
-extern const u8 __far Col_S[];          /* "Col" */
-extern const u8 __far RdFil_P[];        /* "Reading the file" */
-extern const u8 __far FndEr_B[];        /* "Can't find the file" */
-extern const u8 __far Srch_B[];         /* "Search for the string" */
-extern const u8 __far SrFor_P[];        /* "Searching for" */
-extern const u8 __far SrEr_B[];         /* "Could not find the string" */
+extern const u8 ViFl_S[];               /* " View " */
+extern const u8 EdFl_S[];               /* " Edit " */
+extern const u8 Col_S[];                /* "Col" */
+extern const u8 RdFil_P[];              /* "Reading the file" */
+extern const u8 FndEr_B[];              /* "Can't find the file" */
+extern const u8 Srch_B[];               /* "Search for the string" */
+extern const u8 SrFor_P[];              /* "Searching for" */
+extern const u8 SrEr_B[];               /* "Could not find the string" */
 
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
 /* What the status line says behind the size of the file. */
-static const u8 CODE Byts_S[6] = " Bytes";
+static const u8 Byts_S[6] = " Bytes";
 
 #define Menu_C 7                        /* the colour of the menu bar, and of
                                            the status line */
@@ -150,7 +150,7 @@ static const u8 CODE Byts_S[6] = " Bytes";
    does, so a place that has wrapped round, two before 0, is the word
    that it is on DOS, at the segment's end. */
 #define TEXT(segment) AT(segment, 0)
-#define WORD_AT(text, at) (*(u16 __far *)((text) + (u16)(at)))
+#define WORD_AT(text, at) (*(u16 *)((text) + (u16)(at)))
 
 /* Whether two bytes end a line: CR LF, or LF CR. */
 #define IS_CRLF(word) ((word) == 0x0A0D || (word) == 0x0D0A)
@@ -170,7 +170,7 @@ static const u8 CODE Byts_S[6] = " Bytes";
 
    A key that stops it, Esc, leaves the file open, as the assembly
    does. */
-u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open)
+u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open *open)
 {
     u32 length;
     struct Answer file;
@@ -188,7 +188,7 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open)
     if ((u8)edit != 0)
         include = OFFSET(EdFl_S);
     DialBox(0x528, OFFSET(RdFil_P), include, MAIN_SEG,
-            (struct Box STACK *)&open->box);
+            &open->box);
     Window(open->box.begin, open->box.size);
     if (ChgDisk(md.ViewFil))
         goto none;
@@ -235,9 +235,9 @@ none:
    leaves it there, or 1 if the part in the memory has no line behind
    this one: the place then stays and the entry is the first of the
    table. */
-u16 NextLin(u16 segment, struct Line STACK *line)
+u16 NextLin(u16 segment, struct Line *line)
 {
-    const u8 __far *text = TEXT(segment);
+    const u8 *text = TEXT(segment);
     u16 at = line->at;
     u16 entry = line->entry;
     u16 word;
@@ -281,9 +281,9 @@ none:
 
 /* Find where the line before the one at `line` begins. Returns as
    NextLin does. */
-u16 PrevLin(u16 segment, struct Line STACK *line)
+u16 PrevLin(u16 segment, struct Line *line)
 {
-    const u8 __far *text = TEXT(segment);
+    const u8 *text = TEXT(segment);
     u16 at = line->at;
     u16 entry = line->entry;
     u16 word;
@@ -351,7 +351,7 @@ none:
    ViPoint. */
 u16 V20_00(u16 segment)
 {
-    const u8 __far *text = TEXT(segment);
+    const u8 *text = TEXT(segment);
     u16 at = VI->ViFirst;
     u16 entry, word;
 
@@ -445,7 +445,7 @@ void V25_00(void)
    the memory ends before the window is full, and else 0. */
 u16 V30_00(u16 segment)
 {
-    const u8 __far *text = TEXT(segment);
+    const u8 *text = TEXT(segment);
     struct Line line;
     u16 number, count, at, end, result;
     u8 last;
@@ -462,7 +462,7 @@ u16 V30_00(u16 segment)
     line.entry = VI->ViPoint;
     for (;;) {
         at = line.at;
-        if (NextLin(segment, (struct Line STACK *)&line))
+        if (NextLin(segment, &line))
             break;
         V32_00(segment, number, at, line.at);
         number++;
@@ -515,7 +515,7 @@ void V31_00(u16 place)
    file. */
 void V32_00(u16 segment, u16 number, u16 at, u16 end)
 {
-    const u8 __far *text = TEXT(segment);
+    const u8 *text = TEXT(segment);
     u8 *screen = (u8 *)BasAdr(VI->ViBase + (number << 8));
     u8 *chars;
     u32 found, position;
@@ -629,7 +629,7 @@ static void Load(u16 segment, u32 position, u16 to, u16 count)
    read on behind it, as far as the table leaves room. */
 void V50_00(u16 segment)
 {
-    u8 __far *text = TEXT(segment);
+    u8 *text = TEXT(segment);
     u16 half = VI->ViSpace >> 1;
     u16 from, to, at, count, kept;
     u32 rest;
@@ -667,7 +667,7 @@ void V50_00(u16 segment)
    behind it are the same as they were. */
 void V51_00(u16 segment)
 {
-    u8 __far *text = TEXT(segment);
+    u8 *text = TEXT(segment);
     u16 space = VI->ViSpace;
     u16 shift = space >> 1;
     u16 loaded, second, from, to, count;
@@ -708,8 +708,8 @@ void V51_00(u16 segment)
    filled with zeros first. */
 void V55_00(u16 segment, u16 to, u16 count, u16 handle)
 {
-    u8 __far *text = TEXT(segment) + to;
-    u8 __far *at = text;
+    u8 *text = TEXT(segment) + to;
+    u8 *at = text;
     u16 left;
 
     for (left = count; left; left--)
@@ -722,7 +722,7 @@ void V55_00(u16 segment, u16 to, u16 count, u16 handle)
    the text, the part that is in the memory ends. */
 void V60_00(u16 segment, u16 at, u16 table)
 {
-    u8 __far *text = TEXT(segment);
+    u8 *text = TEXT(segment);
     u16 loaded = VI->ViLoaded;
     u16 column, word;
 
@@ -771,7 +771,7 @@ done:
    cent, which V25_00 writes: the name of the file and its size. */
 static void Status(void)
 {
-    u16 __far *screen;
+    u16 *screen;
     u16 cell = Color(Menu_C) << 8 | ' ';
     u16 code = AsmSeg();
     u16 count;
@@ -799,8 +799,8 @@ static void Status(void)
 /* The first line of the screen, as V20_00 finds it, the line behind
    `line` and the one before it. */
 #define FIRST() (line.at = V20_00(segment), line.entry = VI->ViPoint)
-#define NEXT()  NextLin(segment, (struct Line STACK *)&line)
-#define PREV()  PrevLin(segment, (struct Line STACK *)&line)
+#define NEXT()  NextLin(segment, &line)
+#define PREV()  PrevLin(segment, &line)
 
 /* The viewer: read the file `handle`, whose length is in ViLen, show it
    in the window ViBase and ViSize, with a status line if that is as wide
@@ -814,7 +814,7 @@ static void Status(void)
 void V00_10(u16 handle)
 {
     u16 segment = md.ViewSeg;
-    const u8 __far *text = TEXT(segment);
+    const u8 *text = TEXT(segment);
     struct Line line;
     struct Box box;
     struct Answer read;
@@ -1214,7 +1214,7 @@ V14_00:                                 /* F7 - search */
 V15_00:                                 /* Continue search */
     if (md.SrchStr[0] == 0)
         goto V00_30;
-    V80_00(OFFSET(ViFl_S), (struct Box STACK *)&box);
+    V80_00(OFFSET(ViFl_S), &box);
     /* From the first line of the screen, or from the line behind it if
        something has been found before. */
     at = VI->ViFirst;
@@ -1394,7 +1394,7 @@ void V13_01(u16 changed)
    prepare the search: for the viewer and for the editor. `include` is
    the title of the box, an offset in the assembly, and `where` gets
    where the box is. */
-void V80_00(u16 include, struct Box STACK *where)
+void V80_00(u16 include, struct Box *where)
 {
     DialBox(0x528, OFFSET(SrFor_P), include, MAIN_SEG, where);
     Window(where->begin, where->size);
@@ -1466,7 +1466,7 @@ static struct Sought Sought(u16 found, u16 end)
 
 struct Sought V82_00(u16 segment, u16 at, u16 count)
 {
-    const u8 __far *text = TEXT(segment);
+    const u8 *text = TEXT(segment);
     u16 more = SRCH_LEN - HexLen;       /* places at the end where only
                                            the bytes have room */
     u16 start, left, i;
@@ -1541,8 +1541,8 @@ none:
 /* The commands are declared in vc.h, and so are F34_30 and F34_40. */
 
 /* More C routines of other files that vc.h does not have. */
-const u8 __far *FndLet(const u8 __far *text);           /* string.c */
-u8 __far *MainFil(u8 __far *to, const u8 __far *name);
+const u8 *FndLet(const u8 *text);                       /* string.c */
+u8 *MainFil(u8 *to, const u8 *name);
 u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 
 /* More of them, and two names of other files, those of the menu file
@@ -1553,18 +1553,18 @@ u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
    for a name; the boxes shown while a program is loaded as the viewer
    or as the editor; and the box that says it could not be run, with
    its texts. */
-extern const u8 __far ViewE_F[];        /* "VCVIEW.EXT" */
-extern const u8 __far EditE_F[];        /* "VCEDIT.EXT" */
-extern const u8 __far Menu_F[];         /* "VC.MNU" */
-extern const u8 __far DrIn_F[];         /* "DIRINFO" */
-extern const u8 __far ViFil_B[];        /* "View the file:" */
-extern const u8 __far Viewr_P[];        /* "Loading the viewer:" */
-extern const u8 __far Editr_P[];        /* "Loading the editor:" */
-extern const u8 __far RunEr_B[];
-extern const u8 __far RunEr_S[];        /* "Not enough memory to load" */
-extern const u8 __far Run1_S[];         /* "Can't run commands for some
+extern const u8 ViewE_F[];              /* "VCVIEW.EXT" */
+extern const u8 EditE_F[];              /* "VCEDIT.EXT" */
+extern const u8 Menu_F[];               /* "VC.MNU" */
+extern const u8 DrIn_F[];               /* "DIRINFO" */
+extern const u8 ViFil_B[];              /* "View the file:" */
+extern const u8 Viewr_P[];              /* "Loading the viewer:" */
+extern const u8 Editr_P[];              /* "Loading the editor:" */
+extern const u8 RunEr_B[];
+extern const u8 RunEr_S[];              /* "Not enough memory to load" */
+extern const u8 Run1_S[];               /* "Can't run commands for some
                                            reason." */
-extern const u8 __far Run2_S[];         /* "Try rebooting." */
+extern const u8 Run2_S[];               /* "Try rebooting." */
 
 #define MinView 8000                    /* Minimum view buffer size */
 
@@ -1592,7 +1592,7 @@ static struct Onward Own(u16 edit)
    the name of the file, in the tail of its command line: ViewPar, with
    36 zero bytes behind it. The palette is put into its byte 9, and what
    there is to know of the mouse into bytes 11 to 13. */
-static const u8 CODE ViewPar[9] = { 0, 'S', 'o', 'c', 'h', 'a', 0, 0x1F, 1 };
+static const u8 ViewPar[9] = { 0, 'S', 'o', 'c', 'h', 'a', 0, 0x1F, 1 };
 
 /* Look for the next command of a line of an extension file or a menu
    file: F34_30. `text` is where in MenuBuf to look from, in a command or
@@ -1663,9 +1663,9 @@ struct Named F34_40(u16 text, u16 view)
 {
     struct Named named;
     u16 code = AsmSeg();
-    const u8 __far *suffix = AT(code, OFFSET(Menu_F) + 1);
-    const u8 __far *from;
-    u8 __far *to;
+    const u8 *suffix = AT(code, OFFSET(Menu_F) + 1);
+    const u8 *from;
+    u8 *to;
     u8 *at = MD_POINTER(text);
     u8 *end;
     u16 word, count;
@@ -1706,7 +1706,7 @@ struct Named F34_40(u16 text, u16 view)
         goto command;
     to = md.TmpBuf;
     if (MD_PLACE(NEAR(CutPath(MD_POINTER(text)))) == text)
-        to = (u8 __far *)CutPath(md.TmpBuf);
+        to = (u8 *)CutPath(md.TmpBuf);
     from = MD_POINTER(text);
     for (count = LenPath + 13; count != 0; count--)
         *to++ = *from++;
@@ -1732,7 +1732,7 @@ static void Aexec0(u16 edit)
     struct Box where;
     struct Answer ran;
     struct Block all;
-    const u8 __far *from;
+    const u8 *from;
     u8 *tail;
     u16 box, include, error, i;
 
@@ -1742,7 +1742,7 @@ static void Aexec0(u16 edit)
     if (edit != 0)
         box = OFFSET(Editr_P);
     DialBox(0x528, box, MD_PLACE(md.TmpBuf), MAIN_SEG,
-            (struct Box STACK *)&where);
+            &where);
     Window(where.begin, where.size);
     *(u16 *)(md.TmpBuf + 95) = where.begin;
     *(u16 *)(md.TmpBuf + 97) = where.size;
@@ -1801,8 +1801,8 @@ static void Aexec0(u16 edit)
 static struct Onward F34_11(u16 how)
 {
     u16 code = AsmSeg();
-    const u8 __far *name;
-    const u8 __far *from;
+    const u8 *name;
+    const u8 *from;
     struct Named named;
     struct Next next;
     struct Answer file, read, found;
@@ -1892,7 +1892,7 @@ static struct Onward F44_01(u16 how)
    where a click of the mouse in that part comes in as well. */
 struct Onward F34_10(u16 panel)
 {
-    const u8 __far *from = AT(AsmSeg(), OFFSET(DrIn_F));
+    const u8 *from = AT(AsmSeg(), OFFSET(DrIn_F));
     u16 begin = BegBX(panel);
     u16 size = SizDX();
     u16 i;
@@ -1915,8 +1915,8 @@ struct Onward F34_10(u16 panel)
    tree, and for the viewer in an Info panel, the name is asked for. */
 static struct Onward F34_01(u16 panel, u16 how)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    const struct FILENT __far *file;
+    struct WCBdef *wcb = PANEL(panel);
+    const struct FILENT *file;
     u16 i;
 
     if (wcb->Visible == 0)

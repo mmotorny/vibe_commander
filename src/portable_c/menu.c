@@ -69,7 +69,7 @@ u16 *Shadow(u16 *cell);                                 /* screen.c */
 /* F39_00, the bar itself, is declared in vc.h: see "The commands"
    there. The text of the bar, the names of its menus, is of
    bars_t.c. */
-extern const u8 __far PtMnu_S[];
+extern const u8 PtMnu_S[];
 
 /* The lines of the menus, one behind the other, each ended by a 0, and
    an empty one for a line across the menu. FFh and a number are that
@@ -151,7 +151,7 @@ extern const u8 __far PtMnu_S[];
     " Save setup\377\011Shift-F9\0" \
     "\0" \
     " More setup...\0"
-static const u8 CODE MenuLn[sizeof(LEFT_S FILES_S COMMANDS_S OPTIONS_S) - 1] =
+static const u8 MenuLn[sizeof(LEFT_S FILES_S COMMANDS_S OPTIONS_S) - 1] =
     LEFT_S FILES_S COMMANDS_S OPTIONS_S;
 
 /* Where in MenuLn the lines of each menu begin. */
@@ -160,12 +160,12 @@ static const u8 CODE MenuLn[sizeof(LEFT_S FILES_S COMMANDS_S OPTIONS_S) - 1] =
 #define MenuLn3 (MenuLn2 + sizeof FILES_S - 1)
 #define MenuLn4 (MenuLn3 + sizeof COMMANDS_S - 1)
 
-static const u8 CODE Ctrl_S[9] = "Ctrl-Alt-";
+static const u8 Ctrl_S[9] = "Ctrl-Alt-";
 #define Alt_S 5                         /* where in it Alt- begins */
 
 /* The pages of the help: for each kind of menu one for the menu itself
    and one for each of its lines. */
-static const u8 CODE MnuHlp[] = {
+static const u8 MnuHlp[] = {
      7,  8,  8,  9, 10, 11,  0, 12, 12, 12, 12, 12,  0, 13, 14, 15,
     16,  0, 17, 18, 19, 20, 21, 22, 23,  0, 24,  0, 25, 25, 25, 25,  0, 26,
     27, 28, 29, 31, 32, 33,  0, 35, 36, 37,  0, 38,
@@ -185,7 +185,7 @@ struct MnuTab {
     u16 lines;
     u16 help;
 };
-static const struct MnuTab CODE MnuTab[] = {
+static const struct MnuTab MnuTab[] = {
     { 0x102, 0x121B, MenuLn1, MnuHlp1 },        /* Left */
     { 0x10A, 0x141E, MenuLn2, MnuHlp2 },        /* Files */
     { 0x113, 0x0E23, MenuLn3, MnuHlp3 },        /* Commands */
@@ -194,7 +194,7 @@ static const struct MnuTab CODE MnuTab[] = {
 };
 
 /* The letters that open the menus from the bar. */
-static const u8 CODE MnuKey[] = "LFCOR";
+static const u8 MnuKey[] = "LFCOR";
 
 /* The keys that an open menu takes for one of its items: the key, and
    the item in the high byte over the menu in the low one. */
@@ -202,7 +202,7 @@ struct KeyTab {
     u16 key;
     u16 item;
 };
-static const struct KeyTab CODE KeyTab[] = {
+static const struct KeyTab KeyTab[] = {
     { 0x5E00, 0x0501 }, { 0x1312, 0x0D01 }, { 0x2106, 0x0E01 },
     { 0x6800, 0x0F01 }, { 0x3B00, 0x0102 }, { 0x3C00, 0x0202 },
     { 0x3D00, 0x0302 }, { 0x3E00, 0x0402 }, { 0x3F00, 0x0502 },
@@ -228,7 +228,7 @@ struct MenuMouse {
 /* Ask the mouse, and keep its buttons for the next time. `state` is what
    comes back for its place if there is none: the assembly has the menu
    and the item there. */
-static void F40_40(u16 state, struct MenuMouse STACK *mouse)
+static void F40_40(u16 state, struct MenuMouse *mouse)
 {
     struct Mouse pointer = GetMous(state);
 
@@ -242,7 +242,7 @@ static void F40_40(u16 state, struct MenuMouse STACK *mouse)
    columns before its name and the two behind it. `bar` is the text of
    the bar, PtMnu_S: FFh, the number of spaces before a name, the name,
    and so on. */
-static u16 F40_50(u16 column, const u8 __far *bar)
+static u16 F40_50(u16 column, const u8 *bar)
 {
     u16 at = 0, menu = 0;
 
@@ -387,8 +387,8 @@ static void F39_52(u16 *top, u16 size, u16 lines)
    the Right menu are of their own panels. */
 static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
 {
-    const struct WCBdef __far *wcb = PANEL(panel);
-    const struct WCBdef __far *other;
+    const struct WCBdef *wcb = PANEL(panel);
+    const struct WCBdef *other;
     u16 *mark;
     u16 order;
 
@@ -489,7 +489,7 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
    item under the cursor, which only the mouse brings about. */
 struct Picked F39_00(u16 again, u16 panel)
 {
-    const u8 __far *names = AT(AsmSeg(), OFFSET(PtMnu_S));
+    const u8 *names = AT(AsmSeg(), OFFSET(PtMnu_S));
     struct MenuMouse mouse;
     struct Picked picked;
     u16 menu, item;                     /* CL and CH */
@@ -509,7 +509,7 @@ struct Picked F39_00(u16 again, u16 panel)
     PutKey(1);
 
 F39_02:
-    F40_40(item << 8 | menu, (struct MenuMouse STACK *)&mouse);
+    F40_40(item << 8 | menu, &mouse);
     if (mouse.now != 0 && mouse.place >> 8 == 0) {
         menu = F40_50(mouse.place, names);
         if (menu == 0) {
@@ -519,7 +519,7 @@ F39_02:
             item = 0;
             do {
                 do {                    /* F39_03 */
-                    F40_40(item << 8 | menu, (struct MenuMouse STACK *)&mouse);
+                    F40_40(item << 8 | menu, &mouse);
                     if (mouse.now == 0)
                         goto F39_85;
                     ClrKbd();
@@ -535,7 +535,7 @@ F39_07:
 F39_10:
     /* The page of the help for F1, and then the mouse or a key. */
     md.HlpPage = MnuHlp[MnuTab[menu - 1].help + (item == 0xFF ? 0 : item)];
-    F40_40(item << 8 | menu, (struct MenuMouse STACK *)&mouse);
+    F40_40(item << 8 | menu, &mouse);
     if (mouse.now != 0) {
         ClrKbd();
         if (mouse.place >> 8 != 0) {    /* F39_17: below the bar */

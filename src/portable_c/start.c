@@ -36,8 +36,8 @@
    names of the setup file and of the main extension file, 13 bytes each
    with what follows them; and the setup as it was last saved or found,
    of setup.c. */
-extern const u8 __far Init_F[];
-extern const u8 __far Ext_F[];
+extern const u8 Init_F[];
+extern const u8 Ext_F[];
 extern u8 IniSave[];
 
 #define MinView 8000                    /* Minimum view buffer size */
@@ -55,7 +55,7 @@ extern u8 IniSave[];
 /* The setup that the program has without a setup file: the colours, six
    palettes of each, and what follows them in the main data as far as the
    bytes that are reserved. */
-static const u8 CODE Palets[] = {
+static const u8 Palets[] = {
     0x07, 0x07, 0x1B, 0x07, 0x07, 0x07, /*  0 - Main windows */
     0x70, 0x70, 0x30, 0x70, 0x70, 0x70, /*  1 - Cursor */
     0x0F, 0x0F, 0x1E, 0x0F, 0x0F, 0x0F, /*  2 - Selected files */
@@ -141,7 +141,7 @@ typedef char Palets_size[sizeof Palets
 /* The panel that the program has without a setup file, as far as its
    mask, which is empty: files in brief, shown, hidden ones too, no
    filter, unsorted. */
-static const u8 CODE DefWCB[] = {
+static const u8 DefWCB[] = {
     0,                                  /* WinTyp */
     0,                                  /* BrfFul */
     1,                                  /* Visible */
@@ -164,27 +164,27 @@ static const u8 CODE DefWCB[] = {
    " freeware"; and the copyright of the original's author, with that of
    this program put behind it. The prompt names this program
    (DEVIATIONS.md, 10). */
-static const u8 CODE Copyr_S[] =
+static const u8 Copyr_S[] =
     "\r\nCopyright (C) 1991-2000 Vsevolod V. Volkov"
     ", (C) 2026 Maksym Motorny";
-static const u8 CODE CrLf_S[]  =
+static const u8 CrLf_S[]  =
     "\r\n$"
     "\r\nPress ENTER to return \0"
     "\r\nto the Vibe Commander";
 #define Retrn_S (CrLf_S + 3)
 #define Retr2_S (CrLf_S + 28)
-static const u8 CODE NoIni_S[] = "VC.INI is not correct.\r\n";
+static const u8 NoIni_S[] = "VC.INI is not correct.\r\n";
 
 /* What the environment is searched for, and the mask that the program
    starts with: all of it for the file search, without its backslash for
    Select group. */
-static const u8 CODE Comsp[8]   = "COMSPEC=";
-static const u8 CODE NcEnv[3]   = "VC=";
-static const u8 CODE TempEnv[5] = "TEMP=";
-static const u8 CODE Mask_S[]   = "\\*.*";
+static const u8 Comsp[8]   = "COMSPEC=";
+static const u8 NcEnv[3]   = "VC=";
+static const u8 TempEnv[5] = "TEMP=";
+static const u8 Mask_S[]   = "\\*.*";
 
 /* Copy a text with its zero byte. Returns where that is in the copy. */
-static u8 __far *MvzTxt(u8 __far *to, const u8 __far *from)
+static u8 *MvzTxt(u8 *to, const u8 *from)
 {
     while ((*to = *from++) != 0)
         to++;
@@ -194,7 +194,7 @@ static u8 __far *MvzTxt(u8 __far *to, const u8 __far *from)
 /* Write a text on the screen as a teletype would, on the page `page`:
    its first character whatever it is, and on up to its zero byte. This
    is OutStr of resident.c, which the assembly called there. */
-static void OutStr1(const u8 __far *text, u16 page)
+static void OutStr1(const u8 *text, u16 page)
 {
     do
         ScreenType(*text++, page, 7);
@@ -212,12 +212,12 @@ static void OutStr1(const u8 __far *text, u16 page)
    its offset alone, whatever the segment: MainPth at its first call
    writes into the part of the original that stays in the memory, at
    0B87h, and TempDir is at 0B99h of the main data. */
-static u8 __far *MnPth0(u8 __far *to, const u8 __far *env,
-                        const u8 __far *name, u16 length,
-                        const u8 __far *other)
+static u8 *MnPth0(u8 *to, const u8 *env,
+                  const u8 *name, u16 length,
+                  const u8 *other)
 {
-    const u8 __far *from;
-    u8 __far *end;
+    const u8 *from;
+    u8 *end;
     u16 at = 0, i;
 
     for (;;) {                          /* MnPth1 */
@@ -227,7 +227,7 @@ static u8 __far *MnPth0(u8 __far *to, const u8 __far *env,
                 from = other;
             for (i = 0; i < LenPath; i++)       /* MnPth9 */
                 to[i] = from[i];
-            end = (u8 __far *)CutPath(to);
+            end = (u8 *)CutPath(to);
             break;
         }
         for (i = 0; i < length && env[at + i] == name[i]; i++)
@@ -249,8 +249,8 @@ static u8 __far *MnPth0(u8 __far *to, const u8 __far *env,
    behind it. Up to `count` bytes of the file are read to `buffer`.
    Returns how many were read, or FAILED if the file could not be opened,
    read or closed. */
-static u16 ReadOne(const u8 __far *path, u8 __far *end,
-                   const u8 __far *name, u8 __far *buffer, u16 count)
+static u16 ReadOne(const u8 *path, u8 *end,
+                   const u8 *name, u8 *buffer, u16 count)
 {
     struct Answer opened, read;
     u16 i;
@@ -304,8 +304,8 @@ void Init00(void)
     struct WCBdef *first = (struct WCBdef *)(image + 3);
     struct WCBdef *second = (struct WCBdef *)(image + 3 + WCBini);
     u8 *path = md.TmpBuf;
-    const u8 __far *env = ProgramEnvironment();
-    u8 __far *end, __far *to;
+    const u8 *env = ProgramEnvironment();
+    u8 *end, *to;
     u16 code = AsmSeg();
     u16 length, sum, drive, wrong, i;
 
@@ -349,7 +349,7 @@ void Init00(void)
     first->Visible = 0;
 
 Init04:                                 /* Output Report */
-    if (!ChkMode((struct Screen STACK *)&screen))
+    if (!ChkMode(&screen))
         ScreenSetMode(3);               /* 80 columns, in colour */
     to = MvzTxt(md.ExtMain, AT(code, OFFSET(Title_S) + 2));     /* Init05 */
     to = MvzTxt(to, Copyr_S);
@@ -407,7 +407,7 @@ static void Memory(u16 segment, u16 size)
 struct Answer Init11(void)
 {
     struct Answer answer;
-    struct WCBdef __far *wcb;
+    struct WCBdef *wcb;
     const u8 *from = IMAGE + 3;
     u16 largest, segment, panel, i;
 
@@ -426,7 +426,7 @@ struct Answer Init11(void)
     for (panel = md.WCB1seg; panel != md.ViewSeg; panel += PANEL_PARAS) {
         wcb = PANEL(panel);
         for (i = 0; i < WCBini; i++)
-            ((u8 __far *)wcb)[i] = *from++;
+            ((u8 *)wcb)[i] = *from++;
         wcb->CurAdr = DSKBUF;
         wcb->First = DSKBUF;
         wcb->EndBuf = DSKBUF;
@@ -447,8 +447,8 @@ void GiveMem(void)
 {
     u16 first = md.WCB1seg, second = md.WCB2seg;
     u16 behind, i;
-    const u8 __far *from;
-    u8 __far *to;
+    const u8 *from;
+    u8 *to;
 
     if (second < first) {
         first = md.WCB2seg;
@@ -456,8 +456,8 @@ void GiveMem(void)
     }
     behind = first + PANEL_PARAS;
     if (second != behind) {
-        from = (const u8 __far *)PANEL(second);
-        to = (u8 __far *)PANEL(behind);
+        from = (const u8 *)PANEL(second);
+        to = (u8 *)PANEL(behind);
         for (i = 0; i < sizeof(struct WCBdef); i++)
             to[i] = from[i];
         if (second == md.WCB1seg)
@@ -486,8 +486,8 @@ struct Answer TakeMem(void)
     struct Answer answer;
     u16 kept = md.ViewSeg - md.MemSeg;
     u16 largest, segment, i;
-    const u8 __far *from;
-    u8 __far *to;
+    const u8 *from;
+    u8 *to;
 
     MemGive(md.MemSeg);
     largest = MemTake(0xFFFF).largest;  /* the largest block, asked for
@@ -555,20 +555,20 @@ static u16 CurNl(void)
        FCBs at 5Ch and 6Ch of the main data, not of the PSP: ES is on
        the main data when the original fills in here the block for
        running a program. That block is made where a program is run
-       now, by ProgramRun of sys.h: see Run of dos.c.
+       now, by ProgramRun of sys.h: see Run of dos32.c.
      - A cursor below the last line is put on it before the screen is
        fed a line, so the screen scrolls once. */
 void IniData(void)
 {
     struct Screen screen;
     struct SysVersion system;
-    const u8 __far *env;
+    const u8 *env;
     u16 i, c, at, lines, rows, page, shape, cell;
 
     HookVct();                          /* Set Error Vectors */
 
     /* Set Display Segment */
-    if (!ChkMode((struct Screen STACK *)&screen)) {
+    if (!ChkMode(&screen)) {
         CursorShape(0x2000);            /* no cursor */
         OutStr1(Retrn_S, screen.page);
         if (screen.columns < 80)

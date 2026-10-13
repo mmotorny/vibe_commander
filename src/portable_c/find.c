@@ -103,13 +103,13 @@ struct TimeText {
     u8  unused;
     u8  suffix;
 };
-void PutDate(u16 date, struct DateText STACK *text);
-u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
-void PutTime(u16 time, struct TimeText STACK *text);
-u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
-void FilZero(u8 __far *text, u16 length);               /* string.c */
-void NormStr(u8 __far *text);
-u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
+void PutDate(u16 date, struct DateText *text);
+u8 *BufDate(const struct DateText *text, u8 *buffer);
+void PutTime(u16 time, struct TimeText *text);
+u8 *BufTime(const struct TimeText *text, u8 *buffer);
+void FilZero(u8 *text, u16 length);                     /* string.c */
+void NormStr(u8 *text);
+u8 *UnConv(u8 *name, const u8 *buffer);                     /* mask.c */
 void V81_00(void);                                      /* view.c */
 
 /* Objects that are named by their offsets, of find_t.c but for
@@ -120,16 +120,16 @@ void V81_00(void);                                      /* view.c */
    menu, and of Find_B, the dialog that asks what to look for. FnFl6_S
    is " files" and FnFl7_S " found.": each is copied with what follows it
    in the original, 15 bytes, and is written that long. */
-extern const u8 __far Mask_S[];
-extern const u8 __far Find5_D[];
-extern const u8 __far Find6_D[];
-extern const u8 __far FnFl_P[];
-extern const u8 __far Find_B[];
-extern const u8 __far FnFl6_S[];
-extern const u8 __far FnFl7_S[];
+extern const u8 Mask_S[];
+extern const u8 Find5_D[];
+extern const u8 Find6_D[];
+extern const u8 FnFl_P[];
+extern const u8 Find_B[];
+extern const u8 FnFl6_S[];
+extern const u8 FnFl7_S[];
 
 /* What the size column says for a directory. */
-static const u8 CODE SubDir[7] = "SUB-DIR";
+static const u8 SubDir[7] = "SUB-DIR";
 
 /* The error of a call that the user gave up, when a device was not
    ready. */
@@ -155,7 +155,7 @@ enum {
 /* Where a line of the list is in the memory. The lines follow one
    another from ViewSeg on, and the address is made so that a line never
    crosses the end of a segment: of 20 bits, like the assembly's. */
-static u8 __far *Line(u16 number)
+static u8 *Line(u16 number)
 {
     u32 at = ((u32)number << 6) + number;       /* 65 bytes to a line */
 
@@ -166,7 +166,7 @@ static u8 __far *Line(u16 number)
    box: 64 cells from `place`. */
 static void FndLine(u16 number, u16 place)
 {
-    const u8 __far *line = Line(number);
+    const u8 *line = Line(number);
     u16 *screen = BasAdr(place);
     u16 color = Color(Conf_C) << 8;
     u16 i;
@@ -222,7 +222,7 @@ static void FndStat(void)
    it has been in the list, and the left button let go outside the box
    is Esc. In the list the cursor goes to the line under the mouse, at
    `*line`, and a second click on that line is Enter. */
-static u16 FnMv00(u16 at, u16 place, u16 size, u16 STACK *line)
+static u16 FnMv00(u16 at, u16 place, u16 size, u16 *line)
 {
     struct Mouse mouse;
     u16 buttons, was, last, target, clicks;
@@ -327,7 +327,7 @@ static u16 FndMove(u16 key, u16 mode, u16 place, u16 size)
     struct Paged paged;
 
     if ((key >> 8) == KEY_MOUSE)
-        ask = FnMv00(mode, place, size, (u16 STACK *)&line);
+        ask = FnMv00(mode, place, size, &line);
     else
         ask = Find_T(key);
     rows = SIGNED((size >> 8) - 8);
@@ -433,7 +433,7 @@ static u16 FndStuf(void)
 {
     u16 number = FND->FndNumb;
     u16 place, size, line, first, shown, color, i;
-    u8 __far *to;
+    u8 *to;
 
     if (FND->FndSize < number)
         return 1;
@@ -535,7 +535,7 @@ u16 FindFil(u16 attributes)
 {
     struct DateText date;
     struct TimeText time;
-    const u8 __far *from;
+    const u8 *from;
     u8 *end, *to, *name;
     u16 length, suffix, handle, room, chunk, segment, count, found, i;
     struct Answer entry, opened, read;
@@ -690,11 +690,11 @@ next:
     *to++ = (kind & ATTR_HIDDEN) ? 'H' : '.';
     *to++ = (kind & 0x01) ? 'R' : '.';
     to += 3;
-    PutDate(md.DTA.FilDate, (struct DateText STACK *)&date);
-    to = BufDate((struct DateText STACK *)&date, to);
+    PutDate(md.DTA.FilDate, &date);
+    to = BufDate(&date, to);
     to += 3;
-    PutTime(md.DTA.FilTime, (struct TimeText STACK *)&time);
-    BufTime((struct TimeText STACK *)&time, to);
+    PutTime(md.DTA.FilTime, &time);
+    BufTime(&time, to);
     if (FndStuf())
         return 0x100;
     FND->FndFls++;
@@ -708,14 +708,14 @@ stopped:
 
 /* What the box of the command shows. The colours are those of Find_P in
    find_t.c, which the dialog reads there. */
-static const u8 CODE FindColors[4] = { Conf_C, CnfRe_C, 21, 22 };
-static const u8 CODE Find0_S[] = " Find File ";
-static const u8 CODE Find1_S[] = "File name:";
-static const u8 CODE Find2_S[] = "Containing:";
-static const u8 CODE Find3_S[] = "Scanning:";
-static const u8 CODE Find5_S[] =
+static const u8 FindColors[4] = { Conf_C, CnfRe_C, 21, 22 };
+static const u8 Find0_S[] = " Find File ";
+static const u8 Find1_S[] = "File name:";
+static const u8 Find2_S[] = "Containing:";
+static const u8 Find3_S[] = "Scanning:";
+static const u8 Find5_S[] =
     "^r[ Stop ]^r\xFF\x03[ Go to ]\xFF\x03[ Quit ]";
-static const u8 CODE Find6_S[] =
+static const u8 Find6_S[] =
     "[ New search ]\xFF\x03[ Go to ]\xFF\x03[ Quit ]";
 
 #define FIND_BAR 1                      /* the key bar of the box: bKeyBar
@@ -775,9 +775,9 @@ static struct Searched Shows(u16 panel)
 struct Searched F67_00(void)
 {
     struct LineArgs line;
-    struct WCBdef __far *wcb;
-    const u8 __far *from;
-    u8 __far *to;
+    struct WCBdef *wcb;
+    const u8 *from;
+    u8 *to;
     const u8 *rest;
     u8 *end;
     u16 *screen;
@@ -799,7 +799,7 @@ struct Searched F67_00(void)
     line.include = Find0_S;
     line.value = place + 0x100 & 0xFF00 | 40;
     line.line = Find0_S;
-    CntLine((struct LineArgs STACK *)&line);
+    CntLine(&line);
 
 again:
     /* F67_01: the box empty, with the two questions */
@@ -812,11 +812,11 @@ again:
     line.value = color | 25;
     line.screen = BasAdr(row);
     line.line = Find1_S;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     row += 0x200;
     line.screen = BasAdr(row);
     line.line = Find2_S;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     Window(place, size);
     /* The dialog has its box there already: its nine lines. */
     answer = Dialog(OFFSET(Find_B), 9 << 8 | size & 0xFF,
@@ -837,10 +837,10 @@ again:
     line.value = color | 25;
     line.screen = BasAdr(row);
     line.line = Find3_S;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     line.value = row + 0x100 & 0xFF00 | 40;
     line.line = Find5_S;
-    CntLine((struct LineArgs STACK *)&line);
+    CntLine(&line);
     Window(place, size);
     FND->FndBg = place;
     FND->FndSz = size;
@@ -957,11 +957,11 @@ found:
     line.value = count;
     line.screen = screen;
     line.line = md.TmpBuf;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     Window(row, 0x100 | count);
     line.value = MOVED(place, (size >> 8) - 4, 0) & 0xFF00 | 40;
     line.line = Find6_S;
-    CntLine((struct LineArgs STACK *)&line);
+    CntLine(&line);
     FND->FndMenu = 1;
     if (FND->FndCur != 0)
         FndCurs(CnfRe_C << 8, FND->FndCur, FND->FndFrst, place, size);

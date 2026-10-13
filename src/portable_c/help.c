@@ -88,19 +88,19 @@ void Help00(void);
    the cursor and the first line shown. */
 
 /* C routines of other files that vc.h does not have. */
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);                            /* screen.c */
-u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);                                  /* screen.c */
+u8 *MainFil(u8 *to, const u8 *name);                    /* string.c */
 
 /* The tables of the help, in help_t.c: the title of the window, the
    box of the error, which Dialog takes by its offset, and for MinMnu the
    buttons under the index and under a page and the numbers of their
    colours. */
-extern const u8 __far Help_S[];         /* " Help " */
-extern const u8 __far HlpEr_B[];        /* "There was error reading data..." */
-extern const u8 __far HlMn1_D[];        /* Help, Cancel */
-extern const u8 __far HlMn2_D[];        /* Next, Previous, Index, Cancel */
-extern const u8 __far HlpMn_P[];
+extern const u8 Help_S[];               /* " Help " */
+extern const u8 HlpEr_B[];              /* "There was error reading data..." */
+extern const u8 HlMn1_D[];              /* Help, Cancel */
+extern const u8 HlMn2_D[];              /* Next, Previous, Index, Cancel */
+extern const u8 HlpMn_P[];
 
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
@@ -114,20 +114,20 @@ extern const u8 __far HlpMn_P[];
    ninth byte on. They are one text because MainFil takes 13 bytes for a
    name: the first six of the second are copied with the first, as they
    are in the assembly. */
-static const u8 CODE Help_F[] = "VC.HLP\0VC 4.05 Help";
+static const u8 Help_F[] = "VC.HLP\0VC 4.05 Help";
 #define HlpHead 7                       /* where in it the second begins */
 #define LenHead 13                      /* and its length, with its end */
 
 /* The lines of the buttons, as they are written under the index and under
    a page. */
-static const u8 CODE HlMn1_S[] = "\xFF\x15[ Help ]\xFF\x03[ Cancel ]";
-static const u8 CODE HlMn2_S[] =
+static const u8 HlMn1_S[] = "\xFF\x15[ Help ]\xFF\x03[ Cancel ]";
+static const u8 HlMn2_S[] =
     "\xFF\x07[ Next ]\xFF\x03[ Previous ]\xFF\x03[ Index ]\xFF\x03[ Cancel ]";
 
 /* The colours of a line of the help, for NgLine, and the line that it is
    to put in for ^I: none. */
-static const u8 CODE Help_P[] = { Help_C, HlpRe_C, HlpBo_C, HlpUn_C };
-static const u8 CODE Empty_S[] = "";
+static const u8 Help_P[] = { Help_C, HlpRe_C, HlpBo_C, HlpUn_C };
+static const u8 Empty_S[] = "";
 
 #define LINE        0xC4                /* a single line */
 #define LEFT_RIGHT  0xC7B6              /* where one meets the frame, on the
@@ -252,7 +252,7 @@ static u8 *Help72(u16 line)
 
 /* Write a line of text into the window at a row and a column, over
    spaces. Returns where the text of the next line begins. */
-static const u8 __far *Help77(u16 place, const u8 __far *text)
+static const u8 *Help77(u16 place, const u8 *text)
 {
     struct LineArgs line;
     u16 cell = Color(Help_P[0]) << 8 | ' ';
@@ -267,7 +267,7 @@ static const u8 __far *Help77(u16 place, const u8 __far *text)
     line.line = text;
     line.colors = Help_P;
     line.include = Empty_S;
-    NgLine((struct LineArgs STACK *)&line);
+    NgLine(&line);
     return line.line;
 }
 
@@ -276,7 +276,7 @@ static const u8 __far *Help77(u16 place, const u8 __far *text)
    the help or an entry cannot be read. */
 static void Help05(void)
 {
-    const u8 __far *text;
+    const u8 *text;
     u16 size = (u16)(u8)(md.Lines - 3) << 8 | 74;
     u16 item = 0;                       /* CX: the button with the cursor */
     u16 cursor, first;                  /* SI and DI: where to go */

@@ -138,9 +138,9 @@ struct Drawn {
 
 void T50_00(void);
 void T51_00(void);
-u16 T53_00(struct Where STACK *where);
+u16 T53_00(struct Where *where);
 struct Ending T53_10(u16 segment, u16 offset);
-u16 T54_00(struct Where STACK *where);
+u16 T54_00(struct Where *where);
 u16 T55_00(u16 cursor);
 void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low);
 struct Reached T57_00(void);
@@ -148,7 +148,7 @@ struct Reached T57_01(u16 limit);
 u16 T57_02(void);
 struct Address T62_00(void);
 u16 T63_01(u16 high, u16 low);
-u16 T64_00(const u8 __far *name, const u8 *text, u16 count);
+u16 T64_00(const u8 *name, const u8 *text, u16 count);
 void T71_00(u16 function, u16 place, u16 step);
 void T72_00(u16 line, u16 segment, u16 from, u16 end);
 void T73_00(void);
@@ -179,16 +179,16 @@ u16 T80_00(void);
    is the segment of the program's constants. */
 
 /* C routines of other files that vc.h does not have. */
-u16 __far *HexByt(u16 __far *screen, u16 byte);         /* digits.c */
-u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
-                 u16 color);                            /* screen.c */
-void PathLin(u8 __far *text);                           /* string.c */
+u16 *HexByt(u16 *screen, u16 byte);                     /* digits.c */
+u16 *MvsBw(u16 *screen, const u8 *text, u16 count,
+           u16 color);                                  /* screen.c */
+void PathLin(u8 *text);                                 /* string.c */
 /* The viewer's search: V80_00 shows the box "Searching for" under the
    title `include`, says where it is, and makes ready what is looked for,
    SrchStr; V82_00, of vc.h, looks for it in `count` bytes, and returns
    where the search ended, behind what it found, and 1 for the text
    found, 0 for the bytes that it names in hex, and 100h for neither. */
-void V80_00(u16 include, struct Box STACK *where);      /* view.c */
+void V80_00(u16 include, struct Box *where);            /* view.c */
 
 /* How long the text is that V80_00 has made ready. */
 #define SrchLen (*(u16 *)(md.HelpBuf + 90))
@@ -197,32 +197,32 @@ void V80_00(u16 include, struct Box STACK *where);      /* view.c */
    three of other files: Prot_B, Menu_F and Ext_F. DialBox and Dialog
    take theirs by their offsets in the segment that AsmSeg returns, and
    only those are used here: a text is read at its offset in AsmSeg. */
-extern const u8 __far SavFi_P[];        /* "Saving the file" */
-extern const u8 __far SavEr_B[];        /* "There was an error writing..." */
-extern const u8 __far Prot_B[];         /* "... is a read-only file" */
-extern const u8 __far EdFl_S[];         /* " Edit " */
-extern const u8 __far ViFl_S[];         /* " View " */
-extern const u8 __far BigFi_B[];        /* "... is too large for Edit" */
-extern const u8 __far NewFi_B[];        /* "Can't find the file" */
-extern const u8 __far SavAs_B[];        /* "Save this file as" */
-extern const u8 __far SavCn_B[];        /* "You've made changes ..." */
-extern const u8 __far Srch_B[];         /* "Search for the string" */
-extern const u8 __far SrEr_B[];         /* "Could not find the string" */
-extern const u8 __far Menu_F[];         /* the names of the menu file and */
-extern const u8 __far Ext_F[];          /* of the three extension files */
-extern const u8 __far ViewE_F[];
-extern const u8 __far EditE_F[];
-extern const u8 __far Line_S[];         /* "Line", "Col" and "Free" of the */
-extern const u8 __far Col_S[];          /* status line */
-extern const u8 __far FrBuf_S[];
-extern const u8 __far EdtH_P[];         /* the colour of the help, */
-extern const u8 __far EdtH_S[];         /* its six lines on the right, */
-extern const u8 __far EdtH1_S[];        /* and for the menu file and for */
-extern const u8 __far EdtH2_S[];        /* an extension file the title
+extern const u8 SavFi_P[];              /* "Saving the file" */
+extern const u8 SavEr_B[];              /* "There was an error writing..." */
+extern const u8 Prot_B[];               /* "... is a read-only file" */
+extern const u8 EdFl_S[];               /* " Edit " */
+extern const u8 ViFl_S[];               /* " View " */
+extern const u8 BigFi_B[];              /* "... is too large for Edit" */
+extern const u8 NewFi_B[];              /* "Can't find the file" */
+extern const u8 SavAs_B[];              /* "Save this file as" */
+extern const u8 SavCn_B[];              /* "You've made changes ..." */
+extern const u8 Srch_B[];               /* "Search for the string" */
+extern const u8 SrEr_B[];               /* "Could not find the string" */
+extern const u8 Menu_F[];               /* the names of the menu file and */
+extern const u8 Ext_F[];                /* of the three extension files */
+extern const u8 ViewE_F[];
+extern const u8 EditE_F[];
+extern const u8 Line_S[];               /* "Line", "Col" and "Free" of the */
+extern const u8 Col_S[];                /* status line */
+extern const u8 FrBuf_S[];
+extern const u8 EdtH_P[];               /* the colour of the help, */
+extern const u8 EdtH_S[];               /* its six lines on the right, */
+extern const u8 EdtH1_S[];              /* and for the menu file and for */
+extern const u8 EdtH2_S[];              /* an extension file the title
                                            and six lines on the left */
 
 /* The name of the main extension file. */
-static const u8 CODE MainExt_F[] = "VC.EXT";
+static const u8 MainExt_F[] = "VC.EXT";
 
 #define Menu_C  7                       /* the colours of the status line, */
 #define HlBrd_C 25                      /* of the rows around the help, */
@@ -349,7 +349,7 @@ void T50_00(void)
 {
     struct Address address;
     struct Ending end;
-    const u8 __far *text;
+    const u8 *text;
     u16 count, size;
 
     if (ed.EdTxHex != 0)
@@ -365,7 +365,7 @@ void T50_00(void)
         if (!end.none) {
             size = end.at - address.offset;
             if (size >= 2
-                && ENDS_LINE(*(const u16 __far *)
+                && ENDS_LINE(*(const u16 *)
                              AT(address.segment, end.at - 2)))
                 size -= 2;
         }
@@ -385,8 +385,8 @@ void T50_00(void)
 static void T51_30(u16 from_segment, u16 from, u16 to_segment, u16 to,
                    u32 count, u16 down)
 {
-    const u8 __far *source;
-    u8 __far *target;
+    const u8 *source;
+    u8 *target;
     u16 piece;
 
     for (;;) {
@@ -428,7 +428,7 @@ void T51_00(void)
     u32 old, less, end, tail;
     struct Address address, source;
     const u8 *buffer;
-    u8 __far *text;
+    u8 *text;
     u16 size, more, grown, segment, offset, limit, count;
 
     if (ed.EdTxHex != 0 || ed.EdUpdat == 0)
@@ -532,7 +532,7 @@ struct Ending T53_10(u16 segment, u16 offset)
         && (u16)(LOW(left) + offset) < 0xFFFE)
         limit = LOW(left) + offset;
     while (offset < limit) {
-        word = *(const u16 __far *)AT(segment, offset);
+        word = *(const u16 *)AT(segment, offset);
         offset += 2;
         if (offset <= limit && ENDS_LINE(word))
             return EndsAt(offset);
@@ -552,7 +552,7 @@ struct Ending T53_10(u16 segment, u16 offset)
    A line that does not end in the segment of its address is looked at
    again from the address with the lowest offset, and from there on a
    piece further on every time. */
-u16 T53_00(struct Where STACK *where)
+u16 T53_00(struct Where *where)
 {
     u16 segment = where->segment;
     u16 offset = where->offset;
@@ -594,7 +594,7 @@ u16 T53_00(struct Where STACK *where)
         place = OFFSET_OF(segment, offset);
         if (place - start <= 1)
             return 1;
-        if (!ENDS_LINE(*(const u16 __far *)AT(segment, offset - 2)))
+        if (!ENDS_LINE(*(const u16 *)AT(segment, offset - 2)))
             return 1;
     }
     where->segment = segment;
@@ -613,7 +613,7 @@ u16 T53_00(struct Where STACK *where)
    may follow one another there, and are passed over as long as they do;
    so from where that stopped the lines are taken forwards again until the
    next one would be this line. */
-u16 T54_00(struct Where STACK *where)
+u16 T54_00(struct Where *where)
 {
     struct Where line;
     u16 segment = where->segment;
@@ -650,7 +650,7 @@ u16 T54_00(struct Where STACK *where)
             offset += back << 4;
         }
         checked = 1;
-        word = *(const u16 __far *)AT(segment, offset - 2);
+        word = *(const u16 *)AT(segment, offset - 2);
         if (!found) {
             if (ENDS_LINE(word)) {
                 found = 1;
@@ -671,7 +671,7 @@ u16 T54_00(struct Where STACK *where)
         line.segment = address.segment;
         line.offset = address.offset;
         line.line = 0;
-        T53_00((struct Where STACK *)&line);
+        T53_00(&line);
         next = OFFSET_OF(line.segment, line.offset);
         if (next >= place)
             break;
@@ -740,7 +740,7 @@ void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low)
     for (;;) {
         ed.EdOffst = place;
         ed.EdLine = where.line;
-        if (T53_00((struct Where STACK *)&where))
+        if (T53_00(&where))
             break;
         place = OFFSET_OF(where.segment, where.offset);
         if (place > target)
@@ -756,7 +756,7 @@ void T56_00(u16 high, u16 low, u16 line, u16 target_high, u16 target_low)
 }
 
 /* Whether `count` bytes at `name` and at `text` are the same. */
-u16 T64_00(const u8 __far *name, const u8 *text, u16 count)
+u16 T64_00(const u8 *name, const u8 *text, u16 count)
 {
     for (; count; count--)
         if (*name++ != *text++)
@@ -835,9 +835,9 @@ void T71_00(u16 function, u16 place, u16 step)
    no bytes too, which T73_10 does not hand over at all. */
 void T72_00(u16 line, u16 segment, u16 from, u16 end)
 {
-    const u8 __far *text = AT(segment, 0);
+    const u8 *text = AT(segment, 0);
     u16 *screen = T70_00(line).screen;
-    u16 __far *cell;
+    u16 *cell;
     u8 *ascii;
     u32 offset;
     u16 column, place, c, count;
@@ -845,7 +845,7 @@ void T72_00(u16 line, u16 segment, u16 from, u16 end)
     if (ed.EdTxHex == 0) {
         column = 0;
         if (end >= 2) {
-            c = *(const u16 __far *)(text + (u16)(end - 2));
+            c = *(const u16 *)(text + (u16)(end - 2));
             if (c == CR_LF || c == LF_CR)
                 end -= 2;
         }
@@ -870,7 +870,7 @@ void T72_00(u16 line, u16 segment, u16 from, u16 end)
         return;
     }
     offset = OFFSET_OF(segment, from);
-    cell = (u16 __far *)(screen + 1);
+    cell = screen + 1;
     cell = HexByt(cell, (u16)(offset >> 24));
     cell = HexByt(cell, (u16)(offset >> 16));
     cell = HexByt(cell, (u16)offset >> 8);
@@ -981,7 +981,7 @@ void T76_00(u16 place, u16 segment, u16 text, u16 colors)
     line.include = line.line;           /* none of the lines has ^I */
     for (count = 6; count; count--) {
         line.screen = BasAdr(place);
-        NgLine((struct LineArgs STACK *)&line);
+        NgLine(&line);
         place += 0x100;
     }
 }
@@ -1129,7 +1129,7 @@ static void T80_14(void)
 {
     const u8 *name = md.ViewFil;
     const u8 *file;
-    const u8 __far *text;
+    const u8 *text;
     u8 *to;
     u16 letter, count, c;
 
@@ -1196,7 +1196,7 @@ u16 T80_00(void)
     T51_00();
     T50_00();
     /* None of its lines has ^I: no include line. */
-    DialBox(0x528, OFFSET(SavFi_P), 0, MAIN_SEG, (struct Box STACK *)&box);
+    DialBox(0x528, OFFSET(SavFi_P), 0, MAIN_SEG, &box);
     Window(box.begin, box.size);
     if (ChgDisk(md.ViewFil))
         goto done;
@@ -1232,7 +1232,7 @@ done:
 }
 
 /* The line that the cursor is in, as T53_00 and T54_00 take one. */
-static void T60_10(struct Where STACK *where)
+static void T60_10(struct Where *where)
 {
     struct Address address = AddressOf(ed.EdOffst);
 
@@ -1242,7 +1242,7 @@ static void T60_10(struct Where STACK *where)
 }
 
 /* Make the line `where` the one that the cursor is in. */
-static void T60_20(const struct Where STACK *where)
+static void T60_20(const struct Where *where)
 {
     ed.EdLine = where->line;
     ed.EdOffst = OFFSET_OF(where->segment, where->offset);
@@ -1320,9 +1320,9 @@ static void T06_14(void)
     struct Where where;
 
     T51_00();
-    T60_10((struct Where STACK *)&where);
-    if (T53_00((struct Where STACK *)&where) == 0) {
-        T60_20((struct Where STACK *)&where);
+    T60_10(&where);
+    if (T53_00(&where) == 0) {
+        T60_20(&where);
         ed.EdCursr = 0;
     }
     T50_00();
@@ -1413,7 +1413,7 @@ static void T01_10(u16 key)
 {
     u32 place = ed.EdOffst + ed.EdCursr;
     struct Address address = AddressOf(place);
-    u8 __far *byte = AT(address.segment, address.offset);
+    u8 *byte = AT(address.segment, address.offset);
     u16 digit;
 
     if (ed.EdHexAs == 0) {
@@ -1495,11 +1495,11 @@ static void T05_11(void)
 {
     struct Where where;
 
-    T60_10((struct Where STACK *)&where);
-    if (T54_00((struct Where STACK *)&where) != 0)
+    T60_10(&where);
+    if (T54_00(&where) != 0)
         return;
     T51_00();
-    T60_20((struct Where STACK *)&where);
+    T60_20(&where);
     T14_11();
 }
 
@@ -1548,18 +1548,18 @@ static void T10_02(u16 down, u16 count)
     u16 failed, cursor;
 
     T51_00();
-    T60_10((struct Where STACK *)&where);
+    T60_10(&where);
     if (count != 0) {
         do {                            /* T10_03 */
             if ((u8)down == 0)
-                failed = T54_00((struct Where STACK *)&where);
+                failed = T54_00(&where);
             else
-                failed = T53_00((struct Where STACK *)&where);
+                failed = T53_00(&where);
             if (failed)
                 break;
         } while (--count);
     }
-    T60_20((struct Where STACK *)&where);       /* T10_06 */
+    T60_20(&where);                             /* T10_06 */
     ed.EdUpDwn = 1;
     if (ed.EdTxHex == 0) {
         T14_12(ed.EdCol1 + 1);
@@ -1587,7 +1587,7 @@ static void T12_01(u16 down)
     u16 count, row, failed;
 
     T51_00();
-    T60_10((struct Where STACK *)&where);
+    T60_10(&where);
     count = (u16)ed.EdSizeY - 1;
     row = ed.EdLine - ed.EdLin0;
     if (down == 0) {
@@ -1598,14 +1598,14 @@ static void T12_01(u16 down)
     }
     do {                                /* T12_03 */
         if (down == 0)
-            failed = T54_00((struct Where STACK *)&where);
+            failed = T54_00(&where);
         else
-            failed = T53_00((struct Where STACK *)&where);
+            failed = T53_00(&where);
         if (failed)
             break;
     } while (--count);
     if (where.line != ed.EdLine) {      /* T12_06 */
-        T60_20((struct Where STACK *)&where);
+        T60_20(&where);
         ed.EdCursr = 0;
         ed.EdHxCur = 0;
     }
@@ -1620,10 +1620,10 @@ static void T16_00(void)
 
     if (ed.EdTxHex == 0) {
         T51_00();
-        T60_10((struct Where STACK *)&where);
-        while (T53_00((struct Where STACK *)&where) == 0)
+        T60_10(&where);
+        while (T53_00(&where) == 0)
             ;
-        T60_20((struct Where STACK *)&where);
+        T60_20(&where);
     } else {
         ed.EdLine = AddressOf(ed.EdLen).segment - md.ViewSeg;   /* T16_10 */
         ed.EdOffst = ed.EdLen & 0xFFFFFFF0UL;
@@ -1679,11 +1679,11 @@ static void T20_06(u32 end, u16 drawn)
     if (count <= row)
         return;
     count -= row;
-    T60_10((struct Where STACK *)&where);
+    T60_10(&where);
     where.line = line;
     place = ed.EdLen;
     for (;;) {                          /* T20_08 */
-        if (T53_00((struct Where STACK *)&where) != 0)
+        if (T53_00(&where) != 0)
             break;
         if (--count == 0) {
             place = OFFSET_OF(where.segment, where.offset);
@@ -1707,12 +1707,12 @@ static void T20_05(u16 drawn)
 {
     struct Where where;
 
-    T60_10((struct Where STACK *)&where);
+    T60_10(&where);
     /* The assembly has in DI, for the number of the line, whatever was
        left there. T53_00 goes by it only where it is 0FFFFh, which
        nothing leaves. */
     where.line = 0;
-    if (T53_00((struct Where STACK *)&where) != 0)
+    if (T53_00(&where) != 0)
         return;
     ed.EdUndo = 2;
     *(u16 *)UndoBuf = CR_LF;
@@ -1772,11 +1772,11 @@ static void T21_00(void)
         T20_02(at, at + 1);
         return;
     }
-    T60_10((struct Where STACK *)&where);       /* T21_11 */
-    if (T54_00((struct Where STACK *)&where) != 0)
+    T60_10(&where);                             /* T21_11 */
+    if (T54_00(&where) != 0)
         return;
     T51_00();
-    T60_20((struct Where STACK *)&where);
+    T60_20(&where);
     T50_00();
     ed.EdCursr = ed.EdSizLn - T57_00().left;
     row = ed.EdLine + 1 - ed.EdLin0;
@@ -1799,10 +1799,10 @@ static void T24_00(void)
     if (ed.EdWhole == 0) {
         T51_00();
         T50_00();
-        T60_10((struct Where STACK *)&where);
+        T60_10(&where);
         where.line = 0;                 /* see T20_05 */
         end = ed.EdLen;
-        if (T53_00((struct Where STACK *)&where) == 0)
+        if (T53_00(&where) == 0)
             end = OFFSET_OF(where.segment, where.offset) - 2;
         ed.EdEndBf = end;               /* T24_01 */
         ed.EdWhole = 1;
@@ -1831,10 +1831,10 @@ static void T25_00(void)
         UndoBuf[count] = EditBuf[count];
     ed.EdUndo = size + 2;
     *(u16 *)(UndoBuf + size) = CR_LF;
-    T60_10((struct Where STACK *)&where);
+    T60_10(&where);
     where.line = 0;                     /* see T20_05 */
     end = ed.EdLen;
-    if (T53_00((struct Where STACK *)&where) == 0)
+    if (T53_00(&where) == 0)
         end = OFFSET_OF(where.segment, where.offset);
     ed.EdSizLn = 0;                     /* T25_02 */
     ed.EdCursr = 0;
@@ -1940,7 +1940,7 @@ static void T32_00(void)
     if (md.SrchStr[0] == 0)
         return;
     T51_00();
-    V80_00(OFFSET(EdFl_S), (struct Box STACK *)&box);
+    V80_00(OFFSET(EdFl_S), &box);
     place = ed.EdOffst + ed.EdCursr;
     for (;;) {                          /* T32_01 */
         if (TstBrk())
@@ -2301,7 +2301,7 @@ static void T00_20(void)
            from where it was, or back, or back from the cursor's line if
            that is nearer. */
         row = ed.EdLine - ed.EdLin0;
-        T60_10((struct Where STACK *)&where);
+        T60_10(&where);
         where.line = 0;
         place = 0;
         if (first_line >= old_line) {
@@ -2311,7 +2311,7 @@ static void T00_20(void)
                 where.segment = address.segment;
                 where.offset = address.offset;
                 do                      /* T00_27 */
-                    T53_00((struct Where STACK *)&where);
+                    T53_00(&where);
                 while (--count);
                 goto first;
             }
@@ -2330,7 +2330,7 @@ static void T00_20(void)
         if (count != 0) {
             where.line--;
             do                          /* T00_30 */
-                T54_00((struct Where STACK *)&where);
+                T54_00(&where);
             while (--count);
         }
 first:
@@ -2378,7 +2378,7 @@ whole:
             if (place < 2)              /* T00_45 */
                 break;
             address = AddressOf(place - 2);
-            if (!ENDS_LINE(*(const u16 __far *)
+            if (!ENDS_LINE(*(const u16 *)
                            AT(address.segment, address.offset)))
                 break;
             T72_00(row, address.segment, address.offset + 2, 0);
@@ -2550,9 +2550,9 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
 {
     struct Answer read;
     struct LineArgs line;
-    const u8 __far *name;
-    u8 __far *end;
-    u16 __far *cell;
+    const u8 *name;
+    u8 *end;
+    u16 *cell;
     u16 *screen;
     u32 left;
     u16 code = AsmSeg();
@@ -2566,7 +2566,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
         if ((u8)Dialog(OFFSET(BigFi_B), size, begin, saved, MAIN_SEG) != 0)
             goto closed;
         place = (begin & 0xFF00) + 0x100 | 37;  /* T00_02 */
-        MovDz0((u16 __far *)BasAdr(place), AT(code, OFFSET(ViFl_S)));
+        MovDz0(BasAdr(place), AT(code, OFFSET(ViFl_S)));
         Window(place, 0x106);
         return Ends(EDIT_VIEW, 0);
     }
@@ -2631,11 +2631,11 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
         color = Color(Menu_C) << 8 | ' ';
         for (i = 0; i < 80; i++)
             md.ScrBuf[i] = color;
-        cell = MovDz0((u16 __far *)BasAdr(0), AT(code, OFFSET(EdFl_S) + 1));
-        *(u8 __far *)(cell - 1) = ':';
-        MovDz0((u16 __far *)BasAdr(41), AT(code, OFFSET(Line_S)));
-        MovDz0((u16 __far *)BasAdr(52), AT(code, OFFSET(Col_S)));
-        MovDz0((u16 __far *)BasAdr(70), AT(code, OFFSET(FrBuf_S)));
+        cell = MovDz0(BasAdr(0), AT(code, OFFSET(EdFl_S) + 1));
+        *(u8 *)(cell - 1) = ':';
+        MovDz0(BasAdr(41), AT(code, OFFSET(Line_S)));
+        MovDz0(BasAdr(52), AT(code, OFFSET(Col_S)));
+        MovDz0(BasAdr(70), AT(code, OFFSET(FrBuf_S)));
         T74_00();
         ed.EdStat = 1;
     }
@@ -2661,7 +2661,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
         /* None of the lines has ^I; the assembly leaves in DX what it
            had for BoxDubl. */
         line.include = AT(code, 76);
-        CntLine((struct LineArgs STACK *)&line);
+        CntLine(&line);
         T76_00((place & 0xFF00) + 0x200 | 3, code,
                OFFSET_IN_SEG(code, line.line), OFFSET(EdtH_P));
         T76_00((place & 0xFF00) + 0x200 | 46, code, OFFSET(EdtH_S),

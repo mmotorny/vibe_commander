@@ -10,25 +10,25 @@
  * in the list is an address in the segment, as the assembly has it.
  *
  * Nothing here but SetMask touches the main data: FnFile and NearFl
- * take what they read as far pointers. NearFl names ViewSeg there, for
- * where the old list is, and reads it only where a pointer does not
- * say which segment it is in.
+ * take what they read as pointers. NearFl names ViewSeg there, for
+ * where the old list is, since a pointer does not say which segment it
+ * is in.
  */
 #include "vc.h"
 
 #define SIZE_FILENT sizeof(struct FILENT)
 
-u16 TstExe(const u8 __far *name);
+u16 TstExe(const u8 *name);
 /* SetMask, Sort, FnFile and NearFl are in vc.h. */
 
 /* The extensions of programs. Names in a list are in small letters. */
-static const u8 CODE Ext_S[9] = {
+static const u8 Ext_S[9] = {
     'c', 'o', 'm', 'e', 'x', 'e', 'b', 'a', 't'
 };
 
 /* Whether a file is a program, by the three characters behind the first
    full stop of its name: 1 if it is, 0 if not. */
-u16 TstExe(const u8 __far *name)
+u16 TstExe(const u8 *name)
 {
     u16 i;
     u8 c;
@@ -52,10 +52,10 @@ u16 TstExe(const u8 __far *name)
    is no longer selected. The mask is put into its fixed form at TmpBuf. */
 void SetMask(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     u8 *mask = md.TmpBuf;
-    u8 __far *one;
-    u8 __far *other;
+    u8 *one;
+    u8 *other;
     u16 file, last, i;
     u8 attributes, c;
 
@@ -81,8 +81,8 @@ void SetMask(u16 panel)
             } else {
                 if (file == last)
                     break;
-                one = (u8 __far *)wcb + file;
-                other = (u8 __far *)wcb + last;
+                one = (u8 *)wcb + file;
+                other = (u8 *)wcb + last;
                 for (i = 0; i < SIZE_FILENT; i++) {
                     c = one[i];
                     one[i] = other[i];
@@ -105,8 +105,8 @@ void SetMask(u16 panel)
    before other files; then it goes by the extension, by the time, the
    latest first, or by the size, the largest first; and with those the
    same, or sorting by name, by the name and then the extension. */
-static u16 CmpPar(const struct FILENT __far *first,
-                  const struct FILENT __far *second, u16 type)
+static u16 CmpPar(const struct FILENT *first,
+                  const struct FILENT *second, u16 type)
 {
     u16 i;
 
@@ -161,16 +161,16 @@ static u16 CmpPar(const struct FILENT __far *first,
    directory, at EndFul. */
 void Sort(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    u8 __far *name;
-    u8 __far *other;
-    u8 __far *spare;
+    struct WCBdef *wcb = PANEL(panel);
+    u8 *name;
+    u8 *other;
+    u8 *spare;
     u16 file, gap, end, swapped, length, dot, count, i;
     u8 c, c0, c1, c2;
 
     file = DSKBUF;
     do {
-        name = (u8 __far *)wcb + file;
+        name = (u8 *)wcb + file;
         for (length = 0; length < 13 && name[length] != 0; length++)
             ;
         if (length < 12) {
@@ -220,9 +220,9 @@ void Sort(u16 panel)
                             wcb->SortTyp))
                     continue;
                 swapped = file + gap;
-                name = (u8 __far *)wcb + file;
-                other = (u8 __far *)wcb + swapped;
-                spare = (u8 __far *)wcb + wcb->EndFul;
+                name = (u8 *)wcb + file;
+                other = (u8 *)wcb + swapped;
+                spare = (u8 *)wcb + wcb->EndFul;
                 for (i = 0; i < SIZE_FILENT; i++) {
                     c = name[i];
                     spare[i] = c;
@@ -236,7 +236,7 @@ void Sort(u16 panel)
 
     file = DSKBUF;
     do {
-        name = (u8 __far *)wcb + file;
+        name = (u8 *)wcb + file;
         length = 0;
         for (i = 0; i < 8; i++)
             if (name[i] != ' ')
@@ -261,14 +261,14 @@ void Sort(u16 panel)
 /* Find a file in the list that a panel shows, by its name. Returns the
    address of its entry, or one that is not below EndBuf if it is not
    there. */
-u16 FnFile(u16 panel, const u8 __far *name)
+u16 FnFile(u16 panel, const u8 *name)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
-    const u8 __far *entry;
+    struct WCBdef *wcb = PANEL(panel);
+    const u8 *entry;
     u16 file, i;
 
     for (file = DSKBUF; file < wcb->EndBuf; file += SIZE_FILENT) {
-        entry = (u8 __far *)wcb + file;
+        entry = (u8 *)wcb + file;
         for (i = 0; entry[i] == name[i]; i++)
             if (entry[i] == 0)
                 return file;
@@ -287,10 +287,10 @@ u16 FnFile(u16 panel, const u8 __far *name)
    calls this: in the segment ViewSeg, behind both panels. On DOS the
    pointer says so itself, and its offset is where the entry is in the
    list. */
-u16 NearFl(u16 panel, const u8 __far *name, u16 end)
+u16 NearFl(u16 panel, const u8 *name, u16 end)
 {
     u16 start = OFFSET_IN_SEG(md.ViewSeg, name);
-    const u8 __far *list = name - start;
+    const u8 *list = name - start;
     u16 at = start;
     u16 forward = 1;
     u16 found;
@@ -319,7 +319,7 @@ u16 NearFl(u16 panel, const u8 __far *name, u16 end)
    the directories. */
 struct Selected TotSel(u16 panel)
 {
-    struct WCBdef __far *wcb = PANEL(panel);
+    struct WCBdef *wcb = PANEL(panel);
     struct Selected selected;
     u16 files = 0;
     u16 directories = 0;

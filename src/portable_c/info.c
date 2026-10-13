@@ -18,15 +18,15 @@
 
 /* PutInf is in vc.h. */
 
-static const u8 CODE PtIn4_S[] = "Volume in drive ^r^W:^r ^I^r^V";
-static const u8 CODE PtInA_S[] = "is ";
-static const u8 CODE PtInB_S[] = "has no label";
-static const u8 CODE PtIn5_S[] = "^r^V^r ^I on drive ^r^W:";
-static const u8 CODE PtIn6_S[] = "total bytes";
-static const u8 CODE PtIn7_S[] = "bytes free";
-static const u8 CODE PtIn8_S[] = "^r^V^r files uses ^r^W^r bytes in";
-static const u8 CODE PtIn9_S[] = " No `dirinfo' file in this directory";
-static const u8 CODE PtIn_P[] = {Back_C, Title_C};
+static const u8 PtIn4_S[] = "Volume in drive ^r^W:^r ^I^r^V";
+static const u8 PtInA_S[] = "is ";
+static const u8 PtInB_S[] = "has no label";
+static const u8 PtIn5_S[] = "^r^V^r ^I on drive ^r^W:";
+static const u8 PtIn6_S[] = "total bytes";
+static const u8 PtIn7_S[] = "bytes free";
+static const u8 PtIn8_S[] = "^r^V^r files uses ^r^W^r bytes in";
+static const u8 PtIn9_S[] = " No `dirinfo' file in this directory";
+static const u8 PtIn_P[] = {Back_C, Title_C};
 
 #define TAB 9
 #define CR_LF 0x0A0D                    /* the two that end a line, as a */
@@ -60,7 +60,7 @@ static const u8 CODE PtIn_P[] = {Back_C, Title_C};
 void PutInf(u16 panel)
 {
     struct LineArgs line;
-    const struct FILENT __far *file;
+    const struct FILENT *file;
     u8 *text, *cell;
     u16 *screen;
     u32 size, total;
@@ -76,7 +76,7 @@ void PutInf(u16 panel)
     do { \
         line.value = place; \
         line.line = (markup); \
-        CntLine((struct LineArgs STACK *)&line); \
+        CntLine(&line); \
         place += 0x100; \
     } while (0)
 
@@ -147,12 +147,12 @@ void PutInf(u16 panel)
             *text++ = PtIn8_S[i];
         line.value = place;
         line.line = md.TmpBuf;
-        CntLine((struct LineArgs STACK *)&line);
+        CntLine(&line);
         PtPt10(other);
         ShrtLin(md.TmpErr + 2, 38 - 1);
         line.value = place + 0x100;
         line.line = Var_S;
-        CntLine((struct LineArgs STACK *)&line);
+        CntLine(&line);
     }
     place += 0x400;
     lines = (u8)((SizDX() >> 8) - 12);
