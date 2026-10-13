@@ -68,9 +68,6 @@ static const u8 CODE DrIn_F[] = "DIRINFO";
 #define ERR_NO_MORE   0x12
 #define ERR_NOT_READY 0x53
 
-/* The segment that a pointer into the main data is in. */
-#define SEGMENT(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))
-
 /* Read the directory of a panel of files, and its extension file: ReDir
    of the original from ReDr00 on. What
    the panel had before is left for ReDr50 at ViewSeg and in `old`, with
@@ -111,7 +108,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
 
     /* Expand: the panel behind this one as far up as it goes, but no
        further than 64K from here. */
-    top = SEGMENT(&md) + md.FreMem2 - (((MinView - 1) >> 4) + 1);
+    top = MAIN_SEG + md.FreMem2 - (((MinView - 1) >> 4) + 1);
     limit = panel + 0x1000;
     other = md.WCB1seg;
     if (panel >= other)
@@ -149,7 +146,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
 
     /* Keep the old list behind the panels, as much of it as there is room
        for in whole entries. */
-    size = md.FreMem2 - (md.ViewSeg - SEGMENT(&md));
+    size = md.FreMem2 - (md.ViewSeg - MAIN_SEG);
     if (size > 0xFFF)
         size = 0xFFF;
     size <<= 4;

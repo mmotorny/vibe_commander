@@ -221,8 +221,6 @@ extern const u8 __far EdtH1_S[];        /* and for the menu file and for */
 extern const u8 __far EdtH2_S[];        /* an extension file the title
                                            and six lines on the left */
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 /* The name of the main extension file. */
 static const u8 CODE MainExt_F[] = "VC.EXT";
 
@@ -250,10 +248,6 @@ static const u8 CODE MainExt_F[] = "VC.EXT";
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 #define PAIR(high, low) ((u32)(high) << 16 | (low))
-
-/* The byte at an address, and the segment that the main data is in. */
-#define AT(segment, offset) ((u8 __far *)PAIR(segment, offset))
-#define MAIN_DATA() HIGH((u32)(const void __far *)md.TmpBuf)
 
 /* The offset in the text of the byte at an address. */
 #define OFFSET_OF(segment, offset) \
@@ -920,7 +914,7 @@ struct Drawn T73_10(void)
         end = from + ed.EdSizLn;
         T70_00(line);
         if (from < end)
-            T72_00(line, MAIN_DATA(), from, end);
+            T72_00(line, MAIN_SEG, from, end);
     } else {
         address = AddressOf(ed.EdOffst);
         end = T53_10(address.segment, address.offset).at;
@@ -1154,14 +1148,14 @@ static void T80_14(void)
         do
             c = *to++;
         while (--count && c != 0);
-        to = (u8 *)(u16)(u32)AddFile(to - 1);
+        to = NEAR(AddFile(to - 1));
     }
     if (md.TmpBuf + LenPath + 13 <= to)
         return;
     for (count = md.TmpBuf + LenPath + 13 - to; count; count--)
         *to++ = *name++;
     PathLin(md.TmpBuf);
-    file = (const u8 *)(u16)(u32)CutPath(md.TmpBuf);
+    file = NEAR(CutPath(md.TmpBuf));
     count = file - md.TmpBuf;
     for (c = 0; c < count; c++)
         if (md.TmpBuf[c] != md.NcPath[c])

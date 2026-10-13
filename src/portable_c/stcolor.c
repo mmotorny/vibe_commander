@@ -70,10 +70,6 @@ extern const u8 __far StPalets[];
 /* What the setup program has of its own: struct StData of vc.h. */
 #define sd (*(struct StData *)md.MenuBuf)
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-#define AT(segment, offset) \
-    ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-
 #define Hist_C  23                      /* the colour of a list, */
 #define HstCu_C 24                      /* and of the line of its cursor */
 #define ShadFl  38                      /* how shadows are made: the last

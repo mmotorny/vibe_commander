@@ -53,8 +53,6 @@ extern const u8 __far StHlpMn_D[];      /* Ok */
 extern const u8 __far StHlpEr_B[];      /* "Help contents is not available" */
 extern const u8 __far StOk_S[];         /* "[ Ok ]" */
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 #define Help_C  27                      /* the colours of the help: its text, */
 #define HlpBo_C 28                      /* bold, */
 #define HlpRe_C 29                      /* reversed, */

@@ -142,8 +142,6 @@ static FncFn * const CODE Fnc_T[] = {
     C00_00, DiSi10, FindFil, F38_40, M30_50
 };
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 /* Names in the assembly's code segment. Mask_S is \*.* and what follows
    it there, of which DirFunc copies a byte; Tree_F is \TREEINFO.NCD. */
 extern const u8 __far Mask_S[];
@@ -172,9 +170,6 @@ extern const u8 __far Tree_F[];
 #define ERR_NO_ACCESS   0x05
 #define ERR_CURRENT_DIR 0x10
 #define ERR_NOT_READY   0x53
-
-/* The offset in the main data of something there. */
-#define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
 
 /* Take a box off the screen. */
 static void Close(struct Box STACK *box)

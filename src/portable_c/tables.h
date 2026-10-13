@@ -160,8 +160,12 @@ struct BOXMN {
 
 #pragma pack(pop)
 
+/* The header of a dialog and a field of one are the original's where a
+   pointer is a word, which is on DOS: 10 and 11 bytes. Each holds one
+   pointer, and is longer elsewhere by what a pointer is longer, with
+   nothing else in it moved: 12 and 13 bytes in a program of 32 bits. */
 LAID_OUT(BOXTX, 4);
-LAID_OUT(BOXHD, 10);
-LAID_OUT(BOXMN, 11);
+LAID_OUT(BOXHD, 8 + sizeof(const void *));
+LAID_OUT(BOXMN, 9 + sizeof(const void *));
 
 #endif

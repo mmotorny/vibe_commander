@@ -6,68 +6,68 @@ holds the tree to it, and `python3 harness/hostcheck.py --record`
 writes it anew.
 
 arith.c       registers 2
-bars.c        to-number 1, to-pointer 2
+bars.c        clean
 bars_t.c      clean
 blank.c       clean
-box.c         to-number 1
-cmdline.c     to-number 8, to-pointer 3
-commands.c    to-number 29, to-pointer 22
+box.c         clean
+cmdline.c     to-number 6
+commands.c    clean
 commands_t.c  clean
-copy.c        to-number 81, to-pointer 30
+copy.c        to-number 9, to-pointer 4
 copy_t.c      clean
-dialog.c      to-number 18, to-pointer 45
+dialog.c      to-number 18, to-pointer 15
 digits.c      clean
-dirfunc.c     to-number 93, to-pointer 33
+dirfunc.c     to-number 1
 dirfunc_t.c   clean
-dos.c         to-number 55, to-pointer 14, asm-pragma 7, registers 1, intrinsic 1
-drive.c       to-number 2, to-pointer 1
-edit.c        to-number 54, to-pointer 35
+dos.c         to-number 25, to-pointer 14, asm-pragma 7, registers 1, intrinsic 1
+drive.c       to-number 2
+edit.c        to-number 12, to-pointer 1
 edit_t.c      clean
-enter.c       to-number 8, to-pointer 19
+enter.c       to-number 5, to-pointer 8
 extfile.c     to-number 2, to-pointer 1
-files.c       to-number 1, to-pointer 5
-find.c        to-number 18, to-pointer 10
+files.c       to-number 1
+find.c        to-number 3
 find_t.c      clean
 format.c      to-number 1
-help.c        to-number 11
+help.c        to-number 4
 help_t.c      clean
-info.c        to-number 7, to-pointer 2
-input.c       to-number 2, to-pointer 1
-keys.c        to-number 11, to-pointer 28
+info.c        to-number 6
+input.c       to-number 2
+keys.c        clean
 keys_t.c      clean
 line.c        clean
-main.c        to-number 30, to-pointer 21, function 2, interrupt 1, data_seg 2, aborts 1
+main.c        to-number 10, to-pointer 2, function 2, interrupt 1, data_seg 2, aborts 1
 main_t.c      clean
 mask.c        clean
-menu.c        to-number 8, to-pointer 6
-misc.c        to-number 1
+menu.c        to-number 7
+misc.c        clean
 mouse.c       clean
-panel.c       to-number 2, to-pointer 7
-place.c       to-number 7, to-pointer 5
-read.c        to-number 3, to-pointer 16
-resident.c    to-number 18, to-pointer 10, function 3, interrupt 3, loadds 3, naked 2, asm 2, registers 1, aborts 3
+panel.c       to-pointer 1
+place.c       clean
+read.c        to-number 1
+resident.c    to-number 17, to-pointer 10, function 3, interrupt 3, loadds 3, naked 2, asm 2, registers 1, aborts 3
 screen.c      clean
-setup.c       to-number 1, to-pointer 2
+setup.c       clean
 stack.c       data_seg 2
-start.c       to-number 7, to-pointer 15
-stcolor.c     to-number 4, to-pointer 3
+start.c       to-number 1, to-pointer 5
+stcolor.c     to-number 2
 stcolor_t.c   clean
-sthelp.c      to-number 6
+sthelp.c      to-number 2
 sthelp_t.c    clean
-stmain.c      to-number 12, to-pointer 1
+stmain.c      clean
 stmain_t.c    clean
-stopts.c      to-number 22, to-pointer 12
+stopts.c      clean
 stopts_t.c    clean
 string.c      clean
 sys.h         clean
-system.c      to-number 2
+system.c      clean
 system_t.c    clean
-tables.h      layout 2
-tree.c        to-number 17
-treebox.c     to-number 24, to-pointer 8
+tables.h      clean
+tree.c        to-number 8
+treebox.c     to-number 4, to-pointer 3
 treebox_t.c   clean
-usermenu.c    to-number 14, to-pointer 8
+usermenu.c    to-number 9, to-pointer 5
 vc.h          interrupt 1, aborts 4
-view.c        to-number 51, to-pointer 36
+view.c        to-number 10, to-pointer 8
 view_t.c      clean
 window.c      to-pointer 2

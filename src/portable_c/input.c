@@ -573,7 +573,7 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key)
         if (end <= begin)
             return at;
         for (;;) {
-            name = (const u8 __far *)((u32)segment << 16 | at);
+            name = AT(segment, at);
             for (i = 0; i < length; i++)
                 if ((u8)UpCase(name[i]) != md.MenuBuf[i])
                     break;

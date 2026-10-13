@@ -152,8 +152,7 @@ static const u8 CODE PtMnu_B[] = { Menu_C };
 u16 *ClsLine(u16 place, u16 segment)
 {
     u16 *screen = BasAdr(place & 0xFF00);
-    u16 cell = *(const u8 __far *)((u32)segment << 16
-                                   | (u16)(u8 *)&md.CrntCol) << 8 | ' ';
+    u16 cell = *AT(segment, MD_PLACE(&md.CrntCol)) << 8 | ' ';
     u16 count;
 
     for (count = 80; count != 0; count--)

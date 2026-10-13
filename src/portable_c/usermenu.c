@@ -81,8 +81,6 @@ extern const u8 __far UsrEr_B[];        /* "Could not find the menu file" */
 extern const u8 __far List_F[];         /* "vc.lst" */
 extern const u8 __far Mask_S[];         /* "\*.*" */
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 #define LenCmd 124                      /* Length of command line */
 
 #define Hist_C  23                      /* the colour of the menu */
@@ -322,7 +320,7 @@ Run_02:                                 /* to the end of the line */
     goto Run_30;
 
 Run_04:                                 /* a command */
-    from = (const u8 *)(u16)(u32)FndLet(from);
+    from = NEAR(FndLet(from));
     pair = WORD_AT(from);
     if (IS_CRLF(pair))
         goto Run_02;

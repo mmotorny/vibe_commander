@@ -72,12 +72,6 @@ enum {
     END_EXIT                            /* to leave the program */
 };
 
-/* What is at an offset in a segment, and the offset of something that
-   the assembly defines. */
-#define AT(segment, offset) \
-    ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
 
@@ -217,7 +211,7 @@ static u16 Init40(void)
     if (md.LoadRes != 0xFF)
         return 0;
     md.LoadRes = 0;
-    tail = FndLet(AT(PspSeg, 0x81));
+    tail = FndLet(DOS_AT(PspSeg, 0x81));
     if (Init46(*tail))
         return 0;
     to = md.DosBuf;
@@ -1526,7 +1520,7 @@ FtErr5:
    and the compiler has it load DS with the program's data. */
 void __interrupt __far FatErr(struct Saved r)
 {
-    r.ax = FtErr1(r.ax, r.di, AT(r.bp, r.si));
+    r.ax = FtErr1(r.ax, r.di, DOS_AT(r.bp, r.si));
 }
 
 /* Take the critical error of DOS, for FatErr, and Ctrl-Break, for a

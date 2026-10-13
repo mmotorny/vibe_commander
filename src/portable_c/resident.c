@@ -73,11 +73,8 @@ extern const u8 __far Vers_S[];
 
 /* The PSP: where the program goes on when DOS has ended it, and the
    segment of its environment. */
-#define PSP_EXIT (*(u32 __far *)AT(PspSeg, 0x0A))
-#define PSP_ENV  (*(u16 __far *)AT(PspSeg, 0x2C))
-
-#define AT(segment, offset) \
-    ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
+#define PSP_EXIT (*(u32 __far *)DOS_AT(PspSeg, 0x0A))
+#define PSP_ENV  (*(u16 __far *)DOS_AT(PspSeg, 0x2C))
 
 /* Where a routine is, as an address for DOS and for a return. */
 #define ROUTINE(function) ((const u8 __far *)(void __far *)(function))
@@ -406,7 +403,7 @@ static void Exec02(u16 behind)
             if (md.ComSpec == 0) {
                 name = (const u8 __far *)Command;
             } else {
-                name = AT(PSP_ENV, md.ComSpec);
+                name = DOS_AT(PSP_ENV, md.ComSpec);
                 ran = ProgramRunBare(name, &md.EPB);
                 SetBrk();
                 if (!ran.failed)
@@ -564,7 +561,7 @@ void __loadds Alloc0(void)
     PspSeg = ProgramPrefix();
     system = SystemVersion();           /* Check DOS version */
     if ((u8)system.version < 3)         /* Alloc4 */
-        ((void (__far *)(void))AT(PspSeg, 0))();
+        ((void (__far *)(void))DOS_AT(PspSeg, 0))();
     if (((system.version & 0xFF) << 8 | system.version >> 8) < 0x314) {
         OutStr(Vers_S, system.other);   /* BX: as DOS answered */
         ProgramEnd(2);

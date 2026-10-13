@@ -131,8 +131,6 @@ extern const u8 __far Srch_B[];         /* "Search for the string" */
 extern const u8 __far SrFor_P[];        /* "Searching for" */
 extern const u8 __far SrEr_B[];         /* "Could not find the string" */
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-#define AT(segment, offset) ((u8 __far *)((u32)(segment) << 16 | (offset)))
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
@@ -148,7 +146,7 @@ static const u8 CODE Byts_S[6] = " Bytes";
 #define ERR_NOT_READY 0x53
 
 /* The text in a segment, and a word of it or of the table of lines. */
-#define TEXT(segment) ((u8 __far *)((u32)(segment) << 16))
+#define TEXT(segment) AT(segment, 0)
 #define WORD_AT(text, at) (*(u16 __far *)((text) + (at)))
 
 /* Whether two bytes end a line: CR LF, or LF CR. */
@@ -1616,7 +1614,7 @@ struct Next F34_30(u16 text)
     u16 word;
 
     for (;;) {
-        at = (const u8 *)(u16)(u32)FndLet(at);
+        at = NEAR(FndLet(at));
         word = *(const u16 *)at;
         at += 2;
         if (!IS_CRLF(word)) {
@@ -1735,7 +1733,7 @@ static void Aexec0(u16 edit)
     u8 *tail;
     u16 box, include, error, i;
 
-    tail = (u8 *)(u16)(u32)MvzLine(md.TmpBuf + 101, md.ViewFil, LenStr + 1);
+    tail = NEAR(MvzLine(md.TmpBuf + 101, md.ViewFil, LenStr + 1));
     md.TmpBuf[100] = (u8)((u16)(tail - (md.TmpBuf + 101)) + 45);
     box = OFFSET(Viewr_P);
     if (edit != 0)

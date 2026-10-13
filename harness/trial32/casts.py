@@ -89,9 +89,9 @@ def sort(place):
     name, line, macros = place["file"], place["line"], place["macros"]
     if place["kind"] == "function" or name == "dos.c":
         return "D"
-    if ({"PSP_EXIT", "PSP_ENV", "ROUTINE"} & set(macros) or "PspSeg" in line
+    if ({"DOS_AT", "ROUTINE"} & set(macros) or "PspSeg" in line
             or "SetVector" in line or "(void __far *)Stack" in line
-            or "(u32)MAIN_SEG << 16" in line or "AT(r.bp" in line):
+            or "(u32)MAIN_SEG << 16" in line):
         return "D"
     if "WAS" in macros:
         return "N"

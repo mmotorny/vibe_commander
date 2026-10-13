@@ -65,8 +65,6 @@ extern const u8 __far Tree_F[];         /* "\TREEINFO.NCD" */
 extern const u8 __far Tree_P[];         /* "Scanning the directory..." */
 extern const u8 __far TrSav_P[];        /* "Saving the directory..." */
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
@@ -301,7 +299,7 @@ RdTr22:                                 /* no more in this directory: on
             if (*text++ == '\\')
                 break;
     } while (--count);
-    text = (u8 *)(u16)(u32)MvzLine(text, entry->DirName, 13);
+    text = NEAR(MvzLine(text, entry->DirName, 13));
     text[0] = '\\';
     text[1] = '*';
     text[2] = '.';

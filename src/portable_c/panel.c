@@ -167,7 +167,7 @@ u8 *PtPt10(u16 panel)
         end = MvzLine(end, Progs_S, sizeof Progs_S);
     end[0] = ' ';
     end[1] = 0;
-    return (u8 *)(u16)(u32)end + 1;
+    return NEAR(end) + 1;
 }
 
 /* Write the path of a panel into the top of its frame, in the middle: in

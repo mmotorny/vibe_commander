@@ -68,12 +68,6 @@
 #define ARCHIVE     0x20                /* the attribute of a file that
                                            has changed */
 
-/* What is at an offset in a segment, and the offset of something that
-   the tables have. */
-#define AT(segment, offset) \
-    ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 /* Routines of the rest of the program that this file calls: all are of
    vc.h, and those that the setup program has too are the main program's
    word for word, or go by StOpen where the setup program's copy does

@@ -44,8 +44,6 @@ u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 extern const u8 __far Quit_B[];
 extern const u8 __far Name_S[];
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 #define LenCmd 124                      /* Length of command line */
 
 

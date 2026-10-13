@@ -46,9 +46,6 @@
 #define KEY_F10 0x4400
 #define KEY_ALT 0xFD00                  /* Alt, pressed and let go by itself */
 
-#define AT(segment, offset) \
-    ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
 
@@ -73,8 +70,6 @@ u16 *Shadow(u16 *cell);                                 /* screen.c */
    there. The text of the bar, the names of its menus, is of
    bars_t.c. */
 extern const u8 __far PtMnu_S[];
-
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
 /* The lines of the menus, one behind the other, each ended by a 0, and
    an empty one for a line across the menu. FFh and a number are that

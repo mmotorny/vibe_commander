@@ -128,9 +128,6 @@ extern const u8 __far Find_B[];
 extern const u8 __far FnFl6_S[];
 extern const u8 __far FnFl7_S[];
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-#define SEGMENT(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))
-
 /* What the size column says for a directory. */
 static const u8 CODE SubDir[7] = "SUB-DIR";
 
@@ -162,8 +159,7 @@ static u8 __far *Line(u16 number)
 {
     u32 at = ((u32)number << 6) + number;       /* 65 bytes to a line */
 
-    return (u8 __far *)((u32)(u16)((u16)(at >> 4) + md.ViewSeg) << 16
-                        | (u16)at & 0x0F);
+    return AT((u16)(at >> 4) + md.ViewSeg, (u16)at & 0x0F);
 }
 
 /* Write a line of the list to the screen buffer, in the colour of the
@@ -614,7 +610,7 @@ next:
             goto next;
         }
         handle = opened.value;
-        room = SEGMENT(&md) + md.FreMem2 - md.ViewSeg;
+        room = MAIN_SEG + md.FreMem2 - md.ViewSeg;
         chunk = 0x8000 + 80;
         if (!(room & 0xF000)) {
             room <<= 4;
@@ -624,13 +620,12 @@ next:
         found = 0;
         if (chunk < 4000)
             goto stopped;
-        segment = SEGMENT(Line(FND->FndNumb + 1));
+        segment = SEG_OF(Line(FND->FndNumb + 1));
         for (;;) {
             /* FnFl46 */
             if (!FndBack())
                 goto stopped;
-            read = FileRead(handle, (u8 __far *)((u32)segment << 16),
-                            chunk);
+            read = FileRead(handle, AT(segment, 0), chunk);
             if (read.failed)
                 goto stopped;
             count = read.value;
@@ -734,8 +729,6 @@ static const u8 CODE Find6_S[] =
 /* Whether a file is shown in hex: ViTxHex of the viewer, which the
    search reads files with. */
 #define ViTxHex md.TmpBuf[216]
-
-#define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
 
 /* What the search returns, struct Searched of vc.h: the place where the
    program goes on, a TO_ there; or that the current directory is another,
@@ -862,7 +855,7 @@ again:
     ((u16 *)&md.MousTim)[1] = 0xFFFF;
     ViTxHex = 0;
     /* As many lines as the memory behind the program has room for. */
-    room = SEGMENT(&md) + md.FreMem2 - md.ViewSeg;
+    room = MAIN_SEG + md.FreMem2 - md.ViewSeg;
     FND->FndSize = (u16)(((u32)room << 4) / LenFnf) - 1;
     FND->FndDrv = 'A';
 

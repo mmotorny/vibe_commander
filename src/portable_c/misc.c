@@ -16,7 +16,7 @@
    it loads the program. */
 u16 AsmSeg(void)
 {
-    return (u16)((u32)(const void __far *)Title_S >> 16);
+    return TABLES_BY(Title_S);
 }
 
 /* Is `word` the two bytes that end a line, in either order? */

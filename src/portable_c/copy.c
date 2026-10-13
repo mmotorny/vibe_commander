@@ -121,8 +121,6 @@ extern const u8 __far DelEr_B[];        /* "Can't delete the file" */
 extern const u8 __far RdOnl_B[];        /* "... is marked read-only" */
 extern const u8 __far CntDi_B[];        /* "Can't delete the subdirectory" */
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 /* What is put behind a path to find everything in the directory. */
 static const u8 CODE AllIn_S[] = "\\*.*";
 
@@ -146,12 +144,6 @@ static const u8 CODE AllIn_S[] = "\\*.*";
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 #define PAIR(high, low) ((u32)(high) << 16 | (low))
-
-/* The byte at an address, and the segment that the main data is in. */
-#define AT(segment, offset) ((u8 __far *)PAIR(segment, offset))
-#define MAIN_DATA() HIGH((u32)(const void __far *)md.TmpBuf)
-
-#define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
 
 /* The title of the boxes, as the offset of the text in the assembly:
    Copy, Move, or Rename once a file is being renamed. */
@@ -686,7 +678,7 @@ static u16 C20_00(u16 fits)
     SplitFl = 0;
 
 read:
-    left = (u32)((MAIN_DATA() + md.FreMem2 - md.ViewSeg) & 0xFFE0) << 4;
+    left = (u32)((MAIN_SEG + md.FreMem2 - md.ViewSeg) & 0xFFE0) << 4;
     segment = md.ViewSeg;
     if (ChgDisk(CpSrc))
         goto terminate;

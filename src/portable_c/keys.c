@@ -50,8 +50,6 @@ extern const u8 __far Sel_S[];          /* "Select" */
 extern const u8 __far Unsl_S[];         /* "Unselect" */
 extern const u8 __far Inv_S[];          /* "Invert" */
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 /* Bits of a file's attributes that are the program's own: selected, and
    selected before a command went through the selected files. */
 #define ATTR_WAS_SELECTED 0x80

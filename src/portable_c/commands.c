@@ -87,11 +87,6 @@ extern const u8 __far SvSt_B[];         /* "Do you wish to save the current
 extern const u8 __far SetEr_B[];        /* "There was an error while saving
                                            the setup file" */
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
-#define AT(segment, offset) \
-    ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 

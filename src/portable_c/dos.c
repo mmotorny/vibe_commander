@@ -182,8 +182,8 @@ static u16 Mouse(u16 ax, u16 bx, u16 cx, u16 dx)
 #define BIOS(regs) ((struct BiosRegs STACK *)&(regs))
 
 /* The two words of a far pointer, and a far pointer made of two. */
-#define SEGMENT(pointer) ((u16)((u32)(pointer) >> 16))
-#define OFFSET(pointer)  ((u16)(u32)(pointer))
+#define SEGMENT(pointer)   ((u16)((u32)(pointer) >> 16))
+#define OFFSET_OF(pointer) ((u16)(u32)(pointer))
 #define POINTER(segment, offset) \
     ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 
@@ -191,7 +191,7 @@ static u16 Mouse(u16 ax, u16 bx, u16 cx, u16 dx)
    on the main data for the call, as the original has it. And DX as DOS
    left it. */
 #define NUMBER(value) POINTER(MAIN_SEG, value)
-#define DX_OF(regs)   OFFSET((regs).name)
+#define DX_OF(regs)   OFFSET_OF((regs).name)
 
 #define ERR_NOT_READY 0x53              /* the error of a call that the
                                            user gave up, when a device was
@@ -375,7 +375,7 @@ struct Answer FileRename(const u8 FAR *from, const u8 FAR *to)
 
     regs.ax = 0x5600;
     regs.name = from;
-    regs.di = OFFSET(to);
+    regs.di = OFFSET_OF(to);
     regs.es = SEGMENT(to);
     return AskEs(REGS(regs), 0);
 }
@@ -449,8 +449,8 @@ struct Answer FileTrueName(const u8 FAR *name, u8 FAR *to)
 
     regs.ax = 0x6000;
     regs.name = POINTER(SEGMENT(name), 0);
-    regs.si = OFFSET(name);
-    regs.di = OFFSET(to);
+    regs.si = OFFSET_OF(name);
+    regs.di = OFFSET_OF(to);
     regs.es = SEGMENT(to);
     return AskEs(REGS(regs), 0);
 }
@@ -465,8 +465,8 @@ u16 FcbParse(const u8 FAR *name, u8 FAR *fcb, u16 how)
 
     regs.ax = 0x2900 | how & 0xFF;
     regs.name = POINTER(SEGMENT(name), 0);
-    regs.si = OFFSET(name);
-    regs.di = OFFSET(fcb);
+    regs.si = OFFSET_OF(name);
+    regs.di = OFFSET_OF(fcb);
     regs.es = SEGMENT(fcb);
     return TellEs(REGS(regs)).value;
 }
@@ -524,7 +524,7 @@ struct Answer DirCurrent(u16 drive, u8 FAR *to)
 
     regs.ax = 0x4700;
     regs.name = POINTER(SEGMENT(to), drive & 0xFF);
-    regs.si = OFFSET(to);
+    regs.si = OFFSET_OF(to);
     return Ask(REGS(regs));
 }
 
@@ -534,7 +534,7 @@ struct Answer DirCurrentBare(u16 drive, u8 FAR *to)
 
     regs.ax = 0x4700;
     regs.name = POINTER(SEGMENT(to), drive & 0xFF);
-    regs.si = OFFSET(to);
+    regs.si = OFFSET_OF(to);
     return Tell(REGS(regs));
 }
 
@@ -806,7 +806,7 @@ struct Answer ProgramRun(const u8 FAR *name, const struct EPBs FAR *block)
     struct DosRegs regs;
 
     regs.ax = 0x4B00;
-    regs.bx = OFFSET(block);
+    regs.bx = OFFSET_OF(block);
     regs.name = name;
     regs.es = SEGMENT(block);
     return AskEs(REGS(regs), 0);
@@ -818,7 +818,7 @@ struct Answer ProgramRunBare(const u8 FAR *name,
     struct DosRegs regs;
 
     regs.ax = 0x4B00;
-    regs.bx = OFFSET(block);
+    regs.bx = OFFSET_OF(block);
     regs.name = name;
     regs.es = SEGMENT(block);
     return TellEs(REGS(regs));

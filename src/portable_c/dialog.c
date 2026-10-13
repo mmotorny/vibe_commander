@@ -86,9 +86,7 @@
 #define LEFT_RIGHT  0xC7B6              /* where one meets the frame, on the
                                            left and on the right */
 
-/* What is at an offset in a segment. */
-#define AT(segment, offset) \
-    ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
+/* The word at an offset in a segment, and a field of a dialog. */
 #define WORD_AT(segment, offset) (*(u16 __far *)AT(segment, offset))
 #define FIELD(offset) ((const struct BOXMN __far *)AT(code, offset))
 

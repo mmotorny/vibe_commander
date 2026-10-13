@@ -1719,10 +1719,11 @@ in "The portable C".
     has 436 in the same source, and nothing for the address of a
     function kept as that of data, so the test does not ask it.
   - A cast that a macro makes is counted where the macro is used, so a
-    file is not clean while it uses `PANEL` or `AT` of `vc.h`. A macro
-    that is made right makes every file right that uses it, and
-    `--macros` says which macros there are and how many places each
-    makes.
+    file is not clean while it uses `DOS_AT` of `vc.h` or a macro of
+    its own that casts. A macro that is made right makes every file
+    right that uses it, and `--macros` says which macros there are and
+    how many places each makes. The words of the addresses in `vc.h`
+    are made so: gcc reads their second bodies, which cast nothing.
   - What gcc cannot say, since it only reads, is in `TODO.md`: above
     all arithmetic that counts on an int of 16 bits.
 - The figures of the portable C that change with every step, the
@@ -2095,6 +2096,41 @@ in "The portable C".
     what was there. The translation has zeros there, the scenario says
     in a comment that the original's screen is of that kind, and the
     plan has it among what was found.
+
+- The words of the addresses, `AT`, `OFFSET`, `PANEL`, `MAIN_SEG`,
+  `NEAR`, `SEG_OF`, `OFFSET_IN_SEG`, `MD_PLACE`, `MD_POINTER`, are in
+  `vc.h` once, each with a body for DOS in 16 bits and one for a flat
+  memory, and no file defines one for itself: `TODO.md`, "The portable
+  C in 32 bits: the plan", has what each takes and gives, with a line
+  as it was and as it becomes for every kind of place. What putting
+  them there met:
+  - A cast that is made a word is the same bytes of `VC.EXE`, and that
+    is the check: `sha256sum build/portable_c/VC.EXE` before and after,
+    which takes the build's second. Every form that the plan's table
+    has was the same bytes at the first try, with the files' own
+    definitions differing among themselves in a `const`, in a cast of
+    the offset and in a macro between. One thing was not: the
+    difference of two far pointers written out where `(u16)(u32)` took
+    the offset, which is why `OFFSET_IN_SEG` is a word.
+  - A second body is read by nothing but the compilers until the
+    program runs in 32 bits. To try one, a file of a few lines that
+    includes `vc.h`, has gcc take it for this computer, defines `md`
+    after the include as a field of a structure that has 64K in front
+    of it and a megabyte behind, and holds each word against the
+    address that the plan's account gives: `#define md (arena.main)`
+    behind the `#include` is enough, since a macro is expanded where it
+    is used.
+  - `harness/reads.py` goes by the text of a file of code. A constant
+    that a file named and now names through a word of `vc.h` is one
+    that the file "does not name": `AsmSeg` hands `Title_S` to
+    `TABLES_BY` for that, where a word without an argument would have
+    done for the compilers.
+  - `wcc386` writes a file `NAME.err` into the directory it is run in
+    when a file has a warning: run a trial of it from `build/`.
+  - A name that `vc.h` takes is taken in every file: `dos.c` had an
+    `OFFSET` of its own, which is `OFFSET_OF` there now, and `view.c`
+    and `usermenu.c` each have a `WORD_AT` that is not `dialog.c`'s,
+    which is why that word is in no header.
 
 ### Moving a file to the system's functions
 

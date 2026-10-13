@@ -102,8 +102,6 @@ extern const u8 __far HlMn1_D[];        /* Help, Cancel */
 extern const u8 __far HlMn2_D[];        /* Next, Previous, Index, Cancel */
 extern const u8 __far HlpMn_P[];
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 

@@ -1688,6 +1688,15 @@ Most of the two casts are a few macros, and
   `name` of `struct DosRegs`, which only `dos.c` does now; a far
   pointer made of a segment and an offset by a shift.
 
+Since the words of the addresses are in `vc.h` with a second body for
+a memory without segments ("The portable C in 32 bits: the plan", P1),
+gcc reads that body, which casts nothing: `OFFSET`, `AT`, `PANEL`,
+`MAIN_SEG`, `NEAR` and `TRELIST` make no place any more, no file
+defines one of them for itself, and `layout` has none either, the two
+lines of `tables.h` being held by what a pointer is long. What is
+counted of the two casts is what does not go through those words yet,
+and what is DOS's. The plan has the counts and what they do not show.
+
 What the test does not see, since gcc only reads the files:
 
 - Arithmetic that counts on an int of 16 bits. Two numbers of 16 bits
@@ -2081,11 +2090,11 @@ nothing in 32 bits and goes with that build:
 | What | How much | Where it is | In 32 bits |
 |---|---|---|---|
 | `__far`, `FAR`, `STACK`, `CODE` | 790, 62, 262 and 96 places (`harness/hostcheck.py`) | Words in the source | Nothing already: `vc.h` defines them away where `__I86__` is not set. The words go by a script in the last piece |
-| The macros of the addresses | 7 names that files define for themselves, 46 definitions in 23 files, and 4 of `vc.h` | After P1: one block of `vc.h` with two bodies, under `#ifdef __I86__` | The second body. The first goes with the build, the second in step 2 |
+| The macros of the addresses | 5 names that files defined for themselves, 41 definitions in 23 files, and 4 of `vc.h` | Since P1: one block of `vc.h` with two bodies, under `#ifdef __I86__` | The second body. The first goes with the build, the second in step 2 |
 | The three groups of the data, the two code segments, `#pragma data_seg` | `CMakeLists.txt`; 4 pragmas in `main.c` and `stack.c` | The build; the pragmas under `__I86__` after S3 | One flat segment of each kind, by the linker's order |
 | `arith.c`, the compiler's two helpers | 1 file | Not built for 32 bits | `wcc386` multiplies and divides without them |
 | Interrupt functions, `__loadds`, naked functions, `_asm`, registers in `#pragma aux` | 5, 3, 2, 2, 4 and 7 places | In `resident.c`, `main.c`, `vc.h`, `dos.c` today; in `dos.c` alone after S3 | `dos32.c` has its own, as inline assembly of 32 bits |
-| `LAID_OUT(BOXHD, 10)` and `LAID_OUT(BOXMN, 11)` | 2 lines of `tables.h` | Under `__I86__` after P1 | 12 and 13 bytes: see "The tables" |
+| `LAID_OUT(BOXHD, 10)` and `LAID_OUT(BOXMN, 11)` | 2 lines of `tables.h` | Nowhere, since P1: the two lines say 8 and 9 bytes and a pointer, which is 10 and 11 on DOS, and hold every compiler to it | 12 and 13 bytes: see "The tables" |
 | `dos.c` | 1,148 lines | A file that only the 16-bit build has | `dos32.c` |
 
 ### A pointer in a number, by what it is
@@ -2111,11 +2120,12 @@ That is 737 places that change by a definition (286 of T, 148 of P,
 105 of M, 36 of V, 5 of G, the 94 of `NEAR` and the 63 of N that a
 macro makes), 207 by hand, on some 190 lines (147 of N on 138 lines,
 14 of R on 7, the 40 of T, 2 of P, 3 of V, 1 of G), and the 96 of DOS.
-After P1 the host check counts some 310 of the 1,040, since gcc reads
-the second bodies, which cast nothing; when P2, P3 and S3 have landed
-it counts those of `dos.c` and no others. So its record says how far
-the preparation is, file by file, and a file that has gained a place
-has a cast outside the words.
+After P1 the host check was to count some 310 of the 1,040, since gcc
+reads the second bodies, which cast nothing. It counts 252: "P1, the
+words in one place: done" below says why it is fewer. When P2, P3
+and S3 have landed it counts those of `dos.c` and no others. So its
+record says how far the preparation is, file by file, and a file that
+has gained a place has a cast outside the words.
 
 What the host check does not see is said under "Arithmetic" and under
 "What could go wrong".
@@ -2128,7 +2138,8 @@ The megabyte: a segment `s` and an offset `o` are the address
 being the constant 1000h, and gcc for 64 bits says nothing of them.
 Whatever is named by a segment has to lie between the main data and
 983 KB behind it, which the linker's order sees to. The bodies as
-they were tried, for P1 to start from:
+P1 wrote them into `vc.h`, where each has what it takes for granted
+written at it:
 
     #define ARENA ((u8 *)&md - 0x10000L)
     #define MAIN_SEG 0x1000
@@ -2136,10 +2147,12 @@ they were tried, for P1 to start from:
         (ARENA + ((u32)(u16)(segment) << 4) + (u16)(offset))
     #define SEG_OF(pointer) \
         ((u16)(((const u8 *)(pointer) - ARENA) >> 4))
+    #define OFFSET_IN_SEG(segment, pointer) \
+        ((u16)((const u8 *)(pointer) - AT(segment, 0)))
     #define PANEL(panel) ((struct WCBdef *)AT(panel, 0))
-    #define TABLES() SEG_OF(Title_S - 0x8000)      /* AsmSeg */
+    #define TABLES_BY(text) SEG_OF((text) - 0x8000)    /* AsmSeg */
     #define OFFSET(object) \
-        ((u16)((const u8 *)(object) - AT(TABLES(), 0)))
+        ((u16)((const u8 *)(object) - AT(TABLES_BY(Title_S), 0)))
     #define MD_PLACE(pointer) \
         ((u16)((const u8 *)(pointer) - (const u8 *)&md))
     #define MD_POINTER(place) ((u8 *)&md + (u16)(place))
@@ -2485,7 +2498,7 @@ and H1 are started at once by the session.
 
 | Piece | What it does | Owns | Size | Needs; beside | Right when | Could go wrong |
 |---|---|---|---|---|---|---|
-| P1, the words in one place | `vc.h` gets the macros of the addresses once, with two bodies: `AT`, `WORD_AT`, `OFFSET`, `PANEL`, `MAIN_SEG`, `NEAR`, `MD_PLACE`, `MD_POINTER`, `TRELIST`; the files lose their own. The classes P, M, V, G and R whole | `vc.h`, `tables.h` for `LAID_OUT`, and the tops of 23 files | 46 definitions out of 23 files, 17 lines by hand | Nothing; lands first and alone, D1 and H1 start beside it | The 16-bit `VC.EXE` is the same bytes; the host check falls to some 310; `whole.py` still links | A file's own `OFFSET` meant something else: `dos.c`'s does, and keeps its own under another name. And nothing runs the second bodies before M1: a mistake in them is found there |
+| P1, the words in one place. Done: see below | `vc.h` gets the macros of the addresses once, with two bodies: `AT`, `WORD_AT`, `OFFSET`, `PANEL`, `MAIN_SEG`, `NEAR`, `MD_PLACE`, `MD_POINTER`, `TRELIST`; the files lose their own. The classes P, M, V, G and R whole | `vc.h`, `tables.h` for `LAID_OUT`, and the tops of 23 files | 46 definitions out of 23 files, 17 lines by hand | Nothing; lands first and alone, D1 and H1 start beside it | The 16-bit `VC.EXE` is the same bytes; the host check falls to some 310; `whole.py` still links | A file's own `OFFSET` meant something else: `dos.c`'s does, and keeps its own under another name. And nothing runs the second bodies before M1: a mistake in them is found there |
 | P2a, places of the main data: the lists, the tree, the command line | N in `treebox.c`, `tree.c`, `enter.c`, `usermenu.c`, `cmdline.c`, `place.c`, `info.c`, `extfile.c`, `drive.c`, `input.c`, `panel.c`, `files.c`, `read.c` | Those files | 97 places, 59 by hand | P1; beside P2b, P3, P4, S | The same bytes; those files clean in the host check | A number that is no place of the main data: `(u16)(u32)file` is the offset in a panel |
 | P2b, the same: the viewer, the editor, a copy, the menus | N in `view.c`, `edit.c`, `copy.c`, `menu.c`, `help.c`, `find.c`, `stcolor.c`, `sthelp.c`, `window.c`, `bars.c`, `dirfunc.c` | Those files, but the lines that S1 has in `view.c` | 66 places | P1; beside the others | The same | `EditBuf`, `CpSrc`: names that are places of the main data by a macro |
 | P3, the tables read as what they are | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
@@ -2548,6 +2561,151 @@ What a piece goes by:
   against `dos32.c`, or in the two bodies of `vc.h`, and nowhere else:
   no `#ifdef` in a file of code.
 
+### P1, the words in one place: done, and what a later piece should know
+
+`vc.h` has the words of the addresses in one block, under "The words of
+the addresses": each with a body for DOS in 16 bits, which is what the
+files did, and a body for a flat memory, with what that body takes for
+granted written at it. The files have lost their own: 41 definitions
+out of 23 files, 20 of `OFFSET`, 13 of `AT`, 4 of `NEAR`, 2 of
+`MAIN_DATA` and 2 of `SEGMENT`, and 30 lines of code were changed by
+hand. `build/portable_c/VC.EXE` is the same bytes as before it.
+
+Nothing runs the second bodies. They compile: every file but `arith.c`
+and `dos.c` under `wcc386 -3r -mf -os -s -zl -zls -wx -we`, with
+`resident.c` alone warning as it did, twice of one line; and the host
+check's gcc says nothing of them. `harness/trial32/whole.py` links the
+tree with them, 286,640 bytes where it was 277,132: 126,649 of code
+where it was 121,807, and 5,056 relocations where it was 4,440, which
+is what the megabyte costs. And they were read against "The memory"
+above, and once run on this computer, for what that is worth: a file
+of a few lines that has gcc take them for 64 bits, with a main data
+that has 64K in front of it and a megabyte behind, and holds each word
+against the address that the account gives, the tables in front of the
+main data and behind it at every place in a paragraph. It is not kept:
+it says that the bodies do what the account says, not that the account
+is right for the program.
+
+The words, with what each takes and gives. The pointer is far in 16
+bits and plain in 32.
+
+| Word | Takes | Gives | The second body |
+|---|---|---|---|
+| `MAIN_SEG` | | The segment of the main data, a number | 1000h |
+| `AT(segment, offset)` | A segment of the megabyte and an offset in it | `u8 *`, the byte there | `ARENA + 16 * segment + offset`, each cut to 16 bits first |
+| `SEG_OF(pointer)` | A pointer | Its segment | The paragraph that it is in, which is the segment it was made with only where the offset was below 16: `Line` of `find.c` makes such |
+| `OFFSET_IN_SEG(segment, pointer)` | The segment that a pointer was made with, and the pointer | Its offset there: what `AT` wants back. The first body does not read the segment | How far the pointer is behind `AT(segment, 0)` |
+| `PANEL(panel)` | A panel's segment | `struct WCBdef *` | `AT(panel, 0)` |
+| `TABLES_BY(Title_S)` | `Title_S` and nothing else | The segment of the tables. `AsmSeg` of `misc.c` is this, and code calls that | The paragraph 32K below `Title_S` |
+| `OFFSET(object)` | A box, a dialog or a text of the tables | Its offset in the tables' segment | How far it is behind `AT(TABLES_BY(Title_S), 0)`. No constant: it cannot stand in the value of a static object, and stands in none today |
+| `NEAR(pointer)` | A pointer that a routine returns far and that is into the main data | `u8 *`, near | The pointer |
+| `MD_PLACE(pointer)` | A pointer into the main data | Its place there, a word | How far it is behind `&md` |
+| `MD_POINTER(place)` | A place of the main data | `u8 *` to it | `&md` and the place, cut to 16 bits first |
+| `TRELIST` | | Where the list of the tree begins, a place | One body, on `MD_PLACE` |
+| `DOS_AT(segment, offset)` | A segment of DOS's own and an offset: the PSP, the environment, the header of a device | A far pointer | None of its own: it is the cast in both, the host check counts it, and S1 to S3 take its 13 places away |
+
+What is otherwise than the plan had it:
+
+- `WORD_AT` is not in `vc.h`: three files mean three things by it.
+  `dialog.c` keeps its own, the word at a segment and an offset, which
+  is made of `AT` and so has both bodies; `view.c` has the word at a
+  place of the text and `usermenu.c` the word at a pointer, and neither
+  makes a pointer of a number. `start.c` had it for the PSP alone, and
+  has `PSP_WORD` there now, of `DOS_AT`. Likewise `TEXT` of `view.c` is
+  `AT(segment, 0)`, and `FIELD` of `dialog.c` was made of `AT` already.
+- `SEG_OF` and `OFFSET_IN_SEG` are new. The first is what `find.c` and
+  `read.c` had as `SEGMENT`; the second is for a pointer into a panel
+  or into the viewer's text that is taken for its offset, which
+  `MD_PLACE` is not for: see the examples.
+- `DOS_AT` is new, for the 13 places where a file outside `dos.c` made
+  a far pointer into DOS's own memory with its `AT`. Left to `AT` they
+  would have gone from the host check's count while being as wrong in
+  32 bits as before.
+- The two lines of `LAID_OUT` are not under `__I86__`. They say
+  `8 + sizeof(const void *)` and `9 + sizeof(const void *)`, which is
+  10 and 11 on DOS, 12 and 13 for `wcc386`, and holds gcc's 16 and 17
+  as well: no build changes them, and `whole.py` does not any more.
+- `dos.c` has its `OFFSET`, the offset of a far pointer, as
+  `OFFSET_OF`.
+- `AsmSeg` says `TABLES_BY(Title_S)` and not a word without an
+  argument, because `harness/reads.py` goes by the text of a file: its
+  entry for `misc.c` and `Title_S` wants the file to name the constant,
+  and the C translation has the same entry.
+
+The host check counts 252 places where it counted 1,040. The plan
+thought 310 with the two of `WCB_OF` left, and the 58 between are 24 of
+P3 and 34 of DOS that the check sees no more, with one more and one
+fewer by the way:
+
+| Class | Was | Is | What went, and what is left |
+|---|---|---|---|
+| T | 326 | 16 | All that goes through `OFFSET` and `AT`. Left are the 16 of `WORD` in `dialog.c`. The plan had 40 for P3, and thought them all left: what they are besides those 16 goes through `AT`, `FIELD` and `WORD_AT` and went from the count with the rest, 25 places of `dialog.c`, 8 of `main.c` and 3 of `stcolor.c`. Those of them that read a pointer out of a table as a word are as much P3's as they were, with nothing counting them |
+| N | 210 | 171 | The 38 of `TRELIST`, which leave `place.c` clean, and the one of `bars.c`, whose line was changed for its segment |
+| P | 150 | 2 | `PANEL`. The two of `WCB_OF` are left: see below |
+| R | 108 | 0 | |
+| M | 105 | 0 | |
+| V | 39 | 0 | One of them was the environment, in `resident.c`, and is among D now |
+| G | 6 | 0 | |
+| D | 96 | 63 | 30 of `dos.c`, which names `MAIN_SEG` and is read with the constant: it has 39. And 4 outside it for the same reason, the block that a program is run with, `(u32)MAIN_SEG << 16 | ...` in `resident.c`, `view.c` and twice in `start.c`: the two of `start.c` are counted nowhere now, and are S1's all the same |
+
+So a file that is clean in the record is one that makes no pointer of a
+number outside the words. It is not thereby right in 32 bits: gcc has
+nothing to say of a table's word read as 16 bits through `AT`, of
+`MAIN_SEG` shifted into a far pointer for DOS, or of a pointer stepped
+past where its segment ends.
+
+`harness/trial32/casts.py` knows `DOS_AT` for a place of DOS, and
+sorts the tree as it stands: `python3 harness/trial32/casts.py N
+view.c` lists what a piece has left in a file.
+
+What the pieces that start here go by, each line as it is and as it
+becomes. Every one of them was tried under the 16-bit build and gave
+the same bytes, and was taken back where it is another piece's.
+
+| Whose | The place | As it is | As it becomes |
+|---|---|---|---|
+| P2 | A place of the main data handed on as a number | `SavWin(begin, size, (u16)md.WinBuf)` | `SavWin(begin, size, MD_PLACE(md.WinBuf))` |
+| P2 | A pointer kept as a place | `md.HstAdr = (u16)entry` | `md.HstAdr = MD_PLACE(entry)` |
+| P2 | The address of a field | `(u16)(u8 *)&md.CrntCol` | `MD_PLACE(&md.CrntCol)`: `ClsLine` of `bars.c` has it |
+| P2 | A place read as a pointer | `entry = (const u8 *)md.HstAdr` | `entry = MD_POINTER(md.HstAdr)` |
+| P2 | The same, to something that is no byte | `((struct DIRENT *)md.TreAdr)->DirLevel`, `*(u16 *)starts = line.at` | `((struct DIRENT *)MD_POINTER(md.TreAdr))->DirLevel`, `*(u16 *)MD_POINTER(starts) = line.at` |
+| P2 | What a routine returns far, kept as a place | `(u16)(u32)MvzLine(md.MenuBuf, tried + 2, 13)`, `(u16)NEAR(CutPath(CpSrc))` | `MD_PLACE(NEAR(MvzLine(md.MenuBuf, tried + 2, 13)))`, `MD_PLACE(NEAR(CutPath(CpSrc)))` |
+| P2 | A place worked out | `(u16)md.TmpBuf - 2`, `*(u16 *)(u16)(TRELIST + count)` | `MD_PLACE(md.TmpBuf) - 2`, `*(u16 *)MD_POINTER(TRELIST + count)`: the sum is made in the number, inside the word, where it wraps round as on DOS |
+| P2 | A pointer into a panel taken for its offset: no place of the main data | `(u16)(u32)file` | `OFFSET_IN_SEG(panel, file)`, with the segment that the pointer was made with. The difference of two far pointers, written out, is other bytes |
+| P1 | A far pointer kept as a near one | `to = (u8 *)(u16)(u32)AddFile(to - 1)` | `to = NEAR(AddFile(to - 1))` |
+| P1 | A segment and an offset with a shift | `(const u8 __far *)((u32)segment << 16 \| at)` | `AT(segment, at)` |
+| P1 | The segment of the main data, worked out | `SEGMENT(&md)`, `MAIN_DATA()` | `MAIN_SEG` |
+| S1 | The PSP and the environment | `AT(PspSeg, 0x81)` | `DOS_AT(PspSeg, 0x81)`, until it is a function of `sys.h` |
+
+And what each should know besides:
+
+- P2a, P2b: `TRELIST` is done, and with it `place.c`; what is left of N
+  is written out, but for `FIND` of `tree.c`. `MD_PLACE` wants a
+  pointer into the main data. `(u16)(u32)(wcb->WinPath + 3)` of
+  `read.c` and `enter.c` are offsets in a panel, and `(u16)(u32)name`
+  of `files.c` is one in the segment of a list of files:
+  `OFFSET_IN_SEG` is theirs. `(u16 *)(u16)(u32)cell` of `edit.c` is a
+  far pointer kept as a near one, and wants `NEAR`. `MD`, `MDW` of
+  `dialog.c` and `WAS` of `resident.c` are P3's and S3's, as the plan
+  has them.
+- P3: `dialog.c` has `AT` of `vc.h`, and `WORD_AT`, `FIELD`, `WORD`,
+  `MD` and `MDW` of its own as they were. The record does not show the
+  24 places that the table above names: go by the row of the piece,
+  not by the count.
+- P4: the words cut what they are handed to 16 bits, so a sum that is
+  an argument of `AT`, `MD_POINTER` or `PANEL` wraps round as on DOS and
+  needs no cast. `MAIN_SEG` is an int in 32 bits, the constant 1000h,
+  and stands in nine sums with a segment or a count of paragraphs, in
+  `find.c`, `read.c`, `copy.c`, `edit.c`, `view.c`, `info.c` and
+  `start.c`: each is put into a word of 16 bits or cut by a mask.
+- B1: the files compile as they stand with the command above, which
+  needs `-i=` for the compiler's `h`, since `vc.h` includes `stddef.h`
+  where `__I86__` is not set.
+- S1: `start.c` reads the PSP through `PSP_WORD`, and `resident.c`
+  through `PSP_EXIT` and `PSP_ENV`, all of `DOS_AT`; `main.c` has
+  `DOS_AT` for the command tail and for the header of the device in
+  `FatErr`.
+
 ### What could go wrong
 
 1. An offset that has wrapped round, added to a pointer. Nothing finds
@@ -2591,6 +2749,27 @@ What a piece goes by:
     of the main data, which the language does not promise and both
     compilers here take. It is gone, with step 2, before clang builds
     the program.
+13. Two far pointers held against one another. In 16 bits which of two
+    is the greater, and how far they are apart, goes by their offsets
+    alone, whatever their segments; in a flat memory it goes by the
+    addresses. Two pointers of one segment are the same in both, and
+    most are that. A place that counts on the other, a pointer of one
+    segment compared with one of another or taken from it, shows
+    nothing to either compiler, and nobody has looked for one: the
+    pieces that run the 32-bit program first, M1 and the convergence,
+    look where a list, the viewer's text or a copy goes wrong at the
+    end of a segment or between two.
+14. The tables that are written to. `OFFSET` counts from 32K below
+    `Title_S` and holds for what lies within 32K of it. The 274 bytes
+    of the tables that the program writes are no constants to
+    `wcc386`, which puts them with what has a value; linked behind the
+    main data, where the order of "The build" has what has a value,
+    they are more than 64K from where the offsets begin, and `OFFSET`
+    of one wraps round with no word said. They have to be linked with
+    the constants, and the test of the layout, of H3 or B2, has to
+    hold every object of a file of tables, the written ones among
+    them, to lie within 32K of `Title_S`, and `Title_S` no more than
+    32K in front of the main data.
 
 ### The estimate
 

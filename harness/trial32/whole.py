@@ -7,9 +7,6 @@ long it is: nothing that it makes runs.
 It copies src/portable_c/ to build/trial32/whole/, and changes there
 what Open Watcom's 32-bit compiler refuses of the tree as it stands:
 
-  - `LAID_OUT(BOXHD, 10)` and `LAID_OUT(BOXMN, 11)` of tables.h are
-    made 12 and 13: the header and a field of a dialog each hold one
-    pointer, which has four bytes;
   - arith.c is left out, the two helpers of the 16-bit compiler;
   - dos.c is left out, and in its place every function of sys.h is
     written as one that does nothing, with the three that vc.h declares
@@ -23,9 +20,11 @@ file has: its length, its objects, and its relocations. The project
 has to be built once, for the compiler.
 
 What it shows of the tree as it was on 13 October 2026 is in TODO.md,
-"The portable C in 32 bits: the plan". That the file links says nothing
-of whether the program would run: a place of the main data is still
-kept in 16 bits there, and a panel is a segment's number.
+"The portable C in 32 bits: the plan", and again there with the words
+of the addresses of vc.h in their second bodies, which the compiler
+reads here. That the file links says nothing of whether the program
+would run: a place of the main data is still cast to 16 bits in many
+files, and DOS is not there.
 """
 import re
 import shutil
@@ -99,10 +98,6 @@ def main():
     for path in sorted(SOURCE.glob("*.[ch]")):
         if path.name not in ("arith.c", "dos.c"):
             shutil.copy(path, OUT / path.name)
-    tables = (OUT / "tables.h").read_text()
-    tables = tables.replace("LAID_OUT(BOXHD, 10);", "LAID_OUT(BOXHD, 12);")
-    tables = tables.replace("LAID_OUT(BOXMN, 11);", "LAID_OUT(BOXMN, 13);")
-    (OUT / "tables.h").write_text(tables)
     (OUT / "nosystem.c").write_text(stub())
     environment = {"WATCOM": str(WATCOM), "PATH": "/usr/bin:/bin"}
     objects = []

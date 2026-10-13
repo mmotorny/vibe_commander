@@ -30,10 +30,20 @@ memory has no segments, as a build for such a machine will. The summary
 says how many there are.
 
 A place is counted for the file that it is written in, and what a macro
-makes is written where the macro is used: PANEL of vc.h makes a pointer
-of a number in every file that names it, and is counted in each. What
-is wrong in a header itself is counted once, for the header, however
-many files read it. A file with no place of any kind is clean.
+makes is written where the macro is used: DOS_AT of vc.h makes a
+pointer of a number in every file that names it, and is counted in
+each. What is wrong in a header itself is counted once, for the header,
+however many files read it. A file with no place of any kind is clean.
+
+The words of the addresses in vc.h, AT, OFFSET, PANEL, MAIN_SEG, NEAR,
+MD_PLACE, MD_POINTER and their like, have a body for a memory without
+segments, and that is the one gcc reads here: it casts nothing. So a
+segment and an offset that go through those words are not counted, and
+what is counted of the two casts is what does not go through them: a
+cast that is written out, a macro of a file, and what is DOS's. That
+the second bodies compile says nothing of whether a place is right
+there: a word of a table read as a number of 16 bits through AT is not,
+and gcc has nothing to say of it.
 
 What was counted last is kept in harness/hostcheck.txt, of every file,
 and the test `portable_c-host` of the build fails when a file has
@@ -56,9 +66,9 @@ source, and
 
     python3 harness/hostcheck.py --macros
 
-says which macros make the casts, and how many each: most of the places
-are a few macros, PANEL and AT of vc.h, OFFSET of a file, and whoever
-takes one of those away can see what is left of it.
+says which macros make the casts, and how many each, and how many are
+written out in no macro: whoever takes one of those away can see what
+is left of it.
 
 It needs gcc, and one that compiles for a machine whose pointers have 64
 bits. The counts are gcc's: clang finds the same things and counts some

@@ -16,12 +16,6 @@
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))
 
-/* What is at an offset in a segment, and the offset of something that
-   the assembly defines. */
-#define AT(segment, offset) \
-    ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
 /* AsmSeg, of vc.h, returns the segment of the program's constants: the
    name of the file is one of system_t.c, and the code that starts
    the program reads it there too. */

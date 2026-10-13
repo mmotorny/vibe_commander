@@ -1347,23 +1347,192 @@ struct Paged {
 struct Paged PgUp(u16 cursor, u16 first, u16 rows);
 struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 
+/* The words of the addresses. The program keeps a place of the memory
+   in numbers wherever the original kept it in registers: a segment, an
+   offset in one, a table as its offset in the segment of the tables, a
+   place of the main data as a word. These words make a pointer of such
+   numbers and the numbers of a pointer, and the code of the program
+   is to do it through them and nowhere else: a cast between a pointer
+   and a number that is written out in a file is a place that has still
+   to go through one of them, and harness/hostcheck.py counts it.
+
+   Each has two bodies. The first is for DOS in 16 bits, and is what
+   the files did before the words were here: a far pointer is a segment
+   and an offset in one number of 32 bits, and a near one is the offset
+   in the segment of the main data, which begins that segment.
+
+   The second is for a memory that is one address after another: a
+   program of 32 bits, and the gcc of the host check. It holds the
+   memory of the first inside the flat one, so that every number means
+   what it meant: a megabyte counted in paragraphs from ARENA, which is
+   64K below the main data. A segment `s` and an offset `o` are the
+   address ARENA + 16 * s + o there, as they are 16 * s + o on DOS. The
+   main data is then in the segment 1000h whatever its address, the
+   tables are known by offsets from 32K below Title_S, and a panel or
+   the viewer's text is in whatever paragraphs the system's functions
+   for the memory hand out. Nothing has run the second bodies: they
+   compile, and the rest is from reading. What each takes for granted is
+   said at it, and what all of them do:
+
+     - Whatever is named by a segment lies between ARENA and a megabyte
+       and 64K behind it, at an address that is ARENA and a number of
+       whole paragraphs where it is named with the offset 0. The order
+       in which the program is linked and the functions that hand out
+       the memory see to both.
+     - An address is formed that is in no object, between ARENA and the
+       main data and 32K below Title_S. The language promises nothing
+       of that. Open Watcom and gcc take it.
+     - A pointer that such a word has made is stepped as a pointer. On
+       DOS a far pointer that is stepped past FFFFh begins its segment
+       again and a near one the main data; here it goes on, 64K further.
+       What wraps round has to do so in the number, before the word
+       makes the pointer: the words cut a segment and an offset to 16
+       bits each, as a register does.
+     - Which of two pointers is the greater, and how far they are
+       apart, is said by their addresses. On DOS it is said by the
+       offsets of two far pointers alone, whatever their segments.
+
+   TODO.md, "The portable C in 32 bits: the plan", has the megabyte and
+   who takes it down again: the second bodies go when the numbers have
+   become pointers, the first with the build for 16 bits. */
+#ifdef __I86__
+
 /* The segment of the main data, as a number: this compiler makes a far
    pointer of a near one with DS, and that is not read anywhere else. It
    is the segment of all that DS is on. */
 #define MAIN_SEG ((u16)((u32)(void __far *)&md >> 16))
 
-/* The panel that a file entry belongs to. */
-#define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))
+/* What is at an offset in a segment: a far pointer to the byte. */
+#define AT(segment, offset) \
+    ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
+
+/* The segment of a far pointer; and its offset, in the segment that it
+   was made with, which is named for the other body and not read. */
+#define SEG_OF(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))
+#define OFFSET_IN_SEG(segment, pointer) ((u16)(u32)(pointer))
 
 /* The panel in the segment `panel`: what the assembly has in DS where it
    says WCBseg. */
 #define PANEL(panel) ((struct WCBdef __far *)((u32)(panel) << 16))
 
+/* The segment of the tables, by one of them: that of any, a number
+   that DOS sets when it loads the program. AsmSeg of misc.c answers
+   with it, by Title_S. */
+#define TABLES_BY(text) SEG_OF(text)
+
+/* A table as a number: the offset of a box, a dialog or a text in the
+   segment of the tables. The compiler makes of it the offset alone,
+   with no relocation. */
+#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
+
+/* A far pointer that is known to point into the main data, as a near
+   one: what MvzLine, AddFile and CutPath return. */
+#define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
+
+/* A place of the main data as a number, which is what a near pointer
+   is here; and the pointer to a place that is kept as a number. */
+#define MD_PLACE(pointer) ((u16)(pointer))
+#define MD_POINTER(place) ((u8 *)(place))
+
+#else
+
+/* Where the megabyte begins. It takes for granted that an address 64K
+   below the main data can be formed and counted from. */
+#define ARENA ((u8 *)&md - 0x10000L)
+
+/* The segment of the main data: the megabyte begins 64K below it so
+   that this is a constant, whatever the address of the main data is. It
+   takes for granted that what is read in this segment behind the main
+   data, up to its offset FFFFh, is what the linker has put behind
+   `md`, as it is on DOS. */
+#define MAIN_SEG 0x1000
+
+/* What is at an offset in a segment: a pointer to the byte. Both are
+   cut to 16 bits, so a segment or an offset that has wrapped round
+   means what it means on DOS. It takes for granted that the segment is
+   one of the megabyte: the main data's, that of the tables, or one that
+   the functions for the memory handed out. A segment of DOS's own, the
+   PSP's or the environment's, is not: see DOS_AT. */
+#define AT(segment, offset) \
+    (ARENA + ((u32)(u16)(segment) << 4) + (u16)(offset))
+
+/* The segment of a pointer: the paragraph of the megabyte that it is
+   in. That is the segment it was made with only where the offset was
+   below 16; of any other pointer it is another segment, by which the
+   same byte is reached at an offset below 16. It takes for granted that
+   the pointer is not below ARENA, and less than a megabyte behind it. */
+#define SEG_OF(pointer) ((u16)(((const u8 *)(pointer) - ARENA) >> 4))
+
+/* The offset of a pointer in a segment: how far it is behind where the
+   segment begins. It is what AT is handed to make the pointer again. It
+   takes for granted that the pointer was made with this segment, or is
+   less than 64K behind where it begins, and what AT does of the segment.
+   Of a pointer anywhere else it gives a number that means nothing, with
+   no word said. */
+#define OFFSET_IN_SEG(segment, pointer) \
+    ((u16)((const u8 *)(pointer) - AT(segment, 0)))
+
+/* The panel in the segment `panel`. It takes for granted what AT does,
+   and that a number is read at any address, even or not, which the 386
+   does: a panel begins wherever its paragraph is. */
+#define PANEL(panel) ((struct WCBdef *)AT(panel, 0))
+
+/* The segment of the tables, by one of them: the paragraph that the
+   address 32K below that one is in, so that what stands in front of it
+   has an offset too. AsmSeg of misc.c answers with it, by Title_S, and
+   OFFSET counts from it by the same, which is what makes the two agree:
+   it takes for granted that it is asked by Title_S and nothing else.
+   And that Title_S is no more than 32K in front of the main data, or
+   behind it; the first, so that this address is not below ARENA. */
+#define TABLES_BY(text) SEG_OF((text) - 0x8000)
+
+/* A table as a number: how far it is behind where the segment of the
+   tables begins. It takes for granted that everything handed to it, the
+   tables that are written to among them, lies from 32K below Title_S to
+   32K less 16 bytes behind it: what does not gets an offset that has
+   wrapped round, with no word said. And the compiler makes no constant
+   of it, where the first body is one: it cannot stand in the value of a
+   static object. */
+#define OFFSET(object) \
+    ((u16)((const u8 *)(object) - AT(TABLES_BY(Title_S), 0)))
+
+/* A pointer into the main data is a pointer. It takes nothing for
+   granted, and does not look whether the pointer is into the main
+   data. */
+#define NEAR(pointer) ((u8 *)(pointer))
+
+/* A place of the main data as a number: how far it is behind where the
+   main data begins; and the pointer to a place that is kept as a
+   number, which is cut to 16 bits first. They take for granted that the
+   place is within 64K of where `md` begins: in the main data, which is
+   shorter than that, or in what the linker has put just behind it. A
+   pointer to anything else, a table, a local variable, a panel, gives a
+   number that means nothing, with no word said. */
+#define MD_PLACE(pointer) ((u16)((const u8 *)(pointer) - (const u8 *)&md))
+#define MD_POINTER(place) ((u8 *)&md + (u16)(place))
+
+#endif
+
+/* What is at a segment and an offset of DOS's own memory, outside all
+   that the words above name: the PSP, the environment, the header of a
+   device that DOS hands the critical error. It has the one body, a far
+   pointer of 16 bits: its places go to dos.c or behind functions of
+   sys.h before the program is run in 32 bits (TODO.md, the pieces S1
+   to S3 of the plan), and it goes with the last of them. Until then
+   another compiler reads it as a number made a pointer, which the host
+   check counts, and a program of 32 bits would read the wrong address
+   by it. */
+#define DOS_AT(segment, offset) \
+    ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
+
+/* The panel that a file entry belongs to. */
+#define WCB_OF(file) ((struct WCBdef __far *)((u32)(file) & 0xFFFF0000UL))
+
 /* Where in a panel's segment its list of files begins, DskBuf, and where
    in the main data the list of the tree's directories, TreeBuf.TreList.
    The assembly keeps places in both as addresses, not as numbers. */
 #define DSKBUF  (sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT))
-#define TRELIST ((u16)&((struct DIRTREE *)md.TreeBuf)->TreSum2)
+#define TRELIST MD_PLACE(&((struct DIRTREE *)md.TreeBuf)->TreSum2)
 
 /* The file entry at an address in a panel's segment. */
 #define ENTRY(wcb, address) \

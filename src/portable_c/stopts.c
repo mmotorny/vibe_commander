@@ -51,13 +51,6 @@ extern const u8 __far StInf09_S[];      /* and the other 39 with a space, */
 extern u8 __far StInf10_S[];            /* with theirs */
 extern u8 __far StInf11_S[];
 
-#define OFFSET(object) ((u16)(u32)(const void __far *)(object))
-
-#define AT(segment, offset) \
-    ((u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
-
-#define NEAR(pointer) ((const u8 *)(u16)(u32)(pointer))
-
 #define PAGE_PANELS 3                   /* the page of the setup's help
                                            that Panel options has */
 
