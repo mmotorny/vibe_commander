@@ -1951,6 +1951,26 @@ What moving `blank.c`, `main.c`, `enter.c`, `commands.c`, `keys.c`,
   checkout's `build/` puts the disks of the machines there instead:
   `TMPDIR=$PWD/build/tmp ctest --test-dir build`.
 
+What moving `dirfunc.c`, `read.c`, `usermenu.c`, `treebox.c`, `drive.c`
+and `setup.c` met:
+
+- What a DOS leaves in AX where a call has nothing to answer there
+  may be what it was handed. The bench's FreeDOS does that when it has
+  closed a file: a program that closes one with 3E53h in AX gets 3E53h
+  back. So a caller that reads the low byte of AX behind such a call,
+  where the call did not fail, reads the leftover that the original
+  handed over, and the function of `sys.h` hands over 0: the leftover
+  is behaviour there, and the call does not go over until that is
+  decided. `ReDr00` of `read.c` is the one that was met, with the file
+  that it closes after a read which failed (`TODO.md`). At every call,
+  look for a read of `value` where `failed` is 0. One that takes the
+  high byte alone, as `DirFunc` and `GetVol` do, is not of this kind:
+  the function hands the service over there as the original does.
+- The directory that `TMPDIR` names for the tests, of the note above,
+  wants a short path: QEMU's socket is in it, and a path of more than
+  107 characters is refused, "AF_UNIX path too long". `build/tmp` does;
+  a directory two levels further down did not.
+
 ## Work by several agents
 
 Work that can be divided is done by several agents at a time, without

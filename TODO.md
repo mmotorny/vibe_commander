@@ -247,8 +247,33 @@ file. Whoever moves a file takes it out of the table:
 |---|---|---|
 | 1 | `copy.c` 60 | 60 |
 | 2 | `resident.c` 34, of which 11 stay | 34 |
-| 3 | `dirfunc.c` 15, `read.c` 10, `usermenu.c` 10, `treebox.c` 8, `drive.c` 5, `setup.c` 4 | 52 |
+| 3 | `read.c` 2 and `drive.c` 2, which wait: see below | 4 |
 | 5 | `commands.c` 5 and `main.c` 1, which stay for now: see below | 6 |
+
+Of the third piece, `dirfunc.c`, `usermenu.c`, `treebox.c` and
+`setup.c` have gone over, and of the other two all but these:
+
+- `read.c`, the two calls by which `ReDr00` reads the extension file of
+  a directory and closes it. Where reading has failed and DOS closes the
+  file all the same, the original looks at AL behind the close for the
+  error of a drive that is not ready, 53h, and has the panel read again
+  if it finds it. DOS answers nothing in AX there. The bench's FreeDOS
+  leaves AX as it came, tried with a program that closes a file with
+  3E53h in AX and writes what comes back: 3E53h. So what the original
+  finds in AL on such a DOS is what it handed over, the low byte of what
+  reading answered, and the panel is read again exactly when the drive
+  was not ready for the read. `FileClose` hands over 0, and the panel
+  would not be. No scenario gets there: the drive has to fail between
+  the file opened and the file read. To be decided by the user: have the
+  program say what it means, that a read which failed for a drive that
+  is not ready has the panel read again, which is the original's
+  behaviour on a DOS that leaves AX and another on one that does not; or
+  declare that the mark is not set there, with the rest of entry 6 of
+  `src/portable_c/DEVIATIONS.md`.
+- `drive.c`, the two calls of `F62_01` that ask which letter a floppy
+  drive goes by, 440Eh, and give it the one that was chosen, 440Fh: they
+  are of the drive B: that shares the unit of A:, as `Fantom` is, and
+  stay as that does.
 
 Then, when no file is left that calls them: `Intr21` and `Intr21f` of
 `system.c` with `DosTime` and `SelDrv`, and in `dos.c` `Int21f`,
