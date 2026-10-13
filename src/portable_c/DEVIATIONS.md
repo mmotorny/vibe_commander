@@ -446,6 +446,7 @@ are added here as they go.
 | `F38_60`, `dirfunc.c` | DOS 60h, 3Bh and 3Ah, the current directory left and removed | 60h: DX the address of the path, as SI. 3Bh and 3Ah: SI on the path and DI behind the two full stops, of 60h and of what was written since | DX 0 for 60h; SI and DI as they come for the other two |
 | `F54_00`, `dirfunc.c` | DOS 13h, the label deleted for a new one, and 3Eh, the new one's file closed | 13h: AL a space, of filling the name with them. 3Eh: CX 8 and DX the address of the name, of the call that made the file | AL 0 for 13h, CX and DX 0 for 3Eh |
 | `ReDr00`, `read.c` | DOS 4Eh, 47h and 4Fh, the directory of a panel read | 4Eh: AL the drive, 1 for A:. 47h: AL the drive too, and CX 37h of the search. 4Fh: DS:DX on the mask, of the call for the first file, and CX 37h of that call or 0, where a copy has counted it down | AL 0 for 4Eh and 47h, CX as it comes for 47h, CX and DX 0 for 4Fh |
+| `ReDr00`, `read.c` | DOS 3Fh and 3Eh, the extension file of the directory read and closed | 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what reading answered, CX and DS:DX the count and the buffer still. And the original reads AL back behind 3Eh (see below) | AL 0 for both, and for 3Eh CX and DX 0 |
 | `RdInfo`, `read.c` | DOS 36h, the room of the drive, and 3Fh and 3Eh, dirinfo read | 36h: AL the drive, as DL. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still | AL 0 for the three, and for 3Eh CX and DX 0 |
 | `GetVol`, `read.c` | DOS 60h, the full name of the drive, and 4Eh, its label | 60h: BX, CX and DX as the caller has them, for the Info the handle of dirinfo, the count and the buffer. 4Eh: AL 5Ch, of the two backslashes that the name was held against | 60h: BX and CX as they come, DX 0. AL 0 for 4Eh |
 | `FileLst`, `usermenu.c` | DOS 41h, 3Ch, 40h and 3Eh, the list of the selected files written | 41h: AL the low byte of what setting the attributes answered, and CX 20h of that call. 3Ch: AL as the call before left it. 40h, for the mask of a directory and for the end of a line: AL the low byte of what the write before answered. 3Eh: AL as the last write left it, with CX and DS:DX the count and the text of that write | AL 0 for all of them, CX 0 for 41h, CX and DX 0 for 3Eh |
@@ -507,6 +508,22 @@ it:
 
 Nothing else that the functions leave out is known to be read by a DOS
 or a BIOS.
+
+At one place the original reads such a register back itself. `ReDr00`
+of `read.c` reads the extension file of a directory and closes it, and
+where either failed it looks in AL, behind the close, for the error of
+a drive that is not ready, 53h, to have the panel read again. Where
+reading failed and closing did not, DOS has answered nothing in AX.
+FreeDOS leaves AX as it finds it when it has closed a file, tried on
+the bench with a program that closes a file with 3E53h in AX and writes
+what comes back, 3E53h; so there the original finds in AL what it
+handed over, the low byte of the read's error, and marks the panel
+exactly when the read failed for a drive that was not ready. The
+portable C says that: it marks the panel if the read failed with 53h,
+by the read's own answer, whatever closing leaves in AX. On a DOS that
+does change AX when it closes a file the original goes by what that DOS
+leaves, and does not mark the panel unless that happens to be 53h; the
+portable C marks it there too.
 
 **Why.** A function of `sys.h` says what is asked, and what a register
 happened to hold is not asked: it cannot be an argument without a name,

@@ -100,7 +100,6 @@ static const u8 CODE DrIn_F[] = "DIRINFO";
 static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
 {
     struct WCBdef __far *wcb = PANEL(panel);
-    struct DosRegs regs;
     struct FILENT __far *entry;
     u8 __far *to;
     const u8 __far *from;
@@ -108,7 +107,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
     u16 limit, file, number, retries;
     u16 oldCursor, oldFirst;
     u16 drive, attributes, found, answer;
-    struct Answer opened, asked;
+    struct Answer opened, asked, got, closed;
 
     /* Expand: the panel behind this one as far up as it goes, but no
        further than 64K from here. */
@@ -291,24 +290,29 @@ ended:
         opened = OpenFil(md.TmpBuf, 0x40);
         answer = opened.value;
         if (opened.failed == 0) {
-            /* These two calls still hand DOS a structure of registers.
-               Where reading has failed and the file is closed all the
-               same, what follows goes by AL as closing left it, and a
-               DOS that leaves AX alone when it has closed a file has
-               there what it was handed: the low byte of what reading
-               answered, its error. FileClose of sys.h hands over 0. */
-            regs.bx = answer;
-            regs.name = wcb->ExtBuf;
-            regs.cx = LenExt - 1;
-            regs.ax = 0x3F00 | (answer & 0xFF);
-            found = Intr21((struct DosRegs STACK *)&regs);
-            count = regs.ax;
-            regs.ax = 0x3E00 | (count & 0xFF);
-            if (!Intr21((struct DosRegs STACK *)&regs) && !found) {
-                wcb->ExtBuf[count] = 0x1A;
+            got = FileRead(opened.value, wcb->ExtBuf, LenExt - 1);
+            closed = FileClose(opened.value);
+            if (!closed.failed && !got.failed) {
+                wcb->ExtBuf[got.value] = 0x1A;
                 goto done;
             }
-            answer = regs.ax;
+            /* A drive that was not ready has the panel read again: for
+               the file opened, for the file closed, and, where closing
+               did not fail, for the file read.
+
+               The assembly looks in AL behind the close whichever of
+               the two failed, and DOS answers nothing in AX when it has
+               closed a file. A DOS that leaves AX as it finds it there,
+               as the bench's FreeDOS does, has in AL what the assembly
+               handed it: the low byte of what reading answered, its
+               error. So on such a DOS the original marks the panel
+               exactly when reading failed for a drive that was not
+               ready, and that is what is said here. On a DOS that
+               leaves something else in AX the original goes by that
+               (see DEVIATIONS.md). */
+            answer = got.value;
+            if (closed.failed)
+                answer = closed.value;
         }
         if ((answer & 0xFF) == ERR_NOT_READY)
             wcb->ChgFlg = 1;

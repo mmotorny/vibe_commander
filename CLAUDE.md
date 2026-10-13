@@ -2056,10 +2056,14 @@ and `setup.c` met:
   handed over, and the function of `sys.h` hands over 0: the leftover
   is behaviour there, and the call does not go over until that is
   decided. `ReDr00` of `read.c` is the one that was met, with the file
-  that it closes after a read which failed (`TODO.md`). At every call,
-  look for a read of `value` where `failed` is 0. One that takes the
-  high byte alone, as `DirFunc` and `GetVol` do, is not of this kind:
-  the function hands the service over there as the original does.
+  that it closes after a read which failed, and the user decided it:
+  the program says what the original does on such a DOS, in its own
+  words, by the answer of the read, and entry 6 of
+  `src/portable_c/DEVIATIONS.md` says what that is on a DOS that changes
+  AX there. At every call, look for a read of `value` where `failed` is
+  0. One that takes the high byte alone, as `DirFunc` and `GetVol` do,
+  is not of this kind: the function hands the service over there as the
+  original does.
 - The directory of the machines' disks, of the note above, wants a
   short path: QEMU's socket is in it, and a path of more than 107
   characters is refused, "AF_UNIX path too long". `build/tmp` of a
