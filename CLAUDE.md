@@ -2136,6 +2136,30 @@ in "The portable C".
     `OFFSET` of its own, which is `OFFSET_OF` there now, and `view.c`
     and `usermenu.c` each have a `WORD_AT` that is not `dialog.c`'s,
     which is why that word is in no header.
+  - The host check does not count a pointer that is made of a number
+    which gcc can work out. `MD_PLACE` of the address of a field is
+    such a number in its second body, so `(struct DIRENT *)TRELIST`
+    went uncounted in ten places of `treebox.c` and `tree.c`, and a
+    file that is clean in the record may have one. To see them, have
+    gcc read a copy of the tree, in `build/`, whose `vc.h` has
+    `MD_PLACE` as a function, `extern u16 md_place(const void *);`,
+    with the options of `harness/hostcheck.py`, and hold what it says
+    against what it says of the tree.
+  - A pointer to nothing has no place: `MD_PLACE` of a pointer that is
+    0 is 0 on DOS and another number in a flat memory, and
+    `MD_POINTER(0)` is no pointer to nothing there. Before a cast is
+    made `MD_PLACE`, look whether the pointer can be 0, and before one
+    is made `MD_POINTER`, whether the pointer is held against 0 behind
+    it. The user menu cleared a pointer and handed it on as a number:
+    it is set to `MD_POINTER(0)` now, which is the same bytes.
+  - `OFFSET_IN_SEG` wants the segment that the pointer was made with,
+    and a routine that is handed a far pointer alone has none to name:
+    `NearFl` of `files.c` names the one that its only caller has the
+    list in. The first body does not read the segment, so naming it
+    is the same bytes, and nothing in 16 bits says whether it is the
+    right one.
+  - A cast with a step in it, `*(const u8 *)entry--`, is the same
+    bytes with the step as a statement of its own behind it.
 
 ### Moving a file to the system's functions
 

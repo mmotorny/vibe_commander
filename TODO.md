@@ -1713,6 +1713,11 @@ What the test does not see, since gcc only reads the files:
   `KEYS_DOWN` of `keys.c`, are counted nowhere, nor is `NUMBER` of
   `tables.h`, a word of a dialog that holds a number where it could
   hold an address, in 37 lines of the tables.
+- A pointer made of a number that gcc works out, for the same reason:
+  `MD_PLACE` of the address of a field is a constant to it, so
+  `(struct DIRENT *)TRELIST` is counted nowhere. "P2a, the places of
+  the lists, the tree and the command line" in the plan of the 32
+  bits has what finds these, and the one that is left.
 - What a word that is taken for nothing meant. A file that is clean
   compiles; it is not thereby right on another system. `mouse.c` is
   clean and calls the mouse driver; the files of tables are clean and
@@ -2499,7 +2504,7 @@ and H1 are started at once by the session.
 | Piece | What it does | Owns | Size | Needs; beside | Right when | Could go wrong |
 |---|---|---|---|---|---|---|
 | P1, the words in one place. Done: see below | `vc.h` gets the macros of the addresses once, with two bodies: `AT`, `WORD_AT`, `OFFSET`, `PANEL`, `MAIN_SEG`, `NEAR`, `MD_PLACE`, `MD_POINTER`, `TRELIST`; the files lose their own. The classes P, M, V, G and R whole | `vc.h`, `tables.h` for `LAID_OUT`, and the tops of 23 files | 46 definitions out of 23 files, 17 lines by hand | Nothing; lands first and alone, D1 and H1 start beside it | The 16-bit `VC.EXE` is the same bytes; the host check falls to some 310; `whole.py` still links | A file's own `OFFSET` meant something else: `dos.c`'s does, and keeps its own under another name. And nothing runs the second bodies before M1: a mistake in them is found there |
-| P2a, places of the main data: the lists, the tree, the command line | N in `treebox.c`, `tree.c`, `enter.c`, `usermenu.c`, `cmdline.c`, `place.c`, `info.c`, `extfile.c`, `drive.c`, `input.c`, `panel.c`, `files.c`, `read.c` | Those files | 97 places, 59 by hand | P1; beside P2b, P3, P4, S | The same bytes; those files clean in the host check | A number that is no place of the main data: `(u16)(u32)file` is the offset in a panel |
+| P2a, places of the main data: the lists, the tree, the command line. Done: see below | N in `treebox.c`, `tree.c`, `enter.c`, `usermenu.c`, `cmdline.c`, `place.c`, `info.c`, `extfile.c`, `drive.c`, `input.c`, `panel.c`, `files.c`, `read.c` | Those files | 97 places, 59 by hand | P1; beside P2b, P3, P4, S | The same bytes; those files clean in the host check | A number that is no place of the main data: `(u16)(u32)file` is the offset in a panel |
 | P2b, the same: the viewer, the editor, a copy, the menus. Done: see below | N in `view.c`, `edit.c`, `copy.c`, `menu.c`, `help.c`, `find.c`, `stcolor.c`, `sthelp.c`, `window.c`, `bars.c`, `dirfunc.c` | Those files, but the lines that S1 has in `view.c` | 66 places | P1; beside the others | The same | `EditBuf`, `CpSrc`: names that are places of the main data by a macro |
 | P3, the tables read as what they are | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
 | P4, arithmetic | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
@@ -2799,6 +2804,100 @@ What a later piece should know:
   the main data being laid out as it is, which step 1 keeps. They are
   reached only where DOS refuses to say what a handle is or when a
   file was written; whether a scenario gets there was not looked up.
+
+### P2a, the places of the lists, the tree and the command line: done, and what a later piece should know
+
+The thirteen files of the piece make no pointer of a number and no
+number of a pointer outside the words of `vc.h`: `treebox.c`, `tree.c`,
+`panel.c`, `cmdline.c`, `enter.c`, `input.c`, `usermenu.c`,
+`extfile.c`, `info.c`, `drive.c`, `files.c` and `read.c`, and
+`place.c`, which P1 left so. All are clean in the host check, which
+counted 62 places in them when the piece began. With P2b's files,
+`casts.py` has N left in the common code in the files of P3 and S3
+alone: `dialog.c`, `resident.c`, `main.c` and `start.c`.
+`build/portable_c/VC.EXE` was the same bytes after each of the four
+commits, and each of the files compiles under `wcc386` with warnings
+as errors.
+
+72 places, and one that was no cast, in 67 words that are written:
+`MD_PLACE` 39 times, `MD_POINTER` 24 times, `OFFSET_IN_SEG` 4 times,
+and `NEAR` inside `MD_PLACE` at three of them. The host check had
+counted 62 of the 72.
+
+What is otherwise than the plan had it, and what P2b, P3 and S3 look
+for in their files:
+
+- **A place that gcc does not count.** A pointer made of `TRELIST`,
+  `(struct DIRENT *)TRELIST`, is made of a number, and the host check
+  said nothing of it: the second body of `MD_PLACE` takes one address
+  of the main data from another, gcc works that out to a constant
+  when it compiles, and of a constant cast to a pointer it says
+  nothing. Ten places of the piece were such: `LIST` of `treebox.c`,
+  used five times, the two sums of the tree file there, and the start
+  of the list in `tree.c`, in `PutTree` and in `FIND`. In 32 bits each
+  would have been a pointer to the address that the place is as a
+  number, below 64K. They are `MD_POINTER(TRELIST)` now. So "clean in
+  the host check" does not say that a file has none left. What finds
+  them: a copy of the tree in `build/` in which the second body of
+  `MD_PLACE` is a function,
+  `extern u16 md_place(const void *);` and
+  `#define MD_PLACE(pointer) md_place(pointer)`, read by gcc with the
+  host check's options; what gcc says of that and not of the tree is
+  such a place. Over all the files that leaves one, which is S3's:
+  `root = (struct DIRENT *)TRELIST` in `Init90` of `main.c`.
+  Another constant made a pointer, one that does not come from
+  `MD_PLACE`, is not found so, and nobody has looked for one.
+- **A pointer to nothing has no place.** `MD_PLACE` of a pointer that
+  is 0 is 0 on DOS and some other number where the memory is flat, and
+  `MD_POINTER(0)` is a pointer to the main data's first byte there and
+  none that compares equal to 0. One place counted on the first: the
+  user menu hands `Run_00` its pointer into the table of keys for
+  whether a file is being viewed, the register BP of the original, and
+  clears it before a line that names another menu. `key = 0` is
+  `key = (u16 *)MD_POINTER(0)` there now, the pointer whose place is 0,
+  which is the same bytes. Where a pointer is cast to a number, look
+  at whether it can be 0; where a number is made a pointer, at whether
+  the pointer is held against 0 afterwards. The files of this piece
+  have no other, by reading every place that was wrapped.
+- **What is no place of the main data**, and is `OFFSET_IN_SEG`:
+  - `enter.c`, `F23_02`: whether the name left of a panel's path is
+    behind its root. Both are in the panel, and the segment is the
+    panel's.
+  - `read.c`, `ReDr00`: the index into `ColTab` that is where the
+    fourth character of the path is in a panel, a bug of the original
+    that stays. `OFFSET_IN(struct WCBdef, WinPath) + 3` says the same
+    with no pointer in it, and is other bytes: left for step 2.
+  - `files.c`, `NearFl`: the offset of the pointer that it is handed,
+    for where an entry is in the old list of a panel. The routine is
+    not told which segment the old list is in, and a pointer does not
+    say it in a flat memory. It names `md.ViewSeg`, where `ReDr50` of
+    `read.c` has the old list, the one routine that calls it; the
+    first body does not read the segment, so nothing changed in 16
+    bits, and nothing there shows it if a second caller comes with a
+    list elsewhere. Handing `NearFl` the segment and the place in two
+    arguments would say it better and is other bytes: step 2 makes it
+    a pointer to the list and a place.
+- **A number stepped inside a cast.** `c = *(const u8 *)entry--` of
+  `F26_00` in `enter.c` steps the number that it makes a pointer of.
+  The words name what they are handed once in each body, but the step
+  is a statement of its own now, and that is the same bytes.
+- A far pointer that a routine is handed and that every caller has
+  into the main data is `MD_PLACE(NEAR(pointer))`, as for what
+  `MvzLine` returns: `Found` of `extfile.c`, which `FndItem` answers
+  through, and `CutPath(md.ViewFil)` in `Run_00`.
+
+The routines of this piece that take or answer a place of the main
+data as a word, for those whose files call them: `F24_01` takes the
+path, which `main.c` hands it as `(u16)md.TmpBuf`; `Run_00` takes the
+text of a command; `FindExt` answers where one is, which `view.c`
+goes on with, and `FndItem` where an entry is. And those of other
+pieces that this one calls with `MD_PLACE`: `SavWin` and `ResWin` of
+`window.c` take the buffer, `InSt10` of `dialog.c` the text that is
+typed, `F34_30` of `view.c` the text of a command.
+
+Not looked at, being P4's: what is added to a place outside a word,
+`MD_PLACE(md.InfBuf) + md.InfoLen` of `info.c` and `md.HstAdr - 1` of
+`enter.c`, where an int of 32 bits does not wrap round.
 
 ### What could go wrong
 
