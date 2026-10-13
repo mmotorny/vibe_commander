@@ -1114,6 +1114,47 @@ with the original:
     the cursor is hidden below the last row: the box "Help contents is
     not available" beeps, which F1 brings up on the items Country info
     and Exit.
+  - Its option dialogs, F2, F3, F4 and F9, have the buttons on row 19,
+    and Screen and Mouse and Country info, which are a row taller, on
+    row 20. Such a tall box has its shadow on row 23, where the line of
+    the command is: only the colours change there, and the line is still
+    known. A box has a margin of three columns beside its frame: beside
+    the Configuration only column 0 is outside, "Click@0,12".
+  - End in a dialog goes to the buttons and puts them on Ok; PgDn goes
+    there and leaves the button that was chosen. Enter on a box or on
+    a line is Ok. In a line that is typed into, Home and End are the
+    line's, and PgUp and PgDn the dialog's; Left at the start of the
+    line leaves it. The first key in a line takes the place of what is
+    there if it is a character, also one typed as it is, "Ctrl+q Tab";
+    a key that moves or deletes leaves the text to be changed, and so
+    does a click into the line.
+  - In a group, Space or Enter on a line chooses it, Space on the line
+    chosen chooses the next, and Enter on the line chosen is Ok. Up
+    and Down past its ends, Left and Right go to the fields around it,
+    to the first line of a group or to its last by the field. A click
+    on a bracket ticks a box only where the cursor is.
+  - The delay of Panel options is five characters, and Ok with one
+    that is no number brings up a box, which any key or button closes
+    for the dialog with the line as it was typed: "Ctrl+y" before the
+    next. F1 in that box is nothing, and behind it the page of Panel
+    options again: no scenario has that yet, since it shows the help.
+  - What is saved holds in the main program at once. So Full screen is
+    ticked again before the setup program is left with Save: with half
+    panels, or with the panels off, what DOS has shown is on the screen,
+    which no scenario may look at afterwards. Left-handed mouse saved
+    exchanges the buttons from the next step on, in the setup program
+    too. And no scenario of these shows the clock: Clock is ticked and
+    not, within one step.
+  - A setup file with a value that no dialog sets is made in the main
+    program's editor before the setup program is started, as
+    start-setup does it: "Shift+F4" and "d:\\vc\\vc.ini", F4, and 28
+    times Down and 6 times Right are byte 1C3h, the hundredths of the
+    delay. The sum has to stay right: a byte made larger wants another
+    made smaller. See setup-delay-file.
+  - On the Russian bench "Alt+RightShift" in a line selects the
+    Cyrillic letters and "Alt+Shift" the Latin ones again; with the
+    Cyrillic ones the key of the comma is a letter, so a number with a
+    comma is typed with the Latin ones.
   - The colours, F5, F6 and F7 for a palette. The list has 17 of its
     39 items on a screen of 25 lines, on rows 4 to 20 and columns 7 to
     49, in a box of rows 2 to 22 and columns 3 to 53; with 50 lines it
@@ -5662,6 +5703,403 @@ SCENARIOS = {
             "Esc",
             "F10",                        # Exit: save the setup?
             "Enter",                      # Save: the panels, and no bar
+        ),
+        setup=True),
+
+    # The option dialogs of the setup program: the Configuration, Screen
+    # and Mouse, Panel options and Country info. They are what has boxes
+    # to tick, groups to choose from and lines to type into there, so
+    # these scenarios are also what takes the setup program's Dialog
+    # through its fields.
+
+    "setup-config": Scenario(
+        "The Configuration of the setup program by its keys: every box "
+        "ticked or not, from box to box and to the buttons by every key "
+        "that moves, left with Ok, with Cancel and with F10, the key bar "
+        "switched off and on again, and what was set saved",
+        steps=(
+            _SETUP,
+            "F2",                         # Configuration
+            "Space",                      # Auto menus
+            "Down Space",                 # Path prompt, off
+            "Down Down Space",            # past Key bar: Menu bar visible
+            "Down Space",                 # Full screen, off
+            "Down Space Space",           # Clock, ticked and not again
+            "Down Space",                 # Confirmation on quit, off
+            "Down Space",                 # Error sound, off
+            "Down Space",                 # Auto save setup
+            "Down Space",                 # Show logical drive B:
+            "Down",                       # below the last: Execute options
+            "Space",                      # Memory allocation, off
+            "Down Space",                 # Quick execute commands
+            "Down Space",                 # TSR manager, off
+            "Down Space",                 # Alt alone selects menu, off
+            "Down Space",                 # Esc toggles screen on/off, off
+            "Down Space",                 # Alternative viewer, off
+            "Down Space",                 # Alternative editor
+            "Down Space",                 # Clear keyboard buffer, off
+            "Down",                       # the buttons
+            "Right",                      # Cancel
+            "Right",                      # and round to Ok
+            "Enter",                      # Ok
+            "F2",                         # as it was left
+            "Up",                         # the buttons
+            "Left",                       # Cancel, round the other way
+            "Down",                       # below the buttons the first box
+            "Up Up",                      # above it they, and the last box
+            "Left",                       # the box beside it,
+            "Left",                       # which has none to its left,
+            "Right Right",                # nor the other one to its right
+            "Home",                       # the first box
+            "End",                        # the buttons, on Ok
+            "PgUp",
+            "PgDn",
+            "Tab",                        # round to the first box
+            "Tab Tab",
+            "x",                          # a key that is none at a box
+            "Shift+Tab",
+            "Shift+Tab Shift+Tab",        # and round to the buttons
+            "x",                          # nor at the buttons
+            "Alt+F10",                    # nor this
+            "Home Down Down Down Down Space",   # Full screen
+            "PgDn Right",                 # the buttons, which End left on Ok
+            "Enter",                      # Cancel: nothing of it is kept
+            "F2",
+            "Down Down Down Down Space",  # Full screen
+            "F10",                        # as Esc: not kept either
+            "F2",
+            "Down Down Space",            # Key bar, off
+            "Down Down Space",            # Full screen
+            "Enter",                      # Ok, from a box: the bar is gone
+            "F2",                         # with no bar to begin with
+            "Enter",                      # none is put back
+            "F2",
+            "Down Down Space",            # Key bar
+            "Enter",                      # Ok: the bar is back
+            "F10",                        # Exit: save the setup?
+            "Enter",                      # Save: the menu bar, no path
+        ),
+        setup=True),
+
+    "setup-config-mouse": Scenario(
+        "The Configuration of the setup program by the mouse: a box "
+        "ticked where the cursor is and where it is not, on its name and "
+        "on its bracket, the buttons, the right button and the middle "
+        "one, and a button that goes down or comes up beside the box",
+        steps=(
+            _SETUP,
+            "F2",
+            "Click@11,5",                 # Auto menus, where the cursor is
+            "Click@42,6",                 # Quick execute commands
+            "Click@20,8",                 # Menu bar visible, on its name
+            "Click@10,9",                 # the bracket of Full screen is
+                                          # no part of a box without the
+                                          # cursor,
+            "Click@11,9",                 # what is in it is: off,
+            "Click@10,9",                 # and with the cursor there the
+                                          # bracket is too
+            "Click@40,17",                # in the box, on nothing
+            "Click@31,19",                # Ok
+            "F2",                         # as it was left
+            "Click@11,6",                 # Path prompt, off
+            "Click@42,19",                # Cancel
+            "F2",
+            "End",                        # the buttons
+            "Click@11,6",                 # from them to Path prompt, off
+            "RightClick@40,12",           # Enter: Ok
+            "F2",
+            "Click@42,10",                # Alt alone selects menu, off
+            "MiddleClick@40,12",          # Esc
+            "F2",
+            "Click@42,10",
+            "Click@0,12",                 # beside the box: Esc
+            "F2",
+            "Click@0,12>40,17",           # down beside the box, up in it
+            "Click@42,10",
+            "Click@40,17>0,12",           # down in it, up beside it: Esc
+            "F2",
+            "Click@42,10",
+            "End Right",                  # Cancel
+            "RightClick@40,12",           # Enter, on Cancel
+            "F2",
+            "Click@31,19>60,19",          # down on Ok, up beside it
+            "Click@42,19>31,19",          # down on Cancel, up on Ok
+            "Click@1,12",                 # the margin of the box: nothing
+            "Esc",
+            "F10",                        # Exit
+            "Enter",                      # Save
+        ),
+        setup=True),
+
+    "setup-screen": Scenario(
+        "Screen and Mouse of the setup program: its three groups by the "
+        "keys and by the mouse, from a group to the fields around it, the "
+        "characters of the screen saver typed, the black and white "
+        "palette and the laptop one taken by the setup program itself, "
+        "and what was set saved",
+        steps=(
+            _SETUP,
+            "F3",                         # Screen and Mouse: Color chosen
+            "Up",                         # the cursor on Black & White,
+            "Space",                      # which Space chooses
+            "Space",                      # on the line chosen: the next
+            "Down Enter",                 # Enter chooses too: Laptop
+            "Space",                      # and Space goes round
+            "Up",                         # above the first line: buttons
+            "Down",                       # and below them the first group
+            "Down Down Down",             # below its last line: the next
+            "Up",                         # and above that its last line
+            "Right",                      # Screen output, its first line
+            "Space",                      # Synchronized access
+            "Left",                       # Screen colors, its first line
+            "Right Down Down Down",       # below Screen output: Zooming
+            "Space",                      # off
+            "Up",                         # Screen output, its last line
+            "Down Down",                  # Screen saver chars
+            '"ab"',                       # typed in place of the five
+            "Left",                       # the cursor moves in the line
+            "Left Left",                  # and at its start leaves it
+            "Down Space",                 # 20 minutes
+            "End",                        # the last line, and the buttons
+            "Home",                       # the first field, its first line
+            "PgDn",
+            "PgUp",
+            "Tab",                        # the delay, on its last line
+            "Space",                      # Off
+            "Tab Tab Tab Tab",            # Left-handed mouse
+            "Tab",                        # the buttons
+            "Tab",                        # and round
+            "Shift+Tab",
+            "Shift+Tab Shift+Tab",        # Screen saver chars
+            "Enter",                      # Ok, from the line: the menu is
+                                          # black and white
+            "F3",                         # as it was left
+            "Click@20,7",                 # Laptop, in the cursor's group
+            "Click@20,7",                 # the same line again: nothing
+            "Click@20,12",                # 5 minutes, in another group
+            "Click@45,6",                 # Asynchronized access
+            "Click@45,10",                # Zooming boxes
+            "Click@62,11",                # the line: the cursor at its end
+            "Click@60,11",                # at its start
+            "x",                          # typed in front of what is there
+            "Click@64,11",                # behind the text: at its end
+            "Click@45,14",                # Left-handed mouse
+            "Space",                      # and not
+            "Click@40,17",                # in the box, on nothing
+            "Click@62,11",                # the line again
+            "RightClick@20,5",            # Enter: Ok. The laptop palette
+            "F3",
+            "Tab Tab Tab Tab",            # the line
+            "Ctrl+q",                     # the next key as a character,
+            "Tab",                        # which takes the text's place
+            '"wxyz"',                     # five characters
+            '"v"',                        # and no more
+            "Down",                       # Left-handed mouse
+            "Space",
+            "Up Up Up",                   # Screen output, its last line
+            "Left Down Down Down",        # the delay, its first line
+            "Space",                      # 40 minutes
+            "x",                          # a key that is none in a group
+            "Down Down PgUp",             # from a line further down to
+                                          # the first field, its first line
+            "Down Down Enter",            # Enter on the line chosen: Ok
+            "F3",                         # as it was left
+            "MiddleClick@40,12",          # Esc, from a group
+            "F10",                        # Exit
+            "Enter",                      # Save: the program has the
+                                          # laptop palette
+        ),
+        setup=True),
+
+    "setup-panels": Scenario(
+        "Panel options of the setup program: its boxes, and the delay of "
+        "the tree typed in every form that is told apart, taken, cut "
+        "down to hundredths, left as it was or refused with a box, which "
+        "every key and button closes; and what was set saved",
+        steps=(
+            _SETUP,
+            "F4",                         # Panel options
+            "Space",                      # Mini status line, off
+            "Down Space",                 # Auto directory size
+            "Down Space",                 # Ins moves down, off
+            "Down Space",                 # Unselect during group
+                                          # operation, off
+            "Down Space",                 # Auto change directory, off
+            "Down Space",                 # Show hidden subdirectories, off
+            "Down Space",                 # Auto rescan tree, off
+            "Down",                       # the delay
+            '"1"',                        # seconds alone
+            "Enter",                      # Ok
+            "F4",                         # 1.00
+            'Up Up "2." Enter',           # with a full stop and no more
+            "F4",                         # 2.00
+            'Up Up ".5" Enter',           # tenths alone
+            "F4",                         # 0.50
+            'Up Up "3.05" Enter',         # hundredths
+            "F4",                         # 3.05
+            'Up Up "4.005" Enter',        # thousandths are cut off
+            "F4",                         # 4.00
+            'Up Up "5.123" Enter',
+            "F4",                         # 5.12
+            'Up Up "99.99" Enter',        # the most
+            "F4",                         # 99.99
+            'Up Up "6.0" Enter',
+            "F4",                         # 6.00
+            'Up Up ".07" Enter',
+            "F4",                         # 0.07
+            'Up Up "0" Enter',
+            "F4",                         # 0.00
+            'Up Up Space "7.5" Space Enter',    # spaces around it
+            "F4",                         # 7.50
+            "Up Up Ctrl+y Enter",         # nothing: taken, and nothing set
+            "F4",                         # 7.50 still
+            "Up Up Space Space Enter",    # nor by spaces alone
+            "F4",
+            'Up Up "x"',                  # no number
+            "Enter",                      # Illegal format
+            "Enter",                      # Ok: the dialog, the line as typed
+            'Ctrl+y "100" Enter',         # too many seconds
+            "Esc",
+            'Ctrl+y "1x" Enter',          # something behind the seconds
+            "F10",
+            'Ctrl+y "1" Space ".5" Enter',      # a space in front of the
+                                          # full stop
+            "Click@40,16",                # Ok of the box
+            'Ctrl+y "1." Space "5" Enter',      # and one behind it
+            "RightClick@40,5",            # Enter, for the box
+            'Ctrl+y "1.x" Enter',         # no digit behind the full stop
+            "Click@0,12",                 # beside the box
+            'Ctrl+y "1.5x" Enter',        # something behind the digits
+            "MiddleClick@40,5",
+            'Ctrl+y "." Enter',           # a full stop and nothing else
+            "Enter",
+            'Ctrl+y "1,5" Enter',         # a comma, which is none here
+            "Enter",
+            'Ctrl+y "1.5.2" Enter',       # two full stops
+            "Enter",
+            'Ctrl+y ".x" Enter',
+            "Enter",
+            'Ctrl+y "99999" Enter',       # more than a number holds
+            "Enter",
+            "PgUp Enter",                 # Enter on a box: refused as well
+            "Enter",
+            "Click@31,19",                # and Ok clicked
+            "Enter",
+            "Click@42,19",                # Cancel, whatever the line has
+            "F4",                         # nothing of it was kept
+            'Up Up "y"',
+            "Esc",                        # nor is it looked at here
+            "F4",
+            'Up Up End Backspace "9" Enter',    # a key that moves first:
+                                          # the text stays to be changed
+            "F4",                         # 7.59
+            'Up Up End Ctrl+Backspace "8"',     # and so with one that
+                                          # deletes
+            "Enter",
+            "F4",                         # 7.80
+            "Click@53,14",                # the cursor into the line
+            '"1"',
+            "Click@40,12",                # a box, by its name
+            "Enter",
+            "F4",                         # 7.18
+            'Up Up "12.05" Enter',
+            "F4",                         # 12.05
+            "Esc",
+            "F10",                        # Exit
+            "Enter",                      # Save: no mini status
+        ),
+        setup=True),
+
+    "setup-country": Scenario(
+        "Country info of the setup program in the United States: the "
+        "time, the date and numbers as the country writes them, the "
+        "letters beyond ASCII with their capitals and their small "
+        "letters, and every way out of it",
+        steps=(
+            _SETUP,
+            "F9",                         # Country info
+            "Enter",                      # Ok
+            "F9",                         # written into its lines again
+            "Esc",
+            "F9",
+            "Tab",                        # one button: nowhere to go
+            "Up",
+            "Left",
+            "Home",
+            "End",
+            "x",
+            "F10",
+            "F9",
+            "Click@40,20",                # Ok
+            "F9",
+            "Click@40,10",                # in the box, on nothing
+            "RightClick@40,10",           # Enter
+            "F9",
+            "MiddleClick@40,10",
+            "F9",
+            "Click@0,10",                 # beside the box
+            "F10",                        # Exit: nothing has changed
+        ),
+        setup=True),
+
+    "setup-options-russia": Scenario(
+        "The option dialogs of the setup program in Russia: Country "
+        "info with 24 hours, the day first, a space between thousands "
+        "and the Cyrillic letters; the delay of the tree with a comma, "
+        "and refused with a full stop or with letters; and Cyrillic "
+        "characters for the screen saver, saved",
+        steps=(
+            _SETUP,
+            "F9",                         # Country info
+            "Enter",
+            "F4",                         # Panel options: 0,60
+            'Up Up "1,5" Enter',          # with the comma
+            "F4",                         # 1,50
+            'Up Up "1.5" Enter',          # a full stop is none here
+            "Enter",
+            'Ctrl+y ",25" Enter',
+            "F4",                         # 0,25
+            'Up Up Ctrl+y Alt+RightShift "abc"',    # Cyrillic letters
+            "Enter",                      # are no number
+            "Enter",
+            'Ctrl+y Alt+Shift "12,05" Enter',       # Latin ones again
+            "F4",                         # 12,05
+            "Esc",
+            "F3",                         # Screen and Mouse
+            'Tab Tab Tab Tab Alt+RightShift "abcde"',   # Cyrillic for
+                                          # the screen saver
+            "Enter",
+            "F3",                         # as it was left
+            "Esc",
+            "F10",                        # Exit
+            "Enter",                      # Save
+        ),
+        country="ru",
+        setup=True),
+
+    "setup-delay-file": Scenario(
+        "Panel options of the setup program with a setup file whose "
+        "delay is beyond what the dialog takes, 100 seconds and 100 "
+        "hundredths, which no menu sets: the bytes are changed in the "
+        "program's editor, with the first character of the screen saver "
+        "changed the other way, so that the sum of the file stays right",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",
+            '"d:\\vc\\vc.ini" Enter',
+            " ".join(["F4"] + ["Down"] * 28 + ["Right"] * 6),   # byte
+                                          # 1C3h: the hundredths
+            '"64646e"',                   # 100, the seconds behind them
+                                          # 100, and the character
+            "F2 Esc",
+            _SETUP,
+            "F4",                         # 99.99
+            "Esc",
+            "F3",                         # the character
+            "Esc",
+            "F10",                        # Exit: nothing has changed
         ),
         setup=True),
 

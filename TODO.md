@@ -304,7 +304,7 @@ batch, with what no scenario reaches.
 |---|---|---|---|---|
 | 0a, the harness. Done | `harness/`: what the list below has; `tools/figures.py` and the README for the limit that goes. No file of the program | Some 800 lines with what is written for the pieces, where 200 were thought | One, `setup`: the setup program started, its menu, the Configuration with the key bar switched off, Screen and Mouse looked at, the setup saved and left, and the main program without its key bar | Nothing |
 | 0b, setup entered and left | `stmain.c`, `stmain_t.c`; the item of the menu in `menu.c`, `commands_t.c`, `main.c`, `vc.h`, with its tables declared in `harness/datacheck.py`; the three places that are told of setup, in `bars.c` with the bars' tables, `dialog.c` and `input.c`; `ShadCol` in `screen.c`; the entry of `src/portable_c/DEVIATIONS.md`. Of the assembly: the file read and checked, S0, `Main00`, `Main40`, S7 with `Default`, `Exit` | About 300 instructions and the plumbing | 4 or 5: the menu by its keys and left unchanged; the defaults taken and saved, and what the program shows afterwards; a setup file that is missing, with Ok and with Exit; one that is damaged; changed and left with Cancel | 0a |
-| A, the options | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | About 6: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
+| A, the options | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | Seven, 311 steps, see "Piece A" below. As planned: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
 | B, the colours | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
 | C, the help | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
 | D, what is left of S1 and of leaving | In `stmain.c`, after 0b: `Main50`; and scenarios for what crosses the pieces | About 100 instructions | About 3: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse | 0b |
@@ -415,6 +415,116 @@ change, each as it is now, and what came out otherwise than planned.
   and fails for one that it cannot place.
 - Its batch in `SETUP_BATCHES` of `harness/ported.py`, and its
   scenarios out of `not_run`, in the commit that brings the code.
+
+### Piece A, the option dialogs: where it stands
+
+For whoever goes on with it. Its scenarios are there, with their
+goldens; its tables and its code are not begun.
+
+**Done.** Seven scenarios, 311 steps, each derived twice with the same
+result, listed in `not_run` of `TREES["portable_c"]`:
+
+| Scenario | Steps | What |
+|---|---|---|
+| `setup-config` | 60 | S2 by the keys: every box, every key that moves, Ok, Cancel, F10, the key bar off and on, saved |
+| `setup-config-mouse` | 38 | S2 by the mouse: every case of the mouse in `Dialog` and `FlipFl` |
+| `setup-screen` | 67 | S3: the groups by keys and mouse, `Select` whole, the line of characters, `InpStr` whole, two palettes taken inside setup, saved |
+| `setup-panels` | 86 | S4: thirteen delays that are taken, twelve that are refused, the box closed in every way, saved |
+| `setup-country` | 23 | S8 in the United States, and every way out |
+| `setup-options-russia` | 23 | S8, S4 with the comma and Cyrillic characters in S3, in Russia, saved |
+| `setup-delay-file` | 14 | S4 with a delay of 100.100 in the setup file, made in the editor: the two `MOV AL,99` of `F04_00` |
+
+Of the 224 instructions of the piece they run 222: `reach.py --setup
+F02_00 F04_10 F08_00 F09_10 F09_20` (`F02_00` is the stretch with
+`F03_00` and `F04_00`; `F08_00` the one with `F09_00`, whose first five
+instructions are S7, piece 0b's). The two that are out of reach are of
+`F09_00`: `XCHG BH,AL` at 0F4Eh, for a country that writes the year
+first, and `INC DI` at 0F68h, for one with no character between
+thousands; the benches are the United States and Russia. Of `Dialog`,
+which is 0b's to translate and which only these dialogs take through
+its fields, they run 385 of 394: left are `ADD BL,40` four times, for a
+box in the right half of the screen, the calls of `ClrKbd` and `Beep`
+for the flags 1 and 2, which S0 and the help's box have, and
+`Dial78`'s three instructions for the flag 8, which no box has.
+`Select`, `FlipFl`, `InpStr`, `InSt10`, `Slct20`, `TxtNum`, `HexDec` and
+`FndLet` run whole.
+
+**Next**, in the order of the brief: `stopts_t.c` by a script from the
+assembly's bytes, held with `datacheck.py`; `stopts.c`; then, when 0b
+has landed, the line in `stmain.c`, the scenarios out of `not_run`, and
+the batch in `SETUP_BATCHES`.
+
+**What the assembly does**, read whole, so that it need not be read
+again for the code:
+
+- `F02_00`: notes `KeyBar`, calls `Dialog` with `Conf_B`, and if the
+  bar was on and is off now, copies the last row of the screen from
+  `UserScr` to `ScrBuf`, writes it out, `Window` with the row and 150h,
+  and sets `BarPrev` to FFh. Whichever button it was: only Ok changes
+  `KeyBar`.
+- `F03_00`: `TmpBuf` 0 and 1 are `ColTyp`, 2 and 3 the first place of
+  `Delay_T` whose minutes `BlDelay` is not below, 4 and 5 `SnowMod`;
+  with Ok the three are taken back, `BlDelay` through `Delay_T`; then
+  `SetSnow` either way, which the portable C has not. The line of
+  characters is typed straight into `StarTab`, five bytes with whatever
+  the line's buffer had behind a shorter text: "ab" typed over the five
+  leaves a, b, 0 and the last two as they were, in the file too.
+- `F04_00`: the delay written at `TmpBuf+9`, seconds without a leading
+  zero, `Country.DecSep`, two digits of hundredths, each of the two
+  numbers 99 at the most.
+- `F04_10`, called by `Dialog` for Enter with the button in AL: not 0,
+  Cancel, it returns at once. Else the text at `TmpErr+3`: nothing but
+  blanks is taken and sets nothing. Seconds, up to 99; then the end, or
+  the separator directly behind the digits; then the end, or digits
+  directly behind the separator, and nothing but blanks behind those.
+  A fraction below 10 is multiplied by 10, and then divided by 10 as
+  often as it is not below 100, 10 or 1, for no zero, one, or more in
+  front of it: ".5" is 50, ".05" 5, ".005" 0, ".123" 12. `TxtNum`
+  answers FFFFh for more than a word holds. Anything else is the box
+  `NoTim_B`, `HlpPage` 3 again, and the carry set: back to the dialog.
+- `F09_00`: `F09_10` writes the capitals of 40 characters and `F09_20`
+  their small letters, from `Inf05_S+4` to `Inf06_S+7` and `Inf07_S+7`,
+  and from `Inf09_S+7`, 39 characters and a space, to `Inf10_S+7` and
+  `Inf11_S+7`. The time at `Inf02_S+6`: "9", `TimeSep`, "00p", or with
+  24 hours "21", `TimeSep`, "00". The date at `Inf02_S+22`: MM, DD and
+  YY with `DateSep` between, in the order of `DateFmt`. The number at
+  `Inf02_S+39`, a byte further on for a `Sep1000` of 0: "1" and three
+  times `Sep1000` and "000". So those five lines are no constants: they
+  are objects of the file of tables without `const`, which the code
+  writes through far pointers with `AsmSeg`.
+
+**For the other pieces.**
+
+- 0b: `NoTim_P` keeps what it covers in `BoxBuf`, `ErrBuf` in the
+  portable C (`NAMED_OTHERWISE`, "field"); `NoTim_B` has its button at
+  `TmpErr+240`, behind the line of the dialog under it, which is at
+  `TmpErr`; `PanOp_B` names `F04_10`, a `SUB_` number. The line of S3
+  has `StarTab` itself for `mPoint`, and `Dialog` writes a zero behind
+  what it copies back, into the first reserved byte of the setup.
+- C or D: F1 in the box "Illegal format of" does nothing, its page
+  being FFh, and F1 behind it shows the page of Panel options again,
+  which is what `MOV HlpPage,3` of `F04_10` is for. That is seen on the
+  bench and is in no scenario yet, so the effect of that instruction
+  is held by none. The scenario was written, `setup-delay-help`, and
+  taken out because its golden shows a page of the help file. It may
+  come back, with piece C or D: text of `VC.HLP` in a golden is
+  allowed, being what the original shows when it is run, as the main
+  program's `help` goldens hold it already; what is to be kept out of
+  a golden is what the setup program's own file has and the published
+  source has not, its banner and the dialog it shows for an argument.
+  The steps were: `_SETUP`, `F4`, `Up Up "x" Enter`, `F1`, which
+  changes nothing, `Enter`, `F1`, the page, `Esc`, `Esc`, `F10`. It
+  needs the help of setup in the portable C to pass.
+- The 81st cell that `PutKey0` writes is decided, on the user's word:
+  it is fixed, not kept. The portable C writes 80 cells, one routine
+  for the main program and setup, declared as a deviation, which is
+  0b's to do. No scenario of this piece shows the corner that the
+  cell lands in: it shows only on a screen of 50 lines, in the top
+  left of what DOS had shown once setup is left, and none of these
+  has more than 25 lines.
+- D: no scenario of this piece shows the clock, Clock is ticked and
+  not within one step; and none uses the mouse after Left-handed mouse
+  has been saved.
 
 ### How scenarios are written and held
 

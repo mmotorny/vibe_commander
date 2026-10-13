@@ -324,6 +324,14 @@ TREES = {
             # makes its scenario pass (TODO.md, "The setup program in the
             # portable C: the plan").
             "setup": _NO_SETUP_YET,
+            # The option dialogs, piece A of that plan.
+            "setup-config": _NO_SETUP_YET,
+            "setup-config-mouse": _NO_SETUP_YET,
+            "setup-screen": _NO_SETUP_YET,
+            "setup-panels": _NO_SETUP_YET,
+            "setup-country": _NO_SETUP_YET,
+            "setup-options-russia": _NO_SETUP_YET,
+            "setup-delay-file": _NO_SETUP_YET,
             # The colours, piece B.
             "setup-colors": _NO_SETUP_YET,
             "setup-colors-items": _NO_SETUP_YET,
