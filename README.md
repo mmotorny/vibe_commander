@@ -634,19 +634,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,504 bytes |
+| `VC.EXE` | 197,212 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 64,448 bytes |
-| The relocations in its header, which DOS applies | 1,035 |
-| What it keeps of the memory while a command runs: the program and its panels | 207,120 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,416 bytes |
-| The code segment `CTEXT` ends at | D410h, 7,152 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C567h, 10,905 bytes below the limit, F000h |
-| Inline assembly | 57 instructions in 10 pieces: 37 in 7 of `dos.c`, 20 in 3 of `resident.c` |
+| more than the C translation's 133,056 bytes | 64,156 bytes |
+| The relocations in its header, which DOS applies | 1,029 |
+| What it keeps of the memory while a command runs: the program and its panels | 206,848 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,688 bytes |
+| The code segment `CTEXT` ends at | D322h, 7,390 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C543h, 10,941 bytes below the limit, F000h |
+| Inline assembly | 49 instructions in 9 pieces: 37 in 7 of `dos.c`, 12 in 2 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 794, 62, 262, 97 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 790, 62, 262, 96 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -704,7 +704,9 @@ itself; and the program's own call, by which a setup program reads and
 writes its setup. Where one of these could not stay as the original has
 it, `DEVIATIONS.md` says what differs. Of these the watch has gone
 since, with the map of the memory that it was for: see [What a user
-sees no more](#what-a-user-sees-no-more).
+sees no more](#what-a-user-sees-no-more). And the program's own call
+has, with the entry of INT 21h, which was left for it alone: see [The
+setup program in it](#the-setup-program-in-it).
 
 How the program is laid out now. The linker writes `VC.EXE`, DOS loads
 it and sets the words of it that hold a segment, and it starts at
@@ -756,13 +758,13 @@ and `CODE` for nothing where the compiler is not Open Watcom's for the
 What rests on Open Watcom, for the portable C. Of what the code is
 written in, the first table above: `__far`, `STACK` and `CODE`,
 `#pragma aux` and `#pragma pack(1)`, each as often as [the
-figures](#the-figures) say; four of the five `__interrupt` functions,
-`FatErr` of `main.c` and `CtrlC`, `Int21` and `Exit05` of `resident.c`,
-`Int27` having gone with the watch on DOS; two `__loadds` functions,
-`Alloc0`, where DOS enters the program, and `Exec2E`, where it goes on
-behind INT 2Eh; three of the four `__declspec(naked)` functions,
-`New21`, `Exit01` and `Int2E`, without `New27`; two of the three
-intrinsic functions, `_disable` and `_enable`; the two routines for
+figures](#the-figures) say; three of the five `__interrupt` functions,
+`FatErr` of `main.c` and `CtrlC` and `Exit05` of `resident.c`, `Int27`
+having gone with the watch on DOS and `Int21` with the program's own
+call; two `__loadds` functions, `Alloc0`, where DOS enters the program,
+and `Exec2E`, where it goes on behind INT 2Eh; two of the four
+`__declspec(naked)` functions, `Exit01` and `Int2E`, without `New27`
+and `New21`; two of the three intrinsic functions, `_disable` and `_enable`; the two routines for
 arithmetic; and, new, `#pragma data_seg`, for the main data and for the
 stack. The test `portable_c-host` counts these by
 their kinds, and `TODO.md` has its table.
@@ -779,7 +781,7 @@ here:
 | 5 | No code is within 4K of the stack, the tables being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 2; the files of the second code segment in `CMakeLists.txt` | `portable_c-scenarios` reads the linker's map, where `tools/mkexe.c` stopped the build |
 | 6 | The segment of a far pointer made of a near one is DS, `MAIN_SEG` | `src/portable_c/vc.h` | every scenario |
 | 7 | The segment of a far pointer to an object of a group is the group's, and `seg` and `offset` in `_asm` are those of the group too: so the stack that `Int2E` sets is the one that the file's header names, and a table is read at its offset in `AsmSeg` | `src/portable_c/resident.c`, `misc.c` | the scenarios of INT 2Eh, `quick`; every scenario |
-| 8 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with `DGROUP`, as a `__loadds` function does | `src/portable_c/vc.h`, `main.c`, `resident.c` | the scenarios of the critical error, of the program's own call, `asked`, and of the program ended by DOS, `ended` |
+| 8 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with `DGROUP`, as a `__loadds` function does | `src/portable_c/vc.h`, `main.c`, `resident.c` | the scenarios of the critical error, and of the program ended by DOS, `ended` |
 | 9 | `_enable` is `STI` and `CLD`: the first call of the program, `IntOn`, clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/portable_c/resident.c`, `Alloc0` | every scenario |
 
 Gone are 2, 4 to 7, 9, 10, 12, 15 and 17 of that table, and with 15 the
@@ -791,12 +793,12 @@ figures](#the-figures) say. Of the nine pieces of `dos.c` in the table
 above, `VideoBuffer` and `DesqviewPause` are
 [gone](#what-else-has-gone), and the others are as they were. `DataSeg`
 of `main.c` is gone. Of `resident.c`, `New27` is
-[gone](#what-a-user-sees-no-more), and `New21` is eight instructions
-where it was seventeen: three `CMP` with their jumps, for the one call
-that the program still deals with, its own, the jump to the interrupt
-function that answers it, and the far `JMP` through `Vect21` for every
-other call; the three that made room on the stack are gone, since that
-function returns to whoever called and goes on in no other handler.
+[gone](#what-a-user-sees-no-more), and so is `New21`, all seventeen
+instructions of it: nine went with the watch on DOS, and the eight that
+were left for the program's own call, three `CMP` with their jumps, the
+jump to the interrupt function that answered it and the far `JMP`
+through `Vect21` for every other call, went [with that
+call](#the-setup-program-in-it). The program has no entry of INT 21h.
 `Exit01` is as it was. `Int2E` is an instruction shorter: `INT 2Eh`, `CLI`,
 `MOV AX` with the segment of the stack, `MOV SS,AX`, `MOV SP`, `STI`,
 `CLD` and the jump; it no longer loads DS, which the function that it
@@ -889,15 +891,15 @@ there, and the portable C hands them 0. No screen shows that, and
 `src/portable_c/DEVIATIONS.md` declares it, with every place.
 
 Not in the header, and in `dos.c` all the same, is what only DOS on a
-PC has: where an interrupt goes, by DOS or written into the machine's
-table, which the program takes for DOS's critical error, for Ctrl-Break
-and Ctrl-C and for its own call of DOS; and the machine let interrupt
-again. `vc.h` declares those four. What DOS enters of the program is
-where it was, and is all that still knows an interrupt outside `dos.c`:
-`FatErr` of `main.c` for the critical error, and in `resident.c` the
-entry of the program, the entries of INT 21h and of Ctrl-C, where DOS
-goes on when it ends the program, and the call of COMMAND.COM's own
-interrupt for Quick execute, each with what assembly it has. `TODO.md`
+PC has: where an interrupt goes, as DOS says and as DOS is told, which
+the program takes for DOS's critical error and for Ctrl-Break and
+Ctrl-C; and the machine let interrupt again. `vc.h` declares those
+three. What DOS enters of the program is where it was, and is all that
+still knows an interrupt outside `dos.c`: `FatErr` of `main.c` for the
+critical error, and in `resident.c` the entry of the program, the entry
+of Ctrl-C, where DOS goes on when it ends the program, and the call of
+COMMAND.COM's own interrupt for Quick execute, each with what assembly
+it has. `TODO.md`
 says what is to become of them. The map of the memory and the watch on
 DOS, which were of DOS alone, [are gone](#what-a-user-sees-no-more).
 
@@ -926,10 +928,11 @@ steps that went there, against the original's golden without them:
 |---|---|---|
 | 7 | The map of the memory, Alt+F5, Memory info of the Commands menu: `memory.c` and `memory_t.c`. And the watch on DOS that it rested on, in `resident.c`: the entry of INT 27h, `New27` with `Int27`; in the entry of INT 21h the three calls by which a program is run, stays in the memory or gives a block back; the list of the programs that have stayed and their records, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk`, `Release`; `GetStat`; and the programs released when the program is left | Listing what DOS has given to whom, and getting a program out of the memory again that was run from here and has stayed, which DOS had no way to do |
 
-What is left of the watch is what was not for the map: the program
-still takes INT 21h, for its own call, by which a setup program reads
-and writes its setup in the memory, and hands every other call on
-untouched.
+What was left of the watch then was what was not for the map: the
+program still took INT 21h, for its own call, by which a setup program
+reads and writes its setup in the memory, and handed every other call
+on untouched. That has gone since, with the call: see [The setup
+program in it](#the-setup-program-in-it).
 
 ### The setup program in it
 
@@ -945,6 +948,21 @@ the program's command line, over what DOS had shown. It is translated as it
 is: it reads the setup file and edits that, and the program takes what
 was saved when the setup is left, as the original's running copy is
 handed it by a call of DOS.
+
+That call, the program's own (INT 21h with AH 2Bh, 'VC' in CX and 'OM'
+in DX), is gone from the portable C, since nothing asks a running
+program for its data any more, and with it the last reason for the
+program to take DOS's own interrupt. What went: `New21`, the entry of
+INT 21h, eight instructions of assembly that every call of DOS by any
+program passed while the program was in the memory; `Int21`, the
+interrupt function that answered the one call; `Vect21`, where the
+interrupt went before, a variable in the code segment for that entry to
+read; `PutVector` of `dos.c`, which wrote an address into the machine's
+table of interrupts; and the interrupt taken when the program starts
+and given back when it leaves or when DOS ends it. A call of DOS goes
+to DOS. The scenarios `asked` and `handed-on`, which show the call
+answered and the others handed on, are not run for the portable C, and
+stay for the C translation.
 
 Its files have names that begin with `st`, and its routines and tables
 have `St` in front of the names that they have in the assembly, where

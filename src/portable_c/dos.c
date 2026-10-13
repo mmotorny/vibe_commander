@@ -1139,22 +1139,6 @@ void SetVector(u16 number, u32 to)
     Tell(REGS(regs));
 }
 
-/* Have an interrupt go somewhere without asking DOS: the address is
-   written into the machine's table of them, which is at the bottom of
-   the memory, four bytes for each, with the machine kept from
-   interrupting meanwhile. The original takes DOS's own interrupt like
-   that. */
-void PutVector(u16 number, u32 to)
-{
-    /* The segment of the table. Written as a constant, the compiler
-       takes a far pointer into segment 0 for a near one. */
-    volatile u16 table = 0;
-
-    _disable();
-    *(u32 __far *)((u32)table << 16 | (number & 0xFF) * 4) = to;
-    _enable();
-}
-
 /* Let the machine interrupt the program again, where something has
    kept it from that; and the direction flag is clear afterwards, as the
    compiler wants it. */

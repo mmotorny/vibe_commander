@@ -960,10 +960,9 @@ out again (show.py --changes is how):
     own entry into that word, keeping DOS's. w.com of handed-on. The
     program gives INT 21h back to what that word holds when it leaves,
     so such a scenario does not leave it: the watcher would be gone and
-    the interrupt left on its memory. The portable C keeps all of
-    itself in the memory, and the bench has no room for a second copy
-    of it behind a program that stays: handed-on is what holds its
-    entry of INT 21h.
+    the interrupt left on its memory. The portable C has no entry of
+    INT 21h (src/portable_c/DEVIATIONS.md, 8): the watcher would look
+    for the jump in DOS, and neither scenario is run for it.
   - A program that stays lies behind the COMMAND.COM that ran it, and
     that leaves a gap of 71K when it ends. With one program staying in
     front of a second copy and one run from it, the translation has no room

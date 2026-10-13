@@ -424,13 +424,10 @@ def places(source, objects, variables=()):
 # Variables of one tree that the compiler has where it has constants, in a
 # code segment, and under a name of the original: tree -> name -> why.
 # They are not compared, and what the code reads of them is not looked at.
+# There is none: the one that there was, Vect21 of the portable C, where
+# INT 21h went before the program took it, went when that tree stopped
+# taking the interrupt.
 VARIABLES = {
-    "portable_c": {
-        "Vect21": "where INT 21h went before the program took it: a "
-                  "variable, in the segment of the code for the entry of "
-                  "that interrupt to read it through CS. The C translation "
-                  "has it under a name that is not the compiler's for data",
-    },
 }
 
 # Entries of REVIEWED that one tree has no constant for, since it is

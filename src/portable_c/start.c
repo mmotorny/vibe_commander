@@ -274,9 +274,10 @@ static u16 ReadOne(const u8 __far *path, u8 __far *end,
    environment, or of the program's own. A setup file that is not there
    gives the defaults; one of another length, with a wrong sum or without
    its three letters V gives them too, and is said to be not correct.
-   Then the banner. And the program takes the interrupts that it keeps
-   while commands run: its end, which DOS finds in the PSP, Ctrl-Break,
-   and DOS's own, 21h, for the program's own call.
+   Then the banner. And the program takes what it keeps while commands
+   run: Ctrl-C, and its end, which DOS finds in the PSP. The original
+   takes DOS's own interrupt too, 21h, which the portable C leaves to
+   DOS (see DEVIATIONS.md).
 
    The panels are not there yet, since the original asks DOS for their
    memory after the banner, and says after it that there is none. What
@@ -382,7 +383,7 @@ Init04:                                 /* Output Report */
     for (i = 0; i < 5; i++)
         md.FindStr[i] = Mask_S[i];
     SetBrk();
-    TakeDos();
+    TakeEnd();
 }
 
 /* What DOS has given the program for its panels and the viewer: the

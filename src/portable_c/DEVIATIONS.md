@@ -126,12 +126,10 @@ it.
   the panels.
 - The map of the memory, which listed what stays as the program's, is
   gone from the portable C since: see 7.
-- The program's own call hands out the main data and the panels
-  themselves. They begin as the original's copies do: the setup, which
-  is what the original's setup program reads and writes there, the
-  command line, and of a panel its kind, its mask and its path. The
-  files of a panel are where a panel has them, 24 bytes each, not 13
-  behind the path.
+- The program's own call, which handed out the main data and the
+  panels themselves while the portable C had it, is gone from the
+  portable C since, with the setup program made a part of the program:
+  see 8.
 - The byte of the setup file that held the switch is kept as it is found
   and written back as it was; the program does not go by it. A setup file
   of the original is one of the portable C and the other way round. The
@@ -184,7 +182,7 @@ says that every screen is as the original's, by the steps left out alone:
 | `quick` | The step that switches Memory allocation off before the last command is left out; every screen is as the original's after the same step |
 | `second-copy` | The second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work |
 | `start-memory` | The second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with its Info, not the first copy's |
-| `ended` | The program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. And by 7: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. The portable C has where INT 21h went before, the entry of the first copy: an address in the program, which changes with every step of the work and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
+| `ended` | The program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. And by 7: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. And by 8, with no interrupt of DOS's taken: DX has in its low byte what DOS was last told of Ctrl-C and is as it came above that, which is what the original leaves there where its setup has TSR manager off; and DS is as it came, on the program that started the copy, a segment that follows the size of the program and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
 
 A step that switches Memory allocation, "F9 o m", is left out of every
 scenario for the portable C: there it would enter the setup (see 8).
@@ -194,7 +192,7 @@ scenario for the portable C: there it would enter the setup (see 8).
 | Scenario | Why |
 |---|---|
 | `memory` | It switches Memory allocation off, for the Info panel to show the other number, and shows the menu without the mark |
-| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." What the program hands on is held by `handed-on` instead, which sees the same with one copy, by a program that puts itself behind it. The C translation passes that against the original's golden; the portable C, which hands on more, has a patch there: see 7 |
+| `passed-on` | It has a program stay in the memory, starts a second copy behind it and runs commands from that, to see what the copy hands on of the calls of DOS that pass it. The bench has no memory for a second copy of the portable C behind a program that has stayed: COMMAND.COM says "Allocation of DOS memory failed." And the portable C does not take INT 21h any more, so no call of DOS passes it and it has none to hand on: see 8, where `handed-on`, which sees the same with one copy, is not run for that |
 
 **In the data.** The test `portable_c-data` holds five tables of the menus
 against the original's with this difference declared for each, in
@@ -416,7 +414,9 @@ over, where that was noted to be something else; and what the portable C
 hands over. Where that column is empty, nothing was noted: as a rule
 the C translation handed over what the original does. Every file of
 the program has gone over to `sys.h`, and each added its places here as
-it went.
+it went. A call that the portable C makes no more has no row: DOS
+asked where INT 21h goes, when the program starts, went with the
+program's own call (see 8).
 
 | Routine | Call | The original | The C translation, where it differed | The portable C |
 |---|---|---|---|---|
@@ -462,7 +462,6 @@ it went.
 | `NotFind`, `resident.c` | BIOS 00h of the keyboard, a key waited for | AL as the call before left it | AL 0 | AL 0 |
 | `SetBrk`, `resident.c` | DOS 3300h and 3301h, whether DOS looks for Ctrl-C at every call, asked and set | 3300h: DX as whoever calls has it. 3301h: DH as 3300h left it | DS 0 at both, DX 0 at 3300h | DX 0 at 3300h and DH 0 at 3301h, DS on the main data |
 | `Exit02`, `resident.c` | DOS 3301h, Ctrl-C looked for as before, and 4Ch, the program ended | 3301h: DH as the code or DOS before left it. 4Ch: DS:DX on where an interrupt went before the program took it, of giving it back, where the watch on DOS is on | DS 0 at 3301h | DH 0 at 3301h; DS on the main data at both, and DX 0 at 4Ch |
-| `TakeDos`, `resident.c` | DOS 3521h, where INT 21h goes | BX the address of what the original keeps of the main data while a command runs. CX, DX, SI and DI as the code before left them | CX, SI and DI 0 | BX, CX, SI and DI as they come, DX 0 |
 | `Exec02`, `resident.c` | DOS 3301h, Ctrl-C looked for as before; 4B00h, COMMAND.COM run; 19h and 47h, the current drive and its directory for the prompt; BIOS 0Eh, the end of the line typed, twice | 3301h: DH as the code before left it. 4B00h: CX the length of the command's tail, with the slash above it; SI on the tail and DI on the name COMMAND.COM. 19h: AL 0Dh, of the start of the prompt, and DX as the command or DOS left it. 47h: AL a colon, of the prompt. 0Eh: CX and DX as the code before left them | CX and DX 0 at 0Eh | DH 0 at 3301h. CX, SI and DI as they come at 4B00h. AL and DX 0 at 19h, AL 0 at 47h. CX and DX 0 at 0Eh |
 | `SetStat`, `resident.c` | DOS 5801h and 5803h, how DOS looks for memory | CX and DX as the code before left them |  | CX as it comes, DX 0 |
 | `Alloc0`, `resident.c` | DOS 30h, the version, and 4Ah, the block of the program made shorter | 30h: AL as taking the check sum of the file left it, which the portable C does not take. 4Ah: AL the minor number of the version; CX and DX how much of itself the original then moves, in bytes and in paragraphs |  | AL 0 at both, CX as it comes and DX 0 at 4Ah |
@@ -628,20 +627,19 @@ watch.
 - Nothing releases a program that has stayed. It is still in the memory
   when the program is left, as it is when it was run from DOS's own
   command line, and what gets it out again is whatever does there.
-- The program takes INT 21h all the same, for its own call, which
-  answers as before (see 1), and takes it whatever the setup has for
-  the watch. Every other call of DOS is handed on untouched, with no
-  register changed, nothing of the caller's stack used and the flags of
-  the comparison that told it from the program's own. That now holds
-  for a program run, one that stays and a block given back as well,
-  which the original hands on from its watch with other flags, having
-  used the caller's stack.
+- The program does not take INT 21h either, since. When the watch went
+  the entry of that interrupt was kept for the program's own call,
+  which the same entry takes, and handed every other call of DOS on
+  untouched; it went with that call when the setup program became a
+  part of the program: see 8. A call of DOS that another program makes
+  goes to DOS, and does not pass the program.
 - When DOS ends the program, it goes on in the program that started it
-  with the registers as the program leaves them, which are others: DS:DX
-  is where INT 21h went before, where the original has where INT 27h
-  went, and CX and SI are as they came, where the original has 0 in CX,
-  its count of programs run down, and in SI twice that count as it was
-  when the last was released.
+  with the registers as the program leaves them, which are others: CX
+  and SI are as they came, where the original has 0 in CX, its count of
+  programs run down, and in SI twice that count as it was when the last
+  was released; and DS:DX is not where INT 27h went before, which the
+  original has there from giving that interrupt back. What the portable
+  C has there is in 8.
 - The byte of the setup that switched the watch, `ChkTSR`, is kept as it
   is found and written back as it was, 1 in a setup made of the
   defaults; the program does not go by it. A setup file of the original
@@ -658,10 +656,11 @@ made and read them, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk` and
 `Release`, the entry of INT 27h, `New27`, with the interrupt function
 `Int27` behind it, the interrupts noted, `IntTab`, `SavePtr` and
 `NameBuf`, and `GetStat`, which noted how DOS looks for memory before a
-program was released. The entry of INT 21h, `New21`, is the three
-comparisons that know the program's own call and two jumps, and
-`Int21`, the interrupt function that it goes on in, answers that call
-and returns. What is left for two things that are not the map: `SetStat`
+program was released. The entry of INT 21h, `New21`, was left then as
+the three comparisons that know the program's own call and two jumps,
+with `Int21`, the interrupt function that it went on in, which answered
+that call and returned: both have gone since, with the call (see 8).
+What is left for two things that are not the map: `SetStat`
 with 0, by which the program has DOS look for memory in the lowest block
 first when it starts, as the original does; and the prompt that is
 written between two commands, which the original makes where its watch
@@ -684,7 +683,6 @@ left out alone:
 | `menu-items` | Memory info is not chosen from the Commands menu: the two steps that choose it and leave the map are left out. Every screen is as the original's after the same step |
 | `mouse-menu`, `mouse-drag-menu` | The Commands menu where it shows, a line shorter, without Memory info. In `mouse-menu` the click that is on a dark item of the original's menu, Compare directories, is on the line across the menu below that item: nothing is chosen either way, and the screen is the same |
 | `tree-choose` | The key bar with Alt held, twice, has no name for F5, where the original has Memory |
-| `handed-on` | The flags that three calls of DOS come on with from the program, to a program that has put itself behind it: a program run, 0002h for 0246h, one that stays, 0016h for 0202h, and a block given back, 0016h for 0002h and for 0006h. They are those of the call compared with the program's own, 2Bh, as for every other call, and with interrupts as the call found them, off. The other calls come on as from the original, and the stack as it was |
 | `mouse-middle` | The middle button is not pressed in the map of the memory: two steps are left out. Every screen is as the original's after the same step |
 | `mouse-drag-lists` | The last nine steps are left out: a program that stays in the memory, and a button of the mouse moved in the map. Every screen before is as the original's |
 
@@ -704,7 +702,8 @@ scenario by scenario.
 |---|---|
 | `memory-map`, `memory-map-russia` | They show the map of the memory: its lines, its cursor and its numbers, and a program that stays selected and released there |
 | `mouse-memory` | It is the mouse in the map of the memory |
-| `stay` | It has programs stay in the memory, by INT 27h and by DOS's call, to be listed in the map, released there, counted to the 18 that the list holds and beyond, and released when the program is left. What it has besides, a program that asks the program for its data by the program's own call, is a scenario of its own now, `asked`, which the original, the C translation and the portable C are all taken through; the portable C passes it against the original's golden |
+| `stay` | It has programs stay in the memory, by INT 27h and by DOS's call, to be listed in the map, released there, counted to the 18 that the list holds and beyond, and released when the program is left. What it has besides, a program that asks the program for its data by the program's own call, is a scenario of its own, `asked`, for the original and the C translation; the portable C answers that call no more, and is not taken through it: see 8 |
+| `handed-on` | It shows what the program hands on of the calls of DOS that pass it, to a program that has put itself behind its entry of INT 21h. While the portable C had that entry without the watch, it was held there with a patch, for three calls that the original deals with and the portable C handed on like any other. The entry is gone: see 8 |
 
 **In the data.** The test `portable_c-data` holds eight tables against
 the original's with this difference declared for each, in `DECLARED` of
@@ -755,6 +754,18 @@ which the running program takes when the command has ended. Then it
 ends, and the main program goes on as after any command: it looks at
 the screen anew, reads its panels again, and has no setup that it knows
 to be saved.
+
+For that call the main program takes INT 21h, DOS's own interrupt, when
+it starts, in the entry by which it also keeps its watch on the programs
+that stay in the memory (see 7): every call of DOS that any program
+makes while the main program is in the memory passes there, and all but
+its own and three of the watch are handed on to DOS as they came. It
+answers its own with the number of the interface, 42, in AH and an
+address in ES:BX: of what it keeps of the first panel for 0 in AL, of
+the second for 1, and of its setup for anything else (see 1). It gives
+the interrupt back when it is left, and when DOS ends it. With TSR
+manager off it does not take the interrupt, and nothing answers the
+call.
 
 The setup that the setup program makes without a good file, and for
 Set default configuration, has two panels as well as the colours and
@@ -811,6 +822,24 @@ of it.
   back as it was. Either way it goes on as after a command: the screen
   is looked at anew, which moves it up as after a command, the panels
   are read again, and what stood in the command line is gone.
+- The program's own call is gone, since nothing asks a running program
+  for its data any more, and with it the last that the program did with
+  INT 21h: it does not take that interrupt, has none to give back when
+  it is left or DOS ends it, and a call of DOS that another program
+  makes goes to DOS without passing the program. A program that makes
+  the call all the same, as the original's setup program does when it
+  is run from the portable C as a command, is answered by DOS, which
+  has AH 2Bh for setting the date and refuses this one: the original's
+  setup program has written the setup file by then and takes that for
+  no main program in the memory, and the portable C goes on with the
+  setup that it has.
+- When DOS ends the program, the program that started it goes on with
+  the registers as the portable C leaves them: ES on the PSP of the
+  program that was ended, as in the original; in the low byte of DX
+  what DOS was last told of Ctrl-C, and DS and the high byte of DX as
+  they came, which is what the original leaves there where its setup
+  has TSR manager off and it has no interrupt to give back; and CX and
+  SI as they came (see 7). The flags are the original's.
 - The setup that is made without a good file, and for Set default
   configuration, has zeros in the 64 bytes behind the path of each
   panel. A setup file that the setup saves of it differs from the
@@ -834,7 +863,13 @@ on the user's word of the same day. And the 64 bytes behind a path are
 zeros because half of them cannot be anything else: 17 of each 64 are of
 a dialog that the published source has not, which the project does not
 reproduce, and the other 47 are a box with addresses of the original's
-layout, which mean nothing in a file.
+layout, which mean nothing in a file. The program's own call goes by
+the decision of 12 October 2026 too, as the road of `CLAUDE.md` has
+it: "The call by which the setup program asked a running copy for its
+data goes then, with the last of the watch on DOS." Taking DOS's own
+interrupt, so that every call of every program passes the program, was
+for a second program that there is no more, and is a thing of DOS
+alone.
 
 **Which scenarios show it.** Every scenario of the setup program is held
 against the golden that the original's setup program left, with two
@@ -870,6 +905,27 @@ No scenario has a drive that is not ready while the setup is open, a
 The Options menu shows in three scenarios that have a patch for the
 first deviation already, `clock`, `clock-russia` and `menu`: their rows
 there say what differs, and their patches name this entry too.
+
+What the program leaves when DOS ends it shows in `ended`, which has a
+patch for the first and the seventh deviation already: its row under 1
+says what differs, and its patch names this entry too. The program that
+started the copy prints DX and DS as how far they are from where INT
+27h goes, which is to DOS: DX is the same on every build and is
+compared, and DS, the segment of the program that prints, follows the
+size of the program and is left out of the comparison, in
+`harness/deviations.py`, where both words were left out while DS:DX was
+an address in the program.
+
+**Not run for the portable C:**
+
+| Scenario | Why |
+|---|---|
+| `asked` | It is the program asked for its data by another program, by the program's own call: both panels and the main data, and a byte of each printed. The portable C does not answer |
+| `handed-on` | It shows what the program hands on of the calls of DOS that pass it, and how: by a program that looks for the far jump in the program's entry of INT 21h and puts itself behind it. The portable C has no such entry, and no call passes it |
+
+Both stay for the C translation, which has the call and the watch as
+the original has them. `passed-on`, which shows the same as `handed-on`
+with a second copy, was not run before, for want of memory: see 1.
 
 **In the data.** The test `portable_c-data` holds four tables of the
 menus against the original's with this difference declared for each, in

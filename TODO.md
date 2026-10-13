@@ -114,8 +114,9 @@ options the main program has in its menu or in its two dialogs.
 call, when it has been left with Save, also if the file could not be
 written: INT 21h with AX 2B02h, CX 'VC', DX 'OM', which a running copy
 answers with 2A00h in AX and the address of its common setup in ES:BX
-(`Int21` of `src/portable_c/resident.c`; the original answers only with
-its TSR manager on, which is how it is distributed). It then takes
+(`Int21` of `src/c/resident.c`, and of the portable C's until piece E1
+took the call out; the original answers only with its TSR manager on,
+which is how it is distributed). It then takes
 `Active`, `Ctrl_O` and `ChkTSR` from the running copy into its own
 data, puts the running copy's `LoadFl` into its own and its own into
 the running copy's `LoadRes`, and copies its 330 bytes over the running
@@ -356,7 +357,7 @@ batch, with what no scenario reaches.
 | B, the colours. Done | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6; and `ShadCol`, taken out of `Shadow` of `screen.c`, which 0b left as it is. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
 | C, the help. Done | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
 | D, what is left of S1 and of leaving. Done | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | 80 instructions, 74 of them the main program's routine | Six, 100 steps, see "Piece D" below: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and F1 from the other pieces' screens. A setup saved whose file is missing is A's, `setup-missing-saved` | 0b; A, B and C for three of the scenarios |
-| E1, the program's own call of DOS goes | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; the patch of `ended` is written again and read, `goldens.py patch --tree portable_c ended`, for the registers that the program leaves | A to D |
+| E1, the program's own call of DOS goes. Done | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; the patch of `ended` is written again and read, `goldens.py patch --tree portable_c ended`, for the registers that the program leaves. See "Piece E1" below | A to D |
 | E2, three settings go | `stopts.c`, `stopts_t.c`: Memory allocation and TSR manager out of S2, Screen output out of S3; entries 1, 5 and 7 of `DEVIATIONS.md`, which say that the setup program still shows them | Small | The scenarios of A that show the two dialogs get patches of the original's goldens, `goldens.py patch --tree portable_c NAME`, each read row by row against the entries before it is committed | A |
 
 While 0b is made, A, B and C can write their scenarios and derive the
@@ -371,8 +372,9 @@ In all, some 22 scenarios and 600 steps were planned, where the main
 program has 134 and 3,358 for twelve times the code: nearly every
 instruction here is a key or a button of the mouse, and little of it is
 something that other scenarios pass through anyway. With 0a to D done
-there are 33 of 889 steps, and none waits in `not_run`. What is still
-to come is E1 and E2, which take things out.
+there are 33 of 889 steps, and none waits in `not_run`. E1 has taken
+the program's own call out since. What is still to come is E2, which
+takes three settings out.
 
 **What 0a made of the harness.** The nine things that it was to
 change, each as it is now, and what came out otherwise than planned.
@@ -794,7 +796,9 @@ are the setup program's alone, of which some 288 are of its start.
 In `src/portable_c/DEVIATIONS.md`, by the piece that makes each so.
 Entry 8 there has what 0b made so: the first four rows, the first half
 of the sixth, and the two that the plan did not have, which stand
-last.
+last. And what E1 made so, the second half of the third: the call is
+gone, with the entry of INT 21h, `asked` and `handed-on` are not run
+for the portable C, and `ended` has its patch made again.
 
 | What | What shows it |
 |---|---|
@@ -1126,7 +1130,8 @@ and "Do you wish to save the current setup?" (no page either).
   program's own.
 - **The time.** A scenario with the clock on in setup has it on the
   screen from then on.
-- **`resident.c`** is in other hands than setup's until E1.
+- **`resident.c`** is in other hands than setup's until E1. That piece
+  is done, and nothing of setup's went into the file.
 
 ### Piece B, the colours: its scenarios
 
@@ -1426,6 +1431,65 @@ its own: piece C has written it, `StHlpLine`.
   main program watched (the top of `harness/scenarios.py`):
   `setup-clock` unticks Clock before it leaves the setup, for that.
 
+### Piece E1, the program's own call: done, and what a later piece should know
+
+The call is gone from the portable C, and the entry of INT 21h with it
+(`src/portable_c/DEVIATIONS.md`, 8, with 1, 6 and 7 brought in line).
+What went, all of `resident.c` but the last: `New21`, the eight
+instructions of assembly that every call of DOS passed; the interrupt
+function `Int21`, which answered the call; `Vect21`, the variable of the
+code segment that held where the interrupt went before; the interrupt
+taken in `TakeDos` and given back in `Exit02`; and `PutVector` of
+`dos.c`, which only that taking used. `TakeDos` is `TakeEnd` now, since
+what it still does is to have the PSP name `Exit01`.
+
+What was read first, for what else leaned on the entry, and found to
+lean on none of it:
+
+- How DOS ends the program. `Exit01` is named in the PSP, not reached
+  through INT 21h, and `Exit05` and `Exit02` behind it are kept whole
+  but for the interrupt given back: `ended` runs them.
+- Ctrl-C and Ctrl-Break: `CtrlC`, taken by `SetBrk` and by `HookVct`
+  of `main.c` through DOS, `Vector` and `SetVector`.
+- Quick execute, `Int2E` and `Exec2E`: the commands that COMMAND.COM
+  runs there make their calls of DOS, which passed `New21` like any
+  other and were handed on untouched. `quick` and the other scenarios
+  of INT 2Eh pass as they did.
+- The driver of the tests knows the program's idle call by INT 28h and
+  by who DOS has as the current program, and nothing of INT 21h.
+
+For whoever goes on:
+
+- What the program leaves in the registers when DOS ends it was
+  decided by reading the assembly and then seen on the bench. With no
+  interrupt to give back the original, where its setup has TSR manager
+  off, leaves DS as it came and DX as it came but for the low byte,
+  which is what it has just told DOS of Ctrl-C; `Exit02` leaves the
+  same. The trial: the steps of `ended` behind a setup saved with TSR
+  manager off, as a scenario that was not kept, derived from the
+  original. The copy that DOS ends reads that setup, and the program
+  that started it printed DX as 0101h and DS as its own segment, each
+  less where INT 27h went then, which was to the first copy: 01h is
+  the high byte of the address that it had in DX when it ran the copy,
+  and the low byte says that DOS looked for Ctrl-C at every call when
+  the copy started.
+- So of the two words that `ended` had left out of the comparison one
+  is compared again, DX, and one is still left out, DS: the segment of
+  the program that prints, which lies behind the first copy and the
+  COMMAND.COM that it ran, and follows the size of the program under
+  test. A change of `harness/deviations.py` that leaves less out.
+- `asked` and `handed-on` are in `not_run` of `TREES["portable_c"]`,
+  and `handed-on.patch` is gone. `passed-on` and `stay`, which were
+  not run before, say there that `handed-on` and `asked` hold what
+  they held besides: those sentences were brought in line.
+- `VARIABLES` of `harness/reads.py` is empty: `Vect21` was its one
+  entry, and an entry there that the tree has no object for fails the
+  data's test.
+- The original's setup program, `VCSETUP.COM`, run from the portable C
+  as a command, saves its file and is answered by nobody: DOS takes
+  the call for its own AH 2Bh, a date to set, and refuses it. No
+  scenario does that; the bench has no `VCSETUP.COM` next to a C tree.
+
 ## The portable C: what another compiler says of it
 
 The portable C is built by one compiler, for DOS. The test
@@ -1436,8 +1500,9 @@ bits, and counts each place that gcc refuses and each that only Open
 Watcom reads. `harness/hostcheck.txt` has the counts of every file, and
 the test holds the tree to them, so the record is always what is so:
 the top of the script says how. This is what the kinds are waiting
-for, with the counts of when it was written; the test prints them as
-they stand.
+for, with the counts of when it was written, but for the three kinds
+that lost places when the entry of INT 21h went, which are as they
+stand since; the test prints them all as they stand.
 
 1,033 places in 38 of the 58 files, the three headers among them.
 Twenty files are clean: the twelve of tables, `sys.h`, and `blank.c`,
@@ -1457,10 +1522,10 @@ files that ask through it make fewer pointers of numbers.
 | `to-number` | 595 | 33 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets: see below |
 | `to-pointer` | 390 | 28 | A number of 16 or 32 bits made a pointer | The same. Where the address is the machine's, the screen in `window.c` and DOS's routine for capitals in `dos.c`, the system interface |
 | `layout` | 2 | 1 | `BOXHD` and `BOXMN` of `tables.h`, the header and a field of a dialog, are not as long as on DOS: each holds a pointer, which is a word there | Tables that are not held to the original's bytes where a pointer is no word: `LAID_OUT` for DOS alone, when the routines that read them take pointers |
-| `function` | 6 | 2 | The address of a function kept as that of data, for a vector of an interrupt, and once the other way, the call into the PSP | The system interface |
-| `interrupt` | 7 | 3 | `__interrupt`, where a function is declared or defined: `CtrlC`, `Int21` and `Exit05` of `resident.c`, `FatErr` of `main.c` | The system interface: what DOS enters is of DOS, and goes to a file that only the build for DOS has |
+| `function` | 5 | 2 | The address of a function kept as that of data, for a vector of an interrupt, and once the other way, the call into the PSP | The system interface |
+| `interrupt` | 5 | 3 | `__interrupt`, where a function is declared or defined: `CtrlC` and `Exit05` of `resident.c`, `FatErr` of `main.c` | The system interface: what DOS enters is of DOS, and goes to a file that only the build for DOS has |
 | `loadds` | 3 | 1 | `__loadds`: `Alloc0` and `Exec2E` of `resident.c` | The same |
-| `naked`, `asm` | 3, 3 | 1 | The three functions of `resident.c` that are their `_asm`: `New21`, `Exit01` and `Int2E` | The same |
+| `naked`, `asm` | 2, 2 | 1 | The two functions of `resident.c` that are their `_asm`: `Exit01` and `Int2E` | The same |
 | `asm-pragma` | 7 | 1 | The seven pieces of inline assembly of `dos.c`, a `#pragma aux` each | The same: `dos.c` is the side of that interface which is DOS |
 | `registers` | 4 | 3 | A `#pragma aux` that names registers: `__U4M` and `__U4D` of `arith.c`, `CaseMapFn` of `dos.c`, `Int2E` of `resident.c` | The same for the last two. `arith.c` is Open Watcom's own, and another compiler's build leaves the file out |
 | `intrinsic` | 1 | 1 | `_disable` and `_enable` of `dos.c` | The system interface |
@@ -1594,8 +1659,8 @@ left open:
   a command runs (the README has how much, under "The figures"). On the
   bench a second copy of it starts and has no memory to run a command,
   and behind a program that has stayed in the memory it does not start:
-  `second-copy`, `start-memory` and `ended` have goldens of the portable
-  C's own that show that, and `passed-on` is not run. Whether that is
+  `second-copy`, `start-memory` and `ended` have patches of the
+  original's goldens that show that, and `passed-on` is not run. Whether that is
   what "functionally equivalent" allows is the user's to say. What
   would give the memory back without giving the program up again: the
   buffers of the main data that are rebuilt after a command anyway, 57
@@ -1607,10 +1672,10 @@ left open:
   having no XMS driver to swap itself out to, and the bench is the same
   for every tree and every golden. What that scenario holds of the
   entry of INT 21h, `New21`, the flags that a call is handed on with
-  and the caller's stack left alone, `handed-on` holds with one copy,
-  against the original's golden with a patch since the watch on DOS
-  has gone from it: three calls that the original deals with are handed
-  on like any other there. INT 27h the portable C does not take.
+  and the caller's stack left alone, `handed-on` held with one copy
+  while the portable C had that entry. It has none any more, and takes
+  neither INT 21h nor INT 27h: both scenarios have nothing to show of
+  it, and neither is run.
 - The file is longer than it has to be: the README has how long,
   under "The figures", and the scenarios' test holds the portable C to
   no multiple of the original's size any more. The main data's zeros
@@ -1689,30 +1754,23 @@ in the memory are gone from the portable C
 
 - The program's own call (AH 2Bh, CX 'VC', DX 'OM'), by which the
   original's setup program reads and writes the setup of a program that
-  is in the memory, is all that the entry of INT 21h is still there
-  for: `New21`, eight instructions of assembly that every call of DOS by
-  any program passes, the interrupt function `Int21`, `Vect21` in the
-  code segment, and the interrupt taken when the program starts and
-  given back when it leaves or DOS ends it. No other program is known
-  to make the call. It is a thing of DOS as much as the watch was, and
-  it goes when the setup program has been ported into the portable C,
-  step 0 of the road in `CLAUDE.md`, "The portable C": there is one
-  program then, setup is an item of its Options menu, and nothing asks
-  a running copy for its data. `New21`, `Int21` and `Vect21` go with
-  the call, and the last reason for `handed-on` and for `asked`. Until
-  then the call stays as it is.
-- The original takes INT 21h only if its setup has TSR manager on, and
-  the portable C, which has no such option, takes it always. A setup
-  with that byte 0 is one where the original cannot be asked for its
-  data and the portable C can.
-- When DOS ends the program, the program that started it gets DS:DX as
-  the portable C leaves them, where INT 21h went before, an address
-  that follows the layout of the program when that is a first copy's
-  entry: `ended` prints it, and `harness/deviations.py` leaves the two
-  words out of the comparison, for a line that only the portable C
-  prints. Nothing reads those registers but that scenario; they are left
-  as the assembly would leave them without what is gone, and could as
-  well be left alone.
+  is in the memory, was all that the entry of INT 21h was still there
+  for when the map went. It is gone since, with the entry: the setup
+  program is a part of the portable C, step 0 of the road in
+  `CLAUDE.md`, "The portable C", and nothing asks a running copy for
+  its data. `New21`, `Int21` and `Vect21` went with the call, and the
+  interrupt is neither taken nor given back
+  (`src/portable_c/DEVIATIONS.md`, 8; "Piece E1" in the plan above).
+  `handed-on` and `asked` are not run for the portable C.
+- When DOS ends the program, the program that started it gets the
+  registers as the portable C leaves them: ES on the PSP, the low byte
+  of DX what DOS was last told of Ctrl-C, and the rest as it came, DS
+  among them, which is on the program that started this one. That is
+  what the original leaves where its setup has TSR manager off. `ended`
+  prints DS and DX, and `harness/deviations.py` leaves DS out of the
+  comparison, for a line that only the portable C prints: the segment
+  of the program that prints follows the size of the program under
+  test. Nothing reads those registers but that scenario.
 - `SetStat` is called with 0 where the program begins, as in the
   original: DOS is told to look for memory in the lowest block first,
   and not in the upper memory, whatever it did before, and is not told
@@ -1769,14 +1827,16 @@ DOS and is not behind it yet.
   kept: the order in which DOS is asked, which is both vectors read and
   then both set in `HookVct`; and that `SetBrk` of `resident.c` names
   `CtrlC` too, for DOS's Ctrl-C.
-- The program's own call of DOS, and what DOS does when it ends the
-  program: `New21`, `Int21`, `Exit01` and `Exit05` of `resident.c`,
-  with `TakeDos`, which takes INT 21h by `Vector` and `PutVector` of
-  `dos.c` and has the PSP name `Exit01`, and `Exit02`, which gives the
-  interrupt back. They are entered by DOS and by other programs, with
-  what assembly that takes, and name the two interrupts by their
-  numbers. The call goes with the setup program ported, as said above
-  under what the map of the memory has left, and its entry with it.
+- What DOS does when it ends the program: `Exit01` and `Exit05` of
+  `resident.c`, with `TakeEnd`, which has the PSP name `Exit01`, and
+  `Exit02`, which has DOS look for Ctrl-C as before and leaves the
+  registers for the program that started this one. `Exit01` is entered
+  by DOS, on that program's stack, with what assembly that takes. The
+  program's own call of DOS was here too, with its entry of INT 21h,
+  `New21` and `Int21`, and `PutVector` of `dos.c`, which wrote into the
+  machine's table of interrupts: they went when the setup program had
+  been ported, as said above under what the map of the memory has
+  left.
 - The start of the program on DOS, `Alloc0` of `resident.c`. It asks
   through `sys.h` now, for the PSP, the version and the block of the
   program made its own size, and still knows what is of DOS: that a DOS

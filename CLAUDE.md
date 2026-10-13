@@ -1463,7 +1463,8 @@ in "The portable C".
     a header that asked DOS for a megabyte.
   - A variable declared `CODE` and `static` has the compiler's name for
     data, and the data's test takes it for a constant of the original's
-    name: `VARIABLES` of `harness/reads.py` has `Vect21`.
+    name: `VARIABLES` of `harness/reads.py` is for such a one, and had
+    `Vect21` until that went with the entry of INT 21h.
   - A text of the original's name may be a function's in another file:
     `Command`, "COMMAND.COM", and `Command` of `main.c`. It is declared
     in the file that reads it, not in `vc.h`.
@@ -1779,20 +1780,23 @@ in "The portable C".
     address in the program, once the program leaves another thing
     there than the original: it follows the layout and changes with
     every step of the work. `ended` prints DS:DX as the program leaves
-    them, and `IGNORED` of `harness/deviations.py` has the two words
-    left out for the line that only the portable C prints. Look for
-    such a figure in every patch before it is committed: it passes
-    today and fails for the next agent.
-  - What leaned on the watch and stays: the entry of INT 21h for the
-    program's own call, with nothing of the watch in it; the prompt
-    between two commands, which the original writes where the watch
-    notes the interrupts, `PromptLine` of `resident.c`; and `SetStat`
-    with 0 where the program begins. Read what a buffer or a routine of
-    the thing is used for elsewhere before it goes: `grep` its name in
-    the whole tree, the routine's and the buffer's.
+    them, and `IGNORED` of `harness/deviations.py` had the two words
+    left out for the line that only the portable C prints, while they
+    were where INT 21h went before; it has one of them left out since
+    (the note on the program's own call, below). Look for such a
+    figure in every patch before it is committed: it passes today and
+    fails for the next agent.
+  - What leaned on the watch and stayed: the entry of INT 21h for the
+    program's own call, with nothing of the watch in it, until that
+    call went too; the prompt between two commands, which the original
+    writes where the watch notes the interrupts, `PromptLine` of
+    `resident.c`; and `SetStat` with 0 where the program begins. Read
+    what a buffer or a routine of the thing is used for elsewhere
+    before it goes: `grep` its name in the whole tree, the routine's
+    and the buffer's.
   - A handler that no longer goes on in another handler needs no room
-    on the stack for a second return address: `Int21` returns to
-    whoever called, and `New21` jumps to it without the three
+    on the stack for a second return address: `Int21` returned to
+    whoever called, and `New21` jumped to it without the three
     instructions that made the room. `Exit01` still has them.
 - The setup program, step 0 of the road, has its plan in `TODO.md`,
   "The setup program in the portable C: the plan": what the program is,
@@ -1980,6 +1984,38 @@ in "The portable C".
     by, is not mended there: the scenario first has that line gone
     from the screen. `setup-lines` does, for the corner that the key
     bar's 81st cell blanks.
+- What taking out the program's own call met, with the entry of INT
+  21h that was left for it (`src/portable_c/DEVIATIONS.md`, 8; "Piece
+  E1" of the plan in `TODO.md`):
+  - What a thing leaves behind when it goes may be a path that the
+    original has too, by a setting: with no interrupt to give back,
+    the registers that the program leaves when DOS ends it are those
+    that the original leaves with TSR manager off. Such a path can be
+    seen on the bench before it is written down: a scenario that is
+    not kept, the steps of another behind the steps that set the
+    original up so, derived from the original by `python3
+    harness/goldens.py derive NAME`, read, and taken out again with
+    its golden.
+  - A figure that is left out of the comparison is looked at again
+    when what made it follow the program's size goes: of the two words
+    of `ended` one is the same on every build now and is compared, and
+    the other, a segment as it came, is that of a program that lies
+    behind the program under test and still follows its size. Leaving
+    less out needs no asking; the patch is made again and both rows
+    read.
+  - A scenario that showed the thing through a second scenario's eyes
+    says so where it is declared not run: `passed-on` named
+    `handed-on`, and `stay` named `asked`, in `harness/deviations.py`
+    and in two entries of `DEVIATIONS.md`. `grep` the names of the
+    scenarios that go, not only of the functions.
+  - An entry of `VARIABLES` of `harness/reads.py`, or of any table of
+    the harness that is by name, fails the data's test when the object
+    has gone: take it out with the object. A function of a batch that
+    has gone is in `GONE` of `harness/ported.py`, and a batch may have
+    every function there.
+  - `harness/hostcheck.txt` has fewer places for such a change, and
+    the test fails for fewer as for more: `--record`, in the same
+    commit.
 - What the help of the setup program met, the first of its pieces to
   have code, before the setup could be entered:
   - Every C file of `src/portable_c/` is in the next build, by its
@@ -2076,7 +2112,7 @@ is called both ways the bare function says so in its name.
 | 56h | asked | `FileRename(from, to)` |
 | 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |
 | 60h | asked | `FileTrueName(name, to)` |
-| 25h, 35h | bare | `SetVector(number, to)`, `Vector(number)`, of `vc.h` and not of `sys.h`; `PutVector(number, to)` beside them writes the machine's table without DOS |
+| 25h, 35h | bare | `SetVector(number, to)`, `Vector(number)`, of `vc.h` and not of `sys.h`; `PutVector(number, to)` beside them wrote the machine's table without DOS, for INT 21h, and went with that |
 
 The BIOS for the screen, `Int10`, by AH: 0Fh is `ScreenState()`, 0
 `ScreenSetMode(mode)`, 1 `CursorShape(shape)`, 2 `CursorTo(page,
@@ -2447,7 +2483,8 @@ function is added:
   compile. What `tools/calls.py` still watches in the portable C is its
   last kind, a fixed address of the machine written outside `dos.c`,
   and not where the segment comes from a variable, as it has to for
-  the table of interrupts: `PutVector` of `dos.c` is where that is.
+  the table of interrupts: `PutVector` of `dos.c` was where that was,
+  and nothing writes that table now.
 - The whole suite takes three minutes with `ctest --test-dir build
   -j8`: the tests that read the source are done within the first ten
   seconds, and from then on the source may be edited while the

@@ -1,7 +1,6 @@
 /*
  * The program and DOS around it: where the program begins and where it
- * ends, the commands of DOS that it runs, and the program's own call of
- * DOS.
+ * ends, and the commands of DOS that it runs.
  *
  * In the original, and in the C translation after it, this is the part
  * of the program that stays in the memory while a command runs, which
@@ -12,32 +11,32 @@
  * of it like any other: DS is on the program's data, md is the main
  * data, and its variables are variables.
  *
- * Three things are here. The program begins here, at Alloc0: DOS enters
+ * Two things are here. The program begins here, at Alloc0: DOS enters
  * it there.
  *
  * The second is the commands: Exec runs those that the command line
  * holds, DosBuf, by COMMAND.COM or by the interrupt that COMMAND.COM has
  * for that; and what the program does when it leaves, or when DOS ends
- * it.
+ * it. Where DOS ends it, Exit01, is entered on the stack of the program
+ * that started this one: nothing there takes the stack to be the
+ * program's own, and a pointer to a local variable is declared STACK, as
+ * everywhere.
  *
- * The third is the program's own call of DOS, by which another program
- * asks it for its data, as the original's setup program does. For that
- * the program takes INT 21h while it runs, and while a command runs from
- * it: every call of DOS comes by New21, which passes on all but that
- * one. The original has more there, its watch on DOS: it notes which
- * program is being run, and when one stays in the memory, by DOS's call
- * for that or by INT 27h, it writes down who it is and which interrupts
- * it has taken; with those records the map of the memory, Alt+F5, lists
- * the programs and releases them. The portable C has no such map and
- * keeps no such watch (see DEVIATIONS.md). New21 and what it goes on in
- * are entered from other programs, on their stacks: nothing there takes
- * the stack to be the program's own, and a pointer to a local variable
- * is declared STACK, as everywhere.
+ * The original has a third here, which takes INT 21h, DOS's own
+ * interrupt, while the program runs and while a command runs from it.
+ * It is the program's own call of DOS, by which another program asks it
+ * for its data, as the original's setup program does; and its watch on
+ * DOS, which notes which program is being run, and when one stays in the
+ * memory, by DOS's call for that or by INT 27h, writes down who it is
+ * and which interrupts it has taken: with those records the map of the
+ * memory, Alt+F5, lists the programs and releases them. The portable C
+ * has no such map and keeps no such watch, has the setup program in
+ * itself, which asks nobody, and takes neither interrupt (see
+ * DEVIATIONS.md): a call of DOS goes to DOS.
  */
 #include "vc.h"
 
 #define LenCmd  124                     /* Length of command line */
-#define VcApiVr 42
 
 /*----------------------- The data -----------------------
    First the constants: the name that COMMAND.COM has when the
@@ -69,11 +68,6 @@ static u32 Vect22;
    bytes with its zero, and five characters around them. */
 static u8 PromptLine[2 + 3 + 64 + 1 + 1];
 
-/* Where INT 21h went before the program took it. This one is of the
-   code's segment, not of the data: New21 passes a call of DOS on with
-   no register to find the data by, and CS is all that it has. */
-static u32 CODE Vect21;
-
 /* A text of main_t.c, for a DOS that is too old. */
 extern const u8 __far Vers_S[];
 
@@ -88,9 +82,7 @@ extern const u8 __far Vers_S[];
 /* Where a routine is, as an address for DOS and for a return. */
 #define ROUTINE(function) ((const u8 __far *)(void __far *)(function))
 
-/* The interrupts that the program takes here: DOS's own, for the
-   program's call, and Ctrl-C of DOS. */
-#define INT_DOS    0x21
+/* The interrupt that the program takes here: Ctrl-C of DOS. */
 #define INT_CTRL_C 0x23
 
 #define FLAG_CARRY     0x0001
@@ -98,8 +90,6 @@ extern const u8 __far Vers_S[];
 #define FLAG_AUX       0x0010
 #define FLAG_ZERO      0x0040
 #define FLAG_SIGN      0x0080
-#define FLAG_TRAP      0x0100
-#define FLAG_INTERRUPT 0x0200
 #define FLAG_OVERFLOW  0x0800
 
 /* The six that an instruction leaves of what it has worked out. */
@@ -117,7 +107,7 @@ extern const u8 __far Vers_S[];
 #define EPB_WAS     WAS(&md.EPB)
 #define RESPARS_WAS 0x031A
 
-/* The return address that an interrupt leaves on the stack, behind the
+/* A return address as an interrupt leaves one on the stack, behind the
    registers that an interrupt function of the compiler saves there:
    struct Saved of vc.h. */
 struct Frame {
@@ -170,106 +160,6 @@ static u16 Taken(u16 a, u16 b)
    nothing. */
 void __interrupt __far CtrlC(void)
 {
-}
-
-void __interrupt __far Int21(struct Saved r, struct Frame back);
-
-/* INT 21h arrives here, every call of DOS that any program makes while
-   this one is in the memory. Of all but one of them the program wants
-   nothing, and for those it takes nothing either: no register changed
-   and not a byte of the caller's stack, which may be short. They go on
-   in the handler that had the interrupt before, with the flags of the
-   comparison that sent them there, as in the assembly. Only the
-   program's own call goes on to Int21: AH 2Bh with 'VC' in CX and 'OM'
-   in DX.
-
-   The original deals with three calls more, for its watch on the
-   programs that stay in the memory, which the portable C does not keep
-   (see DEVIATIONS.md): a program run, AH 4Bh, one that stays, 31h, and
-   a block of memory given back, 49h. Here they are passed on like any
-   other.
-
-   Why this is assembly, all eight instructions: what the compiler makes
-   saves registers before it compares, on the caller's stack, and cannot
-   jump to another handler with the stack as it found it; a function
-   without that, naked, is given no instruction for a statement of C at
-   all; an ordinary one with the call in AX, nothing to change and the
-   jump as a call that does not return makes itself room on the stack,
-   changes AL to compare, reads the old address through the caller's DS
-   or through an ES that it loads, and jumps with BP still pushed
-   (tried, with this compiler). And the flags that the handler before is
-   entered with are those of these comparisons, which C cannot promise
-   of anything. The old address is read through CS, which is why it is a
-   variable of the code's segment. */
-__declspec(naked) void __far New21(void)
-{
-    _asm {
-        cmp ah,2Bh
-        jne old
-        cmp cx,5643h
-        jne old
-        cmp dx,4F4Dh
-        jne old
-        jmp Int21
-    old:
-        jmp dword ptr cs:Vect21
-    }
-}
-
-/* INT 21h, the one call that New21 does not pass on. Another program
-   asks for this one's data, the program's own call (AH 2Bh, CX 'VC', DX
-   'OM'): it gets in ES:BX the first panel for AL 0, the second for 1 and
-   the main data for anything else, and the number of this interface in
-   AH. An interrupt function of the compiler's saves the registers and
-   finds DS, and has them as `r`, to read and to change; `back` is what
-   the interrupt left on the stack, the place it came from and the flags
-   that it had, which the function returns to and with.
-
-   The original hands out what it keeps of the three while a command
-   runs, copies in the part of it that stays in the memory: of the main
-   data what it has before DosLin, of a panel what it has before ExtBuf
-   and behind that 13 bytes of every file. Here it is the panel and the
-   main data themselves, which begin as those copies do; the files of a
-   panel are where a panel has them, 24 bytes each (see DEVIATIONS.md).
-
-   Ported as it is: the call returns with the flags as the original's
-   handler has them, not as its caller had them. The carry flag is
-   clear, which is the answer; interrupts are still off, as every
-   interrupt begins; and the other flags are those of AL compared with
-   1. */
-void __interrupt __far Int21(struct Saved r, struct Frame back)
-{
-    u8 which = (u8)r.ax;                /* VCapi */
-    u8 less = which - 1;
-    u8 bits = less;
-    u16 flags = back.flags
-        & ~(FLAG_CARRY | FLAG_PARITY | FLAG_AUX | FLAG_ZERO | FLAG_SIGN
-            | FLAG_TRAP | FLAG_INTERRUPT | FLAG_OVERFLOW);
-
-    bits ^= bits >> 4;
-    bits ^= bits >> 2;
-    bits ^= bits >> 1;
-    if (!(bits & 1))
-        flags |= FLAG_PARITY;
-    if (!(which & 0x0F))
-        flags |= FLAG_AUX;
-    if (less == 0)
-        flags |= FLAG_ZERO;
-    if (less & 0x80)
-        flags |= FLAG_SIGN;
-    if (which == 0x80)
-        flags |= FLAG_OVERFLOW;
-    back.flags = flags;
-    r.bx = 0;
-    if (which < 1)
-        r.es = md.WCB1seg;
-    else if (which == 1)
-        r.es = md.WCB2seg;
-    else {
-        r.es = MAIN_SEG;
-        r.bx = (u16)&md;
-    }
-    r.ax = VcApiVr * 0x100;
 }
 
 /*------------------- Execute commands ------------------*/
@@ -326,30 +216,31 @@ void SetBrk(void)
     SetVector(INT_CTRL_C, (u32)ROUTINE(CtrlC));
 }
 
-/* Leave: have DOS look for Ctrl-C as it did, and give INT 21h back.
-   Then end the program with `code`, unless DOS has ended it already and
-   this is where it went on: then return.
+/* Leave: have DOS look for Ctrl-C as it did. Then end the program with
+   `code`, unless DOS has ended it already and this is where it went on:
+   then return.
 
    The original first releases the programs that have stayed in the
    memory since it was started, by the list that its watch on DOS keeps,
-   and gives INT 27h back as well; the portable C keeps no such list and
-   does not take that interrupt (see DEVIATIONS.md). What a command has
-   left in the memory stays there when the program leaves.
+   and gives INT 21h and INT 27h back, if its setup has it keep that
+   watch; the portable C keeps no such list and takes neither interrupt
+   (see DEVIATIONS.md). What a command has left in the memory stays there
+   when the program leaves.
 
    `r` and `flags` are the registers and the flags that this was entered
-   with, and they are left as the assembly leaves its own, without what
-   is gone, for the program that this returns to when DOS has ended this
-   one: ES on the segment of this program's PSP, and DS:DX the address
-   that INT 21h went to before, which DOS was told last. The others are
-   as they came. The flags are those of the segment that the program
-   goes on in, compared with 0. */
+   with, and they are left as the assembly leaves its own where it has
+   taken no interrupt, without what is gone, for the program that this
+   returns to when DOS has ended this one: ES on the segment of this
+   program's PSP, and in DL what DOS was just told of Ctrl-C. The others
+   are as they came, DS and the high byte of DX among them, where the
+   original that has taken the two interrupts leaves the address that
+   the second went to before. The flags are those of the segment that
+   the program goes on in, compared with 0. */
 static void Exit02(u16 code, struct Saved STACK *r, u16 STACK *flags)
 {
     r->es = PspSeg;                     /* Exit01 */
     SetBreakCheck(md.BreakFl);
-    SetVector(INT_DOS, Vect21);         /* Exit03 */
-    r->ds = (u16)(Vect21 >> 16);
-    r->dx = (u16)Vect21;
+    r->dx = r->dx & 0xFF00 | md.BreakFl;
     if ((u16)(Vect22 >> 16) == 0)       /* Exit04 */
         ProgramEnd(code);
     *flags = *flags & ~FLAGS_RESULT | Taken((u16)(Vect22 >> 16), 0);
@@ -401,20 +292,19 @@ void __interrupt __far Exit05(struct Saved r, struct Frame on)
     on.cs = (u16)(Vect22 >> 16);
 }
 
-/* Have the program go on in Exit01 when DOS ends it, and take INT 21h,
-   for the program's own call: when the program has started.
+/* Have the program go on in Exit01 when DOS ends it: when the program
+   has started. This was TakeDos while it took INT 21h as well.
 
-   The original takes INT 21h only if its setup has it know of the
-   programs that stay in the memory, TSR manager of its setup program,
-   as it has when it is distributed, and INT 27h with it. The portable C
-   keeps no such watch (see DEVIATIONS.md), and takes INT 21h whatever
-   that byte of the setup is. */
-void TakeDos(void)
+   The original takes INT 21h here too, and INT 27h with it, if its
+   setup has it know of the programs that stay in the memory, TSR manager
+   of its setup program, as it has when it is distributed: for that
+   watch, and for the program's own call, by which its setup program
+   asks it for its data. The portable C keeps no such watch and has the
+   setup in itself (see DEVIATIONS.md), and takes neither. */
+void TakeEnd(void)
 {
     Vect22 = PSP_EXIT;
     PSP_EXIT = (u32)ROUTINE(Exit01);
-    Vect21 = Vector(INT_DOS);
-    PutVector(INT_DOS, (u32)ROUTINE(New21));
 }
 
 /* No memory: say so and leave. `bx` is what the assembly has in BX

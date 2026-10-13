@@ -1327,6 +1327,13 @@ GONE = {
             "the map of the memory lists and releases: the portable C "
             "keeps no such watch, does not take INT 27h, and releases "
             "nothing"),
+        **dict.fromkeys(
+            ("New21", "Int21_"),
+            "the entry of INT 21h, for that watch and for the program's "
+            "own call, by which the original's setup program asks a "
+            "program that is running for its data: the portable C has "
+            "the setup in itself, nothing makes that call, and it does "
+            "not take INT 21h"),
     },
 }
 

@@ -195,14 +195,16 @@ IGNORED = [
     # ended prints six of them: CX, SI, DX and DS as how far they are
     # from where INT 27h goes, ES and the flags. The original leaves in
     # DS:DX where INT 27h went before it took that, and the line has 0000
-    # for both. The portable C does not take INT 27h (DEVIATIONS.md, 7)
-    # and leaves where INT 21h went before, which for the second copy of
-    # the scenario is the entry of the first: an address in the program,
-    # which follows its size and how it is laid out. The line is known by
-    # CX and SI as p.com sent them, 2222 and 1111, which only the
-    # portable C leaves as they came; the two words are left out, the
-    # others compared.
-    re.compile(r"^2222 1111 ([0-9A-F]{4} [0-9A-F]{4}) 0000 [0-9A-F]{4} +$"),
+    # for both. The portable C takes neither INT 27h nor INT 21h
+    # (DEVIATIONS.md, 7 and 8) and leaves DS as it came, which is on the
+    # program that started it, p.com: that lies behind the first copy of
+    # the program and the COMMAND.COM that the copy ran it by, so its
+    # segment follows the size of the program. The line is known by CX
+    # and SI as p.com sent them, 2222 and 1111, which only the portable
+    # C leaves as they came; the one word is left out, the others
+    # compared, DX among them, which is as far from DOS's own entry of
+    # INT 27h on every build.
+    re.compile(r"^2222 1111 [0-9A-F]{4} ([0-9A-F]{4}) 0000 [0-9A-F]{4} +$"),
 ]
 
 # Deviations that show on no screen, and so change no golden. They are
@@ -334,6 +336,10 @@ def found(steps, some):
 _NO_MAP = ("it shows the map of the memory, Alt+F5, and the programs "
            "that stay in the memory listed and released there: the "
            "portable C has no such map and keeps no such list")
+_NO_CALL = ("it shows the program asked for its data by another "
+            "program, by the call of DOS that is the program's own, as "
+            "the original's setup program asks: the portable C has the "
+            "setup in itself and answers no such call")
 _FDAPM = '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter'
 _NO_SETUP_YET = ("the portable C has no setup yet: what the scenario "
                  "shows of it is still to be translated")
@@ -350,23 +356,33 @@ TREES = {
     # has no Memory allocation in its Options menu; it has no map of
     # the memory, Alt+F5, and no watch on the programs that stay in the
     # memory; and it has the setup program in itself, an item of its
-    # Options menu.
+    # Options menu, so it answers no call of DOS of its own and does not
+    # take INT 21h.
     "portable_c": Declared(
         not_run={
             "memory": "it switches Memory allocation off and shows the "
                       "menu without its mark: the portable C has no such "
                       "option",
-            "passed-on": "it has a program stay in the memory between "
-                         "two copies and runs commands from the second: "
-                         "with all of each copy kept, the machine of the "
-                         "tests has no memory for the second copy behind "
-                         "that program. handed-on sees the same with one "
-                         "copy",
+            "passed-on": "it shows what a second copy of the program "
+                         "hands on of the calls of DOS that pass it, by a "
+                         "program that stays in the memory between the two "
+                         "copies: the portable C does not take INT 21h, "
+                         "and no call of DOS passes it. Nor has the "
+                         "machine of the tests the memory for a second "
+                         "copy behind that program, with all of each copy "
+                         "kept",
             "memory-map": _NO_MAP,
             "memory-map-russia": _NO_MAP,
             "mouse-memory": _NO_MAP,
             "stay": _NO_MAP + ". What it has besides, a program that asks "
-                    "the program for its data, asked has by itself",
+                    "the program for its data, the portable C does not "
+                    "answer either: see asked",
+            "asked": _NO_CALL,
+            "handed-on": "it shows how the program hands on the calls of "
+                         "DOS that pass it, by a program that puts itself "
+                         "behind the program's entry of INT 21h: the "
+                         "portable C does not take that interrupt, and no "
+                         "call of DOS passes it",
             # The scenarios of the setup program, until the tree has the
             # code that each shows: an entry goes with the commit that
             # makes its scenario pass (TODO.md, "The setup program in the
