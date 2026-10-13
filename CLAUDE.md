@@ -1362,9 +1362,9 @@ in "The portable C".
   taken out.
 - What still has registers in a `#pragma aux`, and stays so until the
   thing itself changes: the inline assembly of `dos.c`; `__U4M` and
-  `__U4D`, whose registers are the compiler's; `CaseMapFn`, DOS's
-  routine; and `Int2E`, whose command is in DX:SI, in `dos.c` since
-  the piece S3.
+  `__U4D`, whose registers are the compiler's; and `CaseMapFn`, DOS's
+  routine. `Int2E`, whose command was in DX:SI, in `dos.c` since the
+  piece S3, went with Quick execute commands.
 - An object has the compiler's name in the map, `_Name`, where the C
   translation takes the underscore off with `#pragma aux Name "*"`:
   `harness/datacheck.py` knew an object by either, and no name of the
@@ -2047,6 +2047,46 @@ in "The portable C".
     lines does when the screen gets shorter, changes screens many
     steps on, wherever a panel is off: leaving its steps out wants
     those rows in a patch.
+- What taking Quick execute commands out met, the first setting to go
+  from a dialog of the main program (`src/portable_c/DEVIATIONS.md`,
+  14; `TODO.md`, "The portable C: without Quick execute commands"):
+  - A dialog of one column that loses a line is a row shorter, and the
+    row that it no longer covers shows what is behind it, another thing
+    in every scenario: a patch for each scenario that shows the dialog,
+    and no rule. Some thirty open the Advanced options only to untick
+    Clear keyboard buffer for the editor, which stood below the line
+    that went: each has a patch for that and a step in place of
+    another. One entry of `in_place_of` for the same keys everywhere
+    would have been wrong: the same keys tick the Clock in the setup's
+    Configuration, in `setup-clock`. They are `in_place_in`, by the
+    scenario's name, behind the step that opens the dialog.
+  - A patch that is made again for a second deviation is read against
+    the one before, not against the original: the patch of before,
+    `git show HEAD:harness/goldens/portable_c/NAME.patch` in a file of
+    `build/`, is made to the golden by `goldens.read(name, tree,
+    patched=goldens.read_patch(file, tree))`, what the new declaration
+    says is made to that, and what the golden with the new patch has
+    otherwise is the reading list. That works where the steps are as
+    they were; where steps are left out now, the old patch does not
+    fit, and the screens are held against the original with the whole
+    declaration made.
+  - A function of `sys.h` that goes is in more places than those which
+    the notes on the system's functions list: the toy that holds the
+    two files of the system together, `harness/trial32/sys.c`; a table
+    of `dos32.c` alone in `OWN_OF_FLAT` of `harness/datacheck.py` and
+    in `REVIEWED` of `harness/reads.py`; the count at the top of
+    `dos32.c` of those that are made in real mode; the count of the
+    functions in the README, in its text and in its table by group;
+    and the layout of the block below the megabyte, where what stands
+    behind the bytes that go moves down.
+  - The piece waited while two others landed, and what bringing it
+    onto them met is in its section of `TODO.md`, "What landing it
+    met": above all a count that both sides had each taken one from,
+    which git merged without a word and which was wrong.
+  - A call of DOS that was made for the feature alone goes with it and
+    is said in the entry: DOS was asked for the current drive in two
+    places for the command that went there first. No test counts the
+    calls that the portable C makes for itself.
 - The setup program, step 0 of the road, has its plan in `TODO.md`,
   "The setup program in the portable C: the plan": what the program is,
   what the portable C has of it already, how it becomes a part of the
@@ -2616,7 +2656,7 @@ is called both ways the bare function says so in its name.
 | 4Ah, of the program's own block | bare | `MemOwn()`: the block that DOS loaded the program into made as long as the program is. Which block that is and how long the program is, `dos.c` knows |
 | 5801h, 5803h | bare | `MemSetSearch(how)`, `MemSetUpper(on)` |
 | 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is `dos.c`'s to make |
-| INT 2Eh, COMMAND.COM's own | | `ShellRun(command)`, which comes back: the stack is kept and put back around the interrupt in `dos.c` |
+| INT 2Eh, COMMAND.COM's own | | Was `ShellRun(command)`, which came back, the stack kept and put back around the interrupt in `dos.c`: it went with Quick execute commands (`src/portable_c/DEVIATIONS.md`, 14) |
 | 4Ch | bare | `ProgramEnd(code)` |
 | INT 20h, entered at the start of the PSP | | `ProgramEndOld()`, for a DOS before 3 |
 | The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake()` and `ProgramEndedGive()`: the PSP names `Exit01` of `dos.c` between the two, which has DOS told what the program has said beforehand, `ProgramEndedBreakCheck(on)`, when DOS has ended the program. It called a function of the program's, `told`, until the program of 32 bits had to do the same |

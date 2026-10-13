@@ -622,7 +622,6 @@ The lines that say something of registers still, and why:
 | Inline assembly: the instruction and the registers it takes and leaves | every piece of `src/portable_c/dos.c` |
 | The compiler's own routines for arithmetic on 32 bits, which it calls with registers of its choosing | `__U4M`, `__U4D` of `arith.c` |
 | DOS's routine for capitals, which is no function of the program: called through a pointer, with the letter in AL | `CaseMapFn` of `dos.c` |
-| The command for COMMAND.COM's INT 2Eh, in DX:SI, for a function that is inline assembly and has DS:SI on it as the interrupt takes it | `Int2E` of `dos.c` |
 
 The other lines of `#pragma aux` say that a function does not return,
 `aborts`; [the figures](#the-figures) have how many lines there are in
@@ -661,29 +660,29 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 196,614 bytes |
+| `VC.EXE` | 196,330 bytes |
 | as a multiple of the original's 65,090 bytes | 3.02 |
-| more than the C translation's 133,056 bytes | 63,558 bytes |
-| The relocations in its header, which DOS applies | 1,032 |
-| What it keeps of the memory while a command runs: the program and its panels | 206,256 bytes |
-| What DOS has for a command then, on the bench of the tests | 219,280 bytes |
-| The code segment `CTEXT` ends at | D0D9h, 7,975 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C5B6h, 10,826 bytes below the limit, F000h |
-| Inline assembly | 55 instructions in 9 pieces: 55 in 9 of `dos.c` |
-| Lines of `#pragma aux` | 17, of which 6 say that a function does not return |
+| more than the C translation's 133,056 bytes | 63,274 bytes |
+| The relocations in its header, which DOS applies | 1,029 |
+| What it keeps of the memory while a command runs: the program and its panels | 205,968 bytes |
+| What DOS has for a command then, on the bench of the tests | 219,568 bytes |
+| The code segment `CTEXT` ends at | D091h, 8,047 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C54Dh, 10,931 bytes below the limit, F000h |
+| Inline assembly | 41 instructions in 8 pieces: 41 in 8 of `dos.c` |
+| Lines of `#pragma aux` | 16, of which 6 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 752, 106, 262, 92 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 751, 103, 262, 92 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
-| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,375 bytes, of which the extender's stub is 27,536 |
-| Its code, and what the file has of its data | 132,502 and 104,563 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,053 bytes |
-| The addresses in it that the extender sets when it loads it | 5,292 |
-| The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c32-data` holds them | 643 and 555 |
+| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,095 bytes, of which the extender's stub is 27,536 |
+| Its code, and what the file has of its data | 132,207 and 104,411 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 892,606 bytes |
+| The addresses in it that the extender sets when it loads it | 5,274 |
+| The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c32-data` holds them | 640 and 554 |
 | Its stack | 16,384 bytes |
-| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,176 and 16,420 bytes |
-| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,352 and 2,347 bytes |
-| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 400,851 bytes, 223,238 of them code |
+| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,232 and 16,516 bytes |
+| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,460 and 2,347 bytes |
+| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 400,587 bytes, 222,838 of them code |
 | Inline assembly of `dos32.c`, which the program of 32 bits has in place of that of `dos.c` | 98 instructions in 13 pieces |
 
 <!-- The end of the figures. -->
@@ -749,9 +748,12 @@ itself; and the program's own call, by which a setup program reads and
 writes its setup. Where one of these could not stay as the original has
 it, `DEVIATIONS.md` says what differs. Of these the watch has gone
 since, with the map of the memory that it was for: see [What a user
-sees no more](#what-a-user-sees-no-more). And the program's own call
+sees no more](#what-a-user-sees-no-more). The program's own call
 has, with the entry of INT 21h, which was left for it alone: see [The
-setup program in it](#the-setup-program-in-it).
+setup program in it](#the-setup-program-in-it). And the commands are
+run through COMMAND.COM alone, its INT 2Eh having gone with Quick
+execute commands: see [What a user sees no
+more](#what-a-user-sees-no-more).
 
 How the program is laid out now. The linker writes `VC.EXE`, DOS loads
 it and sets the words of it that hold a segment, and it starts at
@@ -807,9 +809,10 @@ figures](#the-figures) say; three of the five `__interrupt` functions,
 `FatErr`, `CtrlC` and `Exit05`, which are all in `dos.c` there, `Int27`
 having gone with the watch on DOS and `Int21`
 with the program's own call; one `__loadds` function, `Alloc0`, where DOS enters the program,
-`Exec2E` having gone when the call of INT 2Eh came to return; two of the four
-`__declspec(naked)` functions, `Exit01` and `Int2E`, without `New27`
-and `New21`, both in `dos.c` there; two of the three intrinsic functions, `_disable` and `_enable`; the two routines for
+`Exec2E` having gone when the call of INT 2Eh came to return; one of the four
+`__declspec(naked)` functions, `Exit01`, in `dos.c` there, without `New27`
+and `New21`, and without `Int2E`, which went with Quick execute
+commands; two of the three intrinsic functions, `_disable` and `_enable`; the two routines for
 arithmetic; and, new, `#pragma data_seg`, for the main data and for the
 stack. The test `portable_c-host` counts these by
 their kinds, and `TODO.md` has its table.
@@ -825,7 +828,7 @@ here:
 | 4 | In a file compiled with `-nd=S` the same line makes a segment of the class `STACK` outside `DGROUP`; the linker takes a segment of that class for the stack and names its end in the file's header; given a value, zeros, it is in the file; and the linker's command has it last, so the program ends there | `src/portable_c/stack.c`, `MemOwn` of `dos.c` | `portable_c-scenarios` fails if the stack is not the last of the program, or not in the file |
 | 5 | No code is within 4K of the stack, the tables being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 2; the files of the second code segment in `CMakeLists.txt` | `portable_c-scenarios` reads the linker's map, where `tools/mkexe.c` stopped the build |
 | 6 | The segment of a far pointer made of a near one is DS, `MAIN_SEG` | `src/portable_c/vc.h` | every scenario |
-| 7 | The segment of a far pointer to an object of a group is the group's, and `seg` in `_asm` is the group's too: so the DS that `Int2E` finds again behind the interrupt is the one that the program's data is read through, and a table is read at its offset in `AsmSeg` | `src/portable_c/dos.c`, `misc.c` | the scenarios of INT 2Eh, `quick`; every scenario |
+| 7 | The segment of a far pointer to an object of a group is the group's: a table is read at its offset in `AsmSeg`. That `seg` in `_asm` is the group's too was relied on by `Int2E` alone, which is gone | `src/portable_c/misc.c` | every scenario |
 | 8 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with `DGROUP`, as a `__loadds` function does | `src/portable_c/dos.c` | the scenarios of the critical error, and of the program ended by DOS, `ended` |
 | 9 | `_enable` is `STI` and `CLD`: the first thing that the entry of the program does clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/portable_c/dos.c`, `Alloc0` | every scenario |
 
@@ -844,14 +847,15 @@ were left for the program's own call, three `CMP` with their jumps, the
 jump to the interrupt function that answered it and the far `JMP`
 through `Vect21` for every other call, went [with that
 call](#the-setup-program-in-it). The program has no entry of INT 21h.
-`Exit01` is as it was, and is in `dos.c` there. `Int2E` is there too, and is fourteen
-instructions where it was eight, since it returns: `PUSH BP`, SS and SP
-kept in two words of the data, `MOV DS,DX` for the command's segment,
-`INT 2Eh`, `CLI`, `MOV AX` with the segment of the data and `MOV DS,AX`,
-SS and SP put back, `STI`, `CLD`, `POP BP` and `RET`. What that buys is
-that the program has one way into its loop: `Exec2E`, the `__loadds`
-function that the jump went to on a stack set anew, and `Again` of
-`main.c`, which started the loop over from there, are gone. Of the three instructions that are the
+`Exit01` is as it was, and is in `dos.c` there. `Int2E` is
+[gone](#what-a-user-sees-no-more), with Quick execute commands. It had
+come to `dos.c` too, and was fourteen instructions there where it was
+eight, since it returned: the stack kept in two words of the data and
+put back behind the interrupt, where the original sets its stack anew
+and never returns. That bought the program one way into its loop,
+which it keeps: `Exec2E`, the `__loadds` function that the jump went to
+on a stack set anew, and `Again` of `main.c`, which started the loop
+over from there, went then. Of the three instructions that are the
 compiler's own, by its intrinsic functions, `IN` is gone too: the
 program reads no port.
 
@@ -882,7 +886,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 97 functions
+In the portable C that place is `src/portable_c/sys.h`: 96 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
 has the file clean. `dos.c` is those functions for DOS on a PC, and the
@@ -899,7 +903,7 @@ file beside it.
 | Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
 | Memory: a block taken, given back, made another size, where the system looks for one, and the program's own block made as long as the program | 6 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
-| Other programs: one run, with what it is told behind its name; a command handed to the shell that this one was started from; this one ended, on an old DOS too; what this one was told when it was started, and its environment | 7 |
+| Other programs: one run, with what it is told behind its name; this one ended, on an old DOS too; what this one was told when it was started, and its environment | 6 |
 | What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again; what the system is to put back when it has ended the program, said, taken and given back | 11 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
@@ -975,19 +979,15 @@ that answer with them, and the address at which DOS goes on when the
 program has ended; and `dos.c` makes the block that DOS is told of a
 program to run.
 
-Quick execute commands, which hands a command to the COMMAND.COM that
-the program was started from, by that program's own interrupt, is a
-function of the header too, `ShellRun`, which comes back when the
-command has run. The interrupt comes back with every register lost,
-the stack among them: the original sets its stack anew behind it and
-never returns from running commands, and the portable C did the same
-until this was moved, going on in a second way into its loop; now
-`dos.c` keeps where the stack is and puts it back, and the commands'
-loop of `resident.c` goes on behind the call as behind any other.
-Whether Quick execute stays is the user's to decide, and `TODO.md` has
-it.
+Quick execute commands, which handed a command to the COMMAND.COM that
+the program was started from, by that shell's own interrupt, was a
+function of the header too while the portable C had it, `ShellRun`,
+which came back when the command had run, with the stack kept round
+the interrupt in `dos.c`. It is [gone](#what-a-user-sees-no-more), and
+the commands' loop of `resident.c` has one way of running a command, by
+a COMMAND.COM of its own.
 
-With that nothing of DOS is left outside `dos.c`: no file but it and
+Nothing of DOS is left outside `dos.c`: no file but it and
 `arith.c` has an interrupt function, a function that loads DS, a line
 of assembly or a register in a `#pragma aux`, which the test
 `portable_c-host` holds. The map of the memory and the watch on
@@ -1019,6 +1019,12 @@ steps that went there, against the original's golden without them:
 | 7 | The map of the memory, Alt+F5, Memory info of the Commands menu: `memory.c` and `memory_t.c`. And the watch on DOS that it rested on, in `resident.c`: the entry of INT 27h, `New27` with `Int27`; in the entry of INT 21h the three calls by which a program is run, stays in the memory or gives a block back; the list of the programs that have stayed and their records, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk`, `Release`; `GetStat`; and the programs released when the program is left | Listing what DOS has given to whom, and getting a program out of the memory again that was run from here and has stayed, which DOS had no way to do |
 | 11 | The two lines on the memory in the Info panel, "Bytes Memory" and "Bytes Free": the part of `PutInf` of `info.c` that wrote them, with their three texts; and for the first, `MemEnd` of `sys.h` and `dos.c`, which read in the PSP where the memory ends, with its call in `IniData` of `start.c` | Saying how much memory DOS has for programs and how much of it the next command gets. The panel is no row shorter for it: what the program is based on stands below its title, the line under the title a row further down, and the row below that is empty |
 | 12 | EGA lines, Alt+F9, of the Commands menu: `F69_00` of `commands.c`; its name in the key bar with Alt held, and the key bar that the panels had on a display without such lines; and `ScreenSmallFont` and `ScreenPrintAll` of `sys.h`, with their bodies in `dos.c` and `dos32.c` | Giving the screen 43 rows on an EGA or 50 on a VGA, and 25 again, by having the BIOS load a font of 8 lines, and telling the Print Screen key of the rows. The program still asks how many rows the screen has, when it starts and behind every command, and draws on as many as it finds, up to 50: the rows are to come from the system that it runs on. No scenario has it on more than 25 for now |
+| 14 | Quick execute commands, of the Advanced options and of the setup's Configuration, where it was the last of the Execute options: the way through the shell in `Exec02` of `resident.c`; the command that went to the current drive first, which `F21_31` of `enter.c` left for it, with DOS asked for the drive there and in `IniData` of `start.c`; `ShellRun` of `sys.h`; `Int2E` of `dos.c`, fourteen instructions of inline assembly, the one place where the program kept its stack by hand; and for the program of 32 bits the same in real mode, 26 bytes of instructions that `dos32.c` put below the megabyte | Handing a command to the COMMAND.COM that the program was started from, by that shell's INT 2Eh, in place of running a COMMAND.COM for each: sooner, and with what the command set there kept. Every command is run the second way. The Advanced options are a row shorter, with Clear keyboard buffer the one line of Other options, and the right half of the setup's Configuration begins with the Keyboard options |
+
+Quick execute commands is not of DOS alone by what it gave, only by
+how it was done, and was taken out on the user's word of 13 October
+2026, as EGA lines was, and not by the rule, as the two above them
+were: `DEVIATIONS.md` has it under 14 as it has those.
 
 What was left of the watch then was what was not for the map: the
 program still took INT 21h, for its own call, by which a setup program
@@ -1085,12 +1091,12 @@ picture asks for a shadow that is not the one set, is `ShadCol` of
 Screen and Mouse, the Panel options, with the delay of the tree that
 is typed there and the box for one that is none, and the Country info,
 whose lines are written as the country has them before the box is
-shown. `stopts_t.c` has their tables. The first two are without three
+shown. `stopts_t.c` has their tables. The first two are without four
 settings that the original's setup program has there, Memory
-allocation, TSR manager and Screen output, which are of what the
-portable C has no more: what stood below them in a box stands further
-up, and their bytes of the setup file are kept as they are found
-(`src/portable_c/DEVIATIONS.md`, 1, 5 and 7).
+allocation, Quick execute commands, TSR manager and Screen output,
+which are of what the portable C has no more: what stood below them in
+a box stands further up, and their bytes of the setup file are kept as
+they are found (`src/portable_c/DEVIATIONS.md`, 1, 5, 7 and 14).
 
 All nine items of the menu do what the original's do, and F1 is the
 help. The mouse at the menu is the main program's routine for a list in

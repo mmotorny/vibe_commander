@@ -123,18 +123,23 @@ void F21_40(u16 panel)
 
    The vectors go back to their owners, the panels are cut down to what
    is kept of them, and the screen is as DOS left it but for the prompt.
-   With no command the program only starts over, NEXT_INIT11; else
-   DosChg gets the drive, for it to be made the current one first if it
-   is not the one the program began on, and the commands are run,
-   NEXT_EXEC: Exec of resident.c, which the loop's end in main.c calls.
+   With no command the program only starts over, NEXT_INIT11; else the
+   commands are run, NEXT_EXEC: Exec of resident.c, which the loop's end
+   in main.c calls.
+
+   The original asks DOS for the current drive here and leaves a command
+   in DosChg that goes to it, if it is not the drive that was the
+   current one when the program last started: for Quick execute
+   commands, where the shell that the program was started from runs the
+   commands and is on that drive still. The portable C has no such way
+   of running one (see DEVIATIONS.md), and neither asks nor leaves
+   anything.
 
    The original saves the setup, the command and the panels here, in the
    part of it that stays in the memory, and gives the main data back to
    DOS; what it reads from then on is the copy. */
 struct Onward F21_31(void)
 {
-    u16 drive;
-
     RestVct();
     SavMous();
     F21_40(md.WCB1seg);
@@ -153,15 +158,6 @@ struct Onward F21_31(void)
     ScreenType('\r', COMNINI_WAS >> 8, COMNINI_WAS & 0xFF);
     if (!(md.LoadFl & 0x80))
         ScreenType('\n', COMNINI_WAS >> 8, COMNINI_WAS & 0xFF);
-    drive = DriveCurrent();
-    if (drive != md.DosChg[0])
-        drive = (u8)(drive + 'A');
-    else
-        drive = 0;
-    md.DosChg[0] = 2;                   /* the length of "A:" */
-    md.DosChg[1] = (u8)drive;
-    md.DosChg[2] = ':';
-    md.DosChg[3] = 0x0D;
     return To(NEXT_EXEC);
 }
 

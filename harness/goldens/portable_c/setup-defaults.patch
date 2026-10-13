@@ -2,10 +2,37 @@ The portable C in the scenario setup-defaults: what it is expected to show
 otherwise than the original. A patch of harness/goldens/setup-defaults.txt,
 see harness/goldens.py: a line with - is the golden's, a line with + is what
 is expected in its place.
-Deviation: 10 of src/portable_c/DEVIATIONS.md
+Deviation: 10, 14 of src/portable_c/DEVIATIONS.md
 Why: the box of F10 names the program in its title and in its question, by a
 name that is two letters shorter: the box is two cells narrower, a cell on
-either side, and its shadow ends a cell further left
+either side, and its shadow ends a cell further left. And the Advanced options
+have no Quick execute commands: Clear keyboard buffer and what is below it in
+the box stand a row further up, the cursor with them where it is on that box,
+the box is a row shorter, and the two rows that its last row and the shadow
+below it were on show what is behind the box, the upper one in the shadow
+
+== 8: F9 o o
+rows 12-21
+-|║            │    ║  │  [ ] Quick execute commands       │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+-|║            │    ║  │  [x] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+-|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+-|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
++|║            │    ║  │  [x] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
++|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
++|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
++|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │                                                    │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx17 03x49 1Bx14
++|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 
 == 12: F10
 rows 5-11

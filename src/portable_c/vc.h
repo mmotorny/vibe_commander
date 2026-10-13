@@ -229,7 +229,11 @@ struct MainDat {
     u8  ZoomWin;                        /* Zomming windows */
     u8  AltBar;                         /* Alt alone selects menu */
     u8  EscBar;                         /* Esc toggles panels on/off */
-    u8  ExecTyp;                        /* Exec command without COMMAND.COM */
+    u8  ExecTyp;                        /* Exec command without
+                                           COMMAND.COM, Quick execute
+                                           commands: of the original.
+                                           Here a byte of the setup that
+                                           is kept as it is found */
     u8  AutoSiz;                        /* Auto calculate directory sizes */
     u8  HidDirs;                        /* Show hidden subdirs in tree panel */
     u8  QuitAck;                        /* Confirmation on Quit */
@@ -266,7 +270,9 @@ struct MainDat {
     u16 MouseX;                         /* Mouse cursor X */
     u16 MouseY;                         /* Mouse cursor Y */
     u16 BatAdr;                         /* Pointer to command in buffer */
-    u16 BatPoin;                        /* Pointer to command */
+    u16 BatPoin;                        /* Pointer to command, kept
+                                           while the shell ran another:
+                                           not set here */
     u16 LastMnu;                        /* The last pull down menu item */
     u16 OvlPth;                         /* Pointer to file name in
                                            environment: not set here */
@@ -276,7 +282,11 @@ struct MainDat {
     u8  ToFile[LenStr + 1];             /* Target filename */
     u8  FindStr[LenStr + 1];            /* FileFind wildcard */
     u8  SrchStr[LenStr + 1];            /* String for search */
-    u8  DosChg[5];                      /* Reserved for change drive or /C_ */
+    u8  DosChg[5];                      /* Reserved for change drive or
+                                           /C_: here for the second
+                                           alone, the count and /C_ in
+                                           front of the first command,
+                                           its last four bytes */
     u8  DosBuf[LenBat];                 /* Command line */
     /* End of main data' part saved in memory */
 

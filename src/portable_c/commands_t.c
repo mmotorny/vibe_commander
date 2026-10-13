@@ -340,14 +340,20 @@ const DIALOG(10) Conf_B = {
      |  [ ] Alternative editor           |
      +-----------------------------------+
      + Other options --------------------+
-     |  [ ] Quick execute commands       |
      |  [ ] Clear keyboard buffer        |
      +-----------------------------------+
      Press  Space  to change an option,
      arrows to move between options
 
    Chk2_S is put in for ^I here. The assembly has no Set06_S: the line
-   that ends the first frame is the one that ends the second. */
+   that ends the first frame is the one that ends the second.
+
+   The original has a line more, Set08_S, the first of Other options:
+   Quick execute commands, a setting that the portable C has not (see
+   DEVIATIONS.md). Without it the box is a row shorter, Clear keyboard
+   buffer and what is below it stand a row further up, and the fields
+   go to each other as they stand now. Its byte of the setup is kept as
+   it is found. */
 static const u8 Set00_S[] = " Advanced Options ";
 static const u8 Set01_S[] = "\332 ^bKey configuration^b \377\220\304\277";
 static const u8 Set02_S[] = "^IAlt alone selects menu\377\007\263";
@@ -355,35 +361,35 @@ static const u8 Set03_S[] = "^IEscape toggles panels on/off \263";
 static const u8 Set04_S[] = "^IAlternative viewer\377\013\263";
 static const u8 Set05_S[] = "^IAlternative editor\377\013\263";
 static const u8 Set07_S[] = "\332 ^bOther options^b \377\224\304\277";
-static const u8 Set08_S[] = "^IQuick execute commands\377\007\263";
 static const u8 Set09_S[] = "^IClear keyboard buffer\377\010\263";
 static const u8 Set10_S[] = " \300\377\243\304\331 ";
 static const u8 Set11_S[] = "Press ^r Space ^r to change an option,";
 static const u8 Set12_S[] = "arrows to move between options";
 
-static const BOX(15) Sets_P = {
+static const BOX(14) Sets_P = {
     { Conf_C, CnfRe_C, CnfBo_C, 0 },
-    15, 0,
+    14, 0,
     MD_AT(WinBuf),
     {
         Set00_S, Set01_S, Set02_S, Set03_S, Set04_S, Set05_S, Set10_S,
-        Set07_S, Set08_S, Set09_S, Set10_S, Set11_S, Set12_S, 0, OkCn_S
+        Set07_S, Set09_S, Set10_S, Set11_S, Set12_S, 0, OkCn_S
     }
 };
-const DIALOG(7) Sets_B = {
+/* A field keeps the place in TmpBuf that the original gives it, the
+   buttons too: the place of the box that is gone is not used. */
+const DIALOG(6) Sets_B = {
     { &Sets_P, 0x328, 0, 1, 4, 41, 0 },
     {
         /* Alt alone selects menu, Escape toggles panels on/off,
            Alternative viewer, Alternative editor */
-        { 3, 6, 1, 0, 0, 0x30A, MD_AT(TmpBuf), NUMBER(MD_AT(AltBar)) },
+        { 3, 5, 1, 0, 0, 0x30A, MD_AT(TmpBuf), NUMBER(MD_AT(AltBar)) },
         { 3, 0, 2, 1, 1, 0x40A, MD_AT(TmpBuf[1]), NUMBER(MD_AT(EscBar)) },
         { 3, 1, 3, 2, 2, 0x50A, MD_AT(TmpBuf[2]), NUMBER(MD_AT(AltView)) },
         { 3, 2, 4, 3, 3, 0x60A, MD_AT(TmpBuf[3]), NUMBER(MD_AT(AltEdit)) },
-        /* Quick execute commands, Clear keyboard buffer */
-        { 3, 3, 5, 4, 4, 0x90A, MD_AT(TmpBuf[4]), NUMBER(MD_AT(ExecTyp)) },
-        { 3, 4, 6, 5, 5, 0xA0A, MD_AT(TmpBuf[5]), NUMBER(MD_AT(ClrBuf)) },
+        /* Clear keyboard buffer */
+        { 3, 3, 5, 4, 4, 0x90A, MD_AT(TmpBuf[5]), NUMBER(MD_AT(ClrBuf)) },
         /* Ok, Cancel */
-        { 4, 5, 0, 6, 6, 0xF1E, MD_AT(TmpBuf[6]), OkCn_D }
+        { 4, 4, 0, 5, 5, 0xE1E, MD_AT(TmpBuf[6]), OkCn_D }
     },
     0
 };

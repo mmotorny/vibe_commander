@@ -33,7 +33,6 @@ not-ready
 banner
 diskette-command
 second-copy
-quick
 comspec
 device
 user-menu

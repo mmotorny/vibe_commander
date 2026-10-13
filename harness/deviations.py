@@ -652,6 +652,12 @@ _LEFT_HANDED = ("Left-handed mouse is five rows further up in Screen and "
 # What the original calls itself and what the portable C does
 # (DEVIATIONS.md, 10), as the rules of that tree have them: see `rules`
 # below.
+_FIVE_DOWN = "Down Down Down Down Down Space"
+_FOUR_DOWN = "Down Down Down Down Space"
+_CLEAR_BUFFER = ("Clear keyboard buffer is the fifth box of the Advanced "
+                 "options, below Alternative editor, where Quick execute "
+                 "commands was: four times Down goes there, and a fifth "
+                 "would go on to the buttons")
 _TITLE = "The Volkov Commander, Version 4.05"
 _NAME = "Vibe Commander 0.1"
 _BASED = "based on Volkov Commander 4.05"
@@ -674,9 +680,17 @@ TREES = {
     # memory; and it has the setup program in itself, an item of its
     # Options menu, so it answers no call of DOS of its own and does not
     # take INT 21h; and it has no EGA lines, Alt+F9, which is the one
-    # way that a scenario has to a screen of more than 25 rows.
+    # way that a scenario has to a screen of more than 25 rows. And it
+    # has no Quick execute commands: every command is run by a
+    # COMMAND.COM of its own, and neither the Advanced options nor the
+    # setup's Configuration has the setting.
     "portable_c": Declared(
         not_run={
+            "quick": "it switches Quick execute commands on and runs "
+                     "commands so, by the interrupt of the COMMAND.COM "
+                     "that the program was started from: the portable C "
+                     "has neither the setting nor that way of running a "
+                     "command",
             "memory": "it switches Memory allocation off and shows the "
                       "menu without its mark: the portable C has no such "
                       "option",
@@ -852,33 +866,60 @@ TREES = {
                             "an item of the Options menu, More setup..."),
         },
         # The setup has no setting for what the program has no more:
-        # the Configuration is without Memory allocation and TSR
-        # manager, and Screen and Mouse without Screen output
-        # (DEVIATIONS.md, 1, 7 and 5). What stood below them in the
-        # right half of each box stands further up, and the fields go
-        # to each other as they stand: a scenario gets to the same
-        # setting by fewer keys or by a click further up, and a step
-        # that set one of the three is left out. The rows that then
-        # differ are in the scenario's patch.
+        # the Configuration is without its Execute options, Memory
+        # allocation, Quick execute commands and TSR manager, and
+        # Screen and Mouse without Screen output (DEVIATIONS.md, 1, 14,
+        # 7 and 5). What stood below them in the right half of each box
+        # stands further up, and the fields go to each other as they
+        # stand: a scenario gets to the same setting by fewer keys or
+        # by a click further up, and a step that set one of the four is
+        # left out. The rows that then differ are in the scenario's
+        # patch.
+        #
+        # And the Advanced options of the program are without Quick
+        # execute commands (14), the box above Clear keyboard buffer,
+        # which most scenarios of the editor untick first: a Down less
+        # gets there. The step is put in behind the one that opens the
+        # dialog, since the same keys are others elsewhere: in the
+        # setup's Configuration they tick the Clock.
         in_place_in={
+            **{name: {("F9 o o", step):
+                      (("F9 o o", step.replace(_FIVE_DOWN, _FOUR_DOWN)),
+                       _CLEAR_BUFFER)}
+               for step, names in (
+                   (_FIVE_DOWN,
+                    ("command-edit", "comspec", "dirinfo", "ended",
+                     "sizes", "view-search", "editor-hex", "editor-long",
+                     "editor-save", "editor-words", "editor-full",
+                     "editor-keys", "editor-hex-keys", "editor-buffer",
+                     "editor-dirinfo", "mouse-edit", "start-setup",
+                     "start-screen", "start-memory", "setup-delay-file",
+                     "setup-help-file")),
+                   (_FIVE_DOWN + " Enter",
+                    ("user-menu", "user-menu-run", "view-commands")))
+               for name in names},
             "setup-config": {
-                ("Down", "Space", "Down Space", "Down Space"):
-                    (("Down", None, "Space", None),
-                     "below the last box of the left half is Quick "
-                     "execute commands, the one box of Execute options "
-                     "now: it is ticked where the cursor is, and Memory "
-                     "allocation above it and TSR manager below it are "
-                     "not there to be unticked"),
+                ("Down", "Space", "Down Space", "Down Space",
+                 "Down Space"):
+                    (("Down", None, None, None, "Space"),
+                     "below the last box of the left half is Alt alone "
+                     "selects menu, the first of the Keyboard options, "
+                     "which are all of the right half now: it is "
+                     "unticked where the cursor is, and Memory "
+                     "allocation, Quick execute commands and TSR "
+                     "manager are not there to be unticked or ticked "
+                     "on the way"),
             },
             "setup-config-mouse": {
                 ("Click@42,6",):
-                    (("Click@42,5",),
-                     "Quick execute commands is a row further up, where "
-                     "Memory allocation was"),
+                    ((None,),
+                     "Quick execute commands, which is not there to be "
+                     "clicked"),
                 ("Click@42,10",):
-                    (("Click@42,8",),
-                     "Alt alone selects menu is two rows further up, "
-                     "with the other Keyboard options"),
+                    (("Click@42,5",),
+                     "Alt alone selects menu is five rows further up, "
+                     "with the other Keyboard options, at the top of "
+                     "the right half"),
             },
             # The Commands menu is two lines shorter, without Memory
             # info and EGA lines (DEVIATIONS.md, 7 and 12), and the

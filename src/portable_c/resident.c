@@ -11,18 +11,18 @@
  * of it like any other: md is the main data, its variables are
  * variables, and what it wants of DOS it asks through sys.h. Nothing of
  * it stays anywhere, and nothing that DOS enters is here: where the
- * program begins, where DOS goes on when it has ended the program and
- * the interrupt of the shell are the system's, in dos.c.
+ * program begins and where DOS goes on when it has ended the program
+ * are the system's, in dos.c.
  *
  * Two things are here. The first is what the program does before
  * anything else, Alloc3: it looks at the version of DOS and keeps no more
  * of the memory than it is. Main of main.c calls it.
  *
  * The second is the commands: Exec runs those that the command line
- * holds, DosBuf, by COMMAND.COM or by handing them to the shell that the
- * program was started from; and what the program does when it leaves.
- * Where DOS ends it by another's hand, nothing of it is entered: the
- * system puts back what the program has said beforehand, SetBrk.
+ * holds, DosBuf, by COMMAND.COM; and what the program does when it
+ * leaves. Where DOS ends it by another's hand, nothing of it is
+ * entered: the system puts back what the program has said beforehand,
+ * SetBrk.
  *
  * The original has a third here, which takes INT 21h, DOS's own
  * interrupt, while the program runs and while a command runs from it.
@@ -192,17 +192,18 @@ void AlocEr(u16 bx)
    A command is at most 123 characters; what a longer one has beyond
    that is cut off by the carriage return that is written there.
 
-   With ExecTyp, Quick execute commands of the setup, the commands are
-   handed to the shell that the program was started from, the
-   COMMAND.COM that is in the memory, which runs them itself: ShellRun.
-   If the current drive is another than when the program started, F21_31
-   has left a command in DosChg that goes there, which is handed over
-   first; the command itself is kept at BatPoin meanwhile, as the
-   original keeps it, whose registers do not come back from the shell.
-   Without ExecTyp, COMMAND.COM is run for each command, by the name
-   that COMSPEC has in the environment, with /C and the command for its
-   tail, which is written over the four bytes in front of the
-   command. */
+   COMMAND.COM is run for each command, by the name that COMSPEC has in
+   the environment, with /C and the command for its tail, which is
+   written over the four bytes in front of the command: those in front
+   of the first are the last four of DosChg, which is there for them.
+
+   The original has a second way, with ExecTyp, Quick execute commands
+   of its setup: the commands are handed to the COMMAND.COM that the
+   program was started from, by that shell's own interrupt, INT 2Eh,
+   and before the first of them a command that goes to the current
+   drive, if that is another than when the program last started. The
+   portable C has neither the setting nor that way (see
+   DEVIATIONS.md). */
 static void Exec02(void)
 {
     struct Answer ran;
@@ -223,19 +224,6 @@ static void Exec02(void)
                 break;
         end--;
         *end = 0x0D;
-        if (md.ExecTyp != 0) {
-            before += 3;
-            *before = (u8)(end - 1 - before);
-            if (md.DosChg[1] != 0) {
-                md.BatPoin = MD_PLACE(before);
-                ShellRun(md.DosChg);
-                before = MD_POINTER(md.BatPoin);
-                md.DosChg[1] = 0;
-            }
-            ShellRun(before);           /* Exec03 */
-            SetBrk();                   /* SetBrk0 */
-            goto Exec07;
-        }
         before[0] = (u8)(end - 1 - before);     /* Exec04 */
         before[1] = '/';
         before[2] = 'C';
@@ -257,8 +245,7 @@ static void Exec02(void)
             if (NotFind(FnFil_S, name)) /* Exec06 */
                 return;
         }
-    Exec07:
-        command = MD_POINTER(md.BatAdr);
+        command = MD_POINTER(md.BatAdr);        /* Exec07 */
         if (*command == 0)
             return;
         if (*command == '@') {

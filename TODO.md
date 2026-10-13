@@ -1500,19 +1500,23 @@ bytes of the setup file are kept as they are found.
 
 **The two dialogs as they are now.** What stood below a line that went
 stands further up in the right half of its box, and the box is as tall
-as it was, since its left half is:
+as it was, since its left half is. The Configuration is shown as it is
+since Quick execute commands went too, which was not of this piece
+("The portable C: without Quick execute commands" below): E2 left
+Execute options with that one line, and the Keyboard options two rows
+further up than the original's, where they are five now.
 
     ╔═══════════════════════════ Configuration ═══════════════════════════╗
-    ║  ┌ General options ──────────┐  ┌ Execute options ───────────────┐  ║
-    ║  │  [ ] Auto menus           │  │  [ ] Quick execute commands    │  ║
-    ║  │  [x] Path prompt          │  └────────────────────────────────┘  ║
-    ║  │  [x] Key bar              │  ┌ Keyboard options ──────────────┐  ║
-    ║  │  [ ] Menu bar visible     │  │  [x] Alt alone selects menu    │  ║
-    ║  │  [x] Full screen          │  │  [x] Esc toggles screen on/off │  ║
-    ║  │  [ ] Clock                │  │  [x] Alternative viewer        │  ║
-    ║  │  [x] Confirmation on quit │  │  [ ] Alternative editor        │  ║
-    ║  │  [x] Error sound          │  │  [x] Clear keyboard buffer     │  ║
-    ║  │  [ ] Auto save setup      │  └────────────────────────────────┘  ║
+    ║  ┌ General options ──────────┐  ┌ Keyboard options ──────────────┐  ║
+    ║  │  [ ] Auto menus           │  │  [x] Alt alone selects menu    │  ║
+    ║  │  [x] Path prompt          │  │  [x] Esc toggles screen on/off │  ║
+    ║  │  [x] Key bar              │  │  [x] Alternative viewer        │  ║
+    ║  │  [ ] Menu bar visible     │  │  [ ] Alternative editor        │  ║
+    ║  │  [x] Full screen          │  │  [x] Clear keyboard buffer     │  ║
+    ║  │  [ ] Clock                │  └────────────────────────────────┘  ║
+    ║  │  [x] Confirmation on quit │                                      ║
+    ║  │  [x] Error sound          │                                      ║
+    ║  │  [ ] Auto save setup      │                                      ║
     ║  │  [ ] Show logical drive B:│                                      ║
     ║  └───────────────────────────┘                                      ║
 
@@ -1535,12 +1539,13 @@ That is the lines taken out and nothing arranged anew.
 
 **Open, for the user.**
 
-- The layout. Both right halves are shorter than the left ones now, and
-  Screen and Mouse has six empty rows there. Whether the groups are to
-  be aligned at the bottom, or the two dialogs arranged anew, waits for
-  the user's word, and for what is decided on Quick execute commands
-  and on Show logical drive B:, which would change the Configuration
-  once more; either would be new rows in the same patches.
+- The layout. Both right halves are shorter than the left ones now:
+  the Configuration has five empty rows there and Screen and Mouse six.
+  Whether the groups are to be aligned at the bottom, or the two
+  dialogs arranged anew, waits for the user's word. What was decided
+  on 13 October 2026 has changed the Configuration once more, and is
+  made: Quick execute commands is gone, and Show logical drive B:
+  stays.
 - The volume of the ten patches. Every screen that shows one of the
   dialogs repeats the rows of its right half, 11 or 12, so the ten are
   several times all the patches that were there before. A rule of the
@@ -1563,7 +1568,11 @@ patch: the rows of the right half on every screen that shows the
 dialog, 11 or 12 to a screen, which is most of the 1,834 lines that the
 ten have. Six are taken through other steps for the portable C, by
 `in_place_in` of `deviations.TREES`, which was made for this: a step
-for a step, or None for one that set what is gone.
+for a step, or None for one that set what is gone. The table is of this
+piece as it was made: the seven that show the Configuration have other
+rows in their patches since Quick execute commands went, and
+`setup-config` and `setup-config-mouse` other steps, which the section
+on that has.
 
 | Scenario | Entries | Its patch, in lines expected otherwise | Steps for the portable C |
 |---|---|---|---|
@@ -1631,8 +1640,9 @@ Watcom reads. `harness/hostcheck.txt` has the counts of every file, and
 the test holds the tree to them, so the record is always what is so:
 the top of the script says how. This is what the kinds are waiting
 for, with the counts of when it was written, but for the three kinds
-that lost places when the entry of INT 21h went, which are as they
-stand since; the test prints them all as they stand.
+that lost places when the entry of INT 21h went, and the two that lost
+one when Quick execute commands did, which are as they stand since;
+the test prints them all as they stand.
 
 1,033 places in 38 of the 58 files, the three headers among them.
 Twenty files are clean: the twelve of tables, `sys.h`, and `blank.c`,
@@ -1655,9 +1665,9 @@ files that ask through it make fewer pointers of numbers.
 | `function` | 5 | 2 | The address of a function kept as that of data, for a vector of an interrupt, and once the other way, the call into the PSP | The system interface |
 | `interrupt` | 5 | 3 | `__interrupt`, where a function is declared or defined: `CtrlC` and `Exit05` of `resident.c`, `FatErr` of `main.c` | The system interface: what DOS enters is of DOS, and goes to a file that only the build for DOS has |
 | `loadds` | 3 | 1 | `__loadds`: `Alloc0` and `Exec2E` of `resident.c` | The same |
-| `naked`, `asm` | 2, 2 | 1 | The two functions of `resident.c` that are their `_asm`: `Exit01` and `Int2E` | The same |
+| `naked`, `asm` | 3, 3 | 2 | The function of `dos.c` that is its `_asm`, `Exit01`, and two of `dos32.c`, `DeviceEntry` and `NothingEntry`. `Int2E` was a fourth, and went with Quick execute commands | The same |
 | `asm-pragma` | 7 | 1 | The seven pieces of inline assembly of `dos.c`, a `#pragma aux` each | The same: `dos.c` is the side of that interface which is DOS |
-| `registers` | 4 | 3 | A `#pragma aux` that names registers: `__U4M` and `__U4D` of `arith.c`, `CaseMapFn` of `dos.c`, `Int2E` of `resident.c` | The same for the last two. `arith.c` is Open Watcom's own, and another compiler's build leaves the file out |
+| `registers` | 4 | 3 | A `#pragma aux` that names registers: `__U4M` and `__U4D` of `arith.c`, `CaseMapFn` of `dos.c` and of `dos32.c`. That of `Int2E` went with Quick execute commands | The same for the last. `arith.c` is Open Watcom's own, and another compiler's build leaves the file out |
 | `intrinsic` | 1 | 1 | `_disable` and `_enable` of `dos.c` | The system interface |
 | `data_seg` | 4 | 2 | The segment of the main data, in `main.c`, and of the stack, `stack.c` | A program that does not take the main data to be at offset 0 of its segment, which the tables and `MAIN_SEG` do; and a stack that the system gives |
 | `aborts` | 8 | 3 | A `#pragma aux` that says a function does not return | Nothing: another compiler passes over the line. Four are in `vc.h`, which is not clean for them and for the `__interrupt` of `CtrlC`. A word of `vc.h` could say it to every compiler in its own way |
@@ -1841,17 +1851,17 @@ left open:
   cuts it to save it (`F21_40` of `src/portable_c/enter.c`). The limit
   has no reason any more; lifting it is a deviation for the user to
   decide.
-- Whether Quick execute commands stays, of the Advanced options, is
-  the user's to decide, and it stays whole until then: the setting, and
-  `ShellRun` of `sys.h` with `Int2E` of `dos.c` behind it, by which the
-  commands are handed
-  to the COMMAND.COM that the program was started from, through its INT
-  2Eh, in place of a second COMMAND.COM for each. The mechanism is of
-  DOS alone, and has the one place where the stack is put back by
-  hand. What it gives a user may not be: commands run by the shell that
-  the program was started from, faster, and with what they set kept.
-- Whether the phantom drive B: stays is the user's to decide, and it
-  stays whole until then: what the program does for a machine whose one
+- Quick execute commands, of the Advanced options, is gone, on the
+  user's word of 13 October 2026: the setting, and `ShellRun` of
+  `sys.h` with `Int2E` of `dos.c` behind it, by which the commands were
+  handed to the COMMAND.COM that the program was started from, through
+  its INT 2Eh, in place of a second COMMAND.COM for each
+  (`src/portable_c/DEVIATIONS.md`, 14; "The portable C: without Quick
+  execute commands" below). The one place where the stack was put back
+  by hand went with it.
+- The phantom drive B: stays, with its prompt and its setting, for as
+  long as DOS is a target, on the user's word of 13 October 2026: what
+  the program does for a machine whose one
   floppy drive answers as A: and as B:, of which DOS has it be one at a
   time. A user sees three things of it:
   - The prompt. Before the program touches a drive by a letter that
@@ -2235,6 +2245,190 @@ this.
 | A scenario of its own with a file that no build has room for, as C1's table has it: eight times `command.com`, 702,176 bytes | 1 and 2 for every build, with nothing declared | A new golden of the original; drive C: of the bench has to hold the file; and it is in the same 64K as no build's room. Seven times `command.com` and `country.sys`, 644,654 bytes, would be in the same 64K as the room of the program of 32 bits and 2,830 bytes above it, by C1's figure: by arithmetic alone, a number that is gone with step 2 |
 | `editor-full` with as many steps more as fill 640 KB, and `copy-big` with a file of more than that | What those two no longer reach | Both scenarios change, so both goldens are derived anew, and every tree is taken through the longer steps |
 
+## The portable C: without Quick execute commands
+
+Quick execute commands is gone from the portable C, the setting and
+the way through INT 2Eh, on the user's word of 13 October 2026
+(`src/portable_c/DEVIATIONS.md`, 14). Every command is run by a
+COMMAND.COM of its own, with `/C`. `src/c/` and `src/asm/` keep the
+feature, and `quick` is run for the original and the C translation.
+
+**The two dialogs as they are now.** The Advanced options of the
+program, a row shorter, and the setup's Configuration without Execute
+options, which "Piece E2" above shows:
+
+    ╔════════════ Advanced Options ═══════════╗
+    ║  ┌ Key configuration ────────────────┐  ║
+    ║  │  [x] Alt alone selects menu       │  ║
+    ║  │  [x] Escape toggles panels on/off │  ║
+    ║  │  [x] Alternative viewer           │  ║
+    ║  │  [ ] Alternative editor           │  ║
+    ║  └───────────────────────────────────┘  ║
+    ║  ┌ Other options ────────────────────┐  ║
+    ║  │  [x] Clear keyboard buffer        │  ║
+    ║  └───────────────────────────────────┘  ║
+    ║    Press  Space  to change an option,   ║
+    ║      arrows to move between options     ║
+    ╟─────────────────────────────────────────╢
+    ║           [ Ok ]   [ Cancel ]           ║
+    ╚═════════════════════════════════════════╝
+
+Every link of both was tried on the bench, each field with Up, Down,
+Left and Right: the Advanced options go down their one column and round
+by the buttons; in the Configuration, Right from a box of the left half
+is the box on its row, or Clear keyboard buffer from Clock down, Left
+from a box of the right half the box on its row, Down from Show logical
+drive B: Alt alone selects menu, and Down from Clear keyboard buffer
+the buttons.
+
+**What went from the program.**
+
+| Where | What |
+|---|---|
+| `commands_t.c` | The line `Set08_S` and the field of the setting; `Sets_P` has 14 lines and `Sets_B` 6 fields, with the links and the rows of what stands below as they are now |
+| `stopts_t.c` | The field of the setting, the last of Execute options, and with it the group: seven lines have the right half of the line five further down and five have spaces there |
+| `resident.c` | The branch of `Exec02` that `ExecTyp` chose: the command made a tail without `/C`, the command of `DosChg` handed over first with the command kept in `BatPoin`, `ShellRun`, `SetBrk` and the jump to `Exec07`, which is no label any more |
+| `enter.c` | In `F21_31`: DOS asked for the current drive, and the command that goes there written into `DosChg` |
+| `start.c` | In `IniData`: DOS asked for the current drive, kept in `DosChg` |
+| `sys.h` | `ShellRun`, one function of 97 |
+| `dos.c` | `ShellRun` and `Int2E`, fourteen instructions of inline assembly, a function that was `__declspec(naked)` with a `#pragma aux` of registers, and the two words that the stack was kept in, `ShellSs` and `ShellSp` |
+| `dos32.c` | `ShellRun` and `Shell_T`, 26 bytes of instructions of real mode, with `LOW_SHELL` and `LOW_KEPT`, 48 bytes of the block below the megabyte: what stood behind them, `LOW_ENDED` and what its instructions read, is that much further down, and the block is 512 bytes where it was 560 |
+| `harness/trial32/sys.c` | The call of `ShellRun` on the page of the copies, and its text; `python3 harness/trial32/both.py` passes |
+
+What stays: the byte `ExecTyp` of the main data and of the setup file,
+0 in the defaults of `start.c` and of `StPalets`, which nothing reads;
+`BatPoin`, a word of the main data that keeps its place; and `DosChg`,
+whose last four bytes are where the count and `/C` of the first
+command are written, as they were. `Exec02` to `Exec10` were read
+against `VC.ASM` once more for what else leaned on the way that went:
+nothing did. `SetBrk` is called behind `ProgramRunBare` as it was.
+
+**The scenarios.** `quick` is not run for either build of the portable
+C, and is off the record of the program of 32 bits. 34 have a patch
+that names entry 14, 20 of them new:
+
+| | Scenarios | Steps for the portable C |
+|---|---|---|
+| The Advanced options on two screens, Clear keyboard buffer unticked | `command-edit`, `comspec`, `dirinfo`, `ended`, `sizes`, `view-search`, `editor-hex`, `editor-long`, `editor-save`, `editor-words`, `editor-full`, `editor-keys`, `editor-hex-keys`, `editor-buffer`, `editor-dirinfo`, `mouse-edit`, `start-setup`, `start-screen`, `start-memory`, `setup-delay-file`, `setup-help-file` | Four times Down and Space in place of five, by `in_place_in`, behind "F9 o o" |
+| The same on one screen | `user-menu`, `user-menu-run`, `view-commands` | The same, with Enter |
+| The Advanced options on one screen | `command-line`, `setup-cancel`, `setup-defaults` | The original's |
+| The setup's Configuration | `setup-config` | Three steps left out, which set the three settings of Execute options, and Space in place of Down and Space for Alt alone selects menu |
+| | `setup-config-mouse` | The click on Quick execute commands left out; four clicks on Alt alone selects menu five rows further up |
+| | `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The original's |
+
+**How the patches were read.** By a script, as E2's were, which is not
+kept: of each screen of the original's golden it made what entry 14
+says, held that against the golden with its patch, and printed what
+was left. For the Advanced options: the rows of the box from that of
+Quick execute commands down taken from a row further down, the row
+that the original's box ends on taken from the screen before the
+dialog, in the shadow, and the row below that from the same screen as
+it is; the cursor a row further up where it is on Clear keyboard
+buffer. For the Configuration: the right half taken from five rows
+further down and spaces below, the cursor with it. Where a scenario
+had a patch already, the patch of before was made to the golden first,
+so that what was printed was what the new patch has otherwise than the
+old one with the declaration. What was left over, and is all that the
+patches say besides: the cell of the mouse pointer, which stays in the
+middle of the screen while the lines move under it, on every screen of
+the dialogs where no click has moved it; and two cursors of
+`setup-config`, on Full screen where the original has Show logical
+drive B:, Left from Clear keyboard buffer. The setup files that
+`setup-config` and `setup-config-mouse` leave were held against the
+original's byte for byte, by the shim that the notes of `CLAUDE.md`
+have: 1B6h, `ExecTyp`, 0 where the original has 1, in both; 1AFh and
+1C0h, 1 where it has 0, in the first, as before; and the sum at 1FDh.
+
+**What a later piece should know.**
+
+- A scenario that opens the Advanced options needs a patch for the
+  portable C, and one that goes to Clear keyboard buffer there, as
+  nearly every scenario of the editor does, an entry of `in_place_in`
+  by its name: the top of `harness/scenarios.py` says so where it says
+  how such a scenario is written. The same keys in every scenario
+  would have been `in_place_of`, one entry for all; they are not the
+  same thing everywhere, since `setup-clock` ticks the Clock of the
+  setup's Configuration by them.
+- The patches of the Advanced options say the same ten rows on some
+  fifty screens, as those of the setup's dialogs do theirs: a rule of
+  the tree cannot, since the box is a row shorter and the row that it
+  no longer covers shows what is behind it, which is another thing in
+  every scenario. "Leaving a part of the screen out of the comparison"
+  below would not help either: the row is to be held.
+- DOS is asked for the current drive in two places fewer, AH 19h, when
+  the program starts and before commands are run. No scenario of the
+  portable C sees a call of DOS that the program makes for itself; a
+  program of a scenario that counted the program's calls would.
+
+**What landing it met.** The piece was made on a tree that had neither
+the end by another's hand ("E", below) nor the removal of EGA lines
+("The portable C: what EGA lines has left", above), and was rebased
+onto both, and then onto the driver's second copy ("C2"). For whoever lands a piece that has waited so:
+
+- The entry's number was 12 when the piece was made and is 14: EGA
+  lines took 12 and the editor's room 13. It is in the heading of the
+  entry; in the header of each patch that names it, 34 files; where
+  the other entries of `DEVIATIONS.md` cite it, "see 14" and "in 14";
+  and in `harness/deviations.py`, `harness/scenarios.py`, the README's
+  table under "What a user sees no more", these notes and those of
+  `CLAUDE.md`. No comment of the source has the number. The test
+  `portable_c-scenarios` fails for a patch whose header names an entry
+  that does not name its scenario.
+- A count that two pieces each took one from is merged by git without
+  a word, and is wrong: the README said 97 functions of `sys.h` on both
+  sides, each one fewer than 98 for another reason, where there are 96.
+  Count again whatever is a count, also where nothing conflicted: the
+  table by group there adds up to it.
+- The block below the megabyte: E had put `LOW_ENDED` behind the 48
+  bytes that went. The places behind them are 48 further down, and
+  `Ended_T` needed nothing, being written by their names.
+- No patch had to be made again. EGA lines leaves four steps out of
+  `user-menu`, which has its patch of this piece: a patch is of the
+  original's steps, and the two fit together as they were. The row of
+  `user-menu` in entry 12 says that the scenario has a patch for 14.
+- Written anew and not merged: `harness/hostcheck.txt` by `--record`,
+  the README's figures by `tools/figures.py --write`. In
+  `harness/pass32.txt` `quick` went and what the others had added
+  stayed.
+- A patch that a build has of its own stands in the place of the
+  tree's whole, so what the tree's patch gains the build's has to gain
+  too, and nothing fails before a machine is run: both fit the golden.
+  The driver's piece ("C2") had given the program of 32 bits a patch of
+  its own for `start-memory`, which opens the Advanced options: it was
+  made again by `python3 harness/goldens.py patch --tree portable_c32
+  start-memory`, which called 21 rows new on the two screens of the
+  dialog, the rows of the 16-bit program's patch there, and its header
+  names 14 beside 1. `second-copy`, the other, opens no dialog.
+- Two tables of the harness had an entry of the other piece next to
+  the one that went, `OWN_OF_FLAT` of `harness/datacheck.py` and
+  `REVIEWED` of `harness/reads.py`, for `Ended_T` beside `Shell_T`: the
+  first stays and the second goes.
+
+**A flaw of the tests that was met, and is not of this piece.**
+`blank-timed` is on the record of the program of 32 bits and was
+"stopped after step 4, Wait*1300 x: the program did not come to wait
+for a key within 300 s" in the whole suite, twice, with the machine at
+a load of 25 to 30 on its four processors, other agents' tests among
+it. With `--limit 1200` it passes, as the original, the scenario having
+taken 375 seconds. It is what "Piece H3" has under the time of a step:
+a second of the machine takes most of one of the host's while this
+program idles, and the 71 of that wait more than 60 on a machine by
+itself, which a machine with six times its processors' work makes more
+than the 300 that a step has. The limit is one that a test holds a
+build to, and was left as it is.
+
+**Open.**
+
+- The layout of the two dialogs, as "Piece E2" has it for the setup's:
+  the Advanced options have a group of one line now, Other options
+  with Clear keyboard buffer alone, and the right half of the
+  Configuration is five rows shorter than the left. Arranging either
+  anew is the user's to decide.
+- The original's help file still explains Quick execute commands, in
+  the page of the Advanced options and in the setup's page of the
+  Configuration. The file is the distribution's; a help of the
+  portable C's own is not in hand.
+
 ## The portable C: the system's functions
 
 What the program asks of the system it asks through
@@ -2291,9 +2485,8 @@ DOS and is not behind it yet.
   `ProgramEnvironment`.
 - Quick execute was `Int2E` and `Exec2E` of `resident.c`: COMMAND.COM's
   own interrupt, called in assembly, with the stack set by hand behind
-  it. Since S3 it is `ShellRun` of `sys.h`, which comes back, with
-  `Int2E` in `dos.c`. The feature stays whole until it is decided
-  (above).
+  it. From S3 on it was `ShellRun` of `sys.h`, which came back, with
+  `Int2E` in `dos.c`. It is gone, function and feature (above).
 - `MemSetSearch` and `MemSetUpper`, by which `SetStat` has DOS look for
   memory in the lowest block first when the program begins, are
   functions of `sys.h` that only a PC with DOS has a use for: each goes
@@ -2370,7 +2563,7 @@ user. The numbers are those that the two lists have between them.
 |---|---|---|
 | 1 | Whether step 1 keeps segments and offsets as numbers, or has pointers first, under the 16-bit build: see "The strategy" | Numbers in step 1, in a megabyte of the program's own inside the flat memory. They become pointers in step 2, under the 32-bit build alone. It is scaffolding of some 40 lines of `vc.h` and 30 of `dos32.c`, which step 2 takes down again |
 | 2 | Where the panels and the viewer's text are in step 1. With 1 they have to lie within that megabyte, so they cannot be DOS's memory below the megabyte, nor a block that the extender gives wherever it likes | A stretch of the program's own, 640 KB, that the three functions of `sys.h` for memory hand out as they hand out DOS's today. A command then finds all of DOS's memory free but the extender's 52 KB. The editor has more room in it than the original's has on the bench, and opens a file that the original refuses: declared on the user's word, entry 13 of `src/portable_c/DEVIATIONS.md`, with `editor-big` not run for this program |
-| 5 | Quick execute commands, which is the user's to decide and not decided (`TODO.md`, "The portable C: one program"). Under the extender COMMAND.COM's interrupt is called in real mode and comes back; the shell of the bench does not serve it either way (`quick`) | It stays whole through step 1, some 40 lines of `dos32.c`. Should the user decide that it goes, the hardest part of S3 and D2 goes with it |
+| 5 | Quick execute commands, which was the user's to decide. Under the extender COMMAND.COM's interrupt is called in real mode and comes back; the shell of the bench does not serve it either way (`quick`) | It stayed whole through S3 and D2, some 40 lines of `dos32.c`. Decided on 13 October 2026: it goes, and it has gone, from both programs ("The portable C: without Quick execute commands") |
 | 6 | Release and debug, which the user asked for at this step | Two programs of every build: `VC.EXE`, compiled `-os` without debugging information, which is shipped and which every test judges; and `debug/VC.EXE`, compiled `-od -d2` with checks in the macros of the addresses, built always and run by hand. See "The build" |
 | 7 | Where DOS/32A's licence text is kept, which the road has in the repository and the trial left open as to where | `LICENSE.DOS32A` beside `LICENSE`, the text of `binw/license.d32` as it is, and the sentence that the road has the README say, under a heading of its own |
 
@@ -5189,7 +5382,11 @@ still asks for. `VC.EXE` is 4 bytes shorter, 197,106. The stack: 157
 figures of 159 as the entry left them, `command` 14 more, which is the
 12 of the others after all, and `mouse-select` 2 fewer.
 
-**Quick execute: done.** It is a function of `sys.h` that comes back,
+**Quick execute: done.** This is how it was made in this piece, and
+is history: the feature has gone from the portable C since, on the
+user's word of 13 October 2026, with `ShellRun`, `Int2E` and the way
+through them in `Exec02` ("The portable C: without Quick execute
+commands"). It was a function of `sys.h` that came back,
 as the plan's row has it, 98 functions where there were 97:
 
 | Function | What it is | In `dos.c` | In `dos32.c` |
@@ -5636,7 +5833,9 @@ as `Run` of `dos.c` has them; and the 14 bytes that name those.
 | INT 22h of real mode | DOS has it name where it was called from, and puts it back from the PSP when the program ends | Read before the call and put back behind it, DPMI 0200h and 0201h | The extender ends first, and writes "DOS/32A warning (9003): real mode interrupt vector has been modified: INT 22h" onto the last screen. Tried without: it does; with it the last screen is as in 16 bits |
 | CX, SI and DI at the call | As they come | 0, as D1 has every register that a call does not read | |
 
-`ShellRun` is the trial's way: 26 bytes of real mode in the block,
+`ShellRun`, which has gone since with Quick execute commands, and
+with it the 48 bytes of the block that it had, was the trial's way: 26
+bytes of real mode in the block,
 which keep the stack in four bytes behind their own segment, call INT
 2Eh, put the stack back with the machine kept from interrupting, and
 return far, called by DPMI 0301h with DS:SI on the command, which is
@@ -6200,7 +6399,8 @@ extender, which passes it on.
 The build has nothing new: no tool, no step, no line of
 `CMakeLists.txt`. The bytes were read back once with `ndisasm -b16`.
 `harness/datacheck.py` and `harness/reads.py` have an entry each for
-the table, as they have for `Shell_T`.
+the table, as they had for `Shell_T`, the table of Quick execute
+commands, which is gone since.
 
 **What was seen.** `harness/trial32/ended.asm`, which prints the break
 state itself now, as the last word of its second row, against each
@@ -6313,9 +6513,12 @@ at an idle round of the driver for a flat program, or more time for a
 step that waits by `Wait*`, as a scenario that is not on the record
 already has (`short_step` of `harness/ported.py`).
 
-For whoever takes Quick execute out: `LOW_SHELL` and `LOW_KEPT` are 48
-bytes of the block in front of `LOW_ENDED`; the places behind them can
-move down, since `Ended_T` is written by their names.
+Quick execute commands is out since ("The portable C: without Quick
+execute commands"): `LOW_SHELL` and `LOW_KEPT` were 48 bytes of the
+block in front of `LOW_ENDED`, and the places behind them have moved
+down by that, `Ended_T` being written by their names. `LOW_ENDED` is
+at 464, and the block is 512 bytes again; the 560 and the address
+`3391:0200` above are of the block as it was when this was made.
 
 ### C2, a second copy in the driver, and `command`: done but for what is the user's
 
@@ -6431,7 +6634,7 @@ program of 32 bits with the driver as it is now. Its code ran at
 | Scenario | Against the original's golden as the rules leave it, with no patch | Now |
 |---|---|---|
 | `second-copy` | Every screen cell for cell but one: behind step 8, F10, rows 5 to 11, the box that names the program, which is 10 of `DEVIATIONS.md` and the second half of the 16-bit program's patch, row for row. The copy runs `ver` and shows what it printed, as the original's does. The disks are the original's | On the record, with `harness/goldens/portable_c32/second-copy.patch`, those seven rows, of 10 alone |
-| `start-memory` | The same but for steps 11 to 14. The copy runs `k`, as the original's does, and `k` stays in the memory with all but 75 KB of DOS's. The original's copy cannot get its data back, says "Program too big to fit in memory" and ends. This one needs none of DOS's memory to come back, says nothing and is still there: behind step 12 the command line shows `C:\WORK>d:\vc\vc k` and the two lines of the banner a row further down, rows 19 to 21, with no fourth line; behind steps 11, 13 and 14 the panels are the copy's, with the mini status, rows 20 to 22, which are the rows that the 16-bit program's patch has there. The disks are the original's | On the record, with a patch of its own, those four screens, of 1, which says so for the program of 32 bits now |
+| `start-memory` | The same but for steps 11 to 14. The copy runs `k`, as the original's does, and `k` stays in the memory with all but 75 KB of DOS's. The original's copy cannot get its data back, says "Program too big to fit in memory" and ends. This one needs none of DOS's memory to come back, says nothing and is still there: behind step 12 the command line shows `C:\WORK>d:\vc\vc k` and the two lines of the banner a row further down, rows 19 to 21, with no fourth line; behind steps 11, 13 and 14 the panels are the copy's, with the mini status, rows 20 to 22, which are the rows that the 16-bit program's patch has there. The disks are the original's | On the record, with a patch of its own, those four screens, of 1, which says so for the program of 32 bits now; and, since Quick execute commands went, the two screens of the Advanced options as the 16-bit program's patch has them, of 14 |
 | `ended` | Two rows, the one that the scenario prints of the registers behind steps 40 and 43: `2222 1111 EEF6 436D FF75 0202` both times, where the original has `0000 1111 0000 0000 0000 0202` and `0000 0002 0000 0000 0000 0202`, and the 16-bit program's patch `2222 1111 EE4F #### 0000 0202`. Every other screen, and the disks, as the original's. That is what H3 saw: the driver's blindness had no part in it | Not this piece's. On the record since E, which has the program of 32 bits told when DOS ends it: those rows are the 16-bit program's patch's now |
 | `comspec` | Before C1's mend of the editor, against the 16-bit program's patch: first otherwise behind step 45, Enter in the editor, `Line 1` for `Line 2`, and everything behind followed from that; nothing of the second copy showed. With that mend it passes | On the record since C1 |
 | `start-setup`, `start-screen` | Pass, as before | On the record already |

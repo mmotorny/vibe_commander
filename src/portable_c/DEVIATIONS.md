@@ -141,23 +141,17 @@ it.
 - The setup has no box for it either. The original's setup program,
   `VCSETUP`, has the switch in its Configuration as well, the first of
   three boxes of Execute options, and writes the byte. In the setup of
-  the portable C, which is that program (see 8), the box is gone: Quick
-  execute commands stands in its place, a row further up, and with TSR
-  manager gone from below that (see 7) it is the one line of Execute
-  options. The Keyboard options stand two rows further up for the two,
-  and the box of the dialog is as tall as it was, since its left half
-  is: the last two rows of its right half are empty. The boxes go to
-  each other as they stand now: Down from Show logical drive B: is Quick
-  execute commands, Right from a box of the left half is the box on its
-  row or else the one above that row, and Left from one of the right
-  half the box on its row. The setup writes the byte into the setup file
-  as it read it, and Set default configuration makes it 1, as the
-  original's does.
+  the portable C, which is that program (see 8), the box is gone, and so
+  are the two below it, Quick execute commands (see 14) and TSR manager
+  (see 7): the dialog has no Execute options, and 14 says how it stands
+  without the group. The setup writes the byte into the setup file as it
+  read it, and Set default configuration makes it 1, as the original's
+  does.
 - The original's help file, which the portable C reads, still has its
   page on Memory allocation; no item of the menu leads there. And the
   page of the Configuration that the setup shows for F1 still has its
-  paragraph on the box, between those on Show logical drive B: and on
-  Quick execute commands: the help file is the distribution's.
+  paragraph on the box, behind that on Show logical drive B:: the help
+  file is the distribution's.
 - It is an `.EXE` file, with the main data in it, which DOS loads and
   relocates. A DOS before 3 is left through the INT 20h of the
   PSP, as the original leaves it, by a call instead of a return; the
@@ -245,23 +239,23 @@ and no others:
 | `lost` | The program's file is deleted by a command. The original asks for it, twice, and ends; the portable C is back at its panels, and the keys that answered the original are keys at the panels: a space into the command line, Enter, which runs it, and Esc, which switches the panels off |
 | `clock`, `clock-russia` | The Options menu where it shows: without Memory allocation, so with Save setup a row further up. And by 8: with two rows more at its bottom, a line across the menu and More setup, so a row taller than the original's |
 | `menu` | The same. By 8: Up from the top of the menu, and PgDn, go to More setup, the last item, where the original has Save setup, and Up from there goes to Save setup, where the original goes on from that to Memory allocation. And by 7: the Commands menu where it shows, five times, a line shorter, without Memory info, with the items that are dark there a row further up |
-| `quick` | The step that switches Memory allocation off before the last command is left out; every screen is as the original's after the same step |
 | `second-copy` | In 16 bits: the second copy is started with a command to run and has no memory for it: "There is not enough memory to run this command" where the original shows what the command printed. The rest is as the original's: the copy's panels, the copy left, the first copy at work. In 32 bits: every screen is as the original's, the copy having run its command; its patch is of 10 alone |
 | `start-memory` | In 16 bits: the second copy has no memory to run the command that was to leave it without memory for its data, and says so. It is still there afterwards, where the original has said "Program too big to fit in memory" and ended: the panels of the last three screens are the copy's, with the mini status that the first copy's have not. In 32 bits: the copy runs the command, as the original's does, which stays in the memory and leaves 75 KB of DOS's; the copy needs none of that to come back and says nothing, so the command line shows a row less of it, and it is still there afterwards, with the same three screens |
-| `setup-config` | The Configuration of the setup where it shows: without Memory allocation, and by 7 without TSR manager. In the right half of its box, Quick execute commands is a row further up, the frame of Execute options ends below it, the Keyboard options are two rows further up, and the last two rows are empty. The two steps that untick Memory allocation and TSR manager are left out; Quick execute commands is ticked where the cursor is when it comes down from the left half, by Space where the original goes down a line first. Left from Clear keyboard buffer is Error sound, the box of its row, where the original has Show logical drive B: there. And the setup file that is saved has the two bytes as it had them, 1 and 1, where the original's has 0 and 0, with another sum for that: three bytes of the file |
-| `setup-config-mouse` | The Configuration so. The click on Quick execute commands is a row further up and those on Alt alone selects menu two rows, and the mouse pointer with them. Every box is ticked as in the original, and the setup file that is saved is the original's |
-| `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The Configuration so, where each shows it; under the help of `setup-help-screens` nothing of its right half shows. In the Configuration the steps are the original's, since none goes into its right half. All but `setup-missing-saved` show Screen and Mouse too, which is otherwise by 5 |
+| `setup-config` | The Configuration of the setup where it shows: without Memory allocation, by 7 without TSR manager and by 14 without Quick execute commands, so without Execute options. The row of the scenario in 14 says all that differs in it: of this entry, the step that unticks Memory allocation is left out, and the setup file that is saved has the byte as it had it, 1, where the original's has 0 |
+| `setup-config-mouse`, `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The Configuration so, where each shows it: their rows are in 14. All but `setup-config-mouse` and `setup-missing-saved` show Screen and Mouse too, which is otherwise by 5 |
 | `ended` | In 16 bits the program that the second copy was to leave in the memory before DOS ends it does not run, for want of memory. In 32 bits the copy has the memory and runs it, and it stays in the memory, 448 bytes, also when DOS has ended the copy, which by 7 keeps no list of such programs to release: no screen of the scenario shows that, since the program that started the copy clears the screen, and both programs are held to the one patch. And by 7, for both: the copy would have none to release in any case, and the registers that the program which started it prints are as the portable C leaves them, both times: CX and SI as they went, 2222h and 1111h, where the original has 0 and, the second time, 0002h; and DS:DX no longer where INT 27h goes, which the original has as 0 and 0 from there. And by 8, with no interrupt of DOS's taken: DX has in its low byte what DOS was last told of Ctrl-C and is as it came above that, which is what the original leaves there where its setup has TSR manager off; and DS is as it came, on the program that started the copy, a segment that follows the size of the program and is left out of the comparison, in `harness/deviations.py`. The look at the map of the memory that ends the scenario, two steps, is left out |
 
 A step that switches Memory allocation, "F9 o m", is left out of every
-scenario for the portable C: there it would enter the setup (see 8).
+scenario for the portable C: there it would enter the setup (see 8). Of
+the scenarios that the portable C is taken through none has such a step
+since `quick`, which had one before its last command, is not run for it:
+see 14.
 
 On every screen that shows one of the two dialogs with the mouse pointer
 where the setup put it, in the middle of the screen, the pointer is over
 a line that has moved: the cell whose colours it exchanges holds another
-character, and the cell that the original has there is two rows further
-up, or five in Screen and Mouse, in the colours of its line. The patches
-have both.
+character, and the cell that the original has there is five rows further
+up, in the colours of its line. The patches have both.
 
 **Not run for the portable C:**
 
@@ -275,16 +269,8 @@ against the original's with this difference declared for each, in
 `DECLARED` of `harness/datacheck.py`: the lines of the menus, the pages of
 their help, the size of the Options menu, its commands, and the item that
 Shift-F9 chooses in it. And of the setup's Configuration, for this and for
-7 together, the dialog, `StConf_B`, which is held against the original's
-without the two fields and with the fields that each of the others goes
-to and the rows of those that have moved as they are now; and eleven
-lines of its box, `StCnf02_S` to `StCnf12_S`. A line of that box is one
-text for the two halves: each of the nine that have something on the
-right is held against the original's line of that name as far as its left
-half goes and from there against the right half of the original's line
-that stands there now, and the two that have nothing there against their
-left halves, with spaces declared behind. The box itself, `StConf_P`, is
-the original's.
+7 and 14 together, the dialog, `StConf_B`, and twelve lines of its box:
+14 says how each is held.
 
 ### 2. No buffer of TopView or DESQview in place of the screen
 
@@ -547,10 +533,13 @@ the C translation handed over what the original does. Every file of
 the program has gone over to `sys.h`, and each added its places here as
 it went. A call that the portable C makes no more has no row: DOS
 asked where INT 21h goes, when the program starts, went with the
-program's own call (see 8), and the five calls of the BIOS in `F69_00`
-of `commands.c`, the font asked about, the mode set, the small font
+program's own call (see 8); the five calls of the BIOS in `F69_00` of
+`commands.c`, the font asked about, the mode set, the small font
 loaded, Print Screen told of the rows and the font asked about again,
-went with EGA lines (see 12).
+went with EGA lines (see 12); and INT 2Eh, a command handed to the
+COMMAND.COM that is in the memory, went with Quick execute commands,
+as did DOS asked for the current drive in two places for that way alone
+(see 14).
 
 | Routine | Call | The original | The C translation, where it differed | The portable C |
 |---|---|---|---|---|
@@ -596,7 +585,6 @@ went with EGA lines (see 12).
 | `SetBrk`, `resident.c` | DOS 3300h and 3301h, whether DOS looks for Ctrl-C at every call, asked and set | 3300h: DX as whoever calls has it. 3301h: DH as 3300h left it | DS 0 at both, DX 0 at 3300h | DX 0 at 3300h and DH 0 at 3301h, DS on the main data |
 | `Exit00`, `resident.c`, and `Exit05`, `dos.c`, which is the original's `Exit02` where DOS has ended the program | DOS 3301h, Ctrl-C looked for as before, and 4Ch, the program ended | 3301h: DH as the code or DOS before left it. 4Ch: DS:DX on where an interrupt went before the program took it, of giving it back, where the watch on DOS is on | DS 0 at 3301h | DH 0 at 3301h; DS on the main data at both, and DX 0 at 4Ch |
 | `Exec02`, `resident.c` | DOS 3301h, Ctrl-C looked for as before; 4B00h, COMMAND.COM run; 19h and 47h, the current drive and its directory for the prompt; BIOS 0Eh, the end of the line typed, twice | 3301h: DH as the code before left it. 4B00h: CX the length of the command's tail, with the slash above it; SI on the tail and DI on the name COMMAND.COM. 19h: AL 0Dh, of the start of the prompt, and DX as the command or DOS left it. 47h: AL a colon, of the prompt. 0Eh: CX and DX as the code before left them | CX and DX 0 at 0Eh | DH 0 at 3301h. CX, SI and DI as they come at 4B00h. AL and DX 0 at 19h, AL 0 at 47h. CX and DX 0 at 0Eh |
-| `Exec02`, `resident.c`, with Quick execute commands | INT 2Eh, a command handed to the COMMAND.COM that is in the memory, which takes it at DS:SI | AX 3300h, of Ctrl-C just set and the zero that the end of the command was looked for by; CX the length of the command, DI on the carriage return at its end; DL what DOS was told of Ctrl-C; ES on the program's segment, as DS |  | DX the segment of the command, which is DS; AX, BX, CX, DI and ES as they come |
 | `SetStat`, `resident.c` | DOS 5801h and 5803h, how DOS looks for memory | CX and DX as the code before left them |  | CX as it comes, DX 0 |
 | `Alloc3`, `resident.c`, the original's `Alloc0` from that label on | DOS 30h, the version, and 4Ah, the block of the program made shorter | 30h: AL as taking the check sum of the file left it, which the portable C does not take. 4Ah: AL the minor number of the version; CX and DX how much of itself the original then moves, in bytes and in paragraphs |  | AL 0 at both, CX as it comes and DX 0 at 4Ah |
 | `SaveSet`, `setup.c` | DOS 4300h, 3Ch, 40h and 3Eh, the setup file written | 4300h: BX the length of the file. 3Ch: AL the low byte of what 4300h answered, BX the length still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still |  | AL 0 at the three; BX as it comes at 4300h and 3Ch; CX and DX 0 at 3Eh |
@@ -606,7 +594,7 @@ went with EGA lines (see 12).
 | `IniData`, `start.c` | DOS 38h, the country, and DOS's routine for capitals, 128 times | 38h: BX and CX as the BIOS left them at the call before, the page and the shape of the cursor. The routine: AH as 38h left it |  | BX and CX as they come at 38h. AH 0 at the routine |
 | `IniData`, `start.c`, where a command has left a screen that is not text of 80 columns | BIOS 01h, the cursor hidden; 00h, the mode set; 0Fh, the mode | 01h: AL the mode, as 0Fh left it (see below), and BX the page and the columns. 00h: BX the same, and CX 2000h, the shape that hides the cursor. 0Fh: AL as 00h left it, BX and CX the same |  | AL 0 at 01h and 0Fh; BX and CX 0 where the call takes none |
 | `IniData`, `start.c` | BIOS 03h and 01h, the shape of the cursor asked for and set | 03h: AL the mode; BL, CX and DX as the calls before left them. 01h: AL as 03h left it, the mode from a BIOS that leaves AX alone (see below); BH the page; DX where the cursor is, as 03h answered |  | AL 0 at both; BL, CX and DX 0 at 03h, BX and DX 0 at 01h |
-| `IniData`, `start.c` | DOS 19h, the current drive; BIOS 12h and 1130h, an EGA and its font | 19h: BX and CX as the calls before left them. 12h: AL the drive, as DOS answered; CX and DX as left. 1130h: BL and CX as 12h answered, the memory of the EGA and its switches (see below); DH as left |  | BX and CX as they come at 19h. AL, CX and DX 0 at 12h. BL and DH 0 and CX 16 at 1130h |
+| `IniData`, `start.c` | BIOS 12h and 1130h, an EGA and its font | 12h: AL the current drive, as DOS answered the call before, AH 19h, which the portable C does not make (see 14); CX and DX as left. 1130h: BL and CX as 12h answered, the memory of the EGA and its switches (see below); DH as left |  | AL, CX and DX 0 at 12h. BL and DH 0 and CX 16 at 1130h |
 | `IniData`, `start.c` | DOS 3306h and 30h, the version | 30h: BX what 3306h left in AX. CX and DX of both as the calls before left them |  | BX and CX as they come, DX 0 |
 | `IniData` with `CurNl`, `start.c` | The colour that DOS writes in: BIOS 0Fh and 03h, the page and the cursor, twice; 0Eh, a carriage return or a line feed typed, three times; 08h, the cell at the cursor, twice; DOS 06h, a space written; BIOS 09h, the cell written back | 0Eh: BL what DOS left when it was asked for its version, the low byte of AX from 3306h or BL from 30h; the BIOS takes a colour there only where the screen is graphics. 06h: AL the character at the cursor, as 08h answered; DH the row of the cursor; BX and CX as the BIOS left them. AL of 0Fh, 03h and 08h as the call before left it. CX and DX of the BIOS's calls the shape of the cursor and where it is, as 03h answered, with the space in DL from 06h on |  | BL 0 at 0Eh. AL and DH 0 at 06h, BX and CX as they come. AL 0 at 0Fh, 03h and 08h, and 0 in whichever of BL, CX and DX a call of the BIOS does not take |
 | `StRdHelp`, `sthelp.c` | DOS 3Dh, 3Fh and 3Eh, the pages of the setup's help read from the help file | 3Dh: BX, SI and DI as finding the directory and copying the name left them, CX 0, of that copy. 3Fh, five times: AL the low byte of the place in the file that was just gone to, or of what was worked out since, the room for the index or the bytes between two pages. 3Eh: AL as the call before left it, the low byte of what was read where all went well; CX and DS:DX the count and the buffer still, or what the look at the header left |  | BX, SI and DI as they come at 3Dh. AL 0 at 3Fh and 3Eh; CX and DX 0 at 3Eh |
@@ -773,9 +761,11 @@ watch.
 - The setup has no box for it. The original's setup program has TSR
   manager in its Configuration, the last of three boxes of Execute
   options, and writes the byte. In the setup of the portable C, which
-  is that program (see 8), the box is gone, with that of Memory
-  allocation: 1 says how the dialog stands without the two. The setup
-  writes the byte into the setup file as it read it, and Set default
+  is that program (see 8), the box is gone, with those of Memory
+  allocation (see 1) and of Quick execute commands: 14 says how the
+  dialog stands without the three, which were all of its Execute
+  options. The setup writes the byte into the setup file as it read it,
+  and Set default
   configuration makes it 1, as the original's does. When the setup is
   left with Save, the program keeps the byte that it had, as the
   original's running program does.
@@ -823,11 +813,12 @@ left out alone:
 And `menu` and `ended`, which the first deviation changes too: their
 rows there say all that differs in them, and the patch of each names
 both entries. So it is with the scenarios that show the Configuration of
-the setup, which is without TSR manager and without Memory allocation:
-`setup-config`, where the step that unticks TSR manager is left out and
-the byte is 1 in the setup file that is saved, `setup-config-mouse`,
-`setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed` and
-`setup-help-screens`. Their rows are in 1.
+the setup, which is without TSR manager, without Memory allocation and
+without Quick execute commands: `setup-config`, where the step that
+unticks TSR manager is left out and the byte is 1 in the setup file that
+is saved, `setup-config-mouse`, `setup`, `setup-missing-saved`,
+`setup-clock`, `setup-left-handed` and `setup-help-screens`. Their rows
+are in 14, and the patch of each names that entry with this one and 1.
 
 A step that passes through the map on the way to something else is
 left out of its scenario for the portable C, with the steps that leave
@@ -1433,7 +1424,7 @@ are left out with the key, from the one press to the other:
 | `help-keys` | The help on 50 rows is not shown: the last five steps are left out. Every screen before is as the original's |
 | `mouse-help` | The mouse in the help on 50 rows: the last nine steps are left out. Every screen before is as the original's, with the patch that the scenario has for 10 |
 | `scroll` | The two steps that go to 50 rows and back, with the panels on, are left out. Every other screen is as the original's after the same step |
-| `user-menu` | The user menu in its box on 50 rows: four steps are left out. Every other screen is as the original's after the same step |
+| `user-menu` | The user menu in its box on 50 rows: four steps are left out. Every other screen is as the original's after the same step, with the patch that the scenario has for 14 |
 | `history-drives` | The history in its box on 50 rows: four steps are left out. Every other screen is as the original's after the same step |
 | `menu-panel` | The command line left high up by 50 rows, with the panels off: the last four steps are left out, the panels switched off and on again around the two presses. Every screen before is as the original's |
 
@@ -1551,3 +1542,136 @@ much room a build has:
 |---|---|---|
 | `editor-full` | The editor with all of its memory full: a line put back until there is no room, and two characters typed that have none | The editor is never full: it has some 250,000 bytes free where the original has none. Seen, in the count of its status line |
 | `copy-big` | A file that the memory does not hold, 526,632 bytes, read and written in two parts, and skipped when not all of it has been read | The memory holds it: one part. By the numbers, not seen |
+
+### 14. No Quick execute commands
+
+**What the original does.** A command that is typed at the prompt, chosen
+from the user menu or run by a line of the extension file is run by a
+COMMAND.COM of its own: the program runs the file that `COMSPEC` names,
+with `/C` and the command for its tail, once for every command. With
+Quick execute commands switched on it does otherwise. The setting is the
+first of the Other options in the Advanced options of the Options menu,
+and the second of the Execute options in the Configuration of the setup
+program; it is off in the program as it is distributed. With it, each
+command is handed to the COMMAND.COM that the program was started from,
+which is in the memory still, by that shell's own interrupt, INT 2Eh,
+with the command at DS:SI. No second shell is loaded for a command, and
+what a command sets in the shell stays set there. That shell is on the
+drive that it was last left on, so the original notes the current drive
+each time it starts, also when it has come back from a command, and
+before the commands hands the shell one more, which goes to the current
+drive, "D:", if that is another by then.
+The interrupt comes back with every register lost, the stack among
+them, and the original sets its stack anew behind it. A shell that does
+not serve the interrupt runs nothing and says nothing, and the program
+comes back as if the command had run: the COMMAND.COM of FreeDOS, which
+the bench of the tests has, is such a shell.
+
+**What the portable C does.** It has neither the setting nor that way:
+every command is run by a COMMAND.COM of its own, with `/C`, as the
+original runs one with the setting off.
+
+- The Advanced options have no line for it. Other options has one line,
+  Clear keyboard buffer, a row further up; the end of its frame, the two
+  lines of text, the line across the box and the buttons are a row
+  further up with it, and the box is a row shorter, seventeen rows of the
+  screen with its margins where the original's has eighteen. The boxes go
+  to each other as they stand now: Down from Alternative editor is Clear
+  keyboard buffer, and Up from the buttons.
+- The Configuration of the setup has no Execute options: the group had
+  three boxes, of which Memory allocation went by 1 and TSR manager by
+  7, and this was the one that was left. The Keyboard options stand at
+  the top of the right half of the box, five rows further up than in the
+  original's, beside the first five of the General options, and the box
+  of the dialog is as tall as it was, since its left half is: the last
+  five rows of its right half are empty. The boxes go to each other as
+  they stand now, by the rule that the original's follow: Down from Show
+  logical drive B: is Alt alone selects menu; Right from a box of the
+  left half is the box on its row, or else the one above that row, which
+  is Clear keyboard buffer from Clock down; and Left from a box of the
+  right half is the box on its row.
+- INT 2Eh is not called. And DOS is not asked for the current drive
+  where the original asks for the sake of that way alone: when the
+  program starts and each time it has come back from a command (AH 19h,
+  in `IniData`, behind the environment searched), and before the
+  commands are run (AH 19h, in `F21_31`). Nothing is left in the five
+  bytes in front of the command line, `DosChg`, but what running a
+  command by COMMAND.COM writes there, the count and `/C`.
+- The byte of the setup that held the switch, `ExecTyp`, is kept as it
+  is found and written back as it was, 0 in a setup made of the
+  defaults; the program does not go by it. A setup file of the original
+  is one of the portable C and the other way round: with a file that has
+  the byte set, the portable C runs its commands by COMMAND.COM.
+- The original's help file, which the portable C reads, still has its
+  paragraph on Quick execute commands in the page of the Advanced
+  options, and in the page of the Configuration that the setup shows
+  for F1: the help file is the distribution's.
+
+Gone are the way through the shell in `Exec02` of `resident.c`, with the
+command kept in `BatPoin` of the main data meanwhile, a word that keeps
+its place and is neither set nor read; what `F21_31` of `enter.c` and
+`IniData` of `start.c` did for the command that goes to the drive; and
+the function of `sys.h` by which the shell was handed a command,
+`ShellRun`. With that, of `dos.c`: `Int2E`, fourteen instructions of
+inline assembly around the interrupt, the one place where the program
+kept its stack by hand and put it back, with the two words that it was
+kept in. And of `dos32.c`: the 26 bytes of instructions of real mode,
+`Shell_T`, which did the same for the program of 32 bits below the
+megabyte, and the 48 bytes of the block there that they stood in. The
+program has one way of running a command.
+
+**Why.** The user's decision, on 13 October 2026, as `CLAUDE.md` has it
+under "The portable C": Quick execute commands goes, the setting and the
+way through INT 2Eh. It was asked and not taken out as a thing of DOS's,
+since a feature is judged by what it gives a user and not by how DOS did
+it: the interrupt is one that only DOS's COMMAND.COM has, but commands
+run by the shell that the program was started from, sooner and with what
+they set kept, are not DOS's alone. No bench of the project could show a
+command run so: the shell there does not serve the interrupt.
+
+**Which scenarios show it.** Each of these is held against the
+original's golden with what its row says made to it, by its patch:
+
+| Scenario | What changes in it |
+|---|---|
+| `command-edit`, `comspec`, `dirinfo`, `ended`, `sizes`, `view-search`, `editor-hex`, `editor-long`, `editor-save`, `editor-words`, `editor-full`, `editor-keys`, `editor-hex-keys`, `editor-buffer`, `editor-dirinfo`, `mouse-edit`, `start-setup`, `start-screen`, `start-memory`, `setup-delay-file`, `setup-help-file` | The Advanced options, on two screens: opened, and with Clear keyboard buffer unticked, which is four times Down and Space where the original has five. From the row of Quick execute commands down the box has what the original's has a row further down, and the cursor on Clear keyboard buffer is a row further up with it; the row that the original's box ends on shows what is behind the box in the shadow of the box, and the row of that shadow what is behind it. The mouse pointer is in the middle of the screen, on the row that Quick execute commands was on: the cell whose colours it exchanges holds a letter of Clear keyboard buffer, the line that stands there now. `comspec`, `ended`, `start-setup`, `start-screen` and `start-memory` have patches of other entries, which name this one too; `setup-delay-file` shows Screen and Mouse besides, which is otherwise by 5 |
+| `user-menu`, `user-menu-run`, `view-commands` | The same, on one screen: the step that unticks Clear keyboard buffer also leaves the dialog |
+| `command-line`, `setup-cancel`, `setup-defaults` | The Advanced options so, on one screen, with the original's steps: in `command-line` Escape toggles panels on/off is unticked, the second box, and in the other two the dialog is looked at for what the setup left |
+| `setup-config` | The Configuration of the setup where it shows: without Execute options, and by 1 and 7 without the two other boxes of that group. The Keyboard options are five rows further up, and the last five rows of the right half are empty. Down from Show logical drive B: is Alt alone selects menu, which is unticked there by Space where the original goes down three lines first; the three steps on the way, which untick Memory allocation, tick Quick execute commands and untick TSR manager, are left out. Left from Clear keyboard buffer is Full screen, the box of its row, where the original has Show logical drive B: there. And the setup file that is saved has the three bytes as it had them, 1, 0 and 1, where the original's has 0, 1 and 0, with another sum for that: four bytes of the file |
+| `setup-config-mouse` | The Configuration so. The click on Quick execute commands is left out, and those on Alt alone selects menu are five rows further up, and the mouse pointer with them. The setup file that is saved has the byte of Quick execute commands as it had it, 0, where the original's has 1, with another sum: two bytes of the file |
+| `setup`, `setup-missing-saved`, `setup-clock`, `setup-left-handed`, `setup-help-screens` | The Configuration so, where each shows it; under the help of `setup-help-screens` nothing of its right half shows. The steps are the original's, since none goes into the right half |
+
+On every screen that shows the Configuration with the mouse pointer
+where the setup put it, in the middle of the screen, the pointer is over
+a row of the right half that is empty now: the cell whose colours it
+exchanges holds a space, and the cell that the original has there is
+five rows further up, in the colours of its line. The patches have both.
+
+**Not run for the portable C:**
+
+| Scenario | Why |
+|---|---|
+| `quick` | It switches Quick execute commands on and runs commands so, on the drive that the program began on and on another. The bench's shell runs nothing by that interrupt, so what the scenario holds is that the program comes back and goes on; the portable C runs the commands, by COMMAND.COM, as every other scenario that runs one has it do |
+
+**In the data.** The test `portable_c-data` holds two tables of the
+Advanced options against the original's with this difference declared
+for each, in `DECLARED` of `harness/datacheck.py`: the box, `Sets_P`,
+with fourteen lines and without the one that it named ninth, and the
+dialog, `Sets_B`, without the field of the setting and with the fields
+that the others go to and the rows of the two that have moved as they
+are now. The line itself, `Set08_S`, is gone, and the test has nothing
+to say of a text that the tree has not. Of the setup's Configuration,
+for this and for 1 and 7 together, the dialog, `StConf_B`, is held
+against the original's without the three fields of Execute options and
+with the fields that each of the others goes to and the rows of those
+that have moved as they are now; and twelve lines of its box,
+`StCnf01_S` to `StCnf12_S`. A line of that box is one text for the two
+halves: each of the seven that have something on the right is held
+against the original's line of that name as far as its left half goes
+and from there against the right half of the original's line five
+further down, and the five that have nothing there against their left
+halves, with spaces declared behind. The box itself, `StConf_P`, is the
+original's. The program of 32 bits is held in the same way, by the same
+table; the instructions of real mode that it had for the shell,
+`Shell_T`, a table of its own that was not compared, are gone from what
+that test lists.

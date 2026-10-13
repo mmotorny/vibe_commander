@@ -2,18 +2,19 @@ The portable C in the scenario setup: what it is expected to show otherwise
 than the original. A patch of harness/goldens/setup.txt, see
 harness/goldens.py: a line with - is the golden's, a line with + is what is
 expected in its place.
-Deviation: 1, 5, 7 of src/portable_c/DEVIATIONS.md
-Why: the Configuration of the setup has no Memory allocation and no TSR
-manager: Execute options is one line, Quick execute commands, and the Keyboard
-options stand two rows further up, with the last two rows of the right half
-empty; and Screen and Mouse of the setup has no Screen output: the Other
-options and the Mouse options stand five rows further up, where that group
-was, with the right half empty below them. The mouse pointer exchanges the
-colours of the cell that it is on, the middle of the screen where nothing has
-moved it: the lines have moved under it, and it stays
+Deviation: 1, 5, 7, 14 of src/portable_c/DEVIATIONS.md
+Why: the Configuration of the setup has no Execute options, which were Memory
+allocation, Quick execute commands and TSR manager: the Keyboard options stand
+five rows further up, at the top of the right half, with the last five rows of
+the right half empty; and Screen and Mouse of the setup has no Screen output:
+the Other options and the Mouse options stand five rows further up, where that
+group was, with the right half empty below them. The mouse pointer exchanges
+the colours of the cell that it is on, the middle of the screen where nothing
+has moved it: the lines have moved under it, and it stays
 
 == 2: F2
-rows 5-15
+rows 4-15
+-|    ║  ┌ General options ──────────┐  ┌ Execute options ───────────────┐  ║     | 07x1 3Fx8 3Ex15 3Fx16 3Ex15 3Fx23 0Fx2
 -|    ║  │  [ ] Auto menus           │  │  [x] Memory allocation         │  ║     | 07x1 3Fx77 0Fx2
 -|    ║  │  [x] Path prompt          │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
 -|    ║  │  [x] Key bar              │  │  [x] TSR manager               │  ║     | 07x1 3Fx77 0Fx2
@@ -25,20 +26,22 @@ rows 5-15
 -|    ║  │  [ ] Auto save setup      │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
 -|    ║  │  [ ] Show logical drive B:│  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
 -|    ║  └───────────────────────────┘  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [ ] Auto menus           │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Path prompt          │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Key bar              │  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx39 3Ex16 3Fx22 0Fx2
-+|    ║  │  [ ] Menu bar visible     │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Full screen          │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [ ] Clock                │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Confirmation on quit │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Error sound          │  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
-+|    ║  │  [ ] Auto save setup      │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  ┌ General options ──────────┐  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx8 3Ex15 3Fx16 3Ex16 3Fx22 0Fx2
++|    ║  │  [ ] Auto menus           │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Path prompt          │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Key bar              │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Menu bar visible     │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Full screen          │  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Clock                │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Confirmation on quit │                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Error sound          │                                      ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
++|    ║  │  [ ] Auto save setup      │                                      ║     | 07x1 3Fx77 0Fx2
 +|    ║  │  [ ] Show logical drive B:│                                      ║     | 07x1 3Fx77 0Fx2
 +|    ║  └───────────────────────────┘                                      ║     | 07x1 3Fx77 0Fx2
 
 == 3: Down Down Space
-rows 5-15
+rows 4-15
+-|    ║  ┌ General options ──────────┐  ┌ Execute options ───────────────┐  ║     | 07x1 3Fx8 3Ex15 3Fx16 3Ex15 3Fx23 0Fx2
 -|    ║  │  [ ] Auto menus           │  │  [x] Memory allocation         │  ║     | 07x1 3Fx77 0Fx2
 -|    ║  │  [x] Path prompt          │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
 -|    ║  │  [ ] Key bar              │  │  [x] TSR manager               │  ║     | 07x1 3Fx77 0Fx2
@@ -50,15 +53,16 @@ rows 5-15
 -|    ║  │  [ ] Auto save setup      │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
 -|    ║  │  [ ] Show logical drive B:│  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
 -|    ║  └───────────────────────────┘  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [ ] Auto menus           │  │  [ ] Quick execute commands    │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Path prompt          │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [ ] Key bar              │  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx39 3Ex16 3Fx22 0Fx2
-+|    ║  │  [ ] Menu bar visible     │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Full screen          │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [ ] Clock                │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Confirmation on quit │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
-+|    ║  │  [x] Error sound          │  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
-+|    ║  │  [ ] Auto save setup      │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  ┌ General options ──────────┐  ┌ Keyboard options ──────────────┐  ║     | 07x1 3Fx8 3Ex15 3Fx16 3Ex16 3Fx22 0Fx2
++|    ║  │  [ ] Auto menus           │  │  [x] Alt alone selects menu    │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Path prompt          │  │  [x] Esc toggles screen on/off │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Key bar              │  │  [x] Alternative viewer        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Menu bar visible     │  │  [ ] Alternative editor        │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Full screen          │  │  [x] Clear keyboard buffer     │  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [ ] Clock                │  └────────────────────────────────┘  ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Confirmation on quit │                                      ║     | 07x1 3Fx77 0Fx2
++|    ║  │  [x] Error sound          │                                      ║     | 07x1 3Fx39 48x1 3Fx37 0Fx2
++|    ║  │  [ ] Auto save setup      │                                      ║     | 07x1 3Fx77 0Fx2
 +|    ║  │  [ ] Show logical drive B:│                                      ║     | 07x1 3Fx77 0Fx2
 +|    ║  └───────────────────────────┘                                      ║     | 07x1 3Fx77 0Fx2
 

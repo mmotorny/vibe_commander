@@ -540,7 +540,10 @@ static u16 CurNl(void)
    by asking DOS for the capital of each. The environment is searched
    for COMSPEC=, and for VC= and TEMP=; the original also notes where
    the path of the program's own file is behind it, OvlPth, to load
-   itself again after a command. Then the display: an EGA or VGA and its
+   itself again after a command, and asks DOS for the current drive, for
+   DosChg: the drive that the shell is on which it hands its commands to
+   with Quick execute commands, a way of running one that the portable C
+   has not (see DEVIATIONS.md). Then the display: an EGA or VGA and its
    rows, and where its memory is; the original also finds out whether
    writing to it has to wait for the beam, asks whether TopView or
    DESQview shows a buffer in its place, and draws into that, and whether
@@ -635,7 +638,6 @@ void IniData(void)
     md.WinMous = 0;
     md.HstAdr = MD_PLACE(md.HstBuf);
     md.BarPrev = 0xFF;
-    md.DosChg[0] = (u8)DriveCurrent();  /* DosChg */
     if (ScreenEga())                    /* TstEGA */
         md.TstEGA = 1;
     lines = 25;                         /* Init29: Lines */

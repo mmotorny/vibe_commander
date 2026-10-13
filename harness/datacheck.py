@@ -207,11 +207,6 @@ OWN_OF = {
 # not compared, and a program of 16 bits is not held to have them.
 OWN_OF_FLAT = {
     "portable_c": {
-        "Shell_T": "the instructions that dos32.c puts below the megabyte "
-                   "to hand the shell a command in real mode, INT 2Eh "
-                   "with the stack kept round it: the program of 16 bits "
-                   "has them as code, Int2E of dos.c, and so has the "
-                   "original",
         "Ended_T": "the instructions that dos32.c puts below the megabyte "
                    "for where DOS goes on when it has ended the program "
                    "by another's hand, in real mode: the program of 16 "
@@ -287,10 +282,13 @@ _NAME = ("the portable C calls itself Vibe Commander 0.1, since it no "
          "longer is what the original is, and says what it is based on "
          "wherever the original named its version: ")
 _NO_SETTINGS = ("the setup of the portable C has no setting for what the "
-                "program has no more, Memory allocation and TSR manager "
-                "of the Configuration and Screen output of Screen and "
-                "Mouse, and what stood below them in the right half of "
-                "the box stands further up: ")
+                "program has no more, Memory allocation, Quick execute "
+                "commands and TSR manager of the Configuration, which "
+                "were its Execute options, and Screen output of Screen "
+                "and Mouse, and what stood below them in the right half "
+                "of the box stands further up: ")
+_NO_QUICK = ("the portable C has no Quick execute commands, the first of "
+             "the Other options of its Advanced options in the original: ")
 
 
 def _cells(*cells):
@@ -441,34 +439,51 @@ DECLARED = {
                           (28, 13), (29, 15), (32, 5), (35, 16), (36, 0),
                           (37, 0), (38, 0), (39, 0), (40, 14), (41, 15),
                           (56, 17))),
-        # The Configuration of the setup. Execute options has one line,
-        # Quick execute commands, where Memory allocation was, and the
-        # Keyboard options are two rows further up.
+        # The Advanced options of the main program. Other options has
+        # one line, Clear keyboard buffer, and the box is a row shorter.
+        "Sets_P": (_NO_QUICK + "the box has 14 lines, and the line of "
+                   "that setting, Set08_S, the ninth of the 15 that it "
+                   "names, is left out",
+                   ((4, 1, b"\x0E"), (24, 2, b""))),
+        "Sets_B": (_NO_QUICK + "the field of that setting, the fifth, is "
+                   "left out, and the fields go to each other as they "
+                   "stand now, five boxes and the buttons: Clear "
+                   "keyboard buffer is a row further up, below "
+                   "Alternative editor, and the buttons are a row "
+                   "further up too",
+                   (_field(0, (5, 1, 0, 0)), _field(4),
+                    _field(5, (3, 5, 4, 4), 0x90A),
+                    _field(6, (4, 0, 5, 5), 0xE1E))),
+        # The Configuration of the setup. Execute options is gone, with
+        # its three lines, and the Keyboard options are five rows
+        # further up, at the top of the right half.
         **_lines("Cnf",
-                 ((2, 23, 3, 53), (3, 24, 5, 106), (4, 20, 6, 83),
-                  (5, 29, 7, 78), (6, 24, 8, 113), (7, 18, 9, 126),
-                  (8, 32, 10, 118), (9, 24, 11, 120), (10, 28, 12, 103)),
-                 ((11, 30, 34), (12, 6, 8)), 37),
-        "StConf_B": (_NO_SETTINGS + "the fields of Memory allocation and "
-                     "TSR manager, the 11th and the 13th, are left out, "
-                     "and the fields go to each other as they stand now, "
-                     "16 boxes and the buttons: a box of the left half "
-                     "has to its right the box on its row or else the "
-                     "one above that row, and a box of the right half "
-                     "is on a row further up, with the box of its row "
-                     "to its left",
-                     (_field(0, (16, 1, 0, 10)), _field(1, (0, 2, 1, 10)),
-                      _field(2, (1, 3, 2, 10)), _field(3, (2, 4, 3, 11)),
-                      _field(8, (7, 9, 8, 15)), _field(9, (8, 10, 9, 15)),
-                      _field(10),
-                      _field(11, (9, 11, 0, 10), 0x329),
-                      _field(12),
-                      _field(13, (10, 12, 3, 11), 0x629),
-                      _field(14, (11, 13, 4, 12), 0x729),
-                      _field(15, (12, 14, 5, 13), 0x829),
-                      _field(16, (13, 15, 6, 14), 0x929),
-                      _field(17, (14, 16, 7, 15), 0xA29),
-                      _field(18, (15, 0, 15, 16)))),
+                 ((1, 29, 6, 241), (2, 23, 7, 237), (3, 24, 8, 250),
+                  (4, 20, 9, 256), (5, 29, 10, 262), (6, 24, 11, 293),
+                  (7, 18, 12, 287)),
+                 ((8, 30, 37), (9, 22, 31), (10, 26, 31), (11, 30, 34),
+                  (12, 6, 8)), 37),
+        "StConf_B": (_NO_SETTINGS + "the fields of Memory allocation, "
+                     "Quick execute commands and TSR manager, the 11th "
+                     "to the 13th, are left out, and the fields go to "
+                     "each other as they stand now, 15 boxes and the "
+                     "buttons: a box of the left half has to its right "
+                     "the box on its row or else the one above that "
+                     "row, which is the last of the right half from the "
+                     "sixth row down, and a box of the right half is "
+                     "five rows further up, with the box of its row to "
+                     "its left",
+                     (_field(0, (15, 1, 0, 10)), _field(3, (2, 4, 3, 13)),
+                      _field(4, (3, 5, 4, 14)), _field(5, (4, 6, 5, 14)),
+                      _field(7, (6, 8, 7, 14)), _field(8, (7, 9, 8, 14)),
+                      _field(9, (8, 10, 9, 14)),
+                      _field(10), _field(11), _field(12),
+                      _field(13, (9, 11, 0, 10), 0x329),
+                      _field(14, (10, 12, 1, 11), 0x429),
+                      _field(15, (11, 13, 2, 12), 0x529),
+                      _field(16, (12, 14, 3, 13), 0x629),
+                      _field(17, (13, 15, 4, 14), 0x729),
+                      _field(18, (14, 0, 14, 15)))),
         # Screen and Mouse of the setup. The Other options and the Mouse
         # options are five rows further up, where Screen output was.
         **_lines("Scr",

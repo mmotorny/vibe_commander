@@ -60,7 +60,7 @@
  *
  * The program begins here too, at Start, where the extender enters it.
  *
- * The file has two parts: the functions of sys.h, fourteen of them made
+ * The file has two parts: the functions of sys.h, thirteen of them made
  * in real mode, and the start of the program.
  */
 #include "vc.h"
@@ -222,17 +222,13 @@ static void MouseState(u32 eax, struct MouseAt *state);
      LOW_NAME     a name or a path, 128 bytes
      LOW_RECORD   the record of a search, 43 bytes
      LOW_SECOND   128 bytes that DOS writes a path to
-                  or the command tail of a program that is run, or a
-                  command for the shell
+                  or the command tail of a program that is run
      LOW_FCB      a file control block, 44 bytes with what an extended
                   one has in front
      LOW_COUNTRY  what DOS tells of the country, 34 bytes
      LOW_RUN      what DOS is told of a program that it is to run, 14
                   bytes, and the two file control blocks that this
                   names, 16 bytes each
-     LOW_SHELL    instructions of real mode around the shell's
-                  interrupt, and the four bytes in which they keep the
-                  stack
      LOW_ENDED    instructions of real mode for where DOS goes on when
                   it has ended the program by another's hand, and the
                   seven bytes that they read: see ProgramEndedTake */
@@ -246,13 +242,11 @@ static u16 LowSeg = 0;
 #define LOW_RUN     416
 #define LOW_FCB1    432
 #define LOW_FCB2    448
-#define LOW_SHELL   464
-#define LOW_KEPT    496
-#define LOW_ENDED   512
-#define LOW_WAS     544
-#define LOW_PSP     548
-#define LOW_BREAK   550
-#define LOW_SIZE    560
+#define LOW_ENDED   464
+#define LOW_WAS     496
+#define LOW_PSP     500
+#define LOW_BREAK   502
+#define LOW_SIZE    512
 #define LOW(place) ((u8 *)(((u32)LowSeg << 4) + (place)))
 
 #define DPMI_SEGMENT_BASE 0x0006        /* where the segment of the
@@ -1450,8 +1444,7 @@ const u8 FAR *ProgramEnvironment(void)
 
 /* Other programs: AX 4B00h in real mode, since what DOS is told of the
    program is addresses of real mode, with the name at DS:DX and at ES:BX
-   the block that says what the program is run with; the shell's own
-   interrupt, INT 2Eh; and AH 4Ch.
+   the block that says what the program is run with; and AH 4Ch.
 
    All that DOS reads is in the block below the megabyte. The name. The
    tail, of which DOS copies 128 bytes into the PSP of the program
@@ -1532,52 +1525,6 @@ struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
     ran = Tell(&regs);
     SetGoesOn(goes);
     return ran;
-}
-
-/* The shell's own interrupt for a command, INT 2Eh of COMMAND.COM, with
-   the command at DS:SI. It is of real mode, and comes back there with
-   nothing as it was but where it comes back to: no stack and no
-   register. So it cannot be called as an interrupt of real mode is, by
-   the extender's service, which goes on with the stack: it is called
-   from a stretch of instructions of real mode in the block below the
-   megabyte, which keep where the stack is in four bytes there, behind
-   their own segment, and put it back behind the interrupt, with the
-   machine kept from interrupting meanwhile, and return far; and that
-   stretch is called by the extender's service for a routine. Int2E of
-   dos.c is the same in the program's own code. The command goes into
-   the block too: its count, its characters and the carriage return.
-
-   INT 22h is put back behind it as behind a program that DOS runs,
-   since the shell runs programs. */
-#define KEPT_LOW  (LOW_KEPT & 0xFF)
-#define KEPT_HIGH (LOW_KEPT >> 8)
-
-static const u8 Shell_T[] = {
-    0x2E, 0x89, 0x26, KEPT_LOW, KEPT_HIGH,      /* mov cs:[LOW_KEPT],sp */
-    0x2E, 0x8C, 0x16, KEPT_LOW + 2, KEPT_HIGH,  /* mov cs:[LOW_KEPT+2],ss */
-    0xCD, 0x2E,                                 /* int 2Eh */
-    0xFA,                                       /* cli */
-    0x2E, 0x8E, 0x16, KEPT_LOW + 2, KEPT_HIGH,  /* mov ss,cs:[LOW_KEPT+2] */
-    0x2E, 0x8B, 0x26, KEPT_LOW, KEPT_HIGH,      /* mov sp,cs:[LOW_KEPT] */
-    0xFB,                                       /* sti */
-    0xFC,                                       /* cld */
-    0xCB                                        /* retf */
-};
-
-void ShellRun(const u8 FAR *command)
-{
-    struct DosRegs regs;
-    u32 goes = GoesOn();
-    u16 count = command[0] + 2;
-
-    if (count > TAIL_SIZE)
-        count = TAIL_SIZE;
-    Bytes(LOW(LOW_SECOND), command, count);
-    Bytes(LOW(LOW_SHELL), Shell_T, sizeof Shell_T);
-    SetLow(&regs, 0, 0, 0, 0);
-    regs.esi = LOW_SECOND;
-    Real(&regs, 0, (u32)LowSeg << 16 | LOW_SHELL);
-    SetGoesOn(goes);
 }
 
 /* The end of the program. The extender takes the call for its own end

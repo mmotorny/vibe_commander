@@ -839,7 +839,6 @@ TEXT(Echo_S, "/C ECHO ran>RAN.TXT");
 TEXT(Run_S, "/C ");
 TEXT(Two_S, " 2");
 TEXT(Three_S, " 3");
-TEXT(Ver_S, "VER");
 TEXT(No_S, "");
 
 /* The text of the environment that begins with `name`, behind that; or
@@ -924,9 +923,7 @@ static void Others(void)
    page of its own, waits for a key as the first does, and ends, and the
    first writes what it was answered when both have. Run by itself, the
    copy has the environment that DOS made for it of this one's; run by
-   the shell, it has what the shell gave it. Then a command is handed to
-   the shell that started the toy, which the shell of the bench does not
-   run: it comes back, and that it does is what is written. */
+   the shell, it has what the shell gave it. */
 static void Copies(void)
 {
     struct Answer first, second;
@@ -936,9 +933,6 @@ static void Copies(void)
     Clear();
     ANSWER("ProgramRun of a second copy:", first);
     ANSWER("and of the shell for one:", second);
-    Line();
-    ShellRun(Tail(Ver_S, No_S, No_S));
-    SAY("ShellRun came back");
     Line();
 }
 

@@ -13,9 +13,10 @@
  * characters of CP866. \030 and \031 are the arrows up and down, \020
  * and \021 those to the right and to the left.
  *
- * Three settings of the setup program are not here, since they are of
- * what the portable C has no more: Memory allocation and TSR manager of
- * the Configuration, and Screen output of Screen and Mouse (see
+ * Four settings of the setup program are not here, since they are of
+ * what the portable C has no more: Memory allocation, Quick execute
+ * commands and TSR manager of the Configuration, which were all of its
+ * Execute options, and Screen output of Screen and Mouse (see
  * DEVIATIONS.md). Their lines and their fields are gone from the two
  * dialogs, and what stood below them in the right half of a box stands
  * further up: a line of such a box is one text for the two groups that
@@ -38,40 +39,38 @@ extern const u8 OkMn_D[];
    them: of each its width and its column, up to a width of 0. */
 static const u8 StOk_D[3];
 
-/* The Configuration: 16 boxes to tick, and Ok and Cancel. The setup
-   program has 18: Memory allocation above Quick execute commands and TSR
-   manager below it. Without them the group has one line, and the
-   Keyboard options stand two rows further up, which leaves the last two
+/* The Configuration: 15 boxes to tick, and Ok and Cancel. The setup
+   program has 18, and a group more: Execute options, at the top of the
+   right half, with Memory allocation, Quick execute commands and TSR
+   manager. Without it the Keyboard options stand five rows further up,
+   beside the first of the General options, which leaves the last five
    rows of the right half empty. */
 static const u8 StCnf00_S[] = " Configuration ";
 static const u8 StCnf01_S[] =
-    " \332 ^bGeneral options^b \377\212\304\277  \332 ^bExecute options"
-    "^b \377\217\304\277 ";
+    " \332 ^bGeneral options^b \377\212\304\277  \332 ^bKeyboard option"
+    "s^b \377\216\304\277 ";
 static const u8 StCnf02_S[] =
-    " \263  [ ] Auto menus\377\013\263  \263  [ ] Quick execute comman"
-    "ds\377\004\263 ";
+    " \263  [ ] Auto menus\377\013\263  \263  [ ] Alt alone selects men"
+    "u\377\004\263 ";
 static const u8 StCnf03_S[] =
-    " \263  [ ] Path prompt\377\012\263  \300\377\240\304\331 ";
+    " \263  [ ] Path prompt\377\012\263  \263  [ ] Esc toggles screen "
+    "on/off \263 ";
 static const u8 StCnf04_S[] =
-    " \263  [ ] Key bar\377\016\263  \332 ^bKeyboard options^b \377"
-    "\216\304\277 ";
-static const u8 StCnf05_S[] =
-    " \263  [ ] Menu bar visible\377\005\263  \263  [ ] Alt alone sele"
-    "cts menu\377\004\263 ";
-static const u8 StCnf06_S[] =
-    " \263  [ ] Full screen\377\012\263  \263  [ ] Esc toggles screen"
-    " on/off \263 ";
-static const u8 StCnf07_S[] =
-    " \263  [ ] Clock\377\020\263  \263  [ ] Alternative viewer\377"
+    " \263  [ ] Key bar\377\016\263  \263  [ ] Alternative viewer\377"
     "\010\263 ";
-static const u8 StCnf08_S[] =
-    " \263  [ ] Confirmation on quit \263  \263  [ ] Alternative editor"
-    "\377\010\263 ";
-static const u8 StCnf09_S[] =
-    " \263  [ ] Error sound\377\012\263  \263  [ ] Clear keyboard buf"
+static const u8 StCnf05_S[] =
+    " \263  [ ] Menu bar visible\377\005\263  \263  [ ] Alternative ed"
+    "itor\377\010\263 ";
+static const u8 StCnf06_S[] =
+    " \263  [ ] Full screen\377\012\263  \263  [ ] Clear keyboard buf"
     "fer\377\005\263 ";
+static const u8 StCnf07_S[] =
+    " \263  [ ] Clock\377\020\263  \300\377\240\304\331 ";
+static const u8 StCnf08_S[] =
+    " \263  [ ] Confirmation on quit \263\377\045";
+static const u8 StCnf09_S[] = " \263  [ ] Error sound\377\012\263\377\045";
 static const u8 StCnf10_S[] =
-    " \263  [ ] Auto save setup\377\006\263  \300\377\240\304\331 ";
+    " \263  [ ] Auto save setup\377\006\263\377\045";
 static const u8 StCnf11_S[] =
     " \263  [ ] Show logical drive B:\263\377\045";
 static const u8 StCnf12_S[] = " \300\377\233\304\331\377\045";
@@ -100,53 +99,51 @@ static const BOX(17) StConf_P = {
     }
 };
 /* A field keeps the place in TmpBuf that the setup program gives it,
-   the buttons too: the two places of the boxes that are gone are not
+   the buttons too: the three places of the boxes that are gone are not
    used. */
-const DIALOG(17) StConf_B = {
+const DIALOG(16) StConf_B = {
     { &StConf_P, 0x228, 0, 1, 4, 1, 0 },
     {
         /* General options: Auto menus, Path prompt, Key bar, Menu bar
            visible, Full screen, Clock, Confirmation on quit, Error
            sound, Auto save setup, Show logical drive B:. Right of each
-           is the box on its row, or else the one above that row. */
-        { 3, 16, 1, 0, 10, 0x30A, MD_AT(TmpBuf[0]),
+           is the box on its row, or else the one above that row, which
+           is the last of the right half from Clock down. */
+        { 3, 15, 1, 0, 10, 0x30A, MD_AT(TmpBuf[0]),
           NUMBER(MD_AT(AutoMnu)) },
-        { 3, 0, 2, 1, 10, 0x40A, MD_AT(TmpBuf[1]),
+        { 3, 0, 2, 1, 11, 0x40A, MD_AT(TmpBuf[1]),
           NUMBER(MD_AT(Prompt)) },
-        { 3, 1, 3, 2, 10, 0x50A, MD_AT(TmpBuf[2]),
+        { 3, 1, 3, 2, 12, 0x50A, MD_AT(TmpBuf[2]),
           NUMBER(MD_AT(KeyBar)) },
-        { 3, 2, 4, 3, 11, 0x60A, MD_AT(TmpBuf[3]),
+        { 3, 2, 4, 3, 13, 0x60A, MD_AT(TmpBuf[3]),
           NUMBER(MD_AT(MenuVs)) },
-        { 3, 3, 5, 4, 12, 0x70A, MD_AT(TmpBuf[4]),
+        { 3, 3, 5, 4, 14, 0x70A, MD_AT(TmpBuf[4]),
           NUMBER(MD_AT(FulScr)) },
-        { 3, 4, 6, 5, 13, 0x80A, MD_AT(TmpBuf[5]),
+        { 3, 4, 6, 5, 14, 0x80A, MD_AT(TmpBuf[5]),
           NUMBER(MD_AT(Clock)) },
         { 3, 5, 7, 6, 14, 0x90A, MD_AT(TmpBuf[6]),
           NUMBER(MD_AT(QuitAck)) },
-        { 3, 6, 8, 7, 15, 0xA0A, MD_AT(TmpBuf[7]),
+        { 3, 6, 8, 7, 14, 0xA0A, MD_AT(TmpBuf[7]),
           NUMBER(MD_AT(ErrSnd)) },
-        { 3, 7, 9, 8, 15, 0xB0A, MD_AT(TmpBuf[8]),
+        { 3, 7, 9, 8, 14, 0xB0A, MD_AT(TmpBuf[8]),
           NUMBER(MD_AT(AutoSav)) },
-        { 3, 8, 10, 9, 15, 0xC0A, MD_AT(TmpBuf[9]),
+        { 3, 8, 10, 9, 14, 0xC0A, MD_AT(TmpBuf[9]),
           NUMBER(MD_AT(DriveB)) },
-        /* Execute options: Quick execute commands */
-        { 3, 9, 11, 0, 10, 0x329, MD_AT(TmpBuf[11]),
-          NUMBER(MD_AT(ExecTyp)) },
         /* Keyboard options: Alt alone selects menu, Esc toggles screen
            on/off, Alternative viewer, Alternative editor, Clear keyboard
-           buffer */
-        { 3, 10, 12, 3, 11, 0x629, MD_AT(TmpBuf[13]),
+           buffer. Left of each is the box on its row. */
+        { 3, 9, 11, 0, 10, 0x329, MD_AT(TmpBuf[13]),
           NUMBER(MD_AT(AltBar)) },
-        { 3, 11, 13, 4, 12, 0x729, MD_AT(TmpBuf[14]),
+        { 3, 10, 12, 1, 11, 0x429, MD_AT(TmpBuf[14]),
           NUMBER(MD_AT(EscBar)) },
-        { 3, 12, 14, 5, 13, 0x829, MD_AT(TmpBuf[15]),
+        { 3, 11, 13, 2, 12, 0x529, MD_AT(TmpBuf[15]),
           NUMBER(MD_AT(AltView)) },
-        { 3, 13, 15, 6, 14, 0x929, MD_AT(TmpBuf[16]),
+        { 3, 12, 14, 3, 13, 0x629, MD_AT(TmpBuf[16]),
           NUMBER(MD_AT(AltEdit)) },
-        { 3, 14, 16, 7, 15, 0xA29, MD_AT(TmpBuf[17]),
+        { 3, 13, 15, 4, 14, 0x729, MD_AT(TmpBuf[17]),
           NUMBER(MD_AT(ClrBuf)) },
         /* Ok, Cancel */
-        { 4, 15, 0, 15, 16, 0x111E, MD_AT(TmpBuf[18]), StOkCn_D }
+        { 4, 14, 0, 14, 15, 0x111E, MD_AT(TmpBuf[18]), StOkCn_D }
     },
     0
 };

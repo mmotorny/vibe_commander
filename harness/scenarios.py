@@ -87,7 +87,14 @@ out again (show.py --changes is how):
     which the tests run side by side. A scenario that types more than one
     key to a step there first switches that off: "F9 o o" is the dialog of
     advanced options, five times Down goes to "Clear keyboard buffer",
-    Space and Enter. Tab types a tab there and Enter ends a line.
+    Space and Enter. Tab types a tab there and Enter ends a line. Write
+    the two steps so, "F9 o o" and "Down Down Down Down Down Space",
+    with or without Enter in the second: the portable C has a box less
+    in that dialog (DEVIATIONS.md, 14) and is taken there by four times
+    Down, which `in_place_in` of deviations.TREES says for each such
+    scenario by its name, and the scenario has a patch for the screens
+    that show the dialog, a row shorter. A new scenario of the kind is
+    added to both.
   - F7, a name and Enter make a directory and leave the cursor on it, so
     one more Enter goes into it: thirteen such steps make a tree thirteen
     levels deep. "F9 r t" shows the tree in the right panel; it is read
@@ -887,7 +894,8 @@ out again (show.py --changes is how):
     commands of 120 characters fill the history: "rem" and letters.
   - With "Quick execute commands" on, "F9 o o", nothing is run at all:
     the shell of the bench does not serve the interrupt that the
-    program runs a command by then.
+    program runs a command by then. The portable C has no such setting
+    (DEVIATIONS.md, 14), and quick is not run for it.
   - A tree keeps a directory that DOS has removed behind the program's
     back: with Auto change directory off, the cursor of the tree on
     DOCS and "rd docs" typed and run, Enter in the tree finds no such
@@ -1128,22 +1136,23 @@ is the first, and the form of the others:
     committed with the entry of DEVIATIONS.md and the reason in its
     header (see the top of goldens.py). setup-lines has one.
   - The two dialogs that a tree has otherwise. The Configuration and
-    Screen and Mouse of the portable C are without three settings of
-    what that program has no more, Memory allocation, TSR manager and
-    Screen output (DEVIATIONS.md, 1, 7 and 5), and what stood below them
-    in the right half of each box stands further up: the Keyboard
-    options by two rows, Quick execute commands by one, and the Other
-    options and the Mouse options by five. A scenario is still written
+    Screen and Mouse of the portable C are without four settings of
+    what that program has no more, Memory allocation, Quick execute
+    commands and TSR manager, which were all of the Execute options,
+    and Screen output (DEVIATIONS.md, 1, 14, 7 and 5), and what stood
+    below them in the right half of each box stands further up: the
+    Keyboard options, the Other options and the Mouse options, each by
+    five rows. A scenario is still written
     with the steps of the original, and shows either dialog as the
     original has it. For the portable C it then wants two things. A
     patch, for every screen that shows the dialog: the rows of the
     right half, and the cell of the mouse pointer where that is over a
     line that has moved. And, if a step goes into the right half, the
     tree's step for it in `in_place_in` of deviations.TREES, with None
-    for a step that sets one of the three: a click further up, fewer
+    for a step that sets one of the four: a click further up, fewer
     Tabs or Downs, since the fields are fewer. From a box of the left
     half of the Configuration, Right is the box on its row or the one
-    above that row, and Down from the last is Quick execute commands;
+    above that row, and Down from the last is Alt alone selects menu;
     in Screen and Mouse, Right from Screen colors is Zooming boxes, Up
     from there the last line of Screen blank delay, Right from that
     group Left-handed mouse, and Left from the line of characters
