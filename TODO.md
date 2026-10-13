@@ -8451,7 +8451,7 @@ that. Steps 3 to 6 are not planned here.
 | The first five ways under "The way taken" below, and the data's image as the net in the place of `CHECKED` (F0) | Accepted by the session, 13 October 2026 |
 | Questions 6 and 7 at the end: the flags of the setup file stay bytes, and the main data keeps its layout through step 2 | Taken by the session as recommended, 13 October 2026. Neither changes what the program does |
 | The sixth way: three blocks where there was one, with a panel's block fixed at 1000h paragraphs from F1 on; F9 as the piece that takes the memory from the extender, and the trial X at once | Accepted by the session, 13 October 2026 |
-| The clusters N0 to N21 with S, M and P, their order, that the numbers of the room are widened before F9 so that no cap is written, and the recommendations for questions 3, 4, 5, 8 and 9 | This revision, of 13 October 2026. Not yet looked at by the session or the user |
+| The clusters N0 to N21 with S, M and P, and their order; that no cap is in a program that has landed, with F9 behind the five clusters that count the room, and the cap as the fallback, which wants the session's word; `FileSize`, `ByteCount` and `MemSize` and the answer of `FileRead` and `FileWrite` as a structure of their own, as the names of this step, which the layer may change; the 16 bytes round each block of the 640 KB, in the program as it is shipped from F1 to F9, held by F0's tool | Accepted by the session, 13 October 2026 |
 | Questions 3, 4, 5, 8 and 9 | With the user, each when the work comes to it: "The questions for the user" |
 
 For an hour of that day question 1 was answered otherwise: the
@@ -8472,10 +8472,11 @@ plan is taken out; this paragraph is where it is told.
 ### What it rests on of the switch
 
 The switch is the piece "W and Z1" of the plan for the 32 bits, in
-five stages. Its first two have landed: there is one tree,
-`portable_c`, built by `wcc386` with DOS/32A, and the 16-bit build is
-gone, with `dos.c`, `arith.c` and `harness/pass32.txt`. What the plan
-goes by of that:
+five stages. Its first four have landed, at `8031e96`; the fifth, the
+documents turned round and `resident.c` renamed `exec.c`, is with an
+agent. There is one tree, `portable_c`, built by `wcc386` with
+DOS/32A, and the 16-bit build is gone, with `dos.c`, `arith.c` and
+`harness/pass32.txt`. What the plan goes by of that:
 
 - The tests of the portable C are `portable_c-scenarios`,
   `portable_c-data`, `portable_c-layout`, `portable_c-debug-layout`,
@@ -8486,9 +8487,7 @@ goes by of that:
 - One file is behind `sys.h`, `dos32.c`, which keeps its name: "the
   system's file" below.
 
-And of what is still to come, the third stage, Z2, which a fresh agent
-does next. F0 does not wait for it; no other piece starts before it
-has landed:
+And of the third stage, Z2, which no piece but F0 started before:
 
 - One body of each word of the addresses in `vc.h`, the flat one, with
   no `#ifdef __I86__`, and `LenStk` one number.
@@ -8496,10 +8495,9 @@ has landed:
   The sweeps F2 and F3 go by patterns in the text, and are written
   against the text as that stage leaves it.
 
-The fourth stage says anew what `harness/hostcheck.py` and
-`harness/int16.py` are for with one build left, and the fifth turns
-the documents round. N0 builds on the finder as the fourth leaves it;
-nothing else here waits for either.
+The fourth stage has said anew what `harness/hostcheck.py` and
+`harness/int16.py` are for with one build left, and N0 builds on the
+finder as it left it. Nothing here waits for the fifth.
 
 The counts below are of the tree before the third stage, as it was at
 `9031733`, with `dos.c`, which has gone since, and the definitions of
