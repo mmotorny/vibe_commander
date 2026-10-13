@@ -287,7 +287,7 @@ static void Help05(void)
     struct Paged paged;
     struct Mouse pointer;
 
-    SavWin(BEGIN, size, (u16)md.ErrBuf1);
+    SavWin(BEGIN, size, MD_PLACE(md.ErrBuf1));
     color = Color(Help_C) << 8;
     MinBox(BEGIN, size, color);
     screen = BasAdr(BEGIN);
@@ -343,7 +343,8 @@ Help10:                                 /* the cursor within the window */
             count = (u8)((size >> 8) - 9);
             do {
                 /* Behind the text there are only empty lines. */
-                if ((u16)((u16)(u32)text - (u16)hd.HlpInfo) >= hd.HlpSize)
+                if ((u16)(MD_PLACE(NEAR(text)) - MD_PLACE(hd.HlpInfo))
+                        >= hd.HlpSize)
                     text--;
                 text = Help77(place, text);
                 place += 0x100;
@@ -543,7 +544,7 @@ Help65:                                 /* it could not be read */
     Dialog(OFFSET(HlpEr_B), 0, 0, 0, MAIN_SEG);
 
 Help66:                                 /* Esc */
-    ResWin(BEGIN, size, (u16)md.ErrBuf1);
+    ResWin(BEGIN, size, MD_PLACE(md.ErrBuf1));
     Window(BEGIN, size);
 }
 

@@ -485,7 +485,7 @@ static void StCol00(void)
     md.Clock = 0;
     md.KeyBar = 0;
     size = (u16)md.Lines << 8 | 58;
-    SavWin(0, size, (u16)md.WinBuf);
+    SavWin(0, size, MD_PLACE(md.WinBuf));
     place = (u16)(u8)(md.Lines - 1) << 8 | 58;
     row = BasAdr(place);
     for (i = 0; i < 22; i++)
@@ -588,7 +588,7 @@ static void StCol00(void)
     if (chosen.what == WHAT_ENTER)      /* Col50 */
         *ColAddr(sd.ColCur) = (u8)color;
     StF07_75(Color(sd.ColCur));         /* Col55 */
-    ResWin(0, size, (u16)md.WinBuf);
+    ResWin(0, size, MD_PLACE(md.WinBuf));
     Window(0, size);
     md.ColTyp = palette;
     md.Clock = clock;

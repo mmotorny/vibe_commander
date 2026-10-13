@@ -312,7 +312,7 @@ Help02:                                 /* there is none */
 
 Help04:                                 /* the window */
     lines = (const u8 __far *)entry + HlpInfo;
-    SavWin(BEGIN, size, (u16)md.ErrBuf);
+    SavWin(BEGIN, size, MD_PLACE(md.ErrBuf));
     color = Color(Help_C) << 8;
     MinBox(BEGIN, size, color);
     screen = BasAdr(BEGIN);
@@ -480,7 +480,7 @@ Help35:                                 /* or to the first: Home */
     goto Help10;
 
 Help40:                                 /* Esc */
-    ResWin(BEGIN, size, (u16)md.ErrBuf);
+    ResWin(BEGIN, size, MD_PLACE(md.ErrBuf));
     Window(BEGIN, size);
 
 Help41:

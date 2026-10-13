@@ -134,7 +134,7 @@ u16 SftEGA(u16 place)
 void SavWin(u16 begin, u16 size, u16 buffer)
 {
     const u16 *row = BasAdr(begin);
-    u16 *to = (u16 *)buffer;
+    u16 *to = (u16 *)MD_POINTER(buffer);
     u16 rows = size >> 8, columns = size & 0xFF, column;
 
     do {
@@ -149,7 +149,7 @@ void SavWin(u16 begin, u16 size, u16 buffer)
 void ResWin(u16 begin, u16 size, u16 buffer)
 {
     u16 *row = BasAdr(begin);
-    const u16 *from = (const u16 *)buffer;
+    const u16 *from = (const u16 *)MD_POINTER(buffer);
     u16 rows = size >> 8, columns = size & 0xFF, column;
 
     do {

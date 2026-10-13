@@ -27,10 +27,10 @@ edit_t.c      clean
 enter.c       to-number 5, to-pointer 8
 extfile.c     to-number 2, to-pointer 1
 files.c       to-number 1
-find.c        to-number 3
+find.c        clean
 find_t.c      clean
 format.c      clean
-help.c        to-number 4
+help.c        clean
 help_t.c      clean
 info.c        to-number 4
 input.c       to-number 2
@@ -40,7 +40,7 @@ line.c        clean
 main.c        to-number 10, to-pointer 2, function 2, interrupt 1, data_seg 2, aborts 1
 main_t.c      clean
 mask.c        clean
-menu.c        to-number 7
+menu.c        clean
 misc.c        clean
 mouse.c       clean
 panel.c       to-pointer 1
@@ -51,9 +51,9 @@ screen.c      clean
 setup.c       clean
 stack.c       data_seg 2
 start.c       to-number 1, to-pointer 5
-stcolor.c     to-number 2
+stcolor.c     clean
 stcolor_t.c   clean
-sthelp.c      to-number 2
+sthelp.c      clean
 sthelp_t.c    clean
 stmain.c      clean
 stmain_t.c    clean
@@ -71,4 +71,4 @@ usermenu.c    to-number 9, to-pointer 5
 vc.h          interrupt 1, aborts 4
 view.c        to-number 10, to-pointer 8
 view_t.c      clean
-window.c      to-pointer 2
+window.c      clean
