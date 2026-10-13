@@ -1560,9 +1560,12 @@ struct Paged PgDn(u16 cursor, u16 first, u16 rows, u16 lines);
 #define DSKBUF  (sizeof(struct WCBdef) - MinFls * sizeof(struct FILENT))
 #define TRELIST MD_PLACE(&((struct DIRTREE *)md.TreeBuf)->TreSum2)
 
-/* The file entry at an address in a panel's segment. */
+/* The file entry at an address in a panel's segment. The address is
+   cut to 16 bits, so one that has wrapped round means what it means on
+   DOS, where the offset of a pointer wraps round with it: `wcb` is
+   where the panel's segment begins, PANEL of it, at every use. */
 #define ENTRY(wcb, address) \
-    ((struct FILENT __far *)((u8 __far *)(wcb) + (address)))
+    ((struct FILENT __far *)((u8 __far *)(wcb) + (u16)(address)))
 
 /* Bits of a file's attributes. The two highest are the program's own, in
    its lists of files. */

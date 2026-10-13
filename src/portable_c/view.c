@@ -145,9 +145,12 @@ static const u8 CODE Byts_S[6] = " Bytes";
 #define ERR_NO_FILE   0x02
 #define ERR_NOT_READY 0x53
 
-/* The text in a segment, and a word of it or of the table of lines. */
+/* The text in a segment, and a word of it or of the table of lines. The
+   place of the word is cut to 16 bits: the text begins where its segment
+   does, so a place that has wrapped round, two before 0, is the word
+   that it is on DOS, at the segment's end. */
 #define TEXT(segment) AT(segment, 0)
-#define WORD_AT(text, at) (*(u16 __far *)((text) + (at)))
+#define WORD_AT(text, at) (*(u16 __far *)((text) + (u16)(at)))
 
 /* Whether two bytes end a line: CR LF, or LF CR. */
 #define IS_CRLF(word) ((word) == 0x0A0D || (word) == 0x0D0A)
