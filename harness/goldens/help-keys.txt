@@ -4,47 +4,47 @@ code page 437
 
 == 0: the start
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 1: F1
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x5 0Fx62 30x5 06x1 03x1 1Bx2
+|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -52,27 +52,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Sorting order for files                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 2: F1
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x5 0Fx62 30x5 06x1 03x1 1Bx2
+|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -80,27 +80,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Sorting order for files                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 3: "5"
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x5 0Fx62 30x5 06x1 03x1 1Bx2
+|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -108,27 +108,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Sorting order for files                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 4: End
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║       Mini status                                              ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
+|║hel   ║       Mini status                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║not   ║       Clock                                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║       Memory allocation                                        ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║       Save setup                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  VCSETUP program                                               ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  VCSETUP program                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Configuration                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║       Screen and Mouse                                         ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║       Screen and Mouse                                         ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Panel options                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Set Black and White / Color / Monochrome palette         ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Set default configuration                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -136,27 +136,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Exit                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  VC Environment variable                                       ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 5: PgUp
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║       Menu File Edit                                           ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
+|║hel   ║       Menu File Edit                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║not   ║  Options pull-down menu                                        ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║       Configuration...                                         ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║       Advanced options...                                      ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║       Extension File Edit...                                   ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║       Extension File Edit...                                   ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Viewers...                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║       Editors...                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║       Editors...                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Auto menus                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Path prompt                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Key bar                                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -164,27 +164,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Auto directory sizes                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Mini status                                              ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 6: Down
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  Options pull-down menu                                        ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
+|║hel   ║  Options pull-down menu                                        ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║not   ║       Configuration...                                         ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║       Advanced options...                                      ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║       Extension File Edit...                                   ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║       Viewers...                                               ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║       Viewers...                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Editors...                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║       Auto menus                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║       Auto menus                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Path prompt                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Key bar                                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Full screen                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -192,27 +192,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Mini status                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Clock                                                    ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 7: Home
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x5 0Fx62 30x5 06x1 03x1 1Bx2
+|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -220,27 +220,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Sorting order for files                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 8: Home
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x5 0Fx62 30x5 06x1 03x1 1Bx2
+|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -248,27 +248,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Sorting order for files                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 9: Down Down Down Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View (2/2) -- Status line                                      ║      ║| 1Bx4 30x5 3Fx25 30x42 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║ Status Line                                                    ║   :  ║| 1Bx4 30x5 3Ex11 30x56 06x1 03x1 1Bx2
+|║hel   ║ Status Line                                                    ║      ║| 1Bx4 30x5 3Ex11 30x56 03x2 1Bx2
 |║not   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║                 Beginning column ──┐                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║                                    ▼                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║   ───╢| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
+|║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║      ║| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
 |║      ║                                             ▲                  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║                            Size of file ────┘                  ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -276,27 +276,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 10: Down
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View (2/2) -- Status line                                      ║      ║| 1Bx4 30x5 3Fx25 30x42 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║ Status Line                                                    ║   :  ║| 1Bx4 30x5 3Ex11 30x56 06x1 03x1 1Bx2
+|║hel   ║ Status Line                                                    ║      ║| 1Bx4 30x5 3Ex11 30x56 03x2 1Bx2
 |║not   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║                 Beginning column ──┐                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║                                    ▼                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║   ───╢| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
+|║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║      ║| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
 |║      ║                                             ▲                  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║                            Size of file ────┘                  ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -304,27 +304,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 11: Up
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View (2/2) -- Status line                                      ║      ║| 1Bx4 30x5 3Fx25 30x42 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║ Status Line                                                    ║   :  ║| 1Bx4 30x5 3Ex11 30x56 06x1 03x1 1Bx2
+|║hel   ║ Status Line                                                    ║      ║| 1Bx4 30x5 3Ex11 30x56 03x2 1Bx2
 |║not   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║                 Beginning column ──┐                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║                                    ▼                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║   ───╢| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
+|║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║      ║| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
 |║      ║                                             ▲                  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║                            Size of file ────┘                  ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -332,27 +332,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 12: Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Edit (1/2) -- Keyboard reference                               ║      ║| 1Bx4 30x5 3Fx32 30x35 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║ Cursor movement               │  Delete                        ║   :  ║| 1Bx4 30x5 3Ex15 30x18 3Ex6 30x28 06x1 03x1 1Bx2
+|║hel   ║ Cursor movement               │  Delete                        ║      ║| 1Bx4 30x5 3Ex15 30x18 3Ex6 30x28 03x2 1Bx2
 |║not   ║   Char left      ^S  or  ←    │    Char left      BS           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║dat   ║   Char right     ^D  or  →    │    Under cursor   ^G  or  Del  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║run   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
-|║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
+|║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
+|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
@@ -360,27 +360,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║   Start of file  ^Home        │    Quit             Esc or F10 ║      ║| 1Bx4 30x22 3Ex5 30x30 3Ex3 30x4 3Ex3 30x5 03x2 1Bx2
 |║      ║   End of file    ^End         │                                ║      ║| 1Bx4 30x22 3Ex4 30x46 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 13: Down
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Edit (1/2) -- Keyboard reference                               ║      ║| 1Bx4 30x5 3Fx32 30x35 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║   Char left      ^S  or  ←    │    Char left      BS           ║   :  ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 06x1 03x1 1Bx2
+|║hel   ║   Char left      ^S  or  ←    │    Char left      BS           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║not   ║   Char right     ^D  or  →    │    Under cursor   ^G  or  Del  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║dat   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║run   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
-|║emp   ║   Line up        ^E  or  ↑    │    Line           ^Y           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
+|║emp   ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x2 47x1 30x18 3Ex2 30x15 03x2 1Bx2
+|║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x2 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
 |║      ║   End of line    End          │    Quote next char  ^Q         ║      ║| 1Bx4 30x22 3Ex3 30x32 3Ex2 30x13 03x2 1Bx2
@@ -388,27 +388,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║   End of file    ^End         │                                ║      ║| 1Bx4 30x22 3Ex4 30x46 03x2 1Bx2
 |║      ║ ──────────────────────────────┴─────────────────────────────── ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 14: Up
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Edit (1/2) -- Keyboard reference                               ║      ║| 1Bx4 30x5 3Fx32 30x35 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║ Cursor movement               │  Delete                        ║   :  ║| 1Bx4 30x5 3Ex15 30x18 3Ex6 30x28 06x1 03x1 1Bx2
+|║hel   ║ Cursor movement               │  Delete                        ║      ║| 1Bx4 30x5 3Ex15 30x18 3Ex6 30x28 03x2 1Bx2
 |║not   ║   Char left      ^S  or  ←    │    Char left      BS           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║dat   ║   Char right     ^D  or  →    │    Under cursor   ^G  or  Del  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║run   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
-|║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
+|║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
+|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
@@ -416,27 +416,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║   Start of file  ^Home        │    Quit             Esc or F10 ║      ║| 1Bx4 30x22 3Ex5 30x30 3Ex3 30x4 3Ex3 30x5 03x2 1Bx2
 |║      ║   End of file    ^End         │                                ║      ║| 1Bx4 30x22 3Ex4 30x46 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 15: PgDn
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Edit (1/2) -- Keyboard reference                               ║      ║| 1Bx4 30x5 3Fx32 30x35 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   :  ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 06x1 03x1 1Bx2
+|║hel   ║   Line down      ^X  or  ↓    │    To end of line ^K           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║not   ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║dat   ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║run   ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
-|║emp   ║   End of line    End          │    Quote next char  ^Q         ║   ───╢| 1Bx4 30x22 3Ex3 30x32 3Ex2 30x13 03x2 1Bx2
+|║emp   ║   End of line    End          │    Quote next char  ^Q         ║      ║| 1Bx4 30x22 3Ex3 30x32 3Ex2 30x13 03x2 1Bx2
 |║      ║   Start of file  ^Home        │    Quit             Esc or F10 ║      ║| 1Bx4 30x22 3Ex5 30x30 3Ex3 30x4 3Ex3 30x5 03x2 1Bx2
-|║      ║   End of file    ^End         │                                ║   ry ║| 1Bx4 30x22 3Ex4 30x10 47x1 30x35 03x2 1Bx2
+|║      ║   End of file    ^End         │                                ║      ║| 1Bx4 30x22 3Ex4 30x10 47x1 30x35 03x2 1Bx2
 |║      ║ ──────────────────────────────┴─────────────────────────────── ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║ Function keys                                                  ║      ║| 1Bx4 30x5 3Ex13 30x54 03x2 1Bx2
 |║      ║   Help          F1               ASCII / Hex        F4         ║      ║| 1Bx4 30x21 3Ex2 30x34 3Ex2 30x13 03x2 1Bx2
@@ -444,27 +444,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║   Search        F7               Continue search    Shift-F7   ║      ║| 1Bx4 30x21 3Ex2 30x34 3Ex8 30x7 03x2 1Bx2
 |║      ║   Quit          F10              Save and quit      Shift-F10  ║      ║| 1Bx4 30x21 3Ex3 30x33 3Ex9 30x6 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 16: PgUp
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Edit (1/2) -- Keyboard reference                               ║      ║| 1Bx4 30x5 3Fx32 30x35 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║ Cursor movement               │  Delete                        ║   :  ║| 1Bx4 30x5 3Ex15 30x18 3Ex6 30x28 06x1 03x1 1Bx2
+|║hel   ║ Cursor movement               │  Delete                        ║      ║| 1Bx4 30x5 3Ex15 30x18 3Ex6 30x28 03x2 1Bx2
 |║not   ║   Char left      ^S  or  ←    │    Char left      BS           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║dat   ║   Char right     ^D  or  →    │    Under cursor   ^G  or  Del  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║run   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
-|║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
+|║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
+|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
@@ -472,27 +472,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║   Start of file  ^Home        │    Quit             Esc or F10 ║      ║| 1Bx4 30x22 3Ex5 30x30 3Ex3 30x4 3Ex3 30x5 03x2 1Bx2
 |║      ║   End of file    ^End         │                                ║      ║| 1Bx4 30x22 3Ex4 30x46 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 17: End
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Edit (1/2) -- Keyboard reference                               ║      ║| 1Bx4 30x5 3Fx32 30x35 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   :  ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 06x1 03x1 1Bx2
+|║hel   ║   Line down      ^X  or  ↓    │    To end of line ^K           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║not   ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║dat   ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║run   ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
-|║emp   ║   End of line    End          │    Quote next char  ^Q         ║   ───╢| 1Bx4 30x22 3Ex3 30x32 3Ex2 30x13 03x2 1Bx2
+|║emp   ║   End of line    End          │    Quote next char  ^Q         ║      ║| 1Bx4 30x22 3Ex3 30x32 3Ex2 30x13 03x2 1Bx2
 |║      ║   Start of file  ^Home        │    Quit             Esc or F10 ║      ║| 1Bx4 30x22 3Ex5 30x30 3Ex3 30x4 3Ex3 30x5 03x2 1Bx2
-|║      ║   End of file    ^End         │                                ║   ry ║| 1Bx4 30x22 3Ex4 30x10 47x1 30x35 03x2 1Bx2
+|║      ║   End of file    ^End         │                                ║      ║| 1Bx4 30x22 3Ex4 30x10 47x1 30x35 03x2 1Bx2
 |║      ║ ──────────────────────────────┴─────────────────────────────── ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║ Function keys                                                  ║      ║| 1Bx4 30x5 3Ex13 30x54 03x2 1Bx2
 |║      ║   Help          F1               ASCII / Hex        F4         ║      ║| 1Bx4 30x21 3Ex2 30x34 3Ex2 30x13 03x2 1Bx2
@@ -500,27 +500,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║   Search        F7               Continue search    Shift-F7   ║      ║| 1Bx4 30x21 3Ex2 30x34 3Ex8 30x7 03x2 1Bx2
 |║      ║   Quit          F10              Save and quit      Shift-F10  ║      ║| 1Bx4 30x21 3Ex3 30x33 3Ex9 30x6 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 18: Home
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Edit (1/2) -- Keyboard reference                               ║      ║| 1Bx4 30x5 3Fx32 30x35 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║ Cursor movement               │  Delete                        ║   :  ║| 1Bx4 30x5 3Ex15 30x18 3Ex6 30x28 06x1 03x1 1Bx2
+|║hel   ║ Cursor movement               │  Delete                        ║      ║| 1Bx4 30x5 3Ex15 30x18 3Ex6 30x28 03x2 1Bx2
 |║not   ║   Char left      ^S  or  ←    │    Char left      BS           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
 |║dat   ║   Char right     ^D  or  →    │    Under cursor   ^G  or  Del  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
 |║run   ║   Word left      ^A  or  ^←   │    Word left      ^W  or  ^BS  ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x6 3Ex3 30x6 03x2 1Bx2
-|║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║   ───╢| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
+|║emp   ║   Word right     ^F  or  ^→   │    Word right     ^T           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex2 30x23 3Ex2 30x15 03x2 1Bx2
 |║      ║   Line up        ^E  or  ↑    │    Line           ^Y           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x24 3Ex2 30x15 03x2 1Bx2
-|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║   ry ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
+|║      ║   Line down      ^X  or  ↓    │    To end of line ^K           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex1 30x5 47x1 30x18 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page up        ^R  or  PgUp │    Undelete       ^U           ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x21 3Ex2 30x15 03x2 1Bx2
 |║      ║   Page down      ^C  or  PgDn ├─────────────────────────────── ║      ║| 1Bx4 30x22 3Ex2 30x6 3Ex4 30x38 03x2 1Bx2
 |║      ║   Start of line  Home         │  Other                         ║      ║| 1Bx4 30x22 3Ex4 30x12 3Ex5 30x29 03x2 1Bx2
@@ -528,27 +528,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║   Start of file  ^Home        │    Quit             Esc or F10 ║      ║| 1Bx4 30x22 3Ex5 30x30 3Ex3 30x4 3Ex3 30x5 03x2 1Bx2
 |║      ║   End of file    ^End         │                                ║      ║| 1Bx4 30x22 3Ex4 30x46 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 19: Right Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ View (2/2) -- Status line                                      ║      ║| 1Bx4 30x5 3Fx25 30x42 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║ Status Line                                                    ║   :  ║| 1Bx4 30x5 3Ex11 30x56 06x1 03x1 1Bx2
+|║hel   ║ Status Line                                                    ║      ║| 1Bx4 30x5 3Ex11 30x56 03x2 1Bx2
 |║not   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║                 Beginning column ──┐                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║                                    ▼                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║   ───╢| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
+|║emp   ║   View: filename.ext           Col 0     3,287 Bytes   27%     ║      ║| 1Bx4 30x7 0Fx57 30x8 03x2 1Bx2
 |║      ║                                             ▲                  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                            Size of file ────┘                  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║                            Size of file ────┘                  ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -556,27 +556,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x23 0Fx12 30x37 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x23 0Fx12 30x37 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 20: "i"
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
+|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -584,27 +584,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Sorting order for files                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 21: Home Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ About the Commander                                            ║      ║| 1Bx4 30x5 3Fx19 30x48 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  The Commander was created by Vsevolod V. Volkov.              ║   :  ║| 1Bx4 30x35 3Fx18 30x19 06x1 03x1 1Bx2
+|║hel   ║  The Commander was created by Vsevolod V. Volkov.              ║      ║| 1Bx4 30x35 3Fx18 30x19 03x2 1Bx2
 |║not   ║  Official homepage:    http://come.to/volkov                   ║      ║| 1Bx4 30x28 3Fx21 30x23 03x2 1Bx2
 |║dat   ║  E-mail address:       vc@vvv.kiev.ua                          ║      ║| 1Bx4 30x28 3Fx14 30x30 03x2 1Bx2
 |║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  There are some new useful features:                           ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  There are some new useful features:                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║      •  The  Commander  allows  you to select, copy, move and  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║      •  The  Commander  allows  you to select, copy, move and  ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║         delete directories as well as files.                   ║      ║| 1Bx4 30x20 3Ex11 30x41 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║      •  The Memory info  command  lists  the  memory-resident  ║      ║| 1Bx4 30x17 3Ex11 30x44 03x2 1Bx2
@@ -612,27 +612,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║         It  allows  you  to  remove TSRs which were installed  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║         after loading the Commander.                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 22: Right Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ VC Environment variable                                        ║      ║| 1Bx4 30x5 3Fx23 30x44 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  Using  the  Commander  with  a  RAM  disk presents a special  ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
+|║hel   ║  Using  the  Commander  with  a  RAM  disk presents a special  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║not   ║  problem: if  you  save the setup, change the main menu file,  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  or change the main  extension  file, these  changes  will be  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  made to the files on the  RAM disk.  As a result you'll lose  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  your changes as soon as you reboot or turn off your computer. ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  your changes as soon as you reboot or turn off your computer. ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  The  Commander  provides a solution to this problem. You can  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  The  Commander  provides a solution to this problem. You can  ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║  put a line  into  your  autoexec.bat  file  that  tells  the  ║      ║| 1Bx4 30x30 3Ex12 30x30 03x2 1Bx2
 |║      ║  Commander where to find these  files, as well as other files  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  it  needs  that  you haven't copied to the RAM disk. Put the  ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -640,27 +640,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                set vc=c:\progs\vc                              ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x23 0Fx12 30x37 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x23 0Fx12 30x37 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 23: Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Exit                                                           ║      ║| 1Bx4 30x5 3Fx4 30x63 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  This menu selection would exit from the VCSETUP program. You  ║   :  ║| 1Bx4 30x46 3Ex7 30x19 06x1 03x1 1Bx2
+|║hel   ║  This menu selection would exit from the VCSETUP program. You  ║      ║| 1Bx4 30x46 3Ex7 30x19 03x2 1Bx2
 |║not   ║  would be prompted to confirm save of Commander's settings if  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  you have changed them.                                        ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║                                                                ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║                                                                ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║                                                                ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -668,27 +668,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x23 0Fx12 30x37 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x23 0Fx12 30x37 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 24: Left Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ VC Environment variable                                        ║      ║| 1Bx4 30x5 3Fx23 30x44 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  Using  the  Commander  with  a  RAM  disk presents a special  ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
+|║hel   ║  Using  the  Commander  with  a  RAM  disk presents a special  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║not   ║  problem: if  you  save the setup, change the main menu file,  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  or change the main  extension  file, these  changes  will be  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  made to the files on the  RAM disk.  As a result you'll lose  ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  your changes as soon as you reboot or turn off your computer. ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  your changes as soon as you reboot or turn off your computer. ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  The  Commander  provides a solution to this problem. You can  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  The  Commander  provides a solution to this problem. You can  ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║  put a line  into  your  autoexec.bat  file  that  tells  the  ║      ║| 1Bx4 30x30 3Ex12 30x30 03x2 1Bx2
 |║      ║  Commander where to find these  files, as well as other files  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  it  needs  that  you haven't copied to the RAM disk. Put the  ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -696,27 +696,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                set vc=c:\progs\vc                              ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 25: Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ About the Commander                                            ║      ║| 1Bx4 30x5 3Fx19 30x48 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  The Commander was created by Vsevolod V. Volkov.              ║   :  ║| 1Bx4 30x35 3Fx18 30x19 06x1 03x1 1Bx2
+|║hel   ║  The Commander was created by Vsevolod V. Volkov.              ║      ║| 1Bx4 30x35 3Fx18 30x19 03x2 1Bx2
 |║not   ║  Official homepage:    http://come.to/volkov                   ║      ║| 1Bx4 30x28 3Fx21 30x23 03x2 1Bx2
 |║dat   ║  E-mail address:       vc@vvv.kiev.ua                          ║      ║| 1Bx4 30x28 3Fx14 30x30 03x2 1Bx2
 |║run   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  There are some new useful features:                           ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  There are some new useful features:                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║      •  The  Commander  allows  you to select, copy, move and  ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║      •  The  Commander  allows  you to select, copy, move and  ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║         delete directories as well as files.                   ║      ║| 1Bx4 30x20 3Ex11 30x41 03x2 1Bx2
 |║      ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║      •  The Memory info  command  lists  the  memory-resident  ║      ║| 1Bx4 30x17 3Ex11 30x44 03x2 1Bx2
@@ -724,27 +724,27 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║         It  allows  you  to  remove TSRs which were installed  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║         after loading the Commander.                           ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 26: Right Right Enter
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x5 0Fx62 30x5 06x1 03x1 1Bx2
+|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -752,73 +752,73 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║       Sorting order for files                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Re-read a panel                                          ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║                      [ Help ]   [ Cancel ]                     ║      ║| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║                      [ Help ]   [ Cancel ]                     ║   ───╢| 1Bx4 30x26 0Fx8 30x38 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 27: Right Enter
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 28: F7
 cursor 8 8 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
 |║re                                                                            ║| 1Bx3 70x74 1Bx3
 |║he   ╔═════════════════════════ Make directory ═════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║no   ║ Create the directory                                             ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║da   ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
-|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|║em                                                                            ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 29: F1
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Make directory                                              F7 ║      ║| 1Bx4 30x5 3Fx14 30x46 3Ex2 30x5 03x2 1Bx2
 |║re    ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx3 70x1 30x72 08x1 03x1 1Bx2
@@ -826,9 +826,9 @@ cursor 0 127 lines 6 7 mode 3
 |║no    ║  panels and in tree panels).                                   ║      ║| 1Bx3 70x1 30x72 08x1 0Bx1 03x1 1Bx1
 |║da    ║                                                                ║      ║| 1Bx3 70x1 30x72 08x1 0Bx1 03x1 1Bx1
 |║ru    ║  The new directory will be  a  subdirectory  of  the  current  ║      ║| 1Bx3 70x1 30x72 08x1 0Bx1 03x1 1Bx1
-|║em    ║  directory unless you specify a full  path  name  or  another  ║    ──╢| 1Bx3 70x1 30x72 08x1 0Bx1 03x1 1Bx1
+|║em    ║  directory unless you specify a full  path  name  or  another  ║      ║| 1Bx3 70x1 30x72 08x1 0Bx1 03x1 1Bx1
 |║      ║  drive letter.                                                 ║      ║| 1Bx4 30x72 0Bx2 03x1 1Bx1
-|║      ║                                                                ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║                                                                ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║    Notes:                                                      ║      ║| 1Bx4 30x8 3Fx6 30x58 03x2 1Bx2
 |║      ║      •  Directory names  can  be up to 8 characters long, and  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║         can have an extension up to 3 characters long.         ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -836,64 +836,64 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║      •  File  \treeinfo.ncd  will  be  rescaned automatically  ║      ║| 1Bx4 30x19 3Ex13 30x40 03x2 1Bx2
 |║      ║         after creating a directory.                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 30: "c"
 cursor 8 8 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
 |║re                                                                            ║| 1Bx3 70x74 1Bx3
 |║he   ╔═════════════════════════ Make directory ═════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║no   ║ Create the directory                                             ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║da   ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║ru   ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
-|║em                                                                          ──╢| 1Bx3 70x74 03x2 1Bx1
-|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|║em                                                                            ║| 1Bx3 70x74 03x2 1Bx1
+|║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 31: Esc
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -901,27 +901,27 @@ cursor 8 23 lines 6 7 mode 3
 == 32: F9
 cursor 0 127 lines 6 7 mode 3
 |    Left    Files    Commands    Options    Right                               | 30x2 0Fx8 30x70
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -929,18 +929,18 @@ cursor 0 127 lines 6 7 mode 3
 == 33: F1
 cursor 0 127 lines 6 7 mode 3
 |    Left    Files    Commands    Options    Right                               | 30x2 0Fx8 30x70
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║ Left/Right pull-down menus                                     ║      ║| 1Bx4 30x5 3Fx26 30x41 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  The Left and Right  menus  allow  you to change settings for  ║   :  ║| 1Bx4 30x10 3Ex4 30x5 3Ex5 30x48 06x1 03x1 1Bx2
+|║hel   ║  The Left and Right  menus  allow  you to change settings for  ║      ║| 1Bx4 30x10 3Ex4 30x5 3Ex5 30x48 03x2 1Bx2
 |║not   ║  the left and right panels.                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║                                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║                Left ─────┐          ┌─────── Right             ║      ║| 1Bx4 30x20 3Ex4 30x26 3Ex5 30x17 03x2 1Bx2
-|║emp   ║                          ▼          ▼                          ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║                          ▼          ▼                          ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                    ╔══ Tree ══╗╔══ C:\ ══╗                     ║      ║| 1Bx4 30x27 0Fx6 30x39 03x2 1Bx2
-|║      ║                    ║          ║║         ║                     ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║                    ║          ║║         ║                     ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║                    ║          ║║         ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                    ║          ║║         ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                    ║          ║║         ║                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -948,8 +948,8 @@ cursor 0 127 lines 6 7 mode 3
 |║      ║                    ╚══════════╝╚═════════╝                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║                    C>_                                         ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║      ║| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
-|║..    ╚════════════════════════════════════════════════════════════════╝      ║| 1Bx4 30x72 03x2 1Bx2
+|╟───   ║        [ Next ]   [ Previous ]   [ Index ]   [ Cancel ]        ║   ───╢| 1Bx4 30x12 0Fx8 30x52 03x2 1Bx2
+|║..    ╚════════════════════════════════════════════════════════════════╝   00p║| 1Bx4 30x72 03x2 1Bx2
 |╚═══                                                                        ═══╝| 1Bx4 30x72 03x2 1Bx2
 |C:\WORK>                                                                        | 07x6 0Fx72 07x2
 |1       2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -957,102 +957,102 @@ cursor 0 127 lines 6 7 mode 3
 == 34: Esc
 cursor 0 127 lines 6 7 mode 3
 |    Left    Files    Commands    Options    Right                               | 30x2 0Fx8 30x70
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 35: Esc
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 36: Alt+F9
 cursor 8 48 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
 
 == 37: F1
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║  About the Commander                                           ║   :  ║| 1Bx4 30x5 0Fx62 30x5 06x1 03x1 1Bx2
+|║hel   ║  About the Commander                                           ║      ║| 1Bx4 30x5 0Fx62 30x5 03x2 1Bx2
 |║not   ║  Keyboard reference                                            ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  View -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║  View -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║  Edit -- Keyboard reference                                    ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║  Edit -- Keyboard reference                                    ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║  Edit -- Status line                                           ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║  Left/Right menu                                               ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║  Left/Right menu                                               ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Brief/Full                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Info                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -1068,19 +1068,19 @@ cursor 0 127 lines 6 7 mode 3
 
 == 38: End
 cursor 0 127 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                         ───╢| 1Bx1 30x75 1Bx4
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x75 1Bx4
 |║DOC   ╔═════════════════════════════ Help ═════════════════════════════╗      ║| 1Bx4 30x72 03x2 1Bx2
 |║SRC   ║               The Volkov Commander, Version 4.05               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║rea   ╟────────────────────────────────────────────────────────────────╢      ║| 1Bx4 30x72 03x2 1Bx2
-|║hel   ║       Select group                                             ║   :  ║| 1Bx4 30x72 06x1 03x1 1Bx2
+|║hel   ║       Select group                                             ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║not   ║       Quit                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║dat   ║  Commands menu                                                 ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║run   ║       Tree                                                     ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║emp   ║       Volume label                                             ║   ───╢| 1Bx4 30x72 03x2 1Bx2
+|║emp   ║       Volume label                                             ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       Memory info                                              ║      ║| 1Bx4 30x72 03x2 1Bx2
-|║      ║       Directory sizes                                          ║   ry ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
+|║      ║       Directory sizes                                          ║      ║| 1Bx4 30x36 47x1 30x35 03x2 1Bx2
 |║      ║       Find Files                                               ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       History                                                  ║      ║| 1Bx4 30x72 03x2 1Bx2
 |║      ║       EGA Lines                                                ║      ║| 1Bx4 30x72 03x2 1Bx2
@@ -1096,56 +1096,56 @@ cursor 0 127 lines 6 7 mode 3
 
 == 39: F10
 cursor 8 48 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
 
 == 40: Alt+F9
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1175,7 +1175,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

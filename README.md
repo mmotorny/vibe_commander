@@ -1260,15 +1260,21 @@ takes 40 KB, so this machine shows less memory free than the other. The
 other machine has the keyboard a PC has by itself, and no way to type a
 letter beyond ASCII: Alt with the numeric keypad types nothing there.
 
-The program is set up as its distribution sets it up, with one exception:
-the clock in the corner of the screen is off. It would put the time of day
+The program is set up as its distribution sets it up, with two exceptions.
+The clock in the corner of the screen is off. It would put the time of day
 on every screen, and the machine's time is counted in the instructions it
 executes (see below), of which the translation takes more than the original
-to get through a scenario. No setup file
-is prepared for this. Whenever the harness sets up its machines, the
-original is started once, made to switch the clock off in its Options menu
-and to save its setup, and the `VC.INI` it writes is what every scenario
-starts from. One scenario, `clock`, switches the clock on again.
+to get through a scenario. And the panel on the right lists files, as the
+one on the left does, where the distribution has the Info panel there: that
+shows the size of the memory, the label of the disk and what is free on it,
+things of the machine and of the system, and it would be on nearly every
+screen of nearly every scenario. No setup file
+is prepared for either. Whenever the harness sets up its machines, the
+original is started once, made to switch the clock off in its Options menu,
+to make the right panel one of files in its Right menu, and to save its
+setup, and the `VC.INI` it writes is what every scenario
+starts from. One scenario, `clock`, switches the clock on again, and a
+scenario that is about the Info panel switches that on.
 
 ### When a step is finished
 

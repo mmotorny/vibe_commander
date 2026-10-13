@@ -7,29 +7,29 @@ Why: the Commands menu, a line shorter, without Memory info
 
 == 1: Click@70,0>25,0
 rows 4-16
--|║SRC         │     │ memory Info           Alt-F5  │###### Bytes Free          ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 06x2 1Ex4 1Bx22
--|║readme   txt│     │ Directory sizes       Alt-F6  │e in drive C: is WORK      ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx9 1Ex2 1Bx4 1Ex4 1Bx7
--|║hello    txt│     │ Find file             Alt-F7  │2 total bytes on drive C:  ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x1 03x1 1Bx21 1Ex2 1Bx3
--|║notes    doc│     │ History               Alt-F8  │0 bytes free on drive C:   ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x1 03x1 1Bx20 1Ex2 1Bx4
--|║data     bin│     │ EGA lines             Alt-F9  │es use 3,072 bytes in      ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx5 1Ex5 1Bx16
--|║run      bat│     │ ───────────────────────────── │    C:\WORK                ║| 1Bx19 30x33 03x2 1Bx26
--|║empty    dat│     │ Swap panels           Ctrl-U  │───────────────────────────╢| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
--|║            │     │ Panels on/off         Ctrl-O  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
--|║            │     │-Compare directories   Ctrl-C  │fo' file in this directory ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
--|║            │     │ ───────────────────────────── │                           ║| 1Bx19 30x33 03x2 1Bx26
--|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
--|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
--|║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
-+|║SRC         │     │ Directory sizes       Alt-F6  │###### Bytes Free          ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x2 1Ex4 1Bx22
-+|║readme   txt│     │ Find file             Alt-F7  │e in drive C: is WORK      ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx9 1Ex2 1Bx4 1Ex4 1Bx7
-+|║hello    txt│     │ History               Alt-F8  │2 total bytes on drive C:  ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x1 03x1 1Bx21 1Ex2 1Bx3
-+|║notes    doc│     │ EGA lines             Alt-F9  │0 bytes free on drive C:   ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 06x1 03x1 1Bx20 1Ex2 1Bx4
-+|║data     bin│     │ ───────────────────────────── │es use 3,072 bytes in      ║| 1Bx19 30x33 03x2 1Bx5 1Ex5 1Bx16
-+|║run      bat│     │ Swap panels           Ctrl-U  │    C:\WORK                ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-+|║empty    dat│     │ Panels on/off         Ctrl-O  │───────────────────────────╢| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-+|║            │     │-Compare directories   Ctrl-C  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
-+|║            │     │ ───────────────────────────── │fo' file in this directory ║| 1Bx19 30x33 03x2 1Bx26
-+|║            │     │ Menu file edit                │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
-+|║            │     └───────────────────────────────┘                           ║| 1Bx19 30x33 03x2 1Bx26
-+|║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
-+|║            │            │            ║║                                      ║| 1Bx80
+-|║SRC         │     │ memory Info           Alt-F5  │ │            │            ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
+-|║readme   txt│     │ Directory sizes       Alt-F6  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║hello    txt│     │ Find file             Alt-F7  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║notes    doc│     │ History               Alt-F8  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║data     bin│     │ EGA lines             Alt-F9  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║run      bat│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+-|║empty    dat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │ Panels on/off         Ctrl-O  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+-|║            │     │ Menu file edit                │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
+-|║            │     └───────────────────────────────┘ │            │            ║| 1Bx19 30x33 03x2 1Bx26
+-|║            │            │            ║║            │            │            ║| 1Bx21 03x33 1Bx26
++|║SRC         │     │ Directory sizes       Alt-F6  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║readme   txt│     │ Find file             Alt-F7  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║hello    txt│     │ History               Alt-F8  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║notes    doc│     │ EGA lines             Alt-F9  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║data     bin│     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
++|║run      bat│     │ Swap panels           Ctrl-U  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║empty    dat│     │ Panels on/off         Ctrl-O  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     │ Compare directories   Ctrl-C  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     │ ───────────────────────────── │ │            │            ║| 1Bx19 30x33 03x2 1Bx26
++|║            │     │ Menu file edit                │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
++|║            │     └───────────────────────────────┘ │            │            ║| 1Bx19 30x33 03x2 1Bx26
++|║            │            │            ║║            │            │            ║| 1Bx21 03x33 1Bx26
++|║            │            │            ║║            │            │            ║| 1Bx80

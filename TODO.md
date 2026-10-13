@@ -2796,7 +2796,8 @@ reason.
 
 What the next pieces meet:
 
-- The bench's right panel, with every golden derived again. Every patch
+- The bench's right panel, with every golden derived again: done, and
+  the next section says how. Every patch
   on a row that comes out otherwise then fails before anything is run,
   "does not fit ... Nothing was run", with both rows and the cells
   marked. `python3 harness/goldens.py patch --tree portable_c NAME...`
@@ -2826,6 +2827,122 @@ run in a trial; no committed patch has one, since no deviation so far
 changes what blinks. Lines for the disks, which were tried in the same
 way, two patches have since: `setup-config` and `setup-screen`, for the
 setup file that each saves.
+
+## The bench with a list of files on the right: done, and what was put off
+
+Done, on the user's word of 13 October 2026 ("Scenarios" in `CLAUDE.md`):
+the bench makes the panel on the right one of files, in the original's
+own Right menu, before the original saves the setup that every scenario
+starts from (`harness/setups.py`). The setup file is the one of before
+but for two bytes: 05Bh, the kind of the right panel, 02h and now 00h,
+and the low byte of the sum. Every golden of the original was derived
+again. Nothing under `src/` changed for it.
+
+How it was shown that nothing a scenario was written for is lost. Each
+scenario was held against its golden of before, screen by screen, and
+what ran in it against what ran before:
+
+- 125 scenarios are as they were: they say what they said, without the
+  Info panel in the picture. All 34 of the setup program are among them.
+- 22 had a step that was there for another reason and is otherwise
+  now. For 21 it is one: a `Ctrl+l` that was written to take the Info
+  panel away, and brought it. Those steps are gone. The other is
+  `russian`, which empties the line of F5's dialog before it types.
+- 20 leaned on the Info panel, and switch it on now, `Ctrl+l`, as their
+  first step or at the step that needs it: `memory`, `dirinfo`,
+  `view-window`, `reread`, `menu`, `compare`, `move`, `rename-keys`,
+  `copy-ask`, `copy-big`, `mouse-menu` at the start; `cursor`,
+  `user-menu-run`, `command-line`, `enter`, `menu-items`,
+  `make-directory`, `copy-tree`, `mouse-list`, `mouse-edit` at a step.
+
+For each of the 42 the screens behind the mend are those of the golden
+of before, every cell, the cursor and what blinks, and so are the disks
+but for the setup file; for `russian` they are so but for the list of
+files on the right. That is in the history:
+
+    diff <(git show 59252a7:harness/goldens/NAME.txt | sed 's/^== [0-9]*: /== /') \
+         <(sed 's/^== [0-9]*: /== /' harness/goldens/NAME.txt)
+
+shows the screens in front of the mend, the step that is new or gone,
+and nothing behind it but the line of `D:\VC\VC.INI` among the disks.
+And what ran: with the bench changed and no scenario mended, 73
+instructions of the original were run by none, in fifteen routines, and
+1,754 more only by steps that had gone astray. With the scenarios
+mended, every instruction that ran before runs, and none that did not:
+the report of every batch is what it was, line for line, and no entry of
+`unreached` was added or taken away.
+
+What the change found of the two C trees. With the bench changed and no
+scenario mended, both were taken along paths with a list of files on
+the right that they had never been taken along. Nothing differed from
+the original but by a declared deviation or a figure that is known to
+follow the size of the program, each time where a step had gone astray:
+the Info panel on D:, the Info in both panels with its second "Bytes
+Free", the Info of a second copy, and the Commands menu, a line shorter
+in the portable C, left open.
+
+What was found of driving the program is at the top of
+`harness/scenarios.py`: what F5 and F6 offer next to a list of files,
+where the tree is next to one, Compare directories, `Ctrl+]`, a name
+typed behind `Alt+RightShift`, and the time. The first screen is 4.7
+seconds of the machine's time sooner, some five seconds past noon: that
+is what the Info panel takes the first time it is drawn, and a scenario
+that switches it on has it then.
+
+The patches of the portable C. `clock`, `clock-russia`,
+`mouse-drag-menu`, `start-memory` and `lost` were made again and say
+what they said, on rows of the original that are otherwise now: the
+shadow of a menu on the line of a list where it fell on a blank row of
+the Info, the panels that the portable C still shows with the list on
+the right, and, in `start-memory`, six rows fewer, the Info of the
+second copy, which is on no screen now. Those of `menu`, `mouse-menu`,
+`tree-choose` and `second-copy` say what they said row for row, on
+screens whose steps have other numbers; those of `setup-config` and
+`setup-screen` have the other setup file among the disks.
+
+### Put off: eight scenarios that could leave the Info off
+
+Put off on purpose, on 13 October 2026. Eleven scenarios switch the Info
+on as their first step and so have it on every screen, as before. For
+three that is what they are about, `memory`, `dirinfo` and
+`view-window`. The other eight could be written so that the Info is on
+only where a step wants it, or not at all, which is what the change of
+the bench was for. They were mended the short way all the same: with
+`Ctrl+l` in front, every screen behind it is the old golden's cell for
+cell, and that was the proof that the change of the bench lost nothing.
+A scenario written anew has a golden to be read, and proves nothing of
+the kind; it is worth doing once the proof is no longer needed, and not
+before. What each would need, none of it tried but where it says so:
+
+- `copy-big`: "F5", "Enter", "p", five times, repeats a copy by the
+  last target, which F5 offers only next to the Info. With the name
+  typed each time, `"huge" Enter`, it needs no Info. Tried: it leaves
+  the same files.
+- `move`: steps 4 and 5, F6 and Enter "onto itself", lean on F6
+  offering the name of the file; next to files it offers their
+  directory and the file is moved there. The name typed, or the Info on
+  for those two steps.
+- `rename-keys`: only its last three steps want the Info, as the
+  current panel. `Ctrl+l` in front of them; the dialogs of the steps
+  before then have `C:\` for a target, which is not what they are
+  about.
+- `copy-ask`: "offers its own name" and "offers the last target" are of
+  a panel next to the Info, and three steps want the Info as the active
+  panel. Next to files the same keys offer `C:\`, which is another
+  thing to show and wants its own steps.
+- `compare`: its first step, `Ctrl+c` that does nothing next to the
+  Info. `Ctrl+l`, `Ctrl+c`, `Ctrl+l` in a row would have the Info on
+  two screens where it is on nine.
+- `reread`: its second step looks at what the Info says of a directory
+  named dirinfo; the Info could go behind that step, where it goes at
+  the twelfth.
+- `menu`: one look, the Right menu of the Info, with the bar open from
+  the second step to the twentieth. The look would move to a place
+  where the Info can be switched on in front of it and off behind.
+- `mouse-menu`: one click on an item that is dark, Compare directories
+  next to the Info; the Commands menu has none dark next to files. The
+  Info on around that click, which is at the fourth step with the menu
+  open from the second.
 
 ## Leaving a part of the screen out of the comparison: future work
 

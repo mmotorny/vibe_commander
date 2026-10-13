@@ -4,47 +4,47 @@ code page 437
 
 == 0: the start
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 1: F9 o Enter
 cursor 15 6 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                        ────╢| 1Bx1 30x4 3Fx70 1Bx5
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x4 3Fx70 1Bx5
 |║DOCS   ╔═══════════════════════ Configuration ════════════════════════╗       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║SRC    ║  ┌ Screen colors ──────┐  ┌ Panel options ────────────────┐  ║       ║| 1Bx5 3Fx8 3Ex13 3Fx12 3Ex13 3Fx24 03x2 1Bx3
 |║read   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║hell   ║  │  (•) Color          │  │  [x] Auto change directory    │  ║   C:  ║| 1Bx5 3Fx70 06x2 1Bx3
-|║note   ║  │  ( ) Laptop         │  └───────────────────────────────┘  ║   :   ║| 1Bx5 3Fx70 06x1 03x1 1Bx3
+|║hell   ║  │  (•) Color          │  │  [x] Auto change directory    │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║note   ║  │  ( ) Laptop         │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║data   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
 |║run    ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
-|║empt   ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║   ────╢| 1Bx5 3Fx70 03x2 1Bx3
+|║empt   ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║   ory ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
+|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
 |║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( )  1 minute      │  ┌ Mouse options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
 |║       ║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
@@ -52,27 +52,27 @@ cursor 15 6 lines 6 7 mode 3
 |║       ║        Press  Space  to change an option,  ↑  and  ↓         ║       ║| 1Bx5 3Fx18 0Fx7 3Fx22 0Fx3 3Fx5 0Fx3 3Fx12 03x2 1Bx3
 |║       ║                   to move between options                    ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ╟──────────────────────────────────────────────────────────────╢       ║| 1Bx5 3Fx70 03x2 1Bx3
-|╟────   ║                     [ Ok ]   [ Cancel ]                      ║       ║| 1Bx5 3Fx25 3Ex6 3Fx39 03x2 1Bx3
-|║..     ╚══════════════════════════════════════════════════════════════╝       ║| 1Bx5 3Fx70 03x2 1Bx3
+|╟────   ║                     [ Ok ]   [ Cancel ]                      ║   ────╢| 1Bx5 3Fx25 3Ex6 3Fx39 03x2 1Bx3
+|║..     ╚══════════════════════════════════════════════════════════════╝   :00p║| 1Bx5 3Fx70 03x2 1Bx3
 |╚════                                                                      ════╝| 1Bx5 3Fx70 03x2 1Bx3
 |C:\WORK>                                                                        | 07x7 0Fx70 07x3
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 2: Tab Tab Tab Tab Down Space
 cursor 40 10 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..                                                                        ────╢| 1Bx1 30x4 3Fx70 1Bx5
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..                                                                            ║| 1Bx1 30x4 3Fx70 1Bx5
 |║DOCS   ╔═══════════════════════ Configuration ════════════════════════╗       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║SRC    ║  ┌ Screen colors ──────┐  ┌ Panel options ────────────────┐  ║       ║| 1Bx5 3Fx8 3Ex13 3Fx12 3Ex13 3Fx24 03x2 1Bx3
 |║read   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║hell   ║  │  (•) Color          │  │  [x] Auto change directory    │  ║   C:  ║| 1Bx5 3Fx70 06x2 1Bx3
-|║note   ║  │  ( ) Laptop         │  └───────────────────────────────┘  ║   :   ║| 1Bx5 3Fx70 06x1 03x1 1Bx3
+|║hell   ║  │  (•) Color          │  │  [x] Auto change directory    │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║note   ║  │  ( ) Laptop         │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║data   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
 |║run    ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
-|║empt   ║  │  ( ) 40 minutes     │  │  [x] Auto save setup          │  ║   ────╢| 1Bx5 3Fx70 03x2 1Bx3
+|║empt   ║  │  ( ) 40 minutes     │  │  [x] Auto save setup          │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
-|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║   ory ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
+|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║       ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
 |║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ║  │  ( )  1 minute      │  ┌ Mouse options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
 |║       ║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
@@ -80,41 +80,13 @@ cursor 40 10 lines 6 7 mode 3
 |║       ║        Press  Space  to change an option,  ↑  and  ↓         ║       ║| 1Bx5 3Fx18 0Fx7 3Fx22 0Fx3 3Fx5 0Fx3 3Fx12 03x2 1Bx3
 |║       ║                   to move between options                    ║       ║| 1Bx5 3Fx70 03x2 1Bx3
 |║       ╟──────────────────────────────────────────────────────────────╢       ║| 1Bx5 3Fx70 03x2 1Bx3
-|╟────   ║                     [ Ok ]   [ Cancel ]                      ║       ║| 1Bx5 3Fx25 3Ex6 3Fx39 03x2 1Bx3
-|║..     ╚══════════════════════════════════════════════════════════════╝       ║| 1Bx5 3Fx70 03x2 1Bx3
+|╟────   ║                     [ Ok ]   [ Cancel ]                      ║   ────╢| 1Bx5 3Fx25 3Ex6 3Fx39 03x2 1Bx3
+|║..     ╚══════════════════════════════════════════════════════════════╝   :00p║| 1Bx5 3Fx70 03x2 1Bx3
 |╚════                                                                      ════╝| 1Bx5 3Fx70 03x2 1Bx3
 |C:\WORK>                                                                        | 07x7 0Fx70 07x3
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 3: Enter
-cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
-|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 4: Ctrl+l
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -142,7 +114,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 5: F9 o o
+== 4: F9 o o
 cursor 25 6 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -170,7 +142,7 @@ cursor 25 6 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 6: Down Down Down Down Down Space
+== 5: Down Down Down Down Down Space
 cursor 25 13 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -198,7 +170,7 @@ cursor 25 13 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 7: Enter
+== 6: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -226,7 +198,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 8: Shift+F4
+== 7: Shift+F4
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -254,7 +226,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 9: "c.bat"
+== 8: "c.bat"
 cursor 13 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -282,7 +254,7 @@ cursor 13 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 10: Enter
+== 9: Enter
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -310,7 +282,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 11: Enter
+== 10: Enter
 cursor 0 1 lines 6 7 mode 3
 |Edit: c.bat                              Line 1     Col 1############ Free      | 30x80
 |                                                                                | 1Bx80
@@ -338,7 +310,7 @@ cursor 0 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 12: "set" Space "comspec=%1" Enter "d:\vc\vc"
+== 11: "set" Space "comspec=%1" Enter "d:\vc\vc"
 cursor 8 2 lines 6 7 mode 3
 |Edit: c.bat                           *  Line 2     Col 9############ Free      | 30x80
 |set comspec=%1                                                                  | 1Bx80
@@ -366,7 +338,7 @@ cursor 8 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 13: F2
+== 12: F2
 cursor 8 2 lines 6 7 mode 3
 |Edit: c.bat                              Line 2     Col 9############ Free      | 30x80
 |set comspec=%1                                                                  | 1Bx80
@@ -394,7 +366,7 @@ cursor 8 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 14: Esc
+== 13: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -422,7 +394,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 15: Shift+F4
+== 14: Shift+F4
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -450,7 +422,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 16: "m.dat"
+== 15: "m.dat"
 cursor 13 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -478,7 +450,7 @@ cursor 13 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 17: Enter
+== 16: Enter
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -506,7 +478,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 18: Enter
+== 17: Enter
 cursor 0 1 lines 6 7 mode 3
 |Edit: m.dat                              Line 1     Col 1############ Free      | 30x80
 |                                                                                | 1Bx80
@@ -534,7 +506,7 @@ cursor 0 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 19: F4
+== 18: F4
 cursor 11 1 lines 6 7 mode 3
 |Edit: m.dat                              Line 1     Col 1############ Free      | 30x80
 | 00000000                                                                       | 1Bx80
@@ -562,7 +534,7 @@ cursor 11 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 20: "4d5a0000ff7f"
+== 19: "4d5a0000ff7f"
 cursor 30 1 lines 6 7 mode 3
 |Edit: m.dat                           *  Line 1     Col 7############ Free      | 30x80
 | 00000000  4D 5A 00 00  FF 7F                                  MZ..⍽⌂           | 1Bx80
@@ -590,7 +562,7 @@ cursor 30 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 21: "00000200ffff"
+== 20: "00000200ffff"
 cursor 50 1 lines 6 7 mode 3
 |Edit: m.dat                           *  Line 1     Col 13########### Free      | 30x80
 | 00000000  4D 5A 00 00  FF 7F 00 00  02 00 FF FF               MZ..⍽⌂..☻.⍽⍽     | 1Bx80
@@ -618,7 +590,7 @@ cursor 50 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 22: "ffff00000001"
+== 21: "ffff00000001"
 cursor 17 2 lines 6 7 mode 3
 |Edit: m.dat                           *  Line 2     Col 3############ Free      | 30x80
 | 00000000  4D 5A 00 00  FF 7F 00 00  02 00 FF FF  FF FF 00 00  MZ..⍽⌂..☻.⍽⍽⍽⍽.. | 1Bx80
@@ -646,7 +618,7 @@ cursor 17 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 23: "000000000000"
+== 22: "000000000000"
 cursor 37 2 lines 6 7 mode 3
 |Edit: m.dat                           *  Line 2     Col 9############ Free      | 30x80
 | 00000000  4D 5A 00 00  FF 7F 00 00  02 00 FF FF  FF FF 00 00  MZ..⍽⌂..☻.⍽⍽⍽⍽.. | 1Bx80
@@ -674,7 +646,7 @@ cursor 37 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 24: "1c000000"
+== 23: "1c000000"
 cursor 50 2 lines 6 7 mode 3
 |Edit: m.dat                           *  Line 2     Col 13########### Free      | 30x80
 | 00000000  4D 5A 00 00  FF 7F 00 00  02 00 FF FF  FF FF 00 00  MZ..⍽⌂..☻.⍽⍽⍽⍽.. | 1Bx80
@@ -702,7 +674,7 @@ cursor 50 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 25: F2
+== 24: F2
 cursor 50 2 lines 6 7 mode 3
 |Edit: m.dat                              Line 2     Col 13########### Free      | 30x80
 | 00000000  4D 5A 00 00  FF 7F 00 00  02 00 FF FF  FF FF 00 00  MZ..⍽⌂..☻.⍽⍽⍽⍽.. | 1Bx80
@@ -730,7 +702,7 @@ cursor 50 2 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 26: Esc
+== 25: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -758,7 +730,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 27: "c" Space "c:\x" Enter
+== 26: "c" Space "c:\x" Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -786,7 +758,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 28: "ver" Enter
+== 27: "ver" Enter
 cursor 0 24 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -814,7 +786,7 @@ cursor 0 24 lines 6 7 mode 3
 |Press ENTER to try again or ESC to abort                                        | 07x80
 |                                                                                | 07x80
 
-== 29: Enter
+== 28: Enter
 cursor 0 24 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -842,7 +814,7 @@ cursor 0 24 lines 6 7 mode 3
 |Press ENTER to try again or ESC to abort                                        | 07x80
 |                                                                                | 07x80
 
-== 30: Esc
+== 29: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -870,7 +842,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 31: F10
+== 30: F10
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -898,7 +870,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 32: Enter
+== 31: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -926,7 +898,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 33: "c" Space "c:\work\m.dat" Enter
+== 32: "c" Space "c:\work\m.dat" Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -954,7 +926,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 34: "ver" Enter
+== 33: "ver" Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -982,7 +954,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 35: Ctrl+o
+== 34: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |C:\WORK>c c:\x                                                                  | 07x80
 |C:\WORK>set comspec=c:\x                                                        | 07x80
@@ -1010,7 +982,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 36: Ctrl+o
+== 35: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1038,7 +1010,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 37: F10
+== 36: F10
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1066,7 +1038,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 38: Enter
+== 37: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1094,7 +1066,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 39: "c" Enter
+== 38: "c" Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1122,7 +1094,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 40: "ver" Enter
+== 39: "ver" Enter
 cursor 0 24 lines 6 7 mode 3
 |Press ENTER to try again or ESC to abort                                        | 07x80
 |                                                                                | 07x80
@@ -1150,7 +1122,7 @@ cursor 0 24 lines 6 7 mode 3
 |Press ENTER to try again or ESC to abort                                        | 07x80
 |                                                                                | 07x80
 
-== 41: Esc
+== 40: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1178,7 +1150,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 42: F10
+== 41: F10
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1206,7 +1178,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 43: Enter
+== 42: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1234,7 +1206,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 44: Shift+F4
+== 43: Shift+F4
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1262,7 +1234,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 45: "vc.mnu" Enter
+== 44: "vc.mnu" Enter
 cursor 0 1 lines 6 7 mode 3
 |Edit: vc.mnu                             Line 1     Col 1############ Free      | 30x80
 |                                                                                | 1Bx80
@@ -1290,7 +1262,7 @@ cursor 0 1 lines 6 7 mode 3
 |▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀| 13x80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 46: Enter
+== 45: Enter
 cursor 0 2 lines 6 7 mode 3
 |Edit: vc.mnu                          *  Line 2     Col 1############ Free      | 30x80
 |                                                                                | 1Bx80
@@ -1318,7 +1290,7 @@ cursor 0 2 lines 6 7 mode 3
 |▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀| 13x80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 47: "b:" Tab "two" Enter
+== 46: "b:" Tab "two" Enter
 cursor 0 3 lines 6 7 mode 3
 |Edit: vc.mnu                          *  Line 3     Col 1############ Free      | 30x80
 |                                                                                | 1Bx80
@@ -1346,7 +1318,7 @@ cursor 0 3 lines 6 7 mode 3
 |▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀| 13x80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 48: Tab "echo" Space "1" Enter
+== 47: Tab "echo" Space "1" Enter
 cursor 0 4 lines 6 7 mode 3
 |Edit: vc.mnu                          *  Line 4     Col 1############ Free      | 30x80
 |                                                                                | 1Bx80
@@ -1374,7 +1346,7 @@ cursor 0 4 lines 6 7 mode 3
 |▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀| 13x80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 49: Tab "@echo" Space "2" Enter
+== 48: Tab "@echo" Space "2" Enter
 cursor 0 5 lines 6 7 mode 3
 |Edit: vc.mnu                          *  Line 5     Col 1############ Free      | 30x80
 |                                                                                | 1Bx80
@@ -1402,7 +1374,7 @@ cursor 0 5 lines 6 7 mode 3
 |▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀| 13x80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 50: F2 Esc
+== 49: F2 Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1430,7 +1402,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 51: F2
+== 50: F2
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1458,7 +1430,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 52: b
+== 51: b
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1486,7 +1458,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 53: Ctrl+o
+== 52: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |C:\WORK>set comspec=c:\work\m.dat                                               | 07x80
 |C:\WORK>d:\vc\vc                                                                | 07x80
@@ -1514,7 +1486,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 54: Ctrl+o
+== 53: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5

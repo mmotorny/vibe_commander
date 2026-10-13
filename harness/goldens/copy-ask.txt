@@ -4,33 +4,33 @@ code page 437
 
 == 0: the start
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 1: F5
+== 1: Ctrl+l
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -58,7 +58,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 2: Ctrl+F5
+== 2: F5
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -86,7 +86,35 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 3: Down Down Down
+== 3: Ctrl+F5
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 4: Down Down Down
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -114,7 +142,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 4: Ctrl+F6
+== 5: Ctrl+F6
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -142,7 +170,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 5: "r.txt" Enter
+== 6: "r.txt" Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -170,7 +198,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 6: Ins Ins
+== 7: Ins Ins
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -198,7 +226,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 7: Ctrl+F5
+== 8: Ctrl+F5
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -226,7 +254,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 8: "one.txt" Enter
+== 9: "one.txt" Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -254,7 +282,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 9: F5
+== 10: F5
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -282,7 +310,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 10: Esc
+== 11: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -310,7 +338,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 11: F6
+== 12: F6
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -338,7 +366,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 12: Ctrl+y Enter
+== 13: Ctrl+y Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -366,7 +394,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 13: Shift+F6
+== 14: Shift+F6
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -394,7 +422,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 14: Esc
+== 15: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -422,7 +450,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 15: Shift+F5
+== 16: Shift+F5
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -450,7 +478,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 16: "*.zzz" Tab "x" Enter
+== 17: "*.zzz" Tab "x" Enter
 cursor 0 127 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
@@ -478,7 +506,7 @@ cursor 0 127 lines 6 7 mode 3
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 |                                                                                | 07x80
 
-== 17: Enter
+== 18: Enter
 cursor 8 23 lines 6 7 mode 3
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
 |║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
@@ -506,7 +534,7 @@ cursor 8 23 lines 6 7 mode 3
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 18: Tab
+== 19: Tab
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -534,7 +562,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 19: F5
+== 20: F5
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -562,7 +590,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 20: Esc
+== 21: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx57 30x6 1Bx17
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -590,7 +618,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 21: Tab
+== 22: Tab
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -618,7 +646,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 22: Esc
+== 23: Esc
 cursor 8 23 lines 6 7 mode 3
 |The Volkov Commander, Version 4.05 freeware                                     | 07x80
 |Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
@@ -646,7 +674,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 23: F5
+== 24: F5
 cursor 8 8 lines 6 7 mode 3
 |The Volkov Commander, Version 4.05 freeware                                     | 07x80
 |Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
@@ -674,7 +702,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 24: Esc
+== 25: Esc
 cursor 8 23 lines 6 7 mode 3
 |The Volkov Commander, Version 4.05 freeware                                     | 07x80
 |Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
@@ -702,7 +730,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 25: F6
+== 26: F6
 cursor 8 8 lines 6 7 mode 3
 |The Volkov Commander, Version 4.05 freeware                                     | 07x80
 |Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
@@ -730,7 +758,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 26: Esc
+== 27: Esc
 cursor 8 23 lines 6 7 mode 3
 |The Volkov Commander, Version 4.05 freeware                                     | 07x80
 |Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
@@ -758,7 +786,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 27: Esc
+== 28: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -786,7 +814,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 28: F9 r t
+== 29: F9 r t
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -814,7 +842,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 29: F5
+== 30: F5
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -842,7 +870,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 30: "d:" F10
+== 31: "d:" F10
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -870,7 +898,7 @@ cursor 47 20 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x30 0Fx48 07x2
 |1Help   2Rescan 3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 31: Home Enter
+== 32: Home Enter
 cursor 11 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -898,7 +926,7 @@ cursor 11 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 32: Enter
+== 33: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -926,7 +954,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 33: F5
+== 34: F5
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -954,7 +982,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 34: F10
+== 35: F10
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -982,7 +1010,7 @@ cursor 47 20 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x30 0Fx48 07x2
 |1Help   2Rescan 3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 35: Esc
+== 36: Esc
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -1010,7 +1038,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 36: Alt+F10
+== 37: Alt+F10
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -1038,7 +1066,7 @@ cursor 47 20 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x30 0Fx48 07x2
 |1Help   2Rescan 3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 37: Down Enter
+== 38: Down Enter
 cursor 21 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -1066,7 +1094,7 @@ cursor 21 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 38: Tab Right Enter
+== 39: Tab Right Enter
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -1094,7 +1122,7 @@ cursor 47 20 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x30 0Fx48 07x2
 |1Help   2Rescan 3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 39: Esc
+== 40: Esc
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -1122,7 +1150,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 40: Home Ctrl+y "z:" F10
+== 41: Home Ctrl+y "z:" F10
 cursor 47 20 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -1150,7 +1178,7 @@ cursor 47 20 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x30 0Fx48 07x2
 |1Help   2Rescan 3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 41: Esc
+== 42: Esc
 cursor 10 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -1178,7 +1206,7 @@ cursor 10 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 42: Esc
+== 43: Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Tree ════════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║ \                                    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
@@ -1235,7 +1263,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

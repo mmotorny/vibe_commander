@@ -4,145 +4,145 @@ code page 437
 
 == 0: the start
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 1: F9 o o
 cursor 25 6 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
-|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
-|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
-|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
-|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
-|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
-|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
-|║            │    ║  │  [x] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
-|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
-|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                    │            ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║     │            ║| 1Bx15 3Fx8 3Ex17 3Fx24 03x2 1Bx14
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║     │            ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+|║            │    ║  │  [x] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 2: Down Down Down Down Down Space
 cursor 25 13 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │                                                  Memory         ║| 1Bx15 3Fx49 1Bx16
-|║SRC         │    ╔════════════ Advanced Options ═══════════╗    Free          ║| 1Bx15 3Fx49 03x2 1Bx14
-|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║   : is WORK      ║| 1Bx15 3Fx8 3Ex17 3Fx24 06x1 03x1 1Bx3 1Ex4 1Bx7
-|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║   s on drive C:  ║| 1Bx15 3Fx49 03x2 1Bx9 1Ex2 1Bx3
-|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║    on drive C:   ║| 1Bx15 3Fx49 03x2 1Bx8 1Ex2 1Bx4
-|║data     bin│    ║  │  [x] Alternative viewer           │  ║    bytes in      ║| 1Bx15 3Fx49 03x2 1Bx14
-|║run      bat│    ║  │  [ ] Alternative editor           │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║empty    dat│    ║  └───────────────────────────────────┘  ║   ───────────────╢| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ║  ┌ Other options ────────────────────┐  ║                  ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
-|║            │    ║  │  [ ] Quick execute commands       │  ║   this directory ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
-|║            │    ║  │  [ ] Clear keyboard buffer        │  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ║  └───────────────────────────────────┘  ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ║    Press  Space  to change an option,   ║                  ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
-|║            │    ║      arrows to move between options     ║                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ╟─────────────────────────────────────────╢                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|║            │    ║           [ Ok ]   [ Cancel ]           ║                  ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
-|║            │    ╚═════════════════════════════════════════╝                  ║| 1Bx15 3Fx49 03x2 1Bx14
-|╟────────────┴─                                                                ║| 1Bx15 3Fx49 03x2 1Bx14
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx17 03x49 1Bx14
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │                                                    │            ║| 1Bx15 3Fx49 1Bx16
+|║SRC         │    ╔════════════ Advanced Options ═══════════╗     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║readme   txt│    ║  ┌ Key configuration ────────────────┐  ║     │            ║| 1Bx15 3Fx8 3Ex17 3Fx24 03x2 1Bx14
+|║hello    txt│    ║  │  [x] Alt alone selects menu       │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║notes    doc│    ║  │  [x] Escape toggles panels on/off │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║data     bin│    ║  │  [x] Alternative viewer           │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║run      bat│    ║  │  [ ] Alternative editor           │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║empty    dat│    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  ┌ Other options ────────────────────┐  ║     │            ║| 1Bx15 3Fx8 3Ex13 3Fx28 03x2 1Bx14
+|║            │    ║  │  [ ] Quick execute commands       │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+|║            │    ║  │  [ ] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 3: Enter
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 4: F9 o n
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╚════════════╧════════════╧════════════╝╚══════════════════════════════════════╝| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╚════════════╧════════════╧════════════╝╚════════════╧════════════╧════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 5: Ctrl+l
+== 5: Shift+F9 Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -170,35 +170,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 6: Shift+F9 Enter
-cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
-|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
-|║SRC         │            │            ║║            │            │            ║| 1Bx80
-|║readme   txt│            │            ║║            │            │            ║| 1Bx80
-|║hello    txt│            │            ║║            │            │            ║| 1Bx80
-|║notes    doc│            │            ║║            │            │            ║| 1Bx80
-|║data     bin│            │            ║║            │            │            ║| 1Bx80
-|║run      bat│            │            ║║            │            │            ║| 1Bx80
-|║empty    dat│            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|║            │            │            ║║            │            │            ║| 1Bx80
-|╚════════════╧════════════╧════════════╝╚════════════╧════════════╧════════════╝| 1Bx80
-|C:\WORK>                                                                        | 07x80
-|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
-
-== 7: Shift+F4
+== 6: Shift+F4
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -226,7 +198,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 8: "s.bat" Enter
+== 7: "s.bat" Enter
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -254,7 +226,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 9: Enter
+== 8: Enter
 cursor 0 1 lines 6 7 mode 3
 |Edit: s.bat                              Line 1     Col 1############ Free      | 30x80
 |                                                                                | 1Bx80
@@ -282,7 +254,7 @@ cursor 0 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 10: "set" Space "vc=c:\work" Enter "set" Space "comspec=" Enter "d:\vc\vc"
+== 9: "set" Space "vc=c:\work" Enter "set" Space "comspec=" Enter "d:\vc\vc"
 cursor 8 3 lines 6 7 mode 3
 |Edit: s.bat                           *  Line 3     Col 9############ Free      | 30x80
 |set vc=c:\work                                                                  | 1Bx80
@@ -310,7 +282,7 @@ cursor 8 3 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 11: F2 Esc
+== 10: F2 Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -338,7 +310,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 12: "s" Enter
+== 11: "s" Enter
 cursor 8 23 lines 6 7 mode 3
 |                                        ╔════════════╤═ C:\WORK ══╤════════════╗| 07x40 1Bx15 30x9 1Bx16
 |                                        ║    Name    │    Name    │    Name    ║| 07x40 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -366,7 +338,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 13: Ctrl+o
+== 12: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -394,7 +366,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 14: Ctrl+o
+== 13: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |                                        ╔════════════╤═ C:\WORK ══╤════════════╗| 07x40 1Bx15 30x9 1Bx16
 |                                        ║    Name    │    Name    │    Name    ║| 07x40 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -422,7 +394,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 15: F10
+== 14: F10
 cursor 0 127 lines 6 7 mode 3
 |                                        ╔════════════╤═ C:\WORK ══╤════════════╗| 07x40 1Bx15 30x9 1Bx16
 |                                        ║    Name    │    Name    │    Name    ║| 07x40 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -450,7 +422,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 16: Enter
+== 15: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -478,7 +450,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 17: Shift+F5
+== 16: Shift+F5
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -506,7 +478,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 18: "d:\vc\vc.ini" Tab "vc.ini" Enter
+== 17: "d:\vc\vc.ini" Tab "vc.ini" Enter
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -534,7 +506,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 19: Enter
+== 18: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -562,7 +534,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 20: Shift+F4
+== 19: Shift+F4
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -590,7 +562,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 21: "vc.ini" Enter
+== 20: "vc.ini" Enter
 cursor 0 1 lines 6 7 mode 3
 |Edit: vc.ini                             Line 1     Col 1############ Free      | 30x80
 |VVV␀␀☺☺␀◘␀␀␀␀␀␀␀␀␀␀␀␀␀␀C:\WORK␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀→| 1Bx79 1Ex1
@@ -618,7 +590,7 @@ cursor 0 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 22: F4 Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right
+== 21: F4 Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right
 cursor 43 23 lines 6 7 mode 3
 |Edit: vc.ini                             Line 28    Col 11########### Free      | 30x80
 | 00000050  00 00 00 00  00 00 00 00  00 00 00 00  00 01 01 00  .............☺☺. | 1Bx80
@@ -646,7 +618,7 @@ cursor 43 23 lines 6 7 mode 3
 | 000001B0  01 01 00 01  01 01 00 00  01 01 02 01  00 00 00 00  ☺☺.☺☺☺..☺☺☻☺.... | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 23: "00"
+== 22: "00"
 cursor 46 23 lines 6 7 mode 3
 |Edit: vc.ini                          *  Line 28    Col 12########### Free      | 30x80
 | 00000050  00 00 00 00  00 00 00 00  00 00 00 00  00 01 01 00  .............☺☺. | 1Bx80
@@ -674,7 +646,7 @@ cursor 46 23 lines 6 7 mode 3
 | 000001B0  01 01 00 01  01 01 00 00  01 01 00 01  00 00 00 00  ☺☺.☺☺☺..☺☺.☺.... | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 24: Down Left Left
+== 23: Down Left Left
 cursor 43 23 lines 6 7 mode 3
 |Edit: vc.ini                          *  Line 29    Col 11########### Free      | 30x80
 | 00000060  08 00 00 00  00 00 00 00  00 00 00 00  00 00 00 43  ◘..............C | 1Bx80
@@ -702,7 +674,7 @@ cursor 43 23 lines 6 7 mode 3
 | 000001C0  01 01 00 3C  00 FA F9 07  04 0F 00 00  00 00 00 00  ☺☺.<.·∙•♦☼...... | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 25: "02"
+== 24: "02"
 cursor 46 23 lines 6 7 mode 3
 |Edit: vc.ini                          *  Line 29    Col 12########### Free      | 30x80
 | 00000060  08 00 00 00  00 00 00 00  00 00 00 00  00 00 00 43  ◘..............C | 1Bx80
@@ -730,7 +702,7 @@ cursor 46 23 lines 6 7 mode 3
 | 000001C0  01 01 00 3C  00 FA F9 07  04 0F 02 00  00 00 00 00  ☺☺.<.·∙•♦☼☻..... | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 26: F2 Esc
+== 25: F2 Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -758,7 +730,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 27: "s" Enter
+== 26: "s" Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -786,7 +758,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 28: Ctrl+o
+== 27: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |                                                                                | 07x80
@@ -814,7 +786,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 29: Ctrl+o
+== 28: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -842,7 +814,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 30: F10
+== 29: F10
 cursor 0 127 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -870,7 +842,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 31: Enter
+== 30: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -898,7 +870,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 32: Shift+F4
+== 31: Shift+F4
 cursor 8 8 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -926,7 +898,7 @@ cursor 8 8 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 33: "vc.ini" Enter
+== 32: "vc.ini" Enter
 cursor 0 1 lines 6 7 mode 3
 |Edit: vc.ini                             Line 1     Col 1############ Free      | 30x80
 |VVV␀␀☺☺␀◘␀␀␀␀␀␀␀␀␀␀␀␀␀␀C:\WORK␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀→| 1Bx79 1Ex1
@@ -954,7 +926,7 @@ cursor 0 1 lines 6 7 mode 3
 |                                                                                | 1Bx80
 |1Help   2Save   3       4Hex    5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 34: F4 Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right
+== 33: F4 Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Down Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right Right
 cursor 43 23 lines 6 7 mode 3
 |Edit: vc.ini                             Line 29    Col 11########### Free      | 30x80
 | 00000060  08 00 00 00  00 00 00 00  00 00 00 00  00 00 00 43  ◘..............C | 1Bx80
@@ -982,7 +954,7 @@ cursor 43 23 lines 6 7 mode 3
 | 000001C0  01 01 00 3C  00 FA F9 07  04 0F 02 00  00 00 00 00  ☺☺.<.·∙•♦☼☻..... | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 35: "03"
+== 34: "03"
 cursor 46 23 lines 6 7 mode 3
 |Edit: vc.ini                          *  Line 29    Col 12########### Free      | 30x80
 | 00000060  08 00 00 00  00 00 00 00  00 00 00 00  00 00 00 43  ◘..............C | 1Bx80
@@ -1010,7 +982,7 @@ cursor 46 23 lines 6 7 mode 3
 | 000001C0  01 01 00 3C  00 FA F9 07  04 0F 03 00  00 00 00 00  ☺☺.<.·∙•♦☼♥..... | 1Bx80
 |1Help   2Save   3       4ASCII  5       6       7Search 8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 36: F2 Esc
+== 35: F2 Esc
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1038,7 +1010,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 37: "s" Enter
+== 36: "s" Enter
 cursor 8 23 lines 6 7 mode 3
 |                                        ╔════════════╤═ C:\WORK ══╤════════════╗| 07x40 1Bx15 30x9 1Bx16
 |C:\WORK>s                               ║    Name    │    Name    │    Name    ║| 07x40 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1066,7 +1038,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 38: Ctrl+o
+== 37: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |                                                                                | 07x80
 |C:\WORK>s                                                                       | 07x80
@@ -1094,7 +1066,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 39: Ctrl+o
+== 38: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
 |                                        ╔════════════╤═ C:\WORK ══╤════════════╗| 07x40 1Bx15 30x9 1Bx16
 |C:\WORK>s                               ║    Name    │    Name    │    Name    ║| 07x40 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1122,7 +1094,7 @@ cursor 8 23 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 40: F10
+== 39: F10
 cursor 0 127 lines 6 7 mode 3
 |                                        ╔════════════╤═ C:\WORK ══╤════════════╗| 07x40 1Bx15 30x9 1Bx16
 |C:\WORK>s                               ║    Name    │    Name    │    Name    ║| 07x40 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
@@ -1150,7 +1122,7 @@ cursor 0 127 lines 6 7 mode 3
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
-== 41: Enter
+== 40: Enter
 cursor 8 23 lines 6 7 mode 3
 |╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
 |║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5

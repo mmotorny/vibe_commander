@@ -58,11 +58,13 @@ out again (show.py --changes is how):
   - A:\\ is the disk DOS started from: three files before a directory, of
     other dates than the bench's, one of them with a name of twelve
     characters. D:\\ has the directory of the program and nothing else.
-  - Ctrl+l makes the right panel one of files, in C:\\; "F9 r" is its
-    menu, as "F9 l" is the left one's. A mask and "Executable files" are
-    both shown behind the path over a panel, so the filter is a way to a
-    long one: C:\\STAMPS\\SUB, the longest on the bench, is 13 characters.
-    "F9 o n" switches the mini status off.
+  - The right panel is one of files on the bench, in C:\\, which lists
+    WORK and STAMPS: Ctrl+l makes it the Info, and pressed again a list
+    of files as it was. "F9 r" is its menu, as "F9 l" is the left
+    one's. A mask and "Executable files" are both shown behind the path
+    over a panel, so the filter is a way to a long one: C:\\STAMPS\\SUB,
+    the longest on the bench, is 13 characters. "F9 o n" switches the
+    mini status off.
   - In the Configuration dialog "Down Space" from where it opens chooses
     the laptop palette, in which a selected file has a mark.
   - Shift+F4, a name that is not there and Enter twice open the editor on
@@ -510,11 +512,11 @@ out again (show.py --changes is how):
     help below an extension file or the menu file: a window of 13 rows,
     and so a text of two pages without making one.
   - F4 in a panel that shows the Info edits the file dirinfo there, in a
-    window of 36 columns and 11 rows without a status line. "Ctrl+l" and
-    then "F9 l i" leave the Info in the left panel, which stays the
-    active one, and files in the right. With the Info in both panels a
-    row has "Bytes Free" twice, and only the first is left out of the
-    comparison.
+    window of 36 columns and 11 rows without a status line. "F9 l i"
+    leaves the Info in the left panel, which stays the active one, and
+    files in the right. With the Info in both panels, as Ctrl+l in front
+    of that has it, a row has "Bytes Free" twice, and only the first is
+    left out of the comparison.
   - The editor has room for 358,752 bytes of text, and the translation for
     some 328,000 by now, less with every batch: a file that a scenario edits
     has to fit the translation for long, and one that is to be too large is
@@ -628,7 +630,22 @@ out again (show.py --changes is how):
     for a directory: it is moved into itself, a directory deeper every
     time, until the path is too long, with a box and a beep for each.
     Shift+F5 and Shift+F6 ask for the source too: its name, Tab, the
-    target.
+    target. On the bench a panel has a panel of files next to it, in
+    C:\\: F5 and F6 offer "C:\\", Shift+F5 and Shift+F6 have it for
+    the target, and Enter on what F6 offers moves the file to the root.
+    A name that is typed takes its place, but not behind a key that is
+    no character: with "Alt+RightShift" in front, the name goes in
+    front of what is there. "Ctrl+y" first then.
+  - The tree in the left panel, "F9 l t", has its cursor on the
+    directory of the other panel when that is one of files, and DOS
+    goes there: on the bench that is the root, "C:\\>". Next to the
+    Info it is on the directory that the panel had, C:\\WORK. The
+    tree in the right panel, "F9 r t", is on that of the left one.
+  - Compare directories, of the Commands menu, is dark next to the
+    Info, and not on the bench as it starts: Ctrl+c there compares
+    C:\\WORK with C:\\ and selects every file. Ctrl+] puts the path
+    of the right panel into the command line, "C:\\", and nothing
+    where that panel is the Info.
   - "The following file exists" takes Enter to overwrite, "a" for all,
     "p" to append and "s" to skip; "Yes No" takes "Right Enter" for
     no; "Ok Cancel" Enter and Esc; "Abort Continue", of a full disk,
@@ -829,8 +846,8 @@ out again (show.py --changes is how):
     says the disk cannot be read, leave the panel empty. Enter at any
     such box makes the drive A: again.
   - A directory that a panel has, and that is gone when the panel is
-    made one of files again: go into it, Ctrl+l for files on the
-    right, "F9 l i" for the Info on the left, which leaves DOS in the
+    made one of files again: go into it, "F9 l i" for the Info on
+    the left, next to the files on the right, which leaves DOS in the
     other panel's directory, and remove it by a command, "rd" Space
     "work\\docs". Do not have the Info in both panels for it: a row
     then has "Bytes Free" twice, and the second number is compared.
@@ -1395,10 +1412,15 @@ with the original:
     setup-help-screens.
 
 Every scenario gets a machine of its own, in the state the bench was saved
-in: the program as its distribution configures it but for the clock, which
-is off, started in C:\\WORK. A scenario that wants something else arranges
-it with its first steps, the way a user would. It may end anywhere, with
-the program running or not.
+in: the program as its distribution configures it but for two things,
+started in C:\\WORK. The clock is off. And the panel on the right is one of
+files, in C:\\, where the distribution has the Info panel: what that shows
+is of the machine and of the system, the size of the memory, the label of
+the disk and what is free on it, and it was on nearly every screen (see
+Bench in setups.py, and "Scenarios" in CLAUDE.md). A scenario that is
+about the Info panel switches it on, Ctrl+l, at the step that needs it. A
+scenario that wants something else arranges it with its first steps, the
+way a user would. It may end anywhere, with the program running or not.
 
 The machine's clock is counted in the instructions that the machine
 executes, 256 nanoseconds for each (see CLOCK_SHIFT in dos.py), and
@@ -1410,10 +1432,16 @@ agree on the time for long. Nothing on the bench shows the time of day, so
 that does not matter. A scenario that does show it, by switching the
 clock on or by listing a file it has made, has to be done with that
 before the machine's first minute is over. The original shows its first
-screen 9.6 seconds past noon and the translation 9.9; `copy`, of 68 steps,
-ends 26.9 seconds past noon in the original and 28.1 in the translation, and
-`delete`, of 63, 25.8 and 28.6: the translation has taken up to a sixth
-longer.
+screen some five seconds past noon and the translation half a second
+later: a command typed there runs at 5.3 seconds past in the original,
+5.7 in the C translation and 5.8 in the portable C. That is 4.7 seconds
+sooner than while the bench had the Info panel: the first time that panel
+is drawn, where DOS is asked what is free on the disk, takes 4.7 seconds
+of the machine's time, and a scenario that switches it on, Ctrl+l, has
+them then; switched off and on again it takes none. On that bench
+`copy`, of 68 steps, ended 26.9 seconds past noon in the original and
+28.1 in the translation, and `delete`, of 63, 25.8 and 28.6: the
+translation has taken up to a sixth longer.
 """
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -1537,8 +1565,7 @@ _CLOCK_PATH_STEPS = (
     '"????????.???"',                     # a mask, and only programs:
     "Tab Tab Space",                      # both are shown with the path,
     "Enter",                              # which is 30 characters now
-    "Ctrl+l",                             # the Info panel off: two panels
-    "Tab",
+    "Tab",                                # to the files on the right
     "Down Enter",                         # the right one in C:\\STAMPS
     "Down Enter",                         # and in its directory SUB
     "F9 o l",                             # the clock: this path is short
@@ -1591,7 +1618,6 @@ SCENARIOS = {
             "Down Down Down",             # onto a file: the status line
             "Down Down Down",             # onto the 1 KB file
             "End",
-            "Ctrl+l",                     # the Info panel off: two panels
             "Alt+F1",                     # the drive menu of the left panel
             "Esc",
             "Tab",
@@ -1901,6 +1927,9 @@ SCENARIOS = {
               for letter in "abcdefg"),   # tree has thirteen
             "PgDn",                       # a list shorter than its panel
             "PgUp",
+            "Ctrl+l",                     # the Info on the right: next to
+                                          # files the tree would be on their
+                                          # directory, the root
             "F9 l t",                     # the tree, eleven lines of it
             "Down Down Down Down Down",
             "Down Down Down Down Down",   # the tree moves a line up,
@@ -1958,7 +1987,7 @@ SCENARIOS = {
             "Ctrl+F2",                    # the right panel off
             "Ctrl+F2",
             "Ctrl+u",                     # the panels change places
-            "Ctrl+z",                     # the tree for the Info,
+            "Ctrl+z",                     # the tree for the files of C:\\,
             "Ctrl+l",                     # the Info for the tree,
             "Ctrl+l",                     # the tree again, which it was
             "Ctrl+z",                     # and the Info, which it was
@@ -2013,7 +2042,6 @@ SCENARIOS = {
         "The tree of directories, which the other panel follows a moment "
         "after the cursor has come to rest",
         steps=(
-            "Ctrl+l",                     # the Info panel off: two panels
             "F9 l t",                     # the tree in the left one
             "Down",                       # the right one follows
             "Down Down",                  # only to where the cursor stops
@@ -2112,7 +2140,6 @@ SCENARIOS = {
         "there, with another try, and given up; and what the panels show "
         "then",
         steps=(
-            "Ctrl+l",                     # two panels of files
             "Alt+F2",
             "a",                          # the right one on A:
             "Alt+F1",
@@ -2206,11 +2233,10 @@ SCENARIOS = {
             "F9 o Enter",                 # the Configuration
             "Tab Tab Tab Tab Down Space",  # Auto save setup
             "Enter",                      # which is a change: saved
-            "Ctrl+l",                     # two panels of files, saved too:
-                                          # the second copy starts so, and
-                                          # shows no Info, whose count of
-                                          # all the memory follows where
-                                          # the copy is loaded
+            # The setup that is saved has a list of files in the right
+            # panel, as the bench has it: the second copy starts so, and
+            # shows no Info, whose count of all the memory follows where the
+            # copy is loaded.
             # A Tab in the command line, typed as it is after ^Q, comes
             # to the second copy as it is, and is a space in its command.
             '"d:\\vc\\vc" Space "ver" Ctrl+q Tab "/r"',
@@ -2231,9 +2257,8 @@ SCENARIOS = {
         "which it has that interrupt change to first, and with all of "
         "itself kept in the memory",
         steps=(
-            "Ctrl+l",                     # no Info: it would say how much
-                                          # is free on D:, where the
-                                          # program's file is
+            # The bench has no Info on the right: it would say how much is
+            # free on D:, where the program's file is.
             "F9 o o",
             "Down Down Down Down Space",  # Quick execute commands
             "Enter",
@@ -2264,9 +2289,9 @@ SCENARIOS = {
         steps=(
             "F9 o Enter",                 # the Configuration
             "Tab Tab Tab Tab Down Space",  # Auto save setup
-            "Enter",
-            "Ctrl+l",                     # two panels of files, saved:
-                                          # the second copy shows no Info
+            "Enter",                      # saved, with two panels of files
+                                          # as the bench has them: the
+                                          # second copy shows no Info
             "F9 o o",                     # Clear keyboard buffer off, for
             "Down Down Down Down Down Space",     # typing in the editor
             "Enter",
@@ -2465,6 +2490,9 @@ SCENARIOS = {
             "Shift+F3",                   # and one named with a path
             '"..\\work\\hello.txt" Enter',
             "Ctrl+o", "Ctrl+o",
+            "Ctrl+l",                     # the Info on the right: the tree
+                                          # is on C:\\WORK next to it, and on
+                                          # the root next to files
             "F9 l t",                     # the tree: no file to name
             "F2 a",
             "Ctrl+o", "Ctrl+o",
@@ -2497,6 +2525,7 @@ SCENARIOS = {
             "Esc",
             "Home",
             "Ctrl+[",                     # the path of the left panel
+            "Ctrl+l",                     # the Info on the right
             "Ctrl+]",                     # the right one is the Info
             "Esc",
             "Ctrl+l",                     # two panels of files
@@ -2580,7 +2609,7 @@ SCENARIOS = {
             "Enter",                      # the drive it has
             "Alt+F1",
             "a",                          # by its letter
-            "Alt+F2",                     # the right panel: the Info goes
+            "Alt+F2",                     # the right panel
             "Right Enter",                # D:
             "Tab",
             "Alt+F1",                     # of the panel that is not current
@@ -2627,6 +2656,9 @@ SCENARIOS = {
             "Ctrl+y",
             "F9 o Enter",
             "Tab Tab Tab Space Enter",    # Auto change directory off
+            "Ctrl+l",                     # the Info on the right: the tree
+                                          # is on C:\\WORK next to it, and on
+                                          # the root next to files
             "F9 l t",                     # the tree
             "Down",                       # onto DOCS: DOS does not follow
             '"rd" Space "docs"',
@@ -2702,7 +2734,10 @@ SCENARIOS = {
             # The keyboard's Cyrillic letters are selected here, where Alt
             # by itself means nothing: at the panels it brings up the
             # menu, if the program sees it pressed and let go in time.
-            'Alt+RightShift '
+            # The line holds the directory of the other panel, C:\\, and a
+            # name typed behind that key would not take its place: Ctrl+y
+            # empties the line first.
+            'Ctrl+y Alt+RightShift '
             '"\u043f\u0438\u0441\u044c\u043c\u043e_1.\u0434\u043e\u043a"',
             "Enter",                      # the panel lists it
             "End",                        # the status line names it
@@ -2789,6 +2824,7 @@ SCENARIOS = {
         "The Info panel, with what a directory says about itself in its "
         "file dirinfo",
         steps=(
+            "Ctrl+l",                     # the Info panel on the right
             # The editor empties the keyboard buffer when it has taken a
             # key and again before it draws, so of keys pressed one behind
             # the other it may lose one. Not with this option off.
@@ -2821,6 +2857,8 @@ SCENARIOS = {
         "free is what all of the program leaves, a number that is not "
         "compared",
         steps=(
+            "Ctrl+l",                     # the Info panel, which the bench has
+                                          # not on the right
             "F9 o m",                     # off: the number is another
             "F9 o",                       # and the menu has it without
                                           # its mark
@@ -2833,6 +2871,9 @@ SCENARIOS = {
         "the items that a menu has dark, for a tree, with the panels off, "
         "and next to a panel of each kind",
         steps=(
+            "Ctrl+l",                     # the Info on the right: a panel of
+                                          # each kind is next to the menus
+                                          # in turn
             "End",                        # a file under the cursor
             "Shift+F10",                  # nothing chosen yet: the bar
             "z Home End Up PgUp PgDn Left",   # keys that mean nothing on
@@ -2905,9 +2946,9 @@ SCENARIOS = {
         "line high up",
         steps=(
             "Down Enter",                 # the left panel in C:\\WORK\\DOCS
-            "Ctrl+l",                     # files on the right, in C:\\
-            "F9 l i",                     # the Info on the left: DOS goes
-                                          # where the other panel is
+            "F9 l i",                     # the Info on the left, next to
+                                          # the files of C:\\ on the right:
+                                          # DOS goes where that panel is
             '"rd" Space "work\\docs" Enter',  # the directory that the
                                           # left panel had is gone
             "F9 l b",                     # files again: where DOS is
@@ -2932,6 +2973,7 @@ SCENARIOS = {
         "that is newer by its time and one by its date, one that is a "
         "directory there, and two directories that are the same",
         steps=(
+            "Ctrl+l",                     # the Info on the right
             "Ctrl+c",                     # not with the Info next to it
             'F7 "1" Enter',               # a directory named 1
             'Home Down Down Down F5 "src\\" Enter',  # readme.txt into SRC,
@@ -3033,6 +3075,7 @@ SCENARIOS = {
             "F9 c e",                     # and 25 again
             "F9 o k",                     # Key bar: off,
             "F9 o k",                     # and on
+            "Ctrl+l",                     # the Info on the right
             "F9 r r",                     # Re-read, of the Info
             "F9 c s",                     # Swap panels: files on the right
             "F9 r o",                     # On/Off: the current panel off,
@@ -3269,10 +3312,7 @@ SCENARIOS = {
             "Ctrl+o",                     # *C*C*>: the drive of either
             "Ctrl+o",                     # panel's path, and a colour
             "Alt+F1",
-            "a",                          # the left panel on A:, not on
-                                          # D:, where the Info would say
-                                          # how much the program's file
-                                          # leaves free
+            "a",                          # the left panel on A:
             '"c:\\work\\a" Enter',
             "Ctrl+o",                     # *A*C*>
             "Ctrl+o",
@@ -3286,10 +3326,11 @@ SCENARIOS = {
         "whoever called has been written to below what the interrupt "
         "pushed",
         steps=(
-            "F9 o Enter",                 # Auto save setup, and two panels
-            "Tab Tab Tab Tab Down Space",  # of files: a second copy starts
-            "Enter",                      # so, without an Info that counts
-            "Ctrl+l",                     # the memory from where it is
+            "F9 o Enter",                 # Auto save setup: a second copy
+            "Tab Tab Tab Tab Down Space",  # starts with two panels of files
+            "Enter",                      # then, as the bench has them,
+                                          # without an Info that counts
+                                          # the memory from where it is
             "F9 o o",                     # Clear keyboard buffer off, for
             "Down Down Down Down Down Space",     # typing in the editor
             "Enter",
@@ -3596,7 +3637,6 @@ SCENARIOS = {
         "A tree thirteen directories deep, which is drawn narrower and has "
         "no room for the last of them, and longer than its panel",
         steps=(
-            "Ctrl+l",                     # the Info panel off: two panels
             *(f'F7 "{letter}" Enter Enter'    # a directory, and into it
               for letter in "abcdefghijklm"),
             "F9 r t",                     # the tree in the right panel
@@ -3621,7 +3661,6 @@ SCENARIOS = {
         "keys that move in it, the speed search, and the disk read again, "
         "once with a key that stops it",
         steps=(
-            "Ctrl+l",                     # the Info panel off: two panels
             *(f'F7 "{letter}" Enter Enter'    # a directory, and into it
               for letter in "abcdefghijklm"),
             "Alt+F10",                    # 19 directories, read from the
@@ -3673,8 +3712,8 @@ SCENARIOS = {
             "Alt+F1 a",                   # a disk that cannot be written
             "Alt+F10",                    # five directories too: no beep
             "Down Enter",                 # A:\\FREEDOS
-            "Ctrl+l",                     # the right panel one of files,
-            "F9 l t",                     # the left one the tree
+            "F9 l t",                     # the tree on the left, next to
+                                          # the files of the right panel
             "Alt+F10",                    # the box next to it
             "F10",
         )),
@@ -3683,6 +3722,7 @@ SCENARIOS = {
         "A directory read again: what a panel keeps of the list it had, "
         "and where it goes when its directory is gone",
         steps=(
+            "Ctrl+l",                     # the Info panel on the right
             "Down Down Down Ins",         # a file selected
             'F7 "dirinfo" Enter',         # the list is read again, with a
                                           # directory more: the file stays
@@ -3885,6 +3925,7 @@ SCENARIOS = {
         "A dirinfo that is too large for the editor, viewed in the window "
         "of the Info panel, which is narrow and has no status line",
         steps=(
+            "Ctrl+l",                     # the Info panel on the right
             "Home Enter",
             "Down Down Enter",            # C:\\STAMPS
             "Down Down Down Down Down",   # a megabyte, by its entry in
@@ -4307,8 +4348,8 @@ SCENARIOS = {
             "F9 o o",                     # Clear keyboard buffer off, for
             "Down Down Down Down Down Space",     # typing in the editor
             "Enter",
-            "Ctrl+l",                     # files in the right panel, and
-            "F9 l i",                     # the Info in the left one
+            "F9 l i",                     # the Info in the left panel,
+                                          # next to the files of the right
             "F4",
             '"ab" Space "cd" Space "ef" Space "gh" Space "ij" Space',
             '"kl" Space "mn" Space "op" Space "qr" Space "st" Space',
@@ -4496,6 +4537,9 @@ SCENARIOS = {
         steps=(
             "F9 o n",                     # the mini status off: it would
                                           # show the time of what is made
+            "Ctrl+l",                     # the Info on the right: next to
+                                          # files the tree would be on the
+                                          # root
             "F9 l t",                     # the tree, on C:\\WORK
             'F7 "new" Enter',             # a directory below that one,
                                           # which the tree then is on
@@ -4586,8 +4630,8 @@ SCENARIOS = {
             "n",
             '"*.txt" Enter',
             "Enter",                      # Go to: the cursor on the file
-            "Ctrl+l",                     # two panels of files,
-            "F9 l t",                     # and the left one the tree
+            "F9 l t",                     # the tree on the left, next to
+                                          # the files of the right panel
             "Alt+F7",
             '"*.doc" Enter',
             "Up Enter",                   # Go to the directory: the other
@@ -4668,8 +4712,8 @@ SCENARIOS = {
             "1",                          # a key that means nothing
             "Tab",                        # round to the first field
             "F10",                        # as Esc: nothing is changed
-            "Ctrl+l",                     # the right panel one of files
-            "F9 r l",                     # its filter, in the right half
+            "F9 r l",                     # the filter of the right panel,
+                                          # in the right half
             "Tab Tab Tab",                # the buttons there
             "Esc",
             "Down Down Down F5",          # a copy: the tree is F10 here
@@ -4687,9 +4731,9 @@ SCENARIOS = {
         "that is there, onto one that is read-only, onto itself, to a "
         "device and from one",
         steps=(
-            "Ctrl+l",                     # the right panel in C:\\
             "Down Down Down",             # onto readme.txt
-            "F5",                         # offers the other directory
+            "F5",                         # offers the directory of the
+                                          # other panel, C:\\
             "Enter",
             "F5",
             '"docs" Enter',               # a directory, named without \\
@@ -4762,6 +4806,9 @@ SCENARIOS = {
         "there, onto a directory, to another drive, and one that is "
         "read-only",
         steps=(
+            "Ctrl+l",                     # the Info on the right: F6 offers
+                                          # the name of the file then, and
+                                          # next to files their directory
             "Down Down",                  # onto SRC, which is empty
             "F6",
             '"d:\\" Enter',               # made there and removed here
@@ -4859,6 +4906,8 @@ SCENARIOS = {
         "as moving the cursor left them, not both 0, and no name is "
         "offered",
         steps=(
+            "Ctrl+l",                     # the Info on the right: no panel's
+                                          # directory is offered as a target
             "Down Down Down",             # onto readme.txt
             "Shift+F6",                   # no name
             "Esc",
@@ -4883,6 +4932,9 @@ SCENARIOS = {
         "that is typed, with the panels off, and with the tree to "
         "choose the target from",
         steps=(
+            "Ctrl+l",                     # the Info on the right: what is
+                                          # offered is the name or the last
+                                          # target, and no panel's directory
             "F5",                         # on ..: nothing
             "Ctrl+F5",                    # nor for that one entry
             "Down Down Down",             # onto readme.txt
@@ -4933,6 +4985,9 @@ SCENARIOS = {
         steps=(
             "F9 o c",
             "Tab Tab Tab Space Enter",    # Auto change directory off
+            "Ctrl+l",                     # the Info on the right: next to
+                                          # files the tree would take DOS to
+                                          # the root
             "F9 l t",                     # the tree in the left panel
             "Home",                       # the root
             "F5",                         # is not copied
@@ -5018,6 +5073,8 @@ SCENARIOS = {
         "A file that is read in several pieces, and one that the memory "
         "does not hold",
         steps=(
+            "Ctrl+l",                     # the Info on the right: F5 offers
+                                          # the last target again then
             "Shift+F5",
             '"a:\\freedos\\bin\\command.com" Tab "big"',
             "Enter",
@@ -5105,6 +5162,7 @@ SCENARIOS = {
             "Click@3,21",                 # the status line: down again
             "Click@3,3",                  # DOCS
             "Click@3,3",                  # at once again: into it
+            "Ctrl+l",                     # the Info on the right
             "Click@45,5",                 # the Info is the current panel
             "Click@60,5",                 # its upper part: nothing
             "Click@60,15",                # its lower part: a dirinfo
@@ -5228,8 +5286,9 @@ SCENARIOS = {
             "Click@40,10",                # in the box, below the line
             "RightClick@40,10",           # Enter: the directory is made
             "Down Down Down Down",
-            "F6",                         # offers the name
-            "Click@10,8 x",               # a click, and the name is kept
+            "F6",                         # offers the directory of the
+                                          # other panel, C:\\
+            "Click@10,8 x",               # a click, and that text is kept
             "Click@40,3",                 # outside the box: Esc
         )),
 
@@ -5238,8 +5297,8 @@ SCENARIOS = {
         "filter of the right panel: from its buttons to a field, a line "
         "that is full, and its button Ok",
         steps=(
-            "Ctrl+l",                     # files on the right
-            "F9 r l",                     # their filter
+            "F9 r l",                     # the filter of the files on the
+                                          # right
             '"abcdefgh.xyz"',             # as long as the line
             "Click@57,8",                 # its first character
             "Click@70,8",                 # behind the line: no field
@@ -5288,6 +5347,8 @@ SCENARIOS = {
         "another menu open, on an item that is dark, the right button "
         "on an item of the Files menu, and Alt, Ctrl and Shift there",
         steps=(
+            "Ctrl+l",                     # the Info on the right: Compare
+                                          # directories is dark next to it
             "Click@70,0",                 # the top line beside the names:
                                           # the bar while the button is down
             "Click@10,0",                 # on a name: the Files menu
@@ -5676,6 +5737,7 @@ SCENARIOS = {
             "Click@79,4",                 # behind that of the next line
             "Click@79,4",                 # and its last column
             "Esc",
+            "Ctrl+l",                     # the Info on the right
             "Shift+F4",
             '"dirinfo" Enter',
             "Enter",                      # a new file
@@ -5700,8 +5762,9 @@ SCENARIOS = {
             "Enter",                      # no setup file any more
             "Shift+F9",
             "Enter",                      # saved: a new one
-            "Ctrl+l",                     # no Info, which says what D: has
-            "Alt+F1 d",                   # D:\, with the directory VC
+            "Alt+F1 d",                   # D:\, with the directory VC, and
+                                          # no Info next to it, which would
+                                          # say what D: has
             "F6",
             '"vx" Enter',                 # under another name
             "Shift+F9 Enter",             # no such path: a box says so
@@ -5753,9 +5816,10 @@ SCENARIOS = {
             "Enter",
             "F9 o n",                     # the mini status off: it would
                                           # show the time of a file made
-            "Ctrl+l",                     # two panels of files, and that
-            "Shift+F9 Enter",             # saved: a copy that starts from
-                                          # this setup shows no Info
+            "Shift+F9 Enter",             # saved, with two panels of files
+                                          # as the bench has them: a copy
+                                          # that starts from this setup
+                                          # shows no Info
             "Shift+F4",
             '"s.bat" Enter',
             "Enter",
@@ -5812,9 +5876,9 @@ SCENARIOS = {
             "Enter",
             "F9 o n",                     # the mini status off: it would
                                           # show the time of a file made
-            "Ctrl+l",                     # two panels of files, and that
-            "Shift+F9 Enter",             # saved: the second copy shows
-                                          # no Info
+            "Shift+F9 Enter",             # saved, with two panels of files
+                                          # as the bench has them: the
+                                          # second copy shows no Info
             "Shift+F4",                   # m.com: the video mode that its
             '"m.com" Enter',              # command line names by a digit
             "Enter",

@@ -33,9 +33,10 @@ test's to count, and its table is in TODO.md. What is worked out:
     down to for a command (struct WCBdef of vc.h).
   - What DOS has for a command on the bench of the tests: BENCH less
     that. BENCH is not worked out but seen, once: `python3
-    harness/show.py --program build/portable_c/VC.EXE --last Tab` prints
-    the first screen, whose Info panel says how much is free, COMMAND.COM
-    not being loaded yet; that is 72,496 more than a command gets. See it
+    harness/show.py --program build/portable_c/VC.EXE --last Ctrl+l`
+    prints the first screen with the Info panel switched on, which says
+    how much is free, COMMAND.COM not being loaded yet; that is 72,496
+    more than a command gets. See it
     again if the bench changes, or what the program keeps besides its
     file and its panels.
 """

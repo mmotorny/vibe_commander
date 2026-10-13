@@ -4,28 +4,28 @@ code page 866
 
 == 0: the start
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653 296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32 724 992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32 719 360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3 072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄ 16.06.00  12:00║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄ 16.06.00  12:00║║WORK         ►SUB-DIR◄ 16.06.00  12:00║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -33,55 +33,55 @@ cursor 8 23 lines 6 7 mode 3
 == 1: F9 o
 cursor 0 127 lines 6 7 mode 3
 |    Left    Files    Commands    Options    Right                               | 30x31 0Fx11 30x38
-|║    Name    │    Name    │    ┌──────────────────────────────┐, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex4 30x32 1Bx17
-|║..          │            │    │  Configuration...            │────────────────╢| 1Bx1 30x12 1Bx18 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
-|║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
-|║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
-|║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
-|║            │            │    │  cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄ 16.06.00  12:00║║                                      ║| 1Bx80
+|║    Name    │    Name    │    ┌──────────────────────────────┐   │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex4 30x32 1Ex3 1Bx1 1Ex8 1Bx5
+|║..          │            │    │  Configuration...            │   │            ║| 1Bx1 30x12 1Bx18 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
+|║DOCS        │            │    │  advanced Options...         │   │            ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
+|║SRC         │            │    │  eXtension file edit...      │   │            ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
+|║readme   txt│            │    │  Viewers...                  │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║hello    txt│            │    │  Editors...                  │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║notes    doc│            │    │ ──────────────────────────── │   │            ║| 1Bx31 30x32 03x2 1Bx15
+|║data     bin│            │    │  Auto menus                  │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Path prompt                 │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║empty    dat│            │    │√ Key bar            Ctrl-B   │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │√ Full screen                 │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │   │            ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
+|║            │            │    │√ miNi status                 │   │            ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
+|║            │            │    │  cLock                       │   │            ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
+|║            │            │    │√ Memory allocation           │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │ ──────────────────────────── │   │            ║| 1Bx31 30x32 03x2 1Bx15
+|║            │            │    │  Save setup         Shift-F9 │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    └──────────────────────────────┘   │            ║| 1Bx31 30x32 03x2 1Bx15
+|║            │            │            ║║            │            │            ║| 1Bx33 03x32 1Bx15
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄ 16.06.00  12:00║║WORK         ►SUB-DIR◄ 16.06.00  12:00║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 2: l
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════12:00| 1Bx15 30x9 1Bx51 30x5
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653 296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32 724 992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32 719 360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3 072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄ 16.06.00  12:00║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════12:00| 1Bx15 30x9 1Bx51 30x5
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄ 16.06.00  12:00║║WORK         ►SUB-DIR◄ 16.06.00  12:00║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -118,28 +118,28 @@ blinks 77 0 to | | 30
 
 == 4: Ctrl+o
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════12:00| 1Bx15 30x9 1Bx51 30x5
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653 296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32 724 992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32 719 360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3 072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄ 16.06.00  12:00║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════12:00| 1Bx15 30x9 1Bx51 30x5
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄ 16.06.00  12:00║║WORK         ►SUB-DIR◄ 16.06.00  12:00║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -148,27 +148,27 @@ blinks 77 0 to | | 30
 == 5: F9 o
 cursor 0 127 lines 6 7 mode 3
 |    Left    Files    Commands    Options    Right                          12:00| 30x31 0Fx11 30x38
-|║    Name    │    Name    │    ┌──────────────────────────────┐, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex4 30x32 1Bx17
-|║..          │            │    │  Configuration...            │────────────────╢| 1Bx1 30x12 1Bx18 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
-|║DOCS        │            │    │  advanced Options...         │ Memory         ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
-|║SRC         │            │    │  eXtension file edit...      │s Free          ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║readme   txt│            │    │  Viewers...                  │C: is WORK      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │    │  Editors...                  │es on drive C:  ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx10 1Ex2 1Bx3
-|║notes    doc│            │    │ ──────────────────────────── │e on drive C:   ║| 1Bx31 30x32 03x2 1Bx9 1Ex2 1Bx4
-|║data     bin│            │    │  Auto menus                  │2 bytes in      ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 06x1 03x1 1Bx15
-|║run      bat│            │    │√ Path prompt                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║empty    dat│            │    │√ Key bar            Ctrl-B   │────────────────╢| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │√ Full screen                 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │  auto Directory sizes        │ this directory ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
-|║            │            │    │√ miNi status                 │                ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
-|║            │            │    │√ cLock                       │                ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
-|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
-|║            │            │    │  Save setup         Shift-F9 │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
-|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
-|║            │            │            ║║                                      ║| 1Bx33 03x32 1Bx15
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄ 16.06.00  12:00║║                                      ║| 1Bx80
+|║    Name    │    Name    │    ┌──────────────────────────────┐   │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex4 30x32 1Ex3 1Bx1 1Ex8 1Bx5
+|║..          │            │    │  Configuration...            │   │            ║| 1Bx1 30x12 1Bx18 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
+|║DOCS        │            │    │  advanced Options...         │   │            ║| 1Bx31 30x1 3Fx11 3Ex1 3Fx18 30x1 03x2 1Bx15
+|║SRC         │            │    │  eXtension file edit...      │   │            ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
+|║readme   txt│            │    │  Viewers...                  │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║hello    txt│            │    │  Editors...                  │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║notes    doc│            │    │ ──────────────────────────── │   │            ║| 1Bx31 30x32 03x2 1Bx15
+|║data     bin│            │    │  Auto menus                  │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║run      bat│            │    │√ Path prompt                 │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║empty    dat│            │    │√ Key bar            Ctrl-B   │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │√ Full screen                 │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │  auto Directory sizes        │   │            ║| 1Bx31 30x1 3Fx7 3Ex1 48x1 3Fx21 30x1 03x2 1Bx15
+|║            │            │    │√ miNi status                 │   │            ║| 1Bx31 30x1 3Fx4 3Ex1 3Fx25 30x1 03x2 1Bx15
+|║            │            │    │√ cLock                       │   │            ║| 1Bx31 30x1 3Fx3 3Ex1 3Fx26 30x1 03x2 1Bx15
+|║            │            │    │√ Memory allocation           │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    │ ──────────────────────────── │   │            ║| 1Bx31 30x32 03x2 1Bx15
+|║            │            │    │  Save setup         Shift-F9 │   │            ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
+|║            │            │    └──────────────────────────────┘   │            ║| 1Bx31 30x32 03x2 1Bx15
+|║            │            │            ║║            │            │            ║| 1Bx33 03x32 1Bx15
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄ 16.06.00  12:00║║WORK         ►SUB-DIR◄ 16.06.00  12:00║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -176,28 +176,28 @@ blinks 77 0 to | | 30
 
 == 6: l
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653 296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32 724 992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32 719 360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3 072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄ 16.06.00  12:00║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄ 16.06.00  12:00║║WORK         ►SUB-DIR◄ 16.06.00  12:00║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -227,7 +227,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

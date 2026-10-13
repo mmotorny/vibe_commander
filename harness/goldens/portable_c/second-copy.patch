@@ -6,7 +6,7 @@ Deviation: 1 of src/portable_c/DEVIATIONS.md
 Why: the second copy has no memory to run a command: each copy keeps all of
 itself
 
-== 7: Ctrl+o
+== 6: Ctrl+o
 rows 15-21
 -|C:\WORK>d:\vc\vc ver○/r                                                         | 07x80
 -|The Volkov Commander, Version 4.05 freeware                                     | 07x80

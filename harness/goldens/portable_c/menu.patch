@@ -8,7 +8,7 @@ bottom, behind Save setup and a line across the menu: a row taller than the
 original's, with Save setup a row further up; and the Commands menu, a line
 shorter, without Memory info
 
-== 8: Down
+== 9: Down
 rows 15-20
 -|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 -|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
@@ -23,7 +23,7 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
-== 9: Up
+== 10: Up
 rows 15-20
 -|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 -|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
@@ -38,7 +38,7 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
-== 10: Up
+== 11: Up
 rows 15-20
 -|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 0Fx2 0Ex1 0Fx27 30x1 03x2 1Bx15
 -|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
@@ -53,7 +53,7 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
-== 11: End Down
+== 12: End Down
 rows 15-20
 -|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 -|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
@@ -68,7 +68,7 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
-== 12: PgDn
+== 13: PgDn
 rows 15-20
 -|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 -|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
@@ -83,7 +83,7 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
-== 13: PgUp Home
+== 14: PgUp Home
 rows 15-20
 -|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 -|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
@@ -98,7 +98,7 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
-== 14: Down Down Down Down Down
+== 15: Down Down Down Down Down
 rows 15-20
 -|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 -|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
@@ -113,7 +113,7 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
-== 16: Esc
+== 17: Esc
 rows 15-20
 -|║            │            │    │√ Memory allocation           │                ║| 1Bx31 30x1 3Fx2 3Ex1 3Fx27 30x1 03x2 1Bx15
 -|║            │            │    │ ──────────────────────────── │                ║| 1Bx31 30x32 03x2 1Bx15
@@ -128,7 +128,7 @@ rows 15-20
 +|║            │            │    └──────────────────────────────┘                ║| 1Bx31 30x32 03x2 1Bx15
 +|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx33 03x32 1Bx15
 
-== 33: Right
+== 34: Right
 rows 4-16
 -|║SRC         │     │ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
 -|║readme   txt│     │-Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 33x1 30x31 03x2 1Bx26
@@ -157,7 +157,7 @@ rows 4-16
 +|║            │            │            ║║                                      ║| 1Bx21 03x33 1Bx26
 +|║            │            │            ║║                                      ║| 1Bx80
 
-== 37: Tab F9 c
+== 38: Tab F9 c
 rows 4-16
 -|║SRC         │►SUB-│ memory Info           Alt-F5  │                           ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
 -|║readme   txt│     │ Directory sizes       Alt-F6  │                           ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
@@ -186,7 +186,7 @@ rows 4-16
 +|║            │         │        │      ║║                                      ║| 1Bx21 03x33 1Bx26
 +|║            │         │        │      ║║                                      ║| 1Bx80
 
-== 40: c
+== 41: c
 rows 4-16
 -|                   │ memory Info           Alt-F5  │                            | 07x19 30x1 3Fx8 3Ex1 3Fx22 30x1 0Fx2 07x26
 -|                   │-Directory sizes       Alt-F6  │                            | 07x19 30x1 33x1 30x31 0Fx2 07x26
@@ -215,7 +215,7 @@ rows 4-16
 +|                                                                                | 07x21 0Fx33 07x26
 +|                                                                                | 07x80
 
-== 48: F9 c
+== 49: F9 c
 rows 4-16
 -|║SRC         │►SUB-│ memory Info           Alt-F5  │d│            │            ║| 1Bx19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
 -|║readme   txt│     │ Directory sizes       Alt-F6  │ │            │            ║| 1Bx19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26
@@ -244,7 +244,7 @@ rows 4-16
 +|║            │         │        │      ║║            │            │            ║| 1Bx21 03x33 1Bx26
 +|║            │         │        │      ║║            │            │            ║| 1Bx80
 
-== 50: F9 c
+== 51: F9 c
 rows 4-16
 -|                   │ memory Info           Alt-F5  │d│            │            ║| 07x19 30x1 3Fx8 3Ex1 3Fx22 30x1 03x2 1Bx26
 -|                   │ Directory sizes       Alt-F6  │ │            │            ║| 07x19 30x1 3Fx1 3Ex1 3Fx29 30x1 03x2 1Bx26

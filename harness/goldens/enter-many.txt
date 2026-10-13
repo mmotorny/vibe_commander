@@ -4,756 +4,756 @@ code page 437
 
 == 0: the start
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 1: F7 "big" Enter
 cursor 8 23 lines 6 7 mode 3
-|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║notes    doc│            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
-|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
-|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║BIG         │            │            ║║                                      ║| 1Bx1 30x12 1Bx67
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║BIG          ►SUB-DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx80
+|║DOCS        │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║SRC         │            │            ║║            │            │            ║| 1Bx80
+|║readme   txt│            │            ║║            │            │            ║| 1Bx80
+|║hello    txt│            │            ║║            │            │            ║| 1Bx80
+|║notes    doc│            │            ║║            │            │            ║| 1Bx80
+|║data     bin│            │            ║║            │            │            ║| 1Bx80
+|║run      bat│            │            ║║            │            │            ║| 1Bx80
+|║empty    dat│            │            ║║            │            │            ║| 1Bx80
+|║BIG         │            │            ║║            │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║BIG          ►SUB-DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK>                                                                        | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 2: Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║            │            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║            │            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║            │            │            ║║  32,718,848 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║            │            │            ║║        0 files use 0 bytes in        ║| 1Bx49 1Ex1 1Bx11 1Ex1 1Bx18
-|║            │            │            ║║             C:\WORK\BIG              ║| 1Bx80
-|║            │            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 3: Shift+F5
 cursor 8 8 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║            │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║            │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │            │            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║            │            │            ║║STAMPS      │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
 |║                                                                              ║| 1Bx3 70x74 1Bx3
 |║     ╔══════════════════════════════ Copy ══════════════════════════════╗     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║ Copy file                                                        ║     ║| 1Bx3 70x74 03x2 1Bx1
 |║     ║                                                                  ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║     ║ to                                                               ║     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║                                                                  ║   ──╢| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
+|║     ║ C:\                                                              ║     ║| 1Bx3 70x5 30x64 70x5 03x2 1Bx1
 |║     ╟──────────────────────────────────────────────────────────────────╢     ║| 1Bx3 70x74 03x2 1Bx1
-|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║   y ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
+|║     ║               [ Copy ]   [ F10-Tree ]   [ Cancel ]               ║     ║| 1Bx3 70x37 07x1 70x36 03x2 1Bx1
 |║     ╚══════════════════════════════════════════════════════════════════╝     ║| 1Bx3 70x74 03x2 1Bx1
 |║                                                                              ║| 1Bx3 70x74 03x2 1Bx1
-|║            │            │            ║║                                      ║| 1Bx5 03x74 1Bx1
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|║            │            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx5 03x74 1Bx1
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|║            │            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2       3       4       5       6       7       8       9       10Tree  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 4: "a:\freedos\bin\v*.com" Tab "c:\work\big" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│            │            ║║  32,672,768 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│            │            ║║     18 files use 45,568 bytes in     ║| 1Bx46 1Ex2 1Bx11 1Ex6 1Bx15
-|║vecho    com│            │            ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│            │            ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│            │            ║║                                      ║| 1Bx80
-|║vfont    com│            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│            │            ║║                                      ║| 1Bx80
-|║vgotoxy  com│            │            ║║                                      ║| 1Bx80
-|║vinfo    com│            │            ║║                                      ║| 1Bx80
-|║vline    com│            │            ║║                                      ║| 1Bx80
-|║vpause   com│            │            ║║                                      ║| 1Bx80
-|║vprogres com│            │            ║║                                      ║| 1Bx80
-|║vstr     com│            │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│            │            ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│            │            ║║            │            │            ║| 1Bx80
+|║vcls     com│            │            ║║            │            │            ║| 1Bx80
+|║vcursor  com│            │            ║║            │            │            ║| 1Bx80
+|║vdelay   com│            │            ║║            │            │            ║| 1Bx80
+|║veach    com│            │            ║║            │            │            ║| 1Bx80
+|║vecho    com│            │            ║║            │            │            ║| 1Bx80
+|║verrlvl  com│            │            ║║            │            │            ║| 1Bx80
+|║vfdutil  com│            │            ║║            │            │            ║| 1Bx80
+|║vfont    com│            │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│            │            ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│            │            ║║            │            │            ║| 1Bx80
+|║vinfo    com│            │            ║║            │            │            ║| 1Bx80
+|║vline    com│            │            ║║            │            │            ║| 1Bx80
+|║vpause   com│            │            ║║            │            │            ║| 1Bx80
+|║vprogres com│            │            ║║            │            │            ║| 1Bx80
+|║vstr     com│            │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 5: GrayPlus "*.com" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx1 1Ex12 1Bx54
-|║vask     com│            │            ║║         653,296 Bytes Memory         ║| 1Bx1 1Ex12 1Bx37 1Ex7 1Bx23
-|║vchoice  com│            │            ║║          ####### Bytes Free          ║| 1Bx1 1Ex12 1Bx38 1Ex7 1Bx22
-|║vcls     com│            │            ║║      Volume in drive C: is WORK      ║| 1Bx1 1Ex12 1Bx50 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx1 1Ex12 1Bx30 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│            │            ║║  32,672,768 bytes free on drive C:   ║| 1Bx1 1Ex12 1Bx30 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│            │            ║║     18 files use 45,568 bytes in     ║| 1Bx1 1Ex12 1Bx33 1Ex2 1Bx11 1Ex6 1Bx15
-|║vecho    com│            │            ║║             C:\WORK\BIG              ║| 1Bx1 1Ex12 1Bx67
-|║verrlvl  com│            │            ║╟──────────────────────────────────────╢| 1Bx1 1Ex12 1Bx67
-|║vfdutil  com│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
-|║vfont    com│            │            ║║  No `dirinfo' file in this directory ║| 1Bx1 1Ex12 1Bx27 6Cx1 1Bx39
-|║vframe   com│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
-|║vgotoxy  com│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
-|║vinfo    com│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
-|║vline    com│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
-|║vpause   com│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
-|║vprogres com│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
-|║vstr     com│            │            ║║                                      ║| 1Bx1 1Ex12 1Bx67
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║  40,937 bytes in 18 selected files   ║║                                      ║| 1Bx3 1Ex33 1Bx44
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│            ║║WORK        │            │            ║| 1Bx1 30x12 1Bx1 1Ex12 1Bx54
+|║vask     com│            │            ║║STAMPS      │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vchoice  com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vcls     com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vcursor  com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vdelay   com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║veach    com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vecho    com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║verrlvl  com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vfdutil  com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vfont    com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx27 6Cx1 1Bx39
+|║vframe   com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vgotoxy  com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vinfo    com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vline    com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vpause   com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vprogres com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|║vstr     com│            │            ║║            │            │            ║| 1Bx1 1Ex12 1Bx67
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║  40,937 bytes in 18 selected files   ║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx3 1Ex33 1Bx44
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 6: Ctrl+m F5 "*.0" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │            ║║  32,626,688 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │            ║║     36 files use 91,136 bytes in     ║| 1Bx46 1Ex2 1Bx11 1Ex6 1Bx15
-|║vecho    com│vecho    0  │            ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │            ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │            ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │            ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │            ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │            ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │            ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │            ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │            ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │            ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │            ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │            ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │            ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │            ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │            ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │            ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │            ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │            ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │            ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │            ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │            ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │            ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │            ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │            ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │            ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │            ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │            ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 7: Ctrl+m F5 "*.1" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,580,608 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    54 files use 136,704 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 8: Ctrl+m F5 "*.2" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,534,528 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    72 files use 182,272 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 9: Ctrl+m F5 "*.3" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,488,448 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    90 files use 227,840 bytes in     ║| 1Bx45 1Ex2 1Bx11 1Ex7 1Bx15
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 10: Ctrl+m F5 "*.4" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,442,368 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    108 files use 273,408 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 11: Ctrl+m F5 "*.5" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,396,288 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    126 files use 318,976 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 12: Ctrl+m F5 "*.6" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,349,696 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    144 files use 364,544 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 13: Ctrl+m F5 "*.7" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,303,616 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    162 files use 410,112 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 14: Ctrl+m F5 "*.8" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,257,536 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    180 files use 455,680 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 15: Ctrl+m F5 "*.9" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,211,456 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    198 files use 501,248 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 16: Ctrl+m F5 "*.a" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,165,376 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    216 files use 546,816 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 17: Ctrl+m F5 "*.b" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,119,296 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    234 files use 592,384 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 18: Ctrl+m F5 "*.c" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,073,216 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    252 files use 637,952 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 19: Ctrl+m F5 "*.d" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  32,027,136 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    270 files use 683,520 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 20: Ctrl+m F5 "*.e" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
-|║..          │vtest    com│vtest    0  ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
-|║vask     com│vask     0  │vask     1  ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│vchoice  0  │vchoice  1  ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│vcls     0  │vcls     1  ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│vcursor  0  │vcursor  1  ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│vdelay   0  │vdelay   1  ║║  31,980,544 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│veach    0  │veach    1  ║║    288 files use 729,088 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│vecho    0  │vecho    1  ║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│verrlvl  0  │verrlvl  1  ║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║                                      ║| 1Bx80
-|║vfont    com│vfont    0  │vfont    1  ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│vframe   0  │vframe   1  ║║                                      ║| 1Bx80
-|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║                                      ║| 1Bx80
-|║vinfo    com│vinfo    0  │vinfo    1  ║║                                      ║| 1Bx80
-|║vline    com│vline    0  │vline    1  ║║                                      ║| 1Bx80
-|║vpause   com│vpause   0  │vpause   1  ║║                                      ║| 1Bx80
-|║vprogres com│vprogres 0  │vprogres 1  ║║                                      ║| 1Bx80
-|║vstr     com│vstr     0  │vstr     1  ║║                                      ║| 1Bx80
-|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ╤════════════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │    Name    │    Name    ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx10 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │vtest    com│vtest    0  ║║WORK        │            │            ║| 1Bx1 30x12 1Bx67
+|║vask     com│vask     0  │vask     1  ║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│vchoice  0  │vchoice  1  ║║            │            │            ║| 1Bx80
+|║vcls     com│vcls     0  │vcls     1  ║║            │            │            ║| 1Bx80
+|║vcursor  com│vcursor  0  │vcursor  1  ║║            │            │            ║| 1Bx80
+|║vdelay   com│vdelay   0  │vdelay   1  ║║            │            │            ║| 1Bx80
+|║veach    com│veach    0  │veach    1  ║║            │            │            ║| 1Bx80
+|║vecho    com│vecho    0  │vecho    1  ║║            │            │            ║| 1Bx80
+|║verrlvl  com│verrlvl  0  │verrlvl  1  ║║            │            │            ║| 1Bx80
+|║vfdutil  com│vfdutil  0  │vfdutil  1  ║║            │            │            ║| 1Bx80
+|║vfont    com│vfont    0  │vfont    1  ║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│vframe   0  │vframe   1  ║║            │            │            ║| 1Bx80
+|║vgotoxy  com│vgotoxy  0  │vgotoxy  1  ║║            │            │            ║| 1Bx80
+|║vinfo    com│vinfo    0  │vinfo    1  ║║            │            │            ║| 1Bx80
+|║vline    com│vline    0  │vline    1  ║║            │            │            ║| 1Bx80
+|║vpause   com│vpause   0  │vpause   1  ║║            │            │            ║| 1Bx80
+|║vprogres com│vprogres 0  │vprogres 1  ║║            │            │            ║| 1Bx80
+|║vstr     com│vstr     0  │vstr     1  ║║            │            │            ║| 1Bx80
+|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 21: F9 l f
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx1 30x38 1Bx41
-|║vask     com│     3159│ 9-19-22│ 9:21a║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│     2904│ 1-10-22│ 2:15p║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│     1976│ 1-10-22│ 9:14a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│     1342│11-19-21│ 6:28a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│     1360│11-19-21│ 6:28a║║  31,980,544 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│     3166│11-19-21│ 6:28a║║    288 files use 729,088 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│     2196│ 1-10-22│ 2:15p║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│     1083│11-19-21│ 6:28a║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│     2334│ 9-28-22│12:45p║║                                      ║| 1Bx80
-|║vfont    com│     1970│11-19-21│ 6:28a║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│     2492│ 1-10-22│ 2:16p║║                                      ║| 1Bx80
-|║vgotoxy  com│     2085│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vinfo    com│     3112│10-01-24│ 3:42a║║                                      ║| 1Bx80
-|║vline    com│     2144│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vpause   com│     2012│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vprogres com│     2424│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vstr     com│     2387│ 1-10-22│ 2:17p║║                                      ║| 1Bx80
-|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx1 30x38 1Bx41
+|║vask     com│     3159│ 9-19-22│ 9:21a║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│     2904│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+|║vcls     com│     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vcursor  com│     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vdelay   com│     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║veach    com│     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vecho    com│     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+|║verrlvl  com│     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vfdutil  com│     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
+|║vfont    com│     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx80
+|║vgotoxy  com│     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vinfo    com│     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+|║vline    com│     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vpause   com│     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vprogres com│     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vstr     com│     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 22: End
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║vask     e  │     3159│ 9-19-22│ 9:21a║╟──────────────────────────────────────╢| 1Bx80
-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcursor  e  │     1342│11-19-21│ 6:28a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vdelay   e  │     1360│11-19-21│ 6:28a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║veach    e  │     3166│11-19-21│ 6:28a║║  31,980,544 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║    288 files use 729,088 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║             C:\WORK\BIG              ║| 1Bx80
-|║vfdutil  e  │     2334│ 9-28-22│12:45p║╟──────────────────────────────────────╢| 1Bx80
-|║vfont    e  │     1970│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vinfo    e  │     3112│10-01-24│ 3:42a║║                                      ║| 1Bx80
-|║vline    e  │     2144│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║                                      ║| 1Bx80
-|║vtest    e  │     2791│ 6-24-23│11:41a║║                                      ║| 1Bx1 30x38 1Bx41
-|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
-|║vtest.e           2791  6-24-23 11:41a║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
+|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
+|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
+|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 30x38 1Bx41
+|╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║vtest.e           2791  6-24-23 11:41a║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 23: "ver" Enter
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║vask     e  │     3159│ 9-19-22│ 9:21a║╟──────────────────────────────────────╢| 1Bx80
-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcursor  e  │     1342│11-19-21│ 6:28a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vdelay   e  │     1360│11-19-21│ 6:28a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║veach    e  │     3166│11-19-21│ 6:28a║║  31,980,544 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║    288 files use 729,088 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║             C:\WORK\BIG              ║| 1Bx80
-|║vfdutil  e  │     2334│ 9-28-22│12:45p║╟──────────────────────────────────────╢| 1Bx80
-|║vfont    e  │     1970│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vinfo    e  │     3112│10-01-24│ 3:42a║║                                      ║| 1Bx80
-|║vline    e  │     2144│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║                                      ║| 1Bx80
-|║vtest    e  │     2791│ 6-24-23│11:41a║║                                      ║| 1Bx1 30x38 1Bx41
-|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
-|║vtest.e           2791  6-24-23 11:41a║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
+|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
+|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
+|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 30x38 1Bx41
+|╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║vtest.e           2791  6-24-23 11:41a║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 24: Up
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║vask     e  │     3159│ 9-19-22│ 9:21a║╟──────────────────────────────────────╢| 1Bx80
-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcursor  e  │     1342│11-19-21│ 6:28a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vdelay   e  │     1360│11-19-21│ 6:28a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║veach    e  │     3166│11-19-21│ 6:28a║║  31,980,544 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║    288 files use 729,088 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║             C:\WORK\BIG              ║| 1Bx80
-|║vfdutil  e  │     2334│ 9-28-22│12:45p║╟──────────────────────────────────────╢| 1Bx80
-|║vfont    e  │     1970│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vinfo    e  │     3112│10-01-24│ 3:42a║║                                      ║| 1Bx80
-|║vline    e  │     2144│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║                                      ║| 1Bx1 30x38 1Bx41
-|║vtest    e  │     2791│ 6-24-23│11:41a║║                                      ║| 1Bx80
-|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
-|║vstr.e            2387  1-10-22  2:17p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
+|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
+|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
+|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx1 30x38 1Bx41
+|║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║vstr.e            2387  1-10-22  2:17p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 25: Home
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║..          │►UP--DIR◄│ 6-16-00│12:00p║╟──────────────────────────────────────╢| 1Bx1 30x38 1Bx41
-|║vask     com│     3159│ 9-19-22│ 9:21a║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vchoice  com│     2904│ 1-10-22│ 2:15p║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcls     com│     1976│ 1-10-22│ 9:14a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vcursor  com│     1342│11-19-21│ 6:28a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║vdelay   com│     1360│11-19-21│ 6:28a║║  31,980,544 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║veach    com│     3166│11-19-21│ 6:28a║║    288 files use 729,088 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║vecho    com│     2196│ 1-10-22│ 2:15p║║             C:\WORK\BIG              ║| 1Bx80
-|║verrlvl  com│     1083│11-19-21│ 6:28a║╟──────────────────────────────────────╢| 1Bx80
-|║vfdutil  com│     2334│ 9-28-22│12:45p║║                                      ║| 1Bx80
-|║vfont    com│     1970│11-19-21│ 6:28a║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vframe   com│     2492│ 1-10-22│ 2:16p║║                                      ║| 1Bx80
-|║vgotoxy  com│     2085│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vinfo    com│     3112│10-01-24│ 3:42a║║                                      ║| 1Bx80
-|║vline    com│     2144│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vpause   com│     2012│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vprogres com│     2424│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vstr     com│     2387│ 1-10-22│ 2:17p║║                                      ║| 1Bx80
-|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
-|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║..          │►UP--DIR◄│ 6-16-00│12:00p║║WORK        │            │            ║| 1Bx1 30x38 1Bx41
+|║vask     com│     3159│ 9-19-22│ 9:21a║║STAMPS      │            │            ║| 1Bx80
+|║vchoice  com│     2904│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+|║vcls     com│     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vcursor  com│     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vdelay   com│     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║veach    com│     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vecho    com│     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+|║verrlvl  com│     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vfdutil  com│     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
+|║vfont    com│     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vframe   com│     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx80
+|║vgotoxy  com│     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vinfo    com│     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+|║vline    com│     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vpause   com│     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vprogres com│     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vstr     com│     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
 
 == 26: End
 cursor 12 23 lines 6 7 mode 3
-|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════════ Info ════════════════╗| 1Bx13 30x13 1Bx54
-|║    Name    │   Size  │  Date  │ Time ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx42
-|║vask     e  │     3159│ 9-19-22│ 9:21a║╟──────────────────────────────────────╢| 1Bx80
-|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
-|║vcls     e  │     1976│ 1-10-22│ 9:14a║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
-|║vcursor  e  │     1342│11-19-21│ 6:28a║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
-|║vdelay   e  │     1360│11-19-21│ 6:28a║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
-|║veach    e  │     3166│11-19-21│ 6:28a║║  31,980,544 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
-|║vecho    e  │     2196│ 1-10-22│ 2:15p║║    288 files use 729,088 bytes in    ║| 1Bx45 1Ex3 1Bx11 1Ex7 1Bx14
-|║verrlvl  e  │     1083│11-19-21│ 6:28a║║             C:\WORK\BIG              ║| 1Bx80
-|║vfdutil  e  │     2334│ 9-28-22│12:45p║╟──────────────────────────────────────╢| 1Bx80
-|║vfont    e  │     1970│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vframe   e  │     2492│ 1-10-22│ 2:16p║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
-|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║                                      ║| 1Bx80
-|║vinfo    e  │     3112│10-01-24│ 3:42a║║                                      ║| 1Bx80
-|║vline    e  │     2144│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vpause   e  │     2012│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vprogres e  │     2424│ 1-10-22│ 9:14a║║                                      ║| 1Bx80
-|║vstr     e  │     2387│ 1-10-22│ 2:17p║║                                      ║| 1Bx80
-|║vtest    e  │     2791│ 6-24-23│11:41a║║                                      ║| 1Bx1 30x38 1Bx41
-|╟────────────┴─────────┴────────┴──────╢║                                      ║| 1Bx80
-|║vtest.e           2791  6-24-23 11:41a║║                                      ║| 1Bx80
+|╔════════════ C:\WORK\BIG ══════╤══════╗╔════════════╤═══ C:\ ════╤════════════╗| 1Bx13 30x13 1Bx54
+|║    Name    │   Size  │  Date  │ Time ║║    Name    │    Name    │    Name    ║| 1Bx5 1Ex8 1Bx1 1Ex9 1Bx1 1Ex8 1Bx1 1Ex5 1Bx7 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5
+|║vask     e  │     3159│ 9-19-22│ 9:21a║║WORK        │            │            ║| 1Bx80
+|║vchoice  e  │     2904│ 1-10-22│ 2:15p║║STAMPS      │            │            ║| 1Bx80
+|║vcls     e  │     1976│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vcursor  e  │     1342│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vdelay   e  │     1360│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║veach    e  │     3166│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vecho    e  │     2196│ 1-10-22│ 2:15p║║            │            │            ║| 1Bx80
+|║verrlvl  e  │     1083│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vfdutil  e  │     2334│ 9-28-22│12:45p║║            │            │            ║| 1Bx80
+|║vfont    e  │     1970│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vframe   e  │     2492│ 1-10-22│ 2:16p║║            │            │            ║| 1Bx40 6Cx1 1Bx39
+|║vgotoxy  e  │     2085│11-19-21│ 6:28a║║            │            │            ║| 1Bx80
+|║vinfo    e  │     3112│10-01-24│ 3:42a║║            │            │            ║| 1Bx80
+|║vline    e  │     2144│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vpause   e  │     2012│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vprogres e  │     2424│ 1-10-22│ 9:14a║║            │            │            ║| 1Bx80
+|║vstr     e  │     2387│ 1-10-22│ 2:17p║║            │            │            ║| 1Bx80
+|║vtest    e  │     2791│ 6-24-23│11:41a║║            │            │            ║| 1Bx1 30x38 1Bx41
+|╟────────────┴─────────┴────────┴──────╢╟────────────┴────────────┴────────────╢| 1Bx80
+|║vtest.e           2791  6-24-23 11:41a║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
 |╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
 |C:\WORK\BIG>                                                                    | 07x80
 |1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
@@ -1072,7 +1072,7 @@ D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
 D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
 D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
 D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
-D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  b7c1b042b8127e35
+D:\VC\VC.INI  A   2000-06-16 04:05:00  511 bytes  03f5e8926f3ff7e1
 D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
 D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
 D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

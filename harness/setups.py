@@ -12,7 +12,11 @@ Two setups share one clock and one source of files:
                   C:\\WORK. Keeping the program off the disk it displays
                   means its size cannot show up as free space on screen.
                   The clock in the corner of the screen is off, so that
-                  no screen depends on how long it took to get there.
+                  no screen depends on how long it took to get there,
+                  and the panel on the right lists files, where the
+                  distribution has the Info panel: what that shows is
+                  of the machine and of the system, and would be on
+                  nearly every screen (see Bench).
                   DOS has loaded a mouse driver, for the PS/2 mouse of
                   three buttons that the machine has, and the driver of
                   the tests (see
@@ -55,8 +59,11 @@ SETUP_FILE = "VC.INI"
 SETUP_PROGRAM = "VCSETUP.COM"
 
 # The keys that switch the clock from on to off or back, in the Options
-# menu, and those that save the setup.
+# menu; those that make the panel on the right one of files, Brief in the
+# Right menu, which is the form that the left panel has as the program is
+# distributed, so that the two look alike; and those that save the setup.
 CLOCK_KEYS = "F9 o l"
+RIGHT_PANEL_KEYS = "F9 r b"
 SAVE_SETUP_KEYS = "Shift+F9 Enter"
 # The contents of C:\WORK on the test bench, in directory order.
 WORK_DIRECTORIES = ["DOCS", "SRC"]
@@ -262,12 +269,20 @@ class Bench:
     machine has executed the same instructions by then every time it is
     booted, and its clock is counted in them (see CLOCK_SHIFT in dos.py).
 
-    The program is set up as its distribution sets it up, but for the clock
-    in the corner of the screen, which the distribution has on. No setup
-    file is prepared for that: the original is started once, made to switch
-    the clock off in its menu and to save its setup, and what it then
-    writes is the VC.INI of every machine. It writes the same in every
-    country, so a bench can be given the `setup` of another to use.
+    The program is set up as its distribution sets it up, but for two
+    things ("Scenarios" in CLAUDE.md). The clock in the corner of the
+    screen, which the distribution has on, is off. And the panel on the
+    right lists files, in the form of the left one, where the distribution
+    has the Info panel there: that shows the size of the memory, the label
+    of the disk and what is free on it, things of the machine and of the
+    system, and with it on nearly every screen of nearly every scenario a
+    difference there was a difference everywhere. A scenario that is about
+    the Info panel switches it on, Ctrl+l. No setup file is prepared for
+    either: the original is started once, made to switch the clock off and
+    to make the right panel one of files in its menus, and to save its
+    setup, and what it then writes is the VC.INI of every machine. It
+    writes the same in every country, so a bench can be given the `setup`
+    of another to use.
     """
 
     def __init__(self, workdir, country="us", setup=None):
@@ -294,17 +309,18 @@ class Bench:
             machine.wait_for_stop(BOOT_TIME,
                                   "the driver of the tests did not load")
             machine.save(self._state)
-        self.setup = setup or self._setup_without_clock(shipped)
+        self.setup = setup or self._setup_of_the_bench(shipped)
 
-    def _setup_without_clock(self, shipped):
+    def _setup_of_the_bench(self, shipped):
         """The setup file that the original writes in place of `shipped`,
-        the distribution's, once its clock has been switched off."""
+        the distribution's, once its clock has been switched off and its
+        right panel made one of files."""
         workdir = self._workdir / "setup"
         workdir.mkdir()
         original = original_vc()
         disk = self._new_disk("setup.img", original, shipped)
-        script = driver.script([CLOCK_KEYS, SAVE_SETUP_KEYS],
-                               driver.facts(original))
+        script = driver.script([CLOCK_KEYS, RIGHT_PANEL_KEYS,
+                                SAVE_SETUP_KEYS], driver.facts(original))
         with self._machine(workdir, disk, script) as machine:
             machine.resume()
             machine.wait_for_end(BOOT_TIME)
@@ -317,7 +333,8 @@ class Bench:
                          partitioned=True).read(f"VC/{SETUP_FILE}")
         if setup == shipped:
             raise RuntimeError("the original did not save its setup with "
-                               "the clock switched off")
+                               "the clock switched off and files in its "
+                               "right panel")
         return setup
 
     def _new_disk(self, filename, program, setup, beside=None):
