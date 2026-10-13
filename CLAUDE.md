@@ -123,7 +123,14 @@ These held while `src/c/` was made, and they say what it is.
   1. The portable C becomes a 32-bit program for DOS, built by Open
      Watcom's 32-bit compiler with a DOS extender, and judged on the same
      bench by the same scenarios. When it passes them all, its 16-bit
-     build goes: `src/c/` is the 16-bit program.
+     build goes: `src/c/` is the 16-bit program. The extender is
+     DOS/32A, the one that runs on the bench: its stub is linked from the
+     pinned Open Watcom download when the program is built and never
+     committed, its licence text is kept in the repository, and the
+     README says, as that licence asks, "This product uses DOS/32
+     Advanced DOS Extender technology." This step follows the setup
+     program without waiting for the user; the 16-bit build is not
+     deleted before the user has said so.
   2. It uses what 32 bits give: one flat memory, with pointers where
      there were segments and offsets, and numbers and values of 32 bits.
      A variable is widened wherever wrapping round at 16 bits would be
