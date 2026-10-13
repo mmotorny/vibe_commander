@@ -180,58 +180,27 @@ void AlocEr(u16 bx)
     Exit00(1);
 }
 
-/* COMMAND.COM's interrupt for a command: `command` is its length, its
-   text and a carriage return. It comes back with nothing as it was but
-   where it comes back to: no stack, no DS. So this does not return. It
-   is the one place where the program has to set its stack by hand, and
-   it goes on in Exec2E, on a stack that is empty again.
-
-   Why this is assembly, all eight instructions of it: no compiled
-   instruction can run before SS and SP are set, since any of them may
-   use the stack; and the function that called cannot be gone back
-   into, with its place on the stack lost, so the jump is of it too.
-   Interrupts are off meanwhile and the direction flag is clear
-   afterwards, as the compiler has it. Exec2E finds DS itself, as a
-   function that is entered from elsewhere does. */
-static void __loadds Exec2E(void);
-#pragma aux Exec2E aborts
-
-__declspec(naked) static void Int2E(const u8 *command)
-{
-    (void)command;                      /* in SI, where the interrupt
-                                           takes it */
-    _asm {
-        int 2Eh
-        cli
-        mov ax,seg Stack
-        mov ss,ax
-        mov sp,offset Stack + LenStk
-        sti
-        cld
-        jmp Exec2E
-    }
-}
-#pragma aux Int2E parm [si] aborts
-
 /* Run the commands that DosBuf holds from BatAdr on, one after the
    other: each ends with a zero byte, and behind the last there is one
-   more. With `behind`, go on behind a command that has been run. A
-   command that begins with `@`, behind another, is run without being
-   shown first, with a prompt, as the others are. Returns when none is
-   left, or when COMMAND.COM cannot be run.
+   more. A command that begins with `@`, behind another, is run without
+   being shown first, with a prompt, as the others are. Returns when
+   none is left, or when COMMAND.COM cannot be run.
 
    A command is at most 123 characters; what a longer one has beyond
    that is cut off by the carriage return that is written there.
 
-   With ExecTyp, the commands are handed to the COMMAND.COM that is in
-   the memory, by its INT 2Eh, and this does not return: see Int2E. If
-   the current drive is another than when the program started, F21_31
+   With ExecTyp, Quick execute commands of the setup, the commands are
+   handed to the shell that the program was started from, the
+   COMMAND.COM that is in the memory, which runs them itself: ShellRun.
+   If the current drive is another than when the program started, F21_31
    has left a command in DosChg that goes there, which is handed over
-   first. Without ExecTyp, COMMAND.COM is run for each command, by the
-   name that COMSPEC has in the environment, with /C and the command for
-   its tail, which is written over the four bytes in front of the
+   first; the command itself is kept at BatPoin meanwhile, as the
+   original keeps it, whose registers do not come back from the shell.
+   Without ExecTyp, COMMAND.COM is run for each command, by the name
+   that COMSPEC has in the environment, with /C and the command for its
+   tail, which is written over the four bytes in front of the
    command. */
-static void Exec02(u16 behind)
+static void Exec02(void)
 {
     struct Answer ran;
     const u8 __far *name;
@@ -240,8 +209,6 @@ static void Exec02(u16 behind)
     u8 drive;
 
     for (;;) {
-        if (behind)
-            goto Exec07;
         SetBreakCheck(md.BreakFl);
         command = (u8 *)md.BatAdr;
         before = command - 4;
@@ -258,9 +225,13 @@ static void Exec02(u16 behind)
             *before = (u8)(end - 1 - before);
             if (md.DosChg[1] != 0) {
                 md.BatPoin = (u16)before;
-                Int2E(md.DosChg);
+                ShellRun(md.DosChg);
+                before = (u8 *)md.BatPoin;
+                md.DosChg[1] = 0;
             }
-            Int2E(before);              /* Exec03 */
+            ShellRun(before);           /* Exec03 */
+            SetBrk();                   /* SetBrk0 */
+            goto Exec07;
         }
         before[0] = (u8)(end - 1 - before);     /* Exec04 */
         before[1] = '/';
@@ -284,7 +255,6 @@ static void Exec02(u16 behind)
                 return;
         }
     Exec07:
-        behind = 0;
         command = (u8 *)md.BatAdr;
         if (*command == 0)
             return;
@@ -333,31 +303,12 @@ static void Exec10(void)
 }
 
 /* Run the commands of DosBuf. The original first gives up all of itself
-   but the part that this is of, if the program is set up so. With the
-   commands handed to COMMAND.COM's own interrupt, this does not return:
-   the program goes on in Exec2E. */
+   but the part that this is of, if the program is set up so. */
 void Exec(void)
 {
     md.BatAdr = (u16)md.DosBuf;         /* Exec01 */
-    Exec02(0);
+    Exec02();
     Exec10();
-}
-
-/* Behind INT 2Eh, on an empty stack. If that was the command of DosChg,
-   which changes the drive, the command itself is next, at BatPoin. Else
-   a command of DosBuf has been run: on with those that follow it, and
-   then as the program goes on behind Exec, which cannot be returned
-   to: Again of main.c. */
-static void __loadds Exec2E(void)
-{
-    if (md.DosChg[1] != 0) {
-        md.DosChg[1] = 0;
-        Int2E((const u8 *)md.BatPoin);
-    }
-    SetBrk();                           /* SetBrk0 */
-    Exec02(1);
-    Exec10();
-    Again();
 }
 
 /*---------------------- The start ----------------------*/

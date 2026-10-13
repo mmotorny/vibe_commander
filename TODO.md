@@ -4098,6 +4098,58 @@ still asks for. `VC.EXE` is 4 bytes shorter, 197,106. The stack: 157
 figures of 159 as the entry left them, `command` 14 more, which is the
 12 of the others after all, and `mouse-select` 2 fewer.
 
+**Quick execute: done.** It is a function of `sys.h` that comes back,
+as the plan's row has it, 98 functions where there were 97:
+
+| Function | What it is | In `dos.c` | In `dos32.c` |
+|---|---|---|---|
+| `ShellRun(command)` | A command handed to the shell that the program was started from, which runs it itself; `command` is as a command tail is, a count, the characters and a carriage return. It answers nothing | `Int2E`, fourteen instructions of assembly: SS and SP kept in two words of the data, DS:SI on the command, INT 2Eh, DS found again by its segment, SS and SP put back | Not made: nothing, and no command is run |
+
+The feature is whole: the setting, the command that changes the drive
+first, `DosChg`, with the command kept at `BatPoin` meanwhile, and
+`SetBrk` behind the interrupt, in the original's order. What has
+changed is how the program goes on behind the interrupt, which comes
+back with every register lost. The original sets its stack anew there,
+to where it is empty, and jumps on; it can, since it never returns
+from running commands but starts the program over at `Init11`. The
+portable C did the same and so could not return either: `Int2E` set
+the stack to its end and jumped to `Exec2E`, a `__loadds` function,
+which ran what was left of the commands and went on in `Again` of
+`main.c`, a second way into the program's loop. Now the stack is kept
+and put back, `ShellRun` returns, and `Exec02` goes on at its label
+`Exec07` as the original does behind the interrupt. `Exec2E` and
+`Again` are gone, with two `aborts` and the argument by which `Exec02`
+was told to go on behind a command.
+
+This is the one place where the piece did otherwise than "moved as it
+is", and it is the plan's row that says so. What decided: what is
+asked of DOS and of the shell and in which order is the same, read
+line for line against the assembly (`Exec02` to `Exec07` of `VC.ASM`);
+`TakeMem` follows the commands in `Round` as it followed them in
+`Again`; and a function that does not return could not be a function
+of `sys.h` that `dos32.c` makes by a call which does return. The
+assembly is six instructions more for it.
+
+What INT 2Eh is handed: DS:SI on the command, as before, by a far
+pointer taken apart, so DX is the segment too; entry 6 of
+`DEVIATIONS.md` has a row for it, which it had not, with what the
+original has in the registers that the interrupt does not take.
+
+`quick` passes as it did, and the stack figures did not move: `quick`
+3,760. It hands the shell a command three times, the second time
+behind the command that changes the drive first, so both ways through
+`Exec02` are run. On the bench the shell runs nothing by this
+interrupt, so the scenario shows that the program comes back and goes
+on, with the stack whole, and not that a command runs. The toy hands
+the shell `VER` on its last page and writes that it came back, in both
+builds.
+
+With this nothing but `dos.c` and `arith.c` has an interrupt function,
+`__loadds`, `_asm`, a naked function or a register in a `#pragma aux`:
+the host check's record has `resident.c` with 13 numbers, 4 pointers
+and one `aborts`, which the last family takes down. `VC.EXE` is 10
+bytes shorter, 197,096.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")

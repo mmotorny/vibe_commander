@@ -963,6 +963,18 @@ static void Later(void)
     ProgramEndedGive();
     SAY("ProgramEnded taken, given back");
     Line();
+    /* A command handed to the shell that started the toy, which the
+       shell of the bench does not run: it comes back, and that it does
+       is what is written. The command is in the main data, as the
+       program's are. */
+    SMALL[0] = 3;
+    SMALL[1] = 'V';
+    SMALL[2] = 'E';
+    SMALL[3] = 'R';
+    SMALL[4] = '\r';
+    ShellRun(SMALL);
+    SAY("ShellRun came back");
+    Line();
 }
 
 /* The pages, a step of the script behind each.

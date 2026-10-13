@@ -12,8 +12,8 @@
  * do. The registers go into the instruction and come out of it as
  * arguments and as what it returns; the compiler loads them. What other
  * inline assembly there is, is where DOS goes on when it has ended the
- * program, Exit01 here, and where COMMAND.COM's interrupt is called, in
- * resident.c.
+ * program, Exit01, and where COMMAND.COM's interrupt is called, Int2E:
+ * two functions that are their instructions and no more.
  * The memory of the machine that the program reads and writes is here
  * too, the BIOS's data and the cells of the display, through far
  * pointers in plain C; and the interrupt flag of the machine, for which
@@ -847,7 +847,7 @@ void Idle(void)
 }
 
 /* Other programs: AX 4B00h, with the name at DS:DX and at ES:BX the
-   block that says what the program is run with; and AH 4Ch.
+   block that says what the program is run with; INT 2Eh; and AH 4Ch.
 
    The block is where the original has it and as the original has it,
    EPB of the main data: no environment named, so that the program gets a
@@ -884,6 +884,55 @@ struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
 
     Run(REGS(regs), name, tail);
     return TellEs(REGS(regs));
+}
+
+/* COMMAND.COM's own interrupt for a command, INT 2Eh, with the command
+   at DS:SI. It comes back with nothing as it was but where it comes
+   back to: no stack, no DS, no other register. So where the stack is,
+   is kept, in two words that are read through DS; and DS is found again
+   behind the interrupt as an interrupt function finds it, by the
+   segment of something that is in it.
+
+   Why this is assembly, all fourteen instructions of it: no compiled
+   instruction can run before SS and SP are as they were, since any of
+   them may use the stack, and none while DS is on the command's segment
+   and not on the program's data. Interrupts are off while the stack is
+   put back, and the direction flag is clear afterwards, as the compiler
+   has it. BP is kept on the stack, which comes back; the registers that
+   the #pragma aux lists are the compiler's to keep if it wants them.
+
+   The original sets its stack anew behind the interrupt, to where it
+   is empty, and goes on from there without returning, which it can: it
+   never returns from running commands at all, but starts the program
+   over. Here the stack comes back as it was, and so the function
+   returns. */
+static u16 ShellSs, ShellSp;
+
+__declspec(naked) static void Int2E(const u8 __far *command)
+{
+    (void)command;                      /* in DX:SI */
+    _asm {
+        push bp
+        mov ShellSs,ss
+        mov ShellSp,sp
+        mov ds,dx
+        int 2Eh
+        cli
+        mov ax,seg ShellSp
+        mov ds,ax
+        mov ss,ShellSs
+        mov sp,ShellSp
+        sti
+        cld
+        pop bp
+        ret
+    }
+}
+#pragma aux Int2E parm [si dx] modify [ax bx cx dx si di es]
+
+void ShellRun(const u8 FAR *command)
+{
+    Int2E(command);
 }
 
 void ProgramEnd(u16 code)

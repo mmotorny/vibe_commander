@@ -1591,18 +1591,3 @@ void Main(void)
         AlocEr(memory.value);
     Round();
 }
-
-/* Where the program goes on when commands have been run by the
-   interrupt that COMMAND.COM has for them: that comes back with the
-   stack lost, so the commands were finished on a stack that was set
-   anew, and Round cannot be returned into (see Exec2E of resident.c).
-   The rest is as behind any commands. */
-void Again(void)
-{
-    struct Answer memory;
-
-    memory = TakeMem();
-    if (memory.failed)
-        AlocEr(memory.value);
-    Round();
-}

@@ -49,7 +49,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 74 of the 97, six of them in real mode; the 23 that are not made
+ * 74 of the 98, six of them in real mode; the 24 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -1054,7 +1054,7 @@ void IntOn(void)
 }
 
 /*
- * The 23 functions of sys.h that are not made here yet. Each does
+ * The 24 functions of sys.h that are not made here yet. Each does
  * nothing, and answers as a system does that failed or does not know
  * the question; none of them calls DOS, since a call that the extender
  * does not translate has DOS write wherever the registers happen to
@@ -1064,7 +1064,8 @@ void IntOn(void)
  *   - through the block below the megabyte and a call in real mode, as
  *     the search of a directory is made above, with more room in the
  *     block: FileTrueName, FcbParse, FcbDelete, CountryInfo, CaseMap,
- *     ProgramRun and ProgramRunBare;
+ *     ProgramRun and ProgramRunBare; and ShellRun, by a stretch of code
+ *     of real mode there;
  *   - other in 32 bits: MemTake, MemGive and MemResize, which hand out
  *     memory of the program's own; MemSetSearch and MemSetUpper;
  *   - out of the PSP, which is below the megabyte, once the start of
@@ -1171,6 +1172,23 @@ struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail)
 struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail)
 {
     return ProgramRun(name, tail);
+}
+
+/* The shell's own interrupt for a command, INT 2Eh of COMMAND.COM: the
+   command is not handed over, and nothing is run, which is what the
+   program finds of a shell that does not serve the interrupt. It is of
+   real mode and comes back there with every register lost, the stack
+   among them, so it cannot be called as the others are: the trial had
+   a stretch of 28 bytes of real mode in the block below the megabyte,
+   `int 2Eh` with the stack kept in front of it and put back behind it
+   and a far return, called by the extender's service for a routine of
+   real mode, DPMI 0301h, with DS:SI on the command, which has to be in
+   that block too: its count, its text and the carriage return, 127
+   bytes at the most. That came back (TODO.md, "DOS's services under
+   DOS/32A"). */
+void ShellRun(const u8 FAR *command)
+{
+    (void)command;
 }
 
 /* A tail of no characters, and an environment of no texts with no

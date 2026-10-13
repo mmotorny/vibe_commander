@@ -532,19 +532,14 @@ struct Answer SaveSet(void);
    for a command, and TakeMem takes it again afterwards, and answers as
    Init11 does. Main of main.c is the program from when DOS has loaded it:
    the system calls it where it enters the program, Alloc0 of dos.c, and
-   it does not return. Again of
-   main.c is where the program goes on when commands have been run on a
-   stack that was set anew, behind COMMAND.COM's own interrupt for
-   them. */
+   it does not return. */
 void Init00(void);
 struct Answer Init11(void);
 void IniData(void);
 void GiveMem(void);
 struct Answer TakeMem(void);
 void Main(void);
-void Again(void);
 #pragma aux Main aborts
-#pragma aux Again aborts
 
 /* What the setup file holds: three letters V, of each panel what a
    WCBdef has before CurAdr, of the main data what it has before LoadRes,

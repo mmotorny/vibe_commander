@@ -1293,8 +1293,9 @@ in "The portable C".
   `__U4D` far then, with a relocation for each call from the second
   segment; a `__near` in their `#pragma aux` is taken without a word and
   the program links, and returns near to a far call. `_asm` takes the
-  name of a function for a far place: `jmp Exec2E` in `Int2E` of
-  `resident.c` is a far jump there.
+  name of a function for a far place: `jmp Exit05` in `Exit01` of
+  `dos.c` is a far jump there. (`Int2E` had one to `Exec2E`, while it
+  did not return.)
 - What the compiler does with a function that has no `#pragma aux`,
   read in the listings: the arguments come in AX, DX, BX and CX in
   their order, a far pointer in two of them, and what does not fit
@@ -1340,7 +1341,8 @@ in "The portable C".
 - What still has registers in a `#pragma aux`, and stays so until the
   thing itself changes: the inline assembly of `dos.c`; `__U4M` and
   `__U4D`, whose registers are the compiler's; `CaseMapFn`, DOS's
-  routine; and `Int2E`, whose command is in SI.
+  routine; and `Int2E`, whose command is in DX:SI, in `dos.c` since
+  the piece S3.
 - An object has the compiler's name in the map, `_Name`, where the C
   translation takes the underscore off with `#pragma aux Name "*"`:
   `harness/datacheck.py` knew an object by either, and no name of the
@@ -2388,6 +2390,7 @@ is called both ways the bare function says so in its name.
 | 4Ah, of the program's own block | bare | `MemOwn()`: the block that DOS loaded the program into made as long as the program is. Which block that is and how long the program is, `dos.c` knows |
 | 5801h, 5803h | bare | `MemSetSearch(how)`, `MemSetUpper(on)` |
 | 4B00h | asked, bare | `ProgramRun(name, tail)`, `ProgramRunBare`: the block that DOS takes with it is `dos.c`'s to make |
+| INT 2Eh, COMMAND.COM's own | | `ShellRun(command)`, which comes back: the stack is kept and put back around the interrupt in `dos.c` |
 | 4Ch | bare | `ProgramEnd(code)` |
 | INT 20h, entered at the start of the PSP | | `ProgramEndOld()`, for a DOS before 3 |
 | The PSP at 0Ah, where DOS goes on when the program has ended; no call of DOS | | `ProgramEndedTake(told)` and `ProgramEndedGive()`: the PSP names `Exit01` of `dos.c` between the two, which calls `told` when DOS has ended the program |

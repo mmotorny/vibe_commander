@@ -352,6 +352,14 @@ void Idle(void);
 struct Answer ProgramRun(const u8 FAR *name, const u8 FAR *tail);
 struct Answer ProgramRunBare(const u8 FAR *name, const u8 FAR *tail);
 
+/* Hand a command to the shell that this program was started from, to
+   run it itself, and come back when it has: so what the command sets
+   there stays set, and no second shell is run for it. `command` is as a
+   command tail is, a byte that counts the characters, the characters
+   and a carriage return. It answers nothing: a shell that does not do
+   this runs nothing and says nothing. */
+void ShellRun(const u8 FAR *command);
+
 /* End the program, with a number for whoever started it. Does not
    return. */
 void ProgramEnd(u16 code);

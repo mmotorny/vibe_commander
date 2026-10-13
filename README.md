@@ -792,10 +792,10 @@ written in, the first table above: `__far`, `STACK` and `CODE`,
 figures](#the-figures) say; three of the five `__interrupt` functions,
 `FatErr`, `CtrlC` and `Exit05`, which are all in `dos.c` there, `Int27`
 having gone with the watch on DOS and `Int21`
-with the program's own call; two `__loadds` functions, `Alloc0`, where DOS enters the program,
-and `Exec2E`, where it goes on behind INT 2Eh; two of the four
+with the program's own call; one `__loadds` function, `Alloc0`, where DOS enters the program,
+`Exec2E` having gone when the call of INT 2Eh came to return; two of the four
 `__declspec(naked)` functions, `Exit01` and `Int2E`, without `New27`
-and `New21`; two of the three intrinsic functions, `_disable` and `_enable`; the two routines for
+and `New21`, both in `dos.c` there; two of the three intrinsic functions, `_disable` and `_enable`; the two routines for
 arithmetic; and, new, `#pragma data_seg`, for the main data and for the
 stack. The test `portable_c-host` counts these by
 their kinds, and `TODO.md` has its table.
@@ -811,7 +811,7 @@ here:
 | 4 | In a file compiled with `-nd=S` the same line makes a segment of the class `STACK` outside `DGROUP`; the linker takes a segment of that class for the stack and names its end in the file's header; given a value, zeros, it is in the file; and the linker's command has it last, so the program ends there | `src/portable_c/stack.c`, `MemOwn` of `dos.c` | `portable_c-scenarios` fails if the stack is not the last of the program, or not in the file |
 | 5 | No code is within 4K of the stack, the tables being in front of it; and no segment of code reaches into the last 4K of its 64K. Both are for QEMU, not for the program | the `order` of 2; the files of the second code segment in `CMakeLists.txt` | `portable_c-scenarios` reads the linker's map, where `tools/mkexe.c` stopped the build |
 | 6 | The segment of a far pointer made of a near one is DS, `MAIN_SEG` | `src/portable_c/vc.h` | every scenario |
-| 7 | The segment of a far pointer to an object of a group is the group's, and `seg` and `offset` in `_asm` are those of the group too: so the stack that `Int2E` sets is the one that the file's header names, and a table is read at its offset in `AsmSeg` | `src/portable_c/resident.c`, `misc.c` | the scenarios of INT 2Eh, `quick`; every scenario |
+| 7 | The segment of a far pointer to an object of a group is the group's, and `seg` in `_asm` is the group's too: so the DS that `Int2E` finds again behind the interrupt is the one that the program's data is read through, and a table is read at its offset in `AsmSeg` | `src/portable_c/dos.c`, `misc.c` | the scenarios of INT 2Eh, `quick`; every scenario |
 | 8 | An `__interrupt` function saves the registers in a fixed order, which `struct Saved` is, and loads DS with `DGROUP`, as a `__loadds` function does | `src/portable_c/dos.c` | the scenarios of the critical error, and of the program ended by DOS, `ended` |
 | 9 | `_enable` is `STI` and `CLD`: the first thing that the entry of the program does clears the direction flag, which the compiled code needs clear and DOS does not promise | `src/portable_c/dos.c`, `Alloc0` | every scenario |
 
@@ -830,10 +830,14 @@ were left for the program's own call, three `CMP` with their jumps, the
 jump to the interrupt function that answered it and the far `JMP`
 through `Vect21` for every other call, went [with that
 call](#the-setup-program-in-it). The program has no entry of INT 21h.
-`Exit01` is as it was, and is in `dos.c` there. `Int2E` is an instruction shorter: `INT 2Eh`, `CLI`,
-`MOV AX` with the segment of the stack, `MOV SS,AX`, `MOV SP`, `STI`,
-`CLD` and the jump; it no longer loads DS, which the function that it
-jumps to does for itself. Of the three instructions that are the
+`Exit01` is as it was, and is in `dos.c` there. `Int2E` is there too, and is fourteen
+instructions where it was eight, since it returns: `PUSH BP`, SS and SP
+kept in two words of the data, `MOV DS,DX` for the command's segment,
+`INT 2Eh`, `CLI`, `MOV AX` with the segment of the data and `MOV DS,AX`,
+SS and SP put back, `STI`, `CLD`, `POP BP` and `RET`. What that buys is
+that the program has one way into its loop: `Exec2E`, the `__loadds`
+function that the jump went to on a stack set anew, and `Again` of
+`main.c`, which started the loop over from there, are gone. Of the three instructions that are the
 compiler's own, by its intrinsic functions, `IN` is gone too: the
 program reads no port.
 
@@ -864,7 +868,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 97 functions
+In the portable C that place is `src/portable_c/sys.h`: 98 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
 has the file clean. `dos.c` is those functions for DOS on a PC, and the
@@ -881,7 +885,7 @@ file beside it.
 | Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
 | Memory: a block taken, given back, made another size, where the system looks for one, and the program's own block made as long as the program | 6 |
 | The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
-| Other programs: one run, with what it is told behind its name, and this one ended, on an old DOS too; what this one was told when it was started, and its environment | 6 |
+| Other programs: one run, with what it is told behind its name; a command handed to the shell that this one was started from; this one ended, on an old DOS too; what this one was told when it was started, and its environment | 7 |
 | What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again; the program told when the system has ended it, taken and given back | 10 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
@@ -946,13 +950,28 @@ PC has: where DOS enters the program, `Alloc0`, which asks DOS where
 the program's PSP is, keeps that, and calls `Main` of `main.c`, which is
 the program. What the program does first it asks through the header
 like everything else: the version of DOS, and that it keep no more of
-the memory than it is. What is left of DOS outside `dos.c` is in
-`resident.c`: the call of COMMAND.COM's own interrupt for Quick
-execute, with what assembly it has. The PSP is read and written in
+the memory than it is. The PSP is read and written in
 `dos.c` alone: the command tail and the environment, for the functions
 that answer with them, and the address at which DOS goes on when the
 program has ended; and `dos.c` makes the block that DOS is told of a
-program to run. `TODO.md` says what is to become of Quick execute. The map of the memory and the watch on
+program to run.
+
+Quick execute commands, which hands a command to the COMMAND.COM that
+the program was started from, by that program's own interrupt, is a
+function of the header too, `ShellRun`, which comes back when the
+command has run. The interrupt comes back with every register lost,
+the stack among them: the original sets its stack anew behind it and
+never returns from running commands, and the portable C did the same
+until this was moved, going on in a second way into its loop; now
+`dos.c` keeps where the stack is and puts it back, and the commands'
+loop of `resident.c` goes on behind the call as behind any other.
+Whether Quick execute stays is the user's to decide, and `TODO.md` has
+it.
+
+With that nothing of DOS is left outside `dos.c`: no file but it and
+`arith.c` has an interrupt function, a function that loads DS, a line
+of assembly or a register in a `#pragma aux`, which the test
+`portable_c-host` holds. The map of the memory and the watch on
 DOS, which were of DOS alone, [are gone](#what-a-user-sees-no-more).
 
 Every file asks the system through the header: the 348 calls went over
