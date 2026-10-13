@@ -389,8 +389,8 @@ const u8 FAR *ProgramEnvironment(void);
    that call meanwhile: the function may ask for the screen, the keys,
    the mouse and the timer, and may say that it is idle, and nothing
    else. It may be entered with the machine kept from interrupting the
-   program, and on a stack that is not the program's, if a program that
-   this one has run has left the question to it. */
+   program (see IntOn), and on a stack that is not the program's, if a
+   program that this one has run has left the question to it. */
 typedef u16 DeviceErrorFn(u16 how, u16 error, const u8 FAR *device);
 #define DEVICE_RETRY 1
 #define DEVICE_FAIL  3
@@ -400,6 +400,15 @@ typedef u16 DeviceErrorFn(u16 how, u16 error, const u8 FAR *device);
 void DeviceErrorNote(void);
 void DeviceErrorTake(DeviceErrorFn *ask);
 void DeviceErrorGive(void);
+
+/* Let the machine interrupt the program again, its timer and its
+   keyboard: DOS asks about a device with the machine kept from that,
+   and what the program does then, a box and a wait for a key, needs
+   both. The program says this behind everything that it puts on the
+   screen and where it waits for the timer, whoever has entered it, as
+   the original does. A system that never keeps the machine from it has
+   nothing to do here. */
+void IntOn(void);
 
 /* Ctrl-Break, the key of a PC that stops a program wherever it is: note
    who has it now; take it, so that nothing happens when it is pressed;

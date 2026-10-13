@@ -12,7 +12,7 @@ those objects and of what the build does not make:
     leaves <file>.refused there and no object. Such a file is compiled
     here with its warnings, which the build takes for errors;
   - what the tree has of DOS outside sys.h, and so outside dos32.c: the
-    two functions that vc.h declares and the segment of the PSP, and
+    function that vc.h declares and the segment of the PSP, and
     `__GETDS`, which an interrupt function of the compiler's asks for.
     Each function is written here as one that does nothing.
 
@@ -45,7 +45,6 @@ OUT = ROOT / "build" / "trial32" / "whole"
 
 # What the tree calls of DOS that is no function of sys.h.
 OUTSIDE = """#include "vc.h"
-void IntOn(void) { }
 u16 ProgramPrefix(void) { return 0; }
 u16 PspSeg;
 void GetDs(void) { }

@@ -25,9 +25,9 @@
  * as any function is.
  *
  * The file has two parts: the functions of sys.h, and behind them what
- * is of DOS alone and no part of sys.h. A structure of registers, as the
- * C translation hands one to an interrupt from every file, is known here
- * and nowhere else.
+ * is of DOS alone and no part of sys.h, where the PSP is. A structure of
+ * registers, as the C translation hands one to an interrupt from every
+ * file, is known here and nowhere else.
  */
 #include "vc.h"
 
@@ -982,6 +982,15 @@ void DeviceErrorGive(void)
     SetVector(INT_ERROR, md.ErrVct);
 }
 
+/* The interrupt flag set, by the compiler's own function for that,
+   which is STI and CLD: the direction flag is clear afterwards, as the
+   compiler wants it, and the entry of the program calls this for that,
+   Alloc0 of resident.c. */
+void IntOn(void)
+{
+    _enable();
+}
+
 void CtrlBreakNote(void)
 {
     md.BrkVct = Vector(INT_CTRL_BREAK);
@@ -1272,8 +1281,7 @@ u32 Ticks(void)
 }
 
 /*
- * What is of DOS on a PC alone, and no part of sys.h: where the PSP is,
- * and the interrupt flag.
+ * What is of DOS on a PC alone, and no part of sys.h: where the PSP is.
  */
 
 /* Where the PSP is, its segment, as DOS says (AH 51h, which answers in
@@ -1287,12 +1295,4 @@ u16 ProgramPrefix(void)
     regs.name = NUMBER(0);
     Tell(REGS(regs));
     return regs.bx;
-}
-
-/* Let the machine interrupt the program again, where something has
-   kept it from that; and the direction flag is clear afterwards, as the
-   compiler wants it. */
-void IntOn(void)
-{
-    _enable();
 }

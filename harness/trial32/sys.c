@@ -296,6 +296,9 @@ static void System(void)
     SetBreakCheck(was);
     Line();
     time = TimeOfDay();
+    IntOn();                            /* nothing shows of it: the toy
+                                           is never kept from being
+                                           interrupted */
     ticks = Ticks();
     SAY("TimeOfDay "); H4(time.clock);
     SAY("seconds in range "); H2((time.seconds >> 8) < 60

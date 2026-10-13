@@ -646,12 +646,10 @@ void StF09_00(void);
 void StRdHelp(void);
 void StHelp(void);
 
-/* What is of DOS on a PC alone, and no part of sys.h: the machine let
-   interrupt the program again; and the segment of the program's PSP, as
-   DOS says it and as Alloc0 of resident.c keeps it when the program
-   begins, for itself and for the functions of sys.h that read the PSP.
-   See each in dos.c. */
-void IntOn(void);
+/* What is of DOS on a PC alone, and no part of sys.h: the segment of
+   the program's PSP, as DOS says it and as Alloc0 of resident.c keeps
+   it when the program begins, for itself and for the functions of
+   sys.h that read the PSP. See both in dos.c. */
 u16 ProgramPrefix(void);
 extern u16 PspSeg;
 

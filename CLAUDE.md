@@ -2844,7 +2844,13 @@ arrive went into `dos.c` (`TODO.md`, the piece S2 of the plan for the
 - DOS enters the critical error with the machine kept from
   interrupting, and the compiler's interrupt function leaves it so:
   the box gets its keys because `Window`, `MovScr` and `MinBx3` call
-  `IntOn`, as the original has `STI` there.
+  `IntOn`, as the original has `STI` there. Three of its four callers
+  being of the common code, `IntOn` is a function of `sys.h`, beside
+  the critical error, and of `dos32.c`. Having the entry let the
+  machine interrupt before it asks the program would take those calls
+  out of the common code, and would be the program doing otherwise
+  than the original between the entry and its first `Window`: that is
+  asked first.
 - A decision of the program's that is still in `dos.c`: `AskEs` clears
   `md.ErrDat` in front of a call and makes the error 53h of a call
   behind which it is set. What the function answered does not say

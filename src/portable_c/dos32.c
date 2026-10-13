@@ -49,7 +49,7 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 71 of the 92, six of them in real mode; the 21 that are not made
+ * 72 of the 93, six of them in real mode; the 21 that are not made
  * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
@@ -1019,6 +1019,16 @@ u32 Ticks(void)
     ticks = *(const volatile u32 *)0x46C;
     _enable();
     return ticks;
+}
+
+/* The interrupt flag set, by the compiler's own function for that,
+   as in dos.c. It is made though the routine that the critical error
+   is to arrive at is not: the program calls it behind everything that
+   it puts on the screen, and the extender lets a program of protected
+   mode set the flag. */
+void IntOn(void)
+{
+    _enable();
 }
 
 /*

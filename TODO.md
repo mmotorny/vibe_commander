@@ -2235,10 +2235,11 @@ The 84 functions that `sys.h` had when this was written, by what the
 trial found of DOS/32A. It has 85 now: with S1 `ProgramPrefix` left
 it, and `ProgramTail`, `ProgramEnvironment` and `MemEnd` came, which
 read the PSP below the megabyte and ask DOS nothing; and `MemEnd` has
-gone again, with the Info panel's two lines on the memory. And 92
+gone again, with the Info panel's two lines on the memory. And 93
 since S2, with the seven by which the program notes, takes and gives
-back the critical error, Ctrl-Break and Ctrl-C: those are of none of
-the three kinds below, since they ask the extender and not DOS.
+back the critical error, Ctrl-Break and Ctrl-C, which are of none of
+the three kinds below, since they ask the extender and not DOS; and
+with `IntOn`, which asks nobody.
 
 | Kind | Functions | Which |
 |---|---|---|
@@ -3810,7 +3811,7 @@ For D2:
 ### S2, what DOS enters: done, and what a later piece should know
 
 The three interrupts that the program takes are taken through `sys.h`,
-and where they arrive is in `dos.c`. `sys.h` has 92 functions, where it
+and where they arrive is in `dos.c`. `sys.h` has 93 functions, where it
 had 85, and a group of its own for them, "What the system asks the
 program, and the keys that stop one":
 
@@ -3821,6 +3822,7 @@ program, and the keys that stop one":
 | `DeviceErrorGive()` | Whoever was noted is asked again | AX 2524h with `ErrVct` | Not made |
 | `CtrlBreakNote()`, `CtrlBreakTake()`, `CtrlBreakGive()` | The same for Ctrl-Break, which is taken so that nothing happens | AX 351Bh into `BrkVct`, 251Bh with the address of `CtrlC`, 251Bh with `BrkVct` | Not made |
 | `CtrlCTake()` | Ctrl-C taken so that nothing happens; DOS gives it back itself | AX 2523h with the address of `CtrlC` | Not made |
+| `IntOn()` | The machine let interrupt the program again. It was of `vc.h`, with what is of DOS alone | `_enable`, as before | Made: `_enable` |
 
 What the program is asked by is a type of `sys.h`, `DeviceErrorFn`:
 
@@ -3925,8 +3927,22 @@ and asks for the extended error: one function more in `sys.h`, for AH
 error still shows in the common code: DOS enters `FatErr` with the
 machine kept from interrupting, the compiler's interrupt function
 leaves it so, and the box that `FtErr1` shows gets its keys because
-`Window`, `MovScr` and `MinBx3` call `IntOn`. It is declared in `vc.h`
-with what is of DOS alone, and `dos32.c` has none.
+`Window`, `MovScr` and `MinBx3` call `IntOn`. Those three are of the
+common code, which a program of 32 bits is linked of, and the fourth
+caller is the entry, `Alloc0`, for the direction flag. So `IntOn` is a
+function of `sys.h` now, in the group of the critical error, in a
+commit of its own: `dos.c` has it as it was, `dos32.c` has it made, and
+`whole.py` has one name fewer outside `sys.h`. The file is as long as
+it was and not the same bytes, the function having moved within
+`dos.c`, and the whole suite was run for it.
+
+The other way was not taken, and is the user's to decide if it is
+wanted: `FatErr` could let the machine interrupt before it asks the
+program, and the three calls could go from the common code. Then the
+machine can interrupt from the entry on, where in the original it
+cannot before the box is first put on the screen. No call of DOS and
+no screen would show that; it is the program doing otherwise all the
+same.
 
 For S3:
 
@@ -3949,13 +3965,19 @@ For S3:
   the program's.
 - `DOS_AT` has four places left, all in `resident.c`: `PSP_EXIT` three
   times and the far call into the PSP in `Alloc0`.
+- `Alloc0` calls `IntOn` first, for the direction flag, which is a
+  function of `sys.h` now and says nothing of that flag there: in
+  `dos.c` the entry can say `_enable()` itself. What is left outside
+  `sys.h` then is `ProgramPrefix` and `PspSeg`, and `whole.py`'s list
+  has those two and `__GETDS`.
 - The four functions of `sys.h` that the entry of the program asks
   before `Main`, and what leaving does, are untouched by this piece.
 
 For D2:
 
 - The seven are stubs in `dos32.c`, at the end of its second part, 21
-  that are not made where it had 14; the comment in front of them says
+  that are not made where it had 14, and 72 that are made, with
+  `IntOn`; the comment in front of them says
   what the call has to be. What the plan has for them stands: DPMI
   0204h and 0205h for the three, with who had the first two kept in
   variables of `dos32.c`, six bytes each, and not in `ErrVct` and
