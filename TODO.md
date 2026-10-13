@@ -9,72 +9,17 @@ The functions of `src/portable_c/` have lost the registers that the
 assembly called them in (see the README, "The portable C"). Where the
 assembly handed back two registers, or a register and a flag, the C
 translation returns one number of 32 bits with a thing in each half, and
-the caller takes it apart with shifts and casts. 114 functions did. The
-22 that files of several kinds call return a structure now, with members
-named for what they are: the mouse, the keyboard and the BIOS, the time,
-a page of a list, what is selected, DOS's answer to a call that may
-fail, a line that is typed into, a key, the buttons, the entries and the
-commands of an extension file, and the search of the viewer. So do the 9
-of the editor, `edit.c`, which nothing else calls: an address in the
-text, where a line ends, the column that characters reach, the line
-that was drawn, and DOS's answer again. And so do 8 of the 10 that
-another file kept to itself, or nearly, in `dialog.c`, `dirfunc.c` and
-`read.c`: the fields of a dialog, a directory removed, the date and the
-time of the attributes, the label of a drive. The other two had less
-than two things: `F36_04` of `copy.c` returns nothing, and `MenuItem`
-of `usermenu.c` is gone.
+the caller takes it apart with shifts and casts. 114 functions did, and
+none of the portable C does any more: the README has what they return
+instead, and `python3 tools/pairs.py` lists the three that return a
+number of 32 bits because they have one.
 
-The two of the seam between the two parts of the program are gone with
-the seam: `Init11` of `start.c` answers how much memory there was and
-whether that is too little, as `TakeMem` does, and `TrnMain` of `main.c`
-is `Main`, which does not return.
-
-So do the commands and what else comes back to the main loop, 49
-functions, all but those of `enter.c`:
-
-- What a command of the keys of the panels returns is `struct Onward`
-  of `vc.h`: the place where the program goes on, a `NEXT_`, and for
-  the three places that are routines of a panel's menu the panel and
-  the item that the routine takes. The 31 commands of `keys.c` and 10
-  of `view.c` return it, and `CmdEnd` of `main.c` takes it. The editor
-  on a file was the viewer's place with 1 in the high word, and is a
-  place of its own, `NEXT_EDIT`. `Aexec0` of `view.c` had one thing to
-  return, the same place from its one return, and returns nothing.
-- The cursor moved: `F00_50` of `keys.c` returns what it leaves in BX
-  and DX, `struct Left`, and `ChgAdr` of `place.c` what the panel
-  showed before, `struct Shown`.
-- The speed search, `F77_00` of `cmdline.c`: its key and where its box
-  was, `struct SpeedKey`. The file search, `F67_00` of `find.c`, and
-  Copy and Rename, `F35_01` and `F45_01` of `copy.c`: a place of their
-  own families, a `TO_` or a `GO_`, with the panel or the title that
-  one place of each takes, `struct Searched` and `struct Copied`. The
-  menu bar, `F39_00` of `menu.c`: the menu, the item, the table of the
-  commands and what was held down, `struct Picked`.
-
-22 are left, and `python3 tools/pairs.py` lists them as they stand, by
-file, with the files that call each:
-
-- 19, the commands of `enter.c`: Enter, the directory changed, the
-  history and leaving. Every one of them returns a place and nothing
-  with it, since none of the places that they return takes a panel or
-  an item: they are to return `struct Onward` as the other commands do,
-  made by a function of the file like `To` of `keys.c` and of `view.c`.
-  Until they do, `main.c` takes both kinds: `OfEnter` there makes the
-  structure of the number, at its 17 calls of a command of `enter.c`,
-  and `view.c` does the same at its one, of `F21_30`. Those 18 calls,
-  `OfEnter`, the declarations in `vc.h` and its comment at `struct
-  Onward` are all that changes outside `enter.c`, and a call left as it
-  is does not compile either way. `F27_07` and `F27_06` there return
-  one place from every return. This waited for the work below, "one
-  program", which changed that file, and can go on.
-- 3 that are numbers and stay: `Timer`, `__U4M`, and `Dos35` of
-  `main.c`, an address as DOS has it.
-
-`tools/pairs.py` goes by the type `u32`. A number of 16 bits with a
-thing in each byte, or with a flag above something, it does not list:
-`T00_00` of `edit.c` returns what `V13_01` takes in the high byte, and
-in `main.c` `Command` returns a place of the loop or, with `LEAVE`, why
-the loop is left, and `Func21` a command or, with `AGAIN`, a place.
+What is left is numbers of 16 bits with a thing in each byte, or with a
+flag above something, which the tool does not list, since it goes by the
+type `u32`: `T00_00` of `edit.c` returns what `V13_01` takes in the high
+byte, and in `main.c` `Command` returns a place of the loop or, with
+`LEAVE`, why the loop is left, and `Func21` a command or, with `AGAIN`,
+a place.
 
 `CLAUDE.md`, "Notes on the portable C", has how such a function is
 written so that a call that was not changed does not compile, and what

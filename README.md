@@ -566,18 +566,16 @@ translation as the halves of one number of 32 bits, which the caller
 takes apart. In the portable C such a function returns a structure
 with members named for what they are: `GetMous` the buttons and the
 place of the mouse, `OpenFil` what DOS answered and whether that is an
-error, `EdLin` the cursor and whether anything changed, and so on. A
-call that still took such a number apart would not compile. 92 of 114
-are done: those that files of every kind call, those inside the
-editor, those that another file keeps to itself, the commands with
-what else comes back to the main loop: a command of the keys returns
-the place of the loop where the program goes on, and the panel and the
-item of the menu where that place takes them; and the two where one
-part of the program called the other, which went with the two parts.
-Three of the 92 had less than two things to return and have no
-structure. Of the others, 19 are the commands of
-`src/portable_c/enter.c`, which return such a place as a number still,
-and 3 are numbers and stay (see `TODO.md`).
+error, `EdLin` the cursor and whether anything changed, a command of
+the keys the place of the loop where the program goes on, with the
+panel and the item of the menu where that place takes them. A call
+that still took such a number apart would not compile. Of the 114
+functions that returned one, 104 return a structure. Five had one
+thing to say, the same place of the loop from every return, which is
+the end of a command in the assembly, a jump: they return nothing. Two
+are gone. And three return a number that is one: `Timer` of
+`system.c`, the BIOS's count of timer ticks, the compiler's `__U4M`,
+and `Dos35` of `main.c`, an address as DOS has it.
 
 The lines that say something of registers still, and why:
 

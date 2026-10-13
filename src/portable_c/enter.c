@@ -17,7 +17,8 @@
  * here, it starts over.
  *
  * These are commands, as in keys.c: functions that get the panel which
- * the original has in DS and return where the program goes on.
+ * the original has in DS and return where the program goes on, struct
+ * Onward of vc.h. See To below.
  */
 #include "vc.h"
 
@@ -61,7 +62,19 @@ extern const u8 __far Name_S[];
 
 static const u8 CODE CDir_S[] = "\\";
 
-static u32 F23_02(u16 panel, u16 address);
+static struct Onward F23_02(u16 panel, u16 address);
+
+/* What a command returns, struct Onward of vc.h: the place where the
+   program goes on, a NEXT_ there. None of these places takes a panel. */
+static struct Onward To(u16 place)
+{
+    struct Onward next;
+
+    next.place = (u8)place;
+    next.item = 0;
+    next.panel = 0;
+    return next;
+}
 
 /* Cut the list of a panel down to what is kept of it while a command
    runs: F21_40.
@@ -124,7 +137,7 @@ static void F21_40(u16 panel)
    The original saves the setup, the command and the panels here, in the
    part of it that stays in the memory, and gives the main data back to
    DOS; what it reads from then on is the copy. */
-u32 F21_31(void)
+struct Onward F21_31(void)
 {
     struct DosRegs regs;
     struct BiosRegs bios;
@@ -143,7 +156,7 @@ u32 F21_31(void)
 
     if (md.DosBuf[0] == 0) {
         md.LoadFl = md.LoadRes;
-        return NEXT_INIT11;
+        return To(NEXT_INIT11);
     }
     bios.ax = 0x0E0D;
     bios.bx = COMNINI_WAS;
@@ -167,7 +180,7 @@ u32 F21_31(void)
     md.DosChg[1] = (u8)drive;
     md.DosChg[2] = ':';
     md.DosChg[3] = 0x0D;
-    return NEXT_EXEC;
+    return To(NEXT_EXEC);
 }
 
 /* Have what the command line holds run, DosBuf, which may be several
@@ -179,7 +192,7 @@ u32 F21_31(void)
    once kept in the memory whole if the setup has it otherwise, and the
    other way round. The portable C always stays whole, and Shift with
    Enter is Enter (see DEVIATIONS.md). */
-u32 F21_30(void)
+struct Onward F21_30(void)
 {
     md.LoadRes = md.LoadFl & 0x7F;
     return F21_31();
@@ -193,7 +206,7 @@ u32 F21_30(void)
    that is noted pushes the others back, and what then lies across the
    end of the history is cut off. The command is looked for in 256 bytes
    and gets a second zero byte behind it. */
-u32 F21_25(void)
+struct Onward F21_25(void)
 {
     u8 *line = md.DosBuf;
     u8 *history = md.HstBuf + 1;
@@ -246,7 +259,7 @@ u32 F21_25(void)
    the directory has for its kind, if it has one. The extension file is in
    the panel's segment; LenMenu bytes are taken from there, though it has
    LenExt. */
-u32 F21_10(u16 panel)
+struct Onward F21_10(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     const struct FILENT __far *file;
@@ -258,10 +271,10 @@ u32 F21_10(u16 panel)
 
     if (wcb->WinTyp == 1) {
         if (((struct DIRTREE *)md.TreeBuf)->TreeLen == 0)
-            return NEXT_FUNC04;
+            return To(NEXT_FUNC04);
         HidCur();
         if (Fantom((u8)(md.DosPth[0] - ('A' - 1))))
-            return NEXT_FUNC04;
+            return To(NEXT_FUNC04);
         regs.bx = regs.si = regs.di = 0;
         regs.name = md.CrnPath + 2;
         if (md.CrnPath[3] != 0) {
@@ -269,21 +282,22 @@ u32 F21_10(u16 panel)
             regs.ax = DOS_FIND_FIRST;
             regs.cx = 0x37;
             if (Intr21((struct DosRegs STACK *)&regs))
-                return NEXT_FUNC04;
+                return To(NEXT_FUNC04);
             if (!(md.DTA.FilAttr & ATTR_DIRECTORY))
-                return NEXT_FUNC04;
+                return To(NEXT_FUNC04);
             regs.name = md.CrnPath + 2;
         }
         regs.ax = DOS_CHDIR;
         if (Intr21((struct DosRegs STACK *)&regs))
-            return NEXT_FUNC04;
-        return F24_02(panel);
+            return To(NEXT_FUNC04);
+        F24_02(panel);
+        return To(NEXT_INIT50);
     }
     if (wcb->WinTyp != 0)
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     address = wcb->CurAdr;
     if (address >= wcb->EndBuf)
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     file = ENTRY(wcb, address);
     if (file->AttrF & ATTR_DIRECTORY)
         return F23_02(panel, address);
@@ -294,12 +308,12 @@ u32 F21_10(u16 panel)
         md.MenuBuf[LenMenu - 1] = 0x1A;
         command = FindExt(ENTRY(wcb, wcb->CurAdr)->NameF);
         if (command == 0)
-            return NEXT_FUNC04;
+            return To(NEXT_FUNC04);
         command--;
         *(u8 *)command = ' ';
         if (Run_00(command, 0))
             return F21_30();
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     }
     /* The name is typed into the command line, as far as that takes it. */
     file = ENTRY(wcb, wcb->CurAdr);
@@ -318,7 +332,7 @@ u32 F21_10(u16 panel)
 }
 
 /* Enter. */
-u32 F21_00(u16 panel)
+struct Onward F21_00(u16 panel)
 {
     if (md.DosBuf[0] == 0 && PANEL(panel)->Visible != 0)
         return F21_10(panel);
@@ -328,8 +342,12 @@ u32 F21_00(u16 panel)
 /* The panels after DOS has gone to another directory: F24_02. A panel of
    files is read again, and so is the other panel unless both show files:
    the Info is of the current directory. A tree that is not to be read
-   again has the directory looked for in it. */
-u32 F24_02(u16 panel)
+   again has the directory looked for in it.
+
+   The original goes on from here at Init50, which draws the panels and
+   reads those that have changed. That is for what calls this to say: a
+   command returns NEXT_INIT50. */
+void F24_02(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     u16 kind, find = 0;
@@ -342,14 +360,13 @@ u32 F24_02(u16 panel)
         find = 1;
     wcb = PANEL(InvWCB(panel));
     if ((kind | wcb->WinTyp) == 0)
-        return NEXT_INIT50;
+        return;
     if (wcb->WinTyp != 1)
         wcb->ChgFlg = 1;
     else if (wcb->ChgFlg == 0)
         find = 1;
     if (find)
         TrCr10();
-    return NEXT_INIT50;
 }
 
 /* Go into the directory at `address` in the list of a panel: F23_02. For
@@ -357,7 +374,7 @@ u32 F24_02(u16 panel)
    name of the directory that is left: the cursor is put on that name when
    the list has been read. The name is taken off the path of the panel
    with it, 12 bytes of it whatever its length. */
-static u32 F23_02(u16 panel, u16 address)
+static struct Onward F23_02(u16 panel, u16 address)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     struct FILENT __far *file = ENTRY(wcb, address);
@@ -367,12 +384,12 @@ static u32 F23_02(u16 panel, u16 address)
 
     HidCur();
     if (Fantom((u8)(wcb->WinPath[0] - ('A' - 1))))
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     regs.ax = DOS_CHDIR;
     regs.bx = regs.cx = regs.si = regs.di = 0;
     regs.name = file->NameF;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     if (file->NameF[0] == '.') {
         wcb->CurAdr = DSKBUF;
         wcb->First = DSKBUF + sizeof(struct FILENT);
@@ -388,44 +405,45 @@ static u32 F23_02(u16 panel, u16 address)
             name--;
         *name = 0;
     }
-    return F24_02(panel);
+    F24_02(panel);
+    return To(NEXT_INIT50);
 }
 
 /* ^PgUp: the directory above, if the list begins with it. */
-u32 F22_00(u16 panel)
+struct Onward F22_00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
 
     if (ENTRY(wcb, DSKBUF)->NameF[0] != '.')
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     if (!FilePan(panel))
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     if (DSKBUF >= wcb->EndBuf)
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     if (!(ENTRY(wcb, DSKBUF)->AttrF & ATTR_DIRECTORY))
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     return F23_02(panel, DSKBUF);
 }
 
 /* ^PgDn: the directory under the cursor. */
-u32 F23_00(u16 panel)
+struct Onward F23_00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     u16 address = wcb->CurAdr;
 
     if (!FilePan(panel))
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     if (address >= wcb->EndBuf)
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     if (!(ENTRY(wcb, address)->AttrF & ATTR_DIRECTORY))
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     return F23_02(panel, address);
 }
 
 /* Have DOS go to the directory `path`, and the panel show it from its
    start: F24_01, where the tree in its box comes in with the directory
    that was chosen, at TmpBuf. */
-static u32 ChDir(u16 panel, const u8 __far *path)
+static struct Onward ChDir(u16 panel, const u8 __far *path)
 {
     struct DosRegs regs;
 
@@ -433,29 +451,31 @@ static u32 ChDir(u16 panel, const u8 __far *path)
     regs.bx = regs.cx = regs.si = regs.di = 0;
     regs.name = path;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     PANEL(panel)->EndBuf = DSKBUF;
-    return F24_02(panel);
+    F24_02(panel);
+    return To(NEXT_INIT50);
 }
 
-u32 F24_01(u16 panel, u16 path)
+struct Onward F24_01(u16 panel, u16 path)
 {
     return ChDir(panel, (const u8 *)path);
 }
 
 /* ^\: the root of the current drive. */
-u32 F24_00(u16 panel)
+struct Onward F24_00(u16 panel)
 {
     HidCur();
     if (Fantom((u8)(md.DosPth[0] - ('A' - 1))))
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     return ChDir(panel, CDir_S);
 }
 
 /* Type a text into the command line, from the column `cursor` on, as far
    as the line takes it: F27_07. The name of a file, which is at TmpBuf,
-   gets a space behind it. */
-static u32 F27_07(const u8 *text, u16 cursor)
+   gets a space behind it. The original goes on from here at Func05, as
+   every command does that comes here. */
+static void F27_07(const u8 *text, u16 cursor)
 {
     const u8 *from = text;
     struct Edited edited;
@@ -476,23 +496,22 @@ static u32 F27_07(const u8 *text, u16 cursor)
     }
     md.DosCol = (u8)cursor;
     DosCom();
-    return NEXT_FUNC05;
 }
 
 /* Put the command of the history at `entry` into the command line, in
    place of what is there, and note where in the history that is:
    F27_06. */
-static u32 F27_06(const u8 *entry)
+static void F27_06(const u8 *entry)
 {
     md.HstAdr = (u16)entry;
     md.DosBuf[0] = 0;
     md.DosBuf[1] = 0;
-    return F27_07(entry, 0);
+    F27_07(entry, 0);
 }
 
 /* ^E, and Up with the panels off: the command before the one that the
    command line has from the history, if there is one. */
-u32 F25_00(void)
+struct Onward F25_00(void)
 {
     const u8 *entry = (const u8 *)md.HstAdr;
     u16 count = 256;
@@ -503,20 +522,23 @@ u32 F25_00(void)
     while (--count && c != 0);
     if (*entry == 0)
         entry = (const u8 *)md.HstAdr;
-    return F27_06(entry);
+    F27_06(entry);
+    return To(NEXT_FUNC05);
 }
 
 /* ^X, and Down with the panels off: the command after it, and after the
    last one run an empty line. */
-u32 F26_00(void)
+struct Onward F26_00(void)
 {
     u16 entry = md.HstAdr - 1;
     u16 count = 256;
     u8 c;
 
     if (entry >= (u16)md.HstBuf) {
-        if (entry == (u16)md.HstBuf)
-            return F27_06((const u8 *)entry);
+        if (entry == (u16)md.HstBuf) {
+            F27_06((const u8 *)entry);
+            return To(NEXT_FUNC05);
+        }
         entry--;
         do
             c = *(const u8 *)entry--;
@@ -524,7 +546,8 @@ u32 F26_00(void)
         entry++;
     }
     entry++;
-    return F27_06((const u8 *)entry);
+    F27_06((const u8 *)entry);
+    return To(NEXT_FUNC05);
 }
 
 /* ^Enter: the name of the file under the cursor into the command line,
@@ -533,7 +556,7 @@ u32 F26_00(void)
    left, for a command that begins with what the line holds, whatever
    capitals it has, and that command put there instead; and if none does
    and the cursor is at the start of the line, the name again. */
-u32 F27_00(u16 panel)
+struct Onward F27_00(u16 panel)
 {
     struct WCBdef __far *wcb = PANEL(panel);
     const struct FILENT __far *file;
@@ -561,8 +584,10 @@ u32 F27_00(u16 panel)
         line = md.DosBuf;
         for (;;) {
             c = *line++;
-            if (c == 0)
-                return F27_06(found);
+            if (c == 0) {
+                F27_06(found);
+                return To(NEXT_FUNC05);
+            }
             c = (u8)UpCase(c);
             other = (u8)UpCase(*entry++);
             if (other != c)
@@ -570,16 +595,17 @@ u32 F27_00(u16 panel)
         }
     }
     if (cursor != 0)
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
 F27_05:
     if (!FilePan(panel))
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     if (wcb->CurAdr >= wcb->EndBuf)
-        return NEXT_FUNC05;
+        return To(NEXT_FUNC05);
     file = ENTRY(wcb, wcb->CurAdr);
     for (i = 0; i < 13; i++)
         md.TmpBuf[i] = file->NameF[i];
-    return F27_07(md.TmpBuf, cursor);
+    F27_07(md.TmpBuf, cursor);
+    return To(NEXT_FUNC05);
 }
 
 /* F10: leave the program, once the dialog that asks about it has been
@@ -588,19 +614,19 @@ F27_05:
    The assembly has DS on the panel when it calls Dialog, which takes that
    for where the fields of a dialog have what they set. This one has only
    its two buttons, and those are kept in the main data whatever. */
-u32 F30_00(u16 panel)
+struct Onward F30_00(u16 panel)
 {
     if (md.QuitAck != 0
         && (u8)Dialog(OFFSET(Quit_B), OFFSET(Name_S), 0, 0, panel) != 0)
-        return NEXT_FUNC04;
-    return NEXT_EXIT;
+        return To(NEXT_FUNC04);
+    return To(NEXT_EXIT);
 }
 
 /* What the main loop does when the cursor of the tree has been on a
    directory for a while, with Auto change directory on: go there. */
-u32 F75_00(u16 panel)
+struct Onward F75_00(u16 panel)
 {
     if (PANEL(panel)->WinTyp != 1)
-        return NEXT_FUNC04;
+        return To(NEXT_FUNC04);
     return F21_10(panel);
 }

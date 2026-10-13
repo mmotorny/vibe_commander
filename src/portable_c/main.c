@@ -921,19 +921,6 @@ static u16 V00_03(u16 menu, u16 edit, u16 whole)
     return INIT50;
 }
 
-/* What a command of enter.c returns, as what CmdEnd takes, struct Onward
-   of vc.h: such a command returns the place alone, and as a number still
-   (see TODO.md). None of its places takes a panel. */
-static struct Onward OfEnter(u32 place)
-{
-    struct Onward next;
-
-    next.place = (u8)place;
-    next.item = 0;
-    next.panel = 0;
-    return next;
-}
-
 /* After a command of the menus, of commands.c: MnuEnd. */
 static u16 MnuEnd(u16 answer, struct Regs STACK *r)
 {
@@ -943,7 +930,7 @@ static u16 MnuEnd(u16 answer, struct Regs STACK *r)
     case MNU_INIT50:
         return INIT50;
     case MNU_F24_01:                    /* MnuF24 */
-        return CmdEnd(OfEnter(F24_01(r->ds, (u16)md.TmpBuf)), r);
+        return CmdEnd(F24_01(r->ds, (u16)md.TmpBuf), r);
     default:                            /* MnuV00, MNU_V00_01: the menu of
                                            the command is in CL */
         return V00_03(r->cx & 0xFF, 1, 1);
@@ -980,9 +967,9 @@ static u16 CmdEnd(struct Onward next, struct Regs STACK *r)
         F73_00(r->ax);
         return FUNC05;
     case NEXT_EARLIER:
-        return CmdEnd(OfEnter(F25_00()), r);
+        return CmdEnd(F25_00(), r);
     case NEXT_LATER:
-        return CmdEnd(OfEnter(F26_00()), r);
+        return CmdEnd(F26_00(), r);
     case NEXT_INIT40:
         return INIT40;
     case NEXT_INIT50:
@@ -1144,7 +1131,7 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_F68_00:                     /* the history: a command to run? */
         if (F68_00() == 0)
             return FUNC04;
-        return CmdEnd(OfEnter(F21_25()), r);
+        return CmdEnd(F21_25(), r);
 
     /* The keys of the panels, keys.c. The mouse has its buttons in BP. */
     case CMD_F00_60:
@@ -1180,24 +1167,24 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_F20_00: return CmdEnd(F20_00(panel), r);
 
     /* Enter, the directory changed and the history, enter.c. */
-    case CMD_F21_00: return CmdEnd(OfEnter(F21_00(panel)), r);
-    case CMD_F21_10: return CmdEnd(OfEnter(F21_10(panel)), r);
-    case CMD_F21_31: return CmdEnd(OfEnter(F21_31()), r);
-    case CMD_F22_00: return CmdEnd(OfEnter(F22_00(panel)), r);
-    case CMD_F23_00: return CmdEnd(OfEnter(F23_00(panel)), r);
-    case CMD_F24_00: return CmdEnd(OfEnter(F24_00(panel)), r);
-    case CMD_F25_00: return CmdEnd(OfEnter(F25_00()), r);
-    case CMD_F26_00: return CmdEnd(OfEnter(F26_00()), r);
-    case CMD_F27_00: return CmdEnd(OfEnter(F27_00(panel)), r);
-    case CMD_F30_00: return CmdEnd(OfEnter(F30_00(panel)), r);
-    case CMD_F75_00: return CmdEnd(OfEnter(F75_00(panel)), r);
+    case CMD_F21_00: return CmdEnd(F21_00(panel), r);
+    case CMD_F21_10: return CmdEnd(F21_10(panel), r);
+    case CMD_F21_31: return CmdEnd(F21_31(), r);
+    case CMD_F22_00: return CmdEnd(F22_00(panel), r);
+    case CMD_F23_00: return CmdEnd(F23_00(panel), r);
+    case CMD_F24_00: return CmdEnd(F24_00(panel), r);
+    case CMD_F25_00: return CmdEnd(F25_00(), r);
+    case CMD_F26_00: return CmdEnd(F26_00(), r);
+    case CMD_F27_00: return CmdEnd(F27_00(panel), r);
+    case CMD_F30_00: return CmdEnd(F30_00(panel), r);
+    case CMD_F75_00: return CmdEnd(F75_00(panel), r);
 
     /* The user menu, usermenu.c: a line with a command to run? */
     case CMD_F32_00:
     case CMD_F42_00:
         if (F32_00(command == CMD_F42_00) == 0)
             return FUNC04;              /* Run_0A */
-        return CmdEnd(OfEnter(F21_30()), r);
+        return CmdEnd(F21_30(), r);
 
     /* The viewer and the editor, view.c. */
     case CMD_F33_00: return CmdEnd(F33_00(panel), r);
@@ -1242,8 +1229,10 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
        another, and the panel that it hands back show it. */
     case CMD_F67_00:
         searched = F67_00();
-        if (searched.place == TO_F24_02)        /* F67_01 */
-            return CmdEnd(OfEnter(F24_02(searched.panel)), r);
+        if (searched.place == TO_F24_02) {      /* F67_01 */
+            F24_02(searched.panel);
+            return INIT50;
+        }
         return F1Next(searched.place);
 
     /* The commands of the menus, commands.c. Those of a panel's menu

@@ -1916,10 +1916,8 @@ static struct Onward F34_11(u16 how)
     if (named.file == 0) {
         command = named.at;
         *(u8 *)command = ' ';
-        /* F21_30 of enter.c returns the place alone, as a number,
-           still. */
         if (Run_00(command, 1))
-            return To((u16)F21_30());
+            return F21_30();
         return To(NEXT_FUNC04);
     }
     /* A program: is it there? */

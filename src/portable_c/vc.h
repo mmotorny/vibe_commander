@@ -731,8 +731,7 @@ enum {
 
 /* What a command of the keys of the panels returns: the place, and for
    the three places that are routines of a panel's menu what the routine
-   takes, which is 0 with any other place. The commands of enter.c return
-   the place alone, as a number, still: see TODO.md. */
+   takes, which is 0 with any other place. */
 struct Onward {
     u8  place;                          /* where the program goes on: a
                                            NEXT_ */
@@ -838,22 +837,24 @@ struct Onward F20_00(u16 panel);
 /* Enter, the directory changed and the history, enter.c. F21_10 is Enter
    on the entry under the cursor, F21_25 a command of the command line
    run, F21_31 the program started over to run what DosBuf holds; F24_01
-   goes to the directory whose path is at `path` in the main data, and
-   F24_02 has the current panel show the directory that DOS is in. */
-u32 F21_00(u16 panel);
-u32 F21_10(u16 panel);
-u32 F21_25(void);
-u32 F21_31(void);
-u32 F22_00(u16 panel);
-u32 F23_00(u16 panel);
-u32 F24_00(u16 panel);
-u32 F24_01(u16 panel, u16 path);
-u32 F24_02(u16 panel);
-u32 F25_00(void);
-u32 F26_00(void);
-u32 F27_00(u16 panel);
-u32 F30_00(u16 panel);
-u32 F75_00(u16 panel);
+   goes to the directory whose path is at `path` in the main data.
+   F24_02 has the panels show the directory that DOS is in when they
+   are drawn next, `panel` being the current one: it is no command, and
+   what calls it goes on at Init50, which draws them. */
+struct Onward F21_00(u16 panel);
+struct Onward F21_10(u16 panel);
+struct Onward F21_25(void);
+struct Onward F21_31(void);
+struct Onward F22_00(u16 panel);
+struct Onward F23_00(u16 panel);
+struct Onward F24_00(u16 panel);
+struct Onward F24_01(u16 panel, u16 path);
+void F24_02(u16 panel);
+struct Onward F25_00(void);
+struct Onward F26_00(void);
+struct Onward F27_00(u16 panel);
+struct Onward F30_00(u16 panel);
+struct Onward F75_00(u16 panel);
 
 /* The viewer and the editor, view.c and edit.c: the commands, and what
    they go on in. V00_02 opens the file ViewFil and says in `open` what it
@@ -1016,10 +1017,10 @@ u16 F62_01(u16 panel, u16 item);
 struct Picked F39_00(u16 again, u16 panel);
 
 /* Make the program ready for what the command line holds to be run: the
-   interrupts given back, the screen as DOS left it. Returns NEXT_EXEC,
-   or NEXT_INIT11 if there is nothing to run, for the command to return
-   in its turn. See enter.c. */
-u32 F21_30(void);
+   interrupts given back, the screen as DOS left it. Returns the place
+   NEXT_EXEC, or NEXT_INIT11 if there is nothing to run, for the command
+   to return in its turn. See enter.c. */
+struct Onward F21_30(void);
 /* The commands of a line of an extension file or a menu file, in
    MenuBuf: F34_30 looks for the next one from `text`, and F34_40 at
    whether the command at `text` is only the name of a file, a program
