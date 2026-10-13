@@ -226,6 +226,80 @@ whoever calls DOS, holds for the portable C as it is written there;
 the second item above now; and "How the part that stays in the memory
 is laid out by C".
 
+## The portable C: the system's functions
+
+What the program asks of the system it is to ask through
+`src/portable_c/sys.h` (the README, "The system in one place"), and
+`dos.c` alone is to know how DOS is asked. `system.c`, `window.c`,
+`mouse.c` and `input.c` do, with a few callers elsewhere that were moved
+to try what those four have not: files by an FCB, a search through a
+directory, a file written and its date set in `dirfunc.c`, a file read
+bare and the country in `start.c`, the Ins key in `keys.c`. That is 76
+of 348 calls. `CLAUDE.md`, "Moving a file to the system's functions",
+has how a file goes over, with the table from DOS's services to the
+functions and what to look out for.
+
+What is left, as `python3 tools/calls.py` counted it when those had gone
+over, 272 calls, in five pieces of about the same size that share no
+file. Whoever moves a file takes it out of the table:
+
+| Piece | Files, with the calls left in each | Calls |
+|---|---|---|
+| 1 | `copy.c` 60 | 60 |
+| 2 | `start.c` 31, `resident.c` 34, of which 11 stay | 65 |
+| 3 | `dirfunc.c` 15, `read.c` 10, `usermenu.c` 10, `treebox.c` 8, `drive.c` 5, `setup.c` 4 | 52 |
+| 4 | `view.c` 16, `find.c` 14, `edit.c` 11, `help.c` 3 | 44 |
+| 5 | `blank.c` 15, `main.c` 9, `enter.c` 7, `commands.c` 7, `keys.c` 3, `bars.c` 1, `menu.c` 1 | 43 |
+
+Then, when no file is left that calls them: `Intr21` and `Intr21f` of
+`system.c` with `DosTime` and `SelDrv`, and in `dos.c` `Int21f`,
+`Int10`, `Int16`, `Int33`, `MousAt` and `Int28`, with `struct BiosRegs`,
+go; `calls.py` shows when.
+
+What stays on the old calls, `Int21d` and `Int21e` with `struct
+DosRegs`, because it is of DOS alone and likely to go with the feature
+that it is for:
+
+- The map of the memory: `Dos5802`, `Dos5803`, `Dos52`, `Dos4452` and
+  `Dos2523` of `memory.c`, which are a call each already.
+- The watch on DOS in `resident.c`: `AddProg`, `Release`, `GetStat` and
+  `SetStat`, 10 calls, which ask for the PSP of whoever called DOS, for
+  DOS's lists, for how it looks for memory and for the memory of other
+  programs; and the PSP that `Alloc0` asks for. `TakeDos`, which reads
+  two vectors and sets one, has `Vector` and `SetVector` for that.
+
+What the header does not have yet, and why:
+
+- DOS's critical error and Ctrl-Break. The program takes the two
+  interrupts itself, by `Vector` and `SetVector` of `dos.c`, which are
+  of DOS alone and declared in `vc.h`, and DOS enters `FatErr` of
+  `main.c` and `CtrlC` of `resident.c`. They are to be something that
+  `dos.c` raises and the program answers: the two entries in `dos.c`,
+  with one function of the program called for a device that fails,
+  which is told the drive or the device, what is wrong and whether DOS
+  lets it try again, and answers whether to; and functions of `sys.h`
+  by which the program takes the two and gives them back. `ErrDat` is
+  then `dos.c`'s own, between its entry and the functions that are
+  asked with the program's errors, and `BlocEr` stays the program's.
+  What has to be kept: the order in which DOS is asked, which is both
+  vectors read and then both set in `HookVct`; that the watch names
+  `CtrlC` too; and that `HookVct` hands back the offset of `CtrlC`,
+  which the start of the program has in AX at its next call of the
+  BIOS.
+- The start of the program on DOS, `Alloc0` of `resident.c`: the PSP
+  and the block of the program made its own size. It is of DOS alone
+  and will be `dos.c`'s.
+- `Scroll` of `window.c`, the original's `Int10m`, is the one routine of
+  the program that was the BIOS called with any registers; it takes
+  what it means now, and its seven callers were changed with it.
+
+How much it costs: `dos.c` is 2.6 KB longer for the 80 functions, and
+the callers that went over are 0.8 KB shorter. By that measure the
+calls that are left give back some 2 KB when they go, and the old
+functions another 0.3 KB, so the program ends about where it began.
+Until then it is nearer to three times the original's size, where the
+scenarios' test fails: the README's figures say how near.
+
 ## The last of the assembly
 
 Done: the C translation has no assembly file, and its build runs no

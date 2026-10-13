@@ -802,6 +802,78 @@ original's.
 | 4 | The call of INT 2Fh with AX 1680h in `LeaveTm` | Giving the rest of the program's turn to Windows, or to whatever else ran programs of DOS as guests. The call of INT 28h, DOS's own word that the program is idle, stays |
 | 5 | The test of the display in `IniData`, the waiting in `Window` and `MovScr` of `window.c`, `InPort` of `dos.c` and the intrinsic function `inp` | Writing to the memory of a CGA only while it does not draw, which otherwise shows as snow. Snow mode stays a byte of the setup, kept as it is found |
 
+### The system in one place
+
+What the program asks of the system that it runs on, it is to ask in one
+place, and the rest of it is not to know which system that is. The C
+translation has one place for the instruction only: every file that
+wants something of DOS fills a structure of registers, with the number
+of the service among them, and hands it to `Intr21` or `Int21d`, and so
+for the BIOS: 348 calls in 25 files when this began, each of which knows
+DOS.
+
+In the portable C that place is `src/portable_c/sys.h`: 80 functions
+named for what is asked, with no register, no number of a service and no
+interrupt in them, and no word of Open Watcom: the test `portable_c-host`
+has the file clean. `dos.c` is those functions for
+DOS on a PC, and the one file that is to know how DOS is asked. The same
+functions for another system will be another file beside it.
+
+| What | Functions |
+|---|---|
+| Files: made, opened, closed, read, written, a place in one, deleted, renamed, their attributes and their date and time, what a handle is, a full path | 17 |
+| Files by a file control block: a mask deleted at one call, a label | 2 |
+| Directories: what is in one, made, removed, the current one | 8 |
+| Drives: the current one, the room of one, a drive that shares its unit, a network, a disk that stays in, a CD-ROM | 8 |
+| Memory: a block taken, given back, made another size | 3 |
+| The time, the country and its capitals, the version, Ctrl-C, idling | 8 |
+| Other programs: one run, and this one ended | 3 |
+| The console: a character and a text where the cursor is | 2 |
+| The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
+| The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, the font of an EGA, where the cells are and the cells themselves | 16 |
+| The mouse: whether there is one, its pointer shown, placed and shaped, where it is | 8 |
+| The timer | 1 |
+
+What they take and answer with is still as DOS and the BIOS have it: a
+drive by its letter, a path with backslashes, DOS's attributes, dates,
+times and numbers of errors, a key with its scan code, a cell with its
+colour, memory by the segment. The program has those shapes everywhere
+and the screens show them; another system has to answer in them.
+
+One function is one thing asked. Where the program asks several things
+in a row, the row is still in the program, in the original's order,
+since what DOS is asked and in which order is behaviour that the
+scenarios see. Three things of the original's are in the functions by
+name, where they were in what a register happened to hold:
+
+- How a call is asked. The original calls DOS through its routine
+  `Intr21` where a drive may not be ready, which lets the program's box
+  for that come up, makes the error 53h of a call that the user gave up
+  there, and asks DOS for its extended error behind a call that failed;
+  and it calls DOS itself where it does none of that. The functions of
+  files, directories and drives are of the first kind, and the five
+  that the original also calls the second way are functions of their
+  own, with Bare in their names.
+- The carry flag before a call. DOS leaves it as it finds it at two of
+  its calls, and `Intr21` takes a flag that is set for an error: the two
+  functions take the flag as an argument, `flagged`.
+- What a call leaves. Every answer has what DOS left in AX, also where
+  nothing failed, since some callers go on with that; what else a call
+  answers in is a member with a name.
+
+Not in the header is what only DOS has: where an interrupt goes, which
+the program takes for DOS's critical error, for Ctrl-Break and for its
+watch on DOS; the map of the memory; and what belongs to that watch.
+Those call DOS as before.
+
+`system.c`, `window.c`, `mouse.c` and `input.c` ask the system through
+the header so far, with some callers in other files, 76 of the 348
+calls. The rest still hand registers to an interrupt, and `dos.c` keeps
+the functions for that until they have gone over: `TODO.md` has them by
+file, and `CLAUDE.md`, "Moving a file to the system's functions", how a
+file goes over. `python3 tools/calls.py` counts what is left, and [the
+figures](#the-figures) have the sum.
+
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.

@@ -1619,6 +1619,267 @@ in "The portable C".
   What else that test counts is in its own table in `TODO.md`, which
   its `--record` flow goes with, and is not copied.
 
+### Moving a file to the system's functions
+
+What the program asks of the system is to be asked through
+`src/portable_c/sys.h`, functions named for what is asked, with
+`dos.c` as their one file for DOS: read the top of `sys.h` before
+anything else. `system.c`, `window.c`, `mouse.c` and `input.c` went
+first, with a few callers elsewhere for what those four do not have.
+The other files still fill a `struct DosRegs` or a `struct BiosRegs`
+and hand it to an interrupt, `Intr21`, `Int21d`, `Int10`, and these
+notes are for whoever moves one of them. `python3 tools/calls.py`
+lists what is left, by file.
+
+For one function, in this order:
+
+1. Find every call in it, and for each the service: the value last put
+   in AX. The table below has the function for it.
+2. For each call, read on from it to where each register is next
+   written, and note every register that is read on the way, the
+   function's own arguments to the next call included. That is what the
+   call has to hand back, or what the next call has to be handed.
+3. Write the calls, each with a variable for what it answers; `regs`
+   goes when its last call has. Then read every line that still named
+   `regs`.
+4. Build, and run the tests: `portable_c-data` first, then
+   `portable_c-scenarios`. No golden changes.
+
+The calls of DOS, by the value in AH or AX. "Asked" is a call through
+`Intr21` or the `CALL` of `copy.c`, "bare" one through `Int21d` or
+`Int21e`: the function has to be of the same kind, and where a service
+is called both ways the bare function says so in its name.
+
+| AH, AX | was | is |
+|---|---|---|
+| 06h, 09h | bare | `ConsoleChar(character)`, `ConsoleText(text)` |
+| 0Eh | bare, `SelDrv` | `DriveSelect(drive)` |
+| 13h | `Intr21f` | `FcbDelete(fcb, flagged)` |
+| 19h | bare | `DriveCurrent()`, which is the low byte already |
+| 1Ah | `SetDTA` | stays `SetDTA()`, which is `FindRecord(&md.DTA)` |
+| 29h | bare | `FcbParse(name, fcb, how)` |
+| 2Ch | `DosTime` | `TimeOfDay()` |
+| 30h, 3306h | bare | `SystemVersion()`, `SystemTrueVersion()` |
+| 3300h, 3301h | bare | `BreakCheck()`, `SetBreakCheck(on)` |
+| 36h | `Intr21`, `Intr21f` | `DriveSpace(drive, flagged)` |
+| 38h | bare | `CountryInfo(to)` |
+| 39h, 3Ah, 3Bh | asked | `DirMake(name)`, `DirRemove(name)`, `DirChange(name)` |
+| 3Ch | asked | `FileCreate(name, attributes)` |
+| 3Dh | asked, bare | `FileOpen(name, mode)`, `FileOpenBare`; `OpenFil` stays what it is |
+| 3Eh | asked, bare | `FileClose(handle)`, `FileCloseBare` |
+| 3Fh | asked, bare | `FileRead(handle, to, count)`, `FileReadBare` |
+| 40h | asked | `FileWrite(handle, from, count)` |
+| 41h | asked | `FileDelete(name)` |
+| 4200h to 4202h | asked | `FileSeek(handle, from, offset)`, with `from` 0 to 2 |
+| 4300h, 4301h | asked | `FileAttributes(name)`, `FileSetAttributes(name, attributes)` |
+| 4400h | asked | `FileDevice(handle)` |
+| 4408h, 4409h | bare | `DriveFixed(drive)`, `DriveRemote(drive)` |
+| 440Eh, 440Fh | bare | `DriveLetter(drive)`, `DriveSetLetter(drive)` |
+| 47h | asked, bare | `DirCurrent(drive, to)`, `DirCurrentBare` |
+| 48h, 49h, 4Ah | bare | `MemTake(paragraphs)`, `MemGive(block)`, `MemResize(block, paragraphs)` |
+| 4B00h | asked, bare | `ProgramRun(name, block)`, `ProgramRunBare` |
+| 4Ch | bare | `ProgramEnd(code)` |
+| 4Eh, 4Fh | asked | `FindFirst(pattern, attributes)`, `FindNext()` |
+| 56h | asked | `FileRename(from, to)` |
+| 5700h, 5701h | asked | `FileTime(handle)`, `FileSetTime(handle, time, date)` |
+| 60h | asked | `FileTrueName(name, to)` |
+| 25h, 35h | bare | `SetVector(number, to)`, `Vector(number)`, of `vc.h` and not of `sys.h` |
+
+The BIOS for the screen, `Int10`, by AH: 0Fh is `ScreenState()`, 0
+`ScreenSetMode(mode)`, 1 `CursorShape(shape)`, 2 `CursorTo(page,
+place)`, 3 `CursorWhere(page)`, 6 and 7 `ScreenScroll(down, lines,
+color, upper, lower)`, 8 `ScreenCell(page)`, 9 `ScreenFill(page,
+character, color, count)`, 0Eh `ScreenType(character, page, color)`, 12h
+with 10h in BL `ScreenEga()`, 1130h `ScreenFont()`, 1112h
+`ScreenSmallFont()`. For the keyboard, `Int16`: 0 is `KeyRead()`, 100h
+`KeyWaiting()`, 200h `KeysHeld()`, which is the low byte already. The
+mouse is done. `Int2F` with 150Bh is `DriveCd(drive)`, `Int28` is
+`Idle()`. `Timer`, `Beep`, `SetDTA`, `OpenFil` and the others of
+`system.c` and `window.c` are the program's routines as before, and
+are called as before; `Int10m`, which scrolled a window by a line with
+the mouse hidden, is `Scroll` there.
+
+What is not in the table stays as it is, on `Int21d` and `Int21e`, and
+`struct DosRegs` stays in `vc.h` for it: what is of DOS alone and is
+likely to go, the map of the memory (`memory.c`, its `Dos5802` to
+`Dos2523`) and the watch on DOS in `resident.c` (`AddProg`, `Release`,
+`GetStat`, `SetStat`, the PSP in `Alloc0`), with the calls 51h, 52h,
+58h, 62h and 4452h, and 49h and 4Ah where the watch asks them for the
+memory of another program. So does the BIOS's 12h with 20h in BL, by
+which the program has the BIOS print a screen of more lines than 25:
+it is of the PC alone, as TopView, DESQview and the wait for snow
+were, which are gone.
+
+What a call hands back, and where the traps are:
+
+- AX is `value`, also where the call did not fail: `DirFunc` hands the
+  high byte of it on with a file's attributes, `F38_40` reports it,
+  `DelTr0` returns it. Whether DOS set the carry flag is `failed`. A
+  line that read `regs.ax` behind `if (Intr21(...))` reads `.value` of
+  the same answer.
+- A register that a call answers in is a member with a name: the
+  attributes, the time and the date, what a handle is, the clusters.
+  If the call failed, the member is what `dos.c` put in the register,
+  0. The original went on with what its caller had there, since DOS
+  leaves a register alone that it has nothing to say in. Where a line
+  reads such a register without having looked at the flag, write down
+  what was in it: `M30_50` of `dirfunc.c` does, for the time and the
+  date of a file that DOS would not tell.
+- A register that a call does not answer in holds after it what it
+  held before, also behind an error that `Intr21` asked DOS about. So
+  what was read out of `regs` three calls later is a variable of the
+  caller's now, and the call in between does not touch it: CX from
+  4300h to 4301h is `attributes`, BX is the handle.
+- AL of a service that takes nothing there was whatever the call
+  before left, `0x3E00 | regs.ax & 0xFF`, and DS of one that takes no
+  address was the main data's or the segment of a buffer. The functions
+  pass 0 and the main data. The one such byte that anything reads is
+  AL of 4Eh, which DOS's APPEND goes by where it is installed: the
+  original has there what was left in three places, `0x4E00 | drive`
+  and `0x4E5C` in `read.c` and `regs.ax |= 2` in `treebox.c`, and 0 in
+  the others. The same holds for what the BIOS is not asked in: AL of
+  the calls 1 to 3 and 0Fh, BL of those that take a page.
+- What the BIOS is asked in comes by name. The page that is shown goes
+  from `ScreenState` to the calls that take one, where the assembly
+  kept BH from the call before. `ScreenType` takes the page and the
+  colour that the BIOS is handed, and a caller that handed it what a
+  register happened to hold, as Enter does with `COMNINI_WAS`, hands
+  it the two bytes of that.
+- The carry flag as it was before the call: `FcbDelete` and
+  `DriveSpace` take it as `flagged`, since DOS leaves it alone at
+  those two and `Intr21` takes a set flag for an error. `F38_70` has it
+  from comparing two characters, `C20_00` of `copy.c` from a
+  subtraction.
+- A call that took something at ES takes a pointer: the new name of
+  `FileRename`, where `FileTrueName` writes, the block of `ProgramRun`,
+  the block of the memory of `MemGive` and `MemResize`. A near pointer
+  of the main data goes in as it is.
+- `DirCurrent` takes where the path goes as one pointer, where the
+  call had the segment with DX and the offset in SI: `regs.name = wcb +
+  drive` with `regs.si` on `WinPath + 3` is `DirCurrent(drive,
+  wcb->WinPath + 3)`.
+- `FileSeek` hands back the place as one number of 32 bits, and with
+  an error the two words that DOS left: a caller that held AX and DX
+  against the place it asked for, without the flag, compares `place`.
+- A loop that began with 4E00h in AX and went on with 4F00h has a
+  variable for the first time round: `FncMs1` of `dirfunc.c`.
+- A helper that took the caller's `regs` to go on with its registers,
+  `SetDate` of `copy.c`, `GetVol0` of `read.c`, `CurNl` of `start.c`,
+  takes what it reads of them, by name.
+- `BlocEr` is the program's as before. `ErrDat` is cleared by every
+  function that is asked with the program's errors, as `Intr21` cleared
+  it, and by no bare one.
+- The test of the data knows a constant that is handed to a function
+  of `sys.h` which takes a name, and to `FileWrite`: `NAMED` of
+  `harness/reads.py`. A function added to `sys.h` that reads a name
+  goes there.
+- A variable that is left without a use, and a static function, stops
+  the build; a macro does not, `DX_OF`, `NUMBER`, `DOS_CHDIR`: take
+  those out by hand.
+- A structure of more than four bytes comes back through a pointer to
+  room in the caller's frame. Where one member is wanted,
+  `CursorWhere(0).shape` costs no variable.
+
+Three callers, before and after, the casts of `&regs` left out.
+`OpenFil` of `system.c`, where the second call took its mode from what
+the first had left in BX:
+
+```c
+regs.ax = 0x3D00 | mode & 0xFF;
+regs.bx = regs.ax;
+regs.name = name;
+failed = Intr21(&regs);
+if (failed != 0 && regs.ax == 0x20) {
+    regs.ax = regs.bx & 0xFF0F;
+    failed = Intr21(&regs);
+}
+opened.value = regs.ax;
+opened.failed = failed;
+```
+
+```c
+opened = FileOpen(name, mode);
+if (opened.failed != 0 && opened.value == ERR_SHARED)
+    opened = FileOpen(name, mode & 0x0F);
+```
+
+`Cursor` of `window.c`, where the page went from one call of the BIOS
+to the next in BH, and AL with it, which the second call does not
+read:
+
+```c
+regs.ax = 0x0F00 | place & 0xFF;
+regs.bx = 0;
+regs.cx = 0;
+regs.dx = place;
+Int10(&regs);
+regs.ax = 0x0200 | regs.ax & 0xFF;
+Int10(&regs);
+```
+
+```c
+CursorTo(ScreenState().page, place);
+```
+
+`M30_50` of `dirfunc.c`, where the original does not look whether DOS
+told the time, and sets what CX and DX hold:
+
+```c
+regs.bx = opened.value;
+regs.ax = 0x5700;
+Intr21(&regs);
+if (AttrDat != 0xFFFF)
+    DX_OF(regs) = AttrDat;
+if (AttrTim != 0xFFFF)
+    regs.cx = AttrTim;
+regs.ax = 0x5701;
+Intr21(&regs);
+```
+
+```c
+stamp = FileTime(opened.value);
+if (stamp.failed) {
+    /* The assembly goes on with CX and DX as they are, which DOS
+       has not set then: the attributes that it has just set, and
+       the address of the name. */
+    stamp.time = old & 0xFFFE;
+    stamp.date = (u16)md.TmpBuf;
+}
+if (AttrDat != 0xFFFF)
+    stamp.date = AttrDat;
+if (AttrTim != 0xFFFF)
+    stamp.time = AttrTim;
+FileSetTime(opened.value, stamp.time, stamp.date);
+```
+
+What making the first files so met:
+
+- A function of `dos.c` that goes by something which another call has
+  to have set fails where the other call is still the old one:
+  `CaseMap` goes by what `CountryInfo` notes, and the program ended in
+  "Invalid Opcode" at its first capital until `start.c` asked for the
+  country through `CountryInfo`. Nothing else of `sys.h` is like that
+  but `ScreenPut` and `ScreenGet`, which go by what `ScreenMemory` has
+  noted: `ScrOffs` of `window.c` calls that, which `IniData` calls.
+- `dos.c` grew by 2.6 KB for the functions, of which each is some 15 to
+  70 bytes, and a caller is shorter for every call that it moves: the
+  four files and the callers beside them gave back 0.8 KB for 76
+  calls.
+- A file that goes over makes fewer pointers of numbers, and the test
+  `portable_c-host` fails for a count that has changed, fewer as well
+  as more: write its record anew, `python3 harness/hostcheck.py
+  --record`, in every commit that moves calls, and look at what the
+  record's diff says. The README's table of figures has how many calls
+  are left: `python3 tools/figures.py --write`, after the build, in the
+  last commit of a piece of work.
+- A removal that lands beside this work takes out what a function
+  here had wrapped or moved, and the rebase then stops in the same
+  lines: the removal stands, and the function takes its simpler form.
+  `Window` and `MovScr` lost their waits for a CGA that way, and are a
+  call of `ScreenPut` or `ScreenGet` each.
+- The functions that nobody calls yet need nothing to keep them: a
+  function that is not static is in the program whoever calls it.
+
 ## Work by several agents
 
 Work that can be divided is done by several agents at a time, without
