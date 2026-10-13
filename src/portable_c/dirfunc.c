@@ -112,22 +112,6 @@ extern const u8 __far DelFs_S[];        /* "s" */
 extern const u8 __far Empty_S[];        /* nothing */
 extern const u8 __far NoFnd_S[];        /* "Can't find the file" */
 extern const u8 __far NoAtr_S[];        /* "Can't set attributes" */
-#pragma aux DelFl_P "*"
-#pragma aux DelDr_P "*"
-#pragma aux DelCo_B "*"
-#pragma aux RdOnl_B "*"
-#pragma aux NoEmp_B "*"
-#pragma aux DelEr_B "*"
-#pragma aux CntDi_B "*"
-#pragma aux StAtr_P "*"
-#pragma aux AtrEr_B "*"
-#pragma aux NoDat_B "*"
-#pragma aux PthEr_B "*"
-#pragma aux Del_S "*"
-#pragma aux DelFs_S "*"
-#pragma aux Empty_S "*"
-#pragma aux NoFnd_S "*"
-#pragma aux NoAtr_S "*"
 /* Those of the commands. DlWr4_S is copied with what follows it there,
    81 bytes in all. */
 extern const u8 __far MkDi1_B[];        /* "Create the directory", a path */
@@ -149,25 +133,6 @@ extern const u8 __far Label_B[];        /* "Change volume label ... to" */
 extern const u8 __far DelVo_B[];        /* "Do you wish to delete" it */
 extern const u8 __far ErVol_B[];        /* "Could not set" it */
 extern const u8 __far NoFnc_B[];        /* "Can't find file" */
-#pragma aux MkDi1_B "*"
-#pragma aux MkDi2_B "*"
-#pragma aux MkErr_B "*"
-#pragma aux CrDir_S "*"
-#pragma aux MkDir_S "*"
-#pragma aux DelDi_B "*"
-#pragma aux Subdi_S "*"
-#pragma aux DelFi_B "*"
-#pragma aux DelSe_B "*"
-#pragma aux DlMas_B "*"
-#pragma aux DlWrn_B "*"
-#pragma aux DlWr4_S "*"
-#pragma aux StAt1_B "*"
-#pragma aux StAt2_B "*"
-#pragma aux Attr8_S "*"
-#pragma aux Label_B "*"
-#pragma aux DelVo_B "*"
-#pragma aux ErVol_B "*"
-#pragma aux NoFnc_B "*"
 
 /* What FncAddr can name, by the numbers of vc.h: a routine that is called
    with the attributes of a file in AL and answers in AX. The original
@@ -189,8 +154,6 @@ static FncFn * const CODE Fnc_T[] = {
    it there, of which DirFunc copies a byte; Tree_F is \TREEINFO.NCD. */
 extern const u8 __far Mask_S[];
 extern const u8 __far Tree_F[];
-#pragma aux Mask_S "*"
-#pragma aux Tree_F "*"
 
 #define LenCmd 124                      /* Length of command line */
 

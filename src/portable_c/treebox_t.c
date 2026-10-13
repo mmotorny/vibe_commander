@@ -7,13 +7,8 @@
  */
 #include "tables.h"
 
-/* What others name has the name that it has in the assembly: the code of
-   src/c/treebox.c, src/c/dirfunc.c and src/c/panel.c, and the boxes of
-   other files. Tree_S has its by src/c/tables.h, which gives it a near
-   name for a file of constants, and no line here. */
-#pragma aux Tree_F "*"
-#pragma aux Tree_P "*"
-#pragma aux TrSav_P "*"
+/* What is not static here, others name: the code of treebox.c, dirfunc.c
+   and panel.c, and the boxes of other files. */
 
 const u8 Tree_S[] = " Tree ";
 const u8 Tree_F[] = "\\TREEINFO.NCD";

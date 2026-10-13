@@ -77,7 +77,6 @@ u16 *Shadow(u16 *cell);                                 /* screen.c */
    there. The text of the bar, the names of its menus, is of
    src/c/bars_t.c. */
 extern const u8 __far PtMnu_S[];
-#pragma aux PtMnu_S "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 

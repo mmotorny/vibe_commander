@@ -14,30 +14,14 @@
  */
 #include "tables.h"
 
-/* What others name, src/c/commands.c and for Menu_T src/c/main.c, has the
-   name that it has in the assembly. */
-#pragma aux Menu_T "*"
-#pragma aux Filt_B "*"
-#pragma aux DiSiz_P "*"
-#pragma aux CmpDi_B "*"
-#pragma aux Conf_B "*"
-#pragma aux Chk1_S "*"
-#pragma aux Sets_B "*"
-#pragma aux Chk2_S "*"
-#pragma aux MnLoc_B "*"
-#pragma aux ExFl_S "*"
-#pragma aux UsMnu_S "*"
-#pragma aux ExtFl_S "*"
-#pragma aux SvSt_B "*"
-#pragma aux SetEr_B "*"
+/* What is not static here, others name: commands.c, and for Menu_T
+   main.c. */
 
 /* Of other files: the text of the button Ok, and the button. tables.h
    has two more, Var_S, a line that is all one text put in, and Tree_S,
    the title of the tree. */
 extern const u8 Ok_S[];
 extern const u8 OkMn_D[];
-#pragma aux Ok_S "*"
-#pragma aux OkMn_D "*"
 
 /* The buttons, which stand behind the dialogs that name them: of each
    its width and its column, up to a width of 0. */

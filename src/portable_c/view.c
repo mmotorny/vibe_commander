@@ -132,14 +132,6 @@ extern const u8 __far FndEr_B[];        /* "Can't find the file" */
 extern const u8 __far Srch_B[];         /* "Search for the string" */
 extern const u8 __far SrFor_P[];        /* "Searching for" */
 extern const u8 __far SrEr_B[];         /* "Could not find the string" */
-#pragma aux ViFl_S "*"
-#pragma aux EdFl_S "*"
-#pragma aux Col_S "*"
-#pragma aux RdFil_P "*"
-#pragma aux FndEr_B "*"
-#pragma aux Srch_B "*"
-#pragma aux SrFor_P "*"
-#pragma aux SrEr_B "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 #define AT(segment, offset) ((u8 __far *)((u32)(segment) << 16 | (offset)))
@@ -1598,17 +1590,6 @@ extern const u8 __far RunEr_S[];        /* "Not enough memory to load" */
 extern const u8 __far Run1_S[];         /* "Can't run commands for some
                                            reason." */
 extern const u8 __far Run2_S[];         /* "Try rebooting." */
-#pragma aux ViewE_F "*"
-#pragma aux EditE_F "*"
-#pragma aux Menu_F "*"
-#pragma aux DrIn_F "*"
-#pragma aux ViFil_B "*"
-#pragma aux Viewr_P "*"
-#pragma aux Editr_P "*"
-#pragma aux RunEr_B "*"
-#pragma aux RunEr_S "*"
-#pragma aux Run1_S "*"
-#pragma aux Run2_S "*"
 
 #define MinView 8000                    /* Minimum view buffer size */
 

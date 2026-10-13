@@ -90,11 +90,6 @@ extern const u8 __far User_S[];         /* " User Menu " */
 extern const u8 __far UsrEr_B[];        /* "Could not find the menu file" */
 extern const u8 __far List_F[];         /* "vc.lst" */
 extern const u8 __far Mask_S[];         /* "\*.*" */
-#pragma aux Menu_F "*"
-#pragma aux User_S "*"
-#pragma aux UsrEr_B "*"
-#pragma aux List_F "*"
-#pragma aux Mask_S "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 

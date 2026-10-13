@@ -6,20 +6,7 @@
  */
 #include "tables.h"
 
-/* What others name, src/c/edit.c here, has the name that it has in the
-   assembly. */
-#pragma aux Line_S "*"
-#pragma aux FrBuf_S "*"
-#pragma aux EdtH_S "*"
-#pragma aux EdtH1_S "*"
-#pragma aux EdtH2_S "*"
-#pragma aux EdtH_P "*"
-#pragma aux SavFi_P "*"
-#pragma aux SavAs_B "*"
-#pragma aux SavCn_B "*"
-#pragma aux BigFi_B "*"
-#pragma aux NewFi_B "*"
-#pragma aux SavEr_B "*"
+/* What is not static here, edit.c names. */
 
 /* Of other files: the title " Edit "; the empty line that an input is
    typed in; "Can't find the file"; and the text of the button Ok with
@@ -30,11 +17,6 @@ extern const u8 Empty_S[];
 extern const u8 NoFnd_S[];
 extern const u8 Ok_S[];
 extern const u8 OkMn_D[];
-#pragma aux EdFl_S "*"
-#pragma aux Empty_S "*"
-#pragma aux NoFnd_S "*"
-#pragma aux Ok_S "*"
-#pragma aux OkMn_D "*"
 
 /* The buttons, which stand behind the dialogs that name them. */
 static const u8 SavCn_D[7];

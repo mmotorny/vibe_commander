@@ -567,8 +567,26 @@ they are entered with DS anywhere and load it themselves. An interrupt
 function has no such line, since the compiler saves every register for
 it. Seven more lines say that a function does not return, `aborts`,
 one of them with its name.
-The functions of `src/portable_c/dos.c` keep a `#pragma aux` for their
-names alone, since that file is compiled twice, once into each part.
+
+The names are the compiler's as well. In the C translation a constant
+that another file names has a `#pragma aux` wherever it is defined or
+declared, which takes off the underscore that the compiler puts in
+front: the assembly named it so. `harness/datacheck.py` knows an object
+with the underscore or without, so in the portable C those lines are
+gone too, 361 of them, and with them the three by which a file of
+constants had a second, near name for a text that code names far:
+`src/portable_c/vc.h` declares those texts near in such a file and far
+in any other. What still has its name from a `#pragma aux`:
+
+| What | Why | How many |
+|---|---|---|
+| The functions of `src/portable_c/dos.c` | The file is compiled twice, once into each part of the program, and two copies of a function need two names | 16 |
+| What the part that stays in the memory defines, and `TrnBeg`, where the other part begins | `tools/mkexe.c`, the linker's command and the tests find them in the linker's map by these names, and the other part declares those that it reads | 38, for 27 names |
+| `md`, the main data | It is named as the room of the PSP, which the linker has at offset 0 | 1 |
+| `TrnMain`, as the part that stays names it for its address | An object there, a function where it is defined | 1 |
+
+That leaves 83 lines of `#pragma aux` in the portable C where the C
+translation has 863.
 
 ## Testing
 

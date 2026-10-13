@@ -7,25 +7,8 @@
  */
 #include "tables.h"
 
-/* What others name, C code and the boxes of other files, has the name
-   that it has in the assembly. */
-#pragma aux ViewE_F "*"
-#pragma aux EditE_F "*"
-#pragma aux Col_S "*"
-#pragma aux ViFl_S "*"
-#pragma aux EdFl_S "*"
-#pragma aux RunEr_S "*"
-#pragma aux Run1_S "*"
-#pragma aux Run2_S "*"
-#pragma aux RunEr_B "*"
-#pragma aux ViFil_B "*"
-#pragma aux Viewr_P "*"
-#pragma aux Editr_P "*"
-#pragma aux RdFil_P "*"
-#pragma aux Srch_B "*"
-#pragma aux SrFor_P "*"
-#pragma aux FndEr_B "*"
-#pragma aux SrEr_B "*"
+/* What is not static here, others name: the code, and the boxes of other
+   files. */
 
 /* Of other files: the title " Error "; ^I, a line that the caller gives,
    the title as a rule; ^V in quotation marks, a line of the text that
@@ -39,13 +22,6 @@ extern const u8 Kov_S[];
 extern const u8 NoFnd_S[];
 extern const u8 Ok_S[];
 extern const u8 OkMn_D[];
-#pragma aux Err_S "*"
-#pragma aux Inc_S "*"
-#pragma aux Empty_S "*"
-#pragma aux Kov_S "*"
-#pragma aux NoFnd_S "*"
-#pragma aux Ok_S "*"
-#pragma aux OkMn_D "*"
 
 /* The names of the extension files of the viewer and of the editor. The
    commands copy 13 bytes of a name, which has 11: the name and the two

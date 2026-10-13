@@ -47,8 +47,6 @@ u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
    panels while a command runs: of struct Stays there. */
 extern const u8 __far Quit_B[];
 extern const u8 __far Name_S[];
-#pragma aux Quit_B "*"
-#pragma aux Name_S "*"
 #define ComnIni STAYS(ComnIni)
 #define WCB1sav STAYS(WCB1sav)
 #define WCB2sav STAYS(WCB2sav)

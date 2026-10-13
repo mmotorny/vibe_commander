@@ -6,10 +6,7 @@
  */
 #include "tables.h"
 
-/* What others name, src/c/memory.c here, has the name that it has in the
-   assembly. */
-#pragma aux Memo1_P "*"
-#pragma aux Memo_D "*"
+/* What is not static here, memory.c names. */
 
 /* The colours of the buttons, and the buttons: of each its width and its
    column, up to a width of 0. */

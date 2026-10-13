@@ -106,7 +106,6 @@ static const u8 CODE Key_S[34][6] = {
    spaces to the end of the row. It is a constant of src/c/bars_t.c, which
    the menu reads too. */
 extern const u8 __far PtMnu_S[];
-#pragma aux PtMnu_S "*"
 /* Its colour, as NgLine takes the colours of a line. The line switches to
    no other, so the one is all that is read. */
 static const u8 CODE PtMnu_B[] = { Menu_C };

@@ -135,13 +135,6 @@ extern const u8 __far FnFl_P[];
 extern const u8 __far Find_B[];
 extern const u8 __far FnFl6_S[];
 extern const u8 __far FnFl7_S[];
-#pragma aux Mask_S "*"
-#pragma aux Find5_D "*"
-#pragma aux Find6_D "*"
-#pragma aux FnFl_P "*"
-#pragma aux Find_B "*"
-#pragma aux FnFl6_S "*"
-#pragma aux FnFl7_S "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 #define SEGMENT(pointer) ((u16)((u32)(const void __far *)(pointer) >> 16))

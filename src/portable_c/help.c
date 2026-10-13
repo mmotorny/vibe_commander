@@ -101,11 +101,6 @@ extern const u8 __far HlpEr_B[];        /* "There was error reading data..." */
 extern const u8 __far HlMn1_D[];        /* Help, Cancel */
 extern const u8 __far HlMn2_D[];        /* Next, Previous, Index, Cancel */
 extern const u8 __far HlpMn_P[];
-#pragma aux Help_S "*"
-#pragma aux HlpEr_B "*"
-#pragma aux HlMn1_D "*"
-#pragma aux HlMn2_D "*"
-#pragma aux HlpMn_P "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 

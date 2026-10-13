@@ -64,9 +64,6 @@ void TrCr20(u16 lines);
 extern const u8 __far Tree_F[];         /* "\TREEINFO.NCD" */
 extern const u8 __far Tree_P[];         /* "Scanning the directory..." */
 extern const u8 __far TrSav_P[];        /* "Saving the directory..." */
-#pragma aux Tree_F "*"
-#pragma aux Tree_P "*"
-#pragma aux TrSav_P "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 

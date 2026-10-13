@@ -180,28 +180,6 @@ extern const u8 __far EdtH_S[];         /* its six lines on the right, */
 extern const u8 __far EdtH1_S[];        /* and for the menu file and for */
 extern const u8 __far EdtH2_S[];        /* an extension file the title
                                            and six lines on the left */
-#pragma aux SavFi_P "*"
-#pragma aux SavEr_B "*"
-#pragma aux Prot_B "*"
-#pragma aux EdFl_S "*"
-#pragma aux ViFl_S "*"
-#pragma aux BigFi_B "*"
-#pragma aux NewFi_B "*"
-#pragma aux SavAs_B "*"
-#pragma aux SavCn_B "*"
-#pragma aux Srch_B "*"
-#pragma aux SrEr_B "*"
-#pragma aux Menu_F "*"
-#pragma aux Ext_F "*"
-#pragma aux ViewE_F "*"
-#pragma aux EditE_F "*"
-#pragma aux Line_S "*"
-#pragma aux Col_S "*"
-#pragma aux FrBuf_S "*"
-#pragma aux EdtH_P "*"
-#pragma aux EdtH_S "*"
-#pragma aux EdtH1_S "*"
-#pragma aux EdtH2_S "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 

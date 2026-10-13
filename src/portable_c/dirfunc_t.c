@@ -8,44 +8,8 @@
  */
 #include "tables.h"
 
-/* What others name has the name that it has in the assembly: src/c/copy.c
-   names MkErr_B, boxes of other files Var2_S and NoFnd_S, and
-   src/c/dirfunc.c the rest. */
-#pragma aux MkDir_S "*"
-#pragma aux CrDir_S "*"
-#pragma aux MkDi1_B "*"
-#pragma aux MkDi2_B "*"
-#pragma aux MkErr_B "*"
-#pragma aux Del_S "*"
-#pragma aux DelFs_S "*"
-#pragma aux Subdi_S "*"
-#pragma aux DlWr4_S "*"
-#pragma aux Var2_S "*"
-#pragma aux DelFl_P "*"
-#pragma aux DelDr_P "*"
-#pragma aux DlMas_B "*"
-#pragma aux DelSe_B "*"
-#pragma aux DelCo_B "*"
-#pragma aux DelFi_B "*"
-#pragma aux DelDi_B "*"
-#pragma aux RdOnl_B "*"
-#pragma aux NoEmp_B "*"
-#pragma aux DlWrn_B "*"
-#pragma aux DelEr_B "*"
-#pragma aux CntDi_B "*"
-#pragma aux Attr8_S "*"
-#pragma aux NoFnd_S "*"
-#pragma aux NoAtr_S "*"
-#pragma aux StAt1_B "*"
-#pragma aux StAt2_B "*"
-#pragma aux StAtr_P "*"
-#pragma aux NoDat_B "*"
-#pragma aux AtrEr_B "*"
-#pragma aux Label_B "*"
-#pragma aux DelVo_B "*"
-#pragma aux ErVol_B "*"
-#pragma aux PthEr_B "*"
-#pragma aux NoFnc_B "*"
+/* What is not static here, others name: copy.c names MkErr_B, boxes of
+   other files Var2_S and NoFnd_S, and dirfunc.c the rest. */
 
 /* Of other files: lines and buttons that the boxes of every file use.
    Var_S, the line that is a text which the box puts in, is another, and
@@ -58,14 +22,6 @@ extern const u8 Empty_S[];
 extern const u8 Kov_S[];
 extern const u8 OkCan_S[];
 extern const u8 OkCan_D[];
-#pragma aux Ok_S "*"
-#pragma aux OkMn_D "*"
-#pragma aux Inc_S "*"
-#pragma aux Err_S "*"
-#pragma aux Empty_S "*"
-#pragma aux Kov_S "*"
-#pragma aux OkCan_S "*"
-#pragma aux OkCan_D "*"
 
 /* A box to tick, by the byte of TmpBuf that has its value: where that is
    while the dialog is up, and where it is taken from and left, which is

@@ -8,15 +8,8 @@
  */
 #include "tables.h"
 
-/* What others name has the name that it has in the assembly: the code,
-   and the boxes of other files, which have Ok and Cancel from here. */
-#pragma aux Mask_S "*"
-#pragma aux Ext_F "*"
-#pragma aux DrIn_F "*"
-#pragma aux Init_F "*"
-#pragma aux OkCan_S "*"
-#pragma aux Fant_B "*"
-#pragma aux OkCan_D "*"
+/* What is not static here, others name: the code, and the boxes of other
+   files, which have Ok and Cancel from here. */
 
 /* The names of files. Each is copied with what follows it: the mask of
    every file from its second byte on and the extension file by MvzLine,

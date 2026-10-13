@@ -57,8 +57,6 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
    them in the original, and not texts of this file. */
 extern const u8 __far Mask_S[];
 extern const u8 __far Ext_F[];
-#pragma aux Mask_S "*"
-#pragma aux Ext_F "*"
 
 static const u8 CODE DrIn_F[] = "DIRINFO";
 

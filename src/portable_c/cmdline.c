@@ -49,7 +49,6 @@ u16 F32_70(u16 begin, u16 size);                        /* usermenu.c */
 /* The mask that stands behind the name of a directory in the command
    line: the assembly's, which other C code has too. */
 extern const u8 __far Mask_S[];         /* "\*.*" */
-#pragma aux Mask_S "*"
 
 #define LOW(pair)  ((u16)(pair))
 #define HIGH(pair) ((u16)((pair) >> 16))

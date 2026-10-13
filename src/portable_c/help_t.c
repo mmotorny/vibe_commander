@@ -6,19 +6,11 @@
  */
 #include "tables.h"
 
-/* What others name, src/c/help.c here, has the name that it has in the
-   assembly. */
-#pragma aux Help_S "*"
-#pragma aux HlpMn_P "*"
-#pragma aux HlMn1_D "*"
-#pragma aux HlMn2_D "*"
-#pragma aux HlpEr_B "*"
+/* What is not static here, help.c names. */
 
 /* Of another file: the text of the button Ok, and the button. */
 extern const u8 Ok_S[];
 extern const u8 OkMn_D[];
-#pragma aux Ok_S "*"
-#pragma aux OkMn_D "*"
 
 const u8 Help_S[] = " Help ";
 static const u8 HlEr1_S[] = "There was error reading data";

@@ -26,7 +26,6 @@
    name of the file is one of src/c/system_t.c, and the code that starts
    the program reads it there too. */
 extern const u8 __far Init_F[];
-#pragma aux Init_F "*"
 
 /* C routines of other files that vc.h does not have. */
 void FilZero(u8 __far *text, u16 length);               /* string.c */

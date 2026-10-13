@@ -12,31 +12,13 @@
  */
 #include "tables.h"
 
-/* What others name, the C code and the boxes of other files, has the name
-   that it has in the assembly. */
-#pragma aux Sel_S "*"
-#pragma aux Unsl_S "*"
-#pragma aux Inv_S "*"
-#pragma aux Kov_S "*"
-#pragma aux Empty_S "*"
-#pragma aux Sel_B "*"
-#pragma aux ErSel_B "*"
-#pragma aux Name_S "*"
-#pragma aux YesNo_S "*"
-#pragma aux YesNo_D "*"
-#pragma aux Quit_B "*"
-#pragma aux Menu_F "*"
-#pragma aux User_S "*"
-#pragma aux UsrEr_B "*"
-#pragma aux AltSr_T "*"
-#pragma aux List_F "*"
+/* What is not static here, others name: the code, and the boxes of other
+   files. */
 
 /* Of another file: the text of the button Ok, and the button. The line
    that a box puts its text into, Var_S, is in tables.h. */
 extern const u8 Ok_S[];
 extern const u8 OkMn_D[];
-#pragma aux Ok_S "*"
-#pragma aux OkMn_D "*"
 
 #define PrgName "Volkov Commander"
 

@@ -137,9 +137,6 @@ extern const u8 __far AltSr_T[];
 extern const u8 __far Menu_T[];
 extern const u8 __far NoRd_P[];
 extern const u8 __far CtrlC[];
-#pragma aux AltSr_T "*"
-#pragma aux Menu_T "*"
-#pragma aux NoRd_P "*"
 #pragma aux CtrlC "*"
 #define WCB1sav STAYS(WCB1sav)
 
@@ -1434,14 +1431,6 @@ extern const u8 __far FatEr_S[];
 extern const u8 __far FtEr1_B[];
 extern const u8 __far FtEr2_B[];
 extern u16 __near SecDat;
-#pragma aux Err_S "*"
-#pragma aux OnDr_S "*"
-#pragma aux OnDv_S "*"
-#pragma aux Errs_S "*"
-#pragma aux FatEr_S "*"
-#pragma aux FtEr1_B "*"
-#pragma aux FtEr2_B "*"
-#pragma aux SecDat "*"
 
 /* What DOS is answered for a critical error. */
 #define ERR_RETRY 1
@@ -1551,7 +1540,6 @@ void __interrupt __far FatErr(struct Saved r)
     DataSeg(SecDat);
     r.ax = FtErr1(r.ax, r.di, AT(r.bp, r.si));
 }
-#pragma aux FatErr "*"
 
 /* Take the critical error of DOS, for FatErr, and
    Ctrl-Break, for a routine that only returns, and note who had them.

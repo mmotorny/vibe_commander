@@ -120,31 +120,6 @@ extern const u8 __far MkErr_B[];        /* "Can't create the directory" */
 extern const u8 __far DelEr_B[];        /* "Can't delete the file" */
 extern const u8 __far RdOnl_B[];        /* "... is marked read-only" */
 extern const u8 __far CntDi_B[];        /* "Can't delete the subdirectory" */
-#pragma aux Copy0_S "*"
-#pragma aux Move0_S "*"
-#pragma aux Ren0_S "*"
-#pragma aux RnMv_S "*"
-#pragma aux CopTo_S "*"
-#pragma aux CopFi_S "*"
-#pragma aux Copy1_B "*"
-#pragma aux Copy2_B "*"
-#pragma aux Renam_B "*"
-#pragma aux RenFi_P "*"
-#pragma aux CopFi_P "*"
-#pragma aux MovFi_P "*"
-#pragma aux CopDi_P "*"
-#pragma aux MovDi_P "*"
-#pragma aux DelDr_P "*"
-#pragma aux OvrCo_B "*"
-#pragma aux Prot_B "*"
-#pragma aux Cont_B "*"
-#pragma aux OpnEr_B "*"
-#pragma aux Itslf_B "*"
-#pragma aux RenEr_B "*"
-#pragma aux MkErr_B "*"
-#pragma aux DelEr_B "*"
-#pragma aux RdOnl_B "*"
-#pragma aux CntDi_B "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 

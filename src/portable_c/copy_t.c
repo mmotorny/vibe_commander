@@ -7,29 +7,8 @@
  */
 #include "tables.h"
 
-/* What others name, src/c/copy.c and for Prot_B src/c/edit.c too, has the
-   name that it has in the assembly. */
-#pragma aux Copy0_S "*"
-#pragma aux Move0_S "*"
-#pragma aux Ren0_S "*"
-#pragma aux RnMv_S "*"
-#pragma aux CopTo_S "*"
-#pragma aux CopFi_S "*"
-#pragma aux Copy1_B "*"
-#pragma aux Copy2_B "*"
-#pragma aux Renam_B "*"
-#pragma aux CopFi_P "*"
-#pragma aux MovFi_P "*"
-#pragma aux RenFi_P "*"
-#pragma aux CopDi_P "*"
-#pragma aux MovDi_P "*"
-#pragma aux OvrCo_B "*"
-#pragma aux Cont_B "*"
-#pragma aux OpnEr_B "*"
-#pragma aux Itslf_B "*"
-#pragma aux RenEr_B "*"
-#pragma aux Prot_B "*"
-#pragma aux OvrSk_D "*"                 /* which nothing names: see there */
+/* What is not static here, others name: copy.c, and for Prot_B edit.c
+   too. */
 
 /* Of other files: the second line that a box puts a text into, an empty
    line, the line that it puts ^I into, and the buttons Ok and Cancel,
@@ -41,13 +20,6 @@ extern const u8 OkCan_S[];
 extern const u8 OkCan_D[];
 extern const u8 YesNo_S[];
 extern const u8 YesNo_D[];
-#pragma aux Var2_S "*"
-#pragma aux Empty_S "*"
-#pragma aux Inc_S "*"
-#pragma aux OkCan_S "*"
-#pragma aux OkCan_D "*"
-#pragma aux YesNo_S "*"
-#pragma aux YesNo_D "*"
 
 /* Where in the main data the commands keep what the boxes show and the
    dialogs set: see src/c/copy.c. */

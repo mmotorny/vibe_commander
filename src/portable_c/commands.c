@@ -88,24 +88,6 @@ extern const u8 __far SvSt_B[];         /* "Do you wish to save the current
                                            setup?" */
 extern const u8 __far SetEr_B[];        /* "There was an error while saving
                                            the setup file" */
-#pragma aux Filt_B "*"
-#pragma aux DiSiz_P "*"
-#pragma aux CmpDi_B "*"
-#pragma aux Conf_B "*"
-#pragma aux Chk1_S "*"
-#pragma aux Sets_B "*"
-#pragma aux Chk2_S "*"
-#pragma aux MnLoc_B "*"
-#pragma aux User_S "*"
-#pragma aux ExFl_S "*"
-#pragma aux UsMnu_S "*"
-#pragma aux ExtFl_S "*"
-#pragma aux Menu_F "*"
-#pragma aux Ext_F "*"
-#pragma aux ViewE_F "*"
-#pragma aux EditE_F "*"
-#pragma aux SvSt_B "*"
-#pragma aux SetEr_B "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 

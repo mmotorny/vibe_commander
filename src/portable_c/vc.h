@@ -356,17 +356,21 @@ extern struct Stays __far Stays;
 #endif
 
 /* Texts that the code of more than one file shows: the first two are
-   constants of src/c/main_t.c, the third is one of src/c/treebox_t.c.
-   They are in the group of the constants, so naming one costs a
-   relocation. A file of constants has them near, by src/c/tables.h. */
-extern const u8 __far Title_S[];        /* the program's name and version,
+   constants of main_t.c, the third is one of treebox_t.c. They are in
+   the group of the constants, and code reads them as far objects, so
+   naming one costs a relocation. A file of constants, which is one that
+   has tables.h and this by that, names them as lines of its boxes, by
+   near words: there they are near. */
+#ifdef TABLES_H
+#define TEXT_FAR
+#else
+#define TEXT_FAR __far
+#endif
+extern const u8 TEXT_FAR Title_S[];     /* the program's name and version,
                                            behind two bytes of markup */
-extern const u8 __far Var_S[];          /* a line that is the text at
+extern const u8 TEXT_FAR Var_S[];       /* a line that is the text at
                                            TmpErr+1 */
-extern const u8 __far Tree_S[];         /* the title of the tree */
-#pragma aux Title_S "*"
-#pragma aux Var_S "*"
-#pragma aux Tree_S "*"
+extern const u8 TEXT_FAR Tree_S[];      /* the title of the tree */
 
 /* The numbers of the colours of a panel, for Color. */
 #define Back_C  0                       /* what is neither of the others */

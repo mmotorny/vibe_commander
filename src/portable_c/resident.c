@@ -175,7 +175,6 @@ u32 CODE Vect21 = 0;
 extern const u8 __far TrnMain_s[];
 extern const u8 __far Vers_S[];
 #pragma aux TrnMain_s "TrnMain_c"
-#pragma aux Vers_S "*"
 
 /* The segment of something of the part that goes, as the linker has it:
    in paragraphs from the PSP. Every other word of the program that

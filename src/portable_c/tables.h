@@ -19,15 +19,13 @@
  * reads it in the right one. tools/mkexe.c stops the build for an
  * object file that holds both.
  *
- * A constant that only its own file names is static. One that code or
- * another file names has the name that it has in the assembly, without
- * the underscore that the compiler would put in front: `#pragma aux
- * Name "*"`, where it is defined and wherever it is declared. So nothing
- * that named it changed when it went from the assembly to C.
+ * A constant that only its own file names is static, and one that code
+ * or another file names is not. Either has the name that it has in the
+ * assembly, and the compiler's name for it will do for the linker.
  *
  * Every object of such a file is held against the original's bytes by
- * the test `c-data` (harness/datacheck.py), by its name, and so is what it
- * names.
+ * the test `portable_c-data` (harness/datacheck.py), by its name, and so
+ * is what it names.
  */
 #ifndef TABLES_H
 #define TABLES_H
@@ -82,21 +80,6 @@
 /* A word that names something, where it holds a number instead: the
    length of a line that is typed into, say. */
 #define NUMBER(number) ((const void *)(number))
-
-/* Var_S, Title_S and Tree_S are declared far in vc.h, as code reads
-   them, and a box names its lines by near words: here each is the same
-   object under a near name, so a file of constants writes Var_S in a box
-   like any other line. The file that defines one writes no `#pragma aux`
-   for it: that would be expanded, and name the object VarNear_S. */
-extern const u8 VarNear_S[];
-extern const u8 TitleNear_S[];
-extern const u8 TreeNear_S[];
-#pragma aux VarNear_S "Var_S"
-#pragma aux TitleNear_S "Title_S"
-#pragma aux TreeNear_S "Tree_S"
-#define Var_S   VarNear_S
-#define Title_S TitleNear_S
-#define Tree_S  TreeNear_S
 
 #pragma pack(push, 1)
 

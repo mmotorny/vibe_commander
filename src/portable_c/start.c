@@ -58,9 +58,6 @@ extern const u8 __far New21[];
 extern const u8 __far Exit01[];
 extern const u8 __far New27[];
 extern const u8 __far SetBrk[];
-#pragma aux Init_F "*"
-#pragma aux Ext_F "*"
-#pragma aux SecDat "*"
 #pragma aux Vect21 "*"
 #pragma aux RelTab "*"
 #pragma aux TrnPrW "*"

@@ -14,7 +14,6 @@
 /* The dialog that asks for the disk of a drive, a constant of
    src/c/system_t.c: Dialog takes it by its offset. */
 extern const u8 __far Fant_B[];
-#pragma aux Fant_B "*"
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
 #define BIOS_TICKS ((const u32 __far *)0x0040006CUL)    /* the BIOS's count

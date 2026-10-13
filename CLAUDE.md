@@ -1256,6 +1256,17 @@ in "The portable C".
   with `Int2E`. The functions of `dos.c` have a `#pragma aux` for the
   name alone, `DOS_NAME`, since the file is compiled twice. All of the
   seam goes when the program stays in the memory whole.
+- An object has the compiler's name in the map, `_Name`, where the C
+  translation takes the underscore off with `#pragma aux Name "*"`:
+  `harness/datacheck.py` knew an object by either. The names that a
+  `#pragma aux` still fixes are those that `tools/mkexe.c`, the
+  linker's command and `harness/coverage.py` look for, all of the part
+  that stays in the memory, with the other part's declarations of
+  them: a declaration that has lost its line while the definition has
+  not is an undefined reference at the linker. A text that code reads
+  as a far object and a file of constants names by a near word is
+  declared `TEXT_FAR` in `vc.h`, which is `__far` but in a file that
+  has `tables.h`.
 - A function that returned two things as one number of 32 bits is to
   return what it means (`TODO.md` has the list and how it divides).
   Change it so that a call which was not changed does not compile: a

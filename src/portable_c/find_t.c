@@ -6,14 +6,7 @@
  */
 #include "tables.h"
 
-/* What others name, src/c/find.c here, has the name that it has in the
-   assembly. */
-#pragma aux FnFl6_S "*"
-#pragma aux FnFl7_S "*"
-#pragma aux FnFl_P "*"
-#pragma aux Find_B "*"
-#pragma aux Find5_D "*"
-#pragma aux Find6_D "*"
+/* What is not static here, find.c names. */
 
 /* "N files found." is put together of these two, and the command copies
    15 bytes of each, the text and what follows it in the original: behind

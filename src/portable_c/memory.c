@@ -99,8 +99,6 @@ u16 HexDec(u16 number);                                 /* format.c */
 extern const u8 __far Memo1_P[];
 extern const u8 __far Memo_D[];
 extern const u8 __far Command[];
-#pragma aux Memo1_P "*"
-#pragma aux Memo_D "*"
 #pragma aux Command "*"
 #define Counter STAYS(Counter)
 #define PrgList STAYS(PrgList)

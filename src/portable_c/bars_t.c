@@ -7,8 +7,6 @@
  */
 #include "tables.h"
 
-/* What others name has the name that it has in the assembly. */
-#pragma aux PtMnu_S "*"
 
 /* The names of the five menus, each behind four spaces, and spaces to
    the end of the row: FFh and a number are that many spaces. */

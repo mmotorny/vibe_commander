@@ -11,24 +11,9 @@
  */
 #include "tables.h"
 
-/* What others name has the name that it has in the assembly: the code of
-   src/c/main.c, src/c/start.c, src/c/resident.c and of those that show the
-   title, and the boxes of other files, of the assembly and of C. Title_S
-   and Var_S have theirs by src/c/tables.h, which gives each a near name
-   for a file of constants, and no line here. */
-#pragma aux Vers_S "*"
-#pragma aux SecDat "*"
-#pragma aux Err_S "*"
-#pragma aux OnDr_S "*"
-#pragma aux OnDv_S "*"
-#pragma aux Errs_S "*"
-#pragma aux FatEr_S "*"
-#pragma aux Ok_S "*"
-#pragma aux Inc_S "*"
-#pragma aux FtEr1_B "*"
-#pragma aux FtEr2_B "*"
-#pragma aux OkMn_D "*"
-#pragma aux NoRd_P "*"
+/* What is not static here, others name: the code of main.c, start.c,
+   resident.c and of those that show the title, and the boxes of other
+   files. */
 
 /* The title: of the help's window as it is, with the two bytes that set
    its colour, and without them in the panel of the Info and in the

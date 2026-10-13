@@ -66,11 +66,6 @@ extern const u8 __far ErSel_B[];
 extern const u8 __far Sel_S[];          /* "Select" */
 extern const u8 __far Unsl_S[];         /* "Unselect" */
 extern const u8 __far Inv_S[];          /* "Invert" */
-#pragma aux Sel_B "*"
-#pragma aux ErSel_B "*"
-#pragma aux Sel_S "*"
-#pragma aux Unsl_S "*"
-#pragma aux Inv_S "*"
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
