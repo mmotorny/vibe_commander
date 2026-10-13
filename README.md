@@ -222,7 +222,7 @@ portable C](#the-portable-c)).
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
 | `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
-| `tools/` | `mkexe.c` makes the `VC.EXE` of a C tree out of what the linker produces |
+| `tools/` | `mkexe.c` makes the `VC.EXE` of a C tree out of what the linker produces; `pairs.py` lists the functions of the portable C that still return two things as one number |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, each as the other is, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/` |
 | `docs/` | Pictures for this README |

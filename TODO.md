@@ -40,8 +40,9 @@ It divides, by who calls what:
   own block. `main.c` is the one file that two of them meet in: the
   commands' agent has `Command` and `CmdEnd`, and `F35_90` there goes
   with `copy.c`.
-- They are found by their type: a function defined `u32`, and every
-  place where its name stands in front of a parenthesis.
+- `python3 tools/pairs.py` lists them as they stand: every function
+  defined `u32`, by its file, with the files that call it and how
+  often.
 
 `CLAUDE.md`, "Notes on the portable C", has how such a function is
 written so that a call that was not changed does not compile.
