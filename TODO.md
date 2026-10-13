@@ -235,7 +235,9 @@ than the original's but for what "The deviations to declare" lists:
 
 - **Entered**, from the item of the menu. The screen is made what the
   program shows just before it runs a command: what DOS has shown, the
-  panels and the bars gone. The common part of the setup as the program
+  panels and the bars gone, with the row of the command line empty,
+  and the cursor on the next row, which is what Enter behind a command
+  leaves. The common part of the setup as the program
   has it, 330 bytes of the main data from `ColTab` on, is set aside.
   `VC.INI` is read as the setup program reads it: its common part into
   the main data, its two panels into room of setup's own; without a
@@ -247,10 +249,14 @@ than the original's but for what "The deviations to declare" lists:
 - **Left without Save**: what was set aside goes back, all of it.
 - **Left with Save**: the file is written, with the two panels as the
   file had them or as `Default` made them. The main data keeps what was
-  edited, but `Active`, `Ctrl_O`, `LoadFl`, `LoadRes` and `ChkTSR`,
-  which are put back from what was set aside. That is what the call of
-  DOS did to a running copy; the original's `LoadRes` got the new
-  Memory allocation, which the portable C does not go by.
+  edited, but `Active`, `Ctrl_O` and `ChkTSR`, which are put back from
+  what was set aside, and `LoadFl`, which is put back too, with what
+  was edited in `LoadRes`. That is what the call of DOS did to a
+  running copy, and it is done as the original does it: `LoadFl`
+  becomes what `LoadRes` is when the setup has been left, as it does
+  behind every command (`Exec10` of `resident.c`), so the byte that the
+  program later saves is the one that was edited, as the original's.
+  The portable C does not go by it.
 - **Either way** it goes on as when a command has ended: the place
   `NEXT_INIT11` of the main loop, by which `Round` of `main.c` calls
   `IniData` again. That finds out about the screen and the mouse anew,
@@ -260,16 +266,55 @@ than the original's but for what "The deviations to declare" lists:
   that because setup was a command.
 
 Told that setup is open, by a variable of setup's that three places
-read: `PutKey0` takes the setup's bars and writes its 81st cell,
-`Dialog` leaves the menu bar alone and has the flag 4 mean nothing,
-and `Input` has F1 call setup's help. The boxes then hold the bytes
-that the original's have, and the data's test can hold them so.
+read, `StOpen`: `PutKey0` takes the setup's bars, `Dialog` leaves the
+menu bar alone and keeps a typed line in `TmpErr`, and `Input` has F1
+call setup's help. The boxes then hold the bytes that the original's
+have, and the data's test holds them so. That is all that is switched,
+on the user's word of 13 October 2026 that the aim is one program whose
+setup uses the main program's routines: where the setup program's copy
+of a routine differs in what a scenario of setup shows and that is no
+bug, the switch stays; where it differs only by a bug, the bug is asked
+about and not carried by a switch, as `PutKey0`'s 81st cell, which is
+fixed (entry 9 of `DEVIATIONS.md`); and where it differs in what
+nothing of setup can show, the main program's holds for both. Of that
+last kind are four things of `Dialog`, which the comment at the routine
+lists: the flag 4, the place of a box that is on the screen already,
+`NormStr`, and the two answers F10 and Alt-F10. A
+fourth place clears it for a moment: the box of DOS's critical error,
+`FtErr1` of `main.c`, which is the main program's also while setup is
+open.
 
-Where setup keeps what does not fit the program's data, the pages of
-the help and its copy of the screen: the compiler's group, `DGROUP`,
-had some 2 KB left when this was written, which is enough for setup's
-variables and for nothing of 8 KB. The memory behind the panels, where
-the viewer has its text, is free while setup is open.
+Where setup keeps what it has of its own: in the main data, in
+buffers that the main program does not need while setup is open,
+since it makes them anew when a command has ended. `DGROUP` has the
+one byte of `StOpen` more.
+
+- `struct StData` of `vc.h`, in `MenuBuf`, which a file of setup has
+  as `sd`: the setup file as it is read and written, `IniStat`,
+  `MnItem`, `CurType`, `SrcIni`, the variables of the palettes, and two
+  things that the original has not, what is set aside of the program's
+  setup and the 50th row of what DOS had shown. It is a third of
+  `MenuBuf`.
+- `UserScr` is the main data's, 49 rows, and the 50th is in `StData`:
+  `StUser(first, rows)` of `stmain.c` puts rows of it into the screen
+  buffer, which is all that a piece needs of it.
+- `BoxBuf` is `ErrBuf`; `WinBuf`, `TmpBuf`, `TmpErr`, `ScrBuf` and
+  `Stars` are the main data's. `ErrBuf1` is left alone: the box of a
+  critical error keeps there what it covers.
+- `NcPath` is the directory of the program, as the main program has
+  it, and has the name of the setup file behind it only while that
+  file is read or written and while the box S0 shows it: whatever else
+  looks for a file of the program while setup is open, the help file,
+  finds the directory there (`MainFil` of `string.c`).
+- The pages of the help, up to 8,155 bytes: `TreeBuf` of the main data
+  is 12.3 KB and free while setup is open, since a panel that shows
+  the tree reads it anew when setup has been left, as after a command
+  (`ReDir` of `read.c`, with `ChgFlg` set by `IniData`); and so is
+  `InfBuf`, 1.4 KB. `HelpBuf` is the main program's help, 3,000 bytes,
+  with what that has read in it: whatever uses it has to leave the
+  main help knowing that it has nothing. The memory behind the panels,
+  where the viewer has its text, is free too, and is reached by far
+  pointers.
 
 ### Names and files
 
@@ -303,11 +348,11 @@ batch, with what no scenario reaches.
 | Piece | Owns | Size | Scenarios | Needs |
 |---|---|---|---|---|
 | 0a, the harness. Done | `harness/`: what the list below has; `tools/figures.py` and the README for the limit that goes. No file of the program | Some 800 lines with what is written for the pieces, where 200 were thought | One, `setup`: the setup program started, its menu, the Configuration with the key bar switched off, Screen and Mouse looked at, the setup saved and left, and the main program without its key bar | Nothing |
-| 0b, setup entered and left | `stmain.c`, `stmain_t.c`; the item of the menu in `menu.c`, `commands_t.c`, `main.c`, `vc.h`, with its tables declared in `harness/datacheck.py`; the three places that are told of setup, in `bars.c` with the bars' tables, `dialog.c` and `input.c`; `ShadCol` in `screen.c`; the entry of `src/portable_c/DEVIATIONS.md`. Of the assembly: the file read and checked, S0, `Main00`, `Main40`, S7 with `Default`, `Exit` | About 300 instructions and the plumbing | 4 or 5: the menu by its keys and left unchanged; the defaults taken and saved, and what the program shows afterwards; a setup file that is missing, with Ok and with Exit; one that is damaged; changed and left with Cancel | 0a |
+| 0b, setup entered and left. Done | `stmain.c`, `stmain_t.c`; the item of the menu in `menu.c`, `commands_t.c`, `main.c`, `vc.h`, with its tables declared in `harness/datacheck.py`; the three places that are told of setup, in `bars.c` with the bars' tables, `dialog.c` and `input.c`; entry 8 of `src/portable_c/DEVIATIONS.md`. Of the assembly: the file read and checked, S0, `Main00`, `Main40`, S7 with `Default`, `Exit` | 776 instructions carried over, of 934 in its routines, all of `Dialog` among them | 5: `setup-menu`, `setup-defaults`, `setup-missing`, `setup-damaged`, `setup-cancel`, 98 steps, which run 558 of the 776; the scenarios of A and B run 196 more, the fields of `Dialog` and the mouse's rows on 50 lines; 22 are listed as out of reach, 13 of them until a later piece has its scenario | 0a |
 | A, the options | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | Seven, 311 steps, see "Piece A" below. As planned: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
-| B, the colours | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
+| B, the colours | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6; and `ShadCol`, taken out of `Shadow` of `screen.c`, which 0b left as it is. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
 | C, the help | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
-| D, what is left of S1 and of leaving | In `stmain.c`, after 0b: `Main50`; and scenarios for what crosses the pieces | About 100 instructions | About 3: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse | 0b |
+| D, what is left of S1 and of leaving | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | About 100 instructions | About 3: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and, once A is there, a setup saved whose file is missing | 0b; A for the last |
 | E1, the program's own call of DOS goes | `resident.c`: `New21`, `Int21`, `Vect21`, INT 21h taken and given back; the README, `DEVIATIONS.md`, the items of this file that speak of the call | Small | None new. `asked` and `handed-on` are not run for the portable C; `ended` has its golden of the tree's own recorded again, for the registers that the program leaves | A to D |
 | E2, three settings go | `stopts.c`, `stopts_t.c`: Memory allocation and TSR manager out of S2, Screen output out of S3; entries 1, 5 and 7 of `DEVIATIONS.md`, which say that the setup program still shows them | Small | The scenarios of A that show the two dialogs get goldens of the portable C's own, read with `goldens.py changes` | A |
 
@@ -409,6 +454,90 @@ change, each as it is now, and what came out otherwise than planned.
 9. `ported.py`: the portable C is held to no multiple of the original's
    size, and the C translation to three times, `SIZE_LIMIT`; the row is
    gone from the README's figures.
+
+**What 0b made, and what A, B, C and D go by.** `stmain.c` says at its
+top how the setup is a part of the program, and `vc.h` has a section
+for it, "The setup program": read both first.
+
+- **The menu calls a piece's screens** as functions that return when
+  the screen has been left, after which the menu is drawn again with
+  the cursor on that item: `StF02_00`, `StF03_00`, `StF04_00` and
+  `StF09_00` of `stopts.c`, `StF05_00`, `StF06_00` and `StF07_00` of
+  `stcolor.c`, each the label of the original with `St` in front, and
+  none takes anything: the original's code reads no register of the
+  menu's there. `Input` calls `StHelp` of `sthelp.c` for F1, with the
+  page in `HlpPage`. All eight are declared in `vc.h`.
+- **Until a piece's file is there**, its functions are in `stmain.c`,
+  under "What is still to come": an item waits for a key and returns,
+  and the help does nothing. A piece adds its file, puts the file's
+  name into the list of `add_portable_c` in `CMakeLists.txt`, which is
+  the second code segment, and takes its functions out of that block
+  of `stmain.c`. Nothing else of `stmain.c` changes for A, B and C.
+  `setup-menu` has every item entered and left at once, "F2 Esc": it
+  passes with the place-holders and has to pass with the screens.
+- **A routine that a dialog names**, `F04_10`, is a number in the
+  dialog's header: a `SUB_` more in `tables.h`, and its case in the
+  `switch` of `Dialog`, which calls the function. The test of the data
+  is told the number in `NAMED_OTHERWISE`, with "is".
+- **Tables** are in a file of the piece's own, `stopts_t.c`, with `St`
+  in front of every name, or the main program's own where that is the
+  same bytes, as the test of the data allows. `stmain_t.c` has one that
+  others may name, not static for that: `StPalets`, the 330 bytes of
+  `Palets` and `DefInit`, which the palettes read for a default colour.
+  A constant that only code reads is `static const u8 CODE` in the
+  file of the code, as the main program has them.
+- **What setup has in the memory** is under "How it fits" above:
+  `sd`, `StUser`, and where the pages of the help can go.
+- **The main program's routines are used as they are.** Of those that
+  the setup program has otherwise, `PutKey0`, `Dialog` and `Input` go
+  by `StOpen`. `Input0`, `Blank`, `LeaveTm`, `ColAddr` and `Shadow`
+  are the main program's; `ShadCol`, which S6 calls by itself, is B's
+  to take out of `Shadow`.
+- **A batch** names its routines in `SETUP_BATCHES` of
+  `harness/ported.py`. 0b's has the start of the program from `Init15`
+  on, where most of what a program of its own does when it starts is
+  listed as not carried over, and all of `Dialog`, whose fields A's
+  scenarios run.
+- **What 0b's batch lists as out of reach until a later piece has its
+  scenario**, each with the address in `harness/ported.py`: the test
+  fails on the entry once a scenario runs it, and the piece then takes
+  it out.
+  - D: `Main30`, six instructions that call `Main50`, which is where
+    the button of a mouse goes in `StMain00`, the two `goto Main30`
+    that go straight back today; and `Exit5`, three, the line that DOS
+    writes for a setup file that could not be written.
+  - A, or D with A's dialogs: three of `Exit` for a setup saved whose
+    file is not there, which takes a setting changed without a file.
+  - C: nothing any more. One of `Dialog` was listed, the beep of a box
+    that has the flag for it, which the box "Help contents is not
+    available" alone has, and C's scenarios of the original run it,
+    `setup-help-pages` and `setup-help-file`: what ran in the original
+    is of every scenario, also of one that the portable C is not taken
+    through yet. The five instructions that call `RdHelp` when the
+    setup program starts are listed as not carried over. If the pages
+    are read when setup is entered, the call goes into `StSetup` where
+    the original has it, in front of `StFile`, and the five come off
+    that list.
+- **Scenarios** may start the setup program more than once and may
+  look at what DOS has shown afterwards: the portable C leaves an
+  empty row where the original has the line of the command, and moves
+  the screen as the original does. The top of `harness/scenarios.py`
+  says where such a line gets to and when "cls" is needed.
+- **`setup`**, 0a's scenario, is not run for the portable C until the
+  Configuration and Screen and Mouse are there, which its steps go
+  through: A takes it out of `not_run`. Tried in its place, with steps
+  that are no scenario: a setup file saved by the main program with the
+  key bar off, the setup entered and left with it, and Ctrl+o, show the
+  same in the original and in the portable C, the prompt's row
+  included.
+- **What leaving resets.** `StSetup` ends with `StOpen` 0, the name of
+  the setup file off `NcPath`, and the two interrupts given back; then
+  the main loop starts the program over, and `IniData` and `Init40`
+  set what a command leaves to be set: `BarPrev`, `Quote`, `HlpPage`,
+  the mouse, the screen and its buffers, the panels' lists. A piece
+  that uses a buffer of the main program's own has to leave it as that
+  program can go on with: for `HelpBuf`, with the main help knowing
+  that it has read nothing.
 
 **What a piece does**, in this order:
 
@@ -624,16 +753,22 @@ are the setup program's alone, of which some 288 are of its start.
 ### The deviations to declare
 
 In `src/portable_c/DEVIATIONS.md`, by the piece that makes each so.
+Entry 8 there has what 0b made so: the first four rows, the first half
+of the sixth, and the two that the plan did not have, which stand
+last.
 
 | What | What shows it |
 |---|---|
 | Setup is no program of its own: no banner, no word on the version of DOS or on the memory, no command line, nothing run from DOS without the main program, no "Error reading data from the help file." | No scenario: the banner is sent nowhere when a golden is derived |
-| What DOS has shown has no line of a command that started setup, behind setup and afterwards; and the history has no such command | Every scenario of setup, on one row, which `harness/deviations.py` has; afterwards none, as long as none looks |
+| What DOS has shown has no line of a command that started setup, behind setup and afterwards: the row is empty, and the screen moves as the original's. And the history has no such command | Every scenario of setup, on the rows that `harness/deviations.py` has as spaces; the history in none |
 | The program takes what was saved whatever its setup has for TSR manager, where the original's running copy is asked only with that on. And with E1 the program's own call of DOS is gone | `asked`, `handed-on`, `ended` |
-| The Options menu has a line more | `clock`, `clock-russia`, `menu`, which have goldens of the portable C's own already and get them recorded again |
+| The Options menu has a line more | `clock`, `clock-russia`, `menu`, which have goldens of the portable C's own already and got them recorded again |
 | With E2: no Memory allocation and no TSR manager in S2, no Screen output in S3 | The scenarios of piece A that show the two dialogs |
 | The program's box for a critical error of DOS while setup is open, where the original's setup program leaves the error to DOS's own words. And setup's calls for files are asked with the program's errors, where the original's setup program calls DOS itself: a drive that is not ready has the program's box, a call given up there is the error 53h, and DOS is asked what was wrong behind a call that failed | No scenario |
 | The pages of the help read when they are asked for, if piece C does not read them all when setup is entered | No scenario |
+| The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. **This waits for the user's word**: it was met while 0b was made, and is not among the seven things decided | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
+| The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | None yet: D's scenario of 50 lines, with a golden of the portable C's own for the corner |
+| The directory of the setup file is the one that the program has, made by the main program's rule: in capitals, and with a backslash behind whatever `VC=` names, where the setup program adds none behind a colon | No scenario: the bench has no `VC=` |
 
 ### The bugs of the original that stay
 
@@ -650,13 +785,28 @@ on the bench.
   of what lies behind the row in `ScrBuf`: on a screen of 50 lines that
   is `UserScr`, and when setup is left the top left corner of what DOS
   had shown is a space, in the colour of the key bar's numbers. With
-  fewer lines it lands where nothing shows it.
+  fewer lines it lands where nothing shows it. This one does not stay:
+  it is fixed on the user's word of 13 October 2026, entry 9 of
+  `DEVIATIONS.md`, and the key bar of setup is the main program's
+  routine with setup's tables. D's scenario of 50 lines shows the
+  corner, and gets a golden of the portable C's own for it.
 - `Err2`, behind Ok in S0, is to fill `SrcIni` with FFh, so that the
   defaults count as a change and are offered for saving. It does so by
   `REP STOSB` with CX as it happens to be, which is 0 on every way
   there: nothing is stored, and defaults that are left as they are are
   not saved.
 - Cancel in S10 leaves, as Save does, and does not go back to S1.
+- `Default` copies the 88 bytes that the file has of a panel from
+  `DefWCB`, which is 24: the other 64 are what stands behind that table
+  in the setup program's data, the box `IniEr_P` with its dialog and
+  its buttons, 47 bytes with eight addresses of the original's layout
+  in them, and the first 17 bytes of the dialog for registering, which
+  only the binary has that was shipped and the published source has
+  not. They land behind the zero that ends the path of each panel, and
+  are in `VC.INI` when a setup made so is saved; the main program
+  clears them when it has read such a file (`MkIni1` of `setup.c`).
+  This one does not stay: the portable C cannot have the 17 bytes, and
+  has zeros for all 64. See "The deviations to declare".
 - A file that could not be written is said in a line on what DOS has
   shown, which the panels of a running copy cover at once, and the
   running copy takes the settings all the same.
@@ -836,9 +986,8 @@ and "Do you wish to save the current setup?" (no page either).
 - **The code segments.** The new files go into the second, which has
   the more room; the pictures and tables are no code. Should it pass
   its limit, a third segment is a change to `add_portable_c`.
-- **`PutKey0`'s 81st cell** shows only on a screen of 50 lines, and
-  only if setup's copy of the screen lies right behind `ScrBuf`, as the
-  original's does and the main data's `UserScr` does.
+- **`PutKey0`'s 81st cell** is fixed: see the bugs above. No scenario
+  of 0b is on 50 lines.
 - **The help.** That two pages do not show hangs on a length of the
   original's layout. And the main program's help keeps what it has read
   in `HelpBuf`: whatever setup does there has to leave the main help
@@ -868,14 +1017,13 @@ and "Do you wish to save the current setup?" (no page either).
   keys, is held by the screens alone, and `ColPage`, which picture an
   item has, is held by the test only if it is written as the table
   that the assembly has.
-- **The item of the menu.** A line put in above others moves them, and
-  an item is known by its number in code as well as in tables: the
-  ticks of the Options menu, `F39_58` of `menu.c`, the keys of an open
-  menu, `KeyTab`, with Ctrl-B and Shift-F9 among them, the commands,
-  `Menu4_T`, the pages of the help, `MnuHlp`. "Notes on the portable C"
-  of `CLAUDE.md` has what taking a line out met. Behind ` Editors...`
-  the item has eight items below it, and the two lines across the
-  menu, which all move a row.
+- **The item of the menu.** Done. A line put in above others moves
+  them, and an item is known by its number in code as well as in
+  tables: the ticks of the Options menu, `F39_58` of `menu.c`, the keys
+  of an open menu, `KeyTab`, with Ctrl-B, the commands, `Menu4_T`, the
+  pages of the help, `MnuHlp`. Shift-F9 and the size of the menu are
+  the original's again, with a line less and a line more. Nothing else
+  knew an item of that menu by its number.
 - **What a box of setup means to the main program's `Dialog`**: a menu
   bar to draw and a box to move down, unless `Dialog` is told. And the
   routine that a dialog names for Enter, `F04_10`, is a number there, a
@@ -883,7 +1031,13 @@ and "Do you wish to save the current setup?" (no page either).
 - **What both programs have and each sets up for itself**: the main
   program has taken INT 24h, has BREAK off and the mouse started when
   setup is entered, and `IniData` does it all again when setup is left.
-  What setup's own start and end did of that is not done twice.
+  What setup's own start and end did of that is not done twice. Two
+  things are done all the same, because they show: the mouse is set up
+  anew when setup is entered, which puts its pointer in the middle of
+  the screen, and the main program puts it back afterwards; and the
+  two interrupts are given back when setup is left, as before a
+  command, so that `IniData` notes whose they were and not the
+  program's own.
 - **The time.** A scenario with the clock on in setup has it on the
   screen from then on.
 - **`resident.c`** is in other hands than setup's until E1.

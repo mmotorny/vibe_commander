@@ -1789,6 +1789,82 @@ in "The portable C".
     clean afterwards, and that is the proof that a change to the
     harness has left the judging alone: it is cheap enough to do for
     every such change.
+- The setup is entered and left, since the second piece of that plan:
+  `stmain.c`, with a section of `vc.h` for all of setup and the plan
+  itself for what the next pieces go by. What making a program of its
+  own a part of another met:
+  - Two routines of one name are held against each other before one
+    is made to do for both: a diff of the two procedures, each cut out
+    of its file after `iconv -f cp866`, says every line, where
+    `harness/vcsetup/procs.py` only says which differ and by how many
+    lines. What differs may be more than the flags that the other
+    program lacks: the setup program's `Dialog` loads the place of its
+    box whatever a flag says, and keeps a typed line elsewhere. Then
+    each difference is one of three kinds, on the user's word that the
+    setup is to use the main program's routines: what a scenario of
+    setup shows and is no bug is an `if` on `StOpen`; what nothing of
+    setup can show is left out, the main program's holding for both,
+    and said in the comment at the routine; and a bug of the copy is
+    not carried by a switch but asked about, as the 81st cell of the
+    key bar was, which is fixed. The setup program's instructions that
+    are left out so are still of the batch, as out of reach.
+  - What a program does when it starts is not done twice, but look at
+    what of it shows. The setup program sets the mouse up anew, which
+    puts its pointer in the middle of the screen; it notes the row of
+    the cursor, which is where it leaves it. And what the main program
+    does around a command is done around setup too, where the next
+    thing rests on it: the two interrupts are given back before
+    `IniData` takes them, or it notes the program's own handlers as
+    those to give back.
+  - The screen behind setup is that of a command run: the main
+    program writes prompt and command into the row of its command
+    line, types the end of the line, and after the command the screen
+    goes up by two rows where there is a key bar, one in `IniData` and
+    one in `Init40`. With an
+    empty row in place of that line and the same end of the line
+    typed, every later screen is the original's too, so a scenario
+    may start setup several times. A line of such a command that a box
+    covers in part is not known to the harness for what it is, and
+    stays in the golden: the top of `harness/scenarios.py` says where
+    the lines get to.
+  - A copy that runs on behind its table, as the notes above have it
+    for the main program's defaults, may get into a file: `Default`
+    copies 88 bytes of a panel from a table of 24, and the 64 behind
+    it are in `VC.INI` when that is saved. Hold a file that the
+    original writes against what the published tables can make before
+    the scenario is written: `fat.read_tree` hashes every file of a
+    disk, and a shim around its `hashlib` keeps the bytes. Here 17 of
+    the 64 are of the binary alone, so no build can write that file,
+    and the scenario has the main program read it and save its own.
+  - What setup has of its own is in the main data, in buffers that
+    the main program makes anew after a command: the original has
+    nothing behind `DosBuf` left then, so nothing there is counted on
+    across a command, here either. `struct StData` is laid over
+    `MenuBuf`, with a `HOLDS` line that it fits. The file's image in
+    it is an array of bytes with the panels and the sum by their
+    places, not members: members would want `#pragma pack`.
+  - An object of the setup program has `St` in front of its name, and
+    the program has objects whose names begin so already: its
+    `StErr_S`, the line for a file that could not be written, is
+    `StStErr_S`, and `StErr_S` would be its `Err_S`. That one is not
+    written: where the main program has an object of the same name
+    and the same bytes that a file of tables can name, the setup's
+    tables name it, `Err_S`, `Inc_S`, `YesNo_S`. And once one piece
+    names the main program's, no piece may write the `St` one: the
+    test of the data takes a word for the setup's own object if the
+    tree has one, and fails the piece that named the other.
+  - A screen that is still to come can be a function that waits for a
+    key and returns: the item and Esc in one step then leave the menu
+    as the real screen will, and the scenario of the menu runs the
+    code that leads to every item before any of them is there.
+  - The critical error of DOS is the main program's box whoever has
+    asked for a file. `FtErr1` of `main.c` clears `StOpen` around its
+    dialog, as it does the clock and the blanker, and has the next key
+    bar drawn anew: the numbers of the two programs' bars mean other
+    rows, and `BarPrev` would take one for the other.
+  - The calls of DOS and the BIOS that setup makes have rows in entry
+    6 of `DEVIATIONS.md` like any others, read from the setup
+    program's assembly: a piece adds the rows of its calls.
 
 ### Moving a file to the system's functions
 

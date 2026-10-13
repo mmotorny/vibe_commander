@@ -223,7 +223,7 @@ portable C](#the-portable-c)).
 |---|---|
 | `src/asm/` | The assembly: the Volkov Commander 4.05 source, adapted to assemble with JWasm |
 | `src/c/` | The C translation: the program in C, all of it, `src/c/*.c`, with the tables of a file in the one next to it whose name ends in `_t`, and two headers |
-| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
+| `src/portable_c/` | The portable C: a copy of `src/c/` to begin with, laid out like it, with the original's setup program in the files whose names begin with `st`, and `DEVIATIONS.md`, which declares where it behaves otherwise than the original |
 | `tools/` | `mkexe.c` makes the `VC.EXE` of the C translation out of what the linker produces; `figures.py` writes [the figures](#the-figures) of the portable C into this README |
 | `CMakeLists.txt` | Builds the assembler and with it the original, compiles and links the two C trees, and registers the tests |
 | `harness/` | Compares a build with the original: byte for byte, and by running it under FreeDOS in QEMU against what the original did there, recorded in `harness/goldens/`; where the portable C is declared to behave otherwise, against what it did itself, recorded in `harness/goldens/portable_c/` |
@@ -543,11 +543,12 @@ is two parts laid out by a tool. Then come [what the program did for
 the PC and for the programs around it](#what-else-has-gone), and what a
 register happened to hold where DOS or the BIOS is called, which [the
 functions of the system](#the-system-in-one-place) do not hand over; no
-scenario shows either. And then [what a user of DOS saw of the
+scenario shows either. Then [what a user of DOS saw of the
 program](#what-a-user-sees-no-more), a command or an option that only
-made sense there. In every scenario that a deviation does not change
-the portable C is held against the original's golden, as the C
-translation is.
+made sense there. And the original's second program, its setup program,
+[is becoming a part of this one](#the-setup-program-in-it). In every
+scenario that a deviation does not change the portable C is held
+against the original's golden, as the C translation is.
 
 It is compiled in the medium model, the option `-mm`, where the C
 translation has the small one: a function that another file calls is far
@@ -633,19 +634,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 176,420 bytes |
-| as a multiple of the original's 65,090 bytes | 2.71 |
-| more than the C translation's 133,056 bytes | 43,364 bytes |
-| The relocations in its header, which DOS applies | 929 |
-| What it keeps of the memory while a command runs: the program and its panels | 186,464 bytes |
-| What DOS has for a command then, on the bench of the tests | 239,072 bytes |
-| The code segment `CTEXT` ends at | D292h, 7,534 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | A59Fh, 19,041 bytes below the limit, F000h |
+| `VC.EXE` | 187,516 bytes |
+| as a multiple of the original's 65,090 bytes | 2.88 |
+| more than the C translation's 133,056 bytes | 54,460 bytes |
+| The relocations in its header, which DOS applies | 942 |
+| What it keeps of the memory while a command runs: the program and its panels | 197,504 bytes |
+| What DOS has for a command then, on the bench of the tests | 228,032 bytes |
+| The code segment `CTEXT` ends at | D3EEh, 7,186 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | ACC4h, 17,212 bytes below the limit, F000h |
 | Inline assembly | 57 instructions in 10 pieces: 37 in 7 of `dos.c`, 20 in 3 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 6 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 704, 62, 255, 86 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 714, 62, 256, 93 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -929,6 +930,41 @@ What is left of the watch is what was not for the map: the program
 still takes INT 21h, for its own call, by which a setup program reads
 and writes its setup in the memory, and hands every other call on
 untouched.
+
+### The setup program in it
+
+The original is two programs, and the second, `VCSETUP.COM`, is where
+most of the setup is set: every colour, and the options that the main
+program's menus have not. It exists only as assembly,
+`src/asm/VCSETUP.ASM` with two files of routines that are for the most
+part copies of the main program's. In the portable C it is becoming a
+part of the one program, entry 8 of `src/portable_c/DEVIATIONS.md`: an
+item of the Options menu, " seTup...", behind which the setup program
+is on the screen as the original's is when it is run from the
+program's command line, over what DOS had shown. It is translated as it
+is: it reads the setup file and edits that, and the program takes what
+was saved when the setup is left, as the original's running copy is
+handed it by a call of DOS.
+
+Its files have names that begin with `st`, and its routines and tables
+have `St` in front of the names that they have in the assembly, where
+many are the main program's names too. `stmain.c` has the setup
+entered and left, its file, its menu and the setup that the program
+has without a file; `stmain_t.c` its tables. What both programs have is
+there once: the boxes, the dialogs, the bars and the mouse are the main
+program's, and the three routines that the setup program has otherwise
+go by a variable that says the setup is open, `StOpen`: `PutKey0`,
+which has the setup's key bars then, `Dialog`, and `Input`, where F1 is
+the setup's own help. What the setup program has in a segment of its
+own is the main data here, in buffers that the main program makes anew
+after a command anyway.
+
+Of the menu's nine items two do something so far, Set default
+configuration and Exit: the Configuration, Screen and Mouse, the Panel
+options, the three palettes, the Country info and the help are to come,
+each in a file of its own, and so is the mouse at the menu. `TODO.md`
+has the plan, "The setup program in the portable C", with what each
+piece brings and what is declared for it.
 
 ## Testing
 
