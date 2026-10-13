@@ -680,11 +680,11 @@ local variable, and a constant of a code file is still `CODE`, in the
 code segment: with 12 KB less of main data all four could be one, which
 `TODO.md` has, with what stands in its way and what it waits on.
 
-`VC.EXE` of the portable C is 184,836 bytes, 51,780 more than the C
+`VC.EXE` of the portable C is 184,626 bytes, 51,570 more than the C
 translation's: the main data is in the file, the header has the
 relocations that DOS applies, 977 of them, and the part that stayed in
 the memory, with its copies and its second `dos.c`, is gone. While a
-command runs it keeps 194,688 bytes of the memory, the program and its
+command runs it keeps 194,480 bytes of the memory, the program and its
 panels, where the C translation keeps 19,728 and the original 12,704.
 
 What rests on Open Watcom, for the portable C. Of what the code is
@@ -692,8 +692,9 @@ written in, the first table above: `__far` in 690 places, `STACK` in
 481, `CODE` in 96; `#pragma aux` in 19 lines; `#pragma pack(1)` in 7
 pairs; the five `__interrupt` functions; two `__loadds` functions,
 `Alloc0`, where DOS enters the program, and `Exec2E`, where it goes on
-behind INT 2Eh; the four `__declspec(naked)` functions; the three
-intrinsic functions; the two routines for arithmetic; and, new,
+behind INT 2Eh; the four `__declspec(naked)` functions; two of the
+three intrinsic functions, `_disable` and `_enable`; the two routines
+for arithmetic; and, new,
 `#pragma data_seg` in two places, for the main data and for the stack.
 Of what cannot be seen in the code, the seventeen places of the second
 table, seven are left, most in another form, and two are new, 3 and 7
@@ -718,11 +719,13 @@ checks the object files of the portable C, and nothing has to.
 Inline assembly, for the portable C: 70 instructions in 11 pieces.
 Seven of the nine of `dos.c` are as in the table above, 37 instructions;
 `VideoBuffer` and `DesqviewPause` are [gone](#what-else-has-gone).
-`DataSeg` of `main.c` is gone. `New21`, `New27` and `Exit01` of `resident.c` are as
-they were, 17, 4 and 4. `Int2E` is 8, where it was 9: `INT 2Eh`, `CLI`,
-`MOV AX` with the segment of the stack, `MOV SS,AX`, `MOV SP`, `STI`,
-`CLD` and the jump; it no longer loads DS, which the function that it
-jumps to does for itself.
+`DataSeg` of `main.c` is gone. `New21`, `New27` and `Exit01` of
+`resident.c` are as they were, 17, 4 and 4. `Int2E` is 8, where it was
+9: `INT 2Eh`, `CLI`, `MOV AX` with the segment of the stack,
+`MOV SS,AX`, `MOV SP`, `STI`, `CLD` and the jump; it no longer loads DS,
+which the function that it jumps to does for itself. Of the three
+instructions that are the compiler's own, by its intrinsic functions,
+`IN` is gone too: the program reads no port.
 
 ### What else has gone
 
@@ -739,6 +742,7 @@ original's.
 | 2 | `TopView` and `TopScr` of `dos.c`, the inline assembly `VideoBuffer`, their calls in `IniData` of `start.c` and in `Window` | Drawing into the buffer that TopView or DESQview shows in place of the display's memory, and telling them what has changed there |
 | 3 | `DvPause` of `dos.c`, the inline assembly `DesqviewPause`, its call in `LeaveTm` of `blank.c`, the call of DOS in `IniData` that asked for DESQview, and the two places that went by the answer, in `Input0` and in the editor's loop of keys | Giving the rest of the program's turn to the other programs of DESQview, and leaving Alt and the keyboard's buffer to it |
 | 4 | The call of INT 2Fh with AX 1680h in `LeaveTm` | Giving the rest of the program's turn to Windows, or to whatever else ran programs of DOS as guests. The call of INT 28h, DOS's own word that the program is idle, stays |
+| 5 | The test of the display in `IniData`, the waiting in `Window` and `MovScr` of `window.c`, `InPort` of `dos.c` and the intrinsic function `inp` | Writing to the memory of a CGA only while it does not draw, which otherwise shows as snow. Snow mode stays a byte of the setup, kept as it is found |
 
 ## Testing
 

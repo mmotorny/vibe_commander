@@ -618,24 +618,18 @@ static void CurNl(struct BiosRegs STACK *regs)
    by asking DOS for the capital of each. The environment is searched
    for COMSPEC=, and for VC= and TEMP=; the original also notes where
    the path of the program's own file is behind it, OvlPth, to load
-   itself again after a command. Then the display: an EGA or VGA and its rows,
-   whether writing to it has to wait for the beam, and where its memory
-   is; the original also asks whether TopView or DESQview shows a buffer
-   in its place, and draws into that, and whether DESQview runs. The
-   version of DOS; and the colour in which DOS writes, found by having
-   it write a space.
+   itself again after a command. Then the display: an EGA or VGA and its
+   rows, and where its memory is; the original also finds out whether
+   writing to it has to wait for the beam, asks whether TopView or
+   DESQview shows a buffer in its place, and draws into that, and whether
+   DESQview runs. The version of DOS; and the colour in which DOS writes,
+   found by having it write a space.
 
    Ported as they are:
      - The program handed to a command, by COMMAND.COM, gets its two
        FCBs at 5Ch and 6Ch of the main data, not of the PSP: ES is on
        the main data when the block for running a program is filled
        in.
-     - For snow the status of the display is read until its lowest bit
-       is set seven times running, with interrupts off, in 32,767 tries.
-       That is timed by its instructions, and the compiled ones are
-       others: on the display it was written for, a CGA, the bit is set
-       for all of the time that the beam returns to the top, which is
-       longer than seven readings take either way.
      - A cursor below the last line is put on it before the screen is
        fed a line, so the screen scrolls once. */
 void IniData(void)
@@ -644,8 +638,7 @@ void IniData(void)
     struct BiosRegs bios;
     struct VideoMode mode;
     const u8 __far *env;
-    u16 i, c, key, at, lines, rows, snow, tries, count, segment, version,
-        other, cell;
+    u16 i, c, key, at, lines, rows, segment, version, other, cell;
 
     bios.ax = HookVct();                /* Set Error Vectors */
 
@@ -767,26 +760,6 @@ void IniData(void)
         }
     }
     md.Lines = (u8)lines;               /* Init30 */
-    snow = 1;                           /* Snow */
-    if (md.ScrMod != 7 && md.SnowMod != 1
-        && (md.SnowMod < 1 || md.TstEGA == 0)) {
-        tries = 0x8000;
-        for (;;) {                      /* Init31 */
-            IntOn();
-            if (--tries == 0)
-                break;
-            IntOff();
-            for (count = 7; count != 0; count--)    /* Init32 */
-                if (!(InPort(0x3DA) & 1))
-                    break;
-            if (count == 0) {
-                snow = 0;
-                break;
-            }
-        }
-    }
-    IntOn();                            /* Init33 */
-    md.Snow = (u8)snow;
     segment = 0xB800;                   /* Screen Segment */
     if (md.ScrMod == 7)
         segment = 0xB000;

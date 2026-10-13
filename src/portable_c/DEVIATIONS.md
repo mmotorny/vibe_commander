@@ -139,9 +139,9 @@ it.
   later.
 
 What it costs in memory. While a command runs the portable C keeps
-194,688 bytes, the program and its panels, where the original keeps
+194,480 bytes, the program and its panels, where the original keeps
 12,704 and the C translation 19,728. On the bench of the tests DOS has
-230,848 bytes for a command run from the portable C, 412,848 for one run
+231,056 bytes for a command run from the portable C, 412,848 for one run
 from the original as it is distributed, and 405,824 for one run from the
 C translation. That is enough for every command of the scenarios but
 those of a second copy of the program: the bench has 500,128 bytes from
@@ -313,3 +313,65 @@ program of FreeDOS that `memory-map`, `mouse-memory` and
 until the next interrupt for a program that says it is idle, by INT 28h
 as well. That was not looked into: no screen can show it, and every
 scenario is held against the golden that it was held against before.
+
+### 5. The program does not wait for a display that shows snow
+
+**What the original does.** The first colour display of the PC, the CGA,
+shows snow, white dots that come and go, when its memory is written or
+read while it draws. So a program writes to it between two lines or two
+screens, and the original does so for a display that it has found to
+want it, when it starts and again after every command. The setup has a
+byte for that, Snow mode, which no menu of the program sets: the
+original's setup program has it as Screen output, with "Synchronized
+access", 0, "Asynchronized access", 1, and "Auto detect", 2, which is
+how the program is distributed and what its defaults have. With 1, and
+on a monochrome display, the program does not wait. With 0 it tests the
+display, and with 2 it tests one that is no EGA or VGA: it reads the
+status of the display, port 3DAh, with the machine kept from
+interrupting, and if in 32,767 tries the lowest bit is once set seven
+times running, which says that the display is not drawing for long
+enough to be seen at it, the program waits from then on:
+
+- A window of one row is put on the screen cell by cell, each when the
+  display has just finished a line.
+- A window of more rows, and the screen read when the program starts,
+  are copied seven rows at a time, each seven when the display has begun
+  to return to the top of the screen: ten looks in a row have to find it
+  not drawing.
+
+Each cell and each seven rows are copied with the machine kept from
+interrupting, which it may again afterwards. The original says so after
+every cell and every seven rows whatever the display is.
+
+**What the portable C does.** It does not test the display, and writes
+to its memory and reads it at once. `InPort` of `dos.c` is gone, and of
+the compiler's intrinsic functions `inp`, the instruction `IN`: the
+program reads no port any more. The byte of the main data that said
+whether to wait, `Snow`, keeps its place and is neither set nor read.
+Snow mode is a byte of the setup that is kept as it is found and written
+back as it was, 2 in a setup made of the defaults: a setup file of the
+original is one of the portable C and the other way round, and the
+original's setup program, which is not translated, still shows the
+choice and writes the byte.
+
+One thing is left of it, because more than the snow may rest on it: when
+a window has been put on the screen, or the screen has been read, the
+machine may interrupt the program, whether it might before or not. DOS
+calls the program for a critical error with the machine kept from
+interrupting, and the box that the program shows then is put on the
+screen like any other.
+
+**Why.** It only made sense on a PC with that display. No system that
+the program is carried to has a display's memory that may be written
+only while the beam is elsewhere, and a wait that is timed by reading a
+port has nothing to read there.
+
+**Which scenarios show it.** None. The bench has a VGA. `start-setup`
+has a setup with Snow mode 0, so the original tests the display there,
+and finds nothing: QEMU's VGA turns the bit over every time it is read,
+so the instruction that sets the program to waiting, and the 20 of
+`Window` and `MovScr` that wait, ran in no scenario and are listed as
+out of reach in `harness/ported.py`. In that scenario the portable C
+does not test, shows the same screens and leaves the same setup file,
+with the byte as it found it. Every scenario is held against the golden
+that it was held against before.

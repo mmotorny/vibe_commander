@@ -11,10 +11,9 @@
  * No other file calls DOS, the BIOS or the mouse driver: the rest of the
  * program calls these functions in plain C. What other inline assembly
  * there is, is where interrupts arrive and where COMMAND.COM's is called,
- * in resident.c. The ports of the machine
- * and its interrupt flag are here too.
- * They need no assembly, the compiler has intrinsic functions for them, but
- * they are the machine all the same.
+ * in resident.c. The interrupt flag of the machine is here too.
+ * It needs no assembly, the compiler has intrinsic functions for it, but
+ * it is the machine all the same.
  *
  * What is in the memory of the machine is not here: the BIOS's data and
  * the screen are read and written through far pointers, in plain C,
@@ -28,12 +27,11 @@
  */
 #include "vc.h"
 
-/* The compiler's own functions for a port and for the interrupt flag:
-   an instruction each, put where they are called. */
-unsigned inp(unsigned port);
+/* The compiler's own functions for the interrupt flag: an instruction
+   each, put where they are called. */
 void _disable(void);
 void _enable(void);
-#pragma intrinsic(inp, _disable, _enable)
+#pragma intrinsic(_disable, _enable)
 
 /* The interrupts. Each of these is put in place where it is called, as
    the instructions between the quotes. */
@@ -230,13 +228,6 @@ void MousAt(struct MouseAt STACK *state)
 u16 CaseMap(u16 letter)
 {
     return ((CaseMapFn *)md.Country.CaseMap)(letter);
-}
-
-/* A byte from a port of the machine. The program reads the status of a
-   CGA there, 3DAh, to write to its memory when that makes no snow. */
-u16 InPort(u16 port)
-{
-    return inp(port);
 }
 
 /* Keep the machine from interrupting the program, and let it again. */

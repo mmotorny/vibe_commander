@@ -95,7 +95,7 @@ left open:
   of `passed-on` takes as an interrupt of its own and that of
   `handed-on` cannot get behind: where the program hands that on is a
   variable, not a word that its code names.
-- The file is 184,836 bytes, 2.84 times the original's, where the
+- The file is 184,626 bytes, 2.84 times the original's, where the
   scenarios' test fails at 3: some 10 KB are left. The main data's
   zeros are 62.6 KB of it. They are in the file because the main data
   has to be at offset 0 of a segment, the linker starts a segment on a
@@ -1168,7 +1168,8 @@ than it is would pass.
     test never succeeds on the bench, and its `MOV AH,0` is listed as
     out of reach. On a CGA the bit stays set for the whole time that
     the beam returns to the top, more than a millisecond, which is long
-    for seven readings either way.
+    for seven readings either way. The portable C has no such test, and
+    does not wait for a display (`src/portable_c/DEVIATIONS.md`, 5).
 - What ran in the original is told by its bytes, wherever they are in
   the memory, so a program that runs off into what is left there of
   Volkov Commander counts as Volkov Commander running. A command of 33

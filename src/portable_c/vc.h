@@ -164,7 +164,10 @@ struct MainDat {
     u8  AutoSiz;                        /* Auto calculate directory sizes */
     u8  HidDirs;                        /* Show hidden subdirs in tree panel */
     u8  QuitAck;                        /* Confirmation on Quit */
-    u8  SnowMod;                        /* Snow mode (2=auto) */
+    u8  SnowMod;                        /* Snow mode (2=auto): of the
+                                           original. Here a byte of the
+                                           setup that is kept as it is
+                                           found */
     u8  AltView;                        /* Alt-F3 - external viewer */
     u8  AltEdit;                        /* Alt-F4 - external editor */
     u8  ClrBuf;                         /* Clear buffer flag */
@@ -213,7 +216,8 @@ struct MainDat {
     u8  ScrPage;                        /* Current screen page number */
     u8  TstEGA;                         /* 1 if EGA or VGA present */
     u8  Lines;                          /* Number of lines on screen */
-    u8  Snow;                           /* Snow on/off */
+    u8  Snow;                           /* Snow on/off: of the original.
+                                           Not set or read here */
     u8  TopView;                        /* TopView output: of the
                                            original. Not set or read
                                            here */
@@ -535,7 +539,6 @@ struct MuxRegs Int2F(u16 ax, u16 bx, u16 cx);
 u16 Int33(u16 ax, u16 bx, u16 cx, u16 dx);
 void MousAt(struct MouseAt STACK *state);
 u16 CaseMap(u16 letter);
-u16 InPort(u16 port);
 void IntOff(void);
 void IntOn(void);
 void Int28(void);

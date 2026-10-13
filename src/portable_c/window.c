@@ -19,8 +19,6 @@
                                            display's memory the page that
                                            is shown begins, as the BIOS
                                            keeps it */
-#define CGA_STATUS 0x3DA                /* the port whose lowest bit says
-                                           that a CGA is not drawing */
 
 /* What is at an offset in a segment. */
 #define AT(segment, offset) \
@@ -230,46 +228,35 @@ void ResUser(u16 begin, u16 size)
     } while (--rows);
 }
 
-/* Copy `rows` rows of 80 cells, a number of one byte, seven rows at a
-   time. On a display that shows snow when its memory is written while
-   it draws, which is one for which `snow` is 0 in its low byte, each
-   seven are copied when the display has begun not to draw for long
-   enough, with the machine kept from interrupting: after the line it
-   was at, ten looks in a row have to find it not drawing, which is so
-   only between two screens. */
-static void MovScr(u16 __far *to, const u16 __far *from, u16 rows, u16 snow)
-{
-    u16 some = 7, count, looks;
+/* Copy `rows` rows of 80 cells, a number of one byte. The machine may
+   interrupt the program afterwards, whether it might before or not.
 
-    do {
-        if (rows < some)
-            some = rows;
-        count = some * 80;
-        if ((snow & 0xFF) == 0) {
-            while (InPort(CGA_STATUS) & 1)
-                ;
-            do {
-                IntOn();
-                looks = 10;
-                IntOff();
-                while (InPort(CGA_STATUS) & 1)
-                    if (--looks == 0)
-                        break;
-            } while (looks != 0);
-        }
-        for (; count != 0; count--)
-            *to++ = *from++;
-        IntOn();
-        rows -= some;
-    } while (rows != 0);
+   The original copies seven rows at a time, and on a display that shows
+   snow when its memory is written while it draws, a CGA, each seven
+   when the display has begun not to draw for long enough, with the
+   machine kept from interrupting. Not here: see DEVIATIONS.md. What is
+   left of that is that the machine may interrupt again, which the
+   original says after every seven rows whatever the display is. DOS
+   calls the program for a critical error with the machine kept from
+   interrupting, and the box that the program shows then is put on the
+   screen through here. */
+static void MovScr(u16 __far *to, const u16 __far *from, u16 rows)
+{
+    u16 count;
+
+    for (count = rows * 80; count != 0; count--)
+        *to++ = *from++;
+    IntOn();
 }
 
 /* Put on the screen what the screen buffer has in a window: where it
    begins, the row in the high byte, and its rows and columns likewise.
-   A window of one row is copied cell by cell, on a display that shows
-   snow each cell when the display has just finished a line; one of more
-   rows as whole rows of the screen, whatever its columns are. The mouse
-   pointer is hidden meanwhile.
+   A window of one row is copied cell by cell, as many as it has columns,
+   and one of no columns as 65536 cells; one of more rows as whole rows
+   of the screen, whatever its columns are. The mouse pointer is hidden
+   meanwhile, and the machine may interrupt the program afterwards, as
+   after MovScr: see there. On a display that shows snow the original
+   copies each cell of a row when the display has just finished a line.
 
    The original then tells TopView or DESQview what has changed, where
    one of them shows a buffer in place of the display's memory. Not
@@ -288,21 +275,14 @@ void Window(u16 begin, u16 size)
     if (rows != 1) {
         from -= begin & 0xFF;
         offset -= (begin & 0xFF) << 1;
-        MovScr(AT(segment, offset), from, rows, md.Snow);
+        MovScr(AT(segment, offset), from, rows);
     } else {
         to = AT(segment, offset);
         left = size & 0xFF;
-        do {
-            if (md.Snow == 0) {
-                while (InPort(CGA_STATUS) & 1)
-                    ;
-                IntOff();
-                while ((InPort(CGA_STATUS) & 1) == 0)
-                    ;
-            }
+        do
             *to++ = *from++;
-            IntOn();
-        } while (--left);
+        while (--left);
+        IntOn();
     }
     CurMous(1);
 }
@@ -310,6 +290,5 @@ void Window(u16 begin, u16 size)
 /* Read the screen into the screen buffer, all its lines. */
 void SavScr(void)
 {
-    MovScr((u16 __far *)md.ScrBuf, (const u16 __far *)md.Screen, md.Lines,
-           md.Snow);
+    MovScr((u16 __far *)md.ScrBuf, (const u16 __far *)md.Screen, md.Lines);
 }
