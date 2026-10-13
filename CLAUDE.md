@@ -191,7 +191,7 @@ These held while `src/c/` was made, and they say what it is.
   from, is not DOS's alone. Where that is in doubt, it is asked. Any
   other deviation, a fix of a bug of the original included, is asked
   first.
-- What the user has decided of the features that were in doubt, on 14
+- What the user has decided of the features that were in doubt, on 13
   October 2026: Quick execute commands goes, the setting and the way
   through INT 2Eh; EGA lines goes, the command that gives the screen 43
   or 50 rows by a font of the BIOS, and the rows of the screen are to
