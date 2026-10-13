@@ -117,3 +117,4 @@ int of 32 bits from one of 16, has become a test of the build,
 | File | What it asks |
 |---|---|
 | `casts.py` | Of the places where a pointer is kept in a number or made of one, which `harness/hostcheck.py` counts: what is each, a place of the main data, a table by its offset, a panel by its segment? It prints the classes of the plan with their files, and the places of one. It needs gcc, as the host check does |
+| `added.py` | Where is a variable of 16 bits added to a pointer as it is? Of the convergence, not of the plan: the first piece of it met a step of -160 that was kept in such a variable and added to a pointer, which goes 64K less 160 on in a flat memory, and no rule says of a variable what it holds. It lists the places, 158 then, with the pointer and the variable, for reading by eye. It needs clang, as `harness/int16.py` does, whose finder it uses |

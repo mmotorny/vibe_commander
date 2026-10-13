@@ -5667,9 +5667,20 @@ been read with `T71_00` open.
 
 What it still cannot see is a number that is worked out and has
 wrapped round, `first - shown`, kept in a variable and added to a
-pointer later. Reading `edit.c` whole found none; the other files
-were not read whole for it, and the scenarios that pass say only that
-none shows.
+pointer later. No rule says of a variable what it holds, so those
+were read: `python3 harness/trial32/added.py` lists every place of
+the tree where a variable of 16 bits, a function's own or one that it
+is handed, is added to a pointer as it is or is the index of one, but
+for a variable that a loop counts with. 158 places, of which `T71_00`
+had been three. Each was read for whether the variable can stand for
+a number below 0 there, and none can: they are counts, columns,
+lengths of names, and offsets in a panel or in the viewer's text,
+added to where the segment begins. `EdSub1` of `input.c`, which
+steps a cursor back, asks that it is not 0 first. What the list
+leaves out is a field of a structure added to a pointer, `(u8 __far
+*)wcb + wcb->CurAdr`, of which the tree has many and which hold
+offsets by what they are; and a pointer stepped by itself past where
+its segment ends, 2 of "What could go wrong", which nothing lists.
 
 The host check could not be taught it: gcc reads the second bodies
 and has nothing to say of a sum.
