@@ -341,7 +341,7 @@ static u16 C00_01(void)
     const u8 *from = md.ToFile;
     const u8 *end;
     u8 *name, *part, *to;
-    u32 opened;
+    struct Answer opened;
     u16 count, i, kind, info;
     u8 c;
 
@@ -378,9 +378,9 @@ static u16 C00_01(void)
             return 0;
         regs.name = CpDest;
         opened = OpenFil(CpDest, 0x40);
-        if (HIGH(opened) == 0) {
+        if (opened.failed == 0) {
             regs.ax = 0x4400;
-            regs.bx = LOW(opened);
+            regs.bx = opened.value;
             CALL(regs);
             info = DX_OF(regs);
             regs.ax = 0x3E00;
@@ -390,7 +390,7 @@ static u16 C00_01(void)
                 kind = 3;
                 goto known;
             }
-        } else if (LOW(opened) == ERR_NOT_READY)
+        } else if (opened.value == ERR_NOT_READY)
             return 0;
         regs.name = CpDest;
         regs.ax = 0x4300;
@@ -441,13 +441,17 @@ rest:
 }
 
 /* Mark the tree file of the drive of a path as out of date, if trees are
-   read again by themselves: DelTree of the assembly. The high word of
-   what it returns is not 0 if that failed, and the low one is then the
-   error. */
-static u32 DelTree(const u8 *path)
+   read again by themselves: DelTree of the assembly. What it returns
+   says whether that failed, and has the error then. */
+static struct Answer DelTree(const u8 *path)
 {
-    if (md.ChgTree == 0)
-        return 0;
+    struct Answer marked;
+
+    if (md.ChgTree == 0) {
+        marked.value = 0;
+        marked.failed = 0;
+        return marked;
+    }
     return DelTr0(path);
 }
 
@@ -616,7 +620,8 @@ static u16 C20_00(u16 fits)
 {
     struct Box box;
     struct DosRegs regs;
-    u32 opened, left, free;
+    u32 left, free;
+    struct Answer opened;
     u16 result, error, report, answer, info, attributes;
     u16 segment, offset, count, got, i;
     u16 *screen;
@@ -647,11 +652,11 @@ static u16 C20_00(u16 fits)
         goto stop;
     regs.name = CpSrc;
     opened = OpenFil(CpSrc, 0x40);
-    error = LOW(opened);
-    if (HIGH(opened))
+    error = opened.value;
+    if (opened.failed)
         goto unopened;
-    CpHndl1 = LOW(opened);
-    regs.bx = LOW(opened);
+    CpHndl1 = opened.value;
+    regs.bx = opened.value;
     regs.ax = 0x4400;
     CALL(regs);
     info = DX_OF(regs);
@@ -744,8 +749,8 @@ open:
     regs.name = CpDest;
     if (CpDev2 != 0) {
         opened = OpenFil(CpDest, 0x11);
-        error = LOW(opened);
-        if (HIGH(opened))
+        error = opened.value;
+        if (opened.failed)
             goto no_target;
         goto opened;
     }
@@ -792,11 +797,11 @@ create:
         error = regs.ax;
         goto no_target;
     }
-    opened = regs.ax;
+    opened.value = regs.ax;
 opened:
-    CpHndl2 = LOW(opened);
+    CpHndl2 = opened.value;
     FncChg = 1;
-    regs.bx = LOW(opened);
+    regs.bx = opened.value;
     regs.ax = 0x4400;
     CALL(regs);
     if ((DX_OF(regs) & 0x82) != 0x82)
@@ -826,8 +831,8 @@ append:
     }
     CpAttr = regs.cx & 0x27 | 0x20;
     opened = OpenFil(CpDest, 0x12);
-    if (HIGH(opened)) {
-        error = LOW(opened);
+    if (opened.failed) {
+        error = opened.value;
         if (error != ERR_NO_ACCESS)
             goto no_target;
         if ((u8)Ask(OFFSET(Prot_B), F35_40()) != 0)
@@ -840,13 +845,13 @@ append:
         }
         FncChg = 1;
         opened = OpenFil(CpDest, 0x12);
-        error = LOW(opened);
-        if (HIGH(opened))
+        error = opened.value;
+        if (opened.failed)
             goto no_target;
     }
     FncChg = 1;
-    CpHndl2 = LOW(opened);
-    regs.bx = LOW(opened);
+    CpHndl2 = opened.value;
+    regs.bx = opened.value;
     regs.ax = 0x5700;
     CALL(regs);
     CpDate = DX_OF(regs);
@@ -1114,7 +1119,7 @@ static u16 C30_00(u16 across, u16 fits)
 {
     struct Box box;
     struct DosRegs regs;
-    u32 marked;
+    struct Answer marked;
     u16 result, error, i;
     u8 *end;
 
@@ -1143,7 +1148,7 @@ static u16 C30_00(u16 across, u16 fits)
     FncChg = 1;
     if (CpTree1 == 0) {
         marked = DelTree(CpSrc);
-        if (HIGH(marked) && LOW(marked) == ERR_NOT_READY)
+        if (marked.failed && marked.value == ERR_NOT_READY)
             goto stop;
         CpTree1 = 1;
         CpTree2 = 1;
@@ -1183,7 +1188,7 @@ make:
         if (CpTree2 == 0) {
             CpTree2 = 1;
             marked = DelTree(CpDest);
-            if (HIGH(marked) && LOW(marked) == ERR_NOT_READY)
+            if (marked.failed && marked.value == ERR_NOT_READY)
                 goto stop;
         }
     }
@@ -1240,7 +1245,7 @@ removed:
     if (CpTree1 == 0) {
         CpTree1 = 1;
         marked = DelTree(CpSrc);
-        if (HIGH(marked) && LOW(marked) == ERR_NOT_READY)
+        if (marked.failed && marked.value == ERR_NOT_READY)
             goto stop;
     }
     result = DONE;

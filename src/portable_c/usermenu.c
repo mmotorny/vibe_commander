@@ -509,7 +509,8 @@ Run_30:                                 /* that is all of them */
 u16 F32_00(u16 main)
 {
     struct DosRegs regs;
-    u32 opened, pair;
+    u32 pair;
+    struct Answer opened;
     const u8 *text;                     /* SI */
     u16 *screen;                        /* DI */
     u16 *key;                           /* BP */
@@ -528,11 +529,11 @@ u16 F32_00(u16 main)
     if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);
-    if (!HIGH(opened))
+    if (!opened.failed)
         goto F32_05;
-    if ((u8)opened == 2)
+    if ((u8)opened.value == 2)
         goto F32_01;
-    if ((u8)opened != 5)
+    if ((u8)opened.value != 5)
         goto F32_04;
     goto F32_01;
 
@@ -545,9 +546,9 @@ F32_02:
     if (ChgDisk(md.TmpBuf))
         goto F32_04;
     opened = OpenFil(md.TmpBuf, 0x40);
-    if (!HIGH(opened))
+    if (!opened.failed)
         goto F32_05;
-    if ((u8)opened > 3)
+    if ((u8)opened.value > 3)
         goto F32_04;
 F32_03:
     Dialog(OFFSET(UsrEr_B), include, 0, 0, MAIN_SEG);
@@ -555,8 +556,8 @@ F32_04:
     return 0;
 
 F32_05:                                 /* read it */
-    regs.ax = 0x3F00 | LOW(opened) & 0xFF;
-    regs.bx = LOW(opened);
+    regs.ax = 0x3F00 | opened.value & 0xFF;
+    regs.bx = opened.value;
     regs.cx = LenMenu - 1;
     regs.name = md.MenuBuf;
     regs.si = 0;

@@ -246,6 +246,7 @@ u16 F38_40(u16 attributes)
     struct Box box;
     u8 *end;
     u32 removed;
+    struct Answer marked;
     u16 answer, error, report, count;
 
     if (!(attributes & ATTR_DIRECTORY)) {
@@ -341,8 +342,8 @@ u16 F38_40(u16 attributes)
         DEL_TREE = 1;
         /* DelTree */
         if (md.ChgTree != 0) {
-            removed = DelTr0(md.TmpBuf);
-            if (HIGH(removed) != 0 && LOW(removed) == ERR_NOT_READY)
+            marked = DelTr0(md.TmpBuf);
+            if (marked.failed != 0 && marked.value == ERR_NOT_READY)
                 goto stop;
         }
     }
@@ -509,7 +510,7 @@ u16 M30_50(u16 attributes)
 {
     struct DosRegs regs;
     struct Box box;
-    u32 opened;
+    struct Answer opened;
     u16 answer, old, include;
 
     if (attributes & ATTR_DIRECTORY)
@@ -530,10 +531,10 @@ u16 M30_50(u16 attributes)
             goto failed;
         FNC_CHANGE = 1;
         opened = OpenFil(md.TmpBuf, 0x41);
-        regs.ax = LOW(opened);
-        if (HIGH(opened) != 0)
+        regs.ax = opened.value;
+        if (opened.failed != 0)
             goto failed;
-        regs.bx = LOW(opened);
+        regs.bx = opened.value;
         regs.ax = 0x5700;
         Intr21((struct DosRegs STACK *)&regs);
         if (AttrDat != 0xFFFF)
@@ -858,10 +859,10 @@ u16 DirFunc(void)
    a tree takes what is returned without an error for the kind of the
    panel, 1 for a tree: that is the 1 byte written, and with a file that
    may not be written it is DOS's 5. */
-u32 DelTr0(const u8 *path)
+struct Answer DelTr0(const u8 *path)
 {
     struct DosRegs regs;
-    u32 opened;
+    struct Answer opened, marked;
     u16 count, written, failed, carry;
 
     md.TmpErr[0] = path[1] == ':' ? path[0] : md.DosPth[0];
@@ -870,8 +871,8 @@ u32 DelTr0(const u8 *path)
         md.TmpErr[2 + count] = Tree_F[count];
     md.BlocEr = 1;
     opened = OpenFil(md.TmpErr, 0x11);
-    written = LOW(opened);
-    if (HIGH(opened) != 0) {
+    written = opened.value;
+    if (opened.failed != 0) {
         carry = 1;
         if (written == ERR_NO_ACCESS) {
             Beep();
@@ -894,7 +895,9 @@ u32 DelTr0(const u8 *path)
         }
     }
     md.BlocEr = 0;
-    return PAIR(carry, written);
+    marked.value = written;
+    marked.failed = carry;
+    return marked;
 }
 
 /* Shift-F7, and F7 where no tree is under the cursor: ask for a path and

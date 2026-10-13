@@ -111,7 +111,7 @@ static void ReDr00(u16 panel, u16 keep, struct OldList STACK *old)
     u16 limit, file, number, retries;
     u16 oldCursor, oldFirst;
     u16 drive, attributes, found, answer;
-    u32 opened;
+    struct Answer opened;
 
     /* Expand: the panel behind this one as far up as it goes, but no
        further than 64K from here. */
@@ -296,8 +296,8 @@ ended:
         to = (u8 __far *)CutPath(md.TmpBuf);
         MvzLine(to, Ext_F, LenPath);
         opened = OpenFil(md.TmpBuf, 0x40);
-        answer = (u16)opened;
-        if ((u16)(opened >> 16) == 0) {
+        answer = opened.value;
+        if (opened.failed == 0) {
             regs.bx = answer;
             regs.name = wcb->ExtBuf;
             regs.cx = LenExt - 1;
@@ -421,6 +421,7 @@ static void RdInfo(u16 panel)
     struct DosRegs regs;
     u16 drive, failed, handle, length;
     u32 volume;
+    struct Answer opened;
 
     if (wcb->WinTyp != 2)
         return;
@@ -441,9 +442,9 @@ static void RdInfo(u16 panel)
     md.Total = (u16)(u32)regs.name;             /* DX */
     md.FreeDsk = regs.bx;
     md.ClstSiz = regs.ax * regs.cx;
-    volume = OpenFil(DrIn_F, 0x40);
-    handle = (u16)volume;
-    if ((u16)(volume >> 16) != 0) {
+    opened = OpenFil(DrIn_F, 0x40);
+    handle = opened.value;
+    if (opened.failed != 0) {
         if (handle != ERR_NO_FILE)
             return;
     } else {

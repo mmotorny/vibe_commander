@@ -549,7 +549,7 @@ u16 FindFil(u16 attributes)
     const u8 __far *from;
     u8 *end, *to, *name;
     u16 length, suffix, handle, room, chunk, segment, count, found, i;
-    u32 opened;
+    struct Answer opened;
     u8 c, kind;
 
     if (!(attributes & ATTR_DIRECTORY))
@@ -615,12 +615,12 @@ next:
             name[i] = md.DTA.FilName[i];
         FndStat();
         opened = OpenFil(md.TmpBuf, 0x40);
-        if (opened >> 16) {
-            if ((u16)opened == ERR_NOT_READY)
+        if (opened.failed) {
+            if (opened.value == ERR_NOT_READY)
                 return 0x100;
             goto next;
         }
-        handle = (u16)opened;
+        handle = opened.value;
         room = SEGMENT(&md) + md.FreMem2 - md.ViewSeg;
         chunk = 0x8000 + 80;
         if (!(room & 0xF000)) {

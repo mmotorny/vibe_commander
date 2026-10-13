@@ -391,6 +391,15 @@ struct DosRegs {
     u16 es;                             /* as DOS leaves it */
 };
 
+/* What DOS answered to a call that may fail, where the assembly has AX
+   and the carry flag. */
+struct Answer {
+    u16 value;                          /* what was asked for, a handle or
+                                           a number of bytes, or the error:
+                                           AX as DOS left it */
+    u16 failed;                         /* not 0 if that is the error */
+};
+
 /* The registers of a call of the BIOS for the screen. */
 struct BiosRegs {
     u16 ax, bx, cx, dx;
@@ -449,10 +458,10 @@ u32 TrnMain(u16 first);
 u16 ReDir(u16 panel, u16 keep);
 /* The setup file: see each in setup.c. MakeIni writes into MenuBuf what
    the file holds, and returns how long that is. SaveSet writes it to the
-   file: 1 in the high word if it could not, with what DOS answered in
-   the low one, or 53h there for a drive that is not ready. */
+   file, and answers with the bytes written, or with what DOS said was
+   wrong if it could not, 53h for a drive that is not ready. */
 u16 MakeIni(void);
-u32 SaveSet(void);
+struct Answer SaveSet(void);
 
 /* What the setup file holds: three letters V, of each panel what a
    WCBdef has before CurAdr, of the main data what it has before LoadRes,
@@ -948,9 +957,9 @@ u16 FncEx1(void);
    when it was stopped. */
 u16 DirFunc(void);                                      /* dirfunc.c */
 /* Marks the tree's file of the drive that `path` names, or of the current
-   one, as out of date. Returns what DOS answered in the low word, and
-   something that is not 0 in the high one for an error. */
-u32 DelTr0(const u8 *path);
+   one, as out of date. Returns what DOS answered, and whether that is an
+   error. */
+struct Answer DelTr0(const u8 *path);
 
 /* The boxes and the dialogs, which the assembly describes: `box`,
    `include`, `table`, `control` and `colors` are offsets in its code
@@ -1000,8 +1009,8 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key);
    they are not 0 if DOS set the carry flag: AX is its error then, or 53h
    for a drive that is not ready. Intr21f has the carry flag set when DOS
    is called, if `carry` is not 0. OpenFil opens a file, `mode` as DOS
-   takes it in AL, and returns the handle in the low word, or the error
-   there and 1 in the high one. SetPth asks DOS for the current drive and
+   takes it in AL, and answers with the handle, or with the error.
+   SetPth asks DOS for the current drive and
    directory, into DosPth, and is not 0 if that fails. Fantom asks for
    the disk of a drive that shares a floppy drive with another, 1 for A:,
    and ChgDisk for that of the drive that a path of the main data names:
@@ -1024,7 +1033,7 @@ void SelDrv(u16 drive);
 u16 Intr21(struct DosRegs STACK *regs);
 u16 Intr21f(struct DosRegs STACK *regs, u16 carry);
 struct Time DosTime(void);
-u32 OpenFil(const u8 __far *name, u16 mode);
+struct Answer OpenFil(const u8 __far *name, u16 mode);
 u16 SetPth(void);
 u16 Fantom(u16 drive);
 u16 ChgDisk(const u8 *path);

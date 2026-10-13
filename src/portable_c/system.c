@@ -206,11 +206,11 @@ struct Time DosTime(void)
 /* Open a file, `mode` as DOS takes it in AL. Where DOS says that others
    have the file open in a way that does not go with the mode, it is
    asked once more with what the mode says of sharing left out. Returns
-   the handle in the low word, or the error there and 1 in the high
-   one. */
-u32 OpenFil(const u8 __far *name, u16 mode)
+   the handle, or the error. */
+struct Answer OpenFil(const u8 __far *name, u16 mode)
 {
     struct DosRegs regs;
+    struct Answer opened;
     u16 failed;
 
     regs.ax = 0x3D00 | mode & 0xFF;
@@ -221,7 +221,9 @@ u32 OpenFil(const u8 __far *name, u16 mode)
         regs.ax = regs.bx & 0xFF0F;
         failed = Intr21((struct DosRegs STACK *)&regs);
     }
-    return (u32)failed << 16 | regs.ax;
+    opened.value = regs.ax;
+    opened.failed = failed;
+    return opened;
 }
 
 /* Ask DOS for the current drive and its current directory, into DosPth,

@@ -39,7 +39,6 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 #define ERR_NO_FILE 2
 #define ARCHIVE     0x20                /* the attribute of a file that
                                            has changed */
-#define FAILED      0x10000UL
 
 /* What the file holds of a panel, to `to`. The mask of the panel and its
    path are filled with zeros behind their ends first, in the panel
@@ -77,36 +76,47 @@ u16 MakeIni(void)
     return length + 2;
 }
 
+/* What SaveSet returns when it has failed, with what DOS said. */
+static struct Answer Failed(u16 error)
+{
+    struct Answer answer;
+
+    answer.value = error;
+    answer.failed = 1;
+    return answer;
+}
+
 /* Write the setup to its file, which keeps the attributes it has and is
-   marked as changed; one that is not there is made. The low word of what
-   is returned is the number of bytes written, or, with 1 in the high
-   word, what DOS said was wrong, 53h for a drive that is not ready.
+   marked as changed; one that is not there is made. Returns the number
+   of bytes written, or what DOS said was wrong if it failed, 53h for a
+   drive that is not ready.
 
    Ported as they are: a file that could not be written whole is left as
    it is, and counts as an error whose low byte is 0, and so does a disk
    that the user would not put in. The file is made anew before anything
    is written: what it held is gone when the writing fails. */
-u32 SaveSet(void)
+struct Answer SaveSet(void)
 {
     struct DosRegs regs;
+    struct Answer answer;
     u16 length, written, failed;
 
     length = MakeIni();
     MainFil(md.TmpBuf, AT(AsmSeg(), OFFSET(Init_F)));
     if (ChgDisk(md.TmpBuf))
-        return FAILED;
+        return Failed(0);
     regs.bx = length;
     regs.name = md.TmpBuf;
     regs.ax = DOS_ATTRIBUTES;
     if (Intr21((struct DosRegs STACK *)&regs)) {
         if (regs.ax != ERR_NO_FILE)
-            return FAILED | regs.ax;
+            return Failed(regs.ax);
         regs.cx = 0;
     }
     regs.cx |= ARCHIVE;                 /* SavSt1 */
     regs.ax = DOS_CREATE | regs.ax & 0xFF;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return FAILED | regs.ax;
+        return Failed(regs.ax);
     regs.bx = regs.ax;
     regs.cx = length;
     regs.name = md.MenuBuf;
@@ -115,10 +125,12 @@ u32 SaveSet(void)
     written = regs.ax;
     regs.ax = DOS_CLOSE | regs.ax & 0xFF;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return FAILED | regs.ax;
+        return Failed(regs.ax);
     if (failed)
-        return FAILED | written;
-    if (written == length)
-        return written;
-    return FAILED | written & 0xFF00;   /* SavSt2 */
+        return Failed(written);
+    if (written != length)
+        return Failed(written & 0xFF00);        /* SavSt2 */
+    answer.value = written;
+    answer.failed = 0;
+    return answer;
 }

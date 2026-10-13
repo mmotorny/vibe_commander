@@ -174,7 +174,8 @@ static const u8 CODE Byts_S[6] = " Bytes";
 u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open)
 {
     struct DosRegs regs;
-    u32 file, length;
+    u32 length;
+    struct Answer file;
     u16 include, handle;
 
     if (whole) {
@@ -193,8 +194,8 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open)
     if (ChgDisk(md.ViewFil))
         goto none;
     file = OpenFil(md.ViewFil, 0x40);
-    handle = LOW(file);
-    if (HIGH(file) != 0) {
+    handle = file.value;
+    if (file.failed != 0) {
         if (handle == ERR_NOT_READY)
             goto none;
         include = OFFSET(ViFl_S);
@@ -1814,7 +1815,8 @@ static u32 F34_11(u16 how)
     const u8 __far *name;
     const u8 __far *from;
     struct DosRegs regs;
-    u32 file, pair;
+    u32 pair;
+    struct Answer file;
     u16 edit = how & 0xFF;
     u16 own = how >> 8;
     u16 failed, count, command, i;
@@ -1834,28 +1836,28 @@ static u32 F34_11(u16 how)
     if (ChgDisk(md.TmpBuf))
         return NEXT_FUNC04;
     file = OpenFil(md.TmpBuf, 0x40);
-    if (file >> 16) {
-        if ((u8)file != ERR_NO_FILE)
+    if (file.failed) {
+        if ((u8)file.value != ERR_NO_FILE)
             return NEXT_FUNC04;
         MainFil(md.TmpBuf, name);
         if (ChgDisk(md.TmpBuf))
             return GO_VIEW(edit);
         file = OpenFil(md.TmpBuf, 0x40);
-        if (file >> 16) {
-            if ((u8)file <= 3)
+        if (file.failed) {
+            if ((u8)file.value <= 3)
                 return GO_VIEW(edit);
             return NEXT_FUNC04;
         }
     }
     regs.ax = 0x3F00;
-    regs.bx = (u16)file;
+    regs.bx = file.value;
     regs.cx = LenMenu - 1;
     regs.si = regs.di = 0;
     regs.name = md.MenuBuf;
     failed = Intr21((struct DosRegs STACK *)&regs);
     count = regs.ax;
     regs.ax = 0x3E00;
-    regs.bx = (u16)file;
+    regs.bx = file.value;
     if (Intr21((struct DosRegs STACK *)&regs))
         return NEXT_FUNC04;
     if (failed)

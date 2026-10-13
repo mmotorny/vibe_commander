@@ -692,11 +692,11 @@ u16 M73_00(u16 panel)                   /* Memory allocation */
    is the current panel. */
 u16 M75_00(u16 panel)
 {
-    u32 answer;
+    struct Answer saved;
 
     if ((u8)Dialog(OFFSET(SvSt_B), 0, 0, 0, panel) == 0) {
-        answer = SaveSet();
-        if (HIGH(answer) != 0 && LOW(answer) != ERR_NOT_READY)
+        saved = SaveSet();
+        if (saved.failed != 0 && saved.value != ERR_NOT_READY)
             Dialog(OFFSET(SetEr_B), 0, 0, 0, panel);
     }
     return MNU_FUNC04;

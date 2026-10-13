@@ -561,7 +561,7 @@ Help66:                                 /* Esc */
 static void HelpFil(void)
 {
     struct DosRegs regs;
-    u32 opened;
+    struct Answer opened;
     u16 i;
 
     HidCur();
@@ -569,9 +569,9 @@ static void HelpFil(void)
     if (ChgDisk(md.HelpBuf))
         return;
     opened = OpenFil(md.HelpBuf, 0x40);
-    if (HIGH(opened))
+    if (opened.failed)
         return;
-    hd.HlpHndl = LOW(opened);
+    hd.HlpHndl = opened.value;
     if (SeekDsk(0, 8) || ReadDsk(md.HelpBuf + 16, LenHead))
         goto Help01;
     for (i = 0; i < LenHead; i++)

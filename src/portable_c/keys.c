@@ -666,16 +666,16 @@ u32 F17_01(u16 panel)
     struct WCBdef __far *wcb = PANEL(panel);
     u16 kind = wcb->WinTyp;
     u16 address;
-    u32 answer;
+    struct Answer marked;
 
     if (kind != 0) {
         if (kind > 2)
             return GO(NEXT_POP_FUNC04);
         if (kind != 2) {
-            answer = DelTr0(md.DosPth);
-            if ((u16)(answer >> 16) != 0)
+            marked = DelTr0(md.DosPth);
+            if (marked.failed != 0)
                 return GO(NEXT_POP_FUNC04);
-            kind = (u8)answer;
+            kind = (u8)marked.value;
         }
         return GO_PANEL(NEXT_M03_00, panel, 5 - kind);       /* F17_02 */
     }

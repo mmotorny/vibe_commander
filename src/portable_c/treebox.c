@@ -138,7 +138,7 @@ u16 ReadTre(void)
     struct DIRENT *entry;               /* DI: where the next one goes */
     u8 *end = md.TreeBuf + sizeof md.TreeBuf;           /* BP */
     u8 *text;
-    u32 opened;
+    struct Answer opened;
     u16 count, done, failed, error, size, i;
 
     box.begin = 0;
@@ -152,9 +152,9 @@ u16 ReadTre(void)
     if (Fantom((u8)(md.DosPth[0] - ('A' - 1))))
         goto RdTr01;
     opened = OpenFil(Tree_F, 0x40);
-    if (!HIGH(opened))
+    if (!opened.failed)
         goto RdTr02;
-    if (LOW(opened) != 0x53)
+    if (opened.value != 0x53)
         goto RdTr10;
 
 RdTr01:                                 /* no disk: the root alone */
@@ -168,8 +168,8 @@ RdTr01:                                 /* no disk: the root alone */
     goto RdTr40;
 
 RdTr02:                                 /* the file */
-    regs.ax = 0x3F00 | LOW(opened) & 0xFF;
-    regs.bx = LOW(opened);
+    regs.ax = 0x3F00 | opened.value & 0xFF;
+    regs.bx = opened.value;
     regs.cx = sizeof md.TreeBuf;
     regs.name = md.TreeBuf;
     failed = Intr21((struct DosRegs STACK *)&regs);
