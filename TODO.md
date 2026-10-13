@@ -16,13 +16,16 @@ the top of the script says how. This is what the kinds are waiting
 for, with the counts of when it was written; the test prints them as
 they stand.
 
-1,391 places in 50 of the 59 files, the two headers among them. Nine
-files are clean: `bars_t.c`, `blank.c`, `digits.c`, `line.c`, `mask.c`,
-`memory_t.c`, `mouse.c`, `screen.c` and `string.c`.
+1,132 places in 39 of the 59 files, the two headers among them. Twenty
+files are clean: the thirteen of tables, and `blank.c`, `digits.c`,
+`line.c`, `mask.c`, `mouse.c`, `screen.c` and `string.c`. The first
+count was 1,391, with two files of tables clean: the others named
+places in the main data by `MD_AT`, 259 times, which is written as
+`offsetof` is now, `OFFSET_IN` of `vc.h`.
 
 | Kind | Places | Files | What it is | What it waits for |
 |---|---|---|---|---|
-| `to-number` | 898 | 45 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets, but for the 295 that are the offset of a field: see below |
+| `to-number` | 639 | 34 | A pointer cast to a number of 16 or 32 bits, which does not hold it | Pointers in place of segments and offsets, but for the 46 that are the offset of a field: see below |
 | `to-pointer` | 436 | 30 | A number of 16 or 32 bits made a pointer | The same. Where the address is the machine's, the screen in `window.c` and DOS's routine for capitals in `dos.c`, the system interface |
 | `layout` | 2 | 1 | `BOXHD` and `BOXMN` of `tables.h`, the header and a field of a dialog, are not as long as on DOS: each holds a pointer, which is a word there | Tables that are not held to the original's bytes where a pointer is no word: `LAID_OUT` for DOS alone, when the routines that read them take pointers |
 | `inconstant` | 2 | 2 | A length that gcc cannot work out when it compiles: `IniSave` of `setup.c`, and what `start.c` holds `Palets` to | The offset of a field, below |
@@ -39,11 +42,14 @@ files are clean: `bars_t.c`, `blank.c`, `digits.c`, `line.c`, `mask.c`,
 Most of the two casts are a few macros, and
 `python3 harness/hostcheck.py --macros` counts them as they stand:
 
-- The offset of a field, worked out from a pointer at 0: `MD_AT` 256
-  and `WCB_AT` 3 of `tables.h`, `WCBini` 24 and `CmnIni` 12 of `vc.h`,
-  and in files of their own `INI_CMN` 5 and `INI_WCB` 4 of `main.c`
-  and one line of `start.c`. No pointer is meant by these, and they
-  need no other program, only the macro written as `offsetof` is.
+- The offset of a field, worked out from a pointer at 0: `WCBini` 24
+  and `CmnIni` 12 of `vc.h`, `INI_CMN` 5 and `INI_WCB` 4 of `main.c`,
+  and one line of `start.c`, which with `IniSave` of `setup.c` is the
+  kind `inconstant` too. No pointer is meant by these, and they need
+  no other program: `OFFSET_IN` of `vc.h` in their place, which
+  `MD_AT` and `WCB_AT` of `tables.h` are. `start.c` has `WCBini` and
+  `CmnIni` a second time, word for word, and Open Watcom refuses two
+  definitions that differ: that copy has to go first.
 - `OFFSET`, 208, which 17 files define each for itself: a box, a dialog
   or a text of the tables handed on as its offset in their segment, to
   `Dialog`, `DialBox`, `Ask`, `OncZoom` and what else takes one. And

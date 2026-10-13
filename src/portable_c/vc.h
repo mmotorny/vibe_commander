@@ -74,6 +74,18 @@ HOLDS(u32_has_32_bits, sizeof(u32) == 4);
 #define __far
 #endif
 
+/* Where in a structure a field is, as a number: offsetof of <stddef.h>.
+   The build for DOS has no header of the compiler's, so what Open
+   Watcom's has for it is written out here: the address of the field in
+   a structure at 0. Another compiler takes that for no constant, and a
+   pointer there does not fit the number; it has the header. */
+#ifdef __I86__
+#define OFFSET_IN(type, field) ((u16)&((type *)0)->field)
+#else
+#include <stddef.h>
+#define OFFSET_IN(type, field) ((u16)offsetof(type, field))
+#endif
+
 /* Write a 16-bit value to a buffer of bytes, low byte first, and step the
    pointer past it. */
 #define PUT16(buffer, value) (*(u16 *)(buffer) = (value), (buffer) += 2)

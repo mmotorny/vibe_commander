@@ -12,32 +12,32 @@ blank.c       clean
 box.c         to-number 1
 cmdline.c     to-number 8, to-pointer 3
 commands.c    to-number 29, to-pointer 22
-commands_t.c  to-number 50
+commands_t.c  clean
 copy.c        to-number 94, to-pointer 34
-copy_t.c      to-number 48
+copy_t.c      clean
 dialog.c      to-number 18, to-pointer 45
 digits.c      clean
 dirfunc.c     to-number 97, to-pointer 33
-dirfunc_t.c   to-number 97
+dirfunc_t.c   clean
 dos.c         to-number 2, to-pointer 1, asm-pragma 7, registers 1, intrinsic 1
 drive.c       to-number 3, to-pointer 1
 edit.c        to-number 58, to-pointer 36
-edit_t.c      to-number 15
+edit_t.c      clean
 enter.c       to-number 8, to-pointer 19
 extfile.c     to-number 2, to-pointer 1
 files.c       to-number 1, to-pointer 5
 find.c        to-number 19, to-pointer 11
-find_t.c      to-number 2
+find_t.c      clean
 format.c      to-number 1
 help.c        to-number 12, to-pointer 1
-help_t.c      to-number 2
+help_t.c      clean
 info.c        to-number 7, to-pointer 2
 input.c       to-number 2, to-pointer 1
 keys.c        to-number 11, to-pointer 28
-keys_t.c      to-number 10
+keys_t.c      clean
 line.c        clean
 main.c        to-number 56, to-pointer 23, function 2, interrupt 1, data_seg 2, aborts 1
-main_t.c      to-number 8
+main_t.c      clean
 mask.c        clean
 memory.c      to-number 11, to-pointer 27, function 1
 memory_t.c    clean
@@ -54,13 +54,13 @@ stack.c       data_seg 2
 start.c       to-number 25, to-pointer 16, inconstant 1
 string.c      clean
 system.c      to-number 3
-system_t.c    to-number 3
+system_t.c    clean
 tables.h      layout 2
 tree.c        to-number 17
 treebox.c     to-number 24, to-pointer 8
-treebox_t.c   to-number 3
+treebox_t.c   clean
 usermenu.c    to-number 14, to-pointer 8
 vc.h          interrupt 1, aborts 4
 view.c        to-number 57, to-pointer 37
-view_t.c      to-number 21
+view_t.c      clean
 window.c      to-pointer 5
