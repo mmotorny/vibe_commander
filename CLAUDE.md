@@ -1871,6 +1871,15 @@ in "The portable C".
     are handed. Of any other pointer the two builds step back alike
     for a number below 0, kind `back`, and nothing written at the
     place makes a flat memory wrap round at 64K.
+  - A place of the kind `minus` is no arithmetic: a number written
+    below 0 and kept in 16 bits without a sign, `(u16)-160`, where it
+    is cast, handed to a function, returned or given to a variable.
+    It is the same number in both builds. Follow it to where it is
+    used: added to a number of 16 bits it is the way back in both,
+    added to a pointer it is that on DOS alone. The reason in the
+    record says where it goes and that the sum is made in a number.
+    One that is worked out and has wrapped round, a difference kept
+    in a variable, is found nowhere.
   - A variable is taken to hold any number of its type, but one that
     a loop counts with, inside that loop: `for (i = 0; i < 13; i++)`
     with `i` the function's own, changed nowhere else in the loop and

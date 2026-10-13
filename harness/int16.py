@@ -43,8 +43,11 @@ variables can hold, when its value fits the type that it has on DOS.
 
 A place is where an expression that does not fit is looked at (KINDS
 below): compared, divided, shifted right, made a number of 32 bits,
-asked whether it is 0, added to a pointer or made one. And where two
-numbers that do fit are held against one another or divided, of which
+asked whether it is 0, added to a pointer or made one. And where a
+number that is written below 0 is kept as one of 16 bits without a
+sign, which is no arithmetic and the same number in both builds, but
+64K less that much on where it is later added to a pointer. And where
+two numbers that do fit are held against one another or divided, of which
 one has a sign and may be below 0 and the other is of 16 bits without:
 C makes both numbers without a sign on DOS and both numbers with one
 where an int has 32 bits. Three things are known to be the same and
@@ -96,7 +99,11 @@ What it cannot see:
   - A number of 16 bits that has wrapped round already and is then
     added to a pointer: FFFEh for two back. On DOS the pointer wraps
     round with it; in a flat memory it lands 64K further on. Only where
-    the sum is made in the place itself is it found, as `index`.
+    the sum is made in the place itself is it found, as `index`. And
+    where the number is written, `(u16)-160`, the place where it is
+    made one of 16 bits is found, as `minus`: where it goes from there,
+    through a variable or into a function, is for the reader to follow.
+    One that is worked out, `first - shown`, is found nowhere.
   - A pointer that is stepped past the end of its segment or back
     before its beginning, which begins again at the other end on DOS:
     `text--`, `text - count`. Only where what is added is worked out
@@ -175,7 +182,10 @@ ONE_BUILD = {"arith.c", "dos.c", "dos32.c"}
 # with one where an int has 32 bits. Added to a pointer, a number of
 # 65,536 or more is 64K further on in a flat memory and wrapped round on
 # DOS; one below 0 is back in both, but on DOS only as far as the
-# segment begins.
+# segment begins. `minus` is no arithmetic: a number written below 0
+# that is kept in 16 bits without a sign, -160 as 65,376, which is the
+# way back only where it is added to a number of 16 bits and not to a
+# pointer.
 KINDS = [
     ("compare", "held against another number"),
     ("signed", "one with a sign held against one of 16 bits without"),
@@ -185,6 +195,8 @@ KINDS = [
     ("truth", "asked whether it is 0"),
     ("index", "added to a pointer, and it may be 65,536 or more"),
     ("back", "added to a pointer, and it may be below 0"),
+    ("minus", "written below 0 and kept as a number of 16 bits without "
+              "a sign"),
     ("address", "made a pointer"),
 ]
 
@@ -487,6 +499,18 @@ class Finder:
             value = self.same(value, (value.t16, value.t32))
         return Value(types[0], types[1], value.low, value.high)
 
+    def kept(self, value, types, node):
+        """A number that is written, below 0, and made one of 16 bits
+        without a sign, by a cast, as what a function takes or returns,
+        or as what a variable is given: 65,376 for -160. It is the same
+        number in both builds, and no arithmetic is where it is used.
+        But added to a pointer it steps back on DOS, where the offset
+        wraps round, and 64K less that much on in a flat memory, so
+        whoever reads the place follows the number to where it is
+        used."""
+        if types[0] == U16 and value.low == value.high < 0:
+            self.report(node, "minus")
+
     def meet(self, a, b, node, kind, equal=False):
         """Two numbers held against one another or divided: both are
         made the type that C works in, and have to be the same in both
@@ -555,6 +579,7 @@ class Finder:
             return value
         if (how == "IntegralCast" and isinstance(value, Value)
                 and types not in (None, POINTER)):
+            self.kept(value, types, node)
             return self.convert(value, types, node)
         if how == "IntegralToPointer":
             if isinstance(value, Value) and not value.exact():
@@ -648,6 +673,7 @@ class Finder:
             if inner and types not in (None, POINTER):
                 value = self.operand(inner[-1])
                 if isinstance(value, Value):
+                    self.kept(value, types, inner[-1])
                     self.convert(value, types, inner[-1])
             else:
                 for child in inner:
@@ -830,6 +856,7 @@ class Finder:
                 return types
             value = self.operand(right)
             if isinstance(value, Value):
+                self.kept(value, types, node)
                 return self.convert(value, types, node)
             return whole(types)
         a, b = self.operand(left), self.operand(right)
@@ -1156,7 +1183,11 @@ def main():
               "Where the number\ncan leave 16 bits, or stays in them only by "
               "what the code does not say,\nwrite the cast that says what DOS "
               "does. Where it cannot, write the record\nanew, `python3 "
-              "harness/int16.py --record`, and the reason under the place.")
+              "harness/int16.py --record`, and the reason under the place.\n"
+              "Of a `minus`, follow the number to where it is used: added "
+              "to a pointer it\ngoes 64K less that much on in a flat memory, "
+              "and wants to be added to a place,\na number, of which the "
+              "pointer is then made.")
         sys.exit(1)
 
 

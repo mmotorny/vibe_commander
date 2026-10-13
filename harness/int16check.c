@@ -273,6 +273,24 @@ entered:
     x = PLACE(p + (a - 1));             /* finds: back */
     p = (u8 *)(a + 1);                  /* finds: address */
 
+    /* A number written below 0, kept in 16 bits without a sign: the
+       same number in both builds, 65,376, and found for where it goes.
+       One that is worked out is not found, nor one that is put back
+       into a byte or added where it stands. */
+    x = (u16)-160;                      /* finds: minus */
+    x = -160;                           /* finds: minus */
+    x = takes16(-160);                  /* finds: minus */
+    x = takes16((u16)-(2 * 80));        /* finds: minus */
+    x = BELOW;                          /* finds: minus */
+    if (a == (u16)-2)                   /* finds: minus */
+        x = 0;
+    x = -a;
+    x = a - 160;
+    x = a + -160;
+    c = -1;
+    y = takes32(-160);
+    x = 0xFF60;
+
     (void)(e + z + y + x);
     return a - b;                       /* finds: widen */
 }

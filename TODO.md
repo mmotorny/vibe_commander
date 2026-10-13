@@ -4156,7 +4156,10 @@ What the pieces behind this one should know:
   FFFEh for two back, and is added to a pointer as it is, `text +
   shift`, is no arithmetic at the place and is named nowhere. The
   places where the finder did find the sum, kind `index`, are all sums
-  of small numbers.
+  of small numbers. C1 met the first such, the step of `T71_00`, and
+  taught the finder the half of it that can be seen: a number that is
+  written below 0 and kept in 16 bits without a sign is a place, kind
+  `minus`. See "C1, the editor".
 - **Step 2.** A cast of this piece marks a number that can wrap round
   on DOS or cannot be seen not to: when the variables are made wider
   each is a place to decide, and the two commits of the piece that
@@ -5647,6 +5650,29 @@ the program does. The ways that there seem to be, none of them taken:
 
 For the piece that takes it: nothing of `editor-big` behind its step
 28 is known to pass but by the trial with 320 KB.
+
+**What the finder was taught.** `harness/int16.py` could not see the
+fault: `(u8 *)to + step` is a pointer and a variable, which may hold
+any number of its type. What can be seen is where the number comes
+from: `(u16)-160`, a number written below 0 and made one of 16 bits
+without a sign, at the three calls. That is a kind of place now,
+`minus`, found where such a number is cast, handed to a function,
+returned or given to a variable, and the reader follows it to where
+it is used. The tree has four: the three calls of `T71_00`, whose
+reason is that the routine adds the step to a place, and the
+comparison of `treebox.c`. It is fifteen lines of the finder and
+twelve of `harness/int16check.c`, six that are to be found and six
+that are not. Had it been there for P4, the three calls would have
+been read with `T71_00` open.
+
+What it still cannot see is a number that is worked out and has
+wrapped round, `first - shown`, kept in a variable and added to a
+pointer later. Reading `edit.c` whole found none; the other files
+were not read whole for it, and the scenarios that pass say only that
+none shows.
+
+The host check could not be taught it: gcc reads the second bodies
+and has nothing to say of a sum.
 
 For the pieces behind this one:
 

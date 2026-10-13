@@ -68,6 +68,18 @@ drive.c, F62_01: shift
     wide is four times the number of drives at the most, by the lines
     above, and there are 26 letters.
 
+edit.c, T00_20: minus
+    | (u16)-160);
+    The step of T71_00, which adds it to a place of the main data, a
+    number, and makes the pointer of the sum: MD_POINTER(MD_PLACE(to) +
+    step). The sum wraps round there in both builds.
+
+edit.c, T02_03: minus
+    | ed.EdBase + ((u16)(u8)(ed.EdSizeY - 1) << 8), (u16)-160);
+    The step of T71_00, which adds it to a place of the main data, a
+    number, and makes the pointer of the sum: MD_POINTER(MD_PLACE(to) +
+    step). The sum wraps round there in both builds.
+
 enter.c, F21_25: back
     | md.HstBuf[i] = md.HstBuf[i - length];
     The loop goes on while i is length or more.
@@ -242,6 +254,11 @@ tree.c, TreeCur: index
     `(made)[n + 1]` with n 99 at the most, each behind the loop that
     counts it.
 
+treebox.c, ChTree: minus
+    | } else if (moved == (u16)-(int)sizeof(struct DIRENT)) {
+    Held against moved, a difference of two places of 16 bits, and
+    kept nowhere: nothing is added to anything.
+
 usermenu.c, F32_00: index
     | screen += keys + 1;
     keys is how many cells the widest key of the menu's lines takes: it
@@ -251,6 +268,12 @@ usermenu.c, F32_70: shift
     | answer = DoublMo((begin + 0x204 & 0xFF) | (u8)(((begin + 0x204) >> 8)
     Only the low byte of what is shifted is kept, (u8): bits 8 to 15 of
     the sum, which are the same whether or not it has a bit above them.
+
+view.c, V00_10: minus
+    | T71_00(0x700, begin + ((VI->ViSize >> 8) - 1 << 8), (u16)-(2 * 80));
+    The step of T71_00 of edit.c, which adds it to a place of the main
+    data, a number, and makes the pointer of the sum. The sum wraps
+    round there in both builds.
 
 view.c, V30_00: back
     | last = text[end - 1];
