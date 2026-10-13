@@ -96,16 +96,17 @@ the finding: see `csover.c`.
 The three of real mode are run under the program's name: `run.py --name
 VC.COM build/trial32/rmbench.com`.
 
-## Three scripts of the plan
+## Two scripts of the plan
 
 When the step was planned, on 13 October 2026 (`TODO.md`, "The portable
 C in 32 bits: the plan"), the tree itself was asked three things, by
-scripts that read and compile it and run nothing. They are here for the
+scripts that read and compile it and run nothing. Two are here for the
 pieces of that plan to start from, and what each printed that day is in
-the plan.
+the plan. The third, which asked where the program can tell an int of
+32 bits from one of 16, has become a test of the build,
+`portable_c-int16`, and is `harness/int16.py`.
 
 | File | What it asks |
 |---|---|
 | `casts.py` | Of the places where a pointer is kept in a number or made of one, which `harness/hostcheck.py` counts: what is each, a place of the main data, a table by its offset, a panel by its segment? It prints the classes of the plan with their files, and the places of one. It needs gcc, as the host check does |
-| `int16.py` | Where can the program tell an int of 32 bits from one of 16: where is arithmetic on numbers of 16 bits compared, divided, shifted right or made wider before it is put back into 16? It needs clang, which reads each file for a machine of 32 bits. Its top says what it cannot see |
 | `whole.py` | Does the tree link as a flat program, and how long is that? It has the project's build compile the tree for 32 bits, into `build/portable_c32/`, and links those objects, `dos32.c` among them, with what the build does not make: a file that the build lists as not ready for 32 bits, compiled here with its warnings, and the three functions of DOS that are outside `sys.h`, as functions that do nothing. It prints the file's length, its objects and its relocations. Nothing that it makes runs. When the plan was made it compiled the tree itself, and had every function of `sys.h` do nothing |

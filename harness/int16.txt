@@ -1,0 +1,278 @@
+Where the portable C, src/portable_c/, can tell an int of 32 bits
+from one of 16, and why each place is the same in both builds all
+the same. harness/int16.py found the places, with clang 23, and says
+what the kinds are; the reason under a place was written by whoever
+read it. The test portable_c-int16 holds the tree to this: a place
+that is not here is read, and gets the cast that says what DOS does
+or its reason. `python3 harness/int16.py --record` writes the places
+anew and keeps the reasons.
+
+bars.c, DosCom: compare
+    | if (cursor - 5 < first)
+    The line above asks that cursor is 5 or more.
+
+bars.c, DosCom: compare
+    | if (cursor >= width && cursor - width > first)
+    The same line asks first that cursor is width or more.
+
+blank.c, Below: shift
+    | return ((number >> 8) * limit + ((number & 0xFF) * limit >> 8)) >> 8;
+    limit is a byte: the two calls hand it md.Lines and 80. Each product
+    is 255 times 255 at the most, and the sum 65,025 and 254.
+
+box.c, MinBx5: divide
+    | u16 less = (u8)(((u16)(u8)(size - least) >> 1) * step / (Diskret - 1));
+    What is shifted is cut to a byte first, so the half is below 128; and
+    step is 4 at the most, by the loop of MinBox, which alone calls this.
+
+commands.c, F69_00: index
+    | from = md.ScrBuf + less * 80;
+    less is below was, which is md.Lines as it was, a byte.
+
+commands.c, F69_00: index
+    | to = md.ScrBuf + was * 80;
+    was is md.Lines as it was, a byte.
+
+copy.c, F35_50: compare
+    | for (i = 0; i < CpVar2 - CpVar1; i++)
+    CpVar1 and CpVar2 are places of TmpBuf that are written at the top of
+    the file, 120 and 140: 20 apart.
+
+dialog.c, MnMn11: shift
+    | chosen = item - table >> 1;
+    item steps up from table, two at a time, in the loop above.
+
+dialog.c, MnMn11: shift
+    | key = item - table >> 1;
+    item steps up from table, two at a time, in the loop above.
+
+dirfunc.c, DirFunc: index
+    | end[count] = Mask_S[skip + count];
+    skip is 0 or 1, by the lines above, and count is below 5.
+
+drive.c, F62_01: compare
+    | if (active == 3 - unit)
+    unit is 1 or 2: the letter is A or B, by the lines above.
+
+drive.c, F62_01: index
+    | cell = (u8 *)first + (u16)(u8)(apart + 2 + apart) * cursor + 1;
+    What cursor is multiplied by is cut to a byte, and cursor is the
+    number of a drive, below 26.
+
+drive.c, F62_01: index
+    | screen += apart + 1;
+    apart is 3 at the most, by the lines that count it up from 0.
+
+drive.c, F62_01: shift
+    | - (wide + 1 >> 1);
+    wide is four times the number of drives at the most, by the lines
+    above, and there are 26 letters.
+
+enter.c, F21_25: back
+    | md.HstBuf[i] = md.HstBuf[i - length];
+    The loop goes on while i is length or more.
+
+enter.c, F27_00: back
+    | c = md.DosBuf[cursor - 1];
+    The line above asks that cursor is not 0.
+
+files.c, Sort: index
+    | c0 = name[dot + 1];
+    dot is below length, and length below 12, by the lines above.
+
+files.c, Sort: index
+    | c1 = name[dot + 2];
+    dot is below length, and length below 12, by the lines above.
+
+files.c, Sort: index
+    | c2 = name[dot + 3];
+    dot is below length, and length below 12, by the lines above.
+
+files.c, TstExe: index
+    | && name[2] == Ext_S[i + 2])
+    i is below the length of Ext_S, by the loop that the line is in.
+
+files.c, TstExe: index
+    | if (name[0] == Ext_S[i] && name[1] == Ext_S[i + 1]
+    i is below the length of Ext_S, by the loop that the line is in.
+
+find.c, FindFil: index
+    | *to++ = Mask_S[suffix + i];
+    suffix is 1 or 4, by the lines above, and i is below 4.
+
+info.c, PutInf: index
+    | cell += i + i;
+    The line above has made i 8 at the most.
+
+line.c, CntLine: shift
+    | line.screen = BasAdr(args->value) - (length + 1 >> 1);
+    length is how many cells a line of text takes, which LnStr counts a
+    character at a time: no text of the program has 65,535.
+
+main.c, Loop: back
+    | if (keys[i - 1] == key >> 8) {
+    The line above has stepped i up from what was below ALT_KEYS: 1 at
+    the least.
+
+main.c, Loop: back
+    | if (md.CrnPath[i - 1] != md.DosPth[i - 1]) {
+    The line above has stepped i up from what was below length: 1 at the
+    least.
+
+menu.c, F39_00: back
+    | md.HlpPage = MnuHlp[MnuTab[menu - 1].help + (item == 0xFF ? 0 : item)];
+    menu is the number of a menu of the bar, from 1. Were it 0, both
+    builds would read the entry before the table: MnuTab is a constant
+    among others, and not where a segment begins.
+
+menu.c, F39_00: index
+    | md.HlpPage = MnuHlp[MnuTab[menu - 1].help + (item == 0xFF ? 0 : item)];
+    help is a byte of MnuTab, and item the number of a line of a menu, or
+    FFh for none, which is taken for 0 here.
+
+menu.c, F39_58: index
+    | *(u8 *)(top + order * 80 + 561) = TICK;
+    The lines above have made order 4 at the most.
+
+menu.c, F40_30: index
+    | u16 *line = top + item * 80 + 1;
+    item is the number of a line of a menu: the four calls, in F39_58,
+    hand it 10, 12, 13 and 14.
+
+panel.c, PutPath: shift
+    | place = ADD_LOW(place, -((length - least >> 1) + 1));
+    Three lines above ask that length is least or more.
+
+resident.c, Alloc0: shift
+    | length = (u16)(end >> 16) + (((u16)end + LenStk + 15) >> 4)
+    The low word of `end` is where the stack begins in its segment, which
+    holds nothing else (stack.c), and LenStk is 4,096. The line is of the
+    entry of the program for DOS, which goes to dos.c (TODO.md, the plan
+    of the 32 bits, S3).
+
+screen.c, BasAdr: index
+    | return md.ScrBuf + (row << 6) + (row << 4) + (place & 0xFF);
+    row is the high byte of place, by the line that declares it: 255 times
+    80 at the most, and a byte.
+
+screen.c, ColAddr: index
+    | return IN_TABLE(number, palette);
+    The lines above have made palette below 3, and IN_TABLE takes the low
+    byte of number: six times 255 and a little.
+
+screen.c, Color: index
+    | return *IN_TABLE(number, palette);
+    The lines above have made palette below 3, and IN_TABLE takes the low
+    byte of number: six times 255 and a little.
+
+start.c, IniData: back
+    | md.LowTab[c - 128] = (u8)(0x80 + i);
+    The line above asks that c is 80h or more.
+
+start.c, IniData: index
+    | for (i = 0; i < sizeof Comsp && env[at + i] == Comsp[i]; i++)
+    at is a place in the environment, which DOS holds to 32K, and i is
+    below the length of Comsp.
+
+start.c, MnPth0: index
+    | for (i = 0; i < length && env[at + i] == name[i]; i++)
+    at is a place in the environment, which DOS holds to 32K, and i is
+    below the length of a name of a variable, which the callers write.
+
+stcolor.c, StCol00: index
+    | chosen.color = StPalets[ColAddr(sd.ColCur) - md.ColTab];
+    ColAddr answers with a place in ColTab: IN_TABLE of screen.c adds to
+    md.ColTab and takes nothing away.
+
+stcolor.c, StF07_10: compare
+    | if (cursor >= lines + first)
+    first is no more than cursor, by the lines above, and lines is a byte,
+    as Lines answers: the sum leaves 16 bits only for a cursor of 65,281
+    and more, and the cursor is the number of a colour of the list.
+
+stcolor.c, StF07_10: index
+    | StF07_75(md.ColTab[sd.ColCur * 6 + list.palette * 2
+    ColCur is the number of a colour of the list, of which there are
+    ColNum, and palette is below 3: StCol00 is handed it so.
+
+stcolor.c, StF07_30: compare
+    | if (item > sd.ColNum - 1) {
+    ColNum is 1 at the least: StCol00 counts the names of the colours in
+    a loop that goes round once before it asks.
+
+stcolor.c, StF07_44: compare
+    | if (cursor > page + first)
+    The line above has made first what it was less page, or 0: the sum
+    is what first was, or page.
+
+stcolor.c, StF07_53: index
+    | md.ColTab[at + i * 6] = StPalets[at + i * 6];
+    The line above the loop makes at 5 at the most, of a palette below 3,
+    and i is below LenColr, 40.
+
+sthelp.c, StHelp: back
+    | entry = (struct StHlpData __far *)(buffer + (at - HELPBUF));
+    at begins two behind HELPBUF and goes up: the loop is left where the
+    next would have wrapped round.
+
+stmain.c, StUserScr: index
+    | return md.UserScr + row * 80;
+    The line above asks that row is below MaxLins - 1.
+
+string.c, LowCase: back
+    | return md.LowTab[letter - 0x80];
+    The line above asks that letter is 80h or more.
+
+string.c, ShrtLin: back
+    | from = text + (length - limit);
+    The lines above return where length is limit or less.
+
+tree.c, PutTree: index
+    | DESCEND(PATH, entry, text, i, n);
+    `text[i + 1]` of DESCEND: i is 12 at the most behind the loop above
+    it, which goes on while it is below 12.
+
+tree.c, PutTree: index
+    | IS_PATH(color, PATH, md.DosPth, i, n);
+    `(made)[n + 1]` of IS_PATH: n is 99 at the most behind the loop that
+    counts it, which goes on while it is below 99.
+
+tree.c, TrCr10: index
+    | FIND(found, entry, count, text, i, n);
+    FIND is DESCEND and IS_PATH: `text[i + 1]` with i 12 at the most, and
+    `(made)[n + 1]` with n 99 at the most, each behind the loop that
+    counts it.
+
+tree.c, TreeCur: index
+    | FIND(found, entry, count, text, i, n);
+    FIND is DESCEND and IS_PATH: `text[i + 1]` with i 12 at the most, and
+    `(made)[n + 1]` with n 99 at the most, each behind the loop that
+    counts it.
+
+usermenu.c, F32_00: index
+    | screen += keys + 1;
+    keys is how many cells the widest key of the menu's lines takes: it
+    is counted up from 0 above, a name of a key at a time.
+
+usermenu.c, F32_70: shift
+    | answer = DoublMo((begin + 0x204 & 0xFF) | (u8)(((begin + 0x204) >> 8)
+    Only the low byte of what is shifted is kept, (u8): bits 8 to 15 of
+    the sum, which are the same whether or not it has a bit above them.
+
+view.c, V30_00: back
+    | last = text[end - 1];
+    The line above asks that at is below end: end is 1 at the least.
+
+view.c, V32_00: compare
+    | if (end >= at && end - at >= 2) {
+    The same line asks first that end is at or more.
+
+view.c, V32_00: index
+    | screen[place + 1] = (u8)Color(Cursr_C);
+    place is a column of the window, doubled: the lines above leave the
+    loop where its low byte reaches the width, and it is counted up from 0.
+
+window.c, ResUser: index
+    | const u16 *from = md.UserScr + (row - md.ScrBuf);
+    How far row is behind md.ScrBuf, in cells: BasAdr, which the line
+    above has it from, adds to md.ScrBuf and takes nothing away.

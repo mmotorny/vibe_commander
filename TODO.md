@@ -1702,8 +1702,9 @@ What the test does not see, since gcc only reads the files:
 - Arithmetic that counts on an int of 16 bits. Two numbers of 16 bits
   are added and multiplied as numbers of 32 where an int has 32, and
   what wraps round on DOS does not there: `(u16)(a + b)` is the same on
-  both, `(a + b) >> 1` and `a + b < a` are not. Nothing has looked for
-  these.
+  both, `(a + b) >> 1` and `a + b < a` are not. Another test looks for
+  these since, `portable_c-int16`, with clang: `harness/int16.py`, and
+  "P4, the arithmetic: done" in the plan of the 32 bits.
 - A number of 16 or 32 bits read or written at an address that is not
   even, as `PUT16` does: right for the 8086 and its descendants, and
   not promised by the language.
@@ -2016,10 +2017,11 @@ of step 2 has to be settled with it. This is the plan, made on 13
 October 2026 at `c0b3cad`, before any of it was begun, by reading the
 tree and by trials that compile and link and run nothing. What the
 bench does with such a program is in the section behind this one, "what
-a trial on the bench showed", and is not said again. Three scripts of
-this plan's trials are kept with the toys, in `harness/trial32/`:
-`casts.py`, `int16.py` and `whole.py`. A count below says which of
-them counted it.
+a trial on the bench showed", and is not said again. Two scripts of
+this plan's trials are kept with the toys, in `harness/trial32/`,
+`casts.py` and `whole.py`; the third, `int16.py`, was there too until
+P4 made the test `portable_c-int16` of it, `harness/int16.py`. A count
+below says which of them counted it.
 
 ### In short
 
@@ -2276,10 +2278,12 @@ kept in 32 bits, `a == -1`. The types being `u8`, `u16` and `u32`
 everywhere, with no `int` in the tree but in two casts, and 244 places
 that say `(u16)(` already, most of the code is the same in both.
 
-`harness/trial32/int16.py` finds the rest: clang reads a file for a
+The plan's script `int16.py` finds the rest: clang reads a file for a
 machine whose int has 32 bits, and the script walks every expression
 with its type. Held against nineteen lines written for it, it found
-the nineteen. Of the 47 files of code it counts, in 34 of them:
+the nineteen. Of the 47 files of code it counted, in 34 of them, as
+the tree stood when the plan was made; what P4 made of the script
+counts otherwise, and "P4, the arithmetic: done" below has why:
 
 | Kind | Places | What |
 |---|---|---|
@@ -2293,7 +2297,9 @@ the nineteen. Of the 47 files of code it counts, in 34 of them:
 So some 50 places to read and 73 to look over, which is one piece, P4.
 Where a place can differ, `(u16)(a - b) < c` says what DOS does, in
 both builds, and compiles on DOS to the code that it had. P4 makes the
-script a test with a record, as the host check is.
+script a test with a record, as the host check is. It did: 79 places
+as its finder counts them, of which 21 got the cast and 58 are in the
+record with their reasons.
 
 The compiler's own warnings do not do it. Asked of the same files for
 the same machine, clang's `-Wsign-compare` names no place, since both
@@ -2309,7 +2315,9 @@ What neither finds:
   to a pointer: FFFEh for two back. On DOS the pointer wraps round with
   it. In a flat memory it lands 64K further on. Where the number goes
   through `AT` or `MD_POINTER` first, the megabyte does what DOS does;
-  where it is added to a pointer, it does not.
+  where it is added to a pointer, it does not. Since P4 `ENTRY` of
+  `vc.h` and `WORD_AT` of `view.c` cut what they are handed too, a
+  panel and the viewer's text being where their segments begin.
 - A far pointer stepped past the end of its segment, which begins
   again at 0 on DOS.
 - What is read behind an object, or at an index that the program does
@@ -2650,7 +2658,7 @@ and H1 are started at once by the session.
 | P2a, places of the main data: the lists, the tree, the command line. Done: see below | N in `treebox.c`, `tree.c`, `enter.c`, `usermenu.c`, `cmdline.c`, `place.c`, `info.c`, `extfile.c`, `drive.c`, `input.c`, `panel.c`, `files.c`, `read.c` | Those files | 97 places, 59 by hand | P1; beside P2b, P3, P4, S | The same bytes; those files clean in the host check | A number that is no place of the main data: `(u16)(u32)file` is the offset in a panel |
 | P2b, the same: the viewer, the editor, a copy, the menus. Done: see below | N in `view.c`, `edit.c`, `copy.c`, `menu.c`, `help.c`, `find.c`, `stcolor.c`, `sthelp.c`, `window.c`, `bars.c`, `dirfunc.c` | Those files, but the lines that S1 has in `view.c` | 66 places | P1; beside the others | The same | `EditBuf`, `CpSrc`: names that are places of the main data by a macro |
 | P3, the tables read as what they are. Done: see below | `DialBox`, `Dialog` and their routines read a box's lines, a dialog's box and its buttons as pointers; `main.c` reads `Menu_T` so and `stcolor.c` `StPagTab`; a word that is a number is read as one | `dialog.c` whole, with its 17 of N; `tables.h`; three lines of `main.c`, five of `stcolor.c` | 40 places of T, 17 of N | P1; beside the others | The 16-bit scenarios, since the code changes; `dialog.c` clean in the host check | The one routine that every box and dialog goes through |
-| P4, arithmetic | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
+| P4, arithmetic. Done: see below | `int16.py` becomes a test with a record; each place that it names is read, and gets its cast or its reason | `harness/int16.py`, its record, `CMakeLists.txt` for the test; single lines of 34 files | 50 places read, 73 looked over | P1; beside the others, and lands behind P2 | The same bytes where a cast was added; the record | A place taken for one that cannot wrap |
 | S1, the PSP and a program run. Done: see below | The command tail and the environment through `sys.h`; `ProgramRun` takes a name and a tail; `PspSeg` and `ProgramPrefix` go from the common code | `sys.h`, `dos.c`; the places in `resident.c`, `start.c`, `main.c`, `view.c`, `info.c` | Some 3 functions new, 2 changed, 6 places of the PSP and 6 of the block | P1; beside the P pieces | The 16-bit scenarios; `python3 tools/calls.py` | The two file control blocks that a program is run with are bytes of the main data, as the original has them: kept |
 | S2, what DOS enters | The critical error, Ctrl-Break and Ctrl-C taken and given back through `sys.h`; the entries in `dos.c` | `sys.h`, `dos.c`, `vc.h`; `HookVct`, `RestVct`, `FatErr` of `main.c`; `SetBrk`, `CtrlC` of `resident.c` | 3 entries, 7 places | S1 | The 16-bit scenarios, `not-ready` and `phantom` above all | The order in which DOS is asked for the vectors, which is behaviour |
 | S3, the entry, the end, Quick execute | `Alloc0`, `TakeEnd`, `Exit00` to `Exit05`, `Int2E`, `Exec2E` into `dos.c`; the 30 of N in `resident.c`, `main.c`, `start.c`; the four `#pragma data_seg` under `__I86__` | `resident.c`, `dos.c`, `main.c`, `start.c`, `stack.c` | 12 routines moved, 4 places of the PSP, 30 of N | S2 | The 16-bit scenarios, `ended` and `quick` above all; the host check has interrupt functions, `__loadds`, `_asm` and registers in `dos.c` and `arith.c` alone | The one place where the stack is set by hand |
@@ -2696,8 +2704,11 @@ What a piece goes by:
   the same source, which was seen. A file that differs where it was
   not to says where the change did more than it meant; `wdis` on the
   two objects shows the place.
-- The host check's record and, after P4, that of `int16.py` are
-  committed with the change that moves them.
+- The host check's record and that of `int16.py`, `harness/int16.txt`,
+  are committed with the change that moves them. The second moves for
+  a line that is changed and is in it, also where the change has
+  nothing to do with arithmetic: `python3 harness/int16.py --record`
+  then, which keeps every reason whose line is as it was.
 - From B1 on, a piece that does not compile for 32 bits does not land.
   From M1 on, one that takes a scenario out of the record does not.
   The scenarios take 195 to 200 seconds for a tree by itself
@@ -3298,6 +3309,128 @@ What a later piece should know:
   (`CLAUDE.md`, "Notes on the portable C"), and the pointers of
   `tables.h` say what each names by their own types, `const u8 *` for
   a text, `const void *` for a box or for buttons or a number.
+
+### P4, the arithmetic: done, and what a later piece should know
+
+`harness/int16.py` finds where the portable C can tell an int of 32
+bits from one of 16, and the test `portable_c-int16` holds the tree to
+`harness/int16.txt`, which has every such place with the reason why it
+is the same in both builds. A place where it is not, or is so only by
+what cannot be seen there, got the cast that says what DOS does, and is
+no place any more. `build/portable_c/VC.EXE` was the same bytes after
+each commit, and every file compiles for 32 bits.
+
+The finder is not the plan's script any more. That one went by the
+shape of an expression: an operator on numbers of 16 bits, and what
+looks at it. Held against the tree by eye it named what is no place
+and was silent on what is one, so it was written anew, to work out by
+the rules of C what each expression is in both builds: its type where
+an int has 16 bits and where it has 32, and between which numbers its
+value lies. An expression is the same in both when its value fits the
+type that it has on DOS; a place is where one that does not fit is
+looked at. The top of the script has the whole of it.
+
+| | The plan's script | The finder |
+|---|---|---|
+| Was silent on | `x /= a - b`, `p += a - b`: an assignment that works. `a > c - d` with two bytes: a number with a sign against one of 16 bits without. `~0`, `1 << 15`: what is worked out when the file is compiled. A function that clang refuses, which was passed over without a word | Finds them; stops with clang's words for a file that it does not take whole. The tree has three of the first, each a pointer stepped by a sum, `screen += apart + 1`, and none of the others |
+| Named needlessly | Some 200 shifts in the second bodies of `OFFSET` and `SEG_OF`, once P1 had landed. 8 of `widen`, most of them where a length, which is a number of 32 bits without a sign there, makes a sum one that is put back into 16 bits at once: `FILE_ADDRESS` of `place.c` | What is written in a second body of `vc.h` is no place; what is put back into 16 bits is none |
+| Did not know | How long anything is, or what a loop's variable can be | `sizeof` and `offsetof`, which clang is asked for: `INI_LEN` is 511. And a variable inside the loop that counts with it, `for (i = 0; i < 13; i++)`: `md.TmpBuf[100 + i]` is no place there. 57 places are none for these two |
+| Added to a pointer | Any number that may leave 16 bits either way: 73 | Three kinds. One that may be 65,536 or more, `index`: 64K further on in a flat memory. One that may only be below 0, `back`: back in both builds. One that is within 16 bits whatever its sign on DOS, `MD(field->mPoint) * 160` of bytes: no place, since DOS adds it to an offset of 16 bits |
+
+It is held against `harness/int16check.c` every time it runs: 69 lines
+each with the kinds that are to be found in it, and over a hundred in
+which nothing is to be found.
+
+What it counted, at `e345195`, and what became of each:
+
+| Kind | Places | Got the cast | In the record |
+|---|---|---|---|
+| `compare` | 16 | 8: `help.c`, `info.c` twice, `keys.c` four times, `view.c` | 8 |
+| `divide` | 3 | 2: `FILE_NUMBER` and `TREE_NUMBER` of `place.c`, where they are used | 1 |
+| `shift` | 9 | 1: `tree.c` | 8 |
+| `index` | 32 | 1: `ENTRY(wcb, file + gap)` of `files.c`, by `ENTRY` | 31 |
+| `back` | 19 | 9: the viewer's `WORD_AT(text, at - 2)`, by `WORD_AT` | 10 |
+| `signed`, `widen`, `truth`, `address` | none | | |
+| all | 79 | 21 | 58 |
+
+The plan had some 50 to read and 73 to look over. That no place is of
+`widen` or `truth` is the translation's doing: it says `(u16)(` 244
+times and `(u32)` before a product.
+
+**Cast or reason.** A cast where the number is a place of the main
+data and a length (`info.c`, which P2a had listed), a difference of two
+addresses or of the cursor and the first entry shown, a sum that the
+code itself cuts a line below (`keys.c`), or a count that is a byte
+with its sign (`help.c`). A reason where the line above asks that the
+number fits, or the lines above set it. Some fifteen reasons rest on
+what is not at the place, and say what: that an item of a menu, a row
+of the screen, the number of a colour or of a drive is small; that DOS
+holds the environment to 32K (`start.c`, twice); that no text has
+65,535 characters (`line.c`).
+
+**A number added to a pointer**, which the plan had as 73 places to
+look over, comes to this. On DOS it is added to an offset of 16 bits,
+which wraps round; in a flat memory nothing wraps. So:
+
+- A sum that carries out of 16 bits is always another byte in a flat
+  memory, 64K further on. Where the pointer is the beginning of a
+  segment the cut says what DOS does, `text + (u16)(at)`, since the
+  megabyte has at every offset of a segment what DOS has there. That
+  is why `ENTRY` and `WORD_AT` cut.
+- A number below 0 steps back in both builds, to the same byte unless
+  the pointer is less than that far behind the beginning of its
+  segment. `md.DosBuf[cursor - 1]` is such, and so is every `text--`
+  that no finder names. No cast mends that: a cut number steps 64K
+  forward in a flat memory.
+- So nothing that is written at a place makes a pointer wrap round as
+  DOS does, but for a pointer that is a segment's beginning. A pointer
+  that the 16-bit program does step round the end of a segment is found
+  by the bench, as "What could go wrong" has it, 1 and 2.
+
+What is otherwise than the plan had it:
+
+- `md.HstAdr - 1` of `enter.c`, which P2a listed with `info.c`'s, is
+  no place: it is put into a word of 16 bits where it stands, `u16
+  entry`.
+- The test reads the 16 files of tables as well as the files of code:
+  a constant of a table is worked out by each compiler for itself.
+  They have no place.
+- `arith.c` and `dos.c` are not read, nor `dos32.c`: none is compiled
+  for both ints. `resident.c` is, while it is of both builds.
+
+What the pieces behind this one should know:
+
+- **Every piece.** A line that is changed and is in the record is
+  another place to the test, which then fails for it twice, as new and
+  as gone. Read it again and run `--record`; the notes of `CLAUDE.md`
+  say when it is a cast and when a reason. A place has no number of a
+  line, so lines added above move nothing.
+- **D2 and M1.** `start.c` has two places of the environment,
+  `env[at + i]` in `MnPth0` and in `IniData`, recorded as within 32K,
+  which is what DOS holds an environment to. S1 has it come through
+  `ProgramEnvironment` of `sys.h` and left the two lines as they were;
+  what `dos32.c` answers there has to end within 64K of where it
+  begins, as DOS's does.
+- **S3.** `Alloc0` of `resident.c` is in the record for the paragraphs
+  that the program keeps. In `dos.c` it is read no more, and `--record`
+  takes it out.
+- **M1 and the convergence.** What the finder cannot see is at its
+  top. Above all: a variable of 16 bits that holds a wrapped number,
+  FFFEh for two back, and is added to a pointer as it is, `text +
+  shift`, is no arithmetic at the place and is named nowhere. The
+  places where the finder did find the sum, kind `index`, are all sums
+  of small numbers.
+- **Step 2.** A cast of this piece marks a number that can wrap round
+  on DOS or cannot be seen not to: when the variables are made wider
+  each is a place to decide, and the two commits of the piece that
+  change the code list them. The record's reasons hold for
+  numbers of 16 bits: a variable made wider makes a place again where
+  a reason said "a byte".
+- **Whoever changes the finder.** A line of `harness/int16check.c` is
+  worked out by hand before the finder is asked. Five of those written
+  for it were wrong and the finder right; the one that teaches most is
+  that 65,530 written in decimal is a long on DOS, so `x + 65530` is
+  added in 32 bits there as well, and `x + 0xFFFA` is not.
 
 ### What could go wrong
 

@@ -82,7 +82,8 @@ source, the message that it differs in wants a kind of its own in SAYS.
 
 What it cannot see, since it only reads: arithmetic that counts on an
 int of 16 bits, where the sum of two numbers of 16 bits wraps round on
-DOS and does not where an int has 32; a number that is written to the
+DOS and does not where an int has 32, which harness/int16.py finds, the
+test `portable_c-int16`; a number that is written to the
 memory at an address that is not even; a pointer made of a number that
 is written out, an address of the BIOS's data, of which gcc says
 nothing; and anything that is right C and means something else without

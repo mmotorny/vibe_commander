@@ -560,6 +560,15 @@ endforeach()
 add_test(NAME portable_c-host
     COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/hostcheck.py)
 set_tests_properties(portable_c-host PROPERTIES SKIP_RETURN_CODE 77)
+# The arithmetic of the portable C that an int of 32 bits can tell from
+# one of 16: every place where a number that the two builds may have
+# otherwise is compared, divided, shifted, made wider or added to a
+# pointer, held to a record that has the reason why each is the same in
+# both. See harness/int16.py. It builds nothing and runs no machine, and
+# is skipped where there is no clang.
+add_test(NAME portable_c-int16
+    COMMAND Python3::Interpreter ${CMAKE_SOURCE_DIR}/harness/int16.py)
+set_tests_properties(portable_c-int16 PROPERTIES SKIP_RETURN_CODE 77)
 # The harness's reader of a flat program of 32 bits, its file and the
 # linker's map of it, against a toy that the test builds with the
 # compiler, the linker and the stub of the Open Watcom fetched above: see

@@ -1043,21 +1043,21 @@ declared for it.
 ## Testing
 
 Needs `python3`, `qemu-system-i386` and `mtools`, in addition to the above.
-One test, `portable_c-host`, asks `gcc`, and is skipped where there is
-none.
+One test, `portable_c-host`, asks `gcc`, and one, `portable_c-int16`,
+asks `clang`: each is skipped where there is none.
 
 ```sh
 ctest --test-dir build --output-on-failure
 ```
 
-There are nine tests: one of the assembly, three of each C tree,
+There are ten tests: one of the assembly, three of each C tree,
 named by the tree that they judge, `c-` for the C translation and
-`portable_c-` for the portable C, one more of the portable C, of its
+`portable_c-` for the portable C, two more of the portable C, of its
 source, and one of the harness itself. The two trees are held to the
-same checks, against the same goldens. Seven of the tests run no
-machine and take a second or two; `c-scenarios` and
+same checks, against the same goldens. Eight of the tests run no
+machine and take a few seconds at the most; `c-scenarios` and
 `portable_c-scenarios` each run every scenario, in a little under two
-minutes on a machine that does nothing else, so all nine take three
+minutes on a machine that does nothing else, so all ten take three
 minutes and forty seconds.
 
 | Test | What it checks |
@@ -1067,6 +1067,7 @@ minutes and forty seconds.
 | `c-arith` | The two routines of `src/c/arith.c`, which the compiled code calls to multiply and to divide numbers of 32 bits, give what Python gives for some 4,700 pairs of numbers, those at the edges among them: the product, the quotient and the remainder. They are run as the bytes that the compiler made of them, called near or far as each returns, on a model of the processor that knows their instructions, so it also shows a register that is not kept and a write to the caller's stack. No scenario divides by more than 16 bits, and none would show a result that is wrong for some numbers only. No machine is run for it |
 | `portable_c-data`, `portable_c-arith`, `portable_c-scenarios` | The same three checks of the portable C, `build/portable_c/`: what is said of the translation in the rows above and below holds for it, but where `src/portable_c/DEVIATIONS.md` declares otherwise. A table that is declared to differ is held against the original's with that difference made to it. A text, box, dialog or table of the setup program, which has `St` in front of its name in this tree, is held against the bytes of the original's `VCSETUP.COM` in the same way. A scenario that is declared to change is held against the original's golden with that difference made to it, the steps that are left out and the rows of its patch, and one that only shows what the portable C has no more is not run; the test says how many scenarios were held against the original's golden as it is, and names the others. A patch that does not fit its golden, or that names no entry of `DEVIATIONS.md` which names its scenario, fails the test. Its file is held to no multiple of the original's size: the test says how long it is, and holds it to what the machine of the tests asks of its layout |
 | `portable_c-host` | The source of the portable C as another compiler reads it: `harness/hostcheck.py` has gcc read every file of `src/portable_c/` for a machine of 64 bits, as strict C of 1999, and counts by kind what gcc refuses, a pointer cast to a number of 16 or 32 bits, a number made a pointer, a structure that is not as long as on DOS, and what only Open Watcom reads, an interrupt function, inline assembly, a `#pragma` of its own. `harness/hostcheck.txt` has what was counted last, of every file, and the test fails where a file has another count of any kind: more, and a clean file that is clean no more, and fewer too, so that the record is always what is so, and what a change did to it shows in the commit. `python3 harness/hostcheck.py --record` writes the record anew, `--show` lists the places of a file or of a kind, and `--macros` says which macros make the casts. Nothing is compiled or run for it. It is skipped where there is no gcc |
+| `portable_c-int16` | The arithmetic of the portable C that counts on an int of 16 bits. C makes an int of two numbers of 16 bits before it adds them or takes one from the other: without a sign and wrapped round on DOS, with a sign and not wrapped where an int has 32 bits. `harness/int16.py` has clang read every file that both builds have, for a machine whose int has 32 bits, and works out by the rules of C where a number that the two may have otherwise is looked at before it is put back into 16 bits: held against another, divided, shifted right, made a number of 32 bits, asked whether it is 0, added to a pointer. `harness/int16.txt` has every such place, with the reason why it is the same in both builds all the same, written by whoever read it; a place that can differ has no reason and gets the cast that says what DOS does, `(u16)(a - b) < c`, which is no code there. The test fails for a place that the record has not, for one of the record that is gone, and for one without a reason. The finder is held against lines that were written for it, `harness/int16check.c`, each time it runs. `--show` lists the places of a file or of a kind, and `--record` writes the record anew and keeps the reasons. Nothing is compiled or run for it. It is skipped where there is no clang |
 | `harness-le` | It judges the harness and no tree, and is named for that. The harness's own reader of a 32-bit program for DOS, `harness/le.py`, which the tests of the portable C are to go by once that is such a program (`TODO.md`, "The portable C in 32 bits: the plan"). `harness/lecheck.py` builds a toy, `harness/lecheck.c`, as a flat program with DOS/32A for its stub, with the compiler and the linker that the build fetches, and holds what the reader finds in the file and in the linker's map against what the toy's source says must be there: where the stub ends, the objects and how much of each the file has, the entry and the stack, where a symbol is, a static one too, and every address that the extender puts in when it loads the program, with those that lie across the end of a page and those that name something outside their object. The toy is not run; what it shows of itself on the bench, and how that is held against the reader by hand, is at the top of `harness/lecheck.py`. No machine is run for it |
 | `c-scenarios` | The translation does what the original did in every scenario: the same screen after every step, the same files on its disks. Every instruction of the assembly that has been translated ran in the original on the way, and every C function that replaces it ran in the translation. The translation is not more than three times the size of the original, and leaves at least half of its stack untouched in every scenario. And the comparison itself: with one cell of a screen changed, or one entry gone from a disk, it must report a difference |
 

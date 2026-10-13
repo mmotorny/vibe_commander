@@ -1769,8 +1769,53 @@ in "The portable C".
     right that uses it, and `--macros` says which macros there are and
     how many places each makes. The words of the addresses in `vc.h`
     are made so: gcc reads their second bodies, which cast nothing.
-  - What gcc cannot say, since it only reads, is in `TODO.md`: above
-    all arithmetic that counts on an int of 16 bits.
+  - What gcc cannot say, since it only reads, is in `TODO.md`. Of
+    that, arithmetic that counts on an int of 16 bits has a test of
+    its own, the next note.
+- The test `portable_c-int16` has clang read the tree for a machine
+  whose int has 32 bits and finds where a number that the two builds
+  may have otherwise is looked at before it is back in 16 bits: the
+  top of `harness/int16.py` says how it knows, and what it cannot
+  see. `harness/int16.txt` has every such place with the reason why
+  it is the same in both builds. Using it and keeping it up:
+  - It fails for a line that is new or changed and is such a place:
+    "not in the record". Read the place, `--show FILE` for the lines.
+    Where the number can leave 16 bits or go below 0, or stays within
+    only by something that is not to be seen at the place, write the
+    cast that says what DOS does, `(u16)(a - b) < c`, and the place is
+    gone: that is no code on DOS, so `VC.EXE` is the same bytes, which
+    is held against the file of before. Where it cannot, run
+    `--record` and write the reason into `harness/int16.txt` by hand,
+    under the place's line, in the words of the others: what at the
+    place or just above it keeps the number in.
+  - It fails for a place of the record that is gone, also where a
+    line was only written otherwise: `--record` takes it out, and
+    keeps the reason of every place whose line is as it was. A place
+    is its file, its function, its kind and the text of its line; the
+    number of the line is not in the record.
+  - A cast is the answer where the number is a place or an address of
+    16 bits, a difference of two such, or a sum that the code itself
+    cuts elsewhere. A reason is the answer where the line above asks
+    that it fits, or a loop counts it. A cast where nothing can wrap
+    says to the reader of step 2 that something does.
+  - Added to a pointer, a cut number is what DOS has only where the
+    pointer is the beginning of a segment: a panel, `ENTRY` of `vc.h`,
+    and the viewer's text, `WORD_AT` of `view.c`, which cut what they
+    are handed. Of any other pointer the two builds step back alike
+    for a number below 0, kind `back`, and nothing written at the
+    place makes a flat memory wrap round at 64K.
+  - A variable is taken to hold any number of its type, but one that
+    a loop counts with, inside that loop: `for (i = 0; i < 13; i++)`
+    with `i` the function's own, changed nowhere else in the loop and
+    no label in it. A loop of another shape, `i += 3` or a second
+    condition, is not known, and its places want a reason.
+  - It needs clang, any that gives the account of a file that the
+    finder was written for: it holds itself against
+    `harness/int16check.c` first, lines with the kinds that are to be
+    found in each, and says so where they are not. A line added there
+    is worked out by hand first. Five of those written for it were
+    wrong and the finder right: 65,530 written in decimal is a long on
+    DOS, and what is added to it is added in 32 bits there too.
 - The figures of the portable C that change with every step, the
   length of its file and what follows from that, what it keeps of the
   memory, where its code segments end, and the counts of what only
