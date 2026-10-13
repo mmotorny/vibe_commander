@@ -33,9 +33,8 @@ static const u8 CODE PtIn_P[] = {Back_C, Title_C};
    kind. Each line has its middle in the middle of the panel.
 
    From the fourth row of the panel: the memory there is and how much of
-   it is free, which is more while the program gives up most of its own
-   for a command; the label of the current drive; the size of the disk and
-   what is free on it. If the other panel shows files and is not switched
+   it is free with the program loaded; the label of the current drive; the
+   size of the disk and what is free on it. If the other panel shows files and is not switched
    off: how many files it has, without the directories, and what they
    take on the disk, every file counted in whole clusters; and its path
    with its mask, as it stands over that panel, in at most 37 characters.
@@ -82,9 +81,10 @@ void PutInf(u16 panel)
     Number(md.TmpErr + 1, i >> 12, i << 4, NUM_SEPARATED);
     line.include = PtIn2_S;
     PUT(PtIn1_S);
+    /* The memory that is free with all of the program loaded. The
+       original shows another number, FreMem1, where it is set up to
+       give most of itself up for a command. */
     i = md.FreMem2;
-    if (md.LoadFl != 0)
-        i = md.FreMem1;
     Number(md.TmpErr + 1, i >> 12, i << 4, NUM_SEPARATED);
     line.include = PtIn3_S;
     PUT(PtIn1_S);

@@ -332,6 +332,13 @@ def places(source, objects, variables=()):
 # declared to do without what read it (src/<tree>/DEVIATIONS.md): tree ->
 # (file, name) -> why. Each has to be gone from the tree.
 GONE = {
+    "portable_c": {
+        ("resident.c", "BadFl_S"): "said that the program's file is bad "
+                                   "or missing, when the program wanted "
+                                   "to load itself again after a command: "
+                                   "the portable C stays in the memory "
+                                   "whole",
+    },
 }
 
 

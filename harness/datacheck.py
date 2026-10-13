@@ -121,7 +121,22 @@ DIFFERENT = {
 # the original it is, and the bytes that the tree has there instead, none
 # for bytes that are left out. The object is held against the original's
 # with that done to it, and has to be exactly that.
+_NO_OPTION = ("the portable C stays in the memory whole while a command "
+              "runs, and its Options menu has no Memory allocation: ")
 DECLARED = {
+    "portable_c": {
+        "Menu4_T": (_NO_OPTION + "the command of that item is left out, "
+                    "M73_00", ((26, 2, b""),)),
+        "MenuLn": (_NO_OPTION + "the line of that item is left out",
+                   ((706, 19, b""),)),
+        "MnuHlp": (_NO_OPTION + "the page of the help for that item is "
+                   "left out, 52", ((62, 1, b""),)),
+        "MnuTab": (_NO_OPTION + "the menu is a row shorter, 12h rows "
+                   "with its frame and its shadow", ((27, 1, b"\x12"),)),
+        "KeyTab": (_NO_OPTION + "Save setup, which Shift-F9 chooses in "
+                   "the menu, is its item 15 and not 16",
+                   ((119, 1, b"\x0F"),)),
+    },
 }
 
 # Words of an object that hold an address in the original, where the

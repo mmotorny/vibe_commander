@@ -45,6 +45,56 @@ the two. What was the fourth, the rest of `view.c`, is done.
 written so that a call that was not changed does not compile, and what
 went wrong on the way.
 
+## The portable C: one program
+
+The portable C stays in the memory whole while a command runs
+(`src/portable_c/DEVIATIONS.md`, the first entry). So far that is a
+change of what it does, and the least one: it never gives up its code,
+never loads itself again, and has no Memory allocation in its Options
+menu. It is still laid out, built and written as the two parts that the
+original is, one that stays and one that goes, and that is what is left:
+
+- The main data is still given back to DOS for a command and asked for
+  again afterwards, and made of what the first part keeps of it
+  meanwhile: `F21_31` and `F21_40` of `src/portable_c/enter.c`, `Init11`
+  and `Expand` of `start.c`, and `WCB1sav`, `WCB2sav` and `ComnIni` of
+  `struct Stays`. A program that stays whole keeps its main data and its
+  panels where they are, in a block that it makes shorter for the
+  command, as `src/portable_c/view.c` already does around a viewer or an
+  editor of the user's. What is then to be settled, since each can be
+  seen: the map of the memory, which lists the main data as free
+  because a command finds it free; the Info panel's free memory; what
+  the program's own call of DOS, AH 2Bh with 'VC' and 'OM', hands a
+  setup program, which today is those three copies, of a panel its
+  files as 13 bytes each; the 256 files of a panel that are kept across
+  a command; and where the main data goes when a program has stayed in
+  the memory behind it.
+- The two parts themselves: `resident.c` with its own group, its own
+  copy of `dos.c`, DS on the PSP and the far pointers made at run time
+  between it and the rest, `TrnMain`, `SetBrk`, `Release`, `TRN_SEG`,
+  `ResSeg`, `MemRun`, `AsmSeg`; the block of the code made by writing
+  the header that DOS keeps in front of one, in `Alloc0`; the linker's
+  relocations applied by the program, `Reloc`; and `tools/mkexe.c`,
+  which lays the file out for all that and holds it. With one program
+  the linker can write the file, DOS relocate it, and most of the
+  seventeen places of the README's "What rests on Open Watcom" go. What
+  has to stay, in one program: the interrupt functions, and the entry
+  of INT 21h that takes nothing of its caller's stack for a call that
+  it passes on.
+- The memory model, when the program is one: whether its data can be
+  one group with DS on it and the stack in it, so that `STACK`, `CODE`
+  and the far pointers to constants go. The main data is 62.6 KB, the
+  constants 8.9 KB and the stack 4 KB, 11 KB more than a segment holds;
+  the tree of directories has 12 KB of the main data.
+
+What the items below say of the part that stays in the memory, under
+"Known and not dealt with", they say of the C translation, `src/c/`.
+Of the portable C these no longer hold: it has no second copy and no
+check sum, so nothing of "The entry of the program" that concerns
+those, and it cannot fail to load itself again for want of memory,
+which "Where the size of the translation becomes other behaviour"
+has.
+
 ## The last of the assembly
 
 Done: the C translation has no assembly file, and its build runs no

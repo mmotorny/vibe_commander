@@ -137,7 +137,12 @@ struct MainDat {
     u8  AutoSav;                        /* Auto save setup */
     u8  ColTyp;                         /* Monochrome / Color / LapTop */
     u8  BlDelay;                        /* Screen blank delay */
-    u8  LoadFl;                         /* Small mode */
+    u8  LoadFl;                         /* Small mode: of the original.
+                                           Here a byte of the setup that
+                                           is kept as it is found, but
+                                           for its highest bit, which
+                                           says for one command that it
+                                           is not to be shown */
     u8  UnSlct;                         /* Unselect files when group operation */
     u8  ErrSnd;                         /* Beep when error */
     u8  LftMous;                        /* Left handed mouse */
@@ -162,7 +167,9 @@ struct MainDat {
     u8  ResIni[51];                     /* Reserved */
     /* End of main data' part saved in VC.INI */
 
-    u8  LoadRes;                        /* Original LoadFl */
+    u8  LoadRes;                        /* Original LoadFl: as the setup
+                                           has it, while a command has
+                                           it otherwise */
     u8  ScrMod;                         /* Current screen mode */
     u8  Mouse;                          /* 1 if Mouse was found */
     u8  BreakFl;                        /* Break DOS's status */
@@ -176,7 +183,8 @@ struct MainDat {
     u16 BatAdr;                         /* Pointer to command in buffer */
     u16 BatPoin;                        /* Pointer to command */
     u16 LastMnu;                        /* The last pull down menu item */
-    u16 OvlPth;                         /* Pointer to file name in environment */
+    u16 OvlPth;                         /* Pointer to file name in
+                                           environment: not set here */
     u16 ComSpec;                        /* Pointer to COMSPEC= in environment */
     u8  CrnPath[LenPath];               /* Current directory in the tree panel */
     u8  ViewFil[LenStr + 1];            /* Source filename */
@@ -219,7 +227,7 @@ struct MainDat {
     u16 WCB1seg;
     u16 WCB2seg;
     u16 ViewSeg;
-    u16 FreMem1;
+    u16 FreMem1;                        /* not set here */
     u16 FreMem2;
     u16 Memorys;
     u16 HstAdr;
@@ -675,7 +683,7 @@ enum {
     CMD_M16_01, CMD_F62_01, CMD_M21_00, CMD_F76_01, CMD_M53_00,
     CMD_M60_00, CMD_M61_00, CMD_M62_00, CMD_M63_00, CMD_M64_00,
     CMD_M66_00, CMD_M67_00, CMD_M69_00, CMD_M70_00, CMD_M71_00,
-    CMD_M72_00, CMD_M73_00
+    CMD_M72_00
 };
 
 /* Where the program goes on after a command of the keys of the panels,
@@ -906,7 +914,6 @@ u16 M69_00(u16 panel);
 u16 M70_00(u16 panel);
 u16 M71_00(u16 panel);
 u16 M72_00(u16 panel);
-u16 M73_00(u16 panel);
 u16 M75_00(u16 panel);
 
 /* Directories made, files deleted, attributes and the label, dirfunc.c;

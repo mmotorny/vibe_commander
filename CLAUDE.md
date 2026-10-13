@@ -1289,6 +1289,35 @@ in "The portable C".
   this compiler's. What does not: the same function returning one of
   the two as a `u16`, which every old caller still compiles against,
   and reads as the low word.
+- How a deviation goes through the tests, as the first one did. It
+  is declared in `src/portable_c/DEVIATIONS.md` and then, for the
+  harness, in three tables that each fail the test for an entry that
+  no longer applies:
+  - `TREES` of `harness/deviations.py`: the scenarios that it changes,
+    each with what changes; those that are not run for the tree; and a
+    step that is left out of every scenario for it, where the keys
+    choose something that is gone. A program knows its tree by the
+    directory of the build that its file is in.
+  - `DECLARED` of `harness/datacheck.py`: a table of the program that
+    differs, as the places where it departs from the original's, each
+    with the bytes that the tree has there or none for bytes left out.
+    The object is held against the original's with that done to it,
+    so the rest of it is still held. `GONE` of `harness/reads.py` has
+    a constant that the tree no longer has and that `REVIEWED` lists.
+  - `GONE` of `harness/ported.py`: a function of a batch that the tree
+    no longer has.
+  Then the goldens: build, and `python3 harness/compare.py
+  build/portable_c/VC.EXE` says which scenarios differ from the
+  original's goldens, which is the list to declare, each looked at.
+  `python3 harness/goldens.py record --tree portable_c` records those
+  that are declared, and refuses any other; `python3 harness/goldens.py
+  changes --tree portable_c` prints of every screen the rows that
+  differ from the original's golden, which is how to read them: a
+  change that was not meant shows there as a row that the declaration
+  does not explain. A scenario whose steps choose what is gone needs
+  the step left out, not a golden of the keys going astray.
+- Memory allocation is an item of the Options menu, "F9 o m", not a
+  field of the Configuration dialog.
 
 - What retyping the first 22 of those functions met, each of which
   the compiler took without a word:

@@ -1247,7 +1247,6 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_M70_00: return MnuEnd(M70_00(panel), r);
     case CMD_M71_00: return MnuEnd(M71_00(panel), r);
     case CMD_M72_00: return MnuEnd(M72_00(panel), r);
-    case CMD_M73_00: return MnuEnd(M73_00(panel), r);
     default:                            /* CMD_M75_00 */
         return MnuEnd(M75_00(panel), r);
     }

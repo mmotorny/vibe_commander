@@ -26,11 +26,10 @@
 
 /* ResSeg is the segment of the part of the program that stays in the
    memory while a command runs. It and what else is called of the rest
-   of the program are of vc.h: HidCur and Cursor1 for the cursor, InvVar,
-   which makes of a byte 1 if it is 0 and 0 otherwise, Int16 and Int10,
-   the BIOS for the keyboard and for the screen, Int21d, DOS as it is
-   where the assembly did not go through Intr21, and Fantom, SetDTA,
-   Intr21, SetPth, UpCase, RestVct, SavMous, CurMous, Quit and Window. */
+   of the program are of vc.h: HidCur and Cursor1 for the cursor, Int10,
+   the BIOS for the screen, Int21d, DOS as it is where the assembly did
+   not go through Intr21, and Fantom, SetDTA, Intr21, SetPth, UpCase,
+   RestVct, SavMous, CurMous, Quit and Window. */
 
 /* C routines of other files that vc.h does not have. TstExe is 1 for a
    name that DOS can run: com, exe or bat. TrCr10 finds the current
@@ -200,20 +199,17 @@ u32 F21_31(void)
 
 /* Have the part of the program that stays in the memory run what the
    command line holds, DosBuf, which may be several commands, each with
-   its zero byte: F21_30. With Shift held down the program is, for this
-   once, kept in the memory whole if the setup has it otherwise, and the
-   other way round. */
+   its zero byte: F21_30. LoadRes keeps the byte of the setup that
+   LoadFl is while the command runs, without the bit that says not to
+   show the command.
+
+   The original looks at Shift here: held down, the program is for this
+   once kept in the memory whole if the setup has it otherwise, and the
+   other way round. The portable C always stays whole, and Shift with
+   Enter is Enter (see DEVIATIONS.md). */
 u32 F21_30(void)
 {
-    u8 small;
-
     md.LoadRes = md.LoadFl & 0x7F;
-    if (Int16(0x200 | md.LoadRes).key & 3) {
-        small = md.LoadFl;
-        md.LoadFl &= 0x7F;
-        InvVar(&md.LoadFl);
-        md.LoadFl |= small & 0x80;
-    }
     return F21_31();
 }
 

@@ -41,9 +41,9 @@ u16 ResSeg(void)
     return (u16)((u32)(void __far *)&here >> 16);
 }
 
-/* The segment of the block of memory that the part of the program is in
-   which goes while a command runs: this code, which is given back to DOS
-   then, and loaded again. */
+/* The segment of the block of memory that this code is in: the part of
+   the program that the original gives back to DOS while a command runs,
+   and loads again. */
 u16 MemRun(void)
 {
     u16 stays = ResSeg();

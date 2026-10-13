@@ -540,9 +540,12 @@ Init04:                                 /* Output Report */
    when the part that stays says that there is no memory, where the BIOS
    takes a page of the screen (see AlocEr of resident.c).
 
-   FreMem2 is how much there was to have, in paragraphs, and FreMem1
-   that or, if it is more, how large the block of the code could have
-   been made. */
+   FreMem2 is how much there was to have, in paragraphs. The original
+   has a second number, FreMem1: that or, if it is more, how large the
+   block of the code could have been made, which is what a command gets
+   where the code is given up for it. It asks DOS for that first, by
+   making the block of the code as large as it can be; the portable C
+   does not ask. */
 u32 Init11(u16 stays, u16 block)
 {
     struct DosRegs regs;
@@ -551,24 +554,16 @@ u32 Init11(u16 stays, u16 block)
     u16 code = AsmSeg();
     u16 main_size = ((sizeof(struct MainDat) - 1) >> 4) + 1;
     u16 panel_size = ((sizeof(struct WCBdef) - 1) >> 4) + 1;
-    u16 most, largest, segment, i;
+    u16 largest, segment, i;
 
-    regs.ax = 0x4A00;                   /* make a block another size: as
-                                           large as it can be, which DOS
-                                           refuses, and says how large */
-    regs.bx = 0xFFFF;
+    regs.ax = 0x4A00;                   /* Init12: make a block another
+                                           size */
+    regs.bx = WORD_AT(stays, OFFSET(RelTab))
+        - WORD_AT(stays, OFFSET(TrnPrW));
     regs.cx = 0;
     regs.name = AT(stays, 0);
     regs.si = 0;
     regs.di = 0;
-    regs.es = block;
-    Int21e((struct DosRegs STACK *)&regs);
-    most = regs.bx;
-    if (regs.ax != 8)
-        most = 0;
-    regs.ax = 0x4A00 | regs.ax & 0xFF;  /* Init12 */
-    regs.bx = WORD_AT(stays, OFFSET(RelTab))
-        - WORD_AT(stays, OFFSET(TrnPrW));
     regs.es = block;
     Int21e((struct DosRegs STACK *)&regs);
     regs.ax = 0x4800 | regs.ax & 0xFF;  /* a block of the memory: of all
@@ -585,9 +580,6 @@ u32 Init11(u16 stays, u16 block)
         return (u32)largest << 16;
     data = (struct MainDat __far *)AT(segment, 0);
     data->FreMem2 = largest;            /* Init13 */
-    if (most < largest)
-        most = largest;
-    data->FreMem1 = most;               /* Init14 */
     data->WCB1seg = segment + main_size;
     data->WCB2seg = data->WCB1seg + panel_size;
     data->ViewSeg = data->WCB2seg + panel_size;
@@ -624,8 +616,9 @@ static void CurNl(struct BiosRegs STACK *regs)
    it has none or one that a BIOS is known to report wrongly. The
    country, and with it a table of the small letters beyond ASCII, made
    by asking DOS for the capital of each. The environment is searched
-   for COMSPEC=, for the path of the program's own file behind it, and
-   for VC= and TEMP=. Then the display: an EGA or VGA and its rows,
+   for COMSPEC=, and for VC= and TEMP=; the original also notes where
+   the path of the program's own file is behind it, OvlPth, to load
+   itself again after a command. Then the display: an EGA or VGA and its rows,
    whether writing to it has to wait for the beam, where its memory is,
    and whether TopView or DESQview shows a buffer in its place; the
    version of DOS; and the colour in which DOS writes, found by having
@@ -741,11 +734,6 @@ void IniData(void)
             ;
     }
     md.ComSpec = at;                    /* Init26 */
-    at = 0;                             /* OvlPth */
-    while (env[at] != 0)                /* Init27 */
-        while (env[at++] != 0)
-            ;
-    md.OvlPth = at + 3;                 /* Init28 */
     MnPth0(md.NcPath, env, NcEnv, sizeof NcEnv, 0);
     PathLin(md.NcPath);
     MnPth0(md.TempDir, env, TempEnv, sizeof TempEnv, md.NcPath);

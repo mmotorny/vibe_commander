@@ -207,9 +207,44 @@ class Declared:
         return tuple(step for step in steps if step not in self.left_out)
 
 
-# A tree is added here when src/<tree>/DEVIATIONS.md first declares
-# something that a scenario shows.
+_MAP = ("the map of the memory has the program with a block more, its "
+        "code, and with INT 24h among its interrupts")
+
 TREES = {
+    # The portable C stays in the memory whole while a command runs, and
+    # has no Memory allocation in its Options menu.
+    "portable_c": Declared(
+        not_run={
+            "memory": "it switches Memory allocation off and shows the "
+                      "menu without its mark: the portable C has no such "
+                      "option",
+        },
+        left_out={
+            "F9 o m": "Memory allocation switched off or on: the Options "
+                      "menu of the portable C has no line that M chooses, "
+                      "and stays open",
+        },
+        changed={
+            "lost": "the program does not load itself again after a "
+                    "command, and so does not miss its file",
+            "quick": "Memory allocation is not switched off before the "
+                     "last command",
+            "clock": "the Options menu, a line shorter",
+            "clock-russia": "the Options menu, a line shorter",
+            "menu": "the Options menu, a line shorter",
+            "menu-items": _MAP,
+            "memory-map": _MAP + "; Memory allocation is not switched off "
+                          "for a second look at it",
+            "memory-map-russia": _MAP,
+            "stay": _MAP,
+            "passed-on": "Memory allocation is not switched off in the "
+                         "second copy, which stays whole as it is",
+            "ended": _MAP,
+            "mouse-memory": _MAP,
+            "mouse-middle": _MAP,
+            "mouse-drag-lists": _MAP,
+        },
+    ),
 }
 
 

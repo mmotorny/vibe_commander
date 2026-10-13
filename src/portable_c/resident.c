@@ -18,9 +18,11 @@
  * The second is the outermost loop of the program, Stay:
  * it calls the part that goes, which comes back with commands to run or to
  * leave; it runs the commands, Exec, by COMMAND.COM or by the interrupt
- * that COMMAND.COM has for that, brings the other part back into the
- * memory if that was given up for them, by running the program's own
- * file as a second copy, and calls it again.
+ * that COMMAND.COM has for that, and calls it again. The original gives
+ * the other part up for the commands, if it is set up so, and brings it
+ * back by running its own file as a second copy; the portable C keeps
+ * all of itself in the memory (see DEVIATIONS.md), so the part that goes
+ * does not go, and has that name from the original.
  *
  * The third is the program's watch on DOS. While the program runs, and
  * while a command runs from it, every call of DOS comes by New21: it notes
@@ -66,14 +68,12 @@ const u8 Command[] = "COMMAND.COM";
 const u8 NoRun_S[] =
     "There is not enough memory to run this command\015\012";
 const u8 FnFil_S[] = "\015\012" "Can't find the file: ";
-const u8 BadFl_S[] = "\015\012" "Bad or missing ";
 const u8 Retr_S[] =
     "\015\012" "Press ENTER to try again or ESC to abort\015\012";
 const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
 #pragma aux Command "*"
 #pragma aux NoRun_S "*"
 #pragma aux FnFil_S "*"
-#pragma aux BadFl_S "*"
 #pragma aux Retr_S "*"
 #pragma aux Aloc_S "*"
 
@@ -85,7 +85,9 @@ const u8 Aloc_S[] = "Program too big to fit in memory\015\012";
    begins; where the linker's relocations are, RelTab, how many of them
    are of the part that goes, RelCnt, and how many, behind those, of
    this part, ResCnt. They are given a value here, 0, for the compiler
-   to put them where the file has contents. */
+   to put them where the file has contents. DatPrW is read by nothing
+   here: it said where the check sum of the file stops, and the portable
+   C takes none. */
 u16 ImgEnd = 0;
 u16 RelTab = 0;
 u16 RelCnt = 0;
@@ -103,16 +105,12 @@ u16 ResCnt = 0;
 
 /* The segment that the part that goes runs in, which is so many
    paragraphs below its block of memory as that part begins behind the
-   PSP in the file, TrnPrW; the check sum of the program's file as it
-   was loaded; and the command tail by which a second copy of the
-   program knows that it is one, with room for the segment of the
-   first. */
+   PSP in the file, TrnPrW. The original has two things more here, for
+   loading that part again after a command: the check sum of the
+   program's file as it was loaded, ChkFile, and the command tail by
+   which a second copy of the program knows that it is one, OvlPrm. */
 u16 RunPar = 0;
-u16 ChkFile = 0;
-u8 OvlPrm[12] = { 10, 'V', 'V', 'V', 0, 0, 0, 0, 0, 0, 0, 0x0D };
 #pragma aux RunPar "*"
-#pragma aux ChkFile "*"
-#pragma aux OvlPrm "*"
 
 /* What this part keeps: struct Stays of vc.h, which says what is in it.
    Of ComnIni only as much is there as the main data has before DosLin.
@@ -829,8 +827,9 @@ static void OutStr0(const u8 *text, u16 bx)
 }
 
 /* Say that the file `name` is missing, after `text`, and wait for Enter
-   or Esc: 1 for Esc, to give up. Both places that call have the address
-   of ComnIni.EPB in BX, which DOS was to run the file with. */
+   or Esc: 1 for Esc, to give up. The assembly has the address of
+   ComnIni.EPB in BX where it calls, which DOS was to run the file
+   with. */
 static u16 NotFind(const u8 *text, const u8 __far *name)
 {
     OutStr0(text, EPB_WAS);
@@ -1133,13 +1132,14 @@ static void Exec02(u16 behind)
 }
 
 /*---------------- Relocate the transit part -------------
-   The part that goes has just been loaded, into the block that RunPar
-   goes with. The linker's relocations for it are behind it, where
-   tools/mkexe.c has put them: each is the place of a word that holds a
-   segment, as the linker counts them, from the PSP, and so is what the
-   word holds. RunPar is what a segment of the file has become. DOS
-   cannot do this: the program loads that part itself, time after
-   time. */
+   The part that goes is where DOS has loaded it with the rest of the
+   file, in the block that RunPar goes with. The linker's relocations
+   for it are behind it, where tools/mkexe.c has put them: each is the
+   place of a word that holds a segment, as the linker counts them, from
+   the PSP, and so is what the word holds. RunPar is what a segment of
+   the file has become. DOS does not do this, by the header that
+   tools/mkexe.c gives the file: the original loads that part itself,
+   time after time, and so did the C translation. */
 static void Reloc(void)
 {
     const u16 __far *entry = (const u16 __far *)AT(RunPar + RelTab, 0);
@@ -1153,84 +1153,27 @@ static void Reloc(void)
     }
 }
 
-/* The commands are done. If the part that goes was given up for them,
-   bring it back: a block of memory for it, and the program's own file
-   run as a second copy, with a command tail that says where the block
-   is. The copy moves its part there and ends, and leaves the check sum
-   of its file in the first two bytes of DosBuf: that has to be this
-   file's, and the copy's answer 0. If not, or if the file cannot be
-   run, the program says so and asks whether to try again; it ends if
-   not. Returns when the part is there.
+/* The commands are done: LoadFl is as the setup has it again, without
+   the bit that said not to show a command.
 
-   Ported as it is: whether the block was to be had is taken from its
-   address less the paragraphs of TrnPrW, not from what DOS said. DOS
-   answers 8 or 7 when it has no block, which is less than those. */
+   The original does more here, Exec10: if the part that goes was given
+   up for the commands, it asks DOS for a block of memory and runs the
+   program's own file as a second copy, which moves its part there and
+   ends; it holds the check sum of that file against its own, and says
+   "Bad or missing" with the name of the file and asks whether to try
+   again when the file is not there or is another. None of that is in
+   the portable C, which gives nothing up (see DEVIATIONS.md). */
 static void Exec10(void)
 {
-    struct DosRegs regs;
-    const u8 __far *file;
-    u16 state, block;
-    u8 was;
-
-    was = ComnIni.LoadFl;
     ComnIni.LoadFl = ComnIni.LoadRes;
-    if ((was & 0x7F) == 0)
-        return;
-    state = GetStat();                  /* Exec11: Load VC.EXE */
-    regs.bx = ImgEnd - TrnPrW;
-    regs.ax = DOS_ALLOC;
-    Int21e(&regs);
-    block = regs.ax;
-    SetStat(state);
-    RunPar = block - TrnPrW;
-    if (block < TrnPrW) {
-        /* BX is what setting DOS's way of looking for memory back has
-           left there, whether the upper memory was in the chain; or,
-           with a DOS that knows of none, the largest block that DOS
-           said it has. */
-        if (state == 0xFFFF)
-            AlocEr(regs.bx);
-        AlocEr(state & 0xFF);
-    }
-    for (;;) {                          /* Exec12 */
-        *(u16 *)ComnIni.DosBuf = ImgEnd;
-        *(u16 *)(OvlPrm + OvlPrm[0] - 1) = RES_SEG;
-        ComnIni.EPB.CmdLine = (u32)RES_SEG << 16 | (u16)OvlPrm;
-        file = AT(PSP_ENV, ComnIni.OvlPth);
-        regs.name = file;
-        regs.bx = (u16)&ComnIni.EPB;
-        regs.es = RES_SEG;
-        regs.ax = DOS_EXEC;
-        if (!Int21e(&regs)) {
-            regs.ax = DOS_CODE;         /* Exec14 */
-            Int21e(&regs);
-            if (regs.ax == 0 && *(u16 *)ComnIni.DosBuf == ChkFile) {
-                Reloc();
-                return;
-            }
-        } else if ((u8)regs.ax > 3) {
-            AlocEr(EPB_WAS);
-        }
-        if (NotFind(BadFl_S, file))     /* Exec13: VC.EXE not found */
-            Exit00(1);
-    }
 }
 
 /* Run the commands of DosBuf, which the part that goes has left in what
-   it keeps here of the main data, ComnIni. That part is given up first,
-   its block of memory freed, if the program is set up so: LoadFl. */
+   it keeps here of the main data, ComnIni. The original first gives
+   that part up, its block of memory freed, if the program is set up so:
+   LoadFl. */
 static void Exec(void)
 {
-    struct DosRegs regs;
-    u16 state;
-
-    if (ComnIni.LoadFl & 0x7F) {
-        state = GetStat();
-        regs.es = RunPar + TrnPrW;
-        regs.ax = DOS_FREE;
-        Int21e(&regs);
-        SetStat(state);
-    }
     ComnIni.BatAdr = (u16)ComnIni.DosBuf;       /* Exec01 */
     Exec02(0);
     Exec10();
@@ -1311,38 +1254,6 @@ static void Exec2E(void)
 
 /*---------------------- The entry ----------------------*/
 
-/* Add the bytes of `count` paragraphs from the segment `from` on to
-   `sum`. */
-static u16 AllocS(u16 sum, u16 from, u16 count)
-{
-    do {
-        const u8 __far *byte = AT(from, 0);
-        u16 i;
-
-        for (i = 16; i; i--)
-            sum += *byte++;
-        from++;
-    } while (--count);
-    return sum;
-}
-
-/* Move `count` paragraphs from the segment `from` to the segment `to`,
-   the last first. */
-static void MovPars(u16 from, u16 to, u16 count)
-{
-    while (count) {
-        const u8 __far *source;
-        u8 __far *target;
-        u16 i;
-
-        count--;
-        source = AT(from + count, 16);
-        target = AT(to + count, 16);
-        for (i = 16; i; i--)
-            *--target = *--source;
-    }
-}
-
 /* No memory when the program begins: say so and end. */
 static void Alloc9(void)
 {
@@ -1362,64 +1273,43 @@ static void Alloc9(void)
    file is the program as it lies in the memory, so the part that goes
    is where it will run, a paragraph behind this one.
 
-   First the check sum of the file as it is loaded, by which the program
-   knows it again after a command: all of it but the data of this part,
-   where the stack is, and in use.
-
-   If the command tail is the one that Exec10 gives a second copy, this
-   is one: it moves its part that goes into the block that the first
-   copy has for it, leaves its check sum there, takes the length that
-   the first has for the file, and ends, with 1 if that is not the
-   length of its own.
-
-   Else the program is starting. The compiled code of this part names
-   its segment, the PSP's, in a few places: the linker's relocations for
-   that are applied now, when the sum has been taken, and until then
-   nothing here calls what needs them. DOS has to be 3.20 at the least.
-   The block of memory that DOS has given the program is made as long as
-   the file, and of the part that goes a block of its own, by writing
-   the header that DOS keeps in front of one. Then that part is
+   The compiled code of this part names its segment, the PSP's, in a few
+   places: the linker's relocations for that are applied first, and
+   until then nothing here calls what needs them. DOS has to be 3.20 at
+   the least. The block of memory that DOS has given the program is made
+   as long as the file, and of the part that goes a block of its own, by
+   writing the header that DOS keeps in front of one. Then that part is
    relocated, and Stay calls it.
 
    Ported as it is: how DOS looks for memory is set to what it is when
    DOS starts, the lowest block that fits and no upper memory, whatever
    it was.
 
-   Not in the C: the original cannot always make its block as long
-   as it needs, since its file is shorter than the program in the memory,
-   and then asks for a block elsewhere for the part that goes. The
-   translation's block holds all of the file, and making it as long as the
-   file cannot fail but with DOS's chain of blocks destroyed, where asking
-   for another fails as well. So that way is left out, and the program
-   ends as the original does when both fail. */
+   Not in the portable C, which does not load itself again after a
+   command (see DEVIATIONS.md): the original first takes the check sum
+   of its file as it is loaded, to know the file again; and if its
+   command tail is the one that it gives a second copy of itself, it is
+   that copy, which moves its part that goes into the block that the
+   first copy has for it, leaves its check sum there, and ends.
+
+   Not in the C, of either tree: the original cannot always make its
+   block as long as it needs, since its file is shorter than the program
+   in the memory, and then asks for a block elsewhere for the part that
+   goes. The translation's block holds all of the file, and making it as
+   long as the file cannot fail but with DOS's chain of blocks
+   destroyed, where asking for another fails as well. So that way is
+   left out, and the program ends as the original does when both
+   fail. */
 void Alloc0(void)
 {
     struct DosRegs regs;
-    const u8 *tail = (const u8 *)0x80;
     u16 psp = RES_SEG;
-    u16 sum, i, block, rest;
+    u16 i, block, rest;
     u8 __far *header;
     u8 kind;
 
     IntOn();                            /* for the direction flag, which
                                            the compiler wants clear */
-    sum = AllocS(0, psp + 0x10, DatPrW - 0x10);
-    sum = AllocS(sum, psp + TrnPrW, ImgEnd - TrnPrW);
-    for (i = 0; i < (u16)OvlPrm[0] - 1; i++)
-        if (tail[i] != OvlPrm[i])
-            break;
-    if (i == (u16)OvlPrm[0] - 1 && tail[i + 2] == 0x0D) {
-        u16 first = *(const u16 *)(tail + i);
-        u16 __far *size = (u16 __far *)AT(first, (u16)ComnIni.DosBuf);
-        u16 length = *size;
-
-        *size = sum;
-        MovPars(psp + TrnPrW, WORD_AT(first, (u16)&RunPar) + TrnPrW,
-                length - TrnPrW);
-        regs.ax = DOS_EXIT + (length != ImgEnd);
-        Int21e(&regs);                  /* Alloc2 */
-    }
-    ChkFile = sum;                      /* Alloc3 */
     {
         const u16 __far *entry =
             (const u16 __far *)AT(psp + RelTab, RelCnt * 4);

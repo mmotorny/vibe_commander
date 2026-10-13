@@ -210,9 +210,11 @@ them count from the PSP, is said by options of the compiler and by the
 linker's command (see [The C translation](#the-c-translation)).
 
 The third stage has begun, in a tree of its own, `src/portable_c/`,
-which started as a copy of that program and still behaves as it does.
-Its functions no longer take their arguments in the registers of the
-assembly, and its constants have the compiler's names (see [The
+which started as a copy of that program. Its functions no longer take
+their arguments in the registers of the assembly, and its constants have
+the compiler's names. And it behaves otherwise than the original in one
+thing, the first of those that only made sense on DOS: it stays in the
+memory whole while a command runs, and has no option for that (see [The
 portable C](#the-portable-c)).
 
 ## Layout
@@ -528,13 +530,16 @@ functions in `src/c/dos.c`: `IN` for a port of the machine, `CLI`, and
 
 ## The portable C
 
-`src/portable_c/` began as a copy of the C translation, and it is the
-same program still: it passes the same scenarios against the same
-goldens, and `src/portable_c/DEVIATIONS.md` has no entry. What changes
+`src/portable_c/` began as a copy of the C translation. What changes
 there first is how the program is written, toward C that any compiler
 takes, and what follows says where it has left the C translation so far.
 Everything above, of the layout of the file and of what rests on Open
-Watcom, holds for it but where this says otherwise.
+Watcom, holds for it but where this says otherwise. Where it behaves
+otherwise than the original, that is declared in
+`src/portable_c/DEVIATIONS.md`, which has one entry so far: [it stays in
+the memory whole](#staying-in-the-memory-whole) while a command runs. In
+every scenario that this does not change it is held against the
+original's golden, as the C translation is.
 
 It is compiled in the medium model, the option `-mm`, where the C
 translation has the small one: a function that another file calls is far
@@ -595,15 +600,49 @@ in any other. What still has its name from a `#pragma aux`:
 | What | Why | How many |
 |---|---|---|
 | The functions of `src/portable_c/dos.c` | The file is compiled twice, once into each part of the program, and two copies of a function need two names | 16 |
-| What the part that stays in the memory defines, and `TrnBeg`, where the other part begins | `tools/mkexe.c`, the linker's command and the tests find them in the linker's map by these names, and the other part declares those that it reads | 38, for 27 names |
+| What the part that stays in the memory defines, and `TrnBeg`, where the other part begins | `tools/mkexe.c`, the linker's command and the tests find them in the linker's map by these names, and the other part declares those that it reads | 35, for 24 names |
 | `md`, the main data | It is named as the room of the PSP, which the linker has at offset 0 | 1 |
 | `TrnMain`, as the part that stays names it for its address | An object there, a function where it is defined | 1 |
 
-That leaves 83 lines of `#pragma aux` in the portable C where the C
-translation has 863. Its `VC.EXE` is 133,504 bytes, 448 more than the
-C translation's: no effort went into the size, and a function that
-saves the registers it uses by the compiler's rule comes out a little
-longer here and a little shorter there.
+That leaves 80 lines of `#pragma aux` in the portable C where the C
+translation has 863. Its `VC.EXE` is 132,624 bytes, 432 fewer than the
+C translation's: no effort went into the size. A function that saves
+the registers it uses by the compiler's rule comes out a little longer
+here and a little shorter there, 448 bytes more in all, and what loaded
+the program again after a command, which is gone, was 880 bytes.
+
+### Staying in the memory whole
+
+The original gives most of itself up while a command runs, if its
+Options menu has Memory allocation switched on, as it is distributed:
+a small part stays, runs the command, and loads the rest again from the
+program's file. The portable C does not. It keeps its code in the
+memory, as the original does with the switch off, and the switch is
+gone: the first of the features that only made sense on DOS, which this
+tree is to lose one by one. `src/portable_c/DEVIATIONS.md` has what the
+original does, what the portable C does, why, and the scenarios that
+show it.
+
+What went, and what each thing was for:
+
+| What | What it was for |
+|---|---|
+| The line Memory allocation of the Options menu, its command `M73_00`, its page of the menu's help, and Shift with Enter | The switch, and the same turned round for one command |
+| In `Exec` of `resident.c`, the block of the code given back to DOS before a command | So that a command had the memory of the code |
+| `Exec10` of `resident.c`, but for its first line: a block asked for, the program's file run as a second copy, its check sum held against the first copy's, and "Bad or missing", with another try or the end of the program | Loading the code again after a command |
+| In `Alloc0`, the entry: the check sum of the file as it is loaded, `ChkFile`, with `AllocS`; and the second copy, which knows itself by its command tail, `OvlPrm`, moves its code into the first copy's block, `MovPars`, and ends | The same, from the side of the file that is loaded |
+| `OvlPth`, where the environment has the path of the program's file | Which file to run for that |
+| `FreMem1`, and the call of DOS that found it | What the Info panel showed for free memory with the switch on: what a command gets when the code is given up |
+| In the map of the memory, the block of the code listed as free | A command would find it free |
+
+What stays of the two parts, for the next step: the program is still
+laid out and built as two, the part that the original keeps and the
+part that it gives up, with everything between them that
+[What rests on Open Watcom](#what-rests-on-open-watcom) lists, and the
+main data is still given back to DOS for a command and made again
+afterwards of what the first part has kept of it. Nothing of that is
+needed by a program that stays whole, and `TODO.md` has it as what
+comes next.
 
 ## Testing
 

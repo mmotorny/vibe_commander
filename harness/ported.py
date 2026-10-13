@@ -1060,6 +1060,10 @@ BATCHES = [
 # Functions of the batches that a tree has no more: tree -> function ->
 # why. Each has to be gone from the tree's link map.
 GONE = {
+    "portable_c": {
+        "M73_00_c": "Memory allocation of the Options menu: the portable "
+                    "C stays in the memory whole and has no such option",
+    },
 }
 
 

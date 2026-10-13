@@ -681,10 +681,9 @@ u16 M72_00(u16 panel)                   /* Clock */
     return M66_01(panel, &md.Clock);
 }
 
-u16 M73_00(u16 panel)                   /* Memory allocation */
-{
-    return M66_01(panel, &md.LoadFl);
-}
+/* The original has one more switch here, Memory allocation, M73_00: the
+   portable C stays in the memory whole while a command runs, and has no
+   such option (see DEVIATIONS.md). */
 
 /* Shift-F9: save the setup, if the answer is yes, and say so if it could
    not be written, unless the drive was not ready, which a box of its own

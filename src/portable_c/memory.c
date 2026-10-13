@@ -11,7 +11,7 @@
  * is. From that it makes the lines of the map, MemList: one for every
  * owner, with the number of its blocks and their size, and one for every
  * stretch of free memory. What the program itself gives up while a
- * command runs counts as free.
+ * command runs counts as free: its main data.
  */
 #include "vc.h"
 
@@ -72,9 +72,9 @@ LAID_OUT(MemLine, 7 + 12 + 1 + MaxVect);
    calls are C, of vc.h, and so is Int21d, by which DOS is asked for the
    map without Intr21, as in the original: see Dos5802 to Dos2523 below.
 
-   MemRun returns the segment of the part of the program that goes while
-   a command runs, and ResSeg that of the part that stays, where Counter,
-   PrgList and Command are: both of vc.h. Release, of that part
+   ResSeg returns the segment of the part of the program that stays in
+   the memory while a command runs in the original, where Counter,
+   PrgList and Command are: of vc.h. Release, of that part
    (resident.c), releases a program that has stayed in the memory:
    `record` is what PrgList has of it. It is called far, at its offset in
    that part's segment, and loads its own DS. */
@@ -312,16 +312,16 @@ static void Dos2523(u16 routine)
 
 /* MCB analisis: list the blocks of DOS in BlkList. Before the first
    stands the place where DOS itself begins, and the first block, which
-   DOS has for its own data, is given to that. A block of the program
-   itself that goes while a command runs, its main data and, if Memory
-   allocation is on, all that is not the part that stays, is listed as
-   free. The list ends with where the memory ends, as a block that
+   DOS has for its own data, is given to that. The block of the program
+   itself that goes while a command runs, its main data, is listed as
+   free. The original lists a second one so if it is set up to give its
+   code up as well, Memory allocation: all that is not the part that
+   stays. The list ends with where the memory ends, as a block that
    nobody has, and a word 0. */
 static void F65_01(void)
 {
     u16 *list = BlkList;
     u16 linked, header, block, owner, next, last;
-    u16 gone = MemRun();
 
     linked = Dos5802();
     if (linked != 0xFFFF)
@@ -342,8 +342,6 @@ static void F65_01(void)
             break;
         owner = WORD_AT(header, 1);
         if (block == MAIN_SEG)
-            owner = 0;
-        if (md.LoadFl != 0 && block == gone)
             owner = 0;
     }
     *list++ = block;
