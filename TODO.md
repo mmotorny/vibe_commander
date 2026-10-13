@@ -23,8 +23,8 @@ derived and declared. Of the trial's scripts the three that hold the
 setup program's assembly against the main program's are kept, in
 `harness/vcsetup/`; what the others showed the harness does itself.
 
-Seven things were the user's to decide. They are decided, and stand
-first.
+Seven things were the user's to decide, and an eighth was met while
+the setup was made. They are decided, and stand first.
 
 ### Decided, on the user's word of 12 and 13 October 2026
 
@@ -37,6 +37,7 @@ first.
 | 5 | The limit of the file's size, three times the original `VC.COM`'s, which the scenarios' test holds a build to | Dropped for the portable C: the test no longer holds it to a multiple of the original's size, and piece 0a has taken the check out for that tree. It stays for the C translation, which is frozen. The compiler is asked for small code already, `-os`; builds for release and for debugging are a matter for the 32-bit program. The two other limits, of the program's data and of where a code segment ends, are the machine's and stay: see "What could go wrong" |
 | 6 | `asked` and `handed-on`, once the program's own call of DOS is gone with piece E1 | Not run for the portable C, which has nothing left for them to show; they stay for the C translation |
 | 7 | A critical error of DOS while setup is open, as when the setup file is on a drive that is not ready | The program's own box, since its handler of INT 24h is in place then; the original's setup program has none and leaves the error to DOS's own words. And setup asks for its files as the rest of the program does, through the functions of `sys.h` that ask with the program's errors: none with Bare in its name is added for it. No scenario shows either |
+| 8 | The 64 bytes behind the path of each panel in a setup that setup makes without a good file, or for Set default configuration: the original has there what stands behind a table of its setup program, of which the portable C cannot have a part | Zeros, as the portable C has them: the user confirmed it on 13 October 2026, and it stands. It was met while piece 0b was made and declared in entry 8 of `src/portable_c/DEVIATIONS.md` before it was asked |
 
 2, 3 and 4 were decided as one thing: the setup program is translated
 as it is first, and what is to be otherwise comes afterwards, in steps
@@ -808,7 +809,7 @@ for the portable C, and `ended` has its patch made again.
 | The Options menu has two lines more, at its bottom | `clock`, `clock-russia`, `menu`, which are held by patches of the original's goldens, of entries 1 and 8 |
 | No Memory allocation and no TSR manager in S2, no Screen output in S3: entries 1, 7 and 5, since E2 | Ten scenarios, of A, D and 0a, that show the two dialogs: see "Piece E2" below |
 | The program's box for a critical error of DOS while setup is open, where the original's setup program leaves the error to DOS's own words. And setup's calls for files are asked with the program's errors, where the original's setup program calls DOS itself: a drive that is not ready has the program's box, a call given up there is the error 53h, and DOS is asked what was wrong behind a call that failed | No scenario |
-| The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. **This waits for the user's word**: it was met while 0b was made, and is not among the seven things decided | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
+| The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. It was met while 0b was made, was not among the seven things decided then, and was decided on the user's word of 13 October 2026: it stands | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
 | The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | `setup-lines`, with a patch of the original's golden for the corner: one cell, on two screens. Not run for the portable C since EGA lines went, and the patch with it: "The tall screen: untested in the portable C until a system gives it rows", below |
 | The directory of the setup file is the one that the program has, made by the main program's rule: in capitals, and with a backslash behind whatever `VC=` names, where the setup program adds none behind a colon | No scenario: the bench has no `VC=` |
 
@@ -848,7 +849,8 @@ on the bench.
   are in `VC.INI` when a setup made so is saved; the main program
   clears them when it has read such a file (`MkIni1` of `setup.c`).
   This one does not stay: the portable C cannot have the 17 bytes, and
-  has zeros for all 64. See "The deviations to declare".
+  has zeros for all 64, which was decided on the user's word of 13
+  October 2026 and stands. See "The deviations to declare".
 - A file that could not be written is said in a line on what DOS has
   shown, which the panels of a running copy cover at once, and the
   running copy takes the settings all the same. `setup-save-fails`

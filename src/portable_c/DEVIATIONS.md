@@ -997,13 +997,15 @@ on the user's word of the same day. And the 64 bytes behind a path are
 zeros because half of them cannot be anything else: 17 of each 64 are of
 a dialog that the published source has not, which the project does not
 reproduce, and the other 47 are a box with addresses of the original's
-layout, which mean nothing in a file. The program's own call goes by
-the decision of 12 October 2026 too, as the road of `CLAUDE.md` has
-it: "The call by which the setup program asked a running copy for its
-data goes then, with the last of the watch on DOS." Taking DOS's own
-interrupt, so that every call of every program passes the program, was
-for a second program that there is no more, and is a thing of DOS
-alone.
+layout, which mean nothing in a file. That was made so before it was
+asked, and was decided on the user's word of 13 October 2026: a setup
+file made from the defaults has zeros there, and that stands. The
+program's own call goes by the decision of 12 October 2026 too, as the
+road of `CLAUDE.md` has it: "The call by which the setup program asked
+a running copy for its data goes then, with the last of the watch on
+DOS." Taking DOS's own interrupt, so that every call of every program
+passes the program, was for a second program that there is no more, and
+is a thing of DOS alone.
 
 **Which scenarios show it.** Every scenario of the setup program is held
 against the golden that the original's setup program left, with two
