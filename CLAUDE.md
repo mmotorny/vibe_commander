@@ -2482,6 +2482,22 @@ in "The portable C".
     declared for the portable C holds for it without being said again,
     its patches too. Where a table of the harness goes by a tree's
     name and means its source, it asks `deviations.source(tree)`.
+  - What is declared for that build alone is said in its entry of
+    `TREES`, `TREES["portable_c"].also(...)`, and in the portable C's
+    `DEVIATIONS.md`, in an entry that says which build it is of:
+    `editor-big` is not run for it, entry 13. A scenario that is not
+    run for the build has to be named by an entry there and be one
+    that the portable C is taken through, or the test fails. Nothing
+    holds that the build still does otherwise in it.
+  - That program has 640 KB of its own where the program of 16 bits
+    has what DOS leaves it, and a scenario that takes the original to
+    the end of its memory may pass without taking this program there:
+    a count of free memory is left out of the comparison, and such
+    steps were written to end on the same screen whatever room a build
+    has. `editor-full` and `copy-big` are so (`TODO.md`, "The editor's
+    room: untested in the program of 32 bits"). Before a scenario that
+    passes is taken for a test of a limit of memory, look at what the
+    program shows as free in it, `harness/show.py --program`.
   - A scenario of that test is ended at its first screen that differs.
     What the keys of a scenario do in a program that has left, or that
     stands in another box than the scenario takes it to, is not worth

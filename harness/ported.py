@@ -75,8 +75,11 @@ The portable C is built a second way, as a flat program of 32 bits for
 DOS under an extender, build/portable_c32/VC.EXE (TODO.md, "The portable
 C in 32 bits: the plan"). That build is a tree of its own here,
 portable_c32, of the portable C's source: it is declared to do what the
-portable C is declared to, with what the two builds show otherwise
-added, of which there is nothing (deviations.SOURCE and TREES); it has
+portable C is declared to, with what the two builds do otherwise
+added, which is one thing: its editor has room for a file that the
+original's has none for, and the scenario that has the editor refuse
+such a file, editor-big, is not run for it (deviations.SOURCE and
+TREES). It has
 the patches of the portable C, and one of its own where it has a file
 for a scenario; the functions that it has not or has under another name
 are those of the portable C and those of dos.c, which it has dos32.c in

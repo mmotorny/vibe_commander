@@ -960,13 +960,33 @@ SOURCE = {"portable_c32": "portable_c"}
 # the build's too. Either says which entry of the source's DEVIATIONS.md
 # declares it.
 #
-# The program of 32 bits is declared to show nothing otherwise than the
-# portable C of 16 bits. What it will have to be declared for is the
-# user's to decide when the work gets there (TODO.md, the plan, "Open,
-# for the user"): what a second copy of the program does once it has the
+# The program of 32 bits is declared to do one thing otherwise than the
+# portable C of 16 bits, on the user's word of 13 October 2026: its
+# editor has room for a file that the original's has none for
+# (DEVIATIONS.md, "The editor of the program of 32 bits has room for a
+# larger file"), and the scenario that has the editor refuse such a file
+# is not run for it. What that scenario alone tested is listed in
+# TODO.md, "The editor's room: untested in the program of 32 bits". What
+# else it will have to be declared for is in the plan there, "Open, for
+# the user": what a second copy of the program does once it has the
 # memory to run, in second-copy, start-memory and ended, and what the
 # program can do when DOS ends it by another program's hand, in ended.
-TREES["portable_c32"] = TREES["portable_c"].also()
+#
+# What is said here for the build alone is held as what is said for a
+# tree is (ported.check_declared), and besides: a scenario that is not
+# run for the build by an entry here has to be one that the tree of its
+# source is taken through, or the entry says nothing. Nothing holds that
+# the build still does otherwise in such a scenario: that would take
+# running it.
+TREES["portable_c32"] = TREES["portable_c"].also(
+    not_run={
+        "editor-big": "it has the editor refuse a file of 381,338 bytes, "
+                      "which the original's editor has no room for and "
+                      "the editor of the program of 32 bits has, in the "
+                      "640 KB of its own that its text lies in: that "
+                      "program opens the file where the original shows "
+                      "its box",
+    })
 
 
 def source(tree):

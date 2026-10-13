@@ -2084,6 +2084,157 @@ a command sets the mode and clears what DOS has shown, where EGA lines
 keeps it, so a scenario that shows that afterwards, `setup-lines`
 above all, would differ there.
 
+## The editor's room: untested in the program of 32 bits
+
+The editor of the program of 32 bits has room for a file that the
+original's has none for (`src/portable_c/DEVIATIONS.md`, 13), and the
+scenario that has the editor refuse such a file, `editor-big`, is not
+run for that program, on the user's word of 13 October 2026
+(`CLAUDE.md`, "The portable C"): `TREES["portable_c32"]` of
+`harness/deviations.py`. The portable C of 16 bits and the C
+translation are taken through it as they were. This is what the
+scenario alone tested, and so what no test holds of the program of 32
+bits; what that program was seen to do with the scenario all the same;
+what two scenarios that it passes no longer get it to; and what would
+test all of it again. Made at `87291dc`, by reading the scenario and
+what ran of the original, and by three trials on the bench that were
+not kept. It stands behind the tall screen's section, which is of the
+same kind: what a scenario that is no longer run was alone in testing.
+
+**The scenario.** Its steps, counted as the test counts them, from 0
+for the start:
+
+| Steps | What they do | What they show |
+|---|---|---|
+| 1 | The mini status off | Nothing of the editor: the row would show the time of a file that the scenario makes |
+| 2 to 7 | `Shift+F4` on the bench's `command.com`, 87,772 bytes; `F7` for a text, `Shift+F7` for it again, `Esc` | The editor on a text that is read from its file in two pieces, and a text found more than 32K into it and once more 50 bytes on |
+| 8 to 27 | A file `b` made by `Shift+F5` of that file, three times the same appended, and `country.sys` appended | A file of 381,338 bytes: above the room of the original's editor on the bench, 345,840 when C1 measured it, and in the same 64K |
+| 28 | `F4` on `b` | The box "The file b is too large for Edit.", with View and Cancel, over the panels and the box "Reading the file" |
+| 29, 30 | `Enter`, `Esc` | View: the viewer on the file, and the panels again |
+| 31, 32 | `F4`, `Esc` | The box again, and left by Esc: the panels as they were |
+| 33 to 37 | Into `C:\STAMPS`, `F4` on `night.dat`, `Esc` | A file whose directory entry says 9 bytes and that has none: the editor opens it as an empty text |
+| 38 to 40 | `F4` on `noon.dat`, `Right Enter` | A file whose entry says a megabyte: the box, and left by Cancel |
+| The disks | | `b` as it was made, by its length and the sum of its contents |
+
+**What it alone runs of the original.** By `harness/goldens/NAME.ran`,
+the lists of what ran: 36 bytes of `VC.COM` run in `editor-big` and in
+no other scenario, all of them in `T00_00`, where the editor opens a
+file. A script of a dozen lines made the list: `goldens.read_ran` of
+this scenario less that of every other of `scenarios.names(setup=False)`,
+and the lines of `coverage.Listing` at what is left.
+
+| In the listing | What | In `T00_00` of `edit.c` | Steps |
+|---|---|---|---|
+| 613Fh and 6143h | The low words of the room and of the file's length compared, which the original comes to where the high words are the same | A part of one comparison of two numbers of 32 bits, `(u32)ed.EdSpace << 4 <= ed.EdLen` | 28, 31 |
+| 614Fh, and 6217h to 6220h, `T00_10` | The box left without View: the window put back from what was kept of it, and the editor left with nothing opened. A new file that is asked about and not wanted comes to the same place, and no scenario has one | `closed:`, three statements | 32, 40 |
+| 6223h to 622Dh, `T00_11` | The length of the text made what the file gave, where that is less than its entry says | The three statements behind `if (read.value != count)` | 36 |
+
+What ran does not tell everything apart. By the steps of the other
+scenarios, `editor-big` is also the one that has the editor find a
+text far into a long one, steps 4 to 6: `editor-search` looks in a
+file of three lines. And the one that has the box and View in a window
+that is the whole screen. It is not the one with a text read in two
+pieces, nor with the box: `help-broken` and `setup-help-file` open the
+help file in the editor, 68,836 bytes; and `view-window` has the box
+and View for a dirinfo of a megabyte, in the narrow window of the Info
+panel, which the program of 32 bits passes, a megabyte being more than
+its room too.
+
+**The lengths as numbers of 32 bits.** The file was made to lie in the
+same 64K as the room of the original, so that the original has to
+compare the low words: that is what "within 64K of what the editor has
+room for" in the scenario means, and `editor-big` is the one scenario
+that runs those two instructions, the jump taken one way only ("Known
+and not dealt with"). Of a C tree it says less. There the lengths are
+held against one another in one statement, and the room of both C
+trees of 16 bits is in the 64K below the file by C1's figures, 292,288
+and 291,360 against 381,338: a comparison of the high words alone, or
+of the low words alone, would refuse the file as well. So for the
+program of 32 bits what goes untested is not a comparison that the
+scenario held to be right for any C tree, but that a file a little
+above the room is refused at all; the statement is the same for both
+builds, and `view-window` runs it with a megabyte.
+
+**What the program of 32 bits does with the scenario, seen once and
+held by nothing.**
+
+- As it is: `python3 harness/compare.py build/portable_c32/VC.EXE
+  editor-big --first`, before the scenario was declared, differs first
+  after step 28, row 0: `Edit: b`, `Line 1`, `Col 1`, the editor on
+  the file, where the original shows its box over the panels. The 27
+  steps before it are as the original.
+- Without the five steps at the file: a script that put
+  `left_out_of={"editor-big": {("F4", "Enter", "Esc", "F4", "Esc"):
+  ...}}` into the build's entry of `TREES` in the memory and called
+  `compare.compare`. The scenario passed, "as the original without the
+  5 steps that are left out, 36 screens and the disks". So that
+  program opens the 87K file and finds the text in it, makes `b`,
+  opens `night.dat` as an empty text, and refuses `noon.dat` with the
+  box and leaves the box by Cancel, as the original does: a megabyte
+  is above its room. `closed:` and the three statements of `T00_11`
+  ran right that once.
+
+**So this is untested in the program of 32 bits**, each of it compiled
+by `wcc386` from statements that the scenario does hold of the program
+of 16 bits:
+
+| | What | What still holds a part of it |
+|---|---|---|
+| 1 | That the editor refuses a file a little larger than its room, and one that is far larger, where the window is the whole screen: the box over the panels | `view-window`: the box for a megabyte, in the window of the Info panel |
+| 2 | View from that box: the viewer with its status line on the file that was refused | `view-window`: View, in a window without a status line |
+| 3 | The box left by Esc and by Cancel: `closed:` of `T00_00`, which nothing else runs | Nothing |
+| 4 | A file that gives fewer bytes than its directory entry says, opened as long as it gave: `T00_11` | Nothing |
+| 5 | A text found more than 32K into the editor's text, and found again | `editor-search`, in a short text |
+| 6 | The editor on a text of 87K | `help-broken`, `setup-help-file`: 69K, a line of that length |
+
+**Two scenarios that pass and do not get there.** The same memory is
+what the editor fills and what a copy reads into, and two scenarios
+that are run for the program of 32 bits were made to reach its end.
+They pass, since a count of free memory is left out of the comparison
+(`IGNORED` of `harness/deviations.py`) and their steps were written to
+end on the same screen however much room a build has, for the C
+translation, which is full a few keys before the original. Nothing
+says that they no longer test what their titles say.
+
+- `editor-full`, "with all of its memory full". Seen, by
+  `harness/show.py --changes` with the scenario's steps up to the two
+  behind `"ab"`, the count of free bytes in the status line:
+
+  | | The original | The portable C, 16 bits | The portable C, 32 bits |
+  |---|---|---|---|
+  | With the long line made | 267,852 | 213,372 | 563,836 |
+  | After the six steps that put a line back as often as they have keys for | 1 | 1 | 247,855 |
+  | After `"ab"` | 0 | 0 | 247,853 |
+
+  So the editor of the program of 32 bits is never full there. What
+  that leaves untested: `T51_00` where a line has grown and there is no
+  room for it, with its beep and the line cut ("Known and not dealt
+  with" has what the original does then), and a byte typed in hex
+  behind the last one with no room.
+- `copy-big`, "one that the memory does not hold". By the numbers, not
+  seen: the file is 526,632 bytes, six times `command.com`, and a copy
+  reads into what the editor has for a text, cut to whole pieces of 512
+  bytes (`copy.c`, `left`). That is some 291,000 bytes in the program
+  of 16 bits, two parts, and 641,000 in that of 32, one. Untested then:
+  a file read and written in more than one part, and the question
+  whether to overwrite asked with only a part of the file read, which
+  the scenario answers with Skip, by the comments at its steps.
+- The list of the file search is in the same memory. No scenario fills
+  it in any build.
+
+Both are of entry 13 too, which names them. Neither is declared in the
+harness, which has no word for a scenario that is run and does not
+reach its point.
+
+**What would test it again.** None of it is for the piece that wrote
+this.
+
+| Way | What it tests again | Against |
+|---|---|---|
+| For the program of 32 bits the five steps 28 to 32 are left out of `editor-big`, `left_out_of`, where the scenario is not run for it now | 3 to 6 of the table, and the far larger file of 1: all but the box in a whole screen for the file that fits, and View from it. Tried, as above: it passes as the program is | The user's word is that the scenario is not run for that program: this is another thing than was decided, and is asked first. And it holds only while a megabyte is above the room: with the memory the extender's, step 2 of the road, `noon.dat` may fit, and steps 39 and 40 then go the way of 28 |
+| A scenario of its own with a file that no build has room for, as C1's table has it: eight times `command.com`, 702,176 bytes | 1 and 2 for every build, with nothing declared | A new golden of the original; drive C: of the bench has to hold the file; and it is in the same 64K as no build's room. Seven times `command.com` and `country.sys`, 644,654 bytes, would be in the same 64K as the room of the program of 32 bits and 2,830 bytes above it, by C1's figure: by arithmetic alone, a number that is gone with step 2 |
+| `editor-full` with as many steps more as fill 640 KB, and `copy-big` with a file of more than that | What those two no longer reach | Both scenarios change, so both goldens are derived anew, and every tree is taken through the longer steps |
+
 ## The portable C: the system's functions
 
 What the program asks of the system it asks through
@@ -2218,7 +2369,7 @@ user. The numbers are those that the two lists have between them.
 | | What | Taken |
 |---|---|---|
 | 1 | Whether step 1 keeps segments and offsets as numbers, or has pointers first, under the 16-bit build: see "The strategy" | Numbers in step 1, in a megabyte of the program's own inside the flat memory. They become pointers in step 2, under the 32-bit build alone. It is scaffolding of some 40 lines of `vc.h` and 30 of `dos32.c`, which step 2 takes down again |
-| 2 | Where the panels and the viewer's text are in step 1. With 1 they have to lie within that megabyte, so they cannot be DOS's memory below the megabyte, nor a block that the extender gives wherever it likes | A stretch of the program's own, 640 KB, that the three functions of `sys.h` for memory hand out as they hand out DOS's today. A command then finds all of DOS's memory free but the extender's 52 KB |
+| 2 | Where the panels and the viewer's text are in step 1. With 1 they have to lie within that megabyte, so they cannot be DOS's memory below the megabyte, nor a block that the extender gives wherever it likes | A stretch of the program's own, 640 KB, that the three functions of `sys.h` for memory hand out as they hand out DOS's today. A command then finds all of DOS's memory free but the extender's 52 KB. The editor has more room in it than the original's has on the bench, and opens a file that the original refuses: declared on the user's word, entry 13 of `src/portable_c/DEVIATIONS.md`, with `editor-big` not run for this program |
 | 5 | Quick execute commands, which is the user's to decide and not decided (`TODO.md`, "The portable C: one program"). Under the extender COMMAND.COM's interrupt is called in real mode and comes back; the shell of the bench does not serve it either way (`quick`) | It stays whole through step 1, some 40 lines of `dos32.c`. Should the user decide that it goes, the hardest part of S3 and D2 goes with it |
 | 6 | Release and debug, which the user asked for at this step | Two programs of every build: `VC.EXE`, compiled `-os` without debugging information, which is shipped and which every test judges; and `debug/VC.EXE`, compiled `-od -d2` with checks in the macros of the addresses, built always and run by hand. See "The build" |
 | 7 | Where DOS/32A's licence text is kept, which the road has in the repository and the trial left open as to where | `LICENSE.DOS32A` beside `LICENSE`, the text of `binw/license.d32` as it is, and the sentence that the road has the README say, under a heading of its own |
@@ -2852,7 +3003,7 @@ checkout's `build/tmp` by itself; no `TMPDIR` is wanted.
 | Put a scenario on the record | `python3 harness/ported.py --record build/portable_c32/VC.EXE`, which runs them all and adds every one that has come to pass, and commit `harness/pass32.txt` with the change that made it pass. It writes nothing while a scenario of the record fails |
 | Take one off | By hand, a line of the file, with the reason in the commit. From M1 on a piece that does so does not land |
 | Give a scenario more time than the test does | `--limit SECONDS`, of the test and of `--record`: see the time below |
-| Declare that the build shows something otherwise than the portable C of 16 bits | `TREES["portable_c32"]` of `harness/deviations.py`, in the words of `Declared.also()`; and for the rows of one scenario a patch of its own, `python3 harness/goldens.py patch --tree portable_c32 NAME`, which is written to `harness/goldens/portable_c32/` and then stands in the place of the portable C's for that scenario. That was tried, with `command` and with `banner`, and the files taken away again. Both are deviations, and asked first |
+| Declare that the build shows something otherwise than the portable C of 16 bits | `TREES["portable_c32"]` of `harness/deviations.py`, in the words of `Declared.also()`; and for the rows of one scenario a patch of its own, `python3 harness/goldens.py patch --tree portable_c32 NAME`, which is written to `harness/goldens/portable_c32/` and then stands in the place of the portable C's for that scenario. That was tried, with `command` and with `banner`, and the files taken away again. Both are deviations, and asked first. The first that is there is a scenario not run for the build, `editor-big`: `also(not_run={...})`. The test holds of such an entry what it holds of a tree's, that it names a scenario and that an entry of `DEVIATIONS.md` names that scenario, and besides that the portable C is taken through the scenario, or the entry says nothing. It does not hold that the build still does otherwise there, which would take running it |
 
 **What there is.**
 
@@ -2941,7 +3092,21 @@ checkout's `build/tmp` by itself; no `TMPDIR` is wanted.
   71 seconds, which were 14 of the test's for the 16-bit program and
   more than 60 for this one. That is the block moves and the extender
   at every idle round, as "What could go wrong", 4, has it; no scenario
-  that shows the time of day fails for it.
+  that shows the time of day fails for it. Under load it is more: with
+  a load of thirty to forty on the machine's four processors, other
+  agents' tests, that wait was not over in the 300 seconds that a
+  scenario of the record has for a step, and the test failed for
+  `blank-timed`, "stopped after step 4", in three runs of three within
+  an hour, one of them in the whole suite. Run alone by
+  `harness/compare.py`, at a load of thirty, the scenario passed in
+  240 seconds; and the test passed whole, with `--record`, from a
+  script of five lines that set `scenarios.STEP_TIME` to 900 and
+  called `ported.main()`: `blank-timed` took 403 seconds in it. The
+  program was the same bytes throughout. That is a
+  test that comes out otherwise under load (`CLAUDE.md`, "Work by
+  several agents"), seen when `editor-big` was declared, and not
+  mended: `STEP_TIME` of `harness/scenarios.py` is the same for a step
+  that waits 71 of the machine's seconds as for one that waits none.
 
 The 14 that fail, by cause as far as the first screen that differs
 tells it: nothing behind that screen is known of any of them, and no
@@ -2965,8 +3130,8 @@ the second copy's doing by what shows; 6 and 7 wait for the user's
 word, and may have the driver's blindness in them besides.
 
 Since C1 the nine of 1, 2 and 3 pass, by one mend, and are on the
-record; 4 is no fault of the program's and waits for the user: "C1,
-the editor" below.
+record; 4 is no fault of the program's, and is declared and not run
+for this program, on the user's word: "C1, the editor" below.
 
 **A second copy, which the driver does not know.** In six scenarios
 the program is started a second time from the command line of the
@@ -5683,19 +5848,21 @@ way, and made: the section behind this one.)
   in `STEPS`. `build/portable_c/dos.obj` has to be built for the 16-bit
   half.
 
-### C1, the editor: nine of the ten pass, and one is the user's
+### C1, the editor: nine of the ten pass, and one is declared and not run
 
 The first piece of the convergence took the ten scenarios that H3 has
 as the editor's, four families by the look of the first screen that
 differs. They are two causes. One was in the program and is mended:
 nine scenarios pass with it and are on the record, which has 154 of
 159. The other is how much memory the program has, which is no fault
-of a statement and is the user's to decide: `editor-big`.
+of a statement and was the user's to decide: `editor-big`. It is
+decided, declared, and the scenario not run for the program of 32
+bits: "Cause 2" below.
 
 | | Cause | Scenarios | What became of it |
 |---|---|---|---|
 | 1 | A step of FF60h, 160 back, added to a pointer into the screen buffer: `T71_00` of `edit.c` | `editor-long`, `editor-full`, `editor-buffer`; `user-menu-run`, `user-menu`, `comspec`, `view-commands`, `editor-save`; `editor-keys`: H3's families 1, 2 and 3 | Mended, the 16-bit program the same bytes |
-| 2 | The editor has room for 641,824 bytes where the original has it for 345,840 and the portable C of 16 bits for 291,360: the 640 KB of the program's own, 2 of what the session took | `editor-big`: H3's family 4 | Open, for the user: see below |
+| 2 | The editor has room for 641,824 bytes where the original has it for 345,840 and the portable C of 16 bits for 291,360: the 640 KB of the program's own, 2 of what the session took | `editor-big`: H3's family 4 | Decided by the user on 13 October 2026: declared, entry 13 of `src/portable_c/DEVIATIONS.md`, and `editor-big` not run for the program of 32 bits. See below |
 
 **Cause 1, `T71_00`.** The routine moves the rows of the editor's or
 the viewer's window by one in the screen buffer, before the BIOS
@@ -5835,7 +6002,8 @@ Its like elsewhere, looked for by reading and by `grep`:
   beginning; `ENTRY` does the same with the cut. `screen = (u16
   *)((u8 *)screen + count)` of `dialog.c` adds twice a column.
 
-**Cause 2, `editor-big`: open, for the user.** The scenario makes a
+**Cause 2, `editor-big`: decided by the user, declared, and not run
+for the program of 32 bits.** The scenario makes a
 file of 381,338 bytes, "within 64K of what the editor has room for",
 and has the editor say that it is too large. The editor's room is
 `EdSpace`, the paragraphs between `ViewSeg` and the end of the memory
@@ -5857,7 +6025,8 @@ the scenario passes whole. The figure is of the kind that
 "Scenarios" of `CLAUDE.md` leaves out of a comparison, one that
 follows the size of the program, and the count of free bytes in the
 editor's status line is left out already; but here it decides what
-the program does. The ways that there seem to be, none of them taken:
+the program does. The ways that there seemed to be, as C1 wrote them
+down for the user:
 
 | Way | For | Against |
 |---|---|---|
@@ -5866,8 +6035,25 @@ the program does. The ways that there seem to be, none of them taken:
 | A patch of the scenario for this build: the editor opens the file | Says what is so | A deviation: the program does otherwise than the original with the same file, for memory alone. It is the other way round from 3 of what is open, the second copy that has memory to run: there the program of 32 bits does again what the original does, and here it leaves it |
 | The program's own memory made as short as DOS leaves the 16-bit program | The scenario passes as it is | A number chosen to make a test pass; and it is gone with step 2, when the memory is the extender's |
 
-For the piece that takes it: nothing of `editor-big` behind its step
-28 is known to pass but by the trial with 320 KB.
+What the user decided, on 13 October 2026 (`CLAUDE.md`, "The portable
+C"): the editor of the program of 32 bits has room for a file that the
+original's has none for; that is declared; the memory is not made
+short for it; and `editor-big` is not run for that program, with what
+it alone tested listed as untested. Of the ways above that is the
+third's declaration, with the scenario left out for the build where
+the table has a patch; the fourth, the memory made short, is refused.
+Done so:
+
+| What | Where |
+|---|---|
+| The declaration | Entry 13 of `src/portable_c/DEVIATIONS.md`, which says that it is of the program of 32 bits alone |
+| The scenario not run | `TREES["portable_c32"]` of `harness/deviations.py`, the first thing that is said there for that build alone: `also(not_run=...)`. The portable C of 16 bits and the C translation are taken through the scenario as before. The record, `harness/pass32.txt`, did not have it and is as it was; the test had 158 scenarios for that program then, of which 154 passed, and with EGA lines gone, which landed beside this, 155 of which 152 pass |
+| What is untested | "The editor's room: untested in the program of 32 bits", further up, beside the tall screen's section, with what the program of 32 bits was seen to do with the steps behind the file, and what would test it again |
+
+C1 had nothing of `editor-big` behind its step 28 known to pass but by
+the trial with 320 KB. It is known now, by a trial with the five steps
+at the file left out for that program: every other step passes. That
+section has it.
 
 **What the finder was taught.** `harness/int16.py` could not see the
 fault: `(u8 *)to + step` is a pointer and a variable, which may hold
@@ -7912,7 +8098,9 @@ than it is would pass.
   a size in the same 64K as the room, has no place in a scenario: the
   translation's room was 27,104 bytes less than the original's then and
   shrinks with every batch. So of the two instructions that compare the low words,
-  the scenarios take the jump one way only.
+  the scenarios take the jump one way only. For the program of 32 bits
+  the file fits, and the scenario is not run for it: "The editor's
+  room: untested in the program of 32 bits".
 - `T54_00`, which goes to the line before, looks backwards for where a
   line begins and then goes forwards again with `T53_00` until it is back
   where it came from, without asking whether `T53_00` found a line. If

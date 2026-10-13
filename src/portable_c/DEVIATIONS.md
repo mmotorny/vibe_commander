@@ -1422,3 +1422,83 @@ key bars, whose ninth, the bar for such a display, is spaces, and which
 names the rows behind the one left out by a number less. The ninth is
 the commands of the Options menu, where the setup, the last of the
 commands, has a number less (see 8).
+
+### 13. The editor of the program of 32 bits has room for a larger file
+
+This is of one build of the portable C alone: the program of 32 bits,
+`build/portable_c32/VC.EXE`. The program of 16 bits that is built of
+the same source does here what the original does.
+
+**What the original does.** The editor has the whole of a text in the
+memory. Its room is what lies behind the lists of the two panels, as
+far as the block of memory goes that the program got from DOS when it
+started: `EdSpace` of the editor, in paragraphs. That is what DOS had
+free then, less the program and its panels, so it follows the machine,
+what else is loaded, and the size of the program. A file that is not
+shorter than the room is not opened: a box of the editor says "The file
+NAME is too large for Edit." and offers View, which shows the file in
+the viewer, and Cancel.
+
+Two more things are kept in the same memory. A copy reads a file into
+it, as much as there is room for, and writes that before it reads on.
+And the file search keeps its list of what it found there, which is
+full when the memory is.
+
+**What the portable C does.** The same, by the same statements, with
+the room that each of its builds has. In the program of 16 bits that is
+what DOS has left, as in the original, and less than the original's by
+what the program is larger. The program of 32 bits has its panels and
+its text in memory of its own, 640 KB that are a part of the program
+and that it hands out to itself where the program of 16 bits asks DOS
+(`TODO.md`, "The portable C in 32 bits: the plan", "The memory"): its
+editor has all of that but the panels' lists, whatever DOS has free and
+however large the program is. On the bench of the tests that is nearly
+twice the original's room, and more than twice that of the program of
+16 bits; `TODO.md`, "C1, the editor", has the four figures as they were
+measured.
+
+So the program of 32 bits opens a file in the editor that the original
+refuses with its box, if the file is larger than the original's room
+and smaller than its own. A file that is larger than its own room it
+refuses as the original does, with the same box. A copy reads a file
+of that size in one piece where the original reads and writes it in
+two, and the file search has room for a longer list.
+
+**Why.** The user's decision, on 13 October 2026: the editor of the
+program of 32 bits has room for a file that the original's has none
+for, that is declared, and the memory is not made short for it. How
+much room there is was never the program's to say: the original has
+another room on every machine, and a file that it refuses on the bench
+it opens where less is loaded. A length chosen so that this build
+refuses what the original refuses on the bench would be a number made
+for a test, and would go with step 2 of the road, when the memory is
+the extender's and no longer a stretch of the program's own. It is no
+removal of something that only made sense on DOS, and was asked first.
+
+**Which scenarios show it.** `editor-big`, which makes a file of
+381,338 bytes, above the room of the original's editor on the bench
+and in the same 64K, and has the editor refuse it, view it from the
+box, and refuse it once more. The program of 32 bits opens the file at
+the first of those steps. The scenario is not run for that program:
+`TREES["portable_c32"]` of `harness/deviations.py`, which is what the
+portable C is declared to do with this added. It is run for the program
+of 16 bits and for the C translation, and held against the original's
+golden as it is. No patch and no rule is of this entry.
+
+What the scenario has behind that file is not run for the program of 32
+bits either, and some of it no other scenario has: a file that is
+shorter than its directory entry says, and the editor's box left
+without View. `TODO.md`, "The editor's room: untested in the program of
+32 bits", lists what the scenario alone tested, what that program was
+seen to do with its other steps, and what would test it again.
+
+Two scenarios are run for the program of 32 bits and pass, and do not
+get it where they get the original, for the same memory. Nothing says
+so when they are run, since a count of free memory is left out of the
+comparison and their steps were made to end on the same screen however
+much room a build has:
+
+| Scenario | What it is for | In the program of 32 bits |
+|---|---|---|
+| `editor-full` | The editor with all of its memory full: a line put back until there is no room, and two characters typed that have none | The editor is never full: it has some 250,000 bytes free where the original has none. Seen, in the count of its status line |
+| `copy-big` | A file that the memory does not hold, 526,632 bytes, read and written in two parts, and skipped when not all of it has been read | The memory holds it: one part. By the numbers, not seen |
