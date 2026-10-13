@@ -12,8 +12,9 @@ This lists every place where the code names a constant, a text or a table
 of the files of constants or of the code's own, and says
 how many bytes of it are read there. Most places it knows by their form:
 a loop to a count, MvzLine, MvsBw and MainFil with their lengths, a text
-that is read as far as its zero byte, a box or a dialog that is handed
-on by its offset. The others are in REVIEWED below, each with what
+that is read as far as its zero byte, a name that the system is handed
+or bytes that it is to write, a box or a dialog that is handed on by its
+offset. The others are in REVIEWED below, each with what
 reading the code found. A place that is neither is reported, and so is
 an object that is shorter than what is read of it: datacheck.py fails
 for both.
@@ -41,6 +42,13 @@ ZERO = "as far as its zero"     # a text
 TABLE = "as it is laid out"     # a box, a dialog, buttons: by their kind
 OWN = "within itself"           # by an index that its own data bounds
 NONE = "not read"               # only its address or its size is taken
+
+# The functions of src/portable_c/sys.h that take a name, a text that
+# ends in a zero byte.
+NAMED = ("FileCreate", "FileOpen", "FileOpenBare", "FileDelete",
+         "FileRename", "FileAttributes", "FileSetAttributes",
+         "FileTrueName", "FindFirst", "DirMake", "DirRemove", "DirChange",
+         "ProgramRun", "ProgramRunBare")
 
 # What a call reads of a constant that is handed to it by its offset.
 READERS = ("Dialog", "DialBox", "OncZoom", "MinMnu", "MnMn10", "MnMn40",
@@ -244,6 +252,16 @@ def _form(statement, name, sizes):
                  rf"|\b(MvzTxt|OutStr1|OpenFil|ChDir|MovDz0|PUT|F65_29)\s*"
                  rf"\([^;]*\b{n}\b", statement):
         return ZERO
+    # The system is handed a name, which it reads as far as its zero, or
+    # bytes to write, with their count: the functions of sys.h.
+    if re.search(rf"\b({'|'.join(NAMED)})\s*\([^;]*\b{n}\b", statement):
+        return ZERO
+    match = re.search(rf"\bFileWrite\s*\([^;]*?,\s*{plus}\s*,\s*"
+                      rf"([\w ()]+?)\s*\)", statement)
+    if match:
+        count = _count(match[2], name, sizes)
+        if count is not None:
+            return int(match[1] or 0) + count
     if re.search(rf"\b({'|'.join(READERS)})\s*\((?:[^();]|\([^();]*\))*"
                  rf"OFFSET\(\s*&?{n}\s*\)", statement) or re.search(
                      rf"\b(box|report|result)\s*=\s*OFFSET\(\s*{n}\s*\)",
