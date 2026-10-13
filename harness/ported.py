@@ -109,9 +109,13 @@ which may only grow:
     are not run: they start as that one did.
   - Below the scenarios, what failed is listed by what was first
     otherwise, the scenarios that fail alike together.
-  - Which C functions ran is asked once every scenario passes. That
-    each is linked, or gone or renamed as the tables say, is held from
-    the first day.
+  - Which C functions ran is asked as of every tree, once every
+    scenario of the record passes, and of the scenarios that pass: one
+    that fails is ended where it first shows something else, and has not
+    been where its steps would take it. Every function of the batches
+    ran in the scenarios of the record when this was first asked, with
+    one scenario off it. That each is linked, or gone or renamed as the
+    tables say, is held whatever fails.
   - The stack is looked at in the scenarios that pass.
   - The layout is harness/layoutcheck.py's, which this asks before
     anything is run; and from QEMU's log, that the program was in the
@@ -1444,16 +1448,12 @@ RENAMED = {
 
 # The portable C built for 32 bits is the same source but for the file of
 # the system's functions, dos32.c where the program of 16 bits has dos.c:
-# what is gone from the one is gone from the other, and so are the
-# entries by which DOS comes into a program of 16 bits, which are of
-# dos.c.
+# what is gone from the one is gone from the other, and so are the two
+# routines in which DOS goes on when it has ended a program of 16 bits,
+# which are of dos.c. The third thing that DOS enters there, the
+# critical error, the program of 32 bits has under another name.
 GONE["portable_c32"] = {
     **GONE["portable_c"],
-    "FatErr": "the entry of DOS's critical error, an interrupt function "
-              "of dos.c: the program of 32 bits takes the error through "
-              "its extender, at DeviceEntry of dos32.c, which is static, "
-              "as the function that shows the box is, FtErr1 of main.c, "
-              "and the map that this reads has no static name",
     **dict.fromkeys(
         ("Exit01", "Exit05_"),
         "where DOS goes on when it has ended the program by another "
@@ -1466,6 +1466,11 @@ GONE["portable_c32"] = {
 }
 RENAMED["portable_c32"] = {
     **RENAMED["portable_c"],
+    "FatErr": ("DeviceEntry_", "the entry of DOS's critical error, which "
+               "the program of 32 bits takes through its extender: "
+               "DeviceEntry of dos32.c, a routine of that file's own, "
+               "which the extender enters from real mode where DOS "
+               "enters FatErr of dos.c, an interrupt function"),
     "Alloc0": ("Start_", "where the program is entered, by the extender "
                "and not by DOS: Start of dos32.c, which calls Main as "
                "Alloc0 of dos.c does"),
@@ -1543,10 +1548,21 @@ def check_translation(link_map, executed, tree, place, batches):
     In a flat program that is compiled for size, several functions may
     be one place of the map: the compiler gives a function no
     instructions of its own where the one behind it in its file has the
-    same. Such a function counts as run when another of its place did."""
-    symbols = coverage.link_map(link_map)
+    same. Such a function counts as run when another of its place did.
+
+    A function of a batch is one that other files call, and is in the
+    map among what is not static. The function that a tree has in its
+    place, under another name, may be static in its file, as an entry
+    that only the system comes to is: that name is looked for among the
+    static ones too, and has to be there once."""
+    linked = le.Map(link_map)
+    symbols = dict(linked.public)
     gone = GONE.get(tree, {})
     renamed = RENAMED.get(tree, {})
+    for name, _ in renamed.values():
+        found = linked.named(name)
+        if name not in symbols and len(found) == 1:
+            symbols[name] = (found[0].first, found[0].offset)
     passed = True
     for name in sorted(set(renamed) - {name for batch in batches
                                        for name in batch.functions}):
@@ -2176,16 +2192,35 @@ def main():
                                 SETUP_BATCHES) and passed
         batches += SETUP_BATCHES
     # Which functions of the C ran is asked of a tree that passes every
-    # scenario it is taken through, or is held to: one that some still
-    # fail has not been where they would take it.
-    every = all(outcome.passed for outcome in outcomes)
-    if record and not every:
-        in_translation = None
-        print(textwrap.fill(
-            "The C functions: whether each ran is not asked while "
-            f"{tree} does not pass every scenario; that each is linked, "
-            "or gone or renamed as is said of it, is held",
-            width=78, subsequent_indent="  ", break_on_hyphens=False))
+    # scenario that it is held to pass. Of a tree with a record those
+    # are the scenarios of the record, and what ran is what ran in the
+    # scenarios that passed: one that fails was ended at its first
+    # screen that differs, and has not been where its steps would take
+    # it. While a scenario of the record fails, it is not asked.
+    if record:
+        off = [outcome.name for outcome in outcomes if not outcome.passed]
+        if failed:
+            in_translation = None
+            print(textwrap.fill(
+                "The C functions: whether each ran is not asked while "
+                f"{tree} does not pass what its record has and no more; "
+                "that each is linked, or gone or renamed as is said of "
+                "it, is held",
+                width=78, subsequent_indent="  ", break_on_hyphens=False))
+        else:
+            in_translation = {}
+            for outcome in outcomes:
+                if outcome.passed:
+                    in_translation.update(outcome.run.executed)
+            if off:
+                print(textwrap.fill(
+                    "The C functions: whether each ran is asked of the "
+                    f"{len(outcomes) - len(off)} scenarios that pass, "
+                    "which are those of the record; not counted is what "
+                    "ran in " + ", ".join(off) + ", which "
+                    + ("fails" if len(off) == 1 else "fail"),
+                    width=78, subsequent_indent="  ",
+                    break_on_hyphens=False))
     passed = check_translation(translation.linked, in_translation, tree,
                                coverage.place(translation.contents),
                                batches) and passed
