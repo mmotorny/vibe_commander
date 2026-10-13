@@ -201,33 +201,28 @@ F32_77:
    files, the cursor is on "..", or DOS would not. */
 static u16 FileLst(void)
 {
-    struct DosRegs regs;
     struct WCBdef __far *wcb;
     struct FILENT __far *file;
     u8 __far *end;
     struct Selected selected;
+    struct Answer asked;
     u16 i, handle, any, at, length;
 
     end = MvzLine(LIST_NAME, md.TempDir, LenPath);
     for (i = 0; i < 13; i++)
         end[i] = List_F[i];
-    regs.bx = 0;
-    regs.si = 0;
-    regs.di = 0;
-    regs.name = LIST_NAME;
     if (ChgDisk(LIST_NAME))
         goto FiLs18;
-    regs.cx = 0x20;                     /* delete the one that is there */
-    regs.ax = 0x4301;
-    if (!Intr21((struct DosRegs STACK *)&regs))
+    /* delete the one that is there */
+    asked = FileSetAttributes(LIST_NAME, 0x20);
+    if (!asked.failed)
         goto FiLs02;
-    if (regs.ax == 2)
+    if (asked.value == 2)
         goto FiLs03;
-    if (regs.ax != 5)
+    if (asked.value != 5)
         goto FiLs18;
 FiLs02:
-    regs.ax = 0x4100 | regs.ax & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (FileDelete(LIST_NAME).failed)
         goto FiLs18;
 FiLs03:
     wcb = PANEL(md.WCBcrn);
@@ -241,12 +236,10 @@ FiLs03:
         if (ENTRY(wcb, wcb->CurAdr)->NameF[0] == '.')
             goto FiLs18;
     }
-    regs.cx = 0x20;                     /* and make it */
-    regs.ax = 0x3C00 | regs.ax & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    asked = FileCreate(LIST_NAME, 0x20);    /* and make it */
+    if (asked.failed)
         goto FiLs18;
-    handle = regs.ax;
-    regs.bx = handle;
+    handle = asked.value;
     at = wcb->CurAdr;
     if (any == 0)
         goto FiLs13;
@@ -260,36 +253,24 @@ FiLs13:
     file = ENTRY(wcb, at);
     for (length = 0; file->NameF[length] != 0; length++)
         ;
-    regs.name = file->NameF;
-    regs.cx = length;
-    regs.ax = 0x4000;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (FileWrite(handle, file->NameF, length).failed)
         goto FiLs17;
-    if (file->AttrF & ATTR_DIRECTORY) {
-        regs.name = Mask_S;
-        regs.cx = 4;
-        regs.ax = 0x4000 | regs.ax & 0xFF;
-        if (Intr21((struct DosRegs STACK *)&regs))
+    if (file->AttrF & ATTR_DIRECTORY)
+        if (FileWrite(handle, Mask_S, 4).failed)
             goto FiLs17;
-    }
-    regs.name = CrLf_S;
-    regs.cx = 2;
-    regs.ax = 0x4000 | regs.ax & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (FileWrite(handle, CrLf_S, 2).failed)
         goto FiLs17;
 FiLs16:
     at += sizeof(struct FILENT);
     goto FiLs12;
 
 FiLs17:
-    regs.ax = 0x3E00 | regs.ax & 0xFF;
-    Intr21((struct DosRegs STACK *)&regs);
+    FileClose(handle);
 FiLs18:
     return 1;
 
 FiLs20:
-    regs.ax = 0x3E00 | regs.ax & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (FileClose(handle).failed)
         goto FiLs18;
     for (at = DSKBUF; at < wcb->EndBuf; at += sizeof(struct FILENT)) {
         file = ENTRY(wcb, at);
@@ -496,19 +477,18 @@ Run_30:                                 /* that is all of them */
    has put into DosBuf then. */
 u16 F32_00(u16 main)
 {
-    struct DosRegs regs;
     struct Entry item;
     struct Named named;
     struct Next found;
     struct Key pressed;
-    struct Answer opened;
+    struct Answer opened, read;
     const u8 *text;                     /* SI */
     u16 *screen;                        /* DI */
     u16 *key;                           /* BP */
     u16 begin, size;                    /* BX and DX: the box */
     u16 keys;                           /* CL: how wide the keys are */
     u16 row;                            /* CH: the line of the cursor */
-    u16 include, failed, count, c, next, width, widest, lines, length;
+    u16 include, c, next, width, widest, lines, length;
     u16 limit, i, to, answer, room, command;
 
     if (main)
@@ -547,20 +527,12 @@ F32_04:
     return 0;
 
 F32_05:                                 /* read it */
-    regs.ax = 0x3F00 | opened.value & 0xFF;
-    regs.bx = opened.value;
-    regs.cx = LenMenu - 1;
-    regs.name = md.MenuBuf;
-    regs.si = 0;
-    regs.di = 0;
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    count = regs.ax;
-    regs.ax = 0x3E00 | count & 0xFF;
-    if (Intr21((struct DosRegs STACK *)&regs))
+    read = FileRead(opened.value, md.MenuBuf, LenMenu - 1);
+    if (FileClose(opened.value).failed)
         goto F32_04;
-    if (failed)
+    if (read.failed)
         goto F32_04;
-    md.MenuBuf[count] = EOF_CHAR;
+    md.MenuBuf[read.value] = EOF_CHAR;
     include = (u16)md.MenuBuf;
     item = FndItem(md.MenuBuf);
     if (item.end)
