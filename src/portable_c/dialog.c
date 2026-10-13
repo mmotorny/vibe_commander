@@ -86,9 +86,6 @@
 #define MD(offset)  (*(u8 *)(offset))
 #define MDW(offset) (*(u16 *)(offset))
 
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
-
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
 
@@ -113,12 +110,11 @@
 
    The routines that a dialog may name for Enter and F10, the SUB_ of
    tables.h, get the answer as Dialog has it, the key. F38_10 returns the
-   answer to go by. M30_60 does too, and in the high word something that
-   is not 0 to go on with the dialog. F35_61 gets the place of the line
+   answer to go by. M30_60, of vc.h, does too, and whether it has refused
+   a line, to go on with the dialog. F35_61 gets the place of the line
    that the tree is for as well, and is not 0 to go on with the dialog;
    the answer stays what it was. */
 u16 F38_10(u16 answer);                                 /* dirfunc.c */
-u32 M30_60(u16 answer);
 u16 F35_61(u16 answer, u16 place);                      /* copy.c */
 
 /* C routines of other files that vc.h does not have. */
@@ -793,11 +789,11 @@ u16 Dialog(u16 box, u16 include, u16 begin, u16 saved, u16 segment)
     u8 *text;
     u16 *screen;
     struct Box where;
-    u32 pair;
     struct Typed typed;
     struct Chosen chosen;
     struct Ticked ticked;
     struct Buttons menu;
+    struct Checked checked;
     struct Mouse pointer;
     u16 first = box + sizeof(struct BOXHD);
     u16 size = include;
@@ -1046,9 +1042,9 @@ Dial71:
         key = F38_10(key);
         break;
     case SUB_M30_60:
-        pair = M30_60(key);
-        key = LOW(pair);
-        if (HIGH(pair) != 0)
+        checked = M30_60(key);
+        key = checked.answer;
+        if (checked.refused != 0)
             goto Dial31;
         break;
     case SUB_F35_60:

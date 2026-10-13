@@ -464,6 +464,21 @@ u32 TrnMain(u16 first);
    what is selected in it if `keep` is not 0: not 0 if it could not be
    read. See read.c. */
 u16 ReDir(u16 panel, u16 keep);
+/* Get the label of the current drive, a text of at most 11 characters,
+   to `volume` in the main data. See read.c. */
+struct Label {                          /* what GetVol returns: */
+    u16 answer;                         /* AX as DOS left it: its error
+                                           where it could not say what the
+                                           drive is or found no label; with
+                                           a label, what it left in AH and
+                                           the last of 11 characters. 0
+                                           for a drive of a network */
+    u16 local;                          /* 0 for a drive of a network; 1
+                                           for any other, with a label or
+                                           without, and where DOS could
+                                           not say */
+};
+struct Label GetVol(u8 *volume);
 /* The setup file: see each in setup.c. MakeIni writes into MenuBuf what
    the file holds, and returns how long that is. SaveSet writes it to the
    file, and answers with the bytes written, or with what DOS said was
@@ -931,6 +946,15 @@ u16 F54_00(void);
 u16 FncMas(u16 include);
 u16 FncSel(void);
 u16 FncExt(void);
+/* What the dialog of attributes has Dialog call when it is answered,
+   with the answer: it reads the date and the time that were typed. */
+struct Checked {                        /* what M30_60 returns: */
+    u16 answer;                         /* the answer for the dialog to go
+                                           by */
+    u16 refused;                        /* 1 if a line is no date or no
+                                           time: the dialog goes on */
+};
+struct Checked M30_60(u16 answer);
 
 /* Copy and Rename, copy.c: `command` is 1 to rename, and `directories`
    and `files` are what the original has in BX and DX at the jump. Where

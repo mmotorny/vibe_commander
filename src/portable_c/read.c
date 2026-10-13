@@ -43,13 +43,12 @@ static void ReDr45(u16 panel);
 static void ReDr50(u16 panel, struct OldList STACK *old);
 static void RdInfo(u16 panel);
 u16 ReadTre(void);                                      /* treebox.c */
-u32 GetVol(u8 *volume);
 void DirSize(u16 panel);
 u16 DiSi10(u16 attributes);
 void TstInfo(u16 panel);
-static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
+static struct Label GetVol0(u8 *volume, struct DosRegs STACK *regs);
 
-/* ReDir is in vc.h. */
+/* ReDir and GetVol are in vc.h. */
 
 /* The names of files: Mask_S is \*.* and Ext_F is VC.EXT. They are
    copied with MvzLine, which takes what follows a text along, so they
@@ -420,7 +419,7 @@ static void RdInfo(u16 panel)
     struct WCBdef __far *wcb = PANEL(panel);
     struct DosRegs regs;
     u16 drive, failed, handle, length;
-    u32 volume;
+    struct Label label;
     struct Answer opened;
 
     if (wcb->WinTyp != 2)
@@ -459,8 +458,8 @@ static void RdInfo(u16 panel)
             return;
         md.InfoLen = length;
     }
-    volume = GetVol0(md.Volume, (struct DosRegs STACK *)&regs);
-    if ((u16)(volume >> 16) != 0 && (u16)volume == ERR_NOT_READY)
+    label = GetVol0(md.Volume, (struct DosRegs STACK *)&regs);
+    if (label.local != 0 && label.answer == ERR_NOT_READY)
         return;
     wcb->ChgFlg = 0;
 }
@@ -495,21 +494,32 @@ u16 ReDir(u16 panel, u16 keep)
    is a label, without the full stop and the spaces of a file name. An
    empty text if there is none.
 
-   Returns in the high word whether the original has the carry flag set,
-   and in the low one AX. The flag is clear for a drive of a
+   Returns whether the drive is a local one, where the original has the
+   carry flag, and what it has in AX. The flag is clear for a drive of a
    network, and set for any other, with a label or without. AX is the
    error of DOS where it could not say what the drive is or found no
    label; for a label it is what DOS left in AH with the last of the 11
    characters, a space unless the label is that long. */
-u32 GetVol(u8 *volume)
+struct Label GetVol(u8 *volume)
 {
     struct DosRegs regs;
 
     return GetVol0(volume, (struct DosRegs STACK *)&regs);
 }
 
+/* What GetVol returns: what DOS answered, and whether the drive is a
+   local one. */
+static struct Label Labelled(u16 answer, u16 local)
+{
+    struct Label label;
+
+    label.answer = answer;
+    label.local = local;
+    return label;
+}
+
 /* The same, with room for the registers of DOS that the caller has. */
-static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs)
+static struct Label GetVol0(u8 *volume, struct DosRegs STACK *regs)
 {
     u8 *scan, *end;
     u16 i;
@@ -522,7 +532,7 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs)
     regs->si = (u16)md.TmpErr;
     regs->di = (u16)(md.TmpErr + 100);
     if (Intr21(regs))
-        return 0x10000UL | regs->ax;
+        return Labelled(regs->ax, 1);
     scan = md.TmpErr + 100;
     if (*(u16 *)scan == 0x5C5C) {               /* \\server\name\... */
         scan += 2;
@@ -536,7 +546,7 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs)
             *volume++ = c;
         }
         *volume = 0;
-        return 0;
+        return Labelled(0, 0);
     }
     SetDTA();
     regs->ax = 0x4E5C;
@@ -544,7 +554,7 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs)
     regs->name = Mask_S;
     if (Intr21(regs)) {
         *volume = 0;
-        return 0x10000UL | regs->ax;
+        return Labelled(regs->ax, 1);
     }
     Convert(md.DTA.FilName, volume);
     end = volume;
@@ -554,7 +564,7 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs)
             end = volume + i + 1;
     }
     *end = 0;
-    return 0x10000UL | (regs->ax & 0xFF00) | c;
+    return Labelled((regs->ax & 0xFF00) | c, 1);
 }
 
 /* Work out the sizes of the directories in a panel's list, of all files

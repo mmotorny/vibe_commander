@@ -42,11 +42,10 @@ u16 F38_10(u16 answer);
 u16 F38_40(u16 attributes);
 static u16 F38_70(void);
 u16 M30_50(u16 attributes);
-u32 M30_60(u16 answer);
-static u32 F38_60(void);
+static struct Answer F38_60(void);
 static u16 FncMs1(u16 include);
 
-/* DirFunc and DelTr0 are in vc.h. */
+/* DirFunc, DelTr0 and M30_60 are in vc.h. */
 /* The commands, with FncMas, FncSel and FncExt, are declared in vc.h:
    see "The commands" there. */
 
@@ -77,7 +76,6 @@ u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
 void PutFls(u16 panel);                                 /* panel.c */
 void PutTre(u16 panel);                                 /* tree.c */
 u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
-u32 GetVol(u8 *volume);                                 /* read.c */
 struct DateText {                                       /* format.c */
     u16 century;
     u16 first, second, third;
@@ -178,10 +176,6 @@ extern const u8 __far Tree_F[];
 #define ERR_CURRENT_DIR 0x10
 #define ERR_NOT_READY   0x53
 
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
-#define PAIR(high, low) ((u32)(high) << 16 | (low))
-
 /* DX of a call of DOS, where it is not the offset of a name. */
 #define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
@@ -245,8 +239,7 @@ u16 F38_40(u16 attributes)
     struct DosRegs regs;
     struct Box box;
     u8 *end;
-    u32 removed;
-    struct Answer marked;
+    struct Answer removed, marked;
     u16 answer, error, report, count;
 
     if (!(attributes & ATTR_DIRECTORY)) {
@@ -296,8 +289,8 @@ u16 F38_40(u16 attributes)
     if (ChgDisk(md.TmpBuf))
         goto stop;
     removed = F38_60();
-    if (HIGH(removed) != 0) {
-        error = LOW(removed);
+    if (removed.failed != 0) {
+        error = removed.value;
         if (error < 100 && (u8)error != ERR_NO_ACCESS) {
             report = OFFSET(CntDi_B);
             goto failed;
@@ -330,8 +323,8 @@ u16 F38_40(u16 attributes)
         OncZoom(BOX_PLACE, OFFSET(DelDr_P), OFFSET(Del_S),
                 (struct Box STACK *)&box);
         removed = F38_60();
-        if (HIGH(removed) != 0) {
-            if (LOW(removed) == ERR_NOT_READY)
+        if (removed.failed != 0) {
+            if (removed.value == ERR_NOT_READY)
                 goto stop;
             goto not_done;
         }
@@ -367,12 +360,22 @@ out:
     return answer;
 }
 
+/* What F38_60 returns: what DOS answered, and whether that is an
+   error. */
+static struct Answer DosSaid(u16 value, u16 failed)
+{
+    struct Answer answer;
+
+    answer.value = value;
+    answer.failed = failed;
+    return answer;
+}
+
 /* Remove the directory at TmpBuf. If it is the current one, its path is
    made a full one, in TmpBuf too, the directory above is made the
    current one of the current drive, and it is tried again. Returns what
-   DOS answered in the low word, and something that is not 0 in the high
-   one if it was an error. */
-static u32 F38_60(void)
+   DOS answered, and whether that was an error. */
+static struct Answer F38_60(void)
 {
     struct DosRegs regs;
     u16 count;
@@ -380,14 +383,14 @@ static u32 F38_60(void)
     regs.name = md.TmpBuf;
     regs.ax = 0x3A00;
     if (!Intr21((struct DosRegs STACK *)&regs))
-        return regs.ax;
+        return DosSaid(regs.ax, 0);
     if (regs.ax != ERR_CURRENT_DIR)
-        return PAIR(1, regs.ax);
+        return DosSaid(regs.ax, 1);
     regs.si = (u16)md.TmpBuf;
     regs.di = (u16)md.TmpErr;
     regs.ax = 0x6000;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return PAIR(1, regs.ax);
+        return DosSaid(regs.ax, 1);
     for (count = 0; count < LenPath + 13; count++)
         md.TmpBuf[count] = md.TmpErr[count];
     md.TmpErr[0] = '.';
@@ -396,12 +399,12 @@ static u32 F38_60(void)
     regs.name = md.TmpErr;
     regs.ax = 0x3B00;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return PAIR(1, regs.ax);
+        return DosSaid(regs.ax, 1);
     regs.name = md.TmpBuf;
     regs.ax = 0x3A00;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return PAIR(1, regs.ax);
-    return regs.ax;
+        return DosSaid(regs.ax, 1);
+    return DosSaid(regs.ax, 0);
 }
 
 /* Delete the files that the mask at TmpBuf names, at one call of DOS:
@@ -587,13 +590,25 @@ static u16 Figure(const u8 * STACK *text, u16 STACK *number)
     return 1;
 }
 
+/* What M30_60 returns when it has refused no line: the answer for the
+   dialog to go by. */
+static struct Checked Accepted(u16 answer)
+{
+    struct Checked checked;
+
+    checked.answer = answer;
+    checked.refused = 0;
+    return checked;
+}
+
 /* What the dialog of attributes has Dialog call when it is answered:
    with Set, 0, the date and the time are read from the two lines that
    were typed, and put where M30_50 takes them, AttrDat and AttrTim. A
    line that is empty leaves 0FFFFh there: not to be changed. Returns
-   `answer` in the low word; and if a line is no date or no time, which a
-   box says, what that was answered with there and something that is not
-   0 in the high word, for the dialog to go on.
+   the answer for the dialog to go by, `answer` as it came or 0 for Set;
+   and if a line is no date or no time, which a box says, what that box
+   was answered with and that the line was refused, for the dialog to go
+   on.
 
    A date is three numbers with the country's separator between them, in
    the country's order. A year below 100 is one from 1980 to 2079. A time
@@ -603,15 +618,16 @@ static u16 Figure(const u8 * STACK *text, u16 STACK *number)
 
    Ported as it is: a time that has only hours and one separator, "5:",
    is refused, and so is anything behind the letter, but spaces. */
-u32 M30_60(u16 answer)
+struct Checked M30_60(u16 answer)
 {
+    struct Checked checked;
     const u8 *text;
     u16 month, day, year, days, swap;
     u16 hours, minutes = 0, seconds = 0, add = 0, limit;
     u8 letter = 0;
 
     if ((u8)answer != 0)
-        return answer;
+        return Accepted(answer);
     AttrDat = 0xFFFF;
     AttrTim = 0xFFFF;
     text = NEAR(FndLet(md.DosBuf + LenCmd + 10 + 3));
@@ -670,7 +686,7 @@ u32 M30_60(u16 answer)
     /* M30_70 */
     text = NEAR(FndLet(md.DosBuf + LenCmd + 10 + 100 + 3));
     if (*text == 0)
-        return 0;
+        return Accepted(0);
     if (!Figure((const u8 * STACK *)&text, (u16 STACK *)&hours))
         goto refused;
     if (*text == md.Country.TimeSep[0]) {
@@ -708,11 +724,13 @@ u32 M30_60(u16 answer)
     if (hours == limit)
         hours = 0;
     AttrTim = ((hours + add) << 11) + (minutes << 5) + (seconds >> 1);
-    return 0;
+    return Accepted(0);
 
 refused:
     /* None of its lines has ^I: no include line. */
-    return PAIR(1, Dialog(OFFSET(NoDat_B), 0, 0, 0, MAIN_SEG));
+    checked.answer = Dialog(OFFSET(NoDat_B), 0, 0, 0, MAIN_SEG);
+    checked.refused = 1;
+    return checked;
 }
 
 /* Call what FncAddr names, for a file with these attributes at TmpBuf. */
@@ -1240,7 +1258,7 @@ u16 F54_00(void)
 
     HidCur();
     ChgDisk(md.DosPth);
-    if (HIGH(GetVol(md.Volume)) == 0)
+    if (GetVol(md.Volume).local == 0)
         return TO_FUNC04;
     md.TmpBuf[0] = '\\';
     for (i = 0; i < 12; i++)
