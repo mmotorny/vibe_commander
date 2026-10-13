@@ -1321,8 +1321,26 @@ u16 C00_00(u16 attributes)
  * and say where the main loop is to go on.
  */
 
-/* Where a command goes on is in the low word of what it returns, a GO_
-   of vc.h. With GO_MASKED the high word is the title of the boxes. */
+/* What a command returns, struct Copied of vc.h: the place where the
+   program goes on, a GO_ there; or that it goes on with the files of a
+   mask, GO_MASKED, with the title of the boxes. */
+static struct Copied Go(u16 place)
+{
+    struct Copied copied;
+
+    copied.place = place;
+    copied.title = 0;
+    return copied;
+}
+
+static struct Copied Masked(u16 title)
+{
+    struct Copied copied;
+
+    copied.place = GO_MASKED;
+    copied.title = title;
+    return copied;
+}
 
 #define ASM(object, offset) AT(AsmSeg(), OFFSET(object) + (offset))
 
@@ -1401,7 +1419,7 @@ F35_57:
 /* Copy or rename, as the 1 in the low byte of `command` says, files that
    are asked for by name: Shift-F5 and Shift-F6, and F5 and F6 where the
    panel shows no files. Returns where to go on. */
-u32 F45_01(u16 panel, u16 command, u16 directories, u16 files)
+struct Copied F45_01(u16 panel, u16 command, u16 directories, u16 files)
 {
     u8 *to;
     u16 i;
@@ -1412,16 +1430,16 @@ u32 F45_01(u16 panel, u16 command, u16 directories, u16 files)
     for (i = 0; i < 4; i++)                             /* "file" */
         to[i] = *ASM(CopFi_S, 12 + i);
     if ((u8)Ask(OFFSET(Copy2_B), F35_40()) != 0)
-        return GO_PANELS;
+        return Go(GO_PANELS);
     for (i = 0; i < LenStr + 1; i++)
         md.ToFile[i] = CpInpt[i];
     for (i = 0; i < LenStr + 1; i++)
         CpSrc[i] = md.ViewFil[i];
     if (md.ViewFil[0] == 0 || md.ToFile[0] == 0)
-        return GO_PANELS;
+        return Go(GO_PANELS);
     CpBgNam = (u16)NEAR(CutPath(CpSrc));
     F35_70();
-    return PAIR(F35_40(), GO_MASKED);
+    return Masked(F35_40());
 }
 
 /* Copy or rename the directory of the tree that the cursor is on, once
@@ -1472,7 +1490,7 @@ F36_05:
    and to rename that only a name is asked for. `directories` and `files`
    are what BX and DX hold when the key arrives: see F35_50. Returns
    where to go on. */
-u32 F35_01(u16 panel, u16 command, u16 directories, u16 files)
+struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files)
 {
     const struct WCBdef __far *wcb = PANEL(panel);
     const u8 __far *from;
@@ -1488,7 +1506,7 @@ u32 F35_01(u16 panel, u16 command, u16 directories, u16 files)
         return F45_01(panel, command, directories, files);
     if (wcb->WinTyp == 1) {
         if (md.TreAdr <= TRELIST)                       /* the root */
-            return GO_KEYS;
+            return Go(GO_KEYS);
         if (command != 0)
             goto F36_03;
     } else {
@@ -1502,7 +1520,7 @@ u32 F35_01(u16 panel, u16 command, u16 directories, u16 files)
         if ((directories | files) == 0
             && (wcb->CurAdr >= wcb->EndBuf
                 || ENTRY(wcb, wcb->CurAdr)->NameF[0] == '.'))
-            return GO_KEYS;
+            return Go(GO_KEYS);
     }
 
     /* F35_04: what is to be copied, and the dialog. */
@@ -1532,25 +1550,25 @@ F35_06:
         *to++ = ' ';
     *to = 0;
     if ((u8)Ask(OFFSET(Copy1_B), F35_40()) != 0)
-        return GO_PANELS;
+        return Go(GO_PANELS);
     for (i = 0; i < LenStr + 1; i++)
         md.ToFile[i] = CpInpt[i];
     if (md.ToFile[0] == 0)
-        return GO_PANELS;
+        return Go(GO_PANELS);
     if (PANEL(md.WCBcrn)->WinTyp == 1) {
         F36_04();
-        return GO_DONE;
+        return Go(GO_DONE);
     }
     F35_70();
     CpBgNam = (u16)CpSrc;
-    return GO_SELECTED;
+    return Go(GO_SELECTED);
 
 F36_03:
     /* A new name for the directory, which stays where it is. */
     for (i = 0; i < 13; i++)
         CpDest[i] = *(const u8 *)(md.TreAdr + i);
     if ((u8)Ask(OFFSET(Renam_B), 0) != 0)
-        return GO_KEYS;
+        return Go(GO_KEYS);
     typed = CpDest;
     if (NEAR(CutPath(typed)) != typed)
         goto F36_01;
@@ -1566,11 +1584,11 @@ F36_03:
         md.ToFile[i] = CpInpt[i];
     CopyMov = 3;
     F36_04();
-    return GO_DONE;
+    return Go(GO_DONE);
 
 F36_01:
     Ask(OFFSET(MkErr_B), F35_40());
-    return GO_KEYS;
+    return Go(GO_KEYS);
 }
 
 /* What the dialogs of the commands have Dialog call for an answer:

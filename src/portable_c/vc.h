@@ -779,7 +779,8 @@ enum {
                                            came from */
 };
 
-/* After a command of dirfunc.c, and after the file search. */
+/* After a command of dirfunc.c, which returns one of these, and after
+   the file search, which returns one in struct Searched below. */
 #define TO_FUNC04 0                     /* back to the panels as they are */
 #define TO_FNCSEL 1                     /* have what FncAddr names called
                                            for what is selected, or for
@@ -791,8 +792,8 @@ enum {
                                            another: of F67_00 only, which
                                            hands back the panel too */
 
-/* After Copy and Rename, of copy.c, in the low word of what they return.
-   With GO_MASKED the high word is the title of the boxes. */
+/* After Copy and Rename, of copy.c: the place that they return, in
+   struct Copied below. */
 #define GO_KEYS     0                   /* Func04: the next key */
 #define GO_PANELS   1                   /* Init50: the panels drawn anew */
 #define GO_SELECTED 2                   /* FncSel: C00_00 for every file
@@ -984,28 +985,57 @@ struct Checked M30_60(u16 answer);
    and `files` are what the original has in BX and DX at the jump. Where
    the command does not count what is selected, it goes by those two as
    they come: see F35_50 there. */
-u32 F35_01(u16 panel, u16 command, u16 directories, u16 files);
-u32 F45_01(u16 panel, u16 command, u16 directories, u16 files);
+struct Copied {                         /* what they return: */
+    u16 place;                          /* where the program goes on: a
+                                           GO_ */
+    u16 title;                          /* with GO_MASKED the title of the
+                                           boxes, as the offset of the
+                                           text */
+};
+struct Copied F35_01(u16 panel, u16 command, u16 directories, u16 files);
+struct Copied F45_01(u16 panel, u16 command, u16 directories, u16 files);
 
-/* The file search, find.c, which returns a place of dirfunc.c's and in
-   the high word, with TO_F24_02, the panel; the map of the memory,
-   memory.c; the command line, cmdline.c: a key for it, Esc, the selected
-   files and the path of a panel put into it, the history in its box, and
-   the speed search, which returns the key that ended it and in the high
-   word where its box was; the user menu, usermenu.c, 1 for the main one;
-   the box of the drives, drive.c; and the menu bar, menu.c. See each
-   there. */
-u32 F67_00(void);
+/* The file search, find.c; the map of the memory, memory.c; the command
+   line, cmdline.c: a key for it, Esc, the selected files and the path of
+   a panel put into it, the history in its box, and the speed search; the
+   user menu, usermenu.c, 1 for the main one; the box of the drives,
+   drive.c; and the menu bar, menu.c. See each there. */
+struct Searched {                       /* what the file search returns: */
+    u16 place;                          /* where the program goes on: a
+                                           TO_ */
+    u16 panel;                          /* with TO_F24_02 the panel that is
+                                           to show the directory which DOS
+                                           is in now */
+};
+struct SpeedKey {                       /* what the speed search returns: */
+    u16 key;                            /* the key that ended it, to be
+                                           acted on: 0 for Esc */
+    u16 box;                            /* where its box was */
+};
+struct Picked {                         /* what the menu bar returns: */
+    u8  menu;                           /* the menu, 1 to 5 */
+    u8  item;                           /* the item, from 1 with the lines
+                                           across the menu: 0 on the bar
+                                           alone, and FFh in a menu with no
+                                           item under the cursor */
+    u8  held;                           /* what the assembly has in DL when
+                                           it jumps to the command */
+    u8  table;                          /* which of the tables of
+                                           commands_t.c has the command of
+                                           the item, from 1: 0 if none was
+                                           chosen */
+};
+struct Searched F67_00(void);
 void F65_00(void);
 void F73_00(u16 key);
 u16 F74_00(void);
 u16 F80_00(u16 panel);
 void F82_01(u16 panel, u16 key);
 u16 F68_00(void);
-u32 F77_00(u16 key, u16 panel);
+struct SpeedKey F77_00(u16 key, u16 panel);
 u16 F32_00(u16 main);
 u16 F62_01(u16 panel, u16 item);
-u32 F39_00(u16 again, u16 panel);
+struct Picked F39_00(u16 again, u16 panel);
 
 /* Save the setup, the command line and the panels in the part of the
    program that stays in the memory, and give up the main data, for that

@@ -1022,9 +1022,9 @@ static u16 F1Next(u16 answer)
 }
 
 /* After Copy and Rename, of copy.c: F35_90. */
-static u16 F35_90(u32 answer)
+static u16 F35_90(struct Copied copied)
 {
-    switch ((u16)answer) {
+    switch (copied.place) {
     case GO_KEYS:
         return FUNC04;
     case GO_PANELS:
@@ -1032,7 +1032,7 @@ static u16 F35_90(u32 answer)
     case GO_SELECTED:
         return FncSel() ? INIT50 : FUNC04;
     case GO_MASKED:
-        FncMas((u16)(answer >> 16));
+        FncMas(copied.title);
         /* fall through */
     default:                            /* GO_DONE */
         return FncExt() ? INIT50 : FUNC04;
@@ -1066,19 +1066,19 @@ static u16 F62_02(u16 panel, u16 item, struct Regs STACK *r)
    Right menu is for the panel of that menu. */
 static u16 F39_01(u16 again, struct Regs STACK *r)
 {
-    u32 chosen = F39_00(again, r->ds);
-    u16 menu = (u8)chosen;
-    u16 item = (u8)(chosen >> 8);
-    u16 table = (u16)(chosen >> 24);
+    struct Picked picked = F39_00(again, r->ds);
+    u16 menu = picked.menu;
+    u16 item = picked.item;
+    u16 table = picked.table;
     u16 code = AsmSeg();
     u16 panel = r->ds;
 
-    r->cx = (u16)chosen;
+    r->cx = item << 8 | menu;
     if (table == 0)
         return FUNC04;
     r->ax = item << 8 | table;
     r->bx = (item - 1) & 0xFF00 | (item - 1) << 1 & 0xFF;
-    r->dx = 0x100 | (u8)(chosen >> 16);
+    r->dx = 0x100 | picked.held;
     r->di = menu == 5 ? md.WCB2seg : md.WCB1seg;
     if (table == 1)
         panel = r->di;
@@ -1096,7 +1096,8 @@ static u16 F39_01(u16 again, struct Regs STACK *r)
    a command of the Left or the Right menu. */
 static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
 {
-    u32 pair;
+    struct SpeedKey ended;
+    struct Searched searched;
     u16 answer;
 
     switch (command) {
@@ -1117,9 +1118,9 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
         /* The speed search ends with a key that is not its own, and the
            command of that key gets the registers as the search leaves
            them. */
-        pair = F77_00(r->ax, panel);
-        r->ax = (u16)pair;
-        r->bx = (u16)(pair >> 16);
+        ended = F77_00(r->ax, panel);
+        r->ax = ended.key;
+        r->bx = ended.box;
         r->dx = 0x318;
         r->si = (u16)md.WinBuf;
         r->cx = md.KeyBar;
@@ -1231,10 +1232,10 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     /* The file search, find.c: Go to has the current directory be
        another, and the panel that it hands back show it. */
     case CMD_F67_00:
-        pair = F67_00();
-        if ((u16)pair == TO_F24_02)
-            return CmdEnd(OfEnter(F24_02((u16)(pair >> 16))), r);  /* F67_01 */
-        return F1Next((u16)pair);
+        searched = F67_00();
+        if (searched.place == TO_F24_02)        /* F67_01 */
+            return CmdEnd(OfEnter(F24_02(searched.panel)), r);
+        return F1Next(searched.place);
 
     /* The commands of the menus, commands.c. Those of a panel's menu
        take the item, and so do the editors of the menu file and the

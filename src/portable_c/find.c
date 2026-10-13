@@ -65,8 +65,8 @@ static void FndCurs(u16 color, u16 line, u16 first, u16 place, u16 size);
 
 /* FindFil is what FncAddr names for the search. F67_00, the command, is
    declared in vc.h: it returns where the program goes on, one of the TO_
-   there, and in the high word, for TO_F24_02, the panel whose directory
-   is another now. */
+   there, and for TO_F24_02 the panel whose directory is another now,
+   struct Searched there. */
 
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
@@ -757,8 +757,27 @@ static const u8 CODE Find6_S[] =
 #define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
 #define NEAR(pointer) ((u8 *)(u16)(u32)(pointer))
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
+
+/* What the search returns, struct Searched of vc.h: the place where the
+   program goes on, a TO_ there; or that the current directory is another,
+   TO_F24_02, with the panel that is to show it. */
+static struct Searched To(u16 place)
+{
+    struct Searched searched;
+
+    searched.place = place;
+    searched.panel = 0;
+    return searched;
+}
+
+static struct Searched Shows(u16 panel)
+{
+    struct Searched searched;
+
+    searched.place = TO_F24_02;
+    searched.panel = panel;
+    return searched;
+}
 
 /* Alt-F7, the file search: a box over the panels, in which a dialog asks
    for a name, with a path or without, and for a text; then the search,
@@ -781,7 +800,7 @@ static const u8 CODE Find6_S[] =
    line goes into the panel with what follows it, 69 bytes, one more
    than a path has room for there, which is the first of where the
    cursor is and is set next. */
-u32 F67_00(void)
+struct Searched F67_00(void)
 {
     struct LineArgs line;
     struct DosRegs regs;
@@ -1015,14 +1034,14 @@ close:
         /* F67_25 */
         ResWin(place, size, (u16)md.WinBuf);
         Window(place, size);
-        return TO_FUNC04;
+        return To(TO_FUNC04);
     }
 
     /* F67_30: Go to */
     ResWin(place, size, (u16)md.WinBuf);
     Window(place, size);
     if (FND->FndNumb == 0)
-        return TO_FUNC04;
+        return To(TO_FUNC04);
     /* The line of the directory: the first above that begins with no
        space. */
     number = FND->FndCur;
@@ -1030,11 +1049,11 @@ close:
         from = Line(number--);
     while (*from == ' ');
     if (ChgDisk(NEAR(from)))
-        return TO_FUNC04;
+        return To(TO_FUNC04);
     regs.name = from;
     regs.ax = 0x3B00;
     if (Intr21((struct DosRegs STACK *)&regs))
-        return TO_FUNC04;
+        return To(TO_FUNC04);
     DX_OF(regs) = (u8)(*from - 'A');
     regs.ax = 0x0E00;
     Int21d((struct DosRegs STACK *)&regs);
@@ -1064,6 +1083,6 @@ close:
     regs.ax = 0x1900;
     Int21d((struct DosRegs STACK *)&regs);
     if ((u8)((u8)regs.ax + 'A') != md.DosPth[0])
-        return TO_FNCEX1;
-    return (u32)panel << 16 | TO_F24_02;
+        return To(TO_FNCEX1);
+    return Shows(panel);
 }

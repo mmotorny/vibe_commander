@@ -49,9 +49,6 @@
 #define AT(segment, offset) \
     ((const u8 __far *)((u32)(segment) << 16 | (u16)(offset)))
 
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
-
 /* Routines of the rest of the program that this file calls: all are C,
    of vc.h.
 
@@ -471,21 +468,22 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
 /* The menu bar: F9, or with `again` Shift-F10, which goes back to the
    item that was chosen last. `panel` is the current panel. Takes keys and
    the mouse until an item is chosen or the bar is left, and returns the
-   menu in the low byte and the item in the next; and in the highest byte
-   which of the tables of commands_t.c has the command of that item,
-   from 1, or 0 if none was chosen.
+   menu and the item, struct Picked of vc.h, with which of the tables of
+   commands_t.c has the command of that item, from 1, or 0 if none was
+   chosen.
    The menu is 1 to 5, the item is counted from 1 with the lines across
-   the menu, and LastMnu is given both. The byte below the highest is
-   what the assembly has in DL when it jumps to the command, for a
-   command that reads it there, as renaming does: 50h, of the size of the
-   bar's row, or what the BIOS said of the keys held down.
+   the menu, and LastMnu is given both. `held` there is what the assembly
+   has in DL when it jumps to the command, for a command that reads it
+   there, as renaming does: 50h, of the size of the bar's row, or what
+   the BIOS said of the keys held down.
 
    On the bar alone the item is 0. FFh is a menu that is open with no
    item under the cursor, which only the mouse brings about. */
-u32 F39_00(u16 again, u16 panel)
+struct Picked F39_00(u16 again, u16 panel)
 {
     const u8 __far *names = AT(AsmSeg(), OFFSET(PtMnu_S));
     struct MenuMouse mouse;
+    struct Picked picked;
     u16 menu, item;                     /* CL and CH */
     u16 begin = 0, size = 0x150;        /* of the open menu: BX and DX */
     u16 key, to, i, count, hit, table, held;
@@ -750,5 +748,9 @@ F39_85:                                 /* Exit */
                 table = 5;
         }
     }
-    return (u32)(table << 8 | held) << 16 | item << 8 | menu;
+    picked.menu = (u8)menu;
+    picked.item = (u8)item;
+    picked.held = (u8)held;
+    picked.table = (u8)table;
+    return picked;
 }

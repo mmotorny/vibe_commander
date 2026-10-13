@@ -48,9 +48,6 @@ u16 F32_70(u16 begin, u16 size);                        /* usermenu.c */
    line: the assembly's, which other C code has too. */
 extern const u8 __far Mask_S[];         /* "\*.*" */
 
-#define LOW(pair)  ((u16)(pair))
-#define HIGH(pair) ((u16)((pair) >> 16))
-
 #define LenCmd 124                      /* Length of command line */
 
 #define Box_C   16                      /* the colour of a box that reports */
@@ -434,11 +431,11 @@ static void F77_10(u16 key, u16 panel)
    has begun: a box in the bottom line of the panel `panel`, where what
    is typed is shown, while the cursor of the panel goes to the next name
    that begins with it. A key that is no part of that ends it and is
-   returned, to be acted on, 0 for Esc; the high word is where the box
-   was. */
-u32 F77_00(u16 key, u16 panel)
+   returned, to be acted on, 0 for Esc, with where the box was. */
+struct SpeedKey F77_00(u16 key, u16 panel)
 {
     struct LineArgs line;
+    struct SpeedKey ended;
     u16 *screen;
     u16 begin, size, color, bar, i;
 
@@ -520,5 +517,7 @@ F77_20:                                 /* the box goes */
     ResWin(begin, size, (u16)md.WinBuf);
     Window(begin, size);
     Cursor1();
-    return (u32)begin << 16 | key;
+    ended.key = key;
+    ended.box = begin;
+    return ended;
 }
