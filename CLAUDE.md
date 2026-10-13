@@ -32,7 +32,8 @@ not in Claude's memory: memory does not travel between computers.
 - What the original does when it is run is not proprietary: the screens it
   shows and the files it leaves, recorded as goldens in `harness/goldens/`,
   are committed. They are derived by `harness/goldens.py` and never edited
-  by hand.
+  by hand. What a tree is declared to show otherwise is not written into
+  them: see "The portable C".
 - Naming such tools is fine. Documentation should say plainly what the
   original was built with and where a reference came from; the restriction
   is on fetching and running them, not on mentioning them.
@@ -114,6 +115,13 @@ These held while `src/c/` was made, and they say what it is.
   word of 12 October 2026, so work for other operating systems may go in.
   It goes into `src/portable_c/` and nowhere else.
 - The road, on the user's word of 12 October 2026, in this order:
+  -. The program in the portable C is Vibe Commander 0.1, on the user's
+     word of 13 October 2026, since it no longer is what the original
+     is: its title is "Vibe Commander 0.1", it says "based on Volkov
+     Commander 4.05" wherever the original named its version, and its
+     banner keeps the author's copyright and adds the user's, "(C) 2026
+     Maksym Motorny", on the same line. No line is added anywhere for
+     it. The C translation keeps the original's name.
   0. The setup program, `VCSETUP`, is ported into the portable C, so that
      there is one program: setup is reached by an item of its Options
      menu, and is judged by scenarios whose goldens are recorded from
@@ -158,11 +166,16 @@ These held while `src/c/` was made, and they say what it is.
   is to behave otherwise than the original, that is a deviation.
 - Every deviation is declared, in `src/portable_c/DEVIATIONS.md`: what
   the original does, what the portable C does, why, and which scenarios
-  show it. A scenario that a deviation changes gets a golden of its own,
-  recorded from the portable C and read by whoever records it; such a
-  golden is kept apart from those of the original and says where it is
-  from, since it shows that nothing has changed, not that anything is
-  right.
+  show it. What a scenario is then expected to show is the original's
+  golden with the declared difference applied to it, on the user's word
+  of 13 October 2026: a patch, a committed file of the rows that differ,
+  with its reason, kept apart from the goldens of the original and
+  applied to the golden as it is derived, so that deriving the golden
+  again gives the expectation again; or, where one difference is on many
+  screens, as the program's name is, a rule that the comparison applies.
+  A patch that no longer fits the golden it was made for is a failure to
+  look at, not to regenerate. The goldens of the original themselves are
+  never edited.
 - A feature that only made sense on DOS is removed, not kept as a setting
   that does nothing. The first is Memory allocation in the Options menu:
   the portable C stays in memory whole while a command runs. A removal of
