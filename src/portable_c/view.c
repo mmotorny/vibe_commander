@@ -678,7 +678,7 @@ void V51_00(u16 segment)
         loaded = space;
     VI->ViLoaded = loaded;
     second = 0;
-    if (space - 2 > VI->ViEndTab)
+    if ((u16)(space - 2) > VI->ViEndTab)
         second = WORD_AT(text, space - 4);
     second += shift;
     from = space - shift;

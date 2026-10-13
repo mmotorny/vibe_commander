@@ -170,7 +170,7 @@ void PutTree(u16 panel, u16 place, u16 size, const u8 __far *colors)
     PATH[2] = '\\';
     PATH[3] = 0;
     screen = BasAdr(place + 0x102);
-    n -= (md.TreFrst - TRELIST) >> 4;
+    n -= (u16)(md.TreFrst - TRELIST) >> 4;
     lines = (u8)((size >> 8) - 4);
     if (lines > n) {
         lines = n;

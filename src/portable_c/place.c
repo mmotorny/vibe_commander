@@ -40,9 +40,10 @@ u16 NumAdr(u16 panel, u16 number);
 
 /* The number of the entry at an address, and the address of the entry
    with a number: in a list of files, and in the tree. */
-#define FILE_NUMBER(address) (((address) - DSKBUF) / sizeof(struct FILENT))
+#define FILE_NUMBER(address) \
+    ((u16)((address) - DSKBUF) / sizeof(struct FILENT))
 #define TREE_NUMBER(address) \
-    (((address) - TRELIST) / sizeof(struct DIRENT))
+    ((u16)((address) - TRELIST) / sizeof(struct DIRENT))
 #define FILE_ADDRESS(number) (((number) << 4) + ((number) << 3) + DSKBUF)
 #define TREE_ADDRESS(number) (((number) << 4) + TRELIST)
 

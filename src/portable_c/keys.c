@@ -351,7 +351,7 @@ struct Onward F02_00(u16 panel, struct Regs STACK *r)
     AdrNum(panel, (struct Place STACK *)&place);
     cursor = place.cursor;
     first = place.first;
-    if (cursor - first >= place.lines)
+    if ((u16)(cursor - first) >= place.lines)
         cursor -= place.lines;
     else {
         /* From the first column the list moves by one, to its start if
@@ -378,11 +378,11 @@ struct Onward F03_00(u16 panel, struct Regs STACK *r)
     first = place.first;
     column = place.cursor - first;
     cursor = F03_30(place.cursor, place.lines, place.last);
-    if (column >= place.lines + place.lines) {
+    if (column >= (u16)(place.lines + place.lines)) {
         /* From the last column the list moves by one, and to its end if
            that leaves less than three columns to show. */
         first = F03_30(first, place.lines, place.last);
-        if (place.last - first + 1
+        if ((u16)(place.last - first + 1)
                 < (u16)(place.lines + place.lines + place.lines)
             && first != 0)
             cursor = first = place.last;
@@ -475,7 +475,7 @@ struct Onward F08_00(u16 panel, struct Regs STACK *r)
     if (address >= wcb->EndBuf)
         return To(NEXT_FUNC07);
     if (md.InsDwn != 0
-        && address + sizeof(struct FILENT) < wcb->EndBuf)
+        && (u16)(address + sizeof(struct FILENT)) < wcb->EndBuf)
         KeyForgetIns();
     file = ENTRY(wcb, address);
     if (file->NameF[0] != '.')

@@ -324,7 +324,7 @@ Help10:                                 /* the cursor within the window */
     if (cursor < first)
         first = cursor;
     count = (u16)(signed char)((size >> 8) - 9);
-    if (cursor >= count + first)
+    if (cursor >= (u16)(count + first))
         first = cursor - count + 1;
     was = hd.HlpCur;
     hd.HlpCur = cursor;
