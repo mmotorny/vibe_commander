@@ -208,6 +208,11 @@ These held while `src/c/` was made, and they say what it is.
   says only what still differs. When DOS ends the program by another's
   hand, the program of 32 bits is to be told as the 16-bit one is, by a
   small routine of real mode that the system's functions keep for it.
+  The editor of the program of 32 bits has room for a file that the
+  original's has none for: that is declared, the memory is not made
+  short for it, and the scenario that has the editor refuse such a
+  file, `editor-big`, is not run for that program, with what it alone
+  tested listed as untested.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
