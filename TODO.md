@@ -8320,6 +8320,544 @@ have what the file is today.
 - Whether the line A20, which DOS/32A leaves on, troubles anything
   that a command runs.
 
+## The portable C in a flat memory: the plan
+
+Step 2 of the road (`CLAUDE.md`, "The portable C"): the program "uses
+what 32 bits give: one flat memory, with pointers where there were
+segments and offsets, and numbers and values of 32 bits. A variable is
+widened wherever wrapping round at 16 bits would be unexpected
+behaviour, and stays 16 bits only where the program counts on the
+wrapping. A number that is only ever true or false becomes a boolean."
+This is the plan, made on 13 October 2026 at `9031733`, just before the
+switch to the one build, by reading the tree and counting in it; nothing
+of it was tried but that `wcc386` takes `_Bool`. The scripts that
+counted are a dozen lines each and were not kept; each count says how it
+was made. Steps 3 to 6 are not planned here.
+
+### In short
+
+- Step 2 is two things that do not need each other. **The addresses**:
+  a segment becomes a pointer and the megabyte of step 1 goes. That is
+  what a machine of 64 bits cannot do without, and it changes nothing
+  that a user sees. **The widths**: a number of 16 bits becomes one of
+  32 or a boolean. That is what the user's words ask, a machine of 64
+  bits can do without it, and it is where a user could see something
+  change.
+- The addresses are ten pieces, F0 to F9: a net and a record first,
+  one small piece that proves the way, two sweeps that the compiler
+  holds complete by the types, five pieces side by side by file, and
+  the last takes the megabyte down.
+- The main data keeps the original's layout through all of it. A word
+  of it that held a segment or a place leaves it and is a pointer
+  beside it; its word stays where it was, unused. So the setup file,
+  the driver of the tests, the tables and the test of the data need
+  nothing.
+- A place inside a panel stays an offset of 16 bits: a panel is a block
+  that the program moves, and a pointer into it would have to be mended
+  at every move. So do the places that a table names in whatever a
+  dialog is handed.
+- The widths are a finder with a record, N0, and seven pieces side by
+  side by file, N1 to N7. The rule is under "The rule for a number".
+- With one build the bytes of the program check nothing any more. What
+  takes their place for a piece that is to change nothing: the main
+  data and the 640 KB as they are at the end of every scenario, held
+  against those of the build before (F0).
+- Five questions are with the user, at the end, and two were taken by
+  the session. The first is the order: my opinion is that the
+  addresses and the booleans come before the layer is designed and
+  most of the widths behind it.
+
+### What is decided, and by whom
+
+| What | Who |
+|---|---|
+| The words of step 2, above, and that step 3 follows it, with the layer's design approved before anything is built on it | The user, 12 October 2026 (`CLAUDE.md`) |
+| That every deviation is declared, and that any which is not the removal of something that only made sense on DOS is asked first; that a bug of the original stays until its fix is decided | The user (`CLAUDE.md`) |
+| That the editor of the program of 32 bits has more room than the original's, declared and not mended by a number made for a test | The user, 13 October 2026 (`src/portable_c/DEVIATIONS.md`, 13) |
+| Everything under "The way taken" below, and the data's image as the net in the place of `CHECKED` (F0) | Accepted by the session, 13 October 2026. The sixth of them, the memory, is also question 2, and stands unless the user answers that otherwise |
+| Questions 6 and 7 at the end: the flags of the setup file stay bytes, and the main data keeps its layout through step 2 | Taken by the session as recommended, 13 October 2026. Neither changes what the program does |
+| Questions 1 to 5 at the end | With the user |
+
+### What it rests on of the switch
+
+The switch is the piece "W and Z1" of the plan for the 32 bits, in
+five stages. Its first two have landed: there is one tree,
+`portable_c`, built by `wcc386` with DOS/32A, and the 16-bit build is
+gone, with `dos.c`, `arith.c` and `harness/pass32.txt`. What the plan
+goes by of that:
+
+- The tests of the portable C are `portable_c-scenarios`,
+  `portable_c-data`, `portable_c-layout`, `portable_c-debug-layout`,
+  `portable_c-host` and `portable_c-int16`. There is no test with
+  `portable_c32-` in its name and no record of the scenarios: the
+  scenarios' test holds the tree to every scenario that it is taken
+  through, 155 of them, and so is every piece here.
+- One file is behind `sys.h`, `dos32.c`, which keeps its name: "the
+  system's file" below.
+
+And of what is still to come, the third stage, Z2, which a fresh agent
+does next. F0 does not wait for it; no other piece starts before it
+has landed:
+
+- One body of each word of the addresses in `vc.h`, the flat one, with
+  no `#ifdef __I86__`, and `LenStk` one number.
+- `__far`, `FAR`, `STACK`, `CODE` and `TEXT_FAR` out of the source.
+  The sweeps F2 and F3 go by patterns in the text, and are written
+  against the text as that stage leaves it.
+
+The fourth stage says anew what `harness/hostcheck.py` and
+`harness/int16.py` are for with one build left, and the fifth turns
+the documents round. N0 builds on the finder as the fourth leaves it;
+nothing else here waits for either.
+
+The counts below are of the tree before the third stage, as it was at
+`9031733`, with `dos.c`, which has gone since, and the definitions of
+`vc.h` left out. The third stage changes none of them.
+
+### The addresses: what there is
+
+**The words**, as whole words outside comments, in the files of code:
+
+| Word | Places | Files | The most | What it is in step 2 |
+|---|---|---|---|---|
+| `OFFSET` | 230 | 20 | `dirfunc.c` 48, `copy.c` 39, `edit.c` 29, `view.c` 28, `commands.c` 22 | Goes: a table is handed as a pointer to it. F3 |
+| `PANEL` | 149 | 21 | `keys.c` 28, `commands.c` 20, `read.c` 16, `enter.c` 11, `main.c` 11 | Goes: a panel is a `struct WCBdef *`. F2 |
+| `MD_PLACE`, `MD_POINTER` | 102, 48 | 23, 13 | `view.c` 17, `edit.c` 16, `usermenu.c` 15, `copy.c` 13, `enter.c` 11, `treebox.c` 10 | Go where the place is kept in a variable, which becomes a pointer. They are right C as they stand, a pointer taken from another of the same object, and rest on no megabyte: F4 to F8, by file |
+| `AT` | 97 | 16 | `edit.c` 29, `dialog.c` 18, `view.c` 9, `stopts.c` 9, `main.c` 8 | Goes: what it adds to is a pointer. F3 for the tables and a dialog's fields, F4 to F6 for the texts |
+| `MAIN_SEG` | 85 | 21 | `dirfunc.c` 19, `edit.c` 11, `view.c` 10 | Goes: `&md`, where a routine is handed what its dialog's fields are in. F3. Eight of them are arithmetic on paragraphs: F1 |
+| `NEAR` | 61 | 12 | `dirfunc.c` 25, `copy.c` 13, `find.c` 6 | Goes: it is a cast that does nothing. F4 to F8 |
+| `ENTRY`, `DSKBUF` | 60, 58 | 12, 15 | `enter.c`, `read.c`, `files.c` | Stay: an offset in a panel, added to the panel. See below |
+| `AsmSeg` | 28 | 13 | `view.c` 6, `dialog.c` 5 | Goes, with `TABLES_BY`. F3 |
+| `TRELIST` | 24 | 7 | `tree.c` 8, `treebox.c` 8 | A pointer to the tree's list. F7 |
+| `NAMED`, `NUMBER_OF` | 15, 9 | 3, 1 | `dialog.c` | `NAMED` goes: the word of a table is read as the pointer that it is. `NUMBER_OF` stays. F3 |
+| `OFFSET_IN_SEG`, `SEG_OF` | 8, 1 | 6, 1 | | Go. They are the bridge while the pieces land: see "The way taken" |
+| In the tables: `MD_AT`, `WCB_AT`, `NUMBER` | 280, 3, some 65 | 15 files of tables | `dirfunc_t.c` 75, `stopts_t.c` 62, `commands_t.c` 45 | Stay as they are: an offset in whatever the dialog is handed |
+
+**The kinds**, which is what the pieces are cut by:
+
+| | Kind | How much | Where |
+|---|---|---|---|
+| a | A segment in a word of the main data | Seven words, 195 mentions: `WCBcrn` 47 in 15 files, `WCB1seg` 37 in 14, `WCB2seg` 32 in 13, `WCBsec` 16 in 7, `ViewSeg` 39 in 8, `MemSeg` 15 in 3, `FreMem2` 9 in 7 | F1 and F2 |
+| b | A segment handed from routine to routine | `u16 panel` is declared 259 times, 88 of them in `vc.h`, and `panel` is written 719 times in 23 files. `u16 segment` 45 times: the text of the viewer and the editor (`view.c` 65 mentions, `edit.c` 116), the list of the file search, a copy's buffer, and what a dialog's fields are in (`dialog.c`) | F2, F3, F4 to F6 |
+| c | A place of the main data in a word of it | `TreAdr` 28 mentions in 9 files, `TreFrst` 24 in 7, `TreCrnt` 4, `HstAdr` 8 in 4, `BatAdr` 8 in 2. `ComSpec` is a place in the environment and is added to what `ProgramEnvironment` answers: it stays a number | F7 |
+| d | A place of the main data in a variable or handed on | The 150 of `MD_PLACE` and `MD_POINTER` | F4 to F8 |
+| e | An offset in a panel: `CurAdr`, `First`, `EndBuf`, `EndFul` of `WCBdef`, and every `file`, `cursor`, `first` that is made of them | The 60 of `ENTRY` and more that are plain numbers | Stays |
+| f | An offset in a text: the viewer's `struct Line`, `ViPoint`, `ViEndTab`, `ViFirst`, with its table of lines at the top of the same segment; the editor's, which are numbers of 32 bits of which 20 count already, `EdOffst`, `EdLen`, `EdFirst`, made a segment and an offset below 16 by `AddressOf` some 22 times | `view.c`, `edit.c` | F4, F5: `text + place`. `AddressOf` and `OFFSET_OF` go |
+| g | A far address in the main data: `Screen`, `ErrVct`, `BrkVct`, the block `EPB` | 4 fields | Not step 2: only the system's file reads them. They leave the main data when that file moves under the layer |
+| h | Arithmetic on segments | `PANEL_PARAS` and `VIEW_PARAS`, 9 places in `start.c`; the room behind the panels, `MAIN_SEG + md.FreMem2 - md.ViewSeg`, written out five times in `view.c`, `edit.c`, `copy.c` and twice in `find.c`, and twice otherwise in `read.c`; `panel + 0x1000` and `0xFFF` paragraphs in `ReDr00`, which is the 64K of a panel; `GiveMem`, `TakeMem`, `Aexec0` of `view.c` | F1, and F2 for `ReDr00` |
+| i | The main data read as a panel, as the original does with DS left on it | 5 places: `BegBX(MAIN_SEG)` in `main.c` and `keys.c`, `PutPrm(MAIN_SEG)` in `enter.c`, `M60_02(MAIN_SEG)` in `commands.c`, and `md.ColTab[OFFSET_IN_SEG(panel, wcb->WinPath + 3)]` in `read.c` | F2: written as what it is, `(struct WCBdef *)&md`, with its comment. As far as was read they read within the first 82 bytes, which are bytes of the setup in both structures: F2 holds each to that |
+| j | A number of 16 bits added to a pointer, which was right on DOS because the offset wrapped with it | `harness/trial32/added.py` lists 158 places and found none wrong; `harness/int16.txt` has 10 of the kind `back` and 4 of `minus`. C1's fault was of this kind and through no word (`TODO.md`, "C1, the editor") | Each piece reads those of its files again when the pointer changes: see "What could go wrong", 1 |
+
+**The memory.** The program asks for the largest block that there is
+and cuts it up itself: the first panel, the second, and behind them
+whatever is at work, the text of the viewer or the editor, the list of
+the file search, a copy's buffer, the old list while a directory is
+read. A panel that grows moves the other one up (`ReDr00`), and both
+are moved together before and after a command (`GiveMem`, `TakeMem`).
+Nothing of that needs a segment: it is one block, three places in it
+and its end.
+
+### The way taken
+
+1. **The main data keeps its layout**, `LAID_OUT(MainDat, 0xF48B)`,
+   and so does a panel. A word that becomes a pointer leaves the
+   structure for one beside it in `main.c`, and its word stays in
+   `struct MainDat` with "of the original. Not set or read here", as
+   `Snow`, `TopView` and `Memorys` are already. The plan for the 32
+   bits had the layout freed in step 2; that is not taken, for what
+   holds it:
+
+   | Who reads the layout | What breaks if a field moves | The way out, if it were freed |
+   |---|---|---|
+   | The setup file: the first `CmnIni` bytes of the main data and the first `WCBini` of each panel, with a sum. Every one of those fields is a byte | Nothing, as long as those parts stay bytes: no pointer and no number wider than a byte is in them | None needed. Only a boolean in them would touch it: question 6 |
+   | The driver of the tests: `AutoTim` and `Clock`, at the address of `md` plus the offsets of the original's listing (`harness/driver.py`) | Every step waits on the wrong word, and every scenario fails | The two offsets from the build: a constant of the program that holds `offsetof` of each, found by name in the linker's map |
+   | The test of the data: a word of a table that names a place of the main data is held against the original's word, by the field of that name in the original's listing | Every such word fails, 280 of them | The same constant, for every field that a table names |
+   | The tables themselves, `MD_AT` | Nothing: `offsetof` follows the structure | |
+   | What is read behind the end of a field, a path copied as 68 bytes whatever it is, a title as 80: what follows is the next field, as in the original | What a scenario shows, or nothing, by chance. Nothing lists these reads for the main data as `harness/reads.py` does for the tables | Each found by a scenario that fails, or not at all |
+   | The structures laid over its buffers, `EdData` and `ViewDat` in `TmpBuf`, `FndData` there too, `HlpData`, `StData` in `MenuBuf`, most with a `LAID_OUT`; the editor's fields lie over the viewer's on purpose | A field made wider moves the ones behind it, in one of two structures that have to agree | The two made one |
+   | The five places of kind i | Nothing, if they read within the first 82 bytes, which F2 looks at | |
+
+   So freeing the layout buys nothing that step 2 needs and risks the
+   fifth row, which nothing would catch. Whether it is ever freed is
+   for when the layer is designed.
+
+2. **A segment becomes a typed pointer to what is there.** A panel is
+   `struct WCBdef *`, a text `u8 *`. Where one routine is handed now a
+   panel and now the main data, because a dialog's fields are in the
+   one or the other, it takes a pointer to whichever it is and the
+   table keeps the offset in it: `Dialog(&Filter_D, ..., panel)` and
+   `Dialog(&Conf_B, ..., &md)`.
+
+3. **An offset stays an offset where the thing moves or the base
+   varies**: in a panel (kind e) and in a table (`mPoint`, `from`,
+   `saved`). That is plain C, a number added to a pointer, and rests on
+   no megabyte. `ENTRY` keeps its cut to 16 bits for as long as the
+   offsets are 16 bits.
+
+4. **A place of the main data becomes a pointer** where a variable or
+   a word of the main data keeps it; the main data does not move.
+
+5. **The megabyte is the bridge and goes last.** While it stands a
+   segment and a pointer say the same thing, by `PANEL` or `AT` one way
+   and `SEG_OF` the other, exactly, as long as the block begins on a
+   paragraph of the megabyte, which the 640 KB of the system's file
+   do. So a piece changes what it owns and writes `SEG_OF(pointer)` or
+   `AT(segment, 0)` where it meets what another piece owns, and the
+   program runs after every piece. The count of the words goes up with
+   the first pieces and to nothing with the last; a record holds it
+   (F0). F9 takes the megabyte down when the record has no word left
+   that rests on it.
+
+6. **The memory, until the layer is designed**: the 640 KB stay, a
+   stretch of the system's file, handed out by the same three
+   functions in the same order, which answer with a pointer where they
+   answered with a segment and still count in paragraphs. That
+   prejudges the layer least: no call is added or dropped, the room of
+   the editor, of a copy and of the file search is what it is today
+   (entry 13 of `DEVIATIONS.md` stands as written), and what the
+   program asks of a system for its memory, in what unit and how much,
+   is left whole for step 3. Blocks from the extender are the other
+   way: question 2. The screen, the BIOS's data, the PSP and the
+   environment are behind `sys.h` already and stay there; `md.Screen`
+   and the three other fields of kind g are the system's file's own
+   and wait for step 4.
+
+### The widths: what there is
+
+**What 16 bits are today.** `u16` is written on 2,352 lines of the
+tree and `u8` on 2,108, `u32` on 195; there is no number with a sign
+but in two casts. Of 216 functions that return a `u8` or a `u16`, 46
+return nothing but 0, 1 or a comparison (a count by pattern: it misses
+what returns a flag in a structure). The member `failed` of the
+answers of `sys.h` is read 281 times. 45 comparisons are with 0FFh or
+0FFFFh, a number that stands for "none".
+
+**Where a result is cut.** That is where a wider variable would keep
+another number, so it is the reading list:
+
+| What | Places | By |
+|---|---|---|
+| A result of more than 16 bits kept in fewer with no cast | 234, of which 232 into a `u16`: `edit.c` 23, `dialog.c` 22, `main.c` 17, `stcolor.c` 17, `view.c` 14 | clang, `-Wimplicit-int-conversion`, for the 386 |
+| The same with the cast written | `(u16)(` 194 times and `(u8)(` 233 | `grep` |
+| A result looked at before it is cut, and why it is the same number as on DOS | 59 with a reason: 29 `index`, 10 `back`, 8 `compare`, 7 `shift`, 4 `minus`, 1 `divide` | `harness/int16.txt` |
+| A variable stepped below 0 or beyond 65,535 by `--`, `++`, `-=`, `+=` | Not counted: no warning names them. The finder of `harness/int16.py` knows the range of every expression and can | N0 |
+
+A guess from those: 600 to 1,000 places to read, of which most cannot
+leave 16 bits.
+
+**What the program counts on**, as far as the notes have it: the two
+random numbers, `Rand1` and `Rand2`; the sums of the setup file and of
+the tree's file; a loop that goes round 65,536 times for a count of 0
+(the editor's rows, `do ... while (--count)`); a number 0FFFFh for
+"none" that is made by stepping 0 back; a step of -160 kept as FF60h
+(`T71_00`); the 20 bits of an offset in the editor's text; what P4
+gave a cast to say what DOS does, 21 places.
+
+**What is not the program's to widen**: what a file has (`DTAs`,
+`DIRENT`, `DIRTREE`, the bytes of the setup), what DOS and the BIOS
+take and answer in (a handle, attributes, a time and a date, a key, a
+cell of the screen, a place of the cursor, the mouse's), and all of
+`sys.h` but the three functions for the memory. Those widths are what
+the layer's design names in step 3.
+
+### The rule for a number
+
+Every number of 8 or 16 bits is one of five things, and the piece that
+reads a file says of each which:
+
+| | It is | It becomes | How it is known |
+|---|---|---|---|
+| 1 | Laid out by someone else: a field of a structure that a file, DOS, the BIOS or the screen has, or of the main data and a panel, whose layout is the original's | Stays as wide as it is there. A number that is taken out of it into a variable is of the other kinds | The structure says whose it is, once, in the record |
+| 2 | True or false and nothing else: every value put into it is 0, 1 or a comparison, and every use asks whether it is 0 | `bool` | The finder: a range of 0 to 1 and no use in arithmetic, in a shift, or held against a number other than 0 and 1. A number that is tested by its bits, held against 0FFh, or returned as "1, 0, or 100h to stop" is none |
+| 3 | Counted on to wrap round | Stays 16 bits if it wraps all its life, a random number, a sum. If it wraps at one place, the variable is widened and the cut is written there, `(u16)(a - b)`, with the reason in the record | Read, at every place where the finder says that what is kept is cut |
+| 4 | A number that may stand for one below 0 and is added to a place or a pointer | A number with a sign, of 32 bits: a new type of `vc.h`, the tree's first | The same reading. It is what a machine of 64 bits gets wrong where 32 bits happen to get it right: FFFFFF60h added to a pointer of 64 bits is 4 GB on |
+| 5 | Anything else: a count, an index, a length, a number of a line, a size in the memory | `u32` | What is left |
+
+And three rules for what a reader finds at a place where a result is
+cut today and would not be:
+
+- It cannot leave 16 bits there, by what stands at the place: widen,
+  and nothing changes.
+- It can, only with more memory or more files than DOS has: widen. The
+  program does on DOS what it did, and that is said in the commit and
+  not declared.
+- It can, on DOS, within a user's reach, and what the original then
+  shows is wrong: that is a bug of the original. It stays as it is,
+  with the cut written out, and the session asks the user with what
+  was seen (`CLAUDE.md`: "Any other deviation, a fix of a bug of the
+  original included, is asked first").
+
+A limit that the program holds itself to, a list that is full, a file
+that is too large for Edit, is none of these: nothing wraps there. A
+variable behind such a check is widened and the check stays as it is,
+its number written as the program's own. Moving or lifting it is a
+deviation and a question: see "The limits".
+
+**The record.** `harness/width.txt`, held by a test as
+`harness/int16.txt` is, so that a reviewer reads one file: every
+structure of kind 1 by name with whose it is; and every variable,
+parameter, return and cast that is still 8 or 16 bits outside those,
+with its reason, by file, function and the text of its line. The test
+fails for one that is not in the record. When the widths are done the
+record is the list of everything narrow that is left and why, some
+hundreds of lines by a guess. `harness/int16.py` is its finder: what
+that test said of two builds, where a number is looked at before it is
+back in 16 bits, is with one build exactly where a wider variable
+changes a result, and its 59 reasons are the first entries.
+
+### Booleans
+
+- `wcc386` takes `_Bool`: one byte, also in a packed structure, and a
+  number made one is 0 or 1 by the code (`test`, `setne`). Tried.
+- The tree takes `bool`, `true` and `false` from `<stdbool.h>`, in
+  `vc.h` beside `<stddef.h>`: a header that a compiler has without a
+  library, Open Watcom's among them, by the directory that the build
+  names already. A `typedef` of the tree's own would do for both
+  compilers today and stop clang the day its C has `bool` as a word of
+  the language.
+- A flag in a file or handed to DOS keeps its width there: the
+  structure is of kind 1, and the code says `!= 0` where it reads and
+  writes 0 or 1 where it sets. The bytes of the setup are the case
+  that matters: question 6.
+- Making a number a `bool` is silent in C where it is wrong: 0FFFFh
+  put into one is 1, and one held against 0FFFFh is never equal. So
+  the finder sorts first, and after a piece clang is asked for what it
+  says of the result, `-Wtautological-constant-out-of-range-compare`,
+  `-Wconstant-conversion`, `-Wint-in-bool-context`, each of which
+  names such a place.
+- `failed` and its like in `sys.h` are the layer's shape and are left
+  to step 3: `Refused` of the system's file answers 0FFFFh in one.
+- The flags of the setup stay bytes, taken by the session: question
+  6.
+
+### The limits
+
+What a user could see change. None of them changes by the addresses,
+and none by the widths under the rule above; each would change only by
+a decision, and each is a question or says why it is none.
+
+| Limit | The original | Tested by | In step 2 as planned |
+|---|---|---|---|
+| The files of a panel: 64K from the panel's start, some 2,700 entries of 24 bytes, or less if the memory is short | Stops reading, beeps, shows what it has | No scenario fills a panel (a guess from the names: `enter-many` has 288) | Kept: the offsets in a panel stay 16 bits. Question 3 |
+| 256 files of each panel kept while a command runs | Cuts each list to 256 and reads again afterwards | `enter-many` | Kept. Question 4 |
+| The room of the editor, of a copy and of the file search: what is behind the panels | "The file is too large for Edit"; a copy in pieces; a list that is full | `editor-big`, not run; `editor-full` and `copy-big`, which pass without reaching their point (`DEVIATIONS.md`, 13) | As today, 640 KB. Question 2 |
+| The editor's count of lines and of columns, 16 bits | Not looked at: a text of 640 KB can have more than 65,535 lines, and `editor-full` has a line of more than 64K | `editor-full` for the column | N7 looks and reports: a bug of the original if it shows a wrong number. Question 5 |
+| The file search's count of lines, `FndSize`, cut to 16 bits | Cannot be reached below 4.2 MB of room | | Widened; nothing changes on DOS |
+| The tree: 768 directories; the history, 512 bytes; a command line, 1,000; a menu file, 4,000; a line of the editor, 4,000 at a time (`editor-long`); a path, 68 | Buffers of the program's own | `tree-deep`, `editor-long` and others | Stay: numbers of the program, not of 16 bits |
+| Sizes of files and of the free room, sums of them, a place in a file: 32 bits | Wrap at 4 GB, which DOS on a FAT disk does not reach | | Not step 2: question 1 |
+| The viewer's window on a file, 64K at the most | Not seen by a user | `view` and others | Stays, as a number of the viewer's |
+
+### The tools that judge
+
+| Tool | In step 2 |
+|---|---|
+| The scenarios | The judge, all 155 for every piece. A piece of F is to change no screen and no file |
+| The bytes of the program | Gone as a check, with the second build |
+| The data's image, new (F0) | At the end of every scenario, the main data and the 640 KB by QEMU's `pmemsave`, which `harness/dos.py` has; a tool holds the images of two builds against each other. For a piece that is to change nothing they are equal but for what the piece names. It is what would have shown C1's fault, where eleven scenarios passed over a write 64K off. Not a test of the build: run by the piece, before and after |
+| The words' record, new (F0) | The count of each word of the addresses by file, held as the host check's record is. It is the measure of the addresses: up at F1 to F3, nothing left that rests on the megabyte at F9 |
+| `portable_c-host` | Clean already in every file of the common code, since gcc reads the flat bodies, which cast nothing: it does not measure step 2. It guards it: a file must stay clean. Of what it still counts, `aborts` (5 places) can go to a word of `vc.h` in F9; `data_seg` and all of the system's file wait for the layer |
+| Not counted by it, and worth knowing | gcc's `-Wcast-align=strict` names 376 casts that make a pointer to something wider of a pointer to bytes, `copy.c` 85, `view.c` 64, `stcolor.c` 53. Right on the 386 and on x86-64; what clang's sanitizer will name first in step 6. Not step 2's to mend, and not held to |
+| `portable_c-int16` | Its question, whether two builds differ, is gone with the second build. Its finder is the finder of the widths (N0), and its record the start of theirs. Until N0 it stays as it is and its record is kept up |
+| The test of the data and `harness/reads.py` | Unchanged by the plan, since no table and no layout changes. `reads.py` goes by the text `OFFSET(name)`: F3 teaches it the new form |
+| The test of the layout | Loses in F9 the three rules that are of the megabyte: what a segment names within it, the tables within 32K of `Title_S`, `IniSave` within 64K of the main data |
+| `CHECKED`, the debug program's checks | Not worth writing now. They were to be a third body of the words, and the words are what goes; and C1 showed that the fault to fear goes through no word. The image is the better net and costs less |
+| clang's sanitizers | Step 6. F9 leaves the tree with no address formed outside an object by the megabyte, which is what they would stop at first |
+
+### The pieces
+
+F are the addresses, N the widths. Sizes are guesses; a sweep is small
+in thought and long in lines.
+
+| Piece | What it changes | Owns | Needs; beside | Right when | Writes down |
+|---|---|---|---|---|---|
+| F0, the net and the record | The data's image at the end of a scenario, and the tool that holds two builds' images against each other. The record of the words, with its test | `harness/`, `CMakeLists.txt` for the test | Nothing: the harness has its names since the switch; beside the third stage of it | The image of a build against itself is equal; against a build with one byte of the main data written wrongly by hand, it is not. Every golden derived again leaves `harness/goldens/` clean | What differs between two runs of one build, if anything, and how a piece names what it means to change |
+| F1, the block. The proof | `ViewSeg`, `MemSeg` and `FreMem2` leave the main data: three pointers beside it, where the text begins, the block, and its end. `Init11`, `GiveMem`, `TakeMem` count in pointers. The room behind the panels is one function, which answers in paragraphs as the five places work it out today. Elsewhere `SEG_OF(pointer)` | `start.c`, `main.c` for the structure, `vc.h`; the 63 places that name the three | The third stage of the switch, F0 | The scenarios, `start-memory`, `second-copy`, `command`, `enter-many` above all; the images equal but for the three words | Whether the bridge is as cheap as thought, what the image showed, and how long the piece was: the sizes of F2 to F8 are set by it |
+| F2, a panel is a pointer. A sweep | `WCBcrn`, `WCBsec`, `WCB1seg`, `WCB2seg` beside the main data; every `u16 panel` a `struct WCBdef *`; `PANEL` gone; the five places of kind i written as what they are; `ReDr00`'s 64K as a number of its own | Lines of 23 files, by a script and then by what the compiler refuses: a number where a pointer is taken stops the build | F1; alone | The scenarios; the images equal; `PANEL` at 0 in the record | Every variable that held a panel under another name, and every place where two panels are held against each other |
+| F3, what a dialog is handed. A sweep | `Dialog`, `DialBox`, `Ask`, `ClsLine`, `MinMnu` and their like take a pointer to the table and a pointer to what its fields are in: `OFFSET`, `AsmSeg`, `TABLES_BY`, `NAMED` gone, `MAIN_SEG` gone from their calls. `harness/reads.py` knows the new form | `dialog.c`, `misc.c`, `tables.h`; lines of 21 files; `harness/reads.py` | F2; alone | The scenarios; the test of the data with the counts of `reads.py` as before; the images | What a table is typed as where it is handed on, since each box is a structure of its own |
+| F4, the viewer and the file search | The text a `u8 *`, the table of lines at its top, the list of the search; their places of the main data | `view.c`, `find.c` | F3; beside F5 to F8 | The scenarios of the viewer and the search; the images | Where the viewer counts on an offset wrapping at the top of its segment |
+| F5, the editor | The text a `u8 *` and a place in it a number added to it; `AddressOf`, `struct Address`, `struct Where` go; its places of the main data | `edit.c` | F3; beside | The editor's scenarios; the images. The piece most likely to be more than one agent holds: `T50_00` to `T54_00`, which move the text, can be cut off | Every place where a segment was stepped to keep an offset small |
+| F6, a copy and what goes through files | The buffer of a copy; `NEAR`, 38 places; their places | `copy.c`, `dirfunc.c` | F3; beside | Their scenarios; the images | |
+| F7, the tree, the history, the commands | `TreAdr`, `TreFrst`, `TreCrnt`, `HstAdr`, `BatAdr` beside the main data as pointers; `TRELIST`; the old list of `ReDr00` | `tree.c`, `treebox.c`, `place.c`, `panel.c`, `files.c`, `read.c`, `cmdline.c`, `enter.c`, `resident.c`, `extfile.c`, `usermenu.c`, `input.c`, `info.c`, `drive.c` | F3; beside | Their scenarios; the images | |
+| F8, the rest | What is left of the words in `main.c`, `keys.c`, `commands.c`, `menu.c`, `help.c`, `bars.c`, `window.c`, `system.c`, `setup.c`, `start.c` and the setup's files | Those | F3; beside | The scenarios; the images | |
+| F9, the megabyte goes | `ARENA`, `AT`, `SEG_OF`, `OFFSET_IN_SEG`, `PANEL`, `MAIN_SEG` out of `vc.h`. The three functions for the memory answer with a pointer. The 640 KB need be nowhere in particular. Three rules out of the test of the layout. `aborts` behind a word. `DEVIATIONS.md`, 13, and the README, where they say megabyte | `vc.h`, `sys.h`, the system's file, `harness/layoutcheck.py`, the documents | F4 to F8 | The scenarios; the images; the words' record empty of what rests on the megabyte | For step 3: what the common code asks of the memory, call for call, as it then stands |
+| N0, the finder of the widths | `harness/width.py` of `harness/int16.py`, its record and its test; `bool` in `vc.h`; the type with a sign. The rule tried on the files that have no word of the addresses: `string.c`, `format.c`, `digits.c`, `mask.c`, `line.c`, `box.c`, `screen.c`, `mouse.c`, `blank.c`, `misc.c`, some 1,600 lines | `harness/`, those files, `vc.h` | F3; beside F4 to F8 | The scenarios; the images; the record holds those files | The rule as it stood up, with a line as it was and as it is for each kind, in `CLAUDE.md` |
+| N1 to N7, the widths by file | Each number sorted by the rule, widened, made a boolean, or recorded: N1 the panels and the tree (`files.c`, `read.c`, `place.c`, `panel.c`, `info.c`, `drive.c`, `tree.c`, `treebox.c`, `cmdline.c`, `extfile.c`); N2 `main.c`, `keys.c`, `commands.c`; N3 `dialog.c`, `menu.c`, `usermenu.c`, `help.c`, `input.c`, `bars.c`, `window.c`, `system.c`; N4 `enter.c`, `start.c`, `resident.c`, `setup.c` and the setup's four; N5 `copy.c`, `dirfunc.c`; N6 `view.c`, `find.c`; N7 `edit.c` | Its files, and the lines of `vc.h` that declare their functions | N0, F9; side by side | The scenarios; the images, equal but for what the piece names; clang's three warnings of "Booleans" silent; the record | A bug of the original that it met, with what was seen, for the session to ask |
+
+The order:
+
+    at once                F0
+    the switch's third     F1
+    stage landed
+    F1 landed              F2 > F3
+    F3 landed              F4  F5  F6  F7  F8     N0
+    those landed           F9
+    F9 landed              N1 .. N7, side by side
+
+What a piece goes by:
+
+- It lands when every scenario passes, as always. A piece of F also
+  holds the images of its build against those of the commit that it
+  started from, and says in its commit what differs and why.
+- The words' record, the host check's and `harness/int16.txt` are
+  committed with the change that moves them.
+- No piece changes a golden, a patch, a rule, or what the comparison
+  leaves out. One that would has met a deviation and hands its work
+  back.
+- N1 to N7 change one another's callers without touching them: a
+  function that takes a `u32` where it took a `u16` is called as it
+  was, and one that returns more than its caller keeps is cut where it
+  was cut. So they need no order among themselves.
+- What a piece learns goes into `CLAUDE.md`, "Notes on the portable
+  C", before it is committed.
+
+### What could go wrong
+
+1. A number that has wrapped round, added to a pointer. While `AT`
+   and `ENTRY` cut what they are handed, `AT(segment, i - 1)` with `i`
+   at 0 is the byte at FFFFh of the segment, as on DOS; written
+   `text + (i - 1)` it is the byte in front of the text. Where the
+   original counts on the first, the table of lines at the top of the
+   viewer's segment, the cut has to be written: `text[(u16)(i - 1)]`.
+   The pieces F4 to F6 read every `AT` that they take out for that.
+   Shows: in the images, as bytes written where the build before
+   wrote none; on a screen, by chance.
+2. A pointer into something that moves. `ReDr00`, `GiveMem` and
+   `TakeMem` move a panel, and a pointer to it or into it that a
+   caller still holds is stale, where a segment was just as stale but
+   was read again from the main data at every use. F2 looks at every
+   call of those three for what the caller holds across it. Shows: a
+   panel drawn with what the other panel has, after a directory was
+   read or a command run.
+3. Two pointers held against each other. `second < first` of two
+   panels and a place held against `HstAdr` are of one block and
+   right. A comparison of two things that are of two blocks said
+   something on DOS by their offsets and says nothing now. Nobody has
+   looked for one.
+4. A variable that held a panel under another name, `other`, `top`,
+   `behind`: the compiler finds it where it meets a pointer, and not
+   where it is only held against another number.
+5. The sweeps are larger than an agent holds. F1 is there to say so
+   before they are begun; F2 can be cut by family of files, with the
+   bridge between.
+6. A `bool` that held a third value: see "Booleans".
+7. A cut that was counted on and not found: a variable widened where
+   the program went by its wrapping. The finder names every store that
+   cuts; what it cannot name is a cut that is made by handing a number
+   to a function that takes fewer bits, which N0 has to add to it.
+   Shows: in a scenario that reaches the wrap, or not at all.
+8. The time of day. Numbers of 32 bits are shorter code for the 386
+   than those of 16, so the program takes fewer instructions to a
+   step, which is the safe direction for a scenario that shows the
+   time.
+9. The stack. A variable of 32 bits is as long on the stack as one of
+   16 is there already; nothing is expected, and the scenarios' test
+   holds half of it free.
+10. A read of the main data that the build before made of memory that
+    it had not written, and that differs between two builds with no
+    fault in either: the images would say so at F0, against a build
+    that differs in nothing but a line of code.
+
+### Two opinions, as asked
+
+**Whether all of step 2 is worth doing before the layer is designed.**
+No. The addresses are: the megabyte forms addresses that are in no
+object, clang cannot build that, and the layer's design should be made
+looking at what the program really asks of its memory, which is
+plainest when it asks in pointers (F9 writes that down). The booleans
+can go either side and cost little. The widths are what I would put
+behind step 3, but for the finder and the record, which are worth
+having at once since they say what the program counts on. Three
+reasons. A machine of 64 bits does not need them: a `u16` is as good
+there as here. On DOS nothing that they free can be reached, the
+memory being 640 KB and a panel 64K, so every piece of N is judged by
+scenarios that cannot tell whether it did anything, and its one risk,
+a cut that was counted on, is paid for no gain that can be seen yet.
+And what a count of files, a size of a file and a block of memory are
+is what the layer's design says: the widths of 32 to 64 bits wait for
+it in any case, and the limits can then be asked of the user with a
+system in view that gives more. The road has the widths in step 2 on
+the user's word, so this is question 1 and not a way that the plan
+takes: the table of pieces has all of N.
+
+**The smallest piece that proves the way.** F1: three words of the main
+data and the functions of `start.c` that set them. It is one file of
+thought and some 40 places elsewhere, and it has each thing that the
+rest depends on: a word that leaves the main data with the layout held,
+a segment that becomes a pointer with the bridge at every place that is
+not yet its turn, arithmetic on paragraphs that becomes arithmetic on
+pointers and must give the same figures, and the image as its judge. A
+panel as a pointer, F2, is the sweep that it is the rehearsal for, and
+is too wide to learn on. If F1 goes badly, what is rethought is the
+bridge and the layout, before 259 declarations are changed.
+
+### The questions for the user
+
+1 to 5 are with the user, to be answered when the work reaches each;
+1 and 2 before F1 ends. 6 and 7 were taken by the session on 13
+October 2026, as recommended, neither changing what the program does.
+The recommendation is first.
+
+1. **The order.** The road has all of step 2 before the layer's
+   design. *Recommended*: the addresses and the booleans now, the
+   finder and the record of the widths now, the widening itself behind
+   the layer's design, and sizes of files beyond 32 bits with it.
+   *Or*: all of it now, as the road has it, with files and sizes left
+   at 32 bits until the layer.
+2. **The memory for the panels and the text.** Entry 13 of the
+   deviations expected it to be the extender's in step 2.
+   *Recommended*: it stays 640 KB of the program's own until the layer
+   is designed, and entry 13 stands. *Or*: blocks from the extender
+   now: the editor then opens whatever the machine holds, a copy reads
+   any file in one piece, and how the program gets memory is settled
+   before the layer is.
+3. **How many files a panel holds.** The original stops at 64K, some
+   2,700 files, beeps and shows those. *Recommended*: kept, as a
+   number of the program's own, until a system is in view that has
+   more; no scenario reaches it. *Or*: lifted to what the memory
+   holds, declared, with a scenario that fills a panel.
+4. **The 256 files kept while a command runs.** The original cuts
+   each list to make room for the command and reads it again
+   afterwards; the portable C stays in the memory whole and gains
+   nothing by it. *Recommended*: kept until the layer says what a
+   command needs. *Or*: gone now, declared as a removal of what only
+   made sense on DOS, with `enter-many` patched.
+5. **The editor beyond 65,535 lines or columns.** Not looked at yet:
+   if the original shows a wrong number there or loses its place, that
+   is a bug of the original. *Recommended*: N7 looks, and you are
+   asked then with what it saw. Until then it stays.
+6. **The flags of the setup file. Taken as recommended.** They are bytes
+   in the file, and a file made by hand could hold a 2 in one.
+   *Recommended*: they stay bytes in the program too, tested as the
+   original tests them, and every other true-or-false number becomes a
+   boolean. *Or*: booleans, made of the bytes when the file is read,
+   which is a deviation for such a file.
+7. **The main data's layout. Taken as recommended.** *Recommended*: kept
+   as the original's through step 2, with the pointers beside it, so
+   that nothing of the tests changes. *Or*: freed, with the tests taught
+   to find its fields. This is a way of working and the session may take
+   it without you; it is here because the plan for the 32 bits said
+   otherwise.
+
+### Where this plan guesses
+
+- The sizes of the pieces, all of them. No piece was begun, and the
+  sweeps were sized by counting lines, not by trying.
+- That the bridge is exact. It is by the definitions; nothing ran.
+- That the image is cheap and steady from run to run: `pmemsave` is in
+  the harness, the tool is not written, and 10 of "What could go
+  wrong" is unknown.
+- That places inside a panel are best left offsets. If the user lifts
+  the limit of question 3 they become numbers of 32 bits, which is a
+  piece of its own behind N1 and changes the layout of a panel.
+- The count of places for the widths, 600 to 1,000, and that most are
+  plain.
+- What the editor does beyond 65,535 lines, and whether any other
+  number wraps within a user's reach: only the reading of N1 to N7
+  finds those.
+- That no scenario fills a panel, read from the scenarios' names.
+- What `harness/reads.py` needs for the new form of a table handed on:
+  its patterns were looked at, not changed.
+
 ## An implementation of the layer for tests: future work
 
 The road of the portable C (`CLAUDE.md`, "The portable C") has a
