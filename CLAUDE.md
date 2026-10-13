@@ -1710,6 +1710,13 @@ in "The portable C".
     on the stack for a second return address: `Int21` returns to
     whoever called, and `New21` jumps to it without the three
     instructions that made the room. `Exit01` still has them.
+- The setup program, step 0 of the road, has its plan in `TODO.md`,
+  "The setup program in the portable C: the plan": what the program is,
+  what the portable C has of it already, how it becomes a part of the
+  one program, the pieces of the work with the files of each, and how
+  its scenarios are held against the original. Read it before any
+  piece of that work. `harness/trial-setup/` has the scripts of the
+  trial that the plan rests on, with a README of their own.
 
 ### Moving a file to the system's functions
 
