@@ -88,7 +88,6 @@ void V51_00(u16 segment);
 void V55_00(u16 segment, u16 to, u16 count, u16 handle);
 void V60_00(u16 segment, u16 at, u16 table);
 void V81_00(void);
-u32 V82_00(u16 segment, u16 at, u16 count);
 
 /* V00_02, V00_10, V13_00 and V13_01, which the main loop goes on in, are
    declared in vc.h, with struct Open, which V00_02 fills. The others are
@@ -119,8 +118,7 @@ void PutFls(u16 panel);
 void PutTre(u16 panel);                                 /* tree.c */
 u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
-u32 T70_00(u16 line);                                   /* edit.c */
-void T71_00(u16 function, u16 place, u16 step);
+void T71_00(u16 function, u16 place, u16 step);         /* edit.c */
 
 /* Boxes, dialogs and texts of view_t.c, which DialBox and Dialog
    take by their offsets in the segment that AsmSeg returns. */
@@ -837,7 +835,8 @@ void V00_10(u16 handle)
     struct Line line;
     struct Box box;
     struct DosRegs regs;
-    u32 pair, rest, position;
+    u32 rest, position;
+    struct Sought sought;
     struct Mouse pointer;
     u16 count, key, bar, step, column, at, end, number, begin, size;
     u16 starts, panel, length, behind, in_file, result, edge;
@@ -1252,11 +1251,11 @@ V15_00:                                 /* Continue search */
         goto V15_04;
     /* In what is in the memory. */
     count = VI->ViLoaded - at;
-    pair = V82_00(segment, at, count);
-    if (LOW(pair) & 0x100)
+    sought = V82_00(segment, at, count);
+    if (sought.found & 0x100)
         goto V15_06;
-    behind = HIGH(pair) - at;
-    panel = LOW(pair);
+    behind = sought.end - at;
+    panel = sought.found;
     in_file = 0;
     goto V15_10;
 V15_04:                                 /* and on in the file, a piece of
@@ -1288,11 +1287,11 @@ V15_04:                                 /* and on in the file, a piece of
         result = 2;
         goto V15_22;
     }
-    pair = V82_00(MAIN_SEG, (u16)md.MenuBuf, count);
-    behind = HIGH(pair) - (u16)md.MenuBuf;
-    panel = LOW(pair);
+    sought = V82_00(MAIN_SEG, (u16)md.MenuBuf, count);
+    behind = sought.end - (u16)md.MenuBuf;
+    panel = sought.found;
     in_file = 1;
-    if (!(LOW(pair) & 0x100))
+    if (!(sought.found & 0x100))
         goto V15_10;
 V15_06:                                 /* not in these `count` bytes: on
                                            from where it may begin */
@@ -1487,11 +1486,20 @@ void V81_00(void)
     HexLen = 0;
 }
 
-/* Look for what V81_00 has prepared in `count` bytes of a text. The high
-   word of what is returned is where the search ended: behind what was
-   found. The low word is 1 if the text was found, capitals and small
-   letters alike, 0 if the bytes were, and 100h if neither. */
-u32 V82_00(u16 segment, u16 at, u16 count)
+/* Look for what V81_00 has prepared in `count` bytes of a text. Returns
+   where the search ended, behind what was found, and 1 if the text was
+   found, capitals and small letters alike, 0 if the bytes were, and 100h
+   if neither. */
+static struct Sought Sought(u16 found, u16 end)
+{
+    struct Sought sought;
+
+    sought.found = found;
+    sought.end = end;
+    return sought;
+}
+
+struct Sought V82_00(u16 segment, u16 at, u16 count)
 {
     const u8 __far *text = TEXT(segment);
     u16 more = SRCH_LEN - HexLen;       /* places at the end where only
@@ -1517,7 +1525,7 @@ u32 V82_00(u16 segment, u16 at, u16 count)
             if ((u8)UpCase(text[at++]) != md.HelpBuf[i++])
                 break;
             if (--left == 0)
-                return (u32)at << 16 | 1;
+                return Sought(1, at);
         }
         at = start;
 bytes:
@@ -1528,7 +1536,7 @@ bytes:
                 if (text[at++] != md.HelpBuf[i++])
                     break;
                 if (--left == 0)
-                    return (u32)at << 16;
+                    return Sought(0, at);
             }
         }
         at = start + 1;
@@ -1542,7 +1550,7 @@ bytes_only:
         goto bytes;
     }
 none:
-    return (u32)at << 16 | 0x100;
+    return Sought(0x100, at);
 }
 
 /*
@@ -1610,11 +1618,19 @@ static const u8 CODE ViewPar[9] = { 0, 'S', 'o', 'c', 'h', 'a', 0, 0x1F, 1 };
    behind one. Commands are lines that begin with a space or a tab; empty
    lines and lines that begin with an apostrophe are passed over.
 
-   Returns in the high word where the command begins, with 0 in the low
-   one; or 1 there if there is none, and in the high word where the line
-   begins that is no command, or the place behind the character that
-   ends the file. */
-u32 F34_30(u16 text)
+   Returns where the command begins; or that there is none, and where
+   the line begins that is no command, or the place behind the character
+   that ends the file. */
+static struct Next Next(u16 none, const u8 *at)
+{
+    struct Next next;
+
+    next.none = none;
+    next.at = (u16)at;
+    return next;
+}
+
+struct Next F34_30(u16 text)
 {
     const u8 *at = (const u8 *)text;
     u16 word;
@@ -1628,14 +1644,14 @@ u32 F34_30(u16 text)
             if ((u8)word == EOF_CHAR)
                 break;
             at--;
-            return (u32)(u16)at << 16;
+            return Next(0, at);
         }
         for (;;) {                      /* behind the end of a line */
             word = *(const u16 *)at;
             if ((u8)word == ' ' || (u8)word == '\t')
                 break;
             if (!IS_CRLF(word) && (u8)word != '\'')
-                return (u32)(u16)at << 16 | 1;
+                return Next(1, at);
             do {                        /* to the end of this one */
                 word = *(const u16 *)at;
                 at += 2;
@@ -1644,10 +1660,10 @@ u32 F34_30(u16 text)
                 at--;
             } while ((u8)word != EOF_CHAR);
             if (!IS_CRLF(word))
-                return (u32)(u16)at << 16 | 1;
+                return Next(1, at);
         }
     }
-    return (u32)(u16)at << 16 | 1;
+    return Next(1, at);
 }
 
 /* Is the command at `text` in MenuBuf nothing but the name of a file,
@@ -1656,14 +1672,15 @@ u32 F34_30(u16 text)
    menu one that ends in ".MNU". A drive in front of it has to be a
    letter, and a "!" makes it a command.
 
-   If so, the low word is 1, and the path of the file is at TmpBuf: the
+   If so, the path of the file is at TmpBuf: the
    name as it is if it has a path of its own, and else in the directory
    of the extension file or the menu file, whose path is at TmpBuf. Else
-   the low word is 0 and the high one the place before the command. The
+   what is returned has the place before the command. The
    character behind the name is made a zero byte before the length of
    the name is found too great. */
-u32 F34_40(u16 text, u16 view)
+struct Named F34_40(u16 text, u16 view)
 {
+    struct Named named;
     u16 code = AsmSeg();
     const u8 __far *suffix = AT(code, OFFSET(Menu_F) + 1);
     const u8 __far *from;
@@ -1701,7 +1718,7 @@ u32 F34_40(u16 text, u16 view)
         if (c != *suffix)
             goto command;
     } while (--count);
-    if (LOW(F34_30((u16)end)) == 0)
+    if (F34_30((u16)end).none == 0)
         goto command;
     *end = 0;
     if ((u16)(end - (u8 *)text) >= LenPath + 12)
@@ -1712,9 +1729,13 @@ u32 F34_40(u16 text, u16 view)
     from = (const u8 *)text;
     for (count = LenPath + 13; count != 0; count--)
         *to++ = *from++;
-    return (u32)(text + LenPath + 13) << 16 | 1;
+    named.file = 1;
+    named.at = text + LenPath + 13;
+    return named;
 command:
-    return (u32)(u16)(text - 1) << 16;
+    named.file = 0;
+    named.at = text - 1;
+    return named;
 }
 
 /* Run the program at TmpBuf as the viewer of the file ViewFil, or as the
@@ -1815,7 +1836,8 @@ static u32 F34_11(u16 how)
     const u8 __far *name;
     const u8 __far *from;
     struct DosRegs regs;
-    u32 pair;
+    struct Named named;
+    struct Next next;
     struct Answer file;
     u16 edit = how & 0xFF;
     u16 own = how >> 8;
@@ -1866,12 +1888,12 @@ static u32 F34_11(u16 how)
     command = FindExt(CutPath(md.ViewFil));
     if (command == 0)
         return GO_VIEW(edit);
-    pair = F34_30(command);
-    if (LOW(pair))
+    next = F34_30(command);
+    if (next.none)
         return GO_VIEW(edit);
-    pair = F34_40(HIGH(pair), 1);
-    if (LOW(pair) == 0) {
-        command = HIGH(pair);
+    named = F34_40(next.at, 1);
+    if (named.file == 0) {
+        command = named.at;
         *(u8 *)command = ' ';
         if (Run_00(command, 1))
             return F21_30();

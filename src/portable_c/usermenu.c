@@ -57,13 +57,12 @@ u16 Run_00(u16 text, u16 view);
    F34_30, which looks for the next command of a line, and F34_40, which
    looks at whether a command is the name of a file of the kind that is
    being read, a menu here: then it has put the path of that file at
-   TmpBuf. Both return a place in the high word, and the low one is not 0
-   if there is no command, or if it is such a name. */
+   TmpBuf. Both return a place, and whether there is no command, or
+   whether it is such a name. */
 
-/* FndItem of vc.h, which is C, for a place in the main data, with its
-   answer as F34_30 and F34_40 have theirs: where the next line of a menu
-   is that is neither empty, nor a comment, nor a command, in the high
-   word, and the low one not 0 if there is none. */
+/* FndItem of vc.h, which is C, for a place in the main data: where the
+   next line of a menu is that is neither empty, nor a comment, nor a
+   command, in the high word, and the low one not 0 if there is none. */
 static u32 MenuItem(u16 text)
 {
     struct Entry item = FndItem((const u8 *)text);
@@ -510,6 +509,8 @@ u16 F32_00(u16 main)
 {
     struct DosRegs regs;
     u32 pair;
+    struct Named named;
+    struct Next found;
     struct Key pressed;
     struct Answer opened;
     const u8 *text;                     /* SI */
@@ -836,14 +837,14 @@ F32_55:                                 /* Esc, and the box goes */
         md.MenuFl = 0;
         return 0;
     }
-    pair = F34_30((u16)text);
-    command = HIGH(pair);
-    if (LOW(pair))
+    found = F34_30((u16)text);
+    command = found.at;
+    if (found.none)
         goto F32_57;
-    pair = F34_40(command, 0);
-    command = HIGH(pair);
+    named = F34_40(command, 0);
+    command = named.at;
     key = 0;
-    if (LOW(pair))
+    if (named.file)
         goto F32_02;                    /* another menu */
 F32_57:
     md.MenuFl = md.AutoMnu;

@@ -116,7 +116,6 @@ void FilZero(u8 __far *text, u16 length);               /* string.c */
 void NormStr(u8 __far *text);
 u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
 void V81_00(void);                                      /* view.c */
-u32 V82_00(u16 segment, u16 at, u16 count);
 
 /* Objects that are named by their offsets, of find_t.c but for
    Mask_S, which is of another file: Mask_S is \*.*, and four bytes are
@@ -643,7 +642,7 @@ next:
             if (Intr21((struct DosRegs STACK *)&regs))
                 goto stopped;
             count = regs.ax;
-            if ((u16)V82_00(segment, 0, count) != 0x100) {
+            if (V82_00(segment, 0, count).found != 0x100) {
                 found = 1;
                 break;
             }

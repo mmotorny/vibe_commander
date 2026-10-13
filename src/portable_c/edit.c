@@ -108,7 +108,6 @@ u16 T57_02(void);
 u32 T62_00(void);
 u16 T63_01(u16 high, u16 low);
 u16 T64_00(const u8 __far *name, const u8 *text, u16 count);
-u32 T70_00(u16 line);
 void T71_00(u16 function, u16 place, u16 step);
 void T72_00(u16 line, u16 segment, u16 from, u16 end);
 void T73_00(void);
@@ -144,11 +143,10 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
 void PathLin(u8 __far *text);                           /* string.c */
 /* The viewer's search: V80_00 shows the box "Searching for" under the
    title `include`, says where it is, and makes ready what is looked for,
-   SrchStr; V82_00 looks for it in `count` bytes. Behind what it finds is
-   the high word of what it returns; the low word is 1 for the text found,
-   0 for the bytes that it names in hex, and 100h for neither. */
+   SrchStr; V82_00, of vc.h, looks for it in `count` bytes, and returns
+   where the search ended, behind what it found, and 1 for the text
+   found, 0 for the bytes that it names in hex, and 100h for neither. */
 void V80_00(u16 include, struct Box STACK *where);      /* view.c */
-u32 V82_00(u16 segment, u16 at, u16 count);
 
 /* How long the text is that V80_00 has made ready. */
 #define SrchLen (*(u16 *)(md.HelpBuf + 90))
@@ -690,10 +688,11 @@ u16 T64_00(const u8 __far *name, const u8 *text, u16 count)
 }
 
 /* Clear a line of the window in the screen buffer; only the low byte of
-   `line` counts. Returns where the line is in the buffer, and in the high
-   word its row and column on the screen. */
-u32 T70_00(u16 line)
+   `line` counts. Returns where the line is in the buffer, and its row
+   and column on the screen. */
+struct Cleared T70_00(u16 line)
 {
+    struct Cleared cleared;
     u16 place = ed.EdBase + (line << 8);
     u16 *screen = BasAdr(place);
     u16 *cell = screen;
@@ -702,7 +701,9 @@ u32 T70_00(u16 line)
 
     for (count = ed.EdSizeX; count; count--)
         *cell++ = blank;
-    return PAIR(place, (u16)screen);
+    cleared.screen = screen;
+    cleared.place = place;
+    return cleared;
 }
 
 /* Move the lines of the window up or down by one, in the screen buffer
@@ -757,7 +758,7 @@ void T71_00(u16 function, u16 place, u16 step)
 void T72_00(u16 line, u16 segment, u16 from, u16 end)
 {
     const u8 __far *text = AT(segment, 0);
-    u16 *screen = (u16 *)LOW(T70_00(line));
+    u16 *screen = T70_00(line).screen;
     u16 __far *cell;
     u8 *ascii;
     u32 offset;
@@ -1673,7 +1674,7 @@ static void T21_00(void)
         ed.EdChng = 1;
         ed.EdLen--;
         if ((LOW(place) & 0x0F) == 0)
-            Window(HIGH(T70_00(ed.EdLine - ed.EdLin0)),
+            Window(T70_00(ed.EdLine - ed.EdLin0).place,
                    0x100 | ed.EdSizeX);
         T05_02(0);                      /* T21_01 */
         return;
@@ -1845,7 +1846,8 @@ static void T30_00(void)
 static void T32_00(void)
 {
     struct Box box;
-    u32 place, left, address, found;
+    u32 place, left, address;
+    struct Sought sought;
     u16 count;
 
     if (md.SrchStr[0] == 0)
@@ -1863,8 +1865,8 @@ static void T32_00(void)
         if (HIGH(left) == 0 && LOW(left) < count)
             count = LOW(left);
         address = ADDRESS_OF(HIGH(place), LOW(place));  /* T32_02 */
-        found = V82_00(HIGH(address), LOW(address), count);
-        if (LOW(found) < 0x100)
+        sought = V82_00(HIGH(address), LOW(address), count);
+        if (sought.found < 0x100)
             break;
         if (count < SrchLen)
             goto none;
@@ -1872,9 +1874,9 @@ static void T32_00(void)
     }
     if (TstBrk())                       /* T32_05 */
         goto done;
-    place = OFFSET_OF(HIGH(address), HIGH(found));
+    place = OFFSET_OF(HIGH(address), sought.end);
     if (ed.EdTxHex != 0) {
-        ed.EdHexAs = (u8)found;
+        ed.EdHexAs = (u8)sought.found;
         ed.EdHxCur = 0;
         ed.EdOffst = place & 0xFFFFFFF0UL;
         address = ADDRESS_OF(HIGH(place), LOW(place));
