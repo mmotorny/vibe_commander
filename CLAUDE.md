@@ -213,6 +213,15 @@ These held while `src/c/` was made, and they say what it is.
   short for it, and the scenario that has the editor refuse such a
   file, `editor-big`, is not run for that program, with what it alone
   tested listed as untested.
+- The program of 32 bits for DOS is a stage on the road and no product,
+  on the user's word of 13 October 2026: where it differs from the
+  original by what DOS in 32 bits or the extender does, as a command
+  that finds no extended memory while the extender holds it, the
+  difference is declared and held by a patch, and no work goes into
+  making it the original's. The same word has it of the program run
+  more than once at a time, a copy started from a copy, which a modern
+  system makes no matter of: a scenario of that kind that passes stays,
+  and one that would cost work to keep is declared not run.
 - A bug of the original stays as it is until its fix has been decided.
 - DOS stays a target of the portable C for as long as DOS is where it is
   judged: every step builds for DOS and passes its scenarios there before
