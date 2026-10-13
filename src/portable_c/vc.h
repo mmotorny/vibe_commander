@@ -859,16 +859,27 @@ struct Onward F75_00(u16 panel);
 /* The viewer and the editor, view.c and edit.c: the commands, and what
    they go on in. V00_02 opens the file ViewFil and says in `open` what it
    found, 0 if there is nothing to show, 1 for the editor and 2 for the
-   viewer; T00_00 is the editor, which returns 0 if the file is to be
-   viewed instead, 1 if it is to be closed and nothing more, and 2 when
-   it has been edited and is closed, with what V13_01 takes in the high
-   byte: not 0 if a file was written. V00_10 is the viewer; V13_00 closes
-   the file and goes back to the panels, as V13_01 does without closing
-   one. See each there. */
+   viewer; T00_00 is the editor, which returns how it was left. V00_10 is
+   the viewer; V13_00 closes the file and goes back to the panels, as
+   V13_01 does without closing one. See each there. */
 struct Open {
     u16 handle;                         /* 0FFFFh for a new file */
     struct Box box;                     /* where the box "Reading the
                                            file" is */
+};
+enum {                                  /* how the editor was left: */
+    EDIT_VIEW,                          /* the file is to be viewed
+                                           instead */
+    EDIT_CLOSE,                         /* it is to be closed, and nothing
+                                           more */
+    EDIT_DONE                           /* it has been edited and is
+                                           closed */
+};
+struct EditEnd {
+    u8  how;                            /* an EDIT_ above */
+    u8  written;                        /* with EDIT_DONE not 0 if a file
+                                           was written: what V13_01
+                                           takes */
 };
 struct Onward F43_00(void);
 struct Onward F44_00(void);
@@ -881,7 +892,7 @@ u16 V00_02(u16 menu, u16 edit, u16 whole, struct Open STACK *open);
 void V00_10(u16 handle);
 void V13_00(void);
 void V13_01(u16 changed);
-u16 T00_00(u16 handle, u16 begin, u16 size, u16 saved);
+struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved);
 /* Two that the viewer and the editor share, and the file search the
    second: T70_00 of edit.c clears a line of the window in the screen
    buffer, and V82_00 of view.c looks for the text of a search in `count`

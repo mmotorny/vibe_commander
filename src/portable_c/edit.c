@@ -2535,16 +2535,27 @@ again:
     }
 }
 
+/* How the editor was left, struct EditEnd of vc.h: an EDIT_ there, and
+   with EDIT_DONE whether a file was written. */
+static struct EditEnd Ends(u16 how, u16 written)
+{
+    struct EditEnd end;
+
+    end.how = (u8)how;
+    end.written = (u8)written;
+    return end;
+}
+
 /* The editor: T00_00 of the assembly, to which the viewer's code jumps
    once it has opened the file, with the file's handle, or 0FFFFh for a
    file that is not there, and its size in EdLen. The box "Reading the
    file" is on the screen: `begin` and `size` say where, and `saved` where
    what it covers is kept.
 
-   Returns 0 if the file is to be viewed instead, 1 if it is to be closed
-   and nothing more, and 2 when it has been edited and is closed, with
-   EdWrite in the high byte, which V13_01 of the viewer takes: not 0 if
-   the file was written.
+   Returns how it was left: EDIT_VIEW if the file is to be viewed
+   instead, EDIT_CLOSE if it is to be closed and nothing more, and
+   EDIT_DONE when it has been edited and is closed, with EdWrite, which
+   V13_01 of the viewer takes: not 0 if the file was written.
 
    The text goes into the memory behind the program, EdSpace paragraphs:
    a file that is not shorter than that is too large, and a box asks
@@ -2553,7 +2564,7 @@ again:
    gives fewer bytes than its size says is as long as it gives. A window
    as wide as the screen has a status line above it, and the menu file
    and the extension files have ten lines of help below theirs. */
-u16 T00_00(u16 handle, u16 begin, u16 size, u16 saved)
+struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
 {
     struct DosRegs regs;
     struct LineArgs line;
@@ -2575,7 +2586,7 @@ u16 T00_00(u16 handle, u16 begin, u16 size, u16 saved)
         place = (begin & 0xFF00) + 0x100 | 37;  /* T00_02 */
         MovDz0((u16 __far *)BasAdr(place), AT(code, OFFSET(ViFl_S)));
         Window(place, 0x106);
-        return 0;
+        return Ends(EDIT_VIEW, 0);
     }
 
     /* T00_03: the menu file, or an extension file? */
@@ -2702,9 +2713,9 @@ u16 T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     ed.EdShape = ChgCur();
     T00_19();
     CurShp(ed.EdShape);                 /* T35_02 */
-    return (u16)ed.EdWrite << 8 | 2;
+    return Ends(EDIT_DONE, ed.EdWrite);
 closed:
     ResWin(begin, size, (u16)md.WinBuf);        /* T00_10 */
     Window(begin, size);
-    return 1;
+    return Ends(EDIT_CLOSE, 0);
 }

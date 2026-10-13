@@ -14,12 +14,10 @@ none of the portable C does any more: the README has what they return
 instead, and `python3 tools/pairs.py` lists the three that return a
 number of 32 bits because they have one.
 
-What is left is numbers of 16 bits with a thing in each byte, or with a
-flag above something, which the tool does not list, since it goes by the
-type `u32`: `T00_00` of `edit.c` returns what `V13_01` takes in the high
-byte, and in `main.c` `Command` returns a place of the loop or, with
-`LEAVE`, why the loop is left, and `Func21` a command or, with `AGAIN`,
-a place.
+What is left is two numbers of 16 bits with a flag above something,
+which the tool does not list, since it goes by the type `u32`: in
+`main.c` `Command` returns a place of the loop or, with `LEAVE`, why
+the loop is left, and `Func21` a command or, with `AGAIN`, a place.
 
 `CLAUDE.md`, "Notes on the portable C", has how such a function is
 written so that a call that was not changed does not compile, and what

@@ -900,20 +900,21 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
 static u16 V00_03(u16 menu, u16 edit, u16 whole)
 {
     struct Open open;
+    struct EditEnd end;
     u16 what;
 
     what = V00_02(menu, edit, whole, (struct Open STACK *)&open);
     if (what == 0)
         return FUNC04;
     if (what == 1) {
-        what = T00_00(open.handle, open.box.begin, open.box.size,
-                      open.box.saved);
-        if (what == 1) {                /* T00_01: not read */
+        end = T00_00(open.handle, open.box.begin, open.box.size,
+                     open.box.saved);
+        if (end.how == EDIT_CLOSE) {    /* T00_10: not read */
             V13_00();
             return INIT50;
         }
-        if (what != 0) {                /* T00_02: edited */
-            V13_01(what >> 8);
+        if (end.how == EDIT_DONE) {     /* T35_02: edited */
+            V13_01(end.written);
             return INIT50;
         }
     }
