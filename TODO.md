@@ -5583,17 +5583,70 @@ behind it, behind the two panels.
   had not given it, where a second copy of the program is loaded.
   Nothing was seen to come of that.
 
-What leaned on the same body, and whether it touched scenarios that
-pass: the viewer, which calls `T71_00` with -160 for Up where the
-window moves down by a line (`V05_02` of `view.c`). The BIOS scrolls
-the screen and the viewer writes the new first row, so the screen was
-right; the screen buffer was not moved, its last row got what lies
-64K on, and 160 bytes at 638h of the text that the viewer had loaded
-were written over. The scenarios of the viewer passed with that, so
-none of them shows that part of the text again after Up or puts the
-window on the screen from the buffer after it; which of the two it is
-for each was not looked up. They are judged by the mended routine now,
-and no scenario was written for it.
+What leaned on the same body: the viewer, which calls `T71_00` with
+-160 for Up where the window moves down by a line (`V05_02` of
+`view.c`). The BIOS scrolls the screen and the viewer writes the new
+first row, so the screen was right; the screen buffer was not moved,
+its last row got what lies 64K on, and 160 bytes at 638h of the text
+that the viewer had loaded were written over, with the rows behind
+that as in the editor.
+
+**Scenarios that passed went through it.** Eleven of the 145 that
+were on the record before the mend made the call with -160, by what
+ran in the original, `harness/goldens/NAME.ran`: the three
+instructions that load the step for it, `MOV DX,-2*80` at 5485h,
+644Ah and 6853h of the listing.
+
+| The call | Passed before the mend | Failed before it |
+|---|---|---|
+| The viewer, Up: `V05_02`, 5485h | `view`, `view-parts`, `view-keys`, `mouse-view` | |
+| The editor, the window a line down: `T00_34` of `T00_20`, 644Ah | `editor-search`, `start-screen` | `editor-full`, `start-memory` |
+| The editor, Enter or a line put back: `T02_03`, 6853h | `dirinfo`, `editor-words`, `editor-dirinfo`, `mouse-edit`, `start-setup`, `start-screen` | The nine that the mend brought to pass |
+
+So eleven scenarios read a row from 64K on and, wherever more than
+one row was to move, wrote 64K off, into the text and beyond it, and
+showed nothing, which says that none of them puts that part of the
+text or that row of the buffer on the screen afterwards. The viewer's four did so in every
+run, a window of 23 rows having 21 rows to write. `start-memory`
+fails still, for its second copy. They are judged by the mended
+routine now, and no scenario was written for it. A scenario that
+passes says that nothing wrong came to the screen or the disk, not
+that nothing wrong was written.
+
+**What would have stopped at it, and `CHECKED`.** The debug program's
+checks, which B2 left to be written, would not have, as the plan has
+them: they are a third body of the words of the addresses, and hold
+what a word is handed, a segment that the program has and a place
+within the main data. This write went through no word. It was a sum
+on a pointer, and that is the fault: the mend is that it goes through
+two words now. Nor could a check of the address alone tell the first
+of the writes from a right one, since 64K on from the screen buffer
+is the program's own 640 KB, memory that it may write.
+
+What the checks are still for is the other half of 1 and 2 of "What
+could go wrong": a wrapped offset or a segment that is handed to
+`AT`, `PANEL` or `MD_POINTER` and names something that the program
+has not. No such fault has been met yet. What would have stopped at
+this one:
+
+- A check that knows the object and not the address: that a pointer
+  made from `ScrBuf` stays in `ScrBuf`. Nothing in C written for Open
+  Watcom gives that. clang's sanitizers do, which is step 6 of the
+  road, a program that clang builds and that runs.
+- For the rows from the eleventh on, memory that faults behind the
+  end of the program. The bench has none: the extender does not page,
+  and what lies there is the machine's.
+- The finder's new kind, had it been there when P4 read the tree: see
+  below. It names the three calls, and whoever reads them opens
+  `T71_00`.
+
+So the argument for writing `CHECKED` is not this fault. It is that
+eleven scenarios passed over a write 64K off: the scenarios do not
+find wild writes, and the 32-bit program has no other net under it
+until clang builds it. A check costs nothing in the program that is
+shipped, and the piece that writes it should know that it covers the
+words and not the sums beside them; `harness/trial32/added.py` lists
+those.
 
 Its like elsewhere, looked for by reading and by `grep`:
 
