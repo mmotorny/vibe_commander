@@ -22,7 +22,7 @@ dirfunc_t.c   clean
 dos.c         to-number 25, to-pointer 14, asm-pragma 7, registers 1, intrinsic 1
 dos32.c       to-number 9, to-pointer 6, asm-pragma 9, intrinsic 1
 drive.c       to-number 2
-edit.c        to-number 12, to-pointer 1
+edit.c        clean
 edit_t.c      clean
 enter.c       to-number 5, to-pointer 8
 extfile.c     to-number 2, to-pointer 1

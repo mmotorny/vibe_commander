@@ -874,7 +874,7 @@ void T72_00(u16 line, u16 segment, u16 from, u16 end)
     cell = HexByt(cell, (u16)offset >> 8);
     cell = HexByt(cell, (u16)offset);
     cell += 2;
-    ascii = (u8 *)((u16 *)(u16)(u32)cell + 52);
+    ascii = (u8 *)((u16 *)NEAR(cell) + 52);
     for (count = 16; count; count--) {
         if (from >= end)
             break;
@@ -910,7 +910,7 @@ struct Drawn T73_10(void)
             T51_00();
             T50_00();
         }
-        from = (u16)EditBuf;
+        from = MD_PLACE(EditBuf);
         end = from + ed.EdSizLn;
         T70_00(line);
         if (from < end)
@@ -1641,7 +1641,7 @@ static void T20_02(u8 *from, u8 *end)
     ed.EdUndo = count;
     for (; count; count--)
         *undo++ = *source++;
-    if ((u16)(EditBuf + ed.EdSizLn) > (u16)end)
+    if (MD_PLACE(EditBuf + ed.EdSizLn) > MD_PLACE(end))
         for (count = EditBuf + ed.EdSizLn - end; count; count--)
             *from++ = *end++;
     ed.EdSizLn -= cut;                  /* T20_03 */
@@ -1860,9 +1860,9 @@ static void T26_00(void)
         ed.EdSizLn += count;            /* T26_01 */
         to = EditBuf + LenEdit - 1;
         from = to - count;
-        cursor = (u16)(EditBuf + ed.EdCursr - 1);
-        if ((u16)from > cursor)
-            for (i = (u16)from - cursor; i; i--)
+        cursor = MD_PLACE(EditBuf + ed.EdCursr - 1);
+        if (MD_PLACE(from) > cursor)
+            for (i = MD_PLACE(from) - cursor; i; i--)
                 *to-- = *from--;
         ed.EdCursr += count;            /* T26_02 */
         to = from + 1;
@@ -2574,7 +2574,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     end = MvzLine(md.TmpBuf, name, 13);
     *end++ = 0;
     PathLin(md.TmpBuf);
-    count = (u16)(u32)end - (u16)md.TmpBuf;
+    count = MD_PLACE(NEAR(end)) - MD_PLACE(md.TmpBuf);
     help = 0x0A01;
     file = OFFSET(Menu_F);
     if (!T64_00(AT(code, file), md.TmpBuf, count)) {
@@ -2621,7 +2621,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
         }
         FileClose(handle);              /* T00_12 */
     }
-    ResWin(begin, size, (u16)md.WinBuf);        /* T00_13 */
+    ResWin(begin, size, MD_PLACE(md.WinBuf));    /* T00_13 */
     Window(begin, size);
     ed.EdStat = 0;
     if (ed.EdSizeX >= 79) {
@@ -2660,8 +2660,8 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
            had for BoxDubl. */
         line.include = AT(code, 76);
         CntLine((struct LineArgs STACK *)&line);
-        T76_00((place & 0xFF00) + 0x200 | 3, code, (u16)(u32)line.line,
-               OFFSET(EdtH_P));
+        T76_00((place & 0xFF00) + 0x200 | 3, code,
+               OFFSET_IN_SEG(code, line.line), OFFSET(EdtH_P));
         T76_00((place & 0xFF00) + 0x200 | 46, code, OFFSET(EdtH_S),
                OFFSET(EdtH_P));
         Window(place, 0x0A50);
@@ -2691,7 +2691,7 @@ struct EditEnd T00_00(u16 handle, u16 begin, u16 size, u16 saved)
     CurShp(ed.EdShape);                 /* T35_02 */
     return Ends(EDIT_DONE, ed.EdWrite);
 closed:
-    ResWin(begin, size, (u16)md.WinBuf);        /* T00_10 */
+    ResWin(begin, size, MD_PLACE(md.WinBuf));    /* T00_10 */
     Window(begin, size);
     return Ends(EDIT_CLOSE, 0);
 }
