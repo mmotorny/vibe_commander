@@ -1,6 +1,6 @@
 /*
  * The table of the bars: the names of the menus in the menu bar, which
- * src/c/bars.c writes and by which src/c/menu.c finds the menu that the
+ * bars.c writes and by which menu.c finds the menu that the
  * mouse is on.
  *
  * From VCSUB2.INC.

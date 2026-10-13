@@ -23,7 +23,7 @@
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
 /* AsmSeg, of vc.h, returns the segment of the program's constants: the
-   name of the file is one of src/c/system_t.c, and the code that starts
+   name of the file is one of system_t.c, and the code that starts
    the program reads it there too. */
 extern const u8 __far Init_F[];
 

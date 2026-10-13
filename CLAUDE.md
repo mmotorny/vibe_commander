@@ -1244,6 +1244,18 @@ in "The portable C".
   call has arguments whose order of working out could matter, one that
   calls something next to one that calls or reads memory. There were
   20 such calls, and none where it matters.
+- A local variable that is read before it is set holds what a register
+  or the stack happened to, and by the compiler's convention that is
+  another thing than by the registers of the assembly: no build says
+  so, since Open Watcom does not warn of it, and a scenario only by
+  chance. A compiler of this computer does warn. The tree was put
+  through `clang -m32 -Wsometimes-uninitialized
+  -Wconditional-uninitialized`, in a copy with the words of Open Watcom
+  defined away, `__far`, `__based(x)` and the like, and the `LAID_OUT`
+  lines taken out, all files but `resident.c` with its `_asm`: it named
+  two variables, in `edit.c` and `read.c`, and both are set on every
+  path that reads them. `gcc` at `-O2` named none, and none either in a
+  function written to have one.
 - A comment in front of the lines often said what they were for, "How
   the assembly passes arguments to these", "saves every register", and
   is stale when they go: look at what stood in front of each line

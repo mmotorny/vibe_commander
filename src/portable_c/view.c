@@ -122,7 +122,7 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
 u32 T70_00(u16 line);                                   /* edit.c */
 void T71_00(u16 function, u16 place, u16 step);
 
-/* Boxes, dialogs and texts of src/c/view_t.c, which DialBox and Dialog
+/* Boxes, dialogs and texts of view_t.c, which DialBox and Dialog
    take by their offsets in the segment that AsmSeg returns. */
 extern const u8 __far ViFl_S[];         /* " View " */
 extern const u8 __far EdFl_S[];         /* " Edit " */
@@ -1573,7 +1573,7 @@ u16 Run_00(u16 text, u16 view);                         /* usermenu.c */
 /* More of them, and two names of other files, those of the menu file
    and of the file that an Info panel shows. The names of the extension
    files of the viewer and of the editor are copied with what follows
-   them, as those two are, and "Try rebooting." is too: in src/c/view_t.c
+   them, as those two are, and "Try rebooting." is too: in view_t.c
    each is written as long as what is copied. Then the dialog that asks
    for a name; the boxes shown while a program is loaded as the viewer
    or as the editor; and the box that says it could not be run, with

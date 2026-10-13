@@ -1,5 +1,5 @@
 /*
- * The tables of src/c/dirfunc.c: the texts, the boxes, the dialogs and the
+ * The tables of dirfunc.c: the texts, the boxes, the dialogs and the
  * buttons of making a directory, of deleting, of the attributes and of
  * the volume label, and of going through a directory. The code hands them
  * to Dialog and OncZoom by their offsets.
@@ -13,7 +13,7 @@
 
 /* Of other files: lines and buttons that the boxes of every file use.
    Var_S, the line that is a text which the box puts in, is another, and
-   src/c/tables.h has it. */
+   tables.h has it. */
 extern const u8 Ok_S[];
 extern const u8 OkMn_D[];
 extern const u8 Inc_S[];
@@ -73,7 +73,7 @@ const DIALOG(1) MkErr_B = {
 };
 
 /* Delete. DlWr4_S is copied with what follows it, 81 bytes in all, by
-   F48_00 of src/c/dirfunc.c, and so it is written as long as that, with
+   F48_00 of dirfunc.c, and so it is written as long as that, with
    the 56 bytes that the original has behind it: the four texts that
    follow, which are constants of their own besides, and seven bytes of
    the fifth. */

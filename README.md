@@ -209,6 +209,12 @@ such file said, in what order the program's segments lie and which of
 them count from the PSP, is said by options of the compiler and by the
 linker's command (see [The C translation](#the-c-translation)).
 
+The third stage has begun, in a tree of its own, `src/portable_c/`,
+which started as a copy of that program and still behaves as it does.
+Its functions no longer take their arguments in the registers of the
+assembly, and its constants have the compiler's names (see [The
+portable C](#the-portable-c)).
+
 ## Layout
 
 | Path | Contents |
@@ -586,7 +592,10 @@ in any other. What still has its name from a `#pragma aux`:
 | `TrnMain`, as the part that stays names it for its address | An object there, a function where it is defined | 1 |
 
 That leaves 83 lines of `#pragma aux` in the portable C where the C
-translation has 863.
+translation has 863. Its `VC.EXE` is 133,472 bytes, 416 more than the
+C translation's: no effort went into the size, and a function that
+saves the registers it uses by the compiler's rule comes out a little
+longer here and a little shorter there.
 
 ## Testing
 

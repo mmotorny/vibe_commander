@@ -1,6 +1,6 @@
 /*
  * The tables of copying and renaming: the texts, boxes and dialogs that
- * src/c/copy.c hands to OncZoom and Dialog by their offsets, and the texts
+ * copy.c hands to OncZoom and Dialog by their offsets, and the texts
  * that it copies words from.
  *
  * From VCCOPY.INC.
@@ -22,7 +22,7 @@ extern const u8 YesNo_S[];
 extern const u8 YesNo_D[];
 
 /* Where in the main data the commands keep what the boxes show and the
-   dialogs set: see src/c/copy.c. */
+   dialogs set: see copy.c. */
 #define CpVar1  MD_AT(TmpBuf[120])      /* Variable 1 */
 #define CpVar2  MD_AT(TmpBuf[140])      /* Variable 2 */
 #define CpInpt  MD_AT(TmpBuf[0])        /* Input buffer */

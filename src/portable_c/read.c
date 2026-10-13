@@ -53,7 +53,7 @@ static u32 GetVol0(u8 *volume, struct DosRegs STACK *regs);
 
 /* The names of files: Mask_S is \*.* and Ext_F is VC.EXT. They are
    copied with MvzLine, which takes what follows a text along, so they
-   are constants of src/c/system_t.c, written there with what follows
+   are constants of system_t.c, written there with what follows
    them in the original, and not texts of this file. */
 extern const u8 __far Mask_S[];
 extern const u8 __far Ext_F[];

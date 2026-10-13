@@ -1,5 +1,5 @@
 /*
- * The tables of the editor: the texts that src/c/edit.c reads, and the
+ * The tables of the editor: the texts that edit.c reads, and the
  * boxes and dialogs that it hands to DialBox and Dialog by their offsets.
  *
  * From VCEDIT.INC.

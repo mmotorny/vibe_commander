@@ -120,7 +120,7 @@ u8 __far *UnConv(u8 __far *name, const u8 __far *buffer);   /* mask.c */
 void V81_00(void);                                      /* view.c */
 u32 V82_00(u16 segment, u16 at, u16 count);
 
-/* Objects that are named by their offsets, of src/c/find_t.c but for
+/* Objects that are named by their offsets, of find_t.c but for
    Mask_S, which is of another file: Mask_S is \*.*, and four bytes are
    copied from it or from behind it; Find5_D describes the menu of a
    search that runs, and only its offset is used here, as are those of
@@ -732,7 +732,7 @@ stopped:
 }
 
 /* What the box of the command shows. The colours are those of Find_P in
-   src/c/find_t.c, which the dialog reads there. */
+   find_t.c, which the dialog reads there. */
 static const u8 CODE FindColors[4] = { Conf_C, CnfRe_C, 21, 22 };
 static const u8 CODE Find0_S[] = " Find File ";
 static const u8 CODE Find1_S[] = "File name:";

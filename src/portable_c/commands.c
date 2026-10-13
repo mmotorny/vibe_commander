@@ -63,7 +63,7 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what
-   follows them: constants, most of them of src/c/commands_t.c, in the
+   follows them: constants, most of them of commands_t.c, in the
    segment that AsmSeg returns, where DialBox and Dialog read them by
    their offsets. */
 extern const u8 __far Filt_B[];         /* the filter of a panel */
@@ -584,7 +584,7 @@ u16 M61_00(void)
    The original copies the title as 80 bytes and the name as 13, with
    what follows them there, and 64 of those bytes go on into ViewFil
    behind the name. So as many are copied here, and ExFl_S is written
-   in src/c/commands_t.c with the 80 that the original has there. */
+   in commands_t.c with the 80 that the original has there. */
 static u16 M64_02(u16 item, u16 name, u16 title, u16 include, u16 page)
 {
     u16 code = AsmSeg();

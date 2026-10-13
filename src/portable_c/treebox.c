@@ -4,7 +4,7 @@
  *
  * Translated from VCSUB3.INC.
  *
- * The tree is the list in TreeBuf that src/c/tree.c describes. It is kept
+ * The tree is the list in TreeBuf that tree.c describes. It is kept
  * in the file TREEINFO.NCD in the root of its disk, which is TreeBuf as it
  * is in the memory: five bytes that say what the file is, the number of
  * directories, the sum of those seven bytes, the list, and the sum of the
@@ -57,7 +57,7 @@ void FilZero(u8 __far *text, u16 length);               /* string.c */
 void TreeCur(void);                                     /* tree.c */
 void TrCr20(u16 lines);
 
-/* The tables of the tree, in src/c/treebox_t.c: the name of the tree
+/* The tables of the tree, in treebox_t.c: the name of the tree
    file, which DelTr0 has too, and the boxes that are shown while the
    disk is read and while the file is written, which OncZoom takes by
    their offsets. */
@@ -617,7 +617,7 @@ ChTr55:                                 /* the disk read again */
        character for F2, the sixth and seventh for Ctrl+R. No name that
        DOS gives has a colon, so it is the current drive unless a tree
        file has such a name. The addresses are the original's here, since
-       the table is not in the C translation. */
+       the table is not in the C. */
     place = begin + 0x205;
     n = size - 0x80C;
     cell = Color(ChTr_P[0]) << 8 | ' ';

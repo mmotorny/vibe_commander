@@ -66,7 +66,7 @@ extern const u8 __far SetBrk[];
 #pragma aux New27 "*"
 #pragma aux SetBrk "*"
 
-/* A function of the part that stays, src/c/resident.c, which is called
+/* A function of the part that stays, resident.c, which is called
    far and loads its own DS: SetBrk keeps every register but AX and DX. */
 typedef void __far StaysFn(void);
 #pragma aux StaysFn modify exact [ax dx]

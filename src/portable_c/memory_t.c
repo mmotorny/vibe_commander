@@ -1,5 +1,5 @@
 /*
- * The tables of the map of the memory: what src/c/memory.c hands to
+ * The tables of the map of the memory: what memory.c hands to
  * MinMnu by its offset.
  *
  * From VCMEM.INC.

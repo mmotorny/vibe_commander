@@ -107,7 +107,7 @@
 
    AsmSeg returns the segment of the program's constants, where the boxes
    and the dialogs are. Naming one of them would give it too, as a number
-   that is set when the program is loaded; the test of the C translation
+   that is set when the program is loaded; the test of the scenarios
    knows code by its bytes in the file and would not see a function run that
    begins with such a number.
 

@@ -110,7 +110,7 @@ struct BOXTX {
 /* The routine that a dialog names, for Dialog to call when the dialog is
    answered with Enter or F10. The assembly has the address of the
    routine in the header; the C has one of these numbers there, and
-   Dialog of src/c/dialog.c calls the function that it stands for. The
+   Dialog of dialog.c calls the function that it stands for. The
    word is still a word. */
 #define SUB_F38_10 1                    /* F38_10 of dirfunc.c: what is
                                            deleted, the selected files or
@@ -136,7 +136,7 @@ struct BOXHD {
     u8  bFlags;
 };
 
-/* A field of a dialog: BOXMN of the assembly. See src/c/dialog.c for the
+/* A field of a dialog: BOXMN of the assembly. See dialog.c for the
    kinds and for what mPoint and mCtrl are in each. */
 struct BOXMN {
     u8  mType;

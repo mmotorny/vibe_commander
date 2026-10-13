@@ -1,5 +1,5 @@
 /*
- * The tables of the file search: what src/c/find.c hands to Dialog and
+ * The tables of the file search: what find.c hands to Dialog and
  * MinMnu by its offset, and the two texts that it copies.
  *
  * From VCFIND.INC.

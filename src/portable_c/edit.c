@@ -153,7 +153,7 @@ u32 V82_00(u16 segment, u16 at, u16 count);
 /* How long the text is that V80_00 has made ready. */
 #define SrchLen (*(u16 *)(md.HelpBuf + 90))
 
-/* Boxes, dialogs and texts of src/c/edit_t.c and src/c/view_t.c, and
+/* Boxes, dialogs and texts of edit_t.c and view_t.c, and
    three of other files: Prot_B, Menu_F and Ext_F. DialBox and Dialog
    take theirs by their offsets in the segment that AsmSeg returns, and
    only those are used here: a text is read at its offset in AsmSeg. */

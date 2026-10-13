@@ -93,7 +93,7 @@ u8 *BufDate(const struct DateText STACK *text, u8 *buffer);
 void PutTime(u16 time, struct TimeText STACK *text);
 u8 *BufTime(const struct TimeText STACK *text, u8 *buffer);
 
-/* Boxes and texts, constants of src/c/dirfunc_t.c but for Empty_S, which
+/* Boxes and texts, constants of dirfunc_t.c but for Empty_S, which
    OncZoom and Dialog take by their offsets in the segment that the
    constants are in: only those are used here. */
 extern const u8 __far DelFl_P[];        /* "Deleting the file" */

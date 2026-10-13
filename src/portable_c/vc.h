@@ -20,7 +20,7 @@
  *
  * Routines keep the names they have in the assembly source, and data keeps
  * its layout: the structures below are those of the original's VC.ASM, in
- * src/asm/, and the only ones that the C translation has.
+ * src/asm/, and the only ones that the program has.
  */
 #ifndef VC_H
 #define VC_H
@@ -611,7 +611,7 @@ struct Box {
 
 /* The commands, by number: what the main loop finds for a key or for
    the mouse, and what the tables of the menus have for their items, with
-   0 for an item that is none (src/c/commands_t.c). Each has the name of
+   0 for an item that is none (commands_t.c). Each has the name of
    the label that the original has for it, which is how the test of the
    data holds the menus' tables against the original's: it reads the
    numbers here (harness/datacheck.py). Command of main.c has what each

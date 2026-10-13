@@ -1,7 +1,7 @@
 /*
  * The tables of what is asked of DOS at every turn: the names of files
- * that the program reads, which src/c/read.c, src/c/setup.c, src/c/start.c
- * and others take from here, and the dialog that src/c/system.c shows for
+ * that the program reads, which read.c, setup.c, start.c
+ * and others take from here, and the dialog that system.c shows for
  * the disk of a drive that shares the floppy drive with another.
  *
  * From VCSUB3.INC.

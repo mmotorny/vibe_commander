@@ -79,7 +79,7 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);
 u32 TotSel(u16 panel);                                  /* files.c */
 void Help00(void);                                      /* help.c */
 
-/* What src/c/keys_t.c has of the menu: the name of the menu file, which
+/* What keys_t.c has of the menu: the name of the menu file, which
    F34_40 and the editor have too, with the title of the menu behind it,
    and the box that says that no menu file was found. And two names that
    are copied with what follows them: that of the list file, which is

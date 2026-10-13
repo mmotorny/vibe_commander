@@ -70,7 +70,7 @@ u16 F35_61(u16 answer, u16 place);
    DOS is called if `carry` is not 0, and clear if it is: for a call that
    leaves the flag as it finds it. */
 /* AsmSeg returns the segment of the program's constants, where its
-   texts are (see src/c/dialog.c). SelDrv makes a drive the current one, 0
+   texts are (see dialog.c). SelDrv makes a drive the current one, 0
    for A:, by the call of DOS that the assembly makes without Intr21. */
 
 /* A dialog whose box is not on the screen yet, and which sets what it
@@ -92,7 +92,7 @@ u8 *FilDir(u8 *buffer, u16 directories, u16 files);     /* panel.c */
 u16 ChTree(u16 column);                                 /* treebox.c */
 
 /* Boxes and texts, which OncZoom and Dialog take by their offsets in the
-   segment that the constants are in: those of src/c/copy_t.c, and some of
+   segment that the constants are in: those of copy_t.c, and some of
    deleting. Only the offsets are used here, but for the texts that the
    commands copy from there into what their dialogs show. */
 extern const u8 __far Copy0_S[];        /* " Copy " */
@@ -1383,7 +1383,7 @@ F35_57:
         words = OFFSET(RnMv_S);
         length = 15;
     }
-    /* The title and what follows it, 20 bytes: see src/c/copy_t.c. */
+    /* The title and what follows it, 20 bytes: see copy_t.c. */
     for (i = 0; i < CpVar2 - CpVar1; i++)
         CpVar1[i] = *AT(AsmSeg(), title + i);
     for (i = 0; i < LenStr; i++)

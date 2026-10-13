@@ -1,6 +1,6 @@
 /*
  * The tables of the tree: its title, the name of the file that it is
- * kept in, and the boxes that src/c/treebox.c shows while a disk is read
+ * kept in, and the boxes that treebox.c shows while a disk is read
  * for it and while the file is written.
  *
  * From VCSUB2.INC, the title, and VCSUB3.INC.

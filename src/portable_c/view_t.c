@@ -1,6 +1,6 @@
 /*
  * The tables of the viewer and of the commands that view or edit a file:
- * the texts that src/c/view.c and src/c/edit.c read, and the boxes and
+ * the texts that view.c and edit.c read, and the boxes and
  * dialogs that they hand to DialBox and Dialog by their offsets.
  *
  * From VCVIEW.INC.

@@ -92,7 +92,7 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
 
-/* The tables of the help, in src/c/help_t.c: the title of the window, the
+/* The tables of the help, in help_t.c: the title of the window, the
    box of the error, which Dialog takes by its offset, and for MinMnu the
    buttons under the index and under a page and the numbers of their
    colours. */

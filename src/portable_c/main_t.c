@@ -1,6 +1,6 @@
 /*
  * The tables of the main file: the program's name, what it says to a DOS
- * that is too old, and the boxes of src/c/main.c, which are that of DOS's
+ * that is too old, and the boxes of main.c, which are that of DOS's
  * critical error and that of a drive that is not ready. With them the
  * texts and the button that the boxes of every file name: Error, Ok, and
  * the two lines that stand for a text put in. And two things that are
@@ -22,8 +22,8 @@ const u8 Title_S[] = "\377\016The Volkov Commander, Version 4.05";
 const u8 Vers_S[] = "\r\nThis program requires DOS 3.20 or later.\r\n";
 
 /* The segment of the main data, which the program asks DOS for when it
-   starts and after every command: src/c/start.c writes it here. FatErr of
-   src/c/main.c, which DOS calls with DS anywhere, finds the main data by
+   starts and after every command: start.c writes it here. FatErr of
+   main.c, which DOS calls with DS anywhere, finds the main data by
    it: an interrupt function has DS on this group when it begins, and on
    nothing else that the program could keep a word in. It is the one
    variable of the group, with a value, 0, for the compiler to put it

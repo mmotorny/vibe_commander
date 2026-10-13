@@ -40,7 +40,7 @@ static const u8 CODE Panel_T[2][4] = {{13, 26, 0, 0}, {13, 23, 32, 0}};
 
 /* What stands for the path over a panel of another kind, and what follows
    the path of one that shows only programs. Tree_S is a constant of
-   src/c/treebox_t.c.
+   treebox_t.c.
 
    PtPt10 copies 25 bytes for Progs, which has 7. Behind it here is what
    the original has behind it and so copies too, the two markers of

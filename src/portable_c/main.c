@@ -131,7 +131,7 @@ const u8 __far *FndLet(const u8 __far *text);
    that DOS calls for a critical error; and, in the part that stays in
    the memory, the routine for Ctrl-Break, which only returns, and the
    copy of the first panel that is kept while a command runs, of struct
-   Stays there. And of src/c/main_t.c the box that says a drive is not
+   Stays there. And of main_t.c the box that says a drive is not
    ready, which DialBox takes by its offset. */
 extern const u8 __far AltSr_T[];
 extern const u8 __far Menu_T[];
@@ -1034,7 +1034,7 @@ static u16 F62_02(u16 panel, u16 item, struct Regs STACK *r)
 /* The menu bar, F9, and with `again` Shift-F10, which goes back to the
    item chosen last: an item is chosen there or the bar is left, and the
    command of the item is done. The original jumps to it by the tables of
-   the menus, of src/c/commands_t.c, which have the commands by their
+   the menus, of commands_t.c, which have the commands by their
    numbers here: one for each menu, and two more for the first eight
    items of the Files menu with Shift and with Ctrl held down.
 
@@ -1420,7 +1420,7 @@ void RestVct(void)
 }
 
 /*--------------------- Fatal error ---------------------
-   What src/c/main_t.c has for it: the texts and the two boxes, with
+   What main_t.c has for it: the texts and the two boxes, with
    Retry and Abort or with Ok alone, which go to Dialog by their offsets.
    And the word that says where DS will be on the main data, SecDat. */
 extern const u8 __far Err_S[];

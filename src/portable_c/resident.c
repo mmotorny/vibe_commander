@@ -139,7 +139,7 @@ struct Stays Stays = { { 0 } };
 /* The stack, which is the end of this part: the header of the file names
    it, so the program is on it from its first instruction. The original
    has 100h bytes of it. Compiled code uses more than the assembly did,
-   so the C translation has sixteen times that, and its use needs no care.
+   so the C has sixteen times that, and its use needs no care.
    It is an object of its own, not the last member of Stays, for the name:
    by that tools/mkexe.c and the tests find where it begins, and it ends
    where its segment does, R_BSS, of which it is all.
@@ -168,7 +168,7 @@ u32 CODE Vect21 = 0;
 #pragma aux Vect21 "*"
 
 /* Where the part that goes is entered, when the program starts and when
-   it has run a command: TrnMain of src/c/main.c, which vc.h declares as
+   it has run a command: TrnMain of main.c, which vc.h declares as
    the function that it is, and which is named here as an object, for
    its address. And a text of that part, which is where the file has it
    when the program begins. */
@@ -1385,7 +1385,7 @@ static void Alloc9(void)
    DOS starts, the lowest block that fits and no upper memory, whatever
    it was.
 
-   Not in the translation: the original cannot always make its block as long
+   Not in the C: the original cannot always make its block as long
    as it needs, since its file is shorter than the program in the memory,
    and then asks for a block elsewhere for the part that goes. The
    translation's block holds all of the file, and making it as long as the

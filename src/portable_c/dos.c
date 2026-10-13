@@ -8,9 +8,11 @@
  * assembly, in a #pragma aux of its own, with as little beside it as
  * will do. The registers go into the instruction and come out of it as
  * arguments and as what the function returns; the compiler loads them.
- * Nothing else in the C translation has inline assembly, and no other file
- * calls an interrupt: the rest of the program calls these functions in
- * plain C. The ports of the machine and its interrupt flag are here too.
+ * No other file calls DOS, the BIOS or the mouse driver: the rest of the
+ * program calls these functions in plain C. What other inline assembly
+ * there is, is where interrupts arrive and where COMMAND.COM's is called,
+ * in resident.c, and one instruction of main.c. The ports of the machine
+ * and its interrupt flag are here too.
  * They need no assembly, the compiler has intrinsic functions for them, but
  * they are the machine all the same.
  *
@@ -18,11 +20,11 @@
  * the screen are read and written through far pointers, in plain C,
  * where the program does so (see system.c and window.c).
  *
- * This is where the program will meet another operating system. Until
- * the translation is done nothing here hides DOS: a function is the call
- * of an interrupt and no more, and what the program makes of it is in
- * the routine that calls it. What each function is for is said with it,
- * and which of the services of an interrupt the program uses.
+ * This is where the program will meet another operating system. So far
+ * nothing here hides DOS: a function is the call of an interrupt and no
+ * more, and what the program makes of it is in the routine that calls
+ * it. What each function is for is said with it, and which of the
+ * services of an interrupt the program uses.
  */
 #include "vc.h"
 

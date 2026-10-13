@@ -1,11 +1,11 @@
 /*
  * The tables of the menus' commands: which command an item of a menu is;
- * and the boxes and the dialogs that src/c/commands.c hands to DialBox and
+ * and the boxes and the dialogs that commands.c hands to DialBox and
  * Dialog by their offsets, their texts and their buttons, and the texts
  * that it copies.
  *
  * From VCMENU.INC, in the order that they have there. How a line is
- * marked up is said in src/c/line.c: \377 and a count stand for so many
+ * marked up is said in line.c: \377 and a count stand for so many
  * spaces; \377, a count with 200 added to it, in octal as here, and a
  * character for so many of that character; ^I for a text that the caller
  * names and ^V for the one at TmpErr+1; and ^b and ^r switch a colour.
@@ -29,12 +29,12 @@ static const u8 OkCn_D[5];
 static const u8 MnLoc_D[7];
 static const u8 SvSt_D[5];
 
-/* The commands of the menus. The menu bar, F39_00 of src/c/menu.c, says
+/* The commands of the menus. The menu bar, F39_00 of menu.c, says
    which item was chosen and which of these tables has it: Menu_T names
    them, one for each menu, Menu1_T for the Left and for the Right one,
    and MenuS_T and MenuC_T, which are the first eight commands of the
    Files menu with Shift and with Ctrl held down. An entry is the number
-   of a command, a CMD_ of vc.h, which F39_01 of src/c/main.c hands to
+   of a command, a CMD_ of vc.h, which F39_01 of main.c hands to
    Command, and 0 for a line across the menu. The original has the
    address of the command's label there. */
 static const u16 Menu1_T[15];

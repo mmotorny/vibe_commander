@@ -2,7 +2,7 @@
  * The first of the part of the program that goes while a command runs:
  * room for the header that DOS keeps in front of a block of memory, a
  * paragraph. That part is a block of its own, which the program makes
- * by writing the header (Alloc0 of src/c/resident.c): the original has
+ * by writing the header (Alloc0 of resident.c): the original has
  * it loaded over that paragraph and moves it up.
  *
  * The build links this file first of that part, so the linker puts it

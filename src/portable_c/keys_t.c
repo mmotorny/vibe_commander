@@ -1,8 +1,8 @@
 /*
  * The tables of the keys of the panels: the dialog that asks for a mask
- * to select by and the box that says no file is like it, of src/c/keys.c;
- * the dialog that asks whether to quit, of src/c/enter.c; and what
- * src/c/usermenu.c has of the user menu, the names of the menu file and of
+ * to select by and the box that says no file is like it, of keys.c;
+ * the dialog that asks whether to quit, of enter.c; and what
+ * usermenu.c has of the user menu, the names of the menu file and of
  * the list file, the title of the menu and the box that says no menu file
  * was found; and the keys that begin the speed search, which the main
  * loop looks for. The texts that many boxes name are here too: an empty
@@ -86,7 +86,7 @@ const DIALOG(1) Quit_B = {
    assembly, the beginning of the title. */
 const u8 Menu_F[13] = "VC.MNU\000 User ";
 /* Menu file edit copies the title as 80 bytes (M64_02 of
-   src/c/commands.c), so it is written with the 68 that follow it in the
+   commands.c), so it is written with the 68 that follow it in the
    original: the line of the box below, the texts of the box of the
    drives, and the beginning of the history's title. */
 const u8 User_S[80] =
@@ -109,7 +109,7 @@ const DIALOG(1) UsrEr_B = {
 
 /* The scan codes of Alt with a digit or a letter, which begin the speed
    search: the main loop looks for a key here. The search itself, in
-   src/c/cmdline.c, has them too. */
+   cmdline.c, has them too. */
 const u8 AltSr_T[38] = {
     0x78, 0x79, 0x7A, 0x7B, 0x7C, 0x7D, 0x7E, 0x7F, 0x80, 0x81, 0x82, 0x83,
     0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19,

@@ -1,5 +1,5 @@
 /*
- * The tables of the help: what src/c/help.c hands to Dialog and MinMnu by
+ * The tables of the help: what help.c hands to Dialog and MinMnu by
  * its offset, and the title of its window.
  *
  * From VCHELP.INC.
@@ -34,7 +34,7 @@ const u8 HlMn2_D[] = {
 
 /* The box that says the help file could not be read. What it covers is
    kept behind the 32 bytes that the help has in front of a page: HlpInfo
-   of struct HlpData in src/c/help.c. */
+   of struct HlpData in help.c. */
 static const BOX(4) HlpEr_P = {
     { Err_C, ErInv_C, ErInv_C, 0 },
     4, 0,

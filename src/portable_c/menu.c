@@ -6,7 +6,7 @@
  * F9, Shift-F10 or a click on the first row of the screen shows the bar,
  * and from there on this takes the keys and the mouse until an item of a
  * menu is chosen or the bar is left. What the item does is not here: the
- * main loop finds its command in the tables of src/c/commands_t.c, one
+ * main loop finds its command in the tables of commands_t.c, one
  * for each menu and two more for the commands of the Files menu with
  * Shift and with Ctrl (F39_01 of main.c).
  *
@@ -75,7 +75,7 @@ u16 *Shadow(u16 *cell);                                 /* screen.c */
 
 /* F39_00, the bar itself, is declared in vc.h: see "The commands"
    there. The text of the bar, the names of its menus, is of
-   src/c/bars_t.c. */
+   bars_t.c. */
 extern const u8 __far PtMnu_S[];
 
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
@@ -471,7 +471,7 @@ static void F39_58(u16 menu, u16 panel, u16 *top, u16 size)
    item that was chosen last. `panel` is the current panel. Takes keys and
    the mouse until an item is chosen or the bar is left, and returns the
    menu in the low byte and the item in the next; and in the highest byte
-   which of the tables of src/c/commands_t.c has the command of that item,
+   which of the tables of commands_t.c has the command of that item,
    from 1, or 0 if none was chosen.
    The menu is 1 to 5, the item is counted from 1 with the lines across
    the menu, and LastMnu is given both. The byte below the highest is

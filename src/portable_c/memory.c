@@ -91,7 +91,7 @@ u16 __far *MvsBw(u16 __far *screen, const u8 __far *text, u16 count,
                  u16 color);                            /* screen.c */
 u16 HexDec(u16 number);                                 /* format.c */
 
-/* The buttons of the map and their colours, of src/c/memory_t.c, which
+/* The buttons of the map and their colours, of memory_t.c, which
    MinMnu takes by their offsets; and what the part of the program that
    stays has for the map: the number of programs that have stayed too
    and for each the segment where its vectors are noted, of struct Stays
