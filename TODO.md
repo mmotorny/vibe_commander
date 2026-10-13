@@ -509,8 +509,9 @@ for it, "The setup program": read both first.
     the button of a mouse goes in `StMain00`, the two `goto Main30`
     that go straight back today; and `Exit5`, three, the line that DOS
     writes for a setup file that could not be written.
-  - A, or D with A's dialogs: three of `Exit` for a setup saved whose
-    file is not there, which takes a setting changed without a file.
+  - A: nothing any more. Three of `Exit` were listed, for a setup
+    saved whose file is not there, which takes a setting changed
+    without a file: `setup-missing-saved` runs them in the original.
   - C: nothing, and C is done. The beep of a box that has the flag
     for it, in `Dialog`, which the box "Help contents is not
     available" alone has, runs in `setup-help-pages` and

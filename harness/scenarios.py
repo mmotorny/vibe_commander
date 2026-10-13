@@ -1295,7 +1295,11 @@ with the original:
     setup by itself, with Auto save setup on as that setup has it,
     once something of it changes: Ctrl+F1. The bytes behind a path are
     zeros then, in the original too. A setup that was read from a file
-    and saved again has no such bytes.
+    and saved again has no such bytes. The program that the setup
+    program was started from does the same without being left, since
+    it goes by what was saved at once: setup-missing-saved switches a
+    panel off for that, the right one, since the left one is what
+    covers the line of the command (see above).
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -6196,6 +6200,30 @@ SCENARIOS = {
             "F3",                         # the character
             "Esc",
             "F10",                        # Exit: nothing has changed
+        ),
+        setup=True),
+
+    "setup-missing-saved": Scenario(
+        "The setup program without a setup file, with an option of the "
+        "Configuration changed and the setup saved: the file is made, "
+        "and the program goes by it, with its menu bar shown and with "
+        "its own setup saved by itself as soon as a panel changes",
+        steps=(
+            '"del" Space "d:\\vc\\vc.ini" Enter',
+            _SETUP,                       # the setup file ... not found.
+            "Enter",                      # Ok: the menu
+            "F2",                         # the setup without a file
+            "Down Down Down Space",       # Menu bar visible
+            "Enter",
+            "F10",                        # save the current setup?
+            "Enter",                      # Save: the menu bar is there
+            # The file that the setup program has made of its own setup
+            # has bytes that only the original has (see the top): Auto
+            # save setup is on in that setup, and the program writes the
+            # file anew. It is the right panel that goes: the left one
+            # covers the line of the command that started the setup
+            # program.
+            "Ctrl+F2",
         ),
         setup=True),
 

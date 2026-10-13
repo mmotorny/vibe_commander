@@ -1150,14 +1150,6 @@ SETUP_BATCHES = [
                 "piece of the plan that brings Main50 takes this out "
                 "(TODO.md)"),
             **dict.fromkeys(
-                (0x101E, 0x1021, 0x1023),
-                "Exit, where the setup is saved and its file is not "
-                "there: without a file the setup program has the setup "
-                "that it makes itself, which the keys of its menu "
-                "cannot change, and what has not changed is not saved. "
-                "It takes a dialog of the options, which are still to "
-                "come"),
-            **dict.fromkeys(
                 (0x104C, 0x104F, 0x1051),
                 "Exit5, a setup file that could not be written: no "
                 "scenario has one yet. The piece of the plan that has "

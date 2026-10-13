@@ -336,6 +336,7 @@ TREES = {
             "setup-country": _NO_SETUP_YET,
             "setup-options-russia": _NO_SETUP_YET,
             "setup-delay-file": _NO_SETUP_YET,
+            "setup-missing-saved": _NO_SETUP_YET,
             # The help of the setup program, F1, is there. This one shows
             # it over a dialog of the options, piece A, and goes with
             # the commit that brings the second of the two.
