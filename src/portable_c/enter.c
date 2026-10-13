@@ -285,7 +285,7 @@ struct Onward F21_10(u16 panel)
         if (command == 0)
             return To(NEXT_FUNC04);
         command--;
-        *(u8 *)command = ' ';
+        *MD_POINTER(command) = ' ';
         if (Run_00(command, 0))
             return F21_30();
         return To(NEXT_FUNC04);
@@ -372,7 +372,8 @@ static struct Onward F23_02(u16 panel, u16 address)
             file->NameF[i] = name[i];
         file->NameF[12] = 0;
         file->AttrF = ATTR_DIRECTORY;
-        if ((u16)(u32)name > (u16)(u32)(wcb->WinPath + 3))
+        if (OFFSET_IN_SEG(panel, name)
+            > OFFSET_IN_SEG(panel, wcb->WinPath + 3))
             name--;
         *name = 0;
     }
@@ -425,7 +426,7 @@ static struct Onward ChDir(u16 panel, const u8 __far *path)
 
 struct Onward F24_01(u16 panel, u16 path)
 {
-    return ChDir(panel, (const u8 *)path);
+    return ChDir(panel, MD_POINTER(path));
 }
 
 /* ^\: the root of the current drive. */
@@ -469,7 +470,7 @@ static void F27_07(const u8 *text, u16 cursor)
    F27_06. */
 static void F27_06(const u8 *entry)
 {
-    md.HstAdr = (u16)entry;
+    md.HstAdr = MD_PLACE(entry);
     md.DosBuf[0] = 0;
     md.DosBuf[1] = 0;
     F27_07(entry, 0);
@@ -479,7 +480,7 @@ static void F27_06(const u8 *entry)
    command line has from the history, if there is one. */
 struct Onward F25_00(void)
 {
-    const u8 *entry = (const u8 *)md.HstAdr;
+    const u8 *entry = MD_POINTER(md.HstAdr);
     u16 count = 256;
     u8 c;
 
@@ -487,7 +488,7 @@ struct Onward F25_00(void)
         c = *entry++;
     while (--count && c != 0);
     if (*entry == 0)
-        entry = (const u8 *)md.HstAdr;
+        entry = MD_POINTER(md.HstAdr);
     F27_06(entry);
     return To(NEXT_FUNC05);
 }
@@ -500,19 +501,20 @@ struct Onward F26_00(void)
     u16 count = 256;
     u8 c;
 
-    if (entry >= (u16)md.HstBuf) {
-        if (entry == (u16)md.HstBuf) {
-            F27_06((const u8 *)entry);
+    if (entry >= MD_PLACE(md.HstBuf)) {
+        if (entry == MD_PLACE(md.HstBuf)) {
+            F27_06(MD_POINTER(entry));
             return To(NEXT_FUNC05);
         }
         entry--;
-        do
-            c = *(const u8 *)entry--;
-        while (--count && c != 0);
+        do {
+            c = *MD_POINTER(entry);
+            entry--;
+        } while (--count && c != 0);
         entry++;
     }
     entry++;
-    F27_06((const u8 *)entry);
+    F27_06(MD_POINTER(entry));
     return To(NEXT_FUNC05);
 }
 
@@ -533,7 +535,7 @@ struct Onward F27_00(u16 panel)
 
     if (md.DosBuf[0] == 0)
         goto F27_05;
-    entry = (const u8 *)md.HstAdr;
+    entry = MD_POINTER(md.HstAdr);
     if (cursor != 0) {
         c = md.DosBuf[cursor - 1];
         if (CmpSym(c) || c == '@')

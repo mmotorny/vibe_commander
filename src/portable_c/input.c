@@ -566,8 +566,8 @@ u16 Search(u16 segment, u16 at, u16 begin, u16 end, u16 step, u16 key)
         tried[i] = typed[i];
     if ((key & 0xFF) != 0x0A)
         *(u16 *)tried = EdLin(key, tried + 2, *(u16 *)tried, 12).cursor;
-    length = (u16)(u32)MvzLine(md.MenuBuf, tried + 2, 13)
-             - (u16)(u8 *)md.MenuBuf;
+    length = MD_PLACE(NEAR(MvzLine(md.MenuBuf, tried + 2, 13)))
+             - MD_PLACE(md.MenuBuf);
     PathLin(md.MenuBuf);
     if (length != 0) {
         if (end <= begin)
