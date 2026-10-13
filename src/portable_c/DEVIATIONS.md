@@ -470,6 +470,8 @@ it went.
 | `StInit15`, `stmain.c` | DOS 3Dh, 3Fh and 3Eh, the setup file read | 3Dh: BX, CX, SI and DI as the help file read and the name copied left them. 3Fh: AL the low byte of the handle. 3Eh: AL the low byte of what was read, CX and DS:DX the count and the buffer still |  | BX, CX, SI and DI as they come at 3Dh. AL 0 at 3Fh and 3Eh; CX and DX 0 at 3Eh |
 | `StExit`, `stmain.c` | BIOS 01h, the cursor in its shape again; DOS 4300h, 3Ch, 40h and 3Eh, the setup file written; 09h, the line that says it could not be | 01h: DX the rows of the screen and 80, of the screen put back. 4300h: BX the sum of the file. 3Ch: AL as 4300h left it, or 0 for a file that is not there; BX the sum still. 40h: AL the low byte of the handle. 3Eh: AL the low byte of what was written, CX and DS:DX the count and the buffer still. 09h: AL, BX and CX as the calls before left them |  | DX 0 at 01h. AL 0 at 3Ch, 40h, 3Eh and 09h; BX as it comes at 4300h and 3Ch; CX and DX 0 at 3Eh; BX and CX as they come at 09h |
 | `StSetup`, `stmain.c` | BIOS 0Fh and 03h, the page and the cursor, where the setup notes the row and the shape of the cursor | 0Fh: AL and BX as making the table of the small letters left them. 03h: AL the mode, as 0Fh left it; BL, CX and DX as the code before left them |  | AL 0 at both; BX 0 at 0Fh, and BL, CX and DX 0 at 03h |
+| `StF07_10`, `stcolor.c`, of the setup program's `F07_16` | BIOS 06h and 07h, the lines of the list of colours moved by one | BL the column of the lines, 8 |  | BL 0 |
+| `StF07_01`, `stcolor.c`, of the setup program's `F07_57` | BIOS 01h, the shape of the cursor put back when the list of colours is left | AL the low byte of the key that left the list, 1Bh for Esc and 0 for F10, or 0 behind the mouse; BX and DX where the box of the list is and its size |  | AL, BX and DX 0 |
 | `OpenFil`, `system.c` | DOS 3Dh, a file opened, both times | BX the service and the mode, as in AX |  | BX as it comes |
 | `SetPth`, `system.c` | DOS 47h, the current directory | AL the drive, 1 for A: |  | AL 0 |
 | `Fantom`, `system.c` | DOS 440Fh, the drive that a unit goes by, three times | BH the other of the two drives |  | BH 0 |
@@ -510,7 +512,10 @@ it:
   said to want the video mode there. `CursorShape` hands over 0, as the
   original does where an input line sets the shape, by `ChgCur` and
   `CurShp`; in `IniData` of `start.c` and in `Blank` the original has
-  the mode there, left from the call that asked for it.
+  the mode there, left from the call that asked for it. The original's
+  setup program has no mode there either where it puts the shape back
+  behind its list of colours, but what the key or the mouse left:
+  `StF07_01` of `stcolor.c`.
 - CX and DL of BIOS 1130h, the font of an EGA, which a BIOS that does
   not know the call hands back as they came. `ScreenFont` puts 16 and 0
   there, so such a BIOS is taken to have a font of 16 lines and to say

@@ -1264,6 +1264,24 @@ SETUP_BATCHES = [
                 "DEVIATIONS.md)"),
         },
     ),
+    Batch(
+        title="The setup program: the list of the colours of a palette",
+        source="stcolor.c",
+        # F05_00 is the three items of the menu, F5, F6 and F7, and the
+        # list behind them as far as it is left, F07_57: the code of the
+        # setup program up to F07_60, the first of the routines that it
+        # calls. The menu calls three functions for it, one for each
+        # palette; the third, StF07_00 for Laptop, is of the next batch,
+        # which has the scenario that enters it.
+        routines=("F05_00", "F07_60", "F07_65", "F07_70", "F07_75",
+                  "F07_80", "F07_85"),
+        functions=("StF05_00", "StF06_00"),
+        unreached=dict.fromkeys(
+            (0x07F2, 0x09C7, 0x0B39),
+            "for a monochrome display, mode 7, which has \"Monochrome\" "
+            "for its name and the second colour of each pair in a "
+            "palette: the bench has a colour display"),
+    ),
 ]
 
 

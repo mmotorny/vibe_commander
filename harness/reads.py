@@ -248,6 +248,28 @@ REVIEWED = {
     ("view.c", "EdFl_S"): (ZERO, "an include line, and a title"),
     ("view.c", "RunEr_S"): (ZERO, "an include line"),
     ("view.c", "Run1_S"): (ZERO, "an include line"),
+    # The colours of the setup program.
+    ("stcolor.c", "StPalets"): (240, "a colour of one of the six "
+                                     "palettes, 40 colours of six bytes "
+                                     "each, which the object begins "
+                                     "with: by the place that the colour "
+                                     "table has it at"),
+    ("stcolor.c", "StColrs_S"): (OWN, "the names of the items, found by "
+                                      "counting their zeros up to an item "
+                                      "that there is, and counted up to "
+                                      "the empty name that ends them"),
+    ("stcolor.c", "StColNm_S"): (OWN, "the names of the colours, found by "
+                                      "counting their zeros: a colour "
+                                      "below 16, and 16 or 17 for what "
+                                      "Shadow can be besides, of 18"),
+    ("stcolor.c", "StColNm_P"): (1, "the colour of a colour's name, and "
+                                    "of \"on\" with one put in: neither "
+                                    "asks for another colour"),
+    **dict.fromkeys(
+        (("stcolor.c", "StColMd_S"), ("stcolor.c", "StMonMd_S"),
+         ("stcolor.c", "StBwPal_S"), ("stcolor.c", "StLapTp_S")),
+        (ZERO, "the name of the display or of the palette, which "
+               "StF07_01 writes as far as its zero")),
     # The help of the setup program.
     ("sthelp.c", "StHelp_F"): (20, "13 bytes from the seventh on, the "
                                    "header of the help file"),

@@ -337,7 +337,6 @@ TREES = {
             "setup-options-russia": _NO_SETUP_YET,
             "setup-delay-file": _NO_SETUP_YET,
             # The colours, piece B.
-            "setup-colors": _NO_SETUP_YET,
             "setup-colors-items": _NO_SETUP_YET,
             "setup-colors-grid": _NO_SETUP_YET,
             "setup-colors-mouse": _NO_SETUP_YET,

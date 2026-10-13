@@ -160,11 +160,6 @@ void StF03_00(void) { StToCome(); }
 void StF04_00(void) { StToCome(); }
 void StF09_00(void) { StToCome(); }
 
-/* stcolor.c: the palettes, Black & White, Color and Laptop. */
-void StF05_00(void) { StToCome(); }
-void StF06_00(void) { StToCome(); }
-void StF07_00(void) { StToCome(); }
-
 /*------------- What DOS had on the screen -------------*/
 
 /* A row of what DOS had on the screen when the setup was entered:
