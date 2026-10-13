@@ -661,29 +661,29 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,084 bytes |
-| as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 64,028 bytes |
-| The relocations in its header, which DOS applies | 1,033 |
-| What it keeps of the memory while a command runs: the program and its panels | 206,704 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,832 bytes |
-| The code segment `CTEXT` ends at | D0E9h, 7,959 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C76Ah, 10,390 bytes below the limit, F000h |
+| `VC.EXE` | 196,614 bytes |
+| as a multiple of the original's 65,090 bytes | 3.02 |
+| more than the C translation's 133,056 bytes | 63,558 bytes |
+| The relocations in its header, which DOS applies | 1,032 |
+| What it keeps of the memory while a command runs: the program and its panels | 206,256 bytes |
+| What DOS has for a command then, on the bench of the tests | 219,280 bytes |
+| The code segment `CTEXT` ends at | D0D9h, 7,975 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C5B6h, 10,826 bytes below the limit, F000h |
 | Inline assembly | 55 instructions in 9 pieces: 55 in 9 of `dos.c` |
 | Lines of `#pragma aux` | 17, of which 6 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
 | `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 752, 106, 262, 92 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
-| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,587 bytes, of which the extender's stub is 27,536 |
-| Its code, and what the file has of its data | 133,025 and 104,603 bytes |
-| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,616 bytes |
-| The addresses in it that the extender sets when it loads it | 5,316 |
+| The program of 32 bits, `build/portable_c32/VC.EXE` | 307,375 bytes, of which the extender's stub is 27,536 |
+| Its code, and what the file has of its data | 132,502 and 104,563 bytes |
+| What it has of the memory above the megabyte when it is loaded: its code and its data, with what has no value | 893,053 bytes |
+| The addresses in it that the extender sets when it loads it | 5,292 |
 | The words of its boxes, dialogs and tables that are pointers, four bytes where the original has a word of two; and how many of them are among those addresses, the others holding a number: as the test `portable_c32-data` holds them | 643 and 555 |
 | Its stack | 16,384 bytes |
-| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,184 and 16,388 bytes |
-| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,332 and 2,347 bytes |
-| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 401,071 bytes, 224,088 of them code |
+| How far its tables may grow, in front of `Title_S` and behind it, before the offset of one wraps round, as the test `portable_c32-layout` holds them | 24,176 and 16,420 bytes |
+| How much more may stand between `Title_S` and the main data, and between the main data and the end of `IniSave`, by the same test | 16,352 and 2,347 bytes |
+| The same program compiled for finding a fault, `build/portable_c32/debug/VC.EXE` | 400,851 bytes, 223,238 of them code |
 | Inline assembly of `dos32.c`, which the program of 32 bits has in place of that of `dos.c` | 98 instructions in 13 pieces |
 
 <!-- The end of the figures. -->
@@ -882,7 +882,7 @@ of the service among them, and hands it to `Intr21` or `Int21d`, and so
 for the BIOS: 348 calls in 25 files when this began, each of which knows
 DOS.
 
-In the portable C that place is `src/portable_c/sys.h`: 99 functions
+In the portable C that place is `src/portable_c/sys.h`: 97 functions
 named for what is asked, with no register, no number of a service and no
 interrupt in them, and no word of Open Watcom: the test `portable_c-host`
 has the file clean. `dos.c` is those functions for DOS on a PC, and the
@@ -903,7 +903,7 @@ file beside it.
 | What the system asks the program, and the keys that stop one: who is asked about a device that fails, and who has Ctrl-Break, noted, taken and given back; Ctrl-C taken; the machine let interrupt the program again; what the system is to put back when it has ended the program, said, taken and given back | 11 |
 | The console: a character and a text where the cursor is | 2 |
 | The keyboard: a key that waits, a key taken, Shift and the like, Ins | 4 |
-| The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, the font of an EGA and what Print Screen prints of its rows, where the cells are and the cells themselves | 17 |
+| The screen: its mode and page, the cursor, a window scrolled, a cell read and written, a character typed, whether the display is an EGA and how many rows its font gives it, where the cells are and the cells themselves | 15 |
 | The mouse: whether there is one, its pointer shown, placed and shaped, where it is | 8 |
 | The timer | 1 |
 
@@ -1018,6 +1018,7 @@ steps that went there, against the original's golden without them:
 |---|---|---|
 | 7 | The map of the memory, Alt+F5, Memory info of the Commands menu: `memory.c` and `memory_t.c`. And the watch on DOS that it rested on, in `resident.c`: the entry of INT 27h, `New27` with `Int27`; in the entry of INT 21h the three calls by which a program is run, stays in the memory or gives a block back; the list of the programs that have stayed and their records, `ExeProg`, `AddProg`, `FreeBlk`, `ChkBlk`, `Release`; `GetStat`; and the programs released when the program is left | Listing what DOS has given to whom, and getting a program out of the memory again that was run from here and has stayed, which DOS had no way to do |
 | 11 | The two lines on the memory in the Info panel, "Bytes Memory" and "Bytes Free": the part of `PutInf` of `info.c` that wrote them, with their three texts; and for the first, `MemEnd` of `sys.h` and `dos.c`, which read in the PSP where the memory ends, with its call in `IniData` of `start.c` | Saying how much memory DOS has for programs and how much of it the next command gets. The panel is no row shorter for it: what the program is based on stands below its title, the line under the title a row further down, and the row below that is empty |
+| 12 | EGA lines, Alt+F9, of the Commands menu: `F69_00` of `commands.c`; its name in the key bar with Alt held, and the key bar that the panels had on a display without such lines; and `ScreenSmallFont` and `ScreenPrintAll` of `sys.h`, with their bodies in `dos.c` and `dos32.c` | Giving the screen 43 rows on an EGA or 50 on a VGA, and 25 again, by having the BIOS load a font of 8 lines, and telling the Print Screen key of the rows. The program still asks how many rows the screen has, when it starts and behind every command, and draws on as many as it finds, up to 50: the rows are to come from the system that it runs on. No scenario has it on more than 25 for now |
 
 What was left of the watch then was what was not for the map: the
 program still took INT 21h, for its own call, by which a setup program

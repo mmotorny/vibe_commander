@@ -49,7 +49,14 @@ out again (show.py --changes is how):
   - "F9 o f" switches Full screen, which is on: off, a panel has ten lines
     of files. In the Configuration dialog four Tabs go to "Menu bar
     always visible". Alt+F9 switches to 50 lines and back; a screen is
-    recorded as its first 25 rows whatever it has.
+    recorded as its first 25 rows whatever it has. In the portable C
+    Alt+F9 is no key (src/portable_c/DEVIATIONS.md, 12), and that tree
+    has no way to a screen of 50 lines: a scenario that goes there is
+    not run for it, or is run without its steps from the one Alt+F9 to
+    the other, left_out_of of deviations.TREES, and what DOS had shown
+    is then not moved off the screen as the original moves it when it
+    goes back to 25. TODO.md has the list, "The tall screen: untested
+    in the portable C until a system gives it rows".
   - F5 on a file and a name typed makes a copy next to it that keeps the
     time stamp, so copies are a way to more files: C:\\WORK lists nine
     entries. Ins selects and goes down. F8 on what is selected asks

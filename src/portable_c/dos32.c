@@ -1751,16 +1751,6 @@ struct Font ScreenFont(void)
     return font;
 }
 
-void ScreenSmallFont(void)
-{
-    Show(0x1112, 0, 0, 0);
-}
-
-void ScreenPrintAll(void)
-{
-    Show(0x1200, 0x20, 0, 0);
-}
-
 u16 ScreenPageStart(void)
 {
     return *(const u16 *)0x44E;

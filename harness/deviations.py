@@ -618,6 +618,19 @@ _NO_CALL = ("it shows the program asked for its data by another "
             "the original's setup program asks: the portable C has the "
             "setup in itself and answers no such call")
 _FDAPM = '"a:\\freedos\\bin\\fdapm" Space "apmdos" Enter'
+# EGA lines is gone from the portable C (DEVIATIONS.md, 12), and the
+# screen of more than 25 rows is not tested there for now, on the user's
+# word of 13 October 2026: until a system gives the program such a
+# screen (TODO.md, "The tall screen: untested in the portable C until a
+# system gives it rows").
+_NO_LINES = ("it is about a screen of 50 rows, which the original gets by "
+             "EGA lines, Alt+F9: the portable C has no such command, and "
+             "nothing else on the bench gives it such a screen. On the "
+             "user's word of 13 October 2026 the tall screen is not "
+             "tested in the portable C until a system gives it rows")
+_TALL = ("EGA lines, Alt+F9, and what the scenario does on the screen of "
+         "50 rows before the key gives it 25 again: Alt+F9 is no key of "
+         "the portable C")
 _NO_SETUP_YET = ("the portable C has no setup yet: what the scenario "
                  "shows of it is still to be translated")
 # The two dialogs of the setup that three settings have gone from in the
@@ -652,7 +665,8 @@ TREES = {
     # the memory, Alt+F5, and no watch on the programs that stay in the
     # memory; and it has the setup program in itself, an item of its
     # Options menu, so it answers no call of DOS of its own and does not
-    # take INT 21h.
+    # take INT 21h; and it has no EGA lines, Alt+F9, which is the one
+    # way that a scenario has to a screen of more than 25 rows.
     "portable_c": Declared(
         not_run={
             "memory": "it switches Memory allocation off and shows the "
@@ -678,6 +692,15 @@ TREES = {
                          "behind the program's entry of INT 21h: the "
                          "portable C does not take that interrupt, and no "
                          "call of DOS passes it",
+            "setup-lines": _NO_LINES + ". It shows the setup over what "
+                           "DOS has shown there, and the corner where "
+                           "the original's setup program writes its key "
+                           "bar a cell too far, which the portable C "
+                           "does not do",
+            "setup-colors-lines": _NO_LINES + ". It shows the setup's "
+                                  "list of colours with room for all 39",
+            "setup-help-lines": _NO_LINES + ". It shows the setup's help "
+                                "in a window of 38 lines",
             # The scenarios of the setup program, until the tree has the
             # code that each shows: an entry goes with the commit that
             # makes its scenario pass (TODO.md, "The setup program in the
@@ -693,6 +716,10 @@ TREES = {
                 ("F9 c i", "Esc"):
                     "Memory info of the Commands menu, and the map left: "
                     "the menu has no line that I chooses, and stays open",
+                ("F9 c e", "F9 c e"):
+                    "EGA lines of the Commands menu, chosen twice, for 50 "
+                    "rows and for 25 again: the menu has no line that E "
+                    "chooses, and stays open",
             },
             "mouse-middle": {
                 ("Alt+F5", "MiddleClick@30,8"):
@@ -710,6 +737,38 @@ TREES = {
             "ended": {
                 ("Alt+F5", "Esc"):
                     "a look at the map of the memory, for what has stayed",
+            },
+            # EGA lines, Alt+F9, is gone (DEVIATIONS.md, 12), and with
+            # it the one way that a scenario has to a screen of more
+            # than 25 rows: where a scenario passes through such a
+            # screen on the way, the steps there are left out, from the
+            # key that makes it tall to the key that makes it 25 rows
+            # again.
+            "help-keys": {
+                ("Alt+F9", "F1", "End", "F10", "Alt+F9"): _TALL,
+            },
+            "scroll": {
+                ("Alt+F9", "Alt+F9"): _TALL,
+            },
+            "user-menu": {
+                ("Alt+F9", "F2 Enter", "Esc", "Alt+F9"): _TALL,
+            },
+            "history-drives": {
+                ("Alt+F9", "Alt+F8", "Esc", "Alt+F9"): _TALL,
+            },
+            "menu-panel": {
+                ("Ctrl+o", "Alt+F9", "Alt+F9", "Ctrl+o"):
+                    _TALL + ". They are the last four steps, with the "
+                    "panels switched off before and on again behind: "
+                    "the command line left high up by 50 rows",
+            },
+            "mouse-help": {
+                ("Alt+F9", "Click@1,49", "Click@20,30",
+                 "Click@20,10>20,48*20", "Click@20,43 Click@20,43",
+                 "Click@30,12>30,47*8", "MiddleClick@70,40", "Move@40,40",
+                 "Alt+F9"):
+                    _TALL + ". They are the last nine steps: the mouse "
+                    "in the help below the 25th row",
             },
         },
         # The program's name (DEVIATIONS.md, 10), and with it the top
@@ -812,6 +871,18 @@ TREES = {
                     (("Click@42,8",),
                      "Alt alone selects menu is two rows further up, "
                      "with the other Keyboard options"),
+            },
+            # The Commands menu is two lines shorter, without Memory
+            # info and EGA lines (DEVIATIONS.md, 7 and 12), and the
+            # items below them are that much further up.
+            "mouse-menu": {
+                ("Click@30,12",):
+                    (("Click@30,10",),
+                     "Compare directories, which is dark beside the "
+                     "Info, is two rows further up in the Commands menu, "
+                     "where Memory info and EGA lines have gone from "
+                     "above it: row 12 is Menu file edit there, which a "
+                     "click would choose"),
             },
             "setup-screen": {
                 ("Right", "Space", "Left", "Right Down Down Down", "Space",

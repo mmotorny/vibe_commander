@@ -25,14 +25,6 @@ box.c, MinBx5: divide
     What is shifted is cut to a byte first, so the half is below 128; and
     step is 4 at the most, by the loop of MinBox, which alone calls this.
 
-commands.c, F69_00: index
-    | from = md.ScrBuf + less * 80;
-    less is below was, which is md.Lines as it was, a byte.
-
-commands.c, F69_00: index
-    | to = md.ScrBuf + was * 80;
-    was is md.Lines as it was, a byte.
-
 copy.c, F35_50: compare
     | for (i = 0; i < CpVar2 - CpVar1; i++)
     CpVar1 and CpVar2 are places of TmpBuf that are written at the top of

@@ -809,7 +809,7 @@ for the portable C, and `ended` has its patch made again.
 | No Memory allocation and no TSR manager in S2, no Screen output in S3: entries 1, 7 and 5, since E2 | Ten scenarios, of A, D and 0a, that show the two dialogs: see "Piece E2" below |
 | The program's box for a critical error of DOS while setup is open, where the original's setup program leaves the error to DOS's own words. And setup's calls for files are asked with the program's errors, where the original's setup program calls DOS itself: a drive that is not ready has the program's box, a call given up there is the error 53h, and DOS is asked what was wrong behind a call that failed | No scenario |
 | The setup that setup makes without a good file, and for Set default configuration, has zeros in the 64 bytes behind the path of each panel, where the original has what stands behind a table of 24 bytes in the setup program: see the bugs below. A setup file saved of it differs from the original's in those bytes. **This waits for the user's word**: it was met while 0b was made, and is not among the seven things decided | No scenario: `setup-defaults` ends with the file as a program started anew saves it, where the bytes are zeros in the original too |
-| The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | `setup-lines`, with a patch of the original's golden for the corner: one cell, on two screens |
+| The key bar of setup is 80 cells, the main program's routine: the 81st cell of the setup program's is a bug that is fixed, on the user's word of 13 October 2026. Entry 9 | `setup-lines`, with a patch of the original's golden for the corner: one cell, on two screens. Not run for the portable C since EGA lines went, and the patch with it: "The tall screen: untested in the portable C until a system gives it rows", below |
 | The directory of the setup file is the one that the program has, made by the main program's rule: in capitals, and with a backslash behind whatever `VC=` names, where the setup program adds none behind a colon | No scenario: the bench has no `VC=` |
 
 ### The bugs of the original that stay
@@ -1346,7 +1346,9 @@ on each of the last two screens, the corner, and no other row.
 It landed as a golden of the tree's own, like the fifteen others of
 that kind, and is a patch of the original's golden now, as they are:
 `harness/goldens/portable_c/setup-lines.patch`, one cell on two
-screens.
+screens. (The scenario is not run for the portable C since EGA lines
+went, and the patch is in the history: see "The tall screen: untested
+in the portable C until a system gives it rows".)
 
 **A seventh that went.** `setup-save-new`, a setup saved without a
 setup file, was written here while piece A had the same thing in hand,
@@ -1877,10 +1879,12 @@ left open:
   would have DOS write its own over the panels. The scenarios that go
   by it: `drive-b`, `phantom`, `not-ready`, `diskette-command`,
   `delete-mask` and others type B: to get to a drive that refuses.
-- Whether EGA lines stays, Alt-F9, is the user's to decide, and the
-  call in it that has the BIOS print every line of such a screen at
-  Print Screen (`F69_00` of `commands.c`, by `ScreenPrintAll` of
-  `sys.h`) belongs to that decision.
+- EGA lines, Alt-F9, is gone, on the user's word of 13 October 2026
+  (`src/portable_c/DEVIATIONS.md`, 12), with the call in it that had
+  the BIOS print every line of such a screen at Print Screen: `F69_00`
+  of `commands.c`, and `ScreenSmallFont` and `ScreenPrintAll` of
+  `sys.h`. "The portable C: what EGA lines has left" below has what
+  that left open.
 - Names that say what no longer is: `resident.c`, of which nothing is
   resident; `FreMem2`, which is how many paragraphs it is from the main
   data to the end of the block of the panels and the viewer, so that
@@ -1921,13 +1925,17 @@ in the memory are gone from the portable C
   otherwise again. It was not part of the map, and stays; it is a
   thing of DOS's memory all the same.
 - In `mouse-menu` the click that tried a dark item of the Commands
-  menu, at a place of the screen, is on the line across the menu in the
-  portable C, whose menu is a line shorter: nothing is chosen either
-  way, and no scenario clicks a dark item of that menu for the portable
-  C. A dark item of the Files menu is tried by its key, in `menu`.
+  menu, at a place of the screen, was on the line across the menu in
+  the portable C while its menu was one line shorter, and nothing was
+  chosen either way. With EGA lines gone too the place is Menu file
+  edit, and the tree's click is put where the dark item is, two rows
+  further up (`in_place_in` of `harness/deviations.py`): a dark item of
+  that menu is clicked for the portable C again. A dark item of the
+  Files menu is tried by its key, in `menu`.
 - The original's help file, which the portable C reads, has its pages
-  on the map of the memory and on Memory allocation still. The file is
-  the original's; a help of the portable C's own is not in hand.
+  on the map of the memory, on Memory allocation and on EGA lines
+  still. The file is the original's; a help of the portable C's own is
+  not in hand.
 
 What the items below say of the part that stays in the memory, under
 "Known and not dealt with", they say of the C translation, `src/c/`.
@@ -1939,6 +1947,142 @@ whoever calls DOS, holds for the portable C as it is written there;
 "Where the size of the translation becomes other behaviour", which is
 the second item above now; and "How the part that stays in the memory
 is laid out by C".
+
+## The portable C: what EGA lines has left
+
+EGA lines, Alt+F9, is gone from the portable C, on the user's word of 13
+October 2026 (`src/portable_c/DEVIATIONS.md`, 12): `F69_00` of
+`commands.c` with its key, its line of the Commands menu and its name in
+the key bar, and `ScreenSmallFont` and `ScreenPrintAll` of `sys.h`.
+`src/c/` and `src/asm/` keep it, and every scenario and golden of the
+original is as it was. What that has left open:
+
+- The rows of the screen are to come from the system, later. Today the
+  program finds them as the original does, in `IniData` of `start.c`,
+  when it starts and behind every command: `ScreenEga`, and of such a
+  display `ScreenFont().last`, 50 at the most. That is where a system's
+  answer comes in, and those two functions are of the PC and go then.
+  The 50 is `MaxLins` of `vc.h`, which is how long the screen buffer
+  and what is kept of the screen are (`ScrBuf`, `UserScr`, `WinBuf`,
+  `ErrBuf`, `InfBuf`): more rows than that want more than a number, and
+  so does a screen that is not 80 columns, which is written in
+  everywhere.
+- `md.TstEGA` is set and read in `IniData` and nowhere else now. It
+  keeps its byte, as the main data is laid out as the original's.
+- The key bar 9 of `KeyB_T` in `bars.c` is an empty place in the table,
+  where the original has the bar of the panels for a display without
+  EGA lines. It was not taken out: a bar is known by its number in the
+  headers of the dialogs and in the code, and 10 to 14 would each be
+  another. The row of the names that it had is out of `KeyC_T`, since
+  only `KeyB_T` names a row.
+- Print Screen on a tall screen prints what whoever made it tall told
+  the BIOS: the program says nothing of it. Nothing was tried.
+- `MouseRows` of `sys.h` is asked only where the screen has other rows
+  than 25, by `IniMous` of `mouse.c` and by the setup's start in
+  `stmain.c`: no scenario of the portable C has it asked now. The toy
+  of `harness/trial32` still asks it of both `dos.c` and `dos32.c`.
+
+What the work met, for whoever takes the next thing out:
+
+- A second line out of a menu moves a click as well as a key. Step 5
+  of `mouse-menu` clicks a dark item at a place of the screen; with one
+  line gone the place was the line across the menu, where nothing is
+  chosen either, and nobody had to look. With two it is Menu file edit,
+  which the click chose: a box came up and the rest of the scenario
+  went astray. `python3 harness/compare.py build/portable_c/VC.EXE`
+  showed it as a screen with a box that no entry explains. The step is
+  now put where the item is (`in_place_in`), and the pointer's cell is
+  in the patch.
+- A scenario written twice in one table of `harness/deviations.py`,
+  `"menu-items": {...}` in `left_out_of` for 7 and again for 12, is the
+  second alone: Python takes the last of two keys of a dict and says
+  nothing, and the steps of 7 were pressed again. Add to the entry that
+  is there.
+- A command that changes what DOS has shown changes screens long after
+  it. The original's two steps of EGA lines in `menu-items` leave
+  nothing of DOS's screen, and six steps on, where a panel is off, the
+  golden has an empty half there and the tree its banner: two rows of
+  a patch. The other four scenarios that pass through 50 rows have
+  panels over that half, or nothing in it, and need none.
+- The data's test takes an entry for a table that is renumbered as one
+  byte for each cell: `_cells` of `harness/datacheck.py` writes those.
+  The cells were worked out by a script that read the table of
+  `src/c/bars.c`, which is the original's, and the table of
+  `src/portable_c/bars.c`, and printed where they differ.
+- A page out of the toy of `harness/trial32` is a step out of `STEPS`
+  of `both.py`: Tab went, which turned the page of the small font.
+- No function of a batch ran on the tall screen alone: the scenarios'
+  test of each build passes with nothing more in `harness/ported.py`
+  than `F69_00` under `GONE`. What only a tall screen runs is branches
+  of functions that run anyway, which that test does not count; they
+  are listed below.
+- A flaw of the tests under load, seen once: in the whole suite, with
+  the tests of four other checkouts on the same four processors and a
+  load of 37, `blank-timed` of `portable_c32-scenarios` was given up
+  at its step that waits 1,300 ticks, "the program did not come to wait
+  for a key within 300 s", with the stars of the screen saver on the
+  screen as they should be, and the test failed for a scenario of the
+  record. Beside one other test the scenario takes 136 seconds, and in
+  the whole suite run again, with the others still testing, it passed
+  in 332. "Piece H3" has why a machine's second is long while this
+  program idles; the 300 seconds that a step has are near what that
+  one step takes on a machine as busy as that.
+
+### The tall screen: untested in the portable C until a system gives it rows
+
+On the user's word of 13 October 2026: "We don't need to test 50 row
+screen for now, we can solve this problem when we have our first modern
+os implementation with variable terminal width and height." EGA lines
+was the one way that a scenario had to a screen of more than 25 rows,
+so for both builds of the portable C no scenario is on one now. The
+program's own handling of the rows that it finds is in the code,
+untouched, and is not run by any test.
+
+What was dropped, to be brought back when a system gives the screen its
+rows. Every scenario is still run for the original and the C
+translation, and its golden has the screens:
+
+| Scenario | For the portable C | What of the program it was the test of |
+|---|---|---|
+| `setup-lines` | Not run | The setup on 50 rows over what DOS has shown: the 50th row of that, which the setup keeps apart (`StUserScr` of `stmain.c`); the mouse given the rows where the setup starts; and that the key bar does not write an 81st cell (`DEVIATIONS.md`, 9), which shows on 50 rows alone. Its patch for that one cell went with it, and is in the history: `harness/goldens/portable_c/setup-lines.patch` |
+| `setup-colors-lines` | Not run | The setup's list of colours with room for all 39: no second page, a click below the last item, and the rows below the picture, which is of 25 rows (`md.Lines > 25` in `stcolor.c`) |
+| `setup-help-lines` | Not run | The setup's help in a window of 38 lines: its last lines, its thirds for the mouse, a page up |
+| `help-keys` | The last five steps left out, of 40 | The help's index of 38 lines, End there, and F10 out of it |
+| `mouse-help` | The last nine steps left out, of 29 | The mouse on 50 rows: F1 of the key bar clicked in row 49, a line below the 25th row, a button held below the lines and below the text, the last line shown clicked twice, the middle button, and the pointer left on row 40, which 25 rows have not: `MouseRows`, by `IniMous` of `mouse.c` |
+| `scroll` | Two steps left out, of 23 | The panels drawn on 50 rows and on 25 again, with the menu bar always visible (`ROWS` of `place.c`, a row more on a tall screen) |
+| `user-menu` | Four steps left out, of 83 | The box of the user menu in the middle of 50 rows: `SftEGA` of `window.c`, by `usermenu.c` |
+| `history-drives` | Four steps left out, of 70 | The box of the history in the middle of 50 rows: `SftEGA`, by `cmdline.c` |
+| `menu-panel` | The last four steps left out, of 18 | The command line left high up when 50 rows become 25 with the panels off. That was EGA lines' own doing and is gone; what a system would bring back is the same question behind a command that leaves the screen shorter, which `IniData` answers |
+| `menu-items` | Two steps left out, of 43 | EGA lines chosen from the menu, which is gone. Nothing to bring back |
+
+The branches that only a screen of more than 25 rows takes, none of
+which a scenario of the portable C runs now: `SftEGA` of `window.c`,
+which puts a box in the middle of such a screen, for the history, the
+user menu and the box of the drives, and the same in `DialBox` of
+`dialog.c` for every box and dialog; `ROWS` of `place.c`; `MouseRows`
+in `IniMous` and in the setup's start; the 50 that `IniData` takes at
+the most; the 50th row and the rows below the picture in the setup.
+The box of the drives and a dialog on a tall screen had no scenario
+before either.
+
+How they come back. A scenario needs a step that gives the screen its
+rows in the tree, in place of the original's Alt+F9 (`in_place_in` of
+`harness/deviations.py`, one step for one step), and the program takes
+the rows that it finds behind a command. On DOS that would be a command
+that sets them. The bench has none: its floppy is FreeDOS's boot
+floppy, which has no `MODE.COM`, and of the programs that it has only
+`VFONT` loads a font, from a file, of which the floppy has those of 16
+lines. FreeDOS's `MODE` is in the Lite image that the harness downloads
+already, `packages/base/mode.zip`, beside the keyboard driver and the
+mouse driver that `harness/setups.py` takes from there. It was not put
+on the bench: a file more on A: changes what the original shows of
+that disk, so goldens of the original would be derived again, which is
+asked first; and whether the original, given that command in place of
+Alt+F9, then shows what its golden has was not tried, since the
+user's word came first. It is known that it would not everywhere: such
+a command sets the mode and clears what DOS has shown, where EGA lines
+keeps it, so a scenario that shows that afterwards, `setup-lines`
+above all, would differ there.
 
 ## The portable C: the system's functions
 
@@ -2000,10 +2144,14 @@ DOS and is not behind it yet.
   `Int2E` in `dos.c`. The feature stays whole until it is decided
   (above).
 - `MemSetSearch` and `MemSetUpper`, by which `SetStat` has DOS look for
-  memory in the lowest block first when the program begins, and
-  `ScreenPrintAll`, by which EGA lines tells the Print Screen key of the
-  rows, are functions of `sys.h` that only a PC with DOS has a use for:
-  each goes with what it is for, if that goes.
+  memory in the lowest block first when the program begins, are
+  functions of `sys.h` that only a PC with DOS has a use for: each goes
+  with what it is for, if that goes. `ScreenPrintAll`, by which EGA
+  lines told the Print Screen key of the rows, was a third, and went
+  with EGA lines, as `ScreenSmallFont` did. `ScreenEga` and
+  `ScreenFont` are what is left of that kind for the screen: the start
+  asks them for the rows, and they go when the rows come from the
+  system.
 - `Scroll` of `window.c`, the original's `Int10m`, is the one routine of
   the program that was the BIOS called with any registers; it takes
   what it means now, and its seven callers were changed with it.
@@ -2260,6 +2408,12 @@ told of Ctrl-C then, where it had a function of its own called.
 | Straight through: no address, or one that the extender translates, with the program's pointer as it is. D1 found six of these to want real mode: `FileSetAttributes`, `FindRecord`, `FindFirst`, `FindNext`, `DirCurrent` and `DirCurrentBare`. See "Piece D1" | 71 | The files but `FileTrueName`, 16; the directories, 8; the drives, 8; `TimeOfDay`, the two versions, `BreakCheck`, `SetBreakCheck`, `Idle`; `ProgramEnd`; the console, 2; the keyboard, 4; the screen, 17, of which four read and write the display's memory and the BIOS's data at flat addresses; the mouse, 8; `Ticks` |
 | Through one block below the megabyte and a call in real mode, DPMI 0300h, or 0301h for a routine | 7 | `FcbParse` (29h), `FcbDelete` (13h), `CountryInfo` (38h), `CaseMap`, which calls the routine that 38h names, `FileTrueName` (60h), `ProgramRun` and `ProgramRunBare` (4Bh) |
 | Other in 32 bits | 6 | `MemTake`, `MemGive`, `MemResize`: the program's own 640 KB. `MemSetSearch`, `MemSetUpper`: passed to DOS as they are. `ProgramPrefix`: gone from `sys.h` with S1, and from the common code with S3 |
+
+Of the screen's 17 in the first row, two went from `sys.h` with EGA
+lines, `ScreenSmallFont` and `ScreenPrintAll`
+(`src/portable_c/DEVIATIONS.md`, 12), which leaves it two functions
+fewer than the count above says: the README has the count as it
+stands, under "The system in one place".
 
 What is 16 bits in kind and changes shape for both builds, under the
 16-bit build first:

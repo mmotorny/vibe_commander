@@ -1,11 +1,12 @@
 /*
  * The commands of the pull-down menus: the kind of a panel, its order,
  * its filter, a panel switched off and on; the tree in a box and the
- * sizes of directories; EGA lines; two directories compared; the
- * configuration and the advanced options; the menu file and the extension
- * files, to edit; the switches of the Options menu; and the setup saved.
+ * sizes of directories; two directories compared; the configuration and
+ * the advanced options; the menu file and the extension files, to edit;
+ * the switches of the Options menu; and the setup saved.
  *
- * Translated from VCMENU.INC.
+ * Translated from VCMENU.INC. The original has one more here, EGA lines,
+ * F69_00, Alt+F9, which the portable C has not (see DEVIATIONS.md).
  *
  * These are commands, not routines: in the original the menu bar jumps
  * to one by its tables, the main loop by its table of keys, and the keys
@@ -55,9 +56,8 @@ u8 __far *MainFil(u8 __far *to, const u8 __far *name);  /* string.c */
    HidCur puts the cursor below the screen. ResUser writes what DOS has shown, which
    the panels cover, to the screen buffer, for a window given like
    Window's, and ResWin what a box covers, from where it was kept.
-   AsmSeg returns the segment of the program's constants. ScrOffs asks
-   the BIOS where in the memory of the screen the page begins that is
-   shown, and SaveSet writes the setup to its file. */
+   AsmSeg returns the segment of the program's constants, and SaveSet
+   writes the setup to its file. */
 
 /* The boxes and the dialogs of these commands, the texts that ^I stands
    for in them, and texts and names of files that are copied with what
@@ -376,91 +376,18 @@ u16 M42_00(u16 panel)
 }
 
 /* M60_02: the prompt written again, and the panels drawn again if the
-   panel `panel` is on. The configuration and EGA lines come here with DS
-   on the main data instead: PutPrm and the test then read there what
-   they would read of a panel. PutPrm takes of a panel only whether it is
-   the left one, for a column that it does not use. The test finds the
-   third byte of the main data, the colour of selected files in the
-   first palette, which is 0Fh as the program comes: the panels are
-   drawn again. */
+   panel `panel` is on. The configuration comes here with DS on the main
+   data instead: PutPrm and the test then read there what they would
+   read of a panel. PutPrm takes of a panel only whether it is the left
+   one, for a column that it does not use. The test finds the third byte
+   of the main data, the colour of selected files in the first palette,
+   which is 0Fh as the program comes: the panels are drawn again. */
 static u16 M60_02(u16 panel)
 {
     PutPrm(panel);
     if (PANEL(panel)->Visible == 0)
         return MNU_FUNC04;
     return MNU_INIT50;
-}
-
-/* Alt-F9: the screen with as many lines as an EGA or a VGA has for the
-   small font, or with 25 again. The BIOS is asked how high the font is,
-   the mode is set anew, which makes it 25 lines, and if the font was 14
-   lines or more the small one is loaded, and the Print Screen key is
-   told to print all the rows; then the BIOS is asked how many lines
-   that makes. What is on the screen moves up if it gets shorter, so
-   that its last lines stay, and the command line with it; a screen that
-   gets longer has empty lines below.
-
-   Of the height the low byte counts, as in the assembly. A BIOS that
-   does not know the question about the font is taken to have one of 16
-   lines, so the small one is loaded, and 25 rows afterwards. */
-u16 F69_00(void)
-{
-    u16 height, rows, lines, was, less, count, cell, i;
-    const u16 *from;
-    u16 *to;
-
-    if (md.TstEGA == 0)
-        return MNU_FUNC04;
-    Quit();
-    ClsLine((u16)md.DosLin << 8, MAIN_SEG);
-    SavMous();
-    CurMous(0);
-    md.BarPrev = 0xFF;
-    md.ScrPage = 0;
-    height = ScreenFont().height;
-    ScreenSetMode(md.ScrMod);
-    if ((u8)height >= 14) {
-        ScreenSmallFont();
-        ScreenPrintAll();
-    }
-    lines = 25;                         /* F69_03 */
-    rows = ScreenFont().last;           /* the last row */
-    if (rows != 0) {
-        rows = (u8)(rows + 1);
-        lines = MaxLins;
-        if (lines > rows)
-            lines = rows;
-    }
-    /* F69_04 */
-    was = md.Lines;
-    md.Lines = (u8)lines;
-    if (was > lines) {
-        less = was - lines;
-        if (md.DosLin > less)
-            md.DosLin -= (u8)less;
-        else
-            md.DosLin = 1;
-        from = md.ScrBuf + less * 80;
-        to = md.ScrBuf;
-        for (count = lines * 80; count != 0; count--)
-            *to++ = *from++;
-    } else if (was < lines) {
-        to = md.ScrBuf + was * 80;
-        cell = (u16)md.CrntCol << 8 | ' ';
-        for (count = (u8)(lines - was) * 80; count != 0; count--)
-            *to++ = cell;
-    }
-    /* F69_07 */
-    for (i = 0; i < (MaxLins - 1) * 80; i++)
-        md.UserScr[i] = md.ScrBuf[i];
-    ScrOffs();
-    if (md.Mouse != 0) {
-        count = ((u16)(signed char)md.Lines << 3) - 1;
-        if (md.MouseY > count)
-            md.MouseY = count;
-        IniMous();
-    }
-    return M60_02(MAIN_SEG);
 }
 
 /* Mark in a panel every file that the other panel has not, has as a

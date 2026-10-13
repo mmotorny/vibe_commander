@@ -497,13 +497,15 @@ the C translation handed over what the original does. Every file of
 the program has gone over to `sys.h`, and each added its places here as
 it went. A call that the portable C makes no more has no row: DOS
 asked where INT 21h goes, when the program starts, went with the
-program's own call (see 8).
+program's own call (see 8), and the five calls of the BIOS in `F69_00`
+of `commands.c`, the font asked about, the mode set, the small font
+loaded, Print Screen told of the rows and the font asked about again,
+went with EGA lines (see 12).
 
 | Routine | Call | The original | The C translation, where it differed | The portable C |
 |---|---|---|---|---|
 | `Blank`, `blank.c`, with its `Star` | BIOS 0Fh, 03h, 01h, 02h and 09h: the cursor noted, hidden and put back, and a star written | 0Fh: AL and BX as the code before left them, for a star that changes its look and its clock and kind. 03h, 01h and 02h: AL the mode, as 0Fh left it. 01h: BH the page, and DX where the cursor is or was put. 02h: BL and CX as the code before left them, for a star its clock and a count of the stars. 09h: DX the place of the star |  | AL 0 at all but 09h; BX, CX and DX 0 where the call takes nothing in them |
 | `M02_10`, `commands.c` | DOS 3Bh, the directory of a panel made current | AL the drive, 1 for A: |  | AL 0 |
-| `F69_00`, `commands.c` | EGA lines: BIOS 1130h, the font asked about; 00h, the mode set; 1112h, the small font loaded; 12h with 20h in BL, Print Screen told of the rows; and 1130h again | 1130h the first time: CH what the main loop has there, the number of the item where the command is chosen from the menu, and DX the last row of the screen and 80, of the screen put back as DOS had it. 00h, 1112h and 12h: CX and DX as the BIOS left them at the call before, the height of the font and its last row from 1130h. 12h: AL as 1112h left it. 1130h the second time: CX and DH as the calls before left them (see below) |  | CH and DX 0 the first time. CX and DX 0 at 00h, 1112h and 12h, and AL 0 at 12h. CX 16 and DH 0 the second time |
 | `F35_61`, `copy.c` | DOS 0Eh, a drive made the current one, twice | AL the drive, as in DL, the first time, and as choosing from the tree left it the second; DH as the code before left it |  | AL and DH 0 |
 | `C00_01`, `copy.c` | DOS 4400h, what a handle is, and 3Eh, the file closed | 4400h: CX what was left of comparing the target with the directory of the other panel, DX the address of the name. 3Eh: AL as 4400h left it, CX that still, DX what the handle is |  | CX as it comes and DX 0 at 4400h. AL, CX and DX 0 at 3Eh |
 | `C00_01`, `C10_00`, `C20_00` and `C30_00`, `copy.c` | DOS 4300h, the attributes of a file or a directory, at seven of the eight places | CX as the code before left it: what was left of comparing two names or of a piece, or the attributes that the call before answered with |  | CX 0 |
@@ -611,17 +613,8 @@ it:
 - CX and DL of BIOS 1130h, the font of an EGA, which a BIOS that does
   not know the call hands back as they came. `ScreenFont` puts 16 and 0
   there, so such a BIOS is taken to have a font of 16 lines and to say
-  nothing of the rows. The original has 16 in CL where `F69_00` of
-  `commands.c` asks for the height and 0 in DL where it and `IniData`
-  ask for the rows, and leftovers in the other of the two each time,
-  which it does not read then.
-- BL of BIOS 1112h, the small font loaded, which says where the font
-  goes among those that the display keeps. The original does not set it
-  for the call: it has 0 there from clearing the command line, at the
-  start of the command, if the mouse driver and the BIOS leave BX as
-  they find it at their calls between, as they are to.
-  `ScreenSmallFont` hands over 0. The C translation set BX to 0 at the
-  first of the BIOS's calls and kept it as the BIOS left it.
+  nothing of the rows. The original has 0 in DL where `IniData` asks
+  for the rows, and a leftover in CX, which it does not read there.
 
 Nothing else that the functions leave out is known to be read by a DOS
 or a BIOS.
@@ -697,11 +690,12 @@ INT 21h, and nothing answers that call.
 watch.
 
 - Alt+F5 is a key that has no command, and does nothing. The Commands
-  menu has no line "memory Info": it has twelve lines where the original
-  has thirteen, Directory sizes stands a row further up with what is
-  below it, and the box is a row shorter. The letter I chooses nothing
-  there, and Alt+F5 nothing in any open menu. The key bar has no name
-  for F5 while Alt is held.
+  menu has no line "memory Info": it has a line less than the
+  original's thirteen for that, Directory sizes stands a row further up
+  with what is below it, and the box is a row shorter. (It is one more
+  line and row shorter since, without EGA lines: see 12.) The letter I
+  chooses nothing there, and Alt+F5 nothing in any open menu. The key
+  bar has no name for F5 while Alt is held.
 - The program does not take INT 27h, notes nothing of the programs that
   are run, and writes no record: a program that stays in the memory
   keeps the block that it asked for, as long as it asked. Any number of
@@ -771,7 +765,7 @@ left out alone:
 | Scenario | What changes in it |
 |---|---|
 | `menu-items` | Memory info is not chosen from the Commands menu: the two steps that choose it and leave the map are left out. Every screen is as the original's after the same step |
-| `mouse-menu`, `mouse-drag-menu` | The Commands menu where it shows, a line shorter, without Memory info. In `mouse-menu` the click that is on a dark item of the original's menu, Compare directories, is on the line across the menu below that item: nothing is chosen either way, and the screen is the same |
+| `mouse-menu`, `mouse-drag-menu` | The Commands menu where it shows, a line shorter, without Memory info. In `mouse-menu` the click that is on a dark item of the original's menu, Compare directories, was on the line across the menu below that item while this was all that the menu lacked. The menu is a second line shorter since, and the click is taken to the item where it is now: see 12 |
 | `tree-choose` | The key bar with Alt held, twice, has no name for F5, where the original has Memory |
 | `mouse-middle` | The middle button is not pressed in the map of the memory: two steps are left out. Every screen is as the original's after the same step |
 | `mouse-drag-lists` | The last nine steps are left out: a program that stays in the memory, and a button of the mouse moved in the map. Every screen before is as the original's |
@@ -1076,17 +1070,22 @@ account that we are going to merge vc and vcsetup code". The setup uses
 the main program's routines, and a second copy of one is not kept for a
 bug of it.
 
-**Which scenarios show it.** `setup-lines`, which has the setup on a
-screen of 50 lines over what DOS has shown, with the panels off: the
-first row there is the second line of the program's banner, and its
-first cell, the C of Copyright, is a space in the original from the
-way out of the colours on, and when the setup has been left. The
-scenario is held against the original's golden with a patch, which
-says that one cell otherwise, on its last two screens.
-The other scenarios of the setup that are on 50 lines end before the
-screen is put back from what was kept, or have the panels over the
-corner when it is; all the rest are on a screen of 25 lines, where the
-cell lands in a row of the buffer that is not on the screen.
+**Which scenarios show it.** None, for now. The cell shows on a screen
+of 50 lines alone, and the one scenario that has it there is
+`setup-lines`: the setup over what DOS has shown, with the panels off,
+where the first row is the second line of the program's banner, and
+its first cell, the C of Copyright, is a space in the original from
+the way out of the colours on, and when the setup has been left. The
+portable C was held to that scenario with a patch that said the one
+cell otherwise, on its last two screens, and passed. It is not taken
+through it now: the scenario gets its 50 lines by EGA lines, which the
+portable C has not, and a screen of more than 25 rows is not tested
+there until a system gives it one (see 12). The scenario stays for the
+original and the C translation, and comes back here with the tall
+screen; its patch is in the history, `setup-lines.patch`. Every other
+scenario of the setup that the portable C is taken through is on a
+screen of 25 lines, where the cell lands in a row of the buffer that
+is not on the screen.
 
 ### 10. The program calls itself Vibe Commander
 
@@ -1296,3 +1295,129 @@ and `PtIn3_S` of `info.c`, are gone. The test `portable_c-data` holds
 the texts that the tree has against the original's, and has nothing to
 say of one that the tree has not. `BasedOn_S` is listed there as the
 tree's own: see 10.
+
+### 12. No EGA lines: the screen has the rows that the program finds
+
+**What the original does.** Alt+F9, EGA lines of the Commands menu, gives
+the screen more rows than 25, and 25 again. It asks the BIOS how many
+lines of dots a character has, sets the mode of the screen anew, which
+makes it 25 rows, and, if the font was of 14 lines or more, has the BIOS
+load its font of 8 lines, which makes 43 rows of an EGA's screen and 50
+of a VGA's, and tells the Print Screen key to print every row of such a
+screen. Then it asks the BIOS how many rows that has made, takes 50 at
+the most, and fits what it shows to them: what DOS had shown moves up
+when the screen gets shorter, so that its last lines stay, and the
+command line with it, onto the second row if it would leave the screen;
+a screen that gets longer has empty rows below. The mouse is given the
+rows of the new screen for its pointer. The key bar has "EGA Ln" for F9
+while Alt is held, and the help a page for the item of the menu.
+
+On a display that is neither an EGA nor a VGA the key does nothing, the
+item of the menu is dark, and the key bar of the panels is another, the
+same without that name.
+
+The program also finds the rows that the screen has without the
+command: when it starts and behind every command that it has run, it
+asks whether the display is an EGA or a VGA, and such a display how many
+rows it shows, and takes that, 50 at the most. So it draws on a screen
+that something else has given 43 or 50 rows, with its panels, its boxes,
+its help, the viewer and the editor as tall as the screen is.
+
+**What the portable C does.** It has no such command, and does not
+change the rows of the screen.
+
+- Alt+F9 is a key that has no command, and does nothing. The Commands
+  menu has no line "EGA lines": with Memory info gone too (see 7) it has
+  eleven lines where the original has thirteen, Swap panels stands two
+  rows further up than in the original with what is below it, and the
+  box is two rows shorter. The letter E chooses nothing there, and
+  Alt+F9 nothing in any open menu. The key bar has no name for F9 while
+  Alt is held.
+- The key bar of the panels is the one, whatever the display is: the
+  original's second one, for a display without such lines, was the
+  first without the name, which is what the first is now.
+- It finds the rows that the screen has as the original does, when it
+  starts and behind every command, and draws on as many as it finds, 50
+  at the most. That is untouched: `IniData` of `start.c`, and every
+  routine that goes by the rows. What a user has for a tall screen, for
+  now, is a screen that has been given more rows before the program is
+  started, or by a command run from it.
+- It does not tell the Print Screen key anything. On a screen that
+  something else has made tall, the key prints what that something has
+  told the BIOS to print.
+- The original's help file, which the portable C reads, still has its
+  page on EGA lines; no key and no item of a menu leads there.
+
+Gone are `F69_00` of `commands.c`, with its number among the commands,
+its key in the main loop, its line of the Commands menu and what goes
+with a line there, and its name in the key bar; the key bar of the
+panels for a display without EGA lines, with its row of names, and the
+main loop's choice between the two; the test that made the item of the
+menu dark; and two functions of `sys.h` that only the command asked,
+`ScreenSmallFont` and `ScreenPrintAll`, with their bodies in `dos.c` and
+in `dos32.c`. `ScreenEga` and `ScreenFont` stay, for the rows that the
+program finds; so does the byte of the main data that says whether the
+display is an EGA or a VGA, which the start sets and reads.
+
+**Why.** The user's decision, of 13 October 2026: EGA lines goes, and
+the rows of the screen are to come from the system that the program
+runs on. The command is of the PC alone: a font of 8 lines that the
+BIOS of an EGA or a VGA loads, and the BIOS's own routine for the Print
+Screen key. On a system that the program is carried to, how tall the
+screen is belongs to the terminal or the window that the program is
+shown in, and the program is told; that is what finding the rows is
+for, and it comes with the first such system.
+
+**Which scenarios show it.** Each of these is held against the
+original's golden with what its row says made to it: by its patch, or,
+where the row says that every screen is as the original's, by the steps
+left out alone. The scenarios that press the key do so to get to a
+screen of 50 rows and to leave it again, and the steps on that screen
+are left out with the key, from the one press to the other:
+
+| Scenario | What changes in it |
+|---|---|
+| `menu`, `mouse-menu`, `mouse-drag-menu` | The Commands menu where it shows, a second line shorter, without EGA lines: their patches, which are of 7 too, have the rows. In `mouse-menu` the click on the item that is dark beside the Info, Compare directories, is taken to where that item is in the portable C, two rows further up: on the original's row the portable C has Menu file edit, which the click would choose. The pointer of the mouse is on that row behind the click, which the patch says |
+| `tree-choose` | The key bar with Alt held, twice, has no name for F9, where the original has EGA Ln, and none for F5 (see 7) |
+| `menu-items` | EGA lines is not chosen from the Commands menu: the two steps that choose it, for 50 rows and for 25 again, are left out. Going back to 25 rows the original moves what DOS had shown up by 25 rows, which leaves none of it. So where the scenario later has the panel on the right off, beside the Info, the original shows nothing there and the portable C the ends of the two lines of its banner: two rows of one screen, in the patch, which is of 10 too |
+| `help-keys` | The help on 50 rows is not shown: the last five steps are left out. Every screen before is as the original's |
+| `mouse-help` | The mouse in the help on 50 rows: the last nine steps are left out. Every screen before is as the original's, with the patch that the scenario has for 10 |
+| `scroll` | The two steps that go to 50 rows and back, with the panels on, are left out. Every other screen is as the original's after the same step |
+| `user-menu` | The user menu in its box on 50 rows: four steps are left out. Every other screen is as the original's after the same step |
+| `history-drives` | The history in its box on 50 rows: four steps are left out. Every other screen is as the original's after the same step |
+| `menu-panel` | The command line left high up by 50 rows, with the panels off: the last four steps are left out, the panels switched off and on again around the two presses. Every screen before is as the original's |
+
+**Not run for the portable C:**
+
+| Scenario | Why |
+|---|---|
+| `setup-lines` | It is the setup on a screen of 50 rows, over what DOS has shown there, and the corner of that where the original's setup program writes its key bar a cell too far (see 9) |
+| `setup-colors-lines` | It is the setup's list of colours on a screen of 50 rows, which has room for all 39 |
+| `setup-help-lines` | It is the setup's help on a screen of 50 rows, in a window of 38 lines |
+
+With these, no scenario has the portable C on a screen of more than 25
+rows: EGA lines was the one way that the bench has to such a screen. On
+the user's word of 13 October 2026 that is not tested for now, "we can
+solve this problem when we have our first modern os implementation with
+variable terminal width and height". The scenarios stay as they are for
+the original and the C translation, and their goldens with them; what
+is left out here and what of the program it was the test of is listed
+in `TODO.md`, "The tall screen: untested in the portable C until a
+system gives it rows", to be brought back then.
+
+**In the data.** The test `portable_c-data` holds nine tables against
+the original's with this difference declared for each, in `DECLARED` of
+`harness/datacheck.py`. Seven of them 7 names too, and the entry of
+each says both: of the menus their lines, the pages of their help, the size of the
+Commands menu and where the lines and the pages of the Options menu
+begin, the commands of the Commands menu, and the keys that choose an
+item in an open menu, which have Alt+F9 no more and the three items of
+the Commands menu below EGA lines two places further up than in the
+original; and of the key bar the names of the keys, without "EGA Ln",
+and the rows of the names, where the row that had the name has none
+there, the row for a display without EGA lines is left out, and every
+name behind "EGA Ln" has a number less. The eighth is the table of the
+key bars, whose ninth, the bar for such a display, is spaces, and which
+names the rows behind the one left out by a number less. The ninth is
+the commands of the Options menu, where the setup, the last of the
+commands, has a number less (see 8).

@@ -2023,6 +2023,29 @@ in "The portable C".
     `build/CMakeFiles/portable_c.dir/build.make`, and link by the line
     of the linker there with the paths changed. `harness/show.py
     --program` and `harness/datacheck.py` with `--source` take it.
+- What taking EGA lines out met, the second command to go
+  (`src/portable_c/DEVIATIONS.md`, 12; `TODO.md`, "The portable C: what
+  EGA lines has left", which has all of it):
+  - The screen of more than 25 rows is not tested in the portable C
+    for now, on the user's word of 13 October 2026, until a system
+    gives the program its rows: EGA lines was the one way there. The
+    scenarios that were about such a screen are not run for the tree,
+    those that passed through it have the steps left out, and `TODO.md`
+    lists each with what of the program it tested, under "The tall
+    screen: untested in the portable C until a system gives it rows".
+    The code that goes by the rows stays as it is.
+  - A second line out of a menu moves a click onto another item, where
+    the first had moved it onto nothing: `mouse-menu` clicked a dark
+    item by its place, and the place became Menu file edit. Look at
+    every step that clicks or counts in a menu that changes, also
+    those that an earlier removal looked at.
+  - A scenario written twice in a table of `harness/deviations.py` is
+    the second entry alone, and Python says nothing: add to the entry
+    that the scenario has.
+  - A command that changes what DOS has shown, as the original's EGA
+    lines does when the screen gets shorter, changes screens many
+    steps on, wherever a panel is off: leaving its steps out wants
+    those rows in a patch.
 - The setup program, step 0 of the road, has its plan in `TODO.md`,
   "The setup program in the portable C: the plan": what the program is,
   what the portable C has of it already, how it becomes a part of the
@@ -2581,8 +2604,9 @@ The BIOS for the screen, `Int10`, by AH: 0Fh is `ScreenState()`, 0
 place)`, 3 `CursorWhere(page)`, 6 and 7 `ScreenScroll(down, lines,
 color, upper, lower)`, 8 `ScreenCell(page)`, 9 `ScreenFill(page,
 character, color, count)`, 0Eh `ScreenType(character, page, color)`, 12h
-with 10h in BL `ScreenEga()` and with 20h there `ScreenPrintAll()`,
-1130h `ScreenFont()`, 1112h `ScreenSmallFont()`. For the keyboard, `Int16`: 0 is `KeyRead()`, 100h
+with 10h in BL `ScreenEga()`, 1130h `ScreenFont()`; 12h with 20h in BL
+was `ScreenPrintAll()` and 1112h `ScreenSmallFont()`, which went with
+EGA lines (`src/portable_c/DEVIATIONS.md`, 12). For the keyboard, `Int16`: 0 is `KeyRead()`, 100h
 `KeyWaiting()`, 200h `KeysHeld()`, which is the low byte already. The
 mouse is done. `Int2F` with 150Bh is `DriveCd(drive)`, `Int28` is
 `Idle()`. `Timer`, `Beep`, `SetDTA`, `OpenFil` and the others of

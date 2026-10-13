@@ -19,54 +19,60 @@
 
 /* Which names the key bar shows: for each of the bars that the program
    has, and for none of Shift, Ctrl and Alt held, Shift, Ctrl and Alt, a
-   row of KeyC_T. A bar that is not here has the row of spaces. */
+   row of KeyC_T. A bar that is not here has the row of spaces, and so
+   has 9, which nothing asks for: in the original it is the bar of the
+   panels on a display that is neither an EGA nor a VGA, the bar 0 with
+   no name for Alt with F9, and that is what the bar 0 is here (see
+   DEVIATIONS.md). */
 static const u8 CODE KeyB_T[15][4] = {
     { 1,  2,  3,  4},                   /*  0 */
-    { 7,  0,  0,  0},                   /*  1 */
-    { 8,  0,  0,  0},                   /*  2 */
-    { 9, 12,  0,  0},                   /*  3 */
-    {10, 12,  0,  0},                   /*  4 */
-    {11, 12,  0,  0},                   /*  5 */
-    {13, 16,  0,  0},                   /*  6 */
-    {14, 16,  0,  0},                   /*  7 */
-    { 6,  0,  0, 17},                   /*  8 */
-    { 1,  2,  3,  5},                   /*  9 */
-    {15, 16,  0,  0},                   /* 10 */
+    { 6,  0,  0,  0},                   /*  1 */
+    { 7,  0,  0,  0},                   /*  2 */
+    { 8, 11,  0,  0},                   /*  3 */
+    { 9, 11,  0,  0},                   /*  4 */
+    {10, 11,  0,  0},                   /*  5 */
+    {12, 15,  0,  0},                   /*  6 */
+    {13, 15,  0,  0},                   /*  7 */
+    { 5,  0,  0, 16},                   /*  8 */
+    { 0,  0,  0,  0},                   /*  9 */
+    {14, 15,  0,  0},                   /* 10 */
     { 1,  1,  1,  1},                   /* 11 */
     { 2,  2,  2,  2},                   /* 12 */
     { 4,  4,  4,  4},                   /* 13 */
-    {18,  0,  0,  0},                   /* 14 */
+    {17,  0,  0,  0},                   /* 14 */
 };
 
 /* The names of the ten keys in each row, as numbers of Key_S. Alt with
-   F5 has none: the original has "Memory" there, in the rows 4 and 5,
-   for the map of the memory, which the portable C has not (see
-   DEVIATIONS.md). That name was the 30th of Key_S, and the three behind
-   it have a number less here than in the original. */
-static const u8 CODE KeyC_T[19][10] = {
+   F5 and Alt with F9 have none, in the row 4: the original has "Memory"
+   and "EGA Ln" there, for the map of the memory and for EGA lines,
+   which the portable C has not (see DEVIATIONS.md). Those names were
+   the 30th and the 20th of Key_S, and the names behind each have a
+   number less here than in the original for it. The original has a
+   row more, the 5th, which is the 4th without "EGA Ln", for the bar 9:
+   the rows behind it have a number less here, in KeyB_T. */
+static const u8 CODE KeyC_T[18][10] = {
     { 0,  0,  0,  0,  0,  0,  0,  0,  0,  0},   /*  0 */
     { 1,  2,  3,  4,  5,  6,  7,  8,  9, 10},   /*  1 */
-    { 0, 30,  3,  4,  5,  6,  7,  8, 11, 12},   /*  2 */
-    {13, 14,  0, 31,  5,  6,  0,  8,  0,  0},   /*  3 */
-    {13, 14, 15, 16,  0, 17, 18, 19, 20, 21},   /*  4 */
-    {13, 14, 15, 16,  0, 17, 18, 19,  0, 21},   /*  5 */
-    { 1,  0,  0,  0,  0,  0,  0,  0,  0, 21},   /*  6 */
-    { 1,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  7 */
-    { 0,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  8 */
-    { 1,  0, 10, 22,  0,  0, 26,  0,  0, 10},   /*  9 */
-    { 1, 24, 10, 23,  0,  0, 26,  0,  0, 10},   /* 10 */
-    { 1, 25, 10, 23,  0,  0, 26,  0,  0, 10},   /* 11 */
-    { 0,  0,  0,  0,  0,  0, 26,  0,  0,  0},   /* 12 */
-    { 1, 27,  0, 22,  0,  0, 26,  0,  0, 10},   /* 13 */
-    { 1, 27,  0, 23,  0,  0, 26,  0,  0, 10},   /* 14 */
-    { 1, 27,  0,  0,  0,  0, 26,  0,  0, 10},   /* 15 */
-    { 0, 28,  0,  0,  0,  0, 26,  0,  0, 29},   /* 16 */
-    { 0,  0,  0,  0,  0,  0,  0,  0,  0, 21},   /* 17 */
-    { 1, 32,  0,  0,  0,  0,  0,  0,  0, 10},   /* 18 */
+    { 0, 29,  3,  4,  5,  6,  7,  8, 11, 12},   /*  2 */
+    {13, 14,  0, 30,  5,  6,  0,  8,  0,  0},   /*  3 */
+    {13, 14, 15, 16,  0, 17, 18, 19,  0, 20},   /*  4 */
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0, 20},   /*  5 */
+    { 1,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  6 */
+    { 0,  0,  0,  0,  0,  0,  0,  0,  0, 10},   /*  7 */
+    { 1,  0, 10, 21,  0,  0, 25,  0,  0, 10},   /*  8 */
+    { 1, 23, 10, 22,  0,  0, 25,  0,  0, 10},   /*  9 */
+    { 1, 24, 10, 22,  0,  0, 25,  0,  0, 10},   /* 10 */
+    { 0,  0,  0,  0,  0,  0, 25,  0,  0,  0},   /* 11 */
+    { 1, 26,  0, 21,  0,  0, 25,  0,  0, 10},   /* 12 */
+    { 1, 26,  0, 22,  0,  0, 25,  0,  0, 10},   /* 13 */
+    { 1, 26,  0,  0,  0,  0, 25,  0,  0, 10},   /* 14 */
+    { 0, 27,  0,  0,  0,  0, 25,  0,  0, 28},   /* 15 */
+    { 0,  0,  0,  0,  0,  0,  0,  0,  0, 20},   /* 16 */
+    { 1, 31,  0,  0,  0,  0,  0,  0,  0, 10},   /* 17 */
 };
 
 /* What a key does, in the six cells that the bar has for it. */
-static const u8 CODE Key_S[33][6] = {
+static const u8 CODE Key_S[32][6] = {
     {' ', ' ', ' ', ' ', ' ', ' '},     /*  0 */
     {'H', 'e', 'l', 'p', ' ', ' '},     /*  1 */
     {'M', 'e', 'n', 'u', ' ', ' '},     /*  2 */
@@ -87,19 +93,18 @@ static const u8 CODE Key_S[33][6] = {
     {'D', 'i', 'r', 'S', 'i', 'z'},     /* 17 */
     {'F', 'i', 'n', 'd', ' ', ' '},     /* 18 */
     {'H', 'i', 's', 't', 'r', 'y'},     /* 19 */
-    {'E', 'G', 'A', ' ', 'L', 'n'},     /* 20 */
-    {'T', 'r', 'e', 'e', ' ', ' '},     /* 21 */
-    {'A', 'S', 'C', 'I', 'I', ' '},     /* 22 */
-    {'H', 'e', 'x', ' ', ' ', ' '},     /* 23 */
-    {'W', 'r', 'a', 'p', ' ', ' '},     /* 24 */
-    {'U', 'n', 'w', 'r', 'a', 'p'},     /* 25 */
-    {'S', 'e', 'a', 'r', 'c', 'h'},     /* 26 */
-    {'S', 'a', 'v', 'e', ' ', ' '},     /* 27 */
-    {'S', 'a', 'v', 'e', '.', '.'},     /* 28 */
-    {'Q', '&', 'S', 'a', 'v', 'e'},     /* 29 */
-    {'M', 'a', 'i', 'n', ' ', ' '},     /* 30 */
-    {'L', 'a', 'b', 'e', 'l', ' '},     /* 31 */
-    {'R', 'e', 's', 'c', 'a', 'n'},     /* 32 */
+    {'T', 'r', 'e', 'e', ' ', ' '},     /* 20 */
+    {'A', 'S', 'C', 'I', 'I', ' '},     /* 21 */
+    {'H', 'e', 'x', ' ', ' ', ' '},     /* 22 */
+    {'W', 'r', 'a', 'p', ' ', ' '},     /* 23 */
+    {'U', 'n', 'w', 'r', 'a', 'p'},     /* 24 */
+    {'S', 'e', 'a', 'r', 'c', 'h'},     /* 25 */
+    {'S', 'a', 'v', 'e', ' ', ' '},     /* 26 */
+    {'S', 'a', 'v', 'e', '.', '.'},     /* 27 */
+    {'Q', '&', 'S', 'a', 'v', 'e'},     /* 28 */
+    {'M', 'a', 'i', 'n', ' ', ' '},     /* 29 */
+    {'L', 'a', 'b', 'e', 'l', ' '},     /* 30 */
+    {'R', 'e', 's', 'c', 'a', 'n'},     /* 31 */
 };
 
 /* The key bars of the setup, which PutKey0 shows while the setup is open

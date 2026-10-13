@@ -1407,6 +1407,10 @@ GONE = {
                     "C stays in the memory whole and has no such option",
         "F65_00_c": "the map of the memory, Alt+F5: the portable C has "
                     "no such map",
+        "F69_00_c": "EGA lines, Alt+F9, which gives the screen 43 or 50 "
+                    "rows by a font of the BIOS: the portable C has no "
+                    "such command and takes the rows of the screen as it "
+                    "finds them",
         **dict.fromkeys(
             ("New27", "Int27_", "Release"),
             "of the watch on the programs that stay in the memory, which "

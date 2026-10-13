@@ -620,9 +620,9 @@ Func40:                                 /* Move the cursor */
    had found, or on the table: no command reads it, and here it stays as
    it is.
 
-   The original's table has one key more, Alt+F5, the map of the memory,
-   which the portable C has not (see DEVIATIONS.md): here it is a key
-   that has no command. */
+   The original's table has two keys more, Alt+F5, the map of the
+   memory, and Alt+F9, EGA lines, which the portable C has not (see
+   DEVIATIONS.md): here each is a key that has no command. */
 static u16 Func12(u16 key)
 {
     if (key >> 8 == 0)
@@ -677,7 +677,6 @@ static u16 Func12(u16 key)
     case 0x6D00: return CMD_M42_00;  /* Alt F6: directory sizes */
     case 0x6E00: return CMD_F67_00;  /* Alt F7: file find */
     case 0x6F00: return CMD_F68_00;  /* Alt F8: history */
-    case 0x7000: return CMD_F69_00;  /* Alt F9: EGA lines */
     case 0x7100: return CMD_M41_00;  /* Alt F10: Tree */
     case 0xFD00: return CMD_F39_00;  /* Alt: pull down menu */
     case 0xFE00: return CMD_F75_00;  /* the time in AutoTim has come:
@@ -849,7 +848,10 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
                     goto Mouse;
                 md.WinMous = 0;
                 md.MousEnt = 0;
-                key = Input(md.TstEGA != 0 ? 0 : 9);    /* Func11 */
+                key = Input(0);         /* Func11: the original has
+                                           another bar here for a
+                                           display without EGA
+                                           lines */
                 r->ax = key;
                 if (key >> 8 == KEY_MOUSE)
                     goto Func20;
@@ -1253,7 +1255,6 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
     case CMD_M41_00: return MnuEnd(M41_00(), r);
     case CMD_M42_00: return MnuEnd(M42_00(panel), r);
     case CMD_M49_00: return MnuEnd(M49_00(panel), r);
-    case CMD_F69_00: return MnuEnd(F69_00(), r);
     case CMD_M53_00: return MnuEnd(M53_00(r->cx), r);
     case CMD_M60_00: return MnuEnd(M60_00(), r);
     case CMD_M61_00: return MnuEnd(M61_00(), r);

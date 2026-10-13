@@ -40,7 +40,7 @@
    not leave them: `strayed` and a number on the screen says that one
    was not, 400h for the flag and anything else for ES.
 
-   The pages behind the first nine are of what a program of 32 bits has
+   The pages behind the first eight are of what a program of 32 bits has
    to do otherwise than one of 16, each in a function below that says
    what it asks: the memory in blocks and the PSP; the calls that are
    made in real mode; other programs, with a second copy of the toy
@@ -760,27 +760,6 @@ static void Display(void)
     Line();
 }
 
-/* The font of 8 lines, which gives the screen 50 rows. */
-static void Small(void)
-{
-    struct Screen screen;
-    struct Font font;
-
-    ScreenSmallFont();
-    font = ScreenFont();
-    SAY("ScreenSmallFont, ScreenFont "); H4(font.height); H4(font.last);
-    screen = ScreenState();
-    SAY("ScreenState "); H4(screen.mode); H4(screen.columns);
-    H4(screen.page);
-    ScreenPrintAll();
-    SAY("ScreenPrintAll");
-    CARET(", CursorWhere", screen.page);
-    Line();
-    CursorTo(screen.page, 0x3000);      /* row 48 */
-    CARET("CursorTo 3000:", screen.page);
-    Line();
-}
-
 /* The mouse. */
 static void Where(const u8 FAR *name)
 {
@@ -1425,8 +1404,6 @@ void Main(void)
     Finds();
     Page(1);
     Display();
-    Page(0);
-    Small();
     Page(1);
     Pointer();
     Page(0);

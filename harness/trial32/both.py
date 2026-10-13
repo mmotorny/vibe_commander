@@ -41,7 +41,7 @@ OUT = ROOT / "build" / "trial32"
 # mouse. The last is typed at DOS's prompt, when the toy has ended with
 # its end left taken: the shell says what DOS has been told of Ctrl-C by
 # the routine that DOS goes on in then.
-STEPS = ["a", "F5", "Shift+F6", "Alt+F1", "Ctrl+o", "Up", "Tab",
+STEPS = ["a", "F5", "Shift+F6", "Alt+F1", "Ctrl+o", "Up",
          "Click@3,5", "Ins", "m", "n", "p", "2", "3", "o",
          "r", "f", "x", "f", "f", "d", "f", "f", "Ctrl+Break", "Ctrl+c",
          "l", "q", '"break" Enter']

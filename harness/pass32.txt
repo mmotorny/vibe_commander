@@ -145,13 +145,11 @@ setup-colors-grid
 setup-colors-mouse
 setup-colors-palettes
 setup-colors-own
-setup-colors-lines
 setup-help
 setup-help-pages
 setup-help-mouse
 setup-help-file
 setup-delay-help
-setup-help-lines
 setup-menu
 setup-defaults
 setup-missing
@@ -159,7 +157,6 @@ setup-damaged
 setup-cancel
 setup-mouse
 setup-save-fails
-setup-lines
 setup-clock
 setup-left-handed
 setup-help-screens

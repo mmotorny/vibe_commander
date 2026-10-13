@@ -1292,8 +1292,7 @@ void KeyForgetIns(void)
 
 /* The screen: the BIOS's calls 0Fh, 0, 3, 2, 1, 6 and 7, 8, 9 and 0Eh,
    which take the page in BH; for an EGA or a VGA 12h with 10h in BL,
-   which leaves BX as it is where there is neither, 1130h, 1112h, which
-   takes in BL the block of the font, 0, and 12h with 20h in BL; the
+   which leaves BX as it is where there is neither, and 1130h; the
    word of the BIOS's data that says where the page begins; and the
    memory of the display, which is at the segment B000h for the mode of
    one colour and at B800h for the others. Its address is kept where the
@@ -1412,16 +1411,6 @@ struct Font ScreenFont(void)
     font.height = regs.cx;
     font.last = regs.dx & 0xFF;
     return font;
-}
-
-void ScreenSmallFont(void)
-{
-    Show(0x1112, 0, 0, 0);
-}
-
-void ScreenPrintAll(void)
-{
-    Show(0x1200, 0x20, 0, 0);
 }
 
 u16 ScreenPageStart(void)

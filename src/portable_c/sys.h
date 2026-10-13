@@ -558,21 +558,14 @@ void ScreenType(u16 character, u16 page, u16 color);
 u16 ScreenEga(void);
 
 /* The font of such a display: how many lines of dots a character has,
-   and the last row of the screen with it. A display that does not say
-   has 16 and 0. */
+   and the last row of the screen with it, which is how the program
+   knows the rows of the screen that it is given. A display that does
+   not say has 16 and 0. */
 struct Font {
     u16 height;
     u16 last;
 };
 struct Font ScreenFont(void);
-
-/* Give such a display the font of 8 lines, which makes 43 rows of an
-   EGA's screen and 50 of a VGA's. */
-void ScreenSmallFont(void);
-
-/* Have the Print Screen key of such a display print every row that the
-   screen has: the BIOS's own routine for the key prints 25. */
-void ScreenPrintAll(void);
 
 /* How far into the memory of the display the page begins that is shown,
    in bytes. And where the cells of the screen are from now on, for

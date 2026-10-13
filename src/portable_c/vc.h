@@ -285,7 +285,9 @@ struct MainDat {
     u8  BegCol;                         /* Start position of DOS's command line */
     u8  OutCol;                         /* Start position for output com. line */
     u8  ScrPage;                        /* Current screen page number */
-    u8  TstEGA;                         /* 1 if EGA or VGA present */
+    u8  TstEGA;                         /* 1 if EGA or VGA present: the
+                                           start asks such a display
+                                           for its rows */
     u8  Lines;                          /* Number of lines on screen */
     u8  Snow;                           /* Snow on/off: of the original.
                                            Not set or read here */
@@ -772,8 +774,9 @@ enum {
     CMD_F21_31,                         /* run the command in DosBuf */
     /* The other commands of the keys, in the order that the original's
        table of the keys has them in: see Func12 of main.c. The original
-       has one more, F65_00 behind F64_00, the map of the memory, Alt+F5,
-       which the portable C has not (see DEVIATIONS.md). */
+       has two more, which the portable C has not (see DEVIATIONS.md):
+       F65_00 behind F64_00, the map of the memory, Alt+F5, and F69_00
+       behind F68_00, EGA lines, Alt+F9. */
     CMD_F00_00, CMD_F01_00, CMD_F02_00, CMD_F03_00, CMD_F04_00,
     CMD_F05_00, CMD_F06_00, CMD_F07_00, CMD_F08_00, CMD_F09_00,
     CMD_F10_00, CMD_F76_00, CMD_F21_00, CMD_F27_00, CMD_F74_00,
@@ -786,8 +789,8 @@ enum {
     CMD_F42_00, CMD_F43_00, CMD_F44_00, CMD_F45_00, CMD_F46_00,
     CMD_F47_00, CMD_F48_00, CMD_M75_00, CMD_F54_00, CMD_F55_00,
     CMD_F56_00, CMD_F58_00, CMD_F61_00, CMD_F62_00, CMD_F63_00,
-    CMD_F64_00, CMD_M42_00, CMD_F67_00, CMD_F68_00, CMD_F69_00,
-    CMD_M41_00, CMD_F75_00,
+    CMD_F64_00, CMD_M42_00, CMD_F67_00, CMD_F68_00, CMD_M41_00,
+    CMD_F75_00,
     /* Those that only the menus have, or have at a label of their own. */
     CMD_M01_00, CMD_M03_00, CMD_M06_00, CMD_M08_00, CMD_F17_01,
     CMD_M16_01, CMD_F62_01, CMD_M21_00, CMD_F76_01, CMD_M53_00,
@@ -1049,7 +1052,6 @@ u16 M16_10(u16 panel);
 u16 M21_00(void);
 u16 M41_00(void);
 u16 M42_00(u16 panel);
-u16 F69_00(void);
 u16 M49_00(u16 panel);
 u16 M60_00(void);
 u16 M61_00(void);
