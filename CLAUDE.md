@@ -124,7 +124,7 @@ These held while `src/c/` was made, and they say what it is.
   from, since it shows that nothing has changed, not that anything is
   right.
 - A feature that only made sense on DOS is removed, not kept as a setting
-  that does nothing. The first is Memory allocation in the Configuration:
+  that does nothing. The first is Memory allocation in the Options menu:
   the portable C stays in memory whole while a command runs. A removal of
   that kind is declared and made without asking. Any other deviation, a
   fix of a bug of the original included, is asked first.
@@ -1316,8 +1316,6 @@ in "The portable C".
   change that was not meant shows there as a row that the declaration
   does not explain. A scenario whose steps choose what is gone needs
   the step left out, not a golden of the keys going astray.
-- Memory allocation is an item of the Options menu, "F9 o m", not a
-  field of the Configuration dialog.
 
 - What retyping the first 22 of those functions met, each of which
   the compiler took without a word:
