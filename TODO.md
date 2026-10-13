@@ -2782,16 +2782,26 @@ checkout's `build/tmp` by itself; no `TMPDIR` is wanted.
   at every idle round, as "What could go wrong", 4, has it; no scenario
   that shows the time of day fails for it.
 
-The 14 that fail, as the test prints them, for whoever takes them:
+The 14 that fail, by cause as far as the first screen that differs
+tells it: nothing behind that screen is known of any of them, and no
+cause was looked for in the program. The steps are counted from 0, the
+start. "Second copy" says whether the scenario had started the program
+a second time by then, so that the driver was reading the first copy's
+place: see below.
 
-| Scenarios | First otherwise | |
-|---|---|---|
-| `editor-long`, `editor-full`, `editor-buffer` | After step 9, `Ctrl+y Ctrl+u ...`, row 16: every cell has another character, and both rows print as blanks | One cause by the look of it. `compare.py` prints a character that is no letter as a blank: what the cells hold is in the run's screen, `show.py` |
-| `comspec`, `user-menu`, `user-menu-run`, `view-commands`, `editor-save` | In the editor, on a file of the program's own, `vc.mnu`, `vcview.ext`, `vc.ext`: the status says Line 1 with a column further right, where the original is on line 2 or 3 at column 1 | A line's end that the editor does not take for one, by the look of it |
-| `editor-keys` | After step 7, in the editor: Col 157 for Col 13 | |
-| `editor-big` | After step 28, `F4`: the editor is open on `b`, where the original shows the panels | |
-| `command` | After step 7, `Ctrl+o`: `mem` of DOS, run from the program, says 15,360K of extended memory, in all and free, for 15,232K, and 16,384K of memory in all for 16,256K: 128K more of each | What the extender makes of the machine's memory while a command runs: not looked into. If it is a figure that follows what the program is and not what it does, `harness/deviations.py` leaves such out, which is asked first |
-| `second-copy`, `start-memory`, `ended` | After `Ctrl+o`, steps 6, 12 and 40: what the screen behind the panels has of a second copy of the program is otherwise than the patch of the 16-bit build expects, which says that a second copy has no memory to run; in `ended`, of the registers that the program leaves for the one that started it, three words are others | Not looked into further: 3 and 4 of what is open for the user are of these three scenarios |
+| | Cause, by the look of it | Scenarios | First otherwise, in the one named first | Second copy |
+|---|---|---|---|---|
+| 1 | The editor, rows of the screen never written. One cause for the three: the same step and the same rows | `editor-long`, `editor-full`, `editor-buffer` | After step 9, `Ctrl+y Ctrl+u Ctrl+u Up Up End Del`, twice over: rows 16, 18, 20 and 22 hold zeros, character 00 in colour 00, where the original has blanks in 1Bh; the cursor is where it should be. The test prints both rows as blanks, with `^` under every cell | No |
+| 2 | The editor, where a line ends: the cursor is on line 1 at the column behind what was typed, where the original is on a line further down at column 1. Each has typed a line and Enter into a file of the program's own | `user-menu-run`, `user-menu`, `comspec`, `view-commands`, `editor-save` | After step 6, `"a:" Tab "all" Enter`, row 0: `Edit: vc.mnu  *  Line 1  Col 7` for `Line 2  Col 1`. The others at steps 47, 45, 29 and 23, in `vc.mnu`, `vcview.ext` and `D:\VC\vc.ext` | `comspec` alone, and it shows what the four without one show |
+| 3 | The editor, the cursor in a line: perhaps 2 again, since the step begins with Enter | `editor-keys` | After step 7, `Enter Up End Left Left Left Backspace Del`, rows 0 to 13: the status has `Col 157` for `Col 13`, and the cursor is at column 74 of row 1 for column 12 | No |
+| 4 | The editor opened where the original does not open it | `editor-big` | After step 28, `F4`, row 0: `Edit: b  Line 1  Col 1` and the editor's screen, where the original shows the panels | No |
+| 5 | What the machine's memory is said to be while a command runs from the program | `command` | After step 7, `Ctrl+o`, rows 15 and 17: `mem` of DOS says 15,360K of extended memory, in all and free, for 15,232K, and 16,384K of memory in all for 16,256K, 128K more of each. What the extender makes of the memory: not looked into. If it is a figure that follows what the program is and not what it does, `harness/deviations.py` leaves such out, which is asked first | No |
+| 6 | A second copy of the program: the patches of the 16-bit build say that it has no memory to run, and here it has. 3 of what is open for the user | `second-copy`, `start-memory` | After step 6, `Ctrl+o`, row 15: `C:\WORK>d:\vc\vc ver` and what follows it, where the patch expects an empty row. `start-memory` after step 12, `Ctrl+o`, row 18: an empty row where the original has `C:\WORK>d:\vc\vc k` | Both |
+| 7 | The program ended by another's hand. 4 of what is open for the user, which D2 tried and wrote down | `ended` | After step 40, `Ctrl+o`, row 0: of the six words that the scenario prints of the registers left for the program that started this one, `2222 1111 EEF6 436D FF75 0202` for the patch's `2222 1111 EE4F #### 0000 0202` | Yes |
+
+So ten of the fourteen are the editor's, 1 to 4, and none of those is
+the second copy's doing by what shows; 6 and 7 wait for the user's
+word, and may have the driver's blindness in them besides.
 
 **A second copy, which the driver does not know.** In six scenarios
 the program is started a second time from the command line of the
@@ -2803,14 +2813,44 @@ call for the program's by the name of the program that DOS has as the
 current one: while the second copy idles, it reads the first copy's
 variables and writes out the first copy's stack. Of a program of 16
 bits it reads in the segment that DS is on at the idle call, so either
-copy's.
+copy's. What that does: a step in the second copy that waits on
+`AutoTim`, a cursor moved in a tree, ends at once or by a time that the
+first copy left; a clock that the second copy has on and the first has
+not is not looked at for what blinks, or the other way round; and the
+stack that is written out says nothing of the second copy.
 `start-setup` and `start-screen` pass all the same. Whether one of the
-four that fail does so for this is not known; a step that ends too
-early or never in a second copy, or a clock that is taken to blink
-where none does, would be it. The test names these scenarios in its
-line on the place. To mend it the driver would have to know where the
-copy is that idles, which a flat program does not say by a segment
-register; how, is for whoever finds that a scenario needs it.
+four that fail does so for this is not known, and by the table above
+it does not look so. The test names these scenarios in its line on the
+place.
+
+What would mend it, by reading and not tried:
+
+- Where the second copy is, the harness can work out, and the driver
+  cannot find: nothing in the registers of an idle call says where a
+  flat program's objects are. The extender puts the second copy's
+  first object where the next block of its memory begins, by the rule
+  that `le.py` has for one object behind another: the end of the first
+  copy, 001DA18Bh as the program is linked now, rounded up to 16 and
+  16 more, which is the 001DA1A0h that the log has in all six.
+  `driver.flat_facts` takes a `base` already, so a second set of the
+  three addresses is one more call of it.
+- The driver is told both: a second three addresses in the event 06,
+  or a second event. It asks DOS for the current program's PSP at
+  every idle call already, to see by its name whether the call is the
+  program's (AH 62h, in front of `I28N` of `DRIVER.ASM`); it keeps the
+  PSP of the first call that was the program's, and where a later one
+  has another PSP of that name, it reads at the second set. That is in
+  the part that only a flat program comes to, `I28F`, `Pump8` and
+  `PutStF`, so the original goes through the instructions that it went
+  through, which H2 held with `ndisasm` and by deriving every golden
+  again; the same has to be held of this.
+- A third copy would want a third place. No scenario had one in what
+  was run of it, by the log; `check_place` of `harness/ported.py` prints every
+  place that a copy ran at, and can hold each to be one that the
+  harness worked out.
+- The stack of the second copy is then written out as its own, and
+  `driver.stack_left` has to hold it against what a second copy's
+  stack holds when loaded, which is the same zeros.
 
 **What waits.**
 
