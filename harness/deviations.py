@@ -42,26 +42,30 @@ class Part:
     """A part of the screen that a tree shows otherwise than the original,
     wherever it shows and as much of it as shows: a rule of the second
     kind, for a text that is not as long in the tree as in the original,
-    or stands elsewhere on its row, and that a menu or a box may cover in
-    part.
+    or stands elsewhere on its row, or for a block of rows that the tree
+    has other rows in, and that a menu or a box may cover in part.
 
     It says the part as the original shows it when nothing covers it and
-    as the tree shows it then, cell for cell. On a screen of the golden
-    where the part is known to stand, each of its cells that the golden
-    has exactly as the original's part has it, character and colour, is
-    expected as the tree's part has that cell; every other cell there is
-    what covers the part, and is expected as the golden has it. So a
-    rule of this kind leaves nothing out of the comparison, and it can
-    be wrong of a cell in two ways, both of which fail the row, so that
-    the screen wants a patch. What covers the part may happen to have a
-    cell as the part has it, a space in the same colour: the rule then
-    expects the tree's part there, which does not show. And the part
-    may show in a cell in another colour, under the mouse's pointer or
-    in the shadow of a box: the rule takes that for something that
-    covers it, and expects the original's character. It is not taught
-    those colours: what the pointer makes of grey on black is the
-    colour of a box, black on grey, and it would take the box for the
-    part."""
+    as the tree shows it then, cell for cell, character and colour. On a
+    screen of the golden where the part is known to stand, each of its
+    cells that the golden has exactly as the original's part has it,
+    character and colour, is expected as the tree's part has that cell;
+    every other cell there is what covers the part, and is expected as
+    the golden has it. So a rule of this kind leaves nothing out of the
+    comparison, and it can be wrong of a cell in two ways, both of which
+    fail the row, so that the screen wants a patch. What covers the part
+    may happen to have a cell as the part has it, a space in the same
+    colour: the rule then expects the tree's part there, which does not
+    show. And the part may show in a cell in another colour, under the
+    mouse's pointer or in the shadow of a box: the rule takes that for
+    something that covers it, and expects the original's character. It
+    is not taught the pointer's colours: what the pointer makes of grey
+    on black is the colour of a box, black on grey, and it would take the
+    box for the part. The shadow of a box it knows where it is told to,
+    `shaded`: a shadow changes the colour of a cell and leaves its
+    character, so a cell of the part in a shadow has the part's
+    character in what the shadow makes of the part's colour, and the
+    tree's has the tree's character in what it makes of the tree's."""
     # What the part is, in a few words, for the test's report.
     what: str
     # The rows of the part as the original shows them and as the tree
@@ -70,73 +74,144 @@ class Part:
     # longer than the original's or shorter, the other goes on in spaces:
     # the part is as wide as the longer of the two, and what stands
     # behind the shorter text belongs to it, as the blank screen does
-    # behind a line that DOS has written.
+    # behind a line that DOS has written. A figure that the comparison
+    # leaves out (IGNORED) is in a row of the original's as the golden
+    # has it, in BLANK.
     was: tuple
     now: tuple
-    # The colour of its cells, in the original and in the tree.
-    colour: int
+    # The colour of its cells in the original: one number for a part of
+    # one colour, or for each row its colours as a golden has them, runs
+    # of an attribute byte, "1Bx10 1Ex7 1Bx23", which are to be as many
+    # cells as the part is wide.
+    colour: object
     # The columns at which the part may begin, on any row.
     columns: tuple = (0,)
     # How the part is known to stand at a place: at least this many of
     # the original's characters that are no spaces show there, in their
-    # cells and in the colour. Eight were too few to be sure: a line of
-    # the editor had nine letters of the original's title in the cells
+    # cells and in their colours. Eight were too few to be sure: a line
+    # of the editor had nine letters of the original's title in the cells
     # and in the colour of an Info panel's, "ompa" and "ersion" of
     # "incompatible version" under "Commander, Version".
     least: int = 12
+    # The colours in the tree, written as `colour` is, or None where
+    # every cell has the colour that the original's part has there.
+    now_colour: object = None
+    # Characters of the original's part that it is not known by, though
+    # they are no spaces: those of a frame and of a line across a panel,
+    # which every panel has in the same cells.
+    frame: str = ""
+    # Whether the part is known in the shadow of a box as well, which
+    # makes of a colour what the program makes of it as it is
+    # distributed (ShadCol of src/portable_c/screen.c). A character in a
+    # shadow then counts among those that the part is known by.
+    shaded: bool = False
 
     @cached_property
     def rows(self):
         """The rows of the part as bytes of the screen: of each the
-        original's characters and the tree's, as long as each other, and
-        the original's with a zero byte for every space, which is what
-        the part is known by."""
+        original's characters and the tree's, as long as each other; the
+        original's with a zero byte for every character that the part is
+        not known by, a space or one of the frame; and the colours of the
+        original's cells and of the tree's."""
         if len(self.was) != len(self.now):
             raise ValueError(f"a part of {len(self.was)} rows that the "
                              f"tree shows as {len(self.now)}")
         rows = [(was.ljust(len(now)).encode("cp437"),
                  now.ljust(len(was)).encode("cp437"))
                 for was, now in zip(self.was, self.now)]
-        return [(was, now, was.replace(b" ", b"\0")) for was, now in rows]
+        unknown = bytes.maketrans((" " + self.frame).encode("cp437"),
+                                  bytes(len(self.frame) + 1))
+        colours = self._colours(self.colour, rows)
+        now = colours if self.now_colour is None \
+            else self._colours(self.now_colour, rows)
+        return [(was, to, was.translate(unknown), before, after)
+                for (was, to), before, after in zip(rows, colours, now)]
+
+    def _colours(self, colour, rows):
+        """The colours `colour` of the part's rows, cell for cell."""
+        if isinstance(colour, int):
+            return [bytes((colour,)) * len(was) for was, _ in rows]
+        if len(colour) != len(rows):
+            raise ValueError(f"{self.what}: colours of {len(colour)} rows "
+                             f"for a part of {len(rows)}")
+        cells = [b"".join(bytes((int(run[:2], 16),)) * int(run[3:])
+                          for run in row.split()) for row in colour]
+        for (was, _), row in zip(rows, cells):
+            if len(row) != len(was):
+                raise ValueError(f"{self.what}: colours of {len(row)} "
+                                 f"cells for a row of {len(was)}")
+        return cells
 
     def places(self, screen):
         """Where `screen` has the part: the row and the column of each
-        place."""
+        place. The row is above the screen, below 0, where the first
+        rows of the part have gone off its top. No place has a cell of
+        another's: where a beep has moved the screen up a row and what
+        the program then put back has left a row of the part twice, the
+        part could be known at two places that lie over each other, and
+        it stands where more of it shows."""
         codes, colours = screen.cells[0::2], screen.cells[1::2]
-        for row in range(ROWS - len(self.rows) + 1):
+        known = []
+        for row in range(1 - len(self.rows), ROWS - len(self.rows) + 1):
             for column in self.columns:
                 # Whether enough characters are there at all, in whatever
                 # colour, is quickly told, and on most rows none is. A
                 # cell of the screen with a zero byte in it counts here
                 # where the part has a space, and not below.
-                at = row * COLUMNS + column
-                there = [codes[at + down * COLUMNS:
-                               at + down * COLUMNS + len(known)]
-                         for down, (_, _, known) in enumerate(self.rows)]
-                if sum(sum(map(eq, known, some))
-                       for (_, _, known), some in zip(self.rows, there)) \
-                        < self.least:
+                on = [(at, each) for at, each in enumerate(self.rows, row)
+                      if at >= 0]
+                there = [codes[at * COLUMNS + column:
+                               at * COLUMNS + column + len(by)]
+                         for at, (_, _, by, _, _) in on]
+                if sum(sum(map(eq, by, some))
+                       for (_, (_, _, by, _, _)), some
+                       in zip(on, there)) < self.least:
                     continue
                 shown = 0
-                for (_, _, known), some in zip(self.rows, there):
-                    shown += sum(a == b != 0 and colour == self.colour
-                                 for a, b, colour in zip(
-                                     known, some, colours[at:at + COLUMNS]))
-                    at += COLUMNS
+                for (at, (_, _, by, before, _)), some in zip(on, there):
+                    at = at * COLUMNS + column
+                    shown += sum(
+                        a == b != 0 and (colour == was or self.shaded
+                                         and colour == shaded(was))
+                        for a, b, colour, was in zip(
+                            by, some, colours[at:at + COLUMNS], before))
                 if shown >= self.least:
-                    yield row, column
+                    known.append((shown, row, column))
+        places = []
+        width = max(len(was) for was, *_ in self.rows)
+        for _, row, column in sorted(known, key=lambda place: -place[0]):
+            if all(abs(row - other) >= len(self.rows)
+                   or abs(column - beside) >= width
+                   for other, beside in places):
+                places.append((row, column))
+        return sorted(places)
 
     def made(self, screen, cells):
         """Make the part to `cells`, those of `screen`: wherever the
         screen has it, every cell that is the original's becomes the
         tree's."""
         for row, column in self.places(screen):
-            for at, (was, now, _) in enumerate(self.rows):
-                begin = ((row + at) * COLUMNS + column) * 2
+            for at, (was, now, _, before, after) in enumerate(self.rows,
+                                                               row):
+                if at < 0:
+                    continue
+                begin = (at * COLUMNS + column) * 2
                 for cell in range(len(was)):
-                    if screen.cells[begin + cell * 2:begin + cell * 2 + 2] \
-                            == bytes((was[cell], self.colour)):
-                        cells[begin + cell * 2] = now[cell]
+                    here = begin + cell * 2
+                    shown = screen.cells[here:here + 2]
+                    if shown == bytes((was[cell], before[cell])):
+                        cells[here:here + 2] = now[cell], after[cell]
+                    elif self.shaded and shown == bytes(
+                            (was[cell], shaded(before[cell]))):
+                        cells[here:here + 2] = \
+                            now[cell], shaded(after[cell])
+
+
+def shaded(colour):
+    """What the shadow of a box makes of the colour `colour` of a cell,
+    as the program is distributed: it takes the background and the
+    blinking off it and turns its brightness round."""
+    return colour & 0x8F ^ 8
 
 
 def expected(screen, rules=None):
