@@ -50,9 +50,11 @@ COPY = BUILD / "notice" / "source"
 COPY_BUILD = BUILD / "notice" / "build"
 # The C trees, by the names of their directories in src/ and in build/.
 TREES = ("c", "portable_c")
-# What they are built from, of all that the project holds.
-BUILT_FROM = ["CMakeLists.txt", "tools/mkexe.c"] + [f"src/{tree}"
-                                                    for tree in TREES]
+# What they are built from, of all that the project holds: the build
+# makes a tool of each file of tools/ that it names, whichever tree is
+# asked for.
+BUILT_FROM = ["CMakeLists.txt", "tools/mkexe.c", "tools/stub.c"] + [
+    f"src/{tree}" for tree in TREES]
 COM_ORIGIN = 0x100                # where a .COM file is loaded
 
 
