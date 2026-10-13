@@ -381,6 +381,21 @@ def link_map(path):
 STACKS = (("DataSav", "R_BSS"), ("_Stack", "SSTACK"))
 
 
+def flat_stack(program, linked):
+    """Where the stack of a flat program begins and ends, an le.Linear
+    with its le.Map: two places, counted from where the first object
+    begins in the memory (see le.py). The header of the file has the top
+    of the stack that the extender enters the program on, and the stack
+    is the segment of the map that ends there."""
+    top = program.place(*program.stack)
+    for found in linked.segments:
+        bottom = program.place(found.first, found.offset)
+        if found.size and bottom + found.size == top:
+            return bottom, top
+    raise ValueError("no segment of the linker's map ends where the "
+                     "file's header has the top of the stack")
+
+
 def segments(path):
     """Read a wlink map: its segments, each as name, class, where it
     begins, as the paragraph and the offset that the map has, and how

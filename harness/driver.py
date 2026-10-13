@@ -77,6 +77,13 @@ high, and from there to the middle of its cell in steps of 4, which the
 driver takes as they are: 4 dots to the right for 4, 2 dots down for 4,
 where a cell is 8 dots each way. From one place to the next with a button
 down the pointer goes the same way, by steps of 4, without the corner.
+
+A flat program of 32 bits, as the portable C is to be, has its data above
+the megabyte, and is in the machine's memory where its extender puts it.
+What the driver reads of it, it reads at addresses of the machine's
+memory, which are worked out here: from the file and the linker's map,
+which le.py reads, and from where the extender has the first object of a
+program on the bench, le.BENCH. See flat_facts.
 """
 import re
 import struct
@@ -84,6 +91,7 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 
 import coverage
+import le
 from dos import COLUMNS, ROWS, MachineError, Screen
 
 # The driver, assembled by the build.
@@ -95,7 +103,7 @@ PAD = 3
 
 # A script (see DRIVER.ASM).
 MAGIC = b"\xA5\x5A"
-KEYBOARD, MOUSE, STEP, HOLD, ASKS, END = 1, 2, 3, 4, 5, 0
+KEYBOARD, MOUSE, STEP, HOLD, ASKS, ABOVE, END = 1, 2, 3, 4, 5, 6, 0
 NONE = 0xFFFF
 # The disk a script is on: its size is that of the disk the machine had
 # when its state was saved, and the longest that a script may be. The
@@ -173,6 +181,10 @@ class Facts:
     # there, which it moves elsewhere as it starts and leaves behind; the
     # translation has zeros.
     stack_loaded: bytes = b""
+    # A flat program of 32 bits: the three places are addresses of the
+    # machine's memory, 0 for none, and the driver reads them with the
+    # BIOS's block move. The stack has no segment then.
+    flat: bool = False
 
 
 def facts(program, stack=False):
@@ -181,9 +193,14 @@ def facts(program, stack=False):
     listing of its assembly. The translation has the listing of the original
     for that: its main data is laid out as the original's. With `stack`,
     where its stack is too: by the same listing, or for the translation by
-    the linker's map, which the build writes next to it."""
+    the linker's map, which the build writes next to it.
+
+    Of a flat program of 32 bits the main data is a variable, `md`, laid
+    out as the original's all the same: the Facts are addresses of the
+    machine's memory then, by the file and the map (see flat_facts)."""
     code = program.contents
     name = Path(program.filename).stem.upper().encode("ascii")
+    name = name[:NAME].ljust(NAME, b"\0")
     if not program.listing or not Path(program.listing).exists():
         raise RuntimeError(
             f"the driver needs a listing for {program.filename}: its own, "
@@ -194,9 +211,13 @@ def facts(program, stack=False):
     def symbol(pattern):
         return int(re.search(pattern, text, re.M)[1], 16)
 
-    found = Facts(name[:NAME].ljust(NAME, b"\0"),
-                  symbol(r"^ *AutoTim [ .]*([0-9A-F]+) +DWord"),
-                  symbol(r"^ *Clock [ .]*([0-9A-F]+) +Byte"))
+    auto_time = symbol(r"^ *AutoTim [ .]*([0-9A-F]+) +DWord")
+    clock = symbol(r"^ *Clock [ .]*([0-9A-F]+) +Byte")
+    flat = linear(code)
+    if flat:
+        return flat_facts(name, flat, le.Map(program.linked),
+                          ("_md", auto_time), ("_md", clock), stack)
+    found = Facts(name, auto_time, clock)
     if program.linked and not coverage.made_by_mkexe(code):
         # The driver reads the two at those places of the segment that DS
         # is on when the program idles: the main data has to begin there.
@@ -227,6 +248,51 @@ def facts(program, stack=False):
                 f"the stack of {program.filename} is not in its file, and "
                 "what it holds when the program has been loaded is not "
                 "known")
+    return found
+
+
+def linear(contents):
+    """The flat program whose file `contents` is, as le.py reads it, or
+    None for a program of 16 bits."""
+    try:
+        return le.Linear(contents)
+    except le.Unknown:
+        return None
+
+
+def flat_facts(name, program, linked, auto_time, clock, stack=False,
+               base=le.BENCH):
+    """The Facts of a flat program, an le.Linear with its le.Map, that
+    DOS has under `name`: where the driver finds in the machine's memory
+    what it watches. `auto_time` and `clock` are each a symbol of the map
+    and an offset from it, or None for a program that has none. With
+    `stack`, where the stack is too, and what it holds when the program
+    has been loaded: what the file has there, and zeros for the rest.
+
+    `base` is where the extender puts the first object. On the bench that
+    is le.BENCH, the same in every run that was looked at, and promised
+    by nothing: a run with QEMU's log of the code says where the program
+    was, as harness/drivercheck.py --trace asks it."""
+    def address(where):
+        if where is None:
+            return 0
+        symbol, offset = where
+        if symbol not in linked.public:
+            raise RuntimeError(
+                f"the linker's map has no {symbol}: the driver of the "
+                "tests finds by it what it reads of a flat program")
+        first, at = linked.public[symbol]
+        return base + program.place(first, at + offset)
+
+    found = Facts(name, address(auto_time), address(clock), flat=True)
+    if stack:
+        bottom, top = coverage.flat_stack(program, linked)
+        found = replace(found, stack=base + bottom, stack_size=top - bottom,
+                        stack_loaded=program.image()[bottom:top])
+        if found.stack_size >= 1 << 16:
+            raise RuntimeError(
+                f"the stack is {found.stack_size} bytes: the driver of the "
+                "tests writes out one of less than 64K")
     return found
 
 
@@ -434,10 +500,19 @@ def script(steps, known, blinking=False):
     screen that shows the program's clock is written out in both its
     states."""
     out = bytearray(MAGIC)
-    out += struct.pack("<HHHH", known.auto_time,
-                       known.clock if blinking else NONE,
-                       known.stack, known.stack_size)
-    out += known.name
+    if known.flat:
+        # Nothing by the header but how long the stack is: the rest by
+        # addresses, in an event of their own.
+        out += struct.pack("<HHHH", NONE, NONE, 0, known.stack_size)
+        out += known.name
+        out += bytes([ABOVE]) + struct.pack(
+            "<III", known.auto_time, known.clock if blinking else 0,
+            known.stack if known.stack_size else 0)
+    else:
+        out += struct.pack("<HHHH", known.auto_time,
+                           known.clock if blinking else NONE,
+                           known.stack, known.stack_size)
+        out += known.name
     out += events("Enter")                      # ends the PAUSE
     for step in ("",) + tuple(steps):
         out += events(step)
@@ -456,7 +531,8 @@ class Step:
     screen: Screen
     stack: bytes = None           # what the program's stack held, if the
                                   # program waited where that is looked at
-    stack_segment: int = None     # and the segment it is in
+    stack_segment: int = None     # and the segment it is in: 0 for
+                                  # the stack of a flat program
 
 
 def _screen(data):
@@ -507,6 +583,11 @@ def read(data):
             steps[-1].stack = data[at + 5:at + 5 + size]
             steps[-1].stack_segment = segment
             at += 5 + size
+        elif kind == b"F":
+            raise MachineError(
+                "the BIOS refused the driver of the tests a read of the "
+                "program's memory above the megabyte (INT 15h, function "
+                "87h): what it did then is worth nothing")
         elif kind == b"E":
             ended = True
         else:

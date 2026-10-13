@@ -65,6 +65,11 @@
 ;			that waits for a button to come up asks that, and
 ;			is not idle meanwhile. Behind an event 02 it counts
 ;			from that event on
+;	06 3 dwords	the program is a flat one of 32 bits: where its
+;			AutoTim, its Clock and its stack are, as addresses
+;			of the machine's memory, each in place of its word
+;			of the header, or 0 for going by that. See "A flat
+;			program" below. It comes before the first key
 ;	anything else	the script ends
 ;
 ; What the driver writes goes to a port that QEMU keeps in a file:
@@ -75,9 +80,12 @@
 ;	'K' word word bytes
 ;			with it, when the program waits in LeaveTm: the
 ;			length of its stack, its segment, and what the
-;			stack holds, from the bottom up
+;			stack holds, from the bottom up. Of a flat program
+;			the segment is 0
 ;	'B' 4005 bytes	with the clock on: the screen as it was seen to
 ;			change within 20 ticks of the timer after 'S'
+;	'F'		the BIOS refused to read the memory of a flat
+;			program: what the driver did then is worth nothing
 ;	'E'		the script has ended; the machine is then reset
 ;
 ; While no disk holds a script the driver has nothing to go by, and stops
@@ -282,7 +290,9 @@ PutScr	proc	near
 	ret
 PutScr	endp
 
-; Write the program's stack out, which SS is on.
+; Write the program's stack out, which SS is on. For a flat program a
+; jump to PutStF is written over its first instructions: see "A flat
+; program".
 PutStk	proc	near
 	pushf
 	push	ax
@@ -426,7 +436,7 @@ Pump1:	or	bl,bl
 	cmp	ax,cs:HLen
 	jb	PumpX
 	mov	cs:Hold,0
-Pump2:	call	Peek
+Pump2::	call	Peek
 	cmp	al,1
 	je	PumpK
 	cmp	al,2
@@ -437,6 +447,8 @@ Pump2:	call	Peek
 	je	PumpH
 	cmp	al,5
 	je	PumpA
+	cmp	al,6
+	je	PumpL
 	mov	al,'E'			; The script has ended
 	out	OutPort,al
 	mov	cs:Done,1
@@ -498,20 +510,22 @@ Pump4:	mov	al,'S'
 	cmp	cs:HStLen,0
 	je	Pump6
 	call	PutStk
-Pump6:	mov	bx,cs:HClock		; With the clock on, look for a while
+; For a flat program a jump to Pump8 is written over the next instruction:
+; see "A flat program".
+Pump6::	mov	bx,cs:HClock		; With the clock on, look for a while
 	cmp	bx,0FFFFh		; at what blinks before going on
 	je	Pump7
 	pop	ds			; The program's DS: see Int28
 	push	ds
 	cmp	byte ptr [bx],0
 	je	Pump7
-	mov	al,0
+Pump9::	mov	al,0
 	call	Screen
 	call	Ticks
 	mov	cs:WTick,ax
 	mov	cs:Watch,1
 	jmp	PumpX
-Pump7:	mov	bl,0
+Pump7::	mov	bl,0
 Pump5:	inc	cs:SPos
 	jmp	Pump0
 PumpX:	pop	ds
@@ -591,7 +605,9 @@ I28A:	popf
 	pop	bp
 	cmp	cs:Prog,0
 	je	I28I
-	push	bx			; The program, with DS on its main
+; For a flat program a jump to I28F is written over the next two
+; instructions: see "A flat program".
+I28Q:	push	bx			; The program, with DS on its main
 	mov	bx,cs:HAuto		; data: has it something to do by
 	cmp	bx,0FFFFh		; itself after a while?
 	je	I28B
@@ -658,6 +674,221 @@ Int16:	cmp	cs:Done,0
 	call	Pump
 	pop	ax
 I16X:	jmp	cs:[Old16]
+
+;-------------------- A flat program -------------------
+; A program of 32 bits has its data above the megabyte, where no segment
+; reaches, and its idle call comes through its extender, which is in real
+; mode then with DS and SS on what is its own. So the script says where
+; AutoTim, Clock and the stack are as addresses of the machine's memory
+; (event 06), and the driver reads them there with the BIOS's block move,
+; INT 15h function 87h. The idle call and the keys are as for any program.
+;
+; The driver changes its own code for a flat program, and this is why. A
+; program of 16 bits is to be driven by the instructions that it was
+; driven by before there was any of this: the machine's time is counted in
+; the instructions that it executes, and a golden of the original is what
+; the original showed at one of them. A question at each place where the
+; driver reads the program, whether the program is flat, would be two
+; instructions more for the original at every round of its idle call, and
+; whether a golden moves by that would have to be found out scenario by
+; scenario, each time one is added. So nothing above asks. The event
+; writes a jump over the instruction at each of the three places, once,
+; before the first key, to what does the same from above the megabyte: at
+; I28Q to I28F, at Pump6 to Pump8, at PutStk to PutStF. A script without
+; the event goes through the driver as it was, instruction for
+; instruction, but for the two that tell the event from the others, to
+; which it comes at its end, behind its last screen. Whoever changes the
+; driver for a flat program keeps to that: what is new goes here, behind
+; a jump, and not into the way of the original.
+
+; The event, from its second byte: where the three are, 0 for one that is
+; not above the megabyte.
+LAuto	dd	0
+LClock	dd	0
+LStack	dd	0
+
+LFrom	dd	0			; Where PutStF is in the stack
+Got	dd	0			; What RdGot has read
+; The table that the block move goes by: six descriptors, of which the
+; third is where to read and the fourth where to write. The BIOS fills in
+; the others.
+Gdt	db	48 dup (0)
+
+; Have the driver go on at DX where it comes to BX: a jump over what
+; stands there, so that no instruction asks which way to go (see above).
+Divert	proc	near
+	mov	byte ptr cs:[bx],0E9h
+	sub	dx,bx
+	sub	dx,3
+	mov	cs:[bx+1],dx
+	ret
+Divert	endp
+
+; Event 06, in Pump.
+PumpL:	inc	cs:SPos
+	push	bx
+	push	dx
+	mov	bx,offset LAuto
+	mov	cx,12
+PumpL1:	call	Next
+	mov	cs:[bx],al
+	inc	bx
+	loop	PumpL1
+	cmp	cs:LAuto,0
+	je	PumpL2
+	mov	bx,offset I28Q
+	mov	dx,offset I28F
+	call	Divert
+PumpL2:	cmp	cs:LClock,0
+	je	PumpL3
+	mov	bx,offset Pump6
+	mov	dx,offset Pump8
+	call	Divert
+PumpL3:	cmp	cs:LStack,0
+	je	PumpL4
+	mov	bx,offset PutStk
+	mov	dx,offset PutStF
+	call	Divert
+PumpL4:	pop	dx
+	pop	bx
+	jmp	Pump2			; It is nothing to wait for
+
+; Read CX words to DI of the driver's segment, from the address of the
+; machine's memory that the driver has at BX. Returns CY if the BIOS
+; refused, with F written.
+RdHigh	proc	near
+	pusha
+	push	ds
+	push	es
+	push	cs
+	pop	ds
+	push	cs
+	pop	es
+	mov	si,offset Gdt
+	mov	word ptr [si+10h],0FFFFh	; From: 64K at that address,
+	mov	ax,[bx]				; data that can be written
+	mov	[si+12h],ax
+	mov	ax,[bx+2]
+	mov	[si+14h],al
+	mov	byte ptr [si+15h],93h
+	mov	byte ptr [si+16h],0
+	mov	[si+17h],ah
+	mov	ax,cs				; To: the same at CS:DI
+	mov	dx,ax
+	shl	ax,4
+	shr	dx,12
+	add	ax,di
+	adc	dx,0
+	mov	word ptr [si+18h],0FFFFh
+	mov	[si+1Ah],ax
+	mov	[si+1Ch],dl
+	mov	byte ptr [si+1Dh],93h
+	mov	word ptr [si+1Eh],0
+	mov	ah,87h
+	int	15h
+	jnc	RdHi1
+	mov	al,'F'
+	out	OutPort,al
+	stc
+RdHi1:	pop	es
+	pop	ds
+	popa
+	ret
+RdHigh	endp
+
+; Read into Got the four bytes at the address that the driver has at BX.
+; Returns CY if they were not read.
+RdGot	proc	near
+	push	cx
+	push	di
+	mov	cx,2
+	mov	di,offset Got
+	call	RdHigh
+	pop	di
+	pop	cx
+	ret
+RdGot	endp
+
+; INT 28h, from I28Q: has the program something to do by itself after a
+; while? As there, with AutoTim as it was read.
+I28F:	push	bx
+	mov	bx,offset LAuto
+	call	RdGot
+	jc	I28B
+	cmp	word ptr cs:Got,0FFFFh
+	je	I28B
+	mov	ax,word ptr cs:Got	; A time: one that was seen there?
+	cmp	ax,cs:PTime
+	jne	I28K
+	mov	ax,word ptr cs:Got+2
+	cmp	ax,cs:PTime+2
+	jne	I28K
+	call	Ticks			; For how long has it been?
+	sub	ax,cs:PTick
+	cmp	ax,Soon
+	ja	I28B			; Too long to be a time that comes
+	jmp	I28H
+I28K:	mov	ax,word ptr cs:Got	; Another: it is believed from now
+	mov	cs:PTime,ax
+	mov	ax,word ptr cs:Got+2
+	mov	cs:PTime+2,ax
+	call	Ticks
+	mov	cs:PTick,ax
+	jmp	I28H
+
+; Pump, from Pump6: is the clock on?
+Pump8:	mov	bx,offset LClock
+	call	RdGot
+	jc	Pump7
+	cmp	byte ptr cs:Got,0
+	je	Pump7
+	jmp	Pump9
+
+; PutStk: the stack is read a piece at a time to Last, which holds nothing
+; while a step ends, and written out from there.
+PutStF:	pushf
+	pusha
+	push	ds
+	cld
+	push	cs
+	pop	ds
+	mov	dx,OutPort
+	mov	al,'K'
+	out	dx,al
+	mov	ax,HStLen
+	out	dx,al
+	mov	al,ah
+	out	dx,al
+	xor	al,al			; No segment
+	out	dx,al
+	out	dx,al
+	mov	ax,word ptr LStack
+	mov	word ptr LFrom,ax
+	mov	ax,word ptr LStack+2
+	mov	word ptr LFrom+2,ax
+	mov	bp,HStLen		; Bytes still to write
+PutSF1:	mov	cx,Cells
+	cmp	cx,bp
+	jbe	PutSF2
+	mov	cx,bp
+PutSF2:	jcxz	PutSF3
+	sub	bp,cx
+	push	cx
+	inc	cx			; In words, which is what the BIOS
+	shr	cx,1			; moves
+	mov	bx,offset LFrom
+	mov	di,Last
+	call	RdHigh
+	pop	cx
+	add	word ptr LFrom,cx
+	adc	word ptr LFrom+2,0
+	mov	si,Last
+	rep	outsb
+	jmp	PutSF1
+PutSF3:	pop	ds
+	popa
+	popf
+	ret
 
 ;----------------------- Loading -----------------------
 Init:	mov	PktSeg,cs

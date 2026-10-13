@@ -10,11 +10,19 @@
    done its thing. With DRIVERX.COM told where the two are (run.py
    --lauto, --lclock, with the addresses that the toy's first line has),
    it ends when "done by itself" is on the screen, and a step behind "c"
-   takes the 20 ticks for which the driver watches what blinks. */
+   takes the 20 ticks for which the driver watches what blinks.
+
+   That was the trial. The driver of the tests reads above the megabyte
+   itself since, and harness/drivercheck.py holds it to this toy: as it
+   is here, and once more with the two variables in a main data, `md`,
+   at the offsets that the original has them at, which that script
+   defines in front of this file. */
 #include "toy.h"
 
+#ifndef AutoTim
 u32 AutoTim = 0xFFFFFFFFUL;
 u8 Clock = 0;
+#endif
 
 void Main(void)
 {

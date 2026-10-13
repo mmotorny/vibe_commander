@@ -14,6 +14,13 @@ which holds the system's functions of the 32-bit program,
 `src/portable_c/dos32.c`, against those of the 16-bit one, with
 `both.py` to run it.
 
+And the driver of the tests reads above the megabyte itself since,
+where the trial had `DRIVERX.ASM` do it: `harness/drivercheck.py` holds
+it to `auto.c`, `keys.c`, `wait.c` and `sys.c`, and its top says how.
+`run.py` still tells the driver nothing of where a toy keeps anything,
+so what is said below of `auto.c` and "the driver as it is" is what
+`run.py` shows today as well.
+
 Nothing here is built or tested by the project: `CMakeLists.txt` does
 not know the directory, and no test reads it. Nothing here is the
 program's, and none of it is to grow into the harness as it stands:

@@ -2381,8 +2381,8 @@ The trial's seven changes, set against the pieces of the program:
 |---|---|---|---|
 | 1 | The build | B1, B2 | B1: any later piece is held to compiling for both. B2: the first run |
 | 2 | A reader of LE files and of the flat map | H1 | Everything below |
-| 3 | `driver.py`: the facts of a flat program as linear addresses, and the script's second header | H2 | The first run that is to be judged. Before it `harness/trial32/run.py` runs the program and prints its screens, with every step that waits on `AutoTim` ended early |
-| 4 | `DRIVER.ASM`: the block move for `AutoTim`, `Clock` and the stack; then every golden derived again, which must change none | H2 | The same |
+| 3 | `driver.py`: the facts of a flat program as linear addresses, and the script's second header, which became an event | H2, done | The first run that is to be judged. Before it `harness/trial32/run.py` runs the program and prints its screens, with every step that waits on `AutoTim` ended early |
+| 4 | `DRIVER.ASM`: the block move for `AutoTim`, `Clock` and the stack; then every golden derived again, which must change none | H2, done: none changed | The same |
 | 5 | `coverage.py` and `ported.py` on the reader, with the stub left out; the record of the scenarios that pass | H3 | The 32-bit build can be held to anything. What ran of the C is asked only once every scenario passes |
 | 6 | The scenarios' test: the stack, the limits above | H3 | The switch |
 | 7 | `datacheck.py`, with `tools/figures.py`; `reads.py` goes by the text of the C and stays | H4 | The switch: until then the 16-bit build holds the tables, which are the same source |
@@ -2428,6 +2428,8 @@ Where the plan and the code differ:
   `ported.check_translation` and `check_layout` do, and
   `coverage.origin` and `coverage.relocated` read the header of a
   program of 16 bits: those are H2's and H3's to give a second form.
+  H2 gave `driver.facts` its own and `coverage.stack` a second
+  function beside it, `flat_stack`; the others are H3's still.
   `datacheck.py` and `arithcheck.py` each
   still read the lines of the 16-bit map by themselves; `le.Map` has
   what `Translation` of `datacheck.py` reads there, modules and static
@@ -2497,6 +2499,142 @@ an object and an offset that may be below 0. The object files of
 `wcc386` have the records of 32 bits, 99h, 91h, A1h, 9Dh and B7h where
 `ObjectFile` of `datacheck.py` reads 98h, 90h, A0h, 9Ch and B6h.
 
+### Piece H2, the driver: done, and what a later piece should know
+
+The driver of the tests reads of a flat program what it reads of any,
+`AutoTim`, `Clock` and the stack, above the megabyte, by the BIOS's
+block move, at addresses that `harness/driver.py` works out from the
+program's file and the linker's map. A program of 16 bits is driven by
+the instructions that it was driven by before. Nothing of the project
+is flat yet, so no test of the build holds the first: `python3
+harness/drivercheck.py` does, by hand, with toys on the bench.
+
+What there is:
+
+| | |
+|---|---|
+| `driver.facts(program, stack)` | As it was for a program of 16 bits. A flat one, which is one whose file `le.Linear` takes (`driver.linear`), gets `Facts` with `flat` set, whose three places are addresses of the machine's memory: `_md` of the map, placed from `le.BENCH`, with the offsets of `AutoTim` and `Clock` from the original's listing as before; and the stack. So `scenarios.run`, `show.py --program` and the scenarios' test have the driver's side of a flat program with no change of theirs |
+| `driver.flat_facts(name, program, linked, auto_time, clock, stack, base)` | The same of any flat program: each of the two is a symbol of the map and an offset from it, or None. The trial's toys go through it, with `_AutoTim` and `_Clock` of their own |
+| `coverage.flat_stack(program, linked)` | Where the stack is, as two places: the segment of the map that ends where the header of the file has the top of the stack. What it holds when loaded is `image()` there |
+| The script | Its header is as it was. For a flat program the four words say none, none, 0 and the stack's length, and an event 06 follows, before the first key: three addresses of 32 bits, 0 for one that is not above the megabyte |
+| `DRIVER.ASM`, "A flat program" | The event; `RdHigh`, the block move; `I28F`, `Pump8` and `PutStF`, which do with what was read there what the driver does at `I28Q`, `Pump6` and `PutStk`; `Divert` |
+| What the driver writes | `K` of a flat program has 0 for the segment. New, `F`: the BIOS refused a block move, and `driver.read` raises for it |
+| `harness/drivercheck.py` | Builds `auto.c`, `keys.c`, `wait.c` and `sys.c` of `harness/trial32/`, runs them on the bench as the program, and holds what the driver did; `--trace`, `--below`, `--facts FILE`. Its top says what is held. Twenty seconds |
+
+Where the plan and the code differ:
+
+- No second form of the header: an event. The header is read where
+  every script goes, and telling two forms apart there is instructions
+  for the original. An event that no script of a 16-bit program has
+  costs it nothing.
+- The block move is not "taken only when the header says so" by a
+  question at each of the three places: that is two instructions more
+  for the original at every round of its idle call. The event writes a
+  jump over the instruction at each place, once, before the first key:
+  the driver changes its own code for a flat program and for no other.
+  The machine's time is counted in instructions, a golden is what the
+  original showed at one, and the lists of what ran beside the goldens
+  are of what it had run by then; with the instructions the same,
+  nothing of that can move, and it need not be found out for each
+  scenario whether a few more would have.
+- That they are the same was held, with `ndisasm` on the driver before
+  and after: each of the 431 instructions from `RdSec` to `Init` is in
+  the new one as it was, six bytes further on behind the two that were
+  put in, with the jumps and calls across them pointing six further.
+  The two are `cmp al,6` and a jump, where `Pump` tells the events
+  apart: a script without the event comes to them once, at its end,
+  behind its last screen. `Init` is unchanged. What is new stands
+  between the interrupts and `Init`.
+- The file is 2,048 bytes as before, 1,693 of them used where 1,226
+  were, and the driver keeps as much of the memory: the stack is read a
+  piece at a time into the 4,000 bytes that hold a screen while what
+  blinks is looked for, which hold nothing while a step ends.
+- `show.py` and `play.py` needed nothing: the first goes through
+  `scenarios.run` and `driver.facts`, the second has no driver.
+- 220 lines of `DRIVER.ASM`, 80 of `driver.py`, 15 of `coverage.py`,
+  and the check, 470, where the plan had 170 in all.
+
+What decided:
+
+- Every golden of the original derived again, twice, `python3
+  harness/goldens.py derive --together 8`: 167 scenarios each time, and
+  `git status` of `harness/goldens/` clean after each. The second ran
+  beside other agents' tests and took eight and a half minutes for the
+  first's two and a half.
+- The whole suite, before the plan's other pieces of that hour were
+  pulled in and after.
+- `python3 harness/drivercheck.py --trace --below`, run five times
+  as it grew, with what each toy wrote the same every time, to the
+  tick:
+
+  | Toy | What the driver did |
+  |---|---|
+  | `auto.c`, told that `AutoTim` is at 00100608 and `Clock` at 0010060C, which is what the toy writes of itself | The step of `t` ended with "done by itself" on the screen, nine ticks behind the key. The steps with the clock on have the cell 0,20 as blinking and no other; those before have none. The stack: 16,384 bytes at 00100618, 16,246 of them never used |
+  | `auto.c`, told nothing, as `run.py` runs it | The step of `t` ended at once, before the toy had done its thing: what the trial saw of the driver as it was |
+  | `auto.c` with a main data: built with its two variables in an `md` of F48Bh bytes, at the offsets of the original's listing, and watched by what `driver.facts` makes of that file, as the program will be | The same as the first, with `AutoTim` at 00105105 and `Clock` at 00104707, which is again what the toy writes of itself |
+  | `keys.c` | Ten steps, keys with Shift, Ctrl and Alt, both buttons of the mouse, a wait of 18 ticks, a text typed: each ended with its key on the screen, with `AutoTim` and `Clock` read above the megabyte at every round and saying nothing. The toy writes its stack pointer, 001046BC, which is inside the stack as it was written out, 001006FC to 001046FC, used from 00104666 up |
+  | `wait.c` | Its keys came while it waited inside the BIOS; no stack was written out, as for any program that does not idle |
+  | `sys.c`, D1's toy of the system's functions, with the tree's `md`, its `stack.c` and its `dos32.c`: by `scenarios.run`, the way of a scenario | Four steps, each with its page. The stack is that of `stack.c`, 4,096 bytes at 00103F70, the segment that ends where the file's header has the stack's top; 3,598 never used. `python3 harness/trial32/both.py` passes as before, with the driver told nothing |
+  | `--trace` | By QEMU's log of the code that ran, the toy's first object was at 00100010, `le.BENCH` |
+  | `--below` | Of the extender's stack of real mode, 512 bytes at 30C7:0000, 66 were used with the two variables read at every round, and 84 with a stack written out as well |
+
+What the toys prove, and what waits for the first run of the program:
+
+- Proven: the block move from the driver's place in an idle call that
+  comes through DOS/32A, at every round of a run, with the extender
+  unharmed; the three reads and what the driver makes of each; the
+  stack read in pieces, 16 KB in five; the addresses by the file, the
+  map and `le.BENCH`, for a program of two objects with its variables
+  and its stack in the second, and for a main data found by `_md` with
+  the listing's offsets; the whole way of a scenario, `scenarios.run`,
+  for a flat program that the tree's own files make; that a step ends
+  when it should and not before.
+- Waits: that the program has `AutoTim` and `Clock` where its `md`
+  says. That is the layout of the main data, which `LAID_OUT` holds
+  for both compilers, and the toy with a main data is as near as a toy
+  gets. M1 sees it at its first step that waits on `AutoTim`, a cursor
+  moved in a tree (`tree`), and at the first scenario with the clock
+  on.
+- Waits: the program's stack. `sys.c` has the tree's `stack.c`, and
+  its stack is found; if B2 links the program otherwise, with a stack
+  that is not the segment that ends where the header has the stack's
+  top, `coverage.flat_stack` is the one place to say so.
+  `drivercheck.py --facts build/.../VC.EXE` prints what the driver
+  will be told of a file.
+- Waits: the time of day ("What could go wrong", 4). The block move is
+  in every idle round of a flat program; in `auto.c` the key `t` was
+  seen one tick later with it than without.
+- A main data of zeros has 0 in `AutoTim` until the main loop has set
+  it, where DOS's memory has what the last program left. The driver
+  takes 0 for a time and believes it for its two seconds, once: the
+  toy with a main data and `sys.c` both begin so. A box at the start
+  of the 32-bit program, for a diskette that is to be put in, waits
+  those two seconds as it does today for whatever the memory held.
+- Never taken: `F`, the BIOS refusing. SeaBIOS refuses nothing.
+- `le.BENCH` is the bench's, and `--trace` asks it of a run. A bench
+  that changes what DOS/32A finds, an XMS driver or other memory,
+  moves the program, and every flat scenario then waits on nothing or
+  on the wrong bytes: run `drivercheck.py --trace` after such a
+  change.
+
+For H3:
+
+- The driver's side is done: `scenarios.run` needs no change to drive
+  a flat program, to record what blinks, or to answer `stack_left`.
+  `Run.stack_segment` is 0 for one; `place.py` goes by it and is of
+  the 16-bit trees.
+- `coverage.stack`, `coverage.origin`, `coverage.relocated` and
+  `coverage.executed`, and `check_translation` and `check_layout` of
+  `ported.py`, still read a program of 16 bits and are yours, as H1
+  listed them. `driver.facts` no longer comes to the first two for a
+  flat program.
+- The scenarios' test fails a tree that leaves less than half of its
+  stack: of a flat program that is of `known.stack_size` as the map
+  has it, with no change.
+- The README says how a step is finished, "When a step is finished",
+  for programs of 16 bits. What it should say of the block move goes
+  in with W, when a program of the project is flat.
+
 ### The pieces
 
 P and S change the program under the 16-bit build; D, B and H make the
@@ -2518,7 +2656,7 @@ and H1 are started at once by the session.
 | B1, the objects. Done: see below | Every file compiled for 32 bits by the default build, with warnings as errors, but `arith.c`, `dos.c`, and `resident.c` until S3 | `CMakeLists.txt`, `tools/refused.cmake` | 50 lines | P1 | The build | Little |
 | B2, the program | The link, the stub with its banner bit, release and debug, the licence text and the README's sentence | `CMakeLists.txt`, `tools/stub.c`, `LICENSE.DOS32A`, `README.md` | 100 lines | D2, S3 | A file that the bench starts | What has no value ending up in the file: the trial's toy was 232,840 bytes for 32,404 by the order alone |
 | H1, the reader. Done: see "Piece H1, the reader" below | LE files, their objects, pages and relocations; the flat map | `harness/le.py`, `coverage.link_map` | 150 lines | Nothing; starts at once | It reads `whole.py`'s file and the trial's toys | |
-| H2, the driver | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
+| H2, the driver. Done: see "Piece H2, the driver" above | The facts of a flat program; the block move, from `DRIVERX.ASM` of the trial; the stack by it; the goldens derived again | `harness/driver.py`, `DRIVER.ASM`, `show.py`, `play.py` | 170 lines | H1 | `auto.c` of the trial through the harness itself; no golden changed | A golden changes: the work stops there and the user is asked (`CLAUDE.md`, "Work by several agents") |
 | H3, the scenarios' test | The 32-bit build as a tree of the harness, declared as the portable C is, with patches of its own where the two builds are declared to show otherwise; the record; the limits | `harness/ported.py`, `coverage.py`, `deviations.py`, `CMakeLists.txt` | A day | H2, B2 | The test runs and writes a record | |
 | H4, the test of the data | The five shapes and the relocations; the figures of the README | `harness/datacheck.py`, `tools/figures.py` | A day or more | H1, B2, P3 | It passes for the 32-bit build, and fails for a word changed by hand | |
 | M1, the first run | The program started on the bench, and what keeps it from its first screen and from leaving mended | Whatever it meets, each fix under both builds | Unknown | All of P, S, D, B; H2 | `banner` passes; the first record | |
@@ -3181,7 +3319,9 @@ What a later piece should know:
    the time done by fifty seconds past. If the 32-bit program takes
    more, the driver can read the two variables less often; if that
    does not do, the rule is the user's.
-5. The goldens when the driver changes: H2.
+5. The goldens when the driver changes: H2. None changed, and the
+   original goes through the driver by the instructions that it went
+   by: see "Piece H2, the driver".
 6. COMMAND.COM's interrupt: one try in the trial, which came back and
    ran nothing, as the 16-bit program finds it on the bench. It cannot
    be seen to run a command there in either build.
@@ -3191,8 +3331,10 @@ What a later piece should know:
    emulation; flat code and DOS/32A have met none so far, through the
    toys.
 9. The eight stacks of 512 bytes that DOS/32A has for real mode: the
-   driver's work in an idle call used 82 bytes of one. A critical
-   error has calls three deep.
+   driver's work in an idle call used 82 bytes of one in the trial,
+   and uses 84 as it is now, with a stack written out (`python3
+   harness/drivercheck.py --below`). A critical error has calls three
+   deep.
 10. The functions of `dos32.c` that no scenario reaches, when what ran
     of the C is asked: each is listed with its reason, as elsewhere.
 11. Two pieces of P touching one file: they own lines of different
