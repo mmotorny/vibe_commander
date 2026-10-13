@@ -661,6 +661,167 @@ on the bench.
   shown, which the panels of a running copy cover at once, and the
   running copy takes the settings all the same.
 
+### Piece C, the help: what its scenarios showed
+
+The scenarios are there and their goldens derived, each twice with the
+same result; the code is not. Until it is, the six are in `not_run` of
+`TREES["portable_c"]`.
+
+| Scenario | Steps | What it has |
+|---|---|---|
+| `setup-help` | 25 | A page of 82 lines by every key: lines, pages, both ends, a key that means nothing, F1 in the help, and the three keys that close it |
+| `setup-help-pages` | 31 | F1 on each of the nine items: five pages, the palettes sharing one, and "Help contents is not available" twice, with its beep; a page shorter than the window; F1 in that box; the page of a box over the box, F8 and F1 |
+| `setup-help-mouse` | 23 | Each third of the text with either button, a button moved out of the text while held, beside the text, outside the window, the middle button, Ok, and F1 and F10 of the key bar |
+| `setup-help-file` | 41 | The help file changed in the editor, three times: the index made to name the 56th page as the 55th, so that the seven pages fit and the last two show; the file cut off in its index; and no file |
+| `setup-delay-help` | 9 | Piece A's, which wrote it and left it out: F1 over the box "Illegal format of", which has no page, and behind it the page of Panel options, over a dialog whose cursor is in a line that is typed into. It needs piece A's dialog as well as the help |
+| `setup-help-lines` | 8 | A screen of 50 lines |
+
+They run all 408 instructions of `RdHelp`, `Help` and `HlpLine` in the
+original, and all of `SeekDsk` and `ReadDsk`, which `RdHelp` alone
+calls, but the `STC` of `SeekDsk`: DOS does not go to another place
+than it is asked for. `python3 harness/reach.py --setup RdHelp Help
+HlpLine SeekDsk ReadDsk` says so.
+
+**The help file, and what the main program does with the same file.**
+`VC.HLP` has the version at byte 8, `VC 4.05 Help`, and at 194h where
+its index is, 1C2h in the file that is shipped. Every entry is 26 bytes
+and then its text: the mode, 0 for the index and not 0 for a page, the
+length of the text, the number of its lines with the title, and where
+the index is; all of an entry, and the four bytes at 194h, have 1Ah
+added to each byte without carry. The text of the index begins with six
+bytes for each of its 62 lines, the last four of which are where the
+page of that line is. The pages follow one another in the file in the
+order of the index with nothing between them. The 55th to the 61st are
+the setup program's, 8,628 bytes together; the 62nd, the last, is the
+main program's again.
+
+The main program (`help.c`) reads the index every time F1 is pressed,
+and of the pages the one that is asked for, by its place in the index,
+into `HelpBuf` of the main data, 3,000 bytes: it keeps nothing from one
+F1 to the next. The setup program reads once, when it starts: the
+index, to find where the 55th page is and where the 62nd, and then in
+one piece what lies between the two, or as much of it as it has room
+for. A page is then found by going from entry to entry in the memory,
+by the lengths, and never by the index. So its pages are numbered from
+1 by where they lie in that piece, and a help file with something
+between two of them would show the setup program something else than
+the main program.
+
+**The length that the last two pages hang on.** `RdHelp` reads into
+`HelpBuf`, which is the end of the setup program's data, and stops at
+FEE0h of its one segment, 288 bytes below the top, where the stack is:
+`MOV AX,0FEE0h` and `SUB AX,OFFSET HelpBuf`. `HelpBuf` is at DF03h in
+the program that was shipped: 100h for what DOS has in front of a
+program, the 24,278 bytes of `VCSETUP.COM`, and 7F2Dh of data that the
+file does not hold, which is what `build/shareware-layout/VCSETUP.LST`
+has for `HelpBuf` in its segment. The first word there is how many
+bytes were read, so the pages have FEE0h less DF05h, 8,155 bytes: the
+page of Country info begins at 7,898 of the piece and ends at 8,441,
+and that of Exit begins there. The number follows the length of the
+file, and with it the 275 bytes that the binary has and the source has
+not. The translation has the two numbers, DF03h and FEE0h, and goes by
+them: the first for more than the length, see the walk below.
+
+**What the original does that the plan did not have.**
+
+- `RdHelp` makes the name of the file by copying 13 bytes of a text of
+  7: `VC.HLP`, its zero, and the first six characters of the version
+  behind it. The main program does the same with the same two texts.
+- It takes the mark off as many bytes as it asked DOS for, not as many
+  as DOS read, and notes how many were read.
+- Where it fails it says so and leaves `HelpBuf` as it is. The first
+  word there, which `Help` takes for the length of the pages, is then
+  the mode of whatever was read as the index, 0 for a real one, if it
+  got that far; before that it is memory that nothing has set. With no
+  help file F1 goes through what the memory held: on the bench that
+  was "Help contents is not available" each time it was tried, by what
+  was there and not by anything the program did. The portable C can
+  only have a number there, and 0 is the one that shows the same.
+- `Help` goes from entry to entry with addresses of 16 bits, and looks
+  whether an entry ends beyond the end of what was read, and whether
+  adding its 26 bytes or its length went round at 64 KB; where the
+  end is, the start and what was read, it adds up without looking. So
+  with a first word that is no length, behind a read that failed, what
+  shows depends on where `HelpBuf` is in the segment: from 20FBh on
+  the end is below the start, and no page is found. That is why the
+  translation has DF03h and not only the length.
+- The box "Help contents is not available" has three lines and its
+  button on the third row, which is its frame: " Ok " stands in the
+  box as a line of text and again in the frame below it, where the
+  cursor is. The main program's box of that name has four lines.
+- The window of a page is kept in `BoxBuf`, as that box is, and as the
+  boxes "Illegal format of auto change dir time delay" and "Do you wish
+  to set default colors" are, over which F1 does nothing: none of
+  them has a page. The dialogs and the menu are kept in `WinBuf`.
+- `HlpLine` clears the bytes 1 and 101 of `TmpErr` for `NgLine`, as the
+  main program's does. In the setup program a line that is typed into
+  is kept at `TmpErr`, and byte 1 is the high half of its cursor, which
+  is 0: nothing shows.
+- A button of the mouse has been asked for four times before `Help`
+  looks where it is: `Input0`, the buttons of `MinMnu`, and `Help`
+  itself. The top of `harness/scenarios.py` has what that means for a
+  step.
+
+**Not settled.**
+
+- "Error reading data from the help file." The setup program prints it
+  through DOS when it starts and cannot read the file, and goes on. "The
+  deviations to declare" below lists it among what the one program has
+  not; the user would see it, and it has a place, where setup is
+  entered and reads its pages. No scenario can hold it either way: the
+  step that starts the original sends what it prints nowhere, since
+  the banner has texts that the source has not. Printed when setup is
+  entered, it shows on what DOS has shown, behind the menu, in the
+  portable C alone, and `setup-help-file` then wants either a golden of
+  the tree's own or the line left out of the comparison: both are
+  asked first.
+- What leaving setup has to do for the main program's help: nothing,
+  if setup's pages are not in `HelpBuf` of the main data, which has no
+  room for them anyway. The main program's help keeps nothing between
+  two F1, the main loop sets `HlpPage` to 0 each time round, and
+  `Help` puts `HlpPage` back as it found it. `HelpBuf` of the main
+  data also holds what the viewer and the editor last looked for.
+
+**Where the work stands, for whoever goes on with it.** Done and
+committed: the six scenarios, their goldens, the notes at the top of
+`harness/scenarios.py`. Not begun: `sthelp_t.c` and `sthelp.c`. Next,
+in this order:
+
+1. `src/portable_c/sthelp_t.c`, what `Dialog` and `MinMnu` take by its
+   offset: `StHlEr1_S`, `StHlpMn_D` (6, 20, 0), `StHlpEr_P`, a `BOX(3)`
+   kept at `MD_AT(ErrBuf)` with the lines `Help_S`, `StHlEr1_S` and
+   `StOkMn_S`, and `StHlpEr_B`, key bar 2, flags 2, its button at 326h
+   with `MD_AT(TmpErr)` and `OkMn_D`. `Help_S`, `OkMn_D` and `HlpMn_P`
+   are the main program's, the same bytes, and are not written twice.
+   `StOkMn_S`, " Ok ", and `StOk_S`, "[ Ok ]", stand in `VCSETUP.ASM`
+   among what is piece A's, and the help reads both: whichever of the
+   two pieces lands first defines them, not static, and the other
+   declares them.
+2. `src/portable_c/sthelp.c`, with `help.c` as the model, which is
+   not changed: `StRdHelp`, `StHelp`, `StHlpLine`, and `SeekDsk`,
+   `ReadDsk` and `DeCode` as static functions of its own. Constants
+   that only code reads are `static const u8 CODE` there: `StHelp_F`,
+   the name with the version behind it as `help.c` has `Help_F`,
+   `StHlpEr_S`, `StHelp_P`, `StEmpty_S`. The table of keys `Help_T` is
+   a `switch`. The window is kept at `md.ErrBuf`, which is the setup
+   program's `BoxBuf` (`NAMED_OTHERWISE` of `harness/datacheck.py`).
+   The pages want 20FDh bytes, DF03h to the end of the segment, in
+   memory that piece 0b names, with the first word 0 before anything
+   is read; the walk of `Help` is done in numbers of 16 bits that
+   begin at DF05h, so that it goes round where the original's does.
+3. When 0b has landed: the two calls, `StRdHelp` where setup is
+   entered and `StHelp` where `Input` has F1 with setup open; the file
+   in `add_portable_c` of `CMakeLists.txt`, second code segment; the
+   scenarios out of `not_run`; the batch in `SETUP_BATCHES` of
+   `harness/ported.py`, with the `STC` of `SeekDsk` as `unreached`.
+
+**For piece D.** F1 from the screens of A and B is not in these
+scenarios, which keep to the menu and to the box of F8 so as to need no
+other piece: the Configuration, Screen and Mouse and Panel options with
+a line that is typed into, the list of colours and the picture of one
+(`HlpPage` 4 in both), Country info (no page: the box over a dialog),
+and "Do you wish to save the current setup?" (no page either).
+
 ### What could go wrong
 
 - **The size of the file.** Setup is some 8 to 10 KB of compiled code,

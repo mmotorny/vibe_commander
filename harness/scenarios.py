@@ -1200,6 +1200,58 @@ with the original:
     and its "shareware" would be in the golden where a build says
     "freeware": setup-colors-lines ends in the list for that. Whoever
     shows that corner has deviations.py to look at first.
+  - The help, F1, is a window with the title of a page, 13 of its lines
+    on a screen of 25 lines, and Ok: Up and Down move the text by a
+    line, PgUp and PgDn by a page less a line, Home and End go to its
+    ends; Enter, Esc and F10 close it, and F1 and any other key do
+    nothing. The item under the cursor of the menu says which page:
+    Configuration has 82 lines, Screen and Mouse 37, Panel options 51,
+    the three palettes one page of 20, Set default configuration 5.
+    Each box has its page too: F8 and then F1 is the page of the
+    defaults over that box. In the box "Help contents is not available"
+    F1 does nothing.
+  - The mouse in the help: a button held in the upper third of the text
+    moves it up and one in the lower third down, a line each time the
+    program asks where the mouse is, either button; between the thirds
+    it does nothing. The text is rows 6 to 18 on a screen of 25 lines,
+    its thirds rows 6 to 9 and 15 to 18; on a screen of 50 lines rows 6
+    to 43, the thirds 12 rows each. A button that went down in the text
+    and is held above it or below it moves the text too, if it was seen
+    in the text: the first four times that the button is asked for are
+    over before the help looks where it is, so "Click@30,12*8>30,22*8",
+    and with "*4" at the first place nothing moves. Beside the text, in
+    the window, columns 4 to 75 of rows 2 to 22, a click does nothing,
+    and neither does the right button outside it; the left button let
+    go outside the window closes the help, wherever it went down, and
+    let go inside it does not; the middle button closes it anywhere. A
+    click on Ok, "Click@38,20", is Enter, and the key bar has F1, which
+    does nothing, and F10.
+  - The setup program started a second time in a scenario has what DOS
+    has shown behind it again, and the original has two lines more of
+    that than a tree for every time before, the command and the line
+    below it, and whatever a beep left there. '"cls" Enter' at the
+    command line, anywhere between the two, empties it for both.
+  - The setup program reads its pages of the help file once, when it
+    starts, D:\\VC\\VC.HLP: the seven from the 55th of the index on, as
+    one piece of the file and no more of it than 8,155 bytes, which is
+    why the last two do not show. The index is at 1C2h of the file, 26
+    bytes and then six for every page, of which the last four are where
+    the page is, all with 1Ah added to each byte without carry: the
+    place of the 55th page is the four bytes at 322h. In the editor, in
+    hex, 50 times Down and four times Right are that byte, and "a1e9"
+    there makes it the place of the 56th: the seven pages are then one
+    further on each, they fit, and the pages of Country info and Exit
+    show, under Set default configuration and Country info. F4 in hex
+    goes back to the text with the cursor on the same byte, and Ctrl+k
+    there cuts the file off: at 200h it ends in its index.
+  - What the setup program says when it cannot read the help file,
+    "Error reading data from the help file.", it prints through DOS when
+    it starts, and _SETUP sends that nowhere. F1 then brings up "Help
+    contents is not available" for every item. With a file that ends in
+    its index that is so by what was read of the index; with no file at
+    all the setup program looks for its pages in memory that it has put
+    nothing into, and found none there when this was written, started
+    after a command or after an earlier setup program alike.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -6367,6 +6419,199 @@ SCENARIOS = {
         ),
         setup=True),
     # The end of the colours of the setup program.
+
+    # The help of the setup program, F1: piece C of the plan.
+    "setup-help": Scenario(
+        "The help of the setup program by its keys: a page of 82 lines "
+        "moved by lines and by pages to both of its ends, a key that "
+        "means nothing, and the three keys that close it",
+        steps=(
+            _SETUP,
+            "F1",                         # Configuration: 13 lines of 82
+            "F1",                         # in the help: nothing
+            '"5"',                        # a key that means nothing
+            "Down",                       # moved by a line,
+            "Up",                         # and back,
+            "Up",                         # no further
+            "Down PgUp",                  # less than a page from the top
+            "PgUp",                       # at the top: nothing
+            "PgDn",                       # a page, less a line
+            "PgDn PgDn PgDn PgDn",
+            "PgDn",                       # less than a page left: the end
+            "PgDn",                       # no further,
+            "Down",                       # nor by a line
+            "Up",
+            "Down",
+            "PgUp",
+            "Home",
+            "End",
+            "Enter",                      # Ok
+            "F1",
+            "Esc",                        # closes it too,
+            "F1",
+            "F10",                        # and so does F10
+            "F10",                        # Exit: nothing has changed
+        ),
+        setup=True),
+
+    "setup-help-pages": Scenario(
+        "The page of the help that each item of the setup program's menu "
+        "has: five that show, the palettes sharing one, and two that do "
+        "not, with a beep; a page of fewer lines than the window; and "
+        "the help over a box",
+        steps=(
+            _SETUP,
+            "F1",                         # Configuration
+            "Esc",
+            "Down F1",                    # Screen and Mouse
+            "End",
+            "Esc",
+            "Down F1",                    # Panel options
+            "PgDn",
+            "Esc",
+            "Down F1",                    # the palettes: Black & White,
+            "Esc",
+            "Down F1",                    # Color,
+            "Esc",
+            "Down F1",                    # and Laptop: one page
+            "Esc",
+            "Down F1",                    # Set default configuration: five
+            "End PgDn Down",              # lines, and nowhere to move
+            "PgUp Home Up",
+            "Esc",
+            "Down F1",                    # Country info: no such page, and
+                                          # the beep moves the screen up
+            "F1",                         # in that box: nothing
+            "Enter",
+            "Down F1",                    # Exit: none either
+            "Esc",
+            "Up Up F1",                   # a page again: its window draws
+            "Enter",                      # over what the beeps moved
+            "F8",                         # the box that asks about the
+            "F1",                         # defaults, and its page over it
+            "Esc",                        # the box again,
+            "Esc",                        # and No
+            "F10",
+        ),
+        setup=True),
+
+    "setup-help-mouse": Scenario(
+        "The mouse in the help of the setup program: a button held in "
+        "the upper third of the text or the lower moves it, also when it "
+        "went down in the text and is held above or below; beside the "
+        "text it does nothing; on Ok, outside the window, and the middle "
+        "one anywhere, it closes the help; and the key bar",
+        steps=(
+            _SETUP,
+            "F1",
+            "Click@30,18*40",             # the lower third: down, held
+            "Click@30,8*10",              # the upper third: up
+            "Click@30,12",                # between them: nothing
+            "RightClick@30,18*6",         # the right button does the same
+            "Click@30,12*8>30,22*8",      # down in the text, held below it,
+            "Click@30,12*8>30,4*8",       # and above it
+            "Click@5,12",                 # beside the text, in the window
+            "RightClick@5,12",
+            "Click@1,1>5,12",             # down outside, let go inside
+            "RightClick@1,1",             # the right button outside
+            "Click@5,12>1,1",             # let go outside: closes
+            "F1",
+            "Click@1,1",                  # a click outside closes
+            "F1",
+            "MiddleClick@30,12",          # the middle button, anywhere
+            "F1",
+            "Click@1,24",                 # F1 of the key bar: nothing
+            "Click@38,20",                # Ok
+            "F1",
+            "Click@73,24",                # F10 of the key bar
+            "F10",
+        ),
+        setup=True),
+
+    "setup-help-file": Scenario(
+        "The setup program with another help file than it expects: one "
+        "whose pages for it begin a page later, so that they all fit and "
+        "the two that never show do; one that ends in its index; and "
+        "none",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            "Shift+F4",                   # the help file in the editor,
+            '"d:\\vc\\vc.hlp"',
+            "Enter",
+            "F4",                         # in hex:
+            # the index has six bytes for every page, the last four where
+            # it is in the file, and the 55th page is the setup program's
+            # first. Its place, at 322h, made that of the 56th.
+            "Down " * 50 + "Right Right Right Right",
+            '"a1e9"',
+            "F2",
+            "Esc",
+            _SETUP,
+            "F1",                         # Configuration: the second page
+            "Esc",
+            "End F1",                     # Exit: there is no seventh
+            "Enter",
+            "Up F1",                      # Country info: the page of Exit
+            "Esc",
+            "Up F1",                      # the defaults: that of Country
+            "Esc",                        # info
+            "F10",
+            '"cls" Enter',                # what DOS has shown, away
+            "Shift+F4",
+            '"d:\\vc\\vc.hlp"',
+            "Enter",
+            "F4",                         # in hex to its byte 200h, which
+            "Down " * 32,                 # is in the index,
+            "F4",                         # and as text again, the cursor
+            "Ctrl+k",                     # on that byte: the rest cut off
+            "F2",
+            "Esc",
+            _SETUP,                       # an error, which is sent nowhere
+            "F1",                         # no page
+            "Enter",
+            "F10",
+            '"del" Space "d:\\vc\\vc.hlp" Enter',
+            '"cls" Enter',
+            _SETUP,                       # the same error
+            "F1",                         # no page: see the top
+            "Enter",
+            "F10",
+        ),
+        setup=True),
+
+    "setup-delay-help": Scenario(
+        "The help from inside the Panel options of the setup program, "
+        "over the box that says its delay is none: nothing in that box, "
+        "which has no page, and the page of the dialog again behind it",
+        steps=(
+            _SETUP,
+            "F4",                         # Panel options
+            'Up Up "x" Enter',            # a delay that is none: the box
+            "F1",                         # no page of its own: nothing
+            "Enter",                      # the dialog again,
+            "F1",                         # and its page
+            "Esc",
+            "Esc",                        # Cancel
+            "F10",
+        ),
+        setup=True),
+
+    "setup-help-lines": Scenario(
+        "The help of the setup program on a screen of 50 lines, where "
+        "its window has 38 lines of text",
+        steps=(
+            "Alt+F9",                     # 50 lines
+            _SETUP,
+            "F1",
+            "End",                        # the last 38 lines
+            "Click@30,16*6",              # the upper third is larger too
+            "PgUp",                       # and a page
+            "Esc",
+            "F10",
+        ),
+        setup=True),
 
 }
 

@@ -340,6 +340,13 @@ TREES = {
             "setup-colors-palettes": _NO_SETUP_YET,
             "setup-colors-own": _NO_SETUP_YET,
             "setup-colors-lines": _NO_SETUP_YET,
+            # The help of the setup program, F1.
+            "setup-help": _NO_SETUP_YET,
+            "setup-help-pages": _NO_SETUP_YET,
+            "setup-help-mouse": _NO_SETUP_YET,
+            "setup-help-file": _NO_SETUP_YET,
+            "setup-delay-help": _NO_SETUP_YET,
+            "setup-help-lines": _NO_SETUP_YET,
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "
