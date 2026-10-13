@@ -1430,11 +1430,56 @@ in "The portable C".
     The cell in the middle of the screen whose colours are exchanged is
     the mouse's pointer, which a program that has ended does not show:
     `lost` has it as a row of its own.
-  - A rule of one tree is `rules` of its entry in `TREES`, in the form
-    of `DEVIATIONS` there, made to every screen of a golden when it is
-    read for that tree and before its patch: the rows of a patch are
-    then the golden's as the rules leave them. None is there yet; the
-    program's name is the first that wants one.
+  - A rule of one tree is `rules` of its entry in `TREES`, made to
+    every screen of a golden when it is read for that tree and before
+    its patch: the rows of a patch are then the golden's as the rules
+    leave them. The program's name is said by four (`DEVIATIONS.md`,
+    10), each a `Part` of `harness/deviations.py`, the kind of rule
+    for a text that is of another length in the tree, or stands
+    elsewhere on its row, and that a menu, a box or a panel may cover
+    in part: it says the text as the original shows it and as the tree
+    does, and on a screen where enough of the original's shows, each
+    cell that the golden has as the original's text has it, character
+    and colour, is expected as the tree's, and every other cell as the
+    golden has it. What making them met:
+    - How much is enough. Eight letters in their places were too few:
+      a line of text in the editor, in the colour of a panel, had nine
+      of the Info's title, and the rule wrote the name into it. It is
+      twelve, and the two screens that show fewer, of a title under
+      a menu and of the banner beside a panel, have the rows in their
+      scenarios' patches. A rule for one screen is a patch.
+    - Such a rule is wrong of a cell in two ways, and both fail the
+      row, which then goes into the scenario's patch. Something that
+      covers the text has a space in the text's colour where the
+      tree's text is longer: the setup's sample of the colours, made
+      grey on black, over the end of the banner. Or the text shows in
+      another colour, under the mouse's pointer: the rule takes that
+      for a cover. It is not to be taught the pointer's colour, which
+      was tried: the pointer turns grey on black into black on grey,
+      which is a box, and the rule wrote the banner into the box of
+      F10. The shadow of a box, which makes `(colour & 8Fh) ^ 8` of a
+      colour as the program is distributed, it does not know either;
+      no screen has the banner or a title in one.
+    - On a row that a rule changes, the line with `-` of a patch is
+      what the rule made, not what the original shows: read it so. Of
+      the two patches that there were on such rows, `second-copy` and
+      `setup-lines`, the tool said "does not fit" and made them again.
+    - A box whose width follows a text, as that of F10 follows the
+      name, cannot be a rule: where it is narrower, the screen shows
+      what was behind it, which the golden of that screen has not.
+      Those are patches, the same seven rows in eight scenarios.
+    - The test `portable_c-scenarios` says how many screens each rule
+      expects otherwise, and fails for a rule that finds none.
+    - `deviations.expected` makes the rules of every build too, when a
+      golden is derived. After a change to it, derive every golden
+      again: `git status` of `harness/goldens/` is then clean, as it
+      was after this one.
+    - In the data, a text that the tree has longer than the original
+      reached into the room that is reserved for what only the shipped
+      binary has, and was "not compared" for that, declared or not:
+      what counts now is how much of the original's object it is held
+      against, `held` of `harness/datacheck.py`. A text that only one
+      tree has is in `OWN_OF` there.
 - The portable C is one program, and the notes above on the part that
   stays in the memory, on `tools/mkexe.c` and on string literals and
   static variables are of the C translation alone. In the portable C DS

@@ -19,8 +19,11 @@ for that tree, and nothing else:
   - steps that get the tree to the same thing by other keys are put in
     the place of the original's, one for one: `in_place_of` of TREES,
     and `in_place_in` for those of one scenario;
-  - a difference that is on many screens is a rule, of the form that
-    DEVIATIONS has, for that tree alone: `rules` of TREES;
+  - a difference that is on many screens is a rule for that tree alone,
+    `rules` of TREES: of the form that DEVIATIONS has, or, for a text
+    that is of another length in the tree or that something may cover in
+    part, a Part, which says the text as the original shows it and as
+    the tree does, cell for cell;
   - and what one scenario shows otherwise is a patch, a file of the rows
     that differ in harness/goldens/TREE/, written by whoever declared
     the deviation: the top of goldens.py says how it is written, read
@@ -28,8 +31,112 @@ for that tree, and nothing else:
 """
 import re
 from dataclasses import dataclass, field, replace
+from functools import cache, cached_property
+from operator import eq
 
-from dos import COLUMNS
+from dos import COLUMNS, ROWS
+
+
+@dataclass(frozen=True)
+class Part:
+    """A part of the screen that a tree shows otherwise than the original,
+    wherever it shows and as much of it as shows: a rule of the second
+    kind, for a text that is not as long in the tree as in the original,
+    or stands elsewhere on its row, and that a menu or a box may cover in
+    part.
+
+    It says the part as the original shows it when nothing covers it and
+    as the tree shows it then, cell for cell. On a screen of the golden
+    where the part is known to stand, each of its cells that the golden
+    has exactly as the original's part has it, character and colour, is
+    expected as the tree's part has that cell; every other cell there is
+    what covers the part, and is expected as the golden has it. So a
+    rule of this kind leaves nothing out of the comparison, and it can
+    be wrong of a cell in two ways, both of which fail the row, so that
+    the screen wants a patch. What covers the part may happen to have a
+    cell as the part has it, a space in the same colour: the rule then
+    expects the tree's part there, which does not show. And the part
+    may show in a cell in another colour, under the mouse's pointer or
+    in the shadow of a box: the rule takes that for something that
+    covers it, and expects the original's character. It is not taught
+    those colours: what the pointer makes of grey on black is the
+    colour of a box, black on grey, and it would take the box for the
+    part."""
+    # What the part is, in a few words, for the test's report.
+    what: str
+    # The rows of the part as the original shows them and as the tree
+    # does, one under the other, each from the first column of the part
+    # on: as many of the one as of the other. Where a row of the tree's is
+    # longer than the original's or shorter, the other goes on in spaces:
+    # the part is as wide as the longer of the two, and what stands
+    # behind the shorter text belongs to it, as the blank screen does
+    # behind a line that DOS has written.
+    was: tuple
+    now: tuple
+    # The colour of its cells, in the original and in the tree.
+    colour: int
+    # The columns at which the part may begin, on any row.
+    columns: tuple = (0,)
+    # How the part is known to stand at a place: at least this many of
+    # the original's characters that are no spaces show there, in their
+    # cells and in the colour. Eight were too few to be sure: a line of
+    # the editor had nine letters of the original's title in the cells
+    # and in the colour of an Info panel's, "ompa" and "ersion" of
+    # "incompatible version" under "Commander, Version".
+    least: int = 12
+
+    @cached_property
+    def rows(self):
+        """The rows of the part as bytes of the screen: of each the
+        original's characters and the tree's, as long as each other, and
+        the original's with a zero byte for every space, which is what
+        the part is known by."""
+        if len(self.was) != len(self.now):
+            raise ValueError(f"a part of {len(self.was)} rows that the "
+                             f"tree shows as {len(self.now)}")
+        rows = [(was.ljust(len(now)).encode("cp437"),
+                 now.ljust(len(was)).encode("cp437"))
+                for was, now in zip(self.was, self.now)]
+        return [(was, now, was.replace(b" ", b"\0")) for was, now in rows]
+
+    def places(self, screen):
+        """Where `screen` has the part: the row and the column of each
+        place."""
+        codes, colours = screen.cells[0::2], screen.cells[1::2]
+        for row in range(ROWS - len(self.rows) + 1):
+            for column in self.columns:
+                # Whether enough characters are there at all, in whatever
+                # colour, is quickly told, and on most rows none is. A
+                # cell of the screen with a zero byte in it counts here
+                # where the part has a space, and not below.
+                at = row * COLUMNS + column
+                there = [codes[at + down * COLUMNS:
+                               at + down * COLUMNS + len(known)]
+                         for down, (_, _, known) in enumerate(self.rows)]
+                if sum(sum(map(eq, known, some))
+                       for (_, _, known), some in zip(self.rows, there)) \
+                        < self.least:
+                    continue
+                shown = 0
+                for (_, _, known), some in zip(self.rows, there):
+                    shown += sum(a == b != 0 and colour == self.colour
+                                 for a, b, colour in zip(
+                                     known, some, colours[at:at + COLUMNS]))
+                    at += COLUMNS
+                if shown >= self.least:
+                    yield row, column
+
+    def made(self, screen, cells):
+        """Make the part to `cells`, those of `screen`: wherever the
+        screen has it, every cell that is the original's becomes the
+        tree's."""
+        for row, column in self.places(screen):
+            for at, (was, now, _) in enumerate(self.rows):
+                begin = ((row + at) * COLUMNS + column) * 2
+                for cell in range(len(was)):
+                    if screen.cells[begin + cell * 2:begin + cell * 2 + 2] \
+                            == bytes((was[cell], self.colour)):
+                        cells[begin + cell * 2] = now[cell]
 
 
 def expected(screen, rules=None):
@@ -37,15 +144,21 @@ def expected(screen, rules=None):
     the rules of DEVIATIONS, which hold for every build and are made to
     a golden when it is derived. With `rules`, by those instead: the
     rules of one tree (Declared.rules), which are made to the golden's
-    screens when it is read for that tree."""
+    screens when it is read for that tree. Every rule is found on the
+    screen as the original has it, whatever the rules before it have
+    made of it."""
     cells = bytearray(screen.cells)
-    lines = screen.lines()
-    for row, line in enumerate(lines):
-        for pattern, text, below in DEVIATIONS if rules is None else rules:
-            match = pattern.search(line)
+    line = cache(screen.line)
+    for rule in DEVIATIONS if rules is None else rules:
+        if isinstance(rule, Part):
+            rule.made(screen, cells)
+            continue
+        pattern, text, below = rule
+        for row in range(ROWS):
+            match = pattern.search(line(row))
             if match and below:
                 # Known by the line below it as well.
-                under = lines[row + 1] if row + 1 < len(lines) else ""
+                under = line(row + 1) if row + 1 < ROWS else ""
                 match = below.search(under) and match
             if match:
                 # As much of it as shows: a panel may cover the rest.
@@ -250,7 +363,9 @@ IGNORED = [
 # and what the tree is expected to have, with the deviation it is of and
 # why. The patches are not listed here: a scenario has one if the file is
 # there, and the top of goldens.py says how one is written. Every other
-# scenario is held against the original's golden as it is.
+# scenario is held against the original's golden as the rules leave it,
+# which is as it is on every screen that has nothing of what a rule is
+# of.
 
 
 @dataclass(frozen=True)
@@ -271,17 +386,23 @@ class Declared:
     # switches the panels off in another. The steps are left out wherever
     # the scenario has them one behind the other.
     left_out_of: dict = field(default_factory=dict)
-    # What the tree shows otherwise on whatever screen has it: rules of
+    # What the tree shows otherwise on whatever screen has it: rules,
+    # which are made to every screen of every golden when it is read for
+    # this tree, and to no other tree's. For a difference that is on
+    # many screens, where a patch for each scenario would say the same
+    # thing over and over. A rule is of one of two kinds. The first is
     # the form that DEVIATIONS has, (pattern, text, pattern of the line
-    # below or None), which are made to every screen of every golden
-    # when it is read for this tree, and to no other tree's. For a
-    # difference that is on many screens, where a patch for each
-    # scenario would say the same thing over and over. A rule is made
-    # before a scenario's patch, so the rows of a patch are the golden's
-    # as the rules leave them.
+    # below or None), which puts a text over the cells that the
+    # pattern's group matches, one as long as the other. The second is a
+    # Part, above: a text or a block of rows as the original shows it
+    # and as the tree does, for what is longer or shorter in the tree,
+    # or stands elsewhere on its row, and may be covered in part. A rule
+    # is made before a scenario's patch, so the rows of a patch are the
+    # golden's as the rules leave them.
     #
-    # A rule says "expect this in their place" of the cells that its
-    # group matches. It could say "these cells are not compared" as well
+    # A rule of either kind says "expect this in their place" of the
+    # cells that it finds. It could say "these cells are not compared"
+    # as well
     # (TODO.md, "Leaving a part of the screen out of the comparison"),
     # which nothing does today: written as a rule with None for its
     # text, (pattern, None, below). Such cells would be blanked as those
@@ -385,6 +506,17 @@ _THREE_TABS = ("the line of the screen saver's characters is the fourth "
 _LEFT_HANDED = ("Left-handed mouse is five rows further up in Screen and "
                 "Mouse, where Screen output has gone from above it")
 
+# What the original calls itself and what the portable C does
+# (DEVIATIONS.md, 10), as the rules of that tree have them: see `rules`
+# below.
+_TITLE = "The Volkov Commander, Version 4.05"
+_NAME = "Vibe Commander 0.1"
+_BASED = "based on Volkov Commander 4.05"
+_BANNER = (_TITLE + " freeware",
+           "Copyright (C) 1991-2000 Vsevolod V. Volkov")
+_BANNER_NOW = (_NAME + ", " + _BASED,
+               _BANNER[1] + ", (C) 2026 Maksym Motorny")
+
 TREES = {
     # The C translation is the main program and nothing else.
     "c": Declared(
@@ -458,6 +590,48 @@ TREES = {
                     "a look at the map of the memory, for what has stayed",
             },
         },
+        # The program's name (DEVIATIONS.md, 10). The original has its
+        # title or its banner on a thousand screens of the scenarios,
+        # behind the panels or beside them, in the Info and in the help,
+        # and a menu, a box or a panel covers a part of it on many: each
+        # text is a Part, known by twelve of its characters that show.
+        rules=(
+            # The banner, which the program prints when it starts and
+            # which stays on the screen behind the panels, grey on black
+            # as DOS writes: its first line is the name with the version
+            # and what it is based on, where the original has its title
+            # and the word of how it was distributed, and is seven cells
+            # longer.
+            Part("the first line of the banner",
+                 was=_BANNER[:1], now=_BANNER_NOW[:1], colour=0x07),
+            # Its second line has the copyright of this program behind
+            # that of the original's author, 25 cells more. The lines are
+            # rules of their own, since the second shows without the
+            # first: at the top of the screen the bar of the menus covers
+            # the first, or it has gone off the top with what DOS has
+            # shown moved up a row.
+            Part("the second line of the banner",
+                 was=_BANNER[1:], now=_BANNER_NOW[1:], colour=0x07),
+            # Behind a panel on the left with none on the right, only
+            # the ends of the two lines show, three letters and two,
+            # which is nothing to know them by: one screen, of the
+            # scenario banner, which has the two rows in its patch.
+            # The title of the Info panel, in the middle of its second
+            # row, in the panel on the left or on the right: the name and
+            # the version, 18 cells in the middle where the original's
+            # title has 34.
+            Part("the title of the Info panel",
+                 was=(_TITLE,), now=(_NAME.center(len(_TITLE)),),
+                 colour=0x1B, columns=(3, 43)),
+            # The title of the help's window, over the list of its
+            # pages, in the middle of the 62 columns of the window's
+            # text: the name, the version and what it is based on, 50
+            # cells, where the original's title is the 34 in the middle
+            # of those.
+            Part("the title of the help's window",
+                 was=(_TITLE.center(50),), now=(_BANNER_NOW[0],),
+                 colour=0x30, columns=(15,)),
+        ),
         in_place_of={
             SETUP_COMMAND: (SETUP_ITEM,
                             "the setup is no program of its own in the "
@@ -547,6 +721,12 @@ TREES = {
         },
     ),
 }
+
+
+def ruled(screen, rule):
+    """Whether `rule`, a rule of a tree, expects anything of `screen` of
+    the original that the original does not show there."""
+    return expected(screen, (rule,)).cells != screen.cells
 
 
 def declared(tree):

@@ -4203,16 +4203,9 @@ What the next pieces meet:
   the second kind is what has to be read. `start-memory`, `lost` and
   the menus over the right panel will have such rows, since what they
   uncover or show of that panel is another thing then.
-- The program's name, a rule of the portable C alone: `rules` of
-  `TREES["portable_c"]`, in the form of `DEVIATIONS`, made to a golden
-  when it is read for that tree and before its patch. That form puts a
-  text over the cells that a group matches and no more: a name that is
-  shorter than the original's in a line that is centred moves the
-  cells around it, and wants either a pattern whose group is the whole
-  of what moves, with the text as long, or `deviations.expected` taught
-  a second kind of rule. A patch that is on a row which a rule changes
-  has that row as the rule leaves it, so the patches of such rows fail
-  when the rule comes, in the first way, and are made again.
+- The program's name, rules of the portable C alone: done as far as
+  the next section says, with a second kind of rule, `Part` of
+  `harness/deviations.py`.
 - A rule that leaves cells out for one tree, should that be built (the
   next section): the comment at `rules` of `deviations.Declared` says
   how it would be written.
@@ -4223,6 +4216,63 @@ run in a trial; no committed patch has one, since no deviation so far
 changes what blinks. Lines for the disks, which were tried in the same
 way, two patches have since: `setup-config` and `setup-screen`, for the
 setup file that each saves.
+
+## The program's name in the portable C: done but for the Info panel
+
+Decided by the user on 13 October 2026 (`CLAUDE.md`, "The portable C";
+`src/portable_c/DEVIATIONS.md`, 10). Done: the title, the banner, the
+name without a version in the box of F10, and the line that asks for
+Enter. `main_t.c` has the two texts as macros, `NAME_VERSION` and
+`BASED_ON`, and of them `Title_S`, the help's title and the banner's
+first line, and `NameVer_S`, the Info's title.
+
+How it is held. Four rules of `TREES["portable_c"]`, each a `Part`: the
+text as the original shows it and as the portable C does, made to a
+screen of the golden wherever twelve letters of the original's show in
+their places, cell for cell, with what covers the text left as the
+golden has it. The notes of `CLAUDE.md` have what making them met. The
+test says how many screens each rule expects otherwise. Thirteen
+scenarios have rows in a patch for it: the box of F10, which is two
+cells narrower and uncovers what no rule can know, in eight; the line
+that asks for Enter, in one of those; and five where a rule is wrong of
+a cell or does not know the text, which `DEVIATIONS.md` lists.
+
+Still to do, the Info panel, which the user decided with the rest:
+
+- Its two lines on the memory go, "... Bytes Memory" and "... Bytes
+  Free": they mean nothing off DOS. That is the removal of something
+  that only made sense on DOS, declared like the others.
+- "based on Volkov Commander 4.05" comes, centred, on a line of its own
+  between the title and the line under the title. So the top of the
+  panel is: the title; that line; the line across; an empty row; and
+  "Volume in drive ..." on the row where it is today. Nothing below
+  moves, and no row is added.
+- In the program: `Panel` of `panel.c` writes the title and the two
+  lines across, and `PutInf` of `info.c` the rest, the two lines on the
+  memory first, `PtIn1_S` with `PtIn2_S` and `PtIn3_S`. `BASED_ON` of
+  `main_t.c` is the text.
+- In the harness: the four rows change as rows, on every screen that
+  has the Info, some hundreds, in the twenty scenarios that switch it
+  on (`grep -n "Ctrl+l" harness/scenarios.py`), some with a menu or a
+  box over them. A `Part` can be several rows and stand at column 0 or
+  40, which is what it wants. What a `Part` cannot do yet and this
+  needs: cells of more than one colour, since the numbers of the two
+  lines are yellow in a row of cyan; and a row that is not one text,
+  since the count of the memory is of the machine and the count of
+  what is free is `#` in the golden, as many as it has digits and
+  commas, in a line that is centred. A menu over the Info throws its
+  shadow on the rows below its first, which a `Part` does not know:
+  see the note in `CLAUDE.md` before teaching it colours.
+- What the two lines were used for besides: `IGNORED` of
+  `harness/deviations.py` leaves the count of free memory out of the
+  comparison, by two patterns, for every build. With the lines gone
+  from the portable C no screen of that tree needs them: they are to
+  hold for the C translation alone then, and `IGNORED` is one list for
+  both today. Entry 1 of `DEVIATIONS.md` says "The Info panel says how
+  much memory a command has", and the README, under "The figures", that
+  what DOS has for a command "was seen once on the Info panel": both
+  are to say what is so then. The scenario `memory`, which is about the
+  figure, is not run for the portable C already.
 
 ## The bench with a list of files on the right: done, and what was put off
 

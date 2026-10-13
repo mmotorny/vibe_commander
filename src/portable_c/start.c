@@ -161,14 +161,21 @@ static const u8 CODE DefWCB[] = {
    one the program can draw on, and what is said of a setup file that is
    not one. The end of the banner, CrLf_S, has no zero byte: it is copied
    as far as the next one, with the text that stands behind it, Retrn_S,
-   and DOS writes it as far as the dollar sign. */
-static const u8 CODE Suff_S[]  = " freeware";
+   and DOS writes it as far as the dollar sign.
+
+   The banner is two lines, as the original's is: the title, Title_S of
+   main_t.c, which names what the program is based on where the original
+   had the word of how it was distributed behind its title, Suff_S,
+   " freeware"; and the copyright of the original's author, with that of
+   this program put behind it. The prompt names this program
+   (DEVIATIONS.md, 10). */
 static const u8 CODE Copyr_S[] =
-    "\r\nCopyright (C) 1991-2000 Vsevolod V. Volkov";
+    "\r\nCopyright (C) 1991-2000 Vsevolod V. Volkov"
+    ", (C) 2026 Maksym Motorny";
 static const u8 CODE CrLf_S[]  =
     "\r\n$"
     "\r\nPress ENTER to return \0"
-    "\r\nto the Volkov Commander";
+    "\r\nto the Vibe Commander";
 #define Retrn_S (CrLf_S + 3)
 #define Retr2_S (CrLf_S + 28)
 static const u8 CODE NoIni_S[] = "VC.INI is not correct.\r\n";
@@ -350,7 +357,6 @@ Init04:                                 /* Output Report */
     if (!ChkMode((struct Screen STACK *)&screen))
         ScreenSetMode(3);               /* 80 columns, in colour */
     to = MvzTxt(md.ExtMain, AT(code, OFFSET(Title_S) + 2));     /* Init05 */
-    to = MvzTxt(to, Suff_S);
     to = MvzTxt(to, Copyr_S);
     MvzTxt(to, CrLf_S);
     ConsoleText(md.ExtMain);            /* as far as its $ */

@@ -47,7 +47,8 @@ original's golden with the declared difference made to it, each time the
 golden is read for the tree (read), and written nowhere:
 
   1. the rules of the tree, for what is otherwise on many screens
-     (`rules` of deviations.TREES);
+     (`rules` of deviations.TREES, and deviations.Part for the kind of
+     rule that the program's name is said by);
   2. the scenario's patch, if it has one;
   3. the screens of the steps that the tree is not taken through, left
      out (`left_out` and `left_out_of` of deviations.TREES, and what
@@ -103,7 +104,13 @@ whole of one:
 A patch is exact. It is made to the golden only if every line with - is
 what the golden has in that place, character for character (as the rules
 of the tree leave it, which is as the file has it wherever no rule has a
-word), and the screen has that step. Where it is not, nothing is run and
+word), and the screen has that step. So on a row that a rule changes, the
+line with - is not the original's row but what the rule made of it: the
+tree's row, where the patch is of other cells, as the banner of the
+portable C beside a box that is narrower there; or, where the patch is
+there because the rule is wrong of a cell, the tree's row with the
+original's character in that cell, which neither program shows, and the
+line with + puts right. Where it is not, nothing is run and
 the test fails with the patch, the screen and the row, and both lines:
 the original's golden was derived again and came out otherwise, or the
 scenario has other steps now. That is a failure to look at. The patch
@@ -400,6 +407,26 @@ def read(name, tree=None, patched=True):
                                                        name))
     golden.screens = [golden.screens[at] for at in kept]
     return golden
+
+
+def ruled(name, tree):
+    """What the rules of `tree` make of the scenario `name`: of each
+    rule, in their order, how many screens of the original's golden it
+    expects otherwise, and how many screens any of them does. Only the
+    screens of the steps that the tree is taken through count."""
+    declared = deviations.declared(tree)
+    golden = read_original(name)
+    screens = [golden.screens[0]] + [
+        golden.screens[at + 1]
+        for at in declared.kept(golden.steps[1:], name)]
+    # Most screens have nothing of what any rule is of, which is told
+    # by making all the rules at once.
+    found = [[deviations.ruled(screen, rule) for rule in declared.rules]
+             for screen in screens
+             if deviations.expected(screen, declared.rules).cells
+             != screen.cells]
+    return ([sum(column) for column in zip(*found)] or
+            [0] * len(declared.rules)), sum(map(any, found))
 
 
 def read_original(name):

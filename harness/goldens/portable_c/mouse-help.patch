@@ -1,0 +1,15 @@
+The portable C in the scenario mouse-help: what it is expected to show
+otherwise than the original. A patch of harness/goldens/mouse-help.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 10 of src/portable_c/DEVIATIONS.md
+Why: the mouse's pointer is on the title of the help's window, in a cell
+where the original's title has a space in front of it and that of the
+portable C, which is longer, has the C of Commander. The rule of the name
+leaves a cell in another colour as the original has it, and the pointer
+turns the colours of its cell round
+
+== 7: Click@20,4
+row 4
+-|║SRC   ║       Vibe  ommander 0.1, based on Volkov Commander 4.05       ║      ║| 1Bx4 30x16 47x1 30x55 03x2 1Bx2
++|║SRC   ║       Vibe Commander 0.1, based on Volkov Commander 4.05       ║      ║| 1Bx4 30x16 47x1 30x55 03x2 1Bx2

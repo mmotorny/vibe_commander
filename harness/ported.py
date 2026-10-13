@@ -1614,8 +1614,28 @@ def check_declared(tree, names):
                < len(scenarios.SCENARIOS[name].steps)]
     held = [name for name in names
             if name not in patched and name not in shorter]
-    print(f"The goldens: {len(held)} scenarios were held against the "
-          "original's as it is")
+    # The rules of the tree: what each makes of the goldens. A rule that
+    # finds nothing to change on any screen says nothing any more.
+    counts, screens, some = [0] * len(declared.rules), 0, 0
+    for name in names if declared.rules else ():
+        each, any_ = goldens.ruled(name, tree)
+        counts = [a + b for a, b in zip(counts, each)]
+        screens += any_
+        some += bool(any_)
+    print(textwrap.fill(
+        f"The goldens: {len(held)} scenarios were held against the "
+        "original's as it is"
+        + (f", or as the rules of {tree} leave it: they expect "
+           f"{screens} screens of {some} scenarios otherwise than the "
+           "original shows them" if declared.rules else ""),
+        width=78, subsequent_indent="  ", break_on_hyphens=False))
+    for rule, count in zip(declared.rules, counts):
+        what = getattr(rule, "what", None) or rule[0].pattern
+        print(f"  a rule of {tree}, {what}: {count} screens")
+        if not count:
+            passed = False
+            print(f"    which is no screen of any scenario that {tree} is "
+                  "taken through: the rule is to go from deviations.py")
     for what, some in (
             ("against the original's without the steps that are left out "
              f"for {tree}", shorter),

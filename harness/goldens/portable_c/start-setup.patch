@@ -1,0 +1,62 @@
+The portable C in the scenario start-setup: what it is expected to show
+otherwise than the original. A patch of harness/goldens/start-setup.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 10 of src/portable_c/DEVIATIONS.md
+Why: the box of F10 names the program in its title and in its question, by a
+name that is two letters shorter: the box is two cells narrower, a cell on
+either side, and its shadow ends a cell further left. Where the box is over
+what DOS had shown, with no panel on the left, the cell that it no longer
+covers on the left shows what DOS wrote there: the banner, as the portable C
+has it, and the commands
+
+== 14: F10
+rows 5-11
+-|                                                                  │            ║| 07x14 70x51 1Bx15
+-|                 ╔═══════════ The Volkov Commander ══════════╗    │            ║| 07x14 70x51 03x2 1Bx13
+-|                 ║ Do you want to quit the Volkov Commander? ║    │            ║| 07x14 70x51 03x2 1Bx13
+-|                 ║                  Yes   No                 ║    │            ║| 07x14 70x21 30x5 70x25 03x2 1Bx13
+-|                 ╚═══════════════════════════════════════════╝    │            ║| 07x14 70x51 03x2 1Bx13
+-|                                                                  │            ║| 07x14 70x51 03x2 1Bx13
+-|                                        ║s        bat│            │            ║| 07x16 0Fx24 03x27 1Bx13
++|                                                                  │            ║| 07x15 70x49 1Bx16
++|                  ╔═══════════ The Vibe Commander ══════════╗     │            ║| 07x15 70x49 03x2 1Bx14
++|                  ║ Do you want to quit the Vibe Commander? ║     │            ║| 07x15 70x49 03x2 1Bx14
++|                  ║                 Yes   No                ║     │            ║| 07x15 70x20 30x5 70x24 03x2 1Bx14
++|                  ╚═════════════════════════════════════════╝     │            ║| 07x15 70x49 03x2 1Bx14
++|                                                                  │            ║| 07x15 70x49 03x2 1Bx14
++|                                        ║s        bat│            │            ║| 07x17 0Fx23 03x26 1Bx14
+
+== 29: F10
+rows 5-11
+-|║readme   txt│                                                    │            ║| 1Bx14 70x51 1Bx15
+-|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║data     bin│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
+-|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║empty    dat│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║s        bat│            │            ║║            │            │            ║| 1Bx16 03x51 1Bx13
++|║readme   txt│                                                    │            ║| 1Bx15 70x49 1Bx16
++|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║data     bin│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
++|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║empty    dat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
++|║s        bat│            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14
+
+== 39: F10
+rows 5-11
+-|Vibe Commander                                                    │            ║| 07x14 70x51 1Bx15
+-|Copyright (C)    ╔═══════════ The Volkov Commander ══════════╗    │            ║| 07x14 70x51 03x2 1Bx13
+-|                 ║ Do you want to quit the Volkov Commander? ║    │            ║| 07x14 70x51 03x2 1Bx13
+-|C:\WORK>s        ║                  Yes   No                 ║    │            ║| 07x14 70x21 30x5 70x25 03x2 1Bx13
+-|C:\WORK>set vc   ╚═══════════════════════════════════════════╝    │            ║| 07x14 70x51 03x2 1Bx13
+-|C:\WORK>set co                                                    │            ║| 07x14 70x51 03x2 1Bx13
+-|C:\WORK>d:\vc\vc                        ║s        bat│            │            ║| 07x16 0Fx24 03x27 1Bx13
++|Vibe Commander                                                    │            ║| 07x15 70x49 1Bx16
++|Copyright (C) 1   ╔═══════════ The Vibe Commander ══════════╗     │            ║| 07x15 70x49 03x2 1Bx14
++|                  ║ Do you want to quit the Vibe Commander? ║     │            ║| 07x15 70x49 03x2 1Bx14
++|C:\WORK>s         ║                 Yes   No                ║     │            ║| 07x15 70x20 30x5 70x24 03x2 1Bx14
++|C:\WORK>set vc=   ╚═════════════════════════════════════════╝     │            ║| 07x15 70x49 03x2 1Bx14
++|C:\WORK>set com                                                   │            ║| 07x15 70x49 03x2 1Bx14
++|C:\WORK>d:\vc\vc                        ║s        bat│            │            ║| 07x17 0Fx23 03x26 1Bx14

@@ -1,0 +1,72 @@
+The portable C in the scenario setup-colors-own: what it is expected to show
+otherwise than the original. A patch of harness/goldens/setup-colors-own.txt,
+see harness/goldens.py: a line with - is the golden's, a line with + is what
+is expected in its place.
+Deviation: 10 of src/portable_c/DEVIATIONS.md
+Why: the sample of the colours at the right of the screen is grey on black
+on these screens, as what DOS has shown is. Its first four cells of the
+second row are spaces, in front of Mode, and cover the end of the banner's
+second line, which is longer in the portable C and reaches under the sample:
+the rule of the name takes spaces in that colour for the screen behind the
+banner, and the three cells where the line would have letters are the
+sample's spaces
+
+== 7: F7
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 10: Enter
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 11: Down Down Down Down Down
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 14: Esc
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 15: PgDn PgDn Down
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 18: Enter
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 19: F8
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 20: Enter
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 21: Up
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 24: Enter
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 26: F5
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80
+
+== 28: Esc
+row 1
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym MoMode: Color       | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksy    Mode: Color       | 07x80

@@ -103,7 +103,7 @@ void Panel(u16 panel)
     } else if (wcb->WinTyp == 2) {
         place += 0x114;
         line.value = place;
-        line.line = Title_S + 2;
+        line.line = NameVer_S;
         line.colors = Panel_P;
         CntLine((struct LineArgs STACK *)&line);
         screen = BoxLine(BasAdr(place) + (80 - 20), color | LINE, LEFT_RIGHT,

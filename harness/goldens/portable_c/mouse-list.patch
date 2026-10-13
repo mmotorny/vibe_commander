@@ -1,0 +1,15 @@
+The portable C in the scenario mouse-list: what it is expected to show
+otherwise than the original. A patch of harness/goldens/mouse-list.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 10 of src/portable_c/DEVIATIONS.md
+Why: the mouse's pointer is on the first cell of the screen, on the first
+letter of the banner, which is V in the portable C. The rule of the name
+leaves a cell in another colour as the original has it, and the pointer
+turns the colours of its cell round: so the row with - has the original's T
+in front of the portable C's line
+
+== 1: Click@0,0
+row 0
+-|Tibe Commander 0.1, based on Volkov Commander 4.05                              | 70x1 07x79
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 70x1 07x79

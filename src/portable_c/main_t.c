@@ -1,5 +1,5 @@
 /*
- * The tables of the main file: the program's name, what it says to a DOS
+ * The tables of the main file: the program's title, what it says to a DOS
  * that is too old, and the boxes of main.c, which are that of DOS's
  * critical error and that of a drive that is not ready. With them the
  * texts and the button that the boxes of every file name: Error, Ok, and
@@ -13,10 +13,21 @@
    resident.c and of those that show the title, and the boxes of other
    files. */
 
-/* The title: of the help's window as it is, with the two bytes that set
-   its colour, and without them in the panel of the Info and in the
-   banner. */
-const u8 Title_S[] = "\377\016The Volkov Commander, Version 4.05";
+/* What the program calls itself: Vibe Commander 0.1, since it no longer
+   is what the original is (DEVIATIONS.md, 10), and, wherever the original
+   named its version, what it is based on.
+
+   The title, Title_S, is both, where the original's was "The Volkov
+   Commander, Version 4.05": of the help's window as it is, with the two
+   bytes in front that are six spaces and put it in the middle of the
+   window's 62 columns, and without them the first line of the banner.
+   The panel of the Info is 38 columns, which is no room for that: its
+   title is the name and the version alone, NameVer_S, a text that the
+   original has not. */
+#define NAME_VERSION "Vibe Commander 0.1"
+#define BASED_ON "based on Volkov Commander 4.05"
+const u8 Title_S[] = "\377\006" NAME_VERSION ", " BASED_ON;
+const u8 NameVer_S[] = NAME_VERSION;
 const u8 Vers_S[] = "\r\nThis program requires DOS 3.20 or later.\r\n";
 
 /* The critical error of DOS. The title, of which the box of every error

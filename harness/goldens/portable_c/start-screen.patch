@@ -1,0 +1,45 @@
+The portable C in the scenario start-screen: what it is expected to show
+otherwise than the original. A patch of harness/goldens/start-screen.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 10 of src/portable_c/DEVIATIONS.md
+Why: the second of the two lines that ask for Enter on a screen of 40
+columns names the program, two letters shorter, and the cursor is behind it;
+on a screen of graphics the one line is dots, which show here as cells,
+other dots for another name and two letters fewer of them. And the box of
+F10 names the program in its title and in its question, by a name that is
+two letters shorter: the box is two cells narrower, a cell on either side,
+and its shadow ends a cell further left
+
+== 23: "m" Space "1" Enter
+row 1
+-|to the Volkov Commander                                                         | 07x80
++|to the Vibe Commander                                                           | 07x80
+-cursor 23 2 lines 32 0 mode 1
++cursor 21 2 lines 32 0 mode 1
+
+== 25: "m" Space "6" Enter
+rows 2-3
+-|ⁿ␀␀■ⁿⁿ►␀␀␀␀►␀α␀␀α␀<␀␀∟␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀fx|h0f|␀x╠°|␀l␀xf╠└╠x♀▄␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 00x3 C6x1 FEx1 00x3 10x1 00x3 10x1 00x1 CCx1 70x1 00x24 DCx1 7Cx1 00x1 F6x1 68x1 00x1 78x1 DCx1 7Cx1 DCx1 00x1 78x1 7Cx1 78x1 CCx1 30x1 78x1 00x1 78x1 CCx1 F8x1 78x1 00x18
+-|`ⁿxh0l0␀ⁿ╠╠0␀f␀╠x╠└■|╠f␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀≡x°■xµ↑␀xv╠↑␀µ␀xµ0<╞vv≡␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 66x1 78x1 00x1 CEx1 68x1 00x1 CCx1 66x1 30x1 66x1 00x1 CCx1 30x1 FCx1 CCx1 30x1 CCx1 00x1 CCx1 FEx1 CCx1 FCx1 00x18 F0x1 F8x1 00x1 C6x1 FEx1 00x1 78x1 F0x1 18x1 F0x1 00x1 78x1 18x1 78x1 30x1 78x2 00x1 78x1 C6x1 CCx1 78x1 00x18
++|ⁿ␀␀■ⁿⁿ►␀␀␀␀►␀α␀0␀<␀␀∟␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀fx|h0f|␀x╠°|␀l␀px└╠x♀▄␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 00x3 C6x1 FEx1 00x3 10x1 00x3 10x1 00x1 CCx1 E0x1 00x24 DCx1 7Cx1 00x1 F6x1 68x1 00x1 78x1 DCx1 7Cx1 DCx1 00x1 78x1 7Cx1 78x1 CCx1 60x1 00x1 78x1 CCx1 F8x1 78x1 00x19
++|`ⁿxh0l0␀ⁿ╠╠0␀f␀0ⁿ└■|╠f␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀≡x°■xµ↑␀xv╠↑␀µ␀xx<╞vv≡␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀␀| 66x1 78x1 00x1 CEx1 68x1 00x1 CCx1 66x1 30x1 66x1 00x1 CCx1 30x1 FCx1 CCx1 66x1 00x1 CCx1 FEx1 CCx1 FCx1 00x19 F0x1 F8x1 00x1 C6x1 FEx1 00x1 78x1 F0x1 18x1 F0x1 00x1 78x1 18x1 78x1 30x1 DCx1 00x1 78x1 C6x1 CCx1 78x1 00x19
+-cursor 45 1 lines 32 0 mode 6
++cursor 43 1 lines 32 0 mode 6
+
+== 38: F10
+rows 5-11
+-|║readme   txt│                                                    │            ║| 1Bx14 70x51 1Bx15
+-|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║data     bin│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
+-|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║empty    dat│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║m        com│            │            ║║            │            │            ║| 1Bx16 03x51 1Bx13
++|║readme   txt│                                                    │            ║| 1Bx15 70x49 1Bx16
++|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║data     bin│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
++|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║empty    dat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
++|║m        com│            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14

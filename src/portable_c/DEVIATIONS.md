@@ -1085,3 +1085,106 @@ The other scenarios of the setup that are on 50 lines end before the
 screen is put back from what was kept, or have the panels over the
 corner when it is; all the rest are on a screen of 25 lines, where the
 cell lands in a row of the buffer that is not on the screen.
+
+### 10. The program calls itself Vibe Commander
+
+**What the original does.** It names itself in four ways:
+
+- By its title, "The Volkov Commander, Version 4.05", one text in three
+  places: in the second row of the Info panel, in the middle; over the
+  list of the pages in the window of its help; and as the first line of
+  its banner.
+- By its banner, two lines that it has DOS write when it starts and that
+  stay on the screen behind the panels: the title with the word of how
+  it is distributed behind it, "The Volkov Commander, Version 4.05
+  freeware", and "Copyright (C) 1991-2000 Vsevolod V. Volkov".
+- By its name without a version, "Volkov Commander", in the box that
+  asks before the program is left, by F10 or by Quit of the Files menu:
+  in the title of the box, "The Volkov Commander", and in its question,
+  "Do you want to quit the Volkov Commander?". The box is as wide as the
+  question.
+- In the two lines that ask for Enter when a command leaves the screen
+  as one that the program cannot draw on, 40 columns or graphics: "Press
+  ENTER to return" and "to the Volkov Commander", on two lines where the
+  screen has fewer than 80 columns and on one otherwise.
+
+**What the portable C does.** It is Vibe Commander 0.1, and says what it
+is based on wherever the original named its version. No screen has a row
+more for it than the original's.
+
+- The banner is two lines still. The first is the name with the version
+  and what it is based on, without the word "freeware", which said how
+  the original was distributed: "Vibe Commander 0.1, based on Volkov
+  Commander 4.05", 50 cells where the original's line is 43. The second
+  keeps the copyright of the original's author and has that of this
+  program behind it: "Copyright (C) 1991-2000 Vsevolod V. Volkov, (C)
+  2026 Maksym Motorny", 67 cells where the original's is 42. So both
+  reach further to the right behind the panels, and show in cells where
+  the original has the blank screen.
+- The title of the help's window is the first line of the banner: it
+  has room there, 62 columns. It stands in the middle, as the original's
+  does, six cells in where the original's is fourteen.
+- The title of the Info panel is the name with the version alone, "Vibe
+  Commander 0.1", in the middle of the row, 18 cells where the
+  original's title is 34: the panel has 38 columns, which is no room for
+  what the program is based on.
+- The name without a version is "Vibe Commander". The box of F10 has
+  "The Vibe Commander" in its title and asks "Do you want to quit the
+  Vibe Commander?", and is two cells narrower for the two letters, a
+  cell on either side, with its buttons where they were.
+- The second line that asks for Enter is "to the Vibe Commander".
+- Nothing else names the program otherwise. The files have the names
+  they had, `VC.EXE`, `VC.INI`, `VC.HLP` and the others, and the
+  variable of the environment is `VC`. The help file is the
+  distribution's, which the portable C reads as it is: its pages speak
+  of "the Commander" and of its author, and its header, which a viewer
+  shows, has "VC 4.05 Help" and the author's copyright. The setup, which
+  is a part of the program (see 8), does not name it: its menu is headed
+  "Setup", and the pictures in which it shows the colours have a
+  directory `VC` and a line of the help's list, "About the Commander",
+  as the original's have.
+
+**Why.** The user's decision, on 13 October 2026: the program in the
+portable C no longer is what the original is, with what has gone from it
+and with the setup in it, so it no longer carries the original's name or
+its version. What it is based on is said wherever the original named its
+version, and the copyright of the original's author stays where it was.
+The C translation, which behaves as the original does, keeps the
+original's name.
+
+**Which scenarios show it.** Every scenario in which the banner shows
+behind the panels or beside them, the Info panel is on, or the help is
+at the list of its pages: a thousand screens, in some seventy
+scenarios. Those are held against the original's goldens by rules of the
+comparison, `rules` of `TREES` in `harness/deviations.py`, one for each
+of the banner's two lines, one for the title of the Info panel and one
+for that of the help's window. A rule says the text
+as the original shows it and as the portable C does, cell for cell, and
+is made to a screen of the golden wherever at least twelve characters of
+the original's text show in their places: each cell that the golden has
+as the original's text has it, the spaces behind a shorter text
+included, is expected as the portable C's text has it, and every other
+cell, where a menu, a box or a panel covers the text, as the golden has
+it. Nothing is left out of the comparison by it.
+
+What the rules cannot say is in the patches of these scenarios:
+
+| Scenario | What changes in it |
+|---|---|
+| `quit`, `comspec`, `menu-items`, `setup-defaults`, `second-copy` | The box of F10, or of Quit of the Files menu: two cells narrower, with the other name in its title and its question. The cell that it no longer covers on either side shows what is behind it, and its shadow ends a cell further left |
+| `palettes` | The same box in black and white and on a laptop's display, where it is in the colours of the panel and its shadow does not show: its frame and its two lines |
+| `start-setup` | The same box, three times, once over what DOS had shown with no panel on the left: the cell that the box no longer covers shows the banner and the commands there |
+| `start-screen` | The same box. And the second line that asks for Enter, on a screen of 40 columns, with the cursor two cells further left behind it; and on a screen of graphics, where the test sees the dots of the one line as cells: other dots, for another name |
+| `setup-colors-own` | The sample of the colours that the setup shows at the right of the screen is grey on black on twelve screens, as what DOS has shown is, and covers the end of the banner's second line with four spaces. The rule takes a space in that colour for the screen behind the banner, and expects the line's letters in three of the four cells; the patch says that they are the sample's spaces |
+| `mouse-list`, `mouse-help` | The mouse's pointer is on a cell of the banner, its first, and on a cell of the help's title. It turns the colours of its cell round, and a rule leaves a cell in another colour as the original has it: the patch says the portable C's character there, in the pointer's colours |
+| `menu` | The Right menu covers the title of the Info panel but for its last ten cells, too few for the rule to know the title by: the patch has the end of the shorter title there, and spaces |
+| `banner` | A panel on the left with none on the right covers the banner but for the ends of its lines, three letters and two, too few again: the patch has the ends of the longer lines there |
+
+**In the data.** The test `portable_c-data` holds four texts against the
+original's with this difference declared for each, in `DECLARED` of
+`harness/datacheck.py`: the title, `Title_S`, which is the help's and the
+banner's; the name without a version, `Name_S`; the second line of the
+banner, `Copyr_S`, with what is put behind it; and the lines that ask
+for Enter, `CrLf_S`. The title of the Info panel, `NameVer_S`, is a text
+that the original has not, and is listed as the tree's own, in `OWN_OF`
+there. The word behind the original's title, `Suff_S`, is gone.

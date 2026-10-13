@@ -137,6 +137,20 @@ OWN = {
         "instructions"),
 }
 
+# As OWN, for the constants that one tree has and the other has not, since
+# it is declared to show what the original does not show
+# (src/<tree>/DEVIATIONS.md): tree -> name -> why. They are not compared.
+OWN_OF = {
+    "portable_c": {
+        "NameVer_S": "the title of the Info panel, the name and the "
+                     "version by which the portable C calls itself: the "
+                     "original has one title for the Info, the help and "
+                     "the banner, Title_S, which the portable C has too, "
+                     "with what it is based on, and that is longer than "
+                     "the panel is wide",
+    },
+}
+
 # The tables of the menus' commands. Where the original has the address
 # of a command there, the translation has the number of the command: the
 # CMD_ of src/c/vc.h that has the name of the original's label. So an item
@@ -184,6 +198,9 @@ _NO_MAP = ("the portable C has no map of the memory, Alt+F5, Memory info "
 _SETUP = ("the portable C has the setup program in itself, the last item "
           "of its Options menu, More setup..., behind Save setup and a "
           "line across the menu: ")
+_NAME = ("the portable C calls itself Vibe Commander 0.1, since it no "
+         "longer is what the original is, and says what it is based on "
+         "wherever the original named its version: ")
 _NO_SETTINGS = ("the setup of the portable C has no setting for what the "
                 "program has no more, Memory allocation and TSR manager "
                 "of the Configuration and Screen output of Screen and "
@@ -234,6 +251,25 @@ def _lines(group, halves, blanks, spaces):
 
 DECLARED = {
     "portable_c": {
+        "Title_S": (_NAME + "the title of the help's window, and without "
+                    "its first two bytes the first line of the banner, is "
+                    "the name with the version and what it is based on, "
+                    "50 characters behind six spaces where the original "
+                    "has 34 behind fourteen",
+                    ((1, 35, b"\x06Vibe Commander 0.1, based on Volkov "
+                             b"Commander 4.05"),)),
+        "Name_S": (_NAME + "the name without a version, which the box of "
+                   "F10 has in its title and in its question",
+                   ((0, 6, b"Vibe"),)),
+        "Copyr_S": (_NAME + "the second line of the banner has the "
+                    "copyright of this program behind that of the "
+                    "original's author",
+                    ((44, 0, b", (C) 2026 Maksym Motorny"),)),
+        "CrLf_S": (_NAME + "the name in the second of the two lines that "
+                   "ask for Enter where the screen is not one that the "
+                   "program can draw on, which stand behind the end of "
+                   "the banner",
+                   ((37, 6, b"Vibe"),)),
         "Menu3_T": (_NO_MAP + "the command of that item is left out, "
                     "F65_00", ((4, 2, b""),)),
         "Menu4_T": (_NO_OPTION + "the command of that item is left out, "
@@ -994,7 +1030,8 @@ def main():
     failed = []
     count = bytes_held = 0
     of_setup = bytes_of_setup = 0
-    stale = (set(DIFFERENT) | set(ELSEWHERE) | set(OWN) | set(declared)
+    own = OWN | OWN_OF.get(translation.source.name, {})
+    stale = (set(DIFFERENT) | set(ELSEWHERE) | set(own) | set(declared)
              | set(variables) | set(SETUP_ELSEWHERE if setup else ())) \
         - set(gone)
     used = set()
@@ -1004,10 +1041,10 @@ def main():
             failed.append(f"{module}: {name} is listed in "
                           f"{Path(__file__).name} as gone from "
                           f"{translation.source.name}")
-        if name in OWN or name in variables:
+        if name in own or name in variables:
             if not args.quiet:
                 print(f"  {module:12} {name:11} {length:4}  not "
-                      f"compared: {OWN.get(name) or variables[name]}")
+                      f"compared: {own.get(name) or variables[name]}")
             continue
         found = whose(name, original, setup)
         if isinstance(found, str):

@@ -20,7 +20,7 @@
 extern const u8 Ok_S[];
 extern const u8 OkMn_D[];
 
-#define PrgName "Volkov Commander"
+#define PrgName "Vibe Commander"
 
 /* Selecting by a mask: what ^I stands for in the two boxes, their lines,
    and a name in quotes, which is read as far as the zero byte that is

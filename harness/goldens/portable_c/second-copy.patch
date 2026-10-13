@@ -2,15 +2,17 @@ The portable C in the scenario second-copy: what it is expected to show
 otherwise than the original. A patch of harness/goldens/second-copy.txt, see
 harness/goldens.py: a line with - is the golden's, a line with + is what is
 expected in its place.
-Deviation: 1 of src/portable_c/DEVIATIONS.md
+Deviation: 1, 10 of src/portable_c/DEVIATIONS.md
 Why: the second copy has no memory to run a command: each copy keeps all of
-itself
+itself. And by 10, the box of F10 names the program in its title and in its
+question, by a name that is two letters shorter: the box is two cells
+narrower, a cell on either side, and its shadow ends a cell further left
 
 == 6: Ctrl+o
 rows 15-21
 -|C:\WORK>d:\vc\vc ver○/r                                                         | 07x80
--|The Volkov Commander, Version 4.05 freeware                                     | 07x80
--|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+-|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
+-|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
 -|                                                                                | 07x80
 -|FreeCom version 0.86 - WATCOMC - XMS_Swap [Dec 30 2024 22:10:51]                | 07x80
 -|DOS version 7.10                                                                | 07x80
@@ -19,6 +21,23 @@ rows 15-21
 +|                                                                                | 07x80
 +|                                                                                | 07x80
 +|C:\WORK>d:\vc\vc ver○/r                                                         | 07x80
-+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
-+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
++|Vibe Commander 0.1, based on Volkov Commander 4.05                              | 07x80
++|Copyright (C) 1991-2000 Vsevolod V. Volkov, (C) 2026 Maksym Motorny             | 07x80
 +|There is not enough memory to run this command                                  | 07x80
+
+== 8: F10
+rows 5-11
+-|║readme   txt│                                                    │            ║| 1Bx14 70x51 1Bx15
+-|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║data     bin│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
+-|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║empty    dat│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║            │            │            ║║            │            │            ║| 1Bx16 03x51 1Bx13
++|║readme   txt│                                                    │            ║| 1Bx15 70x49 1Bx16
++|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║data     bin│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
++|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║empty    dat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
++|║            │            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14

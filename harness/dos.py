@@ -303,13 +303,16 @@ class Screen:
     # they show in their other state.
     blinking: tuple = ()
 
+    def line(self, row, codepage=437):
+        """The characters of a row as text, as they show in a code
+        page."""
+        return "".join(_glyph(c, codepage) for c in
+                       self.cells[row * COLUMNS * 2:(row + 1) * COLUMNS * 2:2])
+
     def lines(self, codepage=437):
         """The characters on screen as text, one string per row, as they
         show in a code page."""
-        chars = self.cells[0::2]
-        return ["".join(_glyph(c, codepage)
-                        for c in chars[r * COLUMNS:(r + 1) * COLUMNS])
-                for r in range(ROWS)]
+        return [self.line(row, codepage) for row in range(ROWS)]
 
     def describe(self):
         return {

@@ -21,7 +21,10 @@ included; it is finished, and is kept as it is. `src/portable_c/` is the
 portable C: the line that leaves DOS behind. It began as a copy of `src/c/`,
 is built and tested beside it, against the same recordings of the original,
 and is where work goes on; where it is to behave otherwise than the
-original, `src/portable_c/DEVIATIONS.md` says so, and has no entry yet.
+original, `src/portable_c/DEVIATIONS.md` says so. It no longer is what
+the original is, and calls itself Vibe Commander 0.1, based on Volkov
+Commander 4.05; the assembly and the C translation are Volkov Commander
+4.05, by that name.
 
 The project is also an experiment in how far an AI coding agent can take such
 a recreation on its own. The engineering work is done by Claude; a human sets
@@ -563,6 +566,18 @@ made sense there. And the original's second program, its setup program,
 scenario that a deviation does not change the portable C is held
 against the original's golden, as the C translation is.
 
+With that much gone from it and the setup in it, the program no longer
+is what the original is, and does not carry its name: it calls itself
+Vibe Commander 0.1, and says what it is based on wherever the original
+named its version. Its banner is "Vibe Commander 0.1, based on Volkov
+Commander 4.05" over "Copyright (C) 1991-2000 Vsevolod V. Volkov, (C)
+2026 Maksym Motorny", two lines as the original's is; the first of them
+is the title over its help; the title of its Info panel, which has no
+room for all of that, is "Vibe Commander 0.1"; and the box that asks
+before the program is left calls it the Vibe Commander. That is entry
+10 of `DEVIATIONS.md`. Its files keep their names, `VC.EXE` and
+`VC.INI` and the rest, and the help file is the distribution's.
+
 It is compiled in the medium model, the option `-mm`, where the C
 translation has the small one: a function that another file calls is far
 because the compiler makes it so, and a static one near, and no
@@ -647,19 +662,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 197,050 bytes |
+| `VC.EXE` | 197,090 bytes |
 | as a multiple of the original's 65,090 bytes | 3.03 |
-| more than the C translation's 133,056 bytes | 63,994 bytes |
+| more than the C translation's 133,056 bytes | 64,034 bytes |
 | The relocations in its header, which DOS applies | 1,029 |
-| What it keeps of the memory while a command runs: the program and its panels | 206,688 bytes |
-| What DOS has for a command then, on the bench of the tests | 218,848 bytes |
+| What it keeps of the memory while a command runs: the program and its panels | 206,736 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,800 bytes |
 | The code segment `CTEXT` ends at | D356h, 7,338 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C538h, 10,952 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C53Dh, 10,947 bytes below the limit, F000h |
 | Inline assembly | 49 instructions in 9 pieces: 37 in 7 of `dos.c`, 12 in 2 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 757, 93, 262, 96 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 757, 93, 262, 95 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -1111,7 +1126,18 @@ tree, and written nowhere: the steps that the tree is not taken through
 are left out with their screens; what is otherwise on many screens is a
 rule of the comparison, for that tree alone; and the rows that one
 scenario shows otherwise are its patch, `NAME.patch` in
-`harness/goldens/portable_c/`. A patch says of each such row what the
+`harness/goldens/portable_c/`. The rules are of the program's name,
+which the original has on a thousand screens, in its banner behind the
+panels, in the Info panel and over the help, often with a menu, a box
+or a panel over a part of it. Such a rule is a part of the screen,
+`Part` of `harness/deviations.py`: the text as the original shows it
+and as the portable C does, cell for cell. Wherever enough of the
+original's text shows on a screen of the golden to know it by, each
+cell that the golden has as that text has it is expected as the
+portable C's text has it, and every other cell, which is what covers
+the text, as the golden has it. So a rule leaves no cell out of the
+comparison, and a screen on which it is wrong of a cell fails and gets
+a patch. A patch says of each such row what the
 original's golden has and what the portable C is expected to show, one
 above the other, by the screen's line in the golden and the number of
 the row:

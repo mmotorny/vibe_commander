@@ -427,8 +427,8 @@ void Exit00(u16 code);
 #pragma aux AlocEr aborts
 #pragma aux Exit00 aborts
 
-/* Texts that the code of more than one file shows: the first two are
-   constants of main_t.c, the third is one of treebox_t.c. They are in
+/* Texts that the code of more than one file shows: the first three are
+   constants of main_t.c, the fourth is one of treebox_t.c. They are in
    the segment of the tables, and code reads them as far objects. A file
    of tables, which is one that has tables.h and this by that, names
    them as lines of its boxes, by near words: there they are near. */
@@ -437,8 +437,10 @@ void Exit00(u16 code);
 #else
 #define TEXT_FAR __far
 #endif
-extern const u8 TEXT_FAR Title_S[];     /* the program's name and version,
-                                           behind two bytes of markup */
+extern const u8 TEXT_FAR Title_S[];     /* the program's name and version
+                                           and what it is based on, behind
+                                           two bytes of markup */
+extern const u8 TEXT_FAR NameVer_S[];   /* its name and version alone */
 extern const u8 TEXT_FAR Var_S[];       /* a line that is the text at
                                            TmpErr+1 */
 extern const u8 TEXT_FAR Tree_S[];      /* the title of the tree */

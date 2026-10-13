@@ -1,0 +1,16 @@
+The portable C in the scenario banner: what it is expected to show otherwise
+than the original. A patch of harness/goldens/banner.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 10 of src/portable_c/DEVIATIONS.md
+Why: the banner behind a panel on the left with none on the right: the ends
+of its two lines show beside the panel's frame, and the portable C's lines
+are longer and end otherwise. Three letters and two of the original's are
+too few for the rule of the name to know the banner by
+
+== 1: Ctrl+p
+rows 0-1
+-|╔════════════╤═ C:\WORK ══╤════════════╗are                                     | 1Bx15 30x9 1Bx16 07x40
+-|║    Name    │    Name    │    Name    ║ov                                      | 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5 07x40
++|╔════════════╤═ C:\WORK ══╤════════════╗ander 4.05                              | 1Bx15 30x9 1Bx16 07x40
++|║    Name    │    Name    │    Name    ║ov, (C) 2026 Maksym Motorny             | 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx5 07x40
