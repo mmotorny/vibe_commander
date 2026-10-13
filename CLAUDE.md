@@ -3163,7 +3163,11 @@ waiting for the user between its steps.
 - Each piece is the work of an agent of its own, started fresh, so that a
   run does not fill one context. The session that runs them does not do
   the work: it starts each agent, checks what the agent left, which is
-  the commits, the push and `LastTest.log`, and keeps its report.
+  the commits, the push and `LastTest.log`, and keeps its report. Nor
+  does it run or read what prints much, on the user's word of 13
+  October 2026: the suite on `main`, a search through the documents, a
+  small correction of a text are an agent's too, and the session keeps
+  the conclusion. Its context is for the queue and for the user.
 - An agent is given no time limit for work that is going well. The
   session watches what its agents are doing, and turns one round that is
   spending its time on something of little use. It also looks for what
