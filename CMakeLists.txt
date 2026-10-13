@@ -162,6 +162,13 @@ function(c_compile tree model source object text class)
     # What the compiler made of it is written next to the object, as a
     # listing: that is where to read which registers a function saves and
     # how much stack it takes.
+    # A file is compiled again when a header of its tree has changed:
+    # vc.h and tables.h, which both trees have, and sys.h, which the
+    # portable C has and vc.h includes there.
+    set(headers "")
+    if(EXISTS ${source_dir}/sys.h)
+        set(headers ${source_dir}/sys.h)
+    endif()
     add_custom_command(
         OUTPUT ${c_dir}/${object}.obj
         COMMAND ${watcom} ${watcom_bin}/wcc -q -0 -m${model} -os -s -zu -zl -zls
@@ -174,6 +181,7 @@ function(c_compile tree model source object text class)
         DEPENDS ${source_dir}/${source}
                 ${source_dir}/vc.h
                 ${source_dir}/tables.h
+                ${headers}
         COMMENT "Compiling ${tree}/${source} (${text})"
         VERBATIM)
 endfunction()
