@@ -207,6 +207,43 @@ left open:
   cuts it to save it (`F21_40` of `src/portable_c/enter.c`). The limit
   has no reason any more; lifting it is a deviation for the user to
   decide.
+- Whether Quick execute commands stays, of the Advanced options, is
+  the user's to decide, and it stays whole until then: the setting, and
+  `Int2E` and `Exec2E` of `resident.c`, by which the commands are handed
+  to the COMMAND.COM that the program was started from, through its INT
+  2Eh, in place of a second COMMAND.COM for each. The mechanism is of
+  DOS alone, and has the one place where the program sets its stack by
+  hand. What it gives a user may not be: commands run by the shell that
+  the program was started from, faster, and with what they set kept.
+- Whether the phantom drive B: stays is the user's to decide, and it
+  stays whole until then: what the program does for a machine whose one
+  floppy drive answers as A: and as B:, of which DOS has it be one at a
+  time. A user sees three things of it:
+  - The prompt. Before the program touches a drive by a letter that
+    shares the floppy drive with the one it goes by at the moment, it
+    asks in a box, " Change drive ", "Insert diskette for drive B:",
+    with Ok and Cancel: `Fantom` and `ChgDisk` of `system.c`, called at
+    some fifty places in fifteen files. Ok has DOS take the drive for
+    that letter, Cancel gives the command up. Without the box DOS asks
+    in its own words, "Insert diskette for drive B: and press any key
+    when ready", written over the panels, and waits for a key itself;
+    the driver of the tests would in all likelihood not get past that.
+  - The box of the drives, Alt+F1 and Alt+F2, `F62_01` of `drive.c`.
+    With the byte `DriveB` of the setup 0 it offers of the two letters
+    only the one that the drive goes by, A, C and D on the bench; the
+    byte is "Show logical drive B:" of the original's setup program,
+    which alone sets it, and 1 in the defaults. And a letter chosen
+    there is made the drive's without the prompt. Without either the
+    box would offer A and B both on such a machine, and every scenario
+    that shows it would change.
+  - "Can't read the disk in drive A:", `ErrRdy` of `main.c`, the box
+    for a drive that is not ready, which every system has a use for:
+    Enter there also makes the diskette that of the letter shown.
+  So it is more than a prompt to change the disk, though all of it is
+  of the machine with one floppy drive. Taking the prompt alone out
+  would have DOS write its own over the panels. The scenarios that go
+  by it: `drive-b`, `phantom`, `not-ready`, `diskette-command`,
+  `delete-mask` and others type B: to get to a drive that refuses.
 - Whether EGA lines stays, Alt-F9, is the user's to decide, and the
   call in it that has the BIOS print every line of such a screen at
   Print Screen (`F69_00` of `commands.c`, INT 10h, AH 12h, BL 20h)
