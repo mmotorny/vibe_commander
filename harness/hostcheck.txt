@@ -37,7 +37,7 @@ input.c       clean
 keys.c        clean
 keys_t.c      clean
 line.c        clean
-main.c        to-number 8, data_seg 2, aborts 1
+main.c        data_seg 2, aborts 1
 main_t.c      clean
 mask.c        clean
 menu.c        clean
@@ -46,11 +46,11 @@ mouse.c       clean
 panel.c       clean
 place.c       clean
 read.c        clean
-resident.c    to-number 13, to-pointer 4, aborts 1
+resident.c    aborts 1
 screen.c      clean
 setup.c       clean
 stack.c       data_seg 2
-start.c       to-number 1
+start.c       clean
 stcolor.c     clean
 stcolor_t.c   clean
 sthelp.c      clean

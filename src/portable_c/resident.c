@@ -1,6 +1,6 @@
 /*
- * The program and DOS around it: where the program begins and where it
- * ends, and the commands of DOS that it runs.
+ * The program and DOS around it: what it does first, the commands of
+ * DOS that it runs, and what it does when it leaves.
  *
  * In the original, and in the C translation after it, this is the part
  * of the program that stays in the memory while a command runs, which
@@ -8,20 +8,22 @@
  * copies of the setup and the panels, which gives the rest of the
  * program up for the command and loads it again afterwards. The portable
  * C stays in the memory whole (see DEVIATIONS.md), and this is a file
- * of it like any other: DS is on the program's data, md is the main
- * data, and its variables are variables.
+ * of it like any other: md is the main data, its variables are
+ * variables, and what it wants of DOS it asks through sys.h. Nothing of
+ * it stays anywhere, and nothing that DOS enters is here: where the
+ * program begins, where DOS goes on when it has ended the program and
+ * the interrupt of the shell are the system's, in dos.c.
  *
  * Two things are here. The first is what the program does before
  * anything else, Alloc3: it looks at the version of DOS and keeps no more
- * of the memory than it is. Where DOS enters the program is the
- * system's, Alloc0 of dos.c, which calls Main of main.c.
+ * of the memory than it is. Main of main.c calls it.
  *
  * The second is the commands: Exec runs those that the command line
- * holds, DosBuf, by COMMAND.COM or by the interrupt that COMMAND.COM has
- * for that; and what the program does when it leaves, or when DOS has
- * ended it. Where DOS goes on then is the system's, Exit01 of dos.c,
- * which calls Exit02 here on the stack of the program that started this
- * one: nothing there takes the stack to be the program's own.
+ * holds, DosBuf, by COMMAND.COM or by handing them to the shell that the
+ * program was started from; and what the program does when it leaves,
+ * or when DOS has ended it. The system calls Exit02 then, on the stack
+ * of the program that started this one: nothing there takes the stack
+ * to be the program's own.
  *
  * The original has a third here, which takes INT 21h, DOS's own
  * interrupt, while the program runs and while a command runs from it.
@@ -65,24 +67,25 @@ extern const u8 __far Vers_S[];
    registers hold when it calls the BIOS with them unset, and the BIOS
    takes them for a page of the screen and a colour. What the original
    keeps of the main data while a command runs, ComnIni, is at 25E5h
-   there and laid out as the main data is; the part of it that stays in
-   the memory is 31Ah paragraphs. */
+   there and laid out as the main data is, so a place of the main data
+   is as far behind it; the part of it that stays in the memory is 31Ah
+   paragraphs. */
 #define COMNINI_WAS 0x25E5
-#define WAS(address) ((u16)(address) - (u16)&md + COMNINI_WAS)
-#define EPB_WAS     WAS(&md.EPB)
+#define WAS(place)  ((u16)((place) + COMNINI_WAS))
+#define EPB_WAS     WAS(MD_PLACE(&md.EPB))
 #define RESPARS_WAS 0x031A
 
 /*------------------- Execute commands ------------------*/
 
 /* Write the text at `text` on the screen as a teletype would, in grey,
-   on the page in the high byte of `bx`. Returns where the text ends. A
-   text of no characters is written as its zero byte. */
-static u16 OutStr(const u8 __far *text, u16 bx)
+   on the page in the high byte of `bx`. A text of no characters is
+   written as its zero byte. The assembly leaves SI where the text ends,
+   and nothing goes on with that. */
+static void OutStr(const u8 __far *text, u16 bx)
 {
     do
         ScreenType(*text++, bx >> 8, 7);
     while (*text != 0);
-    return (u16)(u32)text;
 }
 
 /* The same for a text of the program's data.
@@ -210,11 +213,11 @@ static void Exec02(void)
 
     for (;;) {
         SetBreakCheck(md.BreakFl);
-        command = (u8 *)md.BatAdr;
+        command = MD_POINTER(md.BatAdr);
         before = command - 4;
         for (end = command; *end++ != 0; )
             ;
-        md.BatAdr = (u16)end;
+        md.BatAdr = MD_PLACE(end);
         for (end = command, count = LenCmd; count; count--)
             if (*end++ == 0)
                 break;
@@ -224,9 +227,9 @@ static void Exec02(void)
             before += 3;
             *before = (u8)(end - 1 - before);
             if (md.DosChg[1] != 0) {
-                md.BatPoin = (u16)before;
+                md.BatPoin = MD_PLACE(before);
                 ShellRun(md.DosChg);
-                before = (u8 *)md.BatPoin;
+                before = MD_POINTER(md.BatPoin);
                 md.DosChg[1] = 0;
             }
             ShellRun(before);           /* Exec03 */
@@ -255,7 +258,7 @@ static void Exec02(void)
                 return;
         }
     Exec07:
-        command = (u8 *)md.BatAdr;
+        command = MD_POINTER(md.BatAdr);
         if (*command == 0)
             return;
         if (*command == '@') {
@@ -281,7 +284,7 @@ static void Exec02(void)
         *to = 0;
         bx = WAS(md.BatAdr);
         OutStr0(PromptLine, bx);
-        OutStr0((const u8 *)md.BatAdr, bx);
+        OutStr0(MD_POINTER(md.BatAdr), bx);
         ScreenType(0x0D, bx >> 8, bx);
         ScreenType(0x0A, bx >> 8, bx);
     }
@@ -306,7 +309,7 @@ static void Exec10(void)
    but the part that this is of, if the program is set up so. */
 void Exec(void)
 {
-    md.BatAdr = (u16)md.DosBuf;         /* Exec01 */
+    md.BatAdr = MD_PLACE(md.DosBuf);    /* Exec01 */
     Exec02();
     Exec10();
 }

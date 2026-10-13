@@ -6,14 +6,13 @@ long it is: nothing that it makes runs.
 
 The project's build compiles the tree for 32 bits, into
 build/portable_c32/, and links no program of it yet. This links one, of
-those objects and of what the build does not make:
-
-  - a file that the build lists as not ready for 32 bits, and tries: it
-    leaves <file>.refused there and no object. Such a file is compiled
-    here with its warnings, which the build takes for errors;
-  - what the tree has of DOS outside sys.h, and so outside dos32.c:
-    `__GETDS`, which a function of the compiler's that loads DS asks for
-    and is written here as a function that does nothing.
+those objects and of what the build does not make: a file that the
+build lists as not ready for 32 bits, and tries, of which it leaves
+<file>.refused there and no object. Such a file is compiled here with
+its warnings, which the build takes for errors. There is none since the
+piece S3 of the plan, and nothing of DOS is left in the tree outside
+sys.h, which this had as functions that do nothing: every name that
+the objects ask for is one of dos32.c.
 
 It has the build make the objects first, links them as build.sh links a
 toy, with DOS/32A for the stub and Start of dos32.c for where the
@@ -26,8 +25,8 @@ What it showed of the tree as it was on 13 October 2026 is in TODO.md,
 of the addresses of vc.h in their second bodies. Then it compiled the
 tree itself, and had every function of sys.h do nothing; since there
 is dos32.c, what it links is that. That the file links says nothing of
-whether the program would run: a place of the main data is still cast
-to 16 bits in many files, and 22 functions of dos32.c are not made.
+whether the program would run: 24 functions of dos32.c are not made,
+and nothing has run the second bodies of the words of vc.h.
 """
 import re
 import struct
@@ -42,13 +41,6 @@ WATCOM = ROOT / "build" / "_deps" / "open_watcom-src"
 BIN = WATCOM / "binl64"
 BUILT = ROOT / "build" / "portable_c32"
 OUT = ROOT / "build" / "trial32" / "whole"
-
-# What the tree calls of DOS that is no function of sys.h.
-OUTSIDE = """#include "vc.h"
-void GetDs(void) { }
-#pragma aux GetDs "__GETDS"
-"""
-
 
 def facts(file):
     """What an LE file has: its objects, and its relocations by their
@@ -84,7 +76,6 @@ def main():
     OUT.mkdir(parents=True, exist_ok=True)
     for old in OUT.iterdir():
         old.unlink()
-    (OUT / "outside.c").write_text(OUTSIDE)
     # A file that the build has refused has no object there. One that
     # has both was refused once, and is ready since.
     waiting = [SOURCE / f"{refused.stem}.c"
@@ -92,7 +83,7 @@ def main():
                if not refused.with_suffix(".obj").exists()]
     environment = {"WATCOM": str(WATCOM), "PATH": "/usr/bin:/bin"}
     objects = sorted(BUILT.glob("*.obj"))
-    for path in waiting + [OUT / "outside.c"]:
+    for path in waiting:
         object_file = OUT / f"{path.stem}.obj"
         made = subprocess.run(
             [BIN / "wcc386", "-q", "-3r", "-mf", "-os", "-s", "-zl", "-zls",
@@ -105,7 +96,7 @@ def main():
             print(f"{path.name}: "
                   f"{(made.stdout + made.stderr).count('Warning')} warnings")
         objects.append(object_file)
-    print(f"{len(objects)} objects, {len(waiting) + 1} of them made here")
+    print(f"{len(objects)} objects, {len(waiting)} of them made here")
     # In the order of the files' names, as the program of 16 bits is
     # linked: a segment holds what the objects have of it in their order.
     objects.sort(key=lambda path: path.name)

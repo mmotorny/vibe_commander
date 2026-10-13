@@ -633,7 +633,7 @@ void IniData(void)
     md.BlocEr = 0;
     md.TstEGA = 0;
     md.WinMous = 0;
-    md.HstAdr = (u16)md.HstBuf;
+    md.HstAdr = MD_PLACE(md.HstBuf);
     md.BarPrev = 0xFF;
     md.DosChg[0] = (u8)DriveCurrent();  /* DosChg */
     if (ScreenEga())                    /* TstEGA */

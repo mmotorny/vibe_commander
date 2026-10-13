@@ -253,7 +253,7 @@ static void Init90(u16 panel)
         md.Volume[0] = 0;
         md.InfoLen = 0xFFFF;
     } else if (wcb->WinTyp < 2) {       /* Init92 */
-        root = (struct DIRENT *)TRELIST;
+        root = (struct DIRENT *)MD_POINTER(TRELIST);
         for (i = 0; i < sizeof(struct DIRENT); i++)
             ((u8 *)root)[i] = 0;
         root->DirName[0] = '\\';
@@ -783,8 +783,13 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
             }
             for (i = 0; i < INI_LEN; i++)       /* Func06 */
                 saved[i] = image[i];
-            r->si = (u16)md.MenuBuf + INI_LEN;
-            r->di = (u16)IniSave + INI_LEN;
+            /* What the registers hold behind the comparison, places as
+               numbers, which a command may go by: the second is of a
+               variable that stands behind the main data, IniSave, and
+               its number is how far behind, which is what the word
+               makes of a pointer that is no place of the main data. */
+            r->si = MD_PLACE(md.MenuBuf) + INI_LEN;
+            r->di = MD_PLACE(IniSave) + INI_LEN;
             /* fall through */
         case FUNC07:
             Cursor1();
@@ -804,8 +809,8 @@ static u16 Loop(u16 entry, struct Regs STACK *r)
                         break;
                     }
                 }
-                r->si = (u16)md.CrnPath + i;
-                r->di = (u16)md.DosPth + i;
+                r->si = MD_PLACE(md.CrnPath) + i;
+                r->di = MD_PLACE(md.DosPth) + i;
                 if (!same && md.FlagCD != 0) {
                     moment = TimeOfDay();
                     time = moment.clock;
@@ -933,7 +938,7 @@ static u16 MnuEnd(u16 answer, struct Regs STACK *r)
     case MNU_INIT50:
         return INIT50;
     case MNU_F24_01:                    /* MnuF24 */
-        return CmdEnd(F24_01(r->ds, (u16)md.TmpBuf), r);
+        return CmdEnd(F24_01(r->ds, MD_PLACE(md.TmpBuf)), r);
     default:                            /* MnuV00, MNU_V00_01: the menu of
                                            the command is in CL */
         return V00_03(r->cx & 0xFF, 1, 1);
@@ -1122,7 +1127,7 @@ static u16 Command(u16 command, u16 panel, struct Regs STACK *r)
         r->ax = ended.key;
         r->bx = ended.box;
         r->dx = 0x318;
-        r->si = (u16)md.WinBuf;
+        r->si = MD_PLACE(md.WinBuf);
         r->cx = md.KeyBar;
         return FUNC12;
     case CMD_F80_00: return F80_00(panel) ? FUNC01 : FUNC05;
@@ -1493,10 +1498,12 @@ FtErr5:
     StOpen = 0;
     *(u16 *)&md.AutoTim = 0xFFFF;
     if (how & 0x1000)
-        answer = (u8)Dialog(OFFSET(FtEr1_B), (u16)(u32)text, 0, 0, MAIN_SEG)
+        answer = (u8)Dialog(OFFSET(FtEr1_B), OFFSET_IN_SEG(assembly, text),
+                            0, 0, MAIN_SEG)
                  == 0 ? DEVICE_RETRY : DEVICE_FAIL;
     else {
-        Dialog(OFFSET(FtEr2_B), (u16)(u32)text, 0, 0, MAIN_SEG);
+        Dialog(OFFSET(FtEr2_B), OFFSET_IN_SEG(assembly, text), 0, 0,
+               MAIN_SEG);
         answer = DEVICE_FAIL;
     }
     md.Clock = clock;                   /* FtErr8 */

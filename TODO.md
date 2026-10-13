@@ -4150,6 +4150,56 @@ the host check's record has `resident.c` with 13 numbers, 4 pointers
 and one `aborts`, which the last family takes down. `VC.EXE` is 10
 bytes shorter, 197,096.
 
+**The places of the main data: done.** The three files say
+`MD_PLACE` and `MD_POINTER` where they cast, and are clean in the host
+check but for an `aborts` in `resident.c` and in `main.c`, which wait
+for nothing:
+
+| File | Places | What |
+|---|---|---|
+| `resident.c` | 7 lines and a macro | `BatAdr` and `BatPoin`, the command that is run, kept as places and read as pointers. And `WAS`, which made of an address of the main data the one that the original has for it: it takes a place now, `WAS(md.BatAdr)`, and `EPB_WAS` is `WAS(MD_PLACE(&md.EPB))` |
+| `resident.c` | 1 | `OutStr` returned where its text ends, a far pointer cut to a word, and nobody read that: it returns nothing |
+| `main.c` | 6 | What the registers of the loop hold as numbers, `r->si` and `r->di`, and the buffer handed to `F24_01` |
+| `main.c` | 2 | The text of a critical error, a far pointer into the tables handed to `Dialog` as its offset there: `OFFSET_IN_SEG(assembly, text)`, as P2b has it in `edit.c` |
+| `main.c` | 1 | `root = (struct DIRENT *)MD_POINTER(TRELIST)` in `Init90`: P2a's place that gcc does not count |
+| `start.c` | 1 | `md.HstAdr` |
+
+One of them is no place of the main data: `r->di = MD_PLACE(IniSave) +
+INI_LEN` in `Loop`. `IniSave` is a variable of `setup.c`, behind the
+main data in the segment that DS is on, and the number is what a
+register holds when the comparison of the setup is done, which goes
+round the loop and which a command may go by. On DOS it is the offset
+that it was. In a flat memory it is how far the variable is behind
+`md`, cut to 16 bits, which means something only while the linker has
+it within 64K: the comment at the line says so. Nothing follows it as
+a pointer.
+
+`main.c` and `start.c` compile to the code that they compiled to,
+listing for listing. `resident.c` does not: `WAS` took `&md` away from
+an address at run time, which is 0, and adds a constant to a place
+now, and `OutStr` has lost its last instruction; `VC.EXE` is 26 bytes
+shorter for the two, 197,070, and the whole suite decided.
+
+P2a's finder, the tree read by gcc with the second body of `MD_PLACE`
+a function, says of that what it says of the tree, in all files: no
+constant that comes from `MD_PLACE` is made a pointer anywhere now.
+
+The host check counts `dos.c`, `dos32.c` and `arith.c`, and of the
+rest only what waits for nothing: `data_seg` in `main.c` and `stack.c`
+and `aborts` in `main.c`, `resident.c` and `vc.h`.
+
+**Not done, and why: the four `#pragma data_seg` under `__I86__`.**
+The row has them so, and the code needs them where they are. The
+stack's is what gives a flat program its segment of the class STACK,
+without which the linker's header names no stack and the extender
+does not get the program going (the trial, "Building one, with no C
+library"); the toy of `dos32.c` is linked by it, `order ... clname
+STACK`. The main data's gives it a class of its own, `MAIN`, in 32
+bits too, which is the one handle that B2 has to say where `md` is
+linked: in front of the 640 KB, and no more than 32K behind the
+tables. And an `#ifdef` in a file of code is what the plan itself
+rules out. `wcc386` takes the four lines as they are.
+
 ## The portable C in 32 bits: what a trial on the bench showed
 
 The first step of the portable C's road (`CLAUDE.md`, "The portable C")
