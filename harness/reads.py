@@ -34,7 +34,10 @@ like any other here: its places are found by that name, and REVIEWED
 has it by that name, ("stopts.c", "StConf_P"). Which of the original's
 two programs its bytes are held against is datacheck.py's to know, not
 this tool's. A function of the setup's that reads a box or a dialog
-handed to it by its offset goes into READERS.
+handed to it by its offset goes into READERS. The files of the setup
+program are SETUP_FILES: a tree that is declared to have no setup
+program has none of them, and what REVIEWED has for them is not held
+against it.
 
     reads.py BUILD_DIR          every place, with the bytes read there:
                                 build/c for the C translation, whose
@@ -45,6 +48,8 @@ import re
 import sys
 from collections import defaultdict
 from pathlib import Path
+
+import deviations
 
 ZERO = "as far as its zero"     # a text
 TABLE = "as it is laid out"     # a box, a dialog, buttons: by their kind
@@ -61,6 +66,12 @@ NAMED = ("FileCreate", "FileOpen", "FileOpenBare", "FileDelete",
 # What a call reads of a constant that is handed to it by its offset.
 READERS = ("Dialog", "DialBox", "OncZoom", "MinMnu", "MnMn10", "MnMn40",
            "Ask")
+
+# The files of code of the setup program, in a tree that has it in itself
+# (TODO.md, "The setup program in the portable C: the plan"). An entry of
+# REVIEWED for one of them is none for a tree that is declared to have no
+# setup program, deviations.TREES.
+SETUP_FILES = ("stmain.c", "stopts.c", "stcolor.c", "sthelp.c")
 
 # Places that are not known by their form: (file, name) -> (what is read,
 # how that is known). A number is a count of bytes from the start of the
@@ -411,7 +422,11 @@ def check(source, objects, contents, variables=()):
                          f"at {file}:{line}, and has none: write it with "
                          f"what the original has behind it, as far as the "
                          f"zero")
-    for file, name in sorted(set(REVIEWED) - used - set(gone)):
+    listed = set(REVIEWED)
+    if deviations.declared(Path(source).name).no_setup:
+        listed = {(file, name) for file, name in listed
+                  if file not in SETUP_FILES}
+    for file, name in sorted(listed - used - set(gone)):
         wrong.append(f"{file} and {name} are listed in "
                      f"{Path(__file__).name}, and the file does not name "
                      f"the constant")

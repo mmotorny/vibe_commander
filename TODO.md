@@ -391,10 +391,16 @@ change, each as it is now, and what came out otherwise than planned.
      data, as the main program's listing has the structure: `MD_AT(X)`
      of `tables.h`.
    - A variable that the main data has under another name wants an
-     entry in `NAMED_OTHERWISE`, with "field": the setup program's
-     `BoxBuf`, which the tree has in `ErrBuf`.
+     entry in `SETUP_NAMED_OTHERWISE`, with "field": the setup
+     program's `BoxBuf`, which the tree has in `ErrBuf`.
    - The routine that a dialog names, `F04_10`, is a number there, as
      in the main program: "is", in the same table.
+   The table was `NAMED_OTHERWISE` when 0a wrote this, and piece B gave
+   the setup program's words one of their own: an entry there for an
+   object of setup failed the C translation's test, which has no such
+   object. Piece B also added `SETUP_COUNTED`, for a word that names a
+   text without a zero byte which the code reads by a count: the four
+   pictures of the colours, through `PagTab`.
    All of it was tried on a copy of the tree with a box and a dialog of
    the setup program written into it, right and with three things
    wrong. `reads.py` needed nothing: it goes by the names that the C

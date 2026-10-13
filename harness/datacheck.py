@@ -54,7 +54,9 @@ fourth. Such an object is written as long as what is read, with the
 original's bytes behind it, and then they are compared too. reads.py
 finds what the code reads of each constant, and an object that is
 shorter than that fails here; so does a text that a box or a dialog
-names and that has no zero byte within itself.
+names and that has no zero byte within itself, unless COUNTED, or
+SETUP_COUNTED for a thing of the setup program, says of the word that
+names it how many bytes are read of the text there.
 
 Exits with status 0 if every object that was compared is as the original,
 and 1 otherwise, with the object and the offset of the first byte or word
@@ -245,6 +247,23 @@ NAMED_OTHERWISE = {
        for row in range(5)},
     **{("MnuTab", row * 8 + 6): ("behind", "MnuHlp1", _MENUS)
        for row in range(5)},
+}
+
+# As NAMED_OTHERWISE, for the words of the setup program's objects, by the
+# names that a tree has them under. A tree that has no setup program has
+# none of these objects, and no entry is held against it.
+SETUP_NAMED_OTHERWISE = {
+}
+
+# Words of an object that name a text which is not read as far as a zero
+# byte, where a text that a word names is taken to be: (object, offset) ->
+# (how many bytes of the text are read through that word, how that is
+# known). The text has to be that long. As REVIEWED of reads.py, for what
+# the code reads through a table and not by the constant's name. And the
+# same for the setup program's objects.
+COUNTED = {
+}
+SETUP_COUNTED = {
 }
 
 
@@ -703,7 +722,9 @@ def compare(original, translation, name, there, address, length,
         word = struct.unpack_from("<H", ours, at)[0]
         names, behind = original.name_of(named)
         said = names[0] + (f"+{behind}" if behind else "")
-        how, label, _ = NAMED_OTHERWISE.get((name, at), ("", None, None))
+        how, label, _ = NAMED_OTHERWISE.get(
+            (name, at),
+            SETUP_NAMED_OTHERWISE.get((name, at), ("", None, None)))
         if how == "behind":
             wanted = [named - original.labels[label]]
             instead = f"how far {said} is behind {label}"
@@ -765,7 +786,16 @@ def compare(original, translation, name, there, address, length,
         if not how and original.segment_of[names[0]] == "CONST":
             text = groups[word] + word
             end = translation.end_of(text)
-            if end is not None and \
+            counted = COUNTED.get((name, at)) \
+                or SETUP_COUNTED.get((name, at))
+            if counted:
+                read = counted[0]
+                if end is not None and end - text < read:
+                    return (f"{name}+{at}: names {said}, of which {read} "
+                            f"bytes are read there by COUNTED, and it is "
+                            f"{end - text} bytes. Write it that long, "
+                            f"with what the original has behind it")
+            elif end is not None and \
                     0 not in translation.bytes(text, end - text):
                 return (f"{name}+{at}: names {said}, a text without a "
                         f"zero byte of its own: what reads it goes on into "
@@ -842,7 +872,9 @@ def main():
         why, otherwise = declared.get(name, (None, ()))
         difference = compare(program, translation, name, there, address,
                              length, otherwise)
-        used |= {key for key in NAMED_OTHERWISE if key[0] == name}
+        used |= {key for key in (*NAMED_OTHERWISE, *COUNTED,
+                                 *SETUP_NAMED_OTHERWISE, *SETUP_COUNTED)
+                 if key[0] == name}
         if name in DIFFERENT:
             if difference is None:
                 failed.append(f"{module}: {name} is as the original, and "
@@ -880,7 +912,10 @@ def main():
     failed += reads.check(translation.source, translation.objects,
                           translation.bytes,
                           translation.variables | set(variables))
-    for name, at in sorted(set(NAMED_OTHERWISE) - used):
+    listed = set(NAMED_OTHERWISE) | set(COUNTED)
+    if setup:
+        listed |= set(SETUP_NAMED_OTHERWISE) | set(SETUP_COUNTED)
+    for name, at in sorted(listed - used):
         failed.append(f"{name}+{at} is listed in {Path(__file__).name}, "
                       "and the translation has no object of that name")
 

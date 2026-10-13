@@ -1757,7 +1757,19 @@ in "The portable C".
     a variable the place of the field of that name in the main data.
     Where it says "the original names X there, which the translation
     has not by that name", one of the three is missing, or the thing
-    is kept under another name and wants a line in `NAMED_OTHERWISE`.
+    is kept under another name and wants a line in
+    `SETUP_NAMED_OTHERWISE`. That table, not `NAMED_OTHERWISE`, is
+    where a word of the setup program's object goes: an entry of
+    `NAMED_OTHERWISE` for an object that a tree has not fails that
+    tree's test, and the C translation has no object of the setup
+    program. And a word that names a text which has no zero byte and is
+    read by a count, as a picture of the colours is through `PagTab`,
+    has its count in `SETUP_COUNTED`: without that the test takes a
+    text that a word names to be read as far as a zero.
+    `harness/reads.py` is the same in its way: an entry of `REVIEWED`
+    for a file of the setup program, one of `SETUP_FILES` there, is
+    not held against a tree that has no setup program, where an entry
+    for a file that does not name its constant fails the test.
   - The test of the data can be tried before any code of a piece is
     there: a copy of the tree with one file of constants more, built as
     `harness/notice.py` builds its copy, `cmake -S` the copy with the
