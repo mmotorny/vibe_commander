@@ -1114,6 +1114,51 @@ with the original:
     the cursor is hidden below the last row: the box "Help contents is
     not available" beeps, which F1 brings up on the items Country info
     and Exit.
+  - The colours, F5, F6 and F7 for a palette. The list has 17 of its
+    39 items on a screen of 25 lines, on rows 4 to 20 and columns 7 to
+    49, in a box of rows 2 to 22 and columns 3 to 53; with 50 lines it
+    has them all, on rows 4 to 42, and room for three more. Up, Down,
+    Home, End, PgUp and PgDn move in it, a page being 16 lines; Enter is
+    the picture of the item, F8 asks whether to take the default colours
+    of the palette, with No a "Right Enter" away, and Esc and F10 go
+    back to the menu. A key that means nothing is taken and does
+    nothing, Tab. Behind the box that F8 asks in, the cursor of the grid
+    is gone until the cursor of the list moves, and the colour named on
+    the right is the one from before: Yes shows on the next Down.
+  - In the picture of an item, Left and Right go round a row of the
+    grid, Up and Down round a column, Home and End to the ends of the
+    row, PgUp and PgDn to the first row and the last, F8 to the default
+    colour; Enter takes the colour and Esc and F10 do not. The grid is
+    on rows 4 to 19 and columns 61 to 76, the foreground by the column
+    and the background by the row. One step that leaves a picture, goes
+    on and enters the next is "Esc Down Enter"; "Down" behind it shows,
+    by another background, which cells of the picture are the item's:
+    setup-colors-items has every item so.
+  - The item Shadow, the last, is No shadow in the first cell of the
+    grid, Inv brightness in the second, and a grey shadow in every
+    other, which is called White on Black whichever it is.
+  - The mouse there. A click on a line of the list puts the cursor on
+    it and a second one is Enter, with either button; let go beside its
+    line, the second chooses nothing. A button that went down on a line
+    and is held above the lines or below them moves the cursor, and
+    with it the lines: "Click@20,10>20,22*30". The middle button leaves,
+    and so does the left one let go outside the box: "Click@56,12",
+    which is beside it and not on row 23, where the pointer would be in
+    the line of the command that deviations.py knows by the whole row.
+    In a picture the left button on a cell of the grid shows that
+    colour, the right one anywhere takes the colour shown and the middle
+    one leaves without.
+  - To have the setup program start with another palette in use, or
+    with the key bar off, without its own dialogs: the main program
+    first, Ctrl+b, the Configuration, "Shift+F9 Enter" to save. The
+    prompt is on row 23 with the key bar off until a command has run.
+  - On 50 lines the way back from the list to the menu shows the top
+    left corner of what DOS had shown as a space: the key bar writes
+    81 cells (TODO.md, "The bugs of the original that stay"). The
+    banner of the main program is then no longer known as the banner,
+    and its "shareware" would be in the golden where a build says
+    "freeware": setup-colors-lines ends in the list for that. Whoever
+    shows that corner has deviations.py to look at first.
 
 Every scenario gets a machine of its own, in the state the bench was saved
 in: the program as its distribution configures it but for the clock, which
@@ -5619,6 +5664,271 @@ SCENARIOS = {
             "Enter",                      # Save: the panels, and no bar
         ),
         setup=True),
+
+    # The colours of the setup program: piece B of the plan.
+    "setup-colors": Scenario(
+        "The setup program's list of the 39 colours of a palette, by "
+        "its keys: the cursor, the pages, the lines moved by one, the "
+        "default colours asked for and not taken, and nothing to save",
+        steps=(
+            _SETUP,
+            "F6",                         # Set Color palette: 17 of the 39
+            "Down",                       # the next item, and its colour
+            "Tab",                        # a key that means nothing here
+            "Up Up",                      # no further than the first
+            "End",                        # the last 17, down to Shadow
+            "Down",                       # no further than the last
+            "Up",
+            "Home",
+            "PgDn",                       # 16 lines on, the cursor on the
+                                          # first that shows
+            "PgDn",                       # the last page, and the cursor
+                                          # is on it already
+            "PgDn",                       # no page more: the last item
+            "PgDn",
+            "PgUp",                       # 16 lines back, and the cursor on
+                                          # the last that shows
+            "PgUp",                       # the first page
+            "PgUp",                       # no page more: the first item
+            "PgUp",
+            "Down Down Down Down Down Down Down Down "
+            "Down Down Down Down Down Down Down Down",    # the last line
+            "Down",                       # and the lines move up by one
+            "PgDn",                       # a page with the cursor in it
+            "Up",                         # the lines move down by one
+            "PgUp",
+            "F8",                         # the default colours?
+            "Right Enter",                # No
+            "F8",
+            "Esc",
+            "F10",                        # back to the menu, on F6
+            "F5",                         # the black and white palette
+            "Esc",
+            "Down",                       # the menu's cursor was on F5
+            "F10",                        # nothing has changed: no question
+        ),
+        setup=True),
+
+    "setup-colors-items": Scenario(
+        "Every one of the 39 colours of the setup program's Color "
+        "palette entered once, with the picture that shows it, and the "
+        "cells of the picture that it colours shown by another "
+        "background; none is taken",
+        steps=(
+            _SETUP,
+            "F6",
+            "Enter Down",                 # Panels, on green
+        ) + 38 * (
+            "Esc Down Enter Down",        # the next item, a row down
+        ) + (
+            "Esc",                        # the list, as it was
+            "Esc",
+            "F10",                        # nothing to save
+        ),
+        setup=True),
+
+    "setup-colors-grid": Scenario(
+        "The colour of an item chosen in the setup program's grid of 16 "
+        "by 16, by its keys: round the rows and the columns, the "
+        "default, taken and not taken; the three things that Shadow can "
+        "be; the default colours of the palette taken; and what is "
+        "saved, in the panels of the program",
+        steps=(
+            _SETUP,
+            "F6",
+            "Enter",                      # Panels: bright cyan on blue
+            "Right",                      # bright red
+            "Tab",                        # a key that means nothing here
+            "End",                        # the last of the row
+            "Right",                      # round to the first
+            "Left",                       # and back round
+            "Left",
+            "Home",
+            "Up",                         # on black
+            "Up",                         # round to the last row
+            "Down",                       # and back
+            "PgDn",                       # the last row
+            "PgUp",                       # the first
+            "F8",                         # the colour of the default
+            "Left",
+            "Esc",                        # not taken
+            "Enter",
+            "Down Down",                  # on cyan
+            "Enter",                      # taken: the list is as it was
+                                          # drawn, the name is the new one
+            "Enter",                      # the picture in it
+            "Up F10",                     # F10 does not take either
+            "End",                        # Shadow: Inv brightness
+            "Enter",
+            "Left",                       # No shadow
+            "Enter",                      # taken
+            "Enter",                      # the picture without shadows
+            "Right",
+            "Right",                      # any other is a grey shadow
+            "Right Down",                 # and is called White on Black
+            "Enter",
+            "Up Up Up Up Up Up Up",       # Error box text
+            "Enter",                      # the editor, with grey shadows
+            "Right",
+            "Enter",
+            "F8",                         # the default colours?
+            "Enter",                      # Yes: on the right, the colour
+                                          # that this item had
+            "Down",
+            "Up",                         # and now its default
+            "Home",                       # Panels, as it was at first
+            "Enter",
+            "Down",                       # on green
+            "Enter",
+            "Esc",                        # the menu
+            "F10",                        # Exit: save the setup?
+            "Enter",                      # Save: the panels on green
+        ),
+        setup=True),
+
+    "setup-colors-mouse": Scenario(
+        "The mouse in the setup program's list of colours and in its "
+        "grid: a line clicked once and twice, a button held below the "
+        "lines and above them, the left button in the grid and beside "
+        "it, the right one to take a colour, the middle one to leave, "
+        "and a click outside the list",
+        steps=(
+            _SETUP,
+            "F6",
+            "Click@20,6",                 # Selected files
+            "Click@20,6",                 # again: its picture
+            "Click@65,8",                 # red on red, in the grid
+            "Click@30,10",                # beside the grid: nothing
+            "RightClick@40,12",           # taken
+            "Enter",
+            "Click@70,5",                 # brown on blue
+            "MiddleClick@40,12",          # not taken
+            "Click@20,10>20,22*30",       # held below the lines: they move
+            "Click@20,10>20,1*30",        # and above them
+            "Click@20,10>60,10*5",        # beside them: nothing more
+            "RightClick@60,10",           # the right button beside them
+            "Click@20,3",                 # on the frame
+            "Click@20,8",                 # a line,
+            "Click@20,8>60,8",            # and again, let go beside it
+            "RightClick@20,12",           # the right button on a line
+            "RightClick@20,12",           # is the left one's
+            "RightClick@40,12",
+            "MiddleClick@20,10",          # the menu
+            "F6",
+            "Click@56,12",                # outside the list: the menu
+            "F10",                        # Exit: save the setup?
+            "Enter",                      # Save
+        ),
+        setup=True),
+
+    "setup-colors-palettes": Scenario(
+        "The setup program's other two palettes, Black & White and "
+        "Laptop, which are not the one that the screen is in: their "
+        "pictures, a colour of each changed and saved",
+        steps=(
+            _SETUP,
+            "F5",                         # Set Black & White palette
+            "Enter",                      # the panels in black and white
+            "Home",                       # black on black
+            "Enter",
+            "PgDn",                       # Dialog box text
+            "Enter",
+            "Esc",
+            "Up Up Up Up Up Up Up Up Up", # Pull-down menu bar
+            "Enter",                      # the menus
+            "Down",
+            "Enter",
+            "F8",                         # the default colours?
+            "Esc",
+            "Esc",
+            "F7",                         # Set Laptop palette
+            "Enter",                      # the panels of a laptop
+            "Esc",
+            "PgDn Down Down Down",        # Configuration boxes text
+            "Enter",                      # the editor
+            "Right",
+            "Enter",
+            "PgDn Up Up Up Up Up Up",     # Help box text
+            "Enter",                      # the help
+            "Left",
+            "Enter",
+            "End",
+            "Enter",                      # the shadows of a laptop
+            "Left",                       # none
+            "Enter",
+            "F10",
+            "F6",                         # the Color palette is as it was
+            "End",
+            "Esc",
+            "F10",                        # Exit: save the setup?
+            "Enter",                      # Save
+        ),
+        setup=True),
+
+    "setup-colors-own": Scenario(
+        "The setup program's colours with the laptop palette in use and "
+        "the key bar off, both saved by the program beforehand: the "
+        "palette that the setup program is drawn in changed, saved, and "
+        "shown by the program",
+        steps=(
+            "Ctrl+b",                     # the key bar off
+            "F9 o Enter",
+            "Down Space",                 # the laptop palette
+            "Enter",
+            "Shift+F9 Enter",             # saved
+            _SETUP,                       # the menu, with no key bar
+            "F7",                         # Set Laptop palette: the right
+                                          # of the screen down to the last
+                                          # row
+            "Enter",                      # Panels
+            "Right Down",
+            "Enter",                      # taken: the list was drawn in
+                                          # the colours before
+            "Down Down Down Down Down",   # Key bar numbers
+            "Enter",
+            "F8",
+            "Esc",
+            "PgDn PgDn Down",             # History box text, which is the
+            "Enter",                      # colour of this list
+            "Right",
+            "Enter",
+            "F8",                         # the box that asks, in the new
+            "Enter",                      # colours; and the defaults
+            "Up",
+            "Enter",
+            "Left",
+            "Enter",
+            "Esc",                        # the menu, in the new colour
+            "F5",                         # the black and white palette,
+            "Enter",                      # with the laptop's in use
+            "Esc",
+            "Esc",
+            "F10",
+            "Enter",                      # Save
+            "Ctrl+b",                     # the key bar, in its colours
+        ),
+        setup=True),
+
+    "setup-colors-lines": Scenario(
+        "The setup program's list of colours on a screen of 50 lines, "
+        "which has room for more than the 39: a page down, a click below "
+        "the last of them, and a picture, which is of 25 rows. It ends "
+        "in the list: the way out of it is the same with any lines",
+        steps=(
+            "Alt+F9",                     # 50 lines
+            _SETUP,
+            "F6",                         # all 39 items
+            "PgDn",                       # no page more: the last item
+            "Home",
+            "Click@20,45",                # below the last item: the last
+            "Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up Up",
+            "Enter",                      # Dialog box bright text
+            "Right",
+            "Enter",
+            "PgUp",                       # the first, on the one page
+        ),
+        setup=True),
+    # The end of the colours of the setup program.
 
 }
 

@@ -611,6 +611,59 @@ on the bench.
   screen from then on.
 - **`resident.c`** is in other hands than setup's until E1.
 
+### Piece B, the colours: its scenarios
+
+Seven, of 226 steps, all of the bench of the United States: the list
+and the picture look at no country. Their goldens are derived and the
+portable C is not taken through them yet (`not_run` of
+`harness/deviations.py`), until the piece's code is there.
+
+| Scenario | Steps | What it has |
+|---|---|---|
+| `setup-colors` | 31 | The list by its keys: the cursor, the pages, the lines moved by one, a key that means nothing, F8 answered No and Esc, a second palette, and nothing to save |
+| `setup-colors-items` | 44 | Every one of the 39 items of the Color palette entered, each with its picture and with its cells shown by another background |
+| `setup-colors-grid` | 47 | The grid by its keys, a colour taken and not taken, Shadow as each of the three things it can be, the default colours of the palette taken, and the setup saved: the program's panels on green |
+| `setup-colors-mouse` | 25 | The mouse in the list and in the grid, each button, and saved |
+| `setup-colors-palettes` | 36 | Black & White and Laptop, which the screen is not in: each of the four pictures in one of them, and saved |
+| `setup-colors-own` | 32 | The laptop palette in use and the key bar off, both saved by the main program beforehand: the palette that setup is drawn in changed, saved, and shown by the program |
+| `setup-colors-lines` | 11 | 50 lines: all 39 items on one page, a click below the last, a picture |
+
+What they run of the original: 810 of the 813 instructions of
+`F05_00` to `F07_57`, `F07_60` to `F07_85`, `Col00` to `Col55` and
+`ShadCol` (`python3 harness/reach.py --setup F05_00 F07_60 F07_65
+F07_70 F07_75 F07_80 F07_85 Col00..F08_00 ShadCol`). The three that
+are left are for a monochrome display, mode 7, which the bench has
+not: `MOV SI,OFFSET MonMd_S` at `F07_01`, `INC SI` in front of
+`F07_19`, `INC DI` in front of `F07_54`.
+
+What the original does there that the plan did not have, each as it
+is, seen in the goldens:
+
+- F8 in the list, answered Yes, takes the default colours and draws
+  nothing: `F07_53` goes back to `F07_10` with the cursor and the first
+  line as they are, which is the way that changes nothing on the
+  screen. The colour named on the right, and the cursor in the grid,
+  are those from before until the cursor of the list moves. And the
+  box hides the cursor, Yes or No, which the grid has again only then.
+- Where the lines move by one, `F07_16` has the BIOS scroll them and
+  writes the one new line out 49 cells wide where a line is 41: the
+  eight more are the frame and what is beside it, as the screen has
+  them already.
+- A shadow of the picture that blinks would lose the blinking while
+  the item Shadow is chosen (`Col32` to `Col36` take the colour without
+  the bit 80h, `Col05` with it). No cell of the four pictures is both.
+- On 50 lines, leaving the list shows `PutKey0`'s 81st cell: the top
+  left corner of what DOS had shown is a space from then on. The
+  banner of the main program is then not known as the banner by
+  `harness/deviations.py`, which knows it from its first letter on,
+  and a golden would have its "shareware" where a build has
+  "freeware". `setup-colors-lines` ends in the list for that; piece D,
+  which is to show that corner, has the entry of `DEVIATIONS` to see
+  to first.
+- With the key bar off when setup is started, the prompt of the main
+  program is on row 23 before and on row 24 after, as behind any
+  command. `setup-colors-own` ends on such a screen, as `setup` does.
+
 ## The portable C: what another compiler says of it
 
 The portable C is built by one compiler, for DOS. The test

@@ -1,0 +1,957 @@
+Volkov Commander 4.05 in the scenario setup-colors-own: what the original shows and
+leaves on its disks. Derived by harness/goldens.py; not to be edited.
+code page 437
+
+== 0: the start
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x2 30x6 07x3 30x6
+
+== 1: Ctrl+b
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..          │            │            ║╟──────────────────────────────────────╢| 1Bx1 30x12 1Bx67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 1Bx50 1Ex7 1Bx23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 1Bx51 1Ex7 1Bx22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 1Bx63 1Ex2 1Bx4 1Ex4 1Bx7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 1Bx43 1Ex10 1Bx22 1Ex2 1Bx3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 1Bx43 1Ex10 1Bx21 1Ex2 1Bx4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 1Bx47 1Ex1 1Bx11 1Ex5 1Bx16
+|║run      bat│            │            ║║               C:\WORK                ║| 1Bx80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 1Bx40 6Cx1 1Bx39
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|║            │            │            ║║                                      ║| 1Bx80
+|╟────────────┴────────────┴────────────╢║                                      ║| 1Bx80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 1Bx80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 1Bx80
+|C:\WORK>                                                                        | 07x80
+|                                                                                | 07x80
+
+== 2: F9 o Enter
+cursor 15 6 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..                                                                        ────╢| 1Bx1 30x4 3Fx70 1Bx5
+|║DOCS   ╔═══════════════════════ Configuration ════════════════════════╗       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║SRC    ║  ┌ Screen colors ──────┐  ┌ Panel options ────────────────┐  ║       ║| 1Bx5 3Fx8 3Ex13 3Fx12 3Ex13 3Fx24 03x2 1Bx3
+|║read   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║hell   ║  │  (•) Color          │  │  [x] Auto change directory    │  ║   C:  ║| 1Bx5 3Fx70 06x2 1Bx3
+|║note   ║  │  ( ) Laptop         │  └───────────────────────────────┘  ║   :   ║| 1Bx5 3Fx70 06x1 03x1 1Bx3
+|║data   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
+|║run    ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
+|║empt   ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║   ────╢| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║   ory ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
+|║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  ( )  1 minute      │  ┌ Mouse options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
+|║       ║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  └─────────────────────┘  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║        Press  Space  to change an option,  ↑  and  ↓         ║       ║| 1Bx5 3Fx18 0Fx7 3Fx22 0Fx3 3Fx5 0Fx3 3Fx12 03x2 1Bx3
+|║       ║                   to move between options                    ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ╟──────────────────────────────────────────────────────────────╢       ║| 1Bx5 3Fx70 03x2 1Bx3
+|╟────   ║                     [ Ok ]   [ Cancel ]                      ║       ║| 1Bx5 3Fx25 3Ex6 3Fx39 03x2 1Bx3
+|║..     ╚══════════════════════════════════════════════════════════════╝       ║| 1Bx5 3Fx70 03x2 1Bx3
+|╚════                                                                      ════╝| 1Bx5 3Fx70 03x2 1Bx3
+|C:\WORK>                                                                        | 07x7 0Fx70 07x3
+|                                                                                | 07x80
+
+== 3: Down Space
+cursor 15 7 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 1Bx15 30x9 1Bx56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 1Bx5 1Ex8 1Bx1 1Ex12 1Bx1 1Ex8 1Bx45
+|║..                                                                        ────╢| 1Bx1 30x4 3Fx70 1Bx5
+|║DOCS   ╔═══════════════════════ Configuration ════════════════════════╗       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║SRC    ║  ┌ Screen colors ──────┐  ┌ Panel options ────────────────┐  ║       ║| 1Bx5 3Fx8 3Ex13 3Fx12 3Ex13 3Fx24 03x2 1Bx3
+|║read   ║  │  ( ) Black & White  │  │  [x] Ins moves down           │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║hell   ║  │  ( ) Color          │  │  [x] Auto change directory    │  ║   C:  ║| 1Bx5 3Fx70 06x2 1Bx3
+|║note   ║  │  (•) Laptop         │  └───────────────────────────────┘  ║   :   ║| 1Bx5 3Fx70 06x1 03x1 1Bx3
+|║data   ║  └─────────────────────┘  ┌ Other options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
+|║run    ║  ┌ Screen blank delay ─┐  │  [ ] Menu bar always visible  │  ║       ║| 1Bx5 3Fx8 3Ex18 3Fx44 03x2 1Bx3
+|║empt   ║  │  ( ) 40 minutes     │  │  [ ] Auto save setup          │  ║   ────╢| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  ( ) 20 minutes     │  │  [x] Confirmation on quit     │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  (•)  5 minutes     │  │  [x] Zooming boxes            │  ║   ory ║| 1Bx5 3Fx35 48x1 3Fx34 03x2 1Bx3
+|║       ║  │  ( )  3 minutes     │  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  │  ( )  1 minute      │  ┌ Mouse options ────────────────┐  ║       ║| 1Bx5 3Fx33 3Ex13 3Fx24 03x2 1Bx3
+|║       ║  │  ( ) Off            │  │  [ ] Left-handed mouse        │  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║  └─────────────────────┘  └───────────────────────────────┘  ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ║        Press  Space  to change an option,  ↑  and  ↓         ║       ║| 1Bx5 3Fx18 0Fx7 3Fx22 0Fx3 3Fx5 0Fx3 3Fx12 03x2 1Bx3
+|║       ║                   to move between options                    ║       ║| 1Bx5 3Fx70 03x2 1Bx3
+|║       ╟──────────────────────────────────────────────────────────────╢       ║| 1Bx5 3Fx70 03x2 1Bx3
+|╟────   ║                     [ Ok ]   [ Cancel ]                      ║       ║| 1Bx5 3Fx25 3Ex6 3Fx39 03x2 1Bx3
+|║..     ╚══════════════════════════════════════════════════════════════╝       ║| 1Bx5 3Fx70 03x2 1Bx3
+|╚════                                                                      ════╝| 1Bx5 3Fx70 03x2 1Bx3
+|C:\WORK>                                                                        | 07x7 0Fx70 07x3
+|                                                                                | 07x80
+
+== 4: Enter
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 07x15 70x9 07x56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x45
+|║..          │            │            ║╟──────────────────────────────────────╢| 07x1 70x12 07x67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 07x50 0Fx7 07x23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 07x51 0Fx7 07x22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 07x63 0Fx2 07x4 0Fx4 07x7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 07x43 0Fx10 07x22 0Fx2 07x3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 07x43 0Fx10 07x21 0Fx2 07x4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 07x47 0Fx1 07x11 0Fx5 07x16
+|║run      bat│            │            ║║               C:\WORK                ║| 07x80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 07x40 70x1 07x39
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|╟────────────┴────────────┴────────────╢║                                      ║| 07x80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 07x80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
+|C:\WORK>                                                                        | 07x80
+|                                                                                | 07x80
+
+== 5: Shift+F9 Enter
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 07x15 70x9 07x56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x45
+|║..          │            │            ║╟──────────────────────────────────────╢| 07x1 70x12 07x67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 07x50 0Fx7 07x23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 07x51 0Fx7 07x22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 07x63 0Fx2 07x4 0Fx4 07x7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 07x43 0Fx10 07x22 0Fx2 07x3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 07x43 0Fx10 07x21 0Fx2 07x4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 07x47 0Fx1 07x11 0Fx5 07x16
+|║run      bat│            │            ║║               C:\WORK                ║| 07x80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 07x40 70x1 07x39
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|╟────────────┴────────────┴────────────╢║                                      ║| 07x80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 07x80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
+|C:\WORK>                                                                        | 07x80
+|                                                                                | 07x80
+
+== 6: "d:\vc\vcsetup>nul" Enter
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 70x41 07x20
+|                      ╔═════════════ Setup ═════════════╗                       | 07x19 70x41 07x20
+|                      ║ F2   Configuration              ║                       | 07x19 70x9 07x27 70x5 07x20
+|                      ║ F3   Screen and Mouse           ║                       | 07x19 70x41 07x20
+|                      ║ F4   Panel options              ║                       | 07x19 70x41 07x20
+|                      ║ F5   Set Black & White palette  ║                       | 07x19 70x41 07x20
+|                      ║ F6   Set Color palette          ║                       | 07x19 70x41 07x20
+|                      ║ F7   Set Laptop palette         ║                       | 07x19 70x21 07x1 70x19 07x20
+|                      ║ F8   Set default configuration  ║                       | 07x19 70x41 07x20
+|                      ║ F9   Country info               ║                       | 07x19 70x41 07x20
+|                      ║ F10  Exit                       ║                       | 07x19 70x41 07x20
+|                      ╚═════════════════════════════════╝                       | 07x19 70x41 07x20
+|                                                                                | 07x19 70x41 07x20
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 7: F7
+cursor 68 4 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Panels                                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  Current pointer                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  Selected files                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Selected pointer                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Title in file panel                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Key bar numbers                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Key bar text                             ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Pull-down menu bar                       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Pull-down menu pointer                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Pull-down menu border                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Pull-down menu text                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Pull-down menu bright                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Pull-down menu current bar               ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Pull-down menu current bright            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Pull-down menu unaccessable lines        ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Pull-down menu minus                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Dialog box text                          ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝               White         | 07x3 70x51 07x26
+|                                                                 on Black       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 8: Enter
+cursor 68 4 lines 0 7 mode 3
+|╔════════════╤══ C:\DOS ════════╤═ 4:55p                                        | 07x16 70x8 07x10 70x2 F0x1 70x3 07x40
+|║    Name    │   Size  │  Date  │ Time ║                      Mode: Color       | 07x1 0Fx12 07x1 0Fx9 07x1 0Fx8 07x1 0Fx6 07x41
+|║..          │►UP--DIR◄│10-29-91│ 2:55p║                   Palette: LapTop      | 07x80
+|║command  com│    54619╔════════════════ Tree ═══════════                       | 07x80
+|║append   exe│     8170║ \                                   xxxxxxxxxxxxxxxx   | 07x61 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|║as                    ║ ├──DOS                              xxxxxxxxxxxxxxxx   | 07x61 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|║at   ╔══════ Drive let║ ├─▌VC          ▐                    xxxxxxxxxxxxxxxx   | 07x27 0Fx14 07x20 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|║ba   ║    Choose left ║ ├──TOOLS                            xxxxxxxxxxxxxxxx   | 07x18 0Fx4 07x39 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|║ch   ║  A   B   C   D ║ ├─▌ARC         ▐                    xxxxxxxxxxxxxxxx   | 07x16 70x3 07x8 70x14 07x20 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|║ch   ╚════════════════║ ├──TEST                             xxxxxxxxxxxxxxxx   | 07x61 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|║co                    ║                                     xxxxxxxxxxxxxxxx   | 07x24 70x33 07x4 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|║debug    exe│    15718║   ╔═══════ User Menu ═══════╗       xxxxxxxxxxxxxxxx   | 07x24 70x33 07x4 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|║deltree  exe│     7930║   ║ F1  Archives...         ║       xxxxxxxxxxxxxxxx   | 07x24 70x8 07x8 70x1 07x11 70x5 07x4 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|║diskcomp com│     7249║   ║ F2  Format floppy disk  ║       xxxxxxxxxxxxxxxx   | 07x24 70x33 07x4 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|║diskcopy com│     8763║   ║ F4  Edit file           ║       xxxxxxxxxxxxxxxx   | 07x1 70x22 07x1 70x33 07x4 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|║doskey   com│     4729║   ╚═════════════════════════╝       xxxxxxxxxxxxxxxx   | 07x24 70x33 07x4 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|║edlin    exe│    10007║                                     xxxxxxxxxxxxxxxx   | 07x1 70x22 07x1 70x33 07x4 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|║exe2bin  exe│     6755║ ├──DOCS                             xxxxxxxxxxxxxxxx   | 07x1 0Fx22 07x38 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|║expand   exe│    16129║ └─ TMP                              xxxxxxxxxxxxxxxx   | 07x1 0Fx22 07x4 70x14 07x20 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|║fasthelp exe│     8199║                                     xxxxxxxxxxxxxxxx   | 07x61 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|╟────────────┴─────────║                                                        | 07x80
+|║   32,891 bytes in 3 s║                                          White         | 07x4 0Fx19 07x57
+|╚══════════════════════║                                         on Black       | 07x80
+|C:\DOS>                ╟─────────────────────────────────                       | 07x80
+|1Help   2Menu   3View  ║C:\DOS                                                  | 07x1 70x6 07x2 70x6 07x2 70x6 07x57
+
+== 9: Right Down
+cursor 69 5 lines 0 7 mode 3
+|╔════════════╤══ C:\DOS ════════╤═ 4:55p                                        | 18x16 70x8 18x10 70x2 F0x1 70x3 07x40
+|║    Name    │   Size  │  Date  │ Time ║                      Mode: Color       | 18x1 0Fx12 18x1 0Fx9 18x1 0Fx8 18x1 0Fx6 18x1 07x40
+|║..          │►UP--DIR◄│10-29-91│ 2:55p║                   Palette: LapTop      | 18x40 07x40
+|║command  com│    54619╔════════════════ Tree ═══════════                       | 18x57 07x23
+|║append   exe│     8170║ \                                   xxxxxxxxxxxxxxxx   | 18x57 07x4 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|║as                    ║ ├──DOS                              xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|║at   ╔══════ Drive let║ ├─▌VC          ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x20 18x4 0Fx14 18x16 07x4 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|║ba   ║    Choose left ║ ├──TOOLS                            xxxxxxxxxxxxxxxx   | 18x3 07x15 0Fx4 07x1 18x34 07x4 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|║ch   ║  A   B   C   D ║ ├─▌ARC         ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x13 70x3 07x4 18x4 70x14 18x16 07x4 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|║ch   ╚════════════════║ ├──TEST                             xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|║co                    ║                                     xxxxxxxxxxxxxxxx   | 18x3 07x20 18x1 70x33 07x4 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|║debug    exe│    15718║   ╔═══════ User Menu ═══════╗       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|║deltree  exe│     7930║   ║ F1  Archives...         ║       xxxxxxxxxxxxxxxx   | 18x24 70x8 07x8 70x1 07x11 70x5 07x4 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|║diskcomp com│     7249║   ║ F2  Format floppy disk  ║       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|║diskcopy com│     8763║   ║ F4  Edit file           ║       xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 70x33 07x4 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|║doskey   com│     4729║   ╚═════════════════════════╝       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|║edlin    exe│    10007║                                     xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 70x33 07x4 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|║exe2bin  exe│     6755║ ├──DOCS                             xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x34 07x4 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|║expand   exe│    16129║ └─ TMP                              xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x4 70x14 18x16 07x4 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|║fasthelp exe│     8199║                                     xxxxxxxxxxxxxxxx   | 18x57 07x4 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|╟────────────┴─────────║                                                        | 18x57 07x23
+|║   32,891 bytes in 3 s║                                           Gray         | 18x4 0Fx19 18x34 07x23
+|╚══════════════════════║                                         on Blue        | 18x57 07x23
+|C:\DOS>                ╟─────────────────────────────────                       | 07x23 18x34 07x23
+|1Help   2Menu   3View  ║C:\DOS                                                  | 07x1 70x6 07x2 70x6 07x2 70x6 18x34 07x23
+
+== 10: Enter
+cursor 69 5 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Panels                                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  Current pointer                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  Selected files                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Selected pointer                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Title in file panel                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Key bar numbers                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Key bar text                             ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Pull-down menu bar                       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Pull-down menu pointer                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Pull-down menu border                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Pull-down menu text                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Pull-down menu bright                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Pull-down menu current bar               ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Pull-down menu current bright            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Pull-down menu unaccessable lines        ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Pull-down menu minus                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Dialog box text                          ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝                Gray         | 07x3 70x51 07x26
+|                                                                 on Blue        | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 11: Down Down Down Down Down
+cursor 68 4 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Panels                                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  Current pointer                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  Selected files                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Selected pointer                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Title in file panel                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Key bar numbers                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Key bar text                             ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Pull-down menu bar                       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Pull-down menu pointer                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Pull-down menu border                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Pull-down menu text                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Pull-down menu bright                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Pull-down menu current bar               ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Pull-down menu current bright            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Pull-down menu unaccessable lines        ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Pull-down menu minus                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Dialog box text                          ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝               White         | 07x3 70x51 07x26
+|                                                                 on Black       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 12: Enter
+cursor 68 4 lines 0 7 mode 3
+|╔════════════╤══ C:\DOS ════════╤═ 4:55p                                        | 18x16 70x8 18x10 70x2 F0x1 70x3 07x40
+|║    Name    │   Size  │  Date  │ Time ║                      Mode: Color       | 18x1 0Fx12 18x1 0Fx9 18x1 0Fx8 18x1 0Fx6 18x1 07x40
+|║..          │►UP--DIR◄│10-29-91│ 2:55p║                   Palette: LapTop      | 18x40 07x40
+|║command  com│    54619╔════════════════ Tree ═══════════                       | 18x57 07x23
+|║append   exe│     8170║ \                                   xxxxxxxxxxxxxxxx   | 18x57 07x4 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|║as                    ║ ├──DOS                              xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|║at   ╔══════ Drive let║ ├─▌VC          ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x20 18x4 0Fx14 18x16 07x4 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|║ba   ║    Choose left ║ ├──TOOLS                            xxxxxxxxxxxxxxxx   | 18x3 07x15 0Fx4 07x1 18x34 07x4 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|║ch   ║  A   B   C   D ║ ├─▌ARC         ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x13 70x3 07x4 18x4 70x14 18x16 07x4 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|║ch   ╚════════════════║ ├──TEST                             xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|║co                    ║                                     xxxxxxxxxxxxxxxx   | 18x3 07x20 18x1 70x33 07x4 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|║debug    exe│    15718║   ╔═══════ User Menu ═══════╗       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|║deltree  exe│     7930║   ║ F1  Archives...         ║       xxxxxxxxxxxxxxxx   | 18x24 70x8 07x8 70x1 07x11 70x5 07x4 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|║diskcomp com│     7249║   ║ F2  Format floppy disk  ║       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|║diskcopy com│     8763║   ║ F4  Edit file           ║       xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 70x33 07x4 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|║doskey   com│     4729║   ╚═════════════════════════╝       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|║edlin    exe│    10007║                                     xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 70x33 07x4 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|║exe2bin  exe│     6755║ ├──DOCS                             xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x34 07x4 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|║expand   exe│    16129║ └─ TMP                              xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x4 70x14 18x16 07x4 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|║fasthelp exe│     8199║                                     xxxxxxxxxxxxxxxx   | 18x57 07x4 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|╟────────────┴─────────║                                                        | 18x57 07x23
+|║   32,891 bytes in 3 s║                                          White         | 18x4 0Fx19 18x34 07x23
+|╚══════════════════════║                                         on Black       | 18x57 07x23
+|C:\DOS>                ╟─────────────────────────────────                       | 07x23 18x34 07x23
+|1Help   2Menu   3View  ║C:\DOS                                                  | 07x1 70x6 07x2 70x6 07x2 70x6 18x34 07x23
+
+== 13: F8
+cursor 68 4 lines 0 7 mode 3
+|╔════════════╤══ C:\DOS ════════╤═ 4:55p                                        | 18x16 70x8 18x10 70x2 F0x1 70x3 07x40
+|║    Name    │   Size  │  Date  │ Time ║                      Mode: Color       | 18x1 0Fx12 18x1 0Fx9 18x1 0Fx8 18x1 0Fx6 18x1 07x40
+|║..          │►UP--DIR◄│10-29-91│ 2:55p║                   Palette: LapTop      | 18x40 07x40
+|║command  com│    54619╔════════════════ Tree ═══════════                       | 18x57 07x23
+|║append   exe│     8170║ \                                   xxxxxxxxxxxxxxxx   | 18x57 07x4 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|║as                    ║ ├──DOS                              xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|║at   ╔══════ Drive let║ ├─▌VC          ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x20 18x4 0Fx14 18x16 07x4 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|║ba   ║    Choose left ║ ├──TOOLS                            xxxxxxxxxxxxxxxx   | 18x3 07x15 0Fx4 07x1 18x34 07x4 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|║ch   ║  A   B   C   D ║ ├─▌ARC         ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x13 70x3 07x4 18x4 70x14 18x16 07x4 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|║ch   ╚════════════════║ ├──TEST                             xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|║co                    ║                                     xxxxxxxxxxxxxxxx   | 18x3 07x20 18x1 70x33 07x4 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|║debug    exe│    15718║   ╔═══════ User Menu ═══════╗       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|║deltree  exe│     7930║   ║ F1  Archives...         ║       xxxxxxxxxxxxxxxx   | 18x24 70x8 07x8 70x1 07x11 70x5 07x4 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|║diskcomp com│     7249║   ║ F2  Format floppy disk  ║       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|║diskcopy com│     8763║   ║ F4  Edit file           ║       xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 70x33 07x4 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|║doskey   com│     4729║   ╚═════════════════════════╝       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|║edlin    exe│    10007║                                     xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 70x33 07x4 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|║exe2bin  exe│     6755║ ├──DOCS                             xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x34 07x4 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|║expand   exe│    16129║ └─ TMP                              xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x4 70x14 18x16 07x4 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|║fasthelp exe│     8199║                                     xxxxxxxxxxxxxxxx   | 18x57 07x4 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|╟────────────┴─────────║                                                        | 18x57 07x23
+|║   32,891 bytes in 3 s║                                          White         | 18x4 0Fx19 18x34 07x23
+|╚══════════════════════║                                         on Black       | 18x57 07x23
+|C:\DOS>                ╟─────────────────────────────────                       | 07x23 18x34 07x23
+|1Help   2Menu   3View  ║C:\DOS                                                  | 07x1 70x6 07x2 70x6 07x2 70x6 18x34 07x23
+
+== 14: Esc
+cursor 68 4 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Panels                                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  Current pointer                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  Selected files                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Selected pointer                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Title in file panel                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Key bar numbers                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Key bar text                             ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Pull-down menu bar                       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Pull-down menu pointer                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Pull-down menu border                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Pull-down menu text                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Pull-down menu bright                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Pull-down menu current bar               ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Pull-down menu current bright            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Pull-down menu unaccessable lines        ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Pull-down menu minus                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Dialog box text                          ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝               White         | 07x3 70x51 07x26
+|                                                                 on Black       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 15: PgDn PgDn Down
+cursor 61 11 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Configuration boxes bright reverse text  ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  History box text                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  History box pointer                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Mini help in .EXT file editor border     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Mini help in .EXT file editor text       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Help box text                            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Help box bright text                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Help box reverse text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Help box underline text                  ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Error box text                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Error box reverse text                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Error box bright text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Clock                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Arrows in viewer and editor              ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Stars                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Explosing stars                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Shadow                                   ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝               Black         | 07x3 70x51 07x26
+|                                                                 on White       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 16: Enter
+cursor 61 11 lines 0 7 mode 3
+|╔════════════╤══ C:\DOS ════════╤═ 4:55p                                        | 18x16 70x8 18x10 70x2 F0x1 70x3 07x40
+|║    Name    │   Size  │  Date  │ Time ║                      Mode: Color       | 18x1 0Fx12 18x1 0Fx9 18x1 0Fx8 18x1 0Fx6 18x1 07x40
+|║..          │►UP--DIR◄│10-29-91│ 2:55p║                   Palette: LapTop      | 18x40 07x40
+|║command  com│    54619╔════════════════ Tree ═══════════                       | 18x57 07x23
+|║append   exe│     8170║ \                                   xxxxxxxxxxxxxxxx   | 18x57 07x4 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|║as                    ║ ├──DOS                              xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|║at   ╔══════ Drive let║ ├─▌VC          ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x20 18x4 0Fx14 18x16 07x4 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|║ba   ║    Choose left ║ ├──TOOLS                            xxxxxxxxxxxxxxxx   | 18x3 07x15 0Fx4 07x1 18x34 07x4 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|║ch   ║  A   B   C   D ║ ├─▌ARC         ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x13 70x3 07x4 18x4 70x14 18x16 07x4 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|║ch   ╚════════════════║ ├──TEST                             xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|║co                    ║                                     xxxxxxxxxxxxxxxx   | 18x3 07x20 18x1 70x33 07x4 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|║debug    exe│    15718║   ╔═══════ User Menu ═══════╗       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|║deltree  exe│     7930║   ║ F1  Archives...         ║       xxxxxxxxxxxxxxxx   | 18x24 70x8 07x8 70x1 07x11 70x5 07x4 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|║diskcomp com│     7249║   ║ F2  Format floppy disk  ║       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|║diskcopy com│     8763║   ║ F4  Edit file           ║       xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 70x33 07x4 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|║doskey   com│     4729║   ╚═════════════════════════╝       xxxxxxxxxxxxxxxx   | 18x24 70x33 07x4 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|║edlin    exe│    10007║                                     xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 70x33 07x4 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|║exe2bin  exe│     6755║ ├──DOCS                             xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x34 07x4 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|║expand   exe│    16129║ └─ TMP                              xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x4 70x14 18x16 07x4 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|║fasthelp exe│     8199║                                     xxxxxxxxxxxxxxxx   | 18x57 07x4 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|╟────────────┴─────────║                                                        | 18x57 07x23
+|║   32,891 bytes in 3 s║                                          Black         | 18x4 0Fx19 18x34 07x23
+|╚══════════════════════║                                         on White       | 18x57 07x23
+|C:\DOS>                ╟─────────────────────────────────                       | 07x23 18x34 07x23
+|1Help   2Menu   3View  ║C:\DOS                                                  | 07x1 70x6 07x2 70x6 07x2 70x6 18x34 07x23
+
+== 17: Right
+cursor 62 11 lines 0 7 mode 3
+|╔════════════╤══ C:\DOS ════════╤═ 4:55p                                        | 18x16 70x8 18x10 70x2 F0x1 70x3 07x40
+|║    Name    │   Size  │  Date  │ Time ║                      Mode: Color       | 18x1 0Fx12 18x1 0Fx9 18x1 0Fx8 18x1 0Fx6 18x1 07x40
+|║..          │►UP--DIR◄│10-29-91│ 2:55p║                   Palette: LapTop      | 18x40 07x40
+|║command  com│    54619╔════════════════ Tree ═══════════                       | 18x57 07x23
+|║append   exe│     8170║ \                                   xxxxxxxxxxxxxxxx   | 18x57 07x4 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|║as                    ║ ├──DOS                              xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|║at   ╔══════ Drive let║ ├─▌VC          ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x20 18x4 0Fx14 18x16 07x4 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|║ba   ║    Choose left ║ ├──TOOLS                            xxxxxxxxxxxxxxxx   | 18x3 07x15 0Fx4 07x1 18x34 07x4 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|║ch   ║  A   B   C   D ║ ├─▌ARC         ▐                    xxxxxxxxxxxxxxxx   | 18x3 07x13 70x3 07x4 18x4 70x14 18x16 07x4 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|║ch   ╚════════════════║ ├──TEST                             xxxxxxxxxxxxxxxx   | 18x3 07x20 18x34 07x4 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|║co                    ║                                     xxxxxxxxxxxxxxxx   | 18x3 07x20 18x1 71x33 07x4 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|║debug    exe│    15718║   ╔═══════ User Menu ═══════╗       xxxxxxxxxxxxxxxx   | 18x24 71x33 07x4 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|║deltree  exe│     7930║   ║ F1  Archives...         ║       xxxxxxxxxxxxxxxx   | 18x24 71x8 07x8 70x1 07x11 71x5 07x4 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|║diskcomp com│     7249║   ║ F2  Format floppy disk  ║       xxxxxxxxxxxxxxxx   | 18x24 71x33 07x4 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|║diskcopy com│     8763║   ║ F4  Edit file           ║       xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 71x33 07x4 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|║doskey   com│     4729║   ╚═════════════════════════╝       xxxxxxxxxxxxxxxx   | 18x24 71x33 07x4 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|║edlin    exe│    10007║                                     xxxxxxxxxxxxxxxx   | 18x1 70x22 18x1 71x33 07x4 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|║exe2bin  exe│     6755║ ├──DOCS                             xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x34 07x4 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|║expand   exe│    16129║ └─ TMP                              xxxxxxxxxxxxxxxx   | 18x1 0Fx22 18x4 70x14 18x16 07x4 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|║fasthelp exe│     8199║                                     xxxxxxxxxxxxxxxx   | 18x57 07x4 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|╟────────────┴─────────║                                                        | 18x57 07x23
+|║   32,891 bytes in 3 s║                                           Blue         | 18x4 0Fx19 18x34 07x23
+|╚══════════════════════║                                         on White       | 18x57 07x23
+|C:\DOS>                ╟─────────────────────────────────                       | 07x23 18x34 07x23
+|1Help   2Menu   3View  ║C:\DOS                                                  | 07x1 70x6 07x2 70x6 07x2 70x6 18x34 07x23
+
+== 18: Enter
+cursor 62 11 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Configuration boxes bright reverse text  ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  History box text                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  History box pointer                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Mini help in .EXT file editor border     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Mini help in .EXT file editor text       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Help box text                            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Help box bright text                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Help box reverse text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Help box underline text                  ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Error box text                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Error box reverse text                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Error box bright text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Clock                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Arrows in viewer and editor              ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Stars                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Explosing stars                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Shadow                                   ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝                Blue         | 07x3 70x51 07x26
+|                                                                 on White       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 19: F8
+cursor 0 127 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Configuration boxes bright reverse text  ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  History box text                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  History box pointer                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Mini help                                           xxxxxxxxxxxxxxxx   | 07x3 70x15 07x43 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Mini help   ╔═══════════ Color Setup ═══════════╗   xxxxxxxxxxxxxxxx   | 07x3 70x15 07x43 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Help box    ║ Do you wish to set default colors ║   xxxxxxxxxxxxxxxx   | 07x3 70x15 07x43 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Help box    ║        for current palette?       ║   xxxxxxxxxxxxxxxx   | 07x3 70x15 07x43 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Help box    ║              Yes   No             ║   xxxxxxxxxxxxxxxx   | 07x3 70x15 07x17 70x5 07x21 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Help box    ╚═══════════════════════════════════╝   xxxxxxxxxxxxxxxx   | 07x3 70x15 07x22 70x1 07x20 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Error box                                           xxxxxxxxxxxxxxxx   | 07x3 70x15 07x43 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Error box reverse text                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Error box bright text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Clock                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Arrows in viewer and editor              ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Stars                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Explosing stars                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Shadow                                   ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝                Blue         | 07x3 70x51 07x26
+|                                                                 on White       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 20: Enter
+cursor 0 127 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Configuration boxes bright reverse text  ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  History box text                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  History box pointer                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Mini help in .EXT file editor border     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Mini help in .EXT file editor text       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Help box text                            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Help box bright text                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Help box reverse text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Help box underline text                  ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Error box text                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Error box reverse text                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Error box bright text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Clock                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Arrows in viewer and editor              ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Stars                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Explosing stars                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Shadow                                   ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝                Blue         | 07x3 70x51 07x26
+|                                                                 on White       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 21: Up
+cursor 61 11 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Configuration boxes bright reverse text  ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  History box text                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  History box pointer                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Mini help in .EXT file editor border     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Mini help in .EXT file editor text       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Help box text                            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Help box bright text                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Help box reverse text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Help box underline text                  ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Error box text                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Error box reverse text                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Error box bright text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Clock                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Arrows in viewer and editor              ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Stars                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Explosing stars                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Shadow                                   ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝               Black         | 07x3 70x51 07x26
+|                                                                 on White       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 22: Enter
+cursor 61 11 lines 0 7 mode 3
+|Edit: C:\VC\                                                                    | 70x12 07x68
+|←asm:    tas   ╔═══════════ Choose Directory ═══════════╗     Mode: Color       | 0Fx1 07x79
+|←obj:    lin   ║  ├──TOOLS                              ║  Palette: LapTop      | 0Fx1 07x79
+|←sys:    dl    ║  ├─ ARC                              ◄ ║                       | 0Fx1 07x19 70x14 07x20 0Fx1 07x25
+|zip:    pkun   ║  ├──TEST                               ║    xxxxxxxxxxxxxxxx   | 07x61 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|arc:                                                         xxxxxxxxxxxxxxxx   | 07x61 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|ice:     ╔══════════════════ Error ══════════════════╗       xxxxxxxxxxxxxxxx   | 07x61 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|lzh:     ║      Can't read the disk in drive A:      ║       xxxxxxxxxxxxxxxx   | 07x61 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|arj:     ║  Press ENTER to try again, ESC to abort,  ║       xxxxxxxxxxxxxxxx   | 07x61 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|         ║ or enter a different drive letter here A: ║       xxxxxxxxxxxxxxxx   | 07x50 70x1 07x10 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|         ╚═══════                                            xxxxxxxxxxxxxxxx   | 07x61 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|                    ╔═══════════ Delete ═══════════╗         xxxxxxxxxxxxxxxx   | 07x61 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|               ║    ║       You are DELETING       ║    ║    xxxxxxxxxxxxxxxx   | 07x36 0Fx4 78x1 0Fx3 07x17 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|               ║    ║ 5 files and 1 directory from ║    ║    xxxxxxxxxxxxxxxx   | 07x61 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|▄▄▄▄▄▄▄▄▄▄▄▄   ║    ║            C:\TMP            ║    ║    xxxxxxxxxxxxxxxx   | 07x61 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+| ╔══════════   ║    ║     Delete   All   Cancel    ║    ║    xxxxxxxxxxxxxxxx   | 70x12 07x13 70x8 07x28 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+| ║ Format of   ║    ╚══════════════════════════════╝    ║    xxxxxxxxxxxxxxxx   | 70x12 07x49 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+| ║             ╟─                                      ─╢    xxxxxxxxxxxxxxxx   | 70x12 07x49 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+| ║ ' comment   ║ C:\ARC                                 ║    xxxxxxxxxxxxxxxx   | 70x12 07x49 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+| ║ txt: edit   ║ Speed search: ARC                      ║    xxxxxxxxxxxxxxxx   | 70x12 07x19 70x12 07x18 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+| ║  ▲   cls    ╚══════════════════┌ Screen colors ──────┐                       | 70x12 07x24 0Fx13 07x31
+| ║  └───────                      │  ( ) Black & White  │         Black         | 70x12 07x68
+| ╚════════════════════════════════│  (•) Color          │        on White       | 70x34 07x46
+|▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀│  ( ) Laptop         │                       | 07x80
+|1Help   2Save   3       4Hex    5 └─────────────────────┘                       | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x1 07x46
+
+== 23: Left
+cursor 76 11 lines 0 7 mode 3
+|Edit: C:\VC\                                                                    | 70x12 07x68
+|←asm:    tas   ╔═══════════ Choose Directory ═══════════╗     Mode: Color       | 0Fx1 07x79
+|←obj:    lin   ║  ├──TOOLS                              ║  Palette: LapTop      | 0Fx1 07x79
+|←sys:    dl    ║  ├─ ARC                              ◄ ║                       | 0Fx1 07x19 7Fx14 07x20 0Fx1 07x25
+|zip:    pkun   ║  ├──TEST                               ║    xxxxxxxxxxxxxxxx   | 07x61 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|arc:                                                         xxxxxxxxxxxxxxxx   | 07x61 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|ice:     ╔══════════════════ Error ══════════════════╗       xxxxxxxxxxxxxxxx   | 07x61 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|lzh:     ║      Can't read the disk in drive A:      ║       xxxxxxxxxxxxxxxx   | 07x61 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|arj:     ║  Press ENTER to try again, ESC to abort,  ║       xxxxxxxxxxxxxxxx   | 07x61 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|         ║ or enter a different drive letter here A: ║       xxxxxxxxxxxxxxxx   | 07x50 70x1 07x10 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|         ╚═══════                                            xxxxxxxxxxxxxxxx   | 07x61 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|                    ╔═══════════ Delete ═══════════╗         xxxxxxxxxxxxxxxx   | 07x61 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|               ║    ║       You are DELETING       ║    ║    xxxxxxxxxxxxxxxx   | 07x36 0Fx4 78x1 0Fx3 07x17 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|               ║    ║ 5 files and 1 directory from ║    ║    xxxxxxxxxxxxxxxx   | 07x61 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|▄▄▄▄▄▄▄▄▄▄▄▄   ║    ║            C:\TMP            ║    ║    xxxxxxxxxxxxxxxx   | 07x61 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+| ╔══════════   ║    ║     Delete   All   Cancel    ║    ║    xxxxxxxxxxxxxxxx   | 70x12 07x13 70x8 07x28 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+| ║ Format of   ║    ╚══════════════════════════════╝    ║    xxxxxxxxxxxxxxxx   | 70x12 07x49 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+| ║             ╟─                                      ─╢    xxxxxxxxxxxxxxxx   | 70x12 07x49 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+| ║ ' comment   ║ C:\ARC                                 ║    xxxxxxxxxxxxxxxx   | 70x12 07x49 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+| ║ txt: edit   ║ Speed search: ARC                      ║    xxxxxxxxxxxxxxxx   | 70x12 07x19 70x12 07x18 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+| ║  ▲   cls    ╚══════════════════┌ Screen colors ──────┐                       | 70x12 07x24 0Fx13 07x31
+| ║  └───────                      │  ( ) Black & White  │      Bright White     | 70x12 07x68
+| ╚════════════════════════════════│  (•) Color          │        on White       | 70x34 07x46
+|▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀│  ( ) Laptop         │                       | 07x80
+|1Help   2Save   3       4Hex    5 └─────────────────────┘                       | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x1 07x46
+
+== 24: Enter
+cursor 76 11 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: LapTop      | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Configuration boxes bright reverse text  ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  History box text                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  History box pointer                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Mini help in .EXT file editor border     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Mini help in .EXT file editor text       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Help box text                            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Help box bright text                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Help box reverse text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Help box underline text                  ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Error box text                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Error box reverse text                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Error box bright text                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Clock                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Arrows in viewer and editor              ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Stars                                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Explosing stars                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Shadow                                   ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝            Bright White     | 07x3 70x51 07x26
+|                                                                 on White       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 25: Esc
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 70x41 07x20
+|                      ╔═════════════ Setup ═════════════╗                       | 07x19 70x41 07x20
+|                      ║ F2   Configuration              ║                       | 07x19 70x41 07x20
+|                      ║ F3   Screen and Mouse           ║                       | 07x19 70x41 07x20
+|                      ║ F4   Panel options              ║                       | 07x19 70x41 07x20
+|                      ║ F5   Set Black & White palette  ║                       | 07x19 70x41 07x20
+|                      ║ F6   Set Color palette          ║                       | 07x19 70x41 07x20
+|                      ║ F7   Set Laptop palette         ║                       | 07x19 70x9 07x12 70x1 07x14 70x5 07x20
+|                      ║ F8   Set default configuration  ║                       | 07x19 70x41 07x20
+|                      ║ F9   Country info               ║                       | 07x19 70x41 07x20
+|                      ║ F10  Exit                       ║                       | 07x19 70x41 07x20
+|                      ╚═════════════════════════════════╝                       | 07x19 70x41 07x20
+|                                                                                | 07x19 70x41 07x20
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 26: F5
+cursor 68 4 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: Black&White | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Panels                                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  Current pointer                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  Selected files                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Selected pointer                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Title in file panel                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Key bar numbers                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Key bar text                             ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Pull-down menu bar                       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Pull-down menu pointer                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Pull-down menu border                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Pull-down menu text                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Pull-down menu bright                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Pull-down menu current bar               ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Pull-down menu current bright            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Pull-down menu unaccessable lines        ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Pull-down menu minus                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Dialog box text                          ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝               White         | 07x3 70x51 07x26
+|                                                                 on Black       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 27: Enter
+cursor 68 4 lines 0 7 mode 3
+|╔════════════╤══ C:\DOS ════════╤═ 4:55p                                        | 07x16 70x8 07x10 70x2 F0x1 70x3 07x40
+|║    Name    │   Size  │  Date  │ Time ║                      Mode: Color       | 07x1 0Fx12 07x1 0Fx9 07x1 0Fx8 07x1 0Fx6 07x41
+|║..          │►UP--DIR◄│10-29-91│ 2:55p║                   Palette: Black&White | 07x80
+|║command  com│    54619╔════════════════ Tree ═══════════                       | 07x80
+|║append   exe│     8170║ \                                   xxxxxxxxxxxxxxxx   | 07x61 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|║as                    ║ ├──DOS                              xxxxxxxxxxxxxxxx   | 07x61 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|║at   ╔══════ Drive let║ ├─▌VC          ▐                    xxxxxxxxxxxxxxxx   | 07x27 0Fx14 07x20 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|║ba   ║    Choose left ║ ├──TOOLS                            xxxxxxxxxxxxxxxx   | 07x18 0Fx4 07x39 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|║ch   ║  A   B   C   D ║ ├─▌ARC         ▐                    xxxxxxxxxxxxxxxx   | 07x16 70x3 07x8 7Fx14 07x20 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|║ch   ╚════════════════║ ├──TEST                             xxxxxxxxxxxxxxxx   | 07x61 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|║co                    ║                                     xxxxxxxxxxxxxxxx   | 07x24 70x33 07x4 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|║debug    exe│    15718║   ╔═══════ User Menu ═══════╗       xxxxxxxxxxxxxxxx   | 07x24 70x33 07x4 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|║deltree  exe│     7930║   ║ F1  Archives...         ║       xxxxxxxxxxxxxxxx   | 07x24 70x8 07x8 70x1 07x11 70x5 07x4 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|║diskcomp com│     7249║   ║ F2  Format floppy disk  ║       xxxxxxxxxxxxxxxx   | 07x24 70x33 07x4 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|║diskcopy com│     8763║   ║ F4  Edit file           ║       xxxxxxxxxxxxxxxx   | 07x1 70x22 07x1 70x33 07x4 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|║doskey   com│     4729║   ╚═════════════════════════╝       xxxxxxxxxxxxxxxx   | 07x24 70x33 07x4 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|║edlin    exe│    10007║                                     xxxxxxxxxxxxxxxx   | 07x1 7Fx22 07x1 70x33 07x4 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|║exe2bin  exe│     6755║ ├──DOCS                             xxxxxxxxxxxxxxxx   | 07x1 0Fx22 07x38 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|║expand   exe│    16129║ └─ TMP                              xxxxxxxxxxxxxxxx   | 07x1 0Fx22 07x4 70x14 07x20 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|║fasthelp exe│     8199║                                     xxxxxxxxxxxxxxxx   | 07x61 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|╟────────────┴─────────║                                                        | 07x80
+|║   32,891 bytes in 3 s║                                          White         | 07x4 0Fx19 07x57
+|╚══════════════════════║                                         on Black       | 07x80
+|C:\DOS>                ╟─────────────────────────────────                       | 07x80
+|1Help   2Menu   3View  ║C:\DOS                                                  | 07x1 70x6 07x2 70x6 07x2 70x6 07x57
+
+== 28: Esc
+cursor 68 4 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                    Mode: Color       | 07x80
+|                                                           Palette: Black&White | 07x3 70x51 07x26
+|      ╔═══════════════ Color Setup ═══════════════╗                             | 07x3 70x51 07x26
+|      ║  Panels                                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x5 07x41 70x5 07x7 00x1 01x1 02x1 03x1 04x1 05x1 06x1 07x1 08x1 09x1 0Ax1 0Bx1 0Cx1 0Dx1 0Ex1 0Fx1 07x3
+|      ║  Current pointer                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 10x1 11x1 12x1 13x1 14x1 15x1 16x1 17x1 18x1 19x1 1Ax1 1Bx1 1Cx1 1Dx1 1Ex1 1Fx1 07x3
+|      ║  Selected files                           ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 20x1 21x1 22x1 23x1 24x1 25x1 26x1 27x1 28x1 29x1 2Ax1 2Bx1 2Cx1 2Dx1 2Ex1 2Fx1 07x3
+|      ║  Selected pointer                         ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 30x1 31x1 32x1 33x1 34x1 35x1 36x1 37x1 38x1 39x1 3Ax1 3Bx1 3Cx1 3Dx1 3Ex1 3Fx1 07x3
+|      ║  Title in file panel                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 40x1 41x1 42x1 43x1 44x1 45x1 46x1 47x1 48x1 49x1 4Ax1 4Bx1 4Cx1 4Dx1 4Ex1 4Fx1 07x3
+|      ║  Key bar numbers                          ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 50x1 51x1 52x1 53x1 54x1 55x1 56x1 57x1 58x1 59x1 5Ax1 5Bx1 5Cx1 5Dx1 5Ex1 5Fx1 07x3
+|      ║  Key bar text                             ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 60x1 61x1 62x1 63x1 64x1 65x1 66x1 67x1 68x1 69x1 6Ax1 6Bx1 6Cx1 6Dx1 6Ex1 6Fx1 07x3
+|      ║  Pull-down menu bar                       ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 70x1 71x1 72x1 73x1 74x1 75x1 76x1 77x1 78x1 79x1 7Ax1 7Bx1 7Cx1 7Dx1 7Ex1 7Fx1 07x3
+|      ║  Pull-down menu pointer                   ║          xxxxxxxxxxxxxxxx   | 07x3 70x37 07x1 70x13 07x7 80x1 81x1 82x1 83x1 84x1 85x1 86x1 87x1 88x1 89x1 8Ax1 8Bx1 8Cx1 8Dx1 8Ex1 8Fx1 07x3
+|      ║  Pull-down menu border                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 90x1 91x1 92x1 93x1 94x1 95x1 96x1 97x1 98x1 99x1 9Ax1 9Bx1 9Cx1 9Dx1 9Ex1 9Fx1 07x3
+|      ║  Pull-down menu text                      ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 A0x1 A1x1 A2x1 A3x1 A4x1 A5x1 A6x1 A7x1 A8x1 A9x1 AAx1 ABx1 ACx1 ADx1 AEx1 AFx1 07x3
+|      ║  Pull-down menu bright                    ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 B0x1 B1x1 B2x1 B3x1 B4x1 B5x1 B6x1 B7x1 B8x1 B9x1 BAx1 BBx1 BCx1 BDx1 BEx1 BFx1 07x3
+|      ║  Pull-down menu current bar               ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 C0x1 C1x1 C2x1 C3x1 C4x1 C5x1 C6x1 C7x1 C8x1 C9x1 CAx1 CBx1 CCx1 CDx1 CEx1 CFx1 07x3
+|      ║  Pull-down menu current bright            ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 D0x1 D1x1 D2x1 D3x1 D4x1 D5x1 D6x1 D7x1 D8x1 D9x1 DAx1 DBx1 DCx1 DDx1 DEx1 DFx1 07x3
+|      ║  Pull-down menu unaccessable lines        ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 E0x1 E1x1 E2x1 E3x1 E4x1 E5x1 E6x1 E7x1 E8x1 E9x1 EAx1 EBx1 ECx1 EDx1 EEx1 EFx1 07x3
+|      ║  Pull-down menu minus                     ║          xxxxxxxxxxxxxxxx   | 07x3 70x51 07x7 F0x1 F1x1 F2x1 F3x1 F4x1 F5x1 F6x1 F7x1 F8x1 F9x1 FAx1 FBx1 FCx1 FDx1 FEx1 FFx1 07x3
+|      ║  Dialog box text                          ║                             | 07x3 70x51 07x26
+|      ╚═══════════════════════════════════════════╝               White         | 07x3 70x51 07x26
+|                                                                 on Black       | 07x3 70x51 07x26
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 29: Esc
+cursor 0 127 lines 6 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x19 70x41 07x20
+|                      ╔═════════════ Setup ═════════════╗                       | 07x19 70x41 07x20
+|                      ║ F2   Configuration              ║                       | 07x19 70x41 07x20
+|                      ║ F3   Screen and Mouse           ║                       | 07x19 70x41 07x20
+|                      ║ F4   Panel options              ║                       | 07x19 70x41 07x20
+|                      ║ F5   Set Black & White palette  ║                       | 07x19 70x9 07x27 70x5 07x20
+|                      ║ F6   Set Color palette          ║                       | 07x19 70x41 07x20
+|                      ║ F7   Set Laptop palette         ║                       | 07x19 70x21 07x1 70x19 07x20
+|                      ║ F8   Set default configuration  ║                       | 07x19 70x41 07x20
+|                      ║ F9   Country info               ║                       | 07x19 70x41 07x20
+|                      ║ F10  Exit                       ║                       | 07x19 70x41 07x20
+|                      ╚═════════════════════════════════╝                       | 07x19 70x41 07x20
+|                                                                                | 07x19 70x41 07x20
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 30: F10
+cursor 0 127 lines 0 7 mode 3
+|The Volkov Commander, Version 4.05 freeware                                     | 07x80
+|Copyright (C) 1991-2000 Vsevolod V. Volkov                                      | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                            ╔═══════ Setup ═══════╗                             | 07x80
+|                            ║ Do you wish to save ║                             | 07x80
+|                            ║  the current setup? ║                             | 07x80
+|                            ║    Save   Cancel    ║                             | 07x32 70x6 07x42
+|                            ╚═════════════════════╝                             | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x40 70x1 07x39
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+|                                                                                | 07x80
+
+== 31: Enter
+cursor 8 24 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 07x15 70x9 07x56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x45
+|║..          │            │            ║╟──────────────────────────────────────╢| 07x1 70x12 07x67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 07x50 0Fx7 07x23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 07x51 0Fx7 07x22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 07x63 0Fx2 07x4 0Fx4 07x7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 07x43 0Fx10 07x22 0Fx2 07x3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 07x43 0Fx10 07x21 0Fx2 07x4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 07x47 0Fx1 07x11 0Fx5 07x16
+|║run      bat│            │            ║║               C:\WORK                ║| 07x80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 07x40 70x1 07x39
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|╟────────────┴────────────┴────────────╢║                                      ║| 07x80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 07x80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
+|                                                                                | 07x80
+|C:\WORK>                                                                        | 07x80
+
+== 32: Ctrl+b
+cursor 8 23 lines 6 7 mode 3
+|╔════════════╤═ C:\WORK ══╤════════════╗╔════════════════ Info ════════════════╗| 07x15 70x9 07x56
+|║    Name    │    Name    │    Name    ║║  The Volkov Commander, Version 4.05  ║| 07x5 0Fx8 07x1 0Fx12 07x1 0Fx8 07x45
+|║..          │            │            ║╟──────────────────────────────────────╢| 07x1 70x12 07x67
+|║DOCS        │            │            ║║         653,296 Bytes Memory         ║| 07x50 0Fx7 07x23
+|║SRC         │            │            ║║          ####### Bytes Free          ║| 07x51 0Fx7 07x22
+|║readme   txt│            │            ║║      Volume in drive C: is WORK      ║| 07x63 0Fx2 07x4 0Fx4 07x7
+|║hello    txt│            │            ║║  32,724,992 total bytes on drive C:  ║| 07x43 0Fx10 07x22 0Fx2 07x3
+|║notes    doc│            │            ║║  32,719,360 bytes free on drive C:   ║| 07x43 0Fx10 07x21 0Fx2 07x4
+|║data     bin│            │            ║║      6 files use 3,072 bytes in      ║| 07x47 0Fx1 07x11 0Fx5 07x16
+|║run      bat│            │            ║║               C:\WORK                ║| 07x80
+|║empty    dat│            │            ║╟──────────────────────────────────────╢| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║  No `dirinfo' file in this directory ║| 07x40 70x1 07x39
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|║            │            │            ║║                                      ║| 07x80
+|╟────────────┴────────────┴────────────╢║                                      ║| 07x80
+|║..           ►UP--DIR◄  6-16-00 12:00p║║                                      ║| 07x80
+|╚══════════════════════════════════════╝╚══════════════════════════════════════╝| 07x80
+|C:\WORK>                                                                        | 07x80
+|1Help   2Menu   3View   4Edit   5Copy   6RenMov 7Mkdir  8Delete 9PullDn 10Quit  | 07x1 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x2 70x6 07x3 70x6
+
+== disks
+C:\STAMPS  D   2000-06-16 12:00:00
+C:\STAMPS\EVENING.DAT  A   2099-11-30 23:59:58  999999999 bytes  e3b0c44298fc1c14
+C:\STAMPS\FIRST.DAT  A   1980-01-01 00:00:00  0 bytes  e3b0c44298fc1c14
+C:\STAMPS\HUGE.DAT  A   2000-06-16 12:00:00  1000000000 bytes  e3b0c44298fc1c14
+C:\STAMPS\LAST.DAT  A   2107-12-31 13:01:02  4294967295 bytes  e3b0c44298fc1c14
+C:\STAMPS\MORNING.DAT  A   2001-02-03 09:05:06  1234 bytes  e3b0c44298fc1c14
+C:\STAMPS\NIGHT.DAT  A   1999-12-31 00:00:58  9 bytes  e3b0c44298fc1c14
+C:\STAMPS\NOON.DAT  A   2010-10-10 12:30:00  1048576 bytes  e3b0c44298fc1c14
+C:\STAMPS\SUB  D   2000-06-16 12:00:00
+C:\WORK  D   2000-06-16 12:00:00
+C:\WORK\DATA.BIN  A   2000-06-16 12:00:00  1024 bytes  785b0751fc2c53dc
+C:\WORK\DOCS  D   2000-06-16 12:00:00
+C:\WORK\EMPTY.DAT  A   2000-06-16 12:00:00  0 bytes  e3b0c44298fc1c14
+C:\WORK\HELLO.TXT  A   2000-06-16 12:00:00  15 bytes  66b01763ad803167
+C:\WORK\NOTES.DOC  A   2000-06-16 12:00:00  32 bytes  3d8cbd89e529ff6c
+C:\WORK\README.TXT  A   2000-06-16 12:00:00  40 bytes  61bc9cb473b798d3
+C:\WORK\RUN.BAT  A   2000-06-16 12:00:00  21 bytes  1f9eae85d0094c6c
+C:\WORK\SRC  D   2000-06-16 12:00:00
+D:\VC  D   2000-06-16 12:00:00
+D:\VC\<program>  the program under test
+D:\VC\ARCHIVES.MNU  A   2000-06-16 04:05:00  225 bytes  64cd7b136e287b5e
+D:\VC\FORMAT.MNU  A   2000-06-16 04:05:00  174 bytes  c368ec041022c462
+D:\VC\VC.EXT  A   2000-06-16 04:05:00  94 bytes  18f8d74a65c28c35
+D:\VC\VC.HLP  A   2000-06-16 04:05:00  68836 bytes  aa3751043baf39ea
+D:\VC\VC.INI  A   during the run  511 bytes  933fbd08565e66fe
+D:\VC\VC.MNU  A   2000-06-16 04:05:00  96 bytes  5250141d3cf58d8a
+D:\VC\VCEDIT.EXT  A   2000-06-16 04:05:00  11 bytes  68208d0c3b9b7f54
+D:\VC\VCVIEW.EXT  A   2000-06-16 04:05:00  409 bytes  f4b947bf37a341c3

@@ -324,6 +324,14 @@ TREES = {
             # makes its scenario pass (TODO.md, "The setup program in the
             # portable C: the plan").
             "setup": _NO_SETUP_YET,
+            # The colours, piece B.
+            "setup-colors": _NO_SETUP_YET,
+            "setup-colors-items": _NO_SETUP_YET,
+            "setup-colors-grid": _NO_SETUP_YET,
+            "setup-colors-mouse": _NO_SETUP_YET,
+            "setup-colors-palettes": _NO_SETUP_YET,
+            "setup-colors-own": _NO_SETUP_YET,
+            "setup-colors-lines": _NO_SETUP_YET,
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "
