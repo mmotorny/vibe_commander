@@ -1,0 +1,86 @@
+The portable C in the scenario stay-left: what it is expected to show
+otherwise than the original. A patch of harness/goldens/stay-left.txt, see
+harness/goldens.py: a line with - is the golden's, a line with + is what is
+expected in its place.
+Deviation: 7, 10, 14 of src/portable_c/DEVIATIONS.md
+Why: the program that has stayed in the memory is not released when the
+program is left, since the portable C keeps no list of such programs: at DOS's
+prompt all five interrupts still go to it, and it answers, where the original
+has given every one of them back. The box of F10 names the program in its
+title and in its question, by a name that is two letters shorter: the box is
+two cells narrower, a cell on either side, and its shadow ends a cell further
+left. And the Advanced options have no Quick execute commands: Clear keyboard
+buffer and what is below it in the box stand a row further up, the cursor with
+them where it is on that box, the box is a row shorter, and the two rows that
+its last row and the shadow below it were on show what is behind the box, the
+upper one in the shadow
+
+== 1: F9 o o
+rows 12-21
+-|║            │    ║  │  [ ] Quick execute commands       │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+-|║            │    ║  │  [x] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+-|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+-|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
++|║            │    ║  │  [x] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
++|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
++|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
++|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │                                                    │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx17 03x49 1Bx14
++|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+
+== 2: Down Down Down Down Down Space
+rows 12-21
+-|║            │    ║  │  [ ] Quick execute commands       │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
+-|║            │    ║  │  [ ] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
+-|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
+-|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
+-|╟────────────┴─                                                 ──┴────────────╢| 1Bx15 3Fx49 03x2 1Bx14
+-|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx17 03x49 1Bx14
++|║            │    ║  │  [ ] Clear keyboard buffer        │  ║     │            ║| 1Bx15 3Fx25 48x1 3Fx23 03x2 1Bx14
++|║            │    ║  └───────────────────────────────────┘  ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║    Press  Space  to change an option,   ║     │            ║| 1Bx15 3Fx14 0Fx7 3Fx28 03x2 1Bx14
++|║            │    ║      arrows to move between options     ║     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ╟─────────────────────────────────────────╢     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │    ║           [ Ok ]   [ Cancel ]           ║     │            ║| 1Bx15 3Fx15 3Ex6 3Fx28 03x2 1Bx14
++|║            │    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|║            │                                                    │            ║| 1Bx15 3Fx49 03x2 1Bx14
++|╟────────────┴────────────┴────────────╢╟────────────┴────────────┴────────────╢| 1Bx17 03x49 1Bx14
++|║..           ►UP--DIR◄  6-16-00 12:00p║║WORK         ►SUB-DIR◄  6-16-00 12:00p║| 1Bx80
+-cursor 25 13 lines 6 7 mode 3
++cursor 25 12 lines 6 7 mode 3
+
+== 48: F10
+rows 5-11
+-|║readme   txt│                                                    │            ║| 1Bx14 70x51 1Bx15
+-|║hello    txt│   ╔═══════════ The Volkov Commander ══════════╗    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║notes    doc│   ║ Do you want to quit the Volkov Commander? ║    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║data     bin│   ║                  Yes   No                 ║    │            ║| 1Bx14 70x21 30x5 70x25 03x2 1Bx13
+-|║run      bat│   ╚═══════════════════════════════════════════╝    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║empty    dat│                                                    │            ║| 1Bx14 70x51 03x2 1Bx13
+-|║t        com│            │            ║║            │            │            ║| 1Bx16 03x51 1Bx13
++|║readme   txt│                                                    │            ║| 1Bx15 70x49 1Bx16
++|║hello    txt│    ╔═══════════ The Vibe Commander ══════════╗     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║notes    doc│    ║ Do you want to quit the Vibe Commander? ║     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║data     bin│    ║                 Yes   No                ║     │            ║| 1Bx15 70x20 30x5 70x24 03x2 1Bx14
++|║run      bat│    ╚═════════════════════════════════════════╝     │            ║| 1Bx15 70x49 03x2 1Bx14
++|║empty    dat│                                                    │            ║| 1Bx15 70x49 03x2 1Bx14
++|║t        com│            │            ║║            │            │            ║| 1Bx17 03x49 1Bx14
+
+== 50: "q" Enter
+row 23
+-|-- -- -- -- --                                                                  | 07x80
++|1B 1C 21 2F 60                                                                  | 07x80

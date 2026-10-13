@@ -6797,7 +6797,7 @@ program of 32 bits hold it.**
 
 | What | The 16-bit program | The program of 32 bits |
 |---|---|---|
-| Every scenario as the original's golden, with what is declared | `portable_c-scenarios`: all | `portable_c32-scenarios`: the record, 153 of the 154 that it is taken through. `command` is off it; `editor-big` is not run, by entry 13 |
+| Every scenario as the original's golden, with what is declared | `portable_c-scenarios`: all | `portable_c32-scenarios`: the record, 153 of the 155 that it is taken through. `command` is off it, and `stay-left`, a scenario that was added since and that this program fails (2 of the list of what differs); `editor-big` is not run, by entry 13 |
 | Every instruction of a batch ran in the original | The same check, of the goldens | The same, by the same run |
 | Every C function of a batch ran | Held | Held since W. It was asked only "once every scenario passes", which `command` kept from ever being so. It is asked now while the record holds, of what ran in the scenarios that pass. A run of them all was kept and asked first: each of the 169 functions that the batches name for this program ran in the 153, and none of them shares its place in the map with another function, which `wcc386 -os` may do to two that have the same instructions |
 | The entry of the critical error ran, `FatErr` | Held: a function of a batch | Held since W, as `DeviceEntry` of `dos32.c`. It was listed as gone, for being static; the linker's map has static names, and a function that a tree has under another name may be static now (`RENAMED`, `check_translation`). It ran in five scenarios, `not-ready`, `device`, `tree-choose`, `find-drives` and `attributes-directory`, and without those the check fails, which was tried |

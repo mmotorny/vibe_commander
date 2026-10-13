@@ -3681,6 +3681,80 @@ SCENARIOS = {
             "Esc",
         )),
 
+    "stay-left": Scenario(
+        "A program that stays in the memory with five interrupts taken, "
+        "made in the editor, in hex, and a second that prints which of "
+        "them still go to the first: before the first is run, with it in "
+        "the memory, and at DOS's prompt when the program has been left, "
+        "where the original has released it",
+        steps=(
+            "F9 o o",                     # Clear keyboard buffer off, for
+            "Down Down Down Down Down Space",     # typing in the editor
+            "Enter",
+            # t.com, which stays. It takes INT 1Bh, 1Ch and 21h, each to
+            # a jump to whoever had it; INT 2Fh, where it answers AX
+            # EE00h with FFh in AL and its segment in BX and hands every
+            # other call on; and INT 60h, which it only returns from.
+            # INT 1Bh, 1Ch, 21h and 2Fh are those that an extender has
+            # to do with, INT 60h is one that nothing has.
+            "Shift+F4",
+            '"t.com"',
+            "Enter",
+            "Enter",                      # a new file
+            "F4",                         # in hex
+            '"eb1e"',                     # to 120h
+            '"3d00ee7505b0ff0e5bcf"',     # 102h, INT 2Fh: its question
+                                          # answered; the IRET at 10Bh is
+                                          # all of INT 60h
+            '"ea00000000"',               # and any other call handed on
+            '"ea00000000ea00000000"',     # INT 1Bh and 1Ch, handed on
+            '"ea00000000"',               # INT 21h
+            '"b86025ba0b01cd21"',         # 120h: INT 60h to the IRET
+            '"b01bbf1201e82500"',         # INT 1Bh taken, by 155h
+            '"b01cbf1701e81d00"',         # INT 1Ch
+            '"b021bf1c01e81500"',         # INT 21h
+            '"b02fbf0d01e80d00"',         # INT 2Fh, to its jump
+            '"b82f25ba0201cd21"',         # and then to 102h
+            '"ba2001cd27"',               # stays by INT 27h, 120h bytes
+            '"50b435cd21891d8c4502"',     # 155h: who has the interrupt
+                                          # in AL, into the jump at DI
+            '"588d55ffb425cd21c3"',       # and the interrupt to that jump
+            "F2",
+            "Esc",
+            # q.com, which asks by INT 2Fh who answers, and prints of
+            # INT 1Bh, 1Ch, 21h, 2Fh and 60h the number if it goes to
+            # the segment of who answered, and two dashes if not, or if
+            # nobody did.
+            "Shift+F4",
+            '"q.com"',
+            "Enter",
+            "Enter",
+            "F4",
+            '"b800eebbffffcd2f8beb"',     # the question; the segment, or
+                                          # FFFFh as it went, to BP
+            '"be4201ac0ac0742f"',         # for each of the list at 142h
+            '"8ad0b435cd218cc3"',         # where it goes, by DOS
+            '"b02d3bdd7517"',             # elsewhere: dashes
+            '"8adab90200c0c304"',         # two digits of its number
+            '"8ac3240f3c0a1c692f"',
+            '"cd29e2f0eb04"',             # by INT 29h
+            '"cd29cd29"',                 # or the dashes
+            '"b020cd29ebccc3"',           # a space, and the next
+            '"1b1c212f6000"',             # the list
+            "F2",
+            "Esc",
+            '"q" Enter',                  # nobody answers: five dashes
+            '"t" Enter',                  # stays
+            '"q" Enter',                  # all five go to it
+            "Ctrl+o",                     # both answers
+            "Ctrl+o",
+            '"cls" Enter',                # an empty screen to leave
+            "F10",
+            "Enter",                      # at DOS's prompt
+            '"q" Enter',                  # released by the original, with
+                                          # its interrupts given back
+        )),
+
     "tree-deep": Scenario(
         "A tree thirteen directories deep, which is drawn narrower and has "
         "no room for the last of them, and longer than its panel",

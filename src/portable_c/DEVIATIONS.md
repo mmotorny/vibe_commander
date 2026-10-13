@@ -846,6 +846,11 @@ watch.
 - Nothing releases a program that has stayed. It is still in the memory
   when the program is left, as it is when it was run from DOS's own
   command line, and what gets it out again is whatever does there.
+  That is so of the program of 16 bits; behind the program of 32 bits
+  such a program is in the memory still and has lost interrupts that
+  it took, by the extender, which is declared nowhere and is open, the
+  user's to decide: `TODO.md`, "The program of 32 bits: what differs
+  from the original, for the user", 2.
 - The program does not take INT 21h either, since. When the watch went
   the entry of that interrupt was kept for the program's own call,
   which the same entry takes, and handed every other call of DOS on
@@ -914,6 +919,7 @@ left out alone:
 | `tree-choose` | The key bar with Alt held, twice, has no name for F5, where the original has Memory |
 | `mouse-middle` | The middle button is not pressed in the map of the memory: two steps are left out. Every screen is as the original's after the same step |
 | `mouse-drag-lists` | The last nine steps are left out: a program that stays in the memory, and a button of the mouse moved in the map. Every screen before is as the original's |
+| `stay-left` | The program that has stayed in the memory with five interrupts, INT 1Bh, 1Ch, 21h, 2Fh and 60h, is not released when the program is left: at DOS's prompt the second program prints all five as still going to it, where the original has given every one back and it prints five times two dashes. The patch names 10 and 14 too, for the box of F10 and for the Advanced options. The program of 32 bits does not show that row, nor two screens before it, and fails the scenario: see above, at what is open |
 
 And `menu` and `ended`, which the first deviation changes too: their
 rows there say all that differs in them, and the patch of each names
@@ -1326,7 +1332,7 @@ What the rules cannot say is in the patches of these scenarios:
 
 | Scenario | What changes in it |
 |---|---|
-| `quit`, `comspec`, `menu-items`, `setup-defaults`, `second-copy` | The box of F10, or of Quit of the Files menu: two cells narrower, with the other name in its title and its question. The cell that it no longer covers on either side shows what is behind it, and its shadow ends a cell further left |
+| `quit`, `comspec`, `menu-items`, `setup-defaults`, `second-copy`, `stay-left` | The box of F10, or of Quit of the Files menu: two cells narrower, with the other name in its title and its question. The cell that it no longer covers on either side shows what is behind it, and its shadow ends a cell further left |
 | `palettes` | The same box in black and white and on a laptop's display, where it is in the colours of the panel and its shadow does not show: its frame and its two lines |
 | `start-setup` | The same box, three times, once over what DOS had shown with no panel on the left: the cell that the box no longer covers shows the banner and the commands there |
 | `start-screen` | The same box. And the second line that asks for Enter, on a screen of 40 columns, with the cursor two cells further left behind it; and on a screen of graphics, where the test sees the dots of the one line as cells: other dots, for another name |
@@ -1741,7 +1747,7 @@ original's golden with what its row says made to it, by its patch:
 
 | Scenario | What changes in it |
 |---|---|
-| `command-edit`, `comspec`, `dirinfo`, `ended`, `sizes`, `view-search`, `editor-hex`, `editor-long`, `editor-save`, `editor-words`, `editor-full`, `editor-keys`, `editor-hex-keys`, `editor-buffer`, `editor-dirinfo`, `mouse-edit`, `start-setup`, `start-screen`, `start-memory`, `setup-delay-file`, `setup-help-file` | The Advanced options, on two screens: opened, and with Clear keyboard buffer unticked, which is four times Down and Space where the original has five. From the row of Quick execute commands down the box has what the original's has a row further down, and the cursor on Clear keyboard buffer is a row further up with it; the row that the original's box ends on shows what is behind the box in the shadow of the box, and the row of that shadow what is behind it. The mouse pointer is in the middle of the screen, on the row that Quick execute commands was on: the cell whose colours it exchanges holds a letter of Clear keyboard buffer, the line that stands there now. `comspec`, `ended`, `start-setup`, `start-screen` and `start-memory` have patches of other entries, which name this one too; `setup-delay-file` shows Screen and Mouse besides, which is otherwise by 5 |
+| `command-edit`, `comspec`, `dirinfo`, `ended`, `sizes`, `view-search`, `editor-hex`, `editor-long`, `editor-save`, `editor-words`, `editor-full`, `editor-keys`, `editor-hex-keys`, `editor-buffer`, `editor-dirinfo`, `mouse-edit`, `start-setup`, `start-screen`, `start-memory`, `setup-delay-file`, `setup-help-file`, `stay-left` | The Advanced options, on two screens: opened, and with Clear keyboard buffer unticked, which is four times Down and Space where the original has five. From the row of Quick execute commands down the box has what the original's has a row further down, and the cursor on Clear keyboard buffer is a row further up with it; the row that the original's box ends on shows what is behind the box in the shadow of the box, and the row of that shadow what is behind it. The mouse pointer is in the middle of the screen, on the row that Quick execute commands was on: the cell whose colours it exchanges holds a letter of Clear keyboard buffer, the line that stands there now. `comspec`, `ended`, `start-setup`, `start-screen`, `start-memory` and `stay-left` have patches of other entries, which name this one too; `setup-delay-file` shows Screen and Mouse besides, which is otherwise by 5 |
 | `user-menu`, `user-menu-run`, `view-commands` | The same, on one screen: the step that unticks Clear keyboard buffer also leaves the dialog |
 | `command-line`, `setup-cancel`, `setup-defaults` | The Advanced options so, on one screen, with the original's steps: in `command-line` Escape toggles panels on/off is unticked, the second box, and in the other two the dialog is looked at for what the setup left |
 | `setup-config` | The Configuration of the setup where it shows: without Execute options, and by 1 and 7 without the two other boxes of that group. The Keyboard options are five rows further up, and the last five rows of the right half are empty. Down from Show logical drive B: is Alt alone selects menu, which is unticked there by Space where the original goes down three lines first; the three steps on the way, which untick Memory allocation, tick Quick execute commands and untick TSR manager, are left out. Left from Clear keyboard buffer is Full screen, the box of its row, where the original has Show logical drive B: there. And the setup file that is saved has the three bytes as it had them, 1, 0 and 1, where the original's has 0, 1 and 0, with another sum for that: four bytes of the file |
