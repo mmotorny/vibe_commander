@@ -626,8 +626,7 @@ void StUser(u16 first, u16 rows);
 /* What the items of the setup's menu do, each of which returns when its
    screen has been left: the Configuration, Screen and Mouse, the Panel
    options and the Country info, of stopts.c; the three palettes, of
-   stcolor.c. Until its file is there, each is a routine of stmain.c
-   that does nothing: see "What is still to come" there. */
+   stcolor.c. */
 void StF02_00(void);
 void StF03_00(void);
 void StF04_00(void);
@@ -1093,6 +1092,9 @@ struct Checked {                        /* what M30_60 returns: */
                                            time: the dialog goes on */
 };
 struct Checked M30_60(u16 answer);
+/* What Panel options of the setup has Dialog call in the same way: it
+   reads the delay of the tree that was typed. See stopts.c. */
+struct Checked StF04_10(u16 answer);
 
 /* Copy and Rename, copy.c: `command` is 1 to rename, and `directories`
    and `files` are what the original has in BX and DX at the jump. Where

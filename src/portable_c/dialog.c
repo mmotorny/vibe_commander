@@ -121,9 +121,10 @@
    The routines that a dialog may name for Enter and F10, the SUB_ of
    tables.h, get the answer as Dialog has it, the key. F38_10 returns the
    answer to go by. M30_60, of vc.h, does too, and whether it has refused
-   a line, to go on with the dialog. F35_61 gets the place of the line
-   that the tree is for as well, and is not 0 to go on with the dialog;
-   the answer stays what it was. */
+   a line, to go on with the dialog; so does StF04_10, of the setup's
+   Panel options. F35_61 gets the place of the line that the tree is for
+   as well, and is not 0 to go on with the dialog; the answer stays what
+   it was. */
 u16 F38_10(u16 answer);                                 /* dirfunc.c */
 u16 F35_61(u16 answer, u16 place);                      /* copy.c */
 
@@ -1080,6 +1081,12 @@ Dial71:
         break;
     case SUB_F35_61:
         if (F35_61(key, begin + 0x305) != 0)
+            goto Dial31;
+        break;
+    case SUB_StF04_10:
+        checked = StF04_10(key);
+        key = checked.answer;
+        if (checked.refused != 0)
             goto Dial31;
         break;
     }

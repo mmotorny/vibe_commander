@@ -352,7 +352,7 @@ batch, with what no scenario reaches.
 |---|---|---|---|---|
 | 0a, the harness. Done | `harness/`: what the list below has; `tools/figures.py` and the README for the limit that goes. No file of the program | Some 800 lines with what is written for the pieces, where 200 were thought | One, `setup`: the setup program started, its menu, the Configuration with the key bar switched off, Screen and Mouse looked at, the setup saved and left, and the main program without its key bar | Nothing |
 | 0b, setup entered and left. Done | `stmain.c`, `stmain_t.c`; the item of the menu in `menu.c`, `commands_t.c`, `main.c`, `vc.h`, with its tables declared in `harness/datacheck.py`; the three places that are told of setup, in `bars.c` with the bars' tables, `dialog.c` and `input.c`; entry 8 of `src/portable_c/DEVIATIONS.md`. Of the assembly: the file read and checked, S0, `Main00`, `Main40`, S7 with `Default`, `Exit` | 776 instructions carried over, of 934 in its routines, all of `Dialog` among them | 5: `setup-menu`, `setup-defaults`, `setup-missing`, `setup-damaged`, `setup-cancel`, 98 steps, which run 558 of the 776; the scenarios of A and B run 196 more, the fields of `Dialog` and the mouse's rows on 50 lines; 22 are listed as out of reach, 13 of them until a later piece has its scenario | 0a |
-| A, the options | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | Seven, 311 steps, see "Piece A" below. As planned: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
+| A, the options. Done | `stopts.c`, `stopts_t.c`: S2, S3, S4, `F04_10`, S8 | 224 instructions, 3.5 KB of tables | Eight, 320 steps, see "Piece A" below. As planned: each box of S2 by the keys and by the mouse, the key bar switched off and on; S3 with its three groups and the line of characters; S4 with a delay of every form that `F04_10` tells apart, good and bad; S8; the last two on the Russian bench as well, for the decimal comma and the Cyrillic letters | 0b |
 | B, the colours. Done | `stcolor.c`, `stcolor_t.c`: S5, `F07_60` to `F07_85`, S6; and `ShadCol`, taken out of `Shadow` of `screen.c`, which 0b left as it is. One agent, the list first and then the picture: each jumps into the other | 804 instructions, 8 KB of tables | About 6, some 250 steps: the list by its keys; every one of the 39 items entered once, which is the one way that `ColPage` shows; the grid by its keys, with F8; the item Shadow; the default colours asked for, Yes and No; the mouse in both; each of the three palettes; the key bar off | 0b |
 | C, the help. Done | `sthelp.c`, `sthelp_t.c`: `RdHelp`, `Help`, `HlpLine` | 408 instructions | About 3: a long page by its keys; every page from its place, five that show and two that do not; the mouse; a help file that is not there | 0b |
 | D, what is left of S1 and of leaving | In `stmain.c`, after 0b: `Main50`, with the six instructions of `Main30` that call it; and scenarios for what crosses the pieces | About 100 instructions | About 3: the mouse at S1; a setup file that cannot be written; a screen of 50 lines; the clock switched on inside setup; the left-handed mouse; and, once A is there, a setup saved whose file is missing | 0b; A for the last |
@@ -470,14 +470,15 @@ for it, "The setup program": read both first.
   none takes anything: the original's code reads no register of the
   menu's there. `Input` calls `StHelp` of `sthelp.c` for F1, with the
   page in `HlpPage`. All eight are declared in `vc.h`.
-- **Until a piece's file is there**, its functions are in `stmain.c`,
-  under "What is still to come": an item waits for a key and returns,
-  and the help does nothing. A piece adds its file, puts the file's
-  name into the list of `add_portable_c` in `CMakeLists.txt`, which is
-  the second code segment, and takes its functions out of that block
-  of `stmain.c`. Nothing else of `stmain.c` changes for A, B and C.
-  `setup-menu` has every item entered and left at once, "F2 Esc": it
-  passes with the place-holders and has to pass with the screens.
+- **Until a piece's file was there**, its functions were in
+  `stmain.c`, under "What is still to come": an item waited for a key
+  and returned, and the help did nothing. A piece added its file, put
+  the file's name into the list of `add_portable_c` in
+  `CMakeLists.txt`, which is the second code segment, and took its
+  functions out of that block of `stmain.c`. A, B and C have done so,
+  and the block is gone with the last of them. `setup-menu` has every
+  item entered and left at once, "F2 Esc": it passed with the
+  place-holders and passes with the screens.
 - **A routine that a dialog names**, `F04_10`, is a number in the
   dialog's header: a `SUB_` more in `tables.h`, and its case in the
   `switch` of `Dialog`, which calls the function. The test of the data
@@ -523,9 +524,10 @@ for it, "The setup program": read both first.
   empty row where the original has the line of the command, and moves
   the screen as the original does. The top of `harness/scenarios.py`
   says where such a line gets to and when "cls" is needed.
-- **`setup`**, 0a's scenario, is not run for the portable C until the
-  Configuration and Screen and Mouse are there, which its steps go
-  through: A takes it out of `not_run`. Tried in its place, with steps
+- **`setup`**, 0a's scenario, was not run for the portable C until the
+  Configuration and Screen and Mouse were there, which its steps go
+  through: it is run since piece A, and passes. Tried in its place
+  before, with steps
   that are no scenario: a setup file saved by the main program with the
   key bar off, the setup entered and left with it, and Ctrl+o, show the
   same in the original and in the portable C, the prompt's row
@@ -551,13 +553,14 @@ for it, "The setup program": read both first.
 - Its batch in `SETUP_BATCHES` of `harness/ported.py`, and its
   scenarios out of `not_run`, in the commit that brings the code.
 
-### Piece A, the option dialogs: where it stands
+### Piece A, the option dialogs: done, and what a later piece should know
 
-For whoever goes on with it. Its scenarios are there, with their
-goldens; its tables and its code are not begun.
+The Configuration, Screen and Mouse, the Panel options and the Country
+info are there, `stopts.c` with `stopts_t.c`, called from the setup's
+menu, and held by their scenarios, with `setup`, 0a's.
 
-**Done.** Seven scenarios, 311 steps, each derived twice with the same
-result, listed in `not_run` of `TREES["portable_c"]`:
+**The scenarios.** Eight, 320 steps, each derived twice with the same
+result:
 
 | Scenario | Steps | What |
 |---|---|---|
@@ -568,26 +571,69 @@ result, listed in `not_run` of `TREES["portable_c"]`:
 | `setup-country` | 23 | S8 in the United States, and every way out |
 | `setup-options-russia` | 23 | S8, S4 with the comma and Cyrillic characters in S3, in Russia, saved |
 | `setup-delay-file` | 14 | S4 with a delay of 100.100 in the setup file, made in the editor: the two `MOV AL,99` of `F04_00` |
+| `setup-missing-saved` | 9 | No setup file, Menu bar visible ticked in S2, saved: the three instructions of `Exit` for a file that is not there, which 0b's batch had listed as out of reach until the options were there |
 
-Of the 224 instructions of the piece they run 222: `reach.py --setup
-F02_00 F04_10 F08_00 F09_10 F09_20` (`F02_00` is the stretch with
-`F03_00` and `F04_00`; `F08_00` the one with `F09_00`, whose first five
-instructions are S7, piece 0b's). The two that are out of reach are of
-`F09_00`: `XCHG BH,AL` at 0F4Eh, for a country that writes the year
-first, and `INC DI` at 0F68h, for one with no character between
-thousands; the benches are the United States and Russia. Of `Dialog`,
-which is 0b's to translate and which only these dialogs take through
-its fields, they run 385 of 394: left are `ADD BL,40` four times, for a
-box in the right half of the screen, the calls of `ClrKbd` and `Beep`
-for the flags 1 and 2, which S0 and the help's box have, and
-`Dial78`'s three instructions for the flag 8, which no box has.
-`Select`, `FlipFl`, `InpStr`, `InSt10`, `Slct20`, `TxtNum`, `HexDec` and
-`FndLet` run whole.
+Of the 224 instructions of the piece they run 221; `SetSnow` called
+behind Screen and Mouse, 06FFh, is not carried over, and two of
+`F09_00` are out of reach: `XCHG BH,AL` at 0F4Eh, for a country that
+writes the year first, and `INC DI` at 0F68h, for one with no character
+between thousands; the benches are the United States and Russia. The
+batch is in `SETUP_BATCHES` of `harness/ported.py`: routines `F02_00`,
+which is the stretch with `F03_00` and `F04_00`, `F04_10`, `F09_00`,
+`F09_10` and `F09_20`. Of `Dialog`, which is 0b's and which only these
+dialogs take through its fields, 0b's batch says what is out of reach.
 
-**Next**, in the order of the brief: `stopts_t.c` by a script from the
-assembly's bytes, held with `datacheck.py`; `stopts.c`; then, when 0b
-has landed, the line in `stmain.c`, the scenarios out of `not_run`, and
-the batch in `SETUP_BATCHES`.
+**Connecting it changed one place of the code.** The portable C passed
+the seven scenarios that were written for it, and `setup`, the first
+time it was taken through them: every screen, the colours and what is
+behind the boxes included, and the setup files that five of them save.
+What was fitted to the skeleton:
+
+- `StF02_00` takes the row of the key bar that has gone from `StUser`
+  of `stmain.c`, where it read `md.UserScr` itself: the main data's
+  copy of the screen has 49 rows, and the 50th is with the setup's
+  data.
+- `Dialog` of `dialog.c` has the case for `SUB_StF04_10` in the
+  `switch` on the routine that a dialog names, as for `SUB_M30_60`,
+  and `vc.h` declares `StF04_10` next to `M30_60`. The line that was
+  typed is at `md.TmpErr + 3`, where the skeleton's `Dialog` keeps it
+  while the setup is open.
+- The four place-holders are out of `stmain.c`, and with them, the
+  last, the block that held them and `StToCome`.
+
+**The tables**, `stopts_t.c`: 77 objects, 3,065 bytes, every text
+written by a script from the bytes of `VCSETUP.ASM` and each held
+against `VCSETUP.COM` by the data's test. What is in it that others
+name: `StOkMn_S`, " Ok ", and `StOk_S`, "[ Ok ]", which the help of the
+setup has for its buttons too (`HlpEr_P`, and `Help` itself); they
+stand in the assembly among the texts of Panel options and of Country
+info, so they are defined here, not static, and the help declares them
+`extern`. `OkMn_D` is the main program's, of `main_t.c`, the same
+bytes. `StDelay_T` is in `stopts.c`, as `Delay_T` is in `commands.c`.
+Two words are in `SETUP_NAMED_OTHERWISE` of `harness/datacheck.py`: the
+`BoxBuf` of `StNoTim_P`, and `F04_10` in `StPanOp_B`, which is the
+number `SUB_StF04_10` of `tables.h`, 5. The five lines that Country
+info writes into are objects without `const` there, and the test holds
+them like the others.
+
+**The code**, `stopts.c`: `StF02_00`, `StF03_00`, `StF04_00` and
+`StF09_00`, each an item of the menu, which take nothing and return
+nothing, where the assembly jumps back to `Main00`; `StF04_10`, which
+returns `struct Checked` as `M30_60` does; and `StF09_10` and
+`StF09_20`, static. It asks nothing of the system.
+
+**A setup made without a file and saved.** `setup-missing-saved` is the
+one scenario in which the setup program writes a file of the setup that
+it has made itself, and that file is not the original's: the 64 bytes
+behind the path of each panel, which are zeros in the portable C (entry
+8 of `DEVIATIONS.md`, and "The bugs of the original that stay" below).
+The screens are the original's all the same. So the scenario does not
+end with that file: Auto save setup is on in such a setup, the program
+goes by what was saved at once, and a panel switched off, Ctrl+F2, has
+it write its own setup, which has zeros there in the original too. The
+file as the setup wrote it is held by no scenario, in the 383 bytes
+that are not those 128 either: only by what the program then shows and
+does, the menu bar and the saving by itself.
 
 **What the assembly does**, read whole, so that it need not be read
 again for the code:
@@ -639,17 +685,8 @@ again for the code:
 - C or D: F1 in the box "Illegal format of" does nothing, its page
   being FFh, and F1 behind it shows the page of Panel options again,
   which is what `MOV HlpPage,3` of `F04_10` is for. That is seen on the
-  bench and is in no scenario yet, so the effect of that instruction
-  is held by none. The scenario was written, `setup-delay-help`, and
-  taken out because its golden shows a page of the help file. It may
-  come back, with piece C or D: text of `VC.HLP` in a golden is
-  allowed, being what the original shows when it is run, as the main
-  program's `help` goldens hold it already; what is to be kept out of
-  a golden is what the setup program's own file has and the published
-  source has not, its banner and the dialog it shows for an argument.
-  The steps were: `_SETUP`, `F4`, `Up Up "x" Enter`, `F1`, which
-  changes nothing, `Enter`, `F1`, the page, `Esc`, `Esc`, `F10`. It
-  needs the help of setup in the portable C to pass.
+  bench, and `setup-delay-help` holds it, with the help of the setup
+  in the tree.
 - The 81st cell that `PutKey0` writes is decided, on the user's word:
   it is fixed, not kept. The portable C writes 80 cells, one routine
   for the main program and setup, declared as a deviation, which is
@@ -821,8 +858,8 @@ on the bench.
 The help of the setup is in the tree: `sthelp.c` and `sthelp_t.c`,
 called from `StSetup`, which reads the pages, and from `Input`, for F1
 while the setup is open. Five of its six scenarios pass, each screen
-the original's, and `setup-delay-help` waits in `not_run` of
-`TREES["portable_c"]` for piece A's dialog: see "What is left" below.
+the original's, and `setup-delay-help` waited in `not_run` of
+`TREES["portable_c"]` for piece A's dialog: see "What was left" below.
 The code passed them as it was written, with nothing changed but where
 the pages are kept.
 
@@ -951,10 +988,10 @@ them: the first for more than the length, see the walk below.
 - `sthelp_t.c` has what `Dialog` and `MinMnu` take by its offset:
   `StHlEr1_S`, `StHlpMn_D`, `StHlpEr_P` and `StHlpEr_B`. `Help_S`,
   `OkMn_D` and `HlpMn_P` are the main program's, the same bytes, and
-  are not written twice. It also has `StOkMn_S`, " Ok ", and `StOk_S`,
-  "[ Ok ]", not static: they stand in `VCSETUP.ASM` among what is
-  piece A's, and the help reads both. Whichever of the two pieces
-  lands second takes its own definitions out and declares the other's.
+  are not written twice. `StOkMn_S`, " Ok ", and `StOk_S`, "[ Ok ]",
+  which the help reads both, stand in `VCSETUP.ASM` among what is
+  piece A's: they are defined in `stopts_t.c`, not static, and the
+  help declares them. `sthelp_t.c` had them until that file was there.
 - `sthelp.c` has `StRdHelp`, `StHelp`, `StHlpLine`, and `SeekDsk` and
   `ReadDsk` as static functions of its own, with `help.c` as the
   model: the setup program's two differ from the main program's, which
@@ -993,10 +1030,10 @@ them: the first for more than the length, see the walk below.
   not carried over the three instructions that print the line. All
   the rest runs in the original, and both functions run in the tree.
 
-**What is left.** `setup-delay-help` passes when piece A's dialog and
-the help are both in the tree. It is in `not_run` with a reason of its
-own, and comes out with whichever of the two lands second: that piece
-runs it, and it has to pass as it is.
+**What was left.** `setup-delay-help` wanted piece A's dialog and the
+help both in the tree. It was in `not_run` with a reason of its own,
+and came out with piece A, which landed second: it passes as it was
+written.
 
 **For piece D.** F1 from the screens of A and B is not in these
 scenarios, which keep to the menu and to the box of F8 so as to need no

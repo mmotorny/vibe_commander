@@ -1783,6 +1783,34 @@ in "The portable C".
     two `FETCHCONTENT_SOURCE_DIR_` of `build/_deps`, and
     `harness/datacheck.py --source` the copy's `src/portable_c`. The
     copy's build is in a directory called `portable_c`, as always.
+  - A screen of the setup program that is a dialog can be tried before
+    the skeleton of setup is there, since `Dialog` is the main
+    program's: in a change that is not kept, a command of the main
+    program calls the piece's function, and `python3 harness/show.py
+    --program build/portable_c/VC.EXE` with the keys of that command
+    and then the steps of the scenario shows the box, to hold against
+    the golden's rows inside its frame. Piece A did that for its four
+    dialogs, and when the skeleton was there its scenarios passed as
+    they were written (`TODO.md`, "Piece A, the option dialogs: done,
+    and what a later piece should know").
+  - Where the disks of a scenario differ in a file, the test says the
+    two sums of its contents and no more. To see the bytes, a script
+    of a dozen lines, kept in `build/`, runs the scenario by
+    `scenarios.run` on the original, `setups.original_vc()`, and on
+    the build, with `fat.hashlib` replaced by an object whose `sha256`
+    keeps what it is given; `scenarios.of(name, "portable_c")` has the
+    steps as that tree is taken through them. That is how the setup
+    file of `setup-missing-saved` was found to differ in the 64 bytes
+    behind the path of each panel and nowhere else, which is declared.
+  - A line of a box that the setup program writes into before it shows
+    the box, as Country info does, is an object without `const` in the
+    file of tables, with the bytes that the assembly has there; the
+    data's test holds it like a constant, and the code writes it
+    through a far pointer made of `AsmSeg` and the object's offset.
+  - A text or a button of the setup program that two pieces name is
+    defined once, not static, in the file of the piece whose part of
+    the assembly has it, and the other declares it `extern`: `StOk_S`
+    and `StOkMn_S` of `stopts_t.c`, which the help of setup has too.
   - `python3 harness/goldens.py derive` derives all goldens again side
     by side, in a minute and a half on four processors, where it took
     them one behind the other. `git status` of `harness/goldens/` is

@@ -42,7 +42,8 @@
  * program's box. That is declared too.
  *
  * What the items of the menu do is of other files, one for each kind:
- * stopts.c, stcolor.c and sthelp.c. See "What is still to come" below.
+ * stopts.c for the options and stcolor.c for the palettes; and the
+ * help is of sthelp.c.
  */
 #include "vc.h"
 
@@ -135,30 +136,6 @@ static const u8 CODE StMainHlp[9] = { 1, 2, 3, 4, 4, 4, 5, 6, 7 };
    sign, and has no zero byte. */
 static const u8 CODE StStErr_S[49] =
     "There was an error while saving the setup file\r\n$";
-
-/*---------------- What is still to come ----------------
-   What the items of the menu do: each is a routine of the file that
-   vc.h names for it, which is not there yet. Until it is, the
-   routine is here. The commit that brings a file takes its routines out
-   of here, and nothing else of this file changes for it.
-
-   An item is a screen that the next key leaves, whichever key, with
-   nothing shown: so the item and Esc pressed in one step leave the menu
-   on the screen as they do when the screen is there, with the cursor on
-   that item, and the scenarios of the menu hold either way. */
-
-/* The screen of an item that is still to come. */
-static void StToCome(void)
-{
-    Input(0);
-}
-
-/* stopts.c: the Configuration, Screen and Mouse, the Panel options and
-   the Country info. */
-void StF02_00(void) { StToCome(); }
-void StF03_00(void) { StToCome(); }
-void StF04_00(void) { StToCome(); }
-void StF09_00(void) { StToCome(); }
 
 /*------------- What DOS had on the screen -------------*/
 

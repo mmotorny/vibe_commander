@@ -399,7 +399,7 @@ add_c_tree(c "the C translation" s
 add_portable_c(
     blank.c box.c cmdline.c commands.c dirfunc.c dos.c enter.c keys.c
     main.c menu.c misc.c mouse.c setup.c start.c stcolor.c sthelp.c
-    stmain.c system.c view.c window.c)
+    stmain.c stopts.c system.c view.c window.c)
 
 # --- Tests --------------------------------------------------------------------
 # The tests need python3. Those that run Volkov Commander do so under FreeDOS

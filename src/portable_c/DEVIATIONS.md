@@ -801,9 +801,9 @@ of it.
   panel. A setup file that the setup saves of it differs from the
   original's in those bytes, twice 64 of the file's 511.
 - While the setup program is being translated (`TODO.md`, "The setup
-  program in the portable C: the plan"), what its menu leads to is not
-  all there: an item whose screen is still to come waits for a key and
-  goes back to the menu, and the mouse does nothing at the menu.
+  program in the portable C: the plan"), one thing of its menu is not
+  there: the mouse does nothing at the menu. Every item of the menu has
+  its screen.
 
 **Why.** The user's decision, on 12 October 2026: the setup program is
 ported into the portable C "so that there is one program", reached by an
@@ -831,8 +831,10 @@ for as long as it is on the screen, is empty in the portable C: the
 golden is derived with spaces there. The scenarios `setup-menu`,
 `setup-defaults`, `setup-missing`, `setup-damaged` and `setup-cancel`
 pass so, and those of the help, `setup-help`, `setup-help-pages`,
-`setup-help-mouse`, `setup-help-file` and `setup-help-lines`; `setup` is
-not run until the screens that it shows are there. `setup-help-file`
+`setup-help-mouse`, `setup-help-file` and `setup-help-lines`; and so do
+`setup` and those of the option dialogs, from `setup-config` to
+`setup-missing-saved`, and `setup-delay-help`, which has the help over
+one of them. `setup-help-file`
 has a help file that cannot be read, twice: the line that the original
 prints then is not in its golden, since the step that starts the setup
 program sends what it prints nowhere.
@@ -842,6 +844,9 @@ made by Set default configuration, starts the program anew with it and
 ends with the setup file as that program saves it, where the bytes
 behind a path are zeros in the original too: the file that the setup
 program itself has written is not on the disk when the scenario ends.
+`setup-missing-saved`, which saves the setup that is made without a
+file, ends in the same way, with the file as the program that goes on
+saves it.
 No scenario has a drive that is not ready while the setup is open, a
 `VC=` in the environment, or a look at the history.
 

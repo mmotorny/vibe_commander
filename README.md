@@ -634,19 +634,19 @@ the number. No test holds the table.
 
 | What | Figure |
 |---|---|
-| `VC.EXE` | 193,220 bytes |
-| as a multiple of the original's 65,090 bytes | 2.97 |
-| more than the C translation's 133,056 bytes | 60,164 bytes |
-| The relocations in its header, which DOS applies | 1,020 |
-| What it keeps of the memory while a command runs: the program and its panels | 202,912 bytes |
-| What DOS has for a command then, on the bench of the tests | 222,624 bytes |
-| The code segment `CTEXT` ends at | D413h, 7,149 bytes below the limit, F000h |
-| The code segment `CTEXT2` ends at | C159h, 11,943 bytes below the limit, F000h |
+| `VC.EXE` | 197,450 bytes |
+| as a multiple of the original's 65,090 bytes | 3.03 |
+| more than the C translation's 133,056 bytes | 64,394 bytes |
+| The relocations in its header, which DOS applies | 1,034 |
+| What it keeps of the memory while a command runs: the program and its panels | 207,072 bytes |
+| What DOS has for a command then, on the bench of the tests | 218,464 bytes |
+| The code segment `CTEXT` ends at | D410h, 7,152 bytes below the limit, F000h |
+| The code segment `CTEXT2` ends at | C534h, 10,956 bytes below the limit, F000h |
 | Inline assembly | 57 instructions in 10 pieces: 37 in 7 of `dos.c`, 20 in 3 of `resident.c` |
 | Lines of `#pragma aux` | 19, of which 9 say that a function does not return |
 | Intrinsic functions | 2: `_disable`, `_enable` |
 | Pairs of `#pragma pack` | 7 |
-| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 770, 62, 259, 96 |
+| `__far`, `FAR`, `STACK`, `CODE`, as the test `portable_c-host` counts them: each place where the word stands in the code | 794, 62, 262, 97 |
 | Calls outside `dos.c` that hand registers to an interrupt, or name a fixed address of the machine, where everything is to go through `sys.h`, as `tools/calls.py` counts them | none |
 
 <!-- The end of the figures. -->
@@ -953,8 +953,9 @@ entered and left, its file, its menu and the setup that the program
 has without a file; `stmain_t.c` its tables. `sthelp.c` has its help,
 with `sthelp_t.c`: the seven pages that the help file has for the
 setup, read when the setup is entered, and the page of where the user
-is in a window, for F1. What both programs have is there once: the boxes, the dialogs, the bars and the mouse are the main
-program's, and the three routines that the setup program has otherwise
+is in a window, for F1. What both programs have is there once: the
+boxes, the dialogs, the bars and the mouse are the main program's, and
+the three routines that the setup program has otherwise
 go by a variable that says the setup is open, `StOpen`: `PutKey0`,
 which has the setup's key bars then, `Dialog`, and `Input`, where F1 is
 the setup's own help. What the setup program has in a segment of its
@@ -970,13 +971,19 @@ four screens among them. What a colour becomes in a shadow, which a
 picture asks for a shadow that is not the one set, is `ShadCol` of
 `screen.c`, for both programs.
 
-Of the menu's nine items five do something so far, the three palettes,
-Set default configuration and Exit, and F1 is the help: the
-Configuration, Screen and Mouse, the Panel options and the Country
-info are to come, each in a file of its own, and so is the mouse at
-the menu. `TODO.md`
-has the plan, "The setup program in the portable C", with what each
-piece brings and what is declared for it.
+`stopts.c` has the four dialogs of the options: the Configuration,
+Screen and Mouse, the Panel options, with the delay of the tree that
+is typed there and the box for one that is none, and the Country info,
+whose lines are written as the country has them before the box is
+shown. `stopts_t.c` has their tables. Memory allocation, TSR manager
+and Screen output are still to be seen in the first two, as the
+original's setup program has them, and set nothing that the portable C
+goes by: they are to go.
+
+All nine items of the menu do what the original's do, and F1 is the
+help. The mouse at the menu is still to come. `TODO.md` has the plan,
+"The setup program in the portable C", with what each piece brings and
+what is declared for it.
 
 ## Testing
 

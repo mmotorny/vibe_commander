@@ -229,6 +229,14 @@ REVIEWED = {
                                     "sign, which is its last byte"),
     ("stmain.c", "StNoFnd_S"): (ZERO, "an include line"),
     ("stmain.c", "StNoIni_S"): (ZERO, "an include line"),
+    ("stopts.c", "StDelay_T"): (OWN, "as far as its 0, or by a line of "
+                                     "the dialog, one of six"),
+    ("stopts.c", "StInf05_S"): (44, "StF09_00 has the capitals and the "
+                                    "small letters of 40 characters "
+                                    "from the fifth on"),
+    ("stopts.c", "StInf09_S"): (47, "StF09_00 has the capitals and the "
+                                    "small letters of 40 characters "
+                                    "from the eighth on"),
     ("tree.c", "PutTr_P"): (4, "the colours of the tree, four"),
     ("treebox.c", "Scan_P"): (4, "the colours of a line: any of four"),
     ("treebox.c", "ChTr_P"): (4, "the colours of the tree and of a line: "

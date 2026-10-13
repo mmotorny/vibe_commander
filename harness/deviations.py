@@ -326,25 +326,7 @@ TREES = {
             # The scenarios of the setup program, until the tree has the
             # code that each shows: an entry goes with the commit that
             # makes its scenario pass (TODO.md, "The setup program in the
-            # portable C: the plan").
-            "setup": _NO_SETUP_YET,
-            # The option dialogs, piece A of that plan.
-            "setup-config": _NO_SETUP_YET,
-            "setup-config-mouse": _NO_SETUP_YET,
-            "setup-screen": _NO_SETUP_YET,
-            "setup-panels": _NO_SETUP_YET,
-            "setup-country": _NO_SETUP_YET,
-            "setup-options-russia": _NO_SETUP_YET,
-            "setup-delay-file": _NO_SETUP_YET,
-            "setup-missing-saved": _NO_SETUP_YET,
-            # The help of the setup program, F1, is there. This one shows
-            # it over a dialog of the options, piece A, and goes with
-            # the commit that brings the second of the two.
-            "setup-delay-help":
-                "it shows the help of the setup over its Panel options, "
-                "and the portable C has the help and not yet that "
-                "dialog: what the scenario shows of it is still to be "
-                "translated",
+            # portable C: the plan"). None waits now.
         },
         left_out={
             "F9 o m": "Memory allocation switched off or on: the Options "

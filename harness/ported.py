@@ -1287,6 +1287,32 @@ SETUP_BATCHES = [
         routines=("Col00..F08_00", "ShadCol"),
         functions=("ShadCol",),
     ),
+    Batch(
+        title="The setup program: the Configuration, Screen and Mouse, "
+              "the Panel options with the delay that is typed there, and "
+              "the Country info",
+        source="stopts.c",
+        # F02_00 is the stretch with F03_00 and F04_00, as far as F04_10.
+        routines=("F02_00", "F04_10", "F09_00", "F09_10", "F09_20"),
+        functions=("StF02_00", "StF03_00", "StF04_00", "StF04_10",
+                   "StF09_00"),
+        unreached={
+            0x0F4E:
+                "Country info, the date of a country that writes the "
+                "year first: the benches are the United States and "
+                "Russia, which write the month or the day first",
+            0x0F68:
+                "Country info, the number of a country that has no "
+                "character between thousands: both benches have one",
+        },
+        not_carried={
+            0x06FF:
+                "SetSnow called behind Screen and Mouse, which finds out "
+                "whether to wait for a display that shows snow: the "
+                "portable C has no such wait "
+                "(src/portable_c/DEVIATIONS.md)",
+        },
+    ),
 ]
 
 

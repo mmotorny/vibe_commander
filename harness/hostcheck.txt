@@ -56,6 +56,7 @@ sthelp.c      to-number 6
 sthelp_t.c    clean
 stmain.c      to-number 12, to-pointer 1
 stmain_t.c    clean
+stopts.c      to-number 22, to-pointer 12
 stopts_t.c    clean
 string.c      clean
 sys.h         clean
