@@ -2228,7 +2228,7 @@ The 84 functions of `sys.h`, by what the trial found of DOS/32A:
 
 | Kind | Functions | Which |
 |---|---|---|
-| Straight through: no address, or one that the extender translates, with the program's pointer as it is | 71 | The files but `FileTrueName`, 16; the directories, 8; the drives, 8; `TimeOfDay`, the two versions, `BreakCheck`, `SetBreakCheck`, `Idle`; `ProgramEnd`; the console, 2; the keyboard, 4; the screen, 17, of which four read and write the display's memory and the BIOS's data at flat addresses; the mouse, 8; `Ticks` |
+| Straight through: no address, or one that the extender translates, with the program's pointer as it is. D1 found six of these to want real mode: `FileSetAttributes`, `FindRecord`, `FindFirst`, `FindNext`, `DirCurrent` and `DirCurrentBare`. See "Piece D1" | 71 | The files but `FileTrueName`, 16; the directories, 8; the drives, 8; `TimeOfDay`, the two versions, `BreakCheck`, `SetBreakCheck`, `Idle`; `ProgramEnd`; the console, 2; the keyboard, 4; the screen, 17, of which four read and write the display's memory and the BIOS's data at flat addresses; the mouse, 8; `Ticks` |
 | Through one block below the megabyte and a call in real mode, DPMI 0300h, or 0301h for a routine | 7 | `FcbParse` (29h), `FcbDelete` (13h), `CountryInfo` (38h), `CaseMap`, which calls the routine that 38h names, `FileTrueName` (60h), `ProgramRun` and `ProgramRunBare` (4Bh) |
 | Other in 32 bits | 6 | `MemTake`, `MemGive`, `MemResize`: the program's own 640 KB. `MemSetSearch`, `MemSetUpper`: passed to DOS as they are. `ProgramPrefix`: goes, S1 |
 
@@ -2840,7 +2840,7 @@ What it showed, and what was done:
 |---|---|---|---|
 | The carry flag set before a call that DOS leaves it at: `DriveSpace(3, 1)`, AH 36h | Comes back set: failed, with what 59h answers, 0 | Came back clear: the extender does not carry the program's flag through DOS. Not failed, AX 1 | `Ask` of `dos32.c` takes the flag for set afterwards if it was to be set before. The same in both. It sets no flag for DOS at all. `FcbDelete`, 13h, goes the same way when D2 makes it |
 | `failed` of a function that asks bare, where DOS reports an error | FFFFh: what SBB makes of the flag | 1 | FFFFh |
-| AX where the call did not fail, of 4301h, 47h, 4Eh and 4Fh: `FileSetAttributes`, `DirCurrent`, `DirCurrentBare`, `FindFirst`, `FindNext` | What DOS left: CX as it went for 4301h (1, 0), 0100h for 47h, 0 for 4Eh and 4Fh | The AX that the call was made with: 4301h, 4700h, 4E00h, 4F00h. DOS/32A translates these four and gives back its caller's EAX | Left so: no call that the extender translates brings DOS's AX back. `both.py` has the nine lines of it in `EXPECTED`, and fails when one of them no longer differs |
+| AX where the call did not fail, of 4301h, 47h, 4Eh and 4Fh: `FileSetAttributes`, `DirCurrent`, `DirCurrentBare`, `FindFirst`, `FindNext` | What DOS left: CX as it went for 4301h (1, 0), 0100h for 47h, 0 for 4Eh and 4Fh | The AX that the call was made with: 4301h, 4700h, 4E00h, 4F00h. DOS/32A translates these four and gives back its caller's EAX | Those five are made in real mode, by DPMI 0300h, and `FindRecord` with them, with the name and the record of the search in a block below the megabyte: what DOS left comes back. The same in both |
 
 Everything else is the same, line for line. So of the services that
 the trial had not run, these answer through DOS/32A as they do
@@ -2852,12 +2852,41 @@ back or moved, as on DOS: the extender copies the record down before
 4Fh. The idle call, the keys and the mouse turned every page of both
 toys alike, shift states included.
 
-The third is where the 71 do not answer as `dos.c` does, and `sys.h`
-has `value` be what DOS left in AX also where nothing failed, since
-some callers go on with it: `DirFunc` of `dirfunc.c` hands the high
-byte of what a search answered on to the routine that it calls for
-each file. It can be had only by making those calls in real mode with
-a block below the megabyte, as the seven of D2 are made.
+The third is other than the plan had it, which counted the search,
+the current directory and the attributes among what goes straight
+through. `sys.h` has `value` be what DOS left in AX also where nothing
+failed, since some callers go on with it: `DirFunc` of `dirfunc.c`
+hands the high byte of what a search answered on to the routine that
+it calls for each file. No call that the extender translates brings
+that back, so the five are made in real mode, and `FindRecord` with
+them, as the seven of D2 are to be: 65 functions go straight through,
+6 through real mode are made, 7 through real mode and 6 that are
+other are not. A commit of its own
+has it, behind the one that has them straight through, so that it can
+be taken back alone should what DOS left in AX at those four calls be
+shown to reach nothing.
+
+What that brought, which D2 builds on:
+
+- `Start` asks for the block when the program starts, DPMI 0100h: 192
+  bytes now, 128 for a name and 64 for the record of a search (`LOW_`
+  of `dos32.c`). D2 makes it longer for what its seven need. A program
+  that does not get it ends with 8 and says nothing: whoever makes the
+  entry whole has it say so.
+- `struct DosRegs` has `low`: `SetLow` in place of `Set` makes a call
+  one of real mode, with DS and ES on the block and the registers
+  places in it, and `Call`, `Tell` and `Ask` do the rest, the program's
+  errors included. `Extender` is INT 31h.
+- The record of a search is the program's and DOS's is in the block:
+  the 43 bytes go down before 4Fh and up behind 4Eh and 4Fh, failed or
+  not. `FindRecord` sets DOS's own, in real mode, and remembers the
+  program's. The extender's own record is not used any more.
+- A call made in real mode could have the carry flag set for DOS, in
+  the registers that DPMI 0300h takes: `FcbDelete` may want that. As
+  it is, `Ask` makes up for the flag whichever way a call is made.
+- What the two more calls cost was not measured: DPMI 0300h was 380
+  instructions more than a call made directly in the trial, and the
+  copies are 43 bytes each way for a file found.
 
 What the toy cannot tell: AX of the other translated calls where they
 do not fail is the same in both on the bench, 3900h, 3A00h, 3B00h,
@@ -2895,7 +2924,8 @@ For D2:
 
 - The last page of the toy asks ten of the 13 already, and
   `both.py` leaves that page out of what it fails for: it is known by
-  its first line, `NOT_MADE`. What `dos.c` answers there is the first
+  its first line, `NOT_MADE`. Its table `EXPECTED`, for a line that
+  is known to differ elsewhere, is empty. What `dos.c` answers there is the first
   column of `both.py --show`. `ProgramRun`, `ProgramRunBare` and
   `ProgramPrefix` are not asked: S1 changes what they take.
 - `MemTake(FFFFh)` answers with how much there is, which follows the

@@ -25,6 +25,15 @@
  *     registers as they are, and the address in them means nothing
  *     there. Those have to be made in real mode with a block below the
  *     megabyte, and are not here yet: see the end of this file.
+ *   - Four calls that it translates it brings back with the AX that it
+ *     was called with where they did not fail, and not with what DOS
+ *     left there, which is what sys.h has an answer be: the search of a
+ *     directory, AH 4Eh and 4Fh, the current directory, 47h, and the
+ *     attributes set, AX 4301h. The toy of harness/trial32/sys.c showed
+ *     it. So these are made in real mode here, by the extender's
+ *     service for that, with the name and the record in a block below
+ *     the megabyte that the program asks for when it starts, and what
+ *     DOS wrote there copied to where the program wants it.
  *
  * The memory of the machine that the program reads and writes, the
  * BIOS's data and the cells of the display, is at the addresses that it
@@ -40,15 +49,26 @@
  * The program begins here too, at Start, where the extender enters it.
  *
  * The file has three parts: the functions of sys.h that are made here,
- * 71 of the 84; the 13 that are not made yet, which do nothing and say
- * so; and the start of the program.
+ * 71 of the 84, six of them in real mode; the 13 that are not made
+ * yet, which do nothing and say so; and the start of the program.
  */
 #include "vc.h"
 
 /* The registers of a call of DOS. A pointer to what DOS takes, a name or
-   a buffer, is the register itself. */
+   a buffer, is the register itself; of a call that is made in real
+   mode, `low`, it is a place in the block below the megabyte, and DS
+   and ES are on that block. */
 struct DosRegs {
     u32 eax, ebx, ecx, edx, esi, edi;
+    u16 low;
+};
+
+/* The registers of a call in real mode, as the extender's service for
+   one takes them and hands them back: DPMI's function 0300h. With SS
+   and SP 0 the call is made on a stack of the extender's. */
+struct RealRegs {
+    u32 edi, esi, ebp, reserved, ebx, edx, ecx, eax;
+    u16 flags, es, ds, fs, gs, ip, cs, sp, ss;
 };
 
 /* The registers of a call of the BIOS for the screen, as it leaves
@@ -96,6 +116,18 @@ static u32 Dos(struct DosRegs *regs);
     "pop ebp" \
     "sbb eax,eax" \
     parm [ebx] value [eax] modify exact [eax ebx ecx edx esi edi]
+
+/* INT 31h, the extender's own services, which are DPMI's: AX as it
+   leaves it, and above that FFFFh if it leaves the carry flag set, which
+   is how it says that it failed. EDI is the address of what a service
+   takes in ES:EDI. */
+static u32 Extender(u32 eax, u32 ebx, u32 ecx, void *edi);
+#pragma aux Extender = \
+    "int 31h" \
+    "sbb edx,edx" \
+    "shl edx,16" \
+    "mov dx,ax" \
+    parm [eax] [ebx] [ecx] [edi] value [edx] modify exact [eax ebx edx]
 
 /* INT 10h with EAX, EBX, ECX and EDX, whose low words go back into the
    four words at `regs` as the BIOS leaves them: more than a function can
@@ -158,12 +190,50 @@ static void MouseState(u32 eax, struct MouseAt *state);
  * driver are each put in place here and nowhere else.
  */
 
+/* The block below the megabyte, by its segment in real mode: Start asks
+   for it. It has room for a name or a path, and for the record of a
+   search. */
+static u16 LowSeg = 0;
+
+#define LOW_NAME   0                    /* 128 bytes */
+#define LOW_RECORD 128                  /* 64 bytes */
+#define LOW_SIZE   192
+#define LOW(place) ((u8 *)(((u32)LowSeg << 4) + (place)))
+
+#define DPMI_LOW_BLOCK 0x0100           /* a block of DOS's memory: BX
+                                           paragraphs; AX its segment */
+#define DPMI_REAL_INT  0x0300           /* an interrupt in real mode: BL
+                                           which, CX words of the stack to
+                                           take along, ES:EDI the
+                                           registers */
+#define FLAG_CARRY 1
+
 /* DOS, with the registers of `regs` and their answer there. Not 0 if
    DOS leaves the carry flag set: FFFFh, as in dos.c, which is what a
    function that asks bare answers with for `failed`. */
 static u16 Call(struct DosRegs *regs)
 {
-    return (u16)Dos(regs);
+    struct RealRegs real;
+
+    if (!regs->low)
+        return (u16)Dos(regs);
+    real.eax = regs->eax;
+    real.ebx = regs->ebx;
+    real.ecx = regs->ecx;
+    real.edx = regs->edx;
+    real.esi = regs->esi;
+    real.edi = regs->edi;
+    real.ebp = 0;
+    real.flags = 0;
+    real.ds = real.es = LowSeg;
+    real.fs = real.gs = 0;
+    real.sp = real.ss = 0;
+    Extender(DPMI_REAL_INT, 0x21, 0, &real);
+    regs->eax = real.eax;
+    regs->ebx = real.ebx;
+    regs->ecx = real.ecx;
+    regs->edx = real.edx;
+    return real.flags & FLAG_CARRY ? 0xFFFF : 0;
 }
 
 /* The BIOS for the screen, with these registers, which come back in
@@ -210,6 +280,35 @@ static void Set(struct DosRegs *regs, u32 eax, u32 ebx, u32 ecx, u32 edx)
     regs->edx = edx;
     regs->esi = 0;
     regs->edi = 0;
+    regs->low = 0;
+}
+
+/* The same for a call that is made in real mode: `edx` is then a place
+   in the block below the megabyte, or a number. */
+static void SetLow(struct DosRegs *regs, u32 eax, u32 ebx, u32 ecx, u32 edx)
+{
+    Set(regs, eax, ebx, ecx, edx);
+    regs->low = 1;
+}
+
+/* Bytes from one place to another. */
+static void Bytes(u8 *to, const u8 *from, u16 count)
+{
+    for (; count != 0; count--)
+        *to++ = *from++;
+}
+
+/* A name or a path, as far as its zero byte, to the block below the
+   megabyte: 127 characters of it at the most, which is more than DOS
+   takes. */
+static void NameLow(const u8 *name)
+{
+    u8 *to = LOW(LOW_NAME);
+    u16 room;
+
+    for (room = 127; room != 0 && *name != 0; room--)
+        *to++ = *name++;
+    *to = 0;
 }
 
 /* What DOS answers: AX, and whether the carry flag is set. */
@@ -381,9 +480,14 @@ struct FileAttr FileAttributes(const u8 FAR *name)
     return attr;
 }
 
+/* In real mode, for what DOS leaves in AX. */
 struct Answer FileSetAttributes(const u8 FAR *name, u16 attributes)
 {
-    return Named(0x4301, name, attributes);
+    struct DosRegs regs;
+
+    NameLow(name);
+    SetLow(&regs, 0x4301, 0, attributes, LOW_NAME);
+    return Ask(&regs, 0);
 }
 
 struct FileStamp FileTime(u16 handle)
@@ -420,34 +524,57 @@ struct Device FileDevice(u16 handle)
     return device;
 }
 
-/* Directories. The record of a search is the program's, wherever it is:
-   the extender keeps one of its own below the megabyte for DOS, and
-   copies between the two at every call of the search.
+/* Directories. The search and the current directory are asked in real
+   mode, for what DOS leaves in AX.
 
-   Not as dos.c answers, and not to be mended by a call that the
-   extender translates: where the search, AH 4Eh and 4Fh, the current
-   directory, 47h, and the attributes set, AX 4301h, have not failed,
-   the extender brings back the AX that it was called with, and not what
-   DOS left there, which is `value` by sys.h: 0 for the search, 0100h
-   for the current directory, and what CX was for the attributes, from
-   the DOS of the test bench. */
+   The record of a search is the program's, wherever it is, and DOS has
+   one in the block below the megabyte. DOS keeps in the record how far
+   a search has got, and the program may put the record of one search
+   back while another has been made, or have it somewhere else: so the
+   program's record goes to DOS's before a search goes on, and DOS's to
+   the program's behind every call of a search, failed or not, the 43
+   bytes that DOS has there. */
+
+#define RECORD_SIZE 43
+
+static struct DTAs *Record = 0;
 
 void FindRecord(struct DTAs FAR *record)
 {
     struct DosRegs regs;
 
-    Set(&regs, 0x1A00, 0, 0, ADDRESS(record));
+    Record = record;
+    SetLow(&regs, 0x1A00, 0, 0, LOW_RECORD);
     Tell(&regs);
+}
+
+/* A call of a search, with the record brought up behind it. */
+static struct Answer Searched(struct DosRegs *regs)
+{
+    struct Answer found = Ask(regs, 0);
+
+    if (Record != 0)
+        Bytes((u8 *)Record, LOW(LOW_RECORD), RECORD_SIZE);
+    return found;
 }
 
 struct Answer FindFirst(const u8 FAR *pattern, u16 attributes)
 {
-    return Named(0x4E00, pattern, attributes);
+    struct DosRegs regs;
+
+    NameLow(pattern);
+    SetLow(&regs, 0x4E00, 0, attributes, LOW_NAME);
+    return Searched(&regs);
 }
 
 struct Answer FindNext(void)
 {
-    return Named(0x4F00, 0, 0);
+    struct DosRegs regs;
+
+    if (Record != 0)
+        Bytes(LOW(LOW_RECORD), (const u8 *)Record, RECORD_SIZE);
+    SetLow(&regs, 0x4F00, 0, 0, 0);
+    return Searched(&regs);
 }
 
 struct Answer DirMake(const u8 FAR *name)
@@ -465,23 +592,33 @@ struct Answer DirChange(const u8 FAR *name)
     return Named(0x3B00, name, 0);
 }
 
-/* The drive is in DL and the room for the path at ESI. */
-struct Answer DirCurrent(u16 drive, u8 FAR *to)
+/* The drive is in DL and the room for the path at DS:SI: DOS writes the
+   path below the megabyte, and it goes to `to` as far as its zero byte
+   if DOS did not fail. */
+static struct Answer Current(u16 drive, u8 *to, u16 bare)
 {
     struct DosRegs regs;
+    struct Answer asked;
+    const u8 *from = LOW(LOW_NAME);
+    u16 room;
 
-    Set(&regs, 0x4700, 0, 0, drive & 0xFF);
-    regs.esi = ADDRESS(to);
-    return Ask(&regs, 0);
+    SetLow(&regs, 0x4700, 0, 0, drive & 0xFF);
+    regs.esi = LOW_NAME;
+    asked = bare ? Tell(&regs) : Ask(&regs, 0);
+    if (!asked.failed)
+        for (room = 64; room != 0 && (*to++ = *from++) != 0; room--)
+            ;
+    return asked;
+}
+
+struct Answer DirCurrent(u16 drive, u8 FAR *to)
+{
+    return Current(drive, to, 0);
 }
 
 struct Answer DirCurrentBare(u16 drive, u8 FAR *to)
 {
-    struct DosRegs regs;
-
-    Set(&regs, 0x4700, 0, 0, drive & 0xFF);
-    regs.esi = ADDRESS(to);
-    return Tell(&regs);
+    return Current(drive, to, 1);
 }
 
 /* Drives. */
@@ -892,8 +1029,9 @@ u32 Ticks(void)
  * point in real mode. What each needs is in TODO.md, "The portable C in
  * 32 bits: the plan", with the piece D2:
  *
- *   - through a block below the megabyte and a call in real mode:
- *     FileTrueName, FcbParse, FcbDelete, CountryInfo, CaseMap,
+ *   - through the block below the megabyte and a call in real mode, as
+ *     the search of a directory is made above, with more room in the
+ *     block: FileTrueName, FcbParse, FcbDelete, CountryInfo, CaseMap,
  *     ProgramRun and ProgramRunBare;
  *   - other in 32 bits: MemTake, MemGive and MemResize, which hand out
  *     memory of the program's own; MemSetSearch and MemSetUpper; and
@@ -1013,11 +1151,22 @@ static void Settle(void);
    words of it that hold an address, and enters this on the stack that
    the header of the file names, with interrupts on, CS, DS and SS on
    all of the memory, and ES on the PSP. The linker is told the name
-   (`option start=Start_`). This is all that a C library's start-up
-   would have had to do, and the program has none. Main of main.c is the
-   program, and does not return. */
+   (`option start=Start_`). Settling the two things is all that a C
+   library's start-up would have had to do, and the program has none.
+
+   The block below the megabyte is asked for here, once, for the calls
+   that are made in real mode: DOS has it for the program, and takes it
+   back when the program ends. A program that does not get it ends at
+   once, with DOS's error for want of memory as its number. Main of
+   main.c is the program, and does not return. */
 void Start(void)
 {
+    u32 block;
+
     Settle();
+    block = Extender(DPMI_LOW_BLOCK, (LOW_SIZE + 15) >> 4, 0, 0);
+    if (block >> 16)
+        ProgramEnd(ERR_NO_MEMORY);
+    LowSeg = (u16)block;
     Main();
 }

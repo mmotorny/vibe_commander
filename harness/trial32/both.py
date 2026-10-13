@@ -52,19 +52,7 @@ NOT_MADE = "Not made in dos32.c yet:"
 
 # Where the two are known to differ, and why: the text that the line of
 # the 16-bit toy begins with or holds, and the reason.
-KEPT = ("DOS/32A brings back the AX that it was called with where the "
-        "call did not fail, and not what DOS left there: ")
 EXPECTED = {
-    "FileSetAttributes 1: 0001/0": KEPT + "4301h, where DOS leaves CX",
-    "FileSetAttributes 0: 0000/0": KEPT + "4301h, where DOS leaves CX",
-    "DirCurrent 0: 0100/0": KEPT + "47h, where DOS leaves 0100h",
-    "DirCurrentBare 0303h: 0100/0": KEPT + "47h, where DOS leaves 0100h",
-    "DirCurrent 0100/0": KEPT + "47h, where DOS leaves 0100h",
-    "FindFirst 0000/0": KEPT + "4Eh and 4Fh, where DOS leaves 0",
-    "FindFirst of another: 0000/0": KEPT + "4Eh, where DOS leaves 0",
-    "t back: 0000/0": KEPT + "4Fh, where DOS leaves 0",
-    "FindNext with the record moved: 0000/0":
-        KEPT + "4Fh, where DOS leaves 0",
 }
 
 
