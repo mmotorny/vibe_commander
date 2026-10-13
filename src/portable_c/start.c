@@ -631,7 +631,7 @@ void IniData(void)
     struct BiosRegs bios;
     struct VideoMode mode;
     const u8 __far *env;
-    u16 i, c, key, at, lines, rows, segment, version, other, cell;
+    u16 i, c, key, at, lines, rows, version, other, cell;
 
     bios.ax = HookVct();                /* Set Error Vectors */
 
@@ -754,13 +754,9 @@ void IniData(void)
         }
     }
     md.Lines = (u8)lines;               /* Init30 */
-    segment = 0xB800;                   /* Screen Segment */
-    if (md.ScrMod == 7)
-        segment = 0xB000;
-    ScrOffs();                          /* Init34: Screen is the memory
-                                           of the display, at the page
-                                           that is shown */
-    *((u16 *)&md.Screen + 1) = segment;
+    ScrOffs();                          /* Init34: where the cells of
+                                           the screen are, for the mode
+                                           and the page that is shown */
     regs.ax = 0x3306;                   /* VerDOS: the version that DOS
                                            has, whatever it says to a
                                            program that asks otherwise */

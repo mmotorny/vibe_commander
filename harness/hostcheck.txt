@@ -54,7 +54,7 @@ stack.c       data_seg 2
 start.c       to-number 9, to-pointer 16
 string.c      clean
 sys.h         clean
-system.c      to-number 3
+system.c      to-number 2
 system_t.c    clean
 tables.h      layout 2
 tree.c        to-number 17
@@ -64,4 +64,4 @@ usermenu.c    to-number 14, to-pointer 8
 vc.h          interrupt 1, aborts 4
 view.c        to-number 57, to-pointer 37
 view_t.c      clean
-window.c      to-pointer 5
+window.c      to-pointer 2

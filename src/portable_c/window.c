@@ -5,24 +5,14 @@
  * Translated from VCSUB1.INC.
  *
  * The program draws into ScrBuf, in the main data (see screen.c), and
- * Window copies a part of that to the memory of the display, which the
+ * Window copies a part of that to the cells of the screen, which the
  * program reads once, when it starts and after every command: SavScr.
- * Where the display's memory is, Screen, was found out when the program
- * started. It is written through far pointers. The cursor and the mode
- * are the BIOS's: Int10 of dos.c, which takes the registers and hands
- * them back as the BIOS leaves them. They go from one call to the next
- * here as they did in the assembly.
+ * The cells, the cursor and the mode are the system's, sys.h. In the
+ * assembly the registers go from one call of the BIOS to the next: what
+ * a call here takes of the one before, the page that is shown, it is
+ * handed.
  */
 #include "vc.h"
-
-#define BIOS_PAGE_OFFSET ((const u16 __far *)0x0040004EUL)  /* where in the
-                                           display's memory the page that
-                                           is shown begins, as the BIOS
-                                           keeps it */
-
-/* What is at an offset in a segment. */
-#define AT(segment, offset) \
-    ((u16 __far *)((u32)(segment) << 16 | (u16)(offset)))
 
 /* Can the program draw on the screen as it is: 80 columns, in mode 2, 3
    or 7? Returns 1 if it can. `mode` comes with BX as the caller has it
@@ -31,21 +21,15 @@
    program goes on with the mode, the columns and the page. */
 u16 ChkMode(struct VideoMode STACK *mode)
 {
-    struct BiosRegs regs;
+    struct Screen screen = ScreenState();
     u16 ok = 0;
 
-    regs.ax = 0x0F00;
-    regs.bx = mode->bx;
-    regs.cx = 0;
-    regs.dx = 0;
-    Int10((struct BiosRegs STACK *)&regs);
-    if (regs.ax >> 8 == 80) {
-        regs.ax &= 0xFF7F;
-        ok = (regs.ax & 0xFF) == 2 || (regs.ax & 0xFF) == 3
-             || (regs.ax & 0xFF) == 7;
+    if (screen.columns == 80) {
+        screen.mode &= 0x7F;
+        ok = screen.mode == 2 || screen.mode == 3 || screen.mode == 7;
     }
-    mode->ax = regs.ax;
-    mode->bx = regs.bx;
+    mode->ax = screen.columns << 8 | screen.mode;
+    mode->bx = screen.page << 8 | mode->bx & 0xFF;
     return ok;
 }
 
@@ -54,15 +38,7 @@ u16 ChkMode(struct VideoMode STACK *mode)
    first. */
 void Cursor(u16 place)
 {
-    struct BiosRegs regs;
-
-    regs.ax = 0x0F00 | place & 0xFF;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.dx = place;
-    Int10((struct BiosRegs STACK *)&regs);
-    regs.ax = 0x0200 | regs.ax & 0xFF;
-    Int10((struct BiosRegs STACK *)&regs);
+    CursorTo(ScreenState().page, place);
 }
 
 /* Put the cursor where the command line has it. */
@@ -78,49 +54,26 @@ void Cursor1(void)
    a laptop. Returns the shape it had. */
 u16 ChgCur(void)
 {
-    struct BiosRegs regs;
-    u16 was;
+    u16 was = CursorWhere(0).shape;
+    u16 shape = md.ScrMod == 7 ? 0x0B0C : 0x0607;
 
-    regs.ax = 0x0300;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.dx = 0;
-    Int10((struct BiosRegs STACK *)&regs);
-    was = regs.cx;
-    regs.cx = md.ScrMod == 7 ? 0x0B0C : 0x0607;
     if (md.ColTyp == 2)
-        regs.cx &= 0xFF;
-    regs.ax = 0x0100 | regs.ax & 0xFF;
-    Int10((struct BiosRegs STACK *)&regs);
+        shape &= 0xFF;
+    CursorShape(shape);
     return was;
 }
 
 /* Give the cursor the shape `shape`, as the BIOS takes it. */
 void CurShp(u16 shape)
 {
-    struct BiosRegs regs;
-
-    regs.ax = 0x0100;
-    regs.bx = 0;
-    regs.cx = shape;
-    regs.dx = 0;
-    Int10((struct BiosRegs STACK *)&regs);
+    CursorShape(shape);
 }
 
 /* Where the cursor is on the page that is shown, the row in the high
    byte. */
 u16 GetCur(void)
 {
-    struct BiosRegs regs;
-
-    regs.ax = 0x0F00;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.dx = 0;
-    Int10((struct BiosRegs STACK *)&regs);
-    regs.ax = 0x0300 | regs.ax & 0xFF;
-    Int10((struct BiosRegs STACK *)&regs);
-    return regs.dx;
+    return CursorWhere(ScreenState().page).place;
 }
 
 /* Put the cursor where it does not show: in row 127. */
@@ -129,43 +82,43 @@ void HidCur(void)
     Cursor(0x7F00);
 }
 
-/* Call the BIOS for the screen with the mouse pointer hidden, which it
-   would move along with the rest: the program does so to scroll a
-   window. Returns the corners of the window, CX and DX, as the BIOS
-   leaves them. */
+/* Have the BIOS scroll a window with the mouse pointer hidden, which it
+   would move along with the rest. The arguments are the registers of
+   the BIOS's call still, for the callers' sake: the high byte of `ax`
+   is 6 to scroll up and 7 to scroll down, and its low byte the lines;
+   the high byte of `bx` is the colour of the lines that come in; `cx`
+   is the upper left corner of the window and `dx` the lower right one.
+   Returns the corners: the assembly goes on with CX and DX as the BIOS
+   leaves them, which is as they went. */
 struct Corners Int10m(u16 ax, u16 bx, u16 cx, u16 dx)
 {
-    struct BiosRegs regs;
     struct Corners corners;
 
-    regs.ax = ax;
-    regs.bx = bx;
-    regs.cx = cx;
-    regs.dx = dx;
     CurMous(0);
-    Int10((struct BiosRegs STACK *)&regs);
+    ScreenScroll(ax >> 8 == 7, ax, bx >> 8, cx, dx);
     CurMous(1);
-    corners.lower = regs.dx;
-    corners.upper = regs.cx;
+    corners.lower = dx;
+    corners.upper = cx;
     return corners;
 }
 
-/* Note where in the display's memory the page that is shown begins: at
-   0 for the first page, and for another where the BIOS says. Returns
-   that. */
+/* Note where the cells of the screen are: in the memory of the display
+   that the mode is of, from where the page begins that is shown, which
+   is at 0 for the first page and for another where the BIOS says.
+   Returns that.
+
+   The original notes the page's place here and no more, in the low word
+   of Screen, and its start-up puts the display's segment above it, B000h
+   for the mode of one colour and B800h for the others. Both are the
+   system's to know: ScreenMemory, which keeps the address in Screen
+   still. */
 u16 ScrOffs(void)
 {
-    struct BiosRegs regs;
     u16 offset = 0;
 
-    regs.ax = 0x0F00;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.dx = 0;
-    Int10((struct BiosRegs STACK *)&regs);
-    if (regs.bx >> 8 != 0)
-        offset = *BIOS_PAGE_OFFSET;
-    *(u16 *)&md.Screen = offset;
+    if (ScreenState().page != 0)
+        offset = ScreenPageStart();
+    ScreenMemory(md.ScrMod, offset);
     return offset;
 }
 
@@ -228,8 +181,10 @@ void ResUser(u16 begin, u16 size)
     } while (--rows);
 }
 
-/* Copy `rows` rows of 80 cells, a number of one byte. The machine may
-   interrupt the program afterwards, whether it might before or not.
+/* Copy `rows` rows of 80 cells, a number of one byte, between the screen
+   and `buffer`: to the screen from its cell `cell` on, or from the
+   screen if `read` is not 0. The machine may interrupt the program
+   afterwards, whether it might before or not.
 
    The original copies seven rows at a time, and on a display that shows
    snow when its memory is written while it draws, a CGA, each seven
@@ -240,12 +195,12 @@ void ResUser(u16 begin, u16 size)
    calls the program for a critical error with the machine kept from
    interrupting, and the box that the program shows then is put on the
    screen through here. */
-static void MovScr(u16 __far *to, const u16 __far *from, u16 rows)
+static void MovScr(u16 cell, u16 *buffer, u16 rows, u16 read)
 {
-    u16 count;
-
-    for (count = rows * 80; count != 0; count--)
-        *to++ = *from++;
+    if (read != 0)
+        ScreenGet(cell, buffer, rows * 80);
+    else
+        ScreenPut(cell, buffer, rows * 80);
     IntOn();
 }
 
@@ -263,25 +218,24 @@ static void MovScr(u16 __far *to, const u16 __far *from, u16 rows)
    here: see DEVIATIONS.md. */
 void Window(u16 begin, u16 size)
 {
-    const u16 *from = BasAdr(begin);
-    u16 offset = (u16)((const u8 *)from - (const u8 *)md.ScrBuf)
-                 + (u16)md.Screen;
-    u16 segment = (u16)(md.Screen >> 16);
+    u16 *from = BasAdr(begin);
+    u16 cell = (u16)(from - md.ScrBuf);
     u16 rows = size >> 8;
-    u16 __far *to;
-    u16 left;
+    u16 columns = size & 0xFF;
 
     CurMous(0);
     if (rows != 1) {
-        from -= begin & 0xFF;
-        offset -= (begin & 0xFF) << 1;
-        MovScr(AT(segment, offset), from, rows);
+        MovScr(cell - (begin & 0xFF), from - (begin & 0xFF), rows, 0);
     } else {
-        to = AT(segment, offset);
-        left = size & 0xFF;
-        do
-            *to++ = *from++;
-        while (--left);
+        if (columns != 0)
+            ScreenPut(cell, from, columns);
+        else {
+            /* 65536 cells, as the original's loop counts none: twice
+               round the 64K that the display's memory and the main data
+               each have, which is the same 32768 cells twice. */
+            ScreenPut(cell, from, 0x8000);
+            ScreenPut(cell, from, 0x8000);
+        }
         IntOn();
     }
     CurMous(1);
@@ -290,5 +244,5 @@ void Window(u16 begin, u16 size)
 /* Read the screen into the screen buffer, all its lines. */
 void SavScr(void)
 {
-    MovScr((u16 __far *)md.ScrBuf, (const u16 __far *)md.Screen, md.Lines);
+    MovScr(0, md.ScrBuf, md.Lines, 1);
 }

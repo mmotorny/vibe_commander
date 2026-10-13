@@ -6,8 +6,11 @@
  *
  * Translated from VCSUB1.INC and VCSUB3.INC.
  *
- * The calls themselves are in dos.c; this is what the program makes of
- * them.
+ * What the system is asked is in sys.h, and how DOS and the BIOS are
+ * asked for it in dos.c; this is what the program makes of the answers.
+ * Intr21 is here still, DOS called with a structure of registers and
+ * the program's errors looked for, for the files that have not gone
+ * over to sys.h.
  */
 #include "vc.h"
 
@@ -16,26 +19,20 @@
 extern const u8 __far Fant_B[];
 #define OFFSET(object) ((u16)(u32)(const void __far *)(object))
 
-#define BIOS_TICKS ((const u32 __far *)0x0040006CUL)    /* the BIOS's count
-                                           of timer ticks since midnight */
-
 #define KEY_CTRL_C 0x2E03
 #define KEY_ESC    0x011B
 #define KEY_F10    0x4400
 
+#define ERR_SHARED 0x20                 /* DOS's error: others have the file
+                                           open in a way that forbids it */
+
 /* DX of a call of DOS that is no pointer: a drive. */
 #define DX_OF(regs) (*(u16 STACK *)&(regs).name)
 
-/* The BIOS's count of timer ticks, read with the timer kept from counting
-   between its two halves. */
+/* The timer's count of ticks since midnight. */
 u32 Timer(void)
 {
-    u32 ticks;
-
-    IntOff();
-    ticks = *BIOS_TICKS;
-    IntOn();
-    return ticks;
+    return Ticks();
 }
 
 /* Take the keys that wait from the keyboard, if the setup says that the
@@ -44,8 +41,8 @@ void ClrKbd(void)
 {
     if (md.ClrBuf == 0)
         return;
-    while (Int16(0x100).none == 0)
-        Int16(0);
+    while (KeyWaiting().none == 0)
+        KeyRead();
 }
 
 /* Look whether the user wants to stop what is going on: take Esc, Ctrl-C
@@ -59,14 +56,14 @@ u16 TstBrk(void)
     u16 key;
 
     for (;;) {
-        keys = Int16(0x100);
+        keys = KeyWaiting();
         if (keys.none != 0)
             break;
         key = keys.key;
         if (key != 0 && key != KEY_CTRL_C && key != KEY_ESC
             && key != KEY_F10)
             break;
-        Int16(0);
+        KeyRead();
         pressed = 1;
     }
     return pressed;
@@ -77,15 +74,8 @@ u16 TstBrk(void)
    for a character that is shown; a bell is not. */
 void Beep(void)
 {
-    struct BiosRegs regs;
-
-    if (md.ErrSnd == 0)
-        return;
-    regs.ax = 0x0E07;
-    regs.bx = 0;
-    regs.cx = 0;
-    regs.dx = 0;
-    Int10((struct BiosRegs STACK *)&regs);
+    if (md.ErrSnd != 0)
+        ScreenType(7, 0, 0);
 }
 
 /* The capital of a letter, the low byte of `letter`: of the 26 by
@@ -103,11 +93,7 @@ u16 UpCase(u16 letter)
 /* Have DOS put what it finds, when it is asked for files, at DTA. */
 void SetDTA(void)
 {
-    struct DosRegs regs;
-
-    regs.ax = 0x1A00;
-    regs.name = (const u8 __far *)&md.DTA;
-    Int21d((struct DosRegs STACK *)&regs);
+    FindRecord(&md.DTA);
 }
 
 /* Is there a drive of this letter, the low byte of `letter`? DOS is asked
@@ -115,40 +101,28 @@ void SetDTA(void)
    that was is made current again. */
 u16 TstDrv(u16 letter)
 {
-    struct DosRegs regs;
     u16 drive = (u8)(letter - 'A');
     u16 was, now;
 
-    regs.name = (const u8 __far *)&md;
-    regs.ax = 0x1900;
-    Int21d((struct DosRegs STACK *)&regs);
-    was = regs.ax & 0xFF;
-    regs.ax = 0x0E00;
-    DX_OF(regs) = drive;
-    Int21d((struct DosRegs STACK *)&regs);
-    regs.ax = 0x1900;
-    Int21d((struct DosRegs STACK *)&regs);
-    now = regs.ax & 0xFF;
-    regs.ax = 0x0E00;
-    DX_OF(regs) = was;
-    Int21d((struct DosRegs STACK *)&regs);
+    was = DriveCurrent();
+    DriveSelect(drive);
+    now = DriveCurrent();
+    DriveSelect(was);
     return now == drive;
 }
 
 /* Make a drive the current one of DOS: 0 for A:, in the low byte of
-   `drive`. */
+   `drive`. DriveSelect of sys.h, for the files that have not gone over
+   to it. */
 void SelDrv(u16 drive)
 {
-    struct DosRegs regs;
-
-    regs.name = (const u8 __far *)&md;
-    regs.ax = 0x0E00;
-    DX_OF(regs) = drive & 0xFF;
-    Int21d((struct DosRegs STACK *)&regs);
+    DriveSelect(drive);
 }
 
 /* Call DOS where a drive may not be ready, with the carry flag set first
-   if `carry` is not 0. When DOS asks what to do about a drive, the
+   if `carry` is not 0: for the files that have not gone over to sys.h,
+   whose functions do the same in dos.c, AskEs there. When DOS asks what
+   to do about a drive, the
    program's routine for that, ErrRdy, shows a box and notes in ErrDat
    that it has; the call then counts as failed with the error 53h. An
    error that DOS reports itself is asked about once more, and its
@@ -188,19 +162,11 @@ u16 Intr21(struct DosRegs STACK *regs)
     return Intr21f(regs, 0);
 }
 
-/* The time of day as DOS has it: the hour and the minute, and the second
-   and the hundredth of one. */
+/* The time of day: TimeOfDay of sys.h, for the files that have not gone
+   over to it. */
 struct Time DosTime(void)
 {
-    struct DosRegs regs;
-    struct Time time;
-
-    regs.name = (const u8 __far *)&md;
-    regs.ax = 0x2C00;
-    Int21d((struct DosRegs STACK *)&regs);
-    time.clock = regs.cx;
-    time.seconds = DX_OF(regs);
-    return time;
+    return TimeOfDay();
 }
 
 /* Open a file, `mode` as DOS takes it in AL. Where DOS says that others
@@ -209,20 +175,10 @@ struct Time DosTime(void)
    the handle, or the error. */
 struct Answer OpenFil(const u8 __far *name, u16 mode)
 {
-    struct DosRegs regs;
-    struct Answer opened;
-    u16 failed;
+    struct Answer opened = FileOpen(name, mode);
 
-    regs.ax = 0x3D00 | mode & 0xFF;
-    regs.bx = regs.ax;
-    regs.name = name;
-    failed = Intr21((struct DosRegs STACK *)&regs);
-    if (failed != 0 && regs.ax == 0x20) {
-        regs.ax = regs.bx & 0xFF0F;
-        failed = Intr21((struct DosRegs STACK *)&regs);
-    }
-    opened.value = regs.ax;
-    opened.failed = failed;
+    if (opened.failed != 0 && opened.value == ERR_SHARED)
+        opened = FileOpen(name, mode & 0x0F);
     return opened;
 }
 
@@ -232,14 +188,10 @@ struct Answer OpenFil(const u8 __far *name, u16 mode)
    not 0. */
 u16 SetPth(void)
 {
-    struct DosRegs regs;
     u16 drive;
 
     md.PathEr = 1;
-    regs.name = (const u8 __far *)&md;
-    regs.ax = 0x1900;
-    Int21d((struct DosRegs STACK *)&regs);
-    drive = regs.ax & 0xFF;
+    drive = DriveCurrent();
     md.DosPth[0] = (u8)(drive + 'A');
     md.DosPth[1] = ':';
     md.DosPth[2] = '\\';
@@ -247,10 +199,7 @@ u16 SetPth(void)
     drive = (u8)(drive + 1);
     if (Fantom(drive))
         return 1;
-    regs.ax = 0x4700 | drive;
-    DX_OF(regs) = drive;
-    regs.si = (u16)(md.DosPth + 3);
-    if (Intr21((struct DosRegs STACK *)&regs))
+    if (DirCurrent(drive, md.DosPth + 3).failed)
         return 1;
     md.PathEr = 0;
     return 0;
@@ -268,28 +217,23 @@ u16 SetPth(void)
    sign, which is 0. */
 u16 Fantom(u16 drive)
 {
-    struct DosRegs regs;
+    struct Answer unit;
     u16 goes_by, answer;
     u8 page;
 
     drive &= 0xFF;
-    regs.name = (const u8 __far *)&md;
-    regs.ax = 0x440E;
-    regs.bx = drive;
-    if (Int21d((struct DosRegs STACK *)&regs))
+    unit = DriveLetter(drive);
+    if (unit.failed)
         return 0;
-    goes_by = regs.ax & 0xFF;
+    goes_by = unit.value & 0xFF;
     if (goes_by == 0 || goes_by == drive)
         return 0;
-    regs.ax = 0x440F;
-    regs.bx = goes_by << 8 | drive;
-    if (Int21d((struct DosRegs STACK *)&regs))
+    unit = DriveSetLetter(drive);
+    if (unit.failed)
         return 0;
-    if ((regs.ax & 0xFF) == goes_by)
+    if ((unit.value & 0xFF) == goes_by)
         return 0;
-    regs.ax = 0x440F;
-    regs.bx = drive << 8 | goes_by;
-    if (Int21d((struct DosRegs STACK *)&regs))
+    if (DriveSetLetter(goes_by).failed)
         return 0;
     *(u16 *)(md.TmpErr + 1) = (u16)(signed char)drive & 0xFF00
                               | (u8)(drive + 'A' - 1);
@@ -298,9 +242,7 @@ u16 Fantom(u16 drive)
     md.HlpPage = page;
     if ((answer & 0xFF) != 0)
         return 1;
-    regs.ax = 0x440F;
-    regs.bx = regs.bx >> 8 | regs.bx << 8;
-    Int21d((struct DosRegs STACK *)&regs);
+    DriveSetLetter(drive);
     return 0;
 }
 

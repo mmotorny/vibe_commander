@@ -40,12 +40,10 @@
 /* Routines of the rest of the program that this file calls, all of them
    C, of vc.h.
 
-   Int16 calls the BIOS for the keyboard, with `ax` as INT 16h takes it: it
-   returns AX as it comes back, and whether the zero flag was set, which
-   says for function 1 that no key waits. Function 0 takes the key that
-   waits. DosTime asks DOS for the time: the hours and the minutes in the
-   two bytes of one word, the seconds and their hundredths in those of
-   another. Timer returns the BIOS's count of timer ticks.
+   The keyboard, KeyWaiting, KeyRead and KeysHeld, and the time of day,
+   TimeOfDay, are the system's, of sys.h: the time has the hours and the
+   minutes in the two bytes of one word, the seconds and their hundredths
+   in those of another. Timer returns the timer's count of ticks.
 
    GetMous returns the buttons of the mouse that are down and where the
    mouse is, the row in the high byte, or `place` as it was if there is
@@ -115,8 +113,8 @@ struct Key Input0(u16 bar)
     u16 *screen;
 
     bar &= 0xFF;
-    if (Int16(0x100).none == 0) {
-        key = Int16(0).key;
+    if (KeyWaiting().none == 0) {
+        key = KeyRead();
         goto Inpt41;
     }
 Inpt02:
@@ -126,7 +124,7 @@ Inpt02:
     AltTime = Timer();
     for (i = 0; i < CLOCK_CELLS; i++)
         ClkBuf[i] = CLOCK_AT[i];
-    KbdFlgs = Int16(0x200).key & 0xFF;
+    KbdFlgs = KeysHeld();
     AltLock = 0;
 Inpt03:
     ClkFlag = 0;
@@ -137,7 +135,7 @@ Inpt04:
        does not read. */
     BlHigh = 0xFFFF;
     if (md.BlDelay != 0) {
-        moment = DosTime();
+        moment = TimeOfDay();
         BlLow = moment.seconds;
         time = moment.clock;
         minute = (time + md.BlDelay) & 0xFF;
@@ -152,7 +150,7 @@ Inpt10:
     PutKey(bar);
     LeaveTm();
     if (md.BlDelay != 0) {
-        moment = DosTime();
+        moment = TimeOfDay();
         time = moment.clock;
         /* Past midnight an hour of 24 or more is the hour 0. */
         if (time >> 8 == 0 && BlHigh >> 8 >= 24)
@@ -168,7 +166,7 @@ Inpt12:
     }
     if (md.Clock != 0) {                /* Inpt20 */
         screen = CLOCK_AT + 1;
-        moment = DosTime();
+        moment = TimeOfDay();
         time = moment.clock;
         hour = time >> 8;
         if (md.Country.TimeFmt == 0) {
@@ -199,7 +197,7 @@ Inpt12:
     key = KEY_TIMER;                    /* Inpt30 */
     if ((u16)md.AutoTim != 0xFFFF) {
         /* AutoTim has the hours and the minutes in its low word. */
-        moment = DosTime();
+        moment = TimeOfDay();
         time = moment.clock;
         if (time > (u16)md.AutoTim
             || time == (u16)md.AutoTim
@@ -207,14 +205,14 @@ Inpt12:
             goto Inpt40;
     }
     Rnd();                              /* Inpt31 */
-    if (Int16(0x100).none == 0) {
-        key = Int16(0).key;
+    if (KeyWaiting().none == 0) {
+        key = KeyRead();
         goto Inpt40;
     }
     key = KEY_MOUSE | GetMous(0).buttons;  /* Inpt33 */
     if ((key & 0xFF) != 0)
         goto Inpt40;
-    flags = Int16(0x200).key & 0xFF;
+    flags = KeysHeld();
     was = KbdFlgs;
     KbdFlgs = flags;
     if (md.AltBar != 0) {               /* and not under DESQview, in

@@ -6,8 +6,7 @@
  *
  * The mouse driver counts in dots, eight to a cell of the text screen;
  * the program goes by cells, the row in the high byte of a place and the
- * column in the low one. What it asks of the driver goes through Int33
- * and MousAt of dos.c.
+ * column in the low one. What it asks of the mouse is in sys.h.
  */
 #include "vc.h"
 
@@ -23,10 +22,10 @@
    place noted is none. */
 void IniMous(void)
 {
-    u16 answer = Int33(0x21, 0, 0, 0);
+    u16 answer = MouseFind();
 
     if (answer == 0x21)
-        answer = Int33(0, 0, 0, 0);
+        answer = MouseReset();
     md.Mouse = answer == 0xFFFF;
     if (md.Mouse == 0) {
         md.MouseX = 0xFFFF;
@@ -35,9 +34,9 @@ void IniMous(void)
     }
     TypMous(0);
     if (md.Lines != 25)
-        Int33(8, 0, 0, ((u16)md.Lines << 3) - 1);
+        MouseRows(0, ((u16)md.Lines << 3) - 1);
     if ((md.MouseX & md.MouseY) != 0xFFFF)
-        Int33(4, 0, md.MouseX, md.MouseY);
+        MouseTo(md.MouseX, md.MouseY);
     CurMous(1);
 }
 
@@ -48,9 +47,9 @@ void TypMous(u16 pointer)
 {
     pointer &= 0xFF;
     if (pointer == 0)
-        Int33(0x0A, 0, 0xFFFF, 0x7700);
+        MousePointer(0xFFFF, 0x7700);
     else
-        Int33(0x0A, 0, 0xFF00, 0x7700 | pointer);
+        MousePointer(0xFF00, 0x7700 | pointer);
 }
 
 /* Note where the mouse pointer is, for IniMous to put it back. */
@@ -60,7 +59,7 @@ void SavMous(void)
 
     if (md.Mouse == 0)
         return;
-    MousAt((struct MouseAt STACK *)&at);
+    at = MouseWhere();
     md.MouseX = at.x;
     md.MouseY = at.y;
 }
@@ -68,8 +67,12 @@ void SavMous(void)
 /* Show the mouse pointer, or hide it if the low byte of `show` is 0. */
 void CurMous(u16 show)
 {
-    if (md.Mouse != 0)
-        Int33((show & 0xFF) == 0 ? 2 : 1, 0, 0, 0);
+    if (md.Mouse == 0)
+        return;
+    if ((show & 0xFF) == 0)
+        MouseHide();
+    else
+        MouseShow();
 }
 
 /* Where the mouse is and which of its buttons are held: the left one 1,
@@ -83,7 +86,7 @@ struct Mouse GetMous(u16 place)
     u16 buttons = 0;
 
     if (md.Mouse != 0) {
-        MousAt((struct MouseAt STACK *)&at);
+        at = MouseWhere();
         place = (at.y >> 3) << 8 | (at.x >> 3) & 0xFF;
         buttons = at.buttons;
         if (md.LftMous != 0)
@@ -118,7 +121,7 @@ u16 DoublMo(u16 begin, u16 size, u16 cursor)
     if (md.MousEnt != 0)
         return 2;
     md.MousEnt = 1;
-    time = DosTime();
+    time = TimeOfDay();
     hours = time.clock;
     seconds = time.seconds;
     if ((u16)(md.MousTim >> 16) != 0xFFFF && cursor == md.MousPos
